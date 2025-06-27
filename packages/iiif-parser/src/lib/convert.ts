@@ -5,6 +5,7 @@ import {
   Metadata2Schema,
   MetadataItem2Schema,
   Thumbnail2Schema,
+  Rendering2Schema,
   Related2Schema,
   Attribution2Schema
 } from '../schemas/presentation.2.js'
@@ -20,6 +21,7 @@ import type {
   MetadataItem,
   RequiredStatement,
   Thumbnail,
+  Rendering,
   Homepage
 } from './types.js'
 
@@ -41,6 +43,7 @@ type LanguageValue3 = z.infer<typeof LanguageValue3Schema>
 type PossibleLanguageValue2 = z.infer<typeof PossibleLanguageValue2Schema>
 
 type Thumbnail2 = z.infer<typeof Thumbnail2Schema>
+type Rendering2 = z.infer<typeof Rendering2Schema>
 type Related2 = z.infer<typeof Related2Schema>
 type Attribution2 = z.infer<typeof Attribution2Schema>
 
@@ -211,6 +214,17 @@ export function parseVersion2Thumbnail(
       }
     }
   })
+}
+
+export function parseVersion2Rendering(
+  rendering2?: Rendering2
+): Rendering | undefined {
+  return rendering2?.map((rendering) => ({
+    id: rendering['@id'],
+    type: rendering['@type'],
+    label: parseVersion2String(rendering.label),
+    format: rendering.format
+  }))
 }
 
 export function parseVersion2Related(related?: Related2): Homepage | undefined {

@@ -1,12 +1,14 @@
 import { isGeojsonPoint, isGeojsonLineString } from '@allmaps/stdlib'
 
+import { env } from '$env/dynamic/private'
+
 import type { GeojsonLineString, GeojsonFeature, Point } from '@allmaps/types'
 
 import type { GeojsonRoute } from '$lib/shared/types.js'
 
-import type { LayoutLoad } from './$types.js'
+import type { LayoutServerLoad } from './$types.js'
 
-export const load: LayoutLoad = async ({ url, fetch }) => {
+export const load: LayoutServerLoad = async ({ url, fetch }) => {
   let geojsonRoute: GeojsonRoute | undefined
   let from: Point | undefined
   let color: string | undefined
@@ -160,6 +162,7 @@ export const load: LayoutLoad = async ({ url, fetch }) => {
   }
 
   return {
+    geocodeEarthKey: env.GEOCODE_EARTH_KEY,
     geojsonRoute,
     from,
     color,

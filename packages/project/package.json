@@ -36,13 +36,12 @@
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
-    "proj4": "^2.16.0"
+    "proj4": "^2.19.0"
   },
   "devDependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
-    "@types/proj4": "^2.5.6",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",

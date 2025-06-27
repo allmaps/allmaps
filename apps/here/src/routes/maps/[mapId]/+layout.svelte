@@ -6,6 +6,7 @@
   import { pink } from '@allmaps/tailwind'
 
   import { getAllmapsId } from '$lib/shared/ids.js'
+  import { getTitle, getDescription } from '$lib/shared/head.js'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { setCompassState } from '$lib/state/compass.svelte.js'
@@ -16,20 +17,21 @@
   import Header from '$lib/components/Header.svelte'
   import Info from '$lib/components/Info.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
-
   import Here from '$lib/components/Here.svelte'
+  import Controls from '$lib/components/Controls.svelte'
+  import Outside from '$lib/components/Outside.svelte'
 
   import type { Snippet } from 'svelte'
 
   import type { LayoutProps } from './$types.js'
 
-  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  import { env } from '$env/dynamic/public'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
   let timeout = $state(false)
 
-  interface Props {
+  type Props = {
     children?: Snippet
   }
 
@@ -54,6 +56,14 @@
 
   let showHereFrom = $derived(page.route.id === '/maps/[mapId]/postcard')
 
+  let ogImageUrl = $derived(
+    data.from &&
+      data.mapId &&
+      `${env.PUBLIC_PREVIEW_URL}/${getAllmapsId(
+        data.mapId
+      )}.jpg?from=${data.from.join(',')}`
+  )
+
   onMount(() => {
     window.setTimeout(() => {
       timeout = true
@@ -64,23 +74,13 @@
 <svelte:head>
   <title>{title}</title>
   <meta name="title" content={title} />
-  <meta property="og:title" content="Look where I am on this map!" />
-  <meta
-    name="description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
-  <meta
-    property="og:description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
+  <meta property="og:title" content={getTitle()} />
+  <meta name="description" content={getDescription()} />
+  <meta property="og:description" content={getDescription()} />
 
   {#if data.mapId && data.from}
-    <meta
-      property="og:image"
-      content="{PUBLIC_PREVIEW_URL}/{getAllmapsId(
-        data.mapId
-      )}.jpg?from={data.from.join(',')}"
-    />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:secure_url" content={ogImageUrl} />
     <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
     <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
   {/if}
@@ -102,7 +102,16 @@
         {/if}
       </Header>
     </div>
-    {@render children?.()}
+
+    <div class="w-full h-full flex flex-col justify-end items-center">
+      <Outside />
+
+      <div class="absolute z-50 bottom-0 w-full p-2 pointer-events-none">
+        <Controls mapId={data.mapId}>
+          {@render children?.()}
+        </Controls>
+      </div>
+    </div>
   </div>
   <DotsPattern color={pink} opacity={0.5}>
     {#if positionOrTimeout}

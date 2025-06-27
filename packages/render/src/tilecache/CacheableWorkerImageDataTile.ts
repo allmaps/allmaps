@@ -4,13 +4,25 @@ import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import type { FetchFn } from '@allmaps/types'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
+
+import type { FetchFn } from '@allmaps/types'
 
 /**
  * Class for tiles that can be cached, and whose data can be processed to its imageData using a WebWorker.
  */
 export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
+  #worker: Comlink.Remote<FetchAndGetImageDataWorkerType>
+
+  constructor(
+    fetchableTile: FetchableTile,
+    worker: Comlink.Remote<FetchAndGetImageDataWorkerType>,
+    fetchFn?: FetchFn
+  ) {
+    super(fetchableTile, fetchFn)
+    this.#worker = worker
+  }
+
   /**
    * Fetch the tile and create its ImageData using a WebWorker.
    *
@@ -18,16 +30,7 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
    */
   async fetch() {
     try {
-      // TODO: move fetch to WebWorker too?
-
-      // Note: Could this become obsolete in the future
-      // once we can pull bytes directly from Blob?
-      // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
-      const worker = new Worker(
-        new URL('../workers/fetch-and-get-image-data.ts', import.meta.url)
-      )
-      const wrappedWorker = Comlink.wrap<FetchAndGetImageDataWorkerType>(worker)
-      wrappedWorker
+      this.#worker
         .getImageData(
           this.tileUrl,
           Comlink.proxy(() => this.abortController.abort()),
@@ -40,7 +43,6 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
           this.dispatchEvent(
             new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
           )
-          worker.terminate()
         })
         .catch((err) => {
           if (err instanceof Error && err.name === 'AbortError') {
@@ -48,7 +50,6 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
           } else {
             console.error(err) // Handle other errors
           }
-          worker.terminate()
         })
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -64,9 +65,9 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
     return this.data
   }
 
-  static createFactory() {
+  static createFactory(worker: Comlink.Remote<FetchAndGetImageDataWorkerType>) {
     return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
-      new CacheableWorkerImageDataTile(fetchableTile, fetchFn)
+      new CacheableWorkerImageDataTile(fetchableTile, worker, fetchFn)
   }
 }
 

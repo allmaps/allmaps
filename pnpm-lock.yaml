@@ -1495,8 +1495,8 @@ importers:
         specifier: workspace:^
         version: link:../transform
       proj4:
-        specifier: ^2.16.0
-        version: 2.17.0
+        specifier: ^2.19.0
+        version: 2.19.3(geotiff@2.1.3)
     devDependencies:
       '@allmaps/annotation':
         specifier: workspace:^
@@ -1507,9 +1507,6 @@ importers:
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.12
-      '@types/proj4':
-        specifier: ^2.5.6
-        version: 2.5.6
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.0.0
         version: 7.18.0(@typescript-eslint/parser@7.18.0)(eslint@8.57.1)(typescript@5.8.3)
@@ -6397,10 +6394,6 @@ packages:
     resolution: {integrity: sha512-j3pOPiEcWZ34R6a6mN07mUkM4o4Lwf6hPNt8eilOeZhTFbxFXmKhvXl9Y28jotFPaI1bpPDJsbCprUoNke6OrA==}
     dev: false
 
-  /@types/proj4@2.5.6:
-    resolution: {integrity: sha512-zfMrPy9fx+8DchqM0kIUGeu2tTVB5ApO1KGAYcSGFS8GoqRIkyL41xq2yCx/iV3sOLzo7v4hEgViSLTiPI1L0w==}
-    dev: true
-
   /@types/prop-types@15.7.14:
     resolution: {integrity: sha512-gNMvNH49DJ7OJYv+KAKn0Xp45p8PLl6zo2YnvDIbTd4J6MER2BmWN49TG7n9LvkyihINxeKW8+3bfS2yDC9dzQ==}
     dev: true
@@ -9292,10 +9285,6 @@ packages:
   /gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
-
-  /geographiclib-geodesic@2.1.1:
-    resolution: {integrity: sha512-lkd8EUkPSByobWu9BPMHTdYA5AUZxOa8McmUNtBE9KrvUJEvSADnN6gTDmhXbi6NzdA16LtWLpSxLE/lIIRhyA==}
-    dev: false
 
   /geojson-vt@4.0.2:
     resolution: {integrity: sha512-AV9ROqlNqoZEIJGfm1ncNjEXfkz2hdFlZf0qkVfmkwdKa8vj7H16YUOT81rJw1rdFhyEDlN2Tds91p/glzbl5A==}
@@ -13438,10 +13427,12 @@ packages:
     engines: {node: ^18.17.0 || >=20.5.0}
     dev: true
 
-  /proj4@2.17.0:
-    resolution: {integrity: sha512-BqVoruVAOUgkw5U9Ns76+E2nHZG0Y42tbkC+0BpyqjhwPIai29hoivyQoyelEKFSfaV3zkR3NqPRD0EwPM4Wug==}
+  /proj4@2.19.3(geotiff@2.1.3):
+    resolution: {integrity: sha512-sXMnThBbpAzYqYLtKDOzmLGvvfFAv+VIJKKDOUied/xWVeVPKi0pwDFUHnLD4OysbIR1lF4aYO5J4LhJxgKMGw==}
+    peerDependencies:
+      geotiff: '*'
     dependencies:
-      geographiclib-geodesic: 2.1.1
+      geotiff: 2.1.3
       mgrs: 1.0.0
       wkt-parser: 1.5.2
     dev: false

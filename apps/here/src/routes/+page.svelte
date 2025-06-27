@@ -6,6 +6,8 @@
 
   import { Loading, Collection } from '@allmaps/ui'
 
+  import { getTitle, getDescription } from '$lib/shared/head.js'
+
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getErrorState } from '$lib/state/error.svelte.js'
@@ -18,6 +20,8 @@
   import Route from '$lib/components/Route.svelte'
 
   import type { PageProps } from './$types.js'
+
+  import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
   let { data }: PageProps = $props()
 
@@ -32,6 +36,12 @@
       !waitingForPositionTimeout
   )
 
+  let waitingForFetch = $derived(
+    mapsState.fetchCount === 0 && !waitingForPositionTimeout
+  )
+
+  let ogImageUrl = $derived(`${page.url.href}allmaps-here.jpg`)
+
   onMount(() => {
     window.setTimeout(() => {
       waitingForPositionTimeout = true
@@ -42,15 +52,14 @@
 <svelte:head>
   <title>Allmaps Here</title>
   <meta name="title" content="Allmaps Here" />
-  <meta property="og:title" content="Look where I am on this map!" />
-  <meta
-    name="description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
-  <meta
-    property="og:description"
-    content="Visit Allmaps Here and find out where you are on digitized maps from your area."
-  />
+  <meta property="og:title" content={getTitle()} />
+  <meta name="description" content={getDescription()} />
+  <meta property="og:description" content={getDescription()} />
+
+  <meta property="og:image" content={ogImageUrl} />
+  <meta name="og:image:secure_url" content={ogImageUrl} />
+  <meta property="og:image:width" content={String(OG_IMAGE_SIZE.width)} />
+  <meta property="og:image:height" content={String(OG_IMAGE_SIZE.height)} />
 
   <meta property="og:url" content={page.url.href} />
   <meta property="og:site_name" content="Allmaps Here" />
@@ -73,10 +82,16 @@
   <section
     class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-center my-2 sm:my-6"
   >
-    <div class="max-w-md w-full flex flex-col gap-6 items-center">
-      <Title name="Here" />
-      <p class="text-black text-center max-w-xs">
-        Find historic maps around your current GPS location.
+    <div class="max-w-md w-full flex flex-col gap-2 items-center text-center">
+      <div class="mb-4">
+        <Title name="Here" />
+      </div>
+      <h2 class="text-lg font-bold">
+        Find historic maps around your current location
+      </h2>
+      <p class="text-black max-w-md">
+        Drop a pin on any map and send a digital postcard to share your location
+        with a friend!
       </p>
     </div>
   </section>
@@ -84,17 +99,17 @@
 
 <section class="bg-blue-200 shrink-0 grow">
   <DotsPattern color={blue}>
-    {#if waitingForPosition || mapsState.fetchCount === 0}
+    {#if waitingForPosition || waitingForFetch}
       <div class="h-full flex items-center justify-center">
         <div class="bg-white p-2 rounded-xl drop-shadow-sm">
           <Loading />
         </div>
       </div>
     {:else if mapsState.maps.size > 0}
-      <div>
+      <div class="h-full flex flex-col">
         <section
-          class="px-3 py-6 flex flex-col gap-6
-         overflow-hidden max-w-4xl w-full m-auto"
+          class="h-full px-3 py-6 flex flex-col gap-6 justify-between
+            overflow-hidden max-w-4xl w-full m-auto"
         >
           <Collection>
             {#each mapsState.mapsFromCoordinates as [mapId, map] (mapId)}
@@ -102,22 +117,31 @@
             {/each}
           </Collection>
 
-          <div class="place-self-center">
-            <Route geojsonRoute={data.geojsonRoute} />
-          </div>
+          {#if mapsState.mapsWithImageInfo.length}
+            <div class="place-self-center">
+              <Route geojsonRoute={data.geojsonRoute} />
+            </div>
+          {/if}
         </section>
-        <Footer />
+        {#if mapsState.mapsWithImageInfo.length}
+          <Footer />
+        {/if}
       </div>
     {:else if errorState.geolocationPositionError}
-      <div class="h-full flex items-center justify-center">
+      <div class="h-full flex items-center justify-center p-2">
         <GeolocationError />
       </div>
     {:else}
-      <div class="h-full flex items-center justify-center">
+      <div class="h-full flex items-center justify-center p-2">
         <div
-          class="bg-white px-3 py-2 rounded-xl drop-shadow-sm max-w-xs text-center"
+          class="bg-white px-3 py-2 rounded-xl drop-shadow-sm max-w-xs text-center space-y-2"
         >
-          No maps found around your location
+          <p>No maps found around your location.</p>
+          <p class="text-gray-700 italic">
+            You can use <a class="underline" href="https://editor.allmaps.org/"
+              >Allmaps Editor</a
+            > to georeference maps and add them to Allmaps.
+          </p>
         </div>
       </div>
     {/if}

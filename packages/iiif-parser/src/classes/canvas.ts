@@ -15,7 +15,8 @@ import type {
   RequiredStatement,
   Summary,
   Annotations,
-  Homepage
+  Homepage,
+  Rendering
 } from '../lib/types.js'
 import {
   parseVersion2String,
@@ -24,6 +25,7 @@ import {
   parseVersion3Metadata,
   parseVersion2Attribution,
   parseVersion2Thumbnail,
+  parseVersion2Rendering,
   parseVersion2Related
 } from '../lib/convert.js'
 
@@ -62,6 +64,7 @@ export class Canvas {
   navPlace?: NavPlace
   homepage?: Homepage
   thumbnail?: Thumbnail
+  rendering?: Rendering
   seeAlso?: SeeAlso
   summary?: Summary
   requiredStatement?: RequiredStatement
@@ -88,6 +91,7 @@ export class Canvas {
         parsedCanvas.attribution
       )
       this.thumbnail = parseVersion2Thumbnail(parsedCanvas.thumbnail)
+      this.rendering = parseVersion2Rendering(parsedCanvas.rendering)
       this.homepage = parseVersion2Related(parsedCanvas.related)
 
       this.image = new EmbeddedImage(
@@ -107,6 +111,7 @@ export class Canvas {
       this.navPlace = parsedCanvas.navPlace
       this.homepage = parsedCanvas.homepage
       this.thumbnail = parsedCanvas.thumbnail
+      this.rendering = parsedCanvas.rendering
       this.seeAlso = parsedCanvas.seeAlso
       this.summary = parsedCanvas.summary
       this.requiredStatement = parsedCanvas.requiredStatement

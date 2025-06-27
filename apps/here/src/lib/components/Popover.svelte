@@ -1,5 +1,6 @@
 <script lang="ts">
   import { beforeNavigate } from '$app/navigation'
+  import { scale } from 'svelte/transition'
 
   import { Popover } from 'bits-ui'
 
@@ -17,18 +18,29 @@
 </script>
 
 <Popover.Root bind:open>
-  <Popover.Trigger class="min-w-0">
+  <Popover.Trigger class="min-w-0 rounded-full">
     {@render button()}
   </Popover.Trigger>
   <Popover.Portal>
     <Popover.Content
-      sideOffset={8}
-      class="outline-0 max-w-screen w-2xl px-2 sm:px-4 md:px-8 lg:px-16
-        starting:opacity-0 opacity-100 transition-opacity duration-75 z-50"
+      forceMount
+      sideOffset={12}
+      class="z-50 outline-0 max-w-screen w-2xl px-3 drop-shadow-md"
     >
-      <div>
-        {@render contents()}
-      </div>
+      {#snippet child({ wrapperProps, props, open })}
+        {#if open}
+          <div {...wrapperProps}>
+            <div transition:scale={{ start: 0.95, duration: 75 }}>
+              <Popover.Arrow width={16} height={10} class="text-white -z-10" />
+              <div {...props}>
+                <div class="bg-white rounded-md">
+                  {@render contents()}
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
+      {/snippet}
     </Popover.Content>
   </Popover.Portal>
 </Popover.Root>

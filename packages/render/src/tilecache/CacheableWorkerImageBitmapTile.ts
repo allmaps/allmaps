@@ -11,6 +11,13 @@ import type { FetchAndGetImageBitmapWorkerType } from '../workers/fetch-and-get-
  * Class for tiles that can be cached, and whose data can be processed to its imageBitmap using a WebWorker.
  */
 export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
+  #worker: Worker
+
+  constructor(fetchableTile: FetchableTile, worker: Worker, fetchFn?: FetchFn) {
+    super(fetchableTile, fetchFn)
+    this.#worker = worker
+  }
+
   /**
    * Fetch the tile and create its ImageBitmap using a WebWorker.
    *
@@ -20,14 +27,9 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
     try {
       // TODO: move fetch to WebWorker too?
 
-      // Note: Could this become obsolete in the future
-      // once we can pull bytes directly from Blob?
-      // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
-      const worker = new Worker(
-        new URL('../workers/fetch-and-get-image-bitmap.ts', import.meta.url)
+      const wrappedWorker = Comlink.wrap<FetchAndGetImageBitmapWorkerType>(
+        this.#worker
       )
-      const wrappedWorker =
-        Comlink.wrap<FetchAndGetImageBitmapWorkerType>(worker)
       wrappedWorker
         .getImageBitmap(
           this.tileUrl,
@@ -41,7 +43,6 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
           this.dispatchEvent(
             new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
           )
-          worker.terminate()
         })
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -57,9 +58,14 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
     return this.data
   }
 
-  static createFactory() {
+  // When calling createFactory, create the worker like this:
+  //  const worker = new Worker(
+  //    new URL('../workers/fetch-and-get-image-bitmap.ts', import.meta.url)
+  //  )
+
+  static createFactory(worker: Worker) {
     return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
-      new CacheableWorkerImageBitmapTile(fetchableTile, fetchFn)
+      new CacheableWorkerImageBitmapTile(fetchableTile, worker, fetchFn)
   }
 }
 

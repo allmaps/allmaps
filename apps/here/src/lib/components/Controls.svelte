@@ -5,9 +5,9 @@
   import { goto } from '$app/navigation'
 
   import {
-    CaretLeft as CaretLeftIcon,
-    CaretRight as CaretRightIcon,
-    SquaresFour as SquaresFourIcon
+    ArrowLeft as ArrowLeftIcon,
+    ArrowRight as ArrowRightIcon,
+    GpsFix as GpsFixIcon
   } from 'phosphor-svelte'
 
   import { NorthArrow } from '@allmaps/ui'
@@ -58,7 +58,7 @@
   })
 </script>
 
-<div class="w-full grid grid-cols-[1fr_max-content_1fr] items-center gap-2">
+<div class="w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2">
   {#if hasMaps && previousMapId && nextMapId}
     <div
       bind:clientWidth={uiState.elementSizes.bottom.left[0]}
@@ -72,20 +72,20 @@
       focus:z-10 focus:ring-2 focus:ring-pink-500 max-w-48 pointer-events-auto shadow
       flex flex-row items-center gap-1"
       >
-        <SquaresFourIcon size="20" weight="bold" />
-        <span class="hidden sm:inline">More maps</span></a
+        <GpsFixIcon size="20" weight="bold" />
+        <span>Maps</span></a
       >
       <a
         href={createRouteUrl(page, getAllmapsId(previousMapId))}
         role="button"
         class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 focus:z-10 focus:ring-2 focus:ring-pink-500"
-        ><CaretLeftIcon size="16" weight="bold" /></a
+        ><ArrowLeftIcon size="16" weight="bold" /></a
       >
       <a
         href={createRouteUrl(page, getAllmapsId(nextMapId))}
         role="button"
         class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg focus:z-10 focus:ring-2 focus:ring-pink-500"
-        ><CaretRightIcon size="16" weight="bold" /></a
+        ><ArrowRightIcon size="16" weight="bold" /></a
       >
     </div>
   {:else}
@@ -98,8 +98,8 @@
       focus:z-10 focus:ring-2 focus:ring-pink-500 max-w-48 pointer-events-auto shadow
       flex flex-row items-center gap-1"
     >
-      <SquaresFourIcon size="20" weight="bold" />
-      <span class="hidden sm:inline">More maps</span></a
+      <GpsFixIcon size="20" weight="bold" />
+      <span>Maps</span></a
     >
   {/if}
 

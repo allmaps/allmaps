@@ -425,6 +425,19 @@ Date
 object
 ```
 
+### `Canvas#rendering?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+}>
+```
+
 ### `Canvas#requiredStatement?`
 
 ###### Type
@@ -609,6 +622,19 @@ Date
 
 ```ts
 object
+```
+
+### `Collection#rendering?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+}>
 ```
 
 ### `Collection#requiredStatement?`
@@ -1159,6 +1185,19 @@ Date
 
 ```ts
 object
+```
+
+### `Manifest#rendering?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+}>
 ```
 
 ### `Manifest#requiredStatement?`

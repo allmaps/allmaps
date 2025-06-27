@@ -56,6 +56,13 @@ export type Homepage = {
   language?: string | string[]
 }[]
 
+export type Rendering = {
+  id: string
+  type?: string
+  label?: LanguageString
+  format?: string
+}[]
+
 export type Thumbnail = {
   id: string
   type?: string

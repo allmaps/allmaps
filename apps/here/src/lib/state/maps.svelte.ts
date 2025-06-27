@@ -4,7 +4,7 @@ import { SvelteMap } from 'svelte/reactivity'
 import { fetchJson } from '@allmaps/stdlib'
 import { parseAnnotation } from '@allmaps/annotation'
 
-import { PUBLIC_ANNOTATIONS_URL } from '$env/static/public'
+import { env } from '$env/dynamic/public'
 
 import { computePositionDistance } from '$lib/shared/position.js'
 
@@ -18,6 +18,8 @@ import type { MapWithImageInfo } from '$lib/shared/types.ts'
 
 const THRESHOLD_TIMESTAMP = 5000 // 5 seconds in milliseconds
 const THRESHOLD_DISTANCE = 10 // 10 meters
+
+const MAX_AREA = 500_000_000_000
 
 const NEARBY_MAPS_COUNT = 40
 
@@ -115,10 +117,10 @@ export class MapsState {
       coords: { latitude, longitude }
     } = position
 
-    const url = `${PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
+    const url = `${env.PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
       latitude,
       longitude
-    ].join(',')}`
+    ].join(',')}&maxarea=${MAX_AREA}`
 
     const annotations = await fetchJson(url)
     const maps = parseAnnotation(annotations)

@@ -4,7 +4,7 @@ import {
   findManifests,
   labelFromPartOfItem
 } from '$lib/shared/iiif.js'
-import { organizationNameFromImageServiceDomain } from '$lib/shared/organizations.js'
+import { organizationNameFromImageServiceUrl } from '$lib/shared/organizations.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -76,8 +76,9 @@ export function getMapLabels(map: GeoreferencedMap): string[] {
     labels = [firstManifestLabel.label]
   } else if (map?.resource.id) {
     const imageServiceDomain = new URL(map.resource.id).host
-    const organizationName =
-      organizationNameFromImageServiceDomain(imageServiceDomain)
+    const organizationName = organizationNameFromImageServiceUrl(
+      map.resource.id
+    )
     if (organizationName) {
       labels = [`Map from ${organizationName}`]
     } else {
@@ -88,15 +89,29 @@ export function getMapLabels(map: GeoreferencedMap): string[] {
   return labels
 }
 
+function isValidLabel(label: string): boolean {
+  const trimmedLabel = label.trim()
+
+  if (!trimmedLabel) {
+    return false
+  } else if (label.trim() === '-') {
+    return false
+  }
+
+  return true
+}
+
 export function formatLabels(labels: string[], maxLength = 64): string {
-  return labels
-    .map((label) =>
-      truncate(label, {
-        maxLength: maxLength / labels.length,
-        toNearestSpace: true
-      })
-    )
-    .join(' / ')
+  const truncatedLabels = labels.filter(isValidLabel).map((label) =>
+    truncate(label.trim(), {
+      maxLength: maxLength / labels.length,
+      toNearestSpace: true
+    })
+  )
+
+  const uniqLabels = [...new Set(truncatedLabels)]
+
+  return uniqLabels.join(' / ')
 }
 
 function formatTimeAgo(dateStr?: string) {

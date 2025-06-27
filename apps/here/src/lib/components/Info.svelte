@@ -2,13 +2,15 @@
   import {
     ArrowSquareOut as ArrowSquareOutIcon,
     Calendar as CalendarIcon,
-    Link as LinkIcon
+    Link as LinkIcon,
+    Info as InfoIcon
   } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getIiifState } from '$lib/state/iiif.svelte.js'
 
   import Popover from '$lib/components/Popover.svelte'
+  import CopyButton from '$lib/components/CopyButton.svelte'
 
   import {
     getMapLabels,
@@ -26,28 +28,16 @@
   }
 
   let { map }: Props = $props()
-  // let { map: propMap }: Props = $props()
 
   const uiState = getUiState()
   const iiifState = getIiifState()
 
   let open = $state(false)
 
-  // Somehow, directly using map sometimes results in a map is undefined error
-  // This happens when switching between layouts
-  // This solves it. Maybe a bug in Svelte? Or I'm doing something wrong?
-  // let map = $state.raw<GeoreferencedMap>()
-  // $effect.pre(() => {
-  //   if (propMap) {
-  //     map = propMap
-  //   }
-  // })
-
   // TODO: get labels and title from layout data!
   let labels = $derived(map ? getMapLabels(map) : [])
   let title = $derived(formatLabels(labels))
 
-  // Trigger fetching of manifests when manifestIds change
   $effect(() => {
     if (open) {
       iiifState.manifestIds.forEach((id) => {
@@ -78,6 +68,9 @@
       )
   )
 
+  // TODO: use https://github.com/nfrasser/linkifyjs
+  // to parse links in manifest labels and descriptions
+
   // Format navigation date helper
   function formatNavDate(navDate?: Date): string {
     if (!navDate) return ''
@@ -95,17 +88,18 @@
       <div
         bind:clientWidth={uiState.elementSizes.top.center[0]}
         bind:clientHeight={uiState.elementSizes.top.center[1]}
-        class="max-w-lg min-w-0 truncate shadow hover:shadow-lg transition-shadow duration-100 bg-white rounded-md px-3 py-2 cursor-pointer text-xs"
+        class="max-w-xl min-w-0 truncate shadow hover:shadow-lg transition-shadow duration-100
+          bg-white rounded-full px-2 py-1.5 cursor-pointer text-sm text-green font-medium leading-tight
+            flex gap-2 items-center"
       >
-        {title}
+        <span class="pl-1 overflow-hidden text-ellipsis">{title}</span>
+        <InfoIcon class="size-6 shrink-0" weight="bold" />
       </div>
     {/snippet}
     {#snippet contents()}
       {#if map}
         <!-- TODO: move contents to grid cell in layout so max-h is no longer needed -->
-        <div
-          class="bg-white rounded-lg shadow-lg max-w-2xl max-h-[calc(100vh-120px)] overflow-auto"
-        >
+        <div class=" max-h-[calc(100vh-200px)] overflow-auto">
           <!-- Loading indicator for manifests -->
           {#if hasLoadingManifests}
             <div class="p-4 border-b border-gray-200 flex items-center gap-2">
@@ -160,7 +154,7 @@
                         {#each manifest.homepage as homepage}
                           <a
                             href={homepage.id}
-                            class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 underline"
+                            class="inline-flex items-center gap-2 text-sm text-pink hover:text-pink-600 transition-colors underline break-all"
                           >
                             <LinkIcon size="14" />
                             {homepage.label
@@ -214,7 +208,7 @@
 
                   <!-- Metadata -->
                   {#if manifest.metadata && manifest.metadata.length > 0}
-                    <div class="flex flex-col gap-2">
+                    <div class="flex flex-col gap-4">
                       <h5 class="text-sm font-medium text-gray-700">
                         Metadata
                       </h5>
@@ -247,14 +241,35 @@
                         {#each manifest.seeAlso as seeAlso}
                           <a
                             href={seeAlso.id}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 underline"
+                            class="inline-flex items-center gap-2 text-sm text-pink hover:text-pink-600 transition-colors underline"
                           >
                             <LinkIcon size="14" />
                             {seeAlso.format
                               ? `${seeAlso.format} resource`
                               : 'External resource'}
+                            <ArrowSquareOutIcon size="12" />
+                          </a>
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
+
+                  <!-- Rendering links -->
+                  {#if manifest.rendering && manifest.rendering.length > 0}
+                    <div class="mb-3">
+                      <h5 class="text-sm font-medium text-gray-700 mb-2">
+                        Other versions
+                      </h5>
+                      <div class="inline-flex flex-wrap gap-2">
+                        {#each manifest.rendering as rendering}
+                          <a
+                            href={rendering.id}
+                            class="inline-flex items-center gap-2 text-sm text-pink hover:text-pink-600 transition-colors underline"
+                          >
+                            <LinkIcon size="14" />
+                            {rendering.label
+                              ? parseLanguageString(rendering.label, 'en')
+                              : `${rendering.format} resource`}
                             <ArrowSquareOutIcon size="12" />
                           </a>
                         {/each}
@@ -332,15 +347,34 @@
               >
             </div>
             <div class="text-sm text-gray-600 flex items-center gap-2">
-              <input
+              <!-- <input
                 class="w-full mt-1 p-2 text-xs bg-gray-50 border border-gray-200 rounded text-gray-700 font-mono"
+                tabindex="-1"
                 readonly
+                inert
                 value={map.id}
+              /> -->
+              <div
+                class="w-full mt-1 p-2 text-xs bg-gray-50 border border-gray-200 rounded text-gray-700
+                overflow-hidden text-ellipsis font-mono"
+              >
+                {map.id || ''}
+              </div>
+              <CopyButton
+                text={map.id || ''}
+                class="disabled:cursor-not-allowed disabled:text-gray
+              active:translate-[1px] hover:translate-[0.5px]
+              hover:bg-gray/20 select-none
+              text-sm
+              cursor-pointer transition-all px-4 py-2 rounded-lg
+              flex flex-row gap-2 items-center"
               />
             </div>
             <p class="text-xs text-gray-600 leading-relaxed text-center">
               Copy the URL of the Georeference Annotation to use it in other
-              parts of Allmaps.
+              parts of <a href="https://allmaps.org" class="underline"
+                >Allmaps</a
+              >.
             </p>
           </div>
         </div>

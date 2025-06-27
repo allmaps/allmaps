@@ -9,7 +9,7 @@
 
   import type { Snippet } from 'svelte'
 
-  interface Props {
+  type Props = {
     children?: Snippet
     appName: string
   }
