@@ -9,7 +9,7 @@
 </script>
 
 <div class="flex flex-col justify-center items-center gap-4">
-  <div class="size-20">
+  <div class="size-12 sm:size-20">
     <Logo />
   </div>
 

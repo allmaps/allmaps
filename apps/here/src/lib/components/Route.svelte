@@ -56,14 +56,14 @@
 </script>
 
 <div
-  class="flex flex-col items-center rounded-lg w-fit
+  class="flex flex-col items-center rounded-lg w-fit text-blue-800
     bg-linear-to-tr from-blue-300 to-blue-500 p-4 shadow hover:shadow-md transition-shadow"
 >
   <button
     onclick={() => (open = !open)}
     class="cursor-pointer flex flex-row items-center justify-center gap-2"
   >
-    <p class="text-center text-gray-800">
+    <p class="text-center">
       Load a GeoJSON file to display a route on these historic maps
     </p>
     <CaretCircleDownIcon
@@ -111,11 +111,12 @@
 
         <button
           disabled={!loadButtonEnabled}
-          class="cursor-pointer shrink-0 bg-blue-200 px-2 py-1 rounded"
+          class="cursor-pointer shrink-0 bg-blue-200 hover:bg-blue-100 px-2 py-1 rounded
+            shadow-none hover:shadow-md transition-all"
           onclick={handleLoadGeojson}>Load GeoJSON</button
         >
       </div>
-      <p class="text-xs text-center text-gray-800 px-8">
+      <p class="text-xs text-center px-8">
         The GeoJSON file must be a FeatureCollection <br />with Point and
         LineString Features, or a single LineString Feature.
       </p>

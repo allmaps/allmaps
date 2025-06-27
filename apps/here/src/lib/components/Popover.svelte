@@ -25,19 +25,15 @@
     <Popover.Content
       forceMount
       sideOffset={12}
-      class="z-50 outline-0 max-w-screen w-2xl px-3"
+      class="z-50 outline-0 max-w-screen w-2xl px-3 drop-shadow-md"
     >
       {#snippet child({ wrapperProps, props, open })}
         {#if open}
           <div {...wrapperProps}>
             <div transition:scale={{ start: 0.95, duration: 75 }}>
-              <Popover.Arrow
-                width={16}
-                height={10}
-                class="text-white drop-shadow-md"
-              />
+              <Popover.Arrow width={16} height={10} class="text-white -z-10" />
               <div {...props}>
-                <div class="bg-white shadow-lg rounded-md">
+                <div class="bg-white rounded-md">
                   {@render contents()}
                 </div>
               </div>

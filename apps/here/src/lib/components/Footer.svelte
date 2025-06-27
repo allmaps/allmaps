@@ -2,7 +2,6 @@
   import { Logo } from '@allmaps/ui'
 </script>
 
-<!-- TODO: move to @allmaps/ui -->
 <footer
   class="w-full px-4 py-16 lg:py-24 flex flex-col gap-4 justify-center items-center
   text-white text-center"

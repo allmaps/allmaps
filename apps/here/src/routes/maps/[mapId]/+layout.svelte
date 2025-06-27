@@ -17,8 +17,9 @@
   import Header from '$lib/components/Header.svelte'
   import Info from '$lib/components/Info.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
-
   import Here from '$lib/components/Here.svelte'
+  import Controls from '$lib/components/Controls.svelte'
+  import Outside from '$lib/components/Outside.svelte'
 
   import type { Snippet } from 'svelte'
 
@@ -101,7 +102,16 @@
         {/if}
       </Header>
     </div>
-    {@render children?.()}
+
+    <div class="w-full h-full flex flex-col justify-end items-center">
+      <Outside />
+
+      <div class="absolute z-50 bottom-0 w-full p-2 pointer-events-none">
+        <Controls mapId={data.mapId}>
+          {@render children?.()}
+        </Controls>
+      </div>
+    </div>
   </div>
   <DotsPattern color={pink} opacity={0.5}>
     {#if positionOrTimeout}
