@@ -29,7 +29,6 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
    * @returns
    */
   async fetch() {
-    console.log(`Fetching tile ${this.tileUrl} using worker`)
     try {
       this.#worker
         .getImageData(
