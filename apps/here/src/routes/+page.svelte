@@ -123,7 +123,9 @@
             </div>
           {/if}
         </section>
-        <Footer />
+        {#if mapsState.mapsWithImageInfo.length}
+          <Footer />
+        {/if}
       </div>
     {:else if errorState.geolocationPositionError}
       <div class="h-full flex items-center justify-center p-2">

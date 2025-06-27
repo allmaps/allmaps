@@ -8,7 +8,7 @@
   type Props = {
     text: string
     link?: boolean
-    label: string
+    label?: string
     class?: string
     disabled?: boolean
   }
