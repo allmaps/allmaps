@@ -1,5 +1,5 @@
 import { throttle } from 'lodash-es'
-import * as Comlink from 'comlink'
+import { wrap as comlinkWtap } from 'comlink'
 
 import {
   hexToFractionalRgb,
@@ -176,7 +176,7 @@ export class WebGL2Renderer
       new URL('../workers/fetch-and-get-image-data.ts', import.meta.url)
     )
 
-    const wrappedWorker = Comlink.wrap<FetchAndGetImageDataWorkerType>(worker)
+    const wrappedWorker = comlinkWtap<FetchAndGetImageDataWorkerType>(worker)
 
     super(
       CacheableWorkerImageDataTile.createFactory(wrappedWorker),

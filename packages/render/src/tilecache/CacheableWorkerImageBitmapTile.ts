@@ -1,4 +1,4 @@
-import * as Comlink from 'comlink'
+import { proxy as comlinkProxy, wrap as comlinkWrap } from 'comlink'
 
 import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile } from './CacheableTile.js'
@@ -27,13 +27,13 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
     try {
       // TODO: move fetch to WebWorker too?
 
-      const wrappedWorker = Comlink.wrap<FetchAndGetImageBitmapWorkerType>(
+      const wrappedWorker = comlinkWrap<FetchAndGetImageBitmapWorkerType>(
         this.#worker
       )
       wrappedWorker
         .getImageBitmap(
           this.tileUrl,
-          Comlink.proxy(this.abortController.signal),
+          comlinkProxy(this.abortController.signal),
           this.fetchFn,
           this.tile.tileZoomLevel.width,
           this.tile.tileZoomLevel.height
