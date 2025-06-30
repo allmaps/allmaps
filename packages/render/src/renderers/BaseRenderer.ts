@@ -352,9 +352,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // this could lead to inaccurate tile loading (in addition to the reason explained below).
     const projectedTransformer =
       warpedMap.transformationType === 'thinPlateSpline' &&
-      warpedMap.gcps.length < MAX_GCPS_EXACT_TPS_TO_RESOURCE
-        ? warpedMap.projectedTransformer
-        : warpedMap.getProjectedTransformer('polynomial')
+      warpedMap.gcps.length > MAX_GCPS_EXACT_TPS_TO_RESOURCE
+        ? warpedMap.getProjectedTransformer('polynomial')
+        : warpedMap.projectedTransformer
     // Compute viewport in resource
     // Note: since the backward transformation is not the exact inverse of the forward
     // there is an inherent imperfection in this computation
