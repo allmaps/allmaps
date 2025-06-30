@@ -7,7 +7,8 @@
     "target": "ES2022",
     "lib": ["ES2022"],
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["@cloudflare/workers-types"]
   },
   "references": [
     { "path": "../../packages/render" },
