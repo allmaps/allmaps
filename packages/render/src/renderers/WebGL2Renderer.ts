@@ -1228,7 +1228,8 @@ export class WebGL2Renderer
     )
   }
 
-  private startTransformaterTransition(mapIds: string[]) {
+  private startTransformerTransition(mapIds: string[]) {
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TRANSITIONSTARTED))
     this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {
@@ -1262,11 +1263,11 @@ export class WebGL2Renderer
       )
     } else {
       // Animation ended
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
   }
 
-  private finishTransition(mapIds: string[]) {
+  private finishTransformerTransition(mapIds: string[]) {
     this.resetPrevious(mapIds)
     this.updateVertexBuffers(mapIds)
 
@@ -1275,6 +1276,9 @@ export class WebGL2Renderer
     this.transformaterTransitionStart = undefined
 
     this.changed()
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.TRANSITIONFINISHED)
+    )
   }
 
   private changed() {
@@ -1355,7 +1359,7 @@ export class WebGL2Renderer
   protected optionsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }
@@ -1363,7 +1367,7 @@ export class WebGL2Renderer
   protected gcpsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }
@@ -1371,7 +1375,7 @@ export class WebGL2Renderer
   protected resourceMaskChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }
@@ -1379,28 +1383,28 @@ export class WebGL2Renderer
   protected transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformaterTransition(mapIds)
+      this.startTransformerTransition(mapIds)
     }
   }
 
   protected distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformaterTransition(mapIds)
+      this.startTransformerTransition(mapIds)
     }
   }
 
   protected internalProjectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformaterTransition(mapIds)
+      this.startTransformerTransition(mapIds)
     }
   }
 
   protected projectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }

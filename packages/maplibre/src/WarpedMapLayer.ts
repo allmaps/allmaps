@@ -51,6 +51,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
   renderer?: WebGL2Renderer
   options?: Partial<MapLibreWarpedMapLayerOptions>
 
+  shouldRepaintAfterRender: boolean
+
   /**
    * Creates a WarpedMapLayer instance
    *
@@ -62,6 +64,8 @@ export class WarpedMapLayer implements CustomLayerInterface {
       this.id = id
     }
     this.options = options
+
+    this.shouldRepaintAfterRender = false
   }
 
   /**
@@ -648,6 +652,20 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
+   * Enable repaint after render.
+   */
+  enableRepaintAfterRender(): void {
+    this.shouldRepaintAfterRender = true
+  }
+
+  /**
+   * Disable repaint after render.
+   */
+  disableRepaintAfterRender(): void {
+    this.shouldRepaintAfterRender = false
+  }
+
+  /**
    * Prepare rendering the layer.
    */
   preparerender(): void {
@@ -731,6 +749,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
     )
 
     this.renderer.render(viewport)
+
+    if (this.shouldRepaintAfterRender) {
+      this.map.triggerRepaint()
+    }
   }
 
   private contextLost() {
@@ -752,6 +774,16 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
       this.render.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.TRANSITIONSTARTED,
+      this.enableRepaintAfterRender.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.TRANSITIONFINISHED,
+      this.disableRepaintAfterRender.bind(this)
     )
 
     this.renderer.addEventListener(
