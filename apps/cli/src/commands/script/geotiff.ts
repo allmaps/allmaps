@@ -170,8 +170,8 @@ export function geotiff() {
         })),
         geojsonMaskPolygon,
         transformationType,
-        projectedGcpTransformerOptions.internalProjection?.definition,
-        projectedGcpTransformerOptions.projection?.definition,
+        String(projectedGcpTransformerOptions.internalProjection?.definition),
+        String(projectedGcpTransformerOptions.projection?.definition),
         Number(options.jpgQuality),
         size
       )
