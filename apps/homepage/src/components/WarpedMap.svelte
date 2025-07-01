@@ -75,7 +75,6 @@
       style: makeStyleTransparent(style),
       bounds: bounds,
       maxPitch: 0,
-      preserveDrawingBuffer: true,
       attributionControl: false
     })
 

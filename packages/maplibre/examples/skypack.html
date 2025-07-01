@@ -28,13 +28,7 @@
         style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
         center: [-73.9337, 40.8011],
         zoom: 11.5,
-        maxPitch: 0,
-        // preserveDrawingBuffer is needed to fix error that causes base map to disappear
-        // Don't know a better way to fix this currently.
-        // Related GitHub issues:
-        // - https://github.com/mapbox/mapbox-gl-js/issues/9499
-        // - https://github.com/mapbox/mapbox-gl-js/issues/8936
-        preserveDrawingBuffer: true
+        maxPitch: 0
       })
 
       let mapLoaded = false

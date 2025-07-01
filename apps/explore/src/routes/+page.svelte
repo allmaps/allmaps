@@ -136,7 +136,6 @@
       center: [14.2437, 40.8384],
       zoom: 7,
       maxPitch: 0,
-      preserveDrawingBuffer: true,
       hash: true
     })
 
