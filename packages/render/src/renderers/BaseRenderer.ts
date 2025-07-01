@@ -623,7 +623,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected optionsChanged(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected gcpsChanged(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars

@@ -74,6 +74,7 @@ const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_COLOR_THRESHOLD = 0
 const DEFAULT_REMOVE_COLOR_HARDNESS = 0.7
+const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
@@ -760,7 +761,7 @@ export class WebGL2Renderer
         )
       }
       const maxSquaredDistance = Math.max(...rectangleSquaredDistances)
-      if (maxSquaredDistance === 0) {
+      if (maxSquaredDistance < SIGNIFICANT_VIEWPORT_EPSILON) {
         return true
       }
       if (maxSquaredDistance > Math.pow(SIGNIFICANT_VIEWPORT_DISTANCE, 2)) {
