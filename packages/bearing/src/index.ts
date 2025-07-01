@@ -16,15 +16,13 @@ export function computeGeoreferencedMapBearing(map: GeoreferencedMap) {
   let projectedTransformer: ProjectedGcpTransformer
 
   if (map.gcps.length < 2) {
-    // Not enough points for polynomial transformation
     throw new Error('Not enough GCPs to compute bearing')
-  } else if (map.gcps.length === 2) {
-    projectedTransformer = new ProjectedGcpTransformer(map.gcps, 'helmert')
   } else {
-    // Using polynomial transformation, not map transformation type,
-    // since faster when many gcps and accurate enough
+    // Using helmert transformation, not map transformation type,
+    // since possible for any amount of points, consistent,
+    // faster when many gcps and accurate when showing original image
     projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(map, {
-      transformationType: 'polynomial',
+      transformationType: 'helmert',
       projection: lonLatProjection
     })
   }
