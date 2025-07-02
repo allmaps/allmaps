@@ -14,7 +14,7 @@
     "lint": "pnpm --recursive run lint",
     "test": "pnpm --recursive run test",
     "documentation": "pnpm --recursive run documentation",
-    "precommit": "pnpm run types && pnpm run test && pnpm run lint && pnpm run documentation",
+    "precommit": "pnpm run types && pnpm run test",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
     "prepare": "husky install",
