@@ -54,7 +54,17 @@
   "peerDependencies": {
     "svelte": "^5.0.0"
   },
+  "keywords": [
+    "svelte"
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
   "devDependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/render": "workspace:^",
     "@eslint/compat": "^1.2.5",
     "@eslint/js": "^9.18.0",
     "@sveltejs/adapter-auto": "^6.0.0",
@@ -62,7 +72,6 @@
     "@sveltejs/package": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tailwindcss/vite": "^4.0.0",
-    "@types/flatbush": "^4.2.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-svelte": "^3.0.0",
@@ -78,20 +87,20 @@
     "typescript-eslint": "^8.20.0",
     "vite": "^6.2.6"
   },
-  "keywords": [
-    "svelte"
-  ],
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
   "dependencies": {
+    "@allmaps/bearing": "workspace:^",
+    "@allmaps/basemap": "workspace:^",
+    "@allmaps/maplibre": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@allmaps/project": "workspace:^",
+    "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "bits-ui": "^1.5.3",
-    "fuse.js": "^7.1.0",
     "flatbush": "^4.4.0",
-    "phosphor-svelte": "^2.0.1"
+    "fuse.js": "^7.1.0",
+    "maplibre-gl": "^5.6.0",
+    "phosphor-svelte": "^2.0.1",
+    "pmtiles": "^3.0.6"
   }
 }

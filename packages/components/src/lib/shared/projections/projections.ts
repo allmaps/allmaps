@@ -7,8 +7,8 @@ import type { Bbox } from '@allmaps/types'
 
 export type Projection = {
   code: string
-  definition?: string
   name: string
+  definition: string
   bbox?: Bbox
   comment?: string
 }

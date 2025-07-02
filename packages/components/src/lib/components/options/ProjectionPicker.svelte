@@ -10,14 +10,15 @@
   import type { Projection } from '$lib/shared/projections/projections.js'
   import type { Bbox } from '@allmaps/types'
 
-  const defaultSearchProjections = (s: string) =>
-    projections.filter((projection) => {
+  function defaultSearchProjections(s: string) {
+    return projections.filter((projection) => {
       const lowerCaseSearchValue = s.toLowerCase()
       return (
         projection.name.toLowerCase().includes(lowerCaseSearchValue) ||
         projection.code.includes(lowerCaseSearchValue)
       )
     })
+  }
 
   let {
     projections,
@@ -35,6 +36,11 @@
 
   let searchValue = $state('')
 
+  const fromAnnotationProjection: Projection = {
+    code: 'fromAnnotation',
+    name: 'From Annotation',
+    definition: ''
+  }
   const defaultProjection = $derived.by(() => {
     const result = projections.find((projection) => projection.code === '3857')
     if (result) {
@@ -51,7 +57,12 @@
       : []
   )
   const topProjections = $derived(
-    [selectedProjection, defaultProjection, ...suggestedProjections]
+    [
+      selectedProjection,
+      fromAnnotationProjection,
+      defaultProjection,
+      ...suggestedProjections
+    ]
       .filter((projection) => projection !== undefined)
       .filter(
         (projection, index, self) =>
@@ -71,7 +82,7 @@
   )
 </script>
 
-{#snippet projectionItem({ projection }: { projection: Projection })}
+{#snippet comboBoxItem({ projection }: { projection: Projection })}
   <Combobox.Item
     class="flex items-center justify-between h-10 w-full select-none rounded px-2 py-2 text-sm capitalize truncate outline-none data-[highlighted]:bg-gray-100"
     value={projection.code}
@@ -106,17 +117,12 @@
     }
   }}
   onValueChange={(v) => {
-    if (v == defaultProjection?.code) {
-      selectedProjection = undefined
-    } else {
-      selectedProjection = projections.find(
-        (projection) => projection.code === v
-      )
-    }
+    selectedProjection = projections.find((projection) => projection.code === v)
   }}
 >
   <div class="relative">
     <Globe
+      weight="thin"
       class="absolute start-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
     />
     <Combobox.Input
@@ -124,19 +130,17 @@
       clearOnDeselect
       class="pl-10 pr-2 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
         focus:z-10 focus:outline-none
-        focus:ring-2 focus:ring-pink w-full"
-      placeholder={selectedProjection
-        ? selectedProjection.name
-        : 'Search an EPSG projection'}
+        focus:ring-2 w-full"
+      placeholder={selectedProjection ? selectedProjection.name : 'Search...'}
       aria-label="Search an EPSG projection"
     />
     <Combobox.Trigger class="absolute end-3 top-1/2 size-6 -translate-y-1/2">
-      <CaretUpDown class="" />
+      <CaretUpDown class="text-muted-foreground ml-auto size-6" />
     </Combobox.Trigger>
   </div>
   <Combobox.Portal>
     <Combobox.Content
-      class="w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)]   rounded-xl border border-gray-200 bg-white px-1 py-2 shadow-md outline-none"
+      class="w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)] rounded-xl border border-gray-200 bg-white px-1 py-2 shadow-md  outline-none z-30"
       sideOffset={10}
       forceMount
     >
@@ -152,14 +156,14 @@
               <Combobox.Viewport class="p-1 max-h-90">
                 {#if topProjections.length > 0}
                   {#each topProjections as projection, i (i + projection.code)}
-                    {@render projectionItem({ projection })}
+                    {@render comboBoxItem({ projection })}
                   {/each}
                   <Combobox.Separator
                     class="my-1 -ml-1 -mr-1 block h-px bg-gray-200"
                   ></Combobox.Separator>
                 {/if}
                 {#each filteredProjections as projection, i (i + projection.code)}
-                  {@render projectionItem({ projection })}
+                  {@render comboBoxItem({ projection })}
                 {:else}
                   <span
                     class="flex items-center h-10 px-2 py-2 text-sm text-muted-foreground text-gray"

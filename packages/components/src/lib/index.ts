@@ -1,3 +1,3 @@
-import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
+import ProjectionPicker from '$lib/components/options/ProjectionPicker.svelte'
 
 export { ProjectionPicker }

@@ -8,11 +8,16 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "strict": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    "strict": true
   },"references": [
+    { "path": "../annotation" },
+    { "path": "../bearing" },
+    { "path": "../basemap" },
+    { "path": "../maplibre" },
+    { "path": "../render" },
     { "path": "../stdlib" },
+    { "path": "../project" },
+    { "path": "../transform" },
     { "path": "../types" }
   ],
 }
