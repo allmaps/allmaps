@@ -26,7 +26,7 @@ export function pointOnPolygon(from: Point, to: Point, polygon: Ring) {
     return null
   }
 
-  let intersections: Point[] = []
+  const intersections: Point[] = []
 
   // Find the intersection of the line with each edge of the polygon
   for (let i = 0; i < polygon.length; i++) {

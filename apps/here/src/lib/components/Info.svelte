@@ -151,7 +151,7 @@
                         Related Links
                       </h5>
                       <div class="space-y-1">
-                        {#each manifest.homepage as homepage}
+                        {#each manifest.homepage as homepage (homepage.id)}
                           <a
                             href={homepage.id}
                             class="inline-flex items-center gap-2 text-sm text-pink hover:text-pink-600 transition-colors underline break-all"
@@ -213,7 +213,7 @@
                         Metadata
                       </h5>
                       <dl class="grid grid-cols-1 gap-4">
-                        {#each manifest.metadata as item}
+                        {#each manifest.metadata as item (item.label)}
                           {#if item.label && item.value}
                             <!-- <div class="flex flex-col gap-2"> -->
                             <dt
@@ -238,7 +238,7 @@
                         See Also
                       </h5>
                       <div class="space-y-1">
-                        {#each manifest.seeAlso as seeAlso}
+                        {#each manifest.seeAlso as seeAlso (seeAlso.id)}
                           <a
                             href={seeAlso.id}
                             class="inline-flex items-center gap-2 text-sm text-pink hover:text-pink-600 transition-colors underline"
@@ -261,7 +261,7 @@
                         Other versions
                       </h5>
                       <div class="inline-flex flex-wrap gap-2">
-                        {#each manifest.rendering as rendering}
+                        {#each manifest.rendering as rendering (rendering.id)}
                           <a
                             href={rendering.id}
                             class="inline-flex items-center gap-2 text-sm text-pink hover:text-pink-600 transition-colors underline"

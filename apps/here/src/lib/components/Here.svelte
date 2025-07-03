@@ -18,9 +18,8 @@
   import TileLayer from 'ol/layer/Tile.js'
   import VectorLayer from 'ol/layer/Vector.js'
 
-  import { red } from '@allmaps/tailwind'
+  import { orange } from '@allmaps/tailwind'
   import { isGeojsonPoint } from '@allmaps/stdlib'
-  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
@@ -99,7 +98,6 @@
       return [imageCoordinates[0], -imageCoordinates[1]]
     }
   })
-  let projectedTransformer: ProjectedGcpTransformer
 
   const tileLayer = new TileLayer()
   const positionFeature = new Feature()
@@ -115,7 +113,7 @@
     }),
     new Style({
       stroke: new Stroke({
-        color: red,
+        color: orange,
         width: 3
       })
     })
@@ -208,13 +206,6 @@
       imageInfo as ImageInformationResponse
     ).getTileSourceOptions()
 
-    projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
-      mapWithImageInfo.map,
-      {
-        projection: lonLatProjection
-      }
-    )
-
     if (!options) {
       return
     }
@@ -256,7 +247,10 @@
         const transformer = resourceTransformerState.transformer
 
         const projectedGeojsonRoute = transformer.transformToResource(
-          geojsonRoute.route.coordinates
+          // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
+          geojsonRoute.route.coordinates.map(
+            (point): Point => [point[0], point[1]]
+          )
         )
         geojsonRouteFeature.setGeometry(
           new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
@@ -265,7 +259,8 @@
         const geojsonMarkerFeatures = geojsonRoute.markers.map((marker) => {
           if (isGeojsonPoint(marker.geometry)) {
             const projectedPoint = transformer.transformToResource(
-              marker.geometry.coordinates
+              // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
+              marker.geometry.coordinates as Point
             )
 
             let title: string | undefined
@@ -424,7 +419,7 @@
               color: 'white'
             }),
             stroke: new Stroke({
-              color: red,
+              color: orange,
               width: 4
             })
           })

@@ -4,11 +4,11 @@
   import Thumbnail from '$lib/components/Thumbnail.svelte'
   import SwitchFollow from '$lib/components/SwitchFollow.svelte'
 
-  import type { GeojsonLineString } from '@allmaps/types'
+  import type { GeojsonRoute } from '$lib/shared/types.js'
 
   type Props = {
     showFollow: boolean
-    geojsonRoute?: GeojsonLineString
+    geojsonRoute?: GeojsonRoute
   }
 
   let { showFollow, geojsonRoute }: Props = $props()
