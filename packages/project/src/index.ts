@@ -15,6 +15,7 @@ export {
 } from './shared/project-functions.js'
 
 export {
+  ProjectionDefinition,
   Projection,
   ProjectedGcpTransformOptions,
   ProjectedGcpTransformerOptions,

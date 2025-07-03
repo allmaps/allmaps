@@ -30,9 +30,6 @@ export enum WarpedMapEventType {
   INTERNALPROJECTIONCHANGED = 'internalprojectionchanged',
   PROJECTIONCHANGED = 'projectionchanged',
 
-  TRANSITIONSTARTED = 'transitionstarted',
-  TRANSITIONFINISHED = 'transitionfinished',
-
   CHANGED = 'changed',
 
   CLEARED = 'cleared'

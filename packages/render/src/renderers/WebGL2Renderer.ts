@@ -1230,7 +1230,6 @@ export class WebGL2Renderer
   }
 
   private startTransformerTransition(mapIds: string[]) {
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TRANSITIONSTARTED))
     this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {
@@ -1255,6 +1254,9 @@ export class WebGL2Renderer
       this.animationProgress =
         (now - this.transformaterTransitionStart) / ANIMATION_DURATION
 
+      // First trigger a general repaint to clear canvas
+      this.changed()
+
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
@@ -1277,9 +1279,6 @@ export class WebGL2Renderer
     this.transformaterTransitionStart = undefined
 
     this.changed()
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.TRANSITIONFINISHED)
-    )
   }
 
   private changed() {
