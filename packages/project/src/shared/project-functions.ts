@@ -24,11 +24,11 @@ const webMercatorEquivalentDefinitions = [
   'EPSG:102113'
 ]
 
-export const lonLatProjection: Projection = {
+export const lonLatProjection: Projection<string> = {
   name: 'EPSG:4326',
   definition: lonLatEquivalentDefinitions[0]
 }
-export const webMercatorProjection: Projection = {
+export const webMercatorProjection: Projection<string> = {
   name: 'EPSG:3857',
   definition: webMercatorEquivalentDefinitions[0]
 }
@@ -55,30 +55,36 @@ export const lonLatToWebMercator =
 export const webMercatorToLonLat =
   lonLatProjectionToWebMecatorProjectionConverter.inverse
 
-function projectionToAntialiasedDefinition(projection: Projection | undefined) {
-  if (projection === undefined) {
+function projectionDefinitionToAntialiasedDefinition(
+  stringProjectionDefinition: string | undefined
+): string | undefined {
+  if (stringProjectionDefinition === undefined) {
     return undefined
   }
 
-  const lonLatIndex = lonLatEquivalentDefinitions.indexOf(projection.definition)
+  const lonLatIndex = lonLatEquivalentDefinitions.indexOf(
+    stringProjectionDefinition
+  )
   const webMercatorIndex = webMercatorEquivalentDefinitions.indexOf(
-    projection.definition
+    stringProjectionDefinition
   )
   if (lonLatIndex != -1) {
     return lonLatProjection.definition
   } else if (webMercatorIndex != -1) {
     return webMercatorProjection.definition
   } else {
-    return projection.definition
+    return stringProjectionDefinition
   }
 }
 
 export function isEqualProjection(
   projection0: Projection | undefined,
   projection1: Projection | undefined
-) {
+): boolean | undefined {
   return (
-    projectionToAntialiasedDefinition(projection0) ==
-    projectionToAntialiasedDefinition(projection1)
+    projectionDefinitionToAntialiasedDefinition(
+      String(projection0?.definition)
+    ) ==
+    projectionDefinitionToAntialiasedDefinition(String(projection1?.definition))
   )
 }

@@ -74,6 +74,7 @@ const DEFAULT_OPACITY = 1
 const DEFAULT_SATURATION = 1
 const DEFAULT_REMOVE_COLOR_THRESHOLD = 0
 const DEFAULT_REMOVE_COLOR_HARDNESS = 0.7
+const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
@@ -760,7 +761,7 @@ export class WebGL2Renderer
         )
       }
       const maxSquaredDistance = Math.max(...rectangleSquaredDistances)
-      if (maxSquaredDistance === 0) {
+      if (maxSquaredDistance < SIGNIFICANT_VIEWPORT_EPSILON) {
         return true
       }
       if (maxSquaredDistance > Math.pow(SIGNIFICANT_VIEWPORT_DISTANCE, 2)) {
@@ -1228,7 +1229,7 @@ export class WebGL2Renderer
     )
   }
 
-  private startTransformaterTransition(mapIds: string[]) {
+  private startTransformerTransition(mapIds: string[]) {
     this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {
@@ -1253,6 +1254,9 @@ export class WebGL2Renderer
       this.animationProgress =
         (now - this.transformaterTransitionStart) / ANIMATION_DURATION
 
+      // First trigger a general repaint to clear canvas
+      this.changed()
+
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
@@ -1262,11 +1266,11 @@ export class WebGL2Renderer
       )
     } else {
       // Animation ended
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
   }
 
-  private finishTransition(mapIds: string[]) {
+  private finishTransformerTransition(mapIds: string[]) {
     this.resetPrevious(mapIds)
     this.updateVertexBuffers(mapIds)
 
@@ -1355,7 +1359,7 @@ export class WebGL2Renderer
   protected optionsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }
@@ -1363,7 +1367,7 @@ export class WebGL2Renderer
   protected gcpsChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }
@@ -1371,7 +1375,7 @@ export class WebGL2Renderer
   protected resourceMaskChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }
@@ -1379,28 +1383,28 @@ export class WebGL2Renderer
   protected transformationChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformaterTransition(mapIds)
+      this.startTransformerTransition(mapIds)
     }
   }
 
   protected distortionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformaterTransition(mapIds)
+      this.startTransformerTransition(mapIds)
     }
   }
 
   protected internalProjectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformaterTransition(mapIds)
+      this.startTransformerTransition(mapIds)
     }
   }
 
   protected projectionChanged(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransition(mapIds)
+      this.finishTransformerTransition(mapIds)
     }
     this.changed()
   }

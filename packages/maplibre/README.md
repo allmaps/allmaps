@@ -62,10 +62,7 @@ const map = new maplibregl.Map({
   center: [-73.9337, 40.8011],
   zoom: 11.5,
   // Pitch is currently not supported by the Allmaps plugin for MapLibre
-  maxPitch: 0,
-  // This is needed to improve rendering
-  // Future versions of the plugin might not need this
-  preserveDrawingBuffer: true
+  maxPitch: 0
 })
 
 const annotationUrl = 'https://annotations.allmaps.org/images/d180902cb93d5bf2'

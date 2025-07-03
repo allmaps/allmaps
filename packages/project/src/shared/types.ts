@@ -5,11 +5,13 @@ import {
   TransformationTypeInputs
 } from '@allmaps/transform'
 
-export type ProjectionDefinition = string
+import { PROJJSONDefinition } from 'proj4/dist/lib/core'
 
-export type Projection = {
+export type ProjectionDefinition = string | PROJJSONDefinition
+
+export type Projection<Definition = ProjectionDefinition> = {
   name?: string
-  definition: ProjectionDefinition
+  definition: Definition
 }
 
 export type ProjectedGcpTransformerOptions = {

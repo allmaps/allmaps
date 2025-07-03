@@ -6,10 +6,10 @@
     <title>@allmaps/maplibre</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css"
+      href="https://unpkg.com/maplibre-gl@5.0.0/dist/maplibre-gl.css"
       type="text/css"
     />
-    <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@5.0.0/dist/maplibre-gl.js"></script>
     <link rel="stylesheet" href="examples/style.css" type="text/css" />
     <script src="examples/controls.js"></script>
   </head>
@@ -17,26 +17,18 @@
     <div id="map"></div>
     <div id="controls"></div>
     <script type="module">
-      import { Map, NavigationControl } from 'maplibre-gl'
-
       import { WarpedMapLayer } from './src/index.ts'
 
-      const map = new Map({
+      const map = new maplibregl.Map({
         container: 'map',
         style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
         center: [-73.9337, 40.8011],
         zoom: 11.5,
-        maxPitch: 0,
-        // preserveDrawingBuffer is needed to fix error that causes base map to disappear
-        // Don't know a better way to fix this currently.
-        // Related GitHub issues:
-        // - https://github.com/mapbox/mapbox-gl-js/issues/9499
-        // - https://github.com/mapbox/mapbox-gl-js/issues/8936
-        preserveDrawingBuffer: true
+        maxPitch: 0
       })
 
       let mapLoaded = false
-      let nav = new NavigationControl()
+      let nav = new maplibregl.NavigationControl()
       map.addControl(nav, 'top-left')
 
       const warpedMapLayer = new WarpedMapLayer()

@@ -12,7 +12,7 @@ import {
   sizesToScale,
   hexToFractionalRgb
 } from '@allmaps/stdlib'
-import { lonLatToWebMercator } from '@allmaps/project'
+import { lonLatToWebMercator, Projection } from '@allmaps/project'
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
@@ -100,7 +100,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     const results =
       await this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
 
     return results
   }
@@ -117,7 +117,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     const results =
       await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
 
     return results
   }
@@ -165,7 +165,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     const result =
       this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
 
     return result
   }
@@ -182,7 +182,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     const result =
       this.renderer.warpedMapList.removeGeoreferencedMap(georeferencedMap)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
 
     return result
   }
@@ -216,7 +216,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.showMaps([mapId])
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -227,7 +227,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.showMaps(mapIds)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -238,7 +238,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.hideMaps([mapId])
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -249,7 +249,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.hideMaps(mapIds)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -272,7 +272,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.setMapResourceMask(resourceMask, mapId)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -289,7 +289,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.warpedMapList.setMapsTransformationType(transformation, {
       mapIds
     })
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -306,7 +306,24 @@ export class WarpedMapLayer implements CustomLayerInterface {
     this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
       mapIds
     })
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
+  }
+
+  /**
+   * Sets the internal projection of multiple maps
+   * @param mapIds - IDs of the maps
+   * @param internalProjection - new internal projection
+   */
+  setMapsInternalProjection(
+    mapIds: Iterable<string>,
+    internalProjection: Projection
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.setMapsInternalProjection(internalProjection, {
+      mapIds
+    })
+    this.triggerRepaint()
   }
 
   /**
@@ -335,7 +352,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.bringMapsToFront(mapIds)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -346,7 +363,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.sendMapsToBack(mapIds)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -357,7 +374,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.bringMapsForward(mapIds)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -368,7 +385,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.sendMapsBackward(mapIds)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -415,7 +432,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.setOpacity(opacity)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -425,7 +442,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetOpacity()
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -459,7 +476,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.setMapOpacity(mapId, opacity)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -470,7 +487,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetMapOpacity(mapId)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -481,7 +498,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.setSaturation(saturation)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -491,7 +508,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetSaturation()
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -503,7 +520,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.setMapSaturation(mapId, saturation)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -514,7 +531,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetMapSaturation(mapId)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -538,7 +555,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
       threshold: options.threshold,
       hardness: options.hardness
     })
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -548,7 +565,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetRemoveColorOptions()
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -574,7 +591,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
       threshold: options.threshold,
       hardness: options.hardness
     })
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -597,7 +614,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setColorizeOptions({ color })
-      this.map?.triggerRepaint()
+      this.triggerRepaint()
     }
   }
 
@@ -608,7 +625,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetColorizeOptions()
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -622,7 +639,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     const color = hexToFractionalRgb(hexColor)
     if (color) {
       this.renderer.setMapColorizeOptions(mapId, { color })
-      this.map?.triggerRepaint()
+      this.triggerRepaint()
     }
   }
 
@@ -634,7 +651,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.resetMapColorizeOptions(mapId)
-    this.map?.triggerRepaint()
+    this.triggerRepaint()
   }
 
   /**
@@ -644,6 +661,13 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.clear()
+    this.triggerRepaint()
+  }
+
+  /**
+   * Trigger repaint.
+   */
+  triggerRepaint(): void {
     this.map?.triggerRepaint()
   }
 
@@ -751,12 +775,12 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     this.renderer.addEventListener(
       WarpedMapEventType.CHANGED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
 
     this.renderer.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
 
     this.renderer.addEventListener(
@@ -796,12 +820,12 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.CLEARED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
   }
 
@@ -815,12 +839,12 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     this.renderer.removeEventListener(
       WarpedMapEventType.CHANGED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
 
     this.renderer.removeEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
 
     this.renderer.removeEventListener(
@@ -860,12 +884,12 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
     this.renderer.warpedMapList.removeEventListener(
       WarpedMapEventType.VISIBILITYCHANGED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
 
     this.renderer.warpedMapList.removeEventListener(
       WarpedMapEventType.CLEARED,
-      this.render.bind(this)
+      this.triggerRepaint.bind(this)
     )
   }
 
