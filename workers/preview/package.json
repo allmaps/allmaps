@@ -21,8 +21,7 @@
     "lerna-build": "lerna run build --scope @allmaps/preview --include-dependencies",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test",
-    "preversion": "pnpm run types && pnpm run lint"
+    "format": "prettier --write src test"
   },
   "license": "MIT",
   "devDependencies": {

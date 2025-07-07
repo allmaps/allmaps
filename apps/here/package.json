@@ -27,7 +27,6 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write src",
     "types": "tsc --noEmit",
-    "preversion": "pnpm run types && pnpm run lint && pnpm run build",
     "cert": "mkdir .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem 'localhost'"
   },
   "dependencies": {

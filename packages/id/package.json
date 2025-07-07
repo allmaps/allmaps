@@ -18,7 +18,6 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && pnpm run documentation",
-    "preversion": "pnpm run lint && pnpm test",
     "test": "NODE_ENV=test pnpm run build && mocha",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",

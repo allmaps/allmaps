@@ -38,7 +38,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "NODE_ENV=test pnpm run build && mocha",
-    "preversion": "pnpm run lint && pnpm test",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
