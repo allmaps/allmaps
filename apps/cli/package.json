@@ -27,7 +27,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "NODE_ENV=test pnpm run build && mocha --slow 200ms",
+    "test": "NODE_ENV=test pnpm run build && mocha --slow 500ms --reporter-option maxDiffSize=0",
     "preversion": "pnpm run lint && pnpm test",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
