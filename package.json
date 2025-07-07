@@ -19,7 +19,8 @@
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
     "prepare": "husky install",
     "version-prerelease": "lerna version prerelease",
-    "publish-beta": "lerna publish from-git --dist-tag beta"
+    "publish-beta": "lerna publish from-git --dist-tag beta",
+    "publish": "lerna publish from-git "
   },
   "devDependencies": {
     "@lerna-lite/cli": "^4.4.1",
