@@ -55,8 +55,11 @@ export function computeCrop(
   const desiredCropY = clampedY - target[1] * scale
 
   // Then, keep the crop within the bbox boundaries
-  let cropX = Math.max(bboxMinX, Math.min(bboxMaxX - cropWidth, desiredCropX))
-  let cropY = Math.max(bboxMinY, Math.min(bboxMaxY - cropHeight, desiredCropY))
+  const cropX = Math.max(bboxMinX, Math.min(bboxMaxX - cropWidth, desiredCropX))
+  const cropY = Math.max(
+    bboxMinY,
+    Math.min(bboxMaxY - cropHeight, desiredCropY)
+  )
 
   // Calculate the cropped coordinates in the image.
   const croppedX = (x - cropX) / scale

@@ -34,6 +34,7 @@
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
+    "@cloudflare/workers-types": "^4.20240320.1",
     "@cloudflare/pages-plugin-vercel-og": "^0.1.2",
     "@turf/rewind": "^7.2.0",
     "@types/d3-geo": "^3.1.0",
