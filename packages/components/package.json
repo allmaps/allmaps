@@ -81,11 +81,6 @@
   "keywords": [
     "svelte"
   ],
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/types": "workspace:^",
