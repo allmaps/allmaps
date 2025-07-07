@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Pagination } from 'bits-ui'
+  import { Pagination, type PageItem } from 'bits-ui'
 
   import {
     CaretLeft as CaretLeftIcon,
@@ -68,7 +68,16 @@
 {/snippet}
 
 <Pagination.Root {count} perPage={Math.min(count, perPage)}>
-  {#snippet children({ pages, range })}
+  {#snippet children({
+    pages,
+    range
+  }: {
+    pages: PageItem[]
+    range: {
+      start: number
+      end: number
+    }
+  })}
     {@const page = examples.slice(range.start, range.end)}
     <div
       class="grid grid-cols-2 md:grid-cols-4 auto-rows-auto md:grid-rows-2 gap-8 bg-white rounded-2xl shadow-md p-4"

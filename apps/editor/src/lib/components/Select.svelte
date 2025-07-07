@@ -60,7 +60,7 @@ from the perspective of the consumer of this component, it will be typed appropr
             class="flex h-10 w-full text-sm sm:text-base select-none items-center rounded-sm py-3 pl-5 pr-1.5
         hover:bg-gray-100 cursor-pointer outline-hidden transition-all gap-2 justify-between"
           >
-            {#snippet children({ selected })}
+            {#snippet children({ selected }: { selected: boolean })}
               {label}
               {#if selected}
                 <div class="ml-auto">
