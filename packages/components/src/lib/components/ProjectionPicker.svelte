@@ -77,7 +77,7 @@
     value={projection.code}
     label={projection.name}
   >
-    {#snippet children({ selected })}
+    {#snippet children({ selected }: { selected: boolean })}
       <div class="flex justify-between">
         {projection.name}
         {#if projection.comment}
