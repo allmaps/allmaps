@@ -19,10 +19,9 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "test": "vitest run --passWithNoTests",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "preversion": "pnpm run types && pnpm run lint && pnpm test"
+    "preversion": "pnpm run types && pnpm run lint"
   },
   "license": "MIT",
   "devDependencies": {
@@ -35,7 +34,6 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
-    "@cloudflare/vitest-pool-workers": "^0.1.0",
     "@cloudflare/workers-types": "^4.20240320.1",
     "@types/eslint": "^8.56.0",
     "@types/upng-js": "^2.1.2",
@@ -49,7 +47,6 @@
     "prettier": "^3.4.2",
     "typescript": "^5.7.0",
     "upng-js": "^2.1.0",
-    "vitest": "1.3.0",
     "wrangler": "^4.0.0"
   }
 }
