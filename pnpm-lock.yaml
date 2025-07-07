@@ -1869,6 +1869,9 @@ importers:
       '@cloudflare/pages-plugin-vercel-og':
         specifier: ^0.1.2
         version: 0.1.2
+      '@cloudflare/workers-types':
+        specifier: ^4.20240320.1
+        version: 4.20250410.0
       '@turf/rewind':
         specifier: ^7.2.0
         version: 7.2.0
