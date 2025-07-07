@@ -11,13 +11,16 @@
   type Props = WithoutChildren<Select.RootProps> & {
     placeholder?: string
     items: { value: string; label: string; disabled?: boolean }[]
+    type?: 'single' | 'multiple'
+    onValueChange?: (value: string | string[]) => void
   }
 
   let {
     value = $bindable(),
     items,
     placeholder,
-    ...restProps
+    type,
+    onValueChange
   }: Props = $props()
 
   const selectedLabel = $derived(
@@ -30,7 +33,7 @@ TypeScript Discriminated Unions + destructing (required for "bindable") do not
 get along, so we shut typescript up by casting `value` to `never`, however,
 from the perspective of the consumer of this component, it will be typed appropriately.
 -->
-<Select.Root bind:value={value as never} {...restProps}>
+<Select.Root bind:value={value as never} {type} {onValueChange}>
   <Select.Trigger
     class="cursor-pointer inline-flex w-full items-center justify-between px-2 py-1 rounded-lg bg-white outline-none
     border-solid border-gray-100 border-1 transition-colors
