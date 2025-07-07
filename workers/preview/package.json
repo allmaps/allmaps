@@ -59,7 +59,6 @@
     "typescript": "^5.7.0",
     "upng-js": "^2.1.0",
     "wrangler": "^4.3.0",
-    "@cloudflare/workers-types": "^4.20240320.1",
     "tinycolor2": "^1.6.0"
   }
 }
