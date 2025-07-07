@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/components",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -85,8 +85,8 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/types": "workspace:^",
     "bits-ui": "^1.5.3",
-    "fuse.js": "^7.1.0",
     "flatbush": "^4.4.0",
+    "fuse.js": "^7.1.0",
     "phosphor-svelte": "^2.0.1"
   }
 }
