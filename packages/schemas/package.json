@@ -29,7 +29,7 @@
     "build": "tsc",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "test": "NODE_ENV=test mocha",
     "types": "tsc --noEmit"
   },
   "license": "MIT",

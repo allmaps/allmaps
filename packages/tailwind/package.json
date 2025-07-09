@@ -28,11 +28,11 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
+    "build": "tsc",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "test": "NODE_ENV=test mocha",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",

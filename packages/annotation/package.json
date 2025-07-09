@@ -29,7 +29,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "test": "NODE_ENV=test pnpm run build && mocha && pnpm run examples",
+    "test": "NODE_ENV=test mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "types": "tsc --noEmit",

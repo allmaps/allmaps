@@ -28,9 +28,9 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
+    "build": "tsc",
     "types": "tsc --noEmit",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "test": "NODE_ENV=test mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "documentation": "remark . --output --use remark-api",
     "format": "prettier --write src test"
