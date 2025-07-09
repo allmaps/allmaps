@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/homepage",
   "description": "Allmaps Homepage",
-  "version": "1.0.0-beta.23",
+  "version": "1.0.0-beta.24",
   "private": true,
   "contributors": [
     {
@@ -50,6 +50,7 @@
     "@astrojs/check": "^0.9.3",
     "@astrojs/starlight": "^0.34.4",
     "@astrojs/svelte": "^7.1.0",
+    "@tailwindcss/vite": "^4.0.0",
     "@turf/rewind": "^7.2.0",
     "astro": "^5.11.0",
     "bits-ui": "^2.8.10",
@@ -64,8 +65,7 @@
     "protomaps-themes-base": "2.0.0-alpha.5",
     "svelte": "^5.34.3",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.6.3",
-    "@tailwindcss/vite": "^4.0.0"
+    "typescript": "^5.6.3"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",

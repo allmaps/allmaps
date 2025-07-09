@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/id",
-  "version": "1.0.0-beta.34",
+  "version": "1.0.0-beta.35",
   "description": "IDs for Allmaps",
   "type": "module",
   "exports": "./dist/index.js",
