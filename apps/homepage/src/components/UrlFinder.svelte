@@ -1,27 +1,33 @@
 <script lang="ts">
   import { generateId } from '@allmaps/id'
 
-  export let regexPattern: string
-  export let testUrl: string
-  export let manifestTemplate: string
+  type Props = {
+    regexPattern: string
+    testUrl: string
+    manifestTemplate: string
+  }
 
-  let url: string | null = null
-  let manifestId: string = ''
-  let editorUrl: string = ''
-  let viewerUrl: string | null = null
-  let annotationUrl: string | null = null
-  let allmapsId: string | null = null
+  const { regexPattern, testUrl, manifestTemplate }: Props = $props()
+
+  let url = $state<string>()
+  let manifestId = $state<string>()
+  let editorUrl = $state<string>()
+  let viewerUrl = $state<string>()
+  let annotationUrl = $state<string>()
+  let allmapsId = $state<string>()
 
   let regex = new RegExp(regexPattern)
-  $: id = url ? url.match(regex) : null
+  let id = $derived(url ? url.match(regex) : null)
 
-  $: if (id) {
-    manifestId = manifestTemplate.replace('{id}', id[1])
-    editorUrl = `https://editor.allmaps.org/#/collection?url=${encodeURIComponent(
-      manifestId
-    )}`
-    checkForAnnotation(manifestId)
-  }
+  $effect(() => {
+    if (id) {
+      manifestId = manifestTemplate.replace('{id}', id[1])
+      editorUrl = `https://editor.allmaps.org/#/collection?url=${encodeURIComponent(
+        manifestId
+      )}`
+      checkForAnnotation(manifestId)
+    }
+  })
 
   async function checkForAnnotation(manifestId: string) {
     allmapsId = await generateId(manifestId)
@@ -34,7 +40,7 @@
         annotationUrl
       )}`
     } else {
-      viewerUrl = null
+      viewerUrl = undefined
     }
   }
 
@@ -44,7 +50,13 @@
 </script>
 
 <div>
-  <p><input placeholder="Enter URL" bind:value={url} /></p>
+  <p>
+    <input
+      class="border-1 border-gray rounded"
+      placeholder="Enter URL"
+      bind:value={url}
+    />
+  </p>
   {#if id}
     <ul>
       <li><a target="_blank" href={manifestId}>Open IIIF Manifest</a></li>
@@ -65,8 +77,9 @@
   {:else}
     <p>
       <i
-        >Please enter a valid URL, e.g. <a class="testlink" on:click={doTest}
-          >{testUrl}</a
+        >Please enter a valid URL, e.g. <button
+          class="cursor-pointer underline"
+          onclick={doTest}>{testUrl}</button
         ></i
       >
     </p>
@@ -76,9 +89,5 @@
 <style>
   input {
     width: 100%;
-  }
-  .testlink {
-    cursor: pointer;
-    text-decoration: underline;
   }
 </style>

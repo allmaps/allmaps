@@ -1,19 +1,18 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition'
   import { DropdownMenu } from 'bits-ui'
 
   import CaretDown from 'phosphor-svelte/lib/CaretDown'
 
-  let open = false
+  let open = $state(false)
 </script>
 
 <div class="flex flex-row items-center gap-2 md:gap-3">
   <a href="/#getting-started" class="w-min text-black no-underline"
     >Getting&nbsp;started</a
   >
-  <DropdownMenu.Root bind:open preventScroll={false}>
+  <DropdownMenu.Root bind:open>
     <DropdownMenu.Trigger
-      class="w-min bg-[transparent] cursor-pointer flex items-center gap-1"
+      class="w-min bg-[transparent] cursor-pointer flex items-center gap-1 border-none"
     >
       Tools <div class:rotate-180={open} class="flex transition-transform">
         <CaretDown weight="bold" />
@@ -21,15 +20,11 @@
     </DropdownMenu.Trigger>
 
     <DropdownMenu.Content
-      class="z-50 w-full max-w-[220px] rounded-xl border border-gray-100 px-1 py-1.5 shadow-md bg-white fixed"
+      class="z-50 w-full min-w-[220px] rounded-xl border border-gray-100 px-1 py-1.5 shadow-md bg-white"
       align="start"
       sideOffset={0}
       strategy="fixed"
-      overlap={true}
-      transition={fade}
-      transitionConfig={{
-        duration: 50
-      }}
+      preventScroll={false}
     >
       <DropdownMenu.Item
         class="text-sm md:text-base select-none rounded-md py-3 pl-3 pr-1.5 hover:bg-gray-100"

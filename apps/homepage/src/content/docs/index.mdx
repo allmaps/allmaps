@@ -252,7 +252,7 @@ The core functionality of Allmaps is published on npm as individual JavaScript p
 Allmaps publishes the georeference data of __all maps__ georeferenced with Allmaps Editor as open data in different formats.
 This metadata contains the ground control points (GCPs), the clipping mask and pointers to the map's IIIF resource.
 
-<DataTable client:load baseUrl={import.meta.env.VITE_DATA_FILES_BASE_URL} />
+<DataTable client:load baseUrl={import.meta.env.VITE_DATA_FILES_BASE_URL || 'https://files.allmaps.org/'} />
 
 The files above are updated twice per day. The data is licensed under
 [CCO](https://creativecommons.org/public-domain/cc0/).
@@ -295,7 +295,7 @@ Allmaps is supported and funded by the following organizations:
     <MapMonster mood="happy" color="pink"
       speechBalloonBackgroundColor={speechBalloonBackgroundColor}
       speechBalloonTextColor={speechBalloonTextColor}>
-      <div class="[&>a]:text-white">If you think Allmaps can be useful for your institution or if you have questions about the project, you can <a class="text-white underline" href="mailto:hello@allmaps.org">send us an email</a> or reach us in the <code class="text-white">#allmaps</code> channel of the <a class="text-white underline" href="http://bit.ly/iiif-slack">IIIF&nbsp;Slack</a>.</div>
+      <div class="[&>a]:text-white">If you think Allmaps can be useful for your institution or if you have questions about the project, you can <a class="text-white underline" href="mailto:hello@bertspaan.nl">send us an email</a> or reach us in the <code class="text-white">#allmaps</code> channel of the <a class="text-white underline" href="http://bit.ly/iiif-slack">IIIF&nbsp;Slack</a>.</div>
     </MapMonster>
   </div>
 </div>
