@@ -84,7 +84,7 @@
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "bits-ui": "^1.5.3",
+    "bits-ui": "^2.8.10",
     "flatbush": "^4.4.0",
     "fuse.js": "^7.1.0",
     "phosphor-svelte": "^2.0.1"
