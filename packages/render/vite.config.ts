@@ -35,5 +35,8 @@ export default defineConfig({
     dts(),
     // TODO: find a way to remove type cast
     noBundlePlugin() as PluginOption
-  ]
+  ],
+  worker: {
+    format: 'es'
+  }
 }) satisfies UserConfig

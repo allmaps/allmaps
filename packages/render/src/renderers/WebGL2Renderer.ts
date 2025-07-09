@@ -170,11 +170,11 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
-    // Note: Could this become obsolete in the future
-    // once we can pull bytes directly from Blob?
-    // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
     const worker = new Worker(
-      new URL('../workers/fetch-and-get-image-data.ts', import.meta.url)
+      new URL('../workers/fetch-and-get-image-data.ts', import.meta.url),
+      {
+        type: 'module'
+      }
     )
 
     const wrappedWorker = comlinkWtap<FetchAndGetImageDataWorkerType>(worker)

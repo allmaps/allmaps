@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["vite-plugin-glsl/ext"],
+    "types": ["vite-plugin-glsl/ext", "vite/client"],
     "paths": {}
   },
   "references": [
