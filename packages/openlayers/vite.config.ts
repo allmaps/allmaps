@@ -5,6 +5,7 @@ import dts from 'vite-plugin-dts'
 import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
+  base: './',
   server: {
     port: ports.openlayers
   },
@@ -23,7 +24,6 @@ export default defineConfig({
       target: 'es2022'
     }
   },
-  base: '',
   plugins: [
     dts(),
     // TODO: find a way to remove type cast

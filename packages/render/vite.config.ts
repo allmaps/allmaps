@@ -6,6 +6,7 @@ import dts from 'vite-plugin-dts'
 import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
+  base: './',
   server: {
     port: ports.render
   },
@@ -29,8 +30,6 @@ export default defineConfig({
       target: 'es2022'
     }
   },
-  base: '',
-
   plugins: [
     glsl(),
     dts(),
