@@ -595,8 +595,8 @@ MIT
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
 * `pointCountMinimum` (`number`)
 
@@ -692,8 +692,8 @@ There are no parameters.
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
 * `pointCountMinimum` (`number`)
 
@@ -861,8 +861,8 @@ Create a transformation
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * The transformation type
 * `pointCountMinimum` (`number`)
@@ -1060,8 +1060,8 @@ Array<Point>
   | 'polynomial1'
   | 'polynomial2'
   | 'polynomial3'
-  | 'projective'
   | 'thinPlateSpline'
+  | 'projective'
   | 'linear'
 ```
 
@@ -2050,8 +2050,8 @@ Array<Array<number>>
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
 * `epsilon?` (`number | undefined`)
 
@@ -2372,8 +2372,8 @@ Transformation type.
   | 'polynomial1'
   | 'polynomial2'
   | 'polynomial3'
-  | 'projective'
   | 'thinPlateSpline'
+  | 'projective'
   | 'linear'
 ```
 
@@ -2387,8 +2387,8 @@ Transformation type.
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
 
 ### `computeDistortionsFromPartialDerivatives(distortionMeasures, partialDerivativeX, partialDerivativeY, referenceScale)`
@@ -2522,4 +2522,20 @@ This wil result in a weights array for each component with rbf weights and affin
 
 ```ts
 Array<string>
+```
+
+### `supportedtransformationTypes`
+
+###### Type
+
+```ts
+Array<
+  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+>
 ```

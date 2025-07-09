@@ -818,6 +818,21 @@ Sets the distortion measure of multiple maps
 
 `void`.
 
+### `WarpedMapLayer#setMapsInternalProjection(mapIds, internalProjection)`
+
+Sets the internal projection of multiple maps
+
+###### Parameters
+
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
+* `internalProjection` (`{name?: string; definition: ProjectionDefinition}`)
+  * new internal projection
+
+###### Returns
+
+`void`.
+
 ### `WarpedMapLayer#setMapsTransformationType(mapIds, transformation)`
 
 Sets the transformation type of multiple maps
@@ -832,8 +847,8 @@ Sets the transformation type of multiple maps
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * new transformation type
 
@@ -918,6 +933,18 @@ Make multiple maps visible
 
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#triggerRepaint()`
+
+Trigger repaint.
+
+###### Parameters
+
+There are no parameters.
 
 ###### Returns
 

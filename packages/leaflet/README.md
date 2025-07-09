@@ -65,7 +65,7 @@ const map = L.map('map', {
   center: [51.0518, 3.7278],
   zoom: 14,
   // Zoom animations for more than one zoom level are
-  // currently not supported by the Allmaps plugin for Leafet
+  // currently not supported by the Allmaps plugin for Leaflet
   zoomAnimationThreshold: 1
 })
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -960,8 +960,8 @@ Sets the transformation type of multiple maps
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * new transformation type
 
