@@ -40,6 +40,7 @@ export function mergeOptionsUnlessUndefined<
   baseOptions: T,
   ...additionalOptions: U
 ): T & Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
+  const mergedOptions = { ...baseOptions } as T
   for (const options of additionalOptions) {
     if (!options) {
       continue
@@ -50,13 +51,13 @@ export function mergeOptionsUnlessUndefined<
         const value = options[key]
 
         if (value !== undefined) {
-          ;(baseOptions as any)[key] = value
+          ;(mergedOptions as any)[key] = value
         }
       }
     }
   }
 
-  return baseOptions as T &
+  return mergedOptions as T &
     Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }>
 }
 
