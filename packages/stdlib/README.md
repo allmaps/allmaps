@@ -1211,38 +1211,37 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 `{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
 
-### `mergeOptions(options0, options1)`
+### `mergeOptions(baseOptions, additionalPartialOptions)`
 
 ###### Parameters
 
-* `options0` (`Options0`)
-* `options1?` (`Options1 | undefined`)
+* `baseOptions` (`T`)
+* `additionalPartialOptions` (`U[0]`)
 
 ###### Returns
 
-`Options0 & Options1`.
+`T & U[number]`.
 
-### `mergeOptionsUnlessUndefined(options0, options1)`
+### `mergeOptionsUnlessUndefined(baseOptions, additionalOptions)`
 
 ###### Parameters
 
-* `options0` (`Options0`)
-* `options1?` (`Options1 | undefined`)
+* `baseOptions` (`T`)
+* `additionalOptions` (`U[0]`)
 
 ###### Returns
 
-`Options0 &
-  Partial<{[K in keyof Options1]: Exclude<Options1[K], undefined>}>`.
+`T & Partial<{[K in keyof U[number]]: Exclude<U[number][K], undefined>}>`.
 
-### `mergePartialOptions(partialOptionsArray)`
+### `mergePartialOptions(partialOptions)`
 
 ###### Parameters
 
-* `partialOptionsArray` (`Partial<Options> | undefined`)
+* `partialOptions` (`U[0]`)
 
 ###### Returns
 
-`{[P in keyof Options]?: Options[P] | undefined}`.
+`{[P in keyof U[number]]?: U[number][P] | undefined}`.
 
 ### `midPoint(points)`
 
@@ -1344,6 +1343,17 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 ###### Returns
 
 `Array<Array<T>>`.
+
+### `objectDifference(a, b)`
+
+###### Parameters
+
+* `a` (`object`)
+* `b` (`object`)
+
+###### Returns
+
+`object`.
 
 ### `pasteArrayMatrix(arrayMatrix, rowsStart, colsStart, subArrayMatrix)`
 

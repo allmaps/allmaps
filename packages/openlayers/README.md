@@ -185,7 +185,7 @@ Creates a WarpedMapLayer instance
 
 ###### Parameters
 
-* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
+* `options?` (`Partial<WebGL2RenderOptions> | undefined`)
   * the WebGL2 renderer options
 
 ###### Returns
@@ -922,8 +922,8 @@ Sets the transformation type of a single map
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * new transformation type
 
@@ -960,8 +960,8 @@ Sets the transformation type of multiple maps
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * new transformation type
 
@@ -975,7 +975,7 @@ Sets the options
 
 ###### Parameters
 
-* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
+* `options?` (`Partial<WebGL2RenderOptions> | undefined`)
   * Options
 
 ###### Returns

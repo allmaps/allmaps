@@ -52,7 +52,7 @@ export type {
   Matrix4
 } from './geometry.js'
 
-export type { ImageInformations } from './iiif.js'
+export type { ImageInfoByMapId } from './iiif.js'
 
 export type {
   SvgAttributes,

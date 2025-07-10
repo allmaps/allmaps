@@ -268,7 +268,7 @@ Note: The weights array of a Polynomial1 Transformation has a different order. S
 [number, number, number, number, number, number]
 ```
 
-### `ImageInformations`
+### `ImageInfoByMapId`
 
 ###### Type
 

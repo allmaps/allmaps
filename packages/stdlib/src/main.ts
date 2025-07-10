@@ -1,3 +1,5 @@
+import { differenceWith, fromPairs, toPairs, isEqual } from 'lodash-es'
+
 export function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
 }
@@ -119,6 +121,11 @@ export function equalSet<T>(set1: Set<T> | null, set2: Set<T> | null): boolean {
     return false
   }
   return [...set1].every((x) => set2.has(x))
+}
+
+// From https://gist.github.com/Yimiprod/7ee176597fef230d1451
+export function objectDifference(a: object, b: object): object {
+  return fromPairs(differenceWith(toPairs(a), toPairs(b), isEqual))
 }
 
 export function maxOfNumberOrUndefined(

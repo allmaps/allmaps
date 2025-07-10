@@ -18,7 +18,8 @@ import {
   squaredDistance,
   intersectBboxes,
   bboxToRectangle,
-  mergeOptions
+  mergeOptions,
+  mergePartialOptions
 } from '@allmaps/stdlib'
 import { lonLatProjection, proj4 } from '@allmaps/project'
 
@@ -27,12 +28,12 @@ import type { WarpedMap } from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
-  BaseRendererOptions,
+  BaseRenderOptions,
   MapPruneInfo
 } from '../shared/types.js'
 
 // TODO: move defaults for tunable options here
-const defaultBaseRendererOptions = {}
+const DEFAULT_BASE_RENDER_OPTIONS: BaseRenderOptions = {}
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -53,12 +54,12 @@ const MAX_TOTAL_RESOLUTION_RATIO = 10
 
 const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
 
+export const defaultBaseRenderOptions: BaseRenderOptions = {}
+
 /**
  * Abstract base class for renderers
  */
 export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
-  partialBaseRendererOptions: Partial<BaseRendererOptions>
-
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
 
@@ -67,26 +68,19 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
+  options: Partial<BaseRenderOptions>
+
   constructor(
     cachableTileFactory: CachableTileFactory<D>,
     warpedMapFactory: WarpedMapFactory<W>,
-    partialBaseRendererOptions?: Partial<BaseRendererOptions>
+    options?: Partial<BaseRenderOptions>
   ) {
     super()
 
-    this.partialBaseRendererOptions = mergeOptions(
-      defaultBaseRendererOptions,
-      partialBaseRendererOptions
-    )
+    this.tileCache = new TileCache(cachableTileFactory, options)
+    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
 
-    this.tileCache = new TileCache(
-      cachableTileFactory,
-      partialBaseRendererOptions
-    )
-    this.warpedMapList = new WarpedMapList(
-      warpedMapFactory,
-      partialBaseRendererOptions
-    )
+    this.options = mergeOptions(DEFAULT_BASE_RENDER_OPTIONS, options)
   }
 
   /**
@@ -112,15 +106,21 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Set the Base Renderer options
    *
-   * @param partialBaseRendererOptions - Options
+   * @param options - Options
    */
-  setOptions(partialBaseRendererOptions?: Partial<BaseRendererOptions>): void {
-    this.partialBaseRendererOptions = mergeOptions(
-      this.partialBaseRendererOptions,
-      partialBaseRendererOptions
-    )
-    this.tileCache.setOptions(partialBaseRendererOptions)
-    this.warpedMapList.setOptions(partialBaseRendererOptions)
+  setOptions(options: Partial<BaseRenderOptions>): void {
+    this.options = mergePartialOptions(this.options, options)
+    this.tileCache.setOptions(options)
+    this.warpedMapList.setOptions(options)
+  }
+
+  /**
+   * Set the options by map
+   *
+   * @param options - Options
+   */
+  setMapsOptions(mapIds: string[], options: Partial<BaseRenderOptions>): void {
+    this.warpedMapList.setMapsOptions(mapIds, options)
   }
 
   protected loadMissingImageInfosInViewport(): Promise<void>[] {
@@ -173,8 +173,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return
     }
 
-    this.warpedMapList.partialWarpedMapListOptions.projection =
-      this.viewport.projection
+    this.warpedMapList.options.projection = this.viewport.projection
     this.warpedMapList.setMapsProjection(this.viewport.projection, {
       onlyVisible: false
     })
@@ -305,7 +304,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.visible) {
+    if (!warpedMap.mergedOptions.visible) {
       return []
     }
 
@@ -448,7 +447,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.visible) {
+    if (!warpedMap.mergedOptions.visible) {
       return []
     }
 
@@ -560,13 +559,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     for (const mapId of mapsEnteringViewport) {
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTERED, mapId)
       )
     }
     for (const mapId of mapsLeavingViewport) {
       this.clearMap(mapId)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEFT, mapId)
       )
     }
 
@@ -617,28 +616,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected warpedMapRemoved(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected preChange(event: Event): void {}
+  protected prepareChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected optionsChanged(event: Event): void {}
+  protected changeNow(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected gcpsChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected resourceMaskChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected transformationChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected distortionChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected internalProjectionChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected projectionChanged(event: Event): void {}
+  protected changeWithTransition(event: Event): void {}
 
   protected addEventListeners() {
     this.tileCache.addEventListener(
@@ -667,43 +651,18 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.PRECHANGE,
-      this.preChange.bind(this)
+      WarpedMapEventType.PREPARECHANGE,
+      this.prepareChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.OPTIONSCHANGED,
-      this.optionsChanged.bind(this)
+      WarpedMapEventType.CHANGEWITHTRANSITION,
+      this.changeWithTransition.bind(this)
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.GCPSCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.DISTORTIONCHANGED,
-      this.distortionChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-      this.internalProjectionChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.PROJECTIONCHANGED,
-      this.projectionChanged.bind(this)
+      WarpedMapEventType.CHANGENOW,
+      this.changeNow.bind(this)
     )
   }
 
@@ -734,43 +693,18 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.PRECHANGE,
-      this.preChange.bind(this)
+      WarpedMapEventType.PREPARECHANGE,
+      this.prepareChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.OPTIONSCHANGED,
-      this.optionsChanged.bind(this)
+      WarpedMapEventType.CHANGENOW,
+      this.changeNow.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.GCPSCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.RESOURCEMASKCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.DISTORTIONCHANGED,
-      this.distortionChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-      this.internalProjectionChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.PROJECTIONCHANGED,
-      this.projectionChanged.bind(this)
+      WarpedMapEventType.CHANGEWITHTRANSITION,
+      this.changeWithTransition.bind(this)
     )
   }
 }

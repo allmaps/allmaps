@@ -1,1 +1,1 @@
-export type ImageInformations = Map<string, unknown>
+export type ImageInfoByMapId = Map<string, unknown>

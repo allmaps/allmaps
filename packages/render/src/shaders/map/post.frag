@@ -1,9 +1,9 @@
 // Remove background color
-if(u_removeColorOptionsThreshold > 0.0f) {
-  vec3 backgroundColorDiff = color.rgb - u_removeColorOptionsColor.rgb;
+if(u_removeColorThreshold > 0.0f) {
+  vec3 backgroundColorDiff = color.rgb - u_removeColorColor.rgb;
   float backgroundColorDistance = length(backgroundColorDiff);
-  if(u_removeColor && backgroundColorDistance < u_removeColorOptionsThreshold) {
-    float amount = smoothstep(u_removeColorOptionsThreshold - u_removeColorOptionsThreshold * (1.0f - u_removeColorOptionsHardness), u_removeColorOptionsThreshold, backgroundColorDistance);
+  if(u_removeColor && backgroundColorDistance < u_removeColorThreshold) {
+    float amount = smoothstep(u_removeColorThreshold - u_removeColorThreshold * (1.0f - u_removeColorHardness), u_removeColorThreshold, backgroundColorDistance);
     color = vec4(color.rgb * amount, amount);
   }
 }
@@ -14,7 +14,7 @@ color = vec4(color.rgb * (u_saturation) + (gray * (1.0f - u_saturation)), color.
 
 // Colorize
 if(u_colorize) {
-  color = vec4((u_colorizeOptionsColor + color.rgb) * color.a, color.a);
+  color = vec4((u_colorizeColor + color.rgb) * color.a, color.a);
 }
 
 // Opacity

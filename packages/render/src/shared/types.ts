@@ -1,20 +1,24 @@
 import { GeoreferencedMap } from '@allmaps/annotation'
-
-import type { FetchableTile } from '../tilecache/FetchableTile.js'
-import type { CacheableTile } from '../tilecache/CacheableTile.js'
-
 import type {
   Point,
   Line,
   Size,
   FetchFn,
-  ImageInformations,
+  ImageInfoByMapId,
   Color,
   Bbox,
-  TileZoomLevel
+  TileZoomLevel,
+  Ring,
+  Gcp
 } from '@allmaps/types'
-import type { TransformationType } from '@allmaps/transform'
+import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { Projection } from '@allmaps/project'
+
+import type { FetchableTile } from '../tilecache/FetchableTile.js'
+import type { CacheableTile } from '../tilecache/CacheableTile.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
+import type { WebGL2WarpedMap } from '../webgl2.js'
+import type { TriangulatedWarpedMap } from '../maps/TriangulatedWarpedMap.js'
 
 export type SelectionOptions = {
   onlyVisible: boolean
@@ -32,17 +36,27 @@ export type TransformationOptions = {
 }
 
 export type WarpedMapOptions = {
-  fetchFn: FetchFn
-  // TODO: this option needs a better name:
-  imageInformations: ImageInformations
-  visible: boolean
-  applyMask: boolean
+  fetchFn?: FetchFn
+  imageInfoByMapId?: ImageInfoByMapId
+  gcps: Gcp[]
+  resourceMask: Ring
   transformationType: TransformationType
   internalProjection: Projection
   projection: Projection
+  visible: boolean
+  applyMask: boolean
+  distortionMeasure?: DistortionMeasure
 }
-export type TriangulatedWarpedMapOptions = WarpedMapOptions
+export type SpecificTriangulatedWarpedMapOptions = {
+  resourceResolution?: number
+  distortionMeasures: DistortionMeasure[]
+}
+export type TriangulatedWarpedMapOptions =
+  SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 export type SpecificWebGL2WarpedMapOptions = {
+  renderMaps: boolean
+  renderLines: boolean
+  renderPoints: boolean
   renderGcps: boolean
   renderGcpsSize?: number
   renderGcpsColor?: string
@@ -68,41 +82,53 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderFullMaskColor?: string
   renderFullMaskBorderSize?: number
   renderFullMaskBorderColor?: string
+  opacity: number
+  saturation: number
+  removeColor: boolean
+  removeColorColor: Color
+  removeColorThreshold: number
+  removeColorHardness: number
+  colorize: boolean
+  colorizeColor: Color
+  distortionColor00: string
+  distortionColor01: string
+  distortionColor1: string
+  distortionColor2: string
+  distortionColor3: string
+  grid: boolean
+  gridColor: string
+  debugTriangles: false
+  debugTriangulation: false
+  debugTiles: false
 }
 export type WebGL2WarpedMapOptions = SpecificWebGL2WarpedMapOptions &
   TriangulatedWarpedMapOptions
 
-export type RenderLineLayerOptions = {
-  viewportSize: number
-  color: string
-  viewportBorderSize: number
-  borderColor: string
-}
+export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
+  ? WebGL2WarpedMapOptions
+  : W extends TriangulatedWarpedMap
+    ? TriangulatedWarpedMapOptions
+    : W extends WarpedMap
+      ? WarpedMapOptions
+      : never
 
-export type RenderPointLayerOptions = {
-  viewportSize: number
-  color: string
-  viewportBorderSize: number
-  borderColor: string
-}
-
-export type WarpedMapListOptions = {
+export type SpecificWarpedMapListOptions = {
   createRTree: boolean
-} & WarpedMapOptions
+}
+export type WarpedMapListOptions<W extends WarpedMapOptions> =
+  SpecificWarpedMapListOptions & Partial<W>
 
-export type BaseRendererOptions = WarpedMapListOptions & WarpedMapOptions
+export type BaseRenderOptions = {}
+export type SpecificWebGL2RenderOptions = {}
+export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
+  BaseRenderOptions &
+  WarpedMapListOptions<WebGL2WarpedMapOptions>
+export type CanvasRenderOptions<W extends WarpedMapOptions> =
+  BaseRenderOptions & WarpedMapListOptions<W>
+export type IntArrayRenderOptions<W extends WarpedMapOptions> =
+  BaseRenderOptions & WarpedMapListOptions<W>
 
-export type WebGL2RendererOptions = {
-  renderMaps: boolean
-  renderLines: boolean
-  renderPoints: boolean
-  debugMaps: boolean
-} & WebGL2WarpedMapOptions &
-  BaseRendererOptions
-export type CanvasRendererOptions = BaseRendererOptions
-export type IntArrayRendererOptions = BaseRendererOptions
-
-export type WarpedMapLayerOptions = WebGL2RendererOptions
+export type WarpedMapLayerOptions = WebGL2RenderOptions
 
 export type TileCacheOptions = {
   fetchFn: FetchFn
@@ -119,27 +145,6 @@ export type GetImageDataValue<D> = (data: D, index: number) => number
 
 export type GetImageDataSize<D> = (data: D) => Size
 
-export type RemoveColorOptions = Partial<{
-  color: Color
-  threshold: number
-  hardness: number
-}>
-
-export type ColorizeOptions = Partial<{
-  color: Color
-}>
-
-export type GridOptions = Partial<{
-  enabled: boolean
-}>
-
-// TODO: don't make partial, extend with other rendering options
-export type RenderOptions = Partial<{
-  removeColorOptions?: RemoveColorOptions
-  colorizeOptions?: ColorizeOptions
-  gridOptions?: GridOptions
-}>
-
 export type WarpedMapFactory<W> = (
   mapId: string,
   georeferencedMap: GeoreferencedMap,
@@ -150,6 +155,20 @@ export type CachableTileFactory<D> = (
   fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>
+
+export type RenderLineLayerOptions = {
+  viewportSize: number
+  color: string
+  viewportBorderSize: number
+  borderColor: string
+}
+
+export type RenderPointLayerOptions = {
+  viewportSize: number
+  color: string
+  viewportBorderSize: number
+  borderColor: string
+}
 
 export type LineLayer = {
   projectedGeoLines: Line[]

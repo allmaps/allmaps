@@ -161,6 +161,7 @@ export {
   arrayRepeated,
   subSetArray,
   equalSet,
+  objectDifference,
   maxOfNumberOrUndefined,
   isValidHttpUrl
 } from './main.js'

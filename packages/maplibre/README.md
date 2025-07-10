@@ -145,7 +145,7 @@ MIT
 ###### Type
 
 ```ts
-{ renderMaps: boolean; renderLines: boolean; renderPoints: boolean; debugMaps: boolean; } & SpecificWebGL2WarpedMapOptions & WarpedMapOptions & { ...; }
+SpecificWarpedMapListOptions & Partial<WebGL2WarpedMapOptions>
 ```
 
 ### `new WarpedMapEvent(type, data)`
@@ -179,7 +179,7 @@ Creates a WarpedMapLayer instance
 
 * `id?` (`string | undefined`)
   * Unique ID for this layer
-* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
+* `options?` (`Partial<WebGL2RenderOptions> | undefined`)
   * options
 
 ###### Returns
@@ -313,19 +313,6 @@ There are no parameters.
 
 * bounding box of all warped maps
 
-### `WarpedMapLayer#getMapOpacity(mapId)`
-
-Gets the opacity of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-opacity of the map (`number | undefined`).
-
 ### `WarpedMapLayer#getMapZIndex(mapId)`
 
 Returns the z-index of a single map
@@ -340,18 +327,6 @@ Returns the z-index of a single map
 `number | undefined`.
 
 * z-index of the warped map
-
-### `WarpedMapLayer#getOpacity()`
-
-Gets the opacity of the layer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-opacity of the map (`number | undefined`).
 
 ### `WarpedMapLayer#getWarpedMap(mapId)`
 
@@ -412,20 +387,6 @@ Make multiple maps invisible
 'warped-map-layer'
 ```
 
-### `WarpedMapLayer#isMapVisible(mapId)`
-
-Returns the visibility of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-
-###### Returns
-
-`boolean | undefined`.
-
-* whether the map is visible
-
 ### `WarpedMapLayer#map?`
 
 ###### Type
@@ -466,7 +427,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; debugMaps?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 30 more ...; createRTree?: boolean | undefined; }
+{ createRTree?: boolean | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 52 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `WarpedMapLayer#passWarpedMapEvent(event)`
@@ -572,106 +533,6 @@ WebGL2Renderer
 '2d'
 ```
 
-### `WarpedMapLayer#resetColorize()`
-
-Resets the colorization for all maps
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapColorize(mapId)`
-
-Resets the colorization of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapOpacity(mapId)`
-
-Resets the opacity of a single map to fully opaque
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapRemoveColor(mapId)`
-
-Resets the color for a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapSaturation(mapId)`
-
-Resets the saturation of a single map to the original colors
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetOpacity()`
-
-Resets the opacity of the layer to fully opaque
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetRemoveColor()`
-
-Resets the color removal for all maps
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetSaturation()`
-
-Resets the saturation of a single map to the original colors
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
 ### `WarpedMapLayer#sendMapsBackward(mapIds)`
 
 Send maps backward
@@ -698,76 +559,14 @@ Send maps to back
 
 `void`.
 
-### `WarpedMapLayer#setColorize(hexColor)`
+### `WarpedMapLayer#setLayerOptions(options)`
 
-Sets the colorization for all maps
-
-###### Parameters
-
-* `hexColor` (`string`)
-  * desired hex color
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setImageInformations(imageInformations)`
-
-Sets the object that caches image information
+Sets the layer options
 
 ###### Parameters
 
-* `imageInformations` (`globalThis.Map<string, unknown>`)
-  * Object that caches image information
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapColorize(mapId, hexColor)`
-
-Sets the colorization for a single mapID of the map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `hexColor` (`string`)
-  * desired hex color
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapOpacity(mapId, opacity)`
-
-Sets the opacity of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `opacity` (`number`)
-  * opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapRemoveColor(mapId, options)`
-
-Removes a color from a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `options` (`{
-    hexColor?: string | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-  * remove color options
+* `options` (`{ createRTree?: boolean | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 52 more ...; distortionMeasure?: DistortionMeasure | undefined; }`)
+  * Options
 
 ###### Returns
 
@@ -788,21 +587,6 @@ Sets the resource mask of a single map
 
 `void`.
 
-### `WarpedMapLayer#setMapSaturation(mapId, saturation)`
-
-Sets the saturation of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-* `saturation` (`number`)
-  * saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
-
-###### Returns
-
-`void`.
-
 ### `WarpedMapLayer#setMapsDistortionMeasure(mapIds, distortionMeasure)`
 
 Sets the distortion measure of multiple maps
@@ -813,6 +597,35 @@ Sets the distortion measure of multiple maps
   * IDs of the maps
 * `distortionMeasure?` (`DistortionMeasure | undefined`)
   * new transformation type
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapsInternalProjection(mapIds, internalProjection)`
+
+Sets the internal projection of multiple maps
+
+###### Parameters
+
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
+* `internalProjection` (`{name?: string; definition: ProjectionDefinition}`)
+  * new internal projection
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapsOptions(mapIds, options)`
+
+Sets the options by map
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+* `options` (`{ createRTree?: boolean | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; ... 52 more ...; distortionMeasure?: DistortionMeasure | undefined; }`)
+  * Options
 
 ###### Returns
 
@@ -832,66 +645,10 @@ Sets the transformation type of multiple maps
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * new transformation type
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setOpacity(opacity)`
-
-Sets the opacity of the layer
-
-###### Parameters
-
-* `opacity` (`number`)
-  * opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setOptions(options)`
-
-Sets the options
-
-###### Parameters
-
-* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
-  * Options
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setRemoveColor(options)`
-
-Removes a color from all maps
-
-###### Parameters
-
-* `options` (`{
-    hexColor?: string | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-  * remove color options
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setSaturation(saturation)`
-
-Sets the saturation of a single map
-
-###### Parameters
-
-* `saturation` (`number`)
-  * saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
 
 ###### Returns
 
@@ -918,6 +675,18 @@ Make multiple maps visible
 
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#triggerRepaint()`
+
+Trigger repaint.
+
+###### Parameters
+
+There are no parameters.
 
 ###### Returns
 

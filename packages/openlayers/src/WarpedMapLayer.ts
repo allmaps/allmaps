@@ -15,7 +15,7 @@ import type { Extent } from 'ol/extent'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { WarpedMapLayerOptions } from '@allmaps/render'
-import type { Ring, ImageInformations, Gcp } from '@allmaps/types'
+import type { Ring, ImageInfoByMapId, Gcp } from '@allmaps/types'
 
 export type OpenLayersWarpedMapLayerOptions = WarpedMapLayerOptions
 
@@ -367,7 +367,7 @@ export class WarpedMapLayer extends Layer {
    * Sets the object that caches image information
    * @param imageInformations - Object that caches image information
    */
-  setImageInformations(imageInformations: ImageInformations) {
+  setImageInformations(imageInformations: ImageInfoByMapId) {
     this.renderer.warpedMapList.setImageInformations(imageInformations)
   }
 
@@ -737,12 +737,12 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.renderer.addEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
+      WarpedMapEventType.WARPEDMAPENTERED,
       this.passWarpedMapEvent.bind(this)
     )
 
     this.renderer.addEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
+      WarpedMapEventType.WARPEDMAPLEFT,
       this.passWarpedMapEvent.bind(this)
     )
 
@@ -804,12 +804,12 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.renderer.removeEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
+      WarpedMapEventType.WARPEDMAPENTERED,
       this.passWarpedMapEvent.bind(this)
     )
 
     this.renderer.removeEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
+      WarpedMapEventType.WARPEDMAPLEFT,
       this.passWarpedMapEvent.bind(this)
     )
 

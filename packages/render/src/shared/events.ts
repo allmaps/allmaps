@@ -5,8 +5,8 @@ export enum WarpedMapEventType {
   WARPEDMAPADDED = 'warpedmapadded',
   WARPEDMAPREMOVED = 'warpedmapremoved',
 
-  WARPEDMAPENTER = 'warpedmapenter',
-  WARPEDMAPLEAVE = 'warpedmapleave',
+  WARPEDMAPENTERED = 'warpedmapentered',
+  WARPEDMAPLEFT = 'warpedmapleft',
 
   IMAGEINFOLOADED = 'imageinfoloaded',
 
@@ -19,17 +19,12 @@ export enum WarpedMapEventType {
 
   TEXTURESUPDATED = 'texturesupdated',
 
-  PRECHANGE = 'prechange',
-  OPTIONSCHANGED = 'optionschanged',
   ZINDICESCHANGED = 'zindiceschanged',
-  RESOURCEMASKCHANGED = 'resourcemaskchanged',
-  GCPSCHANGED = 'gcpschanged',
   VISIBILITYCHANGED = 'visibilitychanged',
-  TRANSFORMATIONCHANGED = 'transformationchanged',
-  DISTORTIONCHANGED = 'distortionchanged',
-  INTERNALPROJECTIONCHANGED = 'internalprojectionchanged',
-  PROJECTIONCHANGED = 'projectionchanged',
 
+  PREPARECHANGE = 'preparechange',
+  CHANGEWITHTRANSITION = 'changewithtransition',
+  CHANGENOW = 'changenow',
   CHANGED = 'changed',
 
   CLEARED = 'cleared'

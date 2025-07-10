@@ -5,23 +5,27 @@ precision highp isampler2D;
 
 #include ../helpers.frag;
 
-uniform float u_debug;
-
-uniform bool u_removeColor;
-uniform vec3 u_removeColorOptionsColor;
-uniform float u_removeColorOptionsThreshold;
-uniform float u_removeColorOptionsHardness;
-
-uniform bool u_colorize;
-uniform vec3 u_colorizeOptionsColor;
-
-uniform bool u_grid;
-
 uniform float u_opacity;
 uniform float u_saturation;
 
+uniform bool u_removeColor;
+uniform vec3 u_removeColorColor;
+uniform float u_removeColorThreshold;
+uniform float u_removeColorHardness;
+
+uniform bool u_colorize;
+uniform vec3 u_colorizeColor;
+
+uniform bool u_grid;
+uniform vec4 u_gridColor;
+
 uniform bool u_distortion;
-uniform int u_distortionOptionsdistortionMeasure;
+uniform int u_distortionMeasure;
+uniform vec4 u_distortionColor00;
+uniform vec4 u_distortionColor01;
+uniform vec4 u_distortionColor1;
+uniform vec4 u_distortionColor2;
+uniform vec4 u_distortionColor3;
 
 uniform int u_scaleFactorForViewport;
 
@@ -29,12 +33,8 @@ uniform lowp sampler2DArray u_cachedTilesTextureArray;
 uniform isampler2D u_cachedTilesResourceOriginPointsAndDimensionsTexture;
 uniform isampler2D u_cachedTilesScaleFactorsTexture;
 
-uniform vec4 u_colorDistortion00;
-uniform vec4 u_colorDistortion01;
-uniform vec4 u_colorDistortion1;
-uniform vec4 u_colorDistortion2;
-uniform vec4 u_colorDistortion3;
-uniform vec4 u_colorGrid;
+uniform float u_debugTriangles;
+uniform float u_debugTiles;
 
 in vec2 v_resourceTrianglePoint;
 in float v_trianglePointDistortion;

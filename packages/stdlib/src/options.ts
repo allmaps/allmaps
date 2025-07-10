@@ -1,59 +1,99 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export function mergeOptions<Options0, Options1>(
-  options0: Options0,
-  options1?: Options1
-): Options0 & Options1 {
-  // In general options1 extends options0
-  // Using this over mergePartialOption() assures that the output type will be at least Option0
-
-  // This function serves two purposes:
-  // 1) Speedup: spreading is a little expensive, so it checks if necessary first
+export function mergeOptions<
+  T extends Record<string, any>,
+  U extends Array<Record<string, any> | undefined>
+>(baseOptions: T, ...additionalPartialOptions: U): T & U[number] {
+  // A specific function for merging options:
+  // - Assure the output extends the type of the first element (e.g. default options)
+  // - Speedup: spreading is a little expensive, so it checks if necessary first
   // (e.g. it was previously executed for every point in transform,
   // where this was a 50% speed increase when transforming a lot of points
-  // 2) It allows option1 to be undefined, which simplifies handing over a simple spread
-
-  if (!options1) {
-    return options0 as Options0 & Options1
-  }
+  // - Allow additionalOptions to be undefined, which simplifies handing over a simple spread
 
   return {
-    ...options0,
-    ...options1
+    ...baseOptions,
+    ...mergePartialOptions(...additionalPartialOptions)
+  }
+}
+
+export function mergePartialOptions<
+  U extends Array<Record<string, any> | undefined>
+>(...partialOptions: U): Partial<U[number]> {
+  const definedPartialOptionsArray = partialOptions.filter(
+    (partialOptions) => partialOptions !== undefined && partialOptions !== null
+  )
+  if (definedPartialOptionsArray.length === 0) {
+    return {}
+  } else if (definedPartialOptionsArray.length === 1) {
+    return definedPartialOptionsArray[0]
+  } else {
+    // This spreads out eacht of the partialOptions
+    return Object.assign({}, ...definedPartialOptionsArray)
   }
 }
 
 export function mergeOptionsUnlessUndefined<
-  Options0,
-  Options1 extends Record<string, any>
+  T extends Record<string, any>,
+  U extends Array<Record<string, any> | undefined>
 >(
-  options0: Options0,
-  options1?: Options1
-): Options0 &
-  Partial<{
-    [K in keyof Options1]: Exclude<Options1[K], undefined>
-  }> {
-  if (!options1) {
-    return options0 as Options0 &
-      Partial<{
-        [K in keyof Options1]: Exclude<Options1[K], undefined>
-      }>
-  }
+  baseOptions: T,
+  ...additionalOptions: U
+): T & Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
+  for (const options of additionalOptions) {
+    if (!options) {
+      continue
+    }
 
-  // Only overwrite properties that are not undefined
-  for (const key in options1) {
-    const value = options1[key as keyof Options1]
-    if (value !== undefined) {
-      ;(options0 as any)[key] = value
+    for (const key in options) {
+      if (Object.prototype.hasOwnProperty.call(options, key)) {
+        const value = options[key]
+
+        if (value !== undefined) {
+          ;(baseOptions as any)[key] = value
+        }
+      }
     }
   }
 
-  return options0 as Options0 &
-    Partial<{
-      [K in keyof Options1]: Exclude<Options1[K], undefined>
-    }>
+  return baseOptions as T &
+    Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }>
 }
 
+// // Original version of mergeOptionsUnlessUndefined
+// // Saving this here, may be useful later
+// export function mergeOptionsUnlessUndefined<
+//   Options0,
+//   Options1 extends Record<string, any>
+// >(
+//   options0: Options0,
+//   options1?: Options1
+// ): Options0 &
+//   Partial<{
+//     [K in keyof Options1]: Exclude<Options1[K], undefined>
+//   }> {
+//   if (!options1) {
+//     return options0 as Options0 &
+//       Partial<{
+//         [K in keyof Options1]: Exclude<Options1[K], undefined>
+//       }>
+//   }
+
+//   // Only overwrite properties that are not undefined
+//   for (const key in options1) {
+//     const value = options1[key as keyof Options1]
+//     if (value !== undefined) {
+//       ;(options0 as any)[key] = value
+//     }
+//   }
+
+//   return options0 as Options0 &
+//     Partial<{
+//       [K in keyof Options1]: Exclude<Options1[K], undefined>
+//     }>
+// }
+
+// // Attempt to create a mergeOptionsDeep function
 // // Saving this here, may be useful later
 // export function mergeOptionsDeep<
 //   Option0 extends Record<string, any>,
@@ -86,19 +126,3 @@ export function mergeOptionsUnlessUndefined<
 
 //   return output as Option0 & Option1
 // }
-
-export function mergePartialOptions<Options>(
-  ...partialOptionsArray: (Partial<Options> | undefined)[]
-): Partial<Options> {
-  const definedPartialOptionsArray = partialOptionsArray.filter(
-    (partialOptions) => partialOptions !== undefined && partialOptions !== null
-  )
-  if (definedPartialOptionsArray.length === 0) {
-    return {}
-  } else if (definedPartialOptionsArray.length === 1) {
-    return definedPartialOptionsArray[0]
-  } else {
-    // This spreads out eacht of the partialOptions
-    return Object.assign({}, ...definedPartialOptionsArray)
-  }
-}

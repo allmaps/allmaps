@@ -61,27 +61,6 @@ export type MapState = {
   customResourceMask?: Point[]
 }
 
-export type RemoveBackgroundOptions = {
-  color: string | null
-  threshold: number
-  hardness: number
-}
-
-export type ColorizeOptions = {
-  enabled: boolean
-  color: string | null
-}
-
-export type GridOptions = {
-  enabled: boolean
-}
-
-export type RenderOptions = {
-  removeBackground: RemoveBackgroundOptions
-  colorize: ColorizeOptions
-  grid: GridOptions
-}
-
 export type FeatureContextMenu = {
   event: MouseEvent
   feature: FeatureLike

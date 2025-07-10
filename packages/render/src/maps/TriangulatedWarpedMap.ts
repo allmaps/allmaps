@@ -4,12 +4,17 @@ import {
   mixNumbers,
   mixPoints,
   getPropertyFromCacheOrComputation,
-  getPropertyFromTrippleCacheOrComputation
+  getPropertyFromTrippleCacheOrComputation,
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { WarpedMap } from './WarpedMap.js'
 
-import type { WarpedMapOptions } from '../shared/types.js'
+import type {
+  SpecificTriangulatedWarpedMapOptions,
+  TriangulatedWarpedMapOptions,
+  WarpedMapOptions
+} from '../shared/types.js'
 
 import type {
   GcpAndDistortions,
@@ -20,16 +25,10 @@ import type { Gcp, Point, Ring, TypedPolygon } from '@allmaps/types'
 import type { TriangulationToUnique } from '@allmaps/triangulate'
 import type { Projection } from '@allmaps/project'
 
-const DEFAULT_RESOURCE_RESOLUTION = undefined // TODO: allow to set via options
-const DEFAULT_DISTORTION_MEASURES: DistortionMeasure[] = [
-  'log2sigma',
-  'twoOmega'
-]
-// TODO: allow to set via options
-
-function createDefaultTriangulatedWarpedMapOptions(): Partial<WarpedMapOptions> {
-  return {}
-}
+export const DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS: SpecificTriangulatedWarpedMapOptions =
+  {
+    distortionMeasures: ['log2sigma', 'twoOmega']
+  }
 
 export function createTriangulatedWarpedMapFactory() {
   return (
@@ -63,6 +62,12 @@ type GcpTriangulation = {
  * @param projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
  */
 export class TriangulatedWarpedMap extends WarpedMap {
+  declare options?: Partial<TriangulatedWarpedMapOptions>
+  declare listOptions?: Partial<TriangulatedWarpedMapOptions>
+  declare georeferencedMapOptions?: Partial<TriangulatedWarpedMapOptions>
+  declare defaultOptions: TriangulatedWarpedMapOptions
+  declare mergedOptions: TriangulatedWarpedMapOptions
+
   previousResourceResolution: number | undefined
   resourceResolution: number | undefined
 
@@ -97,13 +102,8 @@ export class TriangulatedWarpedMap extends WarpedMap {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
+    options?: Partial<TriangulatedWarpedMap>
   ) {
-    options = {
-      ...createDefaultTriangulatedWarpedMapOptions(),
-      ...options
-    }
-
     super(mapId, georeferencedMap, options)
 
     this.resourceTriangulationCache = new Map()
@@ -112,12 +112,20 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.updateTriangulation()
   }
 
+  setDefaultOptions() {
+    super.setDefaultOptions()
+    this.defaultOptions = mergeOptions(
+      DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS,
+      this.defaultOptions
+    )
+  }
+
   /**
    * Update the ground control points loaded from a georeferenced map to new ground control points.
    *
    * @param gcps - the new ground control points
    */
-  setGcps(gcps: Gcp[]): void {
+  protected setGcps(gcps: Gcp[]): void {
     super.setGcps(gcps)
     this.clearResourceTriangulationCaches()
     this.updateTriangulation()
@@ -128,7 +136,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param resourceMask - the new mask
    */
-  setResourceMask(resourceMask: Ring): void {
+  protected setResourceMask(resourceMask: Ring): void {
     super.setResourceMask(resourceMask)
     this.clearResourceTriangulationCaches()
     this.updateTriangulation()
@@ -139,7 +147,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param distortionMeasure - the disortion measure
    */
-  setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
+  protected setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     super.setDistortionMeasure(distortionMeasure)
     this.updateTrianglePointsDistortion()
   }
@@ -149,7 +157,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param projection - the internal projection
    */
-  setInternalProjection(projection: Projection): void {
+  protected setInternalProjection(projection: Projection): void {
     super.setInternalProjection(projection)
     this.updateTriangulation()
   }
@@ -159,7 +167,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param projection - the projection
    */
-  setProjection(projection: Projection): void {
+  protected setProjection(projection: Projection): void {
     super.setProjection(projection)
     this.clearProjectedTriangulationCaches()
     this.updateTriangulation()
@@ -266,7 +274,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
     // Get resolution from transform
     const resourceResolution =
-      DEFAULT_RESOURCE_RESOLUTION ||
+      this.mergedOptions.resourceResolution ||
       this.projectedTransformer.getToGeoTransformationResolution(
         this.resourceMaskBbox
       )
@@ -323,7 +331,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
           this.projectedTransformer.transformToGeo(
             resourcePoint,
             {
-              distortionMeasures: DEFAULT_DISTORTION_MEASURES,
+              distortionMeasures: this.mergedOptions.distortionMeasures,
               referenceScale: this.getReferenceScale()
             },
             (gcpPartialDistortion) => gcpPartialDistortion
@@ -368,7 +376,8 @@ export class TriangulatedWarpedMap extends WarpedMap {
                     this.projectedPreviousTransformer.transformToGeo(
                       projectedGcp.resource,
                       {
-                        distortionMeasures: DEFAULT_DISTORTION_MEASURES,
+                        distortionMeasures:
+                          this.mergedOptions.distortionMeasures,
                         referenceScale: this.getReferenceScale()
                       },
                       (gcpPartialDistortion) => gcpPartialDistortion

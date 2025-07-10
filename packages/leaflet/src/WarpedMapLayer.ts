@@ -16,7 +16,7 @@ import {
 } from '@allmaps/stdlib'
 
 import type { Map, ZoomAnimEvent } from 'leaflet'
-import type { Point, Rectangle, ImageInformations } from '@allmaps/types'
+import type { Point, Rectangle, ImageInfoByMapId } from '@allmaps/types'
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 
 export type LeafletWarpedMapLayerOptions = WarpedMapLayerOptions & {
@@ -25,7 +25,7 @@ export type LeafletWarpedMapLayerOptions = WarpedMapLayerOptions & {
   className: string
   pane: string
   zIndex?: number
-  imageInformations?: ImageInformations
+  imageInformations?: ImageInfoByMapId
 }
 
 const NO_RENDERER_ERROR_MESSAGE =
@@ -509,7 +509,7 @@ export class WarpedMapLayer extends Layer {
    *
    * @param imageInformations - Object that caches image information
    */
-  setImageInformations(imageInformations: ImageInformations) {
+  setImageInformations(imageInformations: ImageInfoByMapId) {
     assertRenderer(this.renderer)
 
     this.renderer.warpedMapList.setImageInformations(imageInformations)
@@ -987,12 +987,12 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.renderer.addEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
+      WarpedMapEventType.WARPEDMAPENTERED,
       this._passWarpedMapEvent.bind(this)
     )
 
     this.renderer.addEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
+      WarpedMapEventType.WARPEDMAPLEFT,
       this._passWarpedMapEvent.bind(this)
     )
 
@@ -1051,12 +1051,12 @@ export class WarpedMapLayer extends Layer {
     )
 
     this.renderer.removeEventListener(
-      WarpedMapEventType.WARPEDMAPENTER,
+      WarpedMapEventType.WARPEDMAPENTERED,
       this._passWarpedMapEvent.bind(this)
     )
 
     this.renderer.removeEventListener(
-      WarpedMapEventType.WARPEDMAPLEAVE,
+      WarpedMapEventType.WARPEDMAPLEFT,
       this._passWarpedMapEvent.bind(this)
     )
 

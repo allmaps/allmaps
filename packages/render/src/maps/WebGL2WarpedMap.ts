@@ -15,7 +15,9 @@ import {
   pink,
   white,
   yellow,
-  gray
+  gray,
+  red,
+  darkblue
 } from '@allmaps/tailwind'
 
 import { TriangulatedWarpedMap } from './TriangulatedWarpedMap.js'
@@ -37,11 +39,9 @@ import type {
   LineLayer,
   PointLayer,
   SpecificWebGL2WarpedMapOptions,
-  WebGL2RendererOptions,
   WebGL2WarpedMapOptions
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
-import type { RenderOptions } from '../shared/types.js'
 
 const THROTTLE_UPDATE_TEXTURES_WAIT_MS = 200
 const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
@@ -49,38 +49,55 @@ const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
   trailing: true
 }
 
-const defaultRenderLineLayerOptions = {
+const DEFAULT_RENDER_LINE_LAYER_OPTIONS = {
   viewportSize: 6,
   color: black,
   viewportBorderSize: 0,
   borderColor: white
 }
 
-const defaultRenderPointLayerOptions = {
+const DEFAULT_RENDER_POINT_LAYER_OPTION = {
   viewportSize: 16,
   color: black,
   viewportBorderSize: 1,
   borderColor: white
 }
 
-const defaultWebgl2WarpedMapOptions = {
-  renderGcps: false,
-  renderGcpsColor: blue,
-  renderTransformedGcps: false,
-  renderTransformedGcpsColor: pink,
-  renderVectors: false,
-  renderMask: false,
-  renderMaskSize: 8,
-  renderMaskColor: pink,
-  renderFullMask: false,
-  renderFullMaskSize: 8,
-  renderFullMaskColor: green
-}
-
-const DEBUG = false
-
-const DEFAULT_OPACITY = 1
-const DEFAULT_SATURATION = 1
+const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions =
+  {
+    renderMaps: true,
+    renderLines: false,
+    renderPoints: false,
+    renderGcps: false,
+    renderGcpsColor: blue,
+    renderTransformedGcps: false,
+    renderTransformedGcpsColor: pink,
+    renderVectors: false,
+    renderMask: false,
+    renderMaskSize: 8,
+    renderMaskColor: pink,
+    renderFullMask: false,
+    renderFullMaskSize: 8,
+    renderFullMaskColor: green,
+    opacity: 1,
+    saturation: 1,
+    removeColor: false,
+    removeColorColor: [0, 0, 0],
+    removeColorThreshold: 0,
+    removeColorHardness: 0.7,
+    colorize: false,
+    colorizeColor: [0, 0, 0],
+    grid: false,
+    gridColor: black,
+    distortionColor00: red,
+    distortionColor01: darkblue,
+    distortionColor1: green,
+    distortionColor2: yellow,
+    distortionColor3: red,
+    debugTiles: false,
+    debugTriangles: false,
+    debugTriangulation: false
+  }
 
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
@@ -111,12 +128,17 @@ export function createWebGL2WarpedMapFactory(
  * Class for WarpedMaps that are rendered with WebGL 2
  */
 export class WebGL2WarpedMap extends TriangulatedWarpedMap {
+  declare options?: Partial<WebGL2WarpedMapOptions>
+  declare listOptions?: Partial<WebGL2WarpedMapOptions>
+  declare georeferencedMapOptions?: Partial<WebGL2WarpedMapOptions>
+  declare defaultOptions: WebGL2WarpedMapOptions
+  declare mergedOptions: WebGL2WarpedMapOptions
+
   // De facto make this a WarpedMapWithImageInfo
   // (Multiple inhertance is not possible in TypeScript)
   declare imageId: string
+  declare imageInfo: unknown
   declare parsedImage: Image
-
-  webgl2WarpedMapOptions: SpecificWebGL2WarpedMapOptions
 
   gl: WebGL2RenderingContext
   mapProgram!: WebGLProgram
@@ -135,10 +157,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesByTileUrl: Map<string, CachedTile<ImageData>>
   cachedTilesForTexture: CachedTile<ImageData>[] = []
   previousCachedTilesForTexture: CachedTile<ImageData>[] = []
-
-  opacity: number = DEFAULT_OPACITY
-  saturation: number = DEFAULT_SATURATION
-  renderOptions: RenderOptions = {}
 
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourceOriginPointsAndDimensionsTexture: WebGLTexture | null =
@@ -180,11 +198,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesByTileKey = new Map()
     this.cachedTilesByTileUrl = new Map()
 
-    this.webgl2WarpedMapOptions = mergeOptions(
-      defaultWebgl2WarpedMapOptions,
-      options
-    )
-
     this.gl = gl
     this.initializeWebGL(mapProgram, linesProgram, pointsProgram)
 
@@ -216,26 +229,46 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       this.gl.createTexture()
   }
 
+  setDefaultOptions() {
+    super.setDefaultOptions()
+    this.defaultOptions = mergeOptions(
+      DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS,
+      this.defaultOptions
+    )
+  }
+
+  setMergedOptions(init: boolean = false) {
+    const changedMergedOptions = super.setMergedOptions(init)
+
+    this.mergedOptions.opacity =
+      (this.listOptions?.opacity ?? this.defaultOptions.opacity) *
+      (this.options?.opacity ?? 1)
+    this.mergedOptions.saturation =
+      (this.listOptions?.saturation ?? this.defaultOptions.saturation) *
+      (this.options?.saturation ?? 1)
+
+    return changedMergedOptions
+  }
+
   /**
    * Update the vertex buffers of this warped map
    *
    * @param projectedGeoToClipHomogeneousTransform - Transform from projected geo coordinates to webgl2 coordinates in the [-1, 1] range. Equivalent to OpenLayers' projectionTransform.
    */
   updateVertexBuffers(
-    projectedGeoToClipHomogeneousTransform: HomogeneousTransform,
-    partialWebgl2RendererOptions: Partial<WebGL2RendererOptions>
+    projectedGeoToClipHomogeneousTransform: HomogeneousTransform
   ) {
     this.invertedRenderHomogeneousTransform = invertHomogeneousTransform(
       projectedGeoToClipHomogeneousTransform
     )
 
-    if (partialWebgl2RendererOptions.renderMaps) {
+    if (this.mergedOptions.renderMaps) {
       this.updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)
     }
-    if (partialWebgl2RendererOptions.renderLines) {
+    if (this.mergedOptions.renderLines) {
       this.updateVertexBuffersLines(projectedGeoToClipHomogeneousTransform)
     }
-    if (partialWebgl2RendererOptions.renderPoints) {
+    if (this.mergedOptions.renderPoints) {
       this.updateVertexBuffersPoints(projectedGeoToClipHomogeneousTransform)
     }
   }
@@ -295,7 +328,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineLayers() {
     this.lineLayers = []
 
-    if (this.webgl2WarpedMapOptions.renderVectors) {
+    if (this.mergedOptions.renderVectors) {
       this.lineLayers.push({
         projectedGeoLines: pointsAndPointsToLines(
           this.projectedGeoPoints,
@@ -305,14 +338,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           this.projectedGeoPoints,
           this.projectedGeoPreviousTransformedResourcePoints
         ),
-        viewportSize: this.webgl2WarpedMapOptions.renderVectorsSize,
-        color: this.webgl2WarpedMapOptions.renderVectorsColor,
-        viewportBorderSize: this.webgl2WarpedMapOptions.renderVectorsBorderSize,
-        borderColor: this.webgl2WarpedMapOptions.renderVectorsBorderColor
+        viewportSize: this.mergedOptions.renderVectorsSize,
+        color: this.mergedOptions.renderVectorsColor,
+        viewportBorderSize: this.mergedOptions.renderVectorsBorderSize,
+        borderColor: this.mergedOptions.renderVectorsBorderColor
       })
     }
 
-    if (this.webgl2WarpedMapOptions.renderMask) {
+    if (this.mergedOptions.renderMask) {
       this.lineLayers.push({
         projectedGeoLines: lineStringToLines(
           this.projectedGeoTriangulationMask
@@ -320,21 +353,20 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoPreviousLines: lineStringToLines(
           this.projectedGeoPreviousTriangulationMask
         ),
-        viewportSize: this.webgl2WarpedMapOptions.renderMaskSize,
-        color: this.webgl2WarpedMapOptions.renderMaskColor,
-        viewportBorderSize: this.webgl2WarpedMapOptions.renderMaskBorderSize,
-        borderColor: this.webgl2WarpedMapOptions.renderMaskBorderColor
+        viewportSize: this.mergedOptions.renderMaskSize,
+        color: this.mergedOptions.renderMaskColor,
+        viewportBorderSize: this.mergedOptions.renderMaskBorderSize,
+        borderColor: this.mergedOptions.renderMaskBorderColor
       })
     }
 
-    if (this.webgl2WarpedMapOptions.renderFullMask) {
+    if (this.mergedOptions.renderFullMask) {
       this.lineLayers.push({
         projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
-        viewportSize: this.webgl2WarpedMapOptions.renderFullMaskSize,
-        color: this.webgl2WarpedMapOptions.renderFullMaskColor,
-        viewportBorderSize:
-          this.webgl2WarpedMapOptions.renderFullMaskBorderSize,
-        borderColor: this.webgl2WarpedMapOptions.renderFullMaskBorderColor
+        viewportSize: this.mergedOptions.renderFullMaskSize,
+        color: this.mergedOptions.renderFullMaskColor,
+        viewportBorderSize: this.mergedOptions.renderFullMaskBorderSize,
+        borderColor: this.mergedOptions.renderFullMaskBorderColor
       })
     }
   }
@@ -342,31 +374,29 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setPointLayers() {
     this.pointLayers = []
 
-    if (this.webgl2WarpedMapOptions.renderGcps) {
+    if (this.mergedOptions.renderGcps) {
       this.pointLayers.push({
         projectedGeoPoints: this.projectedGeoPoints,
-        viewportSize: this.webgl2WarpedMapOptions.renderGcpsSize,
-        color: this.webgl2WarpedMapOptions.renderGcpsColor,
-        viewportBorderSize: this.webgl2WarpedMapOptions.renderGcpsBorderSize,
-        borderColor: this.webgl2WarpedMapOptions.renderGcpsBorderColor
+        viewportSize: this.mergedOptions.renderGcpsSize,
+        color: this.mergedOptions.renderGcpsColor,
+        viewportBorderSize: this.mergedOptions.renderGcpsBorderSize,
+        borderColor: this.mergedOptions.renderGcpsBorderColor
       })
     }
 
-    if (this.webgl2WarpedMapOptions.renderTransformedGcps) {
+    if (this.mergedOptions.renderTransformedGcps) {
       this.pointLayers.push({
         projectedGeoPoints: this.projectedGeoTransformedResourcePoints,
         projectedGeoPreviousPoints:
           this.projectedGeoPreviousTransformedResourcePoints,
-        viewportSize: this.webgl2WarpedMapOptions.renderTransformedGcpsSize,
-        color: this.webgl2WarpedMapOptions.renderTransformedGcpsColor,
-        viewportBorderSize:
-          this.webgl2WarpedMapOptions.renderTransformedGcpsBorderSize,
-        borderColor:
-          this.webgl2WarpedMapOptions.renderTransformedGcpsBorderColor
+        viewportSize: this.mergedOptions.renderTransformedGcpsSize,
+        color: this.mergedOptions.renderTransformedGcpsColor,
+        viewportBorderSize: this.mergedOptions.renderTransformedGcpsBorderSize,
+        borderColor: this.mergedOptions.renderTransformedGcpsBorderColor
       })
     }
 
-    if (DEBUG) {
+    if (this.mergedOptions.debugTriangulation) {
       this.pointLayers.push({
         projectedGeoPoints: this.projectedGeoPreviousTrianglePoints,
         color: gray
@@ -620,7 +650,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
               lineLayer.viewportSize ??
-                defaultRenderLineLayerOptions.viewportSize
+                DEFAULT_RENDER_LINE_LAYER_OPTIONS.viewportSize
             )
           )
         ),
@@ -640,7 +670,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
               hexToFractionalOpaqueRgba(
-                lineLayer.color ?? defaultRenderLineLayerOptions.color
+                lineLayer.color ?? DEFAULT_RENDER_LINE_LAYER_OPTIONS.color
               )
             )
           )
@@ -655,7 +685,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
               lineLayer.viewportBorderSize ??
-                defaultRenderLineLayerOptions.viewportBorderSize
+                DEFAULT_RENDER_LINE_LAYER_OPTIONS.viewportBorderSize
             )
           )
         ),
@@ -676,7 +706,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
             Array(6).fill(
               hexToFractionalOpaqueRgba(
                 lineLayer.borderColor ??
-                  defaultRenderLineLayerOptions.borderColor
+                  DEFAULT_RENDER_LINE_LAYER_OPTIONS.borderColor
               )
             )
           )
@@ -748,7 +778,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           pointLayer.projectedGeoPoints.map(
             (_projectedGeoPoint) =>
               pointLayer.viewportSize ??
-              defaultRenderPointLayerOptions.viewportSize
+              DEFAULT_RENDER_POINT_LAYER_OPTION.viewportSize
           )
         ),
       []
@@ -766,7 +796,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         accumulator.concat(
           pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
             hexToFractionalOpaqueRgba(
-              pointLayer.color ?? defaultRenderPointLayerOptions.color
+              pointLayer.color ?? DEFAULT_RENDER_POINT_LAYER_OPTION.color
             )
           )
         ),
@@ -780,7 +810,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           pointLayer.projectedGeoPoints.map(
             (_projectedGeoPoint) =>
               pointLayer.viewportBorderSize ??
-              defaultRenderPointLayerOptions.viewportBorderSize
+              DEFAULT_RENDER_POINT_LAYER_OPTION.viewportBorderSize
           )
         ),
       []
@@ -799,7 +829,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
             hexToFractionalOpaqueRgba(
               pointLayer.borderColor ??
-                defaultRenderPointLayerOptions.borderColor
+                DEFAULT_RENDER_POINT_LAYER_OPTION.borderColor
             )
           )
         ),

@@ -141,7 +141,15 @@ MIT
 ###### Type
 
 ```ts
-{ renderMaps: boolean; renderLines: boolean; renderPoints: boolean; debugMaps: boolean; } & SpecificWebGL2WarpedMapOptions & WarpedMapOptions & { ...; } & { ...; }
+SpecificWarpedMapListOptions &
+  Partial<WebGL2WarpedMapOptions> & {
+    opacity: number
+    interactive: boolean
+    className: string
+    pane: string
+    zIndex?: number
+    imageInformations?: ImageInfoByMapId
+  }
 ```
 
 ### `new WarpedMapEvent(type, data)`
@@ -960,8 +968,8 @@ Sets the transformation type of multiple maps
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * new transformation type
 
