@@ -1,17 +1,17 @@
 <script lang="ts">
   import { parseAnnotation } from '@allmaps/annotation'
 
-  import GeoreferencedMaps from './GeoreferencedMaps.svelte'
+  import WarpedMapLayerMap from './WarpedMapLayerMap.svelte'
   import MapsOverview from './MapsOverview.svelte'
   import MapOrImage from './MapOrImage.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
-  import type { GeoreferencedMapsComponentOptions } from './GeoreferencedMaps.svelte'
+  import type { WarpedMapLayerMapComponentOptions } from './WarpedMapLayerMap.svelte'
   import OptionsButton from './options/OptionsButton.svelte'
   import { OptionsState } from './options/OptionsState.svelte'
 
-  export type ViewerComponentOptions = GeoreferencedMapsComponentOptions
+  export type ViewerComponentOptions = WarpedMapLayerMapComponentOptions
 
   let {
     annotations = [],
@@ -36,7 +36,7 @@
 </script>
 
 <div class="w-full h-full">
-  <GeoreferencedMaps
+  <WarpedMapLayerMap
     {georeferencedMaps}
     {optionsState}
     {selectedMapId}

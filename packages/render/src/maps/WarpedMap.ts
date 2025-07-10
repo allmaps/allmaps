@@ -281,16 +281,6 @@ export class WarpedMap extends EventTarget {
       previousMergedOptions
     )
 
-    console.log(
-      this.defaultOptions.applyMask,
-      this.georeferencedMapOptions?.applyMask,
-      this.listOptions?.applyMask,
-      this.options?.applyMask,
-      this.mergedOptions.applyMask,
-      previousMergedOptions.applyMask,
-      changedMergedOptions
-    )
-
     if (init) {
       // Set the properties in a specific order
       // And update the projected transformer properties once at the end

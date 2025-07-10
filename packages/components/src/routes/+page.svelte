@@ -5,7 +5,7 @@
     createSearchProjectionsWithFuse,
     createSuggestProjectionsWithFlatbush
   } from '$lib/shared/projections/projections.js'
-  import GeoreferencedMaps from '$lib/components/GeoreferencedMaps.svelte'
+  import WarpedMapLayerMap from '$lib/components/WarpedMapLayerMap.svelte'
 
   const projections = projectionsData.map((projectionData) => {
     return {
@@ -38,6 +38,6 @@
   </section>
   <section>
     <h1 class="text-xl font-bold mb-4">Map</h1>
-    <GeoreferencedMaps georeferencedMaps={[]}></GeoreferencedMaps>
+    <WarpedMapLayerMap georeferencedMaps={[]}></WarpedMapLayerMap>
   </section>
 </main>

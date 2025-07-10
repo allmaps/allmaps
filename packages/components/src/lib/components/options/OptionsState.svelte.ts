@@ -5,6 +5,7 @@ import type { TransformationType } from '@allmaps/transform'
 
 import type { ViewerComponentOptions } from '../Viewer.svelte'
 import type { Projection } from '$lib/shared/projections/projections.js'
+// TODO Load Project from Project and handle fromAnnotation in Picker?
 
 export type TransformationTypeWithFromAnnotation =
   | TransformationType
@@ -31,7 +32,7 @@ const transformationTypesWithFromAnnotation = [
   'fromAnnotation'
 ] as TransformationTypeWithFromAnnotation[]
 
-const defaultOptions: Options = {
+let defaultOptions: Options = {
   visible: true,
   opacity: 1,
   transformationType: 'fromAnnotation',
@@ -59,7 +60,7 @@ export function deleteFromAnnotationOptions(
 }
 
 export class OptionsState {
-  options = $state<Options>()
+  options: Options
 
   visible: boolean
   opacity: number
@@ -73,19 +74,17 @@ export class OptionsState {
     options: Partial<OptionsWithFromAnnotation> = {},
     viewOptions: Partial<OptionsWithFromAnnotation> = {}
   ) {
-    this.options = mergeOptions(defaultOptions, options)
+    defaultOptions = mergeOptions(defaultOptions, options)
 
-    this.visible = $derived(this.options.visible)
-    this.opacity = $derived(this.options.opacity)
-    this.transformationType = $derived(this.options.transformationType)
-    this.internalProjection = $derived(this.options.internalProjection)
-    $effect(() => {
-      this.options = {
-        visible: this.visible,
-        opacity: this.opacity,
-        transformationType: this.transformationType,
-        internalProjection: this.internalProjection
-      }
+    this.visible = $derived(defaultOptions.visible)
+    this.opacity = $derived(defaultOptions.opacity)
+    this.transformationType = $derived(defaultOptions.transformationType)
+    this.internalProjection = $derived(defaultOptions.internalProjection)
+    this.options = $derived({
+      visible: this.visible,
+      opacity: this.opacity,
+      transformationType: this.transformationType,
+      internalProjection: this.internalProjection
     })
 
     this.viewOptions = viewOptions
