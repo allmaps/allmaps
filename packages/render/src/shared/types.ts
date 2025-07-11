@@ -114,24 +114,33 @@ export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
 
 export type SpecificWarpedMapListOptions = {
   createRTree: boolean
+  rtreeUpdatedOptions: string[]
+  animatedOptions: string[]
 }
-export type WarpedMapListOptions<W extends WarpedMapOptions> =
-  SpecificWarpedMapListOptions & Partial<W>
+export type WarpedMapListOptions<WO extends WarpedMapOptions> =
+  SpecificWarpedMapListOptions & Partial<WO>
 
 export type BaseRenderOptions = {}
 export type SpecificWebGL2RenderOptions = {}
 export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
   BaseRenderOptions &
   WarpedMapListOptions<WebGL2WarpedMapOptions>
-export type CanvasRenderOptions<W extends WarpedMapOptions> =
-  BaseRenderOptions & WarpedMapListOptions<W>
-export type IntArrayRenderOptions<W extends WarpedMapOptions> =
-  BaseRenderOptions & WarpedMapListOptions<W>
+export type CanvasRenderOptions<WO extends WarpedMapOptions> =
+  BaseRenderOptions & WarpedMapListOptions<WO>
+export type IntArrayRenderOptions<WO extends WarpedMapOptions> =
+  BaseRenderOptions & WarpedMapListOptions<WO>
 
 export type WarpedMapLayerOptions = WebGL2RenderOptions
 
 export type TileCacheOptions = {
   fetchFn: FetchFn
+}
+
+// The options when setting options
+export type SetOptionsOptions = {
+  omit: string[]
+  init: boolean
+  animate: boolean
 }
 
 export type Renderer = {

@@ -38,6 +38,7 @@ import type { Line, Point, Tile, HomogeneousTransform } from '@allmaps/types'
 import type {
   LineLayer,
   PointLayer,
+  SetOptionsOptions,
   SpecificWebGL2WarpedMapOptions,
   WebGL2WarpedMapOptions
 } from '../shared/types.js'
@@ -237,8 +238,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  setMergedOptions(init: boolean = false) {
-    const changedMergedOptions = super.setMergedOptions(init)
+  setMergedOptions(setOptionsOptions?: Partial<SetOptionsOptions>) {
+    const changedMergedOptions = super.setMergedOptions(setOptionsOptions)
 
     this.mergedOptions.opacity =
       (this.listOptions?.opacity ?? this.defaultOptions.opacity) *

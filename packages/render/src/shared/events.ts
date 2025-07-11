@@ -23,8 +23,8 @@ export enum WarpedMapEventType {
   VISIBILITYCHANGED = 'visibilitychanged',
 
   PREPARECHANGE = 'preparechange',
-  CHANGEWITHTRANSITION = 'changewithtransition',
-  CHANGENOW = 'changenow',
+  ANIMATEDCHANGE = 'animatedchange',
+  IMMEDIATECHANGE = 'immediatechange',
   CHANGED = 'changed',
 
   CLEARED = 'cleared'

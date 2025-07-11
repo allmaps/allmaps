@@ -124,8 +124,13 @@ export function equalSet<T>(set1: Set<T> | null, set2: Set<T> | null): boolean {
 }
 
 // From https://gist.github.com/Yimiprod/7ee176597fef230d1451
-export function objectDifference(a: object, b: object): object {
-  return fromPairs(differenceWith(toPairs(a), toPairs(b), isEqual))
+export function objectDifference(
+  newObject: object,
+  baseObject: object
+): object {
+  return fromPairs(
+    differenceWith(toPairs(newObject), toPairs(baseObject), isEqual)
+  )
 }
 
 export function maxOfNumberOrUndefined(

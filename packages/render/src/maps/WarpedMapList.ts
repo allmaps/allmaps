@@ -1,3 +1,5 @@
+import { pick } from 'lodash-es'
+
 import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
@@ -26,18 +28,32 @@ import type {
   GetWarpedMapOptions,
   ProjectionOptions,
   SelectionOptions,
-  SpecificWarpedMapListOptions,
+  SetOptionsOptions,
   WarpedMapFactory,
-  WarpedMapListOptions
+  WarpedMapListOptions,
+  WarpedMapOptions
 } from '../shared/types.js'
 
 const defaultSelectionOptions: SelectionOptions = {
   onlyVisible: false
 }
 
-const DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS: SpecificWarpedMapListOptions = {
-  createRTree: true
-}
+const DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions<WarpedMapOptions> =
+  {
+    createRTree: true,
+    rtreeUpdatedOptions: [
+      'gcps',
+      'resourceMask',
+      'transformationType',
+      'internalProjection',
+      'projection'
+    ],
+    animatedOptions: [
+      'transformationType',
+      'internalProjection',
+      'distortionMeasure'
+    ]
+  }
 
 /**
  * An ordered list of WarpedMaps. This class contains an optional RTree
@@ -55,7 +71,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   rtree?: RTree
 
-  options: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>
+  options: WarpedMapListOptions<GetWarpedMapOptions<W>>
 
   /**
    * Creates an instance of a WarpedMapList
@@ -78,7 +94,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.options = mergeOptions(
       DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS,
       options
-    )
+    ) as WarpedMapListOptions<GetWarpedMapOptions<W>>
 
     if (this.options.createRTree) {
       this.rtree = new RTree()
@@ -235,7 +251,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   setOptions(
     options: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>
   ): void {
-    this.options = mergePartialOptions(this.options, options)
+    this.options = mergeOptions(this.options, options)
     const mapIds = this.getMapIds()
     this.internalSetMapsOptions(mapIds, undefined, options)
   }
@@ -258,40 +274,64 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   private internalSetMapsOptions(
     mapIds: string[],
     options?: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
-    listOptions?: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>
+    listOptions?: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     const warpedMaps = this.getWarpedMaps({ mapIds })
 
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, mapIds)
-    )
+    // Some options can be set with animation.
+    // When this function is called, it sets all options exept those to be animated,
+    // and then calls itself again with the 'animate' setting to now set all options
+    // including those that will cause an animation, and fire the animation.
 
     let changedOptions = {}
     for (const warpedMap of warpedMaps) {
-      const warpedMapChangedOptions = warpedMap.setOptions(options, listOptions)
+      let warpedMapChangedOptions
+      if (!setOptionsOptions?.animate) {
+        // If no animation information is specified, or it is false
+        // set all options exect those for animation
+        warpedMapChangedOptions = warpedMap.setOptions(options, listOptions, {
+          omit: this.options.animatedOptions
+        })
+      } else {
+        // If the option setting should be animated,
+        // set all options
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, mapIds)
+        )
+        warpedMapChangedOptions = warpedMap.setOptions(options, listOptions)
+      }
       changedOptions = mergeOptions(changedOptions, warpedMapChangedOptions)
       if (
-        'gcps' in warpedMapChangedOptions ||
-        'resourceMask' in warpedMapChangedOptions ||
-        'transformationType' in warpedMapChangedOptions ||
-        'internalProjection' in warpedMapChangedOptions ||
-        'projection' in warpedMapChangedOptions
+        this.options.rtreeUpdatedOptions.some(
+          (option) => option in warpedMapChangedOptions
+        )
       ) {
         this.addToOrUpdateRtree(warpedMap)
       }
     }
 
-    if (
-      'transformationType' in changedOptions ||
-      'internalProjection' in changedOptions
-    ) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.CHANGEWITHTRANSITION, mapIds)
-      )
+    if (!setOptionsOptions?.animate) {
+      // If no animation information is specified, or it is false
+      // finish by firing a direct change,
+      // and set the options again but now with animation
+      if (Object.keys(changedOptions).length > 0) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, mapIds)
+        )
+      }
+
+      this.internalSetMapsOptions(mapIds, options, listOptions, {
+        animate: true
+      })
     } else {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.CHANGENOW, mapIds)
-      )
+      // If the option setting should be animated,
+      // finish by firing the animation
+      if (Object.keys(changedOptions).length > 0) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, mapIds)
+        )
+      }
     }
   }
 
@@ -316,7 +356,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       warpedMap.setOptions({ gcps })
       this.addToOrUpdateRtree(warpedMap)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.CHANGENOW, mapId)
+        new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, mapId)
       )
     }
   }
@@ -333,7 +373,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       warpedMap.setOptions({ resourceMask })
       this.addToOrUpdateRtree(warpedMap)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.CHANGENOW, mapId)
+        new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, mapId)
       )
     }
   }
@@ -381,10 +421,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         }
       })
       this.dispatchEvent(
-        new WarpedMapEvent(
-          WarpedMapEventType.CHANGEWITHTRANSITION,
-          mapIdsChanged
-        )
+        new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, mapIdsChanged)
       )
     }
   }
@@ -430,10 +467,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         }
       })
       this.dispatchEvent(
-        new WarpedMapEvent(
-          WarpedMapEventType.CHANGEWITHTRANSITION,
-          mapIdsChanged
-        )
+        new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, mapIdsChanged)
       )
     }
   }
@@ -477,10 +511,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         }
       })
       this.dispatchEvent(
-        new WarpedMapEvent(
-          WarpedMapEventType.CHANGEWITHTRANSITION,
-          mapIdsChanged
-        )
+        new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, mapIdsChanged)
       )
     }
   }
@@ -524,7 +555,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         }
       })
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.CHANGENOW, mapIdsChanged)
+        new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, mapIdsChanged)
       )
     }
   }

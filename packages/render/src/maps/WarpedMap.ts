@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
 
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
@@ -39,7 +39,7 @@ import type {
   DistortionMeasure
 } from '@allmaps/transform'
 
-import type { WarpedMapOptions } from '../shared/types.js'
+import type { SetOptionsOptions, WarpedMapOptions } from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
@@ -242,31 +242,35 @@ export class WarpedMap extends EventTarget {
       resourceMask: georeferencedMap.resourceMask
     }
     this.setDefaultOptions()
-    this.setMergedOptions(true)
+    this.setMergedOptions({ init: true })
   }
 
   setOptions(
     options?: Partial<WarpedMapOptions>,
-    listOptions?: Partial<WarpedMapOptions>
+    listOptions?: Partial<WarpedMapOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ): object {
-    if (options !== undefined) {
+    if (options !== undefined && Object.keys(options).length > 0) {
       this.options = options
     }
-    if (listOptions !== undefined) {
+    if (listOptions !== undefined && Object.keys(listOptions).length > 0) {
       this.listOptions = listOptions
     }
-    return this.setMergedOptions()
+    return this.setMergedOptions(setOptionsOptions)
   }
 
-  setListOptions(listOptions?: Partial<WarpedMapOptions>): object {
-    return this.setOptions(undefined, listOptions)
+  setListOptions(
+    listOptions?: Partial<WarpedMapOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): object {
+    return this.setOptions(undefined, listOptions, setOptionsOptions)
   }
 
   setDefaultOptions() {
     this.defaultOptions = DEFAULT_WARPED_MAP_OPTIONS
   }
 
-  setMergedOptions(init: boolean = false): object {
+  setMergedOptions(setOptionsOptions?: Partial<SetOptionsOptions>): object {
     const previousMergedOptions = cloneDeep(this.mergedOptions || {})
 
     this.mergedOptions = mergeOptionsUnlessUndefined(
@@ -276,14 +280,25 @@ export class WarpedMap extends EventTarget {
       this.options
     )
 
-    const changedMergedOptions = objectDifference(
+    let changedMergedOptions = objectDifference(
       this.mergedOptions,
       previousMergedOptions
     )
 
-    if (init) {
-      // Set the properties in a specific order
-      // And update the projected transformer properties once at the end
+    if (setOptionsOptions?.omit) {
+      // If some options should be omitted from changing,
+      // like when setting all options exect those that should be animated,
+      // then omit those options and set the merged options accordingly
+      changedMergedOptions = omit(changedMergedOptions, setOptionsOptions?.omit)
+      this.mergedOptions = mergeOptionsUnlessUndefined(
+        previousMergedOptions,
+        changedMergedOptions
+      )
+    }
+
+    if (setOptionsOptions?.init) {
+      // On init we should set the properties in a specific order
+      // and update the projected transformer properties only once at the end
 
       this.gcps = this.mergedOptions.gcps
 
@@ -303,8 +318,6 @@ export class WarpedMap extends EventTarget {
 
       this.updateProjectedTransformerProperties()
     } else {
-      // Set the properties in a specific order
-
       if ('gcps' in changedMergedOptions) {
         this.setGcps(this.mergedOptions.gcps)
       }

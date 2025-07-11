@@ -884,6 +884,8 @@ export class WebGL2Renderer
   }
 
   private startTransformerTransition(mapIds: string[]) {
+    // This changed() is needed to prevent a blank canvas flash
+    this.changed()
     this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {
@@ -891,6 +893,7 @@ export class WebGL2Renderer
     }
 
     this.animating = true
+    this.animationProgress = 0
     this.transformaterTransitionStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
       ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(this)
@@ -908,9 +911,8 @@ export class WebGL2Renderer
       this.animationProgress =
         (now - this.transformaterTransitionStart) / ANIMATION_DURATION
 
-      // First trigger a general repaint to clear canvas
+      // This changed() is needed to trigger the repaint of the canvas
       this.changed()
-
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
@@ -1010,14 +1012,14 @@ export class WebGL2Renderer
     }
   }
 
-  protected changeWithTransition(event: Event) {
+  protected animatedChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       this.startTransformerTransition(mapIds)
     }
   }
 
-  protected changeNow(event: Event) {
+  protected immediateChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
       this.finishTransformerTransition(mapIds)

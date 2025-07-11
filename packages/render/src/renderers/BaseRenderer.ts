@@ -619,10 +619,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected prepareChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected changeNow(event: Event): void {}
+  protected immediateChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected changeWithTransition(event: Event): void {}
+  protected animatedChange(event: Event): void {}
 
   protected addEventListeners() {
     this.tileCache.addEventListener(
@@ -656,13 +656,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.CHANGEWITHTRANSITION,
-      this.changeWithTransition.bind(this)
+      WarpedMapEventType.ANIMATEDCHANGE,
+      this.animatedChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.CHANGENOW,
-      this.changeNow.bind(this)
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.immediateChange.bind(this)
     )
   }
 
@@ -698,13 +698,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.CHANGENOW,
-      this.changeNow.bind(this)
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.immediateChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.CHANGEWITHTRANSITION,
-      this.changeWithTransition.bind(this)
+      WarpedMapEventType.ANIMATEDCHANGE,
+      this.animatedChange.bind(this)
     )
   }
 }
