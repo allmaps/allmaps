@@ -13,6 +13,8 @@
   // Rottedam
   // const annoationUrl =
   //   'https://annotations.allmaps.org/manifests/631b96e4d6d3f421'
+  // Piranesi
+  // const annoationUrl = 'https://annotations.allmaps.org/images/9f888622a47479cc'
 
   let annotations = $state<unknown[]>([])
 
@@ -22,12 +24,13 @@
       annotations = [response]
     })
 
-  let optionsState = new OptionsState({
+  let optionsState = new OptionsState()
+  let componentOptions = {
     addNavigationControl: true,
     addGeolocateControl: true
-  })
+  }
 </script>
 
 <div class="absolute w-full h-full flex flex-col">
-  <Viewer {annotations} {optionsState} />
+  <Viewer {annotations} {optionsState} {componentOptions} />
 </div>

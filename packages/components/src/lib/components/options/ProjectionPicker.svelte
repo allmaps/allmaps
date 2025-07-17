@@ -7,7 +7,7 @@
   import CaretDoubleDown from 'phosphor-svelte/lib/CaretDoubleDown'
   import { fly } from 'svelte/transition'
 
-  import type { Projection } from '$lib/shared/projections/projections.js'
+  import type { PickerProjection } from '$lib/shared/projections/projections.js'
   import type { Bbox } from '@allmaps/types'
 
   function defaultSearchProjections(s: string) {
@@ -27,28 +27,29 @@
     bbox = undefined,
     suggestProjections = undefined
   }: {
-    projections: Projection[]
-    selectedProjection?: Projection
-    searchProjections?: (s: string) => Projection[]
+    projections: PickerProjection[]
+    selectedProjection?: PickerProjection | undefined
+    searchProjections?: (s: string) => PickerProjection[]
     bbox?: Bbox
-    suggestProjections?: (b: Bbox) => Projection[]
+    suggestProjections?: (b: Bbox) => PickerProjection[]
   } = $props()
 
   let searchValue = $state('')
 
-  const fromAnnotationProjection: Projection = {
+  const fromAnnotationProjection: PickerProjection = {
     code: 'fromAnnotation',
     name: 'From Annotation',
+    comment: 'Default',
     definition: ''
   }
   const defaultProjection = $derived.by(() => {
     const result = projections.find((projection) => projection.code === '3857')
     if (result) {
-      result.comment = 'Default'
+      result.comment = 'Common'
     }
     return result
   })
-  const suggestedProjections = $derived<Projection[]>(
+  const suggestedProjections = $derived<PickerProjection[]>(
     bbox && suggestProjections
       ? suggestProjections(bbox).map((projection) => {
           projection.comment = 'From bbox'
@@ -82,7 +83,7 @@
   )
 </script>
 
-{#snippet comboBoxItem({ projection }: { projection: Projection })}
+{#snippet comboBoxItem({ projection }: { projection: PickerProjection })}
   <Combobox.Item
     class="flex items-center justify-between h-10 w-full select-none rounded px-2 py-2 text-sm capitalize truncate outline-none data-[highlighted]:bg-gray-100"
     value={projection.code}
@@ -117,7 +118,10 @@
     }
   }}
   onValueChange={(v) => {
-    selectedProjection = projections.find((projection) => projection.code === v)
+    selectedProjection =
+      v == 'fromAnnotation'
+        ? undefined
+        : projections.find((projection) => projection.code === v)
   }}
 >
   <div class="relative">
@@ -128,7 +132,7 @@
     <Combobox.Input
       oninput={(e) => (searchValue = e.currentTarget.value)}
       clearOnDeselect
-      class="pl-10 pr-2 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
+      class="pl-10 pr-9 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
         focus:z-10 focus:outline-none
         focus:ring-2 w-full"
       placeholder={selectedProjection ? selectedProjection.name : 'Search...'}
@@ -140,7 +144,7 @@
   </div>
   <Combobox.Portal>
     <Combobox.Content
-      class="w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)] rounded-xl border border-gray-200 bg-white px-1 py-2 shadow-md  outline-none z-30"
+      class="w-100 rounded-xl border border-gray-200 bg-white px-1 py-2 shadow-md  outline-none z-30"
       sideOffset={10}
       forceMount
     >

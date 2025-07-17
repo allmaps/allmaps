@@ -1,5 +1,3 @@
-import { pick } from 'lodash-es'
-
 import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
@@ -15,8 +13,7 @@ import {
   bboxToCenter,
   computeBbox,
   convexHull,
-  mergeOptions,
-  mergePartialOptions
+  mergeOptions
 } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
@@ -34,9 +31,7 @@ import type {
   WarpedMapOptions
 } from '../shared/types.js'
 
-const defaultSelectionOptions: SelectionOptions = {
-  onlyVisible: false
-}
+const defaultSelectionOptions: SelectionOptions = {}
 
 const DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions<WarpedMapOptions> =
   {
@@ -302,6 +297,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         warpedMapChangedOptions = warpedMap.setOptions(options, listOptions)
       }
       changedOptions = mergeOptions(changedOptions, warpedMapChangedOptions)
+
       if (
         this.options.rtreeUpdatedOptions.some(
           (option) => option in warpedMapChangedOptions

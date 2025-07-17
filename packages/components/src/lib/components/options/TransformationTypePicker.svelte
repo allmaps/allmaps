@@ -21,16 +21,12 @@
     type TransformationType
   } from '@allmaps/transform'
 
-  export type TransformationTypeAndDefault =
-    | TransformationType
-    | 'fromAnnotation'
+  export type PickerTransformationType = TransformationType | 'fromAnnotation'
 
   let {
-    selectedTransformationType = $bindable(),
-    nextTransformationType
+    selectedTransformationType = $bindable()
   }: {
-    selectedTransformationType: TransformationTypeAndDefault
-    nextTransformationType: () => void
+    selectedTransformationType?: TransformationType | undefined
   } = $props()
 
   function camelCaseToWords(string: string): string {
@@ -41,7 +37,7 @@
   export const transformationTypes = [
     'fromAnnotation',
     ...supportedtransformationTypes
-  ] as TransformationTypeAndDefault[]
+  ] as PickerTransformationType[]
   let transformationTypeItems = transformationTypes.map(
     (transformationType) => {
       return {
@@ -59,7 +55,10 @@
   })
 </script>
 
-{#snippet item(transformationTypeItem: { value: string; label: string })}
+{#snippet item(transformationTypeItem: {
+  value: PickerTransformationType
+  label: string
+})}
   <div class="size-5 mr-2">
     {#if transformationTypeItem.value === 'fromAnnotation'}
       <FileMagnifyingGlass weight="thin" class="size-5" />
@@ -84,7 +83,10 @@
 
 <Select.Root
   type="single"
-  onValueChange={(v) => (selectedTransformationType = v as TransformationType)}
+  onValueChange={(v) => {
+    selectedTransformationType =
+      v === 'fromAnnotation' ? undefined : (v as TransformationType)
+  }}
   items={transformationTypeItems}
 >
   <Select.Trigger
@@ -111,7 +113,7 @@
       <Select.Viewport class="p-1">
         {#each transformationTypeItems as transformationTypeItem, i (i + transformationTypeItem.value)}
           <Select.Item
-            class="rounded-button data-highlighted:bg-muted outline-hidden data-disabled:opacity-50 flex h-10 w-full select-none items-center py-3 pl-3 pr-2 text-sm capitalize
+            class="rounded-button data-highlighted:bg-muted outline-hidden data-disabled:opacity-50 flex h-10 w-full select-none items-center pl-3 pr-2 text-sm capitalize
             rounded px-2 py-2 truncate outline-none data-[highlighted]:bg-gray-100"
             value={transformationTypeItem.value}
             label={transformationTypeItem.label}

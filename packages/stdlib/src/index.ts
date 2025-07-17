@@ -135,6 +135,7 @@ export {
   flipY,
   mixNumbers,
   mixPoints,
+  mixLineStrings,
   midPoint,
   lineAngle,
   stepDistanceAngle,

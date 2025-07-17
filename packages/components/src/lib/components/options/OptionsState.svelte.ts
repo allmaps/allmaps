@@ -1,62 +1,35 @@
 import { supportedtransformationTypes } from '@allmaps/transform'
-import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
+import {
+  mergeOptions,
+  mergeOptionsUnlessUndefined,
+  mergePartialOptions
+} from '@allmaps/stdlib'
 
 import type { TransformationType } from '@allmaps/transform'
 
-import type { ViewerComponentOptions } from '../Viewer.svelte'
-import type { Projection } from '$lib/shared/projections/projections.js'
+import type { PickerProjection } from '$lib/shared/projections/projections.js'
+import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
 // TODO Load Project from Project and handle fromAnnotation in Picker?
 
-export type TransformationTypeWithFromAnnotation =
-  | TransformationType
-  | 'fromAnnotation'
-export type OptionsWithFromAnnotation = Omit<
-  ViewerComponentOptions,
-  'transformationType'
-> & {
-  transformationType: TransformationTypeWithFromAnnotation
-}
-
 // There options must be present for the individual reactive state variables be bindable (not undefined)
-export type BindableOptions = {
+export type Options = {
   visible: boolean
   opacity: number
-  transformationType: TransformationTypeWithFromAnnotation
-  internalProjection: Projection
-}
-
-export type Options = Partial<OptionsWithFromAnnotation> & BindableOptions
-
-const transformationTypesWithFromAnnotation = [
-  ...supportedtransformationTypes,
-  'fromAnnotation'
-] as TransformationTypeWithFromAnnotation[]
+  transformationType: TransformationType | undefined
+  internalProjection: PickerProjection | undefined
+  renderGcps: boolean
+  renderTransformedGcps: boolean
+  renderClipMask: boolean
+} & Partial<MapLibreWarpedMapLayerOptions>
 
 let defaultOptions: Options = {
   visible: true,
   opacity: 1,
-  transformationType: 'fromAnnotation',
-  internalProjection: {
-    definition: 'fromAnnotation',
-    code: 'fromAnnotation',
-    name: 'fromAnnotation'
-  }
-}
-
-export function deleteFromAnnotationOptions(
-  optionsWithFromAnnotation: Partial<OptionsWithFromAnnotation>
-): Partial<ViewerComponentOptions> {
-  if (!optionsWithFromAnnotation) {
-    return {}
-  }
-  const options = optionsWithFromAnnotation
-  if (options.transformationType === 'fromAnnotation') {
-    delete options.transformationType
-  }
-  if (options.internalProjection?.definition === 'fromAnnotation') {
-    delete options.internalProjection
-  }
-  return options as Partial<ViewerComponentOptions>
+  transformationType: undefined,
+  internalProjection: undefined,
+  renderGcps: false,
+  renderTransformedGcps: false,
+  renderClipMask: false
 }
 
 export class OptionsState {
@@ -64,15 +37,18 @@ export class OptionsState {
 
   visible: boolean
   opacity: number
-  transformationType: TransformationTypeWithFromAnnotation
-  internalProjection: Projection
+  transformationType: TransformationType | undefined
+  internalProjection: PickerProjection | undefined
+  renderGcps: boolean
+  renderTransformedGcps: boolean
+  renderClipMask: boolean
 
-  viewOptions = $state<Partial<OptionsWithFromAnnotation>>()
-  mergedOptions
+  viewOptions: Partial<Options>
+  mergedOptions: Options
 
   constructor(
-    options: Partial<OptionsWithFromAnnotation> = {},
-    viewOptions: Partial<OptionsWithFromAnnotation> = {}
+    options: Partial<Options> = {},
+    viewOptions: Partial<Options> = {}
   ) {
     defaultOptions = mergeOptions(defaultOptions, options)
 
@@ -80,27 +56,33 @@ export class OptionsState {
     this.opacity = $derived(defaultOptions.opacity)
     this.transformationType = $derived(defaultOptions.transformationType)
     this.internalProjection = $derived(defaultOptions.internalProjection)
+    this.renderGcps = $derived(defaultOptions.renderGcps)
+    this.renderTransformedGcps = $derived(defaultOptions.renderTransformedGcps)
+    this.renderClipMask = $derived(defaultOptions.renderClipMask)
     this.options = $derived({
       visible: this.visible,
       opacity: this.opacity,
       transformationType: this.transformationType,
-      internalProjection: this.internalProjection
+      internalProjection: this.internalProjection,
+      renderGcps: this.renderGcps,
+      renderTransformedGcps: this.renderTransformedGcps,
+      renderClipMask: this.renderClipMask
     })
 
-    this.viewOptions = viewOptions
+    this.viewOptions = $state(viewOptions)
     this.mergedOptions = $derived(
-      mergePartialOptions(this.options, this.viewOptions)
+      mergeOptionsUnlessUndefined(this.options, this.viewOptions)
     )
   }
 
   nextTransformationType(): void {
     this.transformationType =
-      transformationTypesWithFromAnnotation[
-        (transformationTypesWithFromAnnotation.findIndex(
+      supportedtransformationTypes[
+        (supportedtransformationTypes.findIndex(
           (transformationType) => transformationType === this.transformationType
         ) +
           1) %
-          transformationTypesWithFromAnnotation.length
+          supportedtransformationTypes.length
       ]
   }
 }

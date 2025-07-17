@@ -21,7 +21,7 @@ import type { WebGL2WarpedMap } from '../webgl2.js'
 import type { TriangulatedWarpedMap } from '../maps/TriangulatedWarpedMap.js'
 
 export type SelectionOptions = {
-  onlyVisible: boolean
+  onlyVisible?: boolean
   mapIds?: Iterable<string>
   geoBbox?: Bbox
 }
@@ -54,9 +54,9 @@ export type SpecificTriangulatedWarpedMapOptions = {
 export type TriangulatedWarpedMapOptions =
   SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 export type SpecificWebGL2WarpedMapOptions = {
-  renderMaps: boolean
-  renderLines: boolean
-  renderPoints: boolean
+  renderMaps?: boolean
+  renderLines?: boolean
+  renderPoints?: boolean
   renderGcps: boolean
   renderGcpsSize?: number
   renderGcpsColor?: string
@@ -72,16 +72,21 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderVectorsColor?: string
   renderVectorsBorderSize?: number
   renderVectorsBorderColor?: string
-  renderMask: boolean
-  renderMaskSize?: number
-  renderMaskColor?: string
-  renderMaskBorderSize?: number
-  renderMaskBorderColor?: string
   renderFullMask: boolean
   renderFullMaskSize?: number
   renderFullMaskColor?: string
   renderFullMaskBorderSize?: number
   renderFullMaskBorderColor?: string
+  renderClipMask: boolean
+  renderClipMaskSize?: number
+  renderClipMaskColor?: string
+  renderClipMaskBorderSize?: number
+  renderClipMaskBorderColor?: string
+  renderMask: boolean
+  renderMaskSize?: number
+  renderMaskColor?: string
+  renderMaskBorderSize?: number
+  renderMaskBorderColor?: string
   opacity: number
   saturation: number
   removeColor: boolean

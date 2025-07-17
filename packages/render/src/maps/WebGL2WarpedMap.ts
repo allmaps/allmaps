@@ -66,20 +66,20 @@ const DEFAULT_RENDER_POINT_LAYER_OPTION = {
 
 const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions =
   {
-    renderMaps: true,
-    renderLines: false,
-    renderPoints: false,
     renderGcps: false,
     renderGcpsColor: blue,
     renderTransformedGcps: false,
     renderTransformedGcpsColor: pink,
     renderVectors: false,
-    renderMask: false,
-    renderMaskSize: 8,
-    renderMaskColor: pink,
     renderFullMask: false,
     renderFullMaskSize: 8,
     renderFullMaskColor: green,
+    renderClipMask: false,
+    renderClipMaskSize: 8,
+    renderClipMaskColor: pink,
+    renderMask: false,
+    renderMaskSize: 8,
+    renderMaskColor: pink,
     opacity: 1,
     saturation: 1,
     removeColor: false,
@@ -251,6 +251,28 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return changedMergedOptions
   }
 
+  shouldRenderMaps(): boolean {
+    return this.mergedOptions.renderMaps !== false
+  }
+
+  shouldRenderLines(): boolean {
+    return (
+      this.mergedOptions.renderLines !== false &&
+      (this.mergedOptions.renderFullMask ||
+        this.mergedOptions.renderClipMask ||
+        this.mergedOptions.renderMask ||
+        this.mergedOptions.renderVectors)
+    )
+  }
+
+  shouldRenderPoints(): boolean {
+    return (
+      this.mergedOptions.renderPoints !== false &&
+      (this.mergedOptions.renderGcps ||
+        this.mergedOptions.renderTransformedGcps)
+    )
+  }
+
   /**
    * Update the vertex buffers of this warped map
    *
@@ -263,13 +285,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       projectedGeoToClipHomogeneousTransform
     )
 
-    if (this.mergedOptions.renderMaps) {
+    if (this.shouldRenderMaps()) {
       this.updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)
     }
-    if (this.mergedOptions.renderLines) {
+    if (this.shouldRenderLines()) {
       this.updateVertexBuffersLines(projectedGeoToClipHomogeneousTransform)
     }
-    if (this.mergedOptions.renderPoints) {
+    if (this.shouldRenderPoints()) {
       this.updateVertexBuffersPoints(projectedGeoToClipHomogeneousTransform)
     }
   }
@@ -346,6 +368,31 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       })
     }
 
+    if (this.mergedOptions.renderFullMask) {
+      this.lineLayers.push({
+        projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
+        viewportSize: this.mergedOptions.renderFullMaskSize,
+        color: this.mergedOptions.renderFullMaskColor,
+        viewportBorderSize: this.mergedOptions.renderFullMaskBorderSize,
+        borderColor: this.mergedOptions.renderFullMaskBorderColor
+      })
+    }
+
+    if (this.mergedOptions.renderClipMask) {
+      this.lineLayers.push({
+        projectedGeoLines: lineStringToLines(
+          this.projectedGeoTriangulationClipMask
+        ),
+        projectedGeoPreviousLines: lineStringToLines(
+          this.projectedGeoPreviousTriangulationClipMask
+        ),
+        viewportSize: this.mergedOptions.renderMaskSize,
+        color: this.mergedOptions.renderMaskColor,
+        viewportBorderSize: this.mergedOptions.renderMaskBorderSize,
+        borderColor: this.mergedOptions.renderMaskBorderColor
+      })
+    }
+
     if (this.mergedOptions.renderMask) {
       this.lineLayers.push({
         projectedGeoLines: lineStringToLines(
@@ -358,16 +405,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         color: this.mergedOptions.renderMaskColor,
         viewportBorderSize: this.mergedOptions.renderMaskBorderSize,
         borderColor: this.mergedOptions.renderMaskBorderColor
-      })
-    }
-
-    if (this.mergedOptions.renderFullMask) {
-      this.lineLayers.push({
-        projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
-        viewportSize: this.mergedOptions.renderFullMaskSize,
-        color: this.mergedOptions.renderFullMaskColor,
-        viewportBorderSize: this.mergedOptions.renderFullMaskBorderSize,
-        borderColor: this.mergedOptions.renderFullMaskBorderColor
       })
     }
   }

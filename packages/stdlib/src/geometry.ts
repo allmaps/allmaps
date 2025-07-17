@@ -429,6 +429,16 @@ export function mixPoints(point0: Point, point1: Point, t: number): Point {
   ]
 }
 
+export function mixLineStrings(
+  lineString0: LineString,
+  lineString1: LineString,
+  t: number
+): LineString {
+  return lineString0.map((point, index) => {
+    return mixPoints(point, lineString1[index], t)
+  })
+}
+
 // Compute
 
 export function midPoint(...points: Point[]): Point {

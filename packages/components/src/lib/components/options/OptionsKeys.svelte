@@ -17,6 +17,10 @@
       optionsState.opacity = 0
     } else if (e.key === 't') {
       optionsState.nextTransformationType()
+    } else if (e.key === 'p') {
+      optionsState.renderTransformedGcps = !optionsState.renderTransformedGcps
+    } else if (e.key === 'm') {
+      optionsState.renderClipMask = !optionsState.renderClipMask
     }
   }
 

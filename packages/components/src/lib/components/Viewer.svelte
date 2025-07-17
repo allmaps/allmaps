@@ -15,10 +15,12 @@
 
   let {
     annotations = [],
-    optionsState = $bindable(new OptionsState())
+    optionsState = $bindable(new OptionsState()),
+    componentOptions = {}
   }: {
     annotations: unknown[]
     optionsState: OptionsState
+    componentOptions: Partial<ViewerComponentOptions>
   } = $props()
 
   let selectedMapId: string | undefined = $state(undefined)
@@ -41,6 +43,7 @@
     {optionsState}
     {selectedMapId}
     {mapOrImage}
+    {componentOptions}
   />
 </div>
 

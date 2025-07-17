@@ -4,34 +4,44 @@ import Flatbush from 'flatbush'
 import { bboxToResolution } from '@allmaps/stdlib'
 
 import type { Bbox } from '@allmaps/types'
+import { webMercatorProjection, type Projection } from '@allmaps/project'
 
-export type Projection = {
-  code: string
+export type PickerProjection = Projection<string> & {
   name: string
   definition: string
+  code: string
   bbox?: Bbox
   comment?: string
 }
-type ProjectionWithBbox = Projection & { bbox: Bbox; bboxArea: number }
+type PickerProjectionWithBbox = PickerProjection & {
+  bbox: Bbox
+  bboxArea: number
+}
+
+export const webMercatorPickerProjection: PickerProjection = {
+  ...webMercatorProjection,
+  name: 'EPSG:3857',
+  code: '3857'
+}
 
 export function createSearchProjectionsWithFuse(
-  projections: Projection[]
-): (query: string) => Projection[] {
+  projections: PickerProjection[]
+): (query: string) => PickerProjection[] {
   const fuse = new Fuse(projections, {
     keys: ['name'], // Fields to search
     threshold: 0.3, // Lower means stricter matching
     minMatchCharLength: 3 // Minimum characters that must match
   })
 
-  return function searchProjections(query: string): Projection[] {
+  return function searchProjections(query: string): PickerProjection[] {
     return fuse.search(query).map((result) => result.item)
   }
 }
 
 export function createSuggestProjectionsWithFlatbush(
-  projections: Projection[]
-): (bbox: Bbox) => Projection[] {
-  const projectionWithBbox: ProjectionWithBbox[] = []
+  projections: PickerProjection[]
+): (bbox: Bbox) => PickerProjection[] {
+  const projectionWithBbox: PickerProjectionWithBbox[] = []
   projections.forEach((projection) => {
     if (projection.bbox != undefined) {
       projectionWithBbox.push({
@@ -48,7 +58,7 @@ export function createSuggestProjectionsWithFlatbush(
   }
   flatbushIndex.finish()
 
-  return function suggestProjections(bbox: Bbox): Projection[] {
+  return function suggestProjections(bbox: Bbox): PickerProjection[] {
     return flatbushIndex
       .search(...bbox)
       .map((i) => projectionWithBbox[i])

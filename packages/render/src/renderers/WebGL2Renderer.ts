@@ -467,7 +467,7 @@ export class WebGL2Renderer
     for (const mapId of this.mapsWithRequestedTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap || !webgl2WarpedMap.mergedOptions.renderMaps) {
+      if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderMaps()) {
         continue
       }
 
@@ -488,7 +488,7 @@ export class WebGL2Renderer
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap || !webgl2WarpedMap.mergedOptions.renderLines) {
+      if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderLines()) {
         continue
       }
 
@@ -514,7 +514,7 @@ export class WebGL2Renderer
     for (const mapId of this.mapsInViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap! || !webgl2WarpedMap.mergedOptions.renderPoints) {
+      if (!webgl2WarpedMap! || !webgl2WarpedMap.shouldRenderPoints()) {
         continue
       }
 

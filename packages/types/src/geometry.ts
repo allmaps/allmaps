@@ -65,7 +65,7 @@ export type TypedGeometry<P> =
   | TypedMultiPolygon<P>
 
 export type MultiGeometryOptions = {
-  isMultiGeometry: false
+  isMultiGeometry: boolean
 }
 
 export type Gcp = { resource: Point; geo: Point }

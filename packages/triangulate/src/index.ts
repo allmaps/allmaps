@@ -1,5 +1,6 @@
 import {
   getGridPointsInBbox,
+  interpolateRing,
   interpolatePolygon,
   pointInPolygon
 } from './shared.js'
@@ -49,6 +50,8 @@ const defaultTriangulationOptions = {
   steinerPoints: [],
   minimumTriangleAngle: MINIMUM_TRIANGLE_ANGLE
 } as TriangluationOptions
+
+export { interpolateRing, interpolatePolygon }
 
 /**
  * Triangulate a polygon to triangles smaller then a distance

@@ -174,9 +174,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     this.warpedMapList.options.projection = this.viewport.projection
-    this.warpedMapList.setMapsProjection(this.viewport.projection, {
-      onlyVisible: false
-    })
+    this.warpedMapList.setMapsProjection(this.viewport.projection)
   }
 
   protected requestFetchableTiles(): void {

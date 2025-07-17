@@ -91,7 +91,6 @@
   </div>
   <TransformationTypePicker
     bind:selectedTransformationType={optionsState.transformationType}
-    nextTransformationType={optionsState.nextTransformationType}
   ></TransformationTypePicker>
   <div class="text-sm content-center">Projection</div>
   <ProjectionPicker
@@ -101,4 +100,76 @@
     {bbox}
     suggestProjections={suggestProjectionsWithFlatbush}
   ></ProjectionPicker>
+  <Label.Root
+    id="render-gcps-label"
+    for="render-gcps"
+    class="text-sm content-center leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  >
+    Render GCPs
+  </Label.Root>
+  <Checkbox.Root
+    id="render-gcps"
+    aria-labelledby="render-gcps-label"
+    class="border-muted bg-white data-[state=unchecked]:border-border-input data-[state=checked]:bg-pink-500 data-[state=unchecked]:bg-white data-[state=unchecked]:hover:border-dark-40 peer inline-flex size-[25px] items-center justify-center rounded-md border transition-all duration-150 ease-in-out active:scale-[0.98]"
+    name="render-gcps"
+    bind:checked={optionsState.renderGcps}
+  >
+    {#snippet children({ checked })}
+      <div class="text-white inline-flex items-center justify-center">
+        {#if checked}
+          <Check class="size-[15px] " weight="bold" />
+        {/if}
+      </div>
+    {/snippet}
+  </Checkbox.Root>
+  <Label.Root
+    id="render-transformer-gcps-label"
+    for="render-transformer-gcps"
+    class="text-sm content-center leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  >
+    Render Transformed GCPs<kbd
+      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
+      >p</kbd
+    >
+  </Label.Root>
+  <Checkbox.Root
+    id="render-transformer-gcps"
+    aria-labelledby="render-transformer-gcps-label"
+    class="border-muted bg-white data-[state=unchecked]:border-border-input data-[state=checked]:bg-pink-500 data-[state=unchecked]:bg-white data-[state=unchecked]:hover:border-dark-40 peer inline-flex size-[25px] items-center justify-center rounded-md border transition-all duration-150 ease-in-out active:scale-[0.98]"
+    name="render-transformer-gcps"
+    bind:checked={optionsState.renderTransformedGcps}
+  >
+    {#snippet children({ checked })}
+      <div class="text-white inline-flex items-center justify-center">
+        {#if checked}
+          <Check class="size-[15px] " weight="bold" />
+        {/if}
+      </div>
+    {/snippet}
+  </Checkbox.Root>
+  <Label.Root
+    id="render-mask-label"
+    for="render-mask"
+    class="text-sm content-center leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+  >
+    Render Mask<kbd
+      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
+      >m</kbd
+    >
+  </Label.Root>
+  <Checkbox.Root
+    id="render-mask"
+    aria-labelledby="render-mask-label"
+    class="border-muted bg-white data-[state=unchecked]:border-border-input data-[state=checked]:bg-pink-500 data-[state=unchecked]:bg-white data-[state=unchecked]:hover:border-dark-40 peer inline-flex size-[25px] items-center justify-center rounded-md border transition-all duration-150 ease-in-out active:scale-[0.98]"
+    name="render-mask"
+    bind:checked={optionsState.renderClipMask}
+  >
+    {#snippet children({ checked })}
+      <div class="text-white inline-flex items-center justify-center">
+        {#if checked}
+          <Check class="size-[15px] " weight="bold" />
+        {/if}
+      </div>
+    {/snippet}
+  </Checkbox.Root>
 </div>

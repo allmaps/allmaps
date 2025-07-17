@@ -15,7 +15,7 @@ import {
   rectanglesToScale,
   fetchImageInfo,
   getPropertyFromCacheOrComputation,
-  mixPoints,
+  mixLineStrings,
   sizeToRectangle,
   mergePartialOptions,
   mergeOptionsUnlessUndefined,
@@ -87,13 +87,15 @@ export function createWarpedMapFactory() {
  * @param projectedGeoPoints - The projected geospatial coordinates of the projected ground control points
  * @param projectedGeoPreviousTransformedResourcePoints - The projectedGeoTransformedResourcePoints of the previous transformation type, used during transformation transitions
  * @param projectedGeoTransformedResourcePoints - The resource coordinates of the ground control points, transformed to projected geospatial coordinates using the projected transformer
- * @param resourcePreviousMask - Resource mask of the previous transformation type
- * @param resourceMask - Resource mask
- * @param resourceMaskBbox - Bbox of the resourceMask
- * @param resourceMaskRectangle - Rectangle of the resourceMaskBbox
  * @param resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param resourceFullMaskBbox - Bbox of the resource full mask
  * @param resourceFullMaskRectangle - Rectangle of the resource full mask bbox
+ * @param resourceClipMask - Resource clip mask
+ * @param resourceClipMaskBbox - Bbox of the resourceClipMask
+ * @param resourceClipMaskRectangle - Rectangle of the resourceClipMaskBbox
+ * @param resourceMask - Resource mask
+ * @param resourceMaskBbox - Bbox of the resourceMask
+ * @param resourceMaskRectangle - Rectangle of the resourceMaskBbox
  * @param previousTransformationType - Previous transformation type
  * @param transformationType - Transformation type used in the transfomer. This is loaded from the georeference annotation.
  * @param previousInternalProjection - Previous internal projection
@@ -102,19 +104,24 @@ export function createWarpedMapFactory() {
  * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformerByTransformationType - A Map of projected transformers by transformationType
+ * @param geoFullMask - resourceClipMask in geospatial coordinates
+ * @param geoFullMaskBbox - Bbox of the geoFullMask
+ * @param geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
+ * @param geoClipMask - resourceClipMask in geospatial coordinates
+ * @param geoClipMaskBbox - Bbox of the geoFullMask
+ * @param geoClipMaskRectangle - resourceClipMaskRectangle in geospatial coordinates
  * @param geoMask - resourceMask in geospatial coordinates
  * @param geoMaskBbox - Bbox of the geoMask
  * @param geoMaskRectangle - resourceMaskRectangle in geospatial coordinates
- * @param geoFullMask - resourceFullMask in geospatial coordinates
- * @param geoFullMaskBbox - Bbox of the geoFullMask
- * @param geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
- * @param projectedGeoPreviousMask - The projectedGeoMask of the previous transformation type, used during transformation transitions
- * @param projectedGeoMask - resourceMask in projected geospatial coordinates
- * @param projectedGeoMaskBbox - Bbox of the projectedGeoMask
- * @param projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
  * @param projectedGeoFullMask - resourceFullMask in projected geospatial coordinates
  * @param projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
  * @param projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projected geospatial coordinates
+ * @param projectedGeoClipMask - resourceClipMask in projected geospatial coordinates
+ * @param projectedGeoClipMaskBbox - Bbox of the projectedGeoClipMask
+ * @param projectedGeoClipMaskRectangle - resourceClipMaskRectangle in projected geospatial coordinates
+ * @param projectedGeoMask - resourceMask in projected geospatial coordinates
+ * @param projectedGeoMaskBbox - Bbox of the projectedGeoMask
+ * @param projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
  * @param resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param previousDistortionMeasure - Previous distortion measure displayed for this map
  * @param distortionMeasure - Distortion measure displayed for this map
@@ -154,12 +161,15 @@ export class WarpedMap extends EventTarget {
   projectedGeoPreviousTransformedResourcePoints!: Point[]
   projectedGeoTransformedResourcePoints!: Point[]
 
-  resourceMask!: Ring
-  resourceMaskBbox!: Bbox
-  resourceMaskRectangle!: Rectangle
   resourceFullMask!: Ring
   resourceFullMaskBbox!: Bbox
   resourceFullMaskRectangle!: Rectangle
+  resourceClipMask!: Ring
+  resourceClipMaskBbox!: Bbox
+  resourceClipMaskRectangle!: Rectangle
+  resourceMask!: Ring
+  resourceMaskBbox!: Bbox
+  resourceMaskRectangle!: Rectangle
 
   previousTransformationType!: TransformationType
   transformationType!: TransformationType
@@ -175,19 +185,25 @@ export class WarpedMap extends EventTarget {
     ProjectedGcpTransformer
   >
 
-  geoMask!: Ring
-  geoMaskBbox!: Bbox
-  geoMaskRectangle!: Rectangle
   geoFullMask!: Ring
   geoFullMaskBbox!: Bbox
   geoFullMaskRectangle!: Rectangle
+  geoClipMask!: Ring
+  geoClipMaskBbox!: Bbox
+  geoClipMaskRectangle!: Rectangle
+  geoMask!: Ring
+  geoMaskBbox!: Bbox
+  geoMaskRectangle!: Rectangle
 
-  projectedGeoMask!: Ring
-  projectedGeoMaskBbox!: Bbox
-  projectedGeoMaskRectangle!: Rectangle
   projectedGeoFullMask!: Ring
   projectedGeoFullMaskBbox!: Bbox
   projectedGeoFullMaskRectangle!: Rectangle
+  projectedGeoClipMask!: Ring
+  projectedGeoClipMaskBbox!: Bbox
+  projectedGeoClipMaskRectangle!: Rectangle
+  projectedGeoMask!: Ring
+  projectedGeoMaskBbox!: Bbox
+  projectedGeoMaskRectangle!: Rectangle
 
   resourceToProjectedGeoScale!: number
 
@@ -233,7 +249,7 @@ export class WarpedMap extends EventTarget {
     this.projectedTransformerCache = new Map()
     this.loadingImageInfo = false
 
-    this.options = options
+    this.listOptions = options
     this.georeferencedMapOptions = {
       transformationType: georeferencedMap.transformation
         ?.type as TransformationType,
@@ -303,11 +319,11 @@ export class WarpedMap extends EventTarget {
       this.gcps = this.mergedOptions.gcps
 
       this.resourceFullMask = this.getResourceFullMask()
+      this.resourceClipMask = this.georeferencedMap.resourceMask
       this.resourceMask = this.mergedOptions.applyMask
-        ? this.georeferencedMap.resourceMask
+        ? this.resourceClipMask
         : this.resourceFullMask
       this.updateResourceMaskProperties()
-      this.updateResourceFullMaskProperties()
 
       this.transformationType = this.mergedOptions.transformationType
       this.previousTransformationType = this.transformationType
@@ -324,12 +340,15 @@ export class WarpedMap extends EventTarget {
 
       if (
         'resourceMask' in changedMergedOptions ||
+        'clipMask' in changedMergedOptions ||
         'applyMask' in changedMergedOptions
       ) {
+        const resourceFullMask = this.getResourceFullMask()
+        const resourceClipMask = this.mergedOptions.resourceMask
         const resourceMask = this.mergedOptions.applyMask
-          ? this.mergedOptions.resourceMask
-          : this.getResourceFullMask()
-        this.setResourceMask(resourceMask)
+          ? resourceClipMask
+          : resourceFullMask
+        this.setResourceMask(resourceFullMask, resourceClipMask, resourceMask)
       }
 
       if ('transformationType' in changedMergedOptions) {
@@ -525,11 +544,15 @@ export class WarpedMap extends EventTarget {
    *
    * @param resourceMask
    */
-  protected setResourceMask(resourceMask: Ring): void {
+  protected setResourceMask(
+    resourceFullMask: Ring,
+    resourceClipMask: Ring,
+    resourceMask: Ring
+  ): void {
+    this.resourceFullMask = resourceFullMask
+    this.resourceClipMask = resourceClipMask
     this.resourceMask = resourceMask
-    this.resourceFullMask = this.getResourceFullMask()
     this.updateResourceMaskProperties()
-    this.updateResourceFullMaskProperties()
     this.updateGeoMaskProperties()
     this.updateProjectedGeoMaskProperties()
   }
@@ -712,14 +735,11 @@ export class WarpedMap extends EventTarget {
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
     this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
-    this.projectedGeoPreviousTransformedResourcePoints =
-      this.projectedGeoTransformedResourcePoints.map((point, index) => {
-        return mixPoints(
-          point,
-          this.projectedGeoPreviousTransformedResourcePoints[index],
-          t
-        )
-      })
+    this.projectedGeoPreviousTransformedResourcePoints = mixLineStrings(
+      this.projectedGeoTransformedResourcePoints,
+      this.projectedGeoPreviousTransformedResourcePoints,
+      t
+    )
   }
 
   /**
@@ -775,6 +795,10 @@ export class WarpedMap extends EventTarget {
   }
 
   private updateResourceMaskProperties() {
+    this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
+    this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
+    this.resourceClipMaskBbox = computeBbox(this.resourceClipMask)
+    this.resourceClipMaskRectangle = bboxToRectangle(this.resourceClipMaskBbox)
     this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
   }
@@ -783,7 +807,7 @@ export class WarpedMap extends EventTarget {
     const resourceWidth = this.georeferencedMap.resource.width
     const resourceHeight = this.georeferencedMap.resource.height
 
-    // If width and height not set on georeferenced map
+    // If width and height are not set on georeferenced map
     // get full mask from resource mask, which is sure to be set
     if (resourceWidth && resourceHeight) {
       return sizeToRectangle([resourceWidth, resourceHeight])
@@ -792,19 +816,16 @@ export class WarpedMap extends EventTarget {
     }
   }
 
-  private updateResourceFullMaskProperties() {
-    this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
-    this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
-  }
-
   private updateGeoMaskProperties() {
-    this.updateGeoMask()
     this.updateFullGeoMask()
+    this.updateClipGeoMask()
+    this.updateGeoMask()
   }
 
   private updateProjectedGeoMaskProperties() {
-    this.updateProjectedGeoMask()
     this.updateProjectedFullGeoMask()
+    this.updateProjectedClipGeoMask()
+    this.updateProjectedGeoMask()
     this.updateResourceToProjectedGeoScale()
   }
 
@@ -825,18 +846,6 @@ export class WarpedMap extends EventTarget {
     }
   }
 
-  private updateGeoMask(): void {
-    this.geoMask = this.projectedTransformer.transformToGeo(
-      [this.resourceMask],
-      { projection: lonLatProjection }
-    )[0]
-    this.geoMaskBbox = computeBbox(this.geoMask)
-    this.geoMaskRectangle = this.projectedTransformer.transformToGeo(
-      [this.resourceMaskRectangle],
-      { maxDepth: 0, projection: lonLatProjection }
-    )[0] as Rectangle
-  }
-
   private updateFullGeoMask(): void {
     this.geoFullMask = this.projectedTransformer.transformToGeo(
       [this.resourceFullMask],
@@ -849,14 +858,27 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  private updateProjectedGeoMask(): void {
-    this.projectedGeoMask = this.projectedTransformer.transformToGeo([
-      this.resourceMask
-    ])[0]
-    this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
-    this.projectedGeoMaskRectangle = this.projectedTransformer.transformToGeo(
+  private updateClipGeoMask(): void {
+    this.geoClipMask = this.projectedTransformer.transformToGeo(
+      [this.resourceClipMask],
+      { projection: lonLatProjection }
+    )[0]
+    this.geoClipMaskBbox = computeBbox(this.geoClipMask)
+    this.geoClipMaskRectangle = this.projectedTransformer.transformToGeo(
+      [this.resourceClipMaskRectangle],
+      { maxDepth: 0, projection: lonLatProjection }
+    )[0] as Rectangle
+  }
+
+  private updateGeoMask(): void {
+    this.geoMask = this.projectedTransformer.transformToGeo(
+      [this.resourceMask],
+      { projection: lonLatProjection }
+    )[0]
+    this.geoMaskBbox = computeBbox(this.geoMask)
+    this.geoMaskRectangle = this.projectedTransformer.transformToGeo(
       [this.resourceMaskRectangle],
-      { maxDepth: 0 }
+      { maxDepth: 0, projection: lonLatProjection }
     )[0] as Rectangle
   }
 
@@ -870,6 +892,29 @@ export class WarpedMap extends EventTarget {
         [this.resourceFullMaskRectangle],
         { maxDepth: 0 }
       )[0] as Rectangle
+  }
+
+  private updateProjectedClipGeoMask(): void {
+    this.projectedGeoClipMask = this.projectedTransformer.transformToGeo([
+      this.resourceClipMask
+    ])[0]
+    this.projectedGeoClipMaskBbox = computeBbox(this.projectedGeoClipMask)
+    this.projectedGeoClipMaskRectangle =
+      this.projectedTransformer.transformToGeo(
+        [this.resourceClipMaskRectangle],
+        { maxDepth: 0 }
+      )[0] as Rectangle
+  }
+
+  private updateProjectedGeoMask(): void {
+    this.projectedGeoMask = this.projectedTransformer.transformToGeo([
+      this.resourceMask
+    ])[0]
+    this.projectedGeoMaskBbox = computeBbox(this.projectedGeoMask)
+    this.projectedGeoMaskRectangle = this.projectedTransformer.transformToGeo(
+      [this.resourceMaskRectangle],
+      { maxDepth: 0 }
+    )[0] as Rectangle
   }
 
   private updateResourceToProjectedGeoScale(): void {

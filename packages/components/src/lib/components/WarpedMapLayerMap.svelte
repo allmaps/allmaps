@@ -10,31 +10,30 @@
   import { computeBbox } from '@allmaps/stdlib'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
-  import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
 
-  import {
-    deleteFromAnnotationOptions,
-    OptionsState
-  } from './options/OptionsState.svelte'
-  import { webMercatorProjection } from '@allmaps/project'
+  import { OptionsState } from './options/OptionsState.svelte'
+  import { webMercatorPickerProjection } from '$lib/shared/projections/projections'
 
-  export type WarpedMapLayerMapComponentOptions =
-    MapLibreWarpedMapLayerOptions & {
-      addNavigationControl: boolean
-      addGeolocateControl: boolean
-      opacity: number // TODO: remove when in MapLibreWarpedMapLayerOptions
-    }
+  export type WarpedMapLayerMapComponentOptions = {
+    addNavigationControl: boolean
+    addGeolocateControl: boolean
+    opacity: number // TODO: remove when in MapLibreWarpedMapLayerOptions
+  }
 
   let {
     georeferencedMaps = [],
     optionsState = new OptionsState(),
+    optionsStateByMapId = new Map(),
+    componentOptions = {},
     mapOrImage = $bindable('map'),
     selectedMapId = $bindable(undefined)
   }: {
     georeferencedMaps: GeoreferencedMap[]
     optionsState?: OptionsState
+    optionsStateByMapId?: Map<string, OptionsState>
+    componentOptions?: Partial<WarpedMapLayerMapComponentOptions>
     mapOrImage?: 'map' | 'image'
     selectedMapId?: string
   } = $props()
@@ -47,6 +46,7 @@
   let geoBbox: Bbox | undefined = $state(undefined)
   let selectedGeoreferencedMap: GeoreferencedMap | undefined = $state(undefined)
   let selectedWarpedMap: WarpedMap | undefined = $state(undefined)
+  let selectedOptionState: OptionsState | undefined = $state(undefined)
 
   onMount(() => {
     const protocol = new Protocol()
@@ -61,10 +61,10 @@
 
     // addTerrain(map, maplibregl)
 
-    if (optionsState.mergedOptions.addNavigationControl) {
+    if (componentOptions.addNavigationControl) {
       map.addControl(new maplibregl.NavigationControl(), 'top-left')
     }
-    if (optionsState.mergedOptions.addGeolocateControl) {
+    if (componentOptions.addGeolocateControl) {
       map.addControl(
         new maplibregl.GeolocateControl({
           positionOptions: {
@@ -82,21 +82,36 @@
       // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
     })
+
+    map.on('click', (e) => {
+      if (!warpedMapLayer) {
+        return
+      }
+      selectedMapId = warpedMapLayer.getWarpedMapList().getMapIds({
+        geoBbox: [e.lngLat.lng, e.lngLat.lat, e.lngLat.lng, e.lngLat.lat]
+      })[0]
+    })
   })
 
+  // Derive selected properties
   $effect(() => {
+    if (!selectedMapId) {
+      selectedWarpedMap = undefined
+      selectedOptionState = undefined
+      return
+    }
+
     selectedGeoreferencedMap = georeferencedMaps.find(
       (georeferencedMap) => georeferencedMap.id == selectedMapId
     )
     selectedWarpedMap = warpedMaps.find(
       (warpedMap) => warpedMap.mapId == selectedMapId
     )
+    selectedOptionState = optionsStateByMapId.get(selectedMapId)
   })
 
+  // Switch between 'map' and 'image'
   $effect(() => {
-    // if (!selectedMapId && warpedMaps[0]) {
-    //   selectedMapId = warpedMaps[0].mapId
-    // }
     if (mapOrImage === 'map') {
       for (const layer of map.getLayersOrder()) {
         if (layer !== warpedMapLayer?.id) {
@@ -105,7 +120,9 @@
       }
       warpedMapLayer?.showMaps(mapIds)
       map.rotateTo(0)
-      optionsState.viewOptions = {}
+      optionsState.viewOptions.transformationType = undefined
+      optionsState.viewOptions.internalProjection = undefined
+      optionsState.viewOptions.applyMask = undefined
     } else if (mapOrImage == 'image') {
       for (const layer of map.getLayersOrder()) {
         if (layer !== warpedMapLayer?.id) {
@@ -118,14 +135,13 @@
         warpedMapLayer?.showMap(selectedMapId)
         // TODO: fix: reset transformation type: use extraOptions
       }
-      optionsState.viewOptions = {
-        transformationType: 'helmert',
-        internalProjection: webMercatorProjection,
-        applyMask: false
-      }
+      optionsState.viewOptions.transformationType = 'helmert'
+      optionsState.viewOptions.internalProjection = webMercatorPickerProjection
+      optionsState.viewOptions.applyMask = false
     }
   })
 
+  // Add maps
   $effect(() => {
     if (!warpedMapLayer) {
       return
@@ -157,15 +173,20 @@
     })
   })
 
+  // Set options
   $effect(() => {
     if (!warpedMapLayer) {
       return
     }
 
     // TODO: check in warpedmaplayer that options are also applied to new maps
-    warpedMapLayer.setLayerOptions(
-      deleteFromAnnotationOptions(optionsState?.mergedOptions)
-    )
+    warpedMapLayer.setLayerOptions(optionsState?.mergedOptions)
+    if (selectedMapId && selectedOptionState) {
+      warpedMapLayer.setMapsOptions(
+        [selectedMapId],
+        selectedOptionState.mergedOptions
+      )
+    }
   })
 
   // Fit bounds on mount
@@ -179,10 +200,12 @@
   // Fit bounds on select
   $effect(() => {
     if (!selectedWarpedMap) {
+      // optionsState.viewOptions.renderClipMask = undefined
       if (geoBbox) {
         map.fitBounds(geoBbox, { bearing: map.getBearing() })
       }
     } else {
+      // optionsState.viewOptions.renderClipMask = true
       let bbox = selectedWarpedMap.geoMaskBbox
       // Recompute bbox in case upside down
       bbox = computeBbox([
