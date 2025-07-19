@@ -45,12 +45,11 @@
     "@allmaps/types": "workspace:^",
     "@kninnug/constrainautor": "^4.0.0",
     "delaunator": "^5.0.1",
-    "robust-point-in-polygon": "^1.0.3"
+    "point-in-polygon-hao": "^1.2.4"
   },
   "devDependencies": {
     "@types/delaunator": "^5.0.3",
     "@types/eslint": "^8.56.0",
-    "@types/robust-point-in-polygon": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",

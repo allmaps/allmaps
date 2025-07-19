@@ -1,4 +1,4 @@
-import classifyPoint from 'robust-point-in-polygon'
+import inside from 'point-in-polygon-hao'
 
 import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
 
@@ -9,7 +9,8 @@ import {
   polygonSelfIntersectionPoints,
   arrayRepeated,
   bboxToDiameter,
-  isPoint
+  isPoint,
+  closeRing
 } from '@allmaps/stdlib'
 import { Helmert, Polynomial1 } from '@allmaps/transform'
 import {
@@ -237,7 +238,9 @@ export class Analyzer {
       const gcpsOutside = []
       for (const gcp of this.georeferencedMap.gcps) {
         if (
-          classifyPoint(this.georeferencedMap.resourceMask, gcp.resource) == 1
+          inside(gcp.resource, [
+            closeRing(this.georeferencedMap.resourceMask)
+          ]) === false
         ) {
           gcpsOutside.push(gcp)
         }
@@ -262,10 +265,13 @@ export class Analyzer {
     code = 'maskpointoutsidefullmask'
     if (codes.includes(code) && this.warpedMap) {
       const resourceMaskOutsideFullMaskPoints = []
+
+      const closedResourceFullMask = [
+        closeRing(this.warpedMap.resourceFullMask)
+      ]
+
       for (const resourcePoint of this.warpedMap.resourceMask) {
-        if (
-          classifyPoint(this.warpedMap.resourceFullMask, resourcePoint) == 1
-        ) {
+        if (inside(resourcePoint, closedResourceFullMask) === false) {
           resourceMaskOutsideFullMaskPoints.push(resourcePoint)
         }
       }
