@@ -57,7 +57,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components'
   </TabItem>
   <TabItem label="Leaflet">
     ```js
-    import L from 'leaflet'
+    import * as L from 'leaflet'
     import { WarpedMapLayer } from '@allmaps/leaflet'
 
     const map = L.map('map', {
