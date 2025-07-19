@@ -17,7 +17,7 @@
       "dependsOn": ["^lint"]
     },
     "test": {
-      "inputs": ["src/**/*.*", "test/**/*.*"],
+      "inputs": ["dist/**/*.*", "src/**/*.*", "test/**/*.*"],
       "outputs": ["dist/**", "build/**"],
       "dependsOn": ["^test"]
     },
