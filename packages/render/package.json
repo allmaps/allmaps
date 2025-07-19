@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.75",
+  "version": "1.0.0-beta.76",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -61,8 +61,8 @@
     "@allmaps/types": "workspace:^",
     "comlink": "^4.4.1",
     "lodash-es": "^4.17.21",
-    "rbush": "^4.0.0",
-    "point-in-polygon-hao": "^1.2.4"
+    "point-in-polygon-hao": "^1.2.4",
+    "rbush": "^4.0.0"
   },
   "license": "MIT",
   "devDependencies": {
