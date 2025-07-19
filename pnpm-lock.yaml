@@ -1095,10 +1095,16 @@ importers:
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../stdlib
+      '@allmaps/transform':
+        specifier: workspace:^
+        version: link:../transform
       '@turf/bearing':
         specifier: ^7.2.0
         version: 7.2.0
     devDependencies:
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.12
@@ -1167,17 +1173,10 @@ importers:
         version: 7.1.0
       maplibre-gl:
         specifier: ^5.6.0
-<<<<<<< Updated upstream
-        version: 5.6.0
-      phosphor-svelte:
-        specifier: ^2.0.1
-        version: 2.0.1(svelte@5.33.13)
-=======
         version: 5.6.1
       phosphor-svelte:
         specifier: ^2.0.1
         version: 2.0.1(svelte@5.35.4)
->>>>>>> Stashed changes
       pmtiles:
         specifier: ^3.0.6
         version: 3.2.1
@@ -1208,11 +1207,7 @@ importers:
         version: 5.1.0(svelte@5.35.4)(vite@6.3.5)
       '@tailwindcss/vite':
         specifier: ^4.0.0
-<<<<<<< Updated upstream
-        version: 4.1.8(vite@6.3.5)
-=======
         version: 4.1.11(vite@6.3.5)
->>>>>>> Stashed changes
       eslint:
         specifier: ^9.18.0
         version: 9.30.1
@@ -4569,11 +4564,7 @@ packages:
       tinyqueue: 3.0.0
     dev: false
 
-<<<<<<< Updated upstream
-  /@mdx-js/mdx@3.1.0(acorn@8.14.1):
-=======
   /@mdx-js/mdx@3.1.0(acorn@8.15.0):
->>>>>>> Stashed changes
     resolution: {integrity: sha512-/QxEhPAvGwbQmy1Px8F899L5Uc2KZ6JtXwlCgJmjSTBedwOZkByYcBG4GceIGPXRDsmfxhHazuS+hlOShRLeDw==}
     dependencies:
       '@types/estree': 1.0.8
@@ -5630,11 +5621,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-<<<<<<< Updated upstream
-      '@sveltejs/kit': 2.21.1(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19)
-=======
       '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19)
->>>>>>> Stashed changes
     dev: true
 
   /@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19):
@@ -10060,6 +10047,7 @@ packages:
 
   /is-arrayish@0.3.2:
     resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
+    requiresBuild: true
 
   /is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -10816,13 +10804,8 @@ packages:
       vt-pbf: 3.1.3
     dev: false
 
-<<<<<<< Updated upstream
-  /maplibre-gl@5.6.0:
-    resolution: {integrity: sha512-7TuHMozUC4rlIp08bSsxCixFn18P24otrlZU/7UGCO5RufFTJadFzauTrvBHr9FB67MbJ6nvFXEftGd0bUl4Iw==}
-=======
   /maplibre-gl@5.6.1:
     resolution: {integrity: sha512-TTSfoTaF7RqKUR9wR5qDxCHH2J1XfZ1E85luiLOx0h8r50T/LnwAwwfV0WVNh9o8dA7rwt57Ucivf1emyeukXg==}
->>>>>>> Stashed changes
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
     dependencies:
       '@mapbox/geojson-rewind': 0.5.2
@@ -14369,6 +14352,7 @@ packages:
 
   /simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
+    requiresBuild: true
     dependencies:
       is-arrayish: 0.3.2
 

@@ -4,85 +4,80 @@
   import CaretUpDown from 'phosphor-svelte/lib/CaretUpDown'
   import CaretDoubleUp from 'phosphor-svelte/lib/CaretDoubleUp'
   import CaretDoubleDown from 'phosphor-svelte/lib/CaretDoubleDown'
-  import FileMagnifyingGlass from 'phosphor-svelte/lib/FileMagnifyingGlass'
+  import Angle from 'phosphor-svelte/lib/Angle'
+  import Empty from 'phosphor-svelte/lib/Empty'
+  import Resize from 'phosphor-svelte/lib/Resize'
 
-  import {
-    Straight,
-    Helmert,
-    Polynomial1,
-    Polynomial2,
-    Polynomial3,
-    ThinPlateSpline,
-    Projective
-  } from '@allmaps/ui'
-
-  import { supportedtransformationTypes } from '@allmaps/transform'
   import { camelCaseToWords } from '@allmaps/stdlib'
 
-  import type { TransformationType } from '@allmaps/transform'
+  import type { DistortionMeasure } from '@allmaps/transform'
 
-  export type PickerTransformationType = TransformationType | 'fromAnnotation'
+  export type PickerDistortionMeasure = DistortionMeasure | 'none'
 
   let {
-    selectedTransformationType = $bindable()
+    selectedDistortionMeasure = $bindable()
   }: {
-    selectedTransformationType?: TransformationType | undefined
+    selectedDistortionMeasure?: DistortionMeasure | undefined
   } = $props()
 
-  export const transformationTypes = [
-    'fromAnnotation',
-    ...supportedtransformationTypes
-  ] as PickerTransformationType[]
-  let transformationTypeItems = transformationTypes.map(
-    (transformationType) => {
-      return {
-        label: camelCaseToWords(transformationType),
-        value: transformationType
-      }
+  function translateDistortionMeasure(
+    distortionMeasure: PickerDistortionMeasure
+  ): string {
+    if (distortionMeasure == 'none') {
+      return 'None'
     }
-  )
+    if (distortionMeasure == 'log2sigma') {
+      return 'Area distortion'
+    }
+    if (distortionMeasure == 'twoOmega') {
+      return 'Angular distortion'
+    }
+    return ''
+  }
 
-  const selectedTransformationTypeItem = $derived.by(() => {
-    const item = transformationTypeItems.find(
-      (item) => item.value === selectedTransformationType
+  export const distortionMeasures = [
+    'none',
+    'log2sigma',
+    'twoOmega'
+  ] as PickerDistortionMeasure[]
+  let distortionMeasureItems = distortionMeasures.map((distortionMeasure) => {
+    return {
+      label: translateDistortionMeasure(distortionMeasure),
+      value: distortionMeasure
+    }
+  })
+
+  const selectedDistortionMeasureItem = $derived.by(() => {
+    const item = distortionMeasureItems.find(
+      (item) => item.value === selectedDistortionMeasure
     )
-    return item ? item : transformationTypeItems[0]
+    return item ? item : distortionMeasureItems[0]
   })
 </script>
 
-{#snippet item(transformationTypeItem: {
-  value: PickerTransformationType
+{#snippet item(distortionMeasureItem: {
+  value: PickerDistortionMeasure
   label: string
 })}
   <div class="size-5 mr-2">
-    {#if transformationTypeItem.value === 'fromAnnotation'}
-      <FileMagnifyingGlass weight="thin" class="size-5" />
-    {:else if transformationTypeItem.value === 'straight'}
-      <Straight />
-    {:else if transformationTypeItem.value === 'helmert'}
-      <Helmert />
-    {:else if transformationTypeItem.value === 'polynomial'}
-      <Polynomial1 />
-    {:else if transformationTypeItem.value === 'polynomial2'}
-      <Polynomial2 />
-    {:else if transformationTypeItem.value === 'polynomial3'}
-      <Polynomial3 />
-    {:else if transformationTypeItem.value === 'thinPlateSpline'}
-      <ThinPlateSpline />
-    {:else if transformationTypeItem.value === 'projective'}
-      <Projective />
+    {#if distortionMeasureItem.value === 'none'}
+      <Empty weight="thin" class="size-5" />
+    {:else if distortionMeasureItem.value === 'log2sigma'}
+      <Resize weight="thin" class="size-5" />
+    {:else if distortionMeasureItem.value === 'twoOmega'}
+      <Angle weight="thin" class="size-5" />
     {/if}
   </div>
-  {transformationTypeItem.label}
+  {distortionMeasureItem.label}
 {/snippet}
 
 <Select.Root
   type="single"
   onValueChange={(v) => {
-    selectedTransformationType =
-      v === 'fromAnnotation' ? undefined : (v as TransformationType)
+    selectedDistortionMeasure =
+      v === 'none' ? undefined : (v as DistortionMeasure)
   }}
-  items={transformationTypeItems}
+  items={distortionMeasureItems}
 >
   <Select.Trigger
     class="
@@ -90,9 +85,9 @@
         focus:z-10 focus:outline-none
         focus:ring-2 w-full
      data-placeholder:text-foreground-alt/50 inline-flex touch-none select-none items-center border px-[11px] text-sm transition-colors"
-    aria-label="Select a Transformation Type"
+    aria-label="Select a Distortion Measure"
   >
-    {@render item(selectedTransformationTypeItem)}
+    {@render item(selectedDistortionMeasureItem)}
     <CaretUpDown class="text-muted-foreground ml-auto size-6" />
   </Select.Trigger>
   <Select.Portal>
@@ -106,15 +101,15 @@
         <CaretDoubleUp class="size-3" />
       </Select.ScrollUpButton>
       <Select.Viewport class="p-1">
-        {#each transformationTypeItems as transformationTypeItem, i (i + transformationTypeItem.value)}
+        {#each distortionMeasureItems as distortionMeasureItem, i (i + distortionMeasureItem.value)}
           <Select.Item
             class="rounded-button data-highlighted:bg-muted outline-hidden data-disabled:opacity-50 flex h-10 w-full select-none items-center pl-3 pr-2 text-sm capitalize
             rounded px-2 py-2 truncate outline-none data-[highlighted]:bg-gray-100"
-            value={transformationTypeItem.value}
-            label={transformationTypeItem.label}
+            value={distortionMeasureItem.value}
+            label={distortionMeasureItem.label}
           >
             {#snippet children({ selected })}
-              {@render item(transformationTypeItem)}
+              {@render item(distortionMeasureItem)}
               {#if selected}
                 <div class="ml-auto">
                   <Check aria-label="check" />

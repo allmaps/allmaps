@@ -157,3 +157,8 @@ export function isValidHttpUrl(string: string) {
 
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
+
+export function camelCaseToWords(string: string): string {
+  const result = string.replace(/([A-Z])/g, ' $1')
+  return result.charAt(0).toUpperCase() + result.slice(1)
+}

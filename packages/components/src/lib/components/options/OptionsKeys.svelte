@@ -20,7 +20,9 @@
     } else if (e.key === 'p') {
       optionsState.renderTransformedGcps = !optionsState.renderTransformedGcps
     } else if (e.key === 'm') {
-      optionsState.renderClipMask = !optionsState.renderClipMask
+      optionsState.renderAppliableMask = !optionsState.renderAppliableMask
+    } else if (e.key === 'd') {
+      optionsState.nextDistortionMeasure()
     }
   }
 

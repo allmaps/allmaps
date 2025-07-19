@@ -7,14 +7,13 @@
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
   import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
   import { WarpedMapLayer } from '@allmaps/maplibre'
-  import { computeBbox } from '@allmaps/stdlib'
+
+  import { OptionsState } from './options/OptionsState.svelte'
+  import { webMercatorPickerProjection } from '$lib/shared/projections/projections'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
-
-  import { OptionsState } from './options/OptionsState.svelte'
-  import { webMercatorPickerProjection } from '$lib/shared/projections/projections'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
@@ -56,7 +55,8 @@
       container,
       // @ts-expect-error incorrect MapLibre types
       style: basemapStyle('en'),
-      maxPitch: 0
+      maxPitch: 0,
+      bearingSnap: 0
     })
 
     // addTerrain(map, maplibregl)
@@ -88,26 +88,74 @@
         return
       }
       selectedMapId = warpedMapLayer.getWarpedMapList().getMapIds({
-        geoBbox: [e.lngLat.lng, e.lngLat.lat, e.lngLat.lng, e.lngLat.lat]
+        geoPoint: [e.lngLat.lng, e.lngLat.lat]
       })[0]
     })
   })
 
-  // Derive selected properties
+  // Add maps
   $effect(() => {
-    if (!selectedMapId) {
-      selectedWarpedMap = undefined
-      selectedOptionState = undefined
+    if (!warpedMapLayer) {
       return
     }
 
-    selectedGeoreferencedMap = georeferencedMaps.find(
-      (georeferencedMap) => georeferencedMap.id == selectedMapId
-    )
-    selectedWarpedMap = warpedMaps.find(
-      (warpedMap) => warpedMap.mapId == selectedMapId
-    )
-    selectedOptionState = optionsStateByMapId.get(selectedMapId)
+    //TODO: why clear? This also clears cache!
+    // warpedMapLayer.clear()
+
+    // TODO: remove current?
+
+    // TODO: move adding georeferencedmaps to warpedmaplist
+    Promise.allSettled(
+      georeferencedMaps.map((georeferencedMap) =>
+        warpedMapLayer?.addGeoreferencedMap(georeferencedMap)
+      )
+    ).then(() => {
+      const warpedMapList = warpedMapLayer?.renderer?.warpedMapList
+      if (!warpedMapList) {
+        return
+      }
+      warpedMaps = Array.from(warpedMapList.getWarpedMaps())
+      mapIds = Array.from(warpedMapList.getMapIds())
+      geoBbox =
+        mapIds.length > 0
+          ? warpedMapList.getMapsBbox({
+              projection: { definition: 'EPSG:4326' }
+            })
+          : undefined
+      if (geoBbox) {
+        map.fitBounds(geoBbox, {
+          animate: false,
+          padding: 20,
+          bearing: map.getBearing()
+        })
+      }
+    })
+  })
+
+  // Select map
+  $effect(() => {
+    if (!selectedMapId) {
+      selectedOptionState = undefined
+      selectedGeoreferencedMap = undefined
+      selectedWarpedMap = undefined
+
+      optionsState.viewOptions.renderAppliableMask = undefined
+      optionsState.viewOptions.renderAppliableMaskSize = undefined
+    } else {
+      selectedOptionState = optionsStateByMapId.get(selectedMapId)
+      selectedGeoreferencedMap = georeferencedMaps.find(
+        (georeferencedMap) => georeferencedMap.id == selectedMapId
+      )
+      selectedWarpedMap = warpedMaps.find(
+        (warpedMap) => warpedMap.mapId == selectedMapId
+      )
+      if (!selectedWarpedMap) {
+        return
+      }
+
+      optionsState.viewOptions.renderAppliableMask = true
+      optionsState.viewOptions.renderAppliableMaskSize = 8
+    }
   })
 
   // Switch between 'map' and 'image'
@@ -141,38 +189,6 @@
     }
   })
 
-  // Add maps
-  $effect(() => {
-    if (!warpedMapLayer) {
-      return
-    }
-
-    //TODO: why clear? This also clears cache!
-    // warpedMapLayer.clear()
-
-    // TODO: remove current?
-
-    // TODO: move adding georeferencedmaps to warpedmaplist
-    Promise.allSettled(
-      georeferencedMaps.map((georeferencedMap) =>
-        warpedMapLayer?.addGeoreferencedMap(georeferencedMap)
-      )
-    ).then(() => {
-      const warpedMapList = warpedMapLayer?.renderer?.warpedMapList
-      if (!warpedMapList) {
-        return
-      }
-      warpedMaps = Array.from(warpedMapList.getWarpedMaps())
-      mapIds = Array.from(warpedMapList.getMapIds())
-      geoBbox =
-        mapIds.length > 0
-          ? warpedMapList.getMapsBbox({
-              projection: { definition: 'EPSG:4326' }
-            })
-          : undefined
-    })
-  })
-
   // Set options
   $effect(() => {
     if (!warpedMapLayer) {
@@ -186,36 +202,6 @@
         [selectedMapId],
         selectedOptionState.mergedOptions
       )
-    }
-  })
-
-  // Fit bounds on mount
-  $effect(() => {
-    if (!geoBbox) {
-      return
-    }
-    map.fitBounds(geoBbox, { animate: false, bearing: map.getBearing() })
-  })
-
-  // Fit bounds on select
-  $effect(() => {
-    if (!selectedWarpedMap) {
-      // optionsState.viewOptions.renderClipMask = undefined
-      if (geoBbox) {
-        map.fitBounds(geoBbox, { bearing: map.getBearing() })
-      }
-    } else {
-      // optionsState.viewOptions.renderClipMask = true
-      let bbox = selectedWarpedMap.geoMaskBbox
-      // Recompute bbox in case upside down
-      bbox = computeBbox([
-        [bbox[0], bbox[1]],
-        [bbox[2], bbox[3]]
-      ])
-      // TODO: fix also fit bounds when image
-      map.fitBounds(bbox, {
-        bearing: map.getBearing()
-      })
     }
   })
 </script>

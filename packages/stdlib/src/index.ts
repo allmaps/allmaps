@@ -164,7 +164,8 @@ export {
   equalSet,
   objectDifference,
   maxOfNumberOrUndefined,
-  isValidHttpUrl
+  isValidHttpUrl,
+  camelCaseToWords
 } from './main.js'
 
 export { getFullResourceMask } from './masks.js'

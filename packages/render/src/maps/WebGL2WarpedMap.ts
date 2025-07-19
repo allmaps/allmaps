@@ -74,9 +74,9 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     renderFullMask: false,
     renderFullMaskSize: 8,
     renderFullMaskColor: green,
-    renderClipMask: false,
-    renderClipMaskSize: 8,
-    renderClipMaskColor: pink,
+    renderAppliableMask: false,
+    renderAppliableMaskSize: 8,
+    renderAppliableMaskColor: pink,
     renderMask: false,
     renderMaskSize: 8,
     renderMaskColor: pink,
@@ -259,7 +259,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return (
       this.mergedOptions.renderLines !== false &&
       (this.mergedOptions.renderFullMask ||
-        this.mergedOptions.renderClipMask ||
+        this.mergedOptions.renderAppliableMask ||
         this.mergedOptions.renderMask ||
         this.mergedOptions.renderVectors)
     )
@@ -378,18 +378,18 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       })
     }
 
-    if (this.mergedOptions.renderClipMask) {
+    if (this.mergedOptions.renderAppliableMask) {
       this.lineLayers.push({
         projectedGeoLines: lineStringToLines(
-          this.projectedGeoTriangulationClipMask
+          this.projectedGeoTriangulationAppliableMask
         ),
         projectedGeoPreviousLines: lineStringToLines(
-          this.projectedGeoPreviousTriangulationClipMask
+          this.projectedGeoPreviousTriangulationAppliableMask
         ),
-        viewportSize: this.mergedOptions.renderMaskSize,
-        color: this.mergedOptions.renderMaskColor,
-        viewportBorderSize: this.mergedOptions.renderMaskBorderSize,
-        borderColor: this.mergedOptions.renderMaskBorderColor
+        viewportSize: this.mergedOptions.renderAppliableMaskSize,
+        color: this.mergedOptions.renderAppliableMaskColor,
+        viewportBorderSize: this.mergedOptions.renderAppliableMaskBorderSize,
+        borderColor: this.mergedOptions.renderAppliableMaskBorderColor
       })
     }
 

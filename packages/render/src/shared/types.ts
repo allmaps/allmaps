@@ -24,6 +24,7 @@ export type SelectionOptions = {
   onlyVisible?: boolean
   mapIds?: Iterable<string>
   geoBbox?: Bbox
+  geoPoint?: Point
 }
 
 export type ProjectionOptions = {
@@ -77,11 +78,11 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderFullMaskColor?: string
   renderFullMaskBorderSize?: number
   renderFullMaskBorderColor?: string
-  renderClipMask: boolean
-  renderClipMaskSize?: number
-  renderClipMaskColor?: string
-  renderClipMaskBorderSize?: number
-  renderClipMaskBorderColor?: string
+  renderAppliableMask: boolean
+  renderAppliableMaskSize?: number
+  renderAppliableMaskColor?: string
+  renderAppliableMaskBorderSize?: number
+  renderAppliableMaskBorderColor?: string
   renderMask: boolean
   renderMaskSize?: number
   renderMaskColor?: string

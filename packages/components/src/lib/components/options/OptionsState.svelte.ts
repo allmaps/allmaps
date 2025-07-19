@@ -1,26 +1,23 @@
 import { supportedtransformationTypes } from '@allmaps/transform'
-import {
-  mergeOptions,
-  mergeOptionsUnlessUndefined,
-  mergePartialOptions
-} from '@allmaps/stdlib'
+import { mergeOptions, mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
-import type { TransformationType } from '@allmaps/transform'
+import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 
 import type { PickerProjection } from '$lib/shared/projections/projections.js'
 import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
-// TODO Load Project from Project and handle fromAnnotation in Picker?
 
-// There options must be present for the individual reactive state variables be bindable (not undefined)
-export type Options = {
+export type BindableOptions = {
   visible: boolean
   opacity: number
   transformationType: TransformationType | undefined
   internalProjection: PickerProjection | undefined
   renderGcps: boolean
   renderTransformedGcps: boolean
-  renderClipMask: boolean
-} & Partial<MapLibreWarpedMapLayerOptions>
+  renderAppliableMask: boolean
+  renderMask: boolean
+  distortionMeasure: DistortionMeasure | undefined
+}
+export type Options = BindableOptions & Partial<MapLibreWarpedMapLayerOptions>
 
 let defaultOptions: Options = {
   visible: true,
@@ -29,8 +26,16 @@ let defaultOptions: Options = {
   internalProjection: undefined,
   renderGcps: false,
   renderTransformedGcps: false,
-  renderClipMask: false
+  renderAppliableMask: false,
+  renderMask: false,
+  distortionMeasure: undefined
 }
+
+const usedDistortionMeasures: Array<DistortionMeasure | undefined> = [
+  undefined,
+  'log2sigma',
+  'twoOmega'
+]
 
 export class OptionsState {
   options: Options
@@ -41,7 +46,9 @@ export class OptionsState {
   internalProjection: PickerProjection | undefined
   renderGcps: boolean
   renderTransformedGcps: boolean
-  renderClipMask: boolean
+  renderAppliableMask: boolean
+  renderMask: boolean
+  distortionMeasure: DistortionMeasure | undefined
 
   viewOptions: Partial<Options>
   mergedOptions: Options
@@ -58,7 +65,9 @@ export class OptionsState {
     this.internalProjection = $derived(defaultOptions.internalProjection)
     this.renderGcps = $derived(defaultOptions.renderGcps)
     this.renderTransformedGcps = $derived(defaultOptions.renderTransformedGcps)
-    this.renderClipMask = $derived(defaultOptions.renderClipMask)
+    this.renderAppliableMask = $derived(defaultOptions.renderAppliableMask)
+    this.renderMask = $derived(defaultOptions.renderMask)
+    this.distortionMeasure = $derived(defaultOptions.distortionMeasure)
     this.options = $derived({
       visible: this.visible,
       opacity: this.opacity,
@@ -66,7 +75,11 @@ export class OptionsState {
       internalProjection: this.internalProjection,
       renderGcps: this.renderGcps,
       renderTransformedGcps: this.renderTransformedGcps,
-      renderClipMask: this.renderClipMask
+      renderAppliableMask: this.renderAppliableMask,
+      renderAppliableMaskSize: this.renderAppliableMask ? 4 : undefined,
+      renderMask: this.renderMask,
+      renderMaskSize: this.renderMask ? 4 : undefined,
+      distortionMeasure: this.distortionMeasure
     })
 
     this.viewOptions = $state(viewOptions)
@@ -83,6 +96,17 @@ export class OptionsState {
         ) +
           1) %
           supportedtransformationTypes.length
+      ]
+  }
+
+  nextDistortionMeasure(): void {
+    this.distortionMeasure =
+      usedDistortionMeasures[
+        (usedDistortionMeasures.findIndex(
+          (distortionMeasure) => distortionMeasure === this.distortionMeasure
+        ) +
+          1) %
+          usedDistortionMeasures.length
       ]
   }
 }
