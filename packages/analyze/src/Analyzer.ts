@@ -251,12 +251,7 @@ export class Analyzer {
           code,
           resourcePoint: gcp.resource,
           gcpIndex: index,
-          message:
-            'GCP ' +
-            index +
-            ' with resource coordinates [' +
-            gcp.resource +
-            '] outside mask.'
+          message: `GCP ${index} with resource coordinates [${gcp.resource}] outside mask.`
         })
       })
     }
@@ -282,12 +277,7 @@ export class Analyzer {
             code,
             resourcePoint: resourceMaskOutsideFullMaskPoint,
             gcpIndex: index,
-            message:
-              'Mask point ' +
-              index +
-              ' with resource coordinates [' +
-              resourceMaskOutsideFullMaskPoint +
-              '] outside full mask.'
+            message: `Mask point ${index} with resource coordinates [${resourceMaskOutsideFullMaskPoint}] outside full mask.`
           })
         }
       )
@@ -327,10 +317,7 @@ export class Analyzer {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message:
-            'A polynomial transformation shows a shear higher then ' +
-            MAX_SHEAR +
-            '.'
+          message: `A polynomial transformation shows a shear higher then ${MAX_SHEAR}.`
         })
       }
     }
@@ -366,7 +353,7 @@ export class Analyzer {
           code,
           geoPoint: gcp.geo,
           gcpIndex: index,
-          message: 'GCP ' + index + ' missing resource coordinates.'
+          message: `GCP ${index} missing resource coordinates.`
         })
       })
     }
@@ -384,7 +371,7 @@ export class Analyzer {
           code,
           resourcePoint: gcp.resource,
           gcpIndex: index,
-          message: 'GCP ' + index + ' missing geo coordinates.'
+          message: `GCP ${index} missing geo coordinates.`
         })
       })
     }
@@ -403,10 +390,7 @@ export class Analyzer {
       this.errors.push({
         mapId: this.mapId,
         code,
-        message:
-          'There are ' +
-          this.georeferencedMap.gcps.length +
-          ' GCPs, but a minimum of 2 are required (for a Helmert transform).'
+        message: `There are ${this.georeferencedMap.gcps.length} GCPs, but a minimum of 2 are required (for a Helmert transform).`
       })
     }
 
@@ -416,10 +400,7 @@ export class Analyzer {
       this.errors.push({
         mapId: this.mapId,
         code,
-        message:
-          'There are ' +
-          this.georeferencedMap.gcps.length +
-          ' GCPs, but a minimum of 3 are required.'
+        message: `There are ${this.georeferencedMap.gcps.length} GCPs, but a minimum of 3 are required.`
       })
     }
 
@@ -435,10 +416,7 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: resourceRepeatedPoint,
-          message:
-            'GCP resource coordinates [' +
-            resourceRepeatedPoint +
-            '] are repeated.'
+          message: `GCP resource coordinates [${resourceRepeatedPoint}] are repeated.`
         })
       })
     }
@@ -453,8 +431,7 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           geoPoint: geoRepeatedPoint,
-          message:
-            'GCP geo coordinates [' + geoRepeatedPoint + '] are repeated.'
+          message: `GCP geo coordinates [${geoRepeatedPoint}] are repeated.`
         })
       })
     }
@@ -488,10 +465,7 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: resourceMaskRepeatedPoint,
-          message:
-            'Mask resource coordinates [' +
-            resourceMaskRepeatedPoint +
-            '] are repeated.'
+          message: `Mask resource coordinates [${resourceMaskRepeatedPoint}] are repeated.`
         })
       })
     }
@@ -508,10 +482,7 @@ export class Analyzer {
             mapId: this.mapId,
             code,
             resourcePoint: resourceMaskSelfIntersectionPoint,
-            message:
-              'The mask self-intersects at resource coordinates [' +
-              resourceMaskSelfIntersectionPoint +
-              '].'
+            message: `The mask self-intersects at resource coordinates [${resourceMaskSelfIntersectionPoint}].`
           })
         }
       )
