@@ -179,7 +179,7 @@ export function parseProjectedGcpTransformerInputOptions(
   try {
     map = parseMap(options)
   } catch (error) {
-    if (error instanceof Error && error.message == mustContainOneMapMessage) {
+    if (error instanceof Error && error.message === mustContainOneMapMessage) {
       throw error
     }
     // If no map is found, try parsing GCPs from options instead of a map
@@ -293,9 +293,9 @@ export function parseRcps(options: { rcps?: string }): Rcp[] {
           'type' in rcp &&
           rcp.type === 'rcp' &&
           'id' in rcp &&
-          typeof rcp.id == 'string' &&
+          typeof rcp.id === 'string' &&
           'mapId' in rcp &&
-          typeof rcp.mapId == 'string' &&
+          typeof rcp.mapId === 'string' &&
           'resource' in rcp &&
           isPoint(rcp.resource)
       )
