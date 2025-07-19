@@ -106,7 +106,7 @@
     }
   }}
   onValueChange={(v) => {
-    if (v == defaultProjection?.code) {
+    if (v === defaultProjection?.code) {
       selectedProjection = undefined
     } else {
       selectedProjection = projections.find(

@@ -1,9 +1,10 @@
-import classifyPoint from 'robust-point-in-polygon'
+import inside from 'point-in-polygon-hao'
 
 import {
   doBboxesIntersect,
   pixelToIntArrayIndex,
-  pointToPixel
+  pointToPixel,
+  closeRing
 } from '@allmaps/stdlib'
 
 import { GetImageDataValue, GetImageDataSize } from './types.js'
@@ -84,11 +85,9 @@ export async function renderToIntArray<W extends WarpedMap, D>(
           warpedMap.projectedTransformer.transformToResource(projectedGeoPoint)
 
         // Apply mask: Check if resourcePoint is inside resource mask
-        // classifyPoint returns an integer which determines the position of point relative to polygon:
-        //   -1 if point lies inside polygon
-        //    0 if point lies on the polygon's edge
-        //    1 if point lies outside polygon
-        if (classifyPoint(warpedMap.resourceMask, resourcePoint) === 1) {
+        if (
+          inside(resourcePoint, [closeRing(warpedMap.resourceMask)]) === false
+        ) {
           continue
         }
 

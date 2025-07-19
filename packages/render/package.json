@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.72",
+  "version": "1.0.0-beta.76",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -37,8 +37,7 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "NODE_ENV=test pnpm run build && mocha",
-    "preversion": "pnpm run lint && pnpm test",
+    "test": "NODE_ENV=test mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
@@ -60,11 +59,10 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/triangulate": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "@turf/boolean-point-in-polygon": "^7.2.0",
     "comlink": "^4.4.1",
     "lodash-es": "^4.17.21",
-    "rbush": "^4.0.0",
-    "robust-point-in-polygon": "^1.0.3"
+    "point-in-polygon-hao": "^1.2.4",
+    "rbush": "^4.0.0"
   },
   "license": "MIT",
   "devDependencies": {
@@ -72,7 +70,6 @@
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.14.2",
     "@types/rbush": "^4.0.0",
-    "@types/robust-point-in-polygon": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "chai": "^4.3.6",

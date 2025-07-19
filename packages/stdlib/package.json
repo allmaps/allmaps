@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/stdlib",
-  "version": "1.0.0-beta.34",
+  "version": "1.0.0-beta.37",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -34,9 +34,8 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "build": "tsc",
+    "test": "NODE_ENV=test mocha",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "types": "tsc --noEmit",

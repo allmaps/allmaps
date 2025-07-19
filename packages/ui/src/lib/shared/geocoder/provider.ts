@@ -24,7 +24,7 @@ export abstract class GeocoderProvider {
     const signal = this.controller.signal
 
     let result: GeocoderProviderGeoJsonFeature[] = []
-    if (text == '') {
+    if (text === '') {
       // Using if to avoid calling `fetch` eagerly during server side rendering
       return result
     }

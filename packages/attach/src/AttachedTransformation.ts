@@ -415,7 +415,7 @@ export class AttachedTransformation {
 
       Array.from(georeferencedMapsById.entries()).forEach(
         ([mapId, georeferencedMap]) => {
-          if (mapId == evaluationPoint.transformationId) {
+          if (mapId === evaluationPoint.transformationId) {
             georeferencedMap.gcps.push({
               resource,
               geo
@@ -498,7 +498,7 @@ export class AttachedTransformation {
       const transformerOptions = projectedGcpTransformer.getTransformerOptions()
 
       rcps
-        .filter((rcp) => rcp.mapId == mapId)
+        .filter((rcp) => rcp.mapId === mapId)
         .forEach((rcp) => {
           const { source } = resourceToSource(rcp, transformerOptions)
           scps.push({
@@ -544,7 +544,7 @@ export class AttachedTransformation {
       )
       .flat(1)
     const singleScps = scpsById
-      .filter((scpsForId) => scpsForId.length == 1)
+      .filter((scpsForId) => scpsForId.length === 1)
       .flat(1)
 
     if (options.evaluateSingleScps) {

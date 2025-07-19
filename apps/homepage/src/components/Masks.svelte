@@ -1,10 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-
-  let container: HTMLElement
-
-  let width = 670
-  let height = 422
+  let width = $state(0)
+  let height = $state(0)
 
   type Mask = {
     points: [number, number][]
@@ -23,20 +19,20 @@
         [1051.7, 1190]
       ],
       color: '#ffc742',
-      angle: 315
-    },
-    {
-      points: [
-        [1457.1, 459],
-        [921.5, 305.9],
-        [997.5, 39],
-        [1284.9, 120.7],
-        [1254.9, 226.1],
-        [1503.1, 297.5]
-      ],
-      color: '#FE5E60',
-      angle: 135
+      angle: 265
     }
+    // {
+    //   points: [
+    //     [1457.1, 459],
+    //     [921.5, 305.9],
+    //     [997.5, 39],
+    //     [1284.9, 120.7],
+    //     [1254.9, 226.1],
+    //     [1503.1, 297.5]
+    //   ],
+    //   color: '#FE5E60',
+    //   angle: 135
+    // }
   ]
 
   function getBounds(points: [number, number][]) {
@@ -79,7 +75,7 @@
     return [-dx + width / 2, -dy + height / 2]
   }
 
-  function getTransform(mask: Mask, index: number) {
+  function getTransform(mask: Mask) {
     const bounds = getBounds(mask.points)
 
     const center = [
@@ -93,18 +89,13 @@
 
     return `translate(${translate0[0]}px, ${translate0[1]}px) translate(${translate1[0]}px, ${translate1[1]}px) scale(${scale})`
   }
-
-  onMount(() => {
-    new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        width = entry.contentRect.width
-        height = entry.contentRect.height
-      }
-    }).observe(container)
-  })
 </script>
 
-<div bind:this={container} class="w-full h-full opacity-30 pointer-events-none">
+<div
+  bind:clientWidth={width}
+  bind:clientHeight={height}
+  class="w-full h-full opacity-30 pointer-events-none"
+>
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="100%"
@@ -115,7 +106,7 @@
     {#each masks as mask, index (index)}
       <polygon
         points={mask.points.map((p) => p.join(',')).join(' ')}
-        style:transform={getTransform(mask, index)}
+        style:transform={getTransform(mask)}
         style:fill={mask.color}
         style:fill-opacity={0.6}
         style:stroke={mask.color}

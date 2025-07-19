@@ -1,18 +1,24 @@
 <script lang="ts">
-  export let placeholder: string
-  export let baseUrl: string
-
-  let value = ''
-
-  function handleSubmit() {
-    const url = `${baseUrl}${value}`
-    window.open(url, '_blank')?.focus()
+  type Props = {
+    placeholder: string
+    baseUrl: string
   }
 
-  $: disabled = value.length === 0
+  const { placeholder, baseUrl }: Props = $props()
+
+  let value = $state('')
+
+  function handleSubmit(event: SubmitEvent) {
+    const url = `${baseUrl}${value}`
+    window.open(url, '_blank')?.focus()
+
+    event.preventDefault
+  }
+
+  let disabled = $derived(value.length === 0)
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="flex gap-2 mt-3">
+<form onsubmit={handleSubmit} class="flex gap-2 mt-3">
   <input
     bind:value
     type="text"

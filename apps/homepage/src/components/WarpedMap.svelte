@@ -16,14 +16,18 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { Bbox } from '@allmaps/types'
 
-  export let georeferencedMap: GeoreferencedMap
-  export let bounds: Bbox
-  export let showBasemap = false
+  type Props = {
+    georeferencedMap: GeoreferencedMap
+    bounds: Bbox
+    showBasemap?: boolean
+  }
+
+  const { georeferencedMap, bounds, showBasemap = false }: Props = $props()
 
   const dispatch = createEventDispatcher()
 
-  let map: MapLibreMap
-  let warpedMapLayer: WarpedMapLayer
+  let map = $state<MapLibreMap>()
+  let warpedMapLayer = $state<WarpedMapLayer>()
 
   let container: HTMLElement
 
@@ -45,26 +49,28 @@
     layers: getProtomapsTheme('protomaps', 'light')
   }
 
-  $: {
+  $effect(() => {
     if (map && warpedMapLayer && showBasemap) {
       map.setStyle(style, { diff: true })
       map.moveLayer('warped-map-layer')
 
       setTimeout(() => {
-        const bounds = warpedMapLayer.getBounds()
-        if (bounds) {
-          map.fitBounds(bounds, {
-            padding: {
-              top: 50,
-              bottom: 100,
-              right: 50,
-              left: 50
-            }
-          })
+        if (map && warpedMapLayer) {
+          const bounds = warpedMapLayer.getBounds()
+          if (bounds) {
+            map.fitBounds(bounds, {
+              padding: {
+                top: 50,
+                bottom: 100,
+                right: 50,
+                left: 50
+              }
+            })
+          }
         }
       }, 500)
     }
-  }
+  })
 
   onMount(() => {
     const protocol = new Protocol()
@@ -82,17 +88,22 @@
     map.touchZoomRotate.disableRotation()
 
     map.on('load', async () => {
-      warpedMapLayer = new WarpedMapLayer()
+      if (map) {
+        warpedMapLayer = new WarpedMapLayer()
 
-      map.addLayer(warpedMapLayer)
+        // @ts-expect-error Incompatible with MapLibre types
+        map.addLayer(warpedMapLayer)
 
-      await warpedMapLayer.addGeoreferencedMap(georeferencedMap)
+        await warpedMapLayer.addGeoreferencedMap(georeferencedMap)
 
-      map.on('allrequestedtilesloaded', () => dispatch('ready'))
+        map.on('allrequestedtilesloaded', () => dispatch('ready'))
+      }
     })
 
     return () => {
-      map.remove()
+      if (map) {
+        map.remove()
+      }
     }
   })
 </script>

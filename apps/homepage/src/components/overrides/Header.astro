@@ -6,8 +6,6 @@ import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro'
 
 import Menu from '../Menu.svelte'
 
-import type { Props } from '@astrojs/starlight/props'
-
 /**
  * Render the `Search` component if Pagefind is enabled or the default search component has been overridden.
  */
@@ -15,7 +13,7 @@ const shouldRenderSearch = true
 ---
 
 <div class="header sl-flex">
-  <div class="title-wrapper sl-flex">
+  <div class="title-wrapper sl-flex text-black">
     <SiteTitle {...Astro.props} />
   </div>
   <div class="sl-flex">

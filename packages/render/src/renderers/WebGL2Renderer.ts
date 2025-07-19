@@ -36,6 +36,12 @@ import linesFragmentShaderSource from '../shaders/lines/fragment-shader.glsl'
 import pointsVertexShaderSource from '../shaders/points/vertex-shader.glsl'
 import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 
+// Using the recommended URL constructor -
+// See https://vite.dev/guide/features.html#import-with-constructors -
+// leads to import errors when publising on platforms like jsdelivr.
+// Using the inline query parameter solves this.
+import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
+
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
@@ -170,13 +176,7 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
-    // Note: Could this become obsolete in the future
-    // once we can pull bytes directly from Blob?
-    // see: https://developer.mozilla.org/en-US/docs/Web/API/Blob/bytes
-    const worker = new Worker(
-      new URL('../workers/fetch-and-get-image-data.ts', import.meta.url)
-    )
-
+    const worker = new FetchAndGetImageDataWorker()
     const wrappedWorker = comlinkWtap<FetchAndGetImageDataWorkerType>(worker)
 
     super(

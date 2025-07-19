@@ -1,9 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  export let baseUrl: string
+  type Props = {
+    baseUrl: string
+  }
 
-  const files = [
+  const { baseUrl }: Props = $props()
+
+  const files = $state([
     {
       filename: 'annotations.json',
       type: 'Georeference Annotations',
@@ -31,7 +35,7 @@
       typeUrl: 'https://stevage.github.io/ndgeojson/',
       size: 0
     }
-  ]
+  ])
 
   onMount(() => {
     files.forEach((file, index) => {
@@ -39,7 +43,12 @@
       fetch(url, {
         method: 'HEAD',
         headers: {
-          'Accept-Encoding': 'identity'
+          // Cloudflare GZIPs plaintext and JSON files
+          // For these files, the Content-Length header
+          // will not be set.
+          // I've tried disabling compression by setting:
+          // 'Accept-Encoding': 'identify'
+          // However, this doesn't work.
         }
       }).then((response) => {
         if (response.ok) {

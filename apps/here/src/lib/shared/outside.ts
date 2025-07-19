@@ -1,12 +1,6 @@
-import classifyPoint from 'robust-point-in-polygon'
-
 import { distance } from '@allmaps/stdlib'
 
 import type { Point, Line, Ring } from '@allmaps/types'
-
-export function pointInsidePolygon(point: Point, polygon: Ring) {
-  return classifyPoint(polygon, point) < 1
-}
 
 export function lineBearing(from: Point, to: Point): number {
   const dx = to[0] - from[0]

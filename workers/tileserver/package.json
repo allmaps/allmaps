@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tileserver",
-  "version": "1.0.0-beta.71",
+  "version": "1.0.0-beta.75",
   "description": "Allmaps Tile Server",
   "private": true,
   "author": {
@@ -20,8 +20,7 @@
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test",
-    "preversion": "pnpm run types && pnpm run lint"
+    "format": "prettier --write src test"
   },
   "license": "MIT",
   "devDependencies": {
