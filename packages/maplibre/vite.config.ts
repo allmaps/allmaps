@@ -12,7 +12,6 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
-    emptyOutDir: false,
     minify: false,
     lib: {
       entry: './src/index.ts',
