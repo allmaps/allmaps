@@ -903,14 +903,14 @@ Sets the transformation type of a single map
 - `mapId` (`string`)
   - ID of the map
 - `transformation` (`  | 'straight'
-  | 'helmert'
-  | 'polynomial'
-  | 'polynomial1'
-  | 'polynomial2'
-  | 'polynomial3'
-  | 'thinPlateSpline'
-  | 'projective'
-  | 'linear'`)
+| 'helmert'
+| 'polynomial'
+| 'polynomial1'
+| 'polynomial2'
+| 'polynomial3'
+| 'thinPlateSpline'
+| 'projective'
+| 'linear'`)
   - new transformation type
 
 ###### Returns
@@ -941,14 +941,14 @@ Sets the transformation type of multiple maps
 - `mapIds` (`Iterable<string>`)
   - IDs of the maps
 - `transformation` (`  | 'straight'
-  | 'helmert'
-  | 'polynomial'
-  | 'polynomial1'
-  | 'polynomial2'
-  | 'polynomial3'
-  | 'thinPlateSpline'
-  | 'projective'
-  | 'linear'`)
+| 'helmert'
+| 'polynomial'
+| 'polynomial1'
+| 'polynomial2'
+| 'polynomial3'
+| 'thinPlateSpline'
+| 'projective'
+| 'linear'`)
   - new transformation type
 
 ###### Returns
