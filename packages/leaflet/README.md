@@ -841,7 +841,7 @@ Sets the object that caches image information
 
 ###### Parameters
 
-* `imageInformations` (`globalThis.Map<string, unknown>`)
+* `imageInformations` (`Map<string, unknown>`)
   * Object that caches image information
 
 ###### Returns

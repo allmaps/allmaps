@@ -15,7 +15,6 @@ import {
   isValidHttpUrl
 } from '@allmaps/stdlib'
 
-import type { Map, ZoomAnimEvent } from 'leaflet'
 import type { Point, Rectangle, ImageInformations } from '@allmaps/types'
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
 
@@ -105,7 +104,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Contains all code code that creates DOM elements for the layer and adds them to map panes where they belong.
    */
-  onAdd(map: Map) {
+  onAdd(map: L.Map) {
     if (!this._map || !this.container) {
       return this
     }
@@ -146,7 +145,7 @@ export class WarpedMapLayer extends L.Layer {
   /**
    * Contains all cleanup code that removes the layer's elements from the DOM.
    */
-  onRemove(map: Map) {
+  onRemove(map: L.Map) {
     if (this.container) {
       this.container.remove()
     }
@@ -859,7 +858,7 @@ export class WarpedMapLayer extends L.Layer {
 
   // Note: borrowed from L.ImageOverlay
   // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
-  _animateZoom(e: ZoomAnimEvent) {
+  _animateZoom(e: L.ZoomAnimEvent) {
     if (!this.canvas) {
       return
     }
