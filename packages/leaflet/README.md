@@ -182,10 +182,6 @@ Creates a WarpedMapLayer
 
 `WarpedMapLayer`.
 
-###### Extends
-
-* `Layer`
-
 ### `WarpedMapLayer#_addEventListeners()`
 
 ###### Parameters
@@ -200,7 +196,7 @@ There are no parameters.
 
 ###### Parameters
 
-* `e` (`ZoomAnimEvent`)
+* `e` (`L.ZoomAnimEvent`)
 
 ###### Returns
 
@@ -615,7 +611,7 @@ Contains all code code that creates DOM elements for the layer and adds them to 
 
 ###### Parameters
 
-* `map` (`Map`)
+* `map` (`L.Map`)
 
 ###### Returns
 
@@ -627,7 +623,7 @@ Contains all cleanup code that removes the layer's elements from the DOM.
 
 ###### Parameters
 
-* `map` (`Map`)
+* `map` (`L.Map`)
 
 ###### Returns
 
