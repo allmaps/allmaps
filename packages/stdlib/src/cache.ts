@@ -38,7 +38,7 @@ export function getPropertyFromDoubleCacheOrComputation<T, K0, K1>(
   }
 }
 
-export function getPropertyFromTrippleCacheOrComputation<T, K0, K1, K2>(
+export function getPropertyFromTripleCacheOrComputation<T, K0, K1, K2>(
   cache: Map<K0, Map<K1, Map<K2, T>>>,
   key0: K0,
   key1: K1,
