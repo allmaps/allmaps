@@ -1,4 +1,4 @@
-import { Map, CustomLayerInterface } from 'maplibre-gl'
+import { Map as MaplibreMap, CustomLayerInterface } from 'maplibre-gl'
 
 import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
 import {
@@ -7,20 +7,27 @@ import {
   WarpedMapEvent,
   WarpedMapEventType
 } from '@allmaps/render'
-import {
-  rectangleToSize,
-  sizesToScale,
-  hexToFractionalRgb
-} from '@allmaps/stdlib'
+import { mergeOptions, rectangleToSize, sizesToScale } from '@allmaps/stdlib'
 import { lonLatToWebMercator, Projection } from '@allmaps/project'
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
-import type { WarpedMapLayerOptions } from '@allmaps/render'
-import type { Rectangle, Ring, ImageInfoByMapId, Point } from '@allmaps/types'
+import type { MapLibreWarpedMapLayerOptions } from '@allmaps/render'
+import type { Rectangle, Ring, Point } from '@allmaps/types'
 
-export type MapLibreWarpedMapLayerOptions = WarpedMapLayerOptions
+import type {
+  GetOptionsOptions,
+  SpecificMapLibreWarpedMapLayerOptions,
+  WebGL2WarpedMapOptions
+} from 'packages/render/src/shared/types'
+
+const DEFFAULT_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpedMapLayerOptions =
+  {
+    layerId: 'warped-map-layer',
+    layerType: 'custom',
+    layerRenderingMode: '2d'
+  }
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'
@@ -40,16 +47,13 @@ function assertRenderer(
  * WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/maplibregl.CustomLayerInterface/).
  */
 export class WarpedMapLayer implements CustomLayerInterface {
-  id = 'warped-map-layer'
+  id: string
+  type: 'custom'
+  renderingMode: '2d'
 
-  // @ts-expect-error Adding "as const" throws an error in Titus' module-exports library
-  type = 'custom'
-  // @ts-expect-error same as above
-  renderingMode = '2d'
-
-  map?: Map
+  map?: MaplibreMap
   renderer?: WebGL2Renderer
-  options?: Partial<MapLibreWarpedMapLayerOptions>
+  options: MapLibreWarpedMapLayerOptions
 
   /**
    * Creates a WarpedMapLayer instance
@@ -57,11 +61,15 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param id - Unique ID for this layer
    * @param options - options
    */
-  constructor(id?: string, options?: Partial<MapLibreWarpedMapLayerOptions>) {
-    if (id) {
-      this.id = id
-    }
-    this.options = options
+  constructor(options?: Partial<MapLibreWarpedMapLayerOptions>) {
+    this.options = mergeOptions(
+      DEFFAULT_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS,
+      options
+    )
+
+    this.id = this.options.layerId
+    this.type = this.options.layerType
+    this.renderingMode = this.options.layerRenderingMode
   }
 
   /**
@@ -69,7 +77,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
    * @param map - The Map this custom layer was just added to.
    * @param gl - The WebGL 2 context for the map.
    */
-  onAdd(map: Map, gl: WebGL2RenderingContext) {
+  onAdd(map: MaplibreMap, gl: WebGL2RenderingContext) {
     this.map = map
 
     this.renderer = new WebGL2Renderer(gl, this.options)
@@ -402,6 +410,48 @@ export class WarpedMapLayer implements CustomLayerInterface {
   // not getZIndex() here since so such concept in MapLibre
 
   /**
+   * Get the layer options
+   */
+  getLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getOptions()
+  }
+
+  /**
+   * Get the default layer and map options
+   */
+  getDefaultLayerOptions(
+    getOptionsOptions?: GetOptionsOptions
+  ): Partial<MapLibreWarpedMapLayerOptions> & WebGL2WarpedMapOptions {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getDefaultOptions(getOptionsOptions)
+  }
+
+  /**
+   * Get the options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getMapOptions(mapId)
+  }
+
+  /**
+   * Get the default options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getDefaultMapOptions(mapId)
+  }
+
+  /**
    * Sets the layer options
    *
    * @param options - Options
@@ -413,17 +463,32 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Sets the options by map
+   * Sets the options of specific map IDs
    *
    * @param options - Options
    */
   setMapsOptions(
     mapIds: string[],
-    options: Partial<MapLibreWarpedMapLayerOptions>
+    options: Partial<MapLibreWarpedMapLayerOptions>,
+    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.setMapsOptions(mapIds, options)
+    this.renderer.setMapsOptions(mapIds, options, renderAndListOptions)
+  }
+
+  /**
+   * Sets the options of specific maps by map ID
+   *
+   * @param optionsByMapId - Options by map ID
+   */
+  setMapsOptionsByMapId(
+    optionsByMapId: Map<string, Partial<MapLibreWarpedMapLayerOptions>>,
+    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
   }
 
   // /**

@@ -14,7 +14,8 @@ import {
   computeBbox,
   convexHull,
   mergeOptions,
-  mergePartialOptions
+  mergePartialOptions,
+  omit
 } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
@@ -23,6 +24,7 @@ import type { Projection } from '@allmaps/project'
 import type { Ring, Bbox, Gcp, Point, ImageInfoByMapId } from '@allmaps/types'
 
 import type {
+  GetOptionsOptions,
   GetWarpedMapOptions,
   ProjectionOptions,
   SelectionOptions,
@@ -31,6 +33,7 @@ import type {
   WarpedMapListOptions,
   WarpedMapOptions
 } from '../shared/types.js'
+import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 const defaultSelectionOptions: SelectionOptions = {}
 
@@ -248,11 +251,63 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
+   * Get the options of this warped map list.
+   */
+  getOptions(): Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>> {
+    return this.options
+  }
+
+  /**
+   * Get the default options of this warped map list.
+   */
+  getDefaultOptions(
+    getOptionsOptions?: GetOptionsOptions
+  ): WarpedMapListOptions<GetWarpedMapOptions<W>> & GetWarpedMapOptions<W> {
+    // TODO: get we get default on abstract class W?
+    let defaultWarpedMapOptions: GetWarpedMapOptions<W> =
+      WebGL2WarpedMap.getDefaultOptions() as GetWarpedMapOptions<W>
+    if (getOptionsOptions?.omitDefaultGeoreferencedMapOptions) {
+      defaultWarpedMapOptions = mergeOptions(defaultWarpedMapOptions, {
+        transformationType: undefined,
+        internalProjection: undefined
+      })
+    }
+
+    let result = mergeOptions(
+      defaultWarpedMapOptions,
+      DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS
+    )
+    return result
+  }
+
+  /**
+   * Get the options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+    const warpedMap = Array.from(warpedMaps)[0]
+    return warpedMap?.mergedOptions as GetWarpedMapOptions<W>
+  }
+
+  /**
+   * Get the options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+    const warpedMap = Array.from(warpedMaps)[0]
+    return warpedMap?.getDefaultAndGeoreferencedMapOptions() as GetWarpedMapOptions<W>
+  }
+
+  /**
    * Set the options of this warped map list.
    *
    * Map-specific options will be passed to newly added maps.
    *
-   * @param options - Options
+   * @param options - List Options
    */
   setOptions(
     options: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
@@ -263,13 +318,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the options of the maps in this list
+   * Set the options of specific map IDs
    *
+   * @param mapIds - Map IDs for which the options apply
    * @param options - Options
+   * @param listOptions - list options
    */
   setMapsOptions(
     mapIds: string[],
     options: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
+    listOptions?: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     const optionsByMapId = new Map<
@@ -281,40 +339,38 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
     this.internalSetMapsOptionsByMapId(
       optionsByMapId,
-      undefined,
+      listOptions,
       setOptionsOptions
     )
   }
 
   /**
-   * Set the options of the maps in this list by mapId
+   * Set the options of specific maps by map ID
    *
-   * Note: this is useful when when multiple (and possibly different)
+   * This is useful when when multiple (and possibly different)
    * map options are changed at once,
    * but only one animation should be fired
    *
-   * @param options - Options
+   * @param optionsByMapId - Options by map ID
+   * @param listOptions - List options
    */
   setMapsOptionsByMapId(
     optionsByMapId: Map<
       string,
       Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>
     >,
+    listOptions?: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     this.internalSetMapsOptionsByMapId(
       optionsByMapId,
-      undefined,
+      listOptions,
       setOptionsOptions
     )
   }
 
   /**
    * Internal set map options
-   *
-   * Note: to change maps options (for some maps) and list options (for all maps)
-   * call this function twice, once with specific mapIds using this.setMapsOptions()
-   * and once with all mapIds using this.setOptions()
    */
   private internalSetMapsOptionsByMapId(
     optionsByMapId?: Map<
@@ -324,8 +380,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     listOptions?: Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
-    const mapIds = optionsByMapId?.keys() ?? this.getMapIds()
-    const warpedMaps = this.getWarpedMaps({ mapIds })
+    // If there are no maps yet, return
+    if (this.warpedMapsById.size === 0 || optionsByMapId?.size === 0) {
+      return
+    }
+
+    // We loop over all warped maps and set the maps options (if there are inoptionsByMapId)
+    // and layer options (if there are)
 
     // Some options can be set with animation.
     // When this function is called without specific animation options,
@@ -334,29 +395,34 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // 2) then calls itself again with the 'animate' setting to now set all options
     // including those that will cause an animation, and fire an animated change event
 
-    let changedOptions = {}
-    for (const warpedMap of warpedMaps) {
+    let changedOptionsKeys = []
+    let changedMapIds = []
+    for (const warpedMap of this.getWarpedMaps()) {
       let warpedMapChangedOptions
       if (setOptionsOptions?.animate === undefined) {
         // If no animation information is specified,
         // set all options exect those for animation
         const options = optionsByMapId?.get(warpedMap.mapId)
         warpedMapChangedOptions = warpedMap.setOptions(options, listOptions, {
-          omit: this.options.animatedOptions
+          optionKeysToOmit: this.options.animatedOptions
         })
+        console.log(warpedMapChangedOptions, warpedMap.mapId)
       } else {
         // If the option setting should be animated,
         // or if the option setting should not be animated
         // set all options
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, mapIds)
+          new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, changedMapIds)
         )
         const options = optionsByMapId?.get(warpedMap.mapId)
-        warpedMapChangedOptions = warpedMap.setOptions(options, listOptions, {
-          omit: this.options.animatedOptions
-        })
+        warpedMapChangedOptions = warpedMap.setOptions(options, listOptions)
       }
-      changedOptions = mergeOptions(changedOptions, warpedMapChangedOptions)
+
+      const warpedMapChangedOptionsKeys = Object.keys(warpedMapChangedOptions)
+      if (warpedMapChangedOptionsKeys.length > 0) {
+        changedOptionsKeys.push(...warpedMapChangedOptionsKeys)
+        changedMapIds.push(warpedMap.mapId)
+      }
 
       if (
         this.options.rtreeUpdatedOptions.some(
@@ -374,9 +440,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       // If no animation information is specified,
       // or if the option setting should not be animated
       // finish by firing a direct change
-      if (Object.keys(changedOptions).length > 0) {
+      if (changedOptionsKeys.length > 0) {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, mapIds)
+          new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, changedMapIds)
         )
       }
 
@@ -394,9 +460,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     } else {
       // If the option setting should be animated,
       // finish by firing the animation
-      if (Object.keys(changedOptions).length > 0) {
+      if (changedOptionsKeys.length > 0) {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, mapIds)
+          new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, changedMapIds)
         )
       }
     }

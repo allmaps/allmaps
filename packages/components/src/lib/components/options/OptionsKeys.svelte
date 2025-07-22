@@ -1,4 +1,9 @@
 <script lang="ts">
+  import {
+    nextDistortionMeasure,
+    nextTransformationType
+  } from '$lib/shared/options/options'
+
   import type { OptionsState } from './OptionsState.svelte'
 
   let {
@@ -16,13 +21,19 @@
       }
       optionsState.opacity = 0
     } else if (e.key === 't') {
-      optionsState.nextTransformationType()
+      optionsState.transformationType = nextTransformationType(
+        optionsState.transformationType
+      )
     } else if (e.key === 'p') {
       optionsState.renderTransformedGcps = !optionsState.renderTransformedGcps
+      optionsState.renderGcps = !optionsState.renderGcps
+      optionsState.renderVectors = !optionsState.renderVectors
     } else if (e.key === 'm') {
       optionsState.renderAppliableMask = !optionsState.renderAppliableMask
     } else if (e.key === 'd') {
-      optionsState.nextDistortionMeasure()
+      optionsState.distortionMeasure = nextDistortionMeasure(
+        optionsState.distortionMeasure
+      )
     }
   }
 

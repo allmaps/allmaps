@@ -71,6 +71,8 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     renderTransformedGcps: false,
     renderTransformedGcpsColor: pink,
     renderVectors: false,
+    renderVectorsSize: 6,
+    renderVectorsColor: black,
     renderFullMask: false,
     renderFullMaskSize: 8,
     renderFullMaskColor: green,
@@ -230,12 +232,19 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       this.gl.createTexture()
   }
 
-  setDefaultOptions() {
-    super.setDefaultOptions()
-    this.defaultOptions = mergeOptions(
+  /**
+   * Get default options
+   */
+  static getDefaultOptions(): WebGL2WarpedMapOptions {
+    return mergeOptions(
       DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS,
-      this.defaultOptions
+      super.getDefaultOptions()
     )
+  }
+
+  /** Set default options */
+  setDefaultOptions() {
+    this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }
 
   setMergedOptions(setOptionsOptions?: Partial<SetOptionsOptions>) {

@@ -3,7 +3,6 @@
   import { Popover } from 'bits-ui'
 
   import Options from './Options.svelte'
-  import OptionsKeys from './OptionsKeys.svelte'
 
   import type { OptionsState } from './OptionsState.svelte'
 
@@ -13,8 +12,6 @@
     optionsState: OptionsState
   } = $props()
 </script>
-
-<OptionsKeys bind:optionsState />
 
 <Popover.Root>
   <Popover.Trigger

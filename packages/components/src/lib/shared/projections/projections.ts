@@ -6,10 +6,8 @@ import { bboxToResolution } from '@allmaps/stdlib'
 import type { Bbox } from '@allmaps/types'
 import { webMercatorProjection, type Projection } from '@allmaps/project'
 
-export type PickerProjection = Projection<string> & {
-  name: string
-  definition: string
-  code: string
+export type PickerProjection = Projection & {
+  code?: string
   bbox?: Bbox
   comment?: string
 }

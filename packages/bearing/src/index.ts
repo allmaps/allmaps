@@ -3,17 +3,34 @@ import bearing from '@turf/bearing'
 import {
   lonLatProjection,
   ProjectedGcpTransformer,
-  ProjectedGcpTransformerOptions
+  ProjectedGcpTransformerOptions,
+  webMercatorProjection
 } from '@allmaps/project'
 import { computeBbox, mergePartialOptions, midPoint } from '@allmaps/stdlib'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { TransformationTypeInputs } from '@allmaps/transform'
-import type { Point } from '@allmaps/types'
+import type {
+  TransformationType,
+  TransformationTypeInputs
+} from '@allmaps/transform'
+import type { Projection } from '@allmaps/project'
+import type { Point, Ring } from '@allmaps/types'
+import type { WarpedMap } from '@allmaps/render'
 
-const DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS: Partial<
-  ProjectedGcpTransformerOptions & TransformationTypeInputs
-> = {
+// Using helmert transformation by default, not map transformation type,
+// since possible for any amount of points, consistent,
+// faster when many gcps and accurate when showing original image
+const DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS: {
+  transformationType: TransformationType
+  projection: Projection
+} = {
+  transformationType: 'helmert',
+  projection: lonLatProjection
+}
+const DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS: {
+  transformationType: TransformationType
+  projection: Projection
+} = {
   transformationType: 'helmert',
   projection: lonLatProjection
 }
@@ -21,12 +38,11 @@ const DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS: Partial<
 /**
  * Computes the bearing of a Georeferenced Map.
  *
- * @param map - Georeferenced Map
+ * @param georeferencedMap - Georeferenced Map
  * @returns The bearing of the map in degrees, measured from the north line
  */
-
 export function computeGeoreferencedMapBearing(
-  map: GeoreferencedMap,
+  georeferencedMap: GeoreferencedMap,
   options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
 ) {
   options = mergePartialOptions(
@@ -36,19 +52,56 @@ export function computeGeoreferencedMapBearing(
 
   let projectedTransformer: ProjectedGcpTransformer
 
-  if (map.gcps.length < 2) {
+  if (georeferencedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
   } else {
-    // Using helmert transformation, not map transformation type,
-    // since possible for any amount of points, consistent,
-    // faster when many gcps and accurate when showing original image
     projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
-      map,
+      georeferencedMap,
       options
     )
   }
 
-  const resourceMaskBbox = computeBbox(map.resourceMask)
+  return computeBearingInternal(
+    georeferencedMap.resourceMask,
+    projectedTransformer
+  )
+}
+
+/**
+ * Computes the bearing of a Warped Map.
+ *
+ * @param warpedMap - Warped Map
+ * @returns The bearing of the map in degrees, measured from the north line
+ */
+export function computeWarpedMapBearing(
+  warpedMap: WarpedMap,
+  options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
+) {
+  options = mergePartialOptions(
+    DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS,
+    options
+  )
+
+  let projectedTransformer: ProjectedGcpTransformer
+
+  if (warpedMap.gcps.length < 2) {
+    throw new Error('Not enough GCPs to compute bearing')
+  } else {
+    projectedTransformer = warpedMap.getProjectedTransformer(
+      options?.transformationType ??
+        DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS.transformationType,
+      options
+    )
+  }
+
+  return computeBearingInternal(warpedMap.resourceMask, projectedTransformer)
+}
+
+function computeBearingInternal(
+  resourceMask: Ring,
+  projectedTransformer: ProjectedGcpTransformer
+): number {
+  const resourceMaskBbox = computeBbox(resourceMask)
 
   const resourceTopLeft = [resourceMaskBbox[0], resourceMaskBbox[1]] as Point
   const resourceBottomLeft = [resourceMaskBbox[0], resourceMaskBbox[3]] as Point

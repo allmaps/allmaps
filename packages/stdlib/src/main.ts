@@ -1,4 +1,11 @@
-import { differenceWith, fromPairs, toPairs, isEqual } from 'lodash-es'
+import {
+  differenceWith,
+  fromPairs,
+  toPairs,
+  isEqual,
+  cloneDeep,
+  pick
+} from 'lodash-es'
 
 export function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
@@ -131,6 +138,27 @@ export function objectDifference(
   return fromPairs(
     differenceWith(toPairs(newObject), toPairs(baseObject), isEqual)
   )
+}
+
+export function objectOmitDifference(
+  newObject: object,
+  baseObject: object
+): object {
+  const keysToOmit = Object.keys(objectDifference(newObject, baseObject))
+  return pick(newObject, keysToOmit)
+}
+
+// Basic omit function as replacement for lodash omit, since it will be removed in v5
+// See: https://github.com/lodash/lodash/issues/2930#issuecomment-272298477
+export function omit<T extends Record<string, any>>(
+  object: T,
+  keys: string[]
+): Partial<T> {
+  const result = cloneDeep(object) as T
+  for (const key of keys) {
+    delete result[key]
+  }
+  return result
 }
 
 export function maxOfNumberOrUndefined(

@@ -46,7 +46,7 @@ export type WarpedMapOptions = {
   projection: Projection
   visible: boolean
   applyMask: boolean
-  distortionMeasure?: DistortionMeasure
+  distortionMeasure: DistortionMeasure | undefined
 }
 export type SpecificTriangulatedWarpedMapOptions = {
   resourceResolution?: number
@@ -136,15 +136,27 @@ export type CanvasRenderOptions<WO extends WarpedMapOptions> =
 export type IntArrayRenderOptions<WO extends WarpedMapOptions> =
   BaseRenderOptions & WarpedMapListOptions<WO>
 
-export type WarpedMapLayerOptions = WebGL2RenderOptions
+export type WarpedMapLayerOptions = Partial<WebGL2RenderOptions>
+export type SpecificMapLibreWarpedMapLayerOptions = {
+  layerId: string
+  layerType: 'custom'
+  layerRenderingMode: '2d'
+}
+export type MapLibreWarpedMapLayerOptions =
+  SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 
 export type TileCacheOptions = {
   fetchFn: FetchFn
 }
 
+// The options when getting options
+export type GetOptionsOptions = {
+  omitDefaultGeoreferencedMapOptions: boolean
+}
+
 // The options when setting options
 export type SetOptionsOptions = {
-  omit: string[]
+  optionKeysToOmit: string[]
   init: boolean
   animate: boolean
 }

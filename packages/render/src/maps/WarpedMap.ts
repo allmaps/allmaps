@@ -1,4 +1,4 @@
-import { cloneDeep, omit } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
@@ -17,9 +17,9 @@ import {
   getPropertyFromCacheOrComputation,
   mixLineStrings,
   sizeToRectangle,
-  mergePartialOptions,
   mergeOptionsUnlessUndefined,
-  objectDifference
+  objectDifference,
+  omit
 } from '@allmaps/stdlib'
 
 import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
@@ -43,15 +43,7 @@ import type { SetOptionsOptions, WarpedMapOptions } from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
-// TODO: consider to make the default options more precise
-const DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
-  minOffsetRatio: 0.01,
-  minOffsetDistance: 4,
-  maxDepth: 5,
-  differentHandedness: true
-} as Partial<ProjectedGcpTransformerOptions>
-
-export const DEFAULT_WARPED_MAP_OPTIONS: WarpedMapOptions = {
+export const DEFAULT_WARPED_MAP_OPTIONS = {
   gcps: [],
   resourceMask: [],
   transformationType: 'polynomial' as TransformationType,
@@ -60,6 +52,17 @@ export const DEFAULT_WARPED_MAP_OPTIONS: WarpedMapOptions = {
   visible: true,
   applyMask: true,
   distortionMeasure: undefined
+}
+
+const DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
+  minOffsetRatio: 0.01,
+  minOffsetDistance: 4,
+  maxDepth: 5,
+  differentHandedness: true
+}
+const DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
+  ...DEFAULT_WARPED_MAP_OPTIONS,
+  ...DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS
 }
 
 export function createWarpedMapFactory() {
@@ -139,10 +142,10 @@ export class WarpedMap extends EventTarget {
   mapId: string
   georeferencedMap: GeoreferencedMap
 
-  options?: Partial<WarpedMapOptions>
-  listOptions?: Partial<WarpedMapOptions>
-  georeferencedMapOptions?: Partial<WarpedMapOptions>
   defaultOptions!: WarpedMapOptions
+  georeferencedMapOptions?: Partial<WarpedMapOptions>
+  listOptions?: Partial<WarpedMapOptions>
+  options?: Partial<WarpedMapOptions>
   mergedOptions!: WarpedMapOptions
 
   imageInfo?: unknown
@@ -261,6 +264,101 @@ export class WarpedMap extends EventTarget {
     this.setMergedOptions({ init: true })
   }
 
+  /**
+   * Get default options
+   */
+  static getDefaultOptions(): WarpedMapOptions {
+    return DEFAULT_WARPED_MAP_OPTIONS
+  }
+
+  /**
+   * Get default and georeferenced map options
+   */
+  getDefaultAndGeoreferencedMapOptions(): WarpedMapOptions {
+    return mergeOptionsUnlessUndefined(
+      this.defaultOptions,
+      this.georeferencedMapOptions
+    )
+  }
+
+  /**
+   * Get scale of the warped map, in resource pixels per viewport pixels.
+   *
+   * @param viewport - the current viewport
+   * @returns
+   */
+  getResourceToViewportScale(viewport: Viewport): number {
+    return rectanglesToScale(
+      this.resourceMaskRectangle,
+      this.projectedGeoMaskRectangle.map((point) => {
+        return applyHomogeneousTransform(
+          viewport.projectedGeoToViewportHomogeneousTransform,
+          point
+        )
+      }) as Rectangle
+    )
+  }
+
+  /**
+   * Get scale of the warped map, in resource pixels per canvas pixels.
+   *
+   * @param viewport - the current viewport
+   * @returns
+   */
+  getResourceToCanvasScale(viewport: Viewport): number {
+    return this.getResourceToViewportScale(viewport) / viewport.devicePixelRatio
+  }
+
+  /**
+   * Get the reference scaling from the forward transformation of the projected Helmert transformer
+   *
+   * @returns
+   */
+  getReferenceScale(): number {
+    const projectedHelmertTransformer = this.getProjectedTransformer('helmert')
+    const toProjectedGeoHelmertTransformation =
+      projectedHelmertTransformer.getToGeoTransformation() as Helmert
+    const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
+    return helmertMeasures.scale as number
+  }
+
+  /**
+   * Get a projected transformer of the given transformation type.
+   *
+   * Uses cashed projected transformers by transformation type,
+   * and only computes a new projected transformer if none found.
+   *
+   * Returns a projected transformer in the current projection,
+   * even if the cached transformer was computed in a different projection.
+   *
+   * Default settings apply for the options.
+   *
+   * @params transformationType - the transformation type
+   * @params partialProjectedGcpTransformerOptions - options
+   * @params useCache - whether to use the cached projected transformers previously computed
+   * @returns A projected transformer
+   */
+  getProjectedTransformer(
+    transformationType: TransformationType,
+    partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
+  ): ProjectedGcpTransformer {
+    const options = mergeOptionsUnlessUndefined(
+      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS,
+      {
+        projection: this.projection,
+        internalProjection: this.internalProjection
+      },
+      partialProjectedGcpTransformerOptions
+    )
+
+    const projectedTransformer = getPropertyFromCacheOrComputation(
+      this.projectedTransformerCache,
+      transformationType,
+      () => new ProjectedGcpTransformer(this.gcps, transformationType, options)
+    )
+    return projectedTransformer.setProjection(options.projection)
+  }
+
   setOptions(
     options?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
@@ -283,7 +381,7 @@ export class WarpedMap extends EventTarget {
   }
 
   setDefaultOptions() {
-    this.defaultOptions = DEFAULT_WARPED_MAP_OPTIONS
+    this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
   setMergedOptions(setOptionsOptions?: Partial<SetOptionsOptions>): object {
@@ -301,11 +399,14 @@ export class WarpedMap extends EventTarget {
       previousMergedOptions
     )
 
-    if (setOptionsOptions?.omit) {
+    if (setOptionsOptions?.optionKeysToOmit) {
       // If some options should be omitted from changing,
       // like when setting all options exect those that should be animated,
       // then omit those options and set the merged options accordingly
-      changedMergedOptions = omit(changedMergedOptions, setOptionsOptions?.omit)
+      changedMergedOptions = omit(
+        changedMergedOptions,
+        setOptionsOptions?.optionKeysToOmit
+      )
       this.mergedOptions = mergeOptionsUnlessUndefined(
         previousMergedOptions,
         changedMergedOptions
@@ -372,92 +473,6 @@ export class WarpedMap extends EventTarget {
     }
 
     return changedMergedOptions
-  }
-
-  /**
-   * Get scale of the warped map, in resource pixels per viewport pixels.
-   *
-   * @param viewport - the current viewport
-   * @returns
-   */
-  getResourceToViewportScale(viewport: Viewport): number {
-    return rectanglesToScale(
-      this.resourceMaskRectangle,
-      this.projectedGeoMaskRectangle.map((point) => {
-        return applyHomogeneousTransform(
-          viewport.projectedGeoToViewportHomogeneousTransform,
-          point
-        )
-      }) as Rectangle
-    )
-  }
-
-  /**
-   * Get scale of the warped map, in resource pixels per canvas pixels.
-   *
-   * @param viewport - the current viewport
-   * @returns
-   */
-  getResourceToCanvasScale(viewport: Viewport): number {
-    return this.getResourceToViewportScale(viewport) / viewport.devicePixelRatio
-  }
-
-  /**
-   * Get the reference scaling from the forward transformation of the projected Helmert transformer
-   *
-   * @returns
-   */
-  getReferenceScale(): number {
-    const projectedHelmertTransformer = this.getProjectedTransformer('helmert')
-    const toProjectedGeoHelmertTransformation =
-      projectedHelmertTransformer.getToGeoTransformation() as Helmert
-    const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
-    return helmertMeasures.scale as number
-  }
-
-  /**
-   * Get a projected transformer of the given transformation type.
-   *
-   * Uses cashed projected transformers by transformation type,
-   * and only computes a new projected transformer if none found.
-   *
-   * Returns a projected transformer in the current projection,
-   * even if the cached transformer was computed in a different projection.
-   *
-   * Default settings apply for the options.
-   *
-   * @params transformationType - the transformation type
-   * @params partialProjectedGcpTransformerOptions - options
-   * @params useCache - whether to use the cached projected transformers previously computed
-   * @returns A projected transformer
-   */
-  getProjectedTransformer(
-    transformationType: TransformationType,
-    partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
-  ): ProjectedGcpTransformer {
-    partialProjectedGcpTransformerOptions = mergePartialOptions(
-      {
-        projection: this.projection,
-        internalProjection: this.internalProjection
-      },
-      partialProjectedGcpTransformerOptions
-    )
-    partialProjectedGcpTransformerOptions = mergePartialOptions(
-      DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS,
-      partialProjectedGcpTransformerOptions
-    )
-
-    const projectedTransformer = getPropertyFromCacheOrComputation(
-      this.projectedTransformerCache,
-      transformationType,
-      () =>
-        new ProjectedGcpTransformer(
-          this.gcps,
-          transformationType,
-          partialProjectedGcpTransformerOptions
-        )
-    )
-    return projectedTransformer.setProjection(this.projection)
   }
 
   /**

@@ -14,8 +14,8 @@
     return projections.filter((projection) => {
       const lowerCaseSearchValue = s.toLowerCase()
       return (
-        projection.name.toLowerCase().includes(lowerCaseSearchValue) ||
-        projection.code.includes(lowerCaseSearchValue)
+        projection.name?.toLowerCase().includes(lowerCaseSearchValue) ||
+        projection.code?.includes(lowerCaseSearchValue)
       )
     })
   }
@@ -36,11 +36,11 @@
 
   let searchValue = $state('')
 
-  const fromAnnotationProjection: PickerProjection = {
-    code: 'fromAnnotation',
-    name: 'From Annotation',
+  const undefinedProjection: PickerProjection = {
+    code: 'undefined',
+    name: 'Infered',
     comment: 'Default',
-    definition: ''
+    definition: 'undefined'
   }
   const defaultProjection = $derived.by(() => {
     const result = projections.find((projection) => projection.code === '3857')
@@ -60,7 +60,7 @@
   const topProjections = $derived(
     [
       selectedProjection,
-      fromAnnotationProjection,
+      undefinedProjection,
       defaultProjection,
       ...suggestedProjections
     ]
@@ -86,7 +86,7 @@
 {#snippet comboBoxItem({ projection }: { projection: PickerProjection })}
   <Combobox.Item
     class="flex items-center justify-between h-10 w-full select-none rounded px-2 py-2 text-sm capitalize truncate outline-none data-[highlighted]:bg-gray-100"
-    value={projection.code}
+    value={projection.definition as string}
     label={projection.name}
   >
     {#snippet children({ selected })}
@@ -119,9 +119,9 @@
   }}
   onValueChange={(v) => {
     selectedProjection =
-      v == 'fromAnnotation'
+      v == 'undefined'
         ? undefined
-        : projections.find((projection) => projection.code === v)
+        : projections.find((projection) => projection.definition === v)
   }}
 >
   <div class="relative">
@@ -159,14 +159,14 @@
               </Combobox.ScrollUpButton>
               <Combobox.Viewport class="p-1 max-h-90">
                 {#if topProjections.length > 0}
-                  {#each topProjections as projection, i (i + projection.code)}
+                  {#each topProjections as projection, i (i + (projection.definition as string))}
                     {@render comboBoxItem({ projection })}
                   {/each}
                   <Combobox.Separator
                     class="my-1 -ml-1 -mr-1 block h-px bg-gray-200"
                   ></Combobox.Separator>
                 {/if}
-                {#each filteredProjections as projection, i (i + projection.code)}
+                {#each filteredProjections as projection, i (i + (projection.definition as string))}
                   {@render comboBoxItem({ projection })}
                 {:else}
                   <span

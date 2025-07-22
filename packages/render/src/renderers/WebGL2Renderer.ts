@@ -5,6 +5,7 @@ import {
   hexToFractionalOpaqueRgba,
   hexToFractionalRgba,
   mergeOptions,
+  mergePartialOptions,
   squaredDistance
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
@@ -42,9 +43,11 @@ import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
 
 import type {
+  GetOptionsOptions,
   Renderer,
   SpecificWebGL2RenderOptions,
-  WebGL2RenderOptions
+  WebGL2RenderOptions,
+  WebGL2WarpedMapOptions
 } from '../shared/types.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
@@ -269,6 +272,18 @@ export class WebGL2Renderer
   }
 
   /**
+   * Get the default WebGL2Renderer options
+   */
+  getDefaultOptions(
+    getOptionsOptions?: GetOptionsOptions
+  ): WebGL2RenderOptions & WebGL2WarpedMapOptions {
+    return mergeOptions(
+      super.getDefaultOptions(getOptionsOptions),
+      DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS
+    )
+  }
+
+  /**
    * Set the WebGL2 Renderer options
    *
    * @param options - Options
@@ -278,15 +293,31 @@ export class WebGL2Renderer
   }
 
   /**
-   * Set the options by map
+   * Set the WebGL2 options of specific map IDs
    *
-   * @param options - Options
+   * @param mapIds - Map IDs for which the options apply
+   * @param options - WebGL2 Options
+   * @param renderAndListOptions - WebGL2 Render and List options
    */
   setMapsOptions(
     mapIds: string[],
-    options: Partial<WebGL2RenderOptions>
+    options: Partial<WebGL2RenderOptions>,
+    renderAndListOptions?: Partial<WebGL2RenderOptions>
   ): void {
-    super.setMapsOptions(mapIds, options)
+    super.setMapsOptions(mapIds, options, renderAndListOptions)
+  }
+
+  /**
+   * Set the options of specific maps by map ID
+   *
+   * @param optionsByMapId - WebGL2 Options by map ID
+   * @param renderAndListOptions - WebGL2 Render and List options
+   */
+  setMapsOptionsByMapId(
+    optionsByMapId: Map<string, Partial<WebGL2RenderOptions>>,
+    renderAndListOptions?: Partial<WebGL2RenderOptions>
+  ): void {
+    super.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
   }
 
   /**

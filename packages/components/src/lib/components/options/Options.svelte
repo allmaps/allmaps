@@ -12,7 +12,6 @@
   } from '$lib/shared/projections/projections.js'
 
   import type { Bbox } from '@allmaps/types'
-
   import type { OptionsState } from './OptionsState.svelte'
 
   let {

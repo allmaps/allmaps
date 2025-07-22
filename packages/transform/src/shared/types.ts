@@ -39,7 +39,7 @@ export type TransformationType =
   | 'linear'
 
 export const supportedtransformationTypes: TransformationType[] = [
-  'straight',
+  // 'straight', // Consider to remove this
   'helmert',
   'polynomial', // Note: no 'polynomial1' here
   'polynomial2',

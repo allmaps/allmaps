@@ -1102,6 +1102,9 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
     devDependencies:
+      '@allmaps/render':
+        specifier: workspace:^
+        version: link:../render
       '@allmaps/types':
         specifier: workspace:^
         version: link:../types
@@ -1171,6 +1174,9 @@ importers:
       fuse.js:
         specifier: ^7.1.0
         version: 7.1.0
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       maplibre-gl:
         specifier: ^5.6.0
         version: 5.6.1
@@ -1180,6 +1186,9 @@ importers:
       pmtiles:
         specifier: ^3.0.6
         version: 3.2.1
+      runed:
+        specifier: ^0.31.0
+        version: 0.31.0(svelte@5.35.4)
     devDependencies:
       '@allmaps/annotation':
         specifier: workspace:^
@@ -1208,6 +1217,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.1.11(vite@6.3.5)
+      '@types/lodash-es':
+        specifier: ^4.17.6
+        version: 4.17.12
       eslint:
         specifier: ^9.18.0
         version: 9.30.1
@@ -5621,7 +5633,7 @@ packages:
     peerDependencies:
       '@sveltejs/kit': ^2.0.0
     dependencies:
-      '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19)
+      '@sveltejs/kit': 2.22.2(@sveltejs/vite-plugin-svelte@4.0.4)(svelte@5.35.4)(vite@5.4.19)
     dev: true
 
   /@sveltejs/kit@2.22.2(@sveltejs/vite-plugin-svelte@3.1.2)(svelte@4.2.20)(vite@5.4.19):
@@ -14133,6 +14145,15 @@ packages:
 
   /runed@0.23.4(svelte@5.35.4):
     resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
+    peerDependencies:
+      svelte: ^5.7.0
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.35.4
+    dev: false
+
+  /runed@0.31.0(svelte@5.35.4):
+    resolution: {integrity: sha512-3E3i4svY4PAwI3ANmJnZuVqWG/YJrYW3Jop3HZeycQ0KZNWoFD17Jr+sG/JutJDi15g3vpdzkL7AKk6iMHybdw==}
     peerDependencies:
       svelte: ^5.7.0
     dependencies:

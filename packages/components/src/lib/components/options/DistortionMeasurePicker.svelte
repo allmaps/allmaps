@@ -8,8 +8,6 @@
   import Empty from 'phosphor-svelte/lib/Empty'
   import Resize from 'phosphor-svelte/lib/Resize'
 
-  import { camelCaseToWords } from '@allmaps/stdlib'
-
   import type { DistortionMeasure } from '@allmaps/transform'
 
   export type PickerDistortionMeasure = DistortionMeasure | 'none'

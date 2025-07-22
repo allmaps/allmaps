@@ -21,7 +21,7 @@
 
   import type { TransformationType } from '@allmaps/transform'
 
-  export type PickerTransformationType = TransformationType | 'fromAnnotation'
+  export type PickerTransformationType = TransformationType | 'undefined'
 
   let {
     selectedTransformationType = $bindable()
@@ -30,7 +30,7 @@
   } = $props()
 
   export const transformationTypes = [
-    'fromAnnotation',
+    'undefined',
     ...supportedtransformationTypes
   ] as PickerTransformationType[]
   let transformationTypeItems = transformationTypes.map(
@@ -55,7 +55,7 @@
   label: string
 })}
   <div class="size-5 mr-2">
-    {#if transformationTypeItem.value === 'fromAnnotation'}
+    {#if transformationTypeItem.value === 'undefined'}
       <FileMagnifyingGlass weight="thin" class="size-5" />
     {:else if transformationTypeItem.value === 'straight'}
       <Straight />
@@ -80,7 +80,7 @@
   type="single"
   onValueChange={(v) => {
     selectedTransformationType =
-      v === 'fromAnnotation' ? undefined : (v as TransformationType)
+      v === 'undefined' ? undefined : (v as TransformationType)
   }}
   items={transformationTypeItems}
 >

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { add } from 'lodash-es'
+
 export function mergeOptions<
   T extends Record<string, any>,
   U extends Array<Record<string, any> | undefined>
@@ -33,15 +35,13 @@ export function mergePartialOptions<
   }
 }
 
-export function mergeOptionsUnlessUndefined<
-  T extends Record<string, any>,
+export function removeUndefinedOptions<
   U extends Array<Record<string, any> | undefined>
 >(
-  baseOptions: T,
-  ...additionalOptions: U
-): T & Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
-  const mergedOptions = { ...baseOptions } as T
-  for (const options of additionalOptions) {
+  ...optionsArray: U
+): Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
+  const mergedOptions = {}
+  for (const options of optionsArray) {
     if (!options) {
       continue
     }
@@ -57,8 +57,22 @@ export function mergeOptionsUnlessUndefined<
     }
   }
 
-  return mergedOptions as T &
-    Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }>
+  return mergedOptions as Partial<{
+    [K in keyof U[number]]: Exclude<U[number][K], undefined>
+  }>
+}
+
+export function mergeOptionsUnlessUndefined<
+  T extends Record<string, any>,
+  U extends Array<Record<string, any> | undefined>
+>(
+  baseOptions: T,
+  ...additionalOptions: U
+): T & Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
+  return {
+    ...baseOptions,
+    ...removeUndefinedOptions(...additionalOptions)
+  }
 }
 
 // // Original version of mergeOptionsUnlessUndefined

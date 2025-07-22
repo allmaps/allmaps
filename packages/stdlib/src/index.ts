@@ -163,6 +163,8 @@ export {
   subSetArray,
   equalSet,
   objectDifference,
+  objectOmitDifference,
+  omit,
   maxOfNumberOrUndefined,
   isValidHttpUrl,
   camelCaseToWords

@@ -11,6 +11,7 @@
     { "path": "../transform" },
     { "path": "../project" },
     { "path": "../types" },
+    { "path": "../render" },
   ],
   "include": ["./src/**/*"]
 }

@@ -8,7 +8,7 @@
   let {
     georeferencedMaps = [],
     selectedMapId = $bindable(undefined),
-    optionsStateByMapId = new Map()
+    optionsStateByMapId
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
@@ -18,7 +18,7 @@
 
 {#snippet item(georeferencedMap: GeoreferencedMap)}
   MapId: {georeferencedMap.id}
-  <OptionsButton optionsState={optionsStateByMapId.get(georeferencedMap.id!)!}
+  <OptionsButton optionsState={optionsStateByMapId?.get(georeferencedMap.id!)!}
   ></OptionsButton>
 {/snippet}
 

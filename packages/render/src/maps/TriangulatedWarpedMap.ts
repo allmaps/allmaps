@@ -118,12 +118,19 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.updateTriangulation()
   }
 
-  setDefaultOptions() {
-    super.setDefaultOptions()
-    this.defaultOptions = mergeOptions(
+  /**
+   * Get default options
+   */
+  static getDefaultOptions(): TriangulatedWarpedMapOptions {
+    return mergeOptions(
       DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS,
-      this.defaultOptions
+      super.getDefaultOptions()
     )
+  }
+
+  /** Set default options */
+  setDefaultOptions() {
+    this.defaultOptions = TriangulatedWarpedMap.getDefaultOptions()
   }
 
   /**

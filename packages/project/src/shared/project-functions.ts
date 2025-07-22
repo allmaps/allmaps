@@ -55,13 +55,9 @@ export const lonLatToWebMercator =
 export const webMercatorToLonLat =
   lonLatProjectionToWebMecatorProjectionConverter.inverse
 
-function projectionDefinitionToAntialiasedDefinition(
-  stringProjectionDefinition: string | undefined
-): string | undefined {
-  if (stringProjectionDefinition === undefined) {
-    return undefined
-  }
-
+export function projectionDefinitionToAntialiasedDefinition(
+  stringProjectionDefinition: string
+): string {
   const lonLatIndex = lonLatEquivalentDefinitions.indexOf(
     stringProjectionDefinition
   )
@@ -74,6 +70,16 @@ function projectionDefinitionToAntialiasedDefinition(
     return webMercatorProjection.definition
   } else {
     return stringProjectionDefinition
+  }
+}
+
+export function projectionToAntialiasedProjection(
+  projection: Projection
+): Projection {
+  return {
+    definition: projectionDefinitionToAntialiasedDefinition(
+      String(projection?.definition)
+    )
   }
 }
 

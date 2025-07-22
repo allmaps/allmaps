@@ -29,7 +29,11 @@ import type {
   CachableTileFactory,
   WarpedMapFactory,
   BaseRenderOptions,
-  MapPruneInfo
+  MapPruneInfo,
+  GetOptionsOptions,
+  WarpedMapListOptions,
+  GetWarpedMapOptions,
+  WarpedMapOptions
 } from '../shared/types.js'
 
 // TODO: move defaults for tunable options here
@@ -104,9 +108,48 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Set the Base Renderer options
+   * Get the Renderer options
+   */
+  getOptions(): Partial<BaseRenderOptions> {
+    return mergePartialOptions(this.options, this.warpedMapList.getOptions())
+  }
+
+  /**
+   * Get the default Renderer options
+   */
+  getDefaultOptions(
+    getOptionsOptions?: GetOptionsOptions
+  ): WarpedMapListOptions<GetWarpedMapOptions<W>> &
+    BaseRenderOptions &
+    GetWarpedMapOptions<W> {
+    return mergeOptions(
+      this.warpedMapList.getDefaultOptions(getOptionsOptions),
+      DEFAULT_BASE_RENDER_OPTIONS
+    )
+  }
+
+  /**
+   * Get the options of a specific map ID
    *
-   * @param options - Options
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getMapOptions(mapId)
+  }
+
+  /**
+   * Get the default options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getDefaultMapOptions(mapId)
+  }
+
+  /**
+   * Set the Renderer options
+   *
+   * @param options - Render and List Options
    */
   setOptions(options: Partial<BaseRenderOptions>): void {
     this.options = mergePartialOptions(this.options, options)
@@ -115,12 +158,42 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Set the options by map
+   * Set the options of specific map IDs
    *
+   * @param mapIds - Map IDs for which the options apply
    * @param options - Options
+   * @param renderAndListOptions - Render and List options
    */
-  setMapsOptions(mapIds: string[], options: Partial<BaseRenderOptions>): void {
-    this.warpedMapList.setMapsOptions(mapIds, options)
+  setMapsOptions(
+    mapIds: string[],
+    options: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions>
+  ): void {
+    if (renderAndListOptions) {
+      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.tileCache.setOptions(renderAndListOptions)
+    }
+    this.warpedMapList.setMapsOptions(mapIds, options, renderAndListOptions)
+  }
+
+  /**
+   * Set the options of specific maps by map ID
+   *
+   * @param optionsByMapId - Options by map ID
+   * @param renderAndListOptions - Render and List options
+   */
+  setMapsOptionsByMapId(
+    optionsByMapId: Map<string, Partial<BaseRenderOptions>>,
+    renderAndListOptions?: Partial<BaseRenderOptions>
+  ): void {
+    if (renderAndListOptions) {
+      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.tileCache.setOptions(renderAndListOptions)
+    }
+    this.warpedMapList.setMapsOptionsByMapId(
+      optionsByMapId,
+      renderAndListOptions
+    )
   }
 
   protected loadMissingImageInfosInViewport(): Promise<void>[] {
