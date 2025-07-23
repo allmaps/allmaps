@@ -15,6 +15,11 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
+  import {
+    bboxToCenter,
+    mergeOptionsUnlessUndefined,
+    mergePartialOptions
+  } from '@allmaps/stdlib'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
@@ -25,14 +30,14 @@
   let {
     georeferencedMaps = [],
     optionsState = new OptionsState(),
-    optionsStateByMapId = new Map(),
+    mapOptionsStateByMapId = new Map(),
     componentOptions = {},
     mapOrImage = $bindable('map'),
     selectedMapId = $bindable(undefined)
   }: {
     georeferencedMaps: GeoreferencedMap[]
     optionsState: OptionsState
-    optionsStateByMapId: Map<string, OptionsState>
+    mapOptionsStateByMapId: Map<string, OptionsState>
     componentOptions?: Partial<WarpedMapLayerMapComponentOptions>
     mapOrImage?: 'map' | 'image'
     selectedMapId?: string
@@ -46,14 +51,16 @@
   let geoBbox: Bbox | undefined = $state(undefined)
   let selectedGeoreferencedMap: GeoreferencedMap | undefined = $state(undefined)
   let selectedWarpedMap: WarpedMap | undefined = $state(undefined)
-  let selectedOptionsState: OptionsState | undefined = $state(undefined)
+  let selectedMapOptionsState: OptionsState | undefined = $state(undefined)
 
   const previousSelectedMapId = new Previous(() => selectedMapId)
   const previousSelectedGeoreferencedMap = new Previous(
     () => selectedGeoreferencedMap
   )
   const previousSelectedWarpedMap = new Previous(() => selectedWarpedMap)
-  const previousSelectedOptionsState = new Previous(() => selectedOptionsState)
+  const previousSelectedMapOptionsState = new Previous(
+    () => selectedMapOptionsState
+  )
 
   onMount(() => {
     const protocol = new Protocol()
@@ -90,25 +97,30 @@
       // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
 
-      // Get the layer options and re-initialize the optionState with those option
-      // Such that components using the options state
-      // reflect the starting values for their options (like visible: true, ...)
-      optionsState.setOptions(
-        warpedMapLayer.getDefaultLayerOptions({
-          omitDefaultGeoreferencedMapOptions: true
-        })
-      )
+      // Set the optionState default options again to reflect those of the warpedMapLayer.
+      // This is important if the warpedMapLayer/warpedMapList's options (e.g. renderMask)
+      // are different then the default options.
+      // This way options components will show the correct options.
+      optionsState.reference = warpedMapLayer.getDefaultLayerOptions({
+        omitDefaultGeoreferencedMapOptions: true
+      })
     })
 
     map.on('click', (e) => {
+      if (!warpedMapLayer || mapOrImage == 'image') {
+        return
+      }
+      selectedMapId = warpedMapLayer.getWarpedMapList().getMapIds({
+        geoPoint: [e.lngLat.lng, e.lngLat.lat],
+        onlyVisible: true
+      })[0]
+    })
+
+    map.on('dblclick', (e) => {
       if (!warpedMapLayer) {
         return
       }
-      // TODO: set filter on only visible,
-      // to not accidentally click on other maps while in image mode
-      selectedMapId = warpedMapLayer.getWarpedMapList().getMapIds({
-        geoPoint: [e.lngLat.lng, e.lngLat.lat]
-      })[0]
+      geoBbox = selectedWarpedMap?.geoMaskBbox
     })
   })
 
@@ -137,10 +149,14 @@
       mapIds = Array.from(warpedMapList.getMapIds())
 
       for (const mapId of mapIds) {
-        if (!optionsStateByMapId.has(mapId)) {
-          optionsStateByMapId.set(
+        if (!mapOptionsStateByMapId.has(mapId)) {
+          mapOptionsStateByMapId.set(
             mapId,
-            new OptionsState(warpedMapLayer?.getDefaultMapOptions(mapId))
+            new OptionsState(
+              warpedMapLayer?.getDefaultMapOptions(mapId),
+              {},
+              optionsState
+            )
           )
         }
       }
@@ -151,46 +167,52 @@
               projection: { definition: 'EPSG:4326' }
             })
           : undefined
-      if (geoBbox) {
-        map.fitBounds(geoBbox, {
-          animate: false,
-          padding: 20,
-          bearing: map.getBearing()
-        })
-      }
     })
+  })
+
+  // Fit bounds
+  $effect(() => {
+    if (geoBbox) {
+      map.fitBounds(geoBbox, {
+        animate: selectedMapId !== undefined,
+        padding: 20,
+        bearing: map.getBearing()
+      })
+    }
   })
 
   // Select map
   $effect(() => {
-    if (previousSelectedOptionsState && previousSelectedOptionsState.current) {
-      previousSelectedOptionsState.current.viewOptions.renderAppliableMask =
+    if (
+      previousSelectedMapOptionsState &&
+      previousSelectedMapOptionsState.current
+    ) {
+      previousSelectedMapOptionsState.current.viewOptions.renderAppliableMask =
         undefined
-      previousSelectedOptionsState.current.viewOptions.renderAppliableMaskSize =
+      previousSelectedMapOptionsState.current.viewOptions.renderAppliableMaskSize =
         undefined
     }
 
     if (!selectedMapId) {
-      selectedOptionsState = undefined
+      selectedMapOptionsState = undefined
       selectedGeoreferencedMap = undefined
       selectedWarpedMap = undefined
+    }
 
-      // optionsState.viewOptions.renderAppliableMask = undefined
-      // optionsState.viewOptions.renderAppliableMaskSize = undefined
-    } else {
-      selectedOptionsState = optionsStateByMapId.get(selectedMapId)
+    if (selectedMapId) {
+      selectedMapOptionsState = mapOptionsStateByMapId.get(selectedMapId)
       selectedGeoreferencedMap = georeferencedMaps.find(
         (georeferencedMap) => georeferencedMap.id == selectedMapId
       )
       selectedWarpedMap = warpedMaps.find(
         (warpedMap) => warpedMap.mapId == selectedMapId
       )
-      if (!selectedOptionsState) {
+
+      if (!selectedMapOptionsState) {
         return
       }
-
-      selectedOptionsState.viewOptions.renderAppliableMask = true
-      selectedOptionsState.viewOptions.renderAppliableMaskSize = 8
+      selectedMapOptionsState.viewOptions.renderAppliableMask = true
+      selectedMapOptionsState.viewOptions.renderAppliableMaskSize = 8
     }
   })
 
@@ -202,14 +224,13 @@
           map.setLayoutProperty(layer, 'visibility', 'visible')
         }
       }
-      warpedMapLayer?.showMaps(mapIds)
       map.rotateTo(0)
-      optionsState.viewOptions.visible = true
-      if (selectedOptionsState) {
-        selectedOptionsState.viewOptions.visible = true
-        selectedOptionsState.viewOptions.transformationType = undefined
-        selectedOptionsState.viewOptions.internalProjection = undefined
-        selectedOptionsState.viewOptions.applyMask = undefined
+      optionsState.viewOptions.visible = undefined
+      if (selectedMapOptionsState) {
+        selectedMapOptionsState.viewOptions.visible = undefined
+        selectedMapOptionsState.viewOptions.applyMask = undefined
+        selectedMapOptionsState.viewOptions.transformationType = undefined
+        selectedMapOptionsState.viewOptions.internalProjection = undefined
       }
     } else if (mapOrImage == 'image') {
       for (const layer of map.getLayersOrder()) {
@@ -219,17 +240,15 @@
       }
       if (selectedWarpedMap && selectedMapId) {
         map.rotateTo(-computeWarpedMapBearing(selectedWarpedMap))
-        warpedMapLayer?.hideMaps(mapIds)
-        warpedMapLayer?.showMap(selectedMapId)
         // TODO: fix: reset transformation type: use extraOptions
       }
       optionsState.viewOptions.visible = false
-      if (selectedOptionsState) {
-        selectedOptionsState.viewOptions.visible = true
-        selectedOptionsState.viewOptions.transformationType = 'helmert'
-        selectedOptionsState.viewOptions.internalProjection =
+      if (selectedMapOptionsState) {
+        selectedMapOptionsState.viewOptions.visible = true
+        selectedMapOptionsState.viewOptions.applyMask = false
+        selectedMapOptionsState.viewOptions.transformationType = 'helmert'
+        selectedMapOptionsState.viewOptions.internalProjection =
           webMercatorProjection
-        selectedOptionsState.viewOptions.applyMask = false
       }
     }
   })
@@ -242,19 +261,30 @@
     }
 
     // TODO: replace this with more elegant code once you can .map() a Map()
-    const mergedOptionsByMapId = new Map(
-      Array.from(optionsStateByMapId).map(([mapId, optionsState]) => [
+    const mapOptionsByMapId = new Map(
+      Array.from(mapOptionsStateByMapId).map(([mapId, mapOptionsState]) => [
         mapId,
-        optionsState.mergedOptions
+        $state.snapshot(
+          mergeOptionsUnlessUndefined(
+            mapOptionsState.options,
+            mergeOptionsUnlessUndefined(
+              optionsState.viewOptions,
+              mapOptionsState.viewOptions
+            )
+          )
+        )
       ])
+    )
+    const layerOptions = $state.snapshot(
+      mergeOptionsUnlessUndefined(
+        optionsState.options,
+        optionsState.viewOptions
+      )
     )
 
     // Using $state.snapshot() here to avoid proxies and allow for accurate comparison
-    console.log(mergedOptionsByMapId, optionsState.mergedOptions)
-    warpedMapLayer.setMapsOptionsByMapId(
-      $state.snapshot(mergedOptionsByMapId),
-      $state.snapshot(optionsState.mergedOptions)
-    )
+    console.log('passing', mapOptionsByMapId, layerOptions)
+    warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
 </script>
 

@@ -43,6 +43,11 @@ import type { SetOptionsOptions, WarpedMapOptions } from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
+export const UNDEFINED_GEOREFERENCED_MAP_OPTIONS = {
+  transformationType: undefined,
+  internalProjection: undefined
+}
+
 export const DEFAULT_WARPED_MAP_OPTIONS = {
   gcps: [],
   resourceMask: [],

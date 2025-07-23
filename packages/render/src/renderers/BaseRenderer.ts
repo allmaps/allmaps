@@ -601,14 +601,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           // filter out duplicate mapIds
           return a.indexOf(v) === i
         })
-        .sort((mapIdA, mapIdB) => {
-          const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-          const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-          if (zIndexA !== undefined && zIndexB !== undefined) {
-            return zIndexA - zIndexB
-          }
-          return 0
-        })
+        .sort((mapId0, mapId1) =>
+          this.warpedMapList.orderMapIdsByZIndex(mapId0, mapId1)
+        )
     )
 
     this.mapsInPreviousViewport = this.mapsInViewport

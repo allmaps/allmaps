@@ -28,6 +28,9 @@
   } = $props()
 
   let selectedMapId: string | undefined = $state(undefined)
+  let selectedMapOptionsState = $derived(
+    selectedMapId ? optionsStateByMapId.get(selectedMapId) : undefined
+  )
   let mapOrImage: 'map' | 'image' = $state('map')
 
   let georeferencedMaps: GeoreferencedMap[] = $derived(
@@ -47,7 +50,7 @@
   <WarpedMapLayerMap
     {georeferencedMaps}
     {optionsState}
-    {optionsStateByMapId}
+    mapOptionsStateByMapId={optionsStateByMapId}
     bind:selectedMapId
     {mapOrImage}
     {componentOptions}
@@ -64,6 +67,9 @@
 <div class="absolute z-50 bottom-0 w-full p-2 grid grid-cols-3">
   <div class="flex justify-start">
     <OptionsButton bind:optionsState />
+    {#if selectedMapOptionsState}
+      <OptionsButton bind:optionsState={selectedMapOptionsState} />
+    {/if}
   </div>
   <div class="flex justify-center">
     <MapsOverview

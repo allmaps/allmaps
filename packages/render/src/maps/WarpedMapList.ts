@@ -7,21 +7,20 @@ import {
 import { isEqualProjection, proj4 } from '@allmaps/project'
 
 import { RTree } from './RTree.js'
-import { WarpedMap } from './WarpedMap.js'
+import { UNDEFINED_GEOREFERENCED_MAP_OPTIONS, WarpedMap } from './WarpedMap.js'
 
 import {
   bboxToCenter,
   computeBbox,
   convexHull,
   mergeOptions,
-  mergePartialOptions,
-  omit
+  mergePartialOptions
 } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { Projection } from '@allmaps/project'
-import type { Ring, Bbox, Gcp, Point, ImageInfoByMapId } from '@allmaps/types'
+import type { Ring, Bbox, Gcp, Point } from '@allmaps/types'
 
 import type {
   GetOptionsOptions,
@@ -167,6 +166,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         warpedMaps.push(warpedMap)
       }
     }
+
+    warpedMaps.sort((map0, map1) =>
+      this.orderMapIdsByZIndex(map0.mapId, map1.mapId)
+    )
+
     return warpedMaps
   }
 
@@ -267,10 +271,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     let defaultWarpedMapOptions: GetWarpedMapOptions<W> =
       WebGL2WarpedMap.getDefaultOptions() as GetWarpedMapOptions<W>
     if (getOptionsOptions?.omitDefaultGeoreferencedMapOptions) {
-      defaultWarpedMapOptions = mergeOptions(defaultWarpedMapOptions, {
-        transformationType: undefined,
-        internalProjection: undefined
-      })
+      defaultWarpedMapOptions = mergeOptions(
+        defaultWarpedMapOptions,
+        UNDEFINED_GEOREFERENCED_MAP_OPTIONS
+      )
     }
 
     let result = mergeOptions(
@@ -406,7 +410,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         warpedMapChangedOptions = warpedMap.setOptions(options, listOptions, {
           optionKeysToOmit: this.options.animatedOptions
         })
-        console.log(warpedMapChangedOptions, warpedMap.mapId)
       } else {
         // If the option setting should be animated,
         // or if the option setting should not be animated
@@ -785,38 +788,52 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the visibility of the specified maps to `true`
+   * Order mapIds
    *
-   * @param mapIds - Map IDs
+   * Use this as anonymous sort function in Array.prototype.sort()
    */
-  showMaps(mapIds: Iterable<string>): void {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.mergedOptions.visible = true
-      }
+  orderMapIdsByZIndex(mapId0: string, mapId1: string): number {
+    const zIndex0 = this.getMapZIndex(mapId0)
+    const zIndex1 = this.getMapZIndex(mapId1)
+    if (zIndex0 !== undefined && zIndex1 !== undefined) {
+      return zIndex0 - zIndex1
     }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
-    )
+    return 0
   }
 
-  /**
-   * Changes the visibility of the specified maps to `false`
-   *
-   * @param mapIds - Map IDs
-   */
-  hideMaps(mapIds: Iterable<string>): void {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.mergedOptions.visible = false
-      }
-    }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
-    )
-  }
+  // /**
+  //  * Changes the visibility of the specified maps to `true`
+  //  *
+  //  * @param mapIds - Map IDs
+  //  */
+  // showMaps(mapIds: Iterable<string>): void {
+  //   for (const mapId of mapIds) {
+  //     const warpedMap = this.warpedMapsById.get(mapId)
+  //     if (warpedMap) {
+  //       warpedMap.mergedOptions.visible = true
+  //     }
+  //   }
+  //   this.dispatchEvent(
+  //     new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
+  //   )
+  // }
+
+  // /**
+  //  * Changes the visibility of the specified maps to `false`
+  //  *
+  //  * @param mapIds - Map IDs
+  //  */
+  // hideMaps(mapIds: Iterable<string>): void {
+  //   for (const mapId of mapIds) {
+  //     const warpedMap = this.warpedMapsById.get(mapId)
+  //     if (warpedMap) {
+  //       warpedMap.mergedOptions.visible = false
+  //     }
+  //   }
+  //   this.dispatchEvent(
+  //     new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
+  //   )
+  // }
 
   /**
    * Adds a georeferenced map to this list

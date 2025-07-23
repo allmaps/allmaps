@@ -187,7 +187,8 @@ export {
 export {
   mergeOptions,
   mergeOptionsUnlessUndefined,
-  mergePartialOptions
+  mergePartialOptions,
+  removeUndefinedOptions
 } from './options.js'
 
 export {

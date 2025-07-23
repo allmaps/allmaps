@@ -216,49 +216,49 @@ export class WarpedMapLayer implements CustomLayerInterface {
     return this.renderer.warpedMapList.getWarpedMap(mapId)
   }
 
-  /**
-   * Make a single map visible
-   * @param mapId - ID of the map
-   */
-  showMap(mapId: string) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make a single map visible
+  //  * @param mapId - ID of the map
+  //  */
+  // showMap(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.showMaps([mapId])
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.showMaps([mapId])
+  //   this.triggerRepaint()
+  // }
 
-  /**
-   * Make multiple maps visible
-   * @param mapIds - IDs of the maps
-   */
-  showMaps(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make multiple maps visible
+  //  * @param mapIds - IDs of the maps
+  //  */
+  // showMaps(mapIds: Iterable<string>) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.showMaps(mapIds)
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.showMaps(mapIds)
+  //   this.triggerRepaint()
+  // }
 
-  /**
-   * Make a single map invisible
-   * @param mapId - ID of the map
-   */
-  hideMap(mapId: string) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make a single map invisible
+  //  * @param mapId - ID of the map
+  //  */
+  // hideMap(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.hideMaps([mapId])
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.hideMaps([mapId])
+  //   this.triggerRepaint()
+  // }
 
-  /**
-   * Make multiple maps invisible
-   * @param mapIds - IDs of the maps
-   */
-  hideMaps(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make multiple maps invisible
+  //  * @param mapIds - IDs of the maps
+  //  */
+  // hideMaps(mapIds: Iterable<string>) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.hideMaps(mapIds)
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.hideMaps(mapIds)
+  //   this.triggerRepaint()
+  // }
 
   // /**
   //  * Returns the visibility of a single map

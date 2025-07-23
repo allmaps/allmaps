@@ -261,11 +261,15 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   shouldRenderMaps(): boolean {
-    return this.mergedOptions.renderMaps !== false
+    return (
+      this.mergedOptions.visible !== false &&
+      this.mergedOptions.renderMaps !== false
+    )
   }
 
   shouldRenderLines(): boolean {
     return (
+      this.mergedOptions.visible !== false &&
       this.mergedOptions.renderLines !== false &&
       (this.mergedOptions.renderFullMask ||
         this.mergedOptions.renderAppliableMask ||
@@ -276,6 +280,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   shouldRenderPoints(): boolean {
     return (
+      this.mergedOptions.visible !== false &&
       this.mergedOptions.renderPoints !== false &&
       (this.mergedOptions.renderGcps ||
         this.mergedOptions.renderTransformedGcps)
