@@ -57,31 +57,32 @@
   }
 </script>
 
-<div class="inline-flex pointer-events-auto">
-  {#if georeferencedMaps.length > 0}
-    <button
-      onclick={selectPrevious}
-      class="px-2 py-2 text-sm font-medium bg-white border-t broder-b border-l border-gray-200 rounded-l-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
-      ><CaretLeft /></button
-    >
-  {/if}
-  <button
-    class="px-4 py-2 w-60 text-sm font-medium bg-white border border-gray-200 hover:bg-gray-100 hover:cursor-pointer focus:z-10"
+<div class="pointer-events-auto flex space-x-1">
+  <div
+    class="px-4 py-2 w-60 text-sm text-center font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
   >
     {#if georeferencedMaps.length}
       {#if selectedIndex !== undefined}
         {selectedIndex + 1} of
       {/if}
       {georeferencedMaps.length}
-      {georeferencedMaps.length > 1 ? 'maps' : 'map'} from {annotations.length}
+      {georeferencedMaps.length > 1 ? 'maps' : 'map'}
+      from {annotations.length}
       {annotations.length > 1 ? 'annotations' : 'annotation'}
     {/if}
-  </button>
+  </div>
   {#if georeferencedMaps.length > 0}
-    <button
-      onclick={selectNext}
-      class="px-2 py-2 text-sm font-medium bg-white border-t broder-b border-r border-gray-200 rounded-r-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
-      ><CaretRight /></button
-    >
+    <div class="flex h-9">
+      <button
+        onclick={selectPrevious}
+        class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
+        ><CaretLeft /></button
+      >
+      <button
+        onclick={selectNext}
+        class="px-2 py-2 text-sm font-medium bg-white border-t broder-b border-r border-gray-200 rounded-r-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
+        ><CaretRight /></button
+      >
+    </div>
   {/if}
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import OptionsButton from './options/OptionsButton.svelte'
+  import OptionsBar from './options/OptionsBar.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -8,24 +8,35 @@
   let {
     georeferencedMaps = [],
     selectedMapId = $bindable(undefined),
-    optionsStateByMapId
+    mapOptionsStateByMapId
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
-    optionsStateByMapId?: Map<string, OptionsState>
+    mapOptionsStateByMapId?: Map<string, OptionsState>
   } = $props()
 </script>
 
-{#snippet item(georeferencedMap: GeoreferencedMap)}
-  MapId: {georeferencedMap.id}
-  <OptionsButton optionsState={optionsStateByMapId?.get(georeferencedMap.id!)!}
-  ></OptionsButton>
+{#snippet item(
+  georeferencedMap: GeoreferencedMap,
+  mapOptionsState: OptionsState
+)}
+  <div>
+    MapId: {georeferencedMap.id}
+  </div>
+  <div>
+    <OptionsBar optionsState={mapOptionsState}></OptionsBar>
+  </div>
 {/snippet}
 
-<ul>
-  {#each georeferencedMaps as georeferencedMap, g}
-    <div>
-      {@render item(georeferencedMap)}
-    </div>
-  {/each}
-</ul>
+<div class="">
+  <ul>
+    {#each georeferencedMaps as georeferencedMap, g}
+      <div>
+        {@render item(
+          georeferencedMap,
+          mapOptionsStateByMapId?.get(georeferencedMap.id!)!
+        )}
+      </div>
+    {/each}
+  </ul>
+</div>

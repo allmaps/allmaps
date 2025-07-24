@@ -58,9 +58,7 @@
   label: string
 })}
   <div class="size-5 mr-2">
-    {#if distortionMeasureItem.value === 'none'}
-      <Empty weight="thin" class="size-5" />
-    {:else if distortionMeasureItem.value === 'log2sigma'}
+    {#if distortionMeasureItem.value === 'log2sigma'}
       <Resize weight="thin" class="size-5" />
     {:else if distortionMeasureItem.value === 'twoOmega'}
       <Angle weight="thin" class="size-5" />

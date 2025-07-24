@@ -3,9 +3,8 @@ import { wrap as comlinkWtap } from 'comlink'
 
 import {
   hexToFractionalOpaqueRgba,
-  hexToFractionalRgba,
+  hexToFractionalRgb,
   mergeOptions,
-  mergePartialOptions,
   squaredDistance
 } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
@@ -620,9 +619,9 @@ export class WebGL2Renderer
       program,
       'u_removeColorColor'
     )
-    gl.uniform3fv(
+    gl.uniform3f(
       removeColorColorLocation,
-      webgl2WarpedMap.mergedOptions.removeColorColor
+      ...hexToFractionalRgb(webgl2WarpedMap.mergedOptions.removeColorColor)
     )
 
     const removeColorThresholdLocation = gl.getUniformLocation(
@@ -654,19 +653,23 @@ export class WebGL2Renderer
       program,
       'u_colorizeColor'
     )
-    gl.uniform3fv(
+    console.log(webgl2WarpedMap.mergedOptions.colorizeColor)
+    console.log(hexToFractionalRgb(webgl2WarpedMap.mergedOptions.colorizeColor))
+    gl.uniform3f(
       colorizeColorLocation,
-      webgl2WarpedMap.mergedOptions.colorizeColor
+      ...hexToFractionalRgb(webgl2WarpedMap.mergedOptions.colorizeColor)
     )
 
     // Grid
-    const gridLocation = gl.getUniformLocation(program, 'u_grid')
-    gl.uniform1f(gridLocation, webgl2WarpedMap.mergedOptions.grid ? 1 : 0)
+    const gridLocation = gl.getUniformLocation(program, 'u_renderGrid')
+    gl.uniform1f(gridLocation, webgl2WarpedMap.mergedOptions.renderGrid ? 1 : 0)
 
-    const colorGrid = gl.getUniformLocation(program, 'u_gridColor')
+    const colorGrid = gl.getUniformLocation(program, 'u_renderGridColor')
     gl.uniform4f(
       colorGrid,
-      ...hexToFractionalRgba(webgl2WarpedMap.mergedOptions.gridColor)
+      ...hexToFractionalOpaqueRgba(
+        webgl2WarpedMap.mergedOptions.renderGridColor
+      )
     )
 
     // Distortion

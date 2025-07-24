@@ -28,6 +28,7 @@ export type BindableOptions = {
   renderVectors: boolean
   renderAppliableMask: boolean
   renderMask: boolean
+  applyMaskMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }
 export type Options = BindableOptions & Partial<MapLibreWarpedMapLayerOptions>
@@ -97,7 +98,15 @@ export class OptionsState {
   renderVectors: boolean
   renderAppliableMask: boolean
   renderMask: boolean
+  applyMask: boolean
+  renderGrid: boolean
   distortionMeasure?: DistortionMeasure | undefined
+  removeColor: boolean
+  removeColorColor: string
+  removeColorThreshold: number
+  removeColorHardness: number
+  colorize: boolean
+  colorizeColor: string
 
   viewOptions: Partial<Options>
 
@@ -111,11 +120,15 @@ export class OptionsState {
       options
     )
     this.reference = $derived(
-      mergeOptionsUnlessUndefined(
-        this.processDefaultOptions(this.defaultOptions),
-        this.processReferenceOptions(reference?.options)
-      )
+      reference?.options
+        ? mergeOptionsUnlessUndefined(
+            this.processDefaultOptions(this.defaultOptions),
+            this.processReferenceOptions(reference?.options)
+          )
+        : this.defaultOptions
     )
+    this.reference = this.defaultOptions
+
     this.visible = $derived(this.reference.visible)
     this.opacity = $derived(this.reference.opacity)
     this.transformationType = $derived(this.reference.transformationType)
@@ -125,20 +138,36 @@ export class OptionsState {
     this.renderVectors = $derived(this.reference.renderVectors)
     this.renderAppliableMask = $derived(this.reference.renderAppliableMask)
     this.renderMask = $derived(this.reference.renderMask)
+    this.applyMask = $derived(this.reference.applyMask)
+    this.renderGrid = $derived(this.reference.renderGrid)
     this.distortionMeasure = $derived(this.reference.distortionMeasure)
+    this.removeColor = $derived(this.reference.removeColor)
+    this.removeColorColor = $derived(this.reference.removeColorColor)
+    this.removeColorThreshold = $derived(this.reference.removeColorThreshold)
+    this.removeColorHardness = $derived(this.reference.removeColorHardness)
+    this.colorize = $derived(this.reference.colorize)
+    this.colorizeColor = $derived(this.reference.colorizeColor)
     this.options = $derived({
       visible: this.visible,
       opacity: this.opacity,
       transformationType: this.transformationType,
       internalProjection: this.internalProjection,
       renderGcps: this.renderGcps,
-      renderTransformedGcps: this.renderTransformedGcps,
-      renderVectors: this.renderVectors,
+      renderTransformedGcps: this.renderGcps || this.renderTransformedGcps,
+      renderVectors: this.renderGcps || this.renderVectors,
       renderAppliableMask: this.renderAppliableMask,
       renderAppliableMaskSize: this.renderAppliableMask ? 4 : undefined,
       renderMask: this.renderMask,
       renderMaskSize: this.renderMask ? 4 : undefined,
-      distortionMeasure: this.distortionMeasure
+      applyMask: this.applyMask,
+      renderGrid: this.renderGrid,
+      distortionMeasure: this.renderGrid ? 'log2sigma' : this.distortionMeasure,
+      removeColor: this.removeColor || this.removeColorHardness != 0,
+      removeColorColor: this.removeColorColor,
+      removeColorThreshold: this.removeColorThreshold,
+      removeColorHardness: this.removeColorHardness,
+      colorize: this.colorize,
+      colorizeColor: this.colorizeColor
     })
 
     this.viewOptions = $state(viewOptions)

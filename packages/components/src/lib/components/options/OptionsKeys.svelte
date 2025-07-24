@@ -13,33 +13,47 @@
   } = $props()
 
   let backupOpacity: number
+  let backupRemoveColorThreshold: number
 
   function onKeyDown(e: KeyboardEvent) {
-    if (e.key === 'o') {
-      if (optionsState.opacity !== 0) {
-        backupOpacity = optionsState.opacity
-      }
-      optionsState.opacity = 0
+    if (e.key === 'v') {
+      optionsState.visible = !optionsState.visible
+    } else if (e.key === 'k') {
+      optionsState.applyMask = !optionsState.applyMask
+    } else if (e.key === 'm') {
+      optionsState.renderAppliableMask = !optionsState.renderAppliableMask
+    } else if (e.key === 'p') {
+      optionsState.renderGcps = !optionsState.renderGcps
     } else if (e.key === 't') {
       optionsState.transformationType = nextTransformationType(
         optionsState.transformationType
       )
-    } else if (e.key === 'p') {
-      optionsState.renderTransformedGcps = !optionsState.renderTransformedGcps
-      optionsState.renderGcps = !optionsState.renderGcps
-      optionsState.renderVectors = !optionsState.renderVectors
-    } else if (e.key === 'm') {
-      optionsState.renderAppliableMask = !optionsState.renderAppliableMask
-    } else if (e.key === 'd') {
-      optionsState.distortionMeasure = nextDistortionMeasure(
-        optionsState.distortionMeasure
-      )
+    } else if (e.key === 'g') {
+      optionsState.renderGrid = !optionsState.renderGrid
+      // } else if (e.key === 'd') {
+      //   optionsState.distortionMeasure = nextDistortionMeasure(
+      //     optionsState.distortionMeasure
+      //   )
+    } else if (e.key === 'o') {
+      if (optionsState.opacity !== 0) {
+        backupOpacity = optionsState.opacity
+      }
+      optionsState.opacity = 0
+    } else if (e.key === 'b') {
+      if (optionsState.removeColorThreshold !== 0.7) {
+        backupRemoveColorThreshold = optionsState.removeColorThreshold
+      }
+      optionsState.removeColorThreshold = 0.7
+    } else if (e.key === 'c') {
+      optionsState.colorize = !optionsState.colorize
     }
   }
 
   function onKeyUp(e: KeyboardEvent) {
     if (e.key === 'o') {
       optionsState.opacity = backupOpacity
+    } else if (e.key === 'b') {
+      optionsState.removeColorThreshold = backupRemoveColorThreshold
     }
   }
 </script>

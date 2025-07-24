@@ -35,10 +35,10 @@ if(u_distortion) {
 }
 
 // Grid
-if(u_grid) {
+if(u_renderGrid) {
   float gridSize = 20.0f * float(u_scaleFactorForViewport);
   float gridWidth = 2.0f * float(u_scaleFactorForViewport);
   if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {
-    color = u_gridColor;
+    color = u_renderGridColor;
   }
 }

@@ -16,8 +16,8 @@ uniform float u_removeColorHardness;
 uniform bool u_colorize;
 uniform vec3 u_colorizeColor;
 
-uniform bool u_grid;
-uniform vec4 u_gridColor;
+uniform bool u_renderGrid;
+uniform vec4 u_renderGridColor;
 
 uniform bool u_distortion;
 uniform int u_distortionMeasure;

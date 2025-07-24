@@ -71,10 +71,16 @@
       // @ts-expect-error incorrect MapLibre types
       style: basemapStyle('en'),
       maxPitch: 0,
-      bearingSnap: 0
+      bearingSnap: 0,
+      attributionControl: false
     })
 
     // addTerrain(map, maplibregl)
+
+    map.addControl(
+      new maplibregl.AttributionControl({ compact: false }),
+      'bottom-left'
+    )
 
     if (componentOptions.addNavigationControl) {
       map.addControl(new maplibregl.NavigationControl(), 'top-left')
@@ -283,7 +289,6 @@
     )
 
     // Using $state.snapshot() here to avoid proxies and allow for accurate comparison
-    console.log('passing', mapOptionsByMapId, layerOptions)
     warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
 </script>

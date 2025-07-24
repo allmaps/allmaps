@@ -91,18 +91,18 @@ export type SpecificWebGL2WarpedMapOptions = {
   opacity: number
   saturation: number
   removeColor: boolean
-  removeColorColor: Color
+  removeColorColor: string
   removeColorThreshold: number
   removeColorHardness: number
   colorize: boolean
-  colorizeColor: Color
+  colorizeColor: string
   distortionColor00: string
   distortionColor01: string
   distortionColor1: string
   distortionColor2: string
   distortionColor3: string
-  grid: boolean
-  gridColor: string
+  renderGrid: boolean
+  renderGridColor: string
   debugTriangles: false
   debugTriangulation: false
   debugTiles: false

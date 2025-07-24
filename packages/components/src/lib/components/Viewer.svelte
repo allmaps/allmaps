@@ -6,12 +6,15 @@
   import MapsOverview from './MapsOverview.svelte'
   import MapOrImage from './MapOrImage.svelte'
   import OptionsKeys from './options/OptionsKeys.svelte'
-  import MapsList from './MapsList.svelte'
+  import Button from './ui/button/button.svelte'
+  import { Plus } from 'phosphor-svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
   import type { WarpedMapLayerMapComponentOptions } from './WarpedMapLayerMap.svelte'
   import { OptionsState } from './options/OptionsState.svelte'
+  import MapsListButton from './MapsListButton.svelte'
+  import OptionsBar from './options/OptionsBar.svelte'
 
   export type ViewerComponentOptions = WarpedMapLayerMapComponentOptions
 
@@ -57,31 +60,27 @@
   />
 </div>
 
-<div class="absolute z-50 top-0 w-full p-2 grid grid-cols-3">
-  <div class="flex justify-start"></div>
-  <div class="flex justify-center"></div>
-  <div class="flex justify-end">
-    <MapOrImage bind:mapOrImage disabled={selectedMapId === undefined} />
-  </div>
+<div class="absolute top-0 left-0 m-2 ml-12 flex">
+  <OptionsBar bind:optionsState />
+  <OptionsButton bind:optionsState />
+  {#if selectedMapOptionsState}
+    <!-- <OptionsBar bind:optionsState={selectedMapOptionsState} /> -->
+    <OptionsButton bind:optionsState={selectedMapOptionsState} />
+  {/if}
 </div>
-<div class="absolute z-50 bottom-0 w-full p-2 grid grid-cols-3">
-  <div class="flex justify-start">
-    <OptionsButton bind:optionsState />
-    {#if selectedMapOptionsState}
-      <OptionsButton bind:optionsState={selectedMapOptionsState} />
-    {/if}
-  </div>
-  <div class="flex justify-center">
-    <MapsOverview
+<div class="absolute top-0 right-0 m-2 flex">
+  <MapOrImage bind:mapOrImage disabled={selectedMapId === undefined} />
+</div>
+<div class="absolute bottom-0 left-0 m-2 flex"></div>
+<div class="absolute bottom-0 right-0 m-2 flex">
+  <div class="space-x-2">
+    <!-- <MapsOverview
       {georeferencedMaps}
       bind:selectedMapId
       {annotations}
       {mapOrImage}
-    />
+    /> -->
+    <MapsListButton {georeferencedMaps} {selectedMapId} {optionsStateByMapId} />
+    <Button><Plus />Add</Button>
   </div>
-  <div class="flex justify-end"></div>
 </div>
-
-<!-- <div class="absolute z-50 top-0 w-full h-full flex justify-center items-center">
-  <MapsList {georeferencedMaps} {selectedMapId} {optionsStateByMapId} />
-</div> -->

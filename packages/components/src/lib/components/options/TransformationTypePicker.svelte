@@ -55,9 +55,7 @@
   label: string
 })}
   <div class="size-5 mr-2">
-    {#if transformationTypeItem.value === 'undefined'}
-      <FileMagnifyingGlass weight="thin" class="size-5" />
-    {:else if transformationTypeItem.value === 'straight'}
+    {#if transformationTypeItem.value === 'straight'}
       <Straight />
     {:else if transformationTypeItem.value === 'helmert'}
       <Helmert />

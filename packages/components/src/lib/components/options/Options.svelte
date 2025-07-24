@@ -13,6 +13,7 @@
 
   import type { Bbox } from '@allmaps/types'
   import type { OptionsState } from './OptionsState.svelte'
+  import Kbd from '../Kbd.svelte'
 
   let {
     optionsState = $bindable(),
@@ -60,10 +61,7 @@
     {/snippet}
   </Checkbox.Root>
   <div class="text-sm content-center">
-    Opacity<kbd
-      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
-      >o</kbd
-    >
+    Opacity<Kbd key="o"></Kbd>
   </div>
   <Slider.Root
     type="single"
@@ -84,10 +82,7 @@
     />
   </Slider.Root>
   <div class="text-sm content-center">
-    Transformation Type<kbd
-      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
-      >t</kbd
-    >
+    Transformation Type<Kbd key="t"></Kbd>
   </div>
   <TransformationTypePicker
     bind:selectedTransformationType={optionsState.transformationType}
@@ -101,10 +96,7 @@
     suggestProjections={suggestProjectionsWithFlatbush}
   ></ProjectionPicker>
   <div class="text-sm content-center">
-    Distortion Measure<kbd
-      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
-      >d</kbd
-    >
+    Distortion Measure<Kbd key="d"></Kbd>
   </div>
   <DistortionMeasurePicker
     bind:selectedDistortionMeasure={optionsState.distortionMeasure}
@@ -136,10 +128,7 @@
     for="render-transformer-gcps"
     class="text-sm content-center leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
   >
-    Render Transformed GCPs<kbd
-      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
-      >p</kbd
-    >
+    Render Transformed GCPs<Kbd key="p"></Kbd>
   </Label.Root>
   <Checkbox.Root
     id="render-transformer-gcps"
@@ -183,10 +172,7 @@
     for="render-appliable-mask"
     class="text-sm content-center leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
   >
-    Render Appliable Mask<kbd
-      class="ml-1 min-h-6 inline-flex justify-center items-center py-1 px-1.5 bg-white border border-gray-200 font-mono text-xs text-gray-800 shadow-[0px_2px_0px_0px_rgba(0,0,0,0.08)] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-200 dark:shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)] rounded-md"
-      >m</kbd
-    >
+    Render Appliable Mask<Kbd key="m"></Kbd>
   </Label.Root>
   <Checkbox.Root
     id="render-appliable-mask"
