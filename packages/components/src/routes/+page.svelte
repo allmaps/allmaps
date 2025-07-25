@@ -32,7 +32,7 @@
       {projections}
       bind:selectedProjection
       searchProjections={searchProjectionsWithFuse}
-      bbox={[4.01001, 50.762522, 4.523621, 51.024121]}
+      geoBbox={[4.01001, 50.762522, 4.523621, 51.024121]}
       suggestProjections={suggestProjectionsWithFlatbush}
     ></ProjectionPicker>
   </section>

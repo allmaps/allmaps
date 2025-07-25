@@ -6,42 +6,45 @@
     CompassTool,
     Crop,
     Eye,
+    EyeClosed,
     Eyedropper,
     FrameCorners,
     Globe,
     LineSegment,
     PaintBucket,
     Resize,
-    Square
+    Square,
+    SquareLogo
   } from 'phosphor-svelte'
 
-  import * as ToggleGroup from '$lib/components/ui/toggle-group/index.js'
-  import TransformationTypePicker from './TransformationTypePicker.svelte'
-  import DistortionMeasurePicker from './DistortionMeasurePicker.svelte'
-  import ProjectionPicker from './ProjectionPicker.svelte'
   import projectionsData from '$lib/shared/projections/projections.json' with { type: 'json' }
   import {
     createSearchProjectionsWithFuse,
     createSuggestProjectionsWithFlatbush
   } from '$lib/shared/projections/projections.js'
 
-  import type { Bbox } from '@allmaps/types'
-  import type { OptionsState } from './OptionsState.svelte'
-  import Toggle from '../ui/toggle/toggle.svelte'
-
-  import { buttonVariants } from '$lib/components/ui/button/index.js'
-  import * as Popover from '$lib/components/ui/popover/index.js'
-  import Slider from '../ui/slider/slider.svelte'
+  import TransformationTypePicker from './TransformationTypePicker.svelte'
+  import DistortionMeasurePicker from './DistortionMeasurePicker.svelte'
+  import ProjectionPicker from './ProjectionPicker.svelte'
   import Kbd from '../Kbd.svelte'
+  import * as ToggleGroup from '../ui/toggle-group/index.js'
+  import * as Popover from '../ui/popover/index.js'
+  import Slider from '../ui/slider/slider.svelte'
   import Checkbox from '../ui/checkbox/checkbox.svelte'
   import Switch from '../ui/switch/switch.svelte'
+  import Toggle from '../ui/toggle/toggle.svelte'
+  import Menubar from '../ui/menubar/menubar.svelte'
+
+  import type { Bbox } from '@allmaps/types'
+
+  import type { OptionsState } from './OptionsState.svelte'
 
   let {
     optionsState = $bindable(),
-    bbox = undefined
+    geoBbox = undefined
   }: {
     optionsState: OptionsState
-    bbox?: Bbox | undefined
+    geoBbox?: Bbox | undefined
   } = $props()
 
   const projections = projectionsData.map((projectionData) => {
@@ -58,49 +61,48 @@
     createSuggestProjectionsWithFlatbush(projections)
 </script>
 
-<div class="flex space-x-1 select-none">
+<Menubar class="flex h-11 select-none">
   <Toggle
     class="bg-primary-foreground cursor-pointer"
-    variant="outline"
-    bind:pressed={optionsState.visible}
-    aria-label="Visible"
-    title="Make visible (v)"
+    bind:pressed={
+      () => !optionsState.visible, (v) => (optionsState.visible = !v)
+    }
+    aria-label="Hide"
+    title="Hide (h)"
   >
-    <Eye />
+    <EyeClosed />
   </Toggle>
   <Toggle
     class="bg-primary-foreground cursor-pointer"
-    variant="outline"
-    bind:pressed={optionsState.applyMask}
-    aria-label="Crop using mask"
-    title="Crop using mask (k)"
+    bind:pressed={
+      () => !optionsState.applyMask, (v) => (optionsState.applyMask = !v)
+    }
+    aria-label="Show full image"
+    title="Show full image (f)"
   >
-    <Crop />
+    <SquareLogo />
   </Toggle>
 
   <Toggle
     class="bg-primary-foreground cursor-pointer"
-    variant="outline"
     bind:pressed={optionsState.renderAppliableMask}
-    aria-label="Render mask"
-    title="Render mask (m)"
+    aria-label="Show mask"
+    title="Show mask (m)"
   >
     <Square />
   </Toggle>
 
   <Toggle
     class="bg-primary-foreground cursor-pointer"
-    variant="outline"
     bind:pressed={optionsState.renderGcps}
-    aria-label="Render GCPs"
-    title="Render GCPs (p)"
+    aria-label="Show GCPs"
+    title="Show GCPs (p)"
   >
     <LineSegment />
   </Toggle>
 
   <ToggleGroup.Root
     class="bg-primary-foreground cursor-pointer"
-    variant="outline"
     type="single"
     bind:value={
       () => optionsState.transformationType,
@@ -142,27 +144,34 @@
     <Popover.Trigger>
       <Toggle
         class="bg-primary-foreground cursor-pointer"
-        variant="outline"
         bind:pressed={
           () => optionsState.internalProjection != undefined, (v) => {}
         }
-        aria-label="Projection"
-        title="Projection"
+        aria-label="Use projection"
+        title="Use projection"
       >
-        <Globe />
+        <Globe weight="light" />
       </Toggle>
     </Popover.Trigger>
-    <Popover.Content class="w-60">
-      <ProjectionPicker />
+    <Popover.Content
+      sideOffset={10}
+      class="w-60 p-0 border-none bg-transparent shadow-none"
+    >
+      <ProjectionPicker
+        {projections}
+        bind:selectedProjection={optionsState.internalProjection}
+        searchProjections={searchProjectionsWithFuse}
+        {geoBbox}
+        suggestProjections={suggestProjectionsWithFlatbush}
+      ></ProjectionPicker>
     </Popover.Content>
   </Popover.Root>
 
   <Toggle
     class="bg-primary-foreground cursor-pointer"
-    variant="outline"
     bind:pressed={optionsState.renderGrid}
-    aria-label="Render grid"
-    title="Render Grid (g)"
+    aria-label="Show grid"
+    title="Show grid (g)"
   >
     <CompassTool />
   </Toggle>
@@ -171,11 +180,10 @@
     <Popover.Trigger>
       <Toggle
         class="bg-primary-foreground cursor-pointer"
-        variant="outline"
         bind:pressed={
           () =>
-            optionsState.opacity != 1 ||
-            optionsState.removeColorHardness != 0 ||
+            optionsState.opacity !== 1 ||
+            optionsState.removeColorThreshold !== 0 ||
             optionsState.colorize,
           (v) => {}
         }
@@ -185,7 +193,7 @@
         <CircleHalf />
       </Toggle>
     </Popover.Trigger>
-    <Popover.Content class="w-60">
+    <Popover.Content class="w-60" sideOffset={10}>
       <div class="grid grid-cols-2 gap-4">
         <h4 class="text-sm col-span-2">Opacity<Kbd key="o" /></h4>
         <Slider
@@ -214,4 +222,4 @@
       </div>
     </Popover.Content>
   </Popover.Root>
-</div>
+</Menubar>

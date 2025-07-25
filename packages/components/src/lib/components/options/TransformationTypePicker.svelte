@@ -4,7 +4,6 @@
   import CaretUpDown from 'phosphor-svelte/lib/CaretUpDown'
   import CaretDoubleUp from 'phosphor-svelte/lib/CaretDoubleUp'
   import CaretDoubleDown from 'phosphor-svelte/lib/CaretDoubleDown'
-  import FileMagnifyingGlass from 'phosphor-svelte/lib/FileMagnifyingGlass'
 
   import {
     Straight,
@@ -23,6 +22,16 @@
 
   export type PickerTransformationType = TransformationType | 'undefined'
 
+  function translateTransformationType(
+    transformationType: PickerTransformationType
+  ): string {
+    if (transformationType == 'undefined') {
+      return 'Select...'
+    } else {
+      return camelCaseToWords(transformationType)
+    }
+  }
+
   let {
     selectedTransformationType = $bindable()
   }: {
@@ -36,7 +45,7 @@
   let transformationTypeItems = transformationTypes.map(
     (transformationType) => {
       return {
-        label: camelCaseToWords(transformationType),
+        label: translateTransformationType(transformationType),
         value: transformationType
       }
     }
@@ -69,6 +78,7 @@
       <ThinPlateSpline />
     {:else if transformationTypeItem.value === 'projective'}
       <Projective />
+    {:else}<Polynomial1 />
     {/if}
   </div>
   {transformationTypeItem.label}

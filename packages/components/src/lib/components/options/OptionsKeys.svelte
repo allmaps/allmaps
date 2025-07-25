@@ -15,10 +15,17 @@
   let backupOpacity: number
   let backupRemoveColorThreshold: number
 
+  let keyPressed = $state(false)
+
   function onKeyDown(e: KeyboardEvent) {
-    if (e.key === 'v') {
+    if (keyPressed == true) {
+      return
+    }
+    keyPressed = true
+
+    if (e.key === 'h') {
       optionsState.visible = !optionsState.visible
-    } else if (e.key === 'k') {
+    } else if (e.key === 'f') {
       optionsState.applyMask = !optionsState.applyMask
     } else if (e.key === 'm') {
       optionsState.renderAppliableMask = !optionsState.renderAppliableMask
@@ -50,6 +57,8 @@
   }
 
   function onKeyUp(e: KeyboardEvent) {
+    keyPressed = false
+
     if (e.key === 'o') {
       optionsState.opacity = backupOpacity
     } else if (e.key === 'b') {

@@ -24,13 +24,13 @@
     projections,
     selectedProjection = $bindable(),
     searchProjections = defaultSearchProjections,
-    bbox = undefined,
+    geoBbox = undefined,
     suggestProjections = undefined
   }: {
     projections: PickerProjection[]
     selectedProjection?: PickerProjection | undefined
     searchProjections?: (s: string) => PickerProjection[]
-    bbox?: Bbox
+    geoBbox?: Bbox
     suggestProjections?: (b: Bbox) => PickerProjection[]
   } = $props()
 
@@ -38,7 +38,7 @@
 
   const undefinedProjection: PickerProjection = {
     code: 'undefined',
-    name: 'Infered',
+    name: 'Inferred',
     comment: 'Default',
     definition: 'undefined'
   }
@@ -50,8 +50,8 @@
     return result
   })
   const suggestedProjections = $derived<PickerProjection[]>(
-    bbox && suggestProjections
-      ? suggestProjections(bbox).map((projection) => {
+    geoBbox && suggestProjections
+      ? suggestProjections(geoBbox).map((projection) => {
           projection.comment = 'From bbox'
           return projection
         })
@@ -134,8 +134,10 @@
       clearOnDeselect
       class="pl-10 pr-9 h-9 text-sm bg-white border border-gray-200 rounded-lg truncate
         focus:z-10 focus:outline-none
-        focus:ring-2 w-full"
-      placeholder={selectedProjection ? selectedProjection.name : 'Search...'}
+         w-full"
+      placeholder={selectedProjection
+        ? selectedProjection.name
+        : 'Search Projection...'}
       aria-label="Search an EPSG projection"
     />
     <Combobox.Trigger class="absolute end-3 top-1/2 size-6 -translate-y-1/2">

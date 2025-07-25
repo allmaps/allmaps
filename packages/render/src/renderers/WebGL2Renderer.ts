@@ -653,8 +653,6 @@ export class WebGL2Renderer
       program,
       'u_colorizeColor'
     )
-    console.log(webgl2WarpedMap.mergedOptions.colorizeColor)
-    console.log(hexToFractionalRgb(webgl2WarpedMap.mergedOptions.colorizeColor))
     gl.uniform3f(
       colorizeColorLocation,
       ...hexToFractionalRgb(webgl2WarpedMap.mergedOptions.colorizeColor)

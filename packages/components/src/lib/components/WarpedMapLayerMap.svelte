@@ -33,7 +33,8 @@
     mapOptionsStateByMapId = new Map(),
     componentOptions = {},
     mapOrImage = $bindable('map'),
-    selectedMapId = $bindable(undefined)
+    selectedMapId = $bindable(undefined),
+    geoBbox = $bindable(undefined)
   }: {
     georeferencedMaps: GeoreferencedMap[]
     optionsState: OptionsState
@@ -41,6 +42,7 @@
     componentOptions?: Partial<WarpedMapLayerMapComponentOptions>
     mapOrImage?: 'map' | 'image'
     selectedMapId?: string
+    geoBbox: Bbox | undefined
   } = $props()
 
   let container: HTMLElement
@@ -48,7 +50,6 @@
   let warpedMapLayer: WarpedMapLayer | undefined = $state()
   let mapIds: string[] = $state([])
   let warpedMaps: WarpedMap[] = $state([])
-  let geoBbox: Bbox | undefined = $state(undefined)
   let selectedGeoreferencedMap: GeoreferencedMap | undefined = $state(undefined)
   let selectedWarpedMap: WarpedMap | undefined = $state(undefined)
   let selectedMapOptionsState: OptionsState | undefined = $state(undefined)

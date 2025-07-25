@@ -16,7 +16,7 @@
   <Tooltip.Root>
     <Tooltip.Trigger>
       <Tabs.Root bind:value={mapOrImage} {disabled}>
-        <Tabs.List>
+        <Tabs.List class="h-10">
           <Tabs.Trigger value="map">Map</Tabs.Trigger>
           <Tabs.Trigger value="image">Image</Tabs.Trigger>
         </Tabs.List>

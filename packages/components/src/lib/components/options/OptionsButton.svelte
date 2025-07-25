@@ -2,15 +2,38 @@
   import { SlidersHorizontal } from 'phosphor-svelte'
   import { Popover } from 'bits-ui'
 
+  import projectionsData from '$lib/shared/projections/projections.json' with { type: 'json' }
+  import {
+    createSearchProjectionsWithFuse,
+    createSuggestProjectionsWithFlatbush
+  } from '$lib/shared/projections/projections.js'
+
   import Options from './Options.svelte'
+
+  import type { Bbox } from '@allmaps/types'
 
   import type { OptionsState } from './OptionsState.svelte'
 
   let {
-    optionsState = $bindable()
+    optionsState = $bindable(),
+    geoBbox = undefined
   }: {
     optionsState: OptionsState
+    geoBbox?: Bbox | undefined
   } = $props()
+
+  const projections = projectionsData.map((projectionData) => {
+    return {
+      code: projectionData.code,
+      name: 'EPSG:' + projectionData.code + ' - ' + projectionData.name,
+      definition: projectionData.definition,
+      bbox: projectionData.bbox as [number, number, number, number]
+    }
+  })
+
+  const searchProjectionsWithFuse = createSearchProjectionsWithFuse(projections)
+  const suggestProjectionsWithFlatbush =
+    createSuggestProjectionsWithFlatbush(projections)
 </script>
 
 <Popover.Root>
@@ -36,7 +59,14 @@
       sideOffset={8}
       collisionPadding={8}
     >
-      <Options bind:optionsState />
+      <Options
+        bind:optionsState
+        {projections}
+        bind:selectedProjection={optionsState.internalProjection}
+        searchProjections={searchProjectionsWithFuse}
+        {geoBbox}
+        suggestProjections={suggestProjectionsWithFlatbush}
+      />
       <Popover.Arrow class="**:fill-white" />
     </Popover.Content>
   </Popover.Portal>

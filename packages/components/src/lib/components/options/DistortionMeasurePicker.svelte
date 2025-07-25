@@ -5,10 +5,10 @@
   import CaretDoubleUp from 'phosphor-svelte/lib/CaretDoubleUp'
   import CaretDoubleDown from 'phosphor-svelte/lib/CaretDoubleDown'
   import Angle from 'phosphor-svelte/lib/Angle'
-  import Empty from 'phosphor-svelte/lib/Empty'
   import Resize from 'phosphor-svelte/lib/Resize'
 
   import type { DistortionMeasure } from '@allmaps/transform'
+  import { CompassTool } from 'phosphor-svelte'
 
   export type PickerDistortionMeasure = DistortionMeasure | 'none'
 
@@ -22,7 +22,7 @@
     distortionMeasure: PickerDistortionMeasure
   ): string {
     if (distortionMeasure == 'none') {
-      return 'None'
+      return 'Select...'
     }
     if (distortionMeasure == 'log2sigma') {
       return 'Area distortion'
@@ -62,7 +62,7 @@
       <Resize weight="thin" class="size-5" />
     {:else if distortionMeasureItem.value === 'twoOmega'}
       <Angle weight="thin" class="size-5" />
-    {/if}
+    {:else}<CompassTool weight="thin" class="size-5" />{/if}
   </div>
   {distortionMeasureItem.label}
 {/snippet}

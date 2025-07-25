@@ -5,36 +5,28 @@
   import TransformationTypePicker from './TransformationTypePicker.svelte'
   import DistortionMeasurePicker from './DistortionMeasurePicker.svelte'
   import ProjectionPicker from './ProjectionPicker.svelte'
-  import projectionsData from '$lib/shared/projections/projections.json' with { type: 'json' }
-  import {
-    createSearchProjectionsWithFuse,
-    createSuggestProjectionsWithFlatbush
-  } from '$lib/shared/projections/projections.js'
+  import Kbd from '../Kbd.svelte'
 
   import type { Bbox } from '@allmaps/types'
+
+  import type { PickerProjection } from '$lib/shared/projections/projections'
   import type { OptionsState } from './OptionsState.svelte'
-  import Kbd from '../Kbd.svelte'
 
   let {
     optionsState = $bindable(),
-    bbox = undefined
+    projections,
+    selectedProjection = $bindable(),
+    searchProjections,
+    geoBbox = undefined,
+    suggestProjections = undefined
   }: {
     optionsState: OptionsState
-    bbox?: Bbox | undefined
+    projections: PickerProjection[]
+    selectedProjection?: PickerProjection | undefined
+    searchProjections?: (s: string) => PickerProjection[]
+    geoBbox?: Bbox
+    suggestProjections?: (b: Bbox) => PickerProjection[]
   } = $props()
-
-  const projections = projectionsData.map((projectionData) => {
-    return {
-      code: projectionData.code,
-      name: 'EPSG:' + projectionData.code + ' - ' + projectionData.name,
-      definition: projectionData.definition,
-      bbox: projectionData.bbox as [number, number, number, number]
-    }
-  })
-
-  const searchProjectionsWithFuse = createSearchProjectionsWithFuse(projections)
-  const suggestProjectionsWithFlatbush =
-    createSuggestProjectionsWithFlatbush(projections)
 </script>
 
 <div class="grid grid-cols-2 gap-4">
@@ -91,9 +83,9 @@
   <ProjectionPicker
     {projections}
     bind:selectedProjection={optionsState.internalProjection}
-    searchProjections={searchProjectionsWithFuse}
-    {bbox}
-    suggestProjections={suggestProjectionsWithFlatbush}
+    {searchProjections}
+    {geoBbox}
+    {suggestProjections}
   ></ProjectionPicker>
   <div class="text-sm content-center">
     Distortion Measure<Kbd key="d"></Kbd>
