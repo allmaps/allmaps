@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import 'maplibre-gl/dist/maplibre-gl.css'
   import maplibregl from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
@@ -22,6 +22,9 @@
     addGeolocateControl: boolean
     opacity: number // TODO: remove when in MapLibreWarpedMapLayerOptions
   }
+
+  const PADDING = 60
+  const DURATION = 750
 
   let {
     georeferencedMaps = [],
@@ -133,10 +136,9 @@
       }
       if (selectedWarpedMap) {
         if (geoBbox) {
-          console.log('should fit to', geoBbox)
           map.fitBounds(geoBbox, {
-            animate: selectedMapId !== undefined,
-            padding: 20,
+            animate: true,
+            padding: PADDING,
             bearing: map.getBearing()
           })
         }
@@ -168,6 +170,10 @@
       warpedMaps = Array.from(warpedMapList.getWarpedMaps())
       mapIds = Array.from(warpedMapList.getMapIds())
 
+      if (mapIds.length === 1) {
+        selectedMapId = mapIds[0]
+      }
+
       for (const mapId of mapIds) {
         if (!mapOptionsStateByMapId.has(mapId)) {
           mapOptionsStateByMapId.set(
@@ -188,10 +194,9 @@
             })
           : undefined
       if (geoBbox) {
-        console.log('should fit to', geoBbox)
         map.fitBounds(geoBbox, {
-          animate: selectedMapId !== undefined,
-          padding: 20,
+          animate: false,
+          padding: PADDING,
           bearing: map.getBearing()
         })
       }
@@ -243,29 +248,35 @@
       }
       if (geoBbox) {
         map.fitBounds(geoBbox, {
-          padding: 20,
-          duration: 1000,
+          padding: PADDING,
+          duration: DURATION,
           bearing: 0
         })
       }
       optionsState.viewOptions.visible = undefined
-      if (selectedMapOptionsState) {
-        selectedMapOptionsState.viewOptions.visible = undefined
-        selectedMapOptionsState.viewOptions.applyMask = undefined
-        selectedMapOptionsState.viewOptions.transformationType = undefined
-        selectedMapOptionsState.viewOptions.internalProjection = undefined
+      const untrackedSelectedMapOptionsState = untrack(
+        () => selectedMapOptionsState
+      )
+      if (untrackedSelectedMapOptionsState) {
+        untrackedSelectedMapOptionsState.viewOptions.visible = undefined
+        untrackedSelectedMapOptionsState.viewOptions.applyMask = undefined
+        untrackedSelectedMapOptionsState.viewOptions.transformationType =
+          undefined
+        untrackedSelectedMapOptionsState.viewOptions.internalProjection =
+          undefined
       }
-    } else if (mapOrImage == 'image') {
+    } else if (mapOrImage === 'image') {
       for (const layer of map.getLayersOrder()) {
         if (layer !== warpedMapLayer?.id) {
           map.setLayoutProperty(layer, 'visibility', 'none')
         }
       }
-      if (selectedWarpedMap && selectedMapId) {
-        map.fitBounds(selectedWarpedMap.geoFullMaskBbox, {
-          padding: 20,
-          duration: 1000,
-          bearing: -computeWarpedMapBearing(selectedWarpedMap)
+      const untrackedSelectedWarpedMap = untrack(() => selectedWarpedMap)
+      if (untrackedSelectedWarpedMap && selectedMapId) {
+        map.fitBounds(untrackedSelectedWarpedMap.geoFullMaskBbox, {
+          padding: PADDING,
+          duration: DURATION,
+          bearing: -computeWarpedMapBearing(untrackedSelectedWarpedMap)
         })
         // TODO: fix: reset transformation type: use extraOptions
       }

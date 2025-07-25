@@ -86,7 +86,8 @@
 {#snippet comboBoxItem({ projection }: { projection: PickerProjection })}
   <Combobox.Item
     class="flex items-center justify-between h-10 w-full select-none rounded px-2 py-2 text-sm capitalize truncate outline-none data-[highlighted]:bg-gray-100"
-    value={projection.definition as string}
+    value={(projection.definition +
+      (projection.code ? '|' + projection.code : '')) as string}
     label={projection.name}
   >
     {#snippet children({ selected })}
@@ -121,7 +122,9 @@
     selectedProjection =
       v == 'undefined'
         ? undefined
-        : projections.find((projection) => projection.definition === v)
+        : projections.find(
+            (projection) => projection.definition === v.split('|')[0]
+          )
   }}
 >
   <div class="relative">

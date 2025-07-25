@@ -18,6 +18,16 @@
   let keyPressed = $state(false)
 
   function onKeyDown(e: KeyboardEvent) {
+    const targetElement = e.target as HTMLElement
+
+    if (
+      targetElement.tagName === 'INPUT' ||
+      targetElement.tagName === 'TEXTAREA' ||
+      targetElement.tagName === 'SELECT'
+    ) {
+      return
+    }
+
     if (keyPressed == true) {
       return
     }
@@ -57,6 +67,16 @@
   }
 
   function onKeyUp(e: KeyboardEvent) {
+    const targetElement = e.target as HTMLElement
+
+    if (
+      targetElement.tagName === 'INPUT' ||
+      targetElement.tagName === 'TEXTAREA' ||
+      targetElement.tagName === 'SELECT'
+    ) {
+      return
+    }
+
     keyPressed = false
 
     if (e.key === 'o') {
