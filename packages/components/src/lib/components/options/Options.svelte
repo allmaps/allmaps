@@ -15,14 +15,12 @@
   let {
     optionsState = $bindable(),
     projections,
-    selectedProjection = $bindable(),
     searchProjections,
     geoBbox = undefined,
     suggestProjections = undefined
   }: {
     optionsState: OptionsState
     projections: PickerProjection[]
-    selectedProjection?: PickerProjection | undefined
     searchProjections?: (s: string) => PickerProjection[]
     geoBbox?: Bbox
     suggestProjections?: (b: Bbox) => PickerProjection[]

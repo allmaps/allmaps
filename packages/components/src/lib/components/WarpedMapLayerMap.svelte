@@ -9,17 +9,13 @@
   import { computeWarpedMapBearing } from '@allmaps/bearing'
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { webMercatorProjection } from '@allmaps/project'
+  import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
   import { OptionsState } from './options/OptionsState.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
-  import {
-    bboxToCenter,
-    mergeOptionsUnlessUndefined,
-    mergePartialOptions
-  } from '@allmaps/stdlib'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
@@ -37,12 +33,12 @@
     geoBbox = $bindable(undefined)
   }: {
     georeferencedMaps: GeoreferencedMap[]
-    optionsState: OptionsState
-    mapOptionsStateByMapId: Map<string, OptionsState>
+    optionsState?: OptionsState
+    mapOptionsStateByMapId?: Map<string, OptionsState>
     componentOptions?: Partial<WarpedMapLayerMapComponentOptions>
     mapOrImage?: 'map' | 'image'
     selectedMapId?: string
-    geoBbox: Bbox | undefined
+    geoBbox?: Bbox
   } = $props()
 
   let container: HTMLElement
@@ -114,6 +110,14 @@
     })
 
     map.on('click', (e) => {
+      selectMap(e)
+    })
+
+    map.on('contextmenu', (e) => {
+      selectMap(e)
+    })
+
+    function selectMap(e: maplibregl.MapMouseEvent) {
       if (!warpedMapLayer || mapOrImage == 'image') {
         return
       }
@@ -121,13 +125,22 @@
         geoPoint: [e.lngLat.lng, e.lngLat.lat],
         onlyVisible: true
       })[0]
-    })
+    }
 
     map.on('dblclick', (e) => {
       if (!warpedMapLayer) {
         return
       }
-      geoBbox = selectedWarpedMap?.geoMaskBbox
+      if (selectedWarpedMap) {
+        if (geoBbox) {
+          console.log('should fit to', geoBbox)
+          map.fitBounds(geoBbox, {
+            animate: selectedMapId !== undefined,
+            padding: 20,
+            bearing: map.getBearing()
+          })
+        }
+      }
     })
   })
 
@@ -174,18 +187,15 @@
               projection: { definition: 'EPSG:4326' }
             })
           : undefined
+      if (geoBbox) {
+        console.log('should fit to', geoBbox)
+        map.fitBounds(geoBbox, {
+          animate: selectedMapId !== undefined,
+          padding: 20,
+          bearing: map.getBearing()
+        })
+      }
     })
-  })
-
-  // Fit bounds
-  $effect(() => {
-    if (geoBbox) {
-      map.fitBounds(geoBbox, {
-        animate: selectedMapId !== undefined,
-        padding: 20,
-        bearing: map.getBearing()
-      })
-    }
   })
 
   // Select map
@@ -231,7 +241,13 @@
           map.setLayoutProperty(layer, 'visibility', 'visible')
         }
       }
-      map.rotateTo(0)
+      if (geoBbox) {
+        map.fitBounds(geoBbox, {
+          padding: 20,
+          duration: 1000,
+          bearing: 0
+        })
+      }
       optionsState.viewOptions.visible = undefined
       if (selectedMapOptionsState) {
         selectedMapOptionsState.viewOptions.visible = undefined
@@ -246,7 +262,11 @@
         }
       }
       if (selectedWarpedMap && selectedMapId) {
-        map.rotateTo(-computeWarpedMapBearing(selectedWarpedMap))
+        map.fitBounds(selectedWarpedMap.geoFullMaskBbox, {
+          padding: 20,
+          duration: 1000,
+          bearing: -computeWarpedMapBearing(selectedWarpedMap)
+        })
         // TODO: fix: reset transformation type: use extraOptions
       }
       optionsState.viewOptions.visible = false

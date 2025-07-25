@@ -1,18 +1,31 @@
 <script lang="ts">
-  import OptionsBar from './options/OptionsBar.svelte'
+  import * as Card from '$lib/components/ui/card/index.js'
+  import Checkbox from './ui/checkbox/checkbox.svelte'
+
+  import OptionsToggles from './options/OptionsToggles.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
+  import type { Bbox } from '@allmaps/types'
 
   import type { OptionsState } from './options/OptionsState.svelte'
+  import type { PickerProjection } from '$lib/shared/projections/projections'
 
   let {
     georeferencedMaps = [],
     selectedMapId = $bindable(undefined),
-    mapOptionsStateByMapId
+    mapOptionsStateByMapId,
+    projections,
+    searchProjections,
+    geoBbox = undefined,
+    suggestProjections = undefined
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
     mapOptionsStateByMapId?: Map<string, OptionsState>
+    projections: PickerProjection[]
+    searchProjections?: (s: string) => PickerProjection[]
+    geoBbox?: Bbox
+    suggestProjections?: (b: Bbox) => PickerProjection[]
   } = $props()
 </script>
 
@@ -20,23 +33,41 @@
   georeferencedMap: GeoreferencedMap,
   mapOptionsState: OptionsState
 )}
-  <div>
-    MapId: {georeferencedMap.id}
-  </div>
-  <div>
-    <OptionsBar optionsState={mapOptionsState}></OptionsBar>
-  </div>
+  <Card.Root>
+    <Card.Header>
+      <Checkbox
+        bind:checked={
+          () => selectedMapId == georeferencedMap.id,
+          (v) => {
+            if (v == false) {
+              selectedMapId = undefined
+            } else {
+              selectedMapId = georeferencedMap.id
+            }
+          }
+        }
+      />
+      <div>
+        MapId: {georeferencedMap.id}
+      </div>
+    </Card.Header>
+    <Card.Content>
+      <OptionsToggles
+        optionsState={mapOptionsState}
+        {projections}
+        {searchProjections}
+        {geoBbox}
+        {suggestProjections}
+      />
+    </Card.Content>
+  </Card.Root>
 {/snippet}
 
-<div class="">
-  <ul>
-    {#each georeferencedMaps as georeferencedMap, g}
-      <div>
-        {@render item(
-          georeferencedMap,
-          mapOptionsStateByMapId?.get(georeferencedMap.id!)!
-        )}
-      </div>
-    {/each}
-  </ul>
+<div class="space-y-2">
+  {#each georeferencedMaps as georeferencedMap, g}
+    {@render item(
+      georeferencedMap,
+      mapOptionsStateByMapId?.get(georeferencedMap.id!)!
+    )}
+  {/each}
 </div>

@@ -1,58 +1,33 @@
 <script lang="ts">
   import WarpedMapLayerMap from '$lib/components/WarpedMapLayerMap.svelte'
 
-  import type { GeoreferencedMap } from '@allmaps/annotation'
+  import { parseAnnotation, type GeoreferencedMap } from '@allmaps/annotation'
 
-  const georeferencedMap: GeoreferencedMap = {
-    '@context': 'https://schemas.allmaps.org/map/2/context.json',
-    type: 'GeoreferencedMap',
-    id: 'https://annotations.allmaps.org/maps/83d44a0b956681b0',
-    created: '2025-04-14T07:51:38.539Z',
-    modified: '2025-04-14T07:51:38.539Z',
-    resource: {
-      id: 'https://dlc.services/iiif-img/7/4/32a1daa1-6ff5-46a4-a0a2-ae94ef3a92fa',
-      height: 3949,
-      width: 5208,
-      type: 'ImageService2',
-      partOf: [
-        {
-          id: 'https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=kaartenproject&n1=&n2=581',
-          type: 'Canvas',
-          partOf: [
-            {
-              id: 'https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14',
-              type: 'Manifest'
-            }
-          ]
-        },
-        {
-          id: 'https://dlc.services/iiif-img/7/4/32a1daa1-6ff5-46a4-a0a2-ae94ef3a92fa/canvas/c/3',
-          type: 'Canvas',
-          label: { none: ['Canvas 3'] },
-          partOf: [
-            {
-              id: 'https://dlc.services/iiif-resource/7/string1string2string3/kaartenproject/TRL-11.4.1.14',
-              type: 'Manifest'
-            }
-          ]
-        }
-      ]
-    },
-    gcps: [
-      { resource: [4346, 2550], geo: [4.9405887, 52.3579862] },
-      { resource: [2243, 1837], geo: [4.9560178, 52.3571296] },
-      { resource: [3823, 1010], geo: [4.9470578, 52.3519005] }
-    ],
-    resourceMask: [
-      [512, 299],
-      [486, 3644],
-      [4811, 3656],
-      [4779, 261]
-    ],
-    transformation: { type: 'polynomial', options: { order: 1 } }
-  }
+  // Diemer meer
+  const annotationUrl =
+    'https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a'
+  // Europa
+  // const annotationUrl = 'https://annotations.allmaps.org/images/f6033bee94f7763e'
+  // UK
+  // const annotationUrl = 'https://annotations.allmaps.org/maps/135dfd2d58dc26ec'
+  // Rottedam
+  // const annotationUrl =
+  //   'https://annotations.allmaps.org/manifests/631b96e4d6d3f421'
+  // Piranesi
+  // const annotationUrl = 'https://annotations.allmaps.org/images/9f888622a47479cc'
+  // Netkaart
+  // const annotationUrl =
+  //   'https://gist.githubusercontent.com/sammeltassen/fa3dbfaf4dfa800e00824478c4bd1928/raw/f182beac911e38b0a1d1eb420fbd54b4e6d2f2eb/nl-railway-map.json'
+
+  let georeferencedMaps = $state<GeoreferencedMap[]>([])
+
+  fetch(annotationUrl)
+    .then((response) => response.json())
+    .then((response) => {
+      georeferencedMaps = parseAnnotation(response)
+    })
 </script>
 
 <div class="absolute w-full h-full flex flex-col">
-  <WarpedMapLayerMap georeferencedMaps={[georeferencedMap]} />
+  <WarpedMapLayerMap {georeferencedMaps} />
 </div>

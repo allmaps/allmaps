@@ -38,7 +38,7 @@
 
   const undefinedProjection: PickerProjection = {
     code: 'undefined',
-    name: 'Inferred',
+    name: '',
     comment: 'Default',
     definition: 'undefined'
   }

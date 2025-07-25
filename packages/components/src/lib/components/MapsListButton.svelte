@@ -6,28 +6,47 @@
   import MapsList from './MapsList.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
+  import type { Bbox } from '@allmaps/types'
+
   import type { OptionsState } from './options/OptionsState.svelte'
+  import type { PickerProjection } from '$lib/shared/projections/projections'
 
   let {
     georeferencedMaps = [],
     selectedMapId = $bindable(undefined),
-    optionsStateByMapId
+    optionsStateByMapId,
+    projections,
+    searchProjections,
+    geoBbox = undefined,
+    suggestProjections = undefined
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
     optionsStateByMapId?: Map<string, OptionsState>
+    projections: PickerProjection[]
+    searchProjections?: (s: string) => PickerProjection[]
+    geoBbox?: Bbox
+    suggestProjections?: (b: Bbox) => PickerProjection[]
   } = $props()
 </script>
 
 <Popover.Root>
   <Popover.Trigger
-    ><Button variant="secondary"><List />List</Button>
+    ><Button variant="secondary"
+      ><List />{georeferencedMaps.length +
+        ' Map' +
+        (georeferencedMaps.length > 1 ? 's' : '')}</Button
+    >
   </Popover.Trigger>
-  <Popover.Content class="w-100">
+  <Popover.Content class="w-160">
     <MapsList
       {georeferencedMaps}
-      {selectedMapId}
+      bind:selectedMapId
       mapOptionsStateByMapId={optionsStateByMapId}
+      {projections}
+      {searchProjections}
+      {geoBbox}
+      {suggestProjections}
     />
   </Popover.Content>
 </Popover.Root>

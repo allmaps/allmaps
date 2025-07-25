@@ -1,71 +1,53 @@
 <script lang="ts">
   import { Helmert, Polynomial1, ThinPlateSpline } from '@allmaps/ui'
   import {
-    CircleDashed,
     CircleHalf,
     CompassTool,
-    Crop,
-    Eye,
     EyeClosed,
-    Eyedropper,
-    FrameCorners,
     Globe,
     LineSegment,
-    PaintBucket,
-    Resize,
     Square,
     SquareLogo
   } from 'phosphor-svelte'
 
-  import projectionsData from '$lib/shared/projections/projections.json' with { type: 'json' }
-  import {
-    createSearchProjectionsWithFuse,
-    createSuggestProjectionsWithFlatbush
-  } from '$lib/shared/projections/projections.js'
-
-  import TransformationTypePicker from './TransformationTypePicker.svelte'
-  import DistortionMeasurePicker from './DistortionMeasurePicker.svelte'
   import ProjectionPicker from './ProjectionPicker.svelte'
   import Kbd from '../Kbd.svelte'
   import * as ToggleGroup from '../ui/toggle-group/index.js'
   import * as Popover from '../ui/popover/index.js'
   import Slider from '../ui/slider/slider.svelte'
-  import Checkbox from '../ui/checkbox/checkbox.svelte'
   import Switch from '../ui/switch/switch.svelte'
   import Toggle from '../ui/toggle/toggle.svelte'
   import Menubar from '../ui/menubar/menubar.svelte'
 
   import type { Bbox } from '@allmaps/types'
 
+  import type { PickerProjection } from '$lib/shared/projections/projections'
   import type { OptionsState } from './OptionsState.svelte'
+  import type { TransformationType } from '@allmaps/transform'
 
   let {
     optionsState = $bindable(),
-    geoBbox = undefined
+    projections,
+    searchProjections,
+    geoBbox = undefined,
+    suggestProjections = undefined
   }: {
     optionsState: OptionsState
-    geoBbox?: Bbox | undefined
+    projections: PickerProjection[]
+    searchProjections?: (s: string) => PickerProjection[]
+    geoBbox?: Bbox
+    suggestProjections?: (b: Bbox) => PickerProjection[]
   } = $props()
-
-  const projections = projectionsData.map((projectionData) => {
-    return {
-      code: projectionData.code,
-      name: 'EPSG:' + projectionData.code + ' - ' + projectionData.name,
-      definition: projectionData.definition,
-      bbox: projectionData.bbox as [number, number, number, number]
-    }
-  })
-
-  const searchProjectionsWithFuse = createSearchProjectionsWithFuse(projections)
-  const suggestProjectionsWithFlatbush =
-    createSuggestProjectionsWithFlatbush(projections)
 </script>
 
-<Menubar class="flex h-11 select-none">
+<div class="flex select-none w-fit">
   <Toggle
-    class="bg-primary-foreground cursor-pointer"
+    class="cursor-pointer"
     bind:pressed={
-      () => !optionsState.visible, (v) => (optionsState.visible = !v)
+      () => !optionsState.visible,
+      (v) => {
+        optionsState.visible = !v
+      }
     }
     aria-label="Hide"
     title="Hide (h)"
@@ -73,9 +55,12 @@
     <EyeClosed />
   </Toggle>
   <Toggle
-    class="bg-primary-foreground cursor-pointer"
+    class="cursor-pointer"
     bind:pressed={
-      () => !optionsState.applyMask, (v) => (optionsState.applyMask = !v)
+      () => !optionsState.applyMask,
+      (v) => {
+        optionsState.applyMask = !v
+      }
     }
     aria-label="Show full image"
     title="Show full image (f)"
@@ -84,7 +69,7 @@
   </Toggle>
 
   <Toggle
-    class="bg-primary-foreground cursor-pointer"
+    class="cursor-pointer"
     bind:pressed={optionsState.renderAppliableMask}
     aria-label="Show mask"
     title="Show mask (m)"
@@ -93,7 +78,7 @@
   </Toggle>
 
   <Toggle
-    class="bg-primary-foreground cursor-pointer"
+    class="cursor-pointer"
     bind:pressed={optionsState.renderGcps}
     aria-label="Show GCPs"
     title="Show GCPs (p)"
@@ -102,12 +87,13 @@
   </Toggle>
 
   <ToggleGroup.Root
-    class="bg-primary-foreground cursor-pointer"
+    class="cursor-pointer"
     type="single"
     bind:value={
       () => optionsState.transformationType,
-      (value) => {
-        optionsState.transformationType = value === '' ? undefined : value
+      (value: string | undefined) => {
+        optionsState.transformationType =
+          value == '' ? undefined : (value as TransformationType)
       }
     }
   >
@@ -143,7 +129,7 @@
   <Popover.Root>
     <Popover.Trigger>
       <Toggle
-        class="bg-primary-foreground cursor-pointer"
+        class="cursor-pointer"
         bind:pressed={
           () => optionsState.internalProjection != undefined, (v) => {}
         }
@@ -160,15 +146,15 @@
       <ProjectionPicker
         {projections}
         bind:selectedProjection={optionsState.internalProjection}
-        searchProjections={searchProjectionsWithFuse}
+        {searchProjections}
         {geoBbox}
-        suggestProjections={suggestProjectionsWithFlatbush}
+        {suggestProjections}
       ></ProjectionPicker>
     </Popover.Content>
   </Popover.Root>
 
   <Toggle
-    class="bg-primary-foreground cursor-pointer"
+    class="cursor-pointer"
     bind:pressed={optionsState.renderGrid}
     aria-label="Show grid"
     title="Show grid (g)"
@@ -179,7 +165,7 @@
   <Popover.Root>
     <Popover.Trigger>
       <Toggle
-        class="bg-primary-foreground cursor-pointer"
+        class="cursor-pointer"
         bind:pressed={
           () =>
             optionsState.opacity !== 1 ||
@@ -193,17 +179,19 @@
         <CircleHalf />
       </Toggle>
     </Popover.Trigger>
-    <Popover.Content class="w-60" sideOffset={10}>
-      <div class="grid grid-cols-2 gap-4">
-        <h4 class="text-sm col-span-2">Opacity<Kbd key="o" /></h4>
+    <Popover.Content class="w-90" sideOffset={10}>
+      <div class="grid grid-cols-6 gap-4">
+        <h4 class="text-sm col-span-3">Opacity<Kbd key="o" /></h4>
         <Slider
           bind:value={optionsState.opacity}
           type="single"
           min={0}
           max={1}
           step={0.01}
+          class="col-span-2"
         />
-        <h4 class="text-sm col-span-2">
+        <div></div>
+        <h4 class="text-sm col-span-3">
           Remove background<Kbd key="b" />
         </h4>
         <Slider
@@ -212,14 +200,16 @@
           min={0}
           max={1}
           step={0.01}
+          class="col-span-2"
         />
         <input type="color" bind:value={optionsState.removeColorColor} />
-        <h4 class="text-sm col-span-2">
+        <h4 class="text-sm col-span-3">
           Colorize<Kbd key="c" />
         </h4>
-        <Switch bind:checked={optionsState.colorize}></Switch>
+        <Switch bind:checked={optionsState.colorize} class="col-span-2"
+        ></Switch>
         <input type="color" bind:value={optionsState.colorizeColor} />
       </div>
     </Popover.Content>
   </Popover.Root>
-</Menubar>
+</div>
