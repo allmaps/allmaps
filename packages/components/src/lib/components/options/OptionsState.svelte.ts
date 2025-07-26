@@ -1,4 +1,8 @@
-import { mergeOptions, mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
+import {
+  mergeOptions,
+  mergePartialOptions,
+  mergeOptionsUnlessUndefined
+} from '@allmaps/stdlib'
 import { WebGL2WarpedMap } from '@allmaps/render'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
@@ -17,6 +21,14 @@ export const OPTIONS_NOT_TO_GET_FROM_DEFAULT = {
   internalProjection: undefined
 }
 // See also in @allmaps/render: UNDEFINED_GEOREFERENCED_MAP_OPTIONS
+
+function processDefaultOptions(options: Partial<Options>): Partial<Options> {
+  return mergePartialOptions(options, OPTIONS_NOT_TO_GET_FROM_DEFAULT)
+}
+
+function processReferenceOptions(options: Partial<Options>): Partial<Options> {
+  return mergePartialOptions(options, OPTIONS_NOT_TO_GET_FROM_REFERENCE)
+}
 
 export type BindableOptions = {
   visible: boolean
@@ -122,8 +134,8 @@ export class OptionsState {
     this.reference = $derived(
       reference?.options
         ? mergeOptionsUnlessUndefined(
-            this.processDefaultOptions(this.defaultOptions),
-            this.processReferenceOptions(reference?.options)
+            processDefaultOptions(this.defaultOptions),
+            processReferenceOptions(reference?.options)
           )
         : this.defaultOptions
     )
@@ -171,14 +183,6 @@ export class OptionsState {
     })
 
     this.viewOptions = $state(viewOptions)
-  }
-
-  processDefaultOptions(options: Partial<Options>): Partial<Options> {
-    mergeOptions(options, OPTIONS_NOT_TO_GET_FROM_DEFAULT)
-  }
-
-  processReferenceOptions(options: Partial<Options>): Partial<Options> {
-    mergeOptions(options, OPTIONS_NOT_TO_GET_FROM_REFERENCE)
   }
 }
 

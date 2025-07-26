@@ -16,6 +16,7 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
+  import { Cpu } from 'phosphor-svelte'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
@@ -112,16 +113,11 @@
       })
     })
 
-    map.on('click', (e) => {
-      selectMap(e)
-    })
-
-    map.on('contextmenu', (e) => {
-      selectMap(e)
-    })
-
     function selectMap(e: maplibregl.MapMouseEvent) {
       if (!warpedMapLayer || mapOrImage == 'image') {
+        return
+      }
+      if (warpedMapLayer.renderer?.animating) {
         return
       }
       selectedMapId = warpedMapLayer.getWarpedMapList().getMapIds({
@@ -130,19 +126,16 @@
       })[0]
     }
 
-    map.on('dblclick', (e) => {
-      if (!warpedMapLayer) {
-        return
-      }
-      if (selectedWarpedMap) {
-        if (geoBbox) {
-          map.fitBounds(geoBbox, {
-            animate: true,
-            padding: PADDING,
-            bearing: map.getBearing()
-          })
-        }
-      }
+    map.on('click', (e) => {
+      selectMap(e)
+    })
+
+    map.on('contextmenu', (e) => {
+      selectMap(e)
+    })
+
+    map.on('dblclick', () => {
+      mapOrImage = mapOrImage === 'map' ? 'image' : 'map'
     })
   })
 
@@ -273,6 +266,13 @@
       }
       const untrackedSelectedWarpedMap = untrack(() => selectedWarpedMap)
       if (untrackedSelectedWarpedMap && selectedMapId) {
+        const lngLatBounds = map.getBounds()
+        geoBbox = [
+          lngLatBounds._sw.lng,
+          lngLatBounds._sw.lat,
+          lngLatBounds._ne.lng,
+          lngLatBounds._ne.lat
+        ]
         map.fitBounds(untrackedSelectedWarpedMap.geoFullMaskBbox, {
           padding: PADDING,
           duration: DURATION,

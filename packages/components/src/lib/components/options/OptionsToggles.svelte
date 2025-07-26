@@ -3,7 +3,9 @@
   import {
     CircleHalf,
     CompassTool,
+    Eye,
     EyeClosed,
+    EyeSlash,
     Globe,
     LineSegment,
     Square,
@@ -52,7 +54,12 @@
     aria-label="Hide"
     title="Hide (h)"
   >
-    <EyeClosed />
+    {#if optionsState.visible}
+      <Eye />
+    {/if}
+    {#if !optionsState.visible}
+      <EyeSlash />
+    {/if}
   </Toggle>
   <Toggle
     class="cursor-pointer"
