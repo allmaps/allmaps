@@ -112,6 +112,20 @@
       // This way options components will show the correct options.
       optionsState.defaultOptions = warpedMapLayer.getDefaultLayerOptions()
       optionsState.warpedMapLayer = warpedMapLayer
+
+      // Create a new contextmenu event and dispatch it on the container so it bubbles up to the parent
+      const canvas = map.getCanvas()
+      canvas.addEventListener('contextmenu', (e) => {
+        const newEvent = new MouseEvent('contextmenu', {
+          bubbles: true,
+          cancelable: true,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          button: e.button,
+          buttons: e.buttons
+        })
+        container.dispatchEvent(newEvent)
+      })
     })
 
     function selectMap(e: maplibregl.MapMouseEvent) {

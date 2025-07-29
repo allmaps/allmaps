@@ -11,6 +11,7 @@
 
   import { Menubar } from './ui/menubar'
   import * as ContextMenu from '$lib/components/ui/context-menu/index.js'
+
   import {
     LayerOptionsState,
     MapOptionsState
@@ -75,69 +76,70 @@
 
 <OptionsKeys bind:optionsState />
 
-<ContextMenu.Root>
-  <ContextMenu.Trigger class="h-full w-full">
-    <div class="w-full h-full relative">
+<div class="w-full h-full relative">
+  <ContextMenu.Root>
+    <ContextMenu.Trigger class=" h-full w-full">
       <WarpedMapLayerMap
         {georeferencedMaps}
         {optionsState}
         {mapOptionsStateByMapId}
         bind:selectedMapId
-        {mapOrImage}
+        bind:mapOrImage
         {componentOptions}
         bind:geoBbox
       />
-
-      <div class="absolute top-0 left-0 m-2 ml-12 flex">
+    </ContextMenu.Trigger>
+    {#if selectedMapId}
+      <ContextMenu.Content class="p-0 border-none bg-transparent shadow-none">
         <Menubar class="flex h-11 select-none w-fit">
-          <OptionsToggles
-            bind:optionsState
-            {projections}
-            searchProjections={searchProjectionsWithFuse}
-            {geoBbox}
-            suggestProjections={suggestProjectionsWithFlatbush}
-          />
+          {#if selectedMapOptionsState}
+            <OptionsToggles
+              bind:optionsState={selectedMapOptionsState}
+              {projections}
+              searchProjections={searchProjectionsWithFuse}
+              {geoBbox}
+              suggestProjections={suggestProjectionsWithFlatbush}
+              showTooltips={false}
+            />
+          {/if}
         </Menubar>
-      </div>
-      <div class="absolute top-0 right-0 m-2 flex">
-        <MapOrImage bind:mapOrImage disabled={selectedMapId === undefined} />
-      </div>
-      <div class="absolute bottom-0 left-0 m-2 flex"></div>
-      <div class="absolute bottom-0 right-0 m-2 flex">
-        <div class="space-x-2">
-          <!-- <MapsOverview
+      </ContextMenu.Content>{/if}
+  </ContextMenu.Root>
+
+  <div class="absolute top-0 left-0 m-2 ml-12 flex">
+    <Menubar class="flex h-11 select-none w-fit">
+      <OptionsToggles
+        bind:optionsState
+        {projections}
+        searchProjections={searchProjectionsWithFuse}
+        {geoBbox}
+        suggestProjections={suggestProjectionsWithFlatbush}
+        showKeys={true}
+      />
+    </Menubar>
+  </div>
+  <div class="absolute top-0 right-0 m-2 flex">
+    <MapOrImage bind:mapOrImage disabled={selectedMapId === undefined} />
+  </div>
+  <div class="absolute bottom-0 left-0 m-2 flex"></div>
+  <div class="absolute bottom-0 right-0 m-2 flex">
+    <div class="space-x-2">
+      <!-- <MapsOverview
       {georeferencedMaps}
       bind:selectedMapId
       {annotations}
       {mapOrImage}
       /> -->
-          <Button variant="outline"><ShareNetwork />Share</Button>
-          <MapsListButton
-            {georeferencedMaps}
-            bind:selectedMapId
-            optionsStateByMapId={mapOptionsStateByMapId}
-            {projections}
-            searchProjections={searchProjectionsWithFuse}
-            {geoBbox}
-            suggestProjections={suggestProjectionsWithFlatbush}
-          />
-        </div>
-      </div>
+      <Button variant="outline"><ShareNetwork />Share</Button>
+      <MapsListButton
+        {georeferencedMaps}
+        bind:selectedMapId
+        optionsStateByMapId={mapOptionsStateByMapId}
+        {projections}
+        searchProjections={searchProjectionsWithFuse}
+        {geoBbox}
+        suggestProjections={suggestProjectionsWithFlatbush}
+      />
     </div>
-  </ContextMenu.Trigger>
-  {#if selectedMapId}
-    <ContextMenu.Content class="p-0 border-none bg-transparent shadow-none">
-      <Menubar class="flex h-11 select-none w-fit">
-        {#if selectedMapOptionsState}
-          <OptionsToggles
-            bind:optionsState={selectedMapOptionsState}
-            {projections}
-            searchProjections={searchProjectionsWithFuse}
-            {geoBbox}
-            suggestProjections={suggestProjectionsWithFlatbush}
-          />
-        {/if}
-      </Menubar>
-    </ContextMenu.Content>
-  {/if}
-</ContextMenu.Root>
+  </div>
+</div>
