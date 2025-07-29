@@ -13,7 +13,7 @@
   import {
     LayerOptionsState,
     MapOptionsState
-  } from './options/OptionsState.svelte'
+  } from '../options/OptionsState.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'

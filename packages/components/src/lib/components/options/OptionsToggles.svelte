@@ -13,7 +13,7 @@
   import { WebGL2WarpedMap } from '@allmaps/render'
 
   import ProjectionPicker from './ProjectionPicker.svelte'
-  import Kbd from '../Kbd.svelte'
+  import Kbd from './Kbd.svelte'
   import * as ToggleGroup from '../ui/toggle-group/index.js'
   import * as Tooltip from '../ui/tooltip/index.js'
   import * as Popover from '../ui/popover/index.js'
@@ -270,7 +270,7 @@
       </Popover.Trigger>
       <Popover.Content class="w-90" sideOffset={10}>
         <div class="grid grid-cols-6 gap-4">
-          <h4 class="text-sm col-span-3">Opacity<Kbd key="o" /></h4>
+          <h4 class="text-sm col-span-3">Opacity<Kbd key="space" /></h4>
           <Slider
             bind:value={
               () => optionsState.opacity ?? defaultWebGL2Options.opacity,

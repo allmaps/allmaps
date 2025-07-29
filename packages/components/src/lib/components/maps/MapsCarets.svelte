@@ -2,16 +2,15 @@
   import { CaretLeft, CaretRight } from 'phosphor-svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
+  import Button from '../ui/button/button.svelte'
 
   let {
     georeferencedMaps = [],
     selectedMapId = $bindable(undefined),
-    annotations = [],
     mapOrImage = 'map'
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
-    annotations?: unknown[]
     mapOrImage: 'map' | 'image'
   } = $props()
 
@@ -58,30 +57,17 @@
 </script>
 
 <div class="pointer-events-auto flex space-x-1">
-  <div
-    class="px-4 py-2 w-60 text-sm text-center font-medium bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
-  >
-    {#if georeferencedMaps.length}
-      {#if selectedIndex !== undefined}
-        {selectedIndex + 1} of
-      {/if}
-      {georeferencedMaps.length}
-      {georeferencedMaps.length > 1 ? 'maps' : 'map'}
-      from {annotations.length}
-      {annotations.length > 1 ? 'annotations' : 'annotation'}
-    {/if}
-  </div>
   {#if georeferencedMaps.length > 0}
     <div class="flex h-9">
-      <button
+      <Button
         onclick={selectPrevious}
-        class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
-        ><CaretLeft /></button
+        variant="outline"
+        class="w-8 rounded-r-none"><CaretLeft /></Button
       >
-      <button
+      <Button
         onclick={selectNext}
-        class="px-2 py-2 text-sm font-medium bg-white border-t broder-b border-r border-gray-200 rounded-r-lg hover:bg-gray-100 hover:cursor-pointer focus:z-10"
-        ><CaretRight /></button
+        variant="outline"
+        class="w-8 rounded-l-none border-l-0"><CaretRight /></Button
       >
     </div>
   {/if}

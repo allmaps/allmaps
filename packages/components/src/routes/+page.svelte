@@ -7,7 +7,7 @@
     createSearchProjectionsWithFuse,
     createSuggestProjectionsWithFlatbush
   } from '$lib/shared/projections/projections.js'
-  import WarpedMapLayerMap from '$lib/components/WarpedMapLayerMap.svelte'
+  import WarpedMapLayerMap from '$lib/components/maps/WarpedMapLayerMap.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import Viewer from '$lib/components/Viewer.svelte'

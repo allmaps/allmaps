@@ -1,13 +1,13 @@
 <script lang="ts">
   import * as Card from '$lib/components/ui/card/index.js'
-  import Checkbox from './ui/checkbox/checkbox.svelte'
+  import Checkbox from '../ui/checkbox/checkbox.svelte'
 
-  import OptionsToggles from './options/OptionsToggles.svelte'
+  import OptionsToggles from '../options/OptionsToggles.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { Bbox } from '@allmaps/types'
 
-  import type { MapOptionsState } from './options/OptionsState.svelte'
+  import type { MapOptionsState } from '../options/OptionsState.svelte'
   import type { PickerProjection } from '$lib/shared/projections/projections'
 
   let {

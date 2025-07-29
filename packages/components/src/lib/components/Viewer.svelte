@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { Plus, ShareNetwork } from 'phosphor-svelte'
-
   import { parseAnnotation } from '@allmaps/annotation'
 
   import projectionsData from '$lib/shared/projections/projections.json' with { type: 'json' }
@@ -9,7 +7,7 @@
     createSuggestProjectionsWithFlatbush
   } from '$lib/shared/projections/projections.js'
 
-  import { Menubar } from './ui/menubar'
+  import { Menubar } from '$lib/components/ui/menubar'
   import * as ContextMenu from '$lib/components/ui/context-menu/index.js'
 
   import {
@@ -17,17 +15,16 @@
     MapOptionsState
   } from './options/OptionsState.svelte'
   import OptionsToggles from './options/OptionsToggles.svelte'
-  import WarpedMapLayerMap from './WarpedMapLayerMap.svelte'
-  import MapOrImage from './MapOrImage.svelte'
+  import WarpedMapLayerMap from './maps/WarpedMapLayerMap.svelte'
+  import MapOrImageTabs from './maps/MapOrImageTabs.svelte'
   import OptionsKeys from './options/OptionsKeys.svelte'
-  import MapsOverview from './MapsOverview.svelte'
-  import Button from './ui/button/button.svelte'
-  import MapsListButton from './MapsListButton.svelte'
+  import MapsCarets from './maps/MapsCarets.svelte'
+  import MapsListButton from './maps/MapsListButton.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { Bbox } from '@allmaps/types'
 
-  import type { WarpedMapLayerMapComponentOptions } from './WarpedMapLayerMap.svelte'
+  import type { WarpedMapLayerMapComponentOptions } from './maps/WarpedMapLayerMap.svelte'
 
   export type ViewerComponentOptions = WarpedMapLayerMapComponentOptions
 
@@ -106,7 +103,7 @@
       </ContextMenu.Content>{/if}
   </ContextMenu.Root>
 
-  <div class="absolute top-0 left-0 m-2 ml-12 flex">
+  <div class="absolute top-0 left-0 m-2 ml-12 flex space-x-2">
     <Menubar class="flex h-11 select-none w-fit">
       <OptionsToggles
         bind:optionsState
@@ -118,28 +115,20 @@
       />
     </Menubar>
   </div>
-  <div class="absolute top-0 right-0 m-2 flex">
-    <MapOrImage bind:mapOrImage disabled={selectedMapId === undefined} />
+  <div class="absolute top-0 right-0 m-2 flex space-x-2">
+    <MapOrImageTabs bind:mapOrImage disabled={selectedMapId === undefined} />
   </div>
-  <div class="absolute bottom-0 left-0 m-2 flex"></div>
-  <div class="absolute bottom-0 right-0 m-2 flex">
-    <div class="space-x-2">
-      <!-- <MapsOverview
+  <div class="absolute bottom-0 left-0 m-2 flex space-x-2"></div>
+  <div class="absolute bottom-0 right-0 m-2 flex space-x-2">
+    <MapsCarets {georeferencedMaps} bind:selectedMapId {mapOrImage} />
+    <MapsListButton
       {georeferencedMaps}
       bind:selectedMapId
-      {annotations}
-      {mapOrImage}
-      /> -->
-      <Button variant="outline"><ShareNetwork />Share</Button>
-      <MapsListButton
-        {georeferencedMaps}
-        bind:selectedMapId
-        optionsStateByMapId={mapOptionsStateByMapId}
-        {projections}
-        searchProjections={searchProjectionsWithFuse}
-        {geoBbox}
-        suggestProjections={suggestProjectionsWithFlatbush}
-      />
-    </div>
+      optionsStateByMapId={mapOptionsStateByMapId}
+      {projections}
+      searchProjections={searchProjectionsWithFuse}
+      {geoBbox}
+      suggestProjections={suggestProjectionsWithFlatbush}
+    />
   </div>
 </div>

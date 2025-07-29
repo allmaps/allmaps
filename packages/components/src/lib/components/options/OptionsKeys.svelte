@@ -61,7 +61,7 @@
       //   optionsState.distortionMeasure = nextDistortionMeasure(
       //     optionsState.distortionMeasure
       //   )
-    } else if (e.key === 'o') {
+    } else if (e.key === ' ') {
       if (optionsState.opacity !== 0) {
         backupOpacity = optionsState.opacity
       }
@@ -91,7 +91,7 @@
 
     keyPressed = false
 
-    if (e.key === 'o') {
+    if (e.key === ' ') {
       optionsState.opacity = backupOpacity
     } else if (e.key === 'b') {
       optionsState.removeColorThreshold = backupRemoveColorThreshold
