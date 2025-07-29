@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.34",
+  "version": "1.0.0-beta.38",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -15,6 +15,7 @@
   ],
   "description": "MapLibre classes for Allmaps",
   "type": "module",
+  "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "files": [
     "dist"
@@ -38,14 +39,13 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build && pnpm run documentation",
+    "build": "vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "test": "NODE_ENV=test mocha",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",

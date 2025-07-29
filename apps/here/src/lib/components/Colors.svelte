@@ -38,7 +38,7 @@
 </script>
 
 <RadioGroup.Root class="flex flex-row gap-2">
-  {#each colors as color}
+  {#each colors as color (color.value)}
     <RadioGroup.Item
       id={color.value}
       value={color.value}

@@ -25,7 +25,7 @@
 
 <Popover.Root bind:open={isOpen}>
   <Popover.Trigger>
-    {#snippet child({ props })}
+    {#snippet child({ props }: { props: Record<string, unknown> })}
       <button {...props} class="cursor-pointer">
         {@render children?.()}
       </button>

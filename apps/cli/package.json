@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.46",
+  "version": "1.0.0-beta.49",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -27,8 +27,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "NODE_ENV=test pnpm run build && mocha --slow 200ms",
-    "preversion": "pnpm run lint && pnpm test",
+    "test": "NODE_ENV=test mocha --slow 500ms --reporter-option maxDiffSize=0",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test"

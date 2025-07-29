@@ -19,7 +19,7 @@
   import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
-  import type { Size } from '@allmaps/types'
+  import type { Size, Point } from '@allmaps/types'
 
   import type { GeojsonRoute } from '$lib/shared/types.js'
 
@@ -68,7 +68,9 @@
   let resourceRouteCoordinates = $derived.by(() => {
     if (geojsonRoute && geojsonRoute.route && resourceSize && svgSize) {
       const resourceLineString = transformer.transformToResource(
-        geojsonRoute.route.coordinates
+        geojsonRoute.route.coordinates.map(
+          (point): Point => [point[0], point[1]]
+        )
       )
 
       return resourceLineString.map((point) =>
@@ -191,6 +193,7 @@
                 style:left="calc({pinOriginPosition[0]}% - 1rem)"
                 style:top="calc({pinOriginPosition[1]}% - 3.4rem)"
               >
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html Pin}
               </div>
               <div
@@ -199,6 +202,7 @@
                 style:left="calc({pinOriginPosition[0]}%)"
                 style:top="calc({pinOriginPosition[1]}% - 0.4rem)"
               >
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 {@html PinShadow}
               </div>
             </div>

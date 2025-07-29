@@ -2,7 +2,7 @@
 
 Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
 
-*The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).*
+_The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/)._
 
 <!-- TODO: replace with relative URL, but make sure this does not break docs.allmaps.org -->
 
@@ -12,9 +12,7 @@ Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows display
 
 Examples:
 
-* [Observable notebook](https://observablehq.com/@allmaps/leaflet-plugin)
-* [HTML example using ESM and Skypack](https://allmaps.org/allmaps/packages/leaflet/examples/skypack.html)
-* [HTML example using UMD and jsDelivr](https://allmaps.org/allmaps/packages/leaflet/examples/jsdelivr.html)
+- [Observable notebook](https://observablehq.com/@allmaps/leaflet-plugin)
 
 ## How it works
 
@@ -38,18 +36,6 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
-As an alternative to loading using import, ESM and UMD bundled versions of the code are also provided under `/dist/bundled` (once the code is built). These are also published online, so can load them directly in a HTML script tag using a CDN. They require Leaflet to be loaded as `L`, so place them after loading Leaflet.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js"></script>
-```
-
-When loading the bundled package, its classes are available under the `Allmaps` global variable:
-
-```js
-const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
-```
-
 ## Usage
 
 Built for Leaflet 1.9, but should work with earlier versions as well.
@@ -65,7 +51,7 @@ const map = L.map('map', {
   center: [51.0518, 3.7278],
   zoom: 14,
   // Zoom animations for more than one zoom level are
-  // currently not supported by the Allmaps plugin for Leafet
+  // currently not supported by the Allmaps plugin for Leaflet
   zoomAnimationThreshold: 1
 })
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -118,15 +104,15 @@ map.on('warpedmapadded', (event) => {
 
 Some of the functions specified in the API only make sense once a warped map is loaded into the `WarpedMapLayer`. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
 
-### What is a *map*?
+### What is a _map_?
 
 A Leaflet map is an instance of the Leaflet [`Map`](https://leafletjs.com/reference.html#map) class, the central class of the Leaflet API, used to create a map on a page and manipulate it.
 
 In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
 
-* When a Georeference Annotation is parsed, an instance of the `GeoreferencedMap` class is created from it.
-* When this map is loaded into an application for rendering, an instance of the `WarpedMap` class is created from it.
-* Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
+- When a Georeference Annotation is parsed, an instance of the `GeoreferencedMap` class is created from it.
+- When this map is loaded into an application for rendering, an instance of the `WarpedMap` class is created from it.
+- Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
 
 All these map phases originate from the same Georeference Annotation have the same unique `mapId` property. This string value is used thoughout Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a WarpedMapLayer, so you can use it later to call functions on a specific map.
 
@@ -156,8 +142,8 @@ SpecificWarpedMapListOptions &
 
 ###### Parameters
 
-* `type` (`WarpedMapEventType`)
-* `data?` (`unknown`)
+- `type` (`WarpedMapEventType`)
+- `data?` (`unknown`)
 
 ###### Returns
 
@@ -165,7 +151,7 @@ SpecificWarpedMapListOptions &
 
 ###### Extends
 
-* `Event`
+- `Event`
 
 ### `WarpedMapEvent#data?`
 
@@ -181,18 +167,14 @@ Creates a WarpedMapLayer
 
 ###### Parameters
 
-* `annotationOrAnnotationUrl` (`unknown`)
-  * Georeference Annotation or URL of a Georeference Annotation
-* `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
-  * Options for the layer
+- `annotationOrAnnotationUrl` (`unknown`)
+  - Georeference Annotation or URL of a Georeference Annotation
+- `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
+  - Options for the layer
 
 ###### Returns
 
 `WarpedMapLayer`.
-
-###### Extends
-
-* `Layer`
 
 ### `WarpedMapLayer#_addEventListeners()`
 
@@ -208,7 +190,7 @@ There are no parameters.
 
 ###### Parameters
 
-* `e` (`ZoomAnimEvent`)
+- `e` (`L.ZoomAnimEvent`)
 
 ###### Returns
 
@@ -226,7 +208,7 @@ unknown
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -236,7 +218,7 @@ unknown
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -256,7 +238,7 @@ There are no parameters.
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -276,7 +258,7 @@ There are no parameters.
 
 ###### Parameters
 
-* `entries` (`Array<ResizeObserverEntry>`)
+- `entries` (`Array<ResizeObserverEntry>`)
 
 ###### Returns
 
@@ -318,14 +300,14 @@ Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Georeference Annotation
+- `annotation` (`unknown`)
+  - Georeference Annotation
 
 ###### Returns
 
 `Promise<Array<string | Error>>`.
 
-* the map IDs of the maps that were added, or an error per map
+- the map IDs of the maps that were added, or an error per map
 
 ### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl)`
 
@@ -333,8 +315,8 @@ Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
 
 ###### Parameters
 
-* `annotationUrl` (`string`)
-  * Georeference Annotation
+- `annotationUrl` (`string`)
+  - Georeference Annotation
 
 ###### Returns
 
@@ -346,8 +328,8 @@ Adds a Georeferenced map.
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced map
+- `georeferencedMap` (`unknown`)
+  - Georeferenced map
 
 ###### Returns
 
@@ -359,8 +341,8 @@ Bring maps forward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -372,8 +354,8 @@ Bring maps to front
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -443,7 +425,7 @@ There are no parameters.
 
 `Array<Array<number>> | undefined`.
 
-* L.LatLngBounds in array form of all visible maps
+- L.LatLngBounds in array form of all visible maps
 
 ### `WarpedMapLayer#getCanvas()`
 
@@ -475,8 +457,8 @@ Gets the opacity of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -488,14 +470,14 @@ Returns the z-index of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
 `number | undefined`.
 
-* z-index of the map
+- z-index of the map
 
 ### `WarpedMapLayer#getOpacity()`
 
@@ -527,8 +509,8 @@ Returns a single map's warped map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -563,7 +545,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-WebGL2RenderingContext | null | undefined
+;WebGL2RenderingContext | null | undefined
 ```
 
 ### `WarpedMapLayer#hideMap(mapId)`
@@ -572,8 +554,8 @@ Make a single map invisible
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -585,8 +567,8 @@ Make multiple maps invisible
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -596,8 +578,8 @@ Make multiple maps invisible
 
 ###### Parameters
 
-* `annotationOrAnnotationUrl` (`unknown`)
-* `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
+- `annotationOrAnnotationUrl` (`unknown`)
+- `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
 
 ###### Returns
 
@@ -609,13 +591,13 @@ Returns the visibility of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
+- `mapId` (`string`)
 
 ###### Returns
 
 `boolean | undefined`.
 
-* whether the map is visible
+- whether the map is visible
 
 ### `WarpedMapLayer#onAdd(map)`
 
@@ -623,7 +605,7 @@ Contains all code code that creates DOM elements for the layer and adds them to 
 
 ###### Parameters
 
-* `map` (`Map`)
+- `map` (`L.Map`)
 
 ###### Returns
 
@@ -635,7 +617,7 @@ Contains all cleanup code that removes the layer's elements from the DOM.
 
 ###### Parameters
 
-* `map` (`Map`)
+- `map` (`L.Map`)
 
 ###### Returns
 
@@ -645,11 +627,11 @@ Contains all cleanup code that removes the layer's elements from the DOM.
 
 ###### Fields
 
-* `className` (`string`)
-* `interactive` (`false`)
-* `opacity` (`number`)
-* `pane` (`string`)
-* `zIndex` (`number`)
+- `className` (`string`)
+- `interactive` (`false`)
+- `opacity` (`number`)
+- `pane` (`string`)
+- `zIndex` (`number`)
 
 ### `WarpedMapLayer#removeGeoreferenceAnnotation(annotation)`
 
@@ -657,14 +639,14 @@ Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Georeference Annotation
+- `annotation` (`unknown`)
+  - Georeference Annotation
 
 ###### Returns
 
 `Promise<Array<string | Error>>`.
 
-* the map IDs of the maps that were removed, or an error per map
+- the map IDs of the maps that were removed, or an error per map
 
 ### `WarpedMapLayer#removeGeoreferenceAnnotationByUrl(annotationUrl)`
 
@@ -672,8 +654,8 @@ Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by UR
 
 ###### Parameters
 
-* `annotationUrl` (`string`)
-  * Georeference Annotation
+- `annotationUrl` (`string`)
+  - Georeference Annotation
 
 ###### Returns
 
@@ -685,8 +667,8 @@ Removes a Georeferenced map.
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced map
+- `georeferencedMap` (`unknown`)
+  - Georeferenced map
 
 ###### Returns
 
@@ -718,8 +700,8 @@ Resets the colorization of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -731,8 +713,8 @@ Resets the opacity of a single map to 1
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -744,8 +726,8 @@ Resets the color removal for a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -757,8 +739,8 @@ Resets the saturation of a single map to the original colors
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -814,8 +796,8 @@ Send maps backward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -827,8 +809,8 @@ Send maps to back
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * IDs of the maps
+- `mapIds` (`Array<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -840,8 +822,8 @@ Sets the colorization for all maps
 
 ###### Parameters
 
-* `hexColor` (`string`)
-  * desired hex color
+- `hexColor` (`string`)
+  - desired hex color
 
 ###### Returns
 
@@ -853,8 +835,8 @@ Sets the object that caches image information
 
 ###### Parameters
 
-* `imageInformations` (`globalThis.Map<string, unknown>`)
-  * Object that caches image information
+- `imageInformations` (`Map<string, unknown>`)
+  - Object that caches image information
 
 ###### Returns
 
@@ -866,10 +848,10 @@ Sets the colorization for a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `hexColor` (`string`)
-  * desired hex color
+- `mapId` (`string`)
+  - ID of the map
+- `hexColor` (`string`)
+  - desired hex color
 
 ###### Returns
 
@@ -881,10 +863,10 @@ Sets the opacity of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `opacity` (`number`)
-  * opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+- `mapId` (`string`)
+  - ID of the map
+- `opacity` (`number`)
+  - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
 
 ###### Returns
 
@@ -896,14 +878,14 @@ Removes a color from a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `options` (`{
-    hexColor?: string | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-  * remove color options
+- `mapId` (`string`)
+  - ID of the map
+- `options` (`{
+  hexColor?: string | undefined
+  threshold?: number | undefined
+  hardness?: number | undefined
+}`)
+  - remove color options
 
 ###### Returns
 
@@ -915,10 +897,10 @@ Sets the resource mask of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `resourceMask` (`Array<Point>`)
-  * new resource mask
+- `mapId` (`string`)
+  - ID of the map
+- `resourceMask` (`Array<Point>`)
+  - new resource mask
 
 ###### Returns
 
@@ -930,10 +912,10 @@ Sets the saturation of a single map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `saturation` (`number`)
-  * saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+- `mapId` (`string`)
+  - ID of the map
+- `saturation` (`number`)
+  - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
 
 ###### Returns
 
@@ -945,10 +927,10 @@ Sets the distortion measure of multiple maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
-* `distortionMeasure?` (`DistortionMeasure | undefined`)
-  * new transformation type
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
+- `distortionMeasure?` (`DistortionMeasure | undefined`)
+  - new transformation type
 
 ###### Returns
 
@@ -960,18 +942,18 @@ Sets the transformation type of multiple maps
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
-* `transformation` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
-  * new transformation type
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
+- `transformation` (`  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+  | 'linear'`)
+  - new transformation type
 
 ###### Returns
 
@@ -983,8 +965,8 @@ Sets the opacity of the layer
 
 ###### Parameters
 
-* `opacity` (`number`)
-  * Layer opacity
+- `opacity` (`number`)
+  - Layer opacity
 
 ###### Returns
 
@@ -996,8 +978,8 @@ Sets the options
 
 ###### Parameters
 
-* `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
-  * Options
+- `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
+  - Options
 
 ###### Returns
 
@@ -1009,12 +991,12 @@ Removes a color from all maps
 
 ###### Parameters
 
-* `options` (`{
-    hexColor?: string | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-  * remove color options
+- `options` (`{
+  hexColor?: string | undefined
+  threshold?: number | undefined
+  hardness?: number | undefined
+}`)
+  - remove color options
 
 ###### Returns
 
@@ -1026,8 +1008,8 @@ Sets the saturation of a single map
 
 ###### Parameters
 
-* `saturation` (`number`)
-  * saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+- `saturation` (`number`)
+  - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
 
 ###### Returns
 
@@ -1039,8 +1021,8 @@ Changes the z-index of the layer.
 
 ###### Parameters
 
-* `value` (`number`)
-  * z-index
+- `value` (`number`)
+  - z-index
 
 ###### Returns
 
@@ -1052,8 +1034,8 @@ Make a single map visible
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
+- `mapId` (`string`)
+  - ID of the map
 
 ###### Returns
 
@@ -1065,8 +1047,8 @@ Make multiple maps visible
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 

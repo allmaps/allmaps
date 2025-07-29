@@ -1,0 +1,42 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "build": {
+      "inputs": ["src/**/*.*"],
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["test", "^build"]
+    },
+    "types": {
+      "inputs": ["src/**/*.*"],
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["^types"]
+    },
+    "lint": {
+      "inputs": ["src/**/*.*"],
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["^lint"]
+    },
+    "test": {
+      "inputs": ["dist/**/*.*", "src/**/*.*", "test/**/*.*"],
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["^test"]
+    },
+    "check": {
+      "inputs": ["src/**/*.*"],
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["^check"]
+    },
+    "documentation": {
+      "inputs": ["src/**/*.*"],
+      "outputs": ["README.md"],
+      "dependsOn": ["^documentation"]
+    },
+    "precommit": {
+      "dependsOn": ["types", "lint", "build", "test", "documentation"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    }
+  }
+}

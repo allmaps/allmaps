@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/components",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.3",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -104,6 +104,7 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@allmaps/ui": "workspace:^",
+    "bits-ui": "^2.8.10",
     "flatbush": "^4.4.0",
     "fuse.js": "^7.1.0",
     "lodash-es": "^4.17.21",

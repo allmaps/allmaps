@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/schemas",
-  "version": "1.0.0-beta.20",
+  "version": "1.0.0-beta.22",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -27,10 +27,9 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "preversion": "pnpm run lint && pnpm test",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "test": "NODE_ENV=test mocha",
     "types": "tsc --noEmit"
   },
   "license": "MIT",

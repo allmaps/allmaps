@@ -1175,8 +1175,8 @@ Default settings apply for the options.
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
 * `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
 
@@ -1446,8 +1446,8 @@ Image
   | 'polynomial1'
   | 'polynomial2'
   | 'polynomial3'
-  | 'projective'
   | 'thinPlateSpline'
+  | 'projective'
   | 'linear'
 ```
 
@@ -1852,8 +1852,8 @@ Set the transformationType
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
 
 ###### Returns
@@ -1887,8 +1887,8 @@ Set the transformationType
   | 'polynomial1'
   | 'polynomial2'
   | 'polynomial3'
-  | 'projective'
   | 'thinPlateSpline'
+  | 'projective'
   | 'linear'
 ```
 
@@ -2545,8 +2545,8 @@ Sets the transformation type for a specific map
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * the new transformation type
 * `mapId` (`string`)
@@ -2613,8 +2613,8 @@ Sets the transformation type for selected maps
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
-    | 'projective'
     | 'thinPlateSpline'
+    | 'projective'
     | 'linear'`)
   * the new transformation type
 * `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
@@ -2937,7 +2937,7 @@ false
 
 `void`.
 
-### `WebGL2Renderer#finishTransition(mapIds)`
+### `WebGL2Renderer#finishTransformerTransition(mapIds)`
 
 ###### Parameters
 
@@ -3728,7 +3728,7 @@ There are no parameters.
 
 `boolean`.
 
-### `WebGL2Renderer#startTransformaterTransition(mapIds)`
+### `WebGL2Renderer#startTransformerTransition(mapIds)`
 
 ###### Parameters
 

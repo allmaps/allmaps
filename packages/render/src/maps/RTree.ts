@@ -2,10 +2,9 @@
 // https://github.com/mourner/flatbush
 import RBush from 'rbush'
 
-// TODO: use robust-point-in-polygon
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
+import inside from 'point-in-polygon-hao'
 
-import { computeBbox, geometryToGeojsonGeometry } from '@allmaps/stdlib'
+import { closePolygon, computeBbox } from '@allmaps/stdlib'
 
 import type { Bbox, Point, Polygon } from '@allmaps/types'
 
@@ -109,8 +108,7 @@ export class RTree {
           const polygon = this.polygonsById.get(item.id)
 
           if (polygon) {
-            const geojsonPolygon = geometryToGeojsonGeometry(polygon)
-            return booleanPointInPolygon(point, geojsonPolygon)
+            return inside(point, closePolygon(polygon))
           } else {
             return false
           }

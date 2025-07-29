@@ -111,7 +111,7 @@ function findYearFromValue(value: string | number | boolean) {
   const regex = /\b(?<year>\d{4})\b/g
 
   const stringValue = String(value)
-  let years = []
+  const years = []
 
   for (const match of stringValue.matchAll(regex)) {
     const yearStr = match.groups?.year
@@ -180,7 +180,7 @@ export function findYearsFromMetadata(metadata?: Metadata) {
     return []
   }
 
-  let allYears = []
+  const allYears = []
 
   for (const metadataItem of metadata) {
     const values = Object.values(metadataItem.value).flat()
@@ -188,7 +188,7 @@ export function findYearsFromMetadata(metadata?: Metadata) {
 
     for (const value of values) {
       const stringValue = String(value)
-      let years = []
+      const years = []
 
       for (const match of stringValue.matchAll(regex)) {
         const yearStr = match.groups?.year

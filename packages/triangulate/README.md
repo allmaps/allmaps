@@ -13,7 +13,7 @@ This package is used internally in [@allmaps/render](../../packages/render/) to 
 
 ## How it works
 
-It uses a modern **constrained Delaunay triangulation algorithm** for polygons, built using [Delaunator](https://github.com/mapbox/delaunator) and [Contrainautor](https://github.com/kninnug/Constrainautor), and uses [Robust-Point-In-Polygon](https://github.com/mikolalysenko/robust-point-in-polygon/tree/master) to only allow resulting triangles are indeed inside the original polygon.
+It uses a modern **constrained Delaunay triangulation algorithm** for polygons, built using [Delaunator](https://github.com/mapbox/delaunator) and [Contrainautor](https://github.com/kninnug/Constrainautor).
 
 To learn more on how it works, check out this [Observable notebook](https://observablehq.com/d/efde1d04f1a9bc17).
 

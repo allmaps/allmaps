@@ -4,7 +4,7 @@ import {
   mixNumbers,
   mixPoints,
   getPropertyFromCacheOrComputation,
-  getPropertyFromTrippleCacheOrComputation,
+  getPropertyFromTripleCacheOrComputation,
   mergeOptions,
   mixLineStrings
 } from '@allmaps/stdlib'
@@ -321,7 +321,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
 
     // Compute triangulation
-    this.projectedGcpTriangulation = getPropertyFromTrippleCacheOrComputation(
+    this.projectedGcpTriangulation = getPropertyFromTripleCacheOrComputation(
       this.projectedGcpTriangulationCache,
       this.resourceResolution,
       this.transformationType,
@@ -334,19 +334,14 @@ export class TriangulatedWarpedMap extends WarpedMap {
         } = getPropertyFromCacheOrComputation(
           this.resourceTriangulationCache,
           this.resourceResolution,
-          () => {
-            return triangulateToUnique(
-              [this.resourceMask],
-              this.resourceResolution,
-              {
-                steinerPoints: this.gcps.map((gcp) => gcp.resource)
-              }
-            )
-          }
+          () =>
+            triangulateToUnique([this.resourceMask], this.resourceResolution, {
+              steinerPoints: this.gcps.map((gcp) => gcp.resource)
+            })
         )
 
         // Extend Triangulation to ProjectedGcpTriangulation
-        // By inclusing projectedGeo and distortions
+        // By including projectedGeo and distortions
         const resourceResolution = this.resourceResolution
         const resourceUniquePoints = uniquePoints as Point[]
         const gcpUniquePoints = resourceUniquePoints.map((resourcePoint) =>
@@ -369,6 +364,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
         }
       }
     )
+
     if (!this.projectedGcpPreviousTriangulation) {
       this.projectedGcpPreviousTriangulation = this.projectedGcpTriangulation
     }
@@ -377,7 +373,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     if (refinePrevious) {
       this.previousResourceResolution = this.resourceResolution
       this.projectedGcpPreviousTriangulation =
-        getPropertyFromTrippleCacheOrComputation(
+        getPropertyFromTripleCacheOrComputation(
           this.projectedGcpTriangulationCache,
           this.previousResourceResolution,
           this.previousTransformationType,

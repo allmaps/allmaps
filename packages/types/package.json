@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/types",
-  "version": "1.0.0-beta.18",
+  "version": "1.0.0-beta.20",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -35,12 +35,11 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
+    "build": "tsc",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --write src test",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "test": "NODE_ENV=test mocha",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",

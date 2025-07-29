@@ -1,14 +1,12 @@
 ---
-import AstroPageFrame from '@astrojs/starlight/components/PageFrame.astro'
+import Default from '@astrojs/starlight/components/PageFrame.astro'
 
 import Header from './Header.astro'
 
 import Title from '../Title.svelte'
 import Footer from '../../components/Footer.svelte'
 
-import type { Props } from '@astrojs/starlight/props'
-
-const isHomepage = Astro.props.slug === ''
+const isHomepage = Astro.url.pathname === '/'
 ---
 
 {
@@ -22,7 +20,7 @@ const isHomepage = Astro.props.slug === ''
       <Footer />
     </div>
   ) : (
-    <AstroPageFrame {...Astro.props}>
+    <Default {...Astro.props}>
       <slot />
       <Fragment slot="header">
         <slot name="header" />
@@ -30,7 +28,7 @@ const isHomepage = Astro.props.slug === ''
       <Fragment slot="sidebar">
         <slot name="sidebar" />
       </Fragment>
-    </AstroPageFrame>
+    </Default>
   )
 }
 

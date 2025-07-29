@@ -727,7 +727,7 @@ MIT
 
 `T`.
 
-### `getPropertyFromTrippleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
+### `getPropertyFromTripleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
 
 ###### Parameters
 

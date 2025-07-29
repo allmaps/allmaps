@@ -1,5 +1,5 @@
 import { defineConfig, type UserConfig } from 'vite'
-
+import tailwindcss from '@tailwindcss/vite'
 import { sveltekit } from '@sveltejs/kit/vite'
 import { qrcode } from 'vite-plugin-qrcode'
 
@@ -10,6 +10,7 @@ export default defineConfig({
     port: ports.here
   },
   plugins: [
+    tailwindcss(),
     sveltekit(),
     qrcode(),
     // This is needed to serve the app over HTTPS

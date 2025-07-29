@@ -11,7 +11,7 @@ export class ImageInfoState {
   #imageInfoByUrl = $state<SvelteMap<string, FetchedImageInfo>>(new SvelteMap())
 
   async fetchImageInfo(imageUri: string) {
-    let existingFetchedImageInfo = this.#imageInfoByUrl.get(imageUri)
+    const existingFetchedImageInfo = this.#imageInfoByUrl.get(imageUri)
     if (existingFetchedImageInfo) {
       return existingFetchedImageInfo
     }

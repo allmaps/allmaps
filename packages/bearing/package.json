@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/bearing",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.7",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -27,9 +27,8 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "build": "tsc",
+    "test": "NODE_ENV=test mocha",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",

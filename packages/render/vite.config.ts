@@ -6,13 +6,13 @@ import dts from 'vite-plugin-dts'
 import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
+  base: './',
   server: {
     port: ports.render
   },
   build: {
     target: 'es2022',
     sourcemap: true,
-    emptyOutDir: false,
     minify: false,
     lib: {
       entry: [
@@ -29,12 +29,13 @@ export default defineConfig({
       target: 'es2022'
     }
   },
-  base: '',
-
   plugins: [
     glsl(),
     dts(),
     // TODO: find a way to remove type cast
     noBundlePlugin() as PluginOption
-  ]
+  ],
+  worker: {
+    format: 'es'
+  }
 }) satisfies UserConfig

@@ -14,7 +14,6 @@ import {
 
 import Delaunator from 'delaunator'
 
-// @ts-expect-error Ignore missing types
 import Constrainautor from '@kninnug/constrainautor'
 
 import type {

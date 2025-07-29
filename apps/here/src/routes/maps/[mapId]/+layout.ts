@@ -21,7 +21,7 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
     const annotation = await fetchJson(mapId, undefined, fetch)
     const maps = parseAnnotation(annotation)
     map = maps[0]
-  } catch (err) {
+  } catch {
     error(404, {
       message: 'Map not found'
     })
@@ -43,7 +43,7 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
       // they should fix this, until then, do this:
       imageInfo['@id'] = imageInfo['@id'].replace('https, https://', 'https://')
     }
-  } catch (err) {
+  } catch {
     error(404, {
       message: 'Failed to fetch IIIF Image'
     })

@@ -5,13 +5,13 @@ import dts from 'vite-plugin-dts'
 import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
+  base: './',
   server: {
     port: ports.maplibre
   },
   build: {
     target: 'es2022',
     sourcemap: true,
-    emptyOutDir: false,
     minify: false,
     lib: {
       entry: './src/index.ts',
@@ -23,7 +23,6 @@ export default defineConfig({
       target: 'es2022'
     }
   },
-  base: '',
   plugins: [
     dts(),
     // TODO: find a way to remove type cast

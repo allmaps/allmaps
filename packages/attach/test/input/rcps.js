@@ -115,4 +115,4 @@ export const rcps3 = [
 ]
 
 export const rcps = [...rcps0, ...rcps1, ...rcps2, ...rcps3]
-export const rcps11 = rcps.filter((rcp) => rcp.id == '1,1')
+export const rcps11 = rcps.filter((rcp) => rcp.id === '1,1')

@@ -37,7 +37,7 @@ export class WorldHistoricalGazetteer extends GeocoderProvider {
 
   featuresFunction(features: unknown[]) {
     return (features as GeoJsonFeatureWHG[])
-      .filter((feature) => feature.geometry?.type == 'Point')
+      .filter((feature) => feature.geometry?.type === 'Point')
       .map(({ geometry, properties }) => ({
         type: 'Feature',
         geometry: geometry as GeojsonPoint,

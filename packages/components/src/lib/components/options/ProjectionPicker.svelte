@@ -90,7 +90,7 @@
       (projection.code ? '|' + projection.code : '')) as string}
     label={projection.name}
   >
-    {#snippet children({ selected })}
+    {#snippet children({ selected }: { selected: boolean })}
       <div class="flex justify-between">
         {projection.name}
         {#if projection.comment}
@@ -119,8 +119,15 @@
     }
   }}
   onValueChange={(v) => {
+    if (v === defaultProjection?.code) {
+      selectedProjection = undefined
+    } else {
+      selectedProjection = projections.find(
+        (projection) => projection.code === v
+      )
+    }
     selectedProjection =
-      v == 'undefined'
+      v === 'undefined'
         ? undefined
         : projections.find(
             (projection) => projection.definition === v.split('|')[0]

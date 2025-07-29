@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/ui",
-  "version": "1.0.0-beta.35",
+  "version": "1.0.0-beta.38",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -47,8 +47,7 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check src && eslint src --ext .ts,.svelte",
     "format": "prettier --write src",
-    "types": "tsc --noEmit",
-    "preversion": "pnpm run types && pnpm run lint"
+    "types": "tsc --noEmit"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
