@@ -165,7 +165,6 @@ export {
   objectDifference,
   objectOmitDifference,
   omit,
-  maxOfNumberOrUndefined,
   isValidHttpUrl,
   camelCaseToWords
 } from './main.js'

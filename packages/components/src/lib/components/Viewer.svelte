@@ -11,7 +11,10 @@
 
   import { Menubar } from './ui/menubar'
   import * as ContextMenu from '$lib/components/ui/context-menu/index.js'
-  import { OptionsState } from './options/OptionsState.svelte'
+  import {
+    LayerOptionsState,
+    MapOptionsState
+  } from './options/OptionsState.svelte'
   import OptionsToggles from './options/OptionsToggles.svelte'
   import WarpedMapLayerMap from './WarpedMapLayerMap.svelte'
   import MapOrImage from './MapOrImage.svelte'
@@ -29,13 +32,13 @@
 
   let {
     annotations = [],
-    optionsState = new OptionsState(),
+    optionsState = new LayerOptionsState(),
     mapOptionsStateByMapId = new Map(),
     componentOptions = {}
   }: {
     annotations: unknown[]
-    optionsState?: OptionsState
-    mapOptionsStateByMapId?: Map<string, OptionsState>
+    optionsState?: LayerOptionsState
+    mapOptionsStateByMapId?: Map<string, MapOptionsState>
     componentOptions?: Partial<ViewerComponentOptions>
   } = $props()
 

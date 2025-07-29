@@ -490,7 +490,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
           isMultiGeometry: true
         }
       )
-    if (!this.projectedGeoPreviousTriangulationAppliableMask) {
+    if (this.projectedGeoPreviousTriangulationAppliableMask.length == 0) {
       this.projectedGeoPreviousTriangulationAppliableMask =
         this.projectedGeoTriangulationAppliableMask
     }

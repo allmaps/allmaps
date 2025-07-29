@@ -10,7 +10,7 @@
   import type { Bbox } from '@allmaps/types'
 
   import type { PickerProjection } from '$lib/shared/projections/projections'
-  import type { OptionsState } from './OptionsState.svelte'
+  import type { LayerOptionsState } from './OptionsState.svelte'
 
   let {
     optionsState = $bindable(),
@@ -19,7 +19,7 @@
     geoBbox = undefined,
     suggestProjections = undefined
   }: {
-    optionsState: OptionsState
+    optionsState: LayerOptionsState
     projections: PickerProjection[]
     searchProjections?: (s: string) => PickerProjection[]
     geoBbox?: Bbox

@@ -1,49 +1,20 @@
-import {
-  mergeOptions,
-  mergePartialOptions,
-  mergeOptionsUnlessUndefined
-} from '@allmaps/stdlib'
-import { WebGL2WarpedMap } from '@allmaps/render'
+import { pick } from 'lodash-es'
 
+import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
+
+import type { WarpedMapLayer } from '@allmaps/maplibre'
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 
 import type { PickerProjection } from '$lib/shared/projections/projections.js'
 import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
 
-export const OPTIONS_NOT_TO_GET_FROM_REFERENCE = {
-  opacity: undefined,
-  saturation: undefined,
-  removeColorHardness: undefined,
-  removeColorThreshold: undefined
-}
-export const OPTIONS_NOT_TO_GET_FROM_DEFAULT = {
-  transformationType: undefined,
-  internalProjection: undefined
-}
+export const OPTIONS_TO_GET_FROM_DEFAULT = [
+  'transformationType',
+  'internalProjection'
+]
 // See also in @allmaps/render: UNDEFINED_GEOREFERENCED_MAP_OPTIONS
 
-function processDefaultOptions(options: Partial<Options>): Partial<Options> {
-  return mergePartialOptions(options, OPTIONS_NOT_TO_GET_FROM_DEFAULT)
-}
-
-function processReferenceOptions(options: Partial<Options>): Partial<Options> {
-  return mergePartialOptions(options, OPTIONS_NOT_TO_GET_FROM_REFERENCE)
-}
-
-export type BindableOptions = {
-  visible: boolean
-  opacity: number
-  transformationType: TransformationType | undefined
-  internalProjection: PickerProjection | undefined
-  renderGcps: boolean
-  renderTransformedGcps: boolean
-  renderVectors: boolean
-  renderAppliableMask: boolean
-  renderMask: boolean
-  applyMaskMask: boolean
-  distortionMeasure: DistortionMeasure | undefined
-}
-export type Options = BindableOptions & Partial<MapLibreWarpedMapLayerOptions>
+export type Options = Partial<MapLibreWarpedMapLayerOptions>
 
 /**
  * Option State class
@@ -53,7 +24,7 @@ export type Options = BindableOptions & Partial<MapLibreWarpedMapLayerOptions>
  * 1) Manage 'view options':
  *
  * One could set individual options on the warpedMapLayer in every component where options are set
- * (and this pass a reference to the warpedMapLayer to every such component),
+ * (and thus pass a reference to the warpedMapLayer to every such component),
  * but it's often useful to keep track of 'view options' that are temporary and set by the view state
  * (like applying a Helmert transform when mapOrImage = 'image') and normal options that are set by the user.
  * Therefore, we keep track of both in instances of this class and can pass them between components.
@@ -80,85 +51,118 @@ export type Options = BindableOptions & Partial<MapLibreWarpedMapLayerOptions>
  *
  * 3) Show correct starting and evolving map and layer options in components
  *
- * In a component showing layer options, we want to see the 'starting' layer options reflected,
+ * In a component showing map or layer options, we want to see the 'starting' layer options reflected,
  * but options that could be defined in an annotation (like transformationType) should be undefined.
- * We acchieve this by passing the 'starting' options at construnction (which can be gotten from the warpedMapLayer),
- * merging with WebGL2WarpedMapOptions as default,
- * and processing these default options by omitting the selected ones.
+ * We acchieve this by passing setting the default toggle values from WebGL2WarpedMap's defaults
+ * and passing the default map or layer options at construnction (which can be gotten from the warpedMapLayer),
+ * and processing these default options by only keeping selected options, only for MapOptionStates.
  *
- * In a component showing map options, we want to see the 'starting' map options reflected,
- * and once layer options change, we want these to be reflected in the map options,
+ * In a component showing map options, we also want the layer options to be reflected in the map options,
  * while still be able to change individual map options later.
  * We also don't want to inherit options that are multiplied when merged, so these sliders stay independent.
- * We acchieve this by passing the 'starting' options at construnction (which can be gotten from the warpedMapLayer),
- * merging with WebGL2WarpedMapOptions as default (without omiting like above),
- * and then infering from a reference optionsState of the layer,
- * and processing these inherited options by omitting the selected ones.
+ * We acchieve this by infering from a layerOptionsState, except for selected options.
  * */
-export class OptionsState {
-  defaultOptions: Options
-  reference: Options
+export abstract class BaseOptionsState {
+  defaultOptions: Partial<Options>
+  processedDefaultOptions: Partial<Options>
 
-  options: Options
+  options: Partial<Options>
 
-  visible: boolean
-  opacity: number
-  transformationType: TransformationType | undefined
-  internalProjection: PickerProjection | undefined
-  renderGcps: boolean
-  renderTransformedGcps: boolean
-  renderVectors: boolean
-  renderAppliableMask: boolean
-  renderMask: boolean
-  applyMask: boolean
-  renderGrid: boolean
-  distortionMeasure?: DistortionMeasure | undefined
-  removeColor: boolean
-  removeColorColor: string
-  removeColorThreshold: number
-  removeColorHardness: number
-  colorize: boolean
-  colorizeColor: string
+  visible?: boolean
+  opacity?: number
+  transformationType?: TransformationType
+  internalProjection?: PickerProjection
+  renderGcps?: boolean
+  renderTransformedGcps?: boolean
+  renderVectors?: boolean
+  renderAppliableMask?: boolean
+  renderMask?: boolean
+  applyMask?: boolean
+  renderGrid?: boolean
+  distortionMeasure?: DistortionMeasure
+  removeColor?: boolean
+  removeColorColor?: string
+  removeColorThreshold?: number
+  removeColorHardness?: number
+  colorize?: boolean
+  colorizeColor?: string
 
   viewOptions: Partial<Options>
+  mergedOptions: Partial<Options>
 
-  constructor(
-    options: Partial<BindableOptions> = {},
-    viewOptions: Partial<Options> = {},
-    reference?: OptionsState
-  ) {
-    this.defaultOptions = mergeOptions(
-      WebGL2WarpedMap.getDefaultOptions(),
-      options
-    )
-    this.reference = $derived(
-      reference?.options
-        ? mergeOptionsUnlessUndefined(
-            processDefaultOptions(this.defaultOptions),
-            processReferenceOptions(reference?.options)
-          )
-        : this.defaultOptions
-    )
-    this.reference = this.defaultOptions
+  warpedMapLayer?: WarpedMapLayer
 
-    this.visible = $derived(this.reference.visible)
-    this.opacity = $derived(this.reference.opacity)
-    this.transformationType = $derived(this.reference.transformationType)
-    this.internalProjection = $derived(this.reference.internalProjection)
-    this.renderGcps = $derived(this.reference.renderGcps)
-    this.renderTransformedGcps = $derived(this.reference.renderTransformedGcps)
-    this.renderVectors = $derived(this.reference.renderVectors)
-    this.renderAppliableMask = $derived(this.reference.renderAppliableMask)
-    this.renderMask = $derived(this.reference.renderMask)
-    this.applyMask = $derived(this.reference.applyMask)
-    this.renderGrid = $derived(this.reference.renderGrid)
-    this.distortionMeasure = $derived(this.reference.distortionMeasure)
-    this.removeColor = $derived(this.reference.removeColor)
-    this.removeColorColor = $derived(this.reference.removeColorColor)
-    this.removeColorThreshold = $derived(this.reference.removeColorThreshold)
-    this.removeColorHardness = $derived(this.reference.removeColorHardness)
-    this.colorize = $derived(this.reference.colorize)
-    this.colorizeColor = $derived(this.reference.colorizeColor)
+  constructor(layerOptionsState?: BaseOptionsState) {
+    this.defaultOptions = $state({})
+    this.processedDefaultOptions = $derived(
+      this.processDefaultOptions(this.defaultOptions)
+    )
+
+    // Note: don't infere from layer:
+    // 'opacity',
+    // 'saturation',
+    // 'removeColorHardness',
+    // 'removeColorThreshold'
+    this.visible = $derived(
+      layerOptionsState?.visible ?? this.processedDefaultOptions.visible
+    )
+    this.opacity = $derived(this.processedDefaultOptions.opacity)
+    this.transformationType = $derived(
+      layerOptionsState?.transformationType ??
+        this.processedDefaultOptions.transformationType
+    )
+    this.internalProjection = $derived(
+      layerOptionsState?.internalProjection ??
+        this.processedDefaultOptions.internalProjection
+    )
+    this.renderGcps = $derived(
+      layerOptionsState?.renderGcps ?? this.processedDefaultOptions.renderGcps
+    )
+    this.renderTransformedGcps = $derived(
+      layerOptionsState?.renderTransformedGcps ??
+        this.processedDefaultOptions.renderTransformedGcps
+    )
+    this.renderVectors = $derived(
+      layerOptionsState?.renderVectors ??
+        this.processedDefaultOptions.renderVectors
+    )
+    this.renderAppliableMask = $derived(
+      layerOptionsState?.renderAppliableMask ??
+        this.processedDefaultOptions.renderAppliableMask
+    )
+    this.renderMask = $derived(
+      layerOptionsState?.renderMask ?? this.processedDefaultOptions.renderMask
+    )
+    this.applyMask = $derived(
+      layerOptionsState?.applyMask ?? this.processedDefaultOptions.applyMask
+    )
+    this.renderGrid = $derived(
+      layerOptionsState?.renderGrid ?? this.processedDefaultOptions.renderGrid
+    )
+    this.distortionMeasure = $derived(
+      layerOptionsState?.distortionMeasure ??
+        this.processedDefaultOptions.distortionMeasure
+    )
+    this.removeColor = $derived(
+      layerOptionsState?.removeColor ?? this.processedDefaultOptions.removeColor
+    )
+    this.removeColorColor = $derived(
+      layerOptionsState?.removeColorColor ??
+        this.processedDefaultOptions.removeColorColor
+    )
+    this.removeColorThreshold = $derived(
+      this.processedDefaultOptions.removeColorThreshold
+    )
+    this.removeColorHardness = $derived(
+      this.processedDefaultOptions.removeColorHardness
+    )
+    this.colorize = $derived(
+      layerOptionsState?.colorize ?? this.processedDefaultOptions.colorize
+    )
+    this.colorizeColor = $derived(
+      layerOptionsState?.colorizeColor ??
+        this.processedDefaultOptions.colorizeColor
+    )
     this.options = $derived({
       visible: this.visible,
       opacity: this.opacity,
@@ -182,20 +186,36 @@ export class OptionsState {
       colorizeColor: this.colorizeColor
     })
 
-    this.viewOptions = $state(viewOptions)
+    this.viewOptions = $state({})
+
+    this.warpedMapLayer = $state(undefined)
+  }
+
+  abstract processDefaultOptions(options: Partial<Options>): Partial<Options>
+}
+
+export class LayerOptionsState extends BaseOptionsState {
+  constructor() {
+    super()
+  }
+
+  processDefaultOptions(_options: Partial<Options>): Partial<Options> {
+    // Don't inherit default options
+    return {}
   }
 }
 
-export class MapOptionsState extends OptionsState {
-  constructor(
-    options: Partial<BindableOptions> = {},
-    viewOptions: Partial<Options> = {},
-    reference?: OptionsState
-  ) {
-    super(options, viewOptions, reference)
+export class MapOptionsState extends BaseOptionsState {
+  mapId: string
+
+  constructor(mapId: string, reference?: BaseOptionsState) {
+    super(reference)
+
+    this.mapId = mapId
   }
 
   processDefaultOptions(options: Partial<Options>): Partial<Options> {
-    options
+    // Only inherit allowed options from default
+    return pick(options, OPTIONS_TO_GET_FROM_DEFAULT)
   }
 }

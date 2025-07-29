@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { Helmert, Polynomial1, ThinPlateSpline } from '@allmaps/ui'
   import {
     CircleHalf,
     CompassTool,
     Eye,
-    EyeClosed,
     EyeSlash,
     Globe,
     LineSegment,
     Square,
     SquareLogo
   } from 'phosphor-svelte'
+  import { Helmert, Polynomial1, ThinPlateSpline } from '@allmaps/ui'
+  import { WebGL2WarpedMap } from '@allmaps/render'
 
   import ProjectionPicker from './ProjectionPicker.svelte'
   import Kbd from '../Kbd.svelte'
@@ -19,13 +19,14 @@
   import Slider from '../ui/slider/slider.svelte'
   import Switch from '../ui/switch/switch.svelte'
   import Toggle from '../ui/toggle/toggle.svelte'
-  import Menubar from '../ui/menubar/menubar.svelte'
 
   import type { Bbox } from '@allmaps/types'
 
   import type { PickerProjection } from '$lib/shared/projections/projections'
-  import type { OptionsState } from './OptionsState.svelte'
+  import type { LayerOptionsState } from './OptionsState.svelte'
   import type { TransformationType } from '@allmaps/transform'
+
+  let defaultWebGL2Options = WebGL2WarpedMap.getDefaultOptions()
 
   let {
     optionsState = $bindable(),
@@ -34,7 +35,7 @@
     geoBbox = undefined,
     suggestProjections = undefined
   }: {
-    optionsState: OptionsState
+    optionsState: LayerOptionsState
     projections: PickerProjection[]
     searchProjections?: (s: string) => PickerProjection[]
     geoBbox?: Bbox
@@ -46,7 +47,7 @@
   <Toggle
     class="cursor-pointer"
     bind:pressed={
-      () => !optionsState.visible,
+      () => !(optionsState.visible ?? defaultWebGL2Options.visible),
       (v) => {
         optionsState.visible = !v
       }
@@ -54,17 +55,16 @@
     aria-label="Hide"
     title="Hide (h)"
   >
-    {#if optionsState.visible}
+    {#if optionsState.visible ?? defaultWebGL2Options.visible}
       <Eye />
-    {/if}
-    {#if !optionsState.visible}
+    {:else}
       <EyeSlash />
     {/if}
   </Toggle>
   <Toggle
     class="cursor-pointer"
     bind:pressed={
-      () => !optionsState.applyMask,
+      () => !(optionsState.applyMask ?? defaultWebGL2Options.applyMask),
       (v) => {
         optionsState.applyMask = !v
       }
@@ -77,7 +77,14 @@
 
   <Toggle
     class="cursor-pointer"
-    bind:pressed={optionsState.renderAppliableMask}
+    bind:pressed={
+      () =>
+        optionsState.renderAppliableMask ??
+        defaultWebGL2Options.renderAppliableMask,
+      (v) => {
+        optionsState.renderAppliableMask = v
+      }
+    }
     aria-label="Show mask"
     title="Show mask (m)"
   >
@@ -86,7 +93,12 @@
 
   <Toggle
     class="cursor-pointer"
-    bind:pressed={optionsState.renderGcps}
+    bind:pressed={
+      () => optionsState.renderGcps ?? defaultWebGL2Options.renderGcps,
+      (v) => {
+        optionsState.renderGcps = v
+      }
+    }
     aria-label="Show GCPs"
     title="Show GCPs (p)"
   >
@@ -138,7 +150,7 @@
       <Toggle
         class="cursor-pointer"
         bind:pressed={
-          () => optionsState.internalProjection != undefined, (v) => {}
+          () => optionsState.internalProjection != undefined, () => {}
         }
         aria-label="Use projection"
         title="Use projection"
@@ -162,7 +174,12 @@
 
   <Toggle
     class="cursor-pointer"
-    bind:pressed={optionsState.renderGrid}
+    bind:pressed={
+      () => optionsState.renderGrid ?? defaultWebGL2Options.renderGrid,
+      (v) => {
+        optionsState.renderGrid = v
+      }
+    }
     aria-label="Show grid"
     title="Show grid (g)"
   >
@@ -175,10 +192,12 @@
         class="cursor-pointer"
         bind:pressed={
           () =>
-            optionsState.opacity !== 1 ||
-            optionsState.removeColorThreshold !== 0 ||
-            optionsState.colorize,
-          (v) => {}
+            (optionsState.opacity !== 1 &&
+              optionsState.opacity !== undefined) ||
+            (optionsState.removeColorThreshold !== 0 &&
+              optionsState.removeColorThreshold !== undefined) ||
+            optionsState.colorize === true,
+          () => {}
         }
         aria-label="Opacity, remove background, colorize"
         title="Opacity (o), remove background (b), colorize (c)"
@@ -190,7 +209,12 @@
       <div class="grid grid-cols-6 gap-4">
         <h4 class="text-sm col-span-3">Opacity<Kbd key="o" /></h4>
         <Slider
-          bind:value={optionsState.opacity}
+          bind:value={
+            () => optionsState.opacity ?? defaultWebGL2Options.opacity,
+            (v) => {
+              optionsState.opacity = v
+            }
+          }
           type="single"
           min={0}
           max={1}
@@ -202,20 +226,53 @@
           Remove background<Kbd key="b" />
         </h4>
         <Slider
-          bind:value={optionsState.removeColorThreshold}
+          bind:value={
+            () =>
+              optionsState.removeColorThreshold ??
+              defaultWebGL2Options.removeColorThreshold,
+            (v) => {
+              optionsState.removeColorThreshold = v
+            }
+          }
           type="single"
           min={0}
           max={1}
           step={0.01}
           class="col-span-2"
         />
-        <input type="color" bind:value={optionsState.removeColorColor} />
+        <input
+          type="color"
+          bind:value={
+            () =>
+              optionsState.removeColorColor ??
+              defaultWebGL2Options.removeColorColor,
+            (v) => {
+              optionsState.removeColorColor = v
+            }
+          }
+        />
         <h4 class="text-sm col-span-3">
           Colorize<Kbd key="c" />
         </h4>
-        <Switch bind:checked={optionsState.colorize} class="col-span-2"
+        <Switch
+          bind:checked={
+            () => optionsState.colorize ?? defaultWebGL2Options.colorize,
+            (v) => {
+              optionsState.colorize = v
+            }
+          }
+          class="col-span-2"
         ></Switch>
-        <input type="color" bind:value={optionsState.colorizeColor} />
+        <input
+          type="color"
+          bind:value={
+            () =>
+              optionsState.colorizeColor ?? defaultWebGL2Options.colorizeColor,
+            (v) => {
+              optionsState.colorizeColor = v
+            }
+          }
+        />
       </div>
     </Popover.Content>
   </Popover.Root>

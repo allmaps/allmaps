@@ -9,14 +9,16 @@
   import { computeWarpedMapBearing } from '@allmaps/bearing'
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { webMercatorProjection } from '@allmaps/project'
-  import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
-  import { OptionsState } from './options/OptionsState.svelte'
+  import {
+    LayerOptionsState,
+    MapOptionsState
+  } from './options/OptionsState.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
-  import { Cpu } from 'phosphor-svelte'
+  import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
@@ -29,7 +31,7 @@
 
   let {
     georeferencedMaps = [],
-    optionsState = new OptionsState(),
+    optionsState = new LayerOptionsState(),
     mapOptionsStateByMapId = new Map(),
     componentOptions = {},
     mapOrImage = $bindable('map'),
@@ -37,8 +39,8 @@
     geoBbox = $bindable(undefined)
   }: {
     georeferencedMaps: GeoreferencedMap[]
-    optionsState?: OptionsState
-    mapOptionsStateByMapId?: Map<string, OptionsState>
+    optionsState?: LayerOptionsState
+    mapOptionsStateByMapId?: Map<string, MapOptionsState>
     componentOptions?: Partial<WarpedMapLayerMapComponentOptions>
     mapOrImage?: 'map' | 'image'
     selectedMapId?: string
@@ -52,7 +54,7 @@
   let warpedMaps: WarpedMap[] = $state([])
   let selectedGeoreferencedMap: GeoreferencedMap | undefined = $state(undefined)
   let selectedWarpedMap: WarpedMap | undefined = $state(undefined)
-  let selectedMapOptionsState: OptionsState | undefined = $state(undefined)
+  let selectedMapOptionsState: MapOptionsState | undefined = $state(undefined)
 
   const previousSelectedMapId = new Previous(() => selectedMapId)
   const previousSelectedGeoreferencedMap = new Previous(
@@ -108,9 +110,8 @@
       // This is important if the warpedMapLayer/warpedMapList's options (e.g. renderMask)
       // are different then the default options.
       // This way options components will show the correct options.
-      optionsState.reference = warpedMapLayer.getDefaultLayerOptions({
-        omitDefaultGeoreferencedMapOptions: true
-      })
+      optionsState.defaultOptions = warpedMapLayer.getDefaultLayerOptions()
+      optionsState.warpedMapLayer = warpedMapLayer
     })
 
     function selectMap(e: maplibregl.MapMouseEvent) {
@@ -169,14 +170,11 @@
 
       for (const mapId of mapIds) {
         if (!mapOptionsStateByMapId.has(mapId)) {
-          mapOptionsStateByMapId.set(
-            mapId,
-            new OptionsState(
-              warpedMapLayer?.getDefaultMapOptions(mapId),
-              {},
-              optionsState
-            )
-          )
+          const mapOptionsState = new MapOptionsState(mapId, optionsState)
+          mapOptionsState.defaultOptions =
+            warpedMapLayer?.getDefaultMapOptions(mapId)
+          mapOptionsState.warpedMapLayer = warpedMapLayer
+          mapOptionsStateByMapId.set(mapId, mapOptionsState)
         }
       }
 
@@ -293,12 +291,23 @@
 
   // Set options
   $effect(() => {
-    // Wait for warpedMaps to be added (don't set options yet just after setting warpedMapLayer)
     if (!warpedMapLayer || !warpedMaps) {
       return
     }
 
+    // Setting all options at once
+    //
+    // Note: Using $state.snapshot() here to avoid proxies and allow for accurate comparison
+    //
     // TODO: replace this with more elegant code once you can .map() a Map()
+    //
+    // Note: This replicates some of the mergeing logic of options which is already handled in WarpedMap.
+    // We first tried to set the options indivudually in MapOptionState and LayerOptionState,
+    // but an issue arose (specific to this setup) when changing a layer option:
+    // because of the mapOptionsState infering from layer options in this setup,
+    // all map options changed first one by one before the layer options changed
+    // and the renderer prefers options to be set jointly (especially when using animations).
+    // (Reminder: We had to used $effect.root() when setting merged options in MapOptionState.)
     const mapOptionsByMapId = new Map(
       Array.from(mapOptionsStateByMapId).map(([mapId, mapOptionsState]) => [
         mapId,
@@ -319,8 +328,6 @@
         optionsState.viewOptions
       )
     )
-
-    // Using $state.snapshot() here to avoid proxies and allow for accurate comparison
     warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
 </script>

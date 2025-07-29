@@ -1,10 +1,12 @@
-import { supportedtransformationTypes } from '@allmaps/transform'
+// import { supportedtransformationTypes } from '@allmaps/transform'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 
 const usedTransformationTypes: Array<TransformationType | undefined> = [
   undefined,
-  ...supportedtransformationTypes
+  'helmert',
+  'polynomial',
+  'thinPlateSpline'
 ]
 
 const usedDistortionMeasures: Array<DistortionMeasure | undefined> = [

@@ -1,19 +1,20 @@
 <script lang="ts">
-  import {
-    nextDistortionMeasure,
-    nextTransformationType
-  } from '$lib/shared/options/options'
+  import { WebGL2WarpedMap } from '@allmaps/render'
 
-  import type { OptionsState } from './OptionsState.svelte'
+  import { nextTransformationType } from '$lib/shared/options/options'
+
+  import type { LayerOptionsState } from './OptionsState.svelte'
+
+  let defaultWebGL2Options = WebGL2WarpedMap.getDefaultOptions()
 
   let {
     optionsState = $bindable()
   }: {
-    optionsState: OptionsState
+    optionsState: LayerOptionsState
   } = $props()
 
-  let backupOpacity: number
-  let backupRemoveColorThreshold: number
+  let backupOpacity: number | undefined
+  let backupRemoveColorThreshold: number | undefined
 
   let keyPressed = $state(false)
 
@@ -34,13 +35,22 @@
     keyPressed = true
 
     if (e.key === 'h') {
-      optionsState.visible = !optionsState.visible
+      optionsState.visible = !(
+        optionsState.visible ?? defaultWebGL2Options.visible
+      )
     } else if (e.key === 'f') {
-      optionsState.applyMask = !optionsState.applyMask
+      optionsState.applyMask = !(
+        optionsState.applyMask ?? defaultWebGL2Options.applyMask
+      )
     } else if (e.key === 'm') {
-      optionsState.renderAppliableMask = !optionsState.renderAppliableMask
+      optionsState.renderAppliableMask = !(
+        optionsState.renderAppliableMask ??
+        defaultWebGL2Options.renderAppliableMask
+      )
     } else if (e.key === 'p') {
-      optionsState.renderGcps = !optionsState.renderGcps
+      optionsState.renderGcps = !(
+        optionsState.renderGcps ?? defaultWebGL2Options.renderGcps
+      )
     } else if (e.key === 't') {
       optionsState.transformationType = nextTransformationType(
         optionsState.transformationType
@@ -62,7 +72,9 @@
       }
       optionsState.removeColorThreshold = 0.7
     } else if (e.key === 'c') {
-      optionsState.colorize = !optionsState.colorize
+      optionsState.colorize = !(
+        optionsState.colorize ?? defaultWebGL2Options.colorize
+      )
     }
   }
 

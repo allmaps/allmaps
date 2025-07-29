@@ -8,7 +8,7 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { Bbox } from '@allmaps/types'
 
-  import type { OptionsState } from './options/OptionsState.svelte'
+  import type { MapOptionsState } from './options/OptionsState.svelte'
   import type { PickerProjection } from '$lib/shared/projections/projections'
 
   let {
@@ -22,7 +22,7 @@
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
-    optionsStateByMapId?: Map<string, OptionsState>
+    optionsStateByMapId?: Map<string, MapOptionsState>
     projections: PickerProjection[]
     searchProjections?: (s: string) => PickerProjection[]
     geoBbox?: Bbox
