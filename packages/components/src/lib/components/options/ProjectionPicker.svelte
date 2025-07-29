@@ -169,7 +169,7 @@
               >
                 <CaretDoubleUp class="size-3" />
               </Combobox.ScrollUpButton>
-              <Combobox.Viewport class="p-1 max-h-90">
+              <Combobox.Viewport class="p-1 max-h-120">
                 {#if topProjections.length > 0}
                   {#each topProjections as projection, i (i + (projection.definition as string))}
                     {@render comboBoxItem({ projection })}

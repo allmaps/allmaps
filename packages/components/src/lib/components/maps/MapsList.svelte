@@ -53,7 +53,7 @@
     </Card.Header>
     <Card.Content>
       <OptionsToggles
-        optionsState={mapOptionsState}
+        layerOptionsState={mapOptionsState}
         {projections}
         {searchProjections}
         {geoBbox}

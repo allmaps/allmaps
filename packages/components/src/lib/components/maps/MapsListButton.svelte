@@ -14,7 +14,7 @@
   let {
     georeferencedMaps = [],
     selectedMapId = $bindable(undefined),
-    optionsStateByMapId,
+    mapOptionsStateByMapId,
     projections,
     searchProjections,
     geoBbox = undefined,
@@ -22,7 +22,7 @@
   }: {
     georeferencedMaps: GeoreferencedMap[]
     selectedMapId?: string
-    optionsStateByMapId?: Map<string, MapOptionsState>
+    mapOptionsStateByMapId?: Map<string, MapOptionsState>
     projections: PickerProjection[]
     searchProjections?: (s: string) => PickerProjection[]
     geoBbox?: Bbox
@@ -42,7 +42,7 @@
     <MapsList
       {georeferencedMaps}
       bind:selectedMapId
-      mapOptionsStateByMapId={optionsStateByMapId}
+      {mapOptionsStateByMapId}
       {projections}
       {searchProjections}
       {geoBbox}

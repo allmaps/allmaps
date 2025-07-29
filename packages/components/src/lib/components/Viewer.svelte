@@ -30,12 +30,12 @@
 
   let {
     annotations = [],
-    optionsState = new LayerOptionsState(),
+    layerOptionsState = new LayerOptionsState(),
     mapOptionsStateByMapId = new Map(),
     componentOptions = {}
   }: {
     annotations: unknown[]
-    optionsState?: LayerOptionsState
+    layerOptionsState?: LayerOptionsState
     mapOptionsStateByMapId?: Map<string, MapOptionsState>
     componentOptions?: Partial<ViewerComponentOptions>
   } = $props()
@@ -71,14 +71,14 @@
     createSuggestProjectionsWithFlatbush(projections)
 </script>
 
-<OptionsKeys bind:optionsState />
+<OptionsKeys bind:layerOptionsState />
 
 <div class="w-full h-full relative">
   <ContextMenu.Root>
     <ContextMenu.Trigger class=" h-full w-full">
       <WarpedMapLayerMap
         {georeferencedMaps}
-        {optionsState}
+        {layerOptionsState}
         {mapOptionsStateByMapId}
         bind:selectedMapId
         bind:mapOrImage
@@ -91,7 +91,7 @@
         <Menubar class="flex h-11 select-none w-fit">
           {#if selectedMapOptionsState}
             <OptionsToggles
-              bind:optionsState={selectedMapOptionsState}
+              bind:layerOptionsState={selectedMapOptionsState}
               {projections}
               searchProjections={searchProjectionsWithFuse}
               {geoBbox}
@@ -106,7 +106,7 @@
   <div class="absolute top-0 left-0 m-2 ml-12 flex space-x-2">
     <Menubar class="flex h-11 select-none w-fit">
       <OptionsToggles
-        bind:optionsState
+        bind:layerOptionsState
         {projections}
         searchProjections={searchProjectionsWithFuse}
         {geoBbox}
@@ -124,7 +124,7 @@
     <MapsListButton
       {georeferencedMaps}
       bind:selectedMapId
-      optionsStateByMapId={mapOptionsStateByMapId}
+      {mapOptionsStateByMapId}
       {projections}
       searchProjections={searchProjectionsWithFuse}
       {geoBbox}

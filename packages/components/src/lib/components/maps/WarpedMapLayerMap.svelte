@@ -18,7 +18,6 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMap } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
-  import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
@@ -31,7 +30,7 @@
 
   let {
     georeferencedMaps = [],
-    optionsState = new LayerOptionsState(),
+    layerOptionsState = new LayerOptionsState(),
     mapOptionsStateByMapId = new Map(),
     componentOptions = {},
     mapOrImage = $bindable('map'),
@@ -39,7 +38,7 @@
     geoBbox = $bindable(undefined)
   }: {
     georeferencedMaps: GeoreferencedMap[]
-    optionsState?: LayerOptionsState
+    layerOptionsState?: LayerOptionsState
     mapOptionsStateByMapId?: Map<string, MapOptionsState>
     componentOptions?: Partial<WarpedMapLayerMapComponentOptions>
     mapOrImage?: 'map' | 'image'
@@ -106,12 +105,11 @@
       // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
 
-      // Set the optionState default options again to reflect those of the warpedMapLayer.
+      // Set the default layer options again to reflect those of the warpedMapLayer.
       // This is important if the warpedMapLayer/warpedMapList's options (e.g. renderMask)
       // are different then the default options.
       // This way options components will show the correct options.
-      optionsState.defaultOptions = warpedMapLayer.getDefaultLayerOptions()
-      optionsState.warpedMapLayer = warpedMapLayer
+      layerOptionsState.defaultOptions = warpedMapLayer.getDefaultLayerOptions()
 
       // Create a new contextmenu event and dispatch it on the container so it bubbles up to the parent
       const canvas = map.getCanvas()
@@ -184,10 +182,12 @@
 
       for (const mapId of mapIds) {
         if (!mapOptionsStateByMapId.has(mapId)) {
-          const mapOptionsState = new MapOptionsState(mapId, optionsState)
-          mapOptionsState.defaultOptions =
-            warpedMapLayer?.getDefaultMapOptions(mapId)
-          mapOptionsState.warpedMapLayer = warpedMapLayer
+          const mapOptionsState = new MapOptionsState(
+            mapId,
+            warpedMapLayer?.getDefaultMapOptions(mapId),
+            {},
+            layerOptionsState
+          )
           mapOptionsStateByMapId.set(mapId, mapOptionsState)
         }
       }
@@ -258,7 +258,7 @@
           bearing: 0
         })
       }
-      optionsState.viewOptions.visible = undefined
+      layerOptionsState.viewOptions.visible = undefined
       const untrackedSelectedMapOptionsState = untrack(
         () => selectedMapOptionsState
       )
@@ -292,7 +292,7 @@
         })
         // TODO: fix: reset transformation type: use extraOptions
       }
-      optionsState.viewOptions.visible = false
+      layerOptionsState.viewOptions.visible = false
       if (selectedMapOptionsState) {
         selectedMapOptionsState.viewOptions.visible = true
         selectedMapOptionsState.viewOptions.applyMask = false
@@ -321,27 +321,15 @@
     // because of the mapOptionsState infering from layer options in this setup,
     // all map options changed first one by one before the layer options changed
     // and the renderer prefers options to be set jointly (especially when using animations).
+    // A potential fix could be to move the render animation logic to the map level.
     // (Reminder: We had to used $effect.root() when setting merged options in MapOptionState.)
     const mapOptionsByMapId = new Map(
       Array.from(mapOptionsStateByMapId).map(([mapId, mapOptionsState]) => [
         mapId,
-        $state.snapshot(
-          mergeOptionsUnlessUndefined(
-            mapOptionsState.options,
-            mergeOptionsUnlessUndefined(
-              optionsState.viewOptions,
-              mapOptionsState.viewOptions
-            )
-          )
-        )
+        $state.snapshot(mapOptionsState.mergedOptions)
       ])
     )
-    const layerOptions = $state.snapshot(
-      mergeOptionsUnlessUndefined(
-        optionsState.options,
-        optionsState.viewOptions
-      )
-    )
+    const layerOptions = $state.snapshot(layerOptionsState.mergedOptions)
     warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
 </script>

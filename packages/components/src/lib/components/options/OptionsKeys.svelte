@@ -8,9 +8,9 @@
   let defaultWebGL2Options = WebGL2WarpedMap.getDefaultOptions()
 
   let {
-    optionsState = $bindable()
+    layerOptionsState = $bindable()
   }: {
-    optionsState: LayerOptionsState
+    layerOptionsState: LayerOptionsState
   } = $props()
 
   let backupOpacity: number | undefined
@@ -35,45 +35,45 @@
     keyPressed = true
 
     if (e.key === 'h') {
-      optionsState.visible = !(
-        optionsState.visible ?? defaultWebGL2Options.visible
+      layerOptionsState.visible = !(
+        layerOptionsState.visible ?? defaultWebGL2Options.visible
       )
     } else if (e.key === 'f') {
-      optionsState.applyMask = !(
-        optionsState.applyMask ?? defaultWebGL2Options.applyMask
+      layerOptionsState.applyMask = !(
+        layerOptionsState.applyMask ?? defaultWebGL2Options.applyMask
       )
     } else if (e.key === 'm') {
-      optionsState.renderAppliableMask = !(
-        optionsState.renderAppliableMask ??
+      layerOptionsState.renderAppliableMask = !(
+        layerOptionsState.renderAppliableMask ??
         defaultWebGL2Options.renderAppliableMask
       )
     } else if (e.key === 'p') {
-      optionsState.renderGcps = !(
-        optionsState.renderGcps ?? defaultWebGL2Options.renderGcps
+      layerOptionsState.renderGcps = !(
+        layerOptionsState.renderGcps ?? defaultWebGL2Options.renderGcps
       )
     } else if (e.key === 't') {
-      optionsState.transformationType = nextTransformationType(
-        optionsState.transformationType
+      layerOptionsState.transformationType = nextTransformationType(
+        layerOptionsState.transformationType
       )
     } else if (e.key === 'g') {
-      optionsState.renderGrid = !optionsState.renderGrid
+      layerOptionsState.renderGrid = !layerOptionsState.renderGrid
       // } else if (e.key === 'd') {
-      //   optionsState.distortionMeasure = nextDistortionMeasure(
-      //     optionsState.distortionMeasure
+      //   layerOptionsState.distortionMeasure = nextDistortionMeasure(
+      //     layerOptionsState.distortionMeasure
       //   )
     } else if (e.key === ' ') {
-      if (optionsState.opacity !== 0) {
-        backupOpacity = optionsState.opacity
+      if (layerOptionsState.opacity !== 0) {
+        backupOpacity = layerOptionsState.opacity
       }
-      optionsState.opacity = 0
+      layerOptionsState.opacity = 0
     } else if (e.key === 'b') {
-      if (optionsState.removeColorThreshold !== 0.7) {
-        backupRemoveColorThreshold = optionsState.removeColorThreshold
+      if (layerOptionsState.removeColorThreshold !== 0.7) {
+        backupRemoveColorThreshold = layerOptionsState.removeColorThreshold
       }
-      optionsState.removeColorThreshold = 0.7
+      layerOptionsState.removeColorThreshold = 0.7
     } else if (e.key === 'c') {
-      optionsState.colorize = !(
-        optionsState.colorize ?? defaultWebGL2Options.colorize
+      layerOptionsState.colorize = !(
+        layerOptionsState.colorize ?? defaultWebGL2Options.colorize
       )
     }
   }
@@ -92,9 +92,9 @@
     keyPressed = false
 
     if (e.key === ' ') {
-      optionsState.opacity = backupOpacity
+      layerOptionsState.opacity = backupOpacity
     } else if (e.key === 'b') {
-      optionsState.removeColorThreshold = backupRemoveColorThreshold
+      layerOptionsState.removeColorThreshold = backupRemoveColorThreshold
     }
   }
 </script>

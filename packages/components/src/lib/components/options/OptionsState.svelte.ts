@@ -2,11 +2,10 @@ import { pick } from 'lodash-es'
 
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
-import type { WarpedMapLayer } from '@allmaps/maplibre'
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
+import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
 
 import type { PickerProjection } from '$lib/shared/projections/projections.js'
-import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
 
 export const OPTIONS_TO_GET_FROM_DEFAULT = [
   'transformationType',
@@ -90,10 +89,12 @@ export abstract class BaseOptionsState {
   viewOptions: Partial<Options>
   mergedOptions: Partial<Options>
 
-  warpedMapLayer?: WarpedMapLayer
-
-  constructor(layerOptionsState?: BaseOptionsState) {
-    this.defaultOptions = $state({})
+  constructor(
+    options: Partial<Options> = {},
+    viewOptions: Partial<Options> = {},
+    layerOptionsState?: BaseOptionsState
+  ) {
+    this.defaultOptions = $state(options)
     this.processedDefaultOptions = $derived(
       this.processDefaultOptions(this.defaultOptions)
     )
@@ -186,17 +187,31 @@ export abstract class BaseOptionsState {
       colorizeColor: this.colorizeColor
     })
 
-    this.viewOptions = $state({})
+    this.viewOptions = $state(viewOptions)
 
-    this.warpedMapLayer = $state(undefined)
+    // Merge options and viewOptions.
+    // While inheriting options from layerOptionState is done above,
+    // inheriting viewOptions is done here.
+    this.mergedOptions = $derived(
+      mergeOptionsUnlessUndefined(
+        this.options,
+        mergeOptionsUnlessUndefined(
+          layerOptionsState?.viewOptions,
+          this.viewOptions
+        )
+      )
+    )
   }
 
   abstract processDefaultOptions(options: Partial<Options>): Partial<Options>
 }
 
 export class LayerOptionsState extends BaseOptionsState {
-  constructor() {
-    super()
+  constructor(
+    options: Partial<Options> = {},
+    viewOptions: Partial<Options> = {}
+  ) {
+    super(options, viewOptions)
   }
 
   processDefaultOptions(_options: Partial<Options>): Partial<Options> {
@@ -208,8 +223,13 @@ export class LayerOptionsState extends BaseOptionsState {
 export class MapOptionsState extends BaseOptionsState {
   mapId: string
 
-  constructor(mapId: string, reference?: BaseOptionsState) {
-    super(reference)
+  constructor(
+    mapId: string,
+    options: Partial<Options> = {},
+    viewOptions: Partial<Options> = {},
+    reference?: BaseOptionsState
+  ) {
+    super(options, viewOptions, reference)
 
     this.mapId = mapId
   }

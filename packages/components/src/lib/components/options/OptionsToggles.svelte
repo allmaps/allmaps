@@ -30,7 +30,7 @@
   let defaultWebGL2Options = WebGL2WarpedMap.getDefaultOptions()
 
   let {
-    optionsState = $bindable(),
+    layerOptionsState = $bindable(),
     projections,
     searchProjections,
     geoBbox = undefined,
@@ -38,7 +38,7 @@
     showTooltips = true,
     showKeys = false
   }: {
-    optionsState: LayerOptionsState
+    layerOptionsState: LayerOptionsState
     projections: PickerProjection[]
     searchProjections?: (s: string) => PickerProjection[]
     geoBbox?: Bbox
@@ -55,14 +55,14 @@
         <Toggle
           class="cursor-pointer"
           bind:pressed={
-            () => !(optionsState.visible ?? defaultWebGL2Options.visible),
+            () => !(layerOptionsState.visible ?? defaultWebGL2Options.visible),
             (v) => {
-              optionsState.visible = !v
+              layerOptionsState.visible = !v
             }
           }
           aria-label="Hide"
         >
-          {#if optionsState.visible ?? defaultWebGL2Options.visible}
+          {#if layerOptionsState.visible ?? defaultWebGL2Options.visible}
             <Eye />
           {:else}
             <EyeSlash />
@@ -79,9 +79,10 @@
         <Toggle
           class="cursor-pointer"
           bind:pressed={
-            () => !(optionsState.applyMask ?? defaultWebGL2Options.applyMask),
+            () =>
+              !(layerOptionsState.applyMask ?? defaultWebGL2Options.applyMask),
             (v) => {
-              optionsState.applyMask = !v
+              layerOptionsState.applyMask = !v
             }
           }
           aria-label="Show full image"
@@ -100,10 +101,10 @@
           class="cursor-pointer"
           bind:pressed={
             () =>
-              optionsState.renderAppliableMask ??
+              layerOptionsState.renderAppliableMask ??
               defaultWebGL2Options.renderAppliableMask,
             (v) => {
-              optionsState.renderAppliableMask = v
+              layerOptionsState.renderAppliableMask = v
             }
           }
           aria-label="Show mask"
@@ -121,9 +122,10 @@
         <Toggle
           class="cursor-pointer"
           bind:pressed={
-            () => optionsState.renderGcps ?? defaultWebGL2Options.renderGcps,
+            () =>
+              layerOptionsState.renderGcps ?? defaultWebGL2Options.renderGcps,
             (v) => {
-              optionsState.renderGcps = v
+              layerOptionsState.renderGcps = v
             }
           }
           aria-label="Show GCPs"
@@ -140,9 +142,9 @@
       class="cursor-pointer"
       type="single"
       bind:value={
-        () => optionsState.transformationType,
+        () => layerOptionsState.transformationType,
         (value: string | undefined) => {
-          optionsState.transformationType =
+          layerOptionsState.transformationType =
             value == '' ? undefined : (value as TransformationType)
         }
       }
@@ -201,7 +203,8 @@
             <Toggle
               class="cursor-pointer"
               bind:pressed={
-                () => optionsState.internalProjection != undefined, () => {}
+                () => layerOptionsState.internalProjection != undefined,
+                () => {}
               }
               aria-label="Use projection"
             >
@@ -217,7 +220,7 @@
       >
         <ProjectionPicker
           {projections}
-          bind:selectedProjection={optionsState.internalProjection}
+          bind:selectedProjection={layerOptionsState.internalProjection}
           {searchProjections}
           {geoBbox}
           {suggestProjections}
@@ -230,9 +233,10 @@
         <Toggle
           class="cursor-pointer"
           bind:pressed={
-            () => optionsState.renderGrid ?? defaultWebGL2Options.renderGrid,
+            () =>
+              layerOptionsState.renderGrid ?? defaultWebGL2Options.renderGrid,
             (v) => {
-              optionsState.renderGrid = v
+              layerOptionsState.renderGrid = v
             }
           }
           aria-label="Show grid"
@@ -253,11 +257,11 @@
               class="cursor-pointer"
               bind:pressed={
                 () =>
-                  (optionsState.opacity !== 1 &&
-                    optionsState.opacity !== undefined) ||
-                  (optionsState.removeColorThreshold !== 0 &&
-                    optionsState.removeColorThreshold !== undefined) ||
-                  optionsState.colorize === true,
+                  (layerOptionsState.opacity !== 1 &&
+                    layerOptionsState.opacity !== undefined) ||
+                  (layerOptionsState.removeColorThreshold !== 0 &&
+                    layerOptionsState.removeColorThreshold !== undefined) ||
+                  layerOptionsState.colorize === true,
                 () => {}
               }
               aria-label="Opacity, remove background, colorize"
@@ -273,9 +277,9 @@
           <h4 class="text-sm col-span-3">Opacity<Kbd key="space" /></h4>
           <Slider
             bind:value={
-              () => optionsState.opacity ?? defaultWebGL2Options.opacity,
+              () => layerOptionsState.opacity ?? defaultWebGL2Options.opacity,
               (v) => {
-                optionsState.opacity = v
+                layerOptionsState.opacity = v
               }
             }
             type="single"
@@ -291,10 +295,10 @@
           <Slider
             bind:value={
               () =>
-                optionsState.removeColorThreshold ??
+                layerOptionsState.removeColorThreshold ??
                 defaultWebGL2Options.removeColorThreshold,
               (v) => {
-                optionsState.removeColorThreshold = v
+                layerOptionsState.removeColorThreshold = v
               }
             }
             type="single"
@@ -307,10 +311,10 @@
             type="color"
             bind:value={
               () =>
-                optionsState.removeColorColor ??
+                layerOptionsState.removeColorColor ??
                 defaultWebGL2Options.removeColorColor,
               (v) => {
-                optionsState.removeColorColor = v
+                layerOptionsState.removeColorColor = v
               }
             }
           />
@@ -319,9 +323,9 @@
           </h4>
           <Switch
             bind:checked={
-              () => optionsState.colorize ?? defaultWebGL2Options.colorize,
+              () => layerOptionsState.colorize ?? defaultWebGL2Options.colorize,
               (v) => {
-                optionsState.colorize = v
+                layerOptionsState.colorize = v
               }
             }
             class="col-span-2"
@@ -330,10 +334,10 @@
             type="color"
             bind:value={
               () =>
-                optionsState.colorizeColor ??
+                layerOptionsState.colorizeColor ??
                 defaultWebGL2Options.colorizeColor,
               (v) => {
-                optionsState.colorizeColor = v
+                layerOptionsState.colorizeColor = v
               }
             }
           />
