@@ -30,9 +30,9 @@ import type {
   WarpedMapFactory,
   BaseRenderOptions,
   MapPruneInfo,
-  GetOptionsOptions,
   WarpedMapListOptions,
   GetWarpedMapOptions,
+  SetOptionsOptions,
   WarpedMapOptions
 } from '../shared/types.js'
 
@@ -110,13 +110,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the default Renderer options
    */
-  getDefaultOptions(
-    getOptionsOptions?: GetOptionsOptions
-  ): WarpedMapListOptions<GetWarpedMapOptions<W>> &
-    BaseRenderOptions &
-    GetWarpedMapOptions<W> {
+  getDefaultOptions(): WarpedMapListOptions<WarpedMapOptions> &
+    BaseRenderOptions {
     return mergeOptions(
-      this.warpedMapList.getDefaultOptions(getOptionsOptions),
+      this.warpedMapList.getDefaultOptions(),
       DEFAULT_BASE_RENDER_OPTIONS
     )
   }
@@ -124,16 +121,16 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the default options of a specific map ID
    *
-   * @param mapId - Map ID for which the options apply
+   * @param mapId - Map ID for which the map options apply
    */
   getDefaultMapOptions(): GetWarpedMapOptions<W>
-  getDefaultMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined
+  getDefaultMapOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
   getDefaultMapOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
     return this.warpedMapList.getDefaultMapOptions(mapId)
   }
 
   /**
-   * Get the Renderer options
+   * Get the Render and list options
    */
   getOptions(): Partial<BaseRenderOptions> {
     return mergePartialOptions(this.options, this.warpedMapList.getOptions())
@@ -142,7 +139,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the map options of a specific map ID
    *
-   * @param mapId - Map ID for which the options apply
+   * @param mapId - Map ID for which to get the map options
    */
   getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
     return this.warpedMapList.getMapOptions(mapId)
@@ -151,134 +148,131 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Set the Renderer options
    *
-   * @param options - Render and List Options
+   * @param renderAndListOptions - Render and list Options to set
+   * @param setOptionsOptions - Options when setting the options
    */
   setOptions(
-    options: Partial<BaseRenderOptions>,
-    renderAndListOptions?: Partial<BaseRenderOptions>
+    renderAndListOptions?: Partial<BaseRenderOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
-    this.options = mergePartialOptions(this.options, options)
-    this.tileCache.setOptions(options)
-    this.warpedMapList.setOptions(options, renderAndListOptions)
+    this.options = mergePartialOptions(
+      this.options,
+      renderAndListOptions
+    ) as Partial<BaseRenderOptions>
+    this.tileCache.setOptions(renderAndListOptions)
+    this.warpedMapList.setOptions(renderAndListOptions, setOptionsOptions)
   }
 
   /**
    * Set the map options of specific map IDs
    *
-   * @param mapIds - Map IDs for which the options apply
-   * @param options - Options
-   * @param renderAndListOptions - Render and List options
+   * @param mapIds - Map IDs for which to set the options
+   * @param mapOptions - Map options to set
+   * @param renderAndListOptions - Render and list options to set
+   * @param setOptionsOptions - Options when setting the options
    */
   setMapsOptions(
     mapIds: string[],
-    options: Partial<BaseRenderOptions>,
-    renderAndListOptions?: Partial<BaseRenderOptions>
+    mapOptions?: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     if (renderAndListOptions) {
       this.options = mergePartialOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
-    this.warpedMapList.setMapsOptions(mapIds, options, renderAndListOptions)
+    this.warpedMapList.setMapsOptions(
+      mapIds,
+      mapOptions,
+      renderAndListOptions,
+      setOptionsOptions
+    )
   }
 
   /**
    * Set the map options of specific maps by map ID
    *
-   * @param optionsByMapId - Options by map ID
-   * @param renderAndListOptions - Render and List options
+   * @param mapOptionsByMapId - Map options to set by map ID
+   * @param renderAndListOptions - Render and list options to set
+   * @param setOptionsOptions - Options when setting the options
    */
   setMapsOptionsByMapId(
-    optionsByMapId: Map<string, Partial<BaseRenderOptions>>,
-    renderAndListOptions?: Partial<BaseRenderOptions>
+    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions>>,
+    renderAndListOptions?: Partial<BaseRenderOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     if (renderAndListOptions) {
       this.options = mergePartialOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptionsByMapId(
-      optionsByMapId,
-      renderAndListOptions
+      mapOptionsByMapId,
+      renderAndListOptions,
+      setOptionsOptions
     )
   }
 
   /**
-   * Resets the layer options
+   * Resets the List options
    *
-   * @param optionKeys - Keys of the options to reset
+   * An empty array resets all options, undefined resets no options.
+   * Only resets the list options, not the render options
+   *
+   * @param listOptionKeys - Keys of the render and list options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
-  resetLayerOptions(
-    optionKeys?: string[],
-    renderAndListOptions?: Partial<BaseRenderOptions>
+  resetOptions(
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
-    let options: Partial<BaseRenderOptions>
-    if (optionKeys && optionKeys.length > 0) {
-      options = optionKeys.reduce(
-        (acc, curr) => ((acc[curr] = undefined), acc),
-        {} as Record<string, any>
-      )
-      this.setOptions(options, renderAndListOptions)
-    } else {
-      this.resetLayerOptions(
-        Object.keys(this.getDefaultOptions()),
-        renderAndListOptions
-      )
-    }
+    this.warpedMapList.resetOptions(listOptionKeys, setOptionsOptions)
   }
 
   /**
    * Resets the map options of specific map IDs
    *
-   * @param mapIds - Map IDs for which the options apply
-   * @param optionKeys - Keys of the options to reset
+   * An empty array resets all options, undefined resets no options.
+   * Only resets the list options, not the render options
+   *
+   * @param mapIds - Map IDs for which to reset the options
+   * @param mapOptionKeys - Keys of the map options to reset
+   * @param listOptionKeys - Keys of the render and list options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
   resetMapsOptions(
     mapIds: string[],
-    optionKeys?: string[],
-    renderAndListOptions?: Partial<BaseRenderOptions>
+    mapOptionKeys?: string[],
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
-    if (optionKeys && optionKeys.length > 0) {
-      const options = optionKeys.reduce(
-        (acc, curr) => ((acc[curr] = undefined), acc),
-        {} as Record<string, any>
-      )
-      this.setMapsOptions(mapIds, options, renderAndListOptions)
-    } else {
-      this.resetMapsOptions(
-        mapIds,
-        Object.keys(this.getDefaultMapOptions()),
-        renderAndListOptions
-      )
-    }
+    this.warpedMapList.resetMapsOptions(
+      mapIds,
+      mapOptionKeys,
+      listOptionKeys,
+      setOptionsOptions
+    )
   }
 
   /**
    * Resets the map options of specific maps by map ID
    *
-   * @param optionkeysByMapId - Keys of options by map ID
+   * An empty array or map resets all options (for all maps), undefined resets no options.
+   * Only resets the list options, not the render options
+   *
+   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
+   * @param listOptionKeys - Keys of the render and list options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
   resetMapsOptionsByMapId(
-    optionkeysByMapId: Map<string, string[]>,
-    renderAndListOptions?: Partial<BaseRenderOptions>
+    mapOptionkeysByMapId?: Map<string, string[]>,
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
-    if (optionkeysByMapId) {
-      const mapIds = Array.from(optionkeysByMapId.keys())
-      const optionsByMapId = new Map<string, Partial<BaseRenderOptions>>()
-      for (const mapId of mapIds) {
-        optionsByMapId.set(
-          mapId,
-          optionkeysByMapId
-            .get(mapId)!
-            .reduce(
-              (acc, curr) => ((acc[curr] = undefined), acc),
-              {} as Record<string, any>
-            )
-        )
-      }
-      this.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
-    } else {
-      const mapIds = this.warpedMapList.getMapIds()
-      this.resetMapsOptions(mapIds, [], renderAndListOptions)
-    }
+    this.warpedMapList.resetMapsOptionsByMapId(
+      mapOptionkeysByMapId,
+      listOptionKeys,
+      setOptionsOptions
+    )
   }
 
   protected loadMissingImageInfosInViewport(): Promise<void>[] {

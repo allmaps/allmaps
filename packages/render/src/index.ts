@@ -10,5 +10,7 @@ export { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 export type {
   WarpedMapLayerOptions,
-  MapLibreWarpedMapLayerOptions
+  WebGL2RenderOptions,
+  MapLibreWarpedMapLayerOptions,
+  SetOptionsOptions
 } from './shared/types.js'

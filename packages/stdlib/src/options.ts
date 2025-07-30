@@ -73,69 +73,31 @@ export function mergeOptionsUnlessUndefined<
   }
 }
 
-// // Original version of mergeOptionsUnlessUndefined
-// // Saving this here, may be useful later
-// export function mergeOptionsUnlessUndefined<
-//   Options0,
-//   Options1 extends Record<string, any>
-// >(
-//   options0: Options0,
-//   options1?: Options1
-// ): Options0 &
-//   Partial<{
-//     [K in keyof Options1]: Exclude<Options1[K], undefined>
-//   }> {
-//   if (!options1) {
-//     return options0 as Options0 &
-//       Partial<{
-//         [K in keyof Options1]: Exclude<Options1[K], undefined>
-//       }>
-//   }
+export function optionKeysToUndefinedOptions<T extends readonly string[]>(
+  optionKeys: T | undefined
+): undefined | Record<T[number], undefined> {
+  if (optionKeys === undefined) {
+    return undefined
+  }
+  return optionKeys.reduce(
+    (acc, curr) => ((acc[curr as T[number]] = undefined), acc),
+    {} as Record<T[number], undefined>
+  )
+}
 
-//   // Only overwrite properties that are not undefined
-//   for (const key in options1) {
-//     const value = options1[key as keyof Options1]
-//     if (value !== undefined) {
-//       ;(options0 as any)[key] = value
-//     }
-//   }
+export function optionKeysByMapIdToUndefinedOptionsByMapId<
+  T extends readonly string[]
+>(
+  optionKeysByMapId: Map<string, T> | undefined
+): undefined | Map<string, Record<T[number], undefined>> {
+  if (optionKeysByMapId === undefined) {
+    return undefined
+  }
+  const optionsByMapId = new Map<string, Record<T[number], undefined>>()
+  for (const mapId of optionKeysByMapId.keys()) {
+    const optionKeys = optionKeysByMapId.get(mapId)!
+    optionsByMapId.set(mapId, optionKeysToUndefinedOptions(optionKeys)!)
+  }
 
-//   return options0 as Options0 &
-//     Partial<{
-//       [K in keyof Options1]: Exclude<Options1[K], undefined>
-//     }>
-// }
-
-// // Attempt to create a mergeOptionsDeep function
-// // Saving this here, may be useful later
-// export function mergeOptionsDeep<
-//   Option0 extends Record<string, any>,
-//   Option1 extends Record<string, any>
-// >(option0: Option0, option1: Option1): Option0 & Option1 {
-//   // Create a new object to avoid mutating either input
-//   const output = { ...option0 } as Record<string, any>
-
-//   if (isObject(option0) && isObject(option1)) {
-//     Object.keys(option1).forEach((key) => {
-//       const sourceValue = option1[key as keyof Option1]
-
-//       if (isObject(sourceValue)) {
-//         // If both target and source have the same key and both are objects, recursively merge
-//         if (key in option0 && isObject(option0[key as keyof Option0])) {
-//           output[key] = mergeOptionsDeep(
-//             option0[key as keyof Option0] as Record<string, any>,
-//             sourceValue as Record<string, any>
-//           )
-//         } else {
-//           // Otherwise just clone the source object
-//           output[key] = { ...sourceValue }
-//         }
-//       } else {
-//         // For non-object values, simply copy from source
-//         output[key] = sourceValue
-//       }
-//     })
-//   }
-
-//   return output as Option0 & Option1
-// }
+  return optionsByMapId
+}

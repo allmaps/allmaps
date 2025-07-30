@@ -13,16 +13,18 @@ import { lonLatToWebMercator, Projection } from '@allmaps/project'
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
-import type { MapLibreWarpedMapLayerOptions } from '@allmaps/render'
+import type {
+  MapLibreWarpedMapLayerOptions,
+  SetOptionsOptions
+} from '@allmaps/render'
 import type { Rectangle, Ring, Point } from '@allmaps/types'
 
 import type {
-  GetOptionsOptions,
   SpecificMapLibreWarpedMapLayerOptions,
   WebGL2WarpedMapOptions
 } from 'packages/render/src/shared/types'
 
-const DEFFAULT_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpedMapLayerOptions =
+const DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpedMapLayerOptions =
   {
     layerId: 'warped-map-layer',
     layerType: 'custom',
@@ -63,7 +65,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
    */
   constructor(options?: Partial<MapLibreWarpedMapLayerOptions>) {
     this.options = mergeOptions(
-      DEFFAULT_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS,
+      DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS,
       options
     )
 
@@ -410,18 +412,16 @@ export class WarpedMapLayer implements CustomLayerInterface {
   // not getZIndex() here since so such concept in MapLibre
 
   /**
-   * Get the default layer and map options
+   * Get the default layer options
    */
-  getDefaultLayerOptions(
-    getOptionsOptions?: GetOptionsOptions
-  ): Partial<MapLibreWarpedMapLayerOptions> & WebGL2WarpedMapOptions {
+  getDefaultLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
     assertRenderer(this.renderer)
 
-    return this.renderer.getDefaultOptions(getOptionsOptions)
+    return this.renderer.getDefaultOptions()
   }
 
   /**
-   * Get the default map options
+   * Get the default map options of a specific map ID
    *
    * @param mapId - Map ID for which the options apply
    */
@@ -430,11 +430,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   getDefaultMapOptions(mapId?: string): WebGL2WarpedMapOptions | undefined {
     assertRenderer(this.renderer)
 
-    if (mapId) {
-      return this.renderer.getDefaultMapOptions(mapId)
-    } else {
-      return this.renderer.getDefaultMapOptions()
-    }
+    return this.renderer.getDefaultMapOptions(mapId)
   }
 
   /**
@@ -460,91 +456,126 @@ export class WarpedMapLayer implements CustomLayerInterface {
   /**
    * Sets the layer options
    *
-   * @param options - Options
+   * @param layerOptions - Layer options to set
+   * @param setOptionsOptions - Options when setting the options
    */
   setLayerOptions(
-    options: Partial<MapLibreWarpedMapLayerOptions>,
-    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+    layerOptions: Partial<MapLibreWarpedMapLayerOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.setOptions(options, renderAndListOptions)
+    this.renderer.setOptions(layerOptions, setOptionsOptions)
   }
 
   /**
    * Sets the map options of specific map IDs
    *
-   * @param mapIds - Map IDs for which the options apply
-   * @param options - Options
+   * @param mapIds - Map IDs for which to set the options
+   * @param mapOptions - Options to set
+   * @param layerOptions - Layer options to set
+   * @param setOptionsOptions - Options when setting the options
    */
   setMapsOptions(
     mapIds: string[],
-    options: Partial<MapLibreWarpedMapLayerOptions>,
-    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+    mapOptions: Partial<MapLibreWarpedMapLayerOptions>,
+    layerOptions?: Partial<MapLibreWarpedMapLayerOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.setMapsOptions(mapIds, options, renderAndListOptions)
+    this.renderer.setMapsOptions(
+      mapIds,
+      mapOptions,
+      layerOptions,
+      setOptionsOptions
+    )
   }
 
   /**
    * Sets the map options of specific maps by map ID
    *
-   * @param optionsByMapId - Options by map ID
+   * @param mapOptionsByMapId - Map options to set by map ID
+   * @param layerOptions - Layer options to set
+   * @param setOptionsOptions - Options when setting the options
    */
   setMapsOptionsByMapId(
-    optionsByMapId: Map<string, Partial<MapLibreWarpedMapLayerOptions>>,
-    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+    mapOptionsByMapId: Map<string, Partial<MapLibreWarpedMapLayerOptions>>,
+    layerOptions?: Partial<MapLibreWarpedMapLayerOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
+    this.renderer.setMapsOptionsByMapId(
+      mapOptionsByMapId,
+      layerOptions,
+      setOptionsOptions
+    )
   }
 
   /**
    * Resets the layer options
    *
-   * @param optionKeys - Keys of the options to reset
+   * An empty array resets all options, undefined resets no options.
+   *
+   * @param layerOptionKeys - Keys of the options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
   resetLayerOptions(
-    optionKeys?: string[],
-    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+    layerOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.resetLayerOptions(optionKeys, renderAndListOptions)
+    this.renderer.resetOptions(layerOptionKeys, setOptionsOptions)
   }
 
   /**
    * Resets the map options of specific map IDs
    *
-   * @param mapIds - Map IDs for which the options apply
-   * @param optionKeys - Keys of the options to reset
+   * An empty array resets all options, undefined resets no options.
+   *
+   * @param mapIds - Map IDs for which to reset the options
+   * @param mapOptionKeys - Keys of the map options to reset
+   * @param layerOptionKeys - Keys of the layer options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
   resetMapsOptions(
     mapIds: string[],
-    optionKeys?: string[],
-    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+    mapOptionKeys?: string[],
+    layerOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     assertRenderer(this.renderer)
 
-    this.renderer.resetMapsOptions(mapIds, optionKeys, renderAndListOptions)
+    this.renderer.resetMapsOptions(
+      mapIds,
+      mapOptionKeys,
+      layerOptionKeys,
+      setOptionsOptions
+    )
   }
 
   /**
    * Resets the map options of specific maps by map ID
    *
-   * @param optionkeysByMapId - Keys of options by map ID
+   * An empty array or map resets all options (for all maps), undefined resets no options.
+   *
+   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
+   * @param layerOptionKeys - Keys of the layer options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
   resetMapsOptionsByMapId(
-    optionkeysByMapId: Map<string, string[]>,
-    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+    mapOptionkeysByMapId: Map<string, string[]>,
+    layerOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     assertRenderer(this.renderer)
 
     this.renderer.resetMapsOptionsByMapId(
-      optionkeysByMapId,
-      renderAndListOptions
+      mapOptionkeysByMapId,
+      layerOptionKeys,
+      setOptionsOptions
     )
   }
 

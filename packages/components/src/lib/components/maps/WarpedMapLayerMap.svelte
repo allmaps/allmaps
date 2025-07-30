@@ -111,7 +111,7 @@
       // This is important if the warpedMapLayer/warpedMapList's options (e.g. renderMask)
       // are different then the default options.
       // This way options components will show the correct options.
-      layerOptionsState.defaultOptions = warpedMapLayer.getDefaultLayerOptions()
+      layerOptionsState.defaultOptions = warpedMapLayer.getLayerOptions()
 
       // Create a new contextmenu event and dispatch it on the container so it bubbles up to the parent
       const canvas = map.getCanvas()

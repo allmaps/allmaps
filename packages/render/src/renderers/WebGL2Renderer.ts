@@ -48,7 +48,6 @@ import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
 
 import type {
-  GetOptionsOptions,
   Renderer,
   SpecificWebGL2RenderOptions,
   WebGL2RenderOptions,
@@ -273,53 +272,11 @@ export class WebGL2Renderer
   /**
    * Get the default WebGL2Renderer options
    */
-  getDefaultOptions(
-    getOptionsOptions?: GetOptionsOptions
-  ): WebGL2RenderOptions & WebGL2WarpedMapOptions {
+  getDefaultOptions(): WebGL2RenderOptions {
     return mergeOptions(
-      super.getDefaultOptions(getOptionsOptions),
+      super.getDefaultOptions(),
       DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS
     )
-  }
-
-  /**
-   * Set the WebGL2 Renderer options
-   *
-   * @param options - Options
-   */
-  setOptions(
-    options: Partial<WebGL2RenderOptions>,
-    renderAndListOptions?: Partial<WebGL2RenderOptions>
-  ): void {
-    super.setOptions(options, renderAndListOptions)
-  }
-
-  /**
-   * Set the WebGL2 options of specific map IDs
-   *
-   * @param mapIds - Map IDs for which the options apply
-   * @param options - WebGL2 Options
-   * @param renderAndListOptions - WebGL2 Render and List options
-   */
-  setMapsOptions(
-    mapIds: string[],
-    options: Partial<WebGL2RenderOptions>,
-    renderAndListOptions?: Partial<WebGL2RenderOptions>
-  ): void {
-    super.setMapsOptions(mapIds, options, renderAndListOptions)
-  }
-
-  /**
-   * Set the options of specific maps by map ID
-   *
-   * @param optionsByMapId - WebGL2 Options by map ID
-   * @param renderAndListOptions - WebGL2 Render and List options
-   */
-  setMapsOptionsByMapId(
-    optionsByMapId: Map<string, Partial<WebGL2RenderOptions>>,
-    renderAndListOptions?: Partial<WebGL2RenderOptions>
-  ): void {
-    super.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
   }
 
   /**

@@ -149,11 +149,6 @@ export type TileCacheOptions = {
   fetchFn: FetchFn
 }
 
-// The options when getting options
-export type GetOptionsOptions = {
-  omitDefaultGeoreferencedMapOptions: boolean
-}
-
 // The options when setting options
 export type SetOptionsOptions = {
   optionKeysToOmit: string[]
