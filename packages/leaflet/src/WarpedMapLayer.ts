@@ -291,61 +291,61 @@ export class WarpedMapLayer extends L.Layer {
     return this.renderer.warpedMapList.getWarpedMap(mapId)
   }
 
-  /**
-   * Make a single map visible
-   * @param mapId - ID of the map
-   */
-  showMap(mapId: string) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make a single map visible
+  //  * @param mapId - ID of the map
+  //  */
+  // showMap(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.showMaps([mapId])
-    this._update()
-  }
+  //   this.renderer.warpedMapList.showMaps([mapId])
+  //   this._update()
+  // }
 
-  /**
-   * Make multiple maps visible
-   * @param mapIds - IDs of the maps
-   */
-  showMaps(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make multiple maps visible
+  //  * @param mapIds - IDs of the maps
+  //  */
+  // showMaps(mapIds: Iterable<string>) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.showMaps(mapIds)
-    this._update()
-  }
+  //   this.renderer.warpedMapList.showMaps(mapIds)
+  //   this._update()
+  // }
 
-  /**
-   * Make a single map invisible
-   * @param mapId - ID of the map
-   */
-  hideMap(mapId: string) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make a single map invisible
+  //  * @param mapId - ID of the map
+  //  */
+  // hideMap(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.hideMaps([mapId])
+  //   this.renderer.warpedMapList.hideMaps([mapId])
 
-    this._update()
-  }
+  //   this._update()
+  // }
 
-  /**
-   * Make multiple maps invisible
-   * @param mapIds - IDs of the maps
-   */
-  hideMaps(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Make multiple maps invisible
+  //  * @param mapIds - IDs of the maps
+  //  */
+  // hideMaps(mapIds: Iterable<string>) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.hideMaps(mapIds)
-    this._update()
-  }
+  //   this.renderer.warpedMapList.hideMaps(mapIds)
+  //   this._update()
+  // }
 
-  /**
-   * Returns the visibility of a single map
-   * @returns - whether the map is visible
-   */
-  isMapVisible(mapId: string): boolean | undefined {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Returns the visibility of a single map
+  //  * @returns - whether the map is visible
+  //  */
+  // isMapVisible(mapId: string): boolean | undefined {
+  //   assertRenderer(this.renderer)
 
-    const warpedMap = this.renderer.warpedMapList.getWarpedMap(mapId)
-    return warpedMap?.visible
-  }
+  //   const warpedMap = this.renderer.warpedMapList.getWarpedMap(mapId)
+  //   return warpedMap?.visible
+  // }
 
   /**
    * Sets the resource mask of a single map
@@ -503,16 +503,16 @@ export class WarpedMapLayer extends L.Layer {
     return this
   }
 
-  /**
-   * Sets the object that caches image information
-   *
-   * @param imageInformations - Object that caches image information
-   */
-  setImageInformations(imageInformations: ImageInfoByMapId) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Sets the object that caches image information
+  //  *
+  //  * @param imageInformations - Object that caches image information
+  //  */
+  // setImageInformations(imageInformations: ImageInfoByMapId) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setImageInformations(imageInformations)
-  }
+  //   this.renderer.warpedMapList.setImageInformations(imageInformations)
+  // }
 
   /**
    * Gets the pane name the layer is attached to. Defaults to 'tilePane'
@@ -521,33 +521,6 @@ export class WarpedMapLayer extends L.Layer {
   getPaneName(): string {
     // this._map.getPane(this.options.pane) ? this.options.pane : DEFAULT_PANE
     return this.options.pane || DEFAULT_PANE
-  }
-
-  /**
-   * Gets the opacity of the layer
-   * @returns Layer opacity
-   */
-  getOpacity(): number {
-    return this.options.opacity || DEFAULT_OPACITY
-  }
-
-  /**
-   * Sets the opacity of the layer
-   * @param opacity - Layer opacity
-   */
-  setOpacity(opacity: number) {
-    this.options.opacity = opacity
-    this._update()
-    return this
-  }
-
-  /**
-   * Resets the opacity of the layer to fully opaque
-   */
-  resetOpacity() {
-    this.options.opacity = 1
-    this._update()
-    return this
   }
 
   /**
@@ -561,218 +534,245 @@ export class WarpedMapLayer extends L.Layer {
     this.renderer.setOptions(options)
   }
 
-  /**
-   * Gets the opacity of a single map
-   * @param mapId - ID of the map
-   * @returns opacity of the map
-   */
-  getMapOpacity(mapId: string): number | undefined {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Gets the opacity of the layer
+  //  * @returns Layer opacity
+  //  */
+  // getOpacity(): number {
+  //   return this.options.opacity || DEFAULT_OPACITY
+  // }
 
-    return this.renderer.getMapOpacity(mapId)
-  }
+  // /**
+  //  * Sets the opacity of the layer
+  //  * @param opacity - Layer opacity
+  //  */
+  // setOpacity(opacity: number) {
+  //   this.options.opacity = opacity
+  //   this._update()
+  //   return this
+  // }
 
-  /**
-   * Sets the opacity of a single map
-   * @param mapId - ID of the map
-   * @param opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
-   */
-  setMapOpacity(mapId: string, opacity: number) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Resets the opacity of the layer to fully opaque
+  //  */
+  // resetOpacity() {
+  //   this.options.opacity = 1
+  //   this._update()
+  //   return this
+  // }
 
-    this.renderer.setMapOpacity(mapId, opacity)
-    this._update()
-    return this
-  }
+  // /**
+  //  * Gets the opacity of a single map
+  //  * @param mapId - ID of the map
+  //  * @returns opacity of the map
+  //  */
+  // getMapOpacity(mapId: string): number | undefined {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Resets the opacity of a single map to 1
-   * @param mapId - ID of the map
-   */
-  resetMapOpacity(mapId: string) {
-    assertRenderer(this.renderer)
+  //   return this.renderer.getMapOpacity(mapId)
+  // }
 
-    this.renderer.resetMapOpacity(mapId)
-    this._update()
-    return this
-  }
+  // /**
+  //  * Sets the opacity of a single map
+  //  * @param mapId - ID of the map
+  //  * @param opacity - opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+  //  */
+  // setMapOpacity(mapId: string, opacity: number) {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Sets the saturation of a single map
-   * @param saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
-   */
-  setSaturation(saturation: number) {
-    assertRenderer(this.renderer)
+  //   this.renderer.setMapOpacity(mapId, opacity)
+  //   this._update()
+  //   return this
+  // }
 
-    this.renderer.setSaturation(saturation)
-    this._update()
-    return this
-  }
+  // /**
+  //  * Resets the opacity of a single map to 1
+  //  * @param mapId - ID of the map
+  //  */
+  // resetMapOpacity(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Resets the saturation of a single map to the original colors
-   */
-  resetSaturation() {
-    assertRenderer(this.renderer)
+  //   this.renderer.resetMapOpacity(mapId)
+  //   this._update()
+  //   return this
+  // }
 
-    this.renderer.resetSaturation()
-    this._update()
-    return this
-  }
+  // /**
+  //  * Sets the saturation of a single map
+  //  * @param saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+  //  */
+  // setSaturation(saturation: number) {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Sets the saturation of a single map
-   * @param mapId - ID of the map
-   * @param saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
-   */
-  setMapSaturation(mapId: string, saturation: number) {
-    assertRenderer(this.renderer)
+  //   this.renderer.setSaturation(saturation)
+  //   this._update()
+  //   return this
+  // }
 
-    this.renderer.setMapSaturation(mapId, saturation)
-    this._update()
-    return this
-  }
+  // /**
+  //  * Resets the saturation of a single map to the original colors
+  //  */
+  // resetSaturation() {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Resets the saturation of a single map to the original colors
-   * @param mapId - ID of the map
-   */
-  resetMapSaturation(mapId: string) {
-    assertRenderer(this.renderer)
+  //   this.renderer.resetSaturation()
+  //   this._update()
+  //   return this
+  // }
 
-    this.renderer.resetMapSaturation(mapId)
-    this._update()
-    return this
-  }
+  // /**
+  //  * Sets the saturation of a single map
+  //  * @param mapId - ID of the map
+  //  * @param saturation - saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
+  //  */
+  // setMapSaturation(mapId: string, saturation: number) {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Removes a color from all maps
-   * @param options - remove color options
-   * @param options.hexColor - hex color to remove
-   * @param options.threshold - threshold between 0 and 1
-   * @param options.hardness - hardness between 0 and 1
-   */
-  setRemoveColor(
-    options: Partial<{ hexColor: string; threshold: number; hardness: number }>
-  ) {
-    assertRenderer(this.renderer)
+  //   this.renderer.setMapSaturation(mapId, saturation)
+  //   this._update()
+  //   return this
+  // }
 
-    const color = options.hexColor
-      ? hexToFractionalRgb(options.hexColor)
-      : undefined
+  // /**
+  //  * Resets the saturation of a single map to the original colors
+  //  * @param mapId - ID of the map
+  //  */
+  // resetMapSaturation(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.setRemoveColorOptions({
-      color,
-      threshold: options.threshold,
-      hardness: options.hardness
-    })
-    this._update()
-    return this
-  }
+  //   this.renderer.resetMapSaturation(mapId)
+  //   this._update()
+  //   return this
+  // }
 
-  /**
-   * Resets the color removal for all maps
-   */
-  resetRemoveColor() {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Removes a color from all maps
+  //  * @param options - remove color options
+  //  * @param options.hexColor - hex color to remove
+  //  * @param options.threshold - threshold between 0 and 1
+  //  * @param options.hardness - hardness between 0 and 1
+  //  */
+  // setRemoveColor(
+  //   options: Partial<{ hexColor: string; threshold: number; hardness: number }>
+  // ) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.resetRemoveColorOptions()
-    this._update()
-    return this
-  }
+  //   const color = options.hexColor
+  //     ? hexToFractionalRgb(options.hexColor)
+  //     : undefined
 
-  /**
-   * Removes a color from a single map
-   * @param mapId - ID of the map
-   * @param options - remove color options
-   * @param options.hexColor - hex color to remove
-   * @param options.threshold - threshold between 0 and 1
-   * @param options.hardness - hardness between 0 and 1
-   */
-  setMapRemoveColor(
-    mapId: string,
-    options: Partial<{ hexColor: string; threshold: number; hardness: number }>
-  ) {
-    assertRenderer(this.renderer)
+  //   this.renderer.setRemoveColorOptions({
+  //     color,
+  //     threshold: options.threshold,
+  //     hardness: options.hardness
+  //   })
+  //   this._update()
+  //   return this
+  // }
 
-    const color = options.hexColor
-      ? hexToFractionalRgb(options.hexColor)
-      : undefined
+  // /**
+  //  * Resets the color removal for all maps
+  //  */
+  // resetRemoveColor() {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.setMapRemoveColorOptions(mapId, {
-      color,
-      threshold: options.threshold,
-      hardness: options.hardness
-    })
-    this._update()
-    return this
-  }
+  //   this.renderer.resetRemoveColorOptions()
+  //   this._update()
+  //   return this
+  // }
 
-  /**
-   * Resets the color removal for a single map
-   * @param mapId - ID of the map
-   */
-  resetMapRemoveColor(mapId: string) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Removes a color from a single map
+  //  * @param mapId - ID of the map
+  //  * @param options - remove color options
+  //  * @param options.hexColor - hex color to remove
+  //  * @param options.threshold - threshold between 0 and 1
+  //  * @param options.hardness - hardness between 0 and 1
+  //  */
+  // setMapRemoveColor(
+  //   mapId: string,
+  //   options: Partial<{ hexColor: string; threshold: number; hardness: number }>
+  // ) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.resetMapRemoveColorOptions(mapId)
-    return this
-  }
+  //   const color = options.hexColor
+  //     ? hexToFractionalRgb(options.hexColor)
+  //     : undefined
 
-  /**
-   * Sets the colorization for all maps
-   * @param hexColor - desired hex color
-   */
-  setColorize(hexColor: string) {
-    assertRenderer(this.renderer)
+  //   this.renderer.setMapRemoveColorOptions(mapId, {
+  //     color,
+  //     threshold: options.threshold,
+  //     hardness: options.hardness
+  //   })
+  //   this._update()
+  //   return this
+  // }
 
-    const color = hexToFractionalRgb(hexColor)
-    if (color) {
-      this.renderer.setColorizeOptions({ color })
-      this._update()
-    }
-    return this
-  }
+  // /**
+  //  * Resets the color removal for a single map
+  //  * @param mapId - ID of the map
+  //  */
+  // resetMapRemoveColor(mapId: string) {
+  //   assertRenderer(this.renderer)
 
-  /**
-   * Resets the colorization for all maps
-   */
-  resetColorize() {
-    assertRenderer(this.renderer)
+  //   this.renderer.resetMapRemoveColorOptions(mapId)
+  //   return this
+  // }
 
-    this.renderer.resetColorizeOptions()
-    this._update()
+  // /**
+  //  * Sets the colorization for all maps
+  //  * @param hexColor - desired hex color
+  //  */
+  // setColorize(hexColor: string) {
+  //   assertRenderer(this.renderer)
 
-    return this
-  }
+  //   const color = hexToFractionalRgb(hexColor)
+  //   if (color) {
+  //     this.renderer.setColorizeOptions({ color })
+  //     this._update()
+  //   }
+  //   return this
+  // }
 
-  /**
-   * Sets the colorization for a single map
-   * @param mapId - ID of the map
-   * @param hexColor - desired hex color
-   */
-  setMapColorize(mapId: string, hexColor: string) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Resets the colorization for all maps
+  //  */
+  // resetColorize() {
+  //   assertRenderer(this.renderer)
 
-    const color = hexToFractionalRgb(hexColor)
-    if (color) {
-      this.renderer.setMapColorizeOptions(mapId, { color })
-      this._update()
-    }
-    return this
-  }
+  //   this.renderer.resetColorizeOptions()
+  //   this._update()
 
-  /**
-   * Resets the colorization of a single map
-   * @param mapId - ID of the map
-   */
-  resetMapColorize(mapId: string) {
-    assertRenderer(this.renderer)
+  //   return this
+  // }
 
-    this.renderer.resetMapColorizeOptions(mapId)
-    this._update()
-    return this
-  }
+  // /**
+  //  * Sets the colorization for a single map
+  //  * @param mapId - ID of the map
+  //  * @param hexColor - desired hex color
+  //  */
+  // setMapColorize(mapId: string, hexColor: string) {
+  //   assertRenderer(this.renderer)
+
+  //   const color = hexToFractionalRgb(hexColor)
+  //   if (color) {
+  //     this.renderer.setMapColorizeOptions(mapId, { color })
+  //     this._update()
+  //   }
+  //   return this
+  // }
+
+  // /**
+  //  * Resets the colorization of a single map
+  //  * @param mapId - ID of the map
+  //  */
+  // resetMapColorize(mapId: string) {
+  //   assertRenderer(this.renderer)
+
+  //   this.renderer.resetMapColorizeOptions(mapId)
+  //   this._update()
+  //   return this
+  // }
 
   /**
    * Removes all warped maps from the layer

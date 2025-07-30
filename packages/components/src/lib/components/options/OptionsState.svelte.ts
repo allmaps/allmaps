@@ -3,7 +3,7 @@ import { pick } from 'lodash-es'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
-import type { MapLibreWarpedMapLayerOptions } from '@allmaps/maplibre'
+import type { MapLibreWarpedMapLayerOptions } from '@allmaps/render'
 
 import type { PickerProjection } from '$lib/shared/projections/projections.js'
 
@@ -196,7 +196,7 @@ export abstract class BaseOptionsState {
       mergeOptionsUnlessUndefined(
         this.options,
         mergeOptionsUnlessUndefined(
-          layerOptionsState?.viewOptions,
+          layerOptionsState?.viewOptions ?? {},
           this.viewOptions
         )
       )

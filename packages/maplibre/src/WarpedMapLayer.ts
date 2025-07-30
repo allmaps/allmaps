@@ -410,15 +410,6 @@ export class WarpedMapLayer implements CustomLayerInterface {
   // not getZIndex() here since so such concept in MapLibre
 
   /**
-   * Get the layer options
-   */
-  getLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
-    assertRenderer(this.renderer)
-
-    return this.renderer.getOptions()
-  }
-
-  /**
    * Get the default layer and map options
    */
   getDefaultLayerOptions(
@@ -430,7 +421,33 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Get the options of a specific map ID
+   * Get the default map options
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapOptions(): WebGL2WarpedMapOptions
+  getDefaultMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined
+  getDefaultMapOptions(mapId?: string): WebGL2WarpedMapOptions | undefined {
+    assertRenderer(this.renderer)
+
+    if (mapId) {
+      return this.renderer.getDefaultMapOptions(mapId)
+    } else {
+      return this.renderer.getDefaultMapOptions()
+    }
+  }
+
+  /**
+   * Get the layer options
+   */
+  getLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getOptions()
+  }
+
+  /**
+   * Get the map options of a specific map ID
    *
    * @param mapId - Map ID for which the options apply
    */
@@ -441,30 +458,23 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Get the default options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getDefaultMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
-    assertRenderer(this.renderer)
-
-    return this.renderer.getDefaultMapOptions(mapId)
-  }
-
-  /**
    * Sets the layer options
    *
    * @param options - Options
    */
-  setLayerOptions(options: Partial<MapLibreWarpedMapLayerOptions>) {
+  setLayerOptions(
+    options: Partial<MapLibreWarpedMapLayerOptions>,
+    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+  ) {
     assertRenderer(this.renderer)
 
-    this.renderer.setOptions(options)
+    this.renderer.setOptions(options, renderAndListOptions)
   }
 
   /**
-   * Sets the options of specific map IDs
+   * Sets the map options of specific map IDs
    *
+   * @param mapIds - Map IDs for which the options apply
    * @param options - Options
    */
   setMapsOptions(
@@ -478,7 +488,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Sets the options of specific maps by map ID
+   * Sets the map options of specific maps by map ID
    *
    * @param optionsByMapId - Options by map ID
    */
@@ -489,6 +499,53 @@ export class WarpedMapLayer implements CustomLayerInterface {
     assertRenderer(this.renderer)
 
     this.renderer.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
+  }
+
+  /**
+   * Resets the layer options
+   *
+   * @param optionKeys - Keys of the options to reset
+   */
+  resetLayerOptions(
+    optionKeys?: string[],
+    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.resetLayerOptions(optionKeys, renderAndListOptions)
+  }
+
+  /**
+   * Resets the map options of specific map IDs
+   *
+   * @param mapIds - Map IDs for which the options apply
+   * @param optionKeys - Keys of the options to reset
+   */
+  resetMapsOptions(
+    mapIds: string[],
+    optionKeys?: string[],
+    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.resetMapsOptions(mapIds, optionKeys, renderAndListOptions)
+  }
+
+  /**
+   * Resets the map options of specific maps by map ID
+   *
+   * @param optionkeysByMapId - Keys of options by map ID
+   */
+  resetMapsOptionsByMapId(
+    optionkeysByMapId: Map<string, string[]>,
+    renderAndListOptions?: Partial<MapLibreWarpedMapLayerOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.resetMapsOptionsByMapId(
+      optionkeysByMapId,
+      renderAndListOptions
+    )
   }
 
   // /**

@@ -255,13 +255,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the options of this warped map list.
-   */
-  getOptions(): Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>> {
-    return this.options
-  }
-
-  /**
    * Get the default options of this warped map list.
    */
   getDefaultOptions(
@@ -285,7 +278,29 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the options of a specific map ID
+   * Get the default map options
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
+    if (mapId) {
+      const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+      const warpedMap = Array.from(warpedMaps)[0]
+      return warpedMap?.getDefaultAndGeoreferencedMapOptions() as GetWarpedMapOptions<W>
+    } else {
+      return WebGL2WarpedMap.getDefaultOptions() as GetWarpedMapOptions<W>
+    }
+  }
+
+  /**
+   * Get the options of this warped map list.
+   */
+  getOptions(): Partial<WarpedMapListOptions<GetWarpedMapOptions<W>>> {
+    return this.options
+  }
+
+  /**
+   * Get the map options of a specific map ID
    *
    * @param mapId - Map ID for which the options apply
    */
@@ -293,17 +308,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
     const warpedMap = Array.from(warpedMaps)[0]
     return warpedMap?.mergedOptions as GetWarpedMapOptions<W>
-  }
-
-  /**
-   * Get the options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getDefaultMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
-    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
-    const warpedMap = Array.from(warpedMaps)[0]
-    return warpedMap?.getDefaultAndGeoreferencedMapOptions() as GetWarpedMapOptions<W>
   }
 
   /**
@@ -322,7 +326,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the options of specific map IDs
+   * Set the map options of specific map IDs
    *
    * @param mapIds - Map IDs for which the options apply
    * @param options - Options
@@ -349,7 +353,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the options of specific maps by map ID
+   * Set the map options of specific maps by map ID
    *
    * This is useful when when multiple (and possibly different)
    * map options are changed at once,
@@ -800,40 +804,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
     return 0
   }
-
-  // /**
-  //  * Changes the visibility of the specified maps to `true`
-  //  *
-  //  * @param mapIds - Map IDs
-  //  */
-  // showMaps(mapIds: Iterable<string>): void {
-  //   for (const mapId of mapIds) {
-  //     const warpedMap = this.warpedMapsById.get(mapId)
-  //     if (warpedMap) {
-  //       warpedMap.mergedOptions.visible = true
-  //     }
-  //   }
-  //   this.dispatchEvent(
-  //     new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
-  //   )
-  // }
-
-  // /**
-  //  * Changes the visibility of the specified maps to `false`
-  //  *
-  //  * @param mapIds - Map IDs
-  //  */
-  // hideMaps(mapIds: Iterable<string>): void {
-  //   for (const mapId of mapIds) {
-  //     const warpedMap = this.warpedMapsById.get(mapId)
-  //     if (warpedMap) {
-  //       warpedMap.mergedOptions.visible = false
-  //     }
-  //   }
-  //   this.dispatchEvent(
-  //     new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
-  //   )
-  // }
 
   /**
    * Adds a georeferenced map to this list

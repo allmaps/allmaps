@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { add } from 'lodash-es'
-
 export function mergeOptions<
   T extends Record<string, any>,
   U extends Array<Record<string, any> | undefined>

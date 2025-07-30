@@ -287,8 +287,11 @@ export class WebGL2Renderer
    *
    * @param options - Options
    */
-  setOptions(options: Partial<WebGL2RenderOptions>): void {
-    super.setOptions(options)
+  setOptions(
+    options: Partial<WebGL2RenderOptions>,
+    renderAndListOptions?: Partial<WebGL2RenderOptions>
+  ): void {
+    super.setOptions(options, renderAndListOptions)
   }
 
   /**

@@ -108,13 +108,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Get the Renderer options
-   */
-  getOptions(): Partial<BaseRenderOptions> {
-    return mergePartialOptions(this.options, this.warpedMapList.getOptions())
-  }
-
-  /**
    * Get the default Renderer options
    */
   getDefaultOptions(
@@ -129,7 +122,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Get the options of a specific map ID
+   * Get the default options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapOptions(): GetWarpedMapOptions<W>
+  getDefaultMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined
+  getDefaultMapOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getDefaultMapOptions(mapId)
+  }
+
+  /**
+   * Get the Renderer options
+   */
+  getOptions(): Partial<BaseRenderOptions> {
+    return mergePartialOptions(this.options, this.warpedMapList.getOptions())
+  }
+
+  /**
+   * Get the map options of a specific map ID
    *
    * @param mapId - Map ID for which the options apply
    */
@@ -138,27 +149,21 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Get the default options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getDefaultMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
-    return this.warpedMapList.getDefaultMapOptions(mapId)
-  }
-
-  /**
    * Set the Renderer options
    *
    * @param options - Render and List Options
    */
-  setOptions(options: Partial<BaseRenderOptions>): void {
+  setOptions(
+    options: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions>
+  ): void {
     this.options = mergePartialOptions(this.options, options)
     this.tileCache.setOptions(options)
-    this.warpedMapList.setOptions(options)
+    this.warpedMapList.setOptions(options, renderAndListOptions)
   }
 
   /**
-   * Set the options of specific map IDs
+   * Set the map options of specific map IDs
    *
    * @param mapIds - Map IDs for which the options apply
    * @param options - Options
@@ -177,7 +182,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Set the options of specific maps by map ID
+   * Set the map options of specific maps by map ID
    *
    * @param optionsByMapId - Options by map ID
    * @param renderAndListOptions - Render and List options
@@ -194,6 +199,86 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       optionsByMapId,
       renderAndListOptions
     )
+  }
+
+  /**
+   * Resets the layer options
+   *
+   * @param optionKeys - Keys of the options to reset
+   */
+  resetLayerOptions(
+    optionKeys?: string[],
+    renderAndListOptions?: Partial<BaseRenderOptions>
+  ) {
+    let options: Partial<BaseRenderOptions>
+    if (optionKeys && optionKeys.length > 0) {
+      options = optionKeys.reduce(
+        (acc, curr) => ((acc[curr] = undefined), acc),
+        {} as Record<string, any>
+      )
+      this.setOptions(options, renderAndListOptions)
+    } else {
+      this.resetLayerOptions(
+        Object.keys(this.getDefaultOptions()),
+        renderAndListOptions
+      )
+    }
+  }
+
+  /**
+   * Resets the map options of specific map IDs
+   *
+   * @param mapIds - Map IDs for which the options apply
+   * @param optionKeys - Keys of the options to reset
+   */
+  resetMapsOptions(
+    mapIds: string[],
+    optionKeys?: string[],
+    renderAndListOptions?: Partial<BaseRenderOptions>
+  ) {
+    if (optionKeys && optionKeys.length > 0) {
+      const options = optionKeys.reduce(
+        (acc, curr) => ((acc[curr] = undefined), acc),
+        {} as Record<string, any>
+      )
+      this.setMapsOptions(mapIds, options, renderAndListOptions)
+    } else {
+      this.resetMapsOptions(
+        mapIds,
+        Object.keys(this.getDefaultMapOptions()),
+        renderAndListOptions
+      )
+    }
+  }
+
+  /**
+   * Resets the map options of specific maps by map ID
+   *
+   * @param optionkeysByMapId - Keys of options by map ID
+   */
+  resetMapsOptionsByMapId(
+    optionkeysByMapId: Map<string, string[]>,
+    renderAndListOptions?: Partial<BaseRenderOptions>
+  ) {
+    if (optionkeysByMapId) {
+      const mapIds = Array.from(optionkeysByMapId.keys())
+      const optionsByMapId = new Map<string, Partial<BaseRenderOptions>>()
+      for (const mapId of mapIds) {
+        optionsByMapId.set(
+          mapId,
+          optionkeysByMapId
+            .get(mapId)!
+            .reduce(
+              (acc, curr) => ((acc[curr] = undefined), acc),
+              {} as Record<string, any>
+            )
+        )
+      }
+      this.setMapsOptionsByMapId(optionsByMapId, renderAndListOptions)
+    } else {
+      const mapIds = this.warpedMapList.getMapIds()
+      this.resetMapsOptions(mapIds, [], renderAndListOptions)
+    }
   }
 
   protected loadMissingImageInfosInViewport(): Promise<void>[] {

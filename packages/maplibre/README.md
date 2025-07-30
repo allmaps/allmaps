@@ -67,7 +67,7 @@ WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://ma
 - Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
 
 ```js
-const warpedMapLayerWithUniqueId = new WarpedMapLayer('my-unique-id')
+const warpedMapLayerWithUniqueId = new WarpedMapLayer({layerId: 'my-unique-id'})
 ```
 
 A Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:

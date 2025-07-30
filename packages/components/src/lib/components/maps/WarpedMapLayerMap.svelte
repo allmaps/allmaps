@@ -16,13 +16,15 @@
   } from '../options/OptionsState.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
-  import type { WarpedMap } from '@allmaps/render'
+  import type {
+    MapLibreWarpedMapLayerOptions,
+    WarpedMap
+  } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
 
   export type WarpedMapLayerMapComponentOptions = {
     addNavigationControl: boolean
     addGeolocateControl: boolean
-    opacity: number // TODO: remove when in MapLibreWarpedMapLayerOptions
   }
 
   const PADDING = 60
@@ -326,10 +328,14 @@
     const mapOptionsByMapId = new Map(
       Array.from(mapOptionsStateByMapId).map(([mapId, mapOptionsState]) => [
         mapId,
-        $state.snapshot(mapOptionsState.mergedOptions)
+        $state.snapshot(
+          mapOptionsState.mergedOptions
+        ) as Partial<MapLibreWarpedMapLayerOptions>
       ])
     )
-    const layerOptions = $state.snapshot(layerOptionsState.mergedOptions)
+    const layerOptions = $state.snapshot(
+      layerOptionsState.mergedOptions
+    ) as Partial<MapLibreWarpedMapLayerOptions>
     warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
 </script>
