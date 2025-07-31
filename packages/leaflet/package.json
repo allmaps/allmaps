@@ -50,6 +50,7 @@
   "dependencies": {
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@allmaps/warpedmaplayer": "workspace:^",
     "leaflet": "^1.9.4"
   },
   "license": "MIT",

@@ -1,239 +1,62 @@
-import Layer from 'ol/layer/Layer.js'
-import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
+import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
+import { WarpedMapList, WarpedMapEventType } from '@allmaps/render'
+import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
 
-import { WebGL2Renderer } from '@allmaps/render/webgl2'
-import { Viewport, WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
-import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
-
-import type { FrameState } from 'ol/Map.js'
-import type { Extent } from 'ol/extent'
+import type { SetOptionsOptions, ProjectionOptions } from '@allmaps/render'
+import type { Point, Bbox, Ring } from '@allmaps/types'
 
 import type {
-  ProjectionOptions,
-  SetOptionsOptions,
-  WarpedMapList,
   WebGL2RenderOptions,
-  WebGL2WarpedMap,
   WebGL2WarpedMapOptions
 } from '@allmaps/render'
-import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
-import { Bbox, Point, Ring } from '@allmaps/types'
 
-export type SpecificOpenLayersWarpedMapLayerOptions = {}
+const NO_RENDERER_ERROR_MESSAGE =
+  'Renderer not defined. Add the layer to a map before calling this function.'
 
-export type OpenLayersWarpedMapLayerOptions =
-  SpecificOpenLayersWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-
-const DEFAULT_SPECIFIC_OPENLAYERS_WARPED_MAP_LAYER_OPTIONS: SpecificOpenLayersWarpedMapLayerOptions =
-  {}
+const NO_CANVAS_ERROR_MESSAGE =
+  'Canvas not defined. Add the layer to a map before calling this function.'
 
 /**
- * WarpedMapLayer class.
- *
- * This class renders georeferenced maps from a Georeference Annotation on an OpenLayers map.
- * WarpedMapLayer is a subclass of [Layer](https://openlayers.org/en/latest/apidoc/module-ol_layer_Layer-Layer.html).
+ * Base WarpedMapLayer class.
  */
-export class WarpedMapLayer
-  extends Layer
-  implements BaseWarpedMapLayer<SpecificOpenLayersWarpedMapLayerOptions>
-{
-  defaultSpecificWarpedMapLayerOptions: SpecificOpenLayersWarpedMapLayerOptions
-  options: SpecificOpenLayersWarpedMapLayerOptions &
-    Partial<WebGL2RenderOptions>
+export abstract class BaseWarpedMapLayer<
+  SpecificWarpedMapLayerOptions extends Record<string, any>
+> {
+  defaultSpecificWarpedMapLayerOptions: SpecificWarpedMapLayerOptions
+  options: SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 
-  container: HTMLDivElement
-  canvas: HTMLCanvasElement
+  container?: HTMLDivElement
+  canvas?: HTMLCanvasElement
   gl: WebGL2RenderingContext | null | undefined
 
-  renderer: WebGL2Renderer
-
-  canvasSize: [number, number] = [0, 0]
-
-  private resizeObserver: ResizeObserver
+  renderer?: WebGL2Renderer
 
   /**
    * Creates a WarpedMapLayer instance
-   * @param options - the WebGL2 renderer options
+   *
+   * @param options - options
    */
-  constructor(options?: Partial<OpenLayersWarpedMapLayerOptions>) {
-    super({})
-
+  constructor(
+    defaultSpecificWarpedMapLayerOptions: SpecificWarpedMapLayerOptions,
+    options?: Partial<
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+    >
+  ) {
     this.defaultSpecificWarpedMapLayerOptions =
-      DEFAULT_SPECIFIC_OPENLAYERS_WARPED_MAP_LAYER_OPTIONS
+      defaultSpecificWarpedMapLayerOptions
     this.options = mergeOptions(
       this.defaultSpecificWarpedMapLayerOptions,
       options
     )
-
-    const container = document.createElement('div')
-    this.container = container
-
-    container.style.position = 'absolute'
-    container.style.width = '100%'
-    container.style.height = '100%'
-    container.classList.add('ol-layer')
-    container.classList.add('allmaps-warped-map-layer')
-    const canvas = document.createElement('canvas')
-
-    canvas.style.position = 'absolute'
-    canvas.style.left = '0'
-
-    canvas.style.width = '100%'
-    canvas.style.height = '100%'
-
-    container.appendChild(canvas)
-
-    const gl = canvas.getContext('webgl2', {
-      premultipliedAlpha: true
-    })
-
-    if (!gl) {
-      throw new Error('WebGL 2 not available')
-    }
-
-    this.resizeObserver = new ResizeObserver(this.resized.bind(this))
-    this.resizeObserver.observe(canvas, { box: 'content-box' })
-
-    this.canvas = canvas
-    this.gl = gl
-
-    this.renderer = new WebGL2Renderer(this.gl, options)
-
-    this.addEventListeners()
-
-    this.canvas.addEventListener(
-      'webglcontextlost',
-      this.contextLost.bind(this)
-    )
-
-    this.canvas.addEventListener(
-      'webglcontextrestored',
-      this.contextRestored.bind(this)
-    )
   }
 
-  /**
-   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
-   * @returns - Bounding box of all warped maps
-   */
-  getLonLatExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:4326' }
-    })
-  }
+  // Abstract functions
 
-  /**
-   * Disposes all WebGL resources and cached tiles
-   */
-  dispose() {
-    this.renderer.destroy()
+  abstract nativeUpdate(): void
 
-    const extension = this.gl?.getExtension('WEBGL_lose_context')
-
-    if (extension) {
-      extension.loseContext()
-    }
-    const canvas = this.gl?.canvas
-    if (canvas) {
-      canvas.width = 1
-      canvas.height = 1
-    }
-
-    this.resizeObserver.disconnect()
-
-    this.removeEventListeners()
-
-    this.canvas?.removeEventListener(
-      'webglcontextlost',
-      this.contextLost.bind(this)
-    )
-
-    this.canvas?.removeEventListener(
-      'webglcontextrestored',
-      this.contextRestored.bind(this)
-    )
-
-    // super.disposeInternal()
-  }
-
-  /**
-   * Render the layer.
-   * @param frameState - OpenLayers frame state
-   * @returns The rendered element
-   */
-  render(frameState: FrameState): HTMLElement {
-    if (this.canvas) {
-      this.resizeCanvas(this.canvas, this.canvasSize)
-    }
-
-    const viewport = new Viewport(
-      frameState.size as [number, number],
-      frameState.viewState.center as [number, number],
-      frameState.viewState.resolution,
-      {
-        rotation: frameState.viewState.rotation,
-        devicePixelRatio: window.devicePixelRatio,
-        projection: { definition: frameState.viewState.projection.getCode() }
-        // TODO: add a way for viewport and renderer to understand other codes then the two default ones
-      }
-    )
-
-    this.renderer.render(viewport)
-
-    return this.container
-  }
-
-  private resized(entries: ResizeObserverEntry[]) {
-    // From https://webgl2fundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-    // TODO: read + understand https://web.dev/device-pixel-content-box/
-    for (const entry of entries) {
-      const width = entry.contentRect.width
-      const height = entry.contentRect.height
-      const dpr = window.devicePixelRatio
-
-      const displayWidth = Math.round(width * dpr)
-      const displayHeight = Math.round(height * dpr)
-
-      this.canvasSize = [displayWidth, displayHeight]
-    }
-    this.nativeUpdate()
-  }
-
-  private resizeCanvas(
-    canvas: HTMLCanvasElement,
-    [width, height]: [number, number]
-  ) {
-    const needResize = canvas.width !== width || canvas.height !== height
-
-    if (needResize) {
-      canvas.width = width
-      canvas.height = height
-    }
-
-    return needResize
-  }
-
-  ///////////////////////////////
-  // Implemented methods below //
-  ///////////////////////////////
-
-  // Functions defined as abstract in base class
-
-  nativeUpdate(): void {
-    this.changed()
-  }
-
-  nativePassWarpedMapEvent(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      const olEvent = new OLWarpedMapEvent(event.type, event.data)
-      this.dispatchEvent(olEvent)
-    }
-  }
+  abstract nativePassWarpedMapEvent(event: Event): void
 
   // Normal functions
-  //
-  // These are copied from @allmaps/warpedmaplayermap
-  // since classes can only extend one class
 
   /**
    * Adds a Georeference Annotation
@@ -466,7 +289,7 @@ export class WarpedMapLayer
   /**
    * Get the default layer options
    */
-  getDefaultLayerOptions(): SpecificOpenLayersWarpedMapLayerOptions &
+  getDefaultLayerOptions(): SpecificWarpedMapLayerOptions &
     Partial<WebGL2RenderOptions> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -504,16 +327,14 @@ export class WarpedMapLayer
    * Get the layer options
    */
   getLayerOptions(): Partial<
-    SpecificOpenLayersWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+    SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
   > {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return mergePartialOptions(
       this.options,
       this.renderer.getOptions()
-    ) as Partial<
-      SpecificOpenLayersWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-    >
+    ) as Partial<SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
   }
 
   /**
@@ -546,7 +367,7 @@ export class WarpedMapLayer
    */
   setLayerOptions(
     layerOptions: Partial<
-      SpecificOpenLayersWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
     >,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
@@ -568,7 +389,7 @@ export class WarpedMapLayer
     mapIds: string[],
     mapOptions: Partial<WebGL2WarpedMapOptions>,
     layerOptions?: Partial<
-      SpecificOpenLayersWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
     >,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
@@ -595,7 +416,7 @@ export class WarpedMapLayer
   setMapsOptionsByMapId(
     mapOptionsByMapId: Map<string, Partial<WebGL2WarpedMapOptions>>,
     layerOptions?: Partial<
-      SpecificOpenLayersWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
     >,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
@@ -864,5 +685,21 @@ export class WarpedMapLayer
       WarpedMapEventType.CLEARED,
       this.nativeUpdate.bind(this)
     )
+  }
+
+  static assertRenderer(
+    renderer?: WebGL2Renderer
+  ): asserts renderer is WebGL2Renderer {
+    if (!renderer) {
+      throw new Error(NO_RENDERER_ERROR_MESSAGE)
+    }
+  }
+
+  static assertCanvas(
+    canvas?: HTMLCanvasElement
+  ): asserts canvas is HTMLCanvasElement {
+    if (!canvas) {
+      throw new Error(NO_CANVAS_ERROR_MESSAGE)
+    }
   }
 }

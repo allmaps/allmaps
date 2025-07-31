@@ -10,8 +10,7 @@
     { "path": "../render" },
     { "path": "../transform" },
     { "path": "../stdlib" },
-    { "path": "../types" },
-    { "path": "../warpedmaplayer" },
+    { "path": "../types" }
   ],
   "include": ["./src/**/*"]
 }

@@ -997,7 +997,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     listOptions?: Partial<WarpedMapListOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
-    console.log('setting', optionsByMapId, listOptions)
     // If there are no maps yet, return
     if (this.warpedMapsById.size === 0 || optionsByMapId?.size === 0) {
       return
@@ -1049,8 +1048,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         this.addToOrUpdateRtree(warpedMap)
       }
     }
-
-    console.log('changed', changedOptionsKeys)
 
     if (
       setOptionsOptions?.animate === undefined ||

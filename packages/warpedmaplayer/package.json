@@ -1,6 +1,6 @@
 {
-  "name": "@allmaps/openlayers",
-  "version": "1.0.0-beta.81",
+  "name": "@allmaps/warpedmaplayer",
+  "version": "1.0.0-beta.38",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -13,8 +13,9 @@
       "url": "https://manuelclaeysbouuaert.be"
     }
   ],
-  "description": "OpenLayers classes for Allmaps",
+  "description": "Base plugin classes for Allmaps",
   "type": "module",
+  "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "files": [
     "dist"
@@ -25,14 +26,14 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
-    "directory": "packages/openlayers"
+    "directory": "packages/warpedmaplayer"
   },
   "homepage": "https://allmaps.org",
   "keywords": [
     "iiif",
     "georeference",
     "map",
-    "openlayers",
+    "plugin",
     "allmaps"
   ],
   "scripts": {
@@ -49,11 +50,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
-    "@allmaps/stdlib": "workspace:^",
-    "@allmaps/warpedmaplayer": "workspace:^",
-    "lodash-es": "^4.17.21",
-    "ol": "^8.2.0"
+    "@allmaps/stdlib": "workspace:^"
   },
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
