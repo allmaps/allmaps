@@ -5,7 +5,6 @@ import type {
   Size,
   FetchFn,
   ImageInfoByMapId,
-  Color,
   Bbox,
   TileZoomLevel,
   Ring,
@@ -123,27 +122,18 @@ export type SpecificWarpedMapListOptions = {
   rtreeUpdatedOptions: string[]
   animatedOptions: string[]
 }
-export type WarpedMapListOptions<WO extends WarpedMapOptions> =
-  SpecificWarpedMapListOptions & Partial<WO>
+export type WarpedMapListOptions = SpecificWarpedMapListOptions &
+  Partial<WebGL2WarpedMapOptions>
 
-export type BaseRenderOptions = {}
+export type SpecificBaseRenderOptions = {}
+export type BaseRenderOptions = SpecificBaseRenderOptions & WarpedMapListOptions
 export type SpecificWebGL2RenderOptions = {}
 export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
-  BaseRenderOptions &
-  WarpedMapListOptions<WebGL2WarpedMapOptions>
-export type CanvasRenderOptions<WO extends WarpedMapOptions> =
-  BaseRenderOptions & WarpedMapListOptions<WO>
-export type IntArrayRenderOptions<WO extends WarpedMapOptions> =
-  BaseRenderOptions & WarpedMapListOptions<WO>
+  BaseRenderOptions
+export type CanvasRenderOptions = BaseRenderOptions
+export type IntArrayRenderOptions = BaseRenderOptions
 
 export type WarpedMapLayerOptions = Partial<WebGL2RenderOptions>
-export type SpecificMapLibreWarpedMapLayerOptions = {
-  layerId: string
-  layerType: 'custom'
-  layerRenderingMode: '2d'
-}
-export type MapLibreWarpedMapLayerOptions =
-  SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 
 export type TileCacheOptions = {
   fetchFn: FetchFn

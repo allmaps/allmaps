@@ -4,11 +4,7 @@ import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import { Viewport } from '../viewport/Viewport.js'
 
 import { renderToIntArray } from '../shared/render-to-int-array.js'
-import type {
-  Renderer,
-  CanvasRenderOptions,
-  WarpedMapOptions
-} from '../shared/types.js'
+import type { Renderer, CanvasRenderOptions } from '../shared/types.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
 
 import type { Size } from '@allmaps/types'
@@ -25,7 +21,7 @@ export class CanvasRenderer
 
   constructor(
     canvas: HTMLCanvasElement,
-    options?: Partial<CanvasRenderOptions<WarpedMapOptions>>
+    options?: Partial<CanvasRenderOptions>
   ) {
     super(
       CacheableImageDataTile.createFactory(),

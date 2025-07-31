@@ -9,8 +9,23 @@ export { createWarpedMapFactory } from './maps/WarpedMap.js'
 export { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 export type {
-  WarpedMapLayerOptions,
+  WarpedMapOptions,
+  SpecificTriangulatedWarpedMapOptions,
+  TriangulatedWarpedMapOptions,
+  SpecificWebGL2WarpedMapOptions,
+  WebGL2WarpedMapOptions,
+  GetWarpedMapOptions,
+  SpecificWarpedMapListOptions,
+  WarpedMapListOptions,
+  SpecificBaseRenderOptions,
+  BaseRenderOptions,
+  SpecificWebGL2RenderOptions,
   WebGL2RenderOptions,
-  MapLibreWarpedMapLayerOptions,
-  SetOptionsOptions
+  CanvasRenderOptions,
+  IntArrayRenderOptions,
+  WarpedMapLayerOptions,
+  SetOptionsOptions,
+  SelectionOptions,
+  ProjectionOptions,
+  TransformationOptions
 } from './shared/types.js'

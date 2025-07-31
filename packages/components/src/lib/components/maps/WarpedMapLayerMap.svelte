@@ -16,10 +16,7 @@
   } from '../options/OptionsState.svelte'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
-  import type {
-    MapLibreWarpedMapLayerOptions,
-    WarpedMap
-  } from '@allmaps/render'
+  import type { WarpedMap, WebGL2WarpedMapOptions } from '@allmaps/render'
   import type { Bbox } from '@allmaps/types'
 
   export type WarpedMapLayerMapComponentOptions = {
@@ -186,7 +183,7 @@
         if (!mapOptionsStateByMapId.has(mapId)) {
           const mapOptionsState = new MapOptionsState(
             mapId,
-            warpedMapLayer?.getDefaultMapOptions(mapId),
+            warpedMapLayer?.getDefaultMapMergedOptions(mapId),
             {},
             layerOptionsState
           )
@@ -330,12 +327,12 @@
         mapId,
         $state.snapshot(
           mapOptionsState.mergedOptions
-        ) as Partial<MapLibreWarpedMapLayerOptions>
+        ) as Partial<WebGL2WarpedMapOptions>
       ])
     )
     const layerOptions = $state.snapshot(
       layerOptionsState.mergedOptions
-    ) as Partial<MapLibreWarpedMapLayerOptions>
+    ) as Partial<WebGL2WarpedMapOptions>
     warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
 </script>

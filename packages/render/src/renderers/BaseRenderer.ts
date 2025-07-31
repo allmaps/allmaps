@@ -33,11 +33,12 @@ import type {
   WarpedMapListOptions,
   GetWarpedMapOptions,
   SetOptionsOptions,
-  WarpedMapOptions
+  WarpedMapOptions,
+  SpecificBaseRenderOptions
 } from '../shared/types.js'
 
 // TODO: move defaults for tunable options here
-const DEFAULT_BASE_RENDER_OPTIONS: BaseRenderOptions = {}
+const DEFAULT_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions = {}
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -57,8 +58,6 @@ const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overv
 const MAX_TOTAL_RESOLUTION_RATIO = 10
 
 const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
-
-export const defaultBaseRenderOptions: BaseRenderOptions = {}
 
 /**
  * Abstract base class for renderers
@@ -91,7 +90,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * Parses an annotation and adds its georeferenced map to this renderer's warped map list
    *
    * @param annotation
-   * @returns
    */
   async addGeoreferenceAnnotation(annotation: unknown) {
     return this.warpedMapList.addGeoreferenceAnnotation(annotation)
@@ -101,7 +99,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * Adds a georeferenced map to this renderer's warped map list
    *
    * @param georeferencedMap
-   * @returns
    */
   async addGeoreferencedMap(georeferencedMap: unknown) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
@@ -110,8 +107,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the default Renderer options
    */
-  getDefaultOptions(): WarpedMapListOptions<WarpedMapOptions> &
-    BaseRenderOptions {
+  getDefaultOptions(): WarpedMapListOptions & BaseRenderOptions {
     return mergeOptions(
       this.warpedMapList.getDefaultOptions(),
       DEFAULT_BASE_RENDER_OPTIONS
@@ -119,14 +115,23 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Get the default options of a specific map ID
+   * Get the default options
+   */
+  getDefaultMapOptions(): Partial<GetWarpedMapOptions<W>> {
+    return this.warpedMapList.getDefaultMapOptions()
+  }
+
+  /**
+   * Get the default merged options of a specific map ID
    *
    * @param mapId - Map ID for which the map options apply
    */
-  getDefaultMapOptions(): GetWarpedMapOptions<W>
-  getDefaultMapOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
-  getDefaultMapOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
-    return this.warpedMapList.getDefaultMapOptions(mapId)
+  getDefaultMapMergedOptions(): GetWarpedMapOptions<W>
+  getDefaultMapMergedOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
+  getDefaultMapMergedOptions(
+    mapId?: string
+  ): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getDefaultMapMergedOptions(mapId)
   }
 
   /**
@@ -141,8 +146,17 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    *
    * @param mapId - Map ID for which to get the map options
    */
-  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+  getMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
     return this.warpedMapList.getMapOptions(mapId)
+  }
+
+  /**
+   * Get the map merged options of a specific map ID
+   *
+   * @param mapId - Map ID for which to get the map options
+   */
+  getMapMergedOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getMapMergedOptions(mapId)
   }
 
   /**
@@ -155,10 +169,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     renderAndListOptions?: Partial<BaseRenderOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
-    this.options = mergePartialOptions(
-      this.options,
-      renderAndListOptions
-    ) as Partial<BaseRenderOptions>
+    this.options = mergeOptions(this.options, renderAndListOptions)
     this.tileCache.setOptions(renderAndListOptions)
     this.warpedMapList.setOptions(renderAndListOptions, setOptionsOptions)
   }
@@ -326,7 +337,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     this.warpedMapList.options.projection = this.viewport.projection
-    this.warpedMapList.setMapsProjection(this.viewport.projection)
+    this.warpedMapList.setOptions({ projection: this.viewport.projection })
   }
 
   protected requestFetchableTiles(): void {

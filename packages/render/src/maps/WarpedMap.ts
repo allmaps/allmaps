@@ -257,6 +257,7 @@ export class WarpedMap extends EventTarget {
     this.projectedTransformerCache = new Map()
     this.loadingImageInfo = false
 
+    this.options = {}
     this.listOptions = options
     this.georeferencedMapOptions = {
       transformationType: georeferencedMap.transformation

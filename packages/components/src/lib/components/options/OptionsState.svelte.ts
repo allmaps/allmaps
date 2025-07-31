@@ -3,7 +3,7 @@ import { pick } from 'lodash-es'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
-import type { MapLibreWarpedMapLayerOptions } from '@allmaps/render'
+import type { WebGL2WarpedMapOptions } from '@allmaps/render'
 
 import type { PickerProjection } from '$lib/shared/projections/projections.js'
 
@@ -12,8 +12,6 @@ export const OPTIONS_TO_GET_FROM_DEFAULT = [
   'internalProjection'
 ]
 // See also in @allmaps/render: UNDEFINED_GEOREFERENCED_MAP_OPTIONS
-
-export type Options = Partial<MapLibreWarpedMapLayerOptions>
 
 /**
  * Option State class
@@ -62,10 +60,10 @@ export type Options = Partial<MapLibreWarpedMapLayerOptions>
  * We acchieve this by infering from a layerOptionsState, except for selected options.
  * */
 export abstract class BaseOptionsState {
-  defaultOptions: Partial<Options>
-  processedDefaultOptions: Partial<Options>
+  defaultOptions: Partial<WebGL2WarpedMapOptions>
+  processedDefaultOptions: Partial<WebGL2WarpedMapOptions>
 
-  options: Partial<Options>
+  options: Partial<WebGL2WarpedMapOptions>
 
   visible?: boolean
   opacity?: number
@@ -86,12 +84,12 @@ export abstract class BaseOptionsState {
   colorize?: boolean
   colorizeColor?: string
 
-  viewOptions: Partial<Options>
-  mergedOptions: Partial<Options>
+  viewOptions: Partial<WebGL2WarpedMapOptions>
+  mergedOptions: Partial<WebGL2WarpedMapOptions>
 
   constructor(
-    options: Partial<Options> = {},
-    viewOptions: Partial<Options> = {},
+    options: Partial<WebGL2WarpedMapOptions> = {},
+    viewOptions: Partial<WebGL2WarpedMapOptions> = {},
     layerOptionsState?: BaseOptionsState
   ) {
     this.defaultOptions = $state(options)
@@ -203,18 +201,22 @@ export abstract class BaseOptionsState {
     )
   }
 
-  abstract processDefaultOptions(options: Partial<Options>): Partial<Options>
+  abstract processDefaultOptions(
+    options: Partial<WebGL2WarpedMapOptions>
+  ): Partial<WebGL2WarpedMapOptions>
 }
 
 export class LayerOptionsState extends BaseOptionsState {
   constructor(
-    options: Partial<Options> = {},
-    viewOptions: Partial<Options> = {}
+    options: Partial<WebGL2WarpedMapOptions> = {},
+    viewOptions: Partial<WebGL2WarpedMapOptions> = {}
   ) {
     super(options, viewOptions)
   }
 
-  processDefaultOptions(_options: Partial<Options>): Partial<Options> {
+  processDefaultOptions(
+    _options: Partial<WebGL2WarpedMapOptions>
+  ): Partial<WebGL2WarpedMapOptions> {
     // Don't inherit default options
     return {}
   }
@@ -225,8 +227,8 @@ export class MapOptionsState extends BaseOptionsState {
 
   constructor(
     mapId: string,
-    options: Partial<Options> = {},
-    viewOptions: Partial<Options> = {},
+    options: Partial<WebGL2WarpedMapOptions> = {},
+    viewOptions: Partial<WebGL2WarpedMapOptions> = {},
     reference?: BaseOptionsState
   ) {
     super(options, viewOptions, reference)
@@ -234,7 +236,9 @@ export class MapOptionsState extends BaseOptionsState {
     this.mapId = mapId
   }
 
-  processDefaultOptions(options: Partial<Options>): Partial<Options> {
+  processDefaultOptions(
+    options: Partial<WebGL2WarpedMapOptions>
+  ): Partial<WebGL2WarpedMapOptions> {
     // Only inherit allowed options from default
     return pick(options, OPTIONS_TO_GET_FROM_DEFAULT)
   }

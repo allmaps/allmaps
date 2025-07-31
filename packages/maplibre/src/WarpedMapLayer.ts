@@ -7,22 +7,32 @@ import {
   WarpedMapEvent,
   WarpedMapEventType
 } from '@allmaps/render'
-import { mergeOptions, rectangleToSize, sizesToScale } from '@allmaps/stdlib'
-import { lonLatToWebMercator, Projection } from '@allmaps/project'
+import {
+  mergeOptions,
+  mergePartialOptions,
+  rectangleToSize,
+  sizesToScale
+} from '@allmaps/stdlib'
+import { lonLatToWebMercator } from '@allmaps/project'
 
 import type { LngLatBoundsLike } from 'maplibre-gl'
 
-import type { TransformationType, DistortionMeasure } from '@allmaps/transform'
-import type {
-  MapLibreWarpedMapLayerOptions,
-  SetOptionsOptions
-} from '@allmaps/render'
-import type { Rectangle, Ring, Point } from '@allmaps/types'
+import type { SetOptionsOptions, ProjectionOptions } from '@allmaps/render'
+import type { Rectangle, Point, Bbox, Ring } from '@allmaps/types'
 
 import type {
-  SpecificMapLibreWarpedMapLayerOptions,
+  WebGL2RenderOptions,
   WebGL2WarpedMapOptions
-} from 'packages/render/src/shared/types'
+} from '@allmaps/render'
+
+export type SpecificMapLibreWarpedMapLayerOptions = {
+  layerId: string
+  layerType: 'custom'
+  layerRenderingMode: '2d'
+}
+
+export type MapLibreWarpedMapLayerOptions =
+  SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 
 const DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpedMapLayerOptions =
   {
@@ -76,6 +86,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
   /**
    * Method called when the layer has been added to the Map.
+   *
    * @param map - The Map this custom layer was just added to.
    * @param gl - The WebGL 2 context for the map.
    */
@@ -99,9 +110,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * Adds a Georeference Annotation
+   *
    * @param annotation - Georeference Annotation
-   * @returns the map IDs of the maps that were added, or an error per map
+   * @returns Map IDs of the maps that were added, or an error per map
    */
   async addGeoreferenceAnnotation(
     annotation: unknown
@@ -116,9 +128,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+   * Removes a Georeference Annotation
+   *
    * @param annotation - Georeference Annotation
-   * @returns the map IDs of the maps that were removed, or an error per map
+   * @returns Map IDs of the maps that were removed, or an error per map
    */
   async removeGeoreferenceAnnotation(
     annotation: unknown
@@ -133,9 +146,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
-   * @param annotationUrl - Georeference Annotation
-   * @returns the map IDs of the maps that were added, or an error per map
+   * Adds a Georeference Annotation by URL
+   *
+   * @param annotationUrl - URL of a Georeference Annotation
+   * @returns Map IDs of the maps that were added, or an error per map
    */
   async addGeoreferenceAnnotationByUrl(
     annotationUrl: string
@@ -148,9 +162,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
-   * @param annotationUrl - Georeference Annotation
-   * @returns - the map IDs of the maps that were removed, or an error per map
+   * Removes a Georeference Annotation by URL
+   *
+   * @param annotationUrl - URL of a Georeference Annotation
+   * @returns Map IDs of the maps that were removed, or an error per map
    */
   async removeGeoreferenceAnnotationByUrl(
     annotationUrl: string
@@ -158,15 +173,14 @@ export class WarpedMapLayer implements CustomLayerInterface {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
-    const results = this.removeGeoreferenceAnnotation(annotation)
-
-    return results
+    return this.removeGeoreferenceAnnotation(annotation)
   }
 
   /**
-   * Adds a Georeferenced map.
-   * @param georeferencedMap - Georeferenced map
-   * @returns - the map ID of the map that was added, or an error
+   * Adds a Georeferenced Map
+   *
+   * @param georeferencedMap - Georeferenced Map
+   * @returns Map ID of the map that was added, or an error
    */
   async addGeoreferencedMap(
     georeferencedMap: unknown
@@ -181,9 +195,10 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Removes a Georeferenced map.
-   * @param georeferencedMap - Georeferenced map
-   * @returns - the map ID of the map that was remvoed, or an error
+   * Removes a Georeferenced Map
+   *
+   * @param georeferencedMap - Georeferenced Map
+   * @returns Map ID of the map that was removed, or an error
    */
   async removeGeoreferencedMap(
     georeferencedMap: unknown
@@ -198,8 +213,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
-   * @returns the warped map list
+   * Get the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
   getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
     assertRenderer(this.renderer)
@@ -208,14 +222,389 @@ export class WarpedMapLayer implements CustomLayerInterface {
   }
 
   /**
-   * Returns a single map's warped map
-   * @param mapId - ID of the map
-   * @returns the warped map
+   * Get mapIds for selected maps
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   */
+  getMapIds(): string[] {
+    assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapIds()
+  }
+
+  /**
+   * Get the WarpedMap instances for selected maps
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   */
+  getWarpedMaps(mapIds: string[]): Iterable<WebGL2WarpedMap> {
+    assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getWarpedMaps({ mapIds })
+  }
+
+  /**
+   * Get the WarpedMap instance for a specific map
+   *
+   * @param mapId - Map ID of the requested WarpedMap instance
    */
   getWarpedMap(mapId: string): WebGL2WarpedMap | undefined {
     assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMap(mapId)
+  }
+
+  /**
+   * Get the center of the bounding box of the maps
+   *
+   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
+   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   * @param projection - Projection in which to return the result
+   * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
+   */
+  getMapsCenter(
+    mapIds: string[],
+    projectionOptions?: ProjectionOptions
+  ): Point | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsCenter(
+      mergePartialOptions({ mapIds }, projectionOptions)
+    )
+  }
+
+  /**
+   * Get the bounding box of the maps
+   *
+   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
+   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   * @param projection - Projection in which to return the result
+   * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
+   */
+  getMapsBbox(
+    mapIds: string[],
+    projectionOptions?: ProjectionOptions
+  ): Bbox | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsBbox(
+      mergePartialOptions({ mapIds }, projectionOptions)
+    )
+  }
+
+  /**
+   * Get the bounding box of all maps  as a MapLibre LngLatBoundsLike object
+   *
+   * This is the default MapLibre getBounds() function
+   *
+   * Result is in longitude/latitude `EPSG:4326` coordinates.
+   *
+   * @returns bounding box of all warped maps
+   */
+  getBounds(): LngLatBoundsLike | undefined {
+    assertRenderer(this.renderer)
+
+    const bbox = this.renderer.warpedMapList.getMapsBbox({
+      projection: { definition: 'EPSG:4326' }
+    })
+    if (bbox) {
+      return [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]]
+      ]
+    }
+  }
+
+  /**
+   * Get the convex hull of the maps
+   *
+   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
+   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   * @param projection - Projection in which to return the result
+   * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
+   */
+  getMapsConvexHull(
+    mapIds: string[],
+    projectionOptions?: ProjectionOptions
+  ): Ring | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsConvexHull(
+      mergePartialOptions({ mapIds }, projectionOptions)
+    )
+  }
+
+  /**
+   * Get the z-index of a specific map ID
+   *
+   * @param mapId - Map ID for which to get the z-index
+   * @returns The z-index of a specific map ID
+   */
+  getMapZIndex(mapId: string): number | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapZIndex(mapId)
+  }
+
+  /**
+   * Get the default layer options
+   */
+  getDefaultLayerOptions(): MapLibreWarpedMapLayerOptions {
+    assertRenderer(this.renderer)
+
+    return mergeOptions(
+      this.renderer.getDefaultOptions(),
+      DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS
+    )
+  }
+
+  /**
+   * Get the default map options of a specific map ID
+   */
+  getDefaultMapOptions(): Partial<WebGL2WarpedMapOptions> {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getDefaultMapOptions()
+  }
+
+  /**
+   * Get the default map merged options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getDefaultMapMergedOptions(): WebGL2WarpedMapOptions
+  getDefaultMapMergedOptions(mapId: string): WebGL2WarpedMapOptions | undefined
+  getDefaultMapMergedOptions(
+    mapId?: string
+  ): WebGL2WarpedMapOptions | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getDefaultMapMergedOptions(mapId)
+  }
+
+  /**
+   * Get the layer options
+   */
+  getLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
+    assertRenderer(this.renderer)
+
+    return mergePartialOptions(this.options, this.renderer.getOptions())
+  }
+
+  /**
+   * Get the map options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): Partial<WebGL2WarpedMapOptions> | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getMapOptions(mapId)
+  }
+
+  /**
+   * Get the map merged options of a specific map ID
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapMergedOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
+    assertRenderer(this.renderer)
+
+    return this.renderer.getMapMergedOptions(mapId)
+  }
+
+  /**
+   * Sets the layer options
+   *
+   * @param layerOptions - Layer options to set
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setLayerOptions(
+    layerOptions: Partial<MapLibreWarpedMapLayerOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.options = mergeOptions(this.options, layerOptions)
+    this.renderer.setOptions(layerOptions, setOptionsOptions)
+  }
+
+  /**
+   * Sets the map options of specific map IDs
+   *
+   * @param mapIds - Map IDs for which to set the options
+   * @param mapOptions - Options to set
+   * @param layerOptions - Layer options to set
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setMapsOptions(
+    mapIds: string[],
+    mapOptions: Partial<WebGL2WarpedMapOptions>,
+    layerOptions?: Partial<MapLibreWarpedMapLayerOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    if (layerOptions) {
+      this.options = mergeOptions(this.options, layerOptions)
+    }
+    this.renderer.setMapsOptions(
+      mapIds,
+      mapOptions,
+      layerOptions,
+      setOptionsOptions
+    )
+  }
+
+  /**
+   * Sets the map options of specific maps by map ID
+   *
+   * @param mapOptionsByMapId - Map options to set by map ID
+   * @param layerOptions - Layer options to set
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setMapsOptionsByMapId(
+    mapOptionsByMapId: Map<string, Partial<WebGL2WarpedMapOptions>>,
+    layerOptions?: Partial<MapLibreWarpedMapLayerOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    if (layerOptions) {
+      this.options = mergeOptions(this.options, layerOptions)
+    }
+    this.renderer.setMapsOptionsByMapId(
+      mapOptionsByMapId,
+      layerOptions,
+      setOptionsOptions
+    )
+  }
+
+  /**
+   * Resets the layer options
+   *
+   * An empty array resets all options, undefined resets no options.
+   * Doesn't reset render options or specific warped map layer options
+   *
+   * @param layerOptionKeys - Keys of the options to reset
+   * @param setOptionsOptions - Options when setting the options
+   */
+  resetLayerOptions(
+    layerOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.resetOptions(layerOptionKeys, setOptionsOptions)
+  }
+
+  /**
+   * Resets the map options of specific map IDs
+   *
+   * An empty array resets all options, undefined resets no options.
+   * Doesn't reset render options or specific warped map layer options
+   *
+   * @param mapIds - Map IDs for which to reset the options
+   * @param mapOptionKeys - Keys of the map options to reset
+   * @param layerOptionKeys - Keys of the layer options to reset
+   * @param setOptionsOptions - Options when setting the options
+   */
+  resetMapsOptions(
+    mapIds: string[],
+    mapOptionKeys?: string[],
+    layerOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.resetMapsOptions(
+      mapIds,
+      mapOptionKeys,
+      layerOptionKeys,
+      setOptionsOptions
+    )
+  }
+
+  /**
+   * Resets the map options of specific maps by map ID
+   *
+   * An empty array or map resets all options (for all maps), undefined resets no options.
+   * Doesn't reset render options or specific warped map layer options
+   *
+   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
+   * @param layerOptionKeys - Keys of the layer options to reset
+   * @param setOptionsOptions - Options when setting the options
+   */
+  resetMapsOptionsByMapId(
+    mapOptionkeysByMapId: Map<string, string[]>,
+    layerOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    assertRenderer(this.renderer)
+
+    this.renderer.resetMapsOptionsByMapId(
+      mapOptionkeysByMapId,
+      layerOptionKeys,
+      setOptionsOptions
+    )
+  }
+
+  /**
+   * Bring maps to front
+   * @param mapIds - IDs of the maps
+   */
+  bringMapsToFront(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.bringMapsToFront(mapIds)
+    this.triggerRepaint()
+  }
+
+  /**
+   * Send maps to back
+   * @param mapIds - IDs of the maps
+   */
+  sendMapsToBack(mapIds: string[]) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.sendMapsToBack(mapIds)
+    this.triggerRepaint()
+  }
+
+  /**
+   * Bring maps forward
+   * @param mapIds - IDs of the maps
+   */
+  bringMapsForward(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.bringMapsForward(mapIds)
+    this.triggerRepaint()
+  }
+
+  /**
+   * Send maps backward
+   * @param mapIds - IDs of the maps
+   */
+  sendMapsBackward(mapIds: Iterable<string>) {
+    assertRenderer(this.renderer)
+
+    this.renderer.warpedMapList.sendMapsBackward(mapIds)
+    this.triggerRepaint()
   }
 
   // /**
@@ -264,7 +653,7 @@ export class WarpedMapLayer implements CustomLayerInterface {
 
   // /**
   //  * Returns the visibility of a single map
-  //  * @returns - whether the map is visible
+  //  * @returns whether the map is visible
   //  */
   // isMapVisible(mapId: string): boolean | undefined {
   //   assertRenderer(this.renderer)
@@ -273,311 +662,68 @@ export class WarpedMapLayer implements CustomLayerInterface {
   //   return warpedMap?.visible
   // }
 
-  /**
-   * Sets the resource mask of a single map
-   * @param mapId - ID of the map
-   * @param resourceMask - new resource mask
-   */
-  setMapResourceMask(mapId: string, resourceMask: Ring) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Sets the resource mask of a single map
+  //  * @param mapId - ID of the map
+  //  * @param resourceMask - new resource mask
+  //  */
+  // setMapResourceMask(mapId: string, resourceMask: Ring) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapResourceMask(resourceMask, mapId)
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.setMapResourceMask(resourceMask, mapId)
+  //   this.triggerRepaint()
+  // }
 
-  /**
-   * Sets the transformation type of multiple maps
-   * @param mapIds - IDs of the maps
-   * @param transformation - new transformation type
-   */
-  setMapsTransformationType(
-    mapIds: Iterable<string>,
-    transformation: TransformationType
-  ) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Sets the transformation type of multiple maps
+  //  * @param mapIds - IDs of the maps
+  //  * @param transformation - new transformation type
+  //  */
+  // setMapsTransformationType(
+  //   mapIds: Iterable<string>,
+  //   transformation: TransformationType
+  // ) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsTransformationType(transformation, {
-      mapIds
-    })
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.setMapsTransformationType(transformation, {
+  //     mapIds
+  //   })
+  //   this.triggerRepaint()
+  // }
 
-  /**
-   * Sets the distortion measure of multiple maps
-   * @param mapIds - IDs of the maps
-   * @param distortionMeasure - new transformation type
-   */
-  setMapsDistortionMeasure(
-    mapIds: Iterable<string>,
-    distortionMeasure?: DistortionMeasure
-  ) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Sets the distortion measure of multiple maps
+  //  * @param mapIds - IDs of the maps
+  //  * @param distortionMeasure - new transformation type
+  //  */
+  // setMapsDistortionMeasure(
+  //   mapIds: Iterable<string>,
+  //   distortionMeasure?: DistortionMeasure
+  // ) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
-      mapIds
-    })
-    this.triggerRepaint()
-  }
+  //   this.renderer.warpedMapList.setMapsDistortionMeasure(distortionMeasure, {
+  //     mapIds
+  //   })
+  //   this.triggerRepaint()
+  // }
 
-  /**
-   * Sets the internal projection of multiple maps
-   * @param mapIds - IDs of the maps
-   * @param internalProjection - new internal projection
-   */
-  setMapsInternalProjection(
-    mapIds: Iterable<string>,
-    internalProjection: Projection
-  ) {
-    assertRenderer(this.renderer)
+  // /**
+  //  * Sets the internal projection of multiple maps
+  //  * @param mapIds - IDs of the maps
+  //  * @param internalProjection - new internal projection
+  //  */
+  // setMapsInternalProjection(
+  //   mapIds: Iterable<string>,
+  //   internalProjection: Projection
+  // ) {
+  //   assertRenderer(this.renderer)
 
-    this.renderer.warpedMapList.setMapsInternalProjection(internalProjection, {
-      mapIds
-    })
-    this.triggerRepaint()
-  }
-
-  /**
-   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
-   * @returns - bounding box of all warped maps
-   */
-  getBounds(): LngLatBoundsLike | undefined {
-    assertRenderer(this.renderer)
-
-    const bbox = this.renderer.warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:4326' }
-    })
-    if (bbox) {
-      return [
-        [bbox[0], bbox[1]],
-        [bbox[2], bbox[3]]
-      ]
-    }
-  }
-
-  /**
-   * Bring maps to front
-   * @param mapIds - IDs of the maps
-   */
-  bringMapsToFront(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
-
-    this.renderer.warpedMapList.bringMapsToFront(mapIds)
-    this.triggerRepaint()
-  }
-
-  /**
-   * Send maps to back
-   * @param mapIds - IDs of the maps
-   */
-  sendMapsToBack(mapIds: string[]) {
-    assertRenderer(this.renderer)
-
-    this.renderer.warpedMapList.sendMapsToBack(mapIds)
-    this.triggerRepaint()
-  }
-
-  /**
-   * Bring maps forward
-   * @param mapIds - IDs of the maps
-   */
-  bringMapsForward(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
-
-    this.renderer.warpedMapList.bringMapsForward(mapIds)
-    this.triggerRepaint()
-  }
-
-  /**
-   * Send maps backward
-   * @param mapIds - IDs of the maps
-   */
-  sendMapsBackward(mapIds: Iterable<string>) {
-    assertRenderer(this.renderer)
-
-    this.renderer.warpedMapList.sendMapsBackward(mapIds)
-    this.triggerRepaint()
-  }
-
-  /**
-   * Returns the z-index of a single map
-   * @param mapId - ID of the warped map
-   * @returns - z-index of the warped map
-   */
-  getMapZIndex(mapId: string): number | undefined {
-    assertRenderer(this.renderer)
-
-    return this.renderer.warpedMapList.getMapZIndex(mapId)
-  }
-
-  // not getZIndex() here since so such concept in MapLibre
-
-  /**
-   * Get the default layer options
-   */
-  getDefaultLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
-    assertRenderer(this.renderer)
-
-    return this.renderer.getDefaultOptions()
-  }
-
-  /**
-   * Get the default map options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getDefaultMapOptions(): WebGL2WarpedMapOptions
-  getDefaultMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined
-  getDefaultMapOptions(mapId?: string): WebGL2WarpedMapOptions | undefined {
-    assertRenderer(this.renderer)
-
-    return this.renderer.getDefaultMapOptions(mapId)
-  }
-
-  /**
-   * Get the layer options
-   */
-  getLayerOptions(): Partial<MapLibreWarpedMapLayerOptions> {
-    assertRenderer(this.renderer)
-
-    return this.renderer.getOptions()
-  }
-
-  /**
-   * Get the map options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
-    assertRenderer(this.renderer)
-
-    return this.renderer.getMapOptions(mapId)
-  }
-
-  /**
-   * Sets the layer options
-   *
-   * @param layerOptions - Layer options to set
-   * @param setOptionsOptions - Options when setting the options
-   */
-  setLayerOptions(
-    layerOptions: Partial<MapLibreWarpedMapLayerOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
-  ) {
-    assertRenderer(this.renderer)
-
-    this.renderer.setOptions(layerOptions, setOptionsOptions)
-  }
-
-  /**
-   * Sets the map options of specific map IDs
-   *
-   * @param mapIds - Map IDs for which to set the options
-   * @param mapOptions - Options to set
-   * @param layerOptions - Layer options to set
-   * @param setOptionsOptions - Options when setting the options
-   */
-  setMapsOptions(
-    mapIds: string[],
-    mapOptions: Partial<MapLibreWarpedMapLayerOptions>,
-    layerOptions?: Partial<MapLibreWarpedMapLayerOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
-  ) {
-    assertRenderer(this.renderer)
-
-    this.renderer.setMapsOptions(
-      mapIds,
-      mapOptions,
-      layerOptions,
-      setOptionsOptions
-    )
-  }
-
-  /**
-   * Sets the map options of specific maps by map ID
-   *
-   * @param mapOptionsByMapId - Map options to set by map ID
-   * @param layerOptions - Layer options to set
-   * @param setOptionsOptions - Options when setting the options
-   */
-  setMapsOptionsByMapId(
-    mapOptionsByMapId: Map<string, Partial<MapLibreWarpedMapLayerOptions>>,
-    layerOptions?: Partial<MapLibreWarpedMapLayerOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
-  ) {
-    assertRenderer(this.renderer)
-
-    this.renderer.setMapsOptionsByMapId(
-      mapOptionsByMapId,
-      layerOptions,
-      setOptionsOptions
-    )
-  }
-
-  /**
-   * Resets the layer options
-   *
-   * An empty array resets all options, undefined resets no options.
-   *
-   * @param layerOptionKeys - Keys of the options to reset
-   * @param setOptionsOptions - Options when setting the options
-   */
-  resetLayerOptions(
-    layerOptionKeys?: string[],
-    setOptionsOptions?: Partial<SetOptionsOptions>
-  ) {
-    assertRenderer(this.renderer)
-
-    this.renderer.resetOptions(layerOptionKeys, setOptionsOptions)
-  }
-
-  /**
-   * Resets the map options of specific map IDs
-   *
-   * An empty array resets all options, undefined resets no options.
-   *
-   * @param mapIds - Map IDs for which to reset the options
-   * @param mapOptionKeys - Keys of the map options to reset
-   * @param layerOptionKeys - Keys of the layer options to reset
-   * @param setOptionsOptions - Options when setting the options
-   */
-  resetMapsOptions(
-    mapIds: string[],
-    mapOptionKeys?: string[],
-    layerOptionKeys?: string[],
-    setOptionsOptions?: Partial<SetOptionsOptions>
-  ) {
-    assertRenderer(this.renderer)
-
-    this.renderer.resetMapsOptions(
-      mapIds,
-      mapOptionKeys,
-      layerOptionKeys,
-      setOptionsOptions
-    )
-  }
-
-  /**
-   * Resets the map options of specific maps by map ID
-   *
-   * An empty array or map resets all options (for all maps), undefined resets no options.
-   *
-   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
-   * @param layerOptionKeys - Keys of the layer options to reset
-   * @param setOptionsOptions - Options when setting the options
-   */
-  resetMapsOptionsByMapId(
-    mapOptionkeysByMapId: Map<string, string[]>,
-    layerOptionKeys?: string[],
-    setOptionsOptions?: Partial<SetOptionsOptions>
-  ) {
-    assertRenderer(this.renderer)
-
-    this.renderer.resetMapsOptionsByMapId(
-      mapOptionkeysByMapId,
-      layerOptionKeys,
-      setOptionsOptions
-    )
-  }
+  //   this.renderer.warpedMapList.setMapsInternalProjection(internalProjection, {
+  //     mapIds
+  //   })
+  //   this.triggerRepaint()
+  // }
 
   // /**
   //  * Sets the object that caches image information

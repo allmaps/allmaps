@@ -8,8 +8,7 @@ import type {
   GetImageData,
   GetImageDataValue,
   GetImageDataSize,
-  IntArrayRenderOptions,
-  WarpedMapOptions
+  IntArrayRenderOptions
 } from '../shared/types.js'
 
 import type { WarpedMap } from '../maps/WarpedMap.js'
@@ -32,7 +31,7 @@ export class IntArrayRenderer<D>
     getImageData: GetImageData<D>,
     getImageDataValue: GetImageDataValue<D>,
     getImageDataSize: GetImageDataSize<D>,
-    options?: Partial<IntArrayRenderOptions<WarpedMapOptions>>
+    options?: Partial<IntArrayRenderOptions>
   ) {
     super(
       CacheableIntArrayTile.createFactory(getImageData),
