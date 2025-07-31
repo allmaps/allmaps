@@ -21,7 +21,7 @@ import {
   mergeOptions,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { lonLatProjection, proj4 } from '@allmaps/project'
+import { isEqualProjection, lonLatProjection, proj4 } from '@allmaps/project'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
@@ -336,8 +336,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return
     }
 
-    this.warpedMapList.options.projection = this.viewport.projection
-    this.warpedMapList.setOptions({ projection: this.viewport.projection })
+    if (
+      !isEqualProjection(
+        this.warpedMapList.options.projection,
+        this.viewport.projection
+      )
+    ) {
+      this.warpedMapList.options.projection = this.viewport.projection
+      this.warpedMapList.setOptions({ projection: this.viewport.projection })
+    }
   }
 
   protected requestFetchableTiles(): void {

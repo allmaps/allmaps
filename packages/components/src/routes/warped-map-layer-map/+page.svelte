@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WarpedMapLayerMap from '$lib/components/WarpedMapLayerMap.svelte'
+  import WarpedMapLayerMap from '$lib/components/maps/WarpedMapLayerMap.svelte'
 
   import { parseAnnotation, type GeoreferencedMap } from '@allmaps/annotation'
 
