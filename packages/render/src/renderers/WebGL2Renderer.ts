@@ -50,8 +50,7 @@ import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-im
 import type {
   Renderer,
   SpecificWebGL2RenderOptions,
-  WebGL2RenderOptions,
-  WebGL2WarpedMapOptions
+  WebGL2RenderOptions
 } from '../shared/types.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200

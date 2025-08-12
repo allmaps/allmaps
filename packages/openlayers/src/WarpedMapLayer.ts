@@ -467,7 +467,7 @@ export class WarpedMapLayer
    * Get the default layer options
    */
   getDefaultLayerOptions(): SpecificOpenLayersWarpedMapLayerOptions &
-    Partial<WebGL2RenderOptions> {
+    WebGL2RenderOptions {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return mergeOptions(

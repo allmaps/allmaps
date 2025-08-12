@@ -11,7 +11,7 @@ const annotation = await fetch(
 ).then((response) => response.json())
 
 const maps = parseAnnotation(annotation)
-const bearing = computeGeoreferencedMapBearing(map[0])
+const bearing = computeGeoreferencedMapBearing(maps[0])
 console.log(bearing)
 ```
 

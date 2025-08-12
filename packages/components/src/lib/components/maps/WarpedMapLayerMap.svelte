@@ -320,7 +320,9 @@
     // because of the mapOptionsState infering from layer options in this setup,
     // all map options changed first one by one before the layer options changed
     // and the renderer prefers options to be set jointly (especially when using animations).
-    // A potential fix could be to move the render animation logic to the map level.
+    // A potential fix could be to move the render animation logic to the map level,
+    // or to infer not from the reactive variables but using an event from warpedmaplayer
+    // which would be fired after the layer options update is done (but would also infere view options).
     // (Reminder: We had to used $effect.root() when setting merged options in MapOptionState.)
     const mapOptionsByMapId = new Map(
       Array.from(mapOptionsStateByMapId).map(([mapId, mapOptionsState]) => [
