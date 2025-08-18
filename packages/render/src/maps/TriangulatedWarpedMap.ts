@@ -3,8 +3,8 @@ import { interpolatePolygon, triangulateToUnique } from '@allmaps/triangulate'
 import {
   mixNumbers,
   mixPoints,
-  getPropertyFromCacheOrComputation,
-  getPropertyFromTripleCacheOrComputation,
+  getPropertyFromDoubleCacheOrComputation,
+  getPropertyFromQuadrupleCacheOrComputation,
   mergeOptions,
   mixLineStrings
 } from '@allmaps/stdlib'
@@ -78,10 +78,13 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
   projectedGcpPreviousTriangulation?: GcpTriangulation
   projectedGcpTriangulation?: GcpTriangulation
-  protected resourceTriangulationCache: Map<number, TriangulationToUnique>
+  protected resourceTriangulationCache: Map<
+    number,
+    Map<string, TriangulationToUnique>
+  >
   protected projectedGcpTriangulationCache: Map<
     number,
-    Map<TransformationType, Map<Projection, GcpTriangulation>>
+    Map<string, Map<TransformationType, Map<string, GcpTriangulation>>>
   >
 
   resourceTrianglePoints: Point[] = []
@@ -155,7 +158,6 @@ export class TriangulatedWarpedMap extends WarpedMap {
     resourceMask: Ring
   ): void {
     super.setResourceMask(resourceFullMask, resourceAppliableMask, resourceMask)
-    this.clearResourceTriangulationCaches()
     this.updateTriangulation()
   }
 
@@ -191,7 +193,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Reset previous transform properties to new ones (when completing a transformer transitions).
+   * Reset previous transform properties to new ones (when completing an animation).
    */
   resetPrevious() {
     super.resetPrevious()
@@ -207,7 +209,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Mix previous transform properties with new ones (when changing an ongoing transformer transition).
+   * Mix previous transform properties with new ones (when changing an ongoing animation).
    *
    * @param t - animation progress
    */
@@ -321,19 +323,21 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
 
     // Compute triangulation
-    this.projectedGcpTriangulation = getPropertyFromTripleCacheOrComputation(
+    this.projectedGcpTriangulation = getPropertyFromQuadrupleCacheOrComputation(
       this.projectedGcpTriangulationCache,
       this.resourceResolution,
+      String(this.resourceMask),
       this.transformationType,
-      this.internalProjection,
+      this.internalProjection.definition,
       () => {
         const {
           uniquePoints,
           uniquePointIndexTriangles,
           uniquePointIndexInterpolatedPolygon
-        } = getPropertyFromCacheOrComputation(
+        } = getPropertyFromDoubleCacheOrComputation(
           this.resourceTriangulationCache,
           this.resourceResolution,
+          String(this.resourceMask),
           () =>
             triangulateToUnique([this.resourceMask], this.resourceResolution, {
               steinerPoints: this.gcps.map((gcp) => gcp.resource)
@@ -373,11 +377,12 @@ export class TriangulatedWarpedMap extends WarpedMap {
     if (refinePrevious) {
       this.previousResourceResolution = this.resourceResolution
       this.projectedGcpPreviousTriangulation =
-        getPropertyFromTripleCacheOrComputation(
+        getPropertyFromQuadrupleCacheOrComputation(
           this.projectedGcpTriangulationCache,
           this.previousResourceResolution,
+          String(this.resourceMask),
           this.previousTransformationType,
-          this.previousInternalProjection,
+          this.previousInternalProjection.definition,
           () => {
             if (!this.projectedGcpTriangulation) {
               // TODO: rewrite this function, make more readble?

@@ -1,16 +1,10 @@
-# @allmaps/maplibre
+# @allmaps/warpedmaplayer
 
-Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
-
-[![Example of the Allmaps plugin for MapLibre](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/maplibre/example.jpg)](https://observablehq.com/@allmaps/maplibre-plugin)
-
-Examples:
-
-- [Observable notebook](https://observablehq.com/@allmaps/maplibre-plugin)
+Base class for Allmaps plugins. This class contains the main logic for the WarpedMapLayer class exported by the Leaflet, OpenLayers and MapLibre plugins for Allmaps, which allow displaying georeferenced [IIIF images](https://iiif.io/) on a webmap. These plugins work by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and use WebGL to transform images from a IIIF image server to overlay them on their correct geographical position.
 
 ## How it works
 
-This plugin creates a new class `WarpedMapLayer` which extends MapLibre's [`CustomLayerInterface`](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/). You can add one or multiple Georeference Annotations (or AnnotationPages with multiple Georeference Annotations) to a WarpedMapLayer, and add the WarpedMapLayer to your MapLibre map. This will render all georeferenced maps contained in the Georeference Annotation on your MapLibre map.
+This plugin creates a new class `WarpedMapLayer` which extends or is implemented by the `Layer` classes of the webmap libraries Leaflet, OpenLayers and MapLibre. Where it extends (MapLibre), the methods defined in this package are inherited automatically. Where it is implemented (Leaflet and OpenLayers) any changes to these methods should be copy-pasted to the implementing classes (see comments in the code).
 
 To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
 
@@ -32,57 +26,7 @@ pnpm run build
 
 ## Usage
 
-Built for MapLibre 4.0, but should work with earlier versions as well.
-
-### Loading a Georeference Annotation
-
-Creating a `WarpedMapLayer` and adding it to a map looks like this:
-
-```js
-import { WarpedMapLayer } from '@allmaps/maplibre'
-
-// MapLibre map with base layer
-const map = new maplibregl.Map({
-  container: 'map',
-  style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-  center: [-73.9337, 40.8011],
-  zoom: 11.5,
-  // Pitch is currently not supported by the Allmaps plugin for MapLibre
-  maxPitch: 0
-})
-
-const annotationUrl = 'https://annotations.allmaps.org/images/d180902cb93d5bf2'
-const warpedMapLayer = new WarpedMapLayer()
-
-map.on('load', () => {
-  map.addLayer(warpedMapLayer)
-  warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
-})
-```
-
-WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/). It can be added to a map like any other MapLibre layer, but there are some things to take into account:
-
-- `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
-- `WarpedMapLayer` currently does not support pitch, so disable it on your map.
-- Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
-
-```js
-const warpedMapLayerWithUniqueId = new WarpedMapLayer({layerId: 'my-unique-id'})
-```
-
-A Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
-
-```js
-fetch(annotationUrl)
-  .then((response) => response.json())
-  .then((annotation) => warpedMapLayer.addGeoreferenceAnnotation(annotation))
-```
-
-Or:
-
-```js
-await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
-```
+This package contains the main logic for the WarpedMapLayer class exported by the Allmaps plugins for Leaflet, OpenLayers and MapLibre. It should not be used directly. See the readme of the plugins for more usage information. Use this readme to understand the API of the WarpedMapLayer methods shared between the plugins.
 
 ### Events
 
@@ -98,27 +42,19 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 | The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
 | All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
 
-You can listen to them in the typical MapLibre way. Here's an example:
-
-```js
-warpedMapLayer.on('warpedmapadded', (event) => {
-  console.log(event.mapId, warpedMapLayer.getBounds())
-})
-```
-
-Some of the functions specified in the API only make sense once a warped map is loaded into the WarpedMapLayer. You can use such listeners to make sure function are run e.g. only after a warped map has been added.
-
 ### What is a _map_?
 
-A MapLibre map is an instance of the MapLibre [`Map`](https://maplibre.org/maplibre-gl-js/docs/API/classes/maplibregl.Map/) class, the central class of the MapLibre API, used to create a map on a page and manipulate it.
+Leaflet, OpenLayer and MapLibre each have their concept of a 'map' as the central class their API (see Leaflet [`Map`](https://leafletjs.com/reference.html#map), OpenLayers [`Map`](https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html) and MapLibre [`Map`](https://maplibre.org/maplibre-gl-js/docs/API/classes/maplibregl.Map/)). It generally refers to a `<div>` an a page where tiles or WebGL logic is used to render a projection of the world.
 
-In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
+In Allmaps the concept 'map' is rather related to a Georeference Annotation. There are different classes named 'map', one for each phase a map takes through the Allmaps rendering pipeline:
 
-- When a Georeference Annotation is parsed, an instance of the Georeferenced Map class is created from it.
-- When this map is loaded into an application for rendering, an instance of the Warped Map class is created from it.
-- Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
+- When a Georeference Annotation is parsed, an instance of the `GeoreferencedMap` class is created from it.
+- When this map is loaded into an application for rendering, an instance of the `WarpedMap` class is created from it.
+- Inside the WebGL2 Renderer, the `WebGL2WarpedMap` class is used to render the map.
 
 All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used though-out Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
+
+Note that since a WarpedMapLayer can load multiple Georeference Annotations, we could have multiple Allmaps 'maps' on e.g. one Leaflet 'map'.
 
 ## License
 

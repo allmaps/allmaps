@@ -2,7 +2,7 @@
 
 Allmaps plugin for OpenLayers. Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/).
 
-Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
 
 [![Example of the Allmaps plugin for OpenLayers](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/openlayers/example.jpg)](https://observablehq.com/@allmaps/openlayers-plugin)
 
@@ -79,19 +79,9 @@ Or:
 await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-### Events
+### WarpedMapLayer API and Events
 
-The following events are emitted to inform you of the state of the WarpedMapLayer:
-
-| Description                                                   | Type                      | Data                               |
-| ------------------------------------------------------------- | ------------------------- | ---------------------------------- |
-| A warped map has been added to the warped map list            | `warpedmapadded`          | `mapId: string`                    |
-| A warped map has been removed from the warped map list        | `warpedmapremoved`        | `mapId: string`                    |
-| A warped map enters the viewport                              | `warpedmapenter`          | `mapId: string`                    |
-| A warped map leaves the viewport                              | `warpedmapleave`          | `mapId: string`                    |
-| The visibility of some warpedMaps has changed                 | `visibilitychanged`       | `mapIds: string[]`                 |
-| The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
-| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins) and a list of events emitted by a WarpedMapLayer.
 
 You can listen to them in the typical OpenLayers way. Here's an example:
 
@@ -100,18 +90,6 @@ warpedMapLayer.on('warpedmapadded', (event) => {
   console.log(event.mapId, warpedMapLayer.getExtent())
 })
 ```
-
-### What is a _map_?
-
-An OpenLayers map is an instance of the OpenLayers [`Map`](https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html) class, the central class of the OpenLayers API, used to create a map on a page and manipulate it.
-
-In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
-
-- When a Georeference Annotation is parsed, an instance of the Georeferenced Map class is created from it.
-- When this map is loaded into an application for rendering, an instance of the Warped Map class is created from it.
-- Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
-
-All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used thoughout Allmaps (and in the API below) to identify a map. It is returned after adding a Georeference Annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
 
 ## License
 

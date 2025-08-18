@@ -20,24 +20,19 @@ import {
 } from '@allmaps/stdlib'
 import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
 
-import type {
-  Point,
-  Rectangle,
-  ImageInfoByMapId,
-  Ring,
-  Bbox
-} from '@allmaps/types'
+import type { Point, Rectangle, Ring, Bbox } from '@allmaps/types'
 
 export type SpecificLeafletWarpedMapLayerOptions = {
   interactive: boolean
   className: string
   pane: string
   zIndex?: number
-  imageInformations?: ImageInfoByMapId
 }
 
 export type LeafletWarpedMapLayerOptions =
   SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+
+type SpecificWarpedMapLayerOptions = LeafletWarpedMapLayerOptions
 
 const DEFAULT_SPECIFIC_LEAFLET_WARPED_MAP_LAYER_OPTIONS = {
   interactive: false,
@@ -524,6 +519,23 @@ export class WarpedMapLayer
   }
 
   /**
+   * Removes a Georeferenced Map by its ID
+   *
+   * @param mapId - Map ID of the georeferenced map to remove
+   * @returns Map ID of the map that was removed, or an error
+   */
+  async removeGeoreferencedMapById(
+    mapId: string
+  ): Promise<string | Error | undefined> {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    const result = this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
+    this.nativeUpdate()
+
+    return result
+  }
+
+  /**
    * Get the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
   getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
@@ -649,28 +661,6 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the default layer options
-   */
-  getDefaultLayerOptions(): SpecificLeafletWarpedMapLayerOptions &
-    WebGL2RenderOptions {
-    BaseWarpedMapLayer.assertRenderer(this.renderer)
-
-    return mergeOptions(
-      this.renderer.getDefaultOptions(),
-      this.defaultSpecificWarpedMapLayerOptions
-    )
-  }
-
-  /**
-   * Get the default map options of a specific map ID
-   */
-  getDefaultMapOptions(): Partial<WebGL2WarpedMapOptions> {
-    BaseWarpedMapLayer.assertRenderer(this.renderer)
-
-    return this.renderer.getDefaultMapOptions()
-  }
-
-  /**
    * Get the default map merged options of a specific map ID
    *
    * @param mapId - Map ID for which the options apply
@@ -689,16 +679,14 @@ export class WarpedMapLayer
    * Get the layer options
    */
   getLayerOptions(): Partial<
-    SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+    SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
   > {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return mergePartialOptions(
       this.options,
       this.renderer.getOptions()
-    ) as Partial<
-      SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-    >
+    ) as Partial<SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
   }
 
   /**
@@ -728,10 +716,14 @@ export class WarpedMapLayer
    *
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
+   * @example
+   * ```js
+   * warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
+   * ```
    */
   setLayerOptions(
     layerOptions: Partial<
-      SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
     >,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
@@ -748,12 +740,16 @@ export class WarpedMapLayer
    * @param mapOptions - Options to set
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
+   * @example
+   * ```js
+   * warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+   * ```
    */
   setMapsOptions(
     mapIds: string[],
     mapOptions: Partial<WebGL2WarpedMapOptions>,
     layerOptions?: Partial<
-      SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
     >,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
@@ -780,7 +776,7 @@ export class WarpedMapLayer
   setMapsOptionsByMapId(
     mapOptionsByMapId: Map<string, Partial<WebGL2WarpedMapOptions>>,
     layerOptions?: Partial<
-      SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
+      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
     >,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {

@@ -84,10 +84,15 @@ export function createWarpedMapFactory() {
  *
  * @param mapId - ID of the map
  * @param georeferencedMap - Georeferenced map used to construct the WarpedMap
- * @param imageInformations - Image informations
+ * @param defaultOptions - Default options
+ * @param georeferencedMapOptions - Options from georeferenced map
+ * @param listOptions - Options from warped map list
+ * @param options - Options specific to this map
+ * @param mergedOptions - Result of merging default, georeferenced map, list and specific map options
+ * @param imageInfo - Image information
  * @param parsedImage - ID of the image
- * @param visible - Whether the map is visible
- * @param applyMask - Whether to apply the mask
+ * @param loadingImageInfo - Whether the image information is loading
+ * @param mixed - Wether the options were last set by mixing previous and new properties, i.e. when rerendering during an ongoing animation
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
  * @param resourcePoints - The resource coordinates of the ground control points
@@ -111,7 +116,6 @@ export function createWarpedMapFactory() {
  * @param projection - Projection of the projected geospatial coordinates space
  * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
- * @param projectedTransformerByTransformationType - A Map of projected transformers by transformationType
  * @param geoFullMask - resourceAppliableMask in geospatial coordinates
  * @param geoFullMaskBbox - Bbox of the geoFullMask
  * @param geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
@@ -662,7 +666,7 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Reset previous transform properties to new ones (when completing a transformer transitions).
+   * Reset previous transform properties to new ones (when completing an animation).
    */
   resetPrevious() {
     this.mixed = false
@@ -675,7 +679,7 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Mix previous transform properties with new ones (when changing an ongoing transformer transition).
+   * Mix previous transform properties with new ones (when changing an ongoing animation).
    *
    * @param t - animation progress
    */

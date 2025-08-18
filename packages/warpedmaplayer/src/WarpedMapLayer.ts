@@ -162,6 +162,23 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Removes a Georeferenced Map by its ID
+   *
+   * @param mapId - Map ID of the georeferenced map to remove
+   * @returns Map ID of the map that was removed, or an error
+   */
+  async removeGeoreferencedMapById(
+    mapId: string
+  ): Promise<string | Error | undefined> {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    const result = this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
+    this.nativeUpdate()
+
+    return result
+  }
+
+  /**
    * Get the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
   getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
@@ -287,28 +304,6 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the default layer options
-   */
-  getDefaultLayerOptions(): SpecificWarpedMapLayerOptions &
-    WebGL2RenderOptions {
-    BaseWarpedMapLayer.assertRenderer(this.renderer)
-
-    return mergeOptions(
-      this.renderer.getDefaultOptions(),
-      this.defaultSpecificWarpedMapLayerOptions
-    )
-  }
-
-  /**
-   * Get the default map options of a specific map ID
-   */
-  getDefaultMapOptions(): Partial<WebGL2WarpedMapOptions> {
-    BaseWarpedMapLayer.assertRenderer(this.renderer)
-
-    return this.renderer.getDefaultMapOptions()
-  }
-
-  /**
    * Get the default map merged options of a specific map ID
    *
    * @param mapId - Map ID for which the options apply
@@ -364,6 +359,10 @@ export abstract class BaseWarpedMapLayer<
    *
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
+   * @example
+   * ```js
+   * warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
+   * ```
    */
   setLayerOptions(
     layerOptions: Partial<
@@ -384,6 +383,10 @@ export abstract class BaseWarpedMapLayer<
    * @param mapOptions - Options to set
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
+   * @example
+   * ```js
+   * warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+   * ```
    */
   setMapsOptions(
     mapIds: string[],

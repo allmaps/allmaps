@@ -105,23 +105,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Get the default Renderer options
-   */
-  getDefaultOptions(): WarpedMapListOptions & BaseRenderOptions {
-    return mergeOptions(
-      this.warpedMapList.getDefaultOptions(),
-      DEFAULT_BASE_RENDER_OPTIONS
-    )
-  }
-
-  /**
-   * Get the default options
-   */
-  getDefaultMapOptions(): Partial<GetWarpedMapOptions<W>> {
-    return this.warpedMapList.getDefaultMapOptions()
-  }
-
-  /**
    * Get the default merged options of a specific map ID
    *
    * @param mapId - Map ID for which the map options apply

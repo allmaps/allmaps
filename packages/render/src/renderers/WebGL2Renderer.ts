@@ -269,16 +269,6 @@ export class WebGL2Renderer
   }
 
   /**
-   * Get the default WebGL2Renderer options
-   */
-  getDefaultOptions(): WebGL2RenderOptions {
-    return mergeOptions(
-      super.getDefaultOptions(),
-      DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS
-    )
-  }
-
-  /**
    * Render the map for a given viewport.
    *
    * If no viewport is specified the current viewport is rerendered.
@@ -874,7 +864,7 @@ export class WebGL2Renderer
     )
   }
 
-  private startTransformerTransition(mapIds: string[]) {
+  private startAnimation(mapIds: string[]) {
     // This changed() is needed to prevent a blank canvas flash
     this.changed()
     this.updateVertexBuffers(mapIds)
@@ -887,11 +877,11 @@ export class WebGL2Renderer
     this.animationProgress = 0
     this.transformaterTransitionStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
-      ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(this)
+      ((now: number) => this.animationFrame(now, mapIds)).bind(this)
     )
   }
 
-  private transformerTransitionFrame(now: number, mapIds: string[]) {
+  private animationFrame(now: number, mapIds: string[]) {
     if (!this.transformaterTransitionStart) {
       this.transformaterTransitionStart = now
     }
@@ -907,17 +897,15 @@ export class WebGL2Renderer
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
-        ((now: number) => this.transformerTransitionFrame(now, mapIds)).bind(
-          this
-        )
+        ((now: number) => this.animationFrame(now, mapIds)).bind(this)
       )
     } else {
       // Animation ended
-      this.finishTransformerTransition(mapIds)
+      this.finishAnimation(mapIds)
     }
   }
 
-  private finishTransformerTransition(mapIds: string[]) {
+  private finishAnimation(mapIds: string[]) {
     this.resetPrevious(mapIds)
     this.updateVertexBuffers(mapIds)
 
@@ -992,10 +980,7 @@ export class WebGL2Renderer
 
   protected prepareChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapIds = event.data as string[]
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
-        mapIds
-      })) {
+      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
         if (this.animating) {
           webgl2WarpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }
@@ -1006,14 +991,14 @@ export class WebGL2Renderer
   protected animatedChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.startTransformerTransition(mapIds)
+      this.startAnimation(mapIds)
     }
   }
 
   protected immediateChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
       const mapIds = event.data as string[]
-      this.finishTransformerTransition(mapIds)
+      this.finishAnimation(mapIds)
     }
   }
 

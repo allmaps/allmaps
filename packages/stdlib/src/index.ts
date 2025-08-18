@@ -39,7 +39,8 @@ export {
 export {
   getPropertyFromCacheOrComputation,
   getPropertyFromDoubleCacheOrComputation,
-  getPropertyFromTripleCacheOrComputation
+  getPropertyFromTripleCacheOrComputation,
+  getPropertyFromQuadrupleCacheOrComputation
 } from './cache.js'
 
 export {

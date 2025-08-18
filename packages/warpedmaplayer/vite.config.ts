@@ -2,8 +2,6 @@ import { defineConfig, type PluginOption, type UserConfig } from 'vite'
 import noBundlePlugin from 'vite-plugin-no-bundle'
 import dts from 'vite-plugin-dts'
 
-import ports from '../../ports.json' with { type: 'json' }
-
 export default defineConfig({
   base: './',
   build: {
