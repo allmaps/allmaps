@@ -168,29 +168,29 @@ export type CachableTileFactory<D> = (
   fetchFn?: FetchFn
 ) => CacheableTile<D>
 
-export type RenderLineLayerOptions = {
+export type RenderLineGroupOptions = {
   viewportSize: number
   color: string
   viewportBorderSize: number
   borderColor: string
 }
 
-export type RenderPointLayerOptions = {
+export type RenderPointGroupOptions = {
   viewportSize: number
   color: string
   viewportBorderSize: number
   borderColor: string
 }
 
-export type LineLayer = {
+export type LineGroup = {
   projectedGeoLines: Line[]
   projectedGeoPreviousLines?: Line[]
-} & Partial<RenderLineLayerOptions>
+} & Partial<RenderLineGroupOptions>
 
-export type PointLayer = {
+export type PointGroup = {
   projectedGeoPoints: Point[]
   projectedGeoPreviousPoints?: Point[]
-} & Partial<RenderPointLayerOptions>
+} & Partial<RenderPointGroupOptions>
 
 export type MapPruneInfo = {
   tileZoomLevelForViewport?: TileZoomLevel

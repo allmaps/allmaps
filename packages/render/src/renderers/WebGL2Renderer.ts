@@ -475,9 +475,9 @@ export class WebGL2Renderer
 
       // Draw lines for each map
       const count =
-        webgl2WarpedMap.lineLayers.reduce(
-          (accumulator: number, lineLayer) =>
-            accumulator + lineLayer.projectedGeoLines.length,
+        webgl2WarpedMap.lineGroups.reduce(
+          (accumulator: number, lineGroup) =>
+            accumulator + lineGroup.projectedGeoLines.length,
           0
         ) * 6
       const primitiveType = this.gl.TRIANGLES
@@ -500,9 +500,9 @@ export class WebGL2Renderer
       this.setPointsProgramMapUniforms(webgl2WarpedMap)
 
       // Draw points for each map
-      const count = webgl2WarpedMap.pointLayers.reduce(
-        (accumulator: number, pointLayer) =>
-          accumulator + pointLayer.projectedGeoPoints.length,
+      const count = webgl2WarpedMap.pointGroups.reduce(
+        (accumulator: number, pointGroup) =>
+          accumulator + pointGroup.projectedGeoPoints.length,
         0
       )
       const primitiveType = this.gl.POINTS

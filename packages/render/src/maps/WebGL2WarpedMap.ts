@@ -36,8 +36,8 @@ import type { Image } from '@allmaps/iiif-parser'
 import type { Line, Point, Tile, HomogeneousTransform } from '@allmaps/types'
 
 import type {
-  LineLayer,
-  PointLayer,
+  LineGroup,
+  PointGroup,
   SetOptionsOptions,
   SpecificWebGL2WarpedMapOptions,
   WebGL2WarpedMapOptions
@@ -50,14 +50,14 @@ const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
   trailing: true
 }
 
-const DEFAULT_RENDER_LINE_LAYER_OPTIONS = {
+const DEFAULT_RENDER_LINE_GROUP_OPTIONS = {
   viewportSize: 6,
   color: black,
   viewportBorderSize: 0,
   borderColor: white
 }
 
-const DEFAULT_RENDER_POINT_LAYER_OPTION = {
+const DEFAULT_RENDER_POINT_GROUP_OPTION = {
   viewportSize: 16,
   color: black,
   viewportBorderSize: 1,
@@ -152,8 +152,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   linesVao: WebGLVertexArrayObject | null = null
   pointsVao: WebGLVertexArrayObject | null = null
 
-  lineLayers: LineLayer[] = []
-  pointLayers: PointLayer[] = []
+  lineGroups: LineGroup[] = []
+  pointGroups: PointGroup[] = []
 
   // Consider to store cachedTilesByTileKey as a quadtree for faster lookups
   cachedTilesByTileKey: Map<string, CachedTile<ImageData>>
@@ -362,11 +362,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     super.destroy()
   }
 
-  private setLineLayers() {
-    this.lineLayers = []
+  private setLineGroups() {
+    this.lineGroups = []
 
     if (this.mergedOptions.renderVectors) {
-      this.lineLayers.push({
+      this.lineGroups.push({
         projectedGeoLines: pointsAndPointsToLines(
           this.projectedGeoPoints,
           this.projectedGeoTransformedResourcePoints
@@ -383,7 +383,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
 
     if (this.mergedOptions.renderFullMask) {
-      this.lineLayers.push({
+      this.lineGroups.push({
         projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
         viewportSize: this.mergedOptions.renderFullMaskSize,
         color: this.mergedOptions.renderFullMaskColor,
@@ -393,7 +393,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
 
     if (this.mergedOptions.renderAppliableMask) {
-      this.lineLayers.push({
+      this.lineGroups.push({
         projectedGeoLines: lineStringToLines(
           this.projectedGeoTriangulationAppliableMask
         ),
@@ -408,7 +408,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
 
     if (this.mergedOptions.renderMask) {
-      this.lineLayers.push({
+      this.lineGroups.push({
         projectedGeoLines: lineStringToLines(
           this.projectedGeoTriangulationMask
         ),
@@ -423,11 +423,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
   }
 
-  private setPointLayers() {
-    this.pointLayers = []
+  private setPointGroups() {
+    this.pointGroups = []
 
     if (this.mergedOptions.renderGcps) {
-      this.pointLayers.push({
+      this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoPoints,
         viewportSize: this.mergedOptions.renderGcpsSize,
         color: this.mergedOptions.renderGcpsColor,
@@ -437,7 +437,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
 
     if (this.mergedOptions.renderTransformedGcps) {
-      this.pointLayers.push({
+      this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoTransformedResourcePoints,
         projectedGeoPreviousPoints:
           this.projectedGeoPreviousTransformedResourcePoints,
@@ -449,11 +449,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
 
     if (this.mergedOptions.debugTriangulation) {
-      this.pointLayers.push({
+      this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoPreviousTrianglePoints,
         color: gray
       })
-      this.pointLayers.push({
+      this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoTrianglePoints,
         color: yellow
       })
@@ -552,12 +552,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.linesProgram
     gl.bindVertexArray(this.linesVao)
 
-    this.setLineLayers()
+    this.setLineGroups()
 
-    const clipSixPoints = this.lineLayers
+    const clipSixPoints = this.lineGroups
       .reduce(
-        (accumulator: Line[], lineLayer) =>
-          accumulator.concat(lineLayer.projectedGeoLines),
+        (accumulator: Line[], lineGroup) =>
+          accumulator.concat(lineGroup.projectedGeoLines),
         []
       )
       .map((projectedGeoLine) => [
@@ -580,10 +580,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPoint'
     )
 
-    const clipSixOtherPoints = this.lineLayers
+    const clipSixOtherPoints = this.lineGroups
       .reduce(
-        (accumulator: Line[], lineLayer) =>
-          accumulator.concat(lineLayer.projectedGeoLines),
+        (accumulator: Line[], lineGroup) =>
+          accumulator.concat(lineGroup.projectedGeoLines),
         []
       )
       .map((projectedGeoLine) => [
@@ -606,11 +606,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipOtherPoint'
     )
 
-    const clipSixPreviousPoints = this.lineLayers
+    const clipSixPreviousPoints = this.lineGroups
       .reduce(
-        (accumulator: Line[], lineLayer) =>
+        (accumulator: Line[], lineGroup) =>
           accumulator.concat(
-            lineLayer.projectedGeoPreviousLines || lineLayer.projectedGeoLines
+            lineGroup.projectedGeoPreviousLines || lineGroup.projectedGeoLines
           ),
         []
       )
@@ -634,11 +634,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPreviousPoint'
     )
 
-    const clipSixPreviousOtherPoints = this.lineLayers
+    const clipSixPreviousOtherPoints = this.lineGroups
       .reduce(
-        (accumulator: Line[], lineLayer) =>
+        (accumulator: Line[], lineGroup) =>
           accumulator.concat(
-            lineLayer.projectedGeoPreviousLines || lineLayer.projectedGeoLines
+            lineGroup.projectedGeoPreviousLines || lineGroup.projectedGeoLines
           ),
         []
       )
@@ -662,10 +662,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPreviousOtherPoint'
     )
 
-    const sixIsOtherPoints = this.lineLayers.reduce(
-      (accumulator: number[], lineLayer) =>
+    const sixIsOtherPoints = this.lineGroups.reduce(
+      (accumulator: number[], lineGroup) =>
         accumulator.concat(
-          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) => [
+          lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) => [
             0, 0, 1, 0, 0, 1
           ])
         ),
@@ -679,10 +679,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_isOtherPoint'
     )
 
-    const sixNormalSigns = this.lineLayers.reduce(
-      (accumulator: number[], lineLayer) =>
+    const sixNormalSigns = this.lineGroups.reduce(
+      (accumulator: number[], lineGroup) =>
         accumulator.concat(
-          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) => [
+          lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) => [
             +1, -1, +1, +1, -1, +1
           ])
         ),
@@ -696,13 +696,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_normalSign'
     )
 
-    const viewportSizes = this.lineLayers.reduce(
-      (accumulator: number[], lineLayer) =>
+    const viewportSizes = this.lineGroups.reduce(
+      (accumulator: number[], lineGroup) =>
         accumulator.concat(
-          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+          lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.viewportSize ??
-                DEFAULT_RENDER_LINE_LAYER_OPTIONS.viewportSize
+              lineGroup.viewportSize ??
+                DEFAULT_RENDER_LINE_GROUP_OPTIONS.viewportSize
             )
           )
         ),
@@ -716,13 +716,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_viewportSize'
     )
 
-    const colors = this.lineLayers.reduce(
-      (accumulator: number[][], lineLayer) =>
+    const colors = this.lineGroups.reduce(
+      (accumulator: number[][], lineGroup) =>
         accumulator.concat(
-          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+          lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
               hexToFractionalOpaqueRgba(
-                lineLayer.color ?? DEFAULT_RENDER_LINE_LAYER_OPTIONS.color
+                lineGroup.color ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.color
               )
             )
           )
@@ -731,13 +731,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
     createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
 
-    const viewportBorderSizes = this.lineLayers.reduce(
-      (accumulator: number[], lineLayer) =>
+    const viewportBorderSizes = this.lineGroups.reduce(
+      (accumulator: number[], lineGroup) =>
         accumulator.concat(
-          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+          lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
-              lineLayer.viewportBorderSize ??
-                DEFAULT_RENDER_LINE_LAYER_OPTIONS.viewportBorderSize
+              lineGroup.viewportBorderSize ??
+                DEFAULT_RENDER_LINE_GROUP_OPTIONS.viewportBorderSize
             )
           )
         ),
@@ -751,14 +751,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_viewportBorderSize'
     )
 
-    const borderColors = this.lineLayers.reduce(
-      (accumulator: number[][], lineLayer) =>
+    const borderColors = this.lineGroups.reduce(
+      (accumulator: number[][], lineGroup) =>
         accumulator.concat(
-          lineLayer.projectedGeoLines.flatMap((_projectedGeoLine) =>
+          lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) =>
             Array(6).fill(
               hexToFractionalOpaqueRgba(
-                lineLayer.borderColor ??
-                  DEFAULT_RENDER_LINE_LAYER_OPTIONS.borderColor
+                lineGroup.borderColor ??
+                  DEFAULT_RENDER_LINE_GROUP_OPTIONS.borderColor
               )
             )
           )
@@ -785,12 +785,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.pointsProgram
     gl.bindVertexArray(this.pointsVao)
 
-    this.setPointLayers()
+    this.setPointGroups()
 
-    const clipPoints = this.pointLayers
+    const clipPoints = this.pointGroups
       .reduce(
-        (accumulator: Point[], pointLayer) =>
-          accumulator.concat(pointLayer.projectedGeoPoints),
+        (accumulator: Point[], pointGroup) =>
+          accumulator.concat(pointGroup.projectedGeoPoints),
         []
       )
       .map((point) =>
@@ -804,12 +804,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPoint'
     )
 
-    const clipPreviousPoints = this.pointLayers
+    const clipPreviousPoints = this.pointGroups
       .reduce(
-        (accumulator: Point[], pointLayer) =>
+        (accumulator: Point[], pointGroup) =>
           accumulator.concat(
-            pointLayer.projectedGeoPreviousPoints ||
-              pointLayer.projectedGeoPoints
+            pointGroup.projectedGeoPreviousPoints ||
+              pointGroup.projectedGeoPoints
           ),
         []
       )
@@ -824,13 +824,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_clipPreviousPoint'
     )
 
-    const viewportSizes = this.pointLayers.reduce(
-      (accumulator: number[], pointLayer) =>
+    const viewportSizes = this.pointGroups.reduce(
+      (accumulator: number[], pointGroup) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map(
+          pointGroup.projectedGeoPoints.map(
             (_projectedGeoPoint) =>
-              pointLayer.viewportSize ??
-              DEFAULT_RENDER_POINT_LAYER_OPTION.viewportSize
+              pointGroup.viewportSize ??
+              DEFAULT_RENDER_POINT_GROUP_OPTION.viewportSize
           )
         ),
       []
@@ -843,12 +843,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_viewportSize'
     )
 
-    const colors = this.pointLayers.reduce(
-      (accumulator: number[][], pointLayer) =>
+    const colors = this.pointGroups.reduce(
+      (accumulator: number[][], pointGroup) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+          pointGroup.projectedGeoPoints.map((_projectedGeoPoint) =>
             hexToFractionalOpaqueRgba(
-              pointLayer.color ?? DEFAULT_RENDER_POINT_LAYER_OPTION.color
+              pointGroup.color ?? DEFAULT_RENDER_POINT_GROUP_OPTION.color
             )
           )
         ),
@@ -856,13 +856,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
     createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
 
-    const viewportBorderSizes = this.pointLayers.reduce(
-      (accumulator: number[], pointLayer) =>
+    const viewportBorderSizes = this.pointGroups.reduce(
+      (accumulator: number[], pointGroup) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map(
+          pointGroup.projectedGeoPoints.map(
             (_projectedGeoPoint) =>
-              pointLayer.viewportBorderSize ??
-              DEFAULT_RENDER_POINT_LAYER_OPTION.viewportBorderSize
+              pointGroup.viewportBorderSize ??
+              DEFAULT_RENDER_POINT_GROUP_OPTION.viewportBorderSize
           )
         ),
       []
@@ -875,13 +875,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_viewportBorderSize'
     )
 
-    const borderColors = this.pointLayers.reduce(
-      (accumulator: number[][], pointLayer) =>
+    const borderColors = this.pointGroups.reduce(
+      (accumulator: number[][], pointGroup) =>
         accumulator.concat(
-          pointLayer.projectedGeoPoints.map((_projectedGeoPoint) =>
+          pointGroup.projectedGeoPoints.map((_projectedGeoPoint) =>
             hexToFractionalOpaqueRgba(
-              pointLayer.borderColor ??
-                DEFAULT_RENDER_POINT_LAYER_OPTION.borderColor
+              pointGroup.borderColor ??
+                DEFAULT_RENDER_POINT_GROUP_OPTION.borderColor
             )
           )
         ),
