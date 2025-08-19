@@ -1212,7 +1212,7 @@ Returned in the length of the shortest piece, measured in geo coordinates.
 
 * `geoBbox` (`[number, number, number, number]`)
   * BBox in geo space where the resolution is requested
-* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: boolean | undefined; }`)
   * GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -1239,7 +1239,7 @@ Use with caution, especially for options that have effects in the constructor.
 
 ###### Parameters
 
-* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: boolean | undefined; }`)
 
 ###### Returns
 
@@ -1275,7 +1275,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * A Georeferenced Map
 * `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; geoIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...`)
   * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
@@ -1478,7 +1478,7 @@ Returned in the length of the shortest piece, measured in destination coordinate
 
 * `destinationBbox` (`[number, number, number, number]`)
   * BBox in destination space where the resolution is requested
-* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: boolean | undefined; }`)
   * General GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -1515,7 +1515,7 @@ Returned in the length of the shortest piece, measured in source coordinates.
 
 * `sourceBbox` (`[number, number, number, number]`)
   * BBox in source space where the resolution is requested
-* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: false | undefined; }`)
+* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: boolean | undefined; }`)
   * General GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -2530,7 +2530,6 @@ Array<string>
 
 ```ts
 Array<
-  | 'straight'
   | 'helmert'
   | 'polynomial'
   | 'polynomial2'

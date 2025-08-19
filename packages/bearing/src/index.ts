@@ -3,8 +3,7 @@ import bearing from '@turf/bearing'
 import {
   lonLatProjection,
   ProjectedGcpTransformer,
-  ProjectedGcpTransformerOptions,
-  webMercatorProjection
+  ProjectedGcpTransformerOptions
 } from '@allmaps/project'
 import { computeBbox, mergePartialOptions, midPoint } from '@allmaps/stdlib'
 

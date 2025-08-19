@@ -58,35 +58,35 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderLines?: boolean
   renderPoints?: boolean
   renderGcps: boolean
-  renderGcpsSize?: number
   renderGcpsColor?: string
-  renderGcpsBorderSize?: number
+  renderGcpsSize?: number
   renderGcpsBorderColor?: string
+  renderGcpsBorderSize?: number
   renderTransformedGcps: boolean
-  renderTransformedGcpsSize?: number
   renderTransformedGcpsColor?: string
-  renderTransformedGcpsBorderSize?: number
+  renderTransformedGcpsSize?: number
   renderTransformedGcpsBorderColor?: string
+  renderTransformedGcpsBorderSize?: number
   renderVectors: boolean
-  renderVectorsSize?: number
   renderVectorsColor?: string
-  renderVectorsBorderSize?: number
+  renderVectorsSize?: number
   renderVectorsBorderColor?: string
+  renderVectorsBorderSize?: number
   renderFullMask: boolean
-  renderFullMaskSize?: number
   renderFullMaskColor?: string
-  renderFullMaskBorderSize?: number
+  renderFullMaskSize?: number
   renderFullMaskBorderColor?: string
+  renderFullMaskBorderSize?: number
   renderAppliableMask: boolean
-  renderAppliableMaskSize?: number
   renderAppliableMaskColor?: string
-  renderAppliableMaskBorderSize?: number
+  renderAppliableMaskSize?: number
   renderAppliableMaskBorderColor?: string
+  renderAppliableMaskBorderSize?: number
   renderMask: boolean
-  renderMaskSize?: number
   renderMaskColor?: string
-  renderMaskBorderSize?: number
+  renderMaskSize?: number
   renderMaskBorderColor?: string
+  renderMaskBorderSize?: number
   opacity: number
   saturation: number
   removeColor: boolean

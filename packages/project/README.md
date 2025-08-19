@@ -532,7 +532,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * A Georeferenced Map
 * `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
   * Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
@@ -598,12 +598,40 @@ string | PROJJSONDefinition
 
 ### `lonLatProjection`
 
+lonLatProjection
+
+`EPSG:4326` projection with definition: `"+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees"`
+
 ###### Fields
 
 * `definition` (`string`)
 * `name` (`string`)
 
+### `projectionDefinitionToAntialiasedDefinition(stringProjectionDefinition)`
+
+###### Parameters
+
+* `stringProjectionDefinition` (`string`)
+
+###### Returns
+
+`string`.
+
+### `projectionToAntialiasedProjection(projection)`
+
+###### Parameters
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+
+###### Returns
+
+`{name?: string; definition: ProjectionDefinition}`.
+
 ### `webMercatorProjection`
+
+webMercatorProjection
+
+`EPSG:3857` projection with definition: `"+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs"`
 
 ###### Fields
 

@@ -2,9 +2,10 @@ import Fuse from 'fuse.js'
 import Flatbush from 'flatbush'
 
 import { bboxToResolution } from '@allmaps/stdlib'
+import { webMercatorProjection } from '@allmaps/project'
 
 import type { Bbox } from '@allmaps/types'
-import { webMercatorProjection, type Projection } from '@allmaps/project'
+import type { Projection } from '@allmaps/project'
 
 export type PickerProjection = Projection & {
   code?: string

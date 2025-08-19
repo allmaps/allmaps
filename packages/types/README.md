@@ -328,7 +328,7 @@ Array<Point>
 
 ###### Fields
 
-* `isMultiGeometry` (`false`)
+* `isMultiGeometry` (`boolean`)
 
 ### `MultiLineString`
 

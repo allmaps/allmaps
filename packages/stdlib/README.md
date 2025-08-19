@@ -133,6 +133,16 @@ MIT
 
 `[number, number, number, number]`.
 
+### `camelCaseToWords(string)`
+
+###### Parameters
+
+* `string` (`string`)
+
+###### Returns
+
+`string`.
+
 ### `closeMultiPolygon(multiPolygon)`
 
 ###### Parameters
@@ -727,6 +737,23 @@ MIT
 
 `T`.
 
+### `getPropertyFromQuadrupleCacheOrComputation(cache, key0, key1, key2, key3, computation, checkUse, checkStore)`
+
+###### Parameters
+
+* `cache` (`Map<K0, Map<K1, Map<K2, Map<K3, T>>>>`)
+* `key0` (`K0`)
+* `key1` (`K1`)
+* `key2` (`K2`)
+* `key3` (`K3`)
+* `computation` (`() => T`)
+* `checkUse` (`((t: T) => boolean) | undefined`)
+* `checkStore` (`((t: T) => boolean) | undefined`)
+
+###### Returns
+
+`T`.
+
 ### `getPropertyFromTripleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
 
 ###### Parameters
@@ -1184,22 +1211,11 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
 `{type: 'polygon'; attributes?: SvgAttributes; coordinates: Ring}`.
-
-### `maxOfNumberOrUndefined(number1, number2)`
-
-###### Parameters
-
-* `number1` (`number | undefined`)
-* `number2` (`number | undefined`)
-
-###### Returns
-
-`number | undefined`.
 
 ### `mergeGeojsonFeaturesCollections(geojsonFeatureCollections)`
 
@@ -1252,6 +1268,18 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Returns
 
 `[number, number]`.
+
+### `mixLineStrings(lineString0, lineString1, t)`
+
+###### Parameters
+
+* `lineString0` (`Array<Point>`)
+* `lineString1` (`Array<Point>`)
+* `t` (`number`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `mixNumbers(number0, number1, t)`
 
@@ -1344,16 +1372,58 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 `Array<Array<T>>`.
 
-### `objectDifference(a, b)`
+### `objectDifference(newObject, baseObject)`
 
 ###### Parameters
 
-* `a` (`object`)
-* `b` (`object`)
+* `newObject` (`object`)
+* `baseObject` (`object`)
 
 ###### Returns
 
 `object`.
+
+### `objectOmitDifference(newObject, baseObject)`
+
+###### Parameters
+
+* `newObject` (`object`)
+* `baseObject` (`object`)
+
+###### Returns
+
+`object`.
+
+### `omit(object, keys)`
+
+###### Parameters
+
+* `object` (`T`)
+* `keys` (`Array<string>`)
+
+###### Returns
+
+`{[P in keyof T]?: T[P] | undefined}`.
+
+### `optionKeysByMapIdToUndefinedOptionsByMapId(optionKeysByMapId)`
+
+###### Parameters
+
+* `optionKeysByMapId` (`Map<string, T> | undefined`)
+
+###### Returns
+
+`Map<string, Record<T[number], undefined>> | undefined`.
+
+### `optionKeysToUndefinedOptions(optionKeys)`
+
+###### Parameters
+
+* `optionKeys` (`T | undefined`)
+
+###### Returns
+
+`Record<T[number], undefined> | undefined`.
 
 ### `pasteArrayMatrix(arrayMatrix, rowsStart, colsStart, subArrayMatrix)`
 
@@ -1477,6 +1547,19 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 ###### Returns
 
 `number`.
+
+### `removeUndefinedOptions(optionsArray)`
+
+###### Parameters
+
+* `optionsArray` (`U[0]`)
+
+###### Returns
+
+`{   [P in keyof {[K in keyof U[number]]: Exclude<U[number][K], undefined>}]?:
+    | {[K in keyof U[number]]: Exclude<U[number][K], undefined>}[P]
+    | undefined
+}`.
 
 ### `rgbToHex(color)`
 
