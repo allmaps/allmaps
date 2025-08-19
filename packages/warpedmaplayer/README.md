@@ -32,15 +32,33 @@ This package contains the main logic for the WarpedMapLayer class exported by th
 
 The following events are emitted to inform you of the state of the `WarpedMapLayer`.
 
-| Description                                                   | Type                      | Data                               |
-| ------------------------------------------------------------- | ------------------------- | ---------------------------------- |
-| A warped map has been added to the warped map list            | `warpedmapadded`          | `mapId: string`                    |
-| A warped map has been removed from the warped map list        | `warpedmapremoved`        | `mapId: string`                    |
-| A warped map enters the viewport                              | `warpedmapenter`          | `mapId: string`                    |
-| A warped map leaves the viewport                              | `warpedmapleave`          | `mapId: string`                    |
-| The visibility of some warpedMaps has changed                 | `visibilitychanged`       | `mapIds: string[]`                 |
-| The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
-| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
+  | Description                                                                                                                          | Type                            |
+  |--------------------------------------------------------------------------------------------------------------------------------------|---------------------------------|
+  | A georeference annotation has been added to the warped map list                                                                      | `georeferenceannotationadded`   |
+  | A georeference annotation has been removed from the warped map list                                                                  | `georeferenceannotationremoved` |
+  | A warped map has been added to the warped map list                                                                                   | `warpedmapadded`                |
+  | A warped map has been removed from the warped map list                                                                               | `warpedmapremoved`              |
+  | A warped map has entered the viewport                                                                                                | `warpedmapentered`              |
+  | A warped map has left the viewport                                                                                                   | `warpedmapleft`                 |
+  | The image information has been loaded from a map                                                                                     | `imageinfoloaded`               |
+  | A tile has been loaded to the tile cache for a map                                                                                   | `maptileloaded`                 |
+  | A tile has been deleted from the tile cache for a map                                                                                | `maptiledeleted`                |
+  | The cache loaded a first tile of a map                                                                                               | `firstmaptileloaded`            |
+  | All tiles requested for the current viewport have been loaded                                                                        | `allrequestedtilesloaded`       |
+  | The warped map list has been cleared                                                                                                 | `cleared`                       |
+  | An upcoming options change has been prepared for a specific map (by mixing previous and new properties if the animation was ongoing) | `preparechange`                 |
+  | An options change has been processed immediately                                                                                     | `immediatechange`               |
+  | An options change has been processed with an animation                                                                               | `animatedchange`                |
+
+Event data follows the `Partial<WarpedMapEventData>` type:
+
+```ts
+export type WarpedMapEventData = {
+  mapIds: string[]
+  tileUrl: string
+  optionKeys: string[]
+}
+```
 
 ### What is a _map_?
 

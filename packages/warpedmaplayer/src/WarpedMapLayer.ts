@@ -573,14 +573,24 @@ export abstract class BaseWarpedMapLayer<
       return
     }
 
-    this.renderer.addEventListener(
-      WarpedMapEventType.CHANGED,
-      this.nativeUpdate.bind(this)
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
-    this.renderer.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.nativeUpdate.bind(this)
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.addEventListener(
@@ -590,6 +600,21 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.addEventListener(
       WarpedMapEventType.WARPEDMAPLEFT,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.MAPTILEDELETED,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -604,27 +629,27 @@ export abstract class BaseWarpedMapLayer<
     )
 
     this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.WARPEDMAPREMOVED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.VISIBILITYCHANGED,
+      WarpedMapEventType.CLEARED,
       this.nativeUpdate.bind(this)
     )
 
     this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.CLEARED,
+      WarpedMapEventType.PREPARECHANGE,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.ANIMATEDCHANGE,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.CHANGED,
       this.nativeUpdate.bind(this)
     )
   }
@@ -634,14 +659,24 @@ export abstract class BaseWarpedMapLayer<
       return
     }
 
-    this.renderer.removeEventListener(
-      WarpedMapEventType.CHANGED,
-      this.nativeUpdate.bind(this)
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
-    this.renderer.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.nativeUpdate.bind(this)
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPADDED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.WARPEDMAPREMOVED,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.removeEventListener(
@@ -651,6 +686,21 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.removeEventListener(
       WarpedMapEventType.WARPEDMAPLEFT,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.IMAGEINFOLOADED,
+      this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.MAPTILEDELETED,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -665,27 +715,27 @@ export abstract class BaseWarpedMapLayer<
     )
 
     this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.WARPEDMAPADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.WARPEDMAPREMOVED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.VISIBILITYCHANGED,
+      WarpedMapEventType.CLEARED,
       this.nativeUpdate.bind(this)
     )
 
     this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.CLEARED,
+      WarpedMapEventType.PREPARECHANGE,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.ANIMATEDCHANGE,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.CHANGED,
       this.nativeUpdate.bind(this)
     )
   }

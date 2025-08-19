@@ -171,7 +171,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONADDED)
     )
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return results
   }
 
@@ -583,7 +583,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -600,7 +600,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -619,7 +619,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -638,7 +638,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -687,7 +687,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.addToOrUpdateRtree(warpedMap)
     this.addEventListenersToWarpedMap(warpedMap)
     this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
+      new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, { mapIds: [mapId] })
     )
     return mapId
   }
@@ -702,10 +702,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       this.zIndices.delete(mapId)
       this.removeFromRtree(warpedMap)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, {
+          mapIds: [mapId]
+        })
       )
       this.removeZIndexHoles()
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
 
       warpedMap.destroy()
     } else {
@@ -765,6 +767,17 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       return
     }
 
+    // If the option setting should be animated,
+    // prepare an upcoming change
+    // (i.e. mix previous and current warped map properties if the animation is ongoing)
+    if (setOptionsOptions?.animate !== undefined) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, {
+          mapIds: this.getMapIds()
+        })
+      )
+    }
+
     // We loop over all warped maps and set the maps options (if there are inoptionsByMapId)
     // and list options (if there are)
 
@@ -775,7 +788,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // 2) then calls itself again with the 'animate' setting to now set all options
     // including those that will cause an animation, and fire an animated change event
 
-    let changedOptionsKeys = []
+    let changedOptionKeys = []
     let changedMapIds = []
     for (const warpedMap of this.getWarpedMaps()) {
       let warpedMapChangedOptions
@@ -790,19 +803,17 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         // If the option setting should be animated,
         // or if the option setting should not be animated
         // set all options
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, changedMapIds)
-        )
         const options = optionsByMapId?.get(warpedMap.mapId)
         warpedMapChangedOptions = warpedMap.setOptions(options, listOptions)
       }
 
-      const warpedMapChangedOptionsKeys = Object.keys(warpedMapChangedOptions)
-      if (warpedMapChangedOptionsKeys.length > 0) {
-        changedOptionsKeys.push(...warpedMapChangedOptionsKeys)
+      const warpedMapChangedOptionKeys = Object.keys(warpedMapChangedOptions)
+      if (warpedMapChangedOptionKeys.length > 0) {
+        changedOptionKeys.push(...warpedMapChangedOptionKeys)
         changedMapIds.push(warpedMap.mapId)
       }
 
+      // Update RTree if necessary
       if (
         this.options.rtreeUpdatedOptions.some(
           (option) => option in warpedMapChangedOptions
@@ -812,6 +823,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
 
+    // Make option keys unique
+    changedOptionKeys = Array.from(new Set(changedOptionKeys))
+
     if (
       setOptionsOptions?.animate === undefined ||
       setOptionsOptions?.animate === false
@@ -819,9 +833,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       // If no animation information is specified,
       // or if the option setting should not be animated
       // finish by firing a direct change
-      if (changedOptionsKeys.length > 0) {
+      if (changedOptionKeys.length > 0) {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, changedMapIds)
+          new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, {
+            mapIds: changedMapIds,
+            optionKeys: changedOptionKeys
+          })
         )
       }
 
@@ -839,9 +856,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     } else {
       // If the option setting should be animated,
       // finish by firing the animation
-      if (changedOptionsKeys.length > 0) {
+      if (changedOptionKeys.length > 0) {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, changedMapIds)
+          new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, {
+            mapIds: changedMapIds,
+            optionKeys: changedOptionKeys
+          })
         )
       }
     }
@@ -874,21 +894,25 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   // This function and the listeners below transform an IMAGEINFOLOADED event by a WarpedMap
   // to an IMAGEINFOLOADED of the WarpedMapList, which is listened to in the Renderer
-  private imageInfoLoaded() {
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+  private imageInfoLoaded(mapId: string) {
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, {
+        mapIds: [mapId]
+      })
+    )
   }
 
   private addEventListenersToWarpedMap(warpedMap: W) {
     warpedMap.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
+      this.imageInfoLoaded.bind(this, warpedMap.mapId)
     )
   }
 
   private removeEventListenersFromWarpedMap(warpedMap: W) {
     warpedMap.removeEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
+      this.imageInfoLoaded.bind(this, warpedMap.mapId)
     )
   }
 }

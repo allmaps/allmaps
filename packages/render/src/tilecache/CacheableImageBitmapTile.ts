@@ -34,7 +34,9 @@ export class CacheableImageBitmapTile extends CacheableTile<ImageBitmap> {
       )
 
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
+        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+          tileUrl: this.tileUrl
+        })
       )
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -42,7 +44,9 @@ export class CacheableImageBitmapTile extends CacheableTile<ImageBitmap> {
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, this.tileUrl)
+          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
+            tileUrl: this.tileUrl
+          })
         )
       }
     }

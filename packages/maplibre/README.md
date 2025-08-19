@@ -92,7 +92,7 @@ You can listen to them in the typical MapLibre way. Here's an example:
 
 ```js
 warpedMapLayer.on('warpedmapadded', (event) => {
-  console.log(event.mapId, warpedMapLayer.getBounds())
+  console.log(event.mapIds, warpedMapLayer.getBounds())
 })
 ```
 

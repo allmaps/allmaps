@@ -15,11 +15,7 @@ import {
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
 import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
-import {
-  WarpedMapEvent,
-  WarpedMapEventType,
-  WarpedMapTileEventDetail
-} from '../shared/events.js'
+import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   multiplyHomogeneousTransform,
   invertHomogeneousTransform,
@@ -922,7 +918,9 @@ export class WebGL2Renderer
 
   protected imageInfoLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, event.data)
+      )
     }
   }
 
@@ -935,7 +933,11 @@ export class WebGL2Renderer
 
   protected mapTileLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
+      if (!event.data?.mapIds || !event.data?.tileUrl) {
+        throw new Error('Event data missing')
+      }
+      const { mapIds, tileUrl } = event.data
+      const mapId = mapIds[0]
       const tile = this.tileCache.getCacheableTile(tileUrl)
 
       if (!tile) {
@@ -955,9 +957,13 @@ export class WebGL2Renderer
     }
   }
 
-  protected mapTileRemoved(event: Event) {
+  protected mapTileDeleted(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const { mapId, tileUrl } = event.data as WarpedMapTileEventDetail
+      if (!event.data?.mapIds || !event.data.tileUrl) {
+        throw new Error('Event data missing')
+      }
+      const { mapIds, tileUrl } = event.data
+      const mapId = mapIds[0]
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!webgl2WarpedMap) {
@@ -970,7 +976,11 @@ export class WebGL2Renderer
 
   protected warpedMapAdded(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapId = event.data as string
+      if (!event.data?.mapIds) {
+        throw new Error('Event data missing')
+      }
+      const { mapIds } = event.data
+      const mapId = mapIds[0]
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (webgl2WarpedMap) {
         this.addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
@@ -980,7 +990,13 @@ export class WebGL2Renderer
 
   protected prepareChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
+      if (!event.data?.mapIds) {
+        throw new Error('Event data missing')
+      }
+      const { mapIds } = event.data
+      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+        mapIds
+      })) {
         if (this.animating) {
           webgl2WarpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }
@@ -990,14 +1006,20 @@ export class WebGL2Renderer
 
   protected animatedChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapIds = event.data as string[]
+      if (!event.data?.mapIds) {
+        throw new Error('Event data missing')
+      }
+      const { mapIds } = event.data
       this.startAnimation(mapIds)
     }
   }
 
   protected immediateChange(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const mapIds = event.data as string[]
+      if (!event.data?.mapIds) {
+        throw new Error('Event data missing')
+      }
+      const { mapIds } = event.data
       this.finishAnimation(mapIds)
     }
   }

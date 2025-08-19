@@ -87,7 +87,7 @@ You can listen to them in the typical OpenLayers way. Here's an example:
 
 ```js
 warpedMapLayer.on('warpedmapadded', (event) => {
-  console.log(event.mapId, warpedMapLayer.getExtent())
+  console.log(event.mapIds, warpedMapLayer.getExtent())
 })
 ```
 

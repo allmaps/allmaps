@@ -88,7 +88,7 @@ You can listen to them in the typical Leaflet way. Here's an example:
 
 ```js
 map.on('warpedmapadded', (event) => {
-  console.log(event.mapId, WarpedMapLayer.getBounds())
+  console.log(event.mapIds, WarpedMapLayer.getBounds())
 })
 ```
 

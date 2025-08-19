@@ -705,13 +705,17 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     for (const mapId of mapsEnteringViewport) {
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTERED, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTERED, {
+          mapIds: [mapId]
+        })
       )
     }
     for (const mapId of mapsLeavingViewport) {
       this.clearMap(mapId)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEFT, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEFT, {
+          mapIds: [mapId]
+        })
       )
     }
 
@@ -750,7 +754,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected mapTileLoaded(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected mapTileRemoved(event: Event): void {}
+  protected mapTileDeleted(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected imageInfoLoaded(event: Event): void {}
@@ -777,8 +781,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
+      WarpedMapEventType.MAPTILEDELETED,
+      this.mapTileDeleted.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -819,8 +823,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
+      WarpedMapEventType.MAPTILEDELETED,
+      this.mapTileDeleted.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
