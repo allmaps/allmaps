@@ -19,17 +19,9 @@ import {
   intersectBboxes,
   bboxToRectangle,
   mergeOptions,
-  mergePartialOptions,
-  bindPointWebMercatorProjection
+  mergePartialOptions
 } from '@allmaps/stdlib'
-import {
-  isEqualProjection,
-  lonLatProjection,
-  proj4,
-  webMercatorProjection
-} from '@allmaps/project'
-
-import type { Bbox } from '@allmaps/types'
+import { isEqualProjection } from '@allmaps/project'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
@@ -280,9 +272,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
+    const geoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getGeoBufferedRectangle()
+    )
+
     return Array.from(
       this.warpedMapList.getWarpedMaps({
-        geoBbox: this.viewport.geoRectangleBbox
+        geoBbox: geoBufferedViewportRectangleBbox
       })
     )
       .filter(
@@ -410,30 +406,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
     const viewport = this.viewport
 
-    const projectedGeoBufferedRectangle =
-      this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
-    let geoBufferedRectangleBbox: Bbox | undefined = computeBbox(
-      projectedGeoBufferedRectangle.map((point) =>
-        proj4(
-          viewport.projection.definition,
-          lonLatProjection.definition,
-          bindPointWebMercatorProjection(point)
-        )
-      )
+    const geoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getGeoBufferedRectangle(viewportBufferRatio)
     )
-    // TODO: solve this for random viewport projections:
-    // Don't bind points but project to lnglat without wrapping, using `+over`
-    // (when supported, see https://github.com/proj4js/proj4js/pull/396)
-    // then compute bbox using clipping option
-    // and remove the below code.
-    if (!isEqualProjection(viewport.projection, webMercatorProjection)) {
-      geoBufferedRectangleBbox = undefined
-    }
 
     const mapsInViewport = new Set(
       Array.from(
         this.warpedMapList.getWarpedMaps({
-          geoBbox: geoBufferedRectangleBbox
+          geoBbox: geoBufferedViewportRectangleBbox
         })
       )
         .sort((warpedMapA, warpedMapB) => {

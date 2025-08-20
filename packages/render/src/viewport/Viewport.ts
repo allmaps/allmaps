@@ -16,12 +16,14 @@ import {
   midPoint,
   scalePoints,
   rotatePoint,
-  mergeOptions
+  mergeOptions,
+  bindPointWebMercatorProjection
 } from '@allmaps/stdlib'
 import {
   lonLatProjection,
   webMercatorProjection,
-  proj4
+  proj4,
+  isEqualProjection
 } from '@allmaps/project'
 
 import {
@@ -194,11 +196,14 @@ export class Viewport {
     this.projectedGeoResolution = sizeToResolution(this.projectedGeoSize)
 
     // TODO: improve this with an interpolated back-projection, resulting in a ring
+    // TODO: like in getGeoBufferedRectangle, project to lnglat without wrapping, using `+over`
     this.geoRectangle = this.projectedGeoRectangle.map((point) => {
       return proj4(
         this.projection.definition,
         lonLatProjection.definition,
-        point
+        isEqualProjection(this.projection, webMercatorProjection)
+          ? bindPointWebMercatorProjection(point)
+          : point
       )
     }) as Rectangle
     this.geoRectangleBbox = computeBbox(this.geoRectangle)
@@ -467,7 +472,7 @@ export class Viewport {
     )
   }
 
-  getProjectedGeoBufferedRectangle(bufferFraction: number): Rectangle {
+  getProjectedGeoBufferedRectangle(bufferFraction?: number): Rectangle {
     const viewportBufferedBbox = bufferBboxByRatio(
       this.viewportBbox,
       bufferFraction
@@ -481,6 +486,22 @@ export class Viewport {
         point
       )
     ) as Rectangle
+  }
+
+  getGeoBufferedRectangle(bufferFraction?: number): Rectangle {
+    return this.getProjectedGeoBufferedRectangle(bufferFraction).map((point) =>
+      proj4(
+        this.projection.definition,
+        lonLatProjection.definition,
+        isEqualProjection(this.projection, webMercatorProjection)
+          ? bindPointWebMercatorProjection(point)
+          : point
+      )
+    ) as Rectangle
+    // TODO: solve this for random viewport projections:
+    // Don't bind points but project to lnglat without wrapping, using `+over`
+    // (when supported, see https://github.com/proj4js/proj4js/pull/396)
+    // then, where bbox is computed from this, use bbox clipping option.
   }
 
   private composeProjectedGeoToViewportHomogeneousTransform(): HomogeneousTransform {

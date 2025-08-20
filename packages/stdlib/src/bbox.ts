@@ -160,8 +160,8 @@ export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
 
 // Ratio 2 adds half the current width (or height) both left and right of the current (width or height)
 // so the total width (or height) goes * 2 and the total surface goes * 4
-export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
-  if (ratio === 0) {
+export function bufferBboxByRatio(bbox: Bbox, ratio?: number): Bbox {
+  if (!ratio || ratio === 0) {
     return bbox
   }
   const size = bboxToSize(bbox)
