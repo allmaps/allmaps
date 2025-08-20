@@ -75,6 +75,13 @@
       layerOptionsState.colorize = !(
         layerOptionsState.colorize ?? defaultWebGL2Options.colorize
       )
+    } else if (e.key === 'x') {
+      layerOptionsState.debugTiles = !(
+        layerOptionsState.debugTiles ?? defaultWebGL2Options.debugTiles
+      )
+      layerOptionsState.debugTriangles = !(
+        layerOptionsState.debugTriangles ?? defaultWebGL2Options.debugTriangles
+      )
     }
   }
 

@@ -30,10 +30,8 @@ import type {
   WarpedMapFactory,
   BaseRenderOptions,
   MapPruneInfo,
-  WarpedMapListOptions,
   GetWarpedMapOptions,
   SetOptionsOptions,
-  WarpedMapOptions,
   SpecificBaseRenderOptions
 } from '../shared/types.js'
 

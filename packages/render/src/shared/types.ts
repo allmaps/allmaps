@@ -102,9 +102,9 @@ export type SpecificWebGL2WarpedMapOptions = {
   distortionColor3: string
   renderGrid: boolean
   renderGridColor: string
-  debugTriangles: false
-  debugTriangulation: false
-  debugTiles: false
+  debugTriangles: boolean
+  debugTriangulation: boolean
+  debugTiles: boolean
 }
 export type WebGL2WarpedMapOptions = SpecificWebGL2WarpedMapOptions &
   TriangulatedWarpedMapOptions

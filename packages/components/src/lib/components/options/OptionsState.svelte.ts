@@ -83,6 +83,8 @@ export abstract class BaseOptionsState {
   removeColorHardness?: number
   colorize?: boolean
   colorizeColor?: string
+  debugTiles?: boolean
+  debugTriangles?: boolean
 
   viewOptions: Partial<WebGL2WarpedMapOptions>
   mergedOptions: Partial<WebGL2WarpedMapOptions>
@@ -162,6 +164,13 @@ export abstract class BaseOptionsState {
       layerOptionsState?.colorizeColor ??
         this.processedDefaultOptions.colorizeColor
     )
+    this.debugTiles = $derived(
+      layerOptionsState?.debugTiles ?? this.processedDefaultOptions.debugTiles
+    )
+    this.debugTriangles = $derived(
+      layerOptionsState?.debugTriangles ??
+        this.processedDefaultOptions.debugTriangles
+    )
     this.options = $derived({
       visible: this.visible,
       opacity: this.opacity,
@@ -182,7 +191,9 @@ export abstract class BaseOptionsState {
       removeColorThreshold: this.removeColorThreshold,
       removeColorHardness: this.removeColorHardness,
       colorize: this.colorize,
-      colorizeColor: this.colorizeColor
+      colorizeColor: this.colorizeColor,
+      debugTiles: this.debugTiles,
+      debugTriangles: this.debugTriangles
     })
 
     this.viewOptions = $state(viewOptions)
