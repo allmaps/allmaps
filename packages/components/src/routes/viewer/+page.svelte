@@ -18,6 +18,9 @@
   // Netkaart
   // const annotationUrl =
   //   'https://gist.githubusercontent.com/sammeltassen/fa3dbfaf4dfa800e00824478c4bd1928/raw/f182beac911e38b0a1d1eb420fbd54b4e6d2f2eb/nl-railway-map.json'
+  // Golf van aden
+  // const annotationUrl =
+  //   'https://annotations.allmaps.org/images/134aa0a61c67d758'
 
   let annotations = $state<unknown[]>([])
 

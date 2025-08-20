@@ -19,9 +19,17 @@ import {
   intersectBboxes,
   bboxToRectangle,
   mergeOptions,
-  mergePartialOptions
+  mergePartialOptions,
+  bindPointWebMercatorProjection
 } from '@allmaps/stdlib'
-import { isEqualProjection, lonLatProjection, proj4 } from '@allmaps/project'
+import {
+  isEqualProjection,
+  lonLatProjection,
+  proj4,
+  webMercatorProjection
+} from '@allmaps/project'
+
+import type { Bbox } from '@allmaps/types'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
@@ -404,19 +412,29 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     const projectedGeoBufferedRectangle =
       this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
-    const geoBufferedRectangleBbox = computeBbox(
+    let geoBufferedRectangleBbox: Bbox | undefined = computeBbox(
       projectedGeoBufferedRectangle.map((point) =>
         proj4(
           viewport.projection.definition,
           lonLatProjection.definition,
-          point
+          bindPointWebMercatorProjection(point)
         )
       )
     )
+    // TODO: solve this for random viewport projections:
+    // Don't bind points but project to lnglat without wrapping, using `+over`
+    // (when supported, see https://github.com/proj4js/proj4js/pull/396)
+    // then compute bbox using clipping option
+    // and remove the below code.
+    if (!isEqualProjection(viewport.projection, webMercatorProjection)) {
+      geoBufferedRectangleBbox = undefined
+    }
 
-    return new Set(
+    const mapsInViewport = new Set(
       Array.from(
-        this.warpedMapList.getWarpedMaps({ geoBbox: geoBufferedRectangleBbox })
+        this.warpedMapList.getWarpedMaps({
+          geoBbox: geoBufferedRectangleBbox
+        })
       )
         .sort((warpedMapA, warpedMapB) => {
           if (warpedMapA && warpedMapB) {
@@ -436,6 +454,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         })
         .map((warpedMap) => warpedMap.mapId)
     )
+
+    return mapsInViewport
   }
 
   protected getMapFetchableTilesForViewport(

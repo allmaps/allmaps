@@ -9,6 +9,10 @@ export {
 
 export {
   computeMinMax,
+  bindValue,
+  bindPoint,
+  bindPointLngLatProjection,
+  bindPointWebMercatorProjection,
   computeBbox,
   combineBboxes,
   doBboxesIntersect,

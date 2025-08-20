@@ -75,6 +75,11 @@ export type Gcp = { resource: Point; geo: Point }
  */
 export type Bbox = [number, number, number, number]
 
+export type BboxOptions = {
+  clipLngLat: boolean
+  clipWebMercator: boolean
+}
+
 /**
  * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].
  * Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
