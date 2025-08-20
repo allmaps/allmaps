@@ -1,6 +1,6 @@
 # @allmaps/bearing
 
-Computes the bearing of a Georeferenced Map. Uses [Turf.js](https://turfjs.org/docs/api/bearing) internally.
+Computes the bearing of a Georeferenced Map.
 
 ```js
 import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'

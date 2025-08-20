@@ -162,6 +162,9 @@ export {
 
 export {
   degreesToRadians,
+  radiansToDegrees,
+  angle,
+  bearing,
   groupBy,
   isEqualArray,
   arrayRepeated,

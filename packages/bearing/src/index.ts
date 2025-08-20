@@ -1,11 +1,15 @@
-import bearing from '@turf/bearing'
-
 import {
   lonLatProjection,
   ProjectedGcpTransformer,
   ProjectedGcpTransformerOptions
 } from '@allmaps/project'
-import { computeBbox, mergePartialOptions, midPoint } from '@allmaps/stdlib'
+import {
+  bearing,
+  computeBbox,
+  mergePartialOptions,
+  midPoint,
+  radiansToDegrees
+} from '@allmaps/stdlib'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
@@ -49,16 +53,14 @@ export function computeGeoreferencedMapBearing(
     options
   )
 
-  let projectedTransformer: ProjectedGcpTransformer
-
   if (georeferencedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
-  } else {
-    projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
-      georeferencedMap,
-      options
-    )
   }
+
+  const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
+    georeferencedMap,
+    options
+  )
 
   return computeBearingInternal(
     georeferencedMap.resourceMask,
@@ -81,17 +83,15 @@ export function computeWarpedMapBearing(
     options
   )
 
-  let projectedTransformer: ProjectedGcpTransformer
-
   if (warpedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
-  } else {
-    projectedTransformer = warpedMap.getProjectedTransformer(
-      options?.transformationType ??
-        DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS.transformationType,
-      options
-    )
   }
+
+  const projectedTransformer = warpedMap.getProjectedTransformer(
+    options?.transformationType ??
+      DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS.transformationType,
+    options
+  )
 
   return computeBearingInternal(warpedMap.resourceMask, projectedTransformer)
 }
@@ -116,5 +116,7 @@ function computeBearingInternal(
   const projectedGeoBottomCenter =
     projectedTransformer.transformToGeo(resourceBottomCenter)
 
-  return -bearing(projectedGeoBottomCenter, projectedGeoTopCenter)
+  return radiansToDegrees(
+    bearing([projectedGeoBottomCenter, projectedGeoTopCenter])
+  )
 }

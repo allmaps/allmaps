@@ -1,3 +1,4 @@
+import { Line } from '@allmaps/types'
 import {
   differenceWith,
   fromPairs,
@@ -9,6 +10,18 @@ import {
 
 export function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
+}
+
+export function radiansToDegrees(radians: number) {
+  return radians * (180 / Math.PI)
+}
+
+export function angle(line: Line) {
+  return Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0])
+}
+
+export function bearing(line: Line) {
+  return angle(line) - Math.PI / 2
 }
 
 // Define vanilla groupBy function, since official one is only baseline 2024

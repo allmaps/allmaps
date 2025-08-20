@@ -15,6 +15,7 @@ import {
   rectanglesToScale,
   fetchImageInfo,
   getPropertyFromCacheOrComputation,
+  getPropertyFromDoubleCacheOrComputation,
   mixLineStrings,
   sizeToRectangle,
   mergeOptionsUnlessUndefined,
@@ -196,6 +197,10 @@ export class WarpedMap extends EventTarget {
     TransformationType,
     ProjectedGcpTransformer
   >
+  protected projectedTransformerDoubleCache: Map<
+    TransformationType,
+    Map<string, ProjectedGcpTransformer>
+  >
 
   geoFullMask!: Ring
   geoFullMaskBbox!: Bbox
@@ -259,6 +264,7 @@ export class WarpedMap extends EventTarget {
     this.georeferencedMap = georeferencedMap
 
     this.projectedTransformerCache = new Map()
+    this.projectedTransformerDoubleCache = new Map()
     this.loadingImageInfo = false
 
     this.options = {}
@@ -361,12 +367,27 @@ export class WarpedMap extends EventTarget {
       partialProjectedGcpTransformerOptions
     )
 
-    const projectedTransformer = getPropertyFromCacheOrComputation(
-      this.projectedTransformerCache,
+    return getPropertyFromDoubleCacheOrComputation(
+      this.projectedTransformerDoubleCache,
       transformationType,
-      () => new ProjectedGcpTransformer(this.gcps, transformationType, options)
+      this.projection.definition,
+      () => {
+        const projectedTransformer = getPropertyFromCacheOrComputation(
+          this.projectedTransformerCache,
+          transformationType,
+          () =>
+            new ProjectedGcpTransformer(
+              this.gcps,
+              transformationType,
+              omit(options, ['projection'])
+            )
+        )
+        return ProjectedGcpTransformer.setProjection(
+          cloneDeep(projectedTransformer),
+          options.projection
+        )
+      }
     )
-    return projectedTransformer.setProjection(options.projection)
   }
 
   setOptions(
@@ -905,6 +926,7 @@ export class WarpedMap extends EventTarget {
 
   protected clearProjectedTransformerCaches() {
     this.projectedTransformerCache = new Map()
+    this.projectedTransformerDoubleCache = new Map()
   }
 
   destroy() {

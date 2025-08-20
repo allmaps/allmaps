@@ -39,8 +39,7 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/project": "workspace:^",
-    "@allmaps/stdlib": "workspace:^",
-    "@turf/bearing": "^7.2.0"
+    "@allmaps/stdlib": "workspace:^"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
