@@ -3,12 +3,12 @@ import { Command } from '@commander-js/extra-typings'
 import { ProjectedGcpTransformer } from '@allmaps/project'
 import {
   mergeOptionsUnlessUndefined,
-  mergePartialOptions
+  mergePartialOptions,
+  parseCoordinates
 } from '@allmaps/stdlib'
 
 import { readInput, printString, readFromStdinLine } from '../../lib/io.js'
 import {
-  parseCoordinatesArrayArray,
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions,
@@ -105,7 +105,7 @@ function processPointString(
 ) {
   // Parse pointString to array of points and transform them
   const outputPoints: Point[] = []
-  const pointArray = parseCoordinatesArrayArray(pointString) as Point[]
+  const pointArray = parseCoordinates(pointString) as Point[]
   pointArray.forEach((point) => {
     outputPoints.push(
       partialInverseOptions.inverse

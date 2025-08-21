@@ -186,6 +186,22 @@ export {
 } from './options.js'
 
 export {
+  parseCoordinates,
+  parseQgisCoordinates,
+  parseArcGisCsvCoordinates,
+  parseArcGisTsvCoordinates,
+  parseGdalCoordinates,
+  parseInternalProjectionDefinition,
+  parseInternalProjectionDefinitionFromLine
+} from './parse.js'
+
+export {
+  polygonSelfIntersectionPoints,
+  linesIntersectionPoint,
+  prolongedLinesIntersectionPoint
+} from './self-intersect.js'
+
+export {
   isSvgCircle,
   isSvgLine,
   isSvgPolyLine,
@@ -197,9 +213,3 @@ export {
   mapToResourceMaskSvgPolygon,
   svgGeometryToGeometry
 } from './svg.js'
-
-export {
-  polygonSelfIntersectionPoints,
-  linesIntersectionPoint,
-  prolongedLinesIntersectionPoint
-} from './self-intersect.js'

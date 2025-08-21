@@ -28,6 +28,8 @@ export function addProjectedGcpTransformerInputOptions<
       '-g, --gcps <filename>',
       'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation'
     )
+    .option('--width <number>', 'Resource width', parseInt)
+    .option('--height <number>', 'Resource height', parseInt)
     .option(
       '-t, --transformation-type <type>',
       'Transformation type. One of "polynomial", "thinPlateSpline", "linear", "helmert", "projective". ' +

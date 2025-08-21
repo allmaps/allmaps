@@ -1,7 +1,12 @@
 import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
+import { lonLatProjection, proj4 } from '@allmaps/project'
 
 import { InverseOptions } from '@allmaps/transform/shared/types.js'
-import { isPoint } from '@allmaps/stdlib'
+import {
+  isPoint,
+  parseCoordinates,
+  parseInternalProjectionDefinition
+} from '@allmaps/stdlib'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
 
@@ -11,7 +16,7 @@ import type {
   TransformationTypeInputs,
   GcpsInputs
 } from '@allmaps/transform'
-import type { Gcp } from '@allmaps/types'
+import type { Gcp, Point } from '@allmaps/types'
 import type {
   Rcp,
   AttachedTransformationOptions,
@@ -73,12 +78,12 @@ export function parseAnnotationsValidateMaps(
 }
 
 export function parseGcpInputOptions(
-  options: { gcps?: string },
+  options: { gcps?: string; height?: number },
   map?: GeoreferencedMap
 ): GcpsInputs {
   let gcps: Gcp[]
   if (options.gcps) {
-    gcps = parseGcpsFromFile(options.gcps)
+    gcps = parseGcpsFromFile(options.gcps, options)
   } else if (map) {
     gcps = map.gcps
   } else {
@@ -90,20 +95,46 @@ export function parseGcpInputOptions(
   return { gcps }
 }
 
-export function parseGcpsFromFile(file: string): Gcp[] {
+export function parseGcpsFromFile(
+  file: string,
+  options: Partial<{
+    height: number
+  }>
+): Gcp[] {
   // TODO: also allow file to contain GCPs in the Georeference Annotation GCP format
-  return (
-    parseCoordinateArrayArrayFromFile(file) as [
-      [number, number, number, number]
-    ]
+  let gcps = (
+    parseCoordinateFromFile(file, options) as [[number, number, number, number]]
   ).map((coordinateArray) => ({
-    resource: [coordinateArray[0], coordinateArray[1]],
-    geo: [coordinateArray[2], coordinateArray[3]]
+    resource: [coordinateArray[0], coordinateArray[1]] as Point,
+    geo: [coordinateArray[2], coordinateArray[3]] as Point
   }))
+
+  const internalProjectionDefinition =
+    parseInternalProjectionDefinitionFromFile(file)
+
+  if (internalProjectionDefinition) {
+    gcps = gcps.map((gcp) => {
+      return {
+        resource: gcp.resource,
+        geo: proj4(
+          internalProjectionDefinition,
+          lonLatProjection.definition,
+          gcp.geo
+        )
+      }
+    })
+  }
+
+  return gcps
 }
 
-export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
-  return parseCoordinatesArrayArray(readFromFile(file))
+export function parseCoordinateFromFile(
+  file: string,
+  options: Partial<{
+    height: number
+  }>
+): number[][] {
+  return parseCoordinates(readFromFile(file), options)
 }
 
 export function parseTransformationTypeInputOptions(
@@ -148,16 +179,33 @@ export function parseTransformationTypeInputOptions(
 
 export function parseInternalProjectionInputOptions(
   options: Partial<{
+    gcps?: string
     internalProjection: string
   }>,
   map?: GeoreferencedMap
 ): Partial<InternalProjectionInputs> {
   const internalProjectionInputs: Partial<InternalProjectionInputs> = {}
 
-  if (options && typeof options === 'object') {
-    if ('internalProjection' in options && options.internalProjection) {
+  if (
+    options &&
+    typeof options === 'object' &&
+    'internalProjection' in options &&
+    options.internalProjection
+  ) {
+    internalProjectionInputs.internalProjection = {
+      definition: options.internalProjection
+    } as Projection
+  } else if (
+    options &&
+    typeof options === 'object' &&
+    'gcps' in options &&
+    options.gcps
+  ) {
+    const internalProjectionFromFile =
+      parseInternalProjectionDefinitionFromFile(options.gcps)
+    if (internalProjectionFromFile) {
       internalProjectionInputs.internalProjection = {
-        definition: options.internalProjection
+        definition: internalProjectionFromFile
       } as Projection
     }
   } else if (
@@ -171,6 +219,12 @@ export function parseInternalProjectionInputOptions(
   return internalProjectionInputs
 }
 
+export function parseInternalProjectionDefinitionFromFile(
+  file: string
+): string | undefined {
+  return parseInternalProjectionDefinition(readFromFile(file))
+}
+
 export function parseProjectedGcpTransformerInputOptions(
   options: Partial<{
     annotation: string
@@ -178,6 +232,7 @@ export function parseProjectedGcpTransformerInputOptions(
     transformationType: string
     polynomialOrder: number
     internalProjection: string
+    height: number
   }>
 ): ProjectedGcpTransformerInputs {
   let map: GeoreferencedMap | undefined
@@ -200,6 +255,7 @@ export function parseProjectedGcpTransformerInputOptionsAndMap(
     transformationType: string
     polynomialOrder: number
     internalProjection: string
+    height: number
   }>,
   map?: GeoreferencedMap
 ): ProjectedGcpTransformerInputs {
@@ -387,20 +443,6 @@ export function parseInverseOptions(options: {
   }
 
   return transformOptions
-}
-
-export function parseCoordinatesArrayArray(
-  coordinatesString: string
-): number[][] {
-  // String from mutliline file where each line contains multiple coordinates separated by whitespace
-  return coordinatesString
-    .trim()
-    .split('\n')
-    .map((coordinatesLineString) =>
-      coordinatesLineString
-        .split(/\s+/)
-        .map((coordinateString) => Number(coordinateString.trim()))
-    )
 }
 
 export function parseLaunchInputs(
