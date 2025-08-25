@@ -34,13 +34,6 @@
         "resource": [1765, 1737]
       }
     ],
-    "id": "16f114f39d9466b9",
-    "resource": {
-      "height": 7573,
-      "id": "https://dlc.services/iiif-img/7/14/074a4598-5988-46a2-95f4-f8c625a1fcb3",
-      "type": "ImageService2",
-      "width": 7636
-    },
     "resourceMask": [
       [845, 8569],
       [825, 7518],

@@ -53,7 +53,7 @@ This command was inspired by gdaltransform.`
   )
 
   return command.action(async (files, options) => {
-    let { gcps, transformationType, internalProjection } =
+    const { gcps, transformationType, internalProjection } =
       parseProjectedGcpTransformerInputOptions(options)
     const partialProjectedGcpTransformerOptions =
       parseProjectedGcpTransformerOptions(options)

@@ -241,7 +241,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-qgis.points --resourceHeight 7573',
+      'transform coordinates -g input/coordinates/gcps-qgis.points',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -252,7 +252,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps-internal-projection.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-qgis-internal-projection.points --resourceHeight 7573',
+      'transform coordinates -g input/coordinates/gcps-qgis-internal-projection.points',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)

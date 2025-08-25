@@ -13,7 +13,7 @@ export function parseCoordinates(
   // For more about these datatypes, see https://observablehq.com/d/50deb2a74a628292
 
   if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
-    return parseQgisCoordinates(lines, options)
+    return parseQgisCoordinates(lines)
   } else if (lines[0].split(',').length >= 5) {
     return parseArcGisCsvCoordinates(lines, options)
   } else if (lines[0].split(/\t+/).length >= 4) {
@@ -27,17 +27,7 @@ export function parseCoordinates(
   }
 }
 
-export function parseQgisCoordinates(
-  lines: string[],
-  options?: Partial<{
-    resourceHeight: number
-  }>
-): number[][] {
-  if (!options || !options.resourceHeight) {
-    throw new Error('Resource height required when parsing QGIS coordinates')
-  }
-  const resourceHeight = options.resourceHeight
-
+export function parseQgisCoordinates(lines: string[]): number[][] {
   const coordinates = lines
     .filter(
       (line) => line.slice(0, 4) !== '#CRS' && line.slice(0, 4) !== 'mapX'
@@ -50,10 +40,7 @@ export function parseQgisCoordinates(
           const newOrder = [2, 3, 0, 1]
           return l[newOrder[i]]
         })
-        .map(
-          (coordinate, index) =>
-            Number(coordinate) + (index == 1 ? resourceHeight : 0)
-        )
+        .map((coordinate, index) => Number(coordinate) * (index == 1 ? -1 : 1))
     )
 
   return coordinates

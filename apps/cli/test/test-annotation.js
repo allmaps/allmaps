@@ -74,7 +74,7 @@ describe('allmaps annotation parse', () => {
       'output/maps/7a69f9470b49a744-custom-gcps.json'
     )
     const output = execJson(
-      'annotation parse input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps-qgis.points --resourceHeight 7573'
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps-qgis.points'
     )
 
     expect(expected).to.deep.equal(output)

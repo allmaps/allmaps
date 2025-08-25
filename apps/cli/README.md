@@ -384,7 +384,7 @@ File format used in ArcGIS and [MapAnalyst](https://mapanalyst.org/man/points.ht
 5,1765,5836,-18.1014216,64.3331759
 ```
 
-Column order is `id`, `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis).
+Column order is `id`, `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis). For such files the resource height is required in order to compute the `resourceY` coordinate w.r.t. an origin in the upper left, as is the case in Allmaps.
 
 ##### ESRI TSV files
 
@@ -398,7 +398,7 @@ File format used in ArcGIS. Such files typically have the `.txt` file-extension.
 1765	5836	-18.1014216	64.3331759
 ```
 
-Column order is `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis).
+Column order is `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis). For such files the resource height is required in order to compute the `resourceY` coordinate w.r.t. an origin in the upper left, as is the case in Allmaps.
 
 ### Attach maps
 
