@@ -11,6 +11,7 @@ import {
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import {
+  mustContainGcpsMessage,
   parseAnnotationsValidateMaps,
   parseProjectedGcpTransformOptions,
   parseProjectedGcpTransformerInputOptionsAndMap,
@@ -49,6 +50,10 @@ export function resourceMask() {
     for (const map of maps) {
       const { gcps, transformationType, internalProjection } =
         parseProjectedGcpTransformerInputOptionsAndMap(options, map)
+
+      if (gcps === undefined) {
+        throw new Error(mustContainGcpsMessage)
+      }
 
       const projectedTransformer = new ProjectedGcpTransformer(
         gcps,

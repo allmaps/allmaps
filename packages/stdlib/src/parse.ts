@@ -1,7 +1,7 @@
 export function parseCoordinates(
   coordinates: string,
   options?: Partial<{
-    height: number
+    resourceHeight: number
   }>
 ): number[][] {
   const lines = coordinates.trim().split('\n')
@@ -30,13 +30,13 @@ export function parseCoordinates(
 export function parseQgisCoordinates(
   lines: string[],
   options?: Partial<{
-    height: number
+    resourceHeight: number
   }>
 ): number[][] {
-  if (!options || !options.height) {
-    throw new Error('Image height required when parsing QGIS coordinates')
+  if (!options || !options.resourceHeight) {
+    throw new Error('Resource height required when parsing QGIS coordinates')
   }
-  const height = options.height
+  const resourceHeight = options.resourceHeight
 
   const coordinates = lines
     .filter(
@@ -51,7 +51,8 @@ export function parseQgisCoordinates(
           return l[newOrder[i]]
         })
         .map(
-          (coordinate, index) => Number(coordinate) + (index == 1 ? height : 0)
+          (coordinate, index) =>
+            Number(coordinate) + (index == 1 ? resourceHeight : 0)
         )
     )
 
@@ -61,20 +62,22 @@ export function parseQgisCoordinates(
 export function parseArcGisCsvCoordinates(
   lines: string[],
   options?: Partial<{
-    height: number
+    resourceHeight: number
   }>
 ): number[][] {
-  if (!options || !options.height) {
-    throw new Error('Image height required when parsing ArcGIS CSV coordinates')
+  if (!options || !options.resourceHeight) {
+    throw new Error(
+      'Resource height required when parsing ArcGIS CSV coordinates'
+    )
   }
-  const height = options.height
+  const resourceHeight = options.resourceHeight
   const coordinates = lines.map((line) =>
     line
       .replace(/\s+/g, '')
       .split(',')
       .slice(1)
       .map((coordinate, index) =>
-        index == 1 ? height - Number(coordinate) : Number(coordinate)
+        index == 1 ? resourceHeight - Number(coordinate) : Number(coordinate)
       )
   )
 
@@ -84,19 +87,21 @@ export function parseArcGisCsvCoordinates(
 export function parseArcGisTsvCoordinates(
   lines: string[],
   options?: Partial<{
-    height: number
+    resourceHeight: number
   }>
 ): number[][] {
-  if (!options || !options.height) {
-    throw new Error('Image height required when parsing ArcGIS TSV coordinates')
+  if (!options || !options.resourceHeight) {
+    throw new Error(
+      'Resource height required when parsing ArcGIS TSV coordinates'
+    )
   }
-  const height = options.height
+  const resourceHeight = options.resourceHeight
   const coordinates = lines.map((line) =>
     line
       .split('\t')
       .map((coordinate, index) =>
         index == 1
-          ? height - Number(coordinate.trim())
+          ? resourceHeight - Number(coordinate.trim())
           : Number(coordinate.trim())
       )
   )

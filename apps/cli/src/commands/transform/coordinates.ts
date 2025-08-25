@@ -12,7 +12,8 @@ import {
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions,
-  parseInverseOptions
+  parseInverseOptions,
+  mustContainGcpsMessage
 } from '../../lib/parse.js'
 import {
   addAnnotationOptions,
@@ -52,13 +53,17 @@ This command was inspired by gdaltransform.`
   )
 
   return command.action(async (files, options) => {
-    const { gcps, transformationType, internalProjection } =
+    let { gcps, transformationType, internalProjection } =
       parseProjectedGcpTransformerInputOptions(options)
     const partialProjectedGcpTransformerOptions =
       parseProjectedGcpTransformerOptions(options)
     const partialProjectedGcpTransformOptions =
       parseProjectedGcpTransformOptions(options)
     const partialInverseOptions = parseInverseOptions(options)
+
+    if (gcps === undefined) {
+      throw new Error(mustContainGcpsMessage)
+    }
 
     const projectedTransformer = new ProjectedGcpTransformer(
       gcps,

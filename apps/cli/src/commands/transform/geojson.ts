@@ -14,6 +14,7 @@ import {
   addProjectedGcpTransformOptions
 } from '../../lib/options.js'
 import {
+  mustContainGcpsMessage,
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions
@@ -42,6 +43,10 @@ export function geojson() {
       parseProjectedGcpTransformerOptions(options)
     const partialProjectedGcpTransformOptions =
       parseProjectedGcpTransformOptions(options)
+
+    if (gcps === undefined) {
+      throw new Error(mustContainGcpsMessage)
+    }
 
     const projectedTransformer = new ProjectedGcpTransformer(
       gcps,

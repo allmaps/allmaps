@@ -56,7 +56,7 @@ export function gdalwarp(
   outputDir: string,
   internalProjectedGcps: Gcp[],
   geojsonMaskPolygon: GeojsonPolygon,
-  transformationType: TransformationType,
+  transformationType: TransformationType = 'polynomial',
   internalProjectionDefinition: string = 'EPSG:3857',
   projectionDefinition: string = 'EPSG:3857',
   jpgQuality: number,

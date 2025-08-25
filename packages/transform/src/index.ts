@@ -14,6 +14,11 @@ export { RBF } from './transformation-types/RBF.js'
 export { Straight } from './transformation-types/Straight.js'
 
 export {
+  transformationTypeToTypeAndOrder,
+  typeAndOrderToTransformationType
+} from './shared/conversion-functions.js'
+
+export {
   supportedDistortionMeasures,
   computeDistortionsFromPartialDerivatives
 } from './shared/distortion.js'

@@ -9,6 +9,7 @@ import { ProjectedGcpTransformer } from '@allmaps/project'
 
 import { readInput, printJson } from '../../lib/io.js'
 import {
+  mustContainGcpsMessage,
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions
@@ -42,6 +43,10 @@ export function svg() {
       parseProjectedGcpTransformerOptions(options)
     const partialProjectedGcpTransformOptions =
       parseProjectedGcpTransformOptions(options)
+
+    if (gcps === undefined) {
+      throw new Error(mustContainGcpsMessage)
+    }
 
     const projectedTransformer = new ProjectedGcpTransformer(
       gcps,

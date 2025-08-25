@@ -175,7 +175,7 @@ describe('allmaps transform coordinates', () => {
   // TODO: Add test for muliple input files
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation', () => {
-    const expected = readFile('output/coordinates/coordinates.txt')
+    const expected = readFile('output/coordinates/coordinates-tps.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json',
       'input/coordinates/coordinates.txt'
@@ -184,7 +184,9 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toResource using the supplied Georeference Annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-to-resource.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-tps-to-resource.txt'
+    )
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -i',
       'input/coordinates/coordinates-to-resource.txt'
@@ -193,18 +195,18 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
-    const expected = readFile(
-      'output/coordinates/coordinates-thin-plate-spline.txt'
-    )
+    const expected = readFile('output/coordinates/coordinates-polynomial.txt')
     const output = exec(
-      'transform coordinates -a input/annotations/7a69f9470b49a744.json -t thinPlateSpline',
+      'transform coordinates -a input/annotations/7a69f9470b49a744.json -t polynomial',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation transformation type but overwritable GCPs', () => {
-    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-tps-other-gcps.txt'
+    )
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps.txt',
       'input/coordinates/coordinates.txt'
@@ -214,7 +216,7 @@ describe('allmaps transform coordinates', () => {
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied transformation type and GCPs, even without a provided annotation', () => {
     const expected = readFile(
-      'output/coordinates/coordinates-other-gcps-thin-plate-spline.txt'
+      'output/coordinates/coordinates-tps-other-gcps.txt'
     )
     const output = exec(
       'transform coordinates -g input/coordinates/gcps.txt -t thinPlateSpline',
@@ -224,7 +226,9 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-polynomial-other-gcps.txt'
+    )
     const output = exec(
       'transform coordinates -g input/coordinates/gcps.txt',
       'input/coordinates/coordinates.txt'
@@ -233,9 +237,11 @@ describe('allmaps transform coordinates', () => {
   })
 
   it('should read coordinates from a QGIS-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-polynomial-other-gcps.txt'
+    )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-qgis.points --height 7573',
+      'transform coordinates -g input/coordinates/gcps-qgis.points --resourceHeight 7573',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -243,28 +249,32 @@ describe('allmaps transform coordinates', () => {
 
   it('should read coordinates and internal projection from a QGIS-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
     const expected = readFile(
-      'output/coordinates/coordinates-other-gcps-internal-projection.txt'
+      'output/coordinates/coordinates-polynomial-other-gcps-internal-projection.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-qgis-internal-projection.points --height 7573',
+      'transform coordinates -g input/coordinates/gcps-qgis-internal-projection.points --resourceHeight 7573',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read coordinates from a ArcGIS-CSV-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-polynomial-other-gcps.txt'
+    )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-arcgis-csv.csv --height 7573',
+      'transform coordinates -g input/coordinates/gcps-arcgis-csv.csv --resourceHeight 7573',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
   })
 
   it('should read coordinates from a ArcGIS-TSV-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
-    const expected = readFile('output/coordinates/coordinates-other-gcps.txt')
+    const expected = readFile(
+      'output/coordinates/coordinates-polynomial-other-gcps.txt'
+    )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-arcgis-tsv.txt --height 7573',
+      'transform coordinates -g input/coordinates/gcps-arcgis-tsv.txt --resourceHeight 7573',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)

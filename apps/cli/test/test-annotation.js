@@ -27,6 +27,17 @@ describe('allmaps annotation generate', () => {
     expect(expected).to.deep.equal(output)
   })
 
+  it("should read georeference data in Allmaps' internal format from a file, apply a custom transformation type and and convert it to a Georeference Annotation", () => {
+    const expected = readFileJson(
+      'output/annotations/5610333850638ae2-helmert.json'
+    )
+    const output = execJson(
+      'annotation generate input/maps/5610333850638ae2.json -t helmert'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
   it("should read georeference data in Allmaps' internal format from the standard input and convert it to a Georeference Annotation", () => {
     const expected = readFileJson('output/annotations/5610333850638ae2.json')
     const output = execJson(
@@ -53,6 +64,17 @@ describe('allmaps annotation parse', () => {
     const output = execJson(
       'annotation parse',
       'input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
+  it("should read a Georeference Annotation from a file, apply custom GCPs and convert it to Allmaps' internal format", () => {
+    const expected = readFileJson(
+      'output/maps/7a69f9470b49a744-custom-gcps.json'
+    )
+    const output = execJson(
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps-qgis.points --resourceHeight 7573'
     )
 
     expect(expected).to.deep.equal(output)

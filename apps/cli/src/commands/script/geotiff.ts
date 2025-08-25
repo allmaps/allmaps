@@ -25,7 +25,8 @@ import {
   parseAnnotationsValidateMaps,
   parseProjectedGcpTransformOptions,
   parseProjectedGcpTransformerOptions,
-  parseProjectedGcpTransformerInputOptionsAndMap
+  parseProjectedGcpTransformerInputOptionsAndMap,
+  mustContainGcpsMessage
 } from '../../lib/parse.js'
 import { getMapId } from '../../lib/map.js'
 import {
@@ -115,6 +116,10 @@ export function geotiff() {
         ),
         { internalProjection }
       )
+
+      if (gcps === undefined) {
+        throw new Error(mustContainGcpsMessage)
+      }
 
       const projectedTransformer = new ProjectedGcpTransformer(
         gcps,

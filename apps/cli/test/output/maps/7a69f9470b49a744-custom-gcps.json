@@ -1,0 +1,61 @@
+[
+  {
+    "@context": "https://schemas.allmaps.org/map/2/context.json",
+    "type": "GeoreferencedMap",
+    "id": "16f114f39d9466b9",
+    "resource": {
+      "id": "https://dlc.services/iiif-img/7/14/074a4598-5988-46a2-95f4-f8c625a1fcb3",
+      "width": 7636,
+      "height": 10474,
+      "type": "ImageService2"
+    },
+    "transformation": {
+      "type": "thinPlateSpline"
+    },
+    "gcps": [
+      {
+        "geo": [9.9301538, 53.5814021],
+        "resource": [3899, 6412]
+      },
+      {
+        "geo": [25.4101689, 71.0981125],
+        "resource": [6584, 819]
+      },
+      {
+        "geo": [22.2380717, 60.4764844],
+        "resource": [6491, 4782]
+      },
+      {
+        "geo": [-3.2014645, 55.959946],
+        "resource": [1409, 5436]
+      },
+      {
+        "geo": [-18.1014216, 64.3331759],
+        "resource": [1765, 1737]
+      }
+    ],
+    "id": "16f114f39d9466b9",
+    "resource": {
+      "height": 7573,
+      "id": "https://dlc.services/iiif-img/7/14/074a4598-5988-46a2-95f4-f8c625a1fcb3",
+      "type": "ImageService2",
+      "width": 7636
+    },
+    "resourceMask": [
+      [845, 8569],
+      [825, 7518],
+      [956, 7518],
+      [956, 6952],
+      [817, 6950],
+      [841, 2075],
+      [2768, 2083],
+      [2748, 5445],
+      [2821, 5445],
+      [2838, 7152],
+      [2743, 7152],
+      [2728, 9033],
+      [2691, 9193],
+      [807, 8717]
+    ]
+  }
+]

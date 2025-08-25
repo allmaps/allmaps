@@ -10,12 +10,35 @@ export function addAnnotationOptions<
   // Note: annotation is not required since transformer can be built using only GCPs, which could be specified individually.
   // This is especially useful when transforming coordinates, outside of the Allmaps context.
   // An error message is still displayed when neither an annotation or GCPs are specified
-  return addProjectedGcpTransformerInputOptions(
+  return addAnnotationInputOptions(
     command.option(
       '-a, --annotation <filename>',
-      'Filename of Georeference Annotation (or Georeferenced Map)'
+      'Filename of Georeference Annotation (or Georeferenced Map).'
     )
   )
+}
+
+export function addAnnotationInputOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return addProjectedGcpTransformerInputOptions(
+    addResourceInputOptions(command)
+  )
+}
+
+export function addResourceInputOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command
+    .option('--resourceId <string>', 'Resource ID.')
+    .option('--resourceType <string>', 'Resource type.')
+    .option('--resourceWidth <number>', 'Resource width.', parseInt)
+    .option('--resourceHeight <number>', 'Resource height.', parseInt)
+    .option('--resourceMask <string>', 'Resource mask.')
 }
 
 export function addProjectedGcpTransformerInputOptions<
@@ -26,26 +49,21 @@ export function addProjectedGcpTransformerInputOptions<
   return command
     .option(
       '-g, --gcps <filename>',
-      'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation'
+      'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).'
     )
-    .option('--width <number>', 'Resource width', parseInt)
-    .option('--height <number>', 'Resource height', parseInt)
     .option(
       '-t, --transformation-type <type>',
       'Transformation type. One of "polynomial", "thinPlateSpline", "linear", "helmert", "projective". ' +
-        'This takes precedence over the transformation type from the Georeference Annotation',
-      'polynomial'
+        'This takes precedence over the transformation type from the Georeference Annotation'
     )
     .option(
       '-o, --polynomial-order <order>',
       'Order of polynomial transformation. Either 1, 2 or 3.',
-      parseInt,
-      1
+      parseInt
     )
     .option(
       '--internal-projection <proj4string>',
-      `The geographic projection used internally in the transformation.`,
-      'EPSG:3857'
+      `The geographic projection used internally in the transformation.`
     )
 }
 
