@@ -1,11 +1,18 @@
 {
   "name": "@allmaps/bearing",
   "version": "1.0.0-beta.4",
-  "author": {
-    "name": "Bert Spaan",
-    "email": "hello@bertspaan.nl",
-    "url": "https://bertspaan.nl"
-  },
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
   "description": "Compute bearing of georeferenced map",
   "type": "module",
   "exports": "./dist/index.js",

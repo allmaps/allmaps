@@ -3,17 +3,17 @@ import { Command, Option } from '@commander-js/extra-typings'
 import fs from 'fs'
 import path from 'path'
 
-import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import { ProjectedGcpTransformer } from '@allmaps/project'
 import { generateId } from '@allmaps/id'
 import {
-  bboxToRectangle,
-  bboxToSize,
-  computeBbox,
-  geometryToGeojsonGeometry,
   mergeOptionsUnlessUndefined,
-  mergePartialOptions,
-  rectanglesToScale
+  mergePartialOptions
 } from '@allmaps/stdlib'
+import {
+  getGdalbuildvrtScript,
+  getGeoreferencedMapGdalwarpScripts,
+  getGdalPreamble
+} from '@allmaps/io'
 
 import {
   addProjectedGcpTransformerInputOptions,
@@ -29,14 +29,6 @@ import {
   mustContainGcpsMessage
 } from '../../lib/parse.js'
 import { getMapId } from '../../lib/map.js'
-import {
-  preamble,
-  checkImageExistsAndCorrectSize,
-  gdalwarp,
-  gdalbuildvrt
-} from '../../lib/gdal.js'
-
-import type { Rectangle, Size } from '@allmaps/types'
 
 export function geotiff() {
   const command = addProjectedGcpTransformerOptions(
@@ -127,67 +119,15 @@ export function geotiff() {
         projectedGcpTransformerOptions
       )
 
-      const geoMask = projectedTransformer.transformToGeo(map.resourceMask, {
-        projection: lonLatProjection,
-        maxDepth: 6
-      })
-      const geojsonMaskPolygon = geometryToGeojsonGeometry([geoMask])
-
-      if (!map.resource.width || !map.resource.height) {
-        throw new Error('Map size not specified')
-      }
-      const resourceFullMaskSize: Size = [
-        map.resource.width,
-        map.resource.height
-      ]
-      const resourceMaskBbox = computeBbox(map.resourceMask)
-      const resourceMaskRectangle = bboxToRectangle(resourceMaskBbox)
-      const projectedGeoMaskRectangle = projectedTransformer.transformToGeo(
-        resourceMaskRectangle
-      ) as Rectangle
-      const resourceToProjectedGeoScale = rectanglesToScale(
-        resourceMaskRectangle,
-        projectedGeoMaskRectangle
-      )
-
-      const projectedGeoMask = projectedTransformer.transformToGeo(
-        map.resourceMask
-      )
-
-      const projectedGeoMaskBboxSize: Size = bboxToSize(
-        computeBbox(projectedGeoMask)
-      )
-
-      const size: Size = [
-        Math.round(projectedGeoMaskBboxSize[0] * resourceToProjectedGeoScale),
-        Math.round(projectedGeoMaskBboxSize[1] * resourceToProjectedGeoScale)
-      ]
-
-      const gdalwarpScript = gdalwarp(
-        imageFilename,
-        basename,
-        options.outputDir,
-        gcps.map(({ resource, geo }) => ({
-          resource,
-          geo: projectedTransformer.projectionToInternalProjection(
-            projectedTransformer.lonLatToProjection(geo)
-          )
-        })),
-        geojsonMaskPolygon,
-        transformationType,
-        projectedGcpTransformerOptions.internalProjection?.definition,
-        projectedGcpTransformerOptions.projection?.definition,
-        Number(options.jpgQuality),
-        size
-      )
-
       gdalwarpScripts.push(
-        checkImageExistsAndCorrectSize(
+        ...getGeoreferencedMapGdalwarpScripts(
+          map,
+          projectedTransformer,
           imageFilename,
           basename,
-          resourceFullMaskSize
-        ),
-        gdalwarpScript
+          options.outputDir,
+          Number(options.jpgQuality)
+        )
       )
 
       basenames.push(basename)
@@ -195,16 +135,15 @@ export function geotiff() {
 
     const outputVrt =
       basenames.length > 1 ? 'merged.vrt' : `${basenames[0]}.vrt`
-
     const inputTiffs = basenames.map((basename) => `${basename}-warped.tif`)
-    const gdalbuildvrtScript = gdalbuildvrt(
+    const gdalbuildvrtScript = getGdalbuildvrtScript(
       options.outputDir,
       inputTiffs,
       outputVrt
     )
 
     const gdalScripts = [
-      preamble(options.outputDir),
+      getGdalPreamble(options.outputDir),
       '',
       ...gdalwarpScripts,
       '',

@@ -1,14 +1,23 @@
 import path from 'path'
 
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import {
+  bboxToRectangle,
+  bboxToSize,
+  computeBbox,
+  geometryToGeojsonGeometry,
+  rectanglesToScale
+} from '@allmaps/stdlib'
 import { checkCommand } from './bash.js'
 
-import type { GeojsonPolygon, Gcp, Size } from '@allmaps/types'
+import type { GeojsonPolygon, Gcp, Size, Rectangle } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 
 const jqNotFoundMessage = 'Please install jq: https://jqlang.github.io/jq/.'
 const gdalNotFoundMessage = 'Please install GDAL.'
 
-export function preamble(outputDir: string) {
+export function getGdalPreamble(outputDir: string) {
   return `#!/usr/bin/env bash
 
 mkdir -p ${outputDir}
@@ -18,6 +27,66 @@ ${checkCommand('gdalbuildvrt', gdalNotFoundMessage)}
 ${checkCommand('gdal_translate', gdalNotFoundMessage)}
 ${checkCommand('gdalwarp', gdalNotFoundMessage)}
 ${checkCommand('jq', jqNotFoundMessage)}`.trim()
+}
+
+export function getGeoreferencedMapGdalwarpScripts(
+  map: GeoreferencedMap,
+  projectedTransformer: ProjectedGcpTransformer,
+  imageFilename: string,
+  basename: string,
+  outputDir: string,
+  jpgQuality: number
+): string[] {
+  const geoMask = projectedTransformer.transformToGeo(map.resourceMask, {
+    projection: lonLatProjection,
+    maxDepth: 6
+  })
+  const geojsonMaskPolygon = geometryToGeojsonGeometry([geoMask])
+
+  if (!map.resource.width || !map.resource.height) {
+    throw new Error('Map size not specified')
+  }
+  const resourceFullMaskSize: Size = [map.resource.width, map.resource.height]
+  const resourceMaskBbox = computeBbox(map.resourceMask)
+  const resourceMaskRectangle = bboxToRectangle(resourceMaskBbox)
+  const projectedGeoMaskRectangle = projectedTransformer.transformToGeo(
+    resourceMaskRectangle
+  ) as Rectangle
+  const resourceToProjectedGeoScale = rectanglesToScale(
+    resourceMaskRectangle,
+    projectedGeoMaskRectangle
+  )
+
+  const projectedGeoMask = projectedTransformer.transformToGeo(map.resourceMask)
+
+  const projectedGeoMaskBboxSize: Size = bboxToSize(
+    computeBbox(projectedGeoMask)
+  )
+
+  const size: Size = [
+    Math.round(projectedGeoMaskBboxSize[0] * resourceToProjectedGeoScale),
+    Math.round(projectedGeoMaskBboxSize[1] * resourceToProjectedGeoScale)
+  ]
+
+  return [
+    checkImageExistsAndCorrectSize(
+      imageFilename,
+      basename,
+      resourceFullMaskSize
+    ),
+    gdalwarpScriptInternal(
+      imageFilename,
+      basename,
+      outputDir,
+      projectedTransformer.interalProjectedGcps,
+      projectedTransformer.type,
+      projectedTransformer.internalProjection.definition,
+      projectedTransformer.projection.definition,
+      geojsonMaskPolygon,
+      size,
+      jpgQuality
+    )
+  ]
 }
 
 export function checkImageExistsAndCorrectSize(
@@ -50,17 +119,17 @@ else
 fi`.trim()
 }
 
-export function gdalwarp(
+export function gdalwarpScriptInternal(
   imageFilename: string,
   basename: string,
   outputDir: string,
   internalProjectedGcps: Gcp[],
-  geojsonMaskPolygon: GeojsonPolygon,
   transformationType: TransformationType = 'polynomial',
   internalProjectionDefinition: string = 'EPSG:3857',
   projectionDefinition: string = 'EPSG:3857',
-  jpgQuality: number,
-  size: Size
+  geojsonMaskPolygon: GeojsonPolygon,
+  size: Size,
+  jpgQuality: number
 ) {
   // See also: https://blog.cleverelephant.ca/2015/02/geotiff-compression-for-dummies.html
 
@@ -90,7 +159,8 @@ export function gdalwarp(
   const geojsonFilename = path.join(outputDir, `${basename}.geojson`)
   const geotiffFilename = path.join(outputDir, `${basename}-warped.tif`)
 
-  return `${transformationMessage ? `echo "${transformationMessage}"` : ''}
+  const script =
+    `${transformationMessage ? `echo "${transformationMessage}"` : ''}
 
 gdal_translate -of vrt \\
   -a_srs "${internalProjectionDefinition}" \\
@@ -113,9 +183,11 @@ gdalwarp \\
   ${transformationArguments} \\
   ${vrtFilename} \\
   ${geotiffFilename}`.trim()
+
+  return script
 }
 
-export function gdalbuildvrt(
+export function getGdalbuildvrtScript(
   outputDir: string,
   inputTiffs: string[],
   outputVrt: string

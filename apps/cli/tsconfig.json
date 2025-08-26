@@ -8,14 +8,15 @@
     "outDir": "./dist"
   },
   "references": [
+    { "path": "../../packages/annotation" },
     { "path": "../../packages/attach" },
-    { "path": "../../packages/stdlib" },
     { "path": "../../packages/id" },
-    { "path": "../../packages/types" },
-    { "path": "../../packages/transform" },
-    { "path": "../../packages/project" },
     { "path": "../../packages/iiif-parser" },
-    { "path": "../../packages/annotation" }
+    { "path": "../../packages/io" },
+    { "path": "../../packages/project" },
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/types" }
   ],
   "include": ["./src/**/*"]
 }

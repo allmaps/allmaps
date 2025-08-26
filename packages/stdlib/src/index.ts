@@ -186,16 +186,6 @@ export {
 } from './options.js'
 
 export {
-  parseCoordinates,
-  parseQgisCoordinates,
-  parseArcGisCsvCoordinates,
-  parseArcGisTsvCoordinates,
-  parseGdalCoordinates,
-  parseInternalProjectionDefinition,
-  parseInternalProjectionDefinitionFromLine
-} from './parse.js'
-
-export {
   polygonSelfIntersectionPoints,
   linesIntersectionPoint,
   prolongedLinesIntersectionPoint

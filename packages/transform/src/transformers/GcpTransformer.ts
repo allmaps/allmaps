@@ -107,6 +107,9 @@ export class GcpTransformer extends BaseGcpTransformer {
     )
   }
 
+  /**
+   * Get GCPs as they were inputed to the GCP Transformer.
+   */
   public get gcps(): Gcp[] {
     return this.generalGcpsInternal.map(generalGcpToGcp)
   }

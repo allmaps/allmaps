@@ -10,11 +10,13 @@ import {
   isPoint,
   isRing,
   mergeOptionsUnlessUndefined,
-  parseCoordinates,
-  parseInternalProjectionDefinition,
   stringToSvgGeometriesGenerator,
   svgGeometryToGeometry
 } from '@allmaps/stdlib'
+import {
+  parseCoordinates,
+  parseInternalProjectionDefinition
+} from '@allmaps/io'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
 

@@ -3,9 +3,9 @@ import { Command } from '@commander-js/extra-typings'
 import { ProjectedGcpTransformer } from '@allmaps/project'
 import {
   mergeOptionsUnlessUndefined,
-  mergePartialOptions,
-  parseCoordinates
+  mergePartialOptions
 } from '@allmaps/stdlib'
+import { parseCoordinates } from '@allmaps/io'
 
 import { readInput, printString, readFromStdinLine } from '../../lib/io.js'
 import {
