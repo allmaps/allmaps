@@ -6,9 +6,10 @@ export {
   parseArcGisTsvGcpLines,
   parseGdalGcpLines,
   parseGdalCoordinateLines,
-  parseInternalProjectionDefinition,
+  parseInternalProjectionFromGcpString,
+  parseInternalProjectionDefinitionFromGcpString,
   parseInternalProjectionDefinitionFromLine
-} from './input/coordinates.js'
+} from './input/gcps.js'
 
 export {
   getGdalPreamble,

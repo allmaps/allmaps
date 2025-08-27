@@ -14,7 +14,7 @@ import {
 } from '@allmaps/stdlib'
 import {
   parseGcps,
-  parseInternalProjectionDefinition,
+  parseInternalProjectionFromGcpString,
   parseGdalCoordinateLines
 } from '@allmaps/io'
 
@@ -241,7 +241,10 @@ export function parseProjectedGcpTransformerInputOptionsAndMap(
 }
 
 export function parseGcpInputOptions(
-  options: { gcps?: string; resourceHeight?: number },
+  options: Partial<{
+    gcps: string
+    resourceHeight: number
+  }>,
   map?: GeoreferencedMap
 ): Partial<GcpsInputOptions> {
   let gcps: Gcp[]
@@ -320,12 +323,8 @@ export function parseInternalProjectionInputOptions(
     options.gcps
   ) {
     const gcpString = readFromFile(options.gcps)
-    const internalProjection = parseInternalProjectionDefinition(gcpString)
-    if (internalProjection) {
-      internalProjectionInputs.internalProjection = {
-        definition: internalProjection
-      } as Projection
-    }
+    internalProjectionInputs.internalProjection =
+      parseInternalProjectionFromGcpString(gcpString)
   } else if (
     map &&
     map.resourceCrs &&

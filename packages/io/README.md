@@ -41,6 +41,21 @@ console.log(geotiffScripts.join('\n'))
 
 The generated Bash script expects the full-size images to be available on the local file system with the correct name. You can download these images manually or using the [@allmaps/cli](../../apps/cli/)'s `allmaps fetch full-image` or `allmaps script dezoomify` command.
 
+### Parse GCPs
+
+GCPs can be parsed from common [GCP file formats](#gcp-file-formats).
+
+```js
+import { readFileSync} from 'fs'
+
+// Read a GCP file
+const gcpString = readFileSync('./gcps.points', { encoding: 'utf8', flag: 'r' });
+
+// parse the GCPs and possible internal projection
+const { gcps, internalProjection } = parseGcps(gcpString)
+```
+
+An internal projection can be included in a QGIS GCP file and will be used when parsing and returned. An internal projection can be specified to parse ArcGIS files. The resource height must specified to parse ArcGIS files.
 
 ## GCP file formats
 

@@ -1,28 +1,43 @@
-import { proj4, lonLatProjection } from '@allmaps/project'
+import { proj4, lonLatProjection, isEqualProjection } from '@allmaps/project'
 import { Gcp, Point } from '@allmaps/types'
 
 import type { Projection } from '@allmaps/project'
+import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
+/**
+ * Parse GCPs from file string.
+ *
+ * An internal projection can be included in a QGIS GCP file and will be used when parsing and returned.
+ * An internal projection can be specified to parse ArcGIS files.
+ * The resource height must specified to parse ArcGIS files.
+ */
 export function parseGcps(
   gcpString: string,
   options: Partial<{
     resourceHeight: number
+    internalProjection: Projection
   }>
 ): { gcps: Gcp[]; internalProjection?: Projection } {
   // TODO: consider parsing GCPs from Georeference Annotation too?
+
+  const parsedInternalProjection =
+    parseInternalProjectionFromGcpString(gcpString)
+  const mergedOptions = mergeOptionsUnlessUndefined(
+    { internalProjection: lonLatProjection },
+    mergeOptionsUnlessUndefined(
+      { internalProjection: parsedInternalProjection },
+      options
+    )
+  )
+
   let gcps = parseGcpString(gcpString, options)
 
-  const internalProjectionDefinition =
-    parseInternalProjectionDefinition(gcpString)
-  let internalProjection: Projection | undefined = undefined
-
-  if (internalProjectionDefinition) {
-    internalProjection = { definition: internalProjectionDefinition }
+  if (!isEqualProjection(mergedOptions.internalProjection, lonLatProjection)) {
     gcps = gcps.map((gcp) => {
       return {
         resource: gcp.resource,
         geo: proj4(
-          internalProjectionDefinition,
+          mergedOptions.internalProjection.definition,
           lonLatProjection.definition,
           gcp.geo
         )
@@ -32,17 +47,17 @@ export function parseGcps(
 
   return {
     gcps,
-    internalProjection
+    internalProjection: parsedInternalProjection
   }
 }
 
 export function parseGcpString(
-  coordinates: string,
+  gcpString: string,
   options?: Partial<{
     resourceHeight: number
   }>
 ): Gcp[] {
-  const lines = coordinates.trim().split('\n')
+  const lines = gcpString.trim().split('\n')
 
   if (lines.length == 0) {
     throw new Error('No coordinates')
@@ -152,10 +167,24 @@ export function parseGdalCoordinateLines(lines: string[]): number[][] {
   )
 }
 
-export function parseInternalProjectionDefinition(
-  coordinates: string
+export function parseInternalProjectionFromGcpString(
+  gcpString: string
+): Projection | undefined {
+  const projectionDefinition =
+    parseInternalProjectionDefinitionFromLine(gcpString)
+  let projection: Projection | undefined = undefined
+  if (projectionDefinition) {
+    projection = {
+      definition: projectionDefinition
+    }
+  }
+  return projection
+}
+
+export function parseInternalProjectionDefinitionFromGcpString(
+  gcpString: string
 ): string | undefined {
-  const lines = coordinates.trim().split('\n')
+  const lines = gcpString.trim().split('\n')
 
   if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
     return parseInternalProjectionDefinitionFromLine(lines[0])
