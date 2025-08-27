@@ -1,9 +1,11 @@
 export {
-  parseCoordinates,
-  parseQgisCoordinates,
-  parseArcGisCsvCoordinates,
-  parseArcGisTsvCoordinates,
-  parseGdalCoordinates,
+  parseGcps,
+  parseGcpString,
+  parseQgisGcpLines,
+  parseArcGisCsvGcpLines,
+  parseArcGisTsvGcpLines,
+  parseGdalGcpLines,
+  parseGdalCoordinateLines,
   parseInternalProjectionDefinition,
   parseInternalProjectionDefinitionFromLine
 } from './input/coordinates.js'

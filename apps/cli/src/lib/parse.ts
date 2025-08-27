@@ -1,5 +1,4 @@
 import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
-import { lonLatProjection, proj4 } from '@allmaps/project'
 
 import {
   InverseOptions,
@@ -14,8 +13,9 @@ import {
   svgGeometryToGeometry
 } from '@allmaps/stdlib'
 import {
-  parseCoordinates,
-  parseInternalProjectionDefinition
+  parseGcps,
+  parseInternalProjectionDefinition,
+  parseGdalCoordinateLines
 } from '@allmaps/io'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
@@ -26,7 +26,7 @@ import type {
   TransformationTypeInputs as TransformationTypeInputOptions,
   GcpsInputs as GcpsInputOptions
 } from '@allmaps/transform'
-import type { Gcp, Point, Ring } from '@allmaps/types'
+import type { Gcp, Ring } from '@allmaps/types'
 import type {
   Rcp,
   AttachedTransformationOptions,
@@ -252,7 +252,7 @@ export function parseGcpInputOptions(
     } catch (e) {
       // The GCP option was provided by a file with GCPs
       const gcpString = readFromFile(options.gcps)
-      gcps = parseGcps(gcpString, options)
+      gcps = parseGcps(gcpString, options).gcps
     }
     return { gcps }
   } else if (map) {
@@ -263,37 +263,14 @@ export function parseGcpInputOptions(
   return {}
 }
 
-export function parseGcps(
-  gcpString: string,
-  options: Partial<{
-    resourceHeight: number
-  }>
-): Gcp[] {
-  // TODO: also allow file to contain GCPs in the Georeference Annotation GCP format
-  let gcps = (
-    parseCoordinates(gcpString, options) as [[number, number, number, number]]
-  ).map((coordinateArray) => ({
-    resource: [coordinateArray[0], coordinateArray[1]] as Point,
-    geo: [coordinateArray[2], coordinateArray[3]] as Point
-  }))
+export function parseCoordinates(coordinates: string): number[][] {
+  const lines = coordinates.trim().split('\n')
 
-  const internalProjectionDefinition =
-    parseInternalProjectionDefinition(gcpString)
-
-  if (internalProjectionDefinition) {
-    gcps = gcps.map((gcp) => {
-      return {
-        resource: gcp.resource,
-        geo: proj4(
-          internalProjectionDefinition,
-          lonLatProjection.definition,
-          gcp.geo
-        )
-      }
-    })
+  if (lines.length == 0) {
+    throw new Error('No coordinates')
   }
 
-  return gcps
+  return parseGdalCoordinateLines(lines)
 }
 
 export function parseTransformationTypeInputOptions(

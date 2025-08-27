@@ -5,7 +5,6 @@ import {
   mergeOptionsUnlessUndefined,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { parseCoordinates } from '@allmaps/io'
 
 import { readInput, printString, readFromStdinLine } from '../../lib/io.js'
 import {
@@ -13,6 +12,7 @@ import {
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions,
   parseInverseOptions,
+  parseCoordinates,
   mustContainGcpsMessage
 } from '../../lib/parse.js'
 import {

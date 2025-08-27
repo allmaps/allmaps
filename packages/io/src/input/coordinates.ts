@@ -1,9 +1,47 @@
-export function parseCoordinates(
+import { proj4, lonLatProjection } from '@allmaps/project'
+import { Gcp, Point } from '@allmaps/types'
+
+import type { Projection } from '@allmaps/project'
+
+export function parseGcps(
+  gcpString: string,
+  options: Partial<{
+    resourceHeight: number
+  }>
+): { gcps: Gcp[]; internalProjection?: Projection } {
+  // TODO: consider parsing GCPs from Georeference Annotation too?
+  let gcps = parseGcpString(gcpString, options)
+
+  const internalProjectionDefinition =
+    parseInternalProjectionDefinition(gcpString)
+  let internalProjection: Projection | undefined = undefined
+
+  if (internalProjectionDefinition) {
+    internalProjection = { definition: internalProjectionDefinition }
+    gcps = gcps.map((gcp) => {
+      return {
+        resource: gcp.resource,
+        geo: proj4(
+          internalProjectionDefinition,
+          lonLatProjection.definition,
+          gcp.geo
+        )
+      }
+    })
+  }
+
+  return {
+    gcps,
+    internalProjection
+  }
+}
+
+export function parseGcpString(
   coordinates: string,
   options?: Partial<{
     resourceHeight: number
   }>
-): number[][] {
+): Gcp[] {
   const lines = coordinates.trim().split('\n')
 
   if (lines.length == 0) {
@@ -13,22 +51,22 @@ export function parseCoordinates(
   // For more about these datatypes, see https://observablehq.com/d/50deb2a74a628292
 
   if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
-    return parseQgisCoordinates(lines)
+    return parseQgisGcpLines(lines)
   } else if (lines[0].split(',').length >= 5) {
-    return parseArcGisCsvCoordinates(lines, options)
+    return parseArcGisCsvGcpLines(lines, options)
   } else if (lines[0].split(/\t+/).length >= 4) {
-    return parseArcGisTsvCoordinates(lines, options)
+    return parseArcGisTsvGcpLines(lines, options)
   } else if (lines[0].split(/\ +/).length >= 2) {
     // Note: split on spaces specifically instead of /\s+/
     // to prevent false positive of ArcGIS TSV file
-    return parseGdalCoordinates(lines)
+    return parseGdalGcpLines(lines)
   } else {
     throw 'Unrecognised GCP type'
   }
 }
 
-export function parseQgisCoordinates(lines: string[]): number[][] {
-  const coordinates = lines
+export function parseQgisGcpLines(lines: string[]): Gcp[] {
+  const gcps = lines
     .filter(
       (line) => line.slice(0, 4) !== '#CRS' && line.slice(0, 4) !== 'mapX'
     )
@@ -40,63 +78,74 @@ export function parseQgisCoordinates(lines: string[]): number[][] {
           const newOrder = [2, 3, 0, 1]
           return l[newOrder[i]]
         })
-        .map((coordinate, index) => Number(coordinate) * (index == 1 ? -1 : 1))
+        .map(Number)
     )
+    .map(coordinateArrayToGcp)
+    .map((gcp) => {
+      return {
+        resource: [gcp.resource[0], -gcp.resource[1]] as Point,
+        geo: gcp.geo
+      }
+    })
 
-  return coordinates
+  return gcps
 }
 
-export function parseArcGisCsvCoordinates(
+export function parseArcGisCsvGcpLines(
   lines: string[],
   options?: Partial<{
     resourceHeight: number
   }>
-): number[][] {
+): Gcp[] {
   if (!options || !options.resourceHeight) {
     throw new Error(
       'Resource height required when parsing ArcGIS CSV coordinates'
     )
   }
   const resourceHeight = options.resourceHeight
-  const coordinates = lines.map((line) =>
-    line
-      .replace(/\s+/g, '')
-      .split(',')
-      .slice(1)
-      .map((coordinate, index) =>
-        index == 1 ? resourceHeight - Number(coordinate) : Number(coordinate)
-      )
-  )
+  const coordinates = lines
+    .map((line) => line.replace(/\s+/g, '').split(',').slice(1).map(Number))
+    .map(coordinateArrayToGcp)
+    .map((gcp) => {
+      return {
+        resource: [gcp.resource[0], resourceHeight - gcp.resource[1]] as Point,
+        geo: gcp.geo
+      }
+    })
 
   return coordinates
 }
 
-export function parseArcGisTsvCoordinates(
+export function parseArcGisTsvGcpLines(
   lines: string[],
   options?: Partial<{
     resourceHeight: number
   }>
-): number[][] {
+): Gcp[] {
   if (!options || !options.resourceHeight) {
     throw new Error(
       'Resource height required when parsing ArcGIS TSV coordinates'
     )
   }
   const resourceHeight = options.resourceHeight
-  const coordinates = lines.map((line) =>
-    line
-      .split('\t')
-      .map((coordinate, index) =>
-        index == 1
-          ? resourceHeight - Number(coordinate.trim())
-          : Number(coordinate.trim())
-      )
-  )
+  const coordinates = lines
+    .map((line) => line.split('\t').map(Number))
+    .map(coordinateArrayToGcp)
+    .map((gcp) => {
+      return {
+        resource: [gcp.resource[0], resourceHeight - gcp.resource[1]] as Point,
+        geo: gcp.geo
+      }
+    })
 
   return coordinates
 }
 
-export function parseGdalCoordinates(lines: string[]): number[][] {
+export function parseGdalGcpLines(lines: string[]): Gcp[] {
+  return parseGdalCoordinateLines(lines).map(coordinateArrayToGcp)
+}
+
+export function parseGdalCoordinateLines(lines: string[]): number[][] {
   // String from mutliline file where each line contains multiple coordinates separated by whitespace
   return lines.map((line) =>
     line.split(/\s+/).map((coordinate) => Number(coordinate.trim()))
@@ -124,4 +173,11 @@ export function parseInternalProjectionDefinitionFromLine(
     }
   }
   return undefined
+}
+
+function coordinateArrayToGcp(coordinateArray: number[]): Gcp {
+  return {
+    resource: [coordinateArray[0], coordinateArray[1]] as Point,
+    geo: [coordinateArray[2], coordinateArray[3]] as Point
+  }
 }
