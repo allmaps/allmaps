@@ -26,6 +26,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run prepack",
+    "watch": "svelte-package --watch",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "prepack": "svelte-kit sync && svelte-package && publint",
