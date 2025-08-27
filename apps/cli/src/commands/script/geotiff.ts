@@ -1,19 +1,14 @@
 import { Command, Option } from '@commander-js/extra-typings'
 
 import fs from 'fs'
-import path from 'path'
 
 import { ProjectedGcpTransformer } from '@allmaps/project'
-import { generateId } from '@allmaps/id'
 import {
+  mergeOptions,
   mergeOptionsUnlessUndefined,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import {
-  getGdalbuildvrtScript,
-  getGeoreferencedMapGdalwarpScripts,
-  getGdalPreamble
-} from '@allmaps/io'
+import { getGeoreferencedMapsGeotiffScripts } from '@allmaps/io'
 
 import {
   addProjectedGcpTransformerInputOptions,
@@ -28,7 +23,6 @@ import {
   parseProjectedGcpTransformerInputOptionsAndMap,
   mustContainGcpsMessage
 } from '../../lib/parse.js'
-import { getMapId } from '../../lib/map.js'
 
 export function geotiff() {
   const command = addProjectedGcpTransformerOptions(
@@ -59,7 +53,10 @@ export function geotiff() {
             ).conflicts('source-dir')
           )
       ),
-      { projectionDefinition: 'EPSG:3857' } // Note: different default projection for geotiff!
+      { projectionDefinition: 'EPSG:3857' }
+      // Note: here we overwrite the CLI's default projection
+      // from lonLatProjection to webMercatorProjection like elsewere in Allmaps
+      // so as to obtain the same geotiff results as in e.g. render and Viewer
     )
   )
 
@@ -71,33 +68,18 @@ export function geotiff() {
     const partialProjectedGcpTransformOptions =
       parseProjectedGcpTransformOptions(options)
 
-    const basenames: string[] = []
-    const gdalwarpScripts: string[] = []
-
     let imageFilenames: { [key: string]: string } = {}
-
     if (options.imageFilenamesFile) {
       imageFilenames = JSON.parse(
         fs.readFileSync(options.imageFilenamesFile, 'utf-8')
       )
     }
 
+    // Create projected transformers from options rather then from maps,
+    // since options can overwrite map properties
+    // TODO: consider adding possibility to override map options like resourceMask, height, ...
+    const projectedTransformers: ProjectedGcpTransformer[] = []
     for (const map of maps) {
-      const mapId = await getMapId(map)
-      const imageId = await generateId(map.resource.id)
-
-      const basename = `${imageId}_${mapId}`
-
-      let imageFilename: string
-      if (
-        map.resource.id in imageFilenames &&
-        typeof imageFilenames[map.resource.id] === 'string'
-      ) {
-        imageFilename = imageFilenames[map.resource.id]
-      } else {
-        imageFilename = path.join(options.sourceDir, `${imageId}.jpg`)
-      }
-
       const { gcps, transformationType, internalProjection } =
         parseProjectedGcpTransformerInputOptionsAndMap(options, map)
 
@@ -119,37 +101,14 @@ export function geotiff() {
         projectedGcpTransformerOptions
       )
 
-      gdalwarpScripts.push(
-        ...getGeoreferencedMapGdalwarpScripts(
-          map,
-          projectedTransformer,
-          imageFilename,
-          basename,
-          options.outputDir,
-          Number(options.jpgQuality)
-        )
-      )
-
-      basenames.push(basename)
+      projectedTransformers.push(projectedTransformer)
     }
 
-    const outputVrt =
-      basenames.length > 1 ? 'merged.vrt' : `${basenames[0]}.vrt`
-    const inputTiffs = basenames.map((basename) => `${basename}-warped.tif`)
-    const gdalbuildvrtScript = getGdalbuildvrtScript(
-      options.outputDir,
-      inputTiffs,
-      outputVrt
+    const geotiffScripts = await getGeoreferencedMapsGeotiffScripts(
+      maps,
+      mergeOptions(options, { projectedTransformers })
     )
 
-    const gdalScripts = [
-      getGdalPreamble(options.outputDir),
-      '',
-      ...gdalwarpScripts,
-      '',
-      gdalbuildvrtScript
-    ]
-
-    printString(gdalScripts.join('\n'))
+    printString(geotiffScripts.join('\n'))
   })
 }

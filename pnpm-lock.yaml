@@ -1314,6 +1314,9 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../annotation
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../id
       '@allmaps/project':
         specifier: workspace:^
         version: link:../project

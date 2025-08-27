@@ -75,6 +75,9 @@ export function addProjectedGcpTransformOptions<
   command: Command<Args, Opts, GlobalOpts>,
   defaultOptions: { projectionDefinition: string } = {
     projectionDefinition: 'EPSG:4326'
+    // Note: in the CLI the default projection is the lonLatProjection
+    // so as to produce e.g. GeoJSON output,
+    // and not webMercatorProjection like elsewere in Allmaps
   }
 ) {
   return command

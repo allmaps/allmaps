@@ -12,8 +12,7 @@ export {
   getGdalPreamble,
   getGeoreferencedMapGdalwarpScripts,
   getGdalbuildvrtScript,
-  checkImageExistsAndCorrectSize,
-  gdalwarpScriptInternal
-} from './output/gdal.js'
+  getGeoreferencedMapsGeotiffScripts
+} from './output/geotiff.js'
 
 export { checkCommand } from './output/bash.js'

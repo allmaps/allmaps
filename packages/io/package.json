@@ -45,6 +45,7 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",

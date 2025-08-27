@@ -6,6 +6,7 @@
     "paths": {}
   },
   "references": [
+    { "path": "../id" },
     { "path": "../annotation" },
     { "path": "../stdlib" },
     { "path": "../project" },

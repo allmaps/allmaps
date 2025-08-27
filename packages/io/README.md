@@ -18,6 +18,30 @@ npm install @allmaps/io
 
 This package contains functions for importing specific properties of Georeference Annotation, or creating derivatives from them. These are used in apps like [@allmaps/cli](../../apps/cli/) and [@allmaps/editor](../../apps/editor/).
 
+### GeoTIFF scripts
+
+Generate a Bash script that uses [GDAL](https://gdal.org/index.html) to convert one or more downloaded full-size IIIF images to [Cloud Optimized GeoTIFFs](https://www.cogeo.org/) using a given Georeferenced Map:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { ProjectedGcpTransformer } from '@allmaps/project'
+
+// Fetch an annotation
+const annotation = await fetch(annoationUrl).then((response) => response.json())
+
+// Create georeferencedMaps from the annotation
+const georeferencedMaps = parseAnnotation(annotation)
+
+// Create the script
+const geotiffScripts = await getGeoreferencedMapsGeotiffScripts(maps)
+
+// Log scripts (or write to file)
+console.log(geotiffScripts.join('\n'))
+```
+
+The generated Bash script expects the full-size images to be available on the local file system with the correct name. You can download these images manually or using the [@allmaps/cli](../../apps/cli/)'s `allmaps fetch full-image` or `allmaps script dezoomify` command.
+
+
 ## GCP file formats
 
 The following GCP file formats are supported for reading and writing:
