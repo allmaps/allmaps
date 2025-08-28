@@ -1,11 +1,19 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/basemap" },
+    { "path": "./packages/analyze" },
     { "path": "./packages/annotation" },
+    { "path": "./packages/attach" },
+    { "path": "./packages/basemap" },
+    { "path": "./packages/bearing" },
+    { "path": "./packages/components" },
     { "path": "./packages/id" },
     { "path": "./packages/iiif-parser" },
+    { "path": "./packages/latest" },
+    { "path": "./packages/leaflet" },
+    { "path": "./packages/maplibre" },
     { "path": "./packages/openlayers" },
+    { "path": "./packages/project" },
     { "path": "./packages/render" },
     { "path": "./packages/schemas" },
     { "path": "./packages/stdlib" },
@@ -13,7 +21,6 @@
     { "path": "./packages/transform" },
     { "path": "./packages/triangulate" },
     { "path": "./packages/types" },
-    { "path": "./packages/ui" },
-    { "path": "./packages/bearing" }
+    { "path": "./packages/ui" }
   ]
 }
