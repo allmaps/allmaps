@@ -12,6 +12,15 @@ export {
 } from './input/gcps.js'
 
 export {
+  printGcps,
+  printQgisHeader,
+  printQgisGcpLines,
+  printArcGisCsvGcpLines,
+  printArcGisTsvGcpLines,
+  printGdalGcpLines
+} from './output/gcps.js'
+
+export {
   getGdalPreamble,
   getGeoreferencedMapGdalwarpScripts,
   getGdalbuildvrtScript,
@@ -19,3 +28,5 @@ export {
 } from './output/geotiff.js'
 
 export { checkCommand } from './output/bash.js'
+
+export { GcpFileType, gcpFileTypes } from './types.js'

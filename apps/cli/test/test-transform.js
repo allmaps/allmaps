@@ -208,7 +208,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-tps-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -a input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps.txt',
+      'transform coordinates -a input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-gdal.txt',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -219,7 +219,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-tps-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps.txt -t thinPlateSpline',
+      'transform coordinates -g input/gcps/gcps-gdal.txt -t thinPlateSpline',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -230,7 +230,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps.txt',
+      'transform coordinates -g input/gcps/gcps-gdal.txt',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -241,7 +241,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-qgis.points',
+      'transform coordinates -g input/gcps/gcps-qgis.points',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -252,7 +252,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps-internal-projection.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-qgis-internal-projection.points',
+      'transform coordinates -g input/gcps/gcps-qgis-internal-projection.points',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -263,7 +263,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-arcgis-csv.csv --resourceHeight 7573',
+      'transform coordinates -g input/gcps/gcps-arcgis-csv.csv --resource-height 7573',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -274,7 +274,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/coordinates/gcps-arcgis-tsv.txt --resourceHeight 7573',
+      'transform coordinates -g input/gcps/gcps-arcgis-tsv.txt --resource-height 7573',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)

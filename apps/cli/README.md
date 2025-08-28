@@ -314,7 +314,7 @@ All the commands above accept the following options for specifying the Projected
 | `-g, --gcps <filename>`                          | Filename of GCP file (see [@allmaps/io](../../packages/io/) for the supported GCP file formats)). These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).                                                                               |              |
 | `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map). | `polynomial` |
 | `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
-| `--internal-projection <proj4string>`   | The geographic projection used internally in the transformation.'                                                                                                                         | `'EPSG:3857'`          |
+| `--internal-projection-definition <proj4string>`   | The geographic projection used internally in the transformation.'                                                                                                                         | `'EPSG:3857'`          |
 
 All the commands above accept the following options for specifying the Projected GCP Transformer, for example the way it transforms lines or polygons using midpoints (see [@allmaps/transform](../../packages/transform/) and [@allmaps/project](../../packages/project/) for more details):
 
@@ -325,11 +325,11 @@ All the commands above accept the following options for specifying the Projected
 | `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)           | `Infinity`                                                     |
 | `--min-line-distance <number>`| Minimum line distance when recursively adding midpoints (lower means more midpoints).           | `Infinity`                                                     |
 | `--geo-is-geographic`             | Use geographic distances and midpoints for lon-lat geo points                                 | `false` (`true` for `svg` and `resource-mask` commands) |
-| `--projection <proj4string>`   | The geographic projection of the output.                                                                                                                         | `'EPSG:4326'`          |
+| `--projection-definition <proj4string>`   | The geographic projection of the output.                                                                                                                         | `'EPSG:4326'`          |
 | `--no-different-handedness`   | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.)                                                                                                                         |          |
 
 > [!NOTE]
-> Output coordinates are in `'EPSG:4326'` by default due to the default value of `--projection`. In the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), the default projection is `'EPSG:3857'` to obtain coordinates that can be used in a WebMercator webmap.
+> Output coordinates are in `'EPSG:4326'` by default due to the default value of `--projection-definition`. In the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), the default projection is `'EPSG:3857'` to obtain coordinates that can be used in a WebMercator webmap.
 
 Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of it's Projected GCP Transformer: 'toResource' instead of 'toGeo'.
 
@@ -448,15 +448,15 @@ curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
 ```
 
 > [!NOTE]
-> GeoTIFFs are generated in `'EPSG:3857'` by default due to the default value of `--projection`. Hence, it has the same default projection value as the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), and doesn't follow the `'EPSG:4326'` default projection used in [`allmaps transform`](#transform-resource-coordinates-to-geospatial-coordinates-and-vice-versa).
+> GeoTIFFs are generated in `'EPSG:3857'` by default due to the default value of `--projection-definition`. Hence, it has the same default projection value as the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), and doesn't follow the `'EPSG:4326'` default projection used in [`allmaps transform`](#transform-resource-coordinates-to-geospatial-coordinates-and-vice-versa).
 >
-> The default `--internal-projection` is `'EPSG:3857'`.
+> The default `--internal-projection-definition` is `'EPSG:3857'`.
 
 You can use the parameters to specify another 'internal projection' (to take the map's (known or guessed) projection into account when transforming) or 'projection' (to generate GeoTIFFs in that projection). See [@allmaps/project](../../packages/project/) for more information about projections.
 
 ```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
-  allmaps script geotiff --internal-projection "+proj=lcc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +type=crs" | \
+  allmaps script geotiff --internal-projection-definition "+proj=lcc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +type=crs" | \
   bash
 ```
 

@@ -61,6 +61,10 @@ An internal projection can be included in a QGIS GCP file and will be used when 
 
 The following GCP file formats are supported for reading and writing:
 
+```ts
+export type gcpFileType = 'gdal' | 'qgis' | 'arcgis-csv' | 'arcgis-tsv'
+```
+
 ### GDAL-like files
 
 Such files could have any name or file-extension.
@@ -73,7 +77,7 @@ Such files could have any name or file-extension.
 1765 1737 -18.1014216 64.3331759
 ```
 
-Column order is `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the upper left of the image, and resource y-axis is pointing down (so the handedness is flipped).
+Column order is `resourceX`, `resourceY`, `internalProjectedGeoX`, `internalProjectedGeoY`. Resource origin is in the upper left of the image, and resource y-axis is pointing down (so the handedness is flipped).
 
 ### QGIS Georeferencer files
 
@@ -89,7 +93,7 @@ mapX,mapY,sourceX,sourceY,enable,dX,dY,residual
 2997626.6441897955,4852265.50079984,1765,-5836,1,-0.0000000000039222,0.00000000030794922,0.0000000003079742
 ```
 
-Column order is `projectedGeoX`, `projectedGeoY`, `resourceX`, `resourceY`. Resource origin is in the upper left of the image, and resource y-axis is pointing up (with negative `resourceY` coordinates so as to assure equal handedness of the resource and projectedGeo axis). The first line may specify a CRS in WKT format, in which case projected coordinates are read in this CRS and this CRS is passed as an `internalProjection`.
+Column order is `internalProjectedGeoX`, `internalProjectedGeoY`, `resourceX`, `resourceY`. Resource origin is in the upper left of the image, and resource y-axis is pointing up (with negative `resourceY` coordinates so as to assure equal handedness of the resource and projectedGeo axis). The first line may specify a CRS in WKT format, in which case projected coordinates are read in this CRS and this CRS is passed as an `internalProjection`.
 
 ### ESRI CSV files
 
@@ -103,7 +107,7 @@ File format used in ArcGIS and [MapAnalyst](https://mapanalyst.org/man/points.ht
 5,1765,5836,-18.1014216,64.3331759
 ```
 
-Column order is `id`, `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis). For such files the resource height is required in order to compute the `resourceY` coordinate w.r.t. an origin in the upper left, as is the case in Allmaps.
+Column order is `id`, `resourceX`, `resourceY`, `internalProjectedGeoX`, `internalProjectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis). For such files the resource height is required in order to compute the `resourceY` coordinate w.r.t. an origin in the upper left, as is the case in Allmaps.
 
 ### ESRI TSV files
 
@@ -117,13 +121,21 @@ File format used in ArcGIS. Such files typically have the `.txt` file-extension.
 1765	5836	-18.1014216	64.3331759
 ```
 
-Column order is `resourceX`, `resourceY`, `projectedGeoX`, `projectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis). For such files the resource height is required in order to compute the `resourceY` coordinate w.r.t. an origin in the upper left, as is the case in Allmaps.
+Column order is `resourceX`, `resourceY`, `internalProjectedGeoX`, `internalProjectedGeoY`. Resource origin is in the lower left of the image, and resource y-axis is pointing up (so as to assure equal handedness of the resource and projectedGeo axis). For such files the resource height is required in order to compute the `resourceY` coordinate w.r.t. an origin in the upper left, as is the case in Allmaps.
 
 ## License
 
 MIT
 
 ## API
+
+### `GcpFileType`
+
+###### Type
+
+```ts
+'qgis' | 'arcgis-csv' | 'arcgis-tsv' | 'gdal'
+```
 
 ### `checkCommand(command, message)`
 
@@ -136,65 +148,74 @@ MIT
 
 `string`.
 
-### `checkImageExistsAndCorrectSize(imageFilename, basename, resourceSize)`
+### `gcpFileTypes`
+
+###### Type
+
+```ts
+Array<string>
+```
+
+### `getGdalPreamble(options)`
 
 ###### Parameters
 
-* `imageFilename` (`string`)
-* `basename` (`string`)
-* `resourceSize` (`[number, number]`)
+* `options` (`{outputDir?: string | undefined}`)
 
 ###### Returns
 
 `string`.
 
-### `gdalwarpScriptInternal(imageFilename, basename, outputDir, internalProjectedGcps, transformationType, internalProjectionDefinition, projectionDefinition, geojsonMaskPolygon, size, jpgQuality)`
+### `getGdalbuildvrtScript(basenames, options)`
 
 ###### Parameters
 
-* `imageFilename` (`string`)
-* `basename` (`string`)
-* `outputDir` (`string`)
-* `internalProjectedGcps` (`Array<Gcp>`)
-* `transformationType` (`TransformationType | undefined`)
-* `internalProjectionDefinition` (`string | undefined`)
-* `projectionDefinition` (`string | undefined`)
-* `geojsonMaskPolygon` (`{type: 'Polygon'; coordinates: number[][][]}`)
-* `size` (`[number, number]`)
-* `jpgQuality` (`number`)
+* `basenames` (`Array<string>`)
+* `options` (`{outputDir?: string | undefined}`)
 
 ###### Returns
 
 `string`.
 
-### `getGdalbuildvrtScript(outputDir, inputTiffs, outputVrt)`
-
-###### Parameters
-
-* `outputDir` (`string`)
-* `inputTiffs` (`Array<string>`)
-* `outputVrt` (`string`)
-
-###### Returns
-
-`string`.
-
-### `getGeoreferencedMapGdalwarpScripts(map, projectedTransformer, imageFilename, basename, outputDir, jpgQuality)`
+### `getGeoreferencedMapGdalwarpScripts(map, options)`
 
 ###### Parameters
 
 * `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
-* `projectedTransformer` (`ProjectedGcpTransformer`)
-* `imageFilename` (`string`)
-* `basename` (`string`)
-* `outputDir` (`string`)
-* `jpgQuality` (`number`)
+* `options` (`{
+    projectedTransformer?: ProjectedGcpTransformer | undefined
+    imageFilenames?: {[key: string]: string} | undefined
+    sourceDir?: string | undefined
+    outputDir?: string | undefined
+    jpgQuality?: number | undefined
+  }`)
 
 ###### Returns
 
-`Array<string>`.
+`Promise<{
+  basename: string
+  checkScript: string
+  gdalWarpScript: string
+}>`.
 
-### `parseArcGisCsvCoordinates(lines, options)`
+### `getGeoreferencedMapsGeotiffScripts(maps, options)`
+
+###### Parameters
+
+* `maps` (`Array<{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ ty...`)
+* `options` (`{
+    projectedTransformers?: Array<ProjectedGcpTransformer> | undefined
+    imageFilenames?: {[key: string]: string} | undefined
+    sourceDir?: string | undefined
+    outputDir?: string | undefined
+    jpgQuality?: number | undefined
+  }`)
+
+###### Returns
+
+`Promise<Array<string>>`.
+
+### `parseArcGisCsvGcpLines(lines, options)`
 
 ###### Parameters
 
@@ -203,9 +224,9 @@ MIT
 
 ###### Returns
 
-`Array<Array<number>>`.
+`Array<Gcp>`.
 
-### `parseArcGisTsvCoordinates(lines, options)`
+### `parseArcGisTsvGcpLines(lines, options)`
 
 ###### Parameters
 
@@ -214,20 +235,38 @@ MIT
 
 ###### Returns
 
-`Array<Array<number>>`.
+`Array<Gcp>`.
 
-### `parseCoordinates(coordinates, options)`
+### `parseGcpString(gcpString, options)`
 
 ###### Parameters
 
-* `coordinates` (`string`)
+* `gcpString` (`string`)
 * `options?` (`Partial<{resourceHeight: number}> | undefined`)
 
 ###### Returns
 
-`Array<Array<number>>`.
+`Array<Gcp>`.
 
-### `parseGdalCoordinates(lines)`
+### `parseGcps(gcpString, options)`
+
+Parse GCPs from file string.
+
+An internal projection can be included in a QGIS GCP file and will be used when parsing and returned.
+An internal projection can be specified to parse ArcGIS files.
+The resource height must specified to parse ArcGIS files.
+
+###### Parameters
+
+* `gcpString` (`string`)
+* `options?` (`  | Partial<{resourceHeight: number; internalProjection: Projection}>
+    | undefined`)
+
+###### Returns
+
+`{gcps: Gcp[]; internalProjection?: Projection}`.
+
+### `parseGdalCoordinateLines(lines)`
 
 ###### Parameters
 
@@ -237,11 +276,21 @@ MIT
 
 `Array<Array<number>>`.
 
-### `parseInternalProjectionDefinition(coordinates)`
+### `parseGdalGcpLines(lines)`
 
 ###### Parameters
 
-* `coordinates` (`string`)
+* `lines` (`Array<string>`)
+
+###### Returns
+
+`Array<Gcp>`.
+
+### `parseInternalProjectionDefinitionFromGcpString(gcpString)`
+
+###### Parameters
+
+* `gcpString` (`string`)
 
 ###### Returns
 
@@ -257,7 +306,17 @@ MIT
 
 `string | undefined`.
 
-### `parseQgisCoordinates(lines)`
+### `parseInternalProjectionFromGcpString(gcpString)`
+
+###### Parameters
+
+* `gcpString` (`string`)
+
+###### Returns
+
+`Projection | undefined`.
+
+### `parseQgisGcpLines(lines)`
 
 ###### Parameters
 
@@ -265,4 +324,78 @@ MIT
 
 ###### Returns
 
-`Array<Array<number>>`.
+`Array<Gcp>`.
+
+### `printArcGisCsvGcpLines(gcp, options)`
+
+###### Parameters
+
+* `gcp` (`Array<Gcp>`)
+* `options?` (`Partial<{resourceHeight: number}> | undefined`)
+
+###### Returns
+
+`Array<string>`.
+
+### `printArcGisTsvGcpLines(gcp, options)`
+
+###### Parameters
+
+* `gcp` (`Array<Gcp>`)
+* `options?` (`Partial<{resourceHeight: number}> | undefined`)
+
+###### Returns
+
+`Array<string>`.
+
+### `printGcps(gcps, options)`
+
+Print GCPs to file string.
+
+An internal projection can be specified files to print files.
+It's definition will be included in QGIS GCP files.
+The resource height must specified to parse ArcGIS files.
+
+###### Parameters
+
+* `gcps` (`Array<Gcp>`)
+* `options?` (`  | Partial<{
+        resourceHeight: number
+        internalProjection: Projection
+        gcpFileType: GcpFileType
+      }>
+    | undefined`)
+
+###### Returns
+
+`string`.
+
+### `printGdalGcpLines(gcp)`
+
+###### Parameters
+
+* `gcp` (`Array<Gcp>`)
+
+###### Returns
+
+`Array<string>`.
+
+### `printQgisGcpLines(gcp)`
+
+###### Parameters
+
+* `gcp` (`Array<Gcp>`)
+
+###### Returns
+
+`Array<string>`.
+
+### `printQgisHeader(options)`
+
+###### Parameters
+
+* `options?` (`Partial<{internalProjection: Projection}> | undefined`)
+
+###### Returns
+
+`Array<string>`.

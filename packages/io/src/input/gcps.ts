@@ -13,7 +13,7 @@ import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
  */
 export function parseGcps(
   gcpString: string,
-  options: Partial<{
+  options?: Partial<{
     resourceHeight: number
     internalProjection: Projection
   }>

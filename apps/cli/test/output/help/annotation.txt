@@ -13,6 +13,7 @@ Commands:
   svg [options] [files...]        generate SVG from resource mask
   image-ids [options] [files...]  read all IIIF Image IDs from a Georeference
                                   Annotation
+  gcps [options] [files...]       generate GCP files from GCPs
   help [command]                  display help for command
 
 For more details about Allmaps, see https://allmaps.org

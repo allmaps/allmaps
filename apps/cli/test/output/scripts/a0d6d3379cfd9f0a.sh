@@ -51,7 +51,7 @@ else
     exit 1
 fi
 gdal_translate -of vrt \
-  -a_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -a_srs 'EPSG:3857' \
   -gcp 1801 2421 548613.3751837945 6864617.739664596 \
 -gcp 4222 1445 546926.5398078549 6863398.238686091 \
 -gcp 1146 1267 549383.7060600839 6863825.8467286 \
@@ -65,7 +65,7 @@ gdalwarp \
   -dstalpha -overwrite \
   -r cubic \
   -cutline bc5d7040bad8e28b_5cf13f6681d355e3.geojson -crop_to_cutline -cutline_srs "EPSG:4326" \
-  -s_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -s_srs 'EPSG:3857' \
   -t_srs 'EPSG:3857' \
   -ts 5143 4304 \
   -order 1 \
@@ -94,7 +94,7 @@ else
     exit 1
 fi
 gdal_translate -of vrt \
-  -a_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -a_srs 'EPSG:3857' \
   -gcp 4346 2550 549983.8183030015 6865114.585151263 \
 -gcp 2243 1837 551701.3778583999 6864958.450720401 \
 -gcp 3823 1010 550703.9552208921 6864005.396387596 \
@@ -108,7 +108,7 @@ gdalwarp \
   -dstalpha -overwrite \
   -r cubic \
   -cutline b001de2950590a8d_83d44a0b956681b0.geojson -crop_to_cutline -cutline_srs "EPSG:4326" \
-  -s_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -s_srs 'EPSG:3857' \
   -t_srs 'EPSG:3857' \
   -ts 4955 4402 \
   -order 1 \
@@ -137,7 +137,7 @@ else
     exit 1
 fi
 gdal_translate -of vrt \
-  -a_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -a_srs 'EPSG:3857' \
   -gcp 560 3581 549978.1298770219 6863216.971363358 \
 -gcp 2803 2460 548498.1706427726 6861901.91679246 \
 -gcp 1009 1245 550155.4284300082 6861373.64125519 \
@@ -151,7 +151,7 @@ gdalwarp \
   -dstalpha -overwrite \
   -r cubic \
   -cutline 44a2797e3fc5e3cf_3b72f58c723da9c4.geojson -crop_to_cutline -cutline_srs "EPSG:4326" \
-  -s_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -s_srs 'EPSG:3857' \
   -t_srs 'EPSG:3857' \
   -ts 5176 4257 \
   -order 1 \
@@ -180,7 +180,7 @@ else
     exit 1
 fi
 gdal_translate -of vrt \
-  -a_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -a_srs 'EPSG:3857' \
   -gcp 3324 3373 551263.6807525499 6863348.324617058 \
 -gcp 3794 1538 551271.7514156324 6861899.42063415 \
 -gcp 4463 2750 550532.990746932 6862641.834070058 \
@@ -194,7 +194,7 @@ gdalwarp \
   -dstalpha -overwrite \
   -r cubic \
   -cutline 0618d3727f002bcf_bb4029969eeff948.geojson -crop_to_cutline -cutline_srs "EPSG:4326" \
-  -s_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -s_srs 'EPSG:3857' \
   -t_srs 'EPSG:3857' \
   -ts 4933 4310 \
   -order 1 \

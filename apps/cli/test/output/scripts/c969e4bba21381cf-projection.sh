@@ -51,7 +51,7 @@ else
     exit 1
 fi
 gdal_translate -of vrt \
-  -a_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -a_srs 'EPSG:3857' \
   -gcp 3103 3990 2458826.3258427577 14507748.138380978 \
 -gcp 1529 2742 1226049.933659445 15367511.832901828 \
 -gcp 3153 2208 2537097.842918102 15865881.256943706 \
@@ -104,7 +104,7 @@ gdalwarp \
   -dstalpha -overwrite \
   -r cubic \
   -cutline c21d3a8cff2ff76f_c969e4bba21381cf.geojson -crop_to_cutline -cutline_srs "EPSG:4326" \
-  -s_srs '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs' \
+  -s_srs 'EPSG:3857' \
   -t_srs 'PROJCS["ETRS89 / EPSG Arctic zone 3-11",GEOGCS["ETRS89",DATUM["European_Terrestrial_Reference_System_1989",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6258"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4258"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["latitude_of_origin",78.7073375277778],PARAMETER["central_meridian",21],PARAMETER["standard_parallel_1",80.3333333333333],PARAMETER["standard_parallel_2",77],PARAMETER["false_easting",11500000],PARAMETER["false_northing",3500000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","6070"]]' \
   -ts 3903 3581 \
   -order 1 \

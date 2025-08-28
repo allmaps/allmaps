@@ -74,7 +74,7 @@ describe('allmaps annotation parse', () => {
       'output/maps/7a69f9470b49a744-custom-gcps.json'
     )
     const output = execJson(
-      'annotation parse input/annotations/7a69f9470b49a744.json -g input/coordinates/gcps-qgis.points'
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-qgis.points'
     )
 
     expect(expected).to.deep.equal(output)
@@ -86,6 +86,58 @@ describe('allmaps annotation svg', () => {
     const expected = readFile('output/svg/7a69f9470b49a744.svg')
     const output = exec(
       'annotation svg',
+      'input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.equal(output)
+  })
+})
+
+describe('allmaps annotation gcps', () => {
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an GDAL GCP file', () => {
+    const expected = readFile('output/gcps/gcps-gdal.txt')
+    const output = exec(
+      'annotation gcps',
+      'input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.equal(output)
+  })
+
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an GDAL GCP file, with overwritable internal projection', () => {
+    const expected = readFile('output/gcps/gcps-gdal-lonlat.txt')
+    const output = exec(
+      'annotation gcps --internal-projection-definition "EPSG:4326"',
+      'input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.equal(output)
+  })
+
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an QGIS GCP file', () => {
+    const expected = readFile('output/gcps/gcps-qgis.points')
+    const output = exec(
+      'annotation gcps --gcp-file-type qgis',
+      'input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.equal(output)
+  })
+
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an ArcGIS CSV GCP file', () => {
+    const expected = readFile('output/gcps/gcps-arcgis-csv.csv')
+    const output = exec(
+      'annotation gcps --gcp-file-type arcgis-csv --resource-height 10474',
+      'input/annotations/7a69f9470b49a744.json'
+    )
+
+    expect(expected).to.equal(output)
+  })
+
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an ArcGIS TSV GCP file', () => {
+    const expected = readFile('output/gcps/gcps-arcgis-tsv.txt')
+    const output = exec(
+      'annotation gcps --gcp-file-type arcgis-tsv --resource-height 10474',
       'input/annotations/7a69f9470b49a744.json'
     )
 

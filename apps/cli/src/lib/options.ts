@@ -34,11 +34,11 @@ export function addResourceInputOptions<
   GlobalOpts extends OptionValues = Record<string, unknown>
 >(command: Command<Args, Opts, GlobalOpts>) {
   return command
-    .option('--resourceId <string>', 'Resource ID.')
-    .option('--resourceType <string>', 'Resource type.')
-    .option('--resourceWidth <number>', 'Resource width.', parseInt)
-    .option('--resourceHeight <number>', 'Resource height.', parseInt)
-    .option('--resourceMask <string>', 'Resource mask.')
+    .option('--resource-id <string>', 'Resource ID.')
+    .option('--resource-type <string>', 'Resource type.')
+    .option('--resource-width <number>', 'Resource width.', parseInt)
+    .option('--resource-height <number>', 'Resource height.', parseInt)
+    .option('--resource-mask <string>', 'Resource mask.')
 }
 
 export function addProjectedGcpTransformerInputOptions<
@@ -51,6 +51,7 @@ export function addProjectedGcpTransformerInputOptions<
       '-g, --gcps <filename>',
       'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).'
     )
+    .option('--gcp-file-type <gcpFileType>', 'GCP file type.', 'gdal')
     .option(
       '-t, --transformation-type <type>',
       'Transformation type. One of "polynomial", "thinPlateSpline", "linear", "helmert", "projective". ' +
@@ -62,7 +63,7 @@ export function addProjectedGcpTransformerInputOptions<
       parseInt
     )
     .option(
-      '--internal-projection <proj4string>',
+      '--internal-projection-definition <proj4string>',
       `The geographic projection used internally in the transformation.`
     )
 }
@@ -106,7 +107,7 @@ export function addProjectedGcpTransformOptions<
       `Use geographic distances and midpoints for lon-lat geo points.`
     )
     .option(
-      '--projection <proj4string>',
+      '--projection-definition <proj4string>',
       `The geographic projection rendered in the viewport.`,
       defaultOptions.projectionDefinition
     )

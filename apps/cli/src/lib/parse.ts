@@ -15,7 +15,9 @@ import {
 import {
   parseGcps,
   parseInternalProjectionFromGcpString,
-  parseGdalCoordinateLines
+  parseGdalCoordinateLines,
+  GcpFileType,
+  gcpFileTypes
 } from '@allmaps/io'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
@@ -158,7 +160,7 @@ export function parseAnnotationInputOptions(
     gcps: string
     transformationType: string
     polynomialOrder: number
-    internalProjection: string
+    internalProjectionDefinition: string
   }>
 ): Partial<AnnotationInputOptions> {
   const {
@@ -199,7 +201,7 @@ export function parseProjectedGcpTransformerInputOptions(
     gcps: string
     transformationType: string
     polynomialOrder: number
-    internalProjection: string
+    internalProjectionDefinition: string
     resourceHeight: number
   }>
 ): Partial<ProjectedGcpTransformerInputOptions> {
@@ -222,7 +224,7 @@ export function parseProjectedGcpTransformerInputOptionsAndMap(
     gcps: string
     transformationType: string
     polynomialOrder: number
-    internalProjection: string
+    internalProjectionDefinition: string
     resourceHeight: number
   }>,
   map?: GeoreferencedMap
@@ -301,7 +303,7 @@ export function parseTransformationTypeInputOptions(
 export function parseInternalProjectionInputOptions(
   options: Partial<{
     gcps?: string
-    internalProjection: string
+    internalProjectionDefinition: string
   }>,
   map?: GeoreferencedMap
 ): Partial<InternalProjectionInputOptions> {
@@ -310,11 +312,11 @@ export function parseInternalProjectionInputOptions(
   if (
     options &&
     typeof options === 'object' &&
-    'internalProjection' in options &&
-    options.internalProjection
+    'internalProjectionDefinition' in options &&
+    options.internalProjectionDefinition
   ) {
     internalProjectionInputs.internalProjection = {
-      definition: options.internalProjection
+      definition: options.internalProjectionDefinition
     } as Projection
   } else if (
     options &&
@@ -376,9 +378,9 @@ export function parseProjectedGcpTransformOptions(options: {
         options.geoIsGeographic
     }
 
-    if ('projection' in options && options.projection) {
+    if ('projectionDefinition' in options && options.projectionDefinition) {
       partialProjectedGcpTransformOptions.projection = {
-        definition: options.projection
+        definition: options.projectionDefinition
       } as Projection
     }
   }
@@ -507,6 +509,22 @@ export function parseInverseOptions(options: {
   }
 
   return transformOptions
+}
+
+export function parseGcpFileTypeOptions(options?: { gcpFileType?: string }): {
+  gcpFileType: GcpFileType
+} {
+  if (
+    options &&
+    options.gcpFileType &&
+    gcpFileTypes.includes(options.gcpFileType)
+  ) {
+    return { gcpFileType: options.gcpFileType as GcpFileType }
+  } else {
+    throw new Error(
+      `Unrecognised GCP file type. Allowed types are ${gcpFileTypes.join(', ')}`
+    )
+  }
 }
 
 export function parseLaunchInputs(
