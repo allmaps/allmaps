@@ -127,6 +127,16 @@ Output the IDs of the IIIF Images in the input files:
 allmaps annotation image-ids [files...]
 ```
 
+Output the GCPs from the input files using one of the supported GCP file formats (see [@allmaps/io](../../packages/io/)):
+
+```bash
+allmaps annotation gcps [files...]
+```
+
+> [!NOTE]
+> GCPs are in the internal projection inferred from the map or options, with the same default internal projection as in a Projected GCP Transformer used to render maps: "EPSG:3857". Set the internal projection option to "EPSG:4326" to obtain GCPs in lon-lat coordinates.
+
+
 ### Parse and generate IIIF resources
 
 Show help:
@@ -311,7 +321,8 @@ All the commands above accept the following options for specifying the Projected
 
 | Option                                           | Description                                                                                                                                                                    | Default      |
 |:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-g, --gcps <filename>`                          | Filename of GCP file (see [@allmaps/io](../../packages/io/) for the supported GCP file formats)). These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).                                                                               |              |
+| `-g, --gcps <filename>`                          | Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).                                                                               |              |
+| `--gcp-file-format <gcpFileFormat>`                          | GCP file format. See [@allmaps/io](../../packages/io/) for the supported GCP file formats.                                                                                |  `'gdal'`            |
 | `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map). | `polynomial` |
 | `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
 | `--internal-projection-definition <proj4string>`   | The geographic projection used internally in the transformation.'                                                                                                                         | `'EPSG:3857'`          |

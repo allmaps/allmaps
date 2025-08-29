@@ -63,7 +63,7 @@ export function parseGcpString(
     throw new Error('No coordinates')
   }
 
-  // For more about these datatypes, see https://observablehq.com/d/50deb2a74a628292
+  // For more about these file formats, see https://observablehq.com/d/50deb2a74a628292
 
   if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
     return parseQgisGcpLines(lines)
@@ -76,7 +76,7 @@ export function parseGcpString(
     // to prevent false positive of ArcGIS TSV file
     return parseGdalGcpLines(lines)
   } else {
-    throw 'Unrecognised GCP type'
+    throw 'Unrecognised GCP file format'
   }
 }
 

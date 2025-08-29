@@ -55,8 +55,7 @@ import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
 // Fetch an annotation
 const annotation = await fetch(annoationUrl).then((response) => response.json())
 
-// Create a warpedMap from the annotation
-// Note: always returns an array
+// Create a georeferencedMap from the annotation
 const georeferencedMaps = parseAnnotation(annotation)
 const georeferencedMap = georeferencedMaps[0]
 

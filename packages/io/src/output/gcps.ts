@@ -4,11 +4,38 @@ import {
   isEqualProjection,
   webMercatorProjection
 } from '@allmaps/project'
-import { Gcp } from '@allmaps/types'
 
+import { mergeOptions, mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
+import { GcpFileFormat } from '../types'
+
+import type { Gcp } from '@allmaps/types'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Projection } from '@allmaps/project'
-import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
-import { GcpFileType } from '../types'
+
+/**
+ * Print GCPs from Georeferenced Map to file string.
+ *
+ * An internal projection can be specified files to print files.
+ * It's definition will be included in QGIS GCP files.
+ * The resource height must specified to parse ArcGIS files, and will be infered from the map by default.
+ */
+export function printGeoreferencedMapGcps(
+  map: GeoreferencedMap,
+  options?: Partial<{
+    resourceHeight: number
+    internalProjection: Projection
+    gcpFileFormat: GcpFileFormat
+  }>
+): string {
+  const mergedOptions = mergeOptions(
+    {
+      internalProjection: map.resourceCrs,
+      resourceHeight: map.resource.height
+    },
+    options
+  )
+  return printGcps(map.gcps, mergedOptions)
+}
 
 /**
  * Print GCPs to file string.
@@ -22,11 +49,11 @@ export function printGcps(
   options?: Partial<{
     resourceHeight: number
     internalProjection: Projection
-    gcpFileType: GcpFileType
+    gcpFileFormat: GcpFileFormat
   }>
 ): string {
   const mergedOptions = mergeOptionsUnlessUndefined(
-    { internalProjection: webMercatorProjection, gcpFileType: 'gdal' },
+    { internalProjection: webMercatorProjection, gcpFileFormat: 'gdal' },
     options
   )
 
@@ -43,21 +70,21 @@ export function printGcps(
     })
   }
 
-  // For more about these datatypes, see https://observablehq.com/d/50deb2a74a628292
+  // For more about these file formats, see https://observablehq.com/d/50deb2a74a628292
 
   let headerLines: string[] = []
   let gcpLines: string[]
-  if (mergedOptions.gcpFileType == 'qgis') {
+  if (mergedOptions.gcpFileFormat == 'qgis') {
     headerLines = printQgisHeader(mergedOptions)
     gcpLines = printQgisGcpLines(gcps)
-  } else if (mergedOptions.gcpFileType == 'arcgis-csv') {
+  } else if (mergedOptions.gcpFileFormat == 'arcgis-csv') {
     gcpLines = printArcGisCsvGcpLines(gcps, mergedOptions)
-  } else if (mergedOptions.gcpFileType == 'arcgis-tsv') {
+  } else if (mergedOptions.gcpFileFormat == 'arcgis-tsv') {
     gcpLines = printArcGisTsvGcpLines(gcps, mergedOptions)
-  } else if (mergedOptions.gcpFileType == 'gdal') {
+  } else if (mergedOptions.gcpFileFormat == 'gdal') {
     gcpLines = printGdalGcpLines(gcps)
   } else {
-    throw 'Unrecognised GCP file type'
+    throw 'Unrecognised GCP file format'
   }
 
   return [...headerLines, ...gcpLines].join('\n')

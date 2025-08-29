@@ -41,6 +41,30 @@ console.log(geotiffScripts.join('\n'))
 
 The generated Bash script expects the full-size images to be available on the local file system with the correct name. You can download these images manually or using the [@allmaps/cli](../../apps/cli/)'s `allmaps fetch full-image` or `allmaps script dezoomify` command.
 
+### Print GCPs
+
+GCPs can be printed to common [GCP file formats](#gcp-file-formats).
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { ProjectedGcpTransformer } from '@allmaps/project'
+
+// Fetch an annotation
+const annotation = await fetch(annoationUrl).then((response) => response.json())
+
+// Create a georeferencedMap from the annotation
+const georeferencedMaps = parseAnnotation(annotation)
+const georeferencedMap = parseAnnotation(annotation)
+
+// Print GCPs to QGIS format
+const gcpString = printGeoreferencedMapGcps(georeferencedMap, { gcpFileFormat: 'qgis' })
+
+// Log GCPs (or write to file)
+console.log(gcpString)
+```
+
+GCPs are in the internal projection inferred from the map or options, with the same default internal projection as in a Projected GCP Transformer used to render maps: "EPSG:3857". Set the internal projection option to "EPSG:4326" to obtain GCPs in lon-lat coordinates.
+
 ### Parse GCPs
 
 GCPs can be parsed from common [GCP file formats](#gcp-file-formats).
@@ -62,7 +86,7 @@ An internal projection can be included in a QGIS GCP file and will be used when 
 The following GCP file formats are supported for reading and writing:
 
 ```ts
-export type gcpFileType = 'gdal' | 'qgis' | 'arcgis-csv' | 'arcgis-tsv'
+export type gcpFileFormat = 'gdal' | 'qgis' | 'arcgis-csv' | 'arcgis-tsv'
 ```
 
 ### GDAL-like files

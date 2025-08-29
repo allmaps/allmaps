@@ -16,8 +16,8 @@ import {
   parseGcps,
   parseInternalProjectionFromGcpString,
   parseGdalCoordinateLines,
-  GcpFileType,
-  gcpFileTypes
+  GcpFileFormat,
+  gcpFileFormats
 } from '@allmaps/io'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
@@ -511,18 +511,20 @@ export function parseInverseOptions(options: {
   return transformOptions
 }
 
-export function parseGcpFileTypeOptions(options?: { gcpFileType?: string }): {
-  gcpFileType: GcpFileType
+export function parseGcpFileFormatOptions(options?: {
+  gcpFileFormat?: string
+}): {
+  gcpFileFormat: GcpFileFormat
 } {
   if (
     options &&
-    options.gcpFileType &&
-    gcpFileTypes.includes(options.gcpFileType)
+    options.gcpFileFormat &&
+    gcpFileFormats.includes(options.gcpFileFormat)
   ) {
-    return { gcpFileType: options.gcpFileType as GcpFileType }
+    return { gcpFileFormat: options.gcpFileFormat as GcpFileFormat }
   } else {
     throw new Error(
-      `Unrecognised GCP file type. Allowed types are ${gcpFileTypes.join(', ')}`
+      `Unrecognised GCP file format. Allowed formats are ${gcpFileFormats.join(', ')}`
     )
   }
 }

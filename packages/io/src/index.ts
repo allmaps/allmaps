@@ -12,6 +12,7 @@ export {
 } from './input/gcps.js'
 
 export {
+  printGeoreferencedMapGcps,
   printGcps,
   printQgisHeader,
   printQgisGcpLines,
@@ -29,4 +30,4 @@ export {
 
 export { checkCommand } from './output/bash.js'
 
-export { GcpFileType, gcpFileTypes } from './types.js'
+export { GcpFileFormat, gcpFileFormats } from './types.js'

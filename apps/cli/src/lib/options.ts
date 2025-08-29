@@ -51,7 +51,7 @@ export function addProjectedGcpTransformerInputOptions<
       '-g, --gcps <filename>',
       'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).'
     )
-    .option('--gcp-file-type <gcpFileType>', 'GCP file type.', 'gdal')
+    .option('--gcp-file-format <gcpFileFormat>', 'GCP file format.', 'gdal')
     .option(
       '-t, --transformation-type <type>',
       'Transformation type. One of "polynomial", "thinPlateSpline", "linear", "helmert", "projective". ' +
