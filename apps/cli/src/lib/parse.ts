@@ -8,6 +8,7 @@ import {
 import {
   isPoint,
   isRing,
+  mergeOptions,
   mergeOptionsUnlessUndefined,
   stringToSvgGeometriesGenerator,
   svgGeometryToGeometry
@@ -222,6 +223,7 @@ export function parseProjectedGcpTransformerInputOptions(
 export function parseProjectedGcpTransformerInputOptionsAndMap(
   options: Partial<{
     gcps: string
+    gcpFileFormat: string
     transformationType: string
     polynomialOrder: number
     internalProjectionDefinition: string
@@ -245,6 +247,7 @@ export function parseProjectedGcpTransformerInputOptionsAndMap(
 export function parseGcpInputOptions(
   options: Partial<{
     gcps: string
+    gcpFileFormat: string
     resourceHeight: number
   }>,
   map?: GeoreferencedMap
@@ -257,7 +260,8 @@ export function parseGcpInputOptions(
     } catch (e) {
       // The GCP option was provided by a file with GCPs
       const gcpString = readFromFile(options.gcps)
-      gcps = parseGcps(gcpString, options).gcps
+      const { gcpFileFormat } = parseGcpFileFormatOptions(options)
+      gcps = parseGcps(gcpString, mergeOptions(options, { gcpFileFormat })).gcps
     }
     return { gcps }
   } else if (map) {

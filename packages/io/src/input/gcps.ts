@@ -1,8 +1,9 @@
 import { proj4, lonLatProjection, isEqualProjection } from '@allmaps/project'
-import { Gcp, Point } from '@allmaps/types'
-
-import type { Projection } from '@allmaps/project'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
+
+import type { Gcp, Point } from '@allmaps/types'
+import type { Projection } from '@allmaps/project'
+import type { GcpFileFormat } from '../types'
 
 /**
  * Parse GCPs from file string.
@@ -16,6 +17,7 @@ export function parseGcps(
   options?: Partial<{
     resourceHeight: number
     internalProjection: Projection
+    gcpFileFormat: GcpFileFormat
   }>
 ): { gcps: Gcp[]; internalProjection?: Projection } {
   // TODO: consider parsing GCPs from Georeference Annotation too?
@@ -30,7 +32,7 @@ export function parseGcps(
     )
   )
 
-  let gcps = parseGcpString(gcpString, options)
+  let gcps = parseGcpString(gcpString, mergedOptions)
 
   if (!isEqualProjection(mergedOptions.internalProjection, lonLatProjection)) {
     gcps = gcps.map((gcp) => {
@@ -55,6 +57,7 @@ export function parseGcpString(
   gcpString: string,
   options?: Partial<{
     resourceHeight: number
+    gcpFileFormat: GcpFileFormat
   }>
 ): Gcp[] {
   const lines = gcpString.trim().split('\n')
@@ -65,13 +68,25 @@ export function parseGcpString(
 
   // For more about these file formats, see https://observablehq.com/d/50deb2a74a628292
 
-  if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
+  if (
+    options?.gcpFileFormat === 'qgis' ||
+    lines.find((line) => line.slice(0, 4) === 'mapX') != undefined
+  ) {
     return parseQgisGcpLines(lines)
-  } else if (lines[0].split(',').length >= 5) {
+  } else if (
+    options?.gcpFileFormat === 'arcgis-csv' ||
+    lines[0].split(',').length >= 5
+  ) {
     return parseArcGisCsvGcpLines(lines, options)
-  } else if (lines[0].split(/\t+/).length >= 4) {
+  } else if (
+    options?.gcpFileFormat === 'arcgis-tsv' ||
+    lines[0].split(/\t+/).length >= 4
+  ) {
     return parseArcGisTsvGcpLines(lines, options)
-  } else if (lines[0].split(/\ +/).length >= 2) {
+  } else if (
+    options?.gcpFileFormat === 'gdal' ||
+    lines[0].split(/\ +/).length >= 2
+  ) {
     // Note: split on spaces specifically instead of /\s+/
     // to prevent false positive of ArcGIS TSV file
     return parseGdalGcpLines(lines)
