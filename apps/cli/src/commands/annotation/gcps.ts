@@ -1,7 +1,7 @@
 import { Command } from '@commander-js/extra-typings'
 
 import { printGcps } from '@allmaps/io'
-import { mergeOptions } from '@allmaps/stdlib'
+import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
 import { parseJsonInput, printString } from '../../lib/io.js'
 import {
@@ -18,7 +18,7 @@ export function gcps() {
       .argument('[files...]')
       .summary('generate GCP files from GCPs')
       .description(
-        'Generates GCP files from GCPs of input Georeference Annotations. GCPs are printed in the internal projection infered from the map or options, with "EPSG:3857" as default for optimal rendering. Set the internal projection option to "EPSG:4326" to obtain GCPs in lon-lat coordinates.'
+        'Generates GCP files from GCPs of input Georeference Annotations. GCPs are in the internal projection infered from the map or options, with the same default internal projection as in a Projected GCP Transformer used to render maps: "EPSG:3857". Set the internal projection option to "EPSG:4326" to obtain GCPs in lon-lat coordinates.'
       )
   )
 
@@ -29,11 +29,14 @@ export function gcps() {
     const { gcpFileType } = parseGcpFileTypeOptions(options)
     const maps = parseAnnotationsValidateMaps(jsonValues, annotationInputs)
 
-    const gcps = maps.map((map) => map.gcps)
-    const gcpStrings = gcps.map((gcps) =>
+    const gcpStrings = maps.map((map) =>
       printGcps(
-        gcps,
-        mergeOptions(options, { internalProjection, gcpFileType })
+        map.gcps,
+        mergeOptionsUnlessUndefined(options, {
+          internalProjection,
+          gcpFileType,
+          resourceHeight: map.resource.height
+        })
       )
     )
     printString([...gcpStrings].join('\n\n'))

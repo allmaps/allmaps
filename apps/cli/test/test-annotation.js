@@ -124,20 +124,20 @@ describe('allmaps annotation gcps', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read a Georeference Annotation from the standard input and convert its gcps to an ArcGIS CSV GCP file', () => {
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an ArcGIS CSV GCP file, and infer the resource height from the map', () => {
     const expected = readFile('output/gcps/gcps-arcgis-csv.csv')
     const output = exec(
-      'annotation gcps --gcp-file-type arcgis-csv --resource-height 10474',
+      'annotation gcps --gcp-file-type arcgis-csv',
       'input/annotations/7a69f9470b49a744.json'
     )
 
     expect(expected).to.equal(output)
   })
 
-  it('should read a Georeference Annotation from the standard input and convert its gcps to an ArcGIS TSV GCP file', () => {
+  it('should read a Georeference Annotation from the standard input and convert its gcps to an ArcGIS TSV GCP file, and infer the resource height from the map', () => {
     const expected = readFile('output/gcps/gcps-arcgis-tsv.txt')
     const output = exec(
-      'annotation gcps --gcp-file-type arcgis-tsv --resource-height 10474',
+      'annotation gcps --gcp-file-type arcgis-tsv',
       'input/annotations/7a69f9470b49a744.json'
     )
 
