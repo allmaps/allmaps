@@ -231,12 +231,15 @@ export function parseProjectedGcpTransformerInputOptionsAndMap(
   }>,
   map?: GeoreferencedMap
 ): Partial<ProjectedGcpTransformerInputOptions> {
-  const { gcps } = parseGcpInputOptions(options, map)
-  const { transformationType } = parseTransformationTypeInputOptions(
+  const { internalProjection } = parseInternalProjectionInputOptions(
     options,
     map
   )
-  const { internalProjection } = parseInternalProjectionInputOptions(
+  const { gcps } = parseGcpInputOptions(
+    mergeOptions(options, { internalProjection }),
+    map
+  )
+  const { transformationType } = parseTransformationTypeInputOptions(
     options,
     map
   )
@@ -248,6 +251,7 @@ export function parseGcpInputOptions(
   options: Partial<{
     gcps: string
     gcpFileFormat: string
+    internalProjection: Projection
     resourceHeight: number
   }>,
   map?: GeoreferencedMap

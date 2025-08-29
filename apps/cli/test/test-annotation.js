@@ -69,12 +69,23 @@ describe('allmaps annotation parse', () => {
     expect(expected).to.deep.equal(output)
   })
 
-  it("should read a Georeference Annotation from a file, apply custom GCPs and convert it to Allmaps' internal format", () => {
+  it("should read a Georeference Annotation from a file, apply custom QGIS GCPs and convert it to Allmaps' internal format", () => {
     const expected = readFileJson(
       'output/maps/7a69f9470b49a744-custom-gcps.json'
     )
     const output = execJson(
       'annotation parse input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-qgis.points'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
+  it("should read a Georeference Annotation from a file, apply custom QGIS GCPs and convert it to Allmaps' internal format and infering their internal projection", () => {
+    const expected = readFileJson(
+      'output/maps/7a69f9470b49a744-custom-gcps-internal-projection.json'
+    )
+    const output = execJson(
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-qgis-internal-projection.points'
     )
 
     expect(expected).to.deep.equal(output)
