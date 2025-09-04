@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { UrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/state/url.svelte.js'
 
   import iiifLogoBlack from '$lib/images/iiif-black.svg'
 
+  let urlState = getUrlState()
+
   type Props = {
-    urlState: UrlState
     onSubmit: (url: string) => void
     autofocus?: boolean
     placeholder?: string
   }
 
   let {
-    urlState,
     onSubmit,
     autofocus = false,
     placeholder = 'Open a IIIF resource from a URL'
@@ -46,6 +46,7 @@
   <img src={iiifLogoBlack} class="size-4 opacity-75" alt="IIIF logo" />
   <!-- svelte-ignore a11y_autofocus -->
   <input
+    name="url"
     type="input"
     {autofocus}
     bind:value

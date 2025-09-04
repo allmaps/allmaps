@@ -5,7 +5,6 @@
   import { browser } from '$app/environment'
 
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
-  import { getUrlState } from '$lib/state/url.svelte.js'
 
   import Title from '$lib/components/Title.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
@@ -13,11 +12,9 @@
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
   import Footer from '$lib/components/Footer.svelte'
 
-  import organizations from '$lib/shared/organizations.js'
+  import { organizationsWithCollectionsOnHomepage } from '$lib/shared/organizations.js'
 
   let autofocus = $state(false)
-
-  let urlState = getUrlState()
 
   function hasTouch() {
     if (browser) {
@@ -39,8 +36,6 @@
   }
 
   onMount(() => {
-    autofocus = !hasTouch()
-
     const hash = page.url.hash
     if (hash) {
       let pathWithSearchParams = hash.slice(1)
@@ -85,7 +80,7 @@
           >Allmaps Viewer</a
         > or use them in tools like MapLibre, OpenLayers, Leaflet or QGIS.
       </p>
-      <URLInput onSubmit={handleInputSubmit} {urlState} {autofocus} />
+      <URLInput onSubmit={handleInputSubmit} {autofocus} />
       <!-- TODO: enable when homepage is updated! -->
       <!-- <p>
         <a
@@ -106,7 +101,7 @@
           Or pick a map from these collections
         </h2>
       </div>
-      <Organizations {organizations} />
+      <Organizations organizations={organizationsWithCollectionsOnHomepage} />
     </div>
   </section>
 </div>

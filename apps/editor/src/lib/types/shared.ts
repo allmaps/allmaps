@@ -20,9 +20,15 @@ export type ParamKey =
 export type Params = { [key in ParamKey]?: string | null }
 
 export type Organization = {
-  id: string
   title: string
+  label?: string | ((title: string) => string)
   subtitle?: string
+  baseUrls: string[]
+  allowRedirect?: boolean
+}
+
+export type OrganizationWithId = Organization & {
+  id: string
 }
 
 export type GCP = {

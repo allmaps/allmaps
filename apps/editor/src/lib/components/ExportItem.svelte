@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ArrowSquareOut as ArrowSquareOutIcon } from 'phosphor-svelte'
 
-  import Copy from '$lib/components/Copy.svelte'
+  import Copy from '$lib/components/CopyButton.svelte'
 
   import type { Snippet } from 'svelte'
 

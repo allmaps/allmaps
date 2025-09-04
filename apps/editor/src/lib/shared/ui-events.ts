@@ -1,7 +1,8 @@
 import type { ClickedItem } from '$lib/types/shared'
 
 export const UiEvents = {
-  CLICKED_ITEM: 'CLICKED_ITEM' as const
+  CLICKED_ITEM: 'CLICKED_ITEM' as const,
+  ZOOM_TO_EXTENT: 'ZOOM_TO_EXTENT' as const
 }
 
 interface UiEventMap {

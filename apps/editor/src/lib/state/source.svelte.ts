@@ -15,18 +15,11 @@ import type {
   Canvas as IIIFCanvas,
   Collection as IIIFCollection
 } from '@allmaps/iiif-parser'
-import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { PartOf, PartOfItem } from '@allmaps/annotation'
 
 import type { Source, SourceType } from '$lib/types/shared.js'
 
 import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
-
-type PartOf = GeoreferencedMap['resource']['partOf']
-
-type PartOfItem = {
-  id: string
-  type: string
-}
 
 const SOURCE_KEY = Symbol('source')
 

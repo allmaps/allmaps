@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit'
 
-import organizations from '$lib/shared/organizations.js'
+import { organizationsWithCollectionsOnHomepage as organizations } from '$lib/shared/organizations.js'
 
 type Params = {
   params: {

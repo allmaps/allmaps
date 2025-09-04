@@ -19,7 +19,6 @@
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/tailwind" },
-    { "path": "../../packages/types" },
-    { "path": "../../packages/openlayers" }
+    { "path": "../../packages/types" }
   ]
 }

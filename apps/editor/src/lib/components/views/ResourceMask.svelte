@@ -9,7 +9,7 @@
 
   import { X as XIcon, Check as CheckIcon } from 'phosphor-svelte'
 
-  import { pink } from '@allmaps/tailwind'
+  import { pink, red, green } from '@allmaps/tailwind'
   import { computeBbox } from '@allmaps/stdlib'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
@@ -90,7 +90,6 @@
       )
 
       if (resourceFeature) {
-        // @ts-expect-error incompatible types
         const bbox = computeBbox(resourceFeature.geometry)
 
         makeResourceMaskFeatureActive(event.detail.mapId, true)
@@ -101,6 +100,10 @@
         })
       }
     }
+  }
+
+  function handleZoomToExtent() {
+    console.log('Zoom to extent')
   }
 
   function saveViewport() {
@@ -543,6 +546,7 @@
 
   onMount(() => {
     uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
+    uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
 
     mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
@@ -564,6 +568,7 @@
       saveViewport()
 
       uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
+      uiState.removeEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
 
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
@@ -598,23 +603,27 @@
       class="absolute top-16 w-full flex items-center justify-center pointer-events-none"
     >
       <div
-        transition:fade={{ duration: 50 }}
-        class="p-1 rounded-lg bg-white flex gap-2 shadow pointer-events-auto"
+        transition:fade={{ duration: 100 }}
+        class="p-1 rounded-lg bg-white flex gap-2 shadow pointer-events-auto
+          font-medium"
       >
         <button
           onclick={abortDrawing}
-          class="bg-red z-50 p-2 rounded-md text-sm flex items-center gap-1"
+          class="bg-red-100 z-50 p-2 rounded-md text-sm flex items-center gap-1
+          transition-all cursor-pointer hover:bg-red-200"
         >
-          <XIcon class="size-4" weight="bold" />
+          <XIcon class="size-4" weight="bold" color={red} />
           <span>Cancel</span>
         </button>
 
         <button
           onclick={finishDrawing}
           disabled={!canFinishDrawing}
-          class="bg-green z-50 p-2 rounded-md text-sm flex items-center gap-1 transition-opacity disabled:opacity-50"
+          class="bg-green-100 z-50 p-2 rounded-md text-sm flex items-center gap-1
+          cursor-pointer hover:bg-green-200
+          transition-all disabled:opacity-50"
         >
-          <CheckIcon class="size-4" weight="bold" />
+          <CheckIcon class="size-4" weight="bold" color={green} />
           <span>Finish</span>
         </button>
       </div>

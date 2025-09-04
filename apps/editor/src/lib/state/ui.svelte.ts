@@ -73,6 +73,10 @@ export class UiState extends UiEventTarget {
     }
   }
 
+  zoomToExtent() {
+    this.dispatchEvent(new CustomEvent(UiEvents.ZOOM_TO_EXTENT))
+  }
+
   get basemapPresets() {
     return this.#basemapPresets
   }
