@@ -58,7 +58,12 @@ export async function generateImage(
     zoom: 1.25
   })
   const image = await renderer.render(viewport)
-  const pngBuffer = encodePng([image.buffer], size[0], size[1], 0)
+  const pngBuffer = encodePng(
+    [image.buffer as ArrayBuffer],
+    size[0],
+    size[1],
+    0
+  )
 
   return png(pngBuffer)
 }
