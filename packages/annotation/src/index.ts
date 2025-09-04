@@ -54,5 +54,7 @@ export {
 export type {
   GeoreferencedMap2 as GeoreferencedMap,
   Annotation1 as Annotation,
-  AnnotationPage1 as AnnotationPage
+  AnnotationPage1 as AnnotationPage,
+  PartOf,
+  PartOfItem
 } from './types.js'
