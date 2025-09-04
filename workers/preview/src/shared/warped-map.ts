@@ -56,7 +56,12 @@ export async function generateWarpedMapImage(
 
   const viewport = Viewport.fromSizeAndMaps(size, renderer.warpedMapList)
   const image = await renderer.render(viewport)
-  const pngBuffer = encodePng([image.buffer], size[0], size[1], 0)
+  const pngBuffer = encodePng(
+    [image.buffer as ArrayBuffer],
+    size[0],
+    size[1],
+    0
+  )
 
   return png(pngBuffer)
 }

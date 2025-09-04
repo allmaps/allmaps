@@ -71,6 +71,11 @@ export async function createWarpedTileResponse(
 
   const warpedTile = await renderer.render(viewport)
 
-  const pngBuffer = encodePng([warpedTile.buffer], tileSize[0], tileSize[1], 0)
+  const pngBuffer = encodePng(
+    [warpedTile.buffer as ArrayBuffer],
+    tileSize[0],
+    tileSize[1],
+    0
+  )
   return png(pngBuffer)
 }
