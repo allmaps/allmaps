@@ -45,16 +45,26 @@ export class HeadState {
     this.#sourceState = sourceState
   }
 
-  #getTitle(sourceLabelString: string, canvasLabelString: string) {
+  #getTitle(
+    sourceLabelString: string,
+    canvasLabelString: string,
+    includeAppName = false
+  ) {
+    let labels = includeAppName ? ['Allmaps Editor'] : []
+
     if (sourceLabelString) {
       if (canvasLabelString) {
-        return `${truncate(canvasLabelString, truncateOptions)} | ${truncate(sourceLabelString, truncateOptions)} | Allmaps Editor`
+        labels = [
+          truncate(canvasLabelString, truncateOptions),
+          truncate(sourceLabelString, truncateOptions),
+          ...labels
+        ]
+      } else {
+        labels = [truncate(sourceLabelString, truncateOptions), ...labels]
       }
-
-      return `${truncate(sourceLabelString, truncateOptions)} | Allmaps Editor`
     }
 
-    return 'Allmaps Editor'
+    return labels.join(' / ')
   }
 
   #getDescription() {
@@ -68,8 +78,20 @@ export class HeadState {
     }
   }
 
+  get labels() {
+    return [this.#canvasLabelString, this.#sourceLabelString].filter(Boolean)
+  }
+
   get description() {
     return this.#getDescription()
+  }
+
+  get appTitle() {
+    return this.#getTitle(
+      this.#sourceLabelString,
+      this.#canvasLabelString,
+      true
+    )
   }
 
   get title() {
@@ -97,12 +119,12 @@ export class HeadState {
       : []
 
     return {
-      title: this.title,
+      title: this.appTitle,
       description: this.description,
       og: [
         {
           property: 'og:title',
-          content: this.title
+          content: this.appTitle
         },
         {
           property: 'og:description',

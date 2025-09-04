@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { ToggleGroup } from 'bits-ui'
 
   import {
@@ -12,7 +12,7 @@
   import Info from '$lib/components/drawer/Info.svelte'
   import Maps from '$lib/components/drawer/Maps.svelte'
   import Annotation from '$lib/components/drawer/Annotation.svelte'
-  import Export from '$lib/components/drawer/Export.svelte'
+  import Export from '$lib/components/popovers/Export.svelte'
   import Settings from '$lib/components/drawer/Settings.svelte'
 
   import SourceLabel from '$lib/components/SourceLabel.svelte'
@@ -34,10 +34,10 @@
     | undefined = $state()
 
   const Contents = $derived(value && drawers[value])
-</script>
+</script> -->
 
 <!-- TODO: create snippet for buttons -->
-<div
+<!-- <div
   class="shrink min-w-0 max-w-(--breakpoint-sm) max-h-full bg-white rounded-md shadow-md p-2 gap-2 flex flex-col"
 >
   {#if value}
@@ -100,4 +100,4 @@
       </ToggleGroup.Item>
     </ToggleGroup.Root>
   </div>
-</div>
+</div> -->

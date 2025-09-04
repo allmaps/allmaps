@@ -1,6 +1,6 @@
-import type { LanguageString } from '@allmaps/iiif-parser'
-
+import type { PartOfItem } from '@allmaps/annotation'
 import type {
+  LanguageString,
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage,
   Manifest as IIIFManifest,
@@ -48,7 +48,7 @@ export function parseLanguageString(
     return ''
   }
 
-  let strings: string[] = []
+  let strings: (string | number | boolean)[] = []
 
   if (preferredLanguage && languageString[preferredLanguage]) {
     strings = languageString[preferredLanguage]
@@ -60,5 +60,11 @@ export function parseLanguageString(
     }
   }
 
-  return strings.join(' ')
+  return strings.map((string) => String(string)).join(' ')
+}
+
+export function labelFromPartOfItem(item: PartOfItem) {
+  if (item.label) {
+    return parseLanguageString(item.label)
+  }
 }

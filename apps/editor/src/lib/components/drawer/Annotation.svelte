@@ -5,7 +5,7 @@
 
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import Scope from '$lib/components/drawer/Scope.svelte'
-  import Copy from '$lib/components/Copy.svelte'
+  import Copy from '$lib/components/CopyButton.svelte'
 
   const scopeState = getScopeState()
 </script>
