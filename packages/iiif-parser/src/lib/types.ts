@@ -15,7 +15,7 @@ export type ProfileProperties = {
 }
 
 export type LanguageString = {
-  [language: string]: string[]
+  [language: string]: (string | number | boolean)[]
 }
 
 export type MetadataItem = {
