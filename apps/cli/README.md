@@ -127,14 +127,14 @@ Output the IDs of the IIIF Images in the input files:
 allmaps annotation image-ids [files...]
 ```
 
-Output the GCPs from the input files using one of the supported GCP file formats (see [@allmaps/io](../../packages/io/)):
+Output the GCPs from the input files. Options allow to set the GCP file format (see [@allmaps/io](../../packages/io/) for supported formats), projection, axis orientation and origin:
 
 ```bash
 allmaps annotation gcps [files...]
 ```
 
-> [!NOTE]
-> GCPs are in the internal projection inferred from the map or options, with the same default internal projection as in a Projected GCP Transformer used to render maps: "EPSG:3857". Set the internal projection option to "EPSG:4326" to obtain GCPs in lon-lat coordinates.
+> [!TIP]
+> GCPs are printed in "EPSG:4326" by default, but their projection can be specified in a QGIS GCP file format or via the options. Use "EPSG:3857", the default projection in [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), to obtain the same result when using printed GCPs in e.g. QGIS.
 
 
 ### Parse and generate IIIF resources
@@ -313,40 +313,42 @@ allmaps transform resource-mask path/to/my-annotation.json path/to/my-annotation
 
 All the commands above take an annotation input using a parameter (except `resource-mask`, where annotations are passed via stdin).
 
-| Option                                           | Description                                                                                                                                                                    | Default      |
-|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-a, --annotation <filename>`                    | Filename of Georeference Annotation (or Georeferenced Map).                                                                                                                    |              |
+| Option                        | Description                                                 | Default |
+|:------------------------------|:------------------------------------------------------------|:--------|
+| `-a, --annotation <filename>` | Filename of Georeference Annotation (or Georeferenced Map). |         |
 
 All the commands above accept the following options for specifying the Projected GCP Transformer:
 
-| Option                                           | Description                                                                                                                                                                    | Default      |
-|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-g, --gcps <filename>`                          | Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).                                                                               |              |
-| `--gcp-file-format <gcpFileFormat>`                          | GCP file format. See [@allmaps/io](../../packages/io/) for the supported GCP file formats.                                                                                |  `'gdal'`            |
-| `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map). | `polynomial` |
-| `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
-| `--internal-projection-definition <proj4string>`   | The geographic projection used internally in the transformation.'                                                                                                                         | `'EPSG:3857'`          |
+| Option                                           | Description                                                                                                                                                                                                                                                                                                                        | Default       |
+|:-------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------|
+| `-g, --gcps <filename>`                          | Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map). GCPs are expected in `"EPSG:4326"` by default, but their projection can be specified in a QGIS GCP file format or via the options. |               |
+| `--gcp-file-format <gcpFileFormat>`              | GCP file format. See [@allmaps/io](../../packages/io/) for the supported GCP file formats.                                                                                                                                                                                                                                         |     |
+| `--gcp-resource-origin <gcpFileFormat>`              | Resource origin in the GCP file: "bottom-left" or "top-left".                                                                                                                                                                                                                                         | Default adapted to file format.    |
+| `--gcp-resource-y-axis <gcpResourceYAxis>`              | Y axis orientation in the GCP file: "up" or "down".                                                                                                                                                                                                                                         | Default adapted to file format.    |
+| `--gcp-resource-width <number>`              | Resource width in the GCP file. Can be different the resource width of the map, if the GCPs were created from the same image but on a different scale.                                                                                                                                                                                                                                         |     |
+| `--gcp-resource-height <number>`              | Resource height in the GCP file. Can be different the resource height of the map, if the GCPs were created from the same image but on a different scale.                                                                                                                                                                                                                                         |     |
+| `--gcp-projection-definition <proj4string>`              | The geographic projection used in the GCP file.                                                                                                                                                                                                                                         | `'EPSG:4326'` or read from QGIS file format.    |
+| `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map).                                                                                                                        | `polynomial`  |
+| `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                                                                                                                                                                             | `1`           |
+| `--internal-projection-definition <proj4string>` | The geographic projection used internally in the transformation.'                                                                                                                                                                                                                                                                  | `'EPSG:3857'` |
 
 All the commands above accept the following options for specifying the Projected GCP Transformer, for example the way it transforms lines or polygons using midpoints (see [@allmaps/transform](../../packages/transform/) and [@allmaps/project](../../packages/project/) for more details):
 
-| Option                            | Description                                                                                   | Default                                                 |
-|:----------------------------------|:----------------------------------------------------------------------------------------------|:--------------------------------------------------------|
-| `-m, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints). | `0` (i.e. no midpoints by default!)                     |
-| `--min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints).           | `0`                                                     |
-| `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)           | `Infinity`                                                     |
-| `--min-line-distance <number>`| Minimum line distance when recursively adding midpoints (lower means more midpoints).           | `Infinity`                                                     |
-| `--geo-is-geographic`             | Use geographic distances and midpoints for lon-lat geo points                                 | `false` (`true` for `svg` and `resource-mask` commands) |
-| `--projection-definition <proj4string>`   | The geographic projection of the output.                                                                                                                         | `'EPSG:4326'`          |
-| `--no-different-handedness`   | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.)                                                                                                                         |          |
-
-> [!NOTE]
-> Output coordinates are in `'EPSG:4326'` by default due to the default value of `--projection-definition`. In the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), the default projection is `'EPSG:3857'` to obtain coordinates that can be used in a WebMercator webmap.
+| Option                                  | Description                                                                                                                                                                                                                                                                                                                                          | Default                                                 |
+|:----------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------|
+| `-m, --max-depth <number>`              | Maximum recursion depth when recursively adding midpoints (higher means more midpoints).                                                                                                                                                                                                                                                             | `0` (i.e. no midpoints by default!)                     |
+| `--min-offset-ratio <number>`           | Minimum offset ratio when recursively adding midpoints (lower means more midpoints).                                                                                                                                                                                                                                                                 | `0`                                                     |
+| `--min-offset-distance <number>`        | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                               | `Infinity`                                              |
+| `--min-line-distance <number>`          | Minimum line distance when recursively adding midpoints (lower means more midpoints).                                                                                                                                                                                                                                                                | `Infinity`                                              |
+| `--geo-is-geographic`                   | Use geographic distances and midpoints for lon-lat geo points                                                                                                                                                                                                                                                                                        | `false` (`true` for `svg` and `resource-mask` commands) |
+| `--projection-definition <proj4string>` | The geographic projection of the output.                                                                                                                                                                                                                                                                                                             | `'EPSG:4326'`                                           |
+| `--no-different-handedness`             | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.) |                                                         |
 
 Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of it's Projected GCP Transformer: 'toResource' instead of 'toGeo'.
 
-| Option          | Description                                   | Default |
-|:----------------|:----------------------------------------------|:--------|
-| `-i, --inverse` | Use the Projected GCP Transformer's 'toResource' ("inverse") transformation instead of the 'toGeo' transformation.  |         |
+| Option          | Description                                                                                                        | Default |
+|:----------------|:-------------------------------------------------------------------------------------------------------------------|:--------|
+| `-i, --inverse` | Use the Projected GCP Transformer's 'toResource' ("inverse") transformation instead of the 'toGeo' transformation. |         |
 
 ### Attach maps
 

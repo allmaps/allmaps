@@ -1,6 +1,6 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { ProjectedGcpTransformer } from '@allmaps/project'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import {
   geojsonFeaturesToGeojsonFeatureCollection,
   geojsonGeometryToGeojsonFeature,
@@ -48,11 +48,14 @@ export function resourceMask() {
 
     const features = []
     for (const map of maps) {
-      const { gcps, transformationType, internalProjection } =
+      let { gcps, transformationType, internalProjection, projection } =
         parseProjectedGcpTransformerInputOptionsAndMap(options, map)
 
       if (gcps === undefined) {
         throw new Error(mustContainGcpsMessage)
+      }
+      if (projection === undefined) {
+        projection = lonLatProjection
       }
 
       const projectedTransformer = new ProjectedGcpTransformer(
@@ -63,7 +66,7 @@ export function resourceMask() {
             partialProjectedGcpTransformerOptions,
             partialProjectedGcpTransformOptions
           ),
-          { internalProjection }
+          { internalProjection, projection }
         )
       )
 

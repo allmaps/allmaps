@@ -15,10 +15,14 @@ import {
 } from '@allmaps/stdlib'
 import {
   parseGcps,
-  parseInternalProjectionFromGcpString,
+  parseGcpProjectionFromGcpString,
   parseGdalCoordinateLines,
   GcpFileFormat,
-  gcpFileFormats
+  supportedGcpFileFormats,
+  GcpResourceOrigin,
+  GcpResourceYAxis,
+  supportedGcpResourceYAxis,
+  supportedGcpResourceOrigin
 } from '@allmaps/io'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
@@ -35,8 +39,9 @@ import type {
   AttachedTransformationOptions,
   RcpsInput
 } from '@allmaps/attach'
-import {
+import type {
   InternalProjectionInputs as InternalProjectionInputOptions,
+  ProjectionInputs as ProjectionInputOptions,
   ProjectedGcpTransformerInputs as ProjectedGcpTransformerInputOptions,
   ProjectedGcpTransformerOptions,
   ProjectedGcpTransformOptions,
@@ -56,7 +61,11 @@ export type AnnotationInputOptions = {
   resourceWidth: number
   resourceHeight: number
   resourceMask: Ring
-} & ProjectedGcpTransformerInputOptions
+} & ProjectedGcpTransformerInputOptions &
+  GcpProjectionInputOptions
+export type GcpProjectionInputOptions = {
+  gcpProjection: Projection
+}
 
 export type LaunchOptions = {
   localhost: boolean
@@ -159,9 +168,16 @@ export function parseAnnotationInputOptions(
     resourceMask: string
     annotation: string
     gcps: string
+    gcpFileFormat: GcpFileFormat
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
     transformationType: string
     polynomialOrder: number
     internalProjectionDefinition: string
+    projectionDefinition: string
   }>
 ): Partial<AnnotationInputOptions> {
   const {
@@ -171,6 +187,9 @@ export function parseAnnotationInputOptions(
     resourceHeight,
     resourceMask: resourceMaskString
   } = options
+  // TODO: consider using parse functions from @allmaps/annotation
+  // TODO: parse resourceId: remove trailing '/'
+  // TODO: fix parsing SVG
   const svgGeometry = resourceMaskString
     ? stringToSvgGeometriesGenerator(resourceMaskString).next()
     : undefined
@@ -181,8 +200,14 @@ export function parseAnnotationInputOptions(
       throw new Error('ResourceMask should be a ring')
     }
   }
-  const { gcps, transformationType, internalProjection } =
-    parseProjectedGcpTransformerInputOptions(options)
+
+  const {
+    gcps,
+    gcpProjection,
+    transformationType,
+    internalProjection,
+    projection
+  } = parseProjectedGcpTransformerInputOptions(options)
 
   return {
     resourceId,
@@ -192,7 +217,9 @@ export function parseAnnotationInputOptions(
     resourceMask,
     transformationType,
     internalProjection,
-    gcps
+    projection,
+    gcps,
+    gcpProjection
   }
 }
 
@@ -200,12 +227,20 @@ export function parseProjectedGcpTransformerInputOptions(
   options: Partial<{
     annotation: string
     gcps: string
+    gcpFileFormat: GcpFileFormat
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
     transformationType: string
     polynomialOrder: number
     internalProjectionDefinition: string
+    projectionDefinition: string
+    resourceWidth: number
     resourceHeight: number
   }>
-): Partial<ProjectedGcpTransformerInputOptions> {
+): Partial<ProjectedGcpTransformerInputOptions & GcpProjectionInputOptions> {
   let map: GeoreferencedMap | undefined
 
   try {
@@ -223,57 +258,73 @@ export function parseProjectedGcpTransformerInputOptions(
 export function parseProjectedGcpTransformerInputOptionsAndMap(
   options: Partial<{
     gcps: string
-    gcpFileFormat: string
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
     transformationType: string
     polynomialOrder: number
     internalProjectionDefinition: string
+    projectionDefinition: string
+    resourceWidth: number
     resourceHeight: number
   }>,
   map?: GeoreferencedMap
-): Partial<ProjectedGcpTransformerInputOptions> {
-  const { internalProjection } = parseInternalProjectionInputOptions(
-    options,
-    map
-  )
-  const { gcps } = parseGcpInputOptions(
-    mergeOptions(options, { internalProjection }),
-    map
-  )
+): Partial<ProjectedGcpTransformerInputOptions & GcpProjectionInputOptions> {
+  const { gcps, gcpProjection } = parseGcpInputOptions(options, map)
   const { transformationType } = parseTransformationTypeInputOptions(
     options,
     map
   )
+  const { internalProjection } = parseInternalProjectionInputOptions(
+    options,
+    map
+  )
+  const { projection } = parseProjectionInputOptions(options)
 
-  return { gcps, transformationType, internalProjection }
+  return {
+    gcps,
+    gcpProjection,
+    transformationType,
+    internalProjection,
+    projection
+  }
 }
 
 export function parseGcpInputOptions(
   options: Partial<{
     gcps: string
-    gcpFileFormat: string
-    internalProjection: Projection
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
+    resourceWidth: number
     resourceHeight: number
   }>,
   map?: GeoreferencedMap
-): Partial<GcpsInputOptions> {
+): Partial<GcpsInputOptions & GcpProjectionInputOptions> {
   let gcps: Gcp[]
+  const { gcpProjection } = parseGcpProjectionInputOptions(options)
+
   if (options.gcps) {
     try {
       // The GCP option was provided by another georeferenced map
       gcps = parseMap(options.gcps).gcps
+      return { gcps, gcpProjection }
     } catch (e) {
       // The GCP option was provided by a file with GCPs
       const gcpString = readFromFile(options.gcps)
-      const { gcpFileFormat } = parseGcpFileFormatOptions(options)
-      gcps = parseGcps(gcpString, mergeOptions(options, { gcpFileFormat })).gcps
+      gcps = parseGcps(gcpString, mergeOptions(options, { gcpProjection })).gcps
+      return { gcps, gcpProjection }
     }
-    return { gcps }
   } else if (map) {
     // Use the GCPs already from the already parsed annotation
     gcps = map.gcps
-    return { gcps }
+    return { gcps, gcpProjection }
   }
-  return {}
+  return { gcpProjection }
 }
 
 export function parseCoordinates(coordinates: string): number[][] {
@@ -334,7 +385,7 @@ export function parseInternalProjectionInputOptions(
   ) {
     const gcpString = readFromFile(options.gcps)
     internalProjectionInputs.internalProjection =
-      parseInternalProjectionFromGcpString(gcpString)
+      parseGcpProjectionFromGcpString(gcpString)
   } else if (
     map &&
     map.resourceCrs &&
@@ -344,6 +395,48 @@ export function parseInternalProjectionInputOptions(
   }
 
   return internalProjectionInputs
+}
+
+export function parseProjectionInputOptions(
+  options: Partial<{
+    projectionDefinition: string
+  }>
+): Partial<ProjectionInputOptions> {
+  const projectionInputs: Partial<ProjectionInputOptions> = {}
+
+  if (
+    options &&
+    typeof options === 'object' &&
+    'projectionDefinition' in options &&
+    options.projectionDefinition
+  ) {
+    projectionInputs.projection = {
+      definition: options.projectionDefinition
+    } as Projection
+  }
+
+  return projectionInputs
+}
+
+export function parseGcpProjectionInputOptions(
+  options: Partial<{
+    gcpProjectionDefinition: string
+  }>
+): Partial<{ gcpProjection: Projection }> {
+  const gcpProjectionInputs: Partial<{ gcpProjection: Projection }> = {}
+
+  if (
+    options &&
+    typeof options === 'object' &&
+    'gcpProjectionDefinition' in options &&
+    options.gcpProjectionDefinition
+  ) {
+    gcpProjectionInputs.gcpProjection = {
+      definition: options.gcpProjectionDefinition
+    } as Projection
+  }
+
+  return gcpProjectionInputs
 }
 
 export function parseProjectedGcpTransformOptions(options: {
@@ -384,12 +477,6 @@ export function parseProjectedGcpTransformOptions(options: {
     if ('geoIsGeographic' in options && options.geoIsGeographic) {
       partialProjectedGcpTransformOptions.geoIsGeographic =
         options.geoIsGeographic
-    }
-
-    if ('projectionDefinition' in options && options.projectionDefinition) {
-      partialProjectedGcpTransformOptions.projection = {
-        definition: options.projectionDefinition
-      } as Projection
     }
   }
 
@@ -519,24 +606,6 @@ export function parseInverseOptions(options: {
   return transformOptions
 }
 
-export function parseGcpFileFormatOptions(options?: {
-  gcpFileFormat?: string
-}): {
-  gcpFileFormat: GcpFileFormat
-} {
-  if (
-    options &&
-    options.gcpFileFormat &&
-    gcpFileFormats.includes(options.gcpFileFormat)
-  ) {
-    return { gcpFileFormat: options.gcpFileFormat as GcpFileFormat }
-  } else {
-    throw new Error(
-      `Unrecognised GCP file format. Allowed formats are ${gcpFileFormats.join(', ')}`
-    )
-  }
-}
-
 export function parseLaunchInputs(
   options: Partial<LaunchOptions>
 ): Partial<LaunchOptions> {
@@ -555,4 +624,40 @@ export function parseLaunchInputs(
   }
 
   return partialLaunchOptions
+}
+
+export function parseCommanderGcpFileFormatOption(
+  string: string
+): GcpFileFormat {
+  if (supportedGcpFileFormats.includes(string)) {
+    return string as GcpFileFormat
+  } else {
+    throw new Error(
+      `Unsupported GCP file format. Supported formats are ${supportedGcpFileFormats.join(', ')}`
+    )
+  }
+}
+
+export function parseCommanderGcpResourceOrigin(
+  string: string
+): GcpResourceOrigin {
+  if (supportedGcpResourceOrigin.includes(string)) {
+    return string as GcpResourceOrigin
+  } else {
+    throw new Error(
+      `Unsupported GCP resource origin. Supported formats are ${supportedGcpResourceOrigin.join(', ')}`
+    )
+  }
+}
+
+export function parseCommanderGcpResourceYAxis(
+  string: string
+): GcpResourceYAxis {
+  if (supportedGcpResourceYAxis.includes(string)) {
+    return string as GcpResourceYAxis
+  } else {
+    throw new Error(
+      `Unsupported GCP resource y axis. Supported formats are ${supportedGcpResourceYAxis.join(', ')}`
+    )
+  }
 }

@@ -1,14 +1,14 @@
 export {
   parseGcps,
-  parseGcpString,
+  parseGcpLines,
   parseQgisGcpLines,
   parseArcGisCsvGcpLines,
   parseArcGisTsvGcpLines,
   parseGdalGcpLines,
   parseGdalCoordinateLines,
-  parseInternalProjectionFromGcpString,
-  parseInternalProjectionDefinitionFromGcpString,
-  parseInternalProjectionDefinitionFromLine
+  parseGcpProjectionFromGcpString,
+  parseGcpProjectionDefinitionFromGcpString,
+  parseGcpProjectionDefinitionFromLine
 } from './input/gcps.js'
 
 export {
@@ -30,4 +30,12 @@ export {
 
 export { checkCommand } from './output/bash.js'
 
-export { GcpFileFormat, gcpFileFormats } from './types.js'
+export {
+  GcpFileFormat,
+  supportedGcpFileFormats,
+  GcpResourceOrigin,
+  supportedGcpResourceOrigin,
+  GcpResourceYAxis,
+  supportedGcpResourceYAxis,
+  supportedGcpFileFormatsWithResourceYAxisUp
+} from './types.js'

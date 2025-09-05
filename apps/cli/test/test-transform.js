@@ -247,12 +247,12 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates and internal projection from a QGIS-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
+  it('should read coordinates and projection from a QGIS-like GCP file and transform these coordinates toGeo using the supplied GCPs and the default transformation type, even without a provided annotation', () => {
     const expected = readFile(
-      'output/coordinates/coordinates-polynomial-other-gcps-internal-projection.txt'
+      'output/coordinates/coordinates-polynomial-other-gcps-projection.txt'
     )
     const output = exec(
-      'transform coordinates -g input/gcps/gcps-qgis-internal-projection.points',
+      'transform coordinates -g input/gcps/gcps-qgis-projection.points',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -263,7 +263,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/gcps/gcps-arcgis-csv.csv --resource-height 7573',
+      'transform coordinates -g input/gcps/gcps-arcgis-csv.csv',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -274,7 +274,7 @@ describe('allmaps transform coordinates', () => {
       'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/gcps/gcps-arcgis-tsv.txt --resource-height 7573',
+      'transform coordinates -g input/gcps/gcps-arcgis-tsv.txt',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)

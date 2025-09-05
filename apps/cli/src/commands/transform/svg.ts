@@ -5,7 +5,7 @@ import {
   mergeOptionsUnlessUndefined,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { ProjectedGcpTransformer } from '@allmaps/project'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
 import { readInput, printJson } from '../../lib/io.js'
 import {
@@ -37,7 +37,7 @@ export function svg() {
   )
 
   return command.action(async (files, options) => {
-    const { gcps, transformationType, internalProjection } =
+    let { gcps, transformationType, internalProjection, projection } =
       parseProjectedGcpTransformerInputOptions(options)
     const partialProjectedGcpTransformerOptions =
       parseProjectedGcpTransformerOptions(options)
@@ -46,6 +46,9 @@ export function svg() {
 
     if (gcps === undefined) {
       throw new Error(mustContainGcpsMessage)
+    }
+    if (projection === undefined) {
+      projection = lonLatProjection
     }
 
     const projectedTransformer = new ProjectedGcpTransformer(
@@ -56,7 +59,7 @@ export function svg() {
           partialProjectedGcpTransformerOptions,
           partialProjectedGcpTransformOptions
         ),
-        { internalProjection }
+        { internalProjection, projection }
       )
     )
 

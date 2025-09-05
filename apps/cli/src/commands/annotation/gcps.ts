@@ -5,10 +5,10 @@ import { printGeoreferencedMapGcps } from '@allmaps/io'
 import { parseJsonInput, printString } from '../../lib/io.js'
 import {
   parseAnnotationInputOptions,
-  parseAnnotationsValidateMaps,
-  parseGcpFileFormatOptions
+  parseAnnotationsValidateMaps
 } from '../../lib/parse.js'
 import { addAnnotationInputOptions } from '../../lib/options.js'
+import { mergeOptions } from '@allmaps/stdlib'
 
 export function gcps() {
   const command = addAnnotationInputOptions(
@@ -16,7 +16,7 @@ export function gcps() {
       .argument('[files...]')
       .summary('generate GCP files from GCPs')
       .description(
-        'Generates GCP files from GCPs of input Georeference Annotations. GCPs are in the internal projection inferred from the map or options, with the same default internal projection as in a Projected GCP Transformer used to render maps: "EPSG:3857". Set the internal projection option to "EPSG:4326" to obtain GCPs in lon-lat coordinates.'
+        'Generates GCP files from GCPs of input Georeference Annotations. GCPs are expected in "EPSG:4326" by default, but their projection can be specified in a QGIS GCP file format or via the options.'
       )
   )
 
@@ -24,10 +24,9 @@ export function gcps() {
     const jsonValues = await parseJsonInput(files)
     const annotationInputs = parseAnnotationInputOptions(options)
     const maps = parseAnnotationsValidateMaps(jsonValues, annotationInputs)
-    const { gcpFileFormat } = parseGcpFileFormatOptions(options)
 
     const gcpStrings = maps.map((map) =>
-      printGeoreferencedMapGcps(map, { gcpFileFormat })
+      printGeoreferencedMapGcps(map, mergeOptions(options, annotationInputs))
     )
     printString([...gcpStrings].join('\n\n'))
   })

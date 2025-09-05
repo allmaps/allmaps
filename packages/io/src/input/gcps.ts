@@ -1,97 +1,158 @@
 import { proj4, lonLatProjection, isEqualProjection } from '@allmaps/project'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
+import { supportedGcpFileFormatsWithResourceYAxisUp } from '../types.js'
+
 import type { Gcp, Point } from '@allmaps/types'
 import type { Projection } from '@allmaps/project'
-import type { GcpFileFormat } from '../types'
+
+import type {
+  GcpFileFormat,
+  GcpResourceOrigin,
+  GcpResourceYAxis
+} from '../types.js'
 
 /**
  * Parse GCPs from file string.
  *
- * An internal projection can be included in a QGIS GCP file and will be used when parsing and returned.
- * An internal projection can be specified to parse ArcGIS files.
- * The resource height must specified to parse ArcGIS files.
+ * A projection can be included in a QGIS GCP file and will be used when parsing and returned.
+ * A projection can be specified to parse ArcGIS files.
+ * The resource height must specified when parsing GCPs with resource origin in bottom left.
  */
 export function parseGcps(
   gcpString: string,
   options?: Partial<{
-    resourceHeight: number
-    internalProjection: Projection
     gcpFileFormat: GcpFileFormat
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    resourceWidth: number
+    resourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpProjection: Projection
   }>
-): { gcps: Gcp[]; internalProjection?: Projection } {
-  // TODO: consider parsing GCPs from Georeference Annotation too?
+): { gcps: Gcp[]; gcpProjection?: Projection } {
+  // For more about these file formats, see https://observablehq.com/d/50deb2a74a628292
+  const gcpLines = gcpString.trim().split('\n')
 
-  const parsedInternalProjection =
-    parseInternalProjectionFromGcpString(gcpString)
+  if (gcpLines.length === 0) {
+    throw new Error('No coordinates')
+  }
+
+  const gcpFileFormat =
+    options?.gcpFileFormat ?? parseGcpFileFormatFromGcpString(gcpLines)
+  const gcpProjection =
+    options?.gcpProjection ??
+    parseGcpProjectionFromGcpString(gcpString) ??
+    lonLatProjection
+  const defaultParseGcpsOptions = {
+    gcpProjection,
+    gcpFileFormat,
+    gcpResourceOrigin: 'top-left',
+    gcpResourceYAxis:
+      gcpFileFormat &&
+      supportedGcpFileFormatsWithResourceYAxisUp.includes(gcpFileFormat)
+        ? 'up'
+        : 'down'
+  }
   const mergedOptions = mergeOptionsUnlessUndefined(
-    { internalProjection: lonLatProjection },
-    mergeOptionsUnlessUndefined(
-      { internalProjection: parsedInternalProjection },
-      options
-    )
+    defaultParseGcpsOptions,
+    options
   )
 
-  let gcps = parseGcpString(gcpString, mergedOptions)
+  // Parse
+  let gcps = parseGcpLines(gcpLines, mergedOptions)
 
-  if (!isEqualProjection(mergedOptions.internalProjection, lonLatProjection)) {
-    gcps = gcps.map((gcp) => {
-      return {
+  // Process scales
+  gcps = gcps.map((gcp) => {
+    // Process resource Y Axis flip
+    gcp = {
+      resource: [
+        gcp.resource[0],
+        gcp.resource[1] * (mergedOptions.gcpResourceYAxis === 'up' ? -1 : 1)
+      ] as Point,
+      geo: gcp.geo
+    }
+
+    // Process resource scaling
+    if (mergedOptions.gcpResourceWidth || mergedOptions.gcpResourceHeight) {
+      if (!mergedOptions.resourceWidth || !mergedOptions.resourceHeight) {
+        throw new Error(
+          'Resource width and height required when parsing GCPs with gcp resource width and height'
+        )
+      }
+      if (!mergedOptions.gcpResourceWidth || !mergedOptions.gcpResourceHeight) {
+        throw new Error(
+          'GCP resource width and height required when parsing GCPs with gcp resource width and height'
+        )
+      }
+      gcp = {
+        resource: [
+          (gcp.resource[0] * mergedOptions.resourceWidth) /
+            mergedOptions.gcpResourceWidth,
+          (gcp.resource[1] * mergedOptions.resourceHeight) /
+            mergedOptions.gcpResourceHeight
+        ] as Point,
+        geo: gcp.geo
+      }
+    }
+
+    // Process resource origin
+    if (mergedOptions.gcpResourceOrigin === 'bottom-left') {
+      if (!mergedOptions.resourceHeight) {
+        throw new Error(
+          'Resource height required when parsing GCPs with resource origin in bottom left'
+        )
+      }
+      gcp = {
+        resource: [
+          gcp.resource[0],
+          gcp.resource[1] +
+            (mergedOptions.gcpResourceOrigin === 'bottom-left'
+              ? mergedOptions.resourceHeight
+              : 0)
+        ] as Point,
+        geo: gcp.geo
+      }
+    }
+
+    // Project
+    if (!isEqualProjection(mergedOptions.gcpProjection, lonLatProjection)) {
+      gcp = {
         resource: gcp.resource,
         geo: proj4(
-          mergedOptions.internalProjection.definition,
+          mergedOptions.gcpProjection.definition,
           lonLatProjection.definition,
           gcp.geo
         )
       }
-    })
-  }
+    }
+
+    return gcp
+  })
 
   return {
     gcps,
-    internalProjection: parsedInternalProjection
+    gcpProjection
   }
 }
 
-export function parseGcpString(
-  gcpString: string,
-  options?: Partial<{
-    resourceHeight: number
+export function parseGcpLines(
+  lines: string[],
+  options: {
     gcpFileFormat: GcpFileFormat
-  }>
-): Gcp[] {
-  const lines = gcpString.trim().split('\n')
-
-  if (lines.length == 0) {
-    throw new Error('No coordinates')
   }
-
-  // For more about these file formats, see https://observablehq.com/d/50deb2a74a628292
-
-  if (
-    options?.gcpFileFormat === 'qgis' ||
-    lines.find((line) => line.slice(0, 4) === 'mapX') != undefined
-  ) {
+): Gcp[] {
+  if (options?.gcpFileFormat === 'qgis') {
     return parseQgisGcpLines(lines)
-  } else if (
-    options?.gcpFileFormat === 'arcgis-csv' ||
-    lines[0].split(',').length >= 5
-  ) {
-    return parseArcGisCsvGcpLines(lines, options)
-  } else if (
-    options?.gcpFileFormat === 'arcgis-tsv' ||
-    lines[0].split(/\t+/).length >= 4
-  ) {
-    return parseArcGisTsvGcpLines(lines, options)
-  } else if (
-    options?.gcpFileFormat === 'gdal' ||
-    lines[0].split(/\ +/).length >= 2
-  ) {
-    // Note: split on spaces specifically instead of /\s+/
-    // to prevent false positive of ArcGIS TSV file
+  } else if (options?.gcpFileFormat === 'arcgis-csv') {
+    return parseArcGisCsvGcpLines(lines)
+  } else if (options?.gcpFileFormat === 'arcgis-tsv') {
+    return parseArcGisTsvGcpLines(lines)
+  } else if (options?.gcpFileFormat === 'gdal') {
     return parseGdalGcpLines(lines)
   } else {
-    throw 'Unrecognised GCP file format'
+    throw 'Unrecognised GCP file format while parsing GCP lines'
   }
 }
 
@@ -111,62 +172,22 @@ export function parseQgisGcpLines(lines: string[]): Gcp[] {
         .map(Number)
     )
     .map(coordinateArrayToGcp)
-    .map((gcp) => {
-      return {
-        resource: [gcp.resource[0], -gcp.resource[1]] as Point,
-        geo: gcp.geo
-      }
-    })
 
   return gcps
 }
 
-export function parseArcGisCsvGcpLines(
-  lines: string[],
-  options?: Partial<{
-    resourceHeight: number
-  }>
-): Gcp[] {
-  if (!options || !options.resourceHeight) {
-    throw new Error(
-      'Resource height required when parsing ArcGIS CSV coordinates'
-    )
-  }
-  const resourceHeight = options.resourceHeight
+export function parseArcGisCsvGcpLines(lines: string[]): Gcp[] {
   const coordinates = lines
     .map((line) => line.replace(/\s+/g, '').split(',').slice(1).map(Number))
     .map(coordinateArrayToGcp)
-    .map((gcp) => {
-      return {
-        resource: [gcp.resource[0], resourceHeight - gcp.resource[1]] as Point,
-        geo: gcp.geo
-      }
-    })
 
   return coordinates
 }
 
-export function parseArcGisTsvGcpLines(
-  lines: string[],
-  options?: Partial<{
-    resourceHeight: number
-  }>
-): Gcp[] {
-  if (!options || !options.resourceHeight) {
-    throw new Error(
-      'Resource height required when parsing ArcGIS TSV coordinates'
-    )
-  }
-  const resourceHeight = options.resourceHeight
+export function parseArcGisTsvGcpLines(lines: string[]): Gcp[] {
   const coordinates = lines
     .map((line) => line.split('\t').map(Number))
     .map(coordinateArrayToGcp)
-    .map((gcp) => {
-      return {
-        resource: [gcp.resource[0], resourceHeight - gcp.resource[1]] as Point,
-        geo: gcp.geo
-      }
-    })
 
   return coordinates
 }
@@ -182,41 +203,59 @@ export function parseGdalCoordinateLines(lines: string[]): number[][] {
   )
 }
 
-export function parseInternalProjectionFromGcpString(
+export function parseGcpProjectionFromGcpString(
   gcpString: string
 ): Projection | undefined {
-  const projectionDefinition =
-    parseInternalProjectionDefinitionFromLine(gcpString)
-  let projection: Projection | undefined = undefined
-  if (projectionDefinition) {
-    projection = {
-      definition: projectionDefinition
+  const gcpProjectionDefinition =
+    parseGcpProjectionDefinitionFromGcpString(gcpString)
+  let gcpProjection: Projection | undefined = undefined
+  if (gcpProjectionDefinition) {
+    gcpProjection = {
+      definition: gcpProjectionDefinition
     }
   }
-  return projection
+  return gcpProjection
 }
 
-export function parseInternalProjectionDefinitionFromGcpString(
+export function parseGcpProjectionDefinitionFromGcpString(
   gcpString: string
 ): string | undefined {
   const lines = gcpString.trim().split('\n')
 
   if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
-    return parseInternalProjectionDefinitionFromLine(lines[0])
+    return parseGcpProjectionDefinitionFromLine(lines[0])
   }
   return undefined
 }
 
-export function parseInternalProjectionDefinitionFromLine(
+export function parseGcpProjectionDefinitionFromLine(
   line: string
 ): string | undefined {
   if (line.slice(0, 4) === '#CRS') {
-    const internalProjectionDefinition = line.slice(5)
-    if (internalProjectionDefinition.length > 0) {
-      return internalProjectionDefinition
+    const gcpProjectionDefinition = line.slice(6)
+    if (gcpProjectionDefinition.length > 0) {
+      return gcpProjectionDefinition
     }
   }
   return undefined
+}
+
+export function parseGcpFileFormatFromGcpString(
+  lines: string[]
+): GcpFileFormat {
+  if (lines.find((line) => line.slice(0, 4) === 'mapX') != undefined) {
+    return 'qgis'
+  } else if (lines[0].split(',').length >= 5) {
+    return 'arcgis-csv'
+  } else if (lines[0].split(/\t+/).length >= 4) {
+    return 'arcgis-tsv'
+  } else if (lines[0].split(/\ +/).length >= 2) {
+    // Note: split on spaces specifically instead of /\s+/
+    // to prevent false positive of ArcGIS TSV file
+    return 'gdal'
+  } else {
+    throw 'Unrecognised GCP file format while guessing from GCP string'
+  }
 }
 
 function coordinateArrayToGcp(coordinateArray: number[]): Gcp {

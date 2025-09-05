@@ -52,11 +52,7 @@ export function geotiff() {
               'Path to a JSON file containing filenames of images to be used. See https://github.com/allmaps/allmaps/tree/develop/apps/cli#specifying-image-filenames for details'
             ).conflicts('source-dir')
           )
-      ),
-      { projectionDefinition: 'EPSG:3857' }
-      // Note: here we overwrite the CLI's default projection
-      // from lonLatProjection to webMercatorProjection like elsewere in Allmaps
-      // so as to obtain the same geotiff results as in e.g. render and Viewer
+      )
     )
   )
 
@@ -80,7 +76,7 @@ export function geotiff() {
     // TODO: consider adding possibility to override map options like resourceMask, height, ...
     const projectedTransformers: ProjectedGcpTransformer[] = []
     for (const map of maps) {
-      const { gcps, transformationType, internalProjection } =
+      const { gcps, transformationType, internalProjection, projection } =
         parseProjectedGcpTransformerInputOptionsAndMap(options, map)
 
       const projectedGcpTransformerOptions = mergeOptionsUnlessUndefined(
@@ -88,7 +84,7 @@ export function geotiff() {
           partialProjectedGcpTransformerOptions,
           partialProjectedGcpTransformOptions
         ),
-        { internalProjection }
+        { internalProjection, projection }
       )
 
       if (gcps === undefined) {

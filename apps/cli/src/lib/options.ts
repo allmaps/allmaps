@@ -1,6 +1,11 @@
 import { defaultProjectedGcpTransformOptions } from '@allmaps/project'
 
 import type { Command, OptionValues } from '@commander-js/extra-typings'
+import {
+  parseCommanderGcpFileFormatOption,
+  parseCommanderGcpResourceOrigin,
+  parseCommanderGcpResourceYAxis
+} from './parse.js'
 
 export function addAnnotationOptions<
   Args extends unknown[] = [],
@@ -51,7 +56,35 @@ export function addProjectedGcpTransformerInputOptions<
       '-g, --gcps <filename>',
       'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).'
     )
-    .option('--gcp-file-format <gcpFileFormat>', 'GCP file format.', 'gdal')
+    .option(
+      '--gcp-file-format <gcpFileFormat>',
+      'GCP file format.',
+      parseCommanderGcpFileFormatOption
+    )
+    .option(
+      '--gcp-resource-origin <gcpResourceOrigin>',
+      'Resource origin in the GCP file: "bottom-left" or "top-left".',
+      parseCommanderGcpResourceOrigin
+    )
+    .option(
+      '--gcp-resource-y-axis <gcpResourceYAxis>',
+      'Y axis orientation in the GCP file: "up" or "down".',
+      parseCommanderGcpResourceYAxis
+    )
+    .option(
+      '--gcp-resource-width <number>',
+      'Resource width in the GCP file. Can be different the resource width of the map, if the GCPs were created from the same image but on a different scale.',
+      parseFloat
+    )
+    .option(
+      '--gcp-resource-height <number>',
+      'Resource height in the GCP file. Can be different the resource height of the map, if the GCPs were created from the same image but on a different scale.',
+      parseFloat
+    )
+    .option(
+      '--gcp-projection-definition <proj4string>',
+      `The geographic projection used in the GCP file.`
+    )
     .option(
       '-t, --transformation-type <type>',
       'Transformation type. One of "polynomial", "thinPlateSpline", "linear", "helmert", "projective". ' +
@@ -66,21 +99,17 @@ export function addProjectedGcpTransformerInputOptions<
       '--internal-projection-definition <proj4string>',
       `The geographic projection used internally in the transformation.`
     )
+    .option(
+      '--projection-definition <proj4string>',
+      `The geographic projection rendered in the viewport.`
+    )
 }
 
 export function addProjectedGcpTransformOptions<
   Args extends unknown[] = [],
   Opts extends OptionValues = Record<string, unknown>,
   GlobalOpts extends OptionValues = Record<string, unknown>
->(
-  command: Command<Args, Opts, GlobalOpts>,
-  defaultOptions: { projectionDefinition: string } = {
-    projectionDefinition: 'EPSG:4326'
-    // Note: in the CLI the default projection is the lonLatProjection
-    // so as to produce e.g. GeoJSON output,
-    // and not webMercatorProjection like elsewere in Allmaps
-  }
-) {
+>(command: Command<Args, Opts, GlobalOpts>) {
   return command
     .option(
       '-m, --max-depth <number>',
@@ -105,11 +134,6 @@ export function addProjectedGcpTransformOptions<
     .option(
       '--geo-is-geographic',
       `Use geographic distances and midpoints for lon-lat geo points.`
-    )
-    .option(
-      '--projection-definition <proj4string>',
-      `The geographic projection rendered in the viewport.`,
-      defaultOptions.projectionDefinition
     )
 }
 

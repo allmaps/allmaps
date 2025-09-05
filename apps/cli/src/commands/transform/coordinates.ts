@@ -1,6 +1,6 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { ProjectedGcpTransformer } from '@allmaps/project'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import {
   mergeOptionsUnlessUndefined,
   mergePartialOptions
@@ -53,7 +53,7 @@ This command was inspired by gdaltransform.`
   )
 
   return command.action(async (files, options) => {
-    const { gcps, transformationType, internalProjection } =
+    let { gcps, transformationType, internalProjection, projection } =
       parseProjectedGcpTransformerInputOptions(options)
     const partialProjectedGcpTransformerOptions =
       parseProjectedGcpTransformerOptions(options)
@@ -64,6 +64,9 @@ This command was inspired by gdaltransform.`
     if (gcps === undefined) {
       throw new Error(mustContainGcpsMessage)
     }
+    if (projection === undefined) {
+      projection = lonLatProjection
+    }
 
     const projectedTransformer = new ProjectedGcpTransformer(
       gcps,
@@ -73,7 +76,7 @@ This command was inspired by gdaltransform.`
           partialProjectedGcpTransformerOptions,
           partialProjectedGcpTransformOptions
         ),
-        { internalProjection }
+        { internalProjection, projection }
       )
     )
 
