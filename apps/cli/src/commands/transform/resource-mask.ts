@@ -48,8 +48,11 @@ export function resourceMask() {
 
     const features = []
     for (const map of maps) {
-      let { gcps, transformationType, internalProjection, projection } =
+      const projectedGcpTransformerInputOptions =
         parseProjectedGcpTransformerInputOptionsAndMap(options, map)
+      const { gcps, transformationType, internalProjection } =
+        projectedGcpTransformerInputOptions
+      let { projection } = projectedGcpTransformerInputOptions
 
       if (gcps === undefined) {
         throw new Error(mustContainGcpsMessage)

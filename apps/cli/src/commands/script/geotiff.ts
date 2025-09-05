@@ -1,7 +1,5 @@
 import { Command, Option } from '@commander-js/extra-typings'
 
-import fs from 'fs'
-
 import { ProjectedGcpTransformer } from '@allmaps/project'
 import {
   mergeOptions,
@@ -63,13 +61,6 @@ export function geotiff() {
       parseProjectedGcpTransformerOptions(options)
     const partialProjectedGcpTransformOptions =
       parseProjectedGcpTransformOptions(options)
-
-    let imageFilenames: { [key: string]: string } = {}
-    if (options.imageFilenamesFile) {
-      imageFilenames = JSON.parse(
-        fs.readFileSync(options.imageFilenamesFile, 'utf-8')
-      )
-    }
 
     // Create projected transformers from options rather then from maps,
     // since options can overwrite map properties

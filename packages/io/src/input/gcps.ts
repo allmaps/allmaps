@@ -249,7 +249,7 @@ export function parseGcpFileFormatFromGcpString(
     return 'arcgis-csv'
   } else if (lines[0].split(/\t+/).length >= 4) {
     return 'arcgis-tsv'
-  } else if (lines[0].split(/\ +/).length >= 2) {
+  } else if (lines[0].split(/ +/).length >= 2) {
     // Note: split on spaces specifically instead of /\s+/
     // to prevent false positive of ArcGIS TSV file
     return 'gdal'
