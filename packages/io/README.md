@@ -118,7 +118,9 @@ mapX,mapY,sourceX,sourceY,enable,dX,dY,residual
 2997626.6441897955,4852265.50079984,1765,1737,1,-0.0000000000039222,0.00000000030794922,0.0000000003079742
 ```
 
-Column order is `gcpProjectedGeoX`, `gcpProjectedGeoY`, `resourceX`, `resourceY`. Resource origin is in the upper left of the image, and resource y-axis is pointing up (with negative `resourceY` coordinates so as to assure equal handedness of the resource and projectedGeo axis). The first line may specify a CRS in WKT format, in which case projected coordinates are read in this CRS and this CRS is passed as an `gcpProjection`.
+Column order is `gcpProjectedGeoX`, `gcpProjectedGeoY`, `resourceX`, `resourceY`. Resource origin is in the upper left of the image, and resource y-axis is pointing up (with negative `resourceY` coordinates so as to assure equal handedness of the resource and projectedGeo axis).
+
+The first line may specify a CRS in WKT format (proj4string not supported currently). When reading this format the CRS in this first line is parsed and returned via the `gcpProjection` and the GCPs are parsed using this CRS. When printing to this format the `gcpProjection` option's definition is printed as this CRS. Since only a WKT format is supported, avoid passing a projection whose definition is a proj4string.
 
 ### ESRI CSV files
 

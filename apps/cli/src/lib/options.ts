@@ -82,7 +82,7 @@ export function addProjectedGcpTransformerInputOptions<
       parseFloat
     )
     .option(
-      '--gcp-projection-definition <proj4string>',
+      '--gcp-projection-definition <proj4stringOrWktDefinition>',
       `The geographic projection used in the GCP file.`
     )
     .option(
@@ -96,11 +96,11 @@ export function addProjectedGcpTransformerInputOptions<
       parseInt
     )
     .option(
-      '--internal-projection-definition <proj4string>',
+      '--internal-projection-definition <proj4stringOrWktDefinition>',
       `The geographic projection used internally in the transformation.`
     )
     .option(
-      '--projection-definition <proj4string>',
+      '--projection-definition <proj4stringOrWktDefinition>',
       `The geographic projection rendered in the viewport.`
     )
 }

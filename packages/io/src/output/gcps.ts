@@ -186,9 +186,9 @@ export function printQgisHeader(
   if (options && options.gcpProjection) {
     // Note: for optimal interaction with QGIS the CRS in this header
     // is ideally a EPSG defintion (of which only 'EPSG:4326' and 'EPSG:3857'
-    // are supported by default in proj4) or a WKT definition.
+    // are supported by default in Proj4JS) or a WKT definition (and not a proj4string).
     // In most cases this will depend on the user input, but in the default case
-    // 'EPSG:3857' is recognised better by QGIS then it's proj4string.
+    // 'EPSG:3857' is recognised by QGIS and it's proj4string isn't.
     headerLines.push('#CRS: ' + options.gcpProjection.definition)
   }
   headerLines.push('mapX,mapY,sourceX,sourceY')
