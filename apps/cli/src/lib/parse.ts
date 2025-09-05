@@ -154,7 +154,8 @@ export function mergeAnnotationInputsInMap(
   mergeOptionsUnlessUndefined(map, {
     resourceMask: annotationInputs?.resourceMask,
     gcps: annotationInputs?.gcps,
-    resourceCrs: annotationInputs?.internalProjection
+    resourceCrs:
+      annotationInputs?.internalProjection ?? annotationInputs?.gcpProjection
   })
   return map
 }

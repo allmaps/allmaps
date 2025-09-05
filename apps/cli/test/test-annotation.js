@@ -83,6 +83,17 @@ describe('allmaps annotation parse', () => {
     expect(expected).to.deep.equal(output)
   })
 
+  it("should read a Georeference Annotation from a file, apply custom GCPs from another Georeference Annotation and convert it to Allmaps' internal format", () => {
+    const expected = readFileJson(
+      'output/maps/7a69f9470b49a744-custom-gcps-annotation.json'
+    )
+    const output = execJson(
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/annotations/813b0579711371e2.json'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
   it("should read a Georeference Annotation from a file, apply custom QGIS GCPs and convert it to Allmaps' internal format", () => {
     const expected = readFileJson(
       'output/maps/7a69f9470b49a744-custom-gcps.json'
@@ -105,12 +116,23 @@ describe('allmaps annotation parse', () => {
     expect(expected).to.deep.equal(output)
   })
 
-  it("should read a Georeference Annotation from a file, apply custom GCPs from another Georeference Annotation and convert it to Allmaps' internal format", () => {
+  it("should read a Georeference Annotation from a file, apply custom ArcGIS CSV GCPs and convert it to Allmaps' internal format", () => {
     const expected = readFileJson(
-      'output/maps/7a69f9470b49a744-custom-gcps-annotation.json'
+      'output/maps/7a69f9470b49a744-custom-gcps.json'
     )
     const output = execJson(
-      'annotation parse input/annotations/7a69f9470b49a744.json -g input/annotations/813b0579711371e2.json'
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-arcgis-csv.csv'
+    )
+
+    expect(expected).to.deep.equal(output)
+  })
+
+  it("should read a Georeference Annotation from a file, apply custom ArcGIS CSV GCPs with specified projection and convert it to Allmaps' internal format", () => {
+    const expected = readFileJson(
+      'output/maps/7a69f9470b49a744-custom-gcps-resource-crs.json'
+    )
+    const output = execJson(
+      'annotation parse input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-arcgis-csv-projection.csv --gcp-projection-definition \'PROJCS["ETRS89-extended / LAEA Europe",GEOGCS["ETRS89",DATUM["European_Terrestrial_Reference_System_1989",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6258"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4258"]],PROJECTION["Lambert_Azimuthal_Equal_Area"],PARAMETER["latitude_of_center",52],PARAMETER["longitude_of_center",10],PARAMETER["false_easting",4321000],PARAMETER["false_northing",3210000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","3035"]]\''
     )
 
     expect(expected).to.deep.equal(output)

@@ -29,6 +29,9 @@
         "order": 1
       }
     },
+    "resourceCrs": {
+      "definition": "EPSG:3857"
+    },
     "features": [
       {
         "type": "Feature",
