@@ -43,7 +43,7 @@
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "@kninnug/constrainautor": "^4.0.0",
+    "@kninnug/constrainautor": "^4.0.1",
     "delaunator": "^5.0.1",
     "point-in-polygon-hao": "^1.2.4"
   },

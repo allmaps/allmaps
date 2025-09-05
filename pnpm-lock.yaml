@@ -1781,8 +1781,8 @@ importers:
         specifier: workspace:^
         version: link:../types
       '@kninnug/constrainautor':
-        specifier: ^4.0.0
-        version: 4.0.0
+        specifier: ^4.0.1
+        version: 4.0.1
       delaunator:
         specifier: ^5.0.1
         version: 5.0.1
@@ -3109,8 +3109,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@kninnug/constrainautor@4.0.0':
-    resolution: {integrity: sha512-tIlqPYscvULOA4jkAYxczIXm8bX7t9h2cvnE0p5KYHVQai58XkjoxCWRDhdmEEub/pLurFKdhWmuJrOxKD1qzw==}
+  '@kninnug/constrainautor@4.0.1':
+    resolution: {integrity: sha512-wVnev6bmVBY3GjZeaDK+SQFIc2crpLQAmb5nYUVy/QtYUBz0masTji20XToVXfym7WgpaRFHDhcyX15CMhND8w==}
 
   '@lerna-lite/cli@4.5.1':
     resolution: {integrity: sha512-yNc2c1Fc1Gwcax9zNYoDpuxnaUk8j/o8cwvVtISkbTQfElXd9OG4zsiuFnh7XVIFfeTzH47fwV+Jlri2AUH4Ug==}
@@ -10072,7 +10072,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@kninnug/constrainautor@4.0.0':
+  '@kninnug/constrainautor@4.0.1':
     dependencies:
       robust-predicates: 3.0.2
 
