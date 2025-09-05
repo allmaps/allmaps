@@ -81,7 +81,6 @@ const { gcps, gcpProjection } = parseGcps(gcpString)
 
 GCPs are expected in "EPSG:4326" by default, but their projection can be specified in a QGIS GCP file format or via the options.
 
-
 ## GCP file formats
 
 The following GCP file formats are supported for reading and writing:
@@ -392,9 +391,11 @@ The resource height must specified when parsing GCPs with resource origin in bot
 
 Print GCPs to file string.
 
-A projection can be specified files to print files.
+A projection can be specified files to print files,
+and will be infered from the map's resourceCrs by default.
 It's definition will be included in QGIS GCP files.
-The resource height must specified to parse ArcGIS files.
+The resource height must specified when parsing GCPs with resource origin in bottom left,
+and will be infered from the map by default.
 
 ###### Parameters
 

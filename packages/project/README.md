@@ -379,7 +379,7 @@ MIT
 ###### Type
 
 ```ts
-{projection: Projection} & {
+ProjectionInputs & {
   maxDepth: number
   minOffsetRatio: number
   minOffsetDistance: number
@@ -548,7 +548,10 @@ A Projected GCP Transformer (`ProjectedGcpTransformer`).
 ###### Type
 
 ```ts
-GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
+GcpsInputs &
+  TransformationTypeInputs &
+  InternalProjectionInputs &
+  ProjectionInputs
 ```
 
 ### `ProjectedGcpTransformerOptions`
@@ -565,6 +568,12 @@ GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
 
 * `definition` (`string`)
 * `name?` (`string`)
+
+### `ProjectionInputs`
+
+###### Fields
+
+* `projection?` (`{name?: string; definition: ProjectionDefinition}`)
 
 ### `defaultProjectedGcpTransformOptions`
 
