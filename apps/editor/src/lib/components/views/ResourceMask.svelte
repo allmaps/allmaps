@@ -2,42 +2,37 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  import OLMap from 'ol/Map'
-  import Feature from 'ol/Feature'
-  import View from 'ol/View'
-  import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer'
-  import { Draw, Modify } from 'ol/interaction'
-  import { Polygon } from 'ol/geom'
-  import { Vector as VectorSource } from 'ol/source'
-  import IIIF from 'ol/source/IIIF'
-  import IIIFInfo, { type ImageInformationResponse } from 'ol/format/IIIFInfo'
+  import { Map as MapLibreMap } from 'maplibre-gl'
+
+  import { TerraDraw, TerraDrawPolygonMode } from 'terra-draw'
+  import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter'
 
   import { X as XIcon, Check as CheckIcon } from 'phosphor-svelte'
 
-  import { generateId, generateRandomId } from '@allmaps/id'
+  import { pink } from '@allmaps/tailwind'
+  import { computeBbox } from '@allmaps/stdlib'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
-  import { getImageInfoState } from '$lib/state/image-info.svelte.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import {
-    resourceMaskToPolygon,
-    getResourceMaskFromFeature,
-    deleteCondition,
-    editableResourceMaskStyle,
-    makeFeatureActive,
-    getResolutions
-  } from '$lib/shared/openlayers.js'
-  import { getResourceMask } from '$lib/shared/maps.js'
+  import { generateId } from '$lib/shared/id.js'
   import { polygonDifference } from '$lib/shared/geometry.js'
+  import { getResourceMask } from '$lib/shared/maps.js'
+  import { roundWithDecimals } from '$lib/shared/math.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
+  import { idStrategy, ensureStringId } from '$lib/shared/terra-draw.js'
 
-  import type { VectorSourceEvent } from 'ol/source/Vector'
-  import type { DrawEvent } from 'ol/interaction/Draw'
-  import type { ModifyEvent } from 'ol/interaction/Modify'
+  import type { GeoJSONStoreFeatures } from 'terra-draw'
+  import type { LngLatBoundsLike } from 'maplibre-gl'
+
+  import type { GcpTransformer } from '@allmaps/transform'
+
+  import type { DbImageService, DbMap3, ResourceMask } from '$lib/types/maps.js'
+
+  import Resource from '$lib/components/maplibre/Resource.svelte'
 
   import type {
     InsertMapEvent,
@@ -47,167 +42,246 @@
     RemoveResourceMaskPointEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
-  import type { DbImageService, DbMap, ResourceMask } from '$lib/types/maps.js'
 
-  import { OL_RESOURCE_PADDING } from '$lib/shared/constants.js'
+  import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
 
-  let resourceOlMapTarget: HTMLDivElement
-  let resourceOlMap: OLMap
-  let resourceTileLayer: TileLayer<IIIF>
-  let resourceVectorSource: VectorSource<Feature<Polygon>> | undefined
+  import 'maplibre-gl/dist/maplibre-gl.css'
 
-  let resourceDraw: Draw
-  let resourceModify: Modify
+  const sourceState = getSourceState()
+  const mapsState = getMapsState()
+  const viewportsState = getViewportsState()
+  const uiState = getUiState()
+
+  let resourceMap = $state.raw<MapLibreMap>()
+  let transformer = $state.raw<GcpTransformer>()
+  let bounds = $state.raw<LngLatBoundsLike>()
+
+  let polygonMode: TerraDrawPolygonMode | undefined
+  let resourceDraw: TerraDraw | undefined
+
+  let resourceMapReady = $state(false)
+
+  let mapsInitialized = $state(false)
+  let isDrawing = $state(false)
+  let canFinishDrawing = $state(true)
 
   let currentMapsImageId = $state<string>()
   let currentDisplayImageId = $state<string>()
 
-  let isDrawing = $state(false)
-  let canFinishDrawing = $state(false)
-  let drawingFeature = $state<Feature<Polygon>>()
+  let activeMapId = $state<string>()
 
-  let resourceMaskBeforeModify: ResourceMask | undefined
-
-  const sourceState = getSourceState()
-  const mapsState = getMapsState()
-  const imageInfoState = getImageInfoState()
-  const viewportsState = getViewportsState()
-  const uiState = getUiState()
-
-  function handleDrawStart(event: DrawEvent) {
-    isDrawing = true
-    drawingFeature = event.feature as Feature<Polygon>
-    drawingFeature.on('change', handleDrawingFeatureGeometryChange)
-  }
-
-  function handleDrawingFeatureGeometryChange() {
-    const geom = drawingFeature?.getGeometry()
-    const coordinates = geom?.getCoordinates()[0] || []
-    canFinishDrawing = coordinates.length > 4
-  }
-
-  function handleDrawEnd() {
-    isDrawing = false
-    drawingFeature = undefined
-    canFinishDrawing = false
-  }
-
-  async function handleAddFeature(event: VectorSourceEvent) {
-    const feature = event.feature
-    if (feature) {
-      if (feature.getId()) {
-        return
-      }
-
-      const resourceMask = getResourceMaskFromFeature(
-        feature as Feature<Polygon>
+  function handleLastClickedItem(event: ClickedItemEvent) {
+    if (resourceDraw && event.detail.type === 'map') {
+      const resourceFeature = resourceDraw.getSnapshotFeature(
+        event.detail.mapId
       )
 
-      if (!resourceMask) {
-        console.error('No resource mask!')
-        return
+      if (resourceFeature) {
+        const bbox = computeBbox(resourceFeature.geometry)
+
+        resourceMap?.fitBounds(bbox, {
+          duration: 200,
+          padding: MAPLIBRE_PADDING
+        })
       }
+    }
+  }
 
-      const mapId = await generateRandomId()
-      feature.setId(mapId)
+  function saveViewport() {
+    if (resourceMap && currentDisplayImageId) {
+      const resourceZoom = resourceMap.getZoom()
+      const resourceCenter = resourceMap.getCenter().toArray()
+      const resourceBearing = resourceMap.getBearing()
 
-      feature.setProperties({
-        index: mapsState.mapsCount
-      })
-
-      const image = sourceState.activeImage
-
-      if (!image) {
-        console.error('No active image!')
-        return
-      }
-
-      const allmapsId = await generateId(image.uri)
-
-      let resourceType: DbImageService = 'ImageService1' as const
-      if (image.majorVersion === 2) {
-        resourceType = 'ImageService2' as const
-      } else if (image.majorVersion === 3) {
-        resourceType = 'ImageService3' as const
-      }
-
-      mapsState.insertMap({
-        mapId,
-        map: {
-          id: mapId,
-          version: 3,
-          index: mapsState.mapsCount + Math.random(),
-          gcps: {},
-          resource: {
-            id: allmapsId,
-            uri: image.uri,
-            type: resourceType,
-            width: image.width,
-            height: image.height
-          },
-          resourceMask
+      viewportsState.saveViewport(
+        { imageId: currentDisplayImageId, view: 'mask' },
+        {
+          zoom: resourceZoom,
+          center: resourceCenter,
+          bearing: resourceBearing
         }
-      })
-    }
-  }
-
-  function handleModifyStart(event: ModifyEvent) {
-    const feature = event.features.item(0)
-    const featureId = feature.getId()
-
-    if (!featureId) {
-      throw new Error('Feature has no ID!')
-    }
-
-    const mapId = String(featureId)
-
-    makeResourceMaskFeatureActive(mapId)
-
-    if (feature) {
-      resourceMaskBeforeModify = getResourceMaskFromFeature(
-        feature as Feature<Polygon>
       )
     }
   }
 
-  function handleModifyEnd(event: ModifyEvent) {
-    if (!resourceMaskBeforeModify) {
-      console.error('No resource mask before modify!')
+  export function getResourceMaskFromFeature(
+    transformer: GcpTransformer,
+    feature: GeoJSONStoreFeatures
+  ): ResourceMask {
+    if (feature.geometry.type !== 'Polygon') {
+      throw new Error('Feature is not a polygon!')
+    }
+
+    const coordinates = feature.geometry.coordinates[0] as [number, number][]
+    const geoCoordinates = transformer.transformToResource(coordinates)
+
+    const resourceMask = geoCoordinates
+      .slice(0, -1)
+      .map((coordinate) => [
+        Math.round(coordinate[0]),
+        Math.round(coordinate[1])
+      ]) as ResourceMask
+
+    return resourceMask
+  }
+
+  function createFeature(transformer: GcpTransformer, map: DbMap3) {
+    const resourceMask = getResourceMask(map)
+
+    if (resourceMask.length < 3) {
+      throw new Error('Resource mask is must have 3 or more vertices')
+    }
+
+    const geoCoordinates = transformer
+      .transformToGeo([...resourceMask, resourceMask[0]])
+      .map((coordinate) =>
+        coordinate.map((number) => roundWithDecimals(number, 9))
+      )
+
+    return {
+      type: 'Feature' as const,
+      id: map.id,
+      geometry: {
+        type: 'Polygon' as const,
+        coordinates: [geoCoordinates]
+      },
+      properties: {
+        mode: 'polygon',
+        index: map.index || 0
+      }
+    }
+  }
+
+  function addFeature(
+    transformer: GcpTransformer,
+    resourceDraw: TerraDraw,
+    map: DbMap3
+  ) {
+    const feature = createFeature(transformer, map)
+    resourceDraw.addFeatures([feature])
+  }
+
+  function makeResourceMaskFeatureActive(mapId?: string, redraw = false) {
+    activeMapId = mapId
+
+    if (resourceDraw && redraw) {
+      resourceDraw.updateModeOptions('polygon', getModeOptions())
+    }
+  }
+
+  function getPolygonFeature(
+    resourceDraw: TerraDraw,
+    terraDrawId: string | number
+  ) {
+    const feature = resourceDraw.getSnapshotFeature(terraDrawId)
+
+    if (feature && feature.geometry.type === 'Polygon') {
+      return feature
+    }
+  }
+
+  function initializeMaps(
+    transformer: GcpTransformer,
+    resourceDraw: TerraDraw,
+    maps: DbMap3[]
+  ) {
+    mapsInitialized = false
+
+    resourceDraw.clear()
+    maps.forEach((map) => addFeature(transformer, resourceDraw, map))
+
+    currentMapsImageId = mapsState.connectedImageId
+
+    const resourceViewport = viewportsState.getViewport({
+      imageId: currentMapsImageId,
+      view: 'mask'
+    })
+
+    if (resourceViewport) {
+      resourceMap?.flyTo({
+        ...resourceViewport,
+        duration: 0,
+        padding: MAPLIBRE_PADDING
+      })
+    } else if (bounds) {
+      resourceMap?.fitBounds(bounds, {
+        duration: 0,
+        padding: MAPLIBRE_PADDING
+      })
+    }
+
+    mapsInitialized = true
+  }
+
+  function replaceFeatureFromState(mapId: string) {
+    if (!resourceDraw) {
+      console.error('No resource draw!')
       return
     }
 
-    if (event.features.getLength() > 1) {
-      console.error('Multiple masks edited at once!')
-    } else if (event.features.getLength() === 0) {
+    const map = mapsState?.maps?.find((map) => map.id === mapId)
+
+    if (map && transformer) {
+      resourceDraw.removeFeatures([mapId])
+
+      addFeature(transformer, resourceDraw, map)
+    }
+  }
+
+  function handleDrawChange(
+    ids: (string | number)[],
+    type: string,
+    context?: { origin: 'api' }
+  ) {
+    if (ids.length === 1) {
+      const hasApiOrigin = context && context.origin === 'api'
+
+      if (type === 'update') {
+        const mapId = ensureStringId(ids[0])
+
+        if (mapId) {
+          makeResourceMaskFeatureActive(mapId)
+        }
+      } else if (type === 'create') {
+        const mapId = ids[0]
+        const feature = resourceDraw?.getSnapshotFeature(mapId)
+
+        if (!hasApiOrigin) {
+          isDrawing = true
+        }
+      } else if (type === 'delete') {
+        if (!hasApiOrigin) {
+          isDrawing = false
+        }
+      }
+    }
+  }
+
+  async function handleFeatureEdited(
+    transformer: GcpTransformer,
+    feature: GeoJSONStoreFeatures
+  ) {
+    const mapId = ensureStringId(feature.id)
+
+    if (!mapId) {
+      console.error('No Allmaps ID found!')
       return
     }
 
-    const feature = event.features.item(0)
+    const map = mapsState.getMapById(mapId)
 
-    const resourceMaskAfterModify = getResourceMaskFromFeature(
-      feature as Feature<Polygon>
-    )
-
-    if (!resourceMaskAfterModify) {
-      console.error('No resource mask after modify!')
+    if (!map) {
+      console.error('No map found with ID', mapId)
       return
     }
 
-    const mapId = feature.getId()
+    const resourceMaskCurrent = getResourceMask(map)
+    const resourceMaskEdited = getResourceMaskFromFeature(transformer, feature)
 
-    if (typeof mapId !== 'string') {
-      console.error('Feature has an invalid ID!')
-      return
-    }
-
-    const diff = polygonDifference(
-      resourceMaskBeforeModify,
-      resourceMaskAfterModify
-    )
+    const diff = polygonDifference(resourceMaskCurrent, resourceMaskEdited)
 
     if (diff) {
       const { operation, index, point } = diff
-
       if (operation === 'insert') {
         mapsState.insertResourceMaskPoint({
           mapId,
@@ -227,133 +301,101 @@
         })
       }
     }
-
-    resourceMaskBeforeModify = undefined
   }
 
-  function makeResourceMaskFeatureActive(mapId: string | undefined) {
-    if (resourceVectorSource) {
-      const features = resourceVectorSource.getFeatures()
-      makeFeatureActive(features, mapId)
+  async function handleFeatureDrawn(
+    transformer: GcpTransformer,
+    feature: GeoJSONStoreFeatures
+  ) {
+    if (!transformer) {
+      throw new Error('No transformer!')
     }
-  }
 
-  async function updateImage(imageId: string | undefined) {
-    if (currentDisplayImageId === imageId) {
+    const mapId = ensureStringId(feature.id)
+    const resourceMask = getResourceMaskFromFeature(transformer, feature)
+
+    const image = sourceState.activeImage
+
+    if (!image) {
+      console.error('No active image!')
       return
     }
 
-    if (currentDisplayImageId) {
-      saveViewport()
+    const allmapsId = generateId(image.uri)
+
+    let resourceType: DbImageService = 'ImageService1' as const
+    if (image.majorVersion === 2) {
+      resourceType = 'ImageService2' as const
+    } else if (image.majorVersion === 3) {
+      resourceType = 'ImageService3' as const
     }
 
-    currentDisplayImageId = imageId
-
-    if (resourceVectorSource) {
-      resourceVectorSource.clear()
-    }
-
-    if (imageId) {
-      const imageInfo = (await imageInfoState.fetchImageInfo(
-        imageId
-      )) as ImageInformationResponse
-
-      const options = new IIIFInfo(imageInfo).getTileSourceOptions()
-      if (options === undefined || options.version === undefined) {
-        throw new Error('Data seems to be no valid IIIF image information.')
+    mapsState.insertMap({
+      mapId,
+      map: {
+        id: mapId,
+        version: 3,
+        index: mapsState.mapsCount + Math.random(),
+        gcps: {},
+        resource: {
+          id: allmapsId,
+          uri: image.uri,
+          type: resourceType,
+          width: image.width,
+          height: image.height
+        },
+        resourceMask
       }
-
-      options.zDirection = -1
-      const resourceIiifSource = new IIIF(options)
-      resourceTileLayer.setSource(resourceIiifSource)
-
-      const tileGrid = resourceIiifSource.getTileGrid()
-
-      const resourceViewport = viewportsState.getViewport({
-        imageId,
-        view: 'mask'
-      })
-
-      const extent = tileGrid?.getExtent()
-      if (extent && tileGrid) {
-        resourceOlMap.setView(
-          new View({
-            resolutions: getResolutions(tileGrid),
-            extent,
-            constrainOnlyCenter: true,
-            center: resourceViewport?.center,
-            zoom: resourceViewport?.zoom,
-            rotation: resourceViewport?.rotation
-          })
-        )
-
-        if (!resourceViewport) {
-          resourceOlMap.getView().fit(tileGrid.getExtent(), {
-            padding: OL_RESOURCE_PADDING
-          })
-        }
-      }
-    }
-  }
-
-  function addMap(map: DbMap, index: number) {
-    if (!resourceVectorSource) {
-      return
-    }
-
-    const feature = new Feature<Polygon>()
-    feature.setGeometry(
-      new Polygon(resourceMaskToPolygon(getResourceMask(map)))
-    )
-    feature.setProperties({
-      index,
-      active: map.id === mapsState.activeMapId
     })
-
-    feature.setId(map.id)
-    resourceVectorSource.addFeature(feature)
   }
 
-  function initializeMaps(maps: DbMap[]) {
-    if (!resourceVectorSource) {
-      return
+  function handleDrawFinish(
+    id: string | number,
+    context: { action: string; mode: string }
+  ) {
+    if (!transformer) {
+      throw new Error('Transformer not initialized')
     }
 
-    resourceVectorSource.clear()
-
-    maps.forEach(addMap)
-
-    currentMapsImageId = mapsState.connectedImageId
-  }
-
-  function replaceFeatureFromState(mapId: string) {
-    if (!resourceVectorSource) {
-      return
+    if (!resourceDraw) {
+      throw new Error('Terra Draw not initialized')
     }
 
-    const feature = resourceVectorSource.getFeatureById(mapId)
+    const feature = getPolygonFeature(resourceDraw, id)
 
-    const map = mapsState?.maps?.find((map) => map.id === mapId)
+    if (feature) {
+      isDrawing = false
 
-    if (feature && map) {
-      feature.setGeometry(
-        new Polygon(resourceMaskToPolygon(getResourceMask(map)))
-      )
+      if (context.action === 'edit') {
+        handleFeatureEdited(transformer, feature)
+      } else if (context.action === 'draw') {
+        handleFeatureDrawn(transformer, feature)
+      }
     }
   }
 
   function handleInsertMap(event: InsertMapEvent) {
-    addMap(event.detail.map, mapsState.mapsCount)
+    if (!transformer) {
+      console.error('Transformer not initialized')
+      return
+    }
+
+    if (!resourceDraw) {
+      console.error('Terra Draw not initialized')
+      return
+    }
+
+    addFeature(transformer, resourceDraw, event.detail.map)
   }
 
   function handleRemoveMap(event: RemoveMapEvent) {
-    if (resourceVectorSource) {
-      const mapId = event.detail.mapId
-      const feature = resourceVectorSource.getFeatureById(mapId)
-      if (feature) {
-        resourceVectorSource.removeFeature(feature)
-      }
+    if (!resourceDraw) {
+      console.error('Terra Draw not initialized')
+      return
     }
+
+    const mapId = event.detail.mapId
+    resourceDraw.removeFeatures([mapId])
   }
 
   function handleInsertResourceMaskPoint(event: InsertResourceMaskPointEvent) {
@@ -374,126 +416,91 @@
   }
 
   function abortDrawing() {
-    resourceDraw?.abortDrawing()
+    if (polygonMode) {
+      polygonMode.cleanUp()
+    }
   }
 
   function finishDrawing() {
-    if (canFinishDrawing) {
-      resourceDraw?.finishDrawing()
+    if (polygonMode && canFinishDrawing) {
+      // @ts-expect-error ignore private method
+      polygonMode.close()
     }
   }
 
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      abortDrawing()
-    }
-  }
+  function getModeOptions() {
+    return {
+      editable: true,
+      showCoordinatePoints: true,
+      styles: {
+        fillColor: '#ffffff' as `#${string}`,
+        fillOpacity: ({ id }: { id?: number | string }) =>
+          activeMapId === id ? 0.3 : 0,
 
-  function saveViewport() {
-    if (currentDisplayImageId) {
-      const resourceZoom = resourceOlMap.getView().getZoom()
-      const resourceCenter = resourceOlMap.getView().getCenter()
-      const resourceRotation = resourceOlMap.getView().getRotation()
+        outlineColor: pink as `#${string}`,
+        outlineWidth: ({ id }: { id?: number | string }) =>
+          activeMapId === id ? 5 : 2,
+        editedPointWidth: 4,
+        editedPointColor: '#ffffff' as `#${string}`,
+        editedPointOutlineWidth: 3,
+        editedPointOutlineColor: pink,
 
-      if (resourceZoom && resourceCenter) {
-        viewportsState.saveViewport(
-          { imageId: currentDisplayImageId, view: 'mask' },
-          {
-            zoom: resourceZoom,
-            center: resourceCenter,
-            rotation: resourceRotation
-          }
-        )
+        coordinatePointWidth: ({ id }: { id?: number | string }) =>
+          activeMapId === id ? 3 : 2,
+        coordinatePointColor: '#ffffff' as `#${string}`,
+        coordinatePointOutlineWidth: ({ id }: { id?: number | string }) =>
+          activeMapId === id ? 4 : 3,
+        coordinatePointOutlineColor: pink,
+
+        closingPointWidth: 3,
+        closingPointColor: '#ffffff' as `#${string}`,
+        closingPointOutlineWidth: 4,
+        closingPointOutlineColor: pink
       }
     }
   }
 
-  function handleLastClickedItem(event: ClickedItemEvent) {
-    if (resourceOlMap) {
-      const resourceFeature = resourceVectorSource?.getFeatureById(
-        event.detail.mapId
-      )
+  $effect(() => {
+    if (resourceMap) {
+      polygonMode = new TerraDrawPolygonMode(getModeOptions())
 
-      const resourceGeometry = resourceFeature?.getGeometry()
-      if (resourceGeometry) {
-        resourceOlMap.getView().fit(resourceGeometry, {
-          duration: 200,
-          padding: [25, 25, 25, 25]
-        })
-      }
+      resourceDraw = new TerraDraw({
+        adapter: new TerraDrawMapLibreGLAdapter({
+          map: resourceMap
+        }),
+        modes: [polygonMode],
+        idStrategy
+      })
+
+      resourceDraw.start()
+      resourceDraw.setMode('polygon')
+      resourceDraw.on('change', handleDrawChange)
+      resourceDraw.on('finish', handleDrawFinish)
+
+      resourceMapReady = true
     }
-  }
+  })
+
+  $effect(() => {
+    if (mapsState.activeMapId) {
+      makeResourceMaskFeatureActive(mapsState.activeMapId, true)
+    }
+  })
+
+  $effect(() => {
+    if (
+      resourceMapReady &&
+      transformer &&
+      resourceDraw &&
+      mapsState.connected === true &&
+      mapsState.connectedImageId !== currentMapsImageId
+    ) {
+      initializeMaps(transformer, resourceDraw, mapsState.maps)
+    }
+  })
 
   onMount(() => {
-    resourceTileLayer = new TileLayer()
-    resourceVectorSource = new VectorSource()
-
-    const resourceVectorLayer = new VectorLayer({
-      source: resourceVectorSource,
-      style: editableResourceMaskStyle
-    })
-
-    resourceOlMap = new OLMap({
-      layers: [resourceTileLayer, resourceVectorLayer],
-      target: resourceOlMapTarget,
-      controls: []
-    })
-
-    resourceModify = new Modify({
-      // @ts-expect-error don't know how to type Modify to only accept Polygon features
-      source: resourceVectorSource,
-      pixelTolerance: 25,
-      deleteCondition
-    })
-
-    resourceDraw = new Draw({
-      // @ts-expect-error don't know how to type Draw to only accept Polygon features
-      source: resourceVectorSource,
-      type: 'Polygon',
-      freehandCondition: () => false
-    })
-
-    resourceDraw.on('drawstart', handleDrawStart)
-    resourceDraw.on('drawend', handleDrawEnd)
-    resourceDraw.on('drawabort', handleDrawEnd)
-    resourceVectorSource.on('addfeature', handleAddFeature)
-    resourceModify.on('modifystart', handleModifyStart)
-    resourceModify.on('modifyend', handleModifyEnd)
-
-    $effect(() => {
-      if (mapsState.connected) {
-        resourceOlMap.addInteraction(resourceDraw)
-        resourceOlMap.addInteraction(resourceModify)
-      } else {
-        resourceOlMap.removeInteraction(resourceDraw)
-        resourceOlMap.removeInteraction(resourceModify)
-      }
-    })
-
-    $effect(() => {
-      if (sourceState.activeImageId) {
-        abortDrawing()
-        updateImage(sourceState.activeImageId)
-      }
-    })
-
-    $effect(() => {
-      if (mapsState.activeMapId) {
-        makeResourceMaskFeatureActive(mapsState.activeMapId)
-      }
-    })
-
     uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
-
-    $effect(() => {
-      if (
-        mapsState.connected === true &&
-        mapsState.maps &&
-        mapsState.connectedImageId !== currentMapsImageId
-      ) {
-        initializeMaps(mapsState.maps)
-      }
-    })
 
     mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
@@ -535,9 +542,9 @@
   })
 </script>
 
-<svelte:body onkeydown={handleKeydown} />
-
-<div bind:this={resourceOlMapTarget} class="w-full h-full">
+<div class="relative w-full h-full">
+  <!-- initialBounds -->
+  <Resource bind:resourceMap bind:transformer bind:bounds />
   {#if isDrawing}
     <div
       transition:fade={{ duration: 50 }}

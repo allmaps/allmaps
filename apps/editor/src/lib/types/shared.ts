@@ -85,8 +85,8 @@ export type Example = {
 
 export type Viewport = {
   zoom: number
-  center: number[]
-  rotation: number
+  center: [number, number]
+  bearing: number
 }
 
 export type PresetBaseMapID = 'esri-world-topo' | 'esri-world-imagery' | 'osm'
