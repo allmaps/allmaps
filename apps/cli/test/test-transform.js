@@ -192,7 +192,7 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
+  it('should read coordinates from a filename and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwritable transformation type', () => {
     const expected = readFile('output/coordinates/coordinates-helmert.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -t helmert',
