@@ -194,7 +194,16 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type', () => {
+  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type helmert', () => {
+    const expected = readFile('output/coordinates/coordinates-helmert.txt')
+    const output = exec(
+      'transform coordinates -a input/annotations/7a69f9470b49a744.json -t helmert',
+      'input/coordinates/coordinates.txt'
+    )
+    expect(expected).to.equal(output)
+  })
+
+  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type polynomial', () => {
     const expected = readFile('output/coordinates/coordinates-polynomial.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -t polynomial',
@@ -205,10 +214,10 @@ describe('allmaps transform coordinates', () => {
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation transformation type but overwritable GCPs', () => {
     const expected = readFile(
-      'output/coordinates/coordinates-tps-other-gcps.txt'
+      'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -a input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-gdal.txt',
+      'transform coordinates -a input/annotations/7a69f9470b49a744.json -g input/gcps/gcps-gdal.txt -t polynomial',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
@@ -216,10 +225,10 @@ describe('allmaps transform coordinates', () => {
 
   it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied transformation type and GCPs, even without a provided annotation', () => {
     const expected = readFile(
-      'output/coordinates/coordinates-tps-other-gcps.txt'
+      'output/coordinates/coordinates-polynomial-other-gcps.txt'
     )
     const output = exec(
-      'transform coordinates -g input/gcps/gcps-gdal.txt -t thinPlateSpline',
+      'transform coordinates -g input/gcps/gcps-gdal.txt -t polynomial',
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
