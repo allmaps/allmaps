@@ -1845,7 +1845,7 @@ importers:
         specifier: workspace:^
         version: link:../types
       '@kninnug/constrainautor':
-        specifier: ^4.0.0
+        specifier: ^4.0.1
         version: 4.0.1
       delaunator:
         specifier: ^5.0.1

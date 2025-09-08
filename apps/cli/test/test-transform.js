@@ -194,7 +194,7 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type helmert', () => {
+  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwritable transformation type helmert', () => {
     const expected = readFile('output/coordinates/coordinates-helmert.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -t helmert',
@@ -203,7 +203,7 @@ describe('allmaps transform coordinates', () => {
     expect(expected).to.equal(output)
   })
 
-  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwrittable transformation type polynomial', () => {
+  it('should read coordinates from a GDAL-like GCP file and transform these coordinates toGeo using the supplied Georeference Annotation GCPs but overwritable transformation type polynomial', () => {
     const expected = readFile('output/coordinates/coordinates-polynomial.txt')
     const output = exec(
       'transform coordinates -a input/annotations/7a69f9470b49a744.json -t polynomial',
