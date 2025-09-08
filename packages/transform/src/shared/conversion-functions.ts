@@ -106,8 +106,8 @@ export function typeAndOrderToTransformationType(transformation: {
   type?: string
   options?: { order?: number }
 }): TransformationType {
-  let type = transformation.type
-  let order = transformation.options?.order
+  const type = transformation.type
+  const order = transformation.options?.order
   let transformationType: TransformationType
   if (type == 'polynomial1' || type === 'polynomial') {
     transformationType = 'polynomial1'

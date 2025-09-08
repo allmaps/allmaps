@@ -158,8 +158,8 @@ export async function getGeoreferencedMapGdalwarpScripts(
       mergedOptions.outputDir,
       mergedOptions.projectedTransformer.interalProjectedGcps,
       mergedOptions.projectedTransformer.type,
-      mergedOptions.projectedTransformer.internalProjection.definition,
-      mergedOptions.projectedTransformer.projection.definition,
+      String(mergedOptions.projectedTransformer.internalProjection.definition),
+      String(mergedOptions.projectedTransformer.projection.definition),
       mergedOptions.jpgQuality,
       geojsonMaskPolygon,
       size
