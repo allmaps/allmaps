@@ -2520,6 +2520,22 @@ This wil result in a weights array for each component with rbf weights and affin
 Array<string>
 ```
 
+### `supportedtransformationTypes`
+
+###### Type
+
+```ts
+Array<
+  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+>
+```
+
 ### `transformationTypeToTypeAndOrder(transformationType)`
 
 ###### Parameters
@@ -2544,6 +2560,6 @@ Array<string>
   | 'polynomial1'
   | 'polynomial2'
   | 'polynomial3'
-  | 'projective'
   | 'thinPlateSpline'
+  | 'projective'
   | 'linear'`.

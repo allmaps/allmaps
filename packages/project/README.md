@@ -569,6 +569,14 @@ GcpsInputs &
 * `definition` (`Definition`)
 * `name?` (`string`)
 
+### `ProjectionDefinition`
+
+###### Type
+
+```ts
+string | PROJJSONDefinition
+```
+
 ### `ProjectionInputs`
 
 ###### Fields

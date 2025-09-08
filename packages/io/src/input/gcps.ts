@@ -32,7 +32,7 @@ export function parseGcps(
     gcpProjection: Projection
   }>
 ): { gcps: Gcp[]; gcpProjection?: Projection } {
-  // For more about these file formats, see https://observablehq.com/d/50deb2a74a628292
+  // For more about these file formats, see https://observablehq.com/d/ccc0f30809e756f6
   const gcpLines = gcpString.trim().split('\n')
 
   if (gcpLines.length === 0) {

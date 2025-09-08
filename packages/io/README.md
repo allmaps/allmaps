@@ -91,9 +91,13 @@ export type gcpFileFormat = 'gdal' | 'qgis' | 'arcgis-csv' | 'arcgis-tsv'
 
 ### GDAL-like files
 
-Such files could have any name or file-extension.
+GDAL doesn't allow loading GCP from files, but `gdal_translate` allows to specify GCPs using argument. The [documentation](https://gdal.org/en/stable/programs/gdal_translate.html#cmdoption-gdal_translate-gcp) about this tells us something about GCPs in GDAL:
 
-```js
+`-gcp <pixel> <line> <easting> <northing> [<elevation>]`
+
+If we follow the same logic, a GDAL GCP file would look like this:
+
+```
 3899 6412 9.9301538 53.5814021
 6584 819 25.4101689 71.0981125
 6491 4782 22.2380717 60.4764844
@@ -103,11 +107,13 @@ Such files could have any name or file-extension.
 
 Column order is `resourceX`, `resourceY`, `gcpProjectedGeoX`, `gcpProjectedGeoY`. Resource origin is in the upper left of the image, and resource y-axis is pointing down.
 
+Since this (simple) format follows the same conventions as other Allmaps packages and as the [Georeference Annotation spec](https://iiif.io/api/extension/georef/), we'll use this format as a default.
+
 ### QGIS Georeferencer files
 
 File format used in [QGIS Georeferencer](https://docs.qgis.org/3.40/en/docs/user_manual/managing_data_source/georeferencer.html). Such files typically have the `.points` file-extension.
 
-```txt
+```
 #CRS: PROJCS["ETRS89-extended / LAEA Europe",GEOGCS["ETRS89",DATUM["European_Terrestrial_Reference_System_1989",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6258"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4258"]],PROJECTION["Lambert_Azimuthal_Equal_Area"],PARAMETER["latitude_of_center",52],PARAMETER["longitude_of_center",10],PARAMETER["false_easting",4321000],PARAMETER["false_northing",3210000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","3035"]]
 mapX,mapY,sourceX,sourceY,enable,dX,dY,residual
 4316373.376414543,3385976.075841331,3899,6412,1,-0.0000000000039222,0.00000000030794922,0.0000000003079742
@@ -123,7 +129,7 @@ The first line may specify a CRS in WKT format (proj4string not supported curren
 
 ### ESRI CSV files
 
-File format used in ArcGIS and [MapAnalyst](https://mapanalyst.org/man/points.html). Such files typically have the `.csv` file-extension.
+File format used in ArcGIS. Such files typically have the `.csv` file-extension.
 
 ```
 1,3899,6412,9.9301538,53.5814021
