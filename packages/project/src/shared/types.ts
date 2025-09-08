@@ -19,13 +19,16 @@ export type ProjectedGcpTransformerOptions = {
   projection: Projection
 } & GcpTransformerOptions
 
-export type ProjectedGcpTransformOptions = {
-  projection: Projection
-} & GcpTransformOptions
+export type ProjectedGcpTransformOptions = ProjectionInputs &
+  GcpTransformOptions
 
+export type ProjectionInputs = {
+  projection?: Projection
+}
 export type InternalProjectionInputs = {
   internalProjection?: Projection
 }
 export type ProjectedGcpTransformerInputs = GcpsInputs &
   TransformationTypeInputs &
-  InternalProjectionInputs
+  InternalProjectionInputs &
+  ProjectionInputs

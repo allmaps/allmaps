@@ -24,7 +24,7 @@ export function mergeOptions<Options0, Options1>(
 }
 
 export function mergeOptionsUnlessUndefined<
-  Options0,
+  Options0 extends Record<string, any>,
   Options1 extends Record<string, any>
 >(
   options0: Options0,

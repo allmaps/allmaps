@@ -4,6 +4,7 @@ import { parse } from './annotation/parse.js'
 import { generate } from './annotation/generate.js'
 import { svg } from './annotation/svg.js'
 import { imageIds } from './annotation/image-ids.js'
+import { gcps } from './annotation/gcps.js'
 
 export function annotation() {
   return new Command('annotation')
@@ -13,4 +14,5 @@ export function annotation() {
     .addCommand(generate())
     .addCommand(svg())
     .addCommand(imageIds())
+    .addCommand(gcps())
 }

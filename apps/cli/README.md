@@ -109,6 +109,9 @@ Parse and validate Georeference Annotations to Georeferenced Maps:
 allmaps annotation parse [files...]
 ```
 
+> [!NOTE]
+> When generating or parsing, any georeferenced map property can be overwritten form the input, using e.g. `-t thinPlateSpline` to overwrite the input transformation type with a Thin Plate Spline.
+
 > [!TIP]
 > Since the `generate` and `parse` commands can take both Georeference Annotations and Georeferenced Maps as input, you can also use these commands to 'join' or 'merge' multiple maps together:
 >
@@ -125,6 +128,18 @@ Output the IDs of the IIIF Images in the input files:
 ```bash
 allmaps annotation image-ids [files...]
 ```
+
+Output the GCPs from the input files. Options allow to set the GCP file format (see [@allmaps/io](../../packages/io/) for supported formats), projection, axis orientation and origin:
+
+```bash
+allmaps annotation gcps [files...]
+```
+
+> [!TIP]
+> GCPs are printed in "EPSG:4326" by default, but their projection can be specified in a QGIS GCP file format or via the options. Use "EPSG:3857", the default projection in [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), to obtain the same result when using printed GCPs in e.g. QGIS.
+>
+> Any other CRS can be used, defined by a proj4string or WKT definition, but only WKT definitions can be parsed by QGIS in it's QGIS file format.
+
 
 ### Parse and generate IIIF resources
 
@@ -143,7 +158,7 @@ allmaps iiif parse [files...]
 Generate IIIF Manifest from IIIF Image Services from one or more IIIF resources:
 
 ```bash
-allmaps manifest -d <id> [files...]
+allmaps manifest --id <id> [files...]
 ```
 
 The ID of the IIIF Manifest can be supplied with the `--id` option.
@@ -240,19 +255,13 @@ cat path/to/coordinates.txt | allmaps transform coordinates -a path/to/annotatio
   > path/to/transformed-coordinates.txt
 ```
 
-Or transform using a specific set of GCPs and specified transformation type, instead of reading those from a Georeference Annotation:
+It's possible to overwrite the transformation type (or any other property) of the Georeference Annotation using the options:
 
-With a file `path/to/gcps.txt` that contains four GCPs:
-
-```
-3899 6412 9.9301538 53.5814021
-6584 819 25.4101689 71.0981125
-6491 4782 22.2380717 60.4764844
-1409 5436 -3.2014645 55.959946
-1765 1737 -18.1014216 64.3331759
+```bash
+allmaps transform coordinates -a path/to/annotation.json -t thinPlateSpline path/to/coordinates.txt
 ```
 
-This is done with the following command:
+It's even possible to omit a Georeference Annotation and fully specify the projected transformation using the options. GCPs can be specified using one of the supported GCP file formats (see [@allmaps/io](../../packages/io/)). With a file `path/to/gcps.txt` that contains four GCPs:
 
 ```bash
 allmaps transform coordinates -g path/to/gcps.txt -t thinPlateSpline path/to/coordinates.txt
@@ -308,40 +317,47 @@ allmaps transform resource-mask path/to/my-annotation.json path/to/my-annotation
 
 All the commands above take an annotation input using a parameter (except `resource-mask`, where annotations are passed via stdin).
 
-| Option                                           | Description                                                                                                                                                                    | Default      |
-|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-a, --annotation <filename>`                    | Filename of Georeference Annotation (or Georeferenced Map).                                                                                                                    |              |
+| Option                        | Description                                                 | Default |
+|:------------------------------|:------------------------------------------------------------|:--------|
+| `-a, --annotation <filename>` | Filename of Georeference Annotation (or Georeferenced Map). |         |
 
 All the commands above accept the following options for specifying the Projected GCP Transformer:
 
-| Option                                           | Description                                                                                                                                                                    | Default      |
-|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------|
-| `-g, --gcps <filename>`                          | Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).                                                                               |              |
-| `-t, --transformation-type <transformationType>` | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map) | `polynomial` |
-| `-o, --polynomial-order <transformationOrder>`   | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                         | `1`          |
-| `--internal-projection <proj4string>`   | The geographic projection used internally in the transformation.'                                                                                                                         | `'EPSG:3857'`          |
+| Option                                                          | Description                                                                                                                                                                                                 | Default       |
+|:----------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------|
+| `-g, --gcps <filename>`                                         | Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map). See dedicated GCP file options below.                                               |               |
+| `-t, --transformation-type <transformationType>`                | Transformation type. One of `helmert`, `polynomial`, `thinPlateSpline`, `linear`, `projective`. This takes precedence over the transformation type from the Georeference Annotation (or Georeferenced Map). | `polynomial`  |
+| `-o, --polynomial-order <transformationOrder>`                  | Order of polynomial transformation. Either 1, 2 or 3.'                                                                                                                                                      | `1`           |
+| `--internal-projection-definition <proj4stringOrWktDefinition>` | The geographic projection used internally in the transformation.'                                                                                                                                           | `'EPSG:3857'` |
+| `--projection-definition <proj4stringOrWktDefinition>`          | The geographic projection of the output.                                                                                                                                                                    | `'EPSG:4326'` |
 
-All the commands above accept the following options for specifying the Projected GCP Transformer, for example the way it transforms lines or polygons using midpoints (see [@allmaps/transform](../../packages/transform/) and [@allmaps/project](../../packages/project/) for more details):
+Extra options are available to specify the GCP file:
 
-| Option                            | Description                                                                                   | Default                                                 |
-|:----------------------------------|:----------------------------------------------------------------------------------------------|:--------------------------------------------------------|
-| `-m, --max-depth <number>`        | Maximum recursion depth when recursively adding midpoints (higher means more midpoints). | `0` (i.e. no midpoints by default!)                     |
-| `--min-offset-ratio <number>` | Minimum offset ratio when recursively adding midpoints (lower means more midpoints).           | `0`                                                     |
-| `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)           | `Infinity`                                                     |
-| `--min-line-distance <number>`| Minimum line distance when recursively adding midpoints (lower means more midpoints).           | `Infinity`                                                     |
-| `--geo-is-geographic`             | Use geographic distances and midpoints for lon-lat geo points                                 | `false` (`true` for `svg` and `resource-mask` commands) |
-| `--projection <proj4string>`   | The geographic projection of the output.                                                                                                                         | `'EPSG:4326'`          |
-| `--no-different-handedness`   | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.)                                                                                                                         |          |
+| Option                                                     | Description                                                                                                                                              | Default                                      |
+|:-----------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------|
+| `--gcp-file-format <gcpFileFormat>`                        | GCP file format. See [@allmaps/io](../../packages/io/) for the supported GCP file formats.                                                               |                                              |
+| `--gcp-resource-origin <gcpFileFormat>`                    | Resource origin in the GCP file: "bottom-left" or "top-left".                                                                                            | Default adapted to file format.              |
+| `--gcp-resource-y-axis <gcpResourceYAxis>`                 | Y axis orientation in the GCP file: "up" or "down".                                                                                                      | Default adapted to file format.              |
+| `--gcp-resource-width <number>`                            | Resource width in the GCP file. Can be different the resource width of the map, if the GCPs were created from the same image but on a different scale.   |                                              |
+| `--gcp-resource-height <number>`                           | Resource height in the GCP file. Can be different the resource height of the map, if the GCPs were created from the same image but on a different scale. |                                              |
+| `--gcp-projection-definition <proj4stringOrWktDefinition>` | The geographic projection used in the GCP file.                                                                                                          | `'EPSG:4326'` or read from QGIS file format. |
 
-> [!NOTE]
-> Output coordinates are in `'EPSG:4326'` by default due to the default value of `--projection`. In the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), the default projection is `'EPSG:3857'` to obtain coordinates that can be used in a WebMercator webmap.
+Extra options are available to specify the Projected GCP Transformer even further, for example the way it transforms lines or polygons using midpoints (see [@allmaps/transform](../../packages/transform/) and [@allmaps/project](../../packages/project/) for more details):
+
+| Option                           | Description                                                                                                                                                                                                                                                                                                                                          | Default                                                 |
+|:---------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------|
+| `-m, --max-depth <number>`       | Maximum recursion depth when recursively adding midpoints (higher means more midpoints).                                                                                                                                                                                                                                                             | `0` (i.e. no midpoints by default!)                     |
+| `--min-offset-ratio <number>`    | Minimum offset ratio when recursively adding midpoints (lower means more midpoints).                                                                                                                                                                                                                                                                 | `0`                                                     |
+| `--min-offset-distance <number>` | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                                                                                               | `Infinity`                                              |
+| `--min-line-distance <number>`   | Minimum line distance when recursively adding midpoints (lower means more midpoints).                                                                                                                                                                                                                                                                | `Infinity`                                              |
+| `--geo-is-geographic`            | Use geographic distances and midpoints for lon-lat geo points                                                                                                                                                                                                                                                                                        | `false` (`true` for `svg` and `resource-mask` commands) |
+| `--no-different-handedness`      | Don't flip one of the axes (internally) while computing the transformation parameters. Should be set if the handedness doesn't differ between the resource and geo coordinate spaces. Makes a difference for specific transformation types like the Helmert transform. (Flipping is internal and will not alter the axis orientation of the output.) |                                                         |
 
 Additionally, the `coordinates` command has an option to specifically compute the inverse transformation of its Projected GCP Transformer: 'toResource' instead of 'toGeo'.
 
-| Option          | Description                                   | Default |
-|:----------------|:----------------------------------------------|:--------|
-| `-i, --inverse` | Use the Projected GCP Transformer's 'toResource' ("inverse") transformation instead of the 'toGeo' transformation.  |         |
-
+| Option          | Description                                                                                                        | Default |
+|:----------------|:-------------------------------------------------------------------------------------------------------------------|:--------|
+| `-i, --inverse` | Use the Projected GCP Transformer's 'toResource' ("inverse") transformation instead of the 'toGeo' transformation. |         |
 
 ### Attach maps
 
@@ -455,15 +471,15 @@ curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
 ```
 
 > [!NOTE]
-> GeoTIFFs are generated in `'EPSG:3857'` by default due to the default value of `--projection`. Hence, it has the same default projection value as the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), and doesn't follow the `'EPSG:4326'` default projection used in [`allmaps transform`](#transform-resource-coordinates-to-geospatial-coordinates-and-vice-versa).
+> GeoTIFFs are generated in `'EPSG:3857'` by default due to the default value of `--projection-definition`. Hence, it has the same default projection value as the packages [@allmaps/transform](../../packages/transform/), [@allmaps/project](../../packages/project/) and [@allmaps/render](../../packages/render/), and doesn't follow the `'EPSG:4326'` default projection used in [`allmaps transform`](#transform-resource-coordinates-to-geospatial-coordinates-and-vice-versa).
 >
-> The default `--internal-projection` is `'EPSG:3857'`.
+> The default `--internal-projection-definition` is `'EPSG:3857'`.
 
 You can use the parameters to specify another 'internal projection' (to take the map's (known or guessed) projection into account when transforming) or 'projection' (to generate GeoTIFFs in that projection). See [@allmaps/project](../../packages/project/) for more information about projections.
 
 ```bash
 curl "https://annotations.allmaps.org/images/0b9aef31f14cb5bf" | \
-  allmaps script geotiff --internal-projection "+proj=lcc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +type=crs" | \
+  allmaps script geotiff --internal-projection-definition "+proj=lcc +lat_0=40 +lon_0=-96 +lat_1=20 +lat_2=60 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +type=crs" | \
   bash
 ```
 
