@@ -24,9 +24,10 @@ export const OPTIONS_TO_GET_FROM_DEFAULT = [
  * (and thus pass a reference to the warpedMapLayer to every such component),
  * but it's often useful to keep track of 'view options' that are temporary and set by the view state
  * (like applying a Helmert transform when mapOrImage = 'image') and normal options that are set by the user.
- * Therefore, we keep track of both in instances of this class and can pass them between components.
+ * Therefore, we keep track of both selected options and view options
+ * in instances of this class and can pass them between components.
  *
- * View options should be merged before set options on the warped map layer.
+ * Selected options and view options should be merged before set options on the warped map layer.
  *
  * 2) Have both a reactive 'options' object and reactive individual options:
  *
@@ -63,7 +64,7 @@ export abstract class BaseOptionsState {
   defaultOptions: Partial<WebGL2WarpedMapOptions>
   processedDefaultOptions: Partial<WebGL2WarpedMapOptions>
 
-  options: Partial<WebGL2WarpedMapOptions>
+  selectedOptions: Partial<WebGL2WarpedMapOptions>
 
   visible?: boolean
   opacity?: number
@@ -87,7 +88,7 @@ export abstract class BaseOptionsState {
   debugTriangles?: boolean
 
   viewOptions: Partial<WebGL2WarpedMapOptions>
-  mergedOptions: Partial<WebGL2WarpedMapOptions>
+  options: Partial<WebGL2WarpedMapOptions>
 
   constructor(
     options: Partial<WebGL2WarpedMapOptions> = {},
@@ -171,7 +172,7 @@ export abstract class BaseOptionsState {
       layerOptionsState?.debugTriangles ??
         this.processedDefaultOptions.debugTriangles
     )
-    this.options = $derived({
+    this.selectedOptions = $derived({
       visible: this.visible,
       opacity: this.opacity,
       transformationType: this.transformationType,
@@ -201,9 +202,9 @@ export abstract class BaseOptionsState {
     // Merge options and viewOptions.
     // While inheriting options from layerOptionState is done above,
     // inheriting viewOptions is done here.
-    this.mergedOptions = $derived(
+    this.options = $derived(
       mergeOptionsUnlessUndefined(
-        this.options,
+        this.selectedOptions,
         mergeOptionsUnlessUndefined(
           layerOptionsState?.viewOptions ?? {},
           this.viewOptions

@@ -314,7 +314,7 @@
     //
     // TODO: replace this with more elegant code once you can .map() a Map()
     //
-    // Note: This replicates some of the mergeing logic of options which is already handled in WarpedMap.
+    // Note: This replicates some of the merging logic of options which is already handled in WarpedMap.
     // We first tried to set the options indivudually in MapOptionState and LayerOptionState,
     // but an issue arose (specific to this setup) when changing a layer option:
     // because of the mapOptionsState infering from layer options in this setup,
@@ -323,17 +323,17 @@
     // A potential fix could be to move the render animation logic to the map level,
     // or to infer not from the reactive variables but using an event from warpedmaplayer
     // which would be fired after the layer options update is done (but would also infere view options).
-    // (Reminder: We had to used $effect.root() when setting merged options in MapOptionState.)
+    // (Reminder: We had to used $effect.root() when setting options in MapOptionState.)
     const mapOptionsByMapId = new Map(
       Array.from(mapOptionsStateByMapId).map(([mapId, mapOptionsState]) => [
         mapId,
         $state.snapshot(
-          mapOptionsState.mergedOptions
+          mapOptionsState.options
         ) as Partial<WebGL2WarpedMapOptions>
       ])
     )
     const layerOptions = $state.snapshot(
-      layerOptionsState.mergedOptions
+      layerOptionsState.options
     ) as Partial<WebGL2WarpedMapOptions>
     warpedMapLayer.setMapsOptionsByMapId(mapOptionsByMapId, layerOptions)
   })
