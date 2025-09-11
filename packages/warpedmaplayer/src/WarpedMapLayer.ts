@@ -57,6 +57,8 @@ export abstract class BaseWarpedMapLayer<
   abstract nativePassWarpedMapEvent(event: Event): void
 
   // Normal functions
+  //
+  // These are to be copied to manually to @allmaps/openlayers and @allmaps/leaflet's WarpedMapLayer.ts
 
   /**
    * Adds a Georeference Annotation
@@ -212,7 +214,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the WarpedMap instance for a specific map
+   * Get the WarpedMap instance for a map
    *
    * @param mapId - Map ID of the requested WarpedMap instance
    */
@@ -292,10 +294,10 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the z-index of a specific map ID
+   * Get the z-index of a map
    *
    * @param mapId - Map ID for which to get the z-index
-   * @returns The z-index of a specific map ID
+   * @returns The z-index of a map
    */
   getMapZIndex(mapId: string): number | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -304,18 +306,18 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the default map merged options of a specific map ID
+   * Get the default options of a map
+   *
+   * These come from the default option settings and it's georeferenced map proporties
    *
    * @param mapId - Map ID for which the options apply
    */
-  getDefaultMapMergedOptions(): WebGL2WarpedMapOptions
-  getDefaultMapMergedOptions(mapId: string): WebGL2WarpedMapOptions | undefined
-  getDefaultMapMergedOptions(
-    mapId?: string
-  ): WebGL2WarpedMapOptions | undefined {
+  getMapDefaultOptions(): WebGL2WarpedMapOptions
+  getMapDefaultOptions(mapId: string): WebGL2WarpedMapOptions | undefined
+  getMapDefaultOptions(mapId?: string): WebGL2WarpedMapOptions | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.getDefaultMapMergedOptions(mapId)
+    return this.renderer.getMapDefaultOptions(mapId)
   }
 
   /**
@@ -333,29 +335,32 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the map options of a specific map ID
+   * Get the map-specific options of a map
    *
    * @param mapId - Map ID for which the options apply
    */
-  getMapOptions(mapId: string): Partial<WebGL2WarpedMapOptions> | undefined {
+  getMapMapOptions(mapId: string): Partial<WebGL2WarpedMapOptions> | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.getMapMapOptions(mapId)
+  }
+
+  /**
+   * Get the options of a map
+   *
+   * These options are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.getMapOptions(mapId)
   }
 
   /**
-   * Get the map merged options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getMapMergedOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
-    BaseWarpedMapLayer.assertRenderer(this.renderer)
-
-    return this.renderer.getMapMergedOptions(mapId)
-  }
-
-  /**
-   * Sets the layer options
+   * Set the layer options
    *
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
@@ -377,15 +382,15 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Sets the map options of specific map IDs
+   * Set the map-specific options of maps (and the layer options)
    *
    * @param mapIds - Map IDs for which to set the options
-   * @param mapOptions - Options to set
+   * @param mapOptions - Map-specific options to set
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
    * @example
    * ```js
-   * warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+   * warpedMapLayer.setMapOptions([myMapId], { transformationType: 'thinPlateSpline' })
    * ```
    */
   setMapsOptions(
@@ -410,9 +415,9 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Sets the map options of specific maps by map ID
+   * Set the map-specific options of maps by map ID (and the layer options)
    *
-   * @param mapOptionsByMapId - Map options to set by map ID
+   * @param mapOptionsByMapId - Map-specific options to set by map ID
    * @param layerOptions - Layer options to set
    * @param setOptionsOptions - Options when setting the options
    */
@@ -436,7 +441,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Resets the layer options
+   * Reset the layer options
    *
    * An empty array resets all options, undefined resets no options.
    * Doesn't reset render options or specific warped map layer options
@@ -454,13 +459,13 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Resets the map options of specific map IDs
+   * Reset the map-specific options of maps (and the layer options)
    *
    * An empty array resets all options, undefined resets no options.
    * Doesn't reset render options or specific warped map layer options
    *
    * @param mapIds - Map IDs for which to reset the options
-   * @param mapOptionKeys - Keys of the map options to reset
+   * @param mapOptionKeys - Keys of the map-specific options to reset
    * @param layerOptionKeys - Keys of the layer options to reset
    * @param setOptionsOptions - Options when setting the options
    */
@@ -481,12 +486,12 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Resets the map options of specific maps by map ID
+   * Reset the map-specific options of maps by map ID (and the layer options)
    *
    * An empty array or map resets all options (for all maps), undefined resets no options.
    * Doesn't reset render options or specific warped map layer options
    *
-   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
+   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
    * @param layerOptionKeys - Keys of the layer options to reset
    * @param setOptionsOptions - Options when setting the options
    */
@@ -739,6 +744,10 @@ export abstract class BaseWarpedMapLayer<
       this.nativeUpdate.bind(this)
     )
   }
+
+  // Static functions
+  //
+  // Not to be copied
 
   static assertRenderer(
     renderer?: WebGL2Renderer

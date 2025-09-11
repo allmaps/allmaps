@@ -103,45 +103,48 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Get the default merged options of a specific map ID
+   * Get the default options of a map
    *
-   * @param mapId - Map ID for which the map options apply
+   * These come from the default option settings and it's georeferenced map proporties
+   *
+   * @param mapId - Map ID for which the options apply
    */
-  getDefaultMapMergedOptions(): GetWarpedMapOptions<W>
-  getDefaultMapMergedOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
-  getDefaultMapMergedOptions(
-    mapId?: string
-  ): GetWarpedMapOptions<W> | undefined {
-    return this.warpedMapList.getDefaultMapMergedOptions(mapId)
+  getMapDefaultOptions(): GetWarpedMapOptions<W>
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getMapDefaultOptions(mapId)
   }
 
   /**
-   * Get the Render and list options
+   * Get the render and list options
    */
   getOptions(): Partial<BaseRenderOptions> {
     return mergePartialOptions(this.options, this.warpedMapList.getOptions())
   }
 
   /**
-   * Get the map options of a specific map ID
+   * Get the map-specific options of a map
    *
-   * @param mapId - Map ID for which to get the map options
+   * @param mapId - Map ID for which the options apply
    */
-  getMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
+  getMapMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
+    return this.warpedMapList.getMapMapOptions(mapId)
+  }
+
+  /**
+   * Get the options of a map
+   *
+   * These options are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
     return this.warpedMapList.getMapOptions(mapId)
   }
 
   /**
-   * Get the map merged options of a specific map ID
-   *
-   * @param mapId - Map ID for which to get the map options
-   */
-  getMapMergedOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
-    return this.warpedMapList.getMapMergedOptions(mapId)
-  }
-
-  /**
-   * Set the Renderer options
+   * Set the renderer and list options
    *
    * @param renderAndListOptions - Render and list Options to set
    * @param setOptionsOptions - Options when setting the options
@@ -156,10 +159,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Set the map options of specific map IDs
+   * Set the map-specific options of maps (and the renderer and list options)
    *
    * @param mapIds - Map IDs for which to set the options
-   * @param mapOptions - Map options to set
+   * @param mapOptions - Map-specific options to set
    * @param renderAndListOptions - Render and list options to set
    * @param setOptionsOptions - Options when setting the options
    */
@@ -182,9 +185,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Set the map options of specific maps by map ID
+   * Set the map-specific options of maps by map ID (and the render and list options)
    *
-   * @param mapOptionsByMapId - Map options to set by map ID
+   * @param mapOptionsByMapId - Map-specific options to set by map ID
    * @param renderAndListOptions - Render and list options to set
    * @param setOptionsOptions - Options when setting the options
    */
@@ -205,7 +208,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Resets the List options
+   * Resets the list options
    *
    * An empty array resets all options, undefined resets no options.
    * Only resets the list options, not the render options
@@ -221,13 +224,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Resets the map options of specific map IDs
+   * Resets the map-specific options of maps (and the list options)
    *
    * An empty array resets all options, undefined resets no options.
    * Only resets the list options, not the render options
    *
    * @param mapIds - Map IDs for which to reset the options
-   * @param mapOptionKeys - Keys of the map options to reset
+   * @param mapOptionKeys - Keys of the map-specific options to reset
    * @param listOptionKeys - Keys of the render and list options to reset
    * @param setOptionsOptions - Options when setting the options
    */
@@ -246,12 +249,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
-   * Resets the map options of specific maps by map ID
+   * Resets the map-specific options of maps by map ID (and the list options)
    *
    * An empty array or map resets all options (for all maps), undefined resets no options.
    * Only resets the list options, not the render options
    *
-   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
+   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
    * @param listOptionKeys - Keys of the render and list options to reset
    * @param setOptionsOptions - Options when setting the options
    */
@@ -453,7 +456,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.mergedOptions.visible) {
+    if (!warpedMap.options.visible) {
       return []
     }
 
@@ -596,7 +599,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.mergedOptions.visible) {
+    if (!warpedMap.options.visible) {
       return []
     }
 

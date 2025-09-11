@@ -547,17 +547,17 @@ export class WebGL2Renderer
 
     // Opacity
     const opacityLocation = gl.getUniformLocation(program, 'u_opacity')
-    gl.uniform1f(opacityLocation, webgl2WarpedMap.mergedOptions.opacity)
+    gl.uniform1f(opacityLocation, webgl2WarpedMap.options.opacity)
 
     // Saturation
     const saturationLocation = gl.getUniformLocation(program, 'u_saturation')
-    gl.uniform1f(saturationLocation, webgl2WarpedMap.mergedOptions.saturation)
+    gl.uniform1f(saturationLocation, webgl2WarpedMap.options.saturation)
 
     // Remove color
     const removeColorLocation = gl.getUniformLocation(program, 'u_removeColor')
     gl.uniform1f(
       removeColorLocation,
-      webgl2WarpedMap.mergedOptions.removeColor ? 1 : 0
+      webgl2WarpedMap.options.removeColor ? 1 : 0
     )
 
     const removeColorColorLocation = gl.getUniformLocation(
@@ -566,7 +566,7 @@ export class WebGL2Renderer
     )
     gl.uniform3f(
       removeColorColorLocation,
-      ...hexToFractionalRgb(webgl2WarpedMap.mergedOptions.removeColorColor)
+      ...hexToFractionalRgb(webgl2WarpedMap.options.removeColorColor)
     )
 
     const removeColorThresholdLocation = gl.getUniformLocation(
@@ -575,7 +575,7 @@ export class WebGL2Renderer
     )
     gl.uniform1f(
       removeColorThresholdLocation,
-      webgl2WarpedMap.mergedOptions.removeColorThreshold
+      webgl2WarpedMap.options.removeColorThreshold
     )
 
     const removeColorHardnessLocation = gl.getUniformLocation(
@@ -584,15 +584,12 @@ export class WebGL2Renderer
     )
     gl.uniform1f(
       removeColorHardnessLocation,
-      webgl2WarpedMap.mergedOptions.removeColorHardness
+      webgl2WarpedMap.options.removeColorHardness
     )
 
     // Colorize
     const colorizeLocation = gl.getUniformLocation(program, 'u_colorize')
-    gl.uniform1f(
-      colorizeLocation,
-      webgl2WarpedMap.mergedOptions.colorize ? 1 : 0
-    )
+    gl.uniform1f(colorizeLocation, webgl2WarpedMap.options.colorize ? 1 : 0)
 
     const colorizeColorLocation = gl.getUniformLocation(
       program,
@@ -600,19 +597,17 @@ export class WebGL2Renderer
     )
     gl.uniform3f(
       colorizeColorLocation,
-      ...hexToFractionalRgb(webgl2WarpedMap.mergedOptions.colorizeColor)
+      ...hexToFractionalRgb(webgl2WarpedMap.options.colorizeColor)
     )
 
     // Grid
     const gridLocation = gl.getUniformLocation(program, 'u_renderGrid')
-    gl.uniform1f(gridLocation, webgl2WarpedMap.mergedOptions.renderGrid ? 1 : 0)
+    gl.uniform1f(gridLocation, webgl2WarpedMap.options.renderGrid ? 1 : 0)
 
     const colorGrid = gl.getUniformLocation(program, 'u_renderGridColor')
     gl.uniform4f(
       colorGrid,
-      ...hexToFractionalOpaqueRgba(
-        webgl2WarpedMap.mergedOptions.renderGridColor
-      )
+      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
     )
 
     // Distortion
@@ -636,9 +631,7 @@ export class WebGL2Renderer
     )
     gl.uniform4f(
       distortionColor00Location,
-      ...hexToFractionalOpaqueRgba(
-        webgl2WarpedMap.mergedOptions.distortionColor00
-      )
+      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
     )
 
     const distortionColor01Location = gl.getUniformLocation(
@@ -647,9 +640,7 @@ export class WebGL2Renderer
     )
     gl.uniform4f(
       distortionColor01Location,
-      ...hexToFractionalOpaqueRgba(
-        webgl2WarpedMap.mergedOptions.distortionColor01
-      )
+      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
     )
 
     const distortionColor1Location = gl.getUniformLocation(
@@ -658,9 +649,7 @@ export class WebGL2Renderer
     )
     gl.uniform4f(
       distortionColor1Location,
-      ...hexToFractionalOpaqueRgba(
-        webgl2WarpedMap.mergedOptions.distortionColor1
-      )
+      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
     )
 
     const distortionColor2Location = gl.getUniformLocation(
@@ -669,9 +658,7 @@ export class WebGL2Renderer
     )
     gl.uniform4f(
       distortionColor2Location,
-      ...hexToFractionalOpaqueRgba(
-        webgl2WarpedMap.mergedOptions.distortionColor2
-      )
+      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
     )
 
     const distortionColorLocation3 = gl.getUniformLocation(
@@ -680,9 +667,7 @@ export class WebGL2Renderer
     )
     gl.uniform4f(
       distortionColorLocation3,
-      ...hexToFractionalOpaqueRgba(
-        webgl2WarpedMap.mergedOptions.distortionColor3
-      )
+      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
     )
 
     // Debug Triangles
@@ -692,15 +677,12 @@ export class WebGL2Renderer
     )
     gl.uniform1f(
       debugTrianglesLocation,
-      webgl2WarpedMap.mergedOptions.debugTriangles ? 1 : 0
+      webgl2WarpedMap.options.debugTriangles ? 1 : 0
     )
 
     // Debug Tiles
     const debugTilesLocation = gl.getUniformLocation(program, 'u_debugTiles')
-    gl.uniform1f(
-      debugTilesLocation,
-      webgl2WarpedMap.mergedOptions.debugTiles ? 1 : 0
-    )
+    gl.uniform1f(debugTilesLocation, webgl2WarpedMap.options.debugTiles ? 1 : 0)
 
     // Best scale factor
     const scaleFactorForViewportLocation = gl.getUniformLocation(

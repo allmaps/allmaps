@@ -258,7 +258,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (
         warpedMap &&
-        (selectionOptions.onlyVisible ? warpedMap.mergedOptions.visible : true)
+        (selectionOptions.onlyVisible ? warpedMap.options.visible : true)
       ) {
         warpedMaps.push(warpedMap)
       }
@@ -272,7 +272,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the WarpedMap instance for a specific map
+   * Get the WarpedMap instance for a map
    *
    * @param mapId - Map ID of the requested WarpedMap instance
    * @returns WarpedMap instance, or undefined
@@ -345,7 +345,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the z-index of a specific map ID
+   * Get the z-index of a map
    *
    * @param mapId - Map ID for which to get the z-index
    */
@@ -354,15 +354,15 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the default map merged options
+   * Get the default options of a map
+   *
+   * These come from the default option settings and it's georeferenced map proporties
    *
    * @param mapId - Map ID for which the options apply
    */
-  getDefaultMapMergedOptions(): GetWarpedMapOptions<W>
-  getDefaultMapMergedOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
-  getDefaultMapMergedOptions(
-    mapId?: string
-  ): GetWarpedMapOptions<W> | undefined {
+  getMapDefaultOptions(): GetWarpedMapOptions<W>
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
     if (mapId) {
       const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
       const warpedMap = Array.from(warpedMaps)[0]
@@ -381,31 +381,34 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the map merged options of a specific map ID
+   * Get the map-specific options of a map
    *
    * @param mapId - Map ID for which the options apply
    */
-  getMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
+  getMapMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
+    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+    const warpedMap = Array.from(warpedMaps)[0]
+    return warpedMap?.mapOptions as GetWarpedMapOptions<W>
+  }
+
+  /**
+   * Get the options of a map
+   *
+   * These options are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
     const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
     const warpedMap = Array.from(warpedMaps)[0]
     return warpedMap?.options as GetWarpedMapOptions<W>
   }
 
   /**
-   * Get the map merged options of a specific map ID
-   *
-   * @param mapId - Map ID for which the options apply
-   */
-  getMapMergedOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
-    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
-    const warpedMap = Array.from(warpedMaps)[0]
-    return warpedMap?.mergedOptions as GetWarpedMapOptions<W>
-  }
-
-  /**
    * Set the options of this list
    *
-   * Map-specific options will be passed to newly added maps.
+   * Note: Map-specific options set here will be passed to newly added maps.
    *
    * @param options - List Options
    * @param setOptionsOptions - Options when setting the options
@@ -419,16 +422,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the map options of specific map IDs
+   * Set the map-specific options of maps (and the list options)
    *
    * @param mapIds - Map IDs for which the options apply
-   * @param options - Options
+   * @param mapOptions - Map-specific options
    * @param listOptions - list options
    * @param setOptionsOptions - Options when setting the options
    */
   setMapsOptions(
     mapIds: string[],
-    options?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapListOptions>,
     listOptions?: Partial<WarpedMapListOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
@@ -437,7 +440,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       Partial<WarpedMapListOptions> | undefined
     >()
     for (const mapId of mapIds) {
-      optionsByMapId.set(mapId, options)
+      optionsByMapId.set(mapId, mapOptions)
     }
     this.internalSetMapsOptionsByMapId(
       optionsByMapId,
@@ -447,23 +450,23 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the map options of specific maps by map ID
+   * Set the map-specific options of maps by map ID (and the list options)
    *
    * This is useful when when multiple (and possibly different)
-   * map options are changed at once,
+   * map-specific options are changed at once,
    * but only one animation should be fired
    *
-   * @param optionsByMapId - Options by map ID
+   * @param mapOptionsByMapId - Map-specific options by map ID
    * @param listOptions - List options
    * @param setOptionsOptions - Options when setting the options
    */
   setMapsOptionsByMapId(
-    optionsByMapId?: Map<string, Partial<WarpedMapListOptions>>,
+    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions>>,
     listOptions?: Partial<WarpedMapListOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     this.internalSetMapsOptionsByMapId(
-      optionsByMapId,
+      mapOptionsByMapId,
       listOptions,
       setOptionsOptions
     )
@@ -482,7 +485,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(this.getDefaultMapMergedOptions())
+      listOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
     this.setOptions(
       optionKeysToUndefinedOptions(
@@ -493,12 +496,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Resets the map options of specific map IDs
+   * Resets the map-specific options of maps (and the list options)
    *
    * An empty array resets all options, undefined resets no options.
    *
    * @param mapIds - Map IDs for which to reset the options
-   * @param mapOptionKeys - Keys of the map options to reset
+   * @param mapOptionKeys - Keys of the map-specific options to reset
    * @param listOptionKeys - Keys of the list options to reset
    * @param setOptionsOptions - Options when setting the options
    */
@@ -509,12 +512,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     if (mapOptionKeys && mapOptionKeys.length == 0) {
-      mapOptionKeys = Object.keys(this.getDefaultMapMergedOptions())
+      mapOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
     // Note: undefined resets no options,
     // otherwise leaving out listOptionKeys would reset all list options
     if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(this.getDefaultMapMergedOptions())
+      listOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
     this.setMapsOptions(
       mapIds,
@@ -529,11 +532,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Resets the map options of specific maps by map ID
+   * Resets the map-specific options of maps by map ID (and the list options)
    *
    * An empty array or map resets all options (for all maps), undefined resets no options.
    *
-   * @param mapOptionkeysByMapId - Keys of map options to reset by map ID
+   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
    * @param listOptionKeys - Keys of the list options to reset
    * @param setOptionsOptions - Options when setting the options
    */
@@ -544,9 +547,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ) {
     if (mapOptionkeysByMapId && mapOptionkeysByMapId.size == 0) {
       const mapIds = this.getMapIds()
-      const defaultMapOptionsKeys = Object.keys(
-        this.getDefaultMapMergedOptions()
-      )
+      const defaultMapOptionsKeys = Object.keys(this.getMapDefaultOptions())
       for (const mapId of mapIds) {
         mapOptionkeysByMapId.set(mapId, defaultMapOptionsKeys)
       }
@@ -554,7 +555,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // Note: undefined resets no options,
     // otherwise leaving out listOptionKeys would reset all list options
     if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(this.getDefaultMapMergedOptions())
+      listOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
 
     this.setMapsOptionsByMapId(
@@ -758,12 +759,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * Internal set map options
    */
   private internalSetMapsOptionsByMapId(
-    optionsByMapId?: Map<string, Partial<WarpedMapListOptions> | undefined>,
+    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions> | undefined>,
     listOptions?: Partial<WarpedMapListOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
     // If there are no maps yet, return
-    if (this.warpedMapsById.size === 0 || optionsByMapId?.size === 0) {
+    if (this.warpedMapsById.size === 0 || mapOptionsByMapId?.size === 0) {
       return
     }
 
@@ -778,7 +779,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       )
     }
 
-    // We loop over all warped maps and set the maps options (if there are inoptionsByMapId)
+    // We loop over all warped maps and set the maps options (if there are in mapOptionsByMapId)
     // and list options (if there are)
 
     // Some options can be set with animation.
@@ -795,16 +796,23 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       if (setOptionsOptions?.animate === undefined) {
         // If no animation information is specified,
         // set all options exect those for animation
-        const options = optionsByMapId?.get(warpedMap.mapId)
-        warpedMapChangedOptions = warpedMap.setOptions(options, listOptions, {
-          optionKeysToOmit: this.options.animatedOptions
-        })
+        const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
+        warpedMapChangedOptions = warpedMap.setMapOptions(
+          mapOptions,
+          listOptions,
+          {
+            optionKeysToOmit: this.options.animatedOptions
+          }
+        )
       } else {
         // If the option setting should be animated,
         // or if the option setting should not be animated
         // set all options
-        const options = optionsByMapId?.get(warpedMap.mapId)
-        warpedMapChangedOptions = warpedMap.setOptions(options, listOptions)
+        const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
+        warpedMapChangedOptions = warpedMap.setMapOptions(
+          mapOptions,
+          listOptions
+        )
       }
 
       const warpedMapChangedOptionKeys = Object.keys(warpedMapChangedOptions)
@@ -846,7 +854,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         // If no animation information is specified
         // set the options again but now all options and with animation
         this.internalSetMapsOptionsByMapId(
-          optionsByMapId,
+          mapOptionsByMapId,
           listOptions,
           mergePartialOptions(setOptionsOptions, {
             animate: true

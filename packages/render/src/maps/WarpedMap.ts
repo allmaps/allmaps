@@ -88,8 +88,8 @@ export function createWarpedMapFactory() {
  * @param defaultOptions - Default options
  * @param georeferencedMapOptions - Options from georeferenced map
  * @param listOptions - Options from warped map list
- * @param options - Options specific to this map
- * @param mergedOptions - Result of merging default, georeferenced map, list and specific map options
+ * @param mapOptions - Options specific to this map
+ * @param options - Result of merging default, georeferenced map, list and specific map options
  * @param imageInfo - Image information
  * @param parsedImage - ID of the image
  * @param loadingImageInfo - Whether the image information is loading
@@ -155,8 +155,8 @@ export class WarpedMap extends EventTarget {
   defaultOptions!: WarpedMapOptions
   georeferencedMapOptions?: Partial<WarpedMapOptions>
   listOptions?: Partial<WarpedMapOptions>
-  options?: Partial<WarpedMapOptions>
-  mergedOptions!: WarpedMapOptions
+  mapOptions?: Partial<WarpedMapOptions>
+  options!: WarpedMapOptions
 
   imageInfo?: unknown
   parsedImage?: Image
@@ -267,7 +267,7 @@ export class WarpedMap extends EventTarget {
     this.projectedTransformerDoubleCache = new Map()
     this.loadingImageInfo = false
 
-    this.options = {}
+    this.mapOptions = {}
     this.listOptions = options
     this.georeferencedMapOptions = {
       transformationType: georeferencedMap.transformation
@@ -277,7 +277,7 @@ export class WarpedMap extends EventTarget {
       resourceMask: georeferencedMap.resourceMask
     }
     this.setDefaultOptions()
-    this.setMergedOptions({ init: true })
+    this.setOptions({ init: true })
   }
 
   /**
@@ -390,57 +390,51 @@ export class WarpedMap extends EventTarget {
     )
   }
 
-  setOptions(
-    options?: Partial<WarpedMapOptions>,
+  setMapOptions(
+    mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): object {
-    if (options !== undefined && Object.keys(options).length > 0) {
-      this.options = options
+    if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
+      this.mapOptions = mapOptions
     }
     if (listOptions !== undefined && Object.keys(listOptions).length > 0) {
       this.listOptions = listOptions
     }
-    return this.setMergedOptions(setOptionsOptions)
+    return this.setOptions(setOptionsOptions)
   }
 
   setListOptions(
     listOptions?: Partial<WarpedMapOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ): object {
-    return this.setOptions(undefined, listOptions, setOptionsOptions)
+    return this.setMapOptions(undefined, listOptions, setOptionsOptions)
   }
 
   setDefaultOptions() {
     this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
-  setMergedOptions(setOptionsOptions?: Partial<SetOptionsOptions>): object {
-    const previousMergedOptions = cloneDeep(this.mergedOptions || {})
+  setOptions(setOptionsOptions?: Partial<SetOptionsOptions>): object {
+    const previousOptions = cloneDeep(this.options || {})
 
-    this.mergedOptions = mergeOptionsUnlessUndefined(
+    this.options = mergeOptionsUnlessUndefined(
       this.defaultOptions,
       this.georeferencedMapOptions,
       this.listOptions,
-      this.options
+      this.mapOptions
     )
 
-    let changedMergedOptions = objectDifference(
-      this.mergedOptions,
-      previousMergedOptions
-    )
+    let changedOptions = objectDifference(this.options, previousOptions)
 
     if (setOptionsOptions?.optionKeysToOmit) {
       // If some options should be omitted from changing,
       // like when setting all options exect those that should be animated,
-      // then omit those options and set the merged options accordingly
-      changedMergedOptions = omit(
-        changedMergedOptions,
-        setOptionsOptions?.optionKeysToOmit
-      )
-      this.mergedOptions = mergeOptionsUnlessUndefined(
-        previousMergedOptions,
-        changedMergedOptions
+      // then omit those options and set the options accordingly
+      changedOptions = omit(changedOptions, setOptionsOptions?.optionKeysToOmit)
+      this.options = mergeOptionsUnlessUndefined(
+        previousOptions,
+        changedOptions
       )
     }
 
@@ -448,35 +442,32 @@ export class WarpedMap extends EventTarget {
       // On init we should set the properties in a specific order
       // and update the projected transformer properties only once at the end
 
-      this.gcps = this.mergedOptions.gcps
+      this.gcps = this.options.gcps
 
       this.resourceFullMask = this.getResourceFullMask()
       this.resourceAppliableMask = this.georeferencedMap.resourceMask
-      this.resourceMask = this.mergedOptions.applyMask
+      this.resourceMask = this.options.applyMask
         ? this.resourceAppliableMask
         : this.resourceFullMask
       this.updateResourceMaskProperties()
 
-      this.transformationType = this.mergedOptions.transformationType
+      this.transformationType = this.options.transformationType
       this.previousTransformationType = this.transformationType
 
-      this.internalProjection = this.mergedOptions.internalProjection
+      this.internalProjection = this.options.internalProjection
       this.previousInternalProjection = this.internalProjection
-      this.projection = this.mergedOptions.projection
+      this.projection = this.options.projection
 
       this.updateProjectedTransformerProperties()
     } else {
-      if ('gcps' in changedMergedOptions) {
-        this.setGcps(this.mergedOptions.gcps)
+      if ('gcps' in changedOptions) {
+        this.setGcps(this.options.gcps)
       }
 
-      if (
-        'resourceMask' in changedMergedOptions ||
-        'applyMask' in changedMergedOptions
-      ) {
+      if ('resourceMask' in changedOptions || 'applyMask' in changedOptions) {
         const resourceFullMask = this.getResourceFullMask()
-        const resourceAppliableMask = this.mergedOptions.resourceMask
-        const resourceMask = this.mergedOptions.applyMask
+        const resourceAppliableMask = this.options.resourceMask
+        const resourceMask = this.options.applyMask
           ? resourceAppliableMask
           : resourceFullMask
         this.setResourceMask(
@@ -486,24 +477,24 @@ export class WarpedMap extends EventTarget {
         )
       }
 
-      if ('transformationType' in changedMergedOptions) {
-        this.setTransformationType(this.mergedOptions.transformationType)
+      if ('transformationType' in changedOptions) {
+        this.setTransformationType(this.options.transformationType)
       }
 
-      if ('internalProjection' in changedMergedOptions) {
-        this.setInternalProjection(this.mergedOptions.internalProjection)
+      if ('internalProjection' in changedOptions) {
+        this.setInternalProjection(this.options.internalProjection)
       }
 
-      if ('projection' in changedMergedOptions) {
-        this.setProjection(this.mergedOptions.projection)
+      if ('projection' in changedOptions) {
+        this.setProjection(this.options.projection)
       }
 
-      if ('distortionMeasure' in changedMergedOptions) {
-        this.setDistortionMeasure(this.mergedOptions.distortionMeasure)
+      if ('distortionMeasure' in changedOptions) {
+        this.setDistortionMeasure(this.options.distortionMeasure)
       }
     }
 
-    return changedMergedOptions
+    return changedOptions
   }
 
   /**
@@ -725,7 +716,7 @@ export class WarpedMap extends EventTarget {
   hasImageInfo(): this is WarpedMapWithImageInfo {
     return (
       (this.imageInfo !== undefined ||
-        this.mergedOptions.imageInfoByMapId?.has(this.mapId)) ??
+        this.options.imageInfoByMapId?.has(this.mapId)) ??
       false
     )
   }
@@ -742,19 +733,19 @@ export class WarpedMap extends EventTarget {
 
       let imageInfo
 
-      if (this.mergedOptions.imageInfoByMapId?.get(imageUri)) {
-        imageInfo = this.mergedOptions.imageInfoByMapId.get(imageUri)
+      if (this.options.imageInfoByMapId?.get(imageUri)) {
+        imageInfo = this.options.imageInfoByMapId.get(imageUri)
       } else {
         this.abortController = new AbortController()
         const signal = this.abortController.signal
         imageInfo = await fetchImageInfo(
           imageUri,
           { signal },
-          this.mergedOptions.fetchFn
+          this.options.fetchFn
         )
         this.abortController = undefined
 
-        this.mergedOptions.imageInfoByMapId?.set(imageUri, imageInfo)
+        this.options.imageInfoByMapId?.set(imageUri, imageInfo)
       }
 
       this.imageInfo = imageInfo

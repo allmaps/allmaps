@@ -183,7 +183,7 @@
         if (!mapOptionsStateByMapId.has(mapId)) {
           const mapOptionsState = new MapOptionsState(
             mapId,
-            warpedMapLayer?.getDefaultMapMergedOptions(mapId),
+            warpedMapLayer?.getMapDefaultOptions(mapId),
             {},
             layerOptionsState
           )

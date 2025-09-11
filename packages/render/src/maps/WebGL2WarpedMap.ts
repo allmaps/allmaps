@@ -131,11 +131,11 @@ export function createWebGL2WarpedMapFactory(
  * Class for WarpedMaps that are rendered with WebGL 2
  */
 export class WebGL2WarpedMap extends TriangulatedWarpedMap {
-  declare options?: Partial<WebGL2WarpedMapOptions>
+  declare mapOptions?: Partial<WebGL2WarpedMapOptions>
   declare listOptions?: Partial<WebGL2WarpedMapOptions>
   declare georeferencedMapOptions?: Partial<WebGL2WarpedMapOptions>
   declare defaultOptions: WebGL2WarpedMapOptions
-  declare mergedOptions: WebGL2WarpedMapOptions
+  declare options: WebGL2WarpedMapOptions
 
   // De facto make this a WarpedMapWithImageInfo
   // (Multiple inhertance is not possible in TypeScript)
@@ -247,43 +247,39 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }
 
-  setMergedOptions(setOptionsOptions?: Partial<SetOptionsOptions>) {
-    const changedMergedOptions = super.setMergedOptions(setOptionsOptions)
+  setOptions(setOptionsOptions?: Partial<SetOptionsOptions>) {
+    const changedOptions = super.setOptions(setOptionsOptions)
 
-    this.mergedOptions.opacity =
+    this.options.opacity =
       (this.listOptions?.opacity ?? this.defaultOptions.opacity) *
-      (this.options?.opacity ?? 1)
-    this.mergedOptions.saturation =
+      (this.mapOptions?.opacity ?? 1)
+    this.options.saturation =
       (this.listOptions?.saturation ?? this.defaultOptions.saturation) *
-      (this.options?.saturation ?? 1)
+      (this.mapOptions?.saturation ?? 1)
 
-    return changedMergedOptions
+    return changedOptions
   }
 
   shouldRenderMaps(): boolean {
-    return (
-      this.mergedOptions.visible !== false &&
-      this.mergedOptions.renderMaps !== false
-    )
+    return this.options.visible !== false && this.options.renderMaps !== false
   }
 
   shouldRenderLines(): boolean {
     return (
-      this.mergedOptions.visible !== false &&
-      this.mergedOptions.renderLines !== false &&
-      (this.mergedOptions.renderFullMask ||
-        this.mergedOptions.renderAppliableMask ||
-        this.mergedOptions.renderMask ||
-        this.mergedOptions.renderVectors)
+      this.options.visible !== false &&
+      this.options.renderLines !== false &&
+      (this.options.renderFullMask ||
+        this.options.renderAppliableMask ||
+        this.options.renderMask ||
+        this.options.renderVectors)
     )
   }
 
   shouldRenderPoints(): boolean {
     return (
-      this.mergedOptions.visible !== false &&
-      this.mergedOptions.renderPoints !== false &&
-      (this.mergedOptions.renderGcps ||
-        this.mergedOptions.renderTransformedGcps)
+      this.options.visible !== false &&
+      this.options.renderPoints !== false &&
+      (this.options.renderGcps || this.options.renderTransformedGcps)
     )
   }
 
@@ -365,7 +361,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineGroups() {
     this.lineGroups = []
 
-    if (this.mergedOptions.renderVectors) {
+    if (this.options.renderVectors) {
       this.lineGroups.push({
         projectedGeoLines: pointsAndPointsToLines(
           this.projectedGeoPoints,
@@ -375,24 +371,24 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           this.projectedGeoPoints,
           this.projectedGeoPreviousTransformedResourcePoints
         ),
-        viewportSize: this.mergedOptions.renderVectorsSize,
-        color: this.mergedOptions.renderVectorsColor,
-        viewportBorderSize: this.mergedOptions.renderVectorsBorderSize,
-        borderColor: this.mergedOptions.renderVectorsBorderColor
+        viewportSize: this.options.renderVectorsSize,
+        color: this.options.renderVectorsColor,
+        viewportBorderSize: this.options.renderVectorsBorderSize,
+        borderColor: this.options.renderVectorsBorderColor
       })
     }
 
-    if (this.mergedOptions.renderFullMask) {
+    if (this.options.renderFullMask) {
       this.lineGroups.push({
         projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
-        viewportSize: this.mergedOptions.renderFullMaskSize,
-        color: this.mergedOptions.renderFullMaskColor,
-        viewportBorderSize: this.mergedOptions.renderFullMaskBorderSize,
-        borderColor: this.mergedOptions.renderFullMaskBorderColor
+        viewportSize: this.options.renderFullMaskSize,
+        color: this.options.renderFullMaskColor,
+        viewportBorderSize: this.options.renderFullMaskBorderSize,
+        borderColor: this.options.renderFullMaskBorderColor
       })
     }
 
-    if (this.mergedOptions.renderAppliableMask) {
+    if (this.options.renderAppliableMask) {
       this.lineGroups.push({
         projectedGeoLines: lineStringToLines(
           this.projectedGeoTriangulationAppliableMask
@@ -400,14 +396,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoPreviousLines: lineStringToLines(
           this.projectedGeoPreviousTriangulationAppliableMask
         ),
-        viewportSize: this.mergedOptions.renderAppliableMaskSize,
-        color: this.mergedOptions.renderAppliableMaskColor,
-        viewportBorderSize: this.mergedOptions.renderAppliableMaskBorderSize,
-        borderColor: this.mergedOptions.renderAppliableMaskBorderColor
+        viewportSize: this.options.renderAppliableMaskSize,
+        color: this.options.renderAppliableMaskColor,
+        viewportBorderSize: this.options.renderAppliableMaskBorderSize,
+        borderColor: this.options.renderAppliableMaskBorderColor
       })
     }
 
-    if (this.mergedOptions.renderMask) {
+    if (this.options.renderMask) {
       this.lineGroups.push({
         projectedGeoLines: lineStringToLines(
           this.projectedGeoTriangulationMask
@@ -415,10 +411,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         projectedGeoPreviousLines: lineStringToLines(
           this.projectedGeoPreviousTriangulationMask
         ),
-        viewportSize: this.mergedOptions.renderMaskSize,
-        color: this.mergedOptions.renderMaskColor,
-        viewportBorderSize: this.mergedOptions.renderMaskBorderSize,
-        borderColor: this.mergedOptions.renderMaskBorderColor
+        viewportSize: this.options.renderMaskSize,
+        color: this.options.renderMaskColor,
+        viewportBorderSize: this.options.renderMaskBorderSize,
+        borderColor: this.options.renderMaskBorderColor
       })
     }
   }
@@ -426,29 +422,29 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setPointGroups() {
     this.pointGroups = []
 
-    if (this.mergedOptions.renderGcps) {
+    if (this.options.renderGcps) {
       this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoPoints,
-        viewportSize: this.mergedOptions.renderGcpsSize,
-        color: this.mergedOptions.renderGcpsColor,
-        viewportBorderSize: this.mergedOptions.renderGcpsBorderSize,
-        borderColor: this.mergedOptions.renderGcpsBorderColor
+        viewportSize: this.options.renderGcpsSize,
+        color: this.options.renderGcpsColor,
+        viewportBorderSize: this.options.renderGcpsBorderSize,
+        borderColor: this.options.renderGcpsBorderColor
       })
     }
 
-    if (this.mergedOptions.renderTransformedGcps) {
+    if (this.options.renderTransformedGcps) {
       this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoTransformedResourcePoints,
         projectedGeoPreviousPoints:
           this.projectedGeoPreviousTransformedResourcePoints,
-        viewportSize: this.mergedOptions.renderTransformedGcpsSize,
-        color: this.mergedOptions.renderTransformedGcpsColor,
-        viewportBorderSize: this.mergedOptions.renderTransformedGcpsBorderSize,
-        borderColor: this.mergedOptions.renderTransformedGcpsBorderColor
+        viewportSize: this.options.renderTransformedGcpsSize,
+        color: this.options.renderTransformedGcpsColor,
+        viewportBorderSize: this.options.renderTransformedGcpsBorderSize,
+        borderColor: this.options.renderTransformedGcpsBorderColor
       })
     }
 
-    if (this.mergedOptions.debugTriangulation) {
+    if (this.options.debugTriangulation) {
       this.pointGroups.push({
         projectedGeoPoints: this.projectedGeoPreviousTrianglePoints,
         color: gray

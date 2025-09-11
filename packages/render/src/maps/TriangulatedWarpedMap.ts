@@ -65,11 +65,11 @@ type GcpTriangulation = {
  * @param projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
  */
 export class TriangulatedWarpedMap extends WarpedMap {
-  declare options?: Partial<TriangulatedWarpedMapOptions>
+  declare mapOptions?: Partial<TriangulatedWarpedMapOptions>
   declare listOptions?: Partial<TriangulatedWarpedMapOptions>
   declare georeferencedMapOptions?: Partial<TriangulatedWarpedMapOptions>
   declare defaultOptions: TriangulatedWarpedMapOptions
-  declare mergedOptions: TriangulatedWarpedMapOptions
+  declare options: TriangulatedWarpedMapOptions
 
   previousResourceResolution: number | undefined
   resourceResolution: number | undefined
@@ -298,7 +298,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
     // Get resolution from transform
     const resourceResolution =
-      this.mergedOptions.resourceResolution ||
+      this.options.resourceResolution ||
       this.projectedTransformer.getToGeoTransformationResolution(
         this.resourceMaskBbox
       )
@@ -352,7 +352,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
           this.projectedTransformer.transformToGeo(
             resourcePoint,
             {
-              distortionMeasures: this.mergedOptions.distortionMeasures,
+              distortionMeasures: this.options.distortionMeasures,
               referenceScale: this.getReferenceScale()
             },
             (gcpPartialDistortion) => gcpPartialDistortion
@@ -399,8 +399,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
                     this.projectedPreviousTransformer.transformToGeo(
                       projectedGcp.resource,
                       {
-                        distortionMeasures:
-                          this.mergedOptions.distortionMeasures,
+                        distortionMeasures: this.options.distortionMeasures,
                         referenceScale: this.getReferenceScale()
                       },
                       (gcpPartialDistortion) => gcpPartialDistortion
