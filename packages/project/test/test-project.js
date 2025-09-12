@@ -271,7 +271,7 @@ describe('Allow to change a projection of a transformer', () => {
     }
   )
   const projectedTransformer31370setTo4326 =
-    projectedTransformer31370.setProjection(epsg4326)
+    ProjectedGcpTransformer.setProjection(projectedTransformer31370, epsg4326)
 
   const resourceLineString = [
     [1000, 1000],
