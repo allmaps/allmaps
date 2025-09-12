@@ -379,7 +379,7 @@ MIT
 ###### Type
 
 ```ts
-{projection: Projection} & {
+ProjectionInputs & {
   maxDepth: number
   minOffsetRatio: number
   minOffsetDistance: number
@@ -413,13 +413,15 @@ Create a ProjectedGcpTransformer
 
 * `GcpTransformer`
 
+### `ProjectedGcpTransformer#gcps`
+
+Get GCPs as they were inputed to the GCP Transformer (`Array<Gcp>`).
+
+For a Projected GCP Transformer, these are the GCPs in projected coordinates.
+
 ### `ProjectedGcpTransformer#interalProjectedGcps`
 
-###### Type
-
-```ts
-Array<Gcp>
-```
+Get GCPs in interal projected coordinates (`Array<Gcp>`).
 
 ### `ProjectedGcpTransformer#internalProjection`
 
@@ -445,13 +447,13 @@ Array<Gcp>
 (point: Point) => Point
 ```
 
+### `ProjectedGcpTransformer#lonlatGcps`
+
+Get GCPs in interal projected coordinates (`Array<Gcp>`).
+
 ### `ProjectedGcpTransformer#projectedGcps`
 
-###### Type
-
-```ts
-Array<Gcp>
-```
+Get GCPs in projected coordinates (`Array<Gcp>`).
 
 ### `ProjectedGcpTransformer#projection`
 
@@ -469,7 +471,7 @@ Array<Gcp>
 (point: Point) => Point
 ```
 
-### `ProjectedGcpTransformer#projectionToLatLon`
+### `ProjectedGcpTransformer#projectionToLonLat`
 
 ###### Type
 
@@ -532,7 +534,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * A Georeferenced Map
 * `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
   * Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
@@ -546,7 +548,10 @@ A Projected GCP Transformer (`ProjectedGcpTransformer`).
 ###### Type
 
 ```ts
-GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
+GcpsInputs &
+  TransformationTypeInputs &
+  InternalProjectionInputs &
+  ProjectionInputs
 ```
 
 ### `ProjectedGcpTransformerOptions`
@@ -571,6 +576,12 @@ GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
 ```ts
 string | PROJJSONDefinition
 ```
+
+### `ProjectionInputs`
+
+###### Fields
+
+* `projection?` (`{name?: string; definition: ProjectionDefinition}`)
 
 ### `defaultProjectedGcpTransformOptions`
 

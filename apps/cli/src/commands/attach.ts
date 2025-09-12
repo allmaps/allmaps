@@ -1,6 +1,7 @@
 import { Command } from '@commander-js/extra-typings'
 
 import { AttachedTransformation } from '@allmaps/attach'
+import { generateAnnotation } from '@allmaps/annotation'
 
 import { parseJsonInput, printJson } from '../lib/io.js'
 import {
@@ -8,7 +9,6 @@ import {
   parseAttachInputs
 } from '../lib/parse.js'
 import { addAttachOptions } from '../lib/options.js'
-import { generateAnnotation } from '@allmaps/annotation'
 
 export function attach() {
   const command = addAttachOptions(

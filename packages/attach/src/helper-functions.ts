@@ -29,7 +29,7 @@ export function sourceDestinationToResourceGeo(
   source = transformerOptions.differentHandedness ? flipY(source) : source
 
   destination = transformerOptions.postForward(destination as Point)
-  destination = projectedGcpTransformer.projectionToLatLon(destination)
+  destination = projectedGcpTransformer.projectionToLonLat(destination)
 
   return { resource: source, geo: destination }
 }

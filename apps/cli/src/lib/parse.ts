@@ -1,37 +1,75 @@
 import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
 
-import { InverseOptions } from '@allmaps/transform/shared/types.js'
-import { isPoint } from '@allmaps/stdlib'
+import {
+  InverseOptions,
+  transformationTypeToTypeAndOrder,
+  typeAndOrderToTransformationType
+} from '@allmaps/transform'
+import {
+  isPoint,
+  isRing,
+  mergeOptions,
+  mergeOptionsUnlessUndefined,
+  stringToSvgGeometriesGenerator,
+  svgGeometryToGeometry
+} from '@allmaps/stdlib'
+import {
+  parseGcps,
+  parseGcpProjectionFromGcpString,
+  parseGdalCoordinateLines,
+  GcpFileFormat,
+  supportedGcpFileFormats,
+  GcpResourceOrigin,
+  GcpResourceYAxis,
+  supportedGcpResourceYAxis,
+  supportedGcpResourceOrigin
+} from '@allmaps/io'
 
 import { readFromFile, parseJsonFromFile } from './io.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
   TransformationType,
-  TransformationTypeInputs,
-  GcpsInputs
+  TransformationTypeInputs as TransformationTypeInputOptions,
+  GcpsInputs as GcpsInputOptions
 } from '@allmaps/transform'
-import type { Gcp } from '@allmaps/types'
+import type { Gcp, Ring } from '@allmaps/types'
 import type {
   Rcp,
   AttachedTransformationOptions,
   RcpsInput
 } from '@allmaps/attach'
-import {
-  InternalProjectionInputs,
-  ProjectedGcpTransformerInputs,
+import type {
+  InternalProjectionInputs as InternalProjectionInputOptions,
+  ProjectionInputs as ProjectionInputOptions,
+  ProjectedGcpTransformerInputs as ProjectedGcpTransformerInputOptions,
   ProjectedGcpTransformerOptions,
   ProjectedGcpTransformOptions,
   Projection
 } from '@allmaps/project'
 
-const mustContainOneMapMessage =
+export const mustContainOneMapMessage =
   'Annotation must contain exactly 1 georeferenced map'
+export const mustContainGcpsMessage =
+  'No GCPs supplied. Supply a Georeference Annotation or a file containing GCPs.'
+export const mustContainTransformationTypeMessage =
+  'No transformation type supplied.'
 
-export function parseMap(options: { annotation?: string }): GeoreferencedMap {
-  if (options.annotation) {
-    const annotation = parseJsonFromFile(options.annotation)
-    const mapOrMaps = parseAnnotationValidateMap(annotation)
+export type AnnotationInputOptions = {
+  resourceId: string
+  resourceType: string
+  resourceWidth: number
+  resourceHeight: number
+  resourceMask: Ring
+} & ProjectedGcpTransformerInputOptions &
+  GcpProjectionInputOptions
+export type GcpProjectionInputOptions = {
+  gcpProjection: Projection
+}
+
+export function parseMap(annotation?: string): GeoreferencedMap {
+  if (annotation) {
+    const mapOrMaps = parseAnnotationValidateMap(parseJsonFromFile(annotation))
 
     if (Array.isArray(mapOrMaps) && mapOrMaps.length > 1) {
       throw new Error(mustContainOneMapMessage)
@@ -43,61 +81,255 @@ export function parseMap(options: { annotation?: string }): GeoreferencedMap {
   throw new Error('No Georeference Annotation supplied')
 }
 
+export function parseAnnotationsValidateMaps(
+  jsonValues: unknown[],
+  annotationInputs?: Partial<AnnotationInputOptions>
+): GeoreferencedMap[] {
+  const maps = jsonValues
+    .map((jsonValue) => parseAnnotationValidateMap(jsonValue, annotationInputs))
+    .flat()
+
+  return maps
+}
+
 export function parseAnnotationValidateMap(
-  jsonValue: unknown
+  jsonValue: unknown,
+  annotationInputs?: Partial<AnnotationInputOptions>
 ): GeoreferencedMap[] | GeoreferencedMap {
+  let mapOrMaps
   if (
     jsonValue &&
     typeof jsonValue === 'object' &&
     'type' in jsonValue &&
     (jsonValue.type === 'Annotation' || jsonValue.type === 'AnnotationPage')
   ) {
-    return parseAnnotation(jsonValue)
+    mapOrMaps = parseAnnotation(jsonValue)
   } else {
-    return validateGeoreferencedMap(jsonValue)
+    mapOrMaps = validateGeoreferencedMap(jsonValue)
+  }
+  mapOrMaps = mergeAnnotationInputsInMapOrMaps(mapOrMaps, annotationInputs)
+  return mapOrMaps
+}
+
+export function mergeAnnotationInputsInMapOrMaps(
+  mapOrMaps: GeoreferencedMap | GeoreferencedMap[],
+  annotationInputs?: Partial<AnnotationInputOptions>
+): GeoreferencedMap | GeoreferencedMap[] {
+  if (Array.isArray(mapOrMaps)) {
+    return mapOrMaps.map((map) =>
+      mergeAnnotationInputsInMap(map, annotationInputs)
+    )
+  } else {
+    return mergeAnnotationInputsInMap(mapOrMaps, annotationInputs)
   }
 }
 
-export function parseAnnotationsValidateMaps(
-  jsonValues: unknown[]
-): GeoreferencedMap[] {
-  const maps = jsonValues.map(parseAnnotationValidateMap).flat()
+export function mergeAnnotationInputsInMap(
+  map: GeoreferencedMap,
+  annotationInputs?: Partial<AnnotationInputOptions>
+): GeoreferencedMap {
+  // Merge object-properties: resource, transformation, ...
+  map.resource = mergeOptionsUnlessUndefined(map.resource, {
+    id: annotationInputs?.resourceId,
+    type: annotationInputs?.resourceType,
+    width: annotationInputs?.resourceWidth,
+    height: annotationInputs?.resourceHeight
+  })
 
-  return maps
+  const transformationTypeAndOrder = mergeOptionsUnlessUndefined(
+    map.transformation ?? { type: undefined },
+    transformationTypeToTypeAndOrder(annotationInputs?.transformationType)
+  )
+  if (transformationTypeAndOrder.type !== undefined) {
+    map.transformation = transformationTypeAndOrder
+  }
+
+  // Merge other properties
+  mergeOptionsUnlessUndefined(map, {
+    resourceMask: annotationInputs?.resourceMask,
+    gcps: annotationInputs?.gcps,
+    resourceCrs:
+      annotationInputs?.internalProjection ?? annotationInputs?.gcpProjection
+  })
+  return map
+}
+
+export function parseAnnotationInputOptions(
+  options: Partial<{
+    resourceId: string
+    resourceType: string
+    resourceWidth: number
+    resourceHeight: number
+    resourceMask: string
+    annotation: string
+    gcps: string
+    gcpFileFormat: GcpFileFormat
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
+    transformationType: string
+    polynomialOrder: number
+    internalProjectionDefinition: string
+    projectionDefinition: string
+  }>
+): Partial<AnnotationInputOptions> {
+  const {
+    resourceId,
+    resourceType,
+    resourceWidth,
+    resourceHeight,
+    resourceMask: resourceMaskString
+  } = options
+  // TODO: consider using parse functions from @allmaps/annotation
+  // TODO: parse resourceId: remove trailing '/'
+  // TODO: fix parsing SVG
+  const svgGeometry = resourceMaskString
+    ? stringToSvgGeometriesGenerator(resourceMaskString).next()
+    : undefined
+  let resourceMask
+  if (svgGeometry && svgGeometry.value) {
+    resourceMask = svgGeometryToGeometry(svgGeometry.value)
+    if (!isRing(resourceMask)) {
+      throw new Error('ResourceMask should be a ring')
+    }
+  }
+
+  const {
+    gcps,
+    gcpProjection,
+    transformationType,
+    internalProjection,
+    projection
+  } = parseProjectedGcpTransformerInputOptions(options)
+
+  return {
+    resourceId,
+    resourceType,
+    resourceWidth,
+    resourceHeight,
+    resourceMask,
+    transformationType,
+    internalProjection,
+    projection,
+    gcps,
+    gcpProjection
+  }
+}
+
+export function parseProjectedGcpTransformerInputOptions(
+  options: Partial<{
+    annotation: string
+    gcps: string
+    gcpFileFormat: GcpFileFormat
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
+    transformationType: string
+    polynomialOrder: number
+    internalProjectionDefinition: string
+    projectionDefinition: string
+    resourceWidth: number
+    resourceHeight: number
+  }>
+): Partial<ProjectedGcpTransformerInputOptions & GcpProjectionInputOptions> {
+  let map: GeoreferencedMap | undefined
+
+  try {
+    map = parseMap(options.annotation)
+  } catch (error) {
+    if (error instanceof Error && error.message == mustContainOneMapMessage) {
+      throw error
+    }
+    // If no map is found, try parsing GCPs and co from options instead of from map
+  }
+
+  return parseProjectedGcpTransformerInputOptionsAndMap(options, map)
+}
+
+export function parseProjectedGcpTransformerInputOptionsAndMap(
+  options: Partial<{
+    gcps: string
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
+    transformationType: string
+    polynomialOrder: number
+    internalProjectionDefinition: string
+    projectionDefinition: string
+    resourceWidth: number
+    resourceHeight: number
+  }>,
+  map?: GeoreferencedMap
+): Partial<ProjectedGcpTransformerInputOptions & GcpProjectionInputOptions> {
+  const { gcps, gcpProjection } = parseGcpInputOptions(options, map)
+  const { transformationType } = parseTransformationTypeInputOptions(
+    options,
+    map
+  )
+  const { internalProjection } = parseInternalProjectionInputOptions(
+    options,
+    map
+  )
+  const { projection } = parseProjectionInputOptions(options)
+
+  return {
+    gcps,
+    gcpProjection,
+    transformationType,
+    internalProjection,
+    projection
+  }
 }
 
 export function parseGcpInputOptions(
-  options: { gcps?: string },
+  options: Partial<{
+    gcps: string
+    gcpResourceWidth: number
+    gcpResourceHeight: number
+    gcpResourceOrigin: GcpResourceOrigin
+    gcpResourceYAxis: GcpResourceYAxis
+    gcpProjectionDefinition: string
+    resourceWidth: number
+    resourceHeight: number
+  }>,
   map?: GeoreferencedMap
-): GcpsInputs {
+): Partial<GcpsInputOptions & GcpProjectionInputOptions> {
   let gcps: Gcp[]
+  const { gcpProjection } = parseGcpProjectionInputOptions(options)
+
   if (options.gcps) {
-    gcps = parseGcpsFromFile(options.gcps)
+    try {
+      // The GCP option was provided by another georeferenced map
+      gcps = parseMap(options.gcps).gcps
+      return { gcps, gcpProjection }
+    } catch (e) {
+      // The GCP option was provided by a file with GCPs
+      const gcpString = readFromFile(options.gcps)
+      gcps = parseGcps(gcpString, mergeOptions(options, { gcpProjection })).gcps
+      return { gcps, gcpProjection }
+    }
   } else if (map) {
+    // Use the GCPs already from the already parsed annotation
     gcps = map.gcps
-  } else {
-    throw new Error(
-      'No GCPs supplied. Supply a Georeference Annotation or a file containing GCPs.'
-    )
+    return { gcps, gcpProjection }
+  }
+  return { gcpProjection }
+}
+
+export function parseCoordinates(coordinates: string): number[][] {
+  const lines = coordinates.trim().split('\n')
+
+  if (lines.length == 0) {
+    throw new Error('No coordinates')
   }
 
-  return { gcps }
-}
-
-export function parseGcpsFromFile(file: string): Gcp[] {
-  // TODO: also allow file to contain GCPs in the Georeference Annotation GCP format
-  return (
-    parseCoordinateArrayArrayFromFile(file) as [
-      [number, number, number, number]
-    ]
-  ).map((coordinateArray) => ({
-    resource: [coordinateArray[0], coordinateArray[1]],
-    geo: [coordinateArray[2], coordinateArray[3]]
-  }))
-}
-
-export function parseCoordinateArrayArrayFromFile(file: string): number[][] {
-  return parseCoordinatesArrayArray(readFromFile(file))
+  return parseGdalCoordinateLines(lines)
 }
 
 export function parseTransformationTypeInputOptions(
@@ -106,54 +338,49 @@ export function parseTransformationTypeInputOptions(
     polynomialOrder?: number
   },
   map?: GeoreferencedMap
-): TransformationTypeInputs {
+): Partial<TransformationTypeInputOptions> {
   let transformationType: TransformationType
-  if (
-    options.transformationType === 'polynomial' &&
-    (options.polynomialOrder === 1 || options.polynomialOrder === undefined)
-  ) {
-    transformationType = 'polynomial1'
-  } else if (
-    options.transformationType === 'polynomial' &&
-    options.polynomialOrder === 2
-  ) {
-    transformationType = 'polynomial2'
-  } else if (
-    options.transformationType === 'polynomial' &&
-    options.polynomialOrder === 3
-  ) {
-    transformationType = 'polynomial3'
-  } else if (options.transformationType === 'thinPlateSpline') {
-    transformationType = options.transformationType
-  } else if (options.transformationType === 'linear') {
-    transformationType = options.transformationType
-  } else if (options.transformationType === 'helmert') {
-    transformationType = options.transformationType
-  } else if (options.transformationType === 'projective') {
-    transformationType = options.transformationType
+  if (options.transformationType) {
+    const transformationType = typeAndOrderToTransformationType({
+      type: options.transformationType,
+      options: { order: options.polynomialOrder }
+    })
+    return { transformationType }
   } else if (map && map.transformation) {
     transformationType = map.transformation.type
-  } else {
-    transformationType = 'polynomial'
+    return { transformationType }
   }
 
-  return { transformationType }
+  return {}
 }
 
 export function parseInternalProjectionInputOptions(
   options: Partial<{
-    internalProjection: string
+    gcps?: string
+    internalProjectionDefinition: string
   }>,
   map?: GeoreferencedMap
-): Partial<InternalProjectionInputs> {
-  const internalProjectionInputs: Partial<InternalProjectionInputs> = {}
+): Partial<InternalProjectionInputOptions> {
+  const internalProjectionInputs: Partial<InternalProjectionInputOptions> = {}
 
-  if (options && typeof options === 'object') {
-    if ('internalProjection' in options && options.internalProjection) {
-      internalProjectionInputs.internalProjection = {
-        definition: options.internalProjection
-      } as Projection
-    }
+  if (
+    options &&
+    typeof options === 'object' &&
+    'internalProjectionDefinition' in options &&
+    options.internalProjectionDefinition
+  ) {
+    internalProjectionInputs.internalProjection = {
+      definition: options.internalProjectionDefinition
+    } as Projection
+  } else if (
+    options &&
+    typeof options === 'object' &&
+    'gcps' in options &&
+    options.gcps
+  ) {
+    const gcpString = readFromFile(options.gcps)
+    internalProjectionInputs.internalProjection =
+      parseGcpProjectionFromGcpString(gcpString)
   } else if (
     map &&
     map.resourceCrs &&
@@ -165,49 +392,46 @@ export function parseInternalProjectionInputOptions(
   return internalProjectionInputs
 }
 
-export function parseProjectedGcpTransformerInputOptions(
+export function parseProjectionInputOptions(
   options: Partial<{
-    annotation: string
-    gcps: string
-    transformationType: string
-    polynomialOrder: number
-    internalProjection: string
+    projectionDefinition: string
   }>
-): ProjectedGcpTransformerInputs {
-  let map: GeoreferencedMap | undefined
+): Partial<ProjectionInputOptions> {
+  const projectionInputs: Partial<ProjectionInputOptions> = {}
 
-  try {
-    map = parseMap(options)
-  } catch (error) {
-    if (error instanceof Error && error.message === mustContainOneMapMessage) {
-      throw error
-    }
-    // If no map is found, try parsing GCPs from options instead of a map
+  if (
+    options &&
+    typeof options === 'object' &&
+    'projectionDefinition' in options &&
+    options.projectionDefinition
+  ) {
+    projectionInputs.projection = {
+      definition: options.projectionDefinition
+    } as Projection
   }
 
-  return parseProjectedGcpTransformerInputOptionsAndMap(options, map)
+  return projectionInputs
 }
 
-export function parseProjectedGcpTransformerInputOptionsAndMap(
+export function parseGcpProjectionInputOptions(
   options: Partial<{
-    gcps: string
-    transformationType: string
-    polynomialOrder: number
-    internalProjection: string
-  }>,
-  map?: GeoreferencedMap
-): ProjectedGcpTransformerInputs {
-  const { gcps } = parseGcpInputOptions(options, map)
-  const { transformationType } = parseTransformationTypeInputOptions(
-    options,
-    map
-  )
-  const { internalProjection } = parseInternalProjectionInputOptions(
-    options,
-    map
-  )
+    gcpProjectionDefinition: string
+  }>
+): Partial<{ gcpProjection: Projection }> {
+  const gcpProjectionInputs: Partial<{ gcpProjection: Projection }> = {}
 
-  return { gcps, transformationType, internalProjection }
+  if (
+    options &&
+    typeof options === 'object' &&
+    'gcpProjectionDefinition' in options &&
+    options.gcpProjectionDefinition
+  ) {
+    gcpProjectionInputs.gcpProjection = {
+      definition: options.gcpProjectionDefinition
+    } as Projection
+  }
+
+  return gcpProjectionInputs
 }
 
 export function parseProjectedGcpTransformOptions(options: {
@@ -248,12 +472,6 @@ export function parseProjectedGcpTransformOptions(options: {
     if ('geoIsGeographic' in options && options.geoIsGeographic) {
       partialProjectedGcpTransformOptions.geoIsGeographic =
         options.geoIsGeographic
-    }
-
-    if ('projection' in options && options.projection) {
-      partialProjectedGcpTransformOptions.projection = {
-        definition: options.projection
-      } as Projection
     }
   }
 
@@ -322,13 +540,13 @@ export function parseAttachInputs(
     removeExistingGcps: boolean
   }>
 ): RcpsInput &
-  TransformationTypeInputs &
+  Partial<TransformationTypeInputOptions> &
   Partial<AttachedTransformationOptions> {
   const rcps = parseRcps(options)
   const { transformationType } = parseTransformationTypeInputOptions(options)
 
   const partialAttachedTransformationOptions: RcpsInput &
-    TransformationTypeInputs &
+    Partial<TransformationTypeInputOptions> &
     Partial<AttachedTransformationOptions> = {
     rcps,
     transformationType
@@ -383,16 +601,38 @@ export function parseInverseOptions(options: {
   return transformOptions
 }
 
-export function parseCoordinatesArrayArray(
-  coordinatesString: string
-): number[][] {
-  // String from mutliline file where each line contains multiple coordinates separated by whitespace
-  return coordinatesString
-    .trim()
-    .split('\n')
-    .map((coordinatesLineString) =>
-      coordinatesLineString
-        .split(/\s+/)
-        .map((coordinateString) => Number(coordinateString.trim()))
+export function parseCommanderGcpFileFormatOption(
+  string: string
+): GcpFileFormat {
+  if (supportedGcpFileFormats.includes(string)) {
+    return string as GcpFileFormat
+  } else {
+    throw new Error(
+      `Unsupported GCP file format. Supported formats are ${supportedGcpFileFormats.join(', ')}`
     )
+  }
+}
+
+export function parseCommanderGcpResourceOrigin(
+  string: string
+): GcpResourceOrigin {
+  if (supportedGcpResourceOrigin.includes(string)) {
+    return string as GcpResourceOrigin
+  } else {
+    throw new Error(
+      `Unsupported GCP resource origin. Supported formats are ${supportedGcpResourceOrigin.join(', ')}`
+    )
+  }
+}
+
+export function parseCommanderGcpResourceYAxis(
+  string: string
+): GcpResourceYAxis {
+  if (supportedGcpResourceYAxis.includes(string)) {
+    return string as GcpResourceYAxis
+  } else {
+    throw new Error(
+      `Unsupported GCP resource y axis. Supported formats are ${supportedGcpResourceYAxis.join(', ')}`
+    )
+  }
 }

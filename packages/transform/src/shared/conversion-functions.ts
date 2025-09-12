@@ -3,7 +3,8 @@ import type { Gcp, Point } from '@allmaps/types'
 import type {
   GeneralGcp,
   GeneralGcpAndDistortions,
-  GcpAndDistortions
+  GcpAndDistortions,
+  TransformationType
 } from './types.js'
 
 // Invert
@@ -62,4 +63,68 @@ export function gcpToGeneralGcp(
     distortions: gcp.distortions,
     distortion: gcp.distortion
   }
+}
+
+// TransformationType
+
+// TODO: implement this as a separate, callable function in @allmaps/annotation?
+export function transformationTypeToTypeAndOrder(
+  transformationType?: TransformationType
+): { type?: string; options?: { order: number } } {
+  if (
+    transformationType === 'polynomial' ||
+    transformationType === 'polynomial1'
+  ) {
+    return {
+      type: 'polynomial',
+      options: {
+        order: 1
+      }
+    }
+  } else if (transformationType === 'polynomial2') {
+    return {
+      type: 'polynomial',
+      options: {
+        order: 2
+      }
+    }
+  } else if (transformationType === 'polynomial3') {
+    return {
+      type: 'polynomial',
+      options: {
+        order: 3
+      }
+    }
+  } else {
+    return {
+      type: transformationType
+    }
+  }
+}
+
+export function typeAndOrderToTransformationType(transformation: {
+  type?: string
+  options?: { order?: number }
+}): TransformationType {
+  const type = transformation.type
+  const order = transformation.options?.order
+  let transformationType: TransformationType
+  if (type == 'polynomial1' || type === 'polynomial') {
+    transformationType = 'polynomial1'
+  } else if (type == 'polynomial2' || (type === 'polynomial' && order === 2)) {
+    transformationType = 'polynomial2'
+  } else if (type == 'polynomial3' || (type === 'polynomial' && order === 3)) {
+    transformationType = 'polynomial3'
+  } else if (type === 'thinPlateSpline') {
+    transformationType = type
+  } else if (type === 'linear') {
+    transformationType = type
+  } else if (type === 'helmert') {
+    transformationType = type
+  } else if (type === 'projective') {
+    transformationType = type
+  } else {
+    throw new Error('Unrecognised transformationType.')
+  }
+  return transformationType
 }

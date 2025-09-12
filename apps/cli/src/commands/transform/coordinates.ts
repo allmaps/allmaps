@@ -1,6 +1,6 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { ProjectedGcpTransformer } from '@allmaps/project'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import {
   mergeOptionsUnlessUndefined,
   mergePartialOptions
@@ -8,11 +8,12 @@ import {
 
 import { readInput, printString, readFromStdinLine } from '../../lib/io.js'
 import {
-  parseCoordinatesArrayArray,
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions,
-  parseInverseOptions
+  parseInverseOptions,
+  parseCoordinates,
+  mustContainGcpsMessage
 } from '../../lib/parse.js'
 import {
   addAnnotationOptions,
@@ -52,13 +53,23 @@ This command was inspired by gdaltransform.`
   )
 
   return command.action(async (files, options) => {
-    const { gcps, transformationType, internalProjection } =
+    const projectedGcpTransformerInputOptions =
       parseProjectedGcpTransformerInputOptions(options)
+    const { gcps, transformationType, internalProjection } =
+      projectedGcpTransformerInputOptions
+    let { projection } = projectedGcpTransformerInputOptions
     const partialProjectedGcpTransformerOptions =
       parseProjectedGcpTransformerOptions(options)
     const partialProjectedGcpTransformOptions =
       parseProjectedGcpTransformOptions(options)
     const partialInverseOptions = parseInverseOptions(options)
+
+    if (gcps === undefined) {
+      throw new Error(mustContainGcpsMessage)
+    }
+    if (projection === undefined) {
+      projection = lonLatProjection
+    }
 
     const projectedTransformer = new ProjectedGcpTransformer(
       gcps,
@@ -68,7 +79,7 @@ This command was inspired by gdaltransform.`
           partialProjectedGcpTransformerOptions,
           partialProjectedGcpTransformOptions
         ),
-        { internalProjection }
+        { internalProjection, projection }
       )
     )
 
@@ -105,7 +116,7 @@ function processPointString(
 ) {
   // Parse pointString to array of points and transform them
   const outputPoints: Point[] = []
-  const pointArray = parseCoordinatesArrayArray(pointString) as Point[]
+  const pointArray = parseCoordinates(pointString) as Point[]
   pointArray.forEach((point) => {
     outputPoints.push(
       partialInverseOptions.inverse

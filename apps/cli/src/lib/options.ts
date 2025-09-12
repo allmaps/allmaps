@@ -1,6 +1,11 @@
 import { defaultProjectedGcpTransformOptions } from '@allmaps/project'
 
 import type { Command, OptionValues } from '@commander-js/extra-typings'
+import {
+  parseCommanderGcpFileFormatOption,
+  parseCommanderGcpResourceOrigin,
+  parseCommanderGcpResourceYAxis
+} from './parse.js'
 
 export function addAnnotationOptions<
   Args extends unknown[] = [],
@@ -10,12 +15,35 @@ export function addAnnotationOptions<
   // Note: annotation is not required since transformer can be built using only GCPs, which could be specified individually.
   // This is especially useful when transforming coordinates, outside of the Allmaps context.
   // An error message is still displayed when neither an annotation or GCPs are specified
-  return addProjectedGcpTransformerInputOptions(
+  return addAnnotationInputOptions(
     command.option(
       '-a, --annotation <filename>',
-      'Filename of Georeference Annotation (or Georeferenced Map)'
+      'Filename of Georeference Annotation (or Georeferenced Map).'
     )
   )
+}
+
+export function addAnnotationInputOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return addProjectedGcpTransformerInputOptions(
+    addResourceInputOptions(command)
+  )
+}
+
+export function addResourceInputOptions<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command
+    .option('--resource-id <string>', 'Resource ID.')
+    .option('--resource-type <string>', 'Resource type.')
+    .option('--resource-width <number>', 'Resource width.', parseInt)
+    .option('--resource-height <number>', 'Resource height.', parseInt)
+    .option('--resource-mask <string>', 'Resource mask.')
 }
 
 export function addProjectedGcpTransformerInputOptions<
@@ -26,7 +54,36 @@ export function addProjectedGcpTransformerInputOptions<
   return command
     .option(
       '-g, --gcps <filename>',
-      'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation'
+      'Filename of GCP file. These GCPs take precedence over the GCPs from the Georeference Annotation (or Georeferenced Map).'
+    )
+    .option(
+      '--gcp-file-format <gcpFileFormat>',
+      'GCP file format.',
+      parseCommanderGcpFileFormatOption
+    )
+    .option(
+      '--gcp-resource-origin <gcpResourceOrigin>',
+      'Resource origin in the GCP file: "bottom-left" or "top-left".',
+      parseCommanderGcpResourceOrigin
+    )
+    .option(
+      '--gcp-resource-y-axis <gcpResourceYAxis>',
+      'Y axis orientation in the GCP file: "up" or "down".',
+      parseCommanderGcpResourceYAxis
+    )
+    .option(
+      '--gcp-resource-width <number>',
+      'Resource width in the GCP file. Can be different the resource width of the map, if the GCPs were created from the same image but on a different scale.',
+      parseFloat
+    )
+    .option(
+      '--gcp-resource-height <number>',
+      'Resource height in the GCP file. Can be different the resource height of the map, if the GCPs were created from the same image but on a different scale.',
+      parseFloat
+    )
+    .option(
+      '--gcp-projection-definition <proj4stringOrWktDefinition>',
+      `The geographic projection used in the GCP file.`
     )
     .option(
       '-t, --transformation-type <type>',
@@ -39,9 +96,12 @@ export function addProjectedGcpTransformerInputOptions<
       parseInt
     )
     .option(
-      '--internal-projection <proj4string>',
-      `The geographic projection used internally in the transformation.`,
-      'EPSG:3857'
+      '--internal-projection-definition <proj4stringOrWktDefinition>',
+      `The geographic projection used internally in the transformation.`
+    )
+    .option(
+      '--projection-definition <proj4stringOrWktDefinition>',
+      `The geographic projection rendered in the viewport.`
     )
 }
 
@@ -49,12 +109,7 @@ export function addProjectedGcpTransformOptions<
   Args extends unknown[] = [],
   Opts extends OptionValues = Record<string, unknown>,
   GlobalOpts extends OptionValues = Record<string, unknown>
->(
-  command: Command<Args, Opts, GlobalOpts>,
-  defaultOptions: { projectionDefinition: string } = {
-    projectionDefinition: 'EPSG:4326'
-  }
-) {
+>(command: Command<Args, Opts, GlobalOpts>) {
   return command
     .option(
       '-m, --max-depth <number>',
@@ -79,11 +134,6 @@ export function addProjectedGcpTransformOptions<
     .option(
       '--geo-is-geographic',
       `Use geographic distances and midpoints for lon-lat geo points.`
-    )
-    .option(
-      '--projection <proj4string>',
-      `The geographic projection rendered in the viewport.`,
-      defaultOptions.projectionDefinition
     )
 }
 

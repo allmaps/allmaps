@@ -19,6 +19,7 @@ export {
   Projection,
   ProjectedGcpTransformOptions,
   ProjectedGcpTransformerOptions,
+  ProjectionInputs,
   InternalProjectionInputs,
   ProjectedGcpTransformerInputs
 } from './shared/types.js'
