@@ -394,20 +394,6 @@ There are no parameters.
 
 * L.LatLngBounds in array form of all visible maps
 
-### `WarpedMapLayer#getDefaultMapMergedOptions()`
-
-Get the default map merged options of a specific map ID
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`SpecificWebGL2WarpedMapOptions &
-  SpecificTriangulatedWarpedMapOptions &
-  WarpedMapOptions`.
-
 ### `WarpedMapLayer#getLayerOptions()`
 
 Get the layer options
@@ -419,6 +405,22 @@ There are no parameters.
 ###### Returns
 
 `{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; ... 63 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+
+### `WarpedMapLayer#getMapDefaultOptions()`
+
+Get the default options of a map
+
+These come from the default option settings and it's georeferenced map proporties
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`SpecificWebGL2WarpedMapOptions &
+  SpecificTriangulatedWarpedMapOptions &
+  WarpedMapOptions`.
 
 ### `WarpedMapLayer#getMapIds()`
 
@@ -434,22 +436,9 @@ There are no parameters.
 
 `Array<string>`.
 
-### `WarpedMapLayer#getMapMergedOptions(mapId)`
+### `WarpedMapLayer#getMapMapOptions(mapId)`
 
-Get the map merged options of a specific map ID
-
-###### Parameters
-
-* `mapId` (`string`)
-  * Map ID for which the options apply
-
-###### Returns
-
-`WebGL2WarpedMapOptions | undefined`.
-
-### `WarpedMapLayer#getMapOptions(mapId)`
-
-Get the map options of a specific map ID
+Get the map-specific options of a map
 
 ###### Parameters
 
@@ -460,9 +449,25 @@ Get the map options of a specific map ID
 
 `Partial<WebGL2WarpedMapOptions> | undefined`.
 
+### `WarpedMapLayer#getMapOptions(mapId)`
+
+Get the options of a map
+
+These options are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which the options apply
+
+###### Returns
+
+`WebGL2WarpedMapOptions | undefined`.
+
 ### `WarpedMapLayer#getMapZIndex(mapId)`
 
-Get the z-index of a specific map ID
+Get the z-index of a map
 
 ###### Parameters
 
@@ -471,7 +476,7 @@ Get the z-index of a specific map ID
 
 ###### Returns
 
-The z-index of a specific map ID (`number | undefined`).
+The z-index of a map (`number | undefined`).
 
 ### `WarpedMapLayer#getMapsBbox(mapIds, projectionOptions)`
 
@@ -532,7 +537,7 @@ The convex hull of all selected maps, in the chosen projection, or undefined if 
 
 ### `WarpedMapLayer#getWarpedMap(mapId)`
 
-Get the WarpedMap instance for a specific map
+Get the WarpedMap instance for a map
 
 ###### Parameters
 
@@ -725,7 +730,7 @@ WebGL2Renderer
 
 ### `WarpedMapLayer#resetLayerOptions(layerOptionKeys, setOptionsOptions)`
 
-Resets the layer options
+Reset the layer options
 
 An empty array resets all options, undefined resets no options.
 Doesn't reset render options or specific warped map layer options
@@ -743,7 +748,7 @@ Doesn't reset render options or specific warped map layer options
 
 ### `WarpedMapLayer#resetMapsOptions(mapIds, mapOptionKeys, layerOptionKeys, setOptionsOptions)`
 
-Resets the map options of specific map IDs
+Reset the map-specific options of maps (and the layer options)
 
 An empty array resets all options, undefined resets no options.
 Doesn't reset render options or specific warped map layer options
@@ -753,7 +758,7 @@ Doesn't reset render options or specific warped map layer options
 * `mapIds` (`Array<string>`)
   * Map IDs for which to reset the options
 * `mapOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the map options to reset
+  * Keys of the map-specific options to reset
 * `layerOptionKeys?` (`Array<string> | undefined`)
   * Keys of the layer options to reset
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -765,7 +770,7 @@ Doesn't reset render options or specific warped map layer options
 
 ### `WarpedMapLayer#resetMapsOptionsByMapId(mapOptionkeysByMapId, layerOptionKeys, setOptionsOptions)`
 
-Resets the map options of specific maps by map ID
+Reset the map-specific options of maps by map ID (and the layer options)
 
 An empty array or map resets all options (for all maps), undefined resets no options.
 Doesn't reset render options or specific warped map layer options
@@ -773,7 +778,7 @@ Doesn't reset render options or specific warped map layer options
 ###### Parameters
 
 * `mapOptionkeysByMapId` (`Map<string, Array<string>>`)
-  * Keys of map options to reset by map ID
+  * Keys of map-specific options to reset by map ID
 * `layerOptionKeys?` (`Array<string> | undefined`)
   * Keys of the layer options to reset
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -819,7 +824,7 @@ Send maps to back
 
 ### `WarpedMapLayer#setLayerOptions(layerOptions, setOptionsOptions)`
 
-Sets the layer options
+Set the layer options
 
 ###### Parameters
 
@@ -840,14 +845,14 @@ warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
 
 ### `WarpedMapLayer#setMapsOptions(mapIds, mapOptions, layerOptions, setOptionsOptions)`
 
-Sets the map options of specific map IDs
+Set the map-specific options of maps (and the layer options)
 
 ###### Parameters
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsSize?: number | undefined; renderGcpsColor?: string | undefined; renderGcpsBorderSize?: number | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | u...`)
-  * Options to set
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  * Map-specific options to set
 * `layerOptions?` (`  | Partial<SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
     | undefined`)
   * Layer options to set
@@ -861,17 +866,17 @@ Sets the map options of specific map IDs
 ###### Examples
 
 ```ts
-warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+warpedMapLayer.setMapOptions([myMapId], { transformationType: 'thinPlateSpline' })
 ```
 
 ### `WarpedMapLayer#setMapsOptionsByMapId(mapOptionsByMapId, layerOptions, setOptionsOptions)`
 
-Sets the map options of specific maps by map ID
+Set the map-specific options of maps by map ID (and the layer options)
 
 ###### Parameters
 
 * `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
-  * Map options to set by map ID
+  * Map-specific options to set by map ID
 * `layerOptions?` (`  | Partial<SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
     | undefined`)
   * Layer options to set

@@ -342,9 +342,9 @@ SpecificWarpedMapListOptions & Partial<WebGL2WarpedMapOptions>
 
 * `colorize` (`boolean`)
 * `colorizeColor` (`string`)
-* `debugTiles` (`false`)
-* `debugTriangles` (`false`)
-* `debugTriangulation` (`false`)
+* `debugTiles` (`boolean`)
+* `debugTriangles` (`boolean`)
+* `debugTriangulation` (`boolean`)
 * `distortionColor00` (`string`)
 * `distortionColor01` (`string`)
 * `distortionColor1` (`string`)
@@ -482,12 +482,12 @@ SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 { resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
-### `TriangulatedWarpedMap#mergedOptions`
+### `TriangulatedWarpedMap#mapOptions?`
 
 ###### Type
 
 ```ts
-SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
+{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `TriangulatedWarpedMap#mixPreviousAndNew(t)`
@@ -503,12 +503,12 @@ Mix previous transform properties with new ones (when changing an ongoing animat
 
 `void`.
 
-### `TriangulatedWarpedMap#options?`
+### `TriangulatedWarpedMap#options`
 
 ###### Type
 
 ```ts
-{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 ```
 
 ### `TriangulatedWarpedMap#previousResourceResolution`
@@ -976,11 +976,21 @@ number
 [number, number]
 ```
 
+### `Viewport#getGeoBufferedRectangle(bufferFraction)`
+
+###### Parameters
+
+* `bufferFraction?` (`number | undefined`)
+
+###### Returns
+
+`[Point, Point, Point, Point]`.
+
 ### `Viewport#getProjectedGeoBufferedRectangle(bufferFraction)`
 
 ###### Parameters
 
-* `bufferFraction` (`number`)
+* `bufferFraction?` (`number | undefined`)
 
 ###### Returns
 
@@ -1589,12 +1599,12 @@ boolean
 string
 ```
 
-### `WarpedMap#mergedOptions`
+### `WarpedMap#mapOptions?`
 
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn; imageInfoByMapId?: ImageInfoByMapId; gcps: Gcp[]; resourceMask: Ring; transformationType: TransformationType; ... 4 more ...; distortionMeasure: DistortionMeasure | undefined; }
+{ fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `WarpedMap#mixPreviousAndNew(t)`
@@ -1618,12 +1628,12 @@ Mix previous transform properties with new ones (when changing an ongoing animat
 false
 ```
 
-### `WarpedMap#options?`
+### `WarpedMap#options`
 
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ fetchFn?: FetchFn; imageInfoByMapId?: ImageInfoByMapId; gcps: Gcp[]; resourceMask: Ring; transformationType: TransformationType; ... 4 more ...; distortionMeasure: DistortionMeasure | undefined; }
 ```
 
 ### `WarpedMap#overviewFetchableTilesForViewport`
@@ -1832,6 +1842,14 @@ ProjectedGcpTransformer
 
 ```ts
 Map<TransformationType, ProjectedGcpTransformer>
+```
+
+### `WarpedMap#projectedTransformerDoubleCache`
+
+###### Type
+
+```ts
+Map<TransformationType, Map<string, ProjectedGcpTransformer>>
 ```
 
 ### `WarpedMap#projection`
@@ -2049,22 +2067,22 @@ Set the internal projection
 
 `object`.
 
-### `WarpedMap#setMergedOptions(setOptionsOptions)`
+### `WarpedMap#setMapOptions(mapOptions, listOptions, setOptionsOptions)`
 
 ###### Parameters
 
+* `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
+* `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
 
 ###### Returns
 
 `object`.
 
-### `WarpedMap#setOptions(options, listOptions, setOptionsOptions)`
+### `WarpedMap#setOptions(setOptionsOptions)`
 
 ###### Parameters
 
-* `options?` (`Partial<WarpedMapOptions> | undefined`)
-* `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
 
 ###### Returns
@@ -2524,9 +2542,11 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapList#getDefaultMapMergedOptions()`
+### `WarpedMapList#getMapDefaultOptions()`
 
-Get the default map merged options
+Get the default options of a map
+
+These come from the default option settings and it's georeferenced map proporties
 
 ###### Parameters
 
@@ -2562,22 +2582,9 @@ The selectionOptions allow a.o. to:
 
 mapIds (`Array<string>`).
 
-### `WarpedMapList#getMapMergedOptions(mapId)`
+### `WarpedMapList#getMapMapOptions(mapId)`
 
-Get the map merged options of a specific map ID
-
-###### Parameters
-
-* `mapId` (`string`)
-  * Map ID for which the options apply
-
-###### Returns
-
-`GetWarpedMapOptions<W> | undefined`.
-
-### `WarpedMapList#getMapOptions(mapId)`
-
-Get the map merged options of a specific map ID
+Get the map-specific options of a map
 
 ###### Parameters
 
@@ -2588,9 +2595,25 @@ Get the map merged options of a specific map ID
 
 `Partial<GetWarpedMapOptions<W>> | undefined`.
 
+### `WarpedMapList#getMapOptions(mapId)`
+
+Get the options of a map
+
+These options are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which the options apply
+
+###### Returns
+
+`GetWarpedMapOptions<W> | undefined`.
+
 ### `WarpedMapList#getMapZIndex(mapId)`
 
-Get the z-index of a specific map ID
+Get the z-index of a map
 
 ###### Parameters
 
@@ -2683,7 +2706,7 @@ There are no parameters.
 
 ### `WarpedMapList#getWarpedMap(mapId)`
 
-Get the WarpedMap instance for a specific map
+Get the WarpedMap instance for a map
 
 ###### Parameters
 
@@ -2724,13 +2747,13 @@ WarpedMap instances (`Iterable<W>`).
 
 `void`.
 
-### `WarpedMapList#internalSetMapsOptionsByMapId(optionsByMapId, listOptions, setOptionsOptions)`
+### `WarpedMapList#internalSetMapsOptionsByMapId(mapOptionsByMapId, listOptions, setOptionsOptions)`
 
 Internal set map options
 
 ###### Parameters
 
-* `optionsByMapId?` (`Map<string, Partial<WarpedMapListOptions> | undefined> | undefined`)
+* `mapOptionsByMapId?` (`Map<string, Partial<WarpedMapListOptions> | undefined> | undefined`)
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
 
@@ -2840,7 +2863,7 @@ There are no parameters.
 
 ### `WarpedMapList#resetMapsOptions(mapIds, mapOptionKeys, listOptionKeys, setOptionsOptions)`
 
-Resets the map options of specific map IDs
+Resets the map-specific options of maps (and the list options)
 
 An empty array resets all options, undefined resets no options.
 
@@ -2849,7 +2872,7 @@ An empty array resets all options, undefined resets no options.
 * `mapIds` (`Array<string>`)
   * Map IDs for which to reset the options
 * `mapOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the map options to reset
+  * Keys of the map-specific options to reset
 * `listOptionKeys?` (`Array<string> | undefined`)
   * Keys of the list options to reset
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -2861,14 +2884,14 @@ An empty array resets all options, undefined resets no options.
 
 ### `WarpedMapList#resetMapsOptionsByMapId(mapOptionkeysByMapId, listOptionKeys, setOptionsOptions)`
 
-Resets the map options of specific maps by map ID
+Resets the map-specific options of maps by map ID (and the list options)
 
 An empty array or map resets all options (for all maps), undefined resets no options.
 
 ###### Parameters
 
 * `mapOptionkeysByMapId?` (`Map<string, Array<string>> | undefined`)
-  * Keys of map options to reset by map ID
+  * Keys of map-specific options to reset by map ID
 * `listOptionKeys?` (`Array<string> | undefined`)
   * Keys of the list options to reset
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -2929,16 +2952,16 @@ Changes the z-index of the specified maps to send them to back
 
 `void`.
 
-### `WarpedMapList#setMapsOptions(mapIds, options, listOptions, setOptionsOptions)`
+### `WarpedMapList#setMapsOptions(mapIds, mapOptions, listOptions, setOptionsOptions)`
 
-Set the map options of specific map IDs
+Set the map-specific options of maps (and the list options)
 
 ###### Parameters
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which the options apply
-* `options?` (`Partial<WarpedMapListOptions> | undefined`)
-  * Options
+* `mapOptions?` (`Partial<WarpedMapListOptions> | undefined`)
+  * Map-specific options
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
   * list options
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -2948,18 +2971,18 @@ Set the map options of specific map IDs
 
 `void`.
 
-### `WarpedMapList#setMapsOptionsByMapId(optionsByMapId, listOptions, setOptionsOptions)`
+### `WarpedMapList#setMapsOptionsByMapId(mapOptionsByMapId, listOptions, setOptionsOptions)`
 
-Set the map options of specific maps by map ID
+Set the map-specific options of maps by map ID (and the list options)
 
 This is useful when when multiple (and possibly different)
-map options are changed at once,
+map-specific options are changed at once,
 but only one animation should be fired
 
 ###### Parameters
 
-* `optionsByMapId?` (`Map<string, Partial<WarpedMapListOptions>> | undefined`)
-  * Options by map ID
+* `mapOptionsByMapId?` (`Map<string, Partial<WarpedMapListOptions>> | undefined`)
+  * Map-specific options by map ID
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
   * List options
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -2973,7 +2996,7 @@ but only one animation should be fired
 
 Set the options of this list
 
-Map-specific options will be passed to newly added maps.
+Note: Map-specific options set here will be passed to newly added maps.
 
 ###### Parameters
 
@@ -3280,6 +3303,14 @@ null
 { renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
+### `WebGL2WarpedMap#mapOptions?`
+
+###### Type
+
+```ts
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
+```
+
 ### `WebGL2WarpedMap#mapProgram`
 
 ###### Type
@@ -3296,7 +3327,7 @@ WebGLProgram
 null
 ```
 
-### `WebGL2WarpedMap#mergedOptions`
+### `WebGL2WarpedMap#options`
 
 ###### Type
 
@@ -3304,14 +3335,6 @@ null
 SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions
-```
-
-### `WebGL2WarpedMap#options?`
-
-###### Type
-
-```ts
-{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
 ### `WebGL2WarpedMap#parsedImage`
@@ -3388,7 +3411,7 @@ There are no parameters.
 
 `void`.
 
-### `WebGL2WarpedMap#setMergedOptions(setOptionsOptions)`
+### `WebGL2WarpedMap#setOptions(setOptionsOptions)`
 
 ###### Parameters
 
@@ -4421,6 +4444,14 @@ null
 { renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
+### `WebGL2WarpedMap#mapOptions?`
+
+###### Type
+
+```ts
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
+```
+
 ### `WebGL2WarpedMap#mapProgram`
 
 ###### Type
@@ -4437,7 +4468,7 @@ WebGLProgram
 null
 ```
 
-### `WebGL2WarpedMap#mergedOptions`
+### `WebGL2WarpedMap#options`
 
 ###### Type
 
@@ -4445,14 +4476,6 @@ null
 SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions
-```
-
-### `WebGL2WarpedMap#options?`
-
-###### Type
-
-```ts
-{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
 ### `WebGL2WarpedMap#parsedImage`
@@ -4529,7 +4552,7 @@ There are no parameters.
 
 `void`.
 
-### `WebGL2WarpedMap#setMergedOptions(setOptionsOptions)`
+### `WebGL2WarpedMap#setOptions(setOptionsOptions)`
 
 ###### Parameters
 

@@ -477,31 +477,6 @@ Array<Gcp>
 (point: Point) => Point
 ```
 
-### `ProjectedGcpTransformer#setProjection(projection)`
-
-Set the projection.
-
-To transform 'toGeo' or 'toResource' to or from a different projection
-than set on a transformer's construction (but using the same internal projection)
-it's possible to specify the requested projection in the transform options.
-
-This way we circumvent a possibly expensive recomputation
-of the toGeo and/or toResource transformations.
-
-To do this more systematically, it's possible to set
-a projected gcp transformer's projection using this method
-
-Combine this with a deep clone of the transformer instance
-to keep the original transformer as well.
-
-###### Parameters
-
-* `projection` (`{name?: string; definition: ProjectionDefinition}`)
-
-###### Returns
-
-this (`this`).
-
 ### `ProjectedGcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
@@ -540,6 +515,32 @@ Create a Projected GCP Transformer from a Georeferenced Map
 ###### Returns
 
 A Projected GCP Transformer (`ProjectedGcpTransformer`).
+
+### `ProjectedGcpTransformer.setProjection(projectedTransformer, projection)`
+
+Set the projection.
+
+To transform 'toGeo' or 'toResource' to or from a different projection
+than set on a transformer's construction (but using the same internal projection)
+it's possible to specify the requested projection in the transform options.
+
+This way we circumvent a possibly expensive recomputation
+of the toGeo and/or toResource transformations.
+
+To do this more systematically, it's possible to set
+a projected gcp transformer's projection using this method.
+
+Combine this with a deep clone of the transformer instance
+to keep the original transformer as well.
+
+###### Parameters
+
+* `projectedTransformer` (`ProjectedGcpTransformer`)
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+
+###### Returns
+
+this (`ProjectedGcpTransformer`).
 
 ### `ProjectedGcpTransformerInputs`
 

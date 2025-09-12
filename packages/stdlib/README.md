@@ -8,6 +8,16 @@ MIT
 
 ## API
 
+### `angle(line)`
+
+###### Parameters
+
+* `line` (`[Point, Point]`)
+
+###### Returns
+
+`number`.
+
 ### `arrayMatrixSize(arrayMatrix)`
 
 ###### Parameters
@@ -110,6 +120,60 @@ MIT
 
 `number`.
 
+### `bearing(line)`
+
+###### Parameters
+
+* `line` (`[Point, Point]`)
+
+###### Returns
+
+`number`.
+
+### `bindPoint(point, min, max)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `min` (`[number, number]`)
+* `max` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `bindPointLngLatProjection(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `bindPointWebMercatorProjection(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `bindValue(value, min, max)`
+
+###### Parameters
+
+* `value` (`number`)
+* `min` (`number`)
+* `max` (`number`)
+
+###### Returns
+
+`number`.
+
 ### `bufferBbox(bbox, dist0, dist1)`
 
 ###### Parameters
@@ -127,7 +191,7 @@ MIT
 ###### Parameters
 
 * `bbox` (`[number, number, number, number]`)
-* `ratio` (`number`)
+* `ratio?` (`number | undefined`)
 
 ###### Returns
 
@@ -183,11 +247,12 @@ MIT
 
 `Bbox | undefined`.
 
-### `computeBbox(points)`
+### `computeBbox(points, options)`
 
 ###### Parameters
 
 * `points` (`Geometry | GeojsonGeometry`)
+* `options?` (`Partial<BboxOptions> | undefined`)
 
 ###### Returns
 
@@ -1526,6 +1591,16 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 ###### Returns
 
 `Point | undefined`.
+
+### `radiansToDegrees(radians)`
+
+###### Parameters
+
+* `radians` (`number`)
+
+###### Returns
+
+`number`.
 
 ### `rectangleToSize(rectangle)`
 

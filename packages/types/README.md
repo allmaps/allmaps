@@ -84,6 +84,13 @@ export type SvgGeometry =
 
 Bbox (`[number, number, number, number]`). Defined as \[xMin, yMin, xMax, yMax]
 
+### `BboxOptions`
+
+###### Fields
+
+* `clipLngLat` (`boolean`)
+* `clipWebMercator` (`boolean`)
+
 ### `Color`
 
 ###### Type

@@ -163,6 +163,7 @@ export function objectOmitDifference(
 
 // Basic omit function as replacement for lodash omit, since it will be removed in v5
 // See: https://github.com/lodash/lodash/issues/2930#issuecomment-272298477
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function omit<T extends Record<string, any>>(
   object: T,
   keys: string[]
