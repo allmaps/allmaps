@@ -6,7 +6,10 @@ import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
   server: {
-    port: ports.tiles
+    port: ports.tiles,
+    fs: {
+      strict: false
+    }
   },
   plugins: [sveltekit()]
 }) satisfies UserConfig

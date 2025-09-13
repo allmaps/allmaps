@@ -1,41 +1,39 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
 
-  import { Header, URLInput, Loading, Copy, urlStore } from '@allmaps/ui'
-  import { fetchJson } from '@allmaps/stdlib'
+  import { Header, Loading, Copy } from '@allmaps/ui'
 
+  import URLInput from '$lib/components/URLInput.svelte'
   import TileJSON from '$lib/components/TileJSON.svelte'
   import Info from '$lib/components/Info.svelte'
 
-  import type { TileJSON as TileJSONType } from '$lib/types.js'
+  import type { LayoutProps } from './$types'
 
   import 'ol/ol.css'
 
-  let mounted = false
+  let { data }: LayoutProps = $props()
+
   let error: string | undefined
 
-  let tileJson: TileJSONType | undefined
-  let tileUrl: string | undefined
+  let tileJson = $derived(data.tileJson)
+  let tileUrl = $derived(tileJson ? tileJson.tiles[0] : undefined)
 
-  onMount(async () => {
-    mounted = true
-    urlStore.subscribe(async ($url) => {
-      tileJson = (await fetchJson($url)) as TileJSONType
-      tileUrl = tileJson.tiles[0]
-    })
-  })
+  function handleUrlSubmit(url: string) {
+    goto(`/?url=${url}`)
+  }
 </script>
 
 <div class="absolute w-full h-full flex flex-col">
   <Header appName="Tile Server">
-    {#if $urlStore && tileUrl}
+    {#if tileUrl}
       <Copy string={tileUrl} />
     {/if}
   </Header>
-  {#if !$urlStore || !tileJson || error}
+  {#if !tileJson || error}
     <main class="container m-auto p-1 md:p-2">
-      {#if !$urlStore && mounted}
+      {#if !data.url}
         <URLInput
+          onsubmit={handleUrlSubmit}
           placeholder="Type the URL of a Allmaps Tile Server TileJSON file"
         />
       {:else if error}

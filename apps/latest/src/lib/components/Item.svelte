@@ -7,22 +7,35 @@
 
   import { geometryToPath } from '$lib/shared/geometry.js'
   import { getUrls } from '$lib/shared/urls.js'
-  import { errorCount } from '$lib/shared/stores/counts.js'
+
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
   import type { DisplayMap, Urls } from '$lib/shared/types.js'
 
-  export let apiMap: unknown
-  export let showProperties: boolean
-  export let showUrls: boolean
-  export let strokeColor: string
-  export let backgroundColor: string
+  const uiState = getUiState()
 
-  let urls: Urls | undefined
+  type Props = {
+    apiMap: unknown
+    showProperties: boolean
+    showUrls: boolean
+    strokeColor: string
+    backgroundColor: string
+  }
+
+  let {
+    apiMap,
+    showProperties,
+    showUrls,
+    strokeColor,
+    backgroundColor
+  }: Props = $props()
+
+  let urls: Urls | undefined = $state()
   let map: GeoreferencedMap | undefined
-  let displayMap: DisplayMap | undefined
-  let error: string | undefined
+  let displayMap: DisplayMap | undefined = $state()
+  let error: string | undefined = $state()
 
   onMount(async () => {
     try {
@@ -34,7 +47,7 @@
         error = err.message
       }
 
-      errorCount.set($errorCount + 1)
+      uiState.errorCount += 1
     }
   })
 </script>
@@ -91,7 +104,11 @@
       </div>
     </a>
   {:else if displayMap?.polygon}
-    <a href={urls?.viewer} class="absolute left-0 top-0 w-full h-full p-1.5">
+    <a
+      href={urls?.viewer}
+      class="absolute left-0 top-0 w-full h-full p-1.5"
+      aria-label="Open in Allmaps Viewer"
+    >
       <svg viewBox="0 0 100 100">
         <path
           class={`${strokeColor} fill-none stroke-2 z-0`}

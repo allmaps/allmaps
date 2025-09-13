@@ -8,19 +8,23 @@
 
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
-  import { Header, Thumbnail, Stats, Geocoder } from '@allmaps/ui'
+  import { Header, Thumbnail, Stats } from '@allmaps/ui'
+  import {
+    Geocoder,
+    GeocodeEarthGeocoderProvider,
+    WorldHistoricalGazetteerGeocoderProvider
+  } from '@allmaps/components'
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
   import type { MapGeoJSONFeature, FilterSpecification } from 'maplibre-gl'
-
-  import { GeocodeEarth, WorldHistoricalGazetteer } from '@allmaps/ui/geocoder'
 
   import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
 
   import { formatTimeAgo } from '$lib/shared/format.js'
 
   import type { Bbox } from '@allmaps/types'
+  import type { GeocoderGeoJsonFeature } from '@allmaps/components'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -31,16 +35,16 @@
   let map: Map
   let warpedMapLayer: WarpedMapLayer
 
-  let layersAdded = false
+  let layersAdded = $state(false)
 
-  let features: MapGeoJSONFeature[] = []
+  let features: MapGeoJSONFeature[] = $state([])
 
-  let lastModifiedAgo: string | undefined = ''
+  let lastModifiedAgo: string | undefined = $state('')
 
   const minMaxArea = 100_000
   const maxMaxAea = 500_000_000_000
 
-  let maxAreaSqrt = Math.sqrt(5_000_000_000)
+  let maxAreaSqrt = $state(Math.sqrt(5_000_000_000))
 
   function getFilters(maxAea: number): FilterSpecification {
     return [
@@ -49,13 +53,6 @@
       ['<=', 'area', maxAea],
       ['!=', 'imageServiceDomain', 'iiif.nypl.org']
     ]
-  }
-
-  $: {
-    if (layersAdded) {
-      map.setFilter('masks', getFilters(maxAreaSqrt ** 2))
-      updateFeatures()
-    }
   }
 
   function updateFeatures() {
@@ -97,8 +94,10 @@
     return `https://editor.allmaps.org/images?url=${encodeURIComponent(feature.properties.resourceId)}/info.json`
   }
 
-  function handleGeocoderSelect(event: CustomEvent) {
-    if (event.detail?.bbox) {
+  function handleGeocoderSelect(event: CustomEvent<GeocoderGeoJsonFeature>) {
+    const feature = event.detail
+
+    if (feature?.bbox) {
       const bbox = event.detail.bbox as Bbox
 
       map.fitBounds(
@@ -113,7 +112,7 @@
       )
     } else if (event.detail?.geometry) {
       if (event.detail?.geometry?.type === 'Point') {
-        map.setCenter(event.detail.geometry.coordinates)
+        map.setCenter(feature.geometry.coordinates as [number, number])
       } else {
         console.error(
           'Geocoder event geometry type not supported',
@@ -139,6 +138,7 @@
       hash: true
     })
 
+    // @ts-expect-error incorrect MapLibre types
     addTerrain(map, maplibregl)
 
     map.on('load', () => {
@@ -164,12 +164,16 @@
 
       warpedMapLayer = new WarpedMapLayer()
 
-      // @ts-expect-error MapLibre types are incompatible
+      // @ts-expect-error incorrect MapLibre types
       map.addLayer(warpedMapLayer)
 
       layersAdded = true
 
-      map.on('moveend', updateFeatures)
+      map.on('sourcedata', (event) => {
+        if (event.isSourceLoaded && event.sourceId === 'masks') {
+          updateFeatures()
+        }
+      })
 
       map.on('idle', function firstIdle() {
         updateFeatures()
@@ -190,6 +194,13 @@
       map.remove()
     }
   })
+
+  $effect(() => {
+    if (layersAdded) {
+      map.setFilter('masks', getFilters(maxAreaSqrt ** 2))
+      updateFeatures()
+    }
+  })
 </script>
 
 <Stats />
@@ -200,10 +211,11 @@
       <div class="w-full max-w-xl">
         <Geocoder
           providers={[
-            new GeocodeEarth(PUBLIC_GEOCODE_EARTH_API_KEY),
-            new WorldHistoricalGazetteer()
+            new GeocodeEarthGeocoderProvider(PUBLIC_GEOCODE_EARTH_API_KEY),
+            new WorldHistoricalGazetteerGeocoderProvider()
           ]}
-          on:select={handleGeocoderSelect}
+          onselect={handleGeocoderSelect}
+          showProviderUrls={true}
         />
       </div>
       {#if lastModifiedAgo}
@@ -216,7 +228,7 @@
   <div
     class="overflow-auto grid grid-rows-[50%_50%] sm:grid-rows-none sm:grid-cols-[1fr_300px]"
   >
-    <div bind:this={container} />
+    <div bind:this={container}></div>
     <aside class="relative p-2 flex flex-col min-h-0">
       <ol class="w-full h-full overflow-auto grid auto-rows-min gap-2">
         {#each features.slice(0, 25) as feature (feature.properties.id)}
@@ -234,12 +246,12 @@
               </a>
               <div class="flex-shrink-0 flex gap-2 flex-wrap">
                 <button
-                  on:click={() => showOnMap(feature.properties.id)}
+                  onclick={() => showOnMap(feature.properties.id)}
                   class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
                   >Show on map</button
                 >
                 <button
-                  on:click={() => copyToClipboard(feature.properties.id)}
+                  onclick={() => copyToClipboard(feature.properties.id)}
                   class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
                   >Copy URL</button
                 >

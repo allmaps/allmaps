@@ -54,7 +54,6 @@ export function getProperties(
 ): Properties {
   // TODO: create new type for API output
   // maybe with https://github.com/trpc/trpc
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
   type _Allmaps = {
     area: number

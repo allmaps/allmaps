@@ -2,9 +2,13 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
 
-  export let count
+  type Props = {
+    count: number
+  }
 
-  let loadingSteps: number[] = [0, 1, 2, 3]
+  let { count }: Props = $props()
+
+  let loadingSteps: number[] = $state([0, 1, 2, 3])
 
   onMount(() => {
     let loadingInterval = setInterval(() => {
@@ -20,10 +24,10 @@
   })
 </script>
 
-{#each loadingSteps as index}
+{#each loadingSteps as index (index)}
   <li
     in:fade
     class="rounded-lg aspect-square bg-gray/20"
     style:scale={Math.max(0.9 - 0.02 * index, 0.05)}
-  />
+  ></li>
 {/each}
