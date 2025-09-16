@@ -20,7 +20,7 @@ const NO_CANVAS_ERROR_MESSAGE =
  * Base WarpedMapLayer class.
  */
 export abstract class BaseWarpedMapLayer<
-  SpecificWarpedMapLayerOptions extends Record<string, any>
+  SpecificWarpedMapLayerOptions extends object
 > {
   defaultSpecificWarpedMapLayerOptions: SpecificWarpedMapLayerOptions
   options: SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>

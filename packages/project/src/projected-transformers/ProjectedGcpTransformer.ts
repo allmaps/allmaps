@@ -80,7 +80,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
   internalProjectionToProjection: ProjectionFunction
   projectionToInternalProjection: ProjectionFunction
   lonLatToProjection: ProjectionFunction
-  projectionToLatLon: ProjectionFunction
+  projectionToLonLat: ProjectionFunction
 
   /**
    * Create a ProjectedGcpTransformer
@@ -110,7 +110,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       projectedGcpTransformerOptions.projection.definition
     )
     const lonLatToProjection = lonLatToProjectionConverter.forward
-    const projectionToLatLon = lonLatToProjectionConverter.inverse
+    const projectionToLonlat = lonLatToProjectionConverter.inverse
 
     const partialGcpTransformerOptions = {
       ...partialProjectedGcpTransformerOptions,
@@ -133,23 +133,43 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     this.internalProjectionToProjection = postToGeo
     this.projectionToInternalProjection = preToResource
     this.lonLatToProjection = lonLatToProjection
-    this.projectionToLatLon = projectionToLatLon
+    this.projectionToLonLat = projectionToLonlat
   }
 
-  // Note: this is different from generalGcpsInternal from the BaseTransformer,
-  // which also includes a possible handedness flip
+  /**
+   * Get GCPs as they were inputed to the GCP Transformer.
+   *
+   * For a Projected GCP Transformer, these are the GCPs in projected coordinates.
+   */
+  public get gcps(): Gcp[] {
+    return super.gcps
+  }
+
+  /**
+   * Get GCPs in interal projected coordinates.
+   */
+  public get lonlatGcps(): Gcp[] {
+    return this.projectedGcps.map(({ resource, geo }) => ({
+      resource,
+      geo: this.projectionToLonLat(geo)
+    }))
+  }
+
+  /**
+   * Get GCPs in interal projected coordinates.
+   */
   public get interalProjectedGcps(): Gcp[] {
-    return this.gcps.map(({ resource, geo }) => ({
+    return this.projectedGcps.map(({ resource, geo }) => ({
       resource,
-      geo: this.projectionToInternalProjection(this.lonLatToProjection(geo))
+      geo: this.projectionToInternalProjection(geo)
     }))
   }
 
+  /**
+   * Get GCPs in projected coordinates.
+   */
   public get projectedGcps(): Gcp[] {
-    return this.gcps.map(({ resource, geo }) => ({
-      resource,
-      geo: this.lonLatToProjection(geo)
-    }))
+    return this.gcps
   }
 
   transformToGeo<P = Point>(
@@ -362,7 +382,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       projection.definition
     )
     const lonLatToProjection = lonLatToProjectionConverter.forward
-    const projectionToLatLon = lonLatToProjectionConverter.inverse
+    const projectionToLonLat = lonLatToProjectionConverter.inverse
 
     const partialGcpTransformerOptions: Partial<GcpTransformerOptions> = {
       postToGeo,
@@ -382,7 +402,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     projectedTransformer.internalProjectionToProjection = postToGeo
     projectedTransformer.projectionToInternalProjection = preToResource
     projectedTransformer.lonLatToProjection = lonLatToProjection
-    projectedTransformer.projectionToLatLon = projectionToLatLon
+    projectedTransformer.projectionToLonLat = projectionToLonLat
 
     return projectedTransformer
   }

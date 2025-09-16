@@ -790,7 +790,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // including those that will cause an animation, and fire an animated change event
 
     let changedOptionKeys = []
-    let changedMapIds = []
+    const changedMapIds = []
     for (const warpedMap of this.getWarpedMaps()) {
       let warpedMapChangedOptions
       if (setOptionsOptions?.animate === undefined) {

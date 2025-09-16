@@ -125,9 +125,9 @@ export type SpecificWarpedMapListOptions = {
 export type WarpedMapListOptions = SpecificWarpedMapListOptions &
   Partial<WebGL2WarpedMapOptions>
 
-export type SpecificBaseRenderOptions = {}
+export type SpecificBaseRenderOptions = object
 export type BaseRenderOptions = SpecificBaseRenderOptions & WarpedMapListOptions
-export type SpecificWebGL2RenderOptions = {}
+export type SpecificWebGL2RenderOptions = object
 export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
   BaseRenderOptions
 export type CanvasRenderOptions = BaseRenderOptions

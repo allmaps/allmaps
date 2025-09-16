@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true
-  },"references": [
+  },
+  "references": [
     { "path": "../annotation" },
     { "path": "../bearing" },
     { "path": "../basemap" },
@@ -19,5 +20,5 @@
     { "path": "../project" },
     { "path": "../transform" },
     { "path": "../types" }
-  ],
+  ]
 }

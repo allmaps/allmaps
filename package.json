@@ -27,7 +27,7 @@
     "@lerna-lite/publish": "^4.4.1",
     "@lerna-lite/run": "^4.4.1",
     "husky": "^8",
-    "turbo": "^2.5.4"
+    "turbo": "^2.5.5"
   },
   "engines": {
     "node": ">=22.6.0"

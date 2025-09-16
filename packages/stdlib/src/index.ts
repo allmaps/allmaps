@@ -201,6 +201,12 @@ export {
 } from './options.js'
 
 export {
+  polygonSelfIntersectionPoints,
+  linesIntersectionPoint,
+  prolongedLinesIntersectionPoint
+} from './self-intersect.js'
+
+export {
   isSvgCircle,
   isSvgLine,
   isSvgPolyLine,
@@ -212,9 +218,3 @@ export {
   mapToResourceMaskSvgPolygon,
   svgGeometryToGeometry
 } from './svg.js'
-
-export {
-  polygonSelfIntersectionPoints,
-  linesIntersectionPoint,
-  prolongedLinesIntersectionPoint
-} from './self-intersect.js'

@@ -5,7 +5,7 @@
   import { Protocol } from 'pmtiles'
   import { Previous } from 'runed'
 
-  import { basemapStyle, addTerrain } from '@allmaps/basemap'
+  import { basemapStyle } from '@allmaps/basemap'
   import { computeWarpedMapBearing } from '@allmaps/bearing'
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { webMercatorProjection } from '@allmaps/project'
@@ -30,6 +30,7 @@
   let {
     georeferencedMaps = [],
     layerOptionsState = new LayerOptionsState(),
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     mapOptionsStateByMapId = new Map(),
     componentOptions = {},
     mapOrImage = $bindable('map'),
@@ -50,15 +51,15 @@
   let warpedMapLayer: WarpedMapLayer | undefined = $state()
   let mapIds: string[] = $state([])
   let warpedMaps: WarpedMap[] = $state([])
-  let selectedGeoreferencedMap: GeoreferencedMap | undefined = $state(undefined)
+  // let selectedGeoreferencedMap: GeoreferencedMap | undefined = $state(undefined)
   let selectedWarpedMap: WarpedMap | undefined = $state(undefined)
   let selectedMapOptionsState: MapOptionsState | undefined = $state(undefined)
 
-  const previousSelectedMapId = new Previous(() => selectedMapId)
-  const previousSelectedGeoreferencedMap = new Previous(
-    () => selectedGeoreferencedMap
-  )
-  const previousSelectedWarpedMap = new Previous(() => selectedWarpedMap)
+  // const previousSelectedMapId = new Previous(() => selectedMapId)
+  // const previousSelectedGeoreferencedMap = new Previous(
+  //   () => selectedGeoreferencedMap
+  // )
+  // const previousSelectedWarpedMap = new Previous(() => selectedWarpedMap)
   const previousSelectedMapOptionsState = new Previous(
     () => selectedMapOptionsState
   )
@@ -221,15 +222,15 @@
 
     if (!selectedMapId) {
       selectedMapOptionsState = undefined
-      selectedGeoreferencedMap = undefined
+      // selectedGeoreferencedMap = undefined
       selectedWarpedMap = undefined
     }
 
     if (selectedMapId) {
       selectedMapOptionsState = mapOptionsStateByMapId.get(selectedMapId)
-      selectedGeoreferencedMap = georeferencedMaps.find(
-        (georeferencedMap) => georeferencedMap.id == selectedMapId
-      )
+      // selectedGeoreferencedMap = georeferencedMaps.find(
+      //   (georeferencedMap) => georeferencedMap.id == selectedMapId
+      // )
       selectedWarpedMap = warpedMaps.find(
         (warpedMap) => warpedMap.mapId == selectedMapId
       )

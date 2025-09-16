@@ -60,17 +60,19 @@ export function removeUndefinedOptions<
   }>
 }
 
+// Note: not using Exclude here like we do in removeUndefinedOptions,
+// since TypeScript often inferes too strict types
 export function mergeOptionsUnlessUndefined<
   T extends Record<string, any>,
-  U extends Array<Record<string, any> | undefined>
+  U extends Record<string, any>
 >(
   baseOptions: T,
-  ...additionalOptions: U
-): T & Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
+  ...additionalOptions: Array<Partial<U> | undefined>
+): T & Partial<U> {
   return {
     ...baseOptions,
     ...removeUndefinedOptions(...additionalOptions)
-  }
+  } as T & Partial<U>
 }
 
 export function optionKeysToUndefinedOptions<T extends readonly string[]>(

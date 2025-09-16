@@ -64,9 +64,10 @@
 {/snippet}
 
 <div class="space-y-2">
-  {#each georeferencedMaps as georeferencedMap, g}
+  {#each georeferencedMaps as georeferencedMap (georeferencedMap.id)}
     {@render item(
       georeferencedMap,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
       mapOptionsStateByMapId?.get(georeferencedMap.id!)!
     )}
   {/each}

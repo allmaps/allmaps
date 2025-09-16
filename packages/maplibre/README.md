@@ -7,6 +7,7 @@ Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows disp
 Examples:
 
 * [Observable notebook](https://observablehq.com/@allmaps/maplibre-plugin)
+* [Observable notebook](https://observablehq.com/@allmaps/maplibre-plugin)
 
 ## How it works
 
@@ -62,6 +63,9 @@ map.on('load', () => {
 
 WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/). It can be added to a map like any other MapLibre layer, but there are some things to take into account:
 
+* `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
+* `WarpedMapLayer` currently does not support pitch, so disable it on your map.
+* Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
 * `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
 * `WarpedMapLayer` currently does not support pitch, so disable it on your map.
 * Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
@@ -123,6 +127,7 @@ SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 
 ###### Extends
 
+* `Event`
 * `Event`
 
 ### `WarpedMapEvent#data?`

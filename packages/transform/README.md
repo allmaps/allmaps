@@ -1139,11 +1139,7 @@ Create a GcpTransformer
 
 ### `GcpTransformer#gcps`
 
-###### Type
-
-```ts
-Array<Gcp>
-```
+Get GCPs as they were inputed to the GCP Transformer (`Array<Gcp>`).
 
 ### `GcpTransformer#getToGeoTransformation()`
 
@@ -2538,3 +2534,31 @@ Array<
   | 'projective'
 >
 ```
+
+### `transformationTypeToTypeAndOrder(transformationType)`
+
+###### Parameters
+
+* `transformationType?` (`TransformationType | undefined`)
+
+###### Returns
+
+`{type?: string; options?: {order: number}}`.
+
+### `typeAndOrderToTransformationType(transformation)`
+
+###### Parameters
+
+* `transformation` (`{type?: string; options?: {order?: number}}`)
+
+###### Returns
+
+`  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+  | 'linear'`.

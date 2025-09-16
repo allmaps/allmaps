@@ -9,6 +9,7 @@ Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows dis
 Examples:
 
 * [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
+* [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
 
 ## How it works
 
@@ -103,6 +104,8 @@ MIT
 
 * `type` (`string`)
 * `data` (`unknown`)
+* `type` (`string`)
+* `data` (`unknown`)
 
 ###### Returns
 
@@ -110,6 +113,7 @@ MIT
 
 ###### Extends
 
+* `Event`
 * `Event`
 
 ### `OLWarpedMapEvent#data`
@@ -141,6 +145,7 @@ unknown
 
 ###### Extends
 
+* `Event`
 * `Event`
 
 ### `WarpedMapEvent#data?`
@@ -191,6 +196,8 @@ Adds a Georeference Annotation
 
 * `annotation` (`unknown`)
   * Georeference Annotation
+* `annotation` (`unknown`)
+  * Georeference Annotation
 
 ###### Returns
 
@@ -230,6 +237,8 @@ Bring maps forward
 
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
 
 ###### Returns
 
@@ -241,6 +250,8 @@ Bring maps to front
 
 ###### Parameters
 
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
 
@@ -261,6 +272,7 @@ HTMLCanvasElement
 ###### Type
 
 ```ts
+[number, number]
 [number, number]
 ```
 
@@ -289,6 +301,7 @@ HTMLDivElement
 ###### Parameters
 
 * `event` (`Event`)
+* `event` (`Event`)
 
 ###### Returns
 
@@ -298,6 +311,7 @@ HTMLDivElement
 
 ###### Parameters
 
+* `event` (`Event`)
 * `event` (`Event`)
 
 ###### Returns
@@ -704,6 +718,8 @@ Doesn't reset render options or specific warped map layer options
 
 * `canvas` (`HTMLCanvasElement`)
 * `undefined` (`[number, number]`)
+* `canvas` (`HTMLCanvasElement`)
+* `undefined` (`[number, number]`)
 
 ###### Returns
 
@@ -722,6 +738,7 @@ ResizeObserver
 ###### Parameters
 
 * `entries` (`Array<ResizeObserverEntry>`)
+* `entries` (`Array<ResizeObserverEntry>`)
 
 ###### Returns
 
@@ -735,6 +752,8 @@ Send maps backward
 
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
 
 ###### Returns
 
@@ -746,6 +765,8 @@ Send maps to back
 
 ###### Parameters
 
+* `mapIds` (`Array<string>`)
+  * IDs of the maps
 * `mapIds` (`Array<string>`)
   * IDs of the maps
 

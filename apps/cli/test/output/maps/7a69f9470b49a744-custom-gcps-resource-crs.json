@@ -1,0 +1,57 @@
+[
+  {
+    "@context": "https://schemas.allmaps.org/map/2/context.json",
+    "type": "GeoreferencedMap",
+    "id": "16f114f39d9466b9",
+    "resource": {
+      "id": "https://dlc.services/iiif-img/7/14/074a4598-5988-46a2-95f4-f8c625a1fcb3",
+      "width": 7636,
+      "height": 10474,
+      "type": "ImageService2"
+    },
+    "transformation": {
+      "type": "thinPlateSpline"
+    },
+    "gcps": [
+      {
+        "geo": [9.9301538, 53.5814021016104],
+        "resource": [3899, 6412]
+      },
+      {
+        "geo": [25.41016890000002, 71.09811249341753],
+        "resource": [6584, 819]
+      },
+      {
+        "geo": [22.2380717, 60.476484398292115],
+        "resource": [6491, 4782]
+      },
+      {
+        "geo": [-3.2014645, 55.95994600067392],
+        "resource": [1409, 5436]
+      },
+      {
+        "geo": [-18.10142160000002, 64.33317589611994],
+        "resource": [1765, 1737]
+      }
+    ],
+    "resourceCrs": {
+      "definition": "PROJCS[\"ETRS89-extended / LAEA Europe\",GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],PROJECTION[\"Lambert_Azimuthal_Equal_Area\"],PARAMETER[\"latitude_of_center\",52],PARAMETER[\"longitude_of_center\",10],PARAMETER[\"false_easting\",4321000],PARAMETER[\"false_northing\",3210000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"3035\"]]"
+    },
+    "resourceMask": [
+      [845, 8569],
+      [825, 7518],
+      [956, 7518],
+      [956, 6952],
+      [817, 6950],
+      [841, 2075],
+      [2768, 2083],
+      [2748, 5445],
+      [2821, 5445],
+      [2838, 7152],
+      [2743, 7152],
+      [2728, 9033],
+      [2691, 9193],
+      [807, 8717]
+    ]
+  }
+]

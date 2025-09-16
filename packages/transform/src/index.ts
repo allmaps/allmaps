@@ -16,6 +16,11 @@ export { Straight } from './transformation-types/Straight.js'
 export { supportedtransformationTypes } from './shared/types.js'
 
 export {
+  transformationTypeToTypeAndOrder,
+  typeAndOrderToTransformationType
+} from './shared/conversion-functions.js'
+
+export {
   supportedDistortionMeasures,
   computeDistortionsFromPartialDerivatives
 } from './shared/distortion.js'

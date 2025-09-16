@@ -227,6 +227,7 @@ export class LayerOptionsState extends BaseOptionsState {
   }
 
   processDefaultOptions(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _options: Partial<WebGL2WarpedMapOptions>
   ): Partial<WebGL2WarpedMapOptions> {
     // Don't inherit default options

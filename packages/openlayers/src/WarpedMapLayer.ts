@@ -19,7 +19,7 @@ import type {
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
 import { Bbox, Point, Ring } from '@allmaps/types'
 
-export type SpecificOpenLayersWarpedMapLayerOptions = {}
+export type SpecificOpenLayersWarpedMapLayerOptions = object
 
 type SpecificWarpedMapLayerOptions = SpecificOpenLayersWarpedMapLayerOptions
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
 
   import { Stats } from '@allmaps/ui'
 
@@ -8,9 +8,10 @@
   const DEFAULT_COUNT = 250
   const MAX_COUNT = 1000
 
-  const urlCount = Number($page.url.searchParams.get('count')) || DEFAULT_COUNT
-
-  const count = Math.max(1, Math.min(MAX_COUNT, urlCount))
+  let urlCount = $derived(
+    Number(page.url.searchParams.get('count')) || DEFAULT_COUNT
+  )
+  let count = $derived(Math.max(1, Math.min(MAX_COUNT, urlCount)))
 </script>
 
 <Stats />

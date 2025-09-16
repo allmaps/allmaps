@@ -18,7 +18,7 @@ export function parseGeoreferencedMap(apiMap: unknown) {
   try {
     const mapOrMaps = validateGeoreferencedMap(apiMap)
     return Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps
-  } catch (err) {
+  } catch {
     throw new Error('Error parsing map')
   }
 }

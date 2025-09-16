@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {}
+  },
+  "references": [
+    { "path": "../id" },
+    { "path": "../annotation" },
+    { "path": "../stdlib" },
+    { "path": "../project" },
+    { "path": "../transform" },
+    { "path": "../types" },
+  ],
+  "include": ["./src/**/*"]
+}

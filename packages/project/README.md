@@ -379,7 +379,7 @@ MIT
 ###### Type
 
 ```ts
-{projection: Projection} & {
+ProjectionInputs & {
   maxDepth: number
   minOffsetRatio: number
   minOffsetDistance: number
@@ -413,13 +413,15 @@ Create a ProjectedGcpTransformer
 
 * `GcpTransformer`
 
+### `ProjectedGcpTransformer#gcps`
+
+Get GCPs as they were inputed to the GCP Transformer (`Array<Gcp>`).
+
+For a Projected GCP Transformer, these are the GCPs in projected coordinates.
+
 ### `ProjectedGcpTransformer#interalProjectedGcps`
 
-###### Type
-
-```ts
-Array<Gcp>
-```
+Get GCPs in interal projected coordinates (`Array<Gcp>`).
 
 ### `ProjectedGcpTransformer#internalProjection`
 
@@ -445,13 +447,13 @@ Array<Gcp>
 (point: Point) => Point
 ```
 
+### `ProjectedGcpTransformer#lonlatGcps`
+
+Get GCPs in interal projected coordinates (`Array<Gcp>`).
+
 ### `ProjectedGcpTransformer#projectedGcps`
 
-###### Type
-
-```ts
-Array<Gcp>
-```
+Get GCPs in projected coordinates (`Array<Gcp>`).
 
 ### `ProjectedGcpTransformer#projection`
 
@@ -469,7 +471,7 @@ Array<Gcp>
 (point: Point) => Point
 ```
 
-### `ProjectedGcpTransformer#projectionToLatLon`
+### `ProjectedGcpTransformer#projectionToLonLat`
 
 ###### Type
 
@@ -547,7 +549,10 @@ this (`ProjectedGcpTransformer`).
 ###### Type
 
 ```ts
-GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
+GcpsInputs &
+  TransformationTypeInputs &
+  InternalProjectionInputs &
+  ProjectionInputs
 ```
 
 ### `ProjectedGcpTransformerOptions`
@@ -572,6 +577,12 @@ GcpsInputs & TransformationTypeInputs & InternalProjectionInputs
 ```ts
 string | PROJJSONDefinition
 ```
+
+### `ProjectionInputs`
+
+###### Fields
+
+* `projection?` (`{name?: string; definition: ProjectionDefinition}`)
 
 ### `defaultProjectedGcpTransformOptions`
 

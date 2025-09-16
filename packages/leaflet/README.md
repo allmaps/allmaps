@@ -3,6 +3,7 @@
 Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
 
 *The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).*
+*The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).*
 
 <!-- TODO: replace with relative URL, but make sure this does not break docs.allmaps.org -->
 
@@ -12,6 +13,7 @@ Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows display
 
 Examples:
 
+* [Observable notebook](https://observablehq.com/@allmaps/leaflet-plugin)
 * [Observable notebook](https://observablehq.com/@allmaps/leaflet-plugin)
 
 ## How it works
@@ -120,6 +122,7 @@ SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 ###### Extends
 
 * `Event`
+* `Event`
 
 ### `WarpedMapEvent#data?`
 
@@ -143,6 +146,10 @@ Creates a WarpedMapLayer
   * Georeference Annotation or URL of a Georeference Annotation
 * `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
   * Options for the layer
+* `annotationOrAnnotationUrl` (`unknown`)
+  * Georeference Annotation or URL of a Georeference Annotation
+* `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
+  * Options for the layer
 
 ###### Returns
 
@@ -156,6 +163,7 @@ Creates a WarpedMapLayer
 
 ###### Parameters
 
+* `e` (`L.ZoomAnimEvent`)
 * `e` (`L.ZoomAnimEvent`)
 
 ###### Returns
@@ -238,6 +246,8 @@ Adds a Georeference Annotation
 
 * `annotation` (`unknown`)
   * Georeference Annotation
+* `annotation` (`unknown`)
+  * Georeference Annotation
 
 ###### Returns
 
@@ -277,6 +287,8 @@ Bring maps forward
 
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
 
 ###### Returns
 
@@ -288,6 +300,8 @@ Bring maps to front
 
 ###### Parameters
 
+* `mapIds` (`Iterable<string>`)
+  * IDs of the maps
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
 
