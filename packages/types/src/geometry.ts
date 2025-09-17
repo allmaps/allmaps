@@ -65,7 +65,7 @@ export type TypedGeometry<P> =
   | TypedMultiPolygon<P>
 
 export type MultiGeometryOptions = {
-  isMultiGeometry: false
+  isMultiGeometry: boolean
 }
 
 export type Gcp = { resource: Point; geo: Point }
@@ -74,6 +74,11 @@ export type Gcp = { resource: Point; geo: Point }
  * Bbox. Defined as [xMin, yMin, xMax, yMax]
  */
 export type Bbox = [number, number, number, number]
+
+export type BboxOptions = {
+  clipLngLat: boolean
+  clipWebMercator: boolean
+}
 
 /**
  * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].

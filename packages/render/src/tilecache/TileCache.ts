@@ -274,7 +274,7 @@ export class TileCache<D> extends EventTarget {
       if (cachedTile?.isCachedTile()) {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
-            mapId,
+            mapIds: [mapId],
             tileUrl
           })
         )
@@ -317,8 +317,8 @@ export class TileCache<D> extends EventTarget {
     }
 
     this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.MAPTILEREMOVED, {
-        mapId,
+      new WarpedMapEvent(WarpedMapEventType.MAPTILEDELETED, {
+        mapIds: [mapId],
         tileUrl
       })
     )
@@ -326,14 +326,17 @@ export class TileCache<D> extends EventTarget {
 
   private tileFetched(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const tileUrl = event.data as string
+      if (!event.data?.tileUrl) {
+        throw new Error('Event data missing')
+      }
+      const { tileUrl } = event.data
 
       this.updateTilesFetchingCount(-1)
 
       for (const mapId of this.mapIdsByTileUrl.get(tileUrl) || []) {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
-            mapId,
+            mapIds: [mapId],
             tileUrl
           })
         )
@@ -344,7 +347,7 @@ export class TileCache<D> extends EventTarget {
         if (firstTileUrl === tileUrl) {
           this.dispatchEvent(
             new WarpedMapEvent(WarpedMapEventType.FIRSTMAPTILELOADED, {
-              mapId,
+              mapIds: [mapId],
               tileUrl
             })
           )
@@ -355,7 +358,10 @@ export class TileCache<D> extends EventTarget {
 
   private tileFetchError(event: Event) {
     if (event instanceof WarpedMapEvent) {
-      const tileUrl = event.data as string
+      if (!event.data?.tileUrl) {
+        throw new Error('Event data missing')
+      }
+      const { tileUrl } = event.data
 
       if (!this.tilesByTileUrl.has(tileUrl)) {
         this.updateTilesFetchingCount(-1)

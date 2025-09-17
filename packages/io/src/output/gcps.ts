@@ -42,7 +42,7 @@ export function printGeoreferencedMapGcps(
     // Indeed, if a resourceCrs is specified it is probably inteded to be used
     // when printed GCPs are entered in other georeferencing programs like QGIS.
     {
-      gcpProjection: map.resourceCrs,
+      gcpProjection: map.resourceCrs as Projection,
       resourceHeight: map.resource.height
     },
     options

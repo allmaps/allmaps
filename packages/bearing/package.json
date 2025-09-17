@@ -44,11 +44,13 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/transform": "workspace:^",
     "@allmaps/project": "workspace:^",
-    "@allmaps/stdlib": "workspace:^",
-    "@turf/bearing": "^7.2.0"
+    "@allmaps/stdlib": "workspace:^"
   },
   "devDependencies": {
+    "@allmaps/types": "workspace:^",
+    "@allmaps/render": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

@@ -9,6 +9,10 @@ export {
 
 export {
   computeMinMax,
+  bindValue,
+  bindPoint,
+  bindPointLngLatProjection,
+  bindPointWebMercatorProjection,
   computeBbox,
   combineBboxes,
   doBboxesIntersect,
@@ -39,7 +43,8 @@ export {
 export {
   getPropertyFromCacheOrComputation,
   getPropertyFromDoubleCacheOrComputation,
-  getPropertyFromTripleCacheOrComputation
+  getPropertyFromTripleCacheOrComputation,
+  getPropertyFromQuadrupleCacheOrComputation
 } from './cache.js'
 
 export {
@@ -135,6 +140,7 @@ export {
   flipY,
   mixNumbers,
   mixPoints,
+  mixLineStrings,
   midPoint,
   lineAngle,
   stepDistanceAngle,
@@ -156,13 +162,19 @@ export {
 
 export {
   degreesToRadians,
+  radiansToDegrees,
+  angle,
+  bearing,
   groupBy,
   isEqualArray,
   arrayRepeated,
   subSetArray,
   equalSet,
-  maxOfNumberOrUndefined,
-  isValidHttpUrl
+  objectDifference,
+  objectOmitDifference,
+  omit,
+  isValidHttpUrl,
+  camelCaseToWords
 } from './main.js'
 
 export { getFullResourceMask } from './masks.js'
@@ -182,7 +194,10 @@ export {
 export {
   mergeOptions,
   mergeOptionsUnlessUndefined,
-  mergePartialOptions
+  mergePartialOptions,
+  removeUndefinedOptions,
+  optionKeysToUndefinedOptions,
+  optionKeysByMapIdToUndefinedOptionsByMapId
 } from './options.js'
 
 export {

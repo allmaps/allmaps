@@ -84,6 +84,13 @@ export type SvgGeometry =
 
 Bbox (`[number, number, number, number]`). Defined as \[xMin, yMin, xMax, yMax]
 
+### `BboxOptions`
+
+###### Fields
+
+* `clipLngLat` (`boolean`)
+* `clipWebMercator` (`boolean`)
+
 ### `Color`
 
 ###### Type
@@ -268,7 +275,7 @@ Note: The weights array of a Polynomial1 Transformation has a different order. S
 [number, number, number, number, number, number]
 ```
 
-### `ImageInformations`
+### `ImageInfoByMapId`
 
 ###### Type
 
@@ -328,7 +335,7 @@ Array<Point>
 
 ###### Fields
 
-* `isMultiGeometry` (`false`)
+* `isMultiGeometry` (`boolean`)
 
 ### `MultiLineString`
 

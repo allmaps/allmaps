@@ -56,6 +56,7 @@
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "@allmaps/warpedmaplayer": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@types/leaflet": "^1.9.3",
     "@typescript-eslint/eslint-plugin": "^7.0.0",

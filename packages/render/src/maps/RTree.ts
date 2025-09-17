@@ -4,7 +4,7 @@ import RBush from 'rbush'
 
 import inside from 'point-in-polygon-hao'
 
-import { computeBbox } from '@allmaps/stdlib'
+import { closePolygon, computeBbox } from '@allmaps/stdlib'
 
 import type { Bbox, Point, Polygon } from '@allmaps/types'
 
@@ -108,7 +108,7 @@ export class RTree {
           const polygon = this.polygonsById.get(item.id)
 
           if (polygon) {
-            return inside(point, polygon)
+            return inside(point, closePolygon(polygon))
           } else {
             return false
           }

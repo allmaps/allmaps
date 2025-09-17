@@ -1,49 +1,50 @@
 export enum WarpedMapEventType {
+  // WarpedMapList > ...
   GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
   GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
-
   WARPEDMAPADDED = 'warpedmapadded',
   WARPEDMAPREMOVED = 'warpedmapremoved',
 
-  WARPEDMAPENTER = 'warpedmapenter',
-  WARPEDMAPLEAVE = 'warpedmapleave',
+  // Renderer > ...
+  WARPEDMAPENTERED = 'warpedmapentered',
+  WARPEDMAPLEFT = 'warpedmapleft',
 
+  // WarpedMap > WarpedMapList > Renderer > ...
   IMAGEINFOLOADED = 'imageinfoloaded',
 
+  // Tile > TileCache
   TILEFETCHED = 'tilefetched',
   TILEFETCHERROR = 'tilefetcherror',
+
+  // TileCache > Renderer > ...
   MAPTILELOADED = 'maptileloaded',
-  MAPTILEREMOVED = 'maptileremoved',
+  MAPTILEDELETED = 'maptiledeleted',
   FIRSTMAPTILELOADED = 'firstmaptileloaded',
   ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
 
+  // WebGL2WarpedMap > WebGL2Renderer
   TEXTURESUPDATED = 'texturesupdated',
 
-  PRECHANGE = 'prechange',
-  OPTIONSCHANGED = 'optionschanged',
-  ZINDICESCHANGED = 'zindiceschanged',
-  RESOURCEMASKCHANGED = 'resourcemaskchanged',
-  GCPSCHANGED = 'gcpschanged',
-  VISIBILITYCHANGED = 'visibilitychanged',
-  TRANSFORMATIONCHANGED = 'transformationchanged',
-  DISTORTIONCHANGED = 'distortionchanged',
-  INTERNALPROJECTIONCHANGED = 'internalprojectionchanged',
-  PROJECTIONCHANGED = 'projectionchanged',
+  // WarpedMapList > ...
+  CLEARED = 'cleared',
+  PREPARECHANGE = 'preparechange',
+  IMMEDIATECHANGE = 'immediatechange',
+  ANIMATEDCHANGE = 'animatedchange',
 
-  CHANGED = 'changed',
-
-  CLEARED = 'cleared'
+  // Renderer
+  CHANGED = 'changed'
 }
 
-export type WarpedMapTileEventDetail = {
-  mapId: string
+export type WarpedMapEventData = {
+  mapIds: string[]
   tileUrl: string
+  optionKeys: string[]
 }
 
 export class WarpedMapEvent extends Event {
-  data?: unknown
+  data?: Partial<WarpedMapEventData>
 
-  constructor(type: WarpedMapEventType, data?: unknown) {
+  constructor(type: WarpedMapEventType, data?: Partial<WarpedMapEventData>) {
     super(type)
 
     this.data = data

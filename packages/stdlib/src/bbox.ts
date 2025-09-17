@@ -14,8 +14,18 @@ import type {
   Size,
   Fit,
   GeojsonGeometry,
-  Ring
+  Ring,
+  BboxOptions
 } from '@allmaps/types'
+
+export const MIN_POINT_LNG_LAT_PROJECTION = [-180, -90] as Point
+export const MAX_POINT_LNG_LAT_PROJECTION = [180, 90] as Point
+export const MIN_POINT_WEBMERCATOR_PROJECTION = [
+  -20037508.34, -20048966.1
+] as Point
+export const MAX_POINT_WEBMERCATOR_PROJECTION = [
+  20037508.34, 20048966.1
+] as Point
 
 // Compute
 
@@ -35,8 +45,38 @@ export function computeMinMax(values: number[]): [number, number] {
   return [min, max]
 }
 
+export function bindValue(value: number, min: number, max: number): number {
+  return Math.max(Math.min(value, max), min)
+}
+
+export function bindPoint(point: Point, min: Point, max: Point): Point {
+  return [
+    bindValue(point[0], min[0], max[0]),
+    bindValue(point[1], min[1], max[1])
+  ]
+}
+
+export function bindPointLngLatProjection(point: Point): Point {
+  return bindPoint(
+    point,
+    MIN_POINT_LNG_LAT_PROJECTION,
+    MAX_POINT_LNG_LAT_PROJECTION
+  )
+}
+
+export function bindPointWebMercatorProjection(point: Point): Point {
+  return bindPoint(
+    point,
+    MIN_POINT_WEBMERCATOR_PROJECTION,
+    MAX_POINT_WEBMERCATOR_PROJECTION
+  )
+}
+
 // Note: bbox order is minX, minY, maxX, maxY
-export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
+export function computeBbox(
+  points: Geometry | GeojsonGeometry,
+  options?: Partial<BboxOptions>
+): Bbox {
   if (isPoint(points)) {
     points = [points]
   }
@@ -47,14 +87,23 @@ export function computeBbox(points: Geometry | GeojsonGeometry): Bbox {
     points = points.flat()
   }
   if (isGeojsonGeometry(points)) {
-    return computeBbox(geojsonGeometryToGeometry(points))
+    return computeBbox(geojsonGeometryToGeometry(points), options)
+  }
+
+  points = points as LineString
+
+  if (options?.clipLngLat) {
+    points = points.map((point) => bindPointLngLatProjection(point))
+  }
+  if (options?.clipWebMercator) {
+    points = points.map((point) => bindPointWebMercatorProjection(point))
   }
 
   // TODO: do this without making two new arrays
   const xs = []
   const ys = []
 
-  for (const point of points as LineString) {
+  for (const point of points) {
     xs.push(point[0])
     ys.push(point[1])
   }
@@ -111,8 +160,8 @@ export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
 
 // Ratio 2 adds half the current width (or height) both left and right of the current (width or height)
 // so the total width (or height) goes * 2 and the total surface goes * 4
-export function bufferBboxByRatio(bbox: Bbox, ratio: number): Bbox {
-  if (ratio === 0) {
+export function bufferBboxByRatio(bbox: Bbox, ratio?: number): Bbox {
+  if (!ratio || ratio === 0) {
     return bbox
   }
   const size = bboxToSize(bbox)

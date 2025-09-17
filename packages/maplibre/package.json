@@ -15,6 +15,7 @@
   ],
   "description": "MapLibre classes for Allmaps",
   "type": "module",
+  "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "files": [
     "dist"
@@ -52,6 +53,7 @@
     "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@allmaps/warpedmaplayer": "workspace:^",
     "maplibre-gl": "^4.5.0"
   },
   "devDependencies": {

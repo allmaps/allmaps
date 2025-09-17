@@ -4,7 +4,7 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { isEqualProjection, proj4 } from '@allmaps/project'
+import { proj4 } from '@allmaps/project'
 
 import { RTree } from './RTree.js'
 import { WarpedMap } from './WarpedMap.js'
@@ -14,28 +14,41 @@ import {
   computeBbox,
   convexHull,
   mergeOptions,
-  mergePartialOptions
+  mergePartialOptions,
+  optionKeysByMapIdToUndefinedOptionsByMapId,
+  optionKeysToUndefinedOptions
 } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
+import type { Ring, Bbox, Point } from '@allmaps/types'
+
 import type {
+  GetWarpedMapOptions,
   ProjectionOptions,
   SelectionOptions,
+  SetOptionsOptions,
+  SpecificWarpedMapListOptions,
   WarpedMapFactory,
   WarpedMapListOptions
 } from '../shared/types.js'
+import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
-import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
-import type { Projection } from '@allmaps/project'
-import type { Ring, Bbox, Gcp, Point, ImageInformations } from '@allmaps/types'
+const defaultSelectionOptions: SelectionOptions = {}
 
-const defaultSelectionOptions: SelectionOptions = {
-  onlyVisible: true
-}
-
-const defaultWarpedMapListOptions: Partial<WarpedMapListOptions> = {
+const DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS: SpecificWarpedMapListOptions = {
   createRTree: true,
-  imageInformations: new Map()
+  rtreeUpdatedOptions: [
+    'gcps',
+    'resourceMask',
+    'transformationType',
+    'internalProjection',
+    'projection'
+  ],
+  animatedOptions: [
+    'transformationType',
+    'internalProjection',
+    'distortionMeasure'
+  ]
 }
 
 /**
@@ -54,18 +67,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   rtree?: RTree
 
-  partialWarpedMapListOptions: Partial<WarpedMapListOptions>
+  options: WarpedMapListOptions
 
   /**
    * Creates an instance of a WarpedMapList
    *
    * @constructor
    * @param warpedMapFactory - Factory function for creating WarpedMap objects
-   * @param partialWarpedMapListOptions - Options
+   * @param options - Options of this list, which will be set on newly added maps as their list options
    */
   constructor(
     warpedMapFactory: WarpedMapFactory<W>,
-    partialWarpedMapListOptions?: Partial<WarpedMapListOptions>
+    options?: Partial<WarpedMapListOptions>
   ) {
     super()
 
@@ -74,27 +87,128 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     this.warpedMapFactory = warpedMapFactory
 
-    this.partialWarpedMapListOptions = mergePartialOptions(
-      defaultWarpedMapListOptions,
-      partialWarpedMapListOptions
-    )
+    this.options = mergeOptions(
+      DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS,
+      options
+    ) as WarpedMapListOptions
 
-    if (this.partialWarpedMapListOptions.createRTree) {
+    if (this.options.createRTree) {
       this.rtree = new RTree()
     }
   }
 
   /**
+   * Adds a georeferenced map to this list
+   *
+   * @param georeferencedMap
+   * @returns Map ID of the map that was added
+   */
+  async addGeoreferencedMap(georeferencedMap: unknown): Promise<string> {
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMap)
+    const validatedGeoreferencedMap = Array.isArray(
+      validatedGeoreferencedMapOrMaps
+    )
+      ? validatedGeoreferencedMapOrMaps[0]
+      : validatedGeoreferencedMapOrMaps
+    return this.addGeoreferencedMapInternal(validatedGeoreferencedMap)
+  }
+
+  /**
+   * Removes a georeferenced map from this list
+   *
+   * @param georeferencedMap
+   * @returns Map ID of the removed map, or an error
+   */
+  async removeGeoreferencedMap(
+    georeferencedMap: unknown
+  ): Promise<string | Error> {
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMap)
+    const validatedGeoreferencedMap = Array.isArray(
+      validatedGeoreferencedMapOrMaps
+    )
+      ? validatedGeoreferencedMapOrMaps[0]
+      : validatedGeoreferencedMapOrMaps
+    return this.removeGeoreferencedMapInternal(validatedGeoreferencedMap)
+  }
+
+  /**
+   * Removes a georeferenced map from the list by its ID
+   *
+   * @param mapId - Map ID
+   * @returns Map ID of the removed map, or an error
+   */
+  async removeGeoreferencedMapById(
+    mapId: string
+  ): Promise<string | Error | undefined> {
+    const warpedMap = this.warpedMapsById.get(mapId)
+    if (warpedMap) {
+      return this.removeGeoreferencedMap(warpedMap)
+    }
+  }
+
+  /**
+   * Parses an annotation and adds its georeferenced map to this list
+   *
+   * @param annotation
+   * @returns Map IDs of the maps that were added, or an error per map
+   */
+  async addGeoreferenceAnnotation(annotation: unknown) {
+    const results: (string | Error)[] = []
+    const maps = parseAnnotation(annotation)
+    const settledResults = await Promise.allSettled(
+      maps.map((map) => this.addGeoreferencedMapInternal(map))
+    )
+    // TODO: make sure reason contains Error
+    for (const settledResult of settledResults) {
+      if (settledResult.status === 'fulfilled') {
+        results.push(settledResult.value)
+      } else {
+        results.push(settledResult.reason)
+      }
+    }
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONADDED)
+    )
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    return results
+  }
+
+  /**
+   * Parses an annotation and removes its georeferenced map from this list
+   *
+   * @param annotation
+   * @returns Map IDs of the maps that were removed, or an error per map
+   */
+  async removeGeoreferenceAnnotation(
+    annotation: unknown
+  ): Promise<(string | Error)[]> {
+    const results: (string | Error)[] = []
+    const maps = parseAnnotation(annotation)
+    for (const map of maps) {
+      const mapIdOrError = await this.removeGeoreferencedMapInternal(map)
+      results.push(mapIdOrError)
+    }
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
+    )
+    return results
+  }
+
+  /**
    * Get mapIds for selected maps
    *
-   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
+   * The selectionOptions allow a.o. to:
+   * - filter for visible maps
+   * - filter for specific mapIds
+   * - filter for maps whose geoBbox overlap with the specified geoBbox
+   * - filter for maps that overlap with a given geoPoint
    *
    * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    * @returns mapIds
    */
-  getMapIds(
-    partialSelectionOptions?: Partial<SelectionOptions>
-  ): Iterable<string> {
+  getMapIds(partialSelectionOptions?: Partial<SelectionOptions>): string[] {
     // Enable the same selection options when getting mapIds
     return Array.from(this.getWarpedMaps(partialSelectionOptions)).map(
       (warpedMap) => warpedMap.mapId
@@ -104,7 +218,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the WarpedMap instances for selected maps
    *
-   * Also allows to only select maps whose geoBbox overlaps with the specified geoBbox
+   * The selectionOptions allow a.o. to:
+   * - filter for visible maps
+   * - filter for specific mapIds
+   * - filter for maps whose geoBbox overlap with the specified geoBbox
+   * - filter for maps that overlap with a given geoPoint
    *
    * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
    * @returns WarpedMap instances
@@ -121,6 +239,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     if (selectionOptions.mapIds === undefined) {
       if (this.rtree && selectionOptions.geoBbox) {
         mapIds = this.rtree.searchFromBbox(selectionOptions.geoBbox)
+      } else if (this.rtree && selectionOptions.geoPoint) {
+        mapIds = this.rtree.searchFromPoint(selectionOptions.geoPoint)
       } else {
         mapIds = Array.from(this.warpedMapsById.keys())
       }
@@ -138,16 +258,21 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (
         warpedMap &&
-        (selectionOptions.onlyVisible ? warpedMap.visible : true)
+        (selectionOptions.onlyVisible ? warpedMap.options.visible : true)
       ) {
         warpedMaps.push(warpedMap)
       }
     }
+
+    warpedMaps.sort((map0, map1) =>
+      this.orderMapIdsByZIndex(map0.mapId, map1.mapId)
+    )
+
     return warpedMaps
   }
 
   /**
-   * Get the WarpedMap instance for a specific map
+   * Get the WarpedMap instance for a map
    *
    * @param mapId - Map ID of the requested WarpedMap instance
    * @returns WarpedMap instance, or undefined
@@ -157,19 +282,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Get the z-index for a specific map
-   *
-   * @param mapId
-   * @returns
-   */
-  getMapZIndex(mapId: string): number | undefined {
-    return this.zIndices.get(mapId)
-  }
-
-  /**
    * Get the center of the bounding box of the maps in this list
    *
-   * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in the list's projection, `EPSG:3857` by default
+   * Use {projection: {definition: 'EPSG:4326'}} to request the result in lon-lat `EPSG:4326`
    *
    * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
@@ -188,7 +304,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the bounding box of the maps in this list
    *
-   * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in the list's projection, `EPSG:3857` by default
+   * Use {projection: {definition: 'EPSG:4326'}} to request the result in lon-lat `EPSG:4326`
    *
    * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
@@ -210,7 +327,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the convex hull of the maps in this list
    *
-   * Use {projection: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in the list's projection, `EPSG:3857` by default
+   * Use {projection: {definition: 'EPSG:4326'}} to request the result in lon-lat `EPSG:4326`
    *
    * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
@@ -227,270 +345,229 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the Warped Map List options
+   * Get the z-index of a map
    *
-   * @param partialWarpedMapListOptions - Options
+   * @param mapId - Map ID for which to get the z-index
+   */
+  getMapZIndex(mapId: string): number | undefined {
+    return this.zIndices.get(mapId)
+  }
+
+  /**
+   * Get the default options of a map
+   *
+   * These come from the default option settings and it's georeferenced map proporties
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapDefaultOptions(): GetWarpedMapOptions<W>
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
+    if (mapId) {
+      const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+      const warpedMap = Array.from(warpedMaps)[0]
+      return warpedMap?.getDefaultAndGeoreferencedMapOptions() as GetWarpedMapOptions<W>
+    } else {
+      // Could we get default options from abstract type <W> instead of WebGL2WarpedMap?
+      return WebGL2WarpedMap.getDefaultOptions() as GetWarpedMapOptions<W>
+    }
+  }
+
+  /**
+   * Get the options of this list
+   */
+  getOptions(): Partial<WarpedMapListOptions> {
+    return this.options
+  }
+
+  /**
+   * Get the map-specific options of a map
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
+    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+    const warpedMap = Array.from(warpedMaps)[0]
+    return warpedMap?.mapOptions as GetWarpedMapOptions<W>
+  }
+
+  /**
+   * Get the options of a map
+   *
+   * These options are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
+    const warpedMap = Array.from(warpedMaps)[0]
+    return warpedMap?.options as GetWarpedMapOptions<W>
+  }
+
+  /**
+   * Set the options of this list
+   *
+   * Note: Map-specific options set here will be passed to newly added maps.
+   *
+   * @param options - List Options
+   * @param setOptionsOptions - Options when setting the options
    */
   setOptions(
-    partialWarpedMapListOptions?: Partial<WarpedMapListOptions>
+    options?: Partial<WarpedMapListOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
   ): void {
-    this.partialWarpedMapListOptions = mergeOptions(
-      this.partialWarpedMapListOptions,
-      partialWarpedMapListOptions
+    this.options = mergeOptions(this.options, options)
+    this.internalSetMapsOptionsByMapId(undefined, options, setOptionsOptions)
+  }
+
+  /**
+   * Set the map-specific options of maps (and the list options)
+   *
+   * @param mapIds - Map IDs for which the options apply
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setMapsOptions(
+    mapIds: string[],
+    mapOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): void {
+    const optionsByMapId = new Map<
+      string,
+      Partial<WarpedMapListOptions> | undefined
+    >()
+    for (const mapId of mapIds) {
+      optionsByMapId.set(mapId, mapOptions)
+    }
+    this.internalSetMapsOptionsByMapId(
+      optionsByMapId,
+      listOptions,
+      setOptionsOptions
     )
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.OPTIONSCHANGED, this.getMapIds())
+  }
+
+  /**
+   * Set the map-specific options of maps by map ID (and the list options)
+   *
+   * This is useful when when multiple (and possibly different)
+   * map-specific options are changed at once,
+   * but only one animation should be fired
+   *
+   * @param mapOptionsByMapId - Map-specific options by map ID
+   * @param listOptions - List options
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setMapsOptionsByMapId(
+    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions>>,
+    listOptions?: Partial<WarpedMapListOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): void {
+    this.internalSetMapsOptionsByMapId(
+      mapOptionsByMapId,
+      listOptions,
+      setOptionsOptions
     )
   }
 
   /**
-   * Sets the object that caches image information
+   * Resets the list options
    *
-   * @param imageInformations - object that caches image information
-   */
-  setImageInformations(imageInformations: ImageInformations): void {
-    this.partialWarpedMapListOptions.imageInformations = imageInformations
-  }
-
-  /**
-   * Sets the GCPs for a specific map
+   * An empty array resets all options, undefined resets no options.
    *
-   * @param gcps - new GCPs
-   * @param mapId - ID of the map
+   * @param listOptionKeys - Keys of the list options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
-  setMapGcps(gcps: Gcp[], mapId: string): void {
-    const warpedMap = this.warpedMapsById.get(mapId)
-    if (warpedMap) {
-      warpedMap.setGcps(gcps)
-      this.addToOrUpdateRtree(warpedMap)
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.GCPSCHANGED, mapId)
-      )
+  resetOptions(
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    if (listOptionKeys && listOptionKeys.length == 0) {
+      listOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
+    this.setOptions(
+      optionKeysToUndefinedOptions(
+        listOptionKeys
+      ) as Partial<WarpedMapListOptions>,
+      setOptionsOptions
+    )
   }
 
   /**
-   * Sets the resource mask for a specific map
+   * Resets the map-specific options of maps (and the list options)
    *
-   * @param resourceMask - the new resource mask
-   * @param mapId - ID of the map
+   * An empty array resets all options, undefined resets no options.
+   *
+   * @param mapIds - Map IDs for which to reset the options
+   * @param mapOptionKeys - Keys of the map-specific options to reset
+   * @param listOptionKeys - Keys of the list options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
-  setMapResourceMask(resourceMask: Ring, mapId: string): void {
-    const warpedMap = this.warpedMapsById.get(mapId)
-    if (warpedMap) {
-      warpedMap.setResourceMask(resourceMask)
-      this.addToOrUpdateRtree(warpedMap)
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.RESOURCEMASKCHANGED, mapId)
-      )
+  resetMapsOptions(
+    mapIds: string[],
+    mapOptionKeys?: string[],
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    if (mapOptionKeys && mapOptionKeys.length == 0) {
+      mapOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
+    // Note: undefined resets no options,
+    // otherwise leaving out listOptionKeys would reset all list options
+    if (listOptionKeys && listOptionKeys.length == 0) {
+      listOptionKeys = Object.keys(this.getMapDefaultOptions())
+    }
+    this.setMapsOptions(
+      mapIds,
+      optionKeysToUndefinedOptions(
+        mapOptionKeys
+      ) as Partial<WarpedMapListOptions>,
+      optionKeysToUndefinedOptions(
+        listOptionKeys
+      ) as Partial<WarpedMapListOptions>,
+      setOptionsOptions
+    )
   }
 
   /**
-   * Sets the transformation type for a specific map
+   * Resets the map-specific options of maps by map ID (and the list options)
    *
-   * @param transformationType - the new transformation type
-   * @param mapId - the ID of the map
-   */
-  setMapTransformationType(
-    transformationType: TransformationType,
-    mapId: string
-  ): void {
-    this.setMapsTransformationType(transformationType, { mapIds: [mapId] })
-  }
-
-  /**
-   * Sets the transformation type for selected maps
+   * An empty array or map resets all options (for all maps), undefined resets no options.
    *
-   * @param transformationType - the new transformation type
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
+   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
+   * @param listOptionKeys - Keys of the list options to reset
+   * @param setOptionsOptions - Options when setting the options
    */
-  setMapsTransformationType(
-    transformationType: TransformationType,
-    partialSelectionOptions?: Partial<SelectionOptions>
-  ): void {
-    const mapIdsChanged = []
-    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
-    for (const warpedMap of warpedMaps) {
-      if (warpedMap.transformationType !== transformationType) {
-        mapIdsChanged.push(warpedMap.mapId)
+  resetMapsOptionsByMapId(
+    mapOptionkeysByMapId?: Map<string, string[]>,
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    if (mapOptionkeysByMapId && mapOptionkeysByMapId.size == 0) {
+      const mapIds = this.getMapIds()
+      const defaultMapOptionsKeys = Object.keys(this.getMapDefaultOptions())
+      for (const mapId of mapIds) {
+        mapOptionkeysByMapId.set(mapId, defaultMapOptionsKeys)
       }
     }
-
-    if (mapIdsChanged.length > 0) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
-      )
-      mapIdsChanged.forEach((mapId) => {
-        const warpedMap = this.warpedMapsById.get(mapId)
-        if (warpedMap) {
-          warpedMap.setTransformationType(transformationType)
-          this.addToOrUpdateRtree(warpedMap)
-        }
-      })
-      this.dispatchEvent(
-        new WarpedMapEvent(
-          WarpedMapEventType.TRANSFORMATIONCHANGED,
-          mapIdsChanged
-        )
-      )
+    // Note: undefined resets no options,
+    // otherwise leaving out listOptionKeys would reset all list options
+    if (listOptionKeys && listOptionKeys.length == 0) {
+      listOptionKeys = Object.keys(this.getMapDefaultOptions())
     }
-  }
 
-  /**
-   * Sets the distortionMeasure for a specific map
-   *
-   * @param distortionMeasure - the distortion measure
-   * @param mapId - the ID of the map
-   */
-  setMapDistortionMeasure(
-    distortionMeasure: DistortionMeasure | undefined,
-    mapId: string
-  ): void {
-    this.setMapsDistortionMeasure(distortionMeasure, { mapIds: [mapId] })
-  }
-
-  /**
-   * Sets the distortion measure for selected maps
-   *
-   * @param distortionMeasure - the distortion measure
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
-   */
-  setMapsDistortionMeasure(
-    distortionMeasure?: DistortionMeasure,
-    partialSelectionOptions?: Partial<SelectionOptions>
-  ): void {
-    const mapIdsChanged = []
-    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
-    for (const warpedMap of warpedMaps) {
-      if (warpedMap.distortionMeasure !== distortionMeasure) {
-        mapIdsChanged.push(warpedMap.mapId)
-      }
-    }
-    if (mapIdsChanged.length > 0) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
-      )
-      mapIdsChanged.forEach((mapId) => {
-        const warpedMap = this.warpedMapsById.get(mapId)
-        if (warpedMap) {
-          warpedMap.setDistortionMeasure(distortionMeasure)
-        }
-      })
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.DISTORTIONCHANGED, mapIdsChanged)
-      )
-    }
-  }
-
-  /**
-   * Sets the internal projection for a specific map
-   *
-   * @param projection - the internal projection
-   * @param mapId - the ID of the map
-   */
-  setMapInternalProjection(projection: Projection, mapId: string): void {
-    this.setMapsInternalProjection(projection, { mapIds: [mapId] })
-  }
-
-  /**
-   * Sets the internal projection for selected maps
-   *
-   * @param projection - the internal projection
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
-   */
-  setMapsInternalProjection(
-    projection: Projection | undefined,
-    partialSelectionOptions?: Partial<SelectionOptions>
-  ): void {
-    const mapIdsChanged = []
-    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
-    for (const warpedMap of warpedMaps) {
-      if (!isEqualProjection(warpedMap.internalProjection, projection)) {
-        mapIdsChanged.push(warpedMap.mapId)
-      }
-    }
-    if (mapIdsChanged.length > 0) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
-      )
-      mapIdsChanged.forEach((mapId) => {
-        const warpedMap = this.warpedMapsById.get(mapId)
-        if (warpedMap) {
-          warpedMap.setInternalProjection(projection)
-          this.addToOrUpdateRtree(warpedMap)
-        }
-      })
-      this.dispatchEvent(
-        new WarpedMapEvent(
-          WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-          mapIdsChanged
-        )
-      )
-    }
-  }
-
-  /**
-   * Sets the projection for a specific map
-   *
-   * @param projection - the projection
-   * @param mapId - the ID of the map
-   */
-  setMapProjection(projection: Projection, mapId: string): void {
-    this.setMapsProjection(projection, { mapIds: [mapId] })
-  }
-
-  /**
-   * Sets the projection for selected maps
-   *
-   * @param projection - the projection
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
-   */
-  setMapsProjection(
-    projection: Projection | undefined,
-    partialSelectionOptions?: Partial<SelectionOptions>
-  ): void {
-    const mapIdsChanged = []
-    const warpedMaps = this.getWarpedMaps(partialSelectionOptions)
-    for (const warpedMap of warpedMaps) {
-      if (!isEqualProjection(warpedMap.projection, projection)) {
-        mapIdsChanged.push(warpedMap.mapId)
-      }
-    }
-    if (mapIdsChanged.length > 0) {
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PRECHANGE, mapIdsChanged)
-      )
-      mapIdsChanged.forEach((mapId) => {
-        const warpedMap = this.warpedMapsById.get(mapId)
-        if (warpedMap) {
-          warpedMap.setProjection(projection)
-          this.addToOrUpdateRtree(warpedMap)
-        }
-      })
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.PROJECTIONCHANGED, mapIdsChanged)
-      )
-    }
-  }
-
-  /**
-   * Removes a warped map by its ID
-   *
-   * @param mapId - the ID of the map
-   *
-   * @param mapIds - Map IDs
-   */
-  removeGeoreferencedMapById(mapId: string) {
-    const warpedMap = this.warpedMapsById.get(mapId)
-    if (warpedMap) {
-      this.removeGeoreferencedMap(warpedMap)
-      this.removeFromRtree(warpedMap)
-
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
-      )
-    }
+    this.setMapsOptionsByMapId(
+      optionKeysByMapIdToUndefinedOptionsByMapId(mapOptionkeysByMapId) as Map<
+        string,
+        Partial<WarpedMapListOptions>
+      >,
+      optionKeysToUndefinedOptions(
+        listOptionKeys
+      ) as Partial<WarpedMapListOptions>,
+      setOptionsOptions
+    )
   }
 
   /**
@@ -507,7 +584,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -524,7 +601,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -543,7 +620,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
@@ -562,127 +639,21 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
     this.removeZIndexHoles()
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
   /**
-   * Changes the visibility of the specified maps to `true`
+   * Order mapIds
    *
-   * @param mapIds - Map IDs
+   * Use this as anonymous sort function in Array.prototype.sort()
    */
-  showMaps(mapIds: Iterable<string>): void {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.visible = true
-      }
+  orderMapIdsByZIndex(mapId0: string, mapId1: string): number {
+    const zIndex0 = this.getMapZIndex(mapId0)
+    const zIndex1 = this.getMapZIndex(mapId1)
+    if (zIndex0 !== undefined && zIndex1 !== undefined) {
+      return zIndex0 - zIndex1
     }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
-    )
-  }
-
-  /**
-   * Changes the visibility of the specified maps to `false`
-   *
-   * @param mapIds - Map IDs
-   */
-  hideMaps(mapIds: Iterable<string>): void {
-    for (const mapId of mapIds) {
-      const warpedMap = this.warpedMapsById.get(mapId)
-      if (warpedMap) {
-        warpedMap.visible = false
-      }
-    }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.VISIBILITYCHANGED, mapIds)
-    )
-  }
-
-  /**
-   * Adds a georeferenced map to this list
-   *
-   * @param georeferencedMap
-   * @returns
-   */
-  async addGeoreferencedMap(
-    georeferencedMap: unknown
-  ): Promise<string | Error> {
-    const validatedGeoreferencedMapOrMaps =
-      validateGeoreferencedMap(georeferencedMap)
-    const validatedGeoreferencedMap = Array.isArray(
-      validatedGeoreferencedMapOrMaps
-    )
-      ? validatedGeoreferencedMapOrMaps[0]
-      : validatedGeoreferencedMapOrMaps
-    return this.addGeoreferencedMapInternal(validatedGeoreferencedMap)
-  }
-
-  /**
-   * Removes a georeferenced map from this list
-   *
-   * @param georeferencedMap
-   * @returns
-   */
-  async removeGeoreferencedMap(
-    georeferencedMap: unknown
-  ): Promise<string | Error> {
-    const validatedGeoreferencedMapOrMaps =
-      validateGeoreferencedMap(georeferencedMap)
-    const validatedGeoreferencedMap = Array.isArray(
-      validatedGeoreferencedMapOrMaps
-    )
-      ? validatedGeoreferencedMapOrMaps[0]
-      : validatedGeoreferencedMapOrMaps
-    return this.removeGeoreferencedMapInternal(validatedGeoreferencedMap)
-  }
-
-  /**
-   * Parses an annotation and adds its georeferenced map to this list
-   *
-   * @param annotation
-   * @returns
-   */
-  async addGeoreferenceAnnotation(annotation: unknown) {
-    const results: (string | Error)[] = []
-    const maps = parseAnnotation(annotation)
-    const settledResults = await Promise.allSettled(
-      maps.map((map) => this.addGeoreferencedMapInternal(map))
-    )
-    // TODO: make sure reason contains Error
-    for (const settledResult of settledResults) {
-      if (settledResult.status === 'fulfilled') {
-        results.push(settledResult.value)
-      } else {
-        results.push(settledResult.reason)
-      }
-    }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONADDED)
-    )
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
-    return results
-  }
-
-  /**
-   * Parses an annotation and removes its georeferenced map from this list
-   *
-   * @param annotation
-   * @returns
-   */
-  async removeGeoreferenceAnnotation(
-    annotation: unknown
-  ): Promise<(string | Error)[]> {
-    const results: (string | Error)[] = []
-    const maps = parseAnnotation(annotation)
-    for (const map of maps) {
-      const mapIdOrError = await this.removeGeoreferencedMapInternal(map)
-      results.push(mapIdOrError)
-    }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
-    )
-    return results
+    return 0
   }
 
   clear(): void {
@@ -709,7 +680,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const warpedMap = this.warpedMapFactory(
       mapId,
       georeferencedMap,
-      this.partialWarpedMapListOptions
+      this.options
     )
 
     this.warpedMapsById.set(mapId, warpedMap)
@@ -717,7 +688,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.addToOrUpdateRtree(warpedMap)
     this.addEventListenersToWarpedMap(warpedMap)
     this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, mapId)
+      new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, { mapIds: [mapId] })
     )
     return mapId
   }
@@ -732,10 +703,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       this.zIndices.delete(mapId)
       this.removeFromRtree(warpedMap)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, {
+          mapIds: [mapId]
+        })
       )
       this.removeZIndexHoles()
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.ZINDICESCHANGED))
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
 
       warpedMap.destroy()
     } else {
@@ -782,6 +755,126 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
   }
 
+  /**
+   * Internal set map options
+   */
+  private internalSetMapsOptionsByMapId(
+    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions> | undefined>,
+    listOptions?: Partial<WarpedMapListOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): void {
+    // If there are no maps yet, return
+    if (this.warpedMapsById.size === 0 || mapOptionsByMapId?.size === 0) {
+      return
+    }
+
+    // If the option setting should be animated,
+    // prepare an upcoming change
+    // (i.e. mix previous and current warped map properties if the animation is ongoing)
+    if (setOptionsOptions?.animate !== undefined) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, {
+          mapIds: this.getMapIds()
+        })
+      )
+    }
+
+    // We loop over all warped maps and set the maps options (if there are in mapOptionsByMapId)
+    // and list options (if there are)
+
+    // Some options can be set with animation.
+    // When this function is called without specific animation options,
+    // it sets options in two go's:
+    // 1) first all options, exept those to be animated, and fire a direct change event
+    // 2) then calls itself again with the 'animate' setting to now set all options
+    // including those that will cause an animation, and fire an animated change event
+
+    let changedOptionKeys = []
+    const changedMapIds = []
+    for (const warpedMap of this.getWarpedMaps()) {
+      let warpedMapChangedOptions
+      if (setOptionsOptions?.animate === undefined) {
+        // If no animation information is specified,
+        // set all options exect those for animation
+        const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
+        warpedMapChangedOptions = warpedMap.setMapOptions(
+          mapOptions,
+          listOptions,
+          {
+            optionKeysToOmit: this.options.animatedOptions
+          }
+        )
+      } else {
+        // If the option setting should be animated,
+        // or if the option setting should not be animated
+        // set all options
+        const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
+        warpedMapChangedOptions = warpedMap.setMapOptions(
+          mapOptions,
+          listOptions
+        )
+      }
+
+      const warpedMapChangedOptionKeys = Object.keys(warpedMapChangedOptions)
+      if (warpedMapChangedOptionKeys.length > 0) {
+        changedOptionKeys.push(...warpedMapChangedOptionKeys)
+        changedMapIds.push(warpedMap.mapId)
+      }
+
+      // Update RTree if necessary
+      if (
+        this.options.rtreeUpdatedOptions.some(
+          (option) => option in warpedMapChangedOptions
+        )
+      ) {
+        this.addToOrUpdateRtree(warpedMap)
+      }
+    }
+
+    // Make option keys unique
+    changedOptionKeys = Array.from(new Set(changedOptionKeys))
+
+    if (
+      setOptionsOptions?.animate === undefined ||
+      setOptionsOptions?.animate === false
+    ) {
+      // If no animation information is specified,
+      // or if the option setting should not be animated
+      // finish by firing a direct change
+      if (changedOptionKeys.length > 0) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, {
+            mapIds: changedMapIds,
+            optionKeys: changedOptionKeys
+          })
+        )
+      }
+
+      if (setOptionsOptions?.animate === undefined) {
+        // If no animation information is specified
+        // set the options again but now all options and with animation
+        this.internalSetMapsOptionsByMapId(
+          mapOptionsByMapId,
+          listOptions,
+          mergePartialOptions(setOptionsOptions, {
+            animate: true
+          })
+        )
+      }
+    } else {
+      // If the option setting should be animated,
+      // finish by firing the animation
+      if (changedOptionKeys.length > 0) {
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, {
+            mapIds: changedMapIds,
+            optionKeys: changedOptionKeys
+          })
+        )
+      }
+    }
+  }
+
   private addToOrUpdateRtree(warpedMap: W): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
@@ -809,21 +902,25 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   // This function and the listeners below transform an IMAGEINFOLOADED event by a WarpedMap
   // to an IMAGEINFOLOADED of the WarpedMapList, which is listened to in the Renderer
-  private imageInfoLoaded() {
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+  private imageInfoLoaded(mapId: string) {
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, {
+        mapIds: [mapId]
+      })
+    )
   }
 
   private addEventListenersToWarpedMap(warpedMap: W) {
     warpedMap.addEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
+      this.imageInfoLoaded.bind(this, warpedMap.mapId)
     )
   }
 
   private removeEventListenersFromWarpedMap(warpedMap: W) {
     warpedMap.removeEventListener(
       WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
+      this.imageInfoLoaded.bind(this, warpedMap.mapId)
     )
   }
 }

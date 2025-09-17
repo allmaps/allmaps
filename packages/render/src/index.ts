@@ -7,4 +7,20 @@ export { createWarpedMapFactory } from './maps/WarpedMap.js'
 
 export { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
-export type { WarpedMapLayerOptions } from './shared/types.js'
+export type {
+  WarpedMapOptions,
+  SpecificTriangulatedWarpedMapOptions,
+  TriangulatedWarpedMapOptions,
+  GetWarpedMapOptions,
+  SpecificWarpedMapListOptions,
+  WarpedMapListOptions,
+  SpecificBaseRenderOptions,
+  BaseRenderOptions,
+  CanvasRenderOptions,
+  IntArrayRenderOptions,
+  WarpedMapLayerOptions,
+  SetOptionsOptions,
+  SelectionOptions,
+  ProjectionOptions,
+  TransformationOptions
+} from './shared/types.js'

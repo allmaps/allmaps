@@ -13,7 +13,7 @@ function initializeControls(
   function initializeEventListeners() {
     document.querySelector('#opacity').addEventListener('input', (event) => {
       const opacity = event.target.valueAsNumber
-      warpedMapLayer.setOpacity(opacity)
+      warpedMapLayer.setLayerOptions({ opacity: opacity })
     })
 
     function setRemoveColor() {
@@ -27,10 +27,11 @@ function initializeControls(
         '#background-color-hardness'
       ).valueAsNumber
 
-      warpedMapLayer.setRemoveColor({
-        hexColor: color,
-        threshold,
-        hardness
+      warpedMapLayer.setLayerOptions({
+        removeColor: true,
+        removeColorColor: color,
+        removeColorThreshold: threshold,
+        removeColorHardness: hardness
       })
     }
 
@@ -38,9 +39,14 @@ function initializeControls(
       const colorize = document.querySelector('#colorize').checked
       if (colorize) {
         const colorizeColor = document.querySelector('#colorize-color').value
-        warpedMapLayer.setColorize(colorizeColor)
+        warpedMapLayer.setLayerOptions({
+          colorize: true,
+          colorizeColor: colorizeColor
+        })
       } else {
-        warpedMapLayer.resetColorize()
+        warpedMapLayer.setLayerOptions({
+          colorize: false
+        })
       }
     }
 
@@ -73,13 +79,17 @@ function initializeControls(
     // Toggle the opacity using the 'Space' key
     document.addEventListener('keydown', (event) => {
       if (event.code === 'Space') {
-        warpedMapLayer.setOpacity(0)
+        warpedMapLayer.setLayerOptions({
+          opacity: 0
+        })
       }
     })
 
     document.addEventListener('keyup', (event) => {
       if (event.code === 'Space') {
-        warpedMapLayer.setOpacity(1)
+        warpedMapLayer.setLayerOptions({
+          opacity: 1
+        })
       }
     })
   }

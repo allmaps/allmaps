@@ -11,7 +11,9 @@ export {
   defaultProjectedGcpTransformOptions,
   lonLatToWebMercator,
   webMercatorToLonLat,
-  isEqualProjection
+  isEqualProjection,
+  projectionToAntialiasedProjection,
+  projectionDefinitionToAntialiasedDefinition
 } from './shared/project-functions.js'
 
 export type {

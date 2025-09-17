@@ -18,21 +18,25 @@ import {
   squaredDistance,
   intersectBboxes,
   bboxToRectangle,
-  mergeOptions
+  mergeOptions,
+  mergePartialOptions
 } from '@allmaps/stdlib'
-import { lonLatProjection, proj4 } from '@allmaps/project'
+import { isEqualProjection } from '@allmaps/project'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
-  BaseRendererOptions,
-  MapPruneInfo
+  BaseRenderOptions,
+  MapPruneInfo,
+  GetWarpedMapOptions,
+  SetOptionsOptions,
+  SpecificBaseRenderOptions
 } from '../shared/types.js'
 
 // TODO: move defaults for tunable options here
-const defaultBaseRendererOptions = {}
+const DEFAULT_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions = {}
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -57,8 +61,6 @@ const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
  * Abstract base class for renderers
  */
 export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
-  partialBaseRendererOptions: Partial<BaseRendererOptions>
-
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
 
@@ -67,33 +69,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
+  options: Partial<BaseRenderOptions>
+
   constructor(
     cachableTileFactory: CachableTileFactory<D>,
     warpedMapFactory: WarpedMapFactory<W>,
-    partialBaseRendererOptions?: Partial<BaseRendererOptions>
+    options?: Partial<BaseRenderOptions>
   ) {
     super()
 
-    this.partialBaseRendererOptions = mergeOptions(
-      defaultBaseRendererOptions,
-      partialBaseRendererOptions
-    )
+    this.tileCache = new TileCache(cachableTileFactory, options)
+    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
 
-    this.tileCache = new TileCache(
-      cachableTileFactory,
-      partialBaseRendererOptions
-    )
-    this.warpedMapList = new WarpedMapList(
-      warpedMapFactory,
-      partialBaseRendererOptions
-    )
+    this.options = mergeOptions(DEFAULT_BASE_RENDER_OPTIONS, options)
   }
 
   /**
    * Parses an annotation and adds its georeferenced map to this renderer's warped map list
    *
    * @param annotation
-   * @returns
    */
   async addGeoreferenceAnnotation(annotation: unknown) {
     return this.warpedMapList.addGeoreferenceAnnotation(annotation)
@@ -103,24 +97,177 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * Adds a georeferenced map to this renderer's warped map list
    *
    * @param georeferencedMap
-   * @returns
    */
   async addGeoreferencedMap(georeferencedMap: unknown) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
   }
 
   /**
-   * Set the Base Renderer options
+   * Get the default options of a map
    *
-   * @param partialBaseRendererOptions - Options
+   * These come from the default option settings and it's georeferenced map proporties
+   *
+   * @param mapId - Map ID for which the options apply
    */
-  setOptions(partialBaseRendererOptions?: Partial<BaseRendererOptions>): void {
-    this.partialBaseRendererOptions = mergeOptions(
-      this.partialBaseRendererOptions,
-      partialBaseRendererOptions
+  getMapDefaultOptions(): GetWarpedMapOptions<W>
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
+  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getMapDefaultOptions(mapId)
+  }
+
+  /**
+   * Get the render and list options
+   */
+  getOptions(): Partial<BaseRenderOptions> {
+    return mergePartialOptions(this.options, this.warpedMapList.getOptions())
+  }
+
+  /**
+   * Get the map-specific options of a map
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
+    return this.warpedMapList.getMapMapOptions(mapId)
+  }
+
+  /**
+   * Get the options of a map
+   *
+   * These options are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * @param mapId - Map ID for which the options apply
+   */
+  getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
+    return this.warpedMapList.getMapOptions(mapId)
+  }
+
+  /**
+   * Set the renderer and list options
+   *
+   * @param renderAndListOptions - Render and list Options to set
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setOptions(
+    renderAndListOptions?: Partial<BaseRenderOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): void {
+    this.options = mergeOptions(this.options, renderAndListOptions)
+    this.tileCache.setOptions(renderAndListOptions)
+    this.warpedMapList.setOptions(renderAndListOptions, setOptionsOptions)
+  }
+
+  /**
+   * Set the map-specific options of maps (and the renderer and list options)
+   *
+   * @param mapIds - Map IDs for which to set the options
+   * @param mapOptions - Map-specific options to set
+   * @param renderAndListOptions - Render and list options to set
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setMapsOptions(
+    mapIds: string[],
+    mapOptions?: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): void {
+    if (renderAndListOptions) {
+      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.tileCache.setOptions(renderAndListOptions)
+    }
+    this.warpedMapList.setMapsOptions(
+      mapIds,
+      mapOptions,
+      renderAndListOptions,
+      setOptionsOptions
     )
-    this.tileCache.setOptions(partialBaseRendererOptions)
-    this.warpedMapList.setOptions(partialBaseRendererOptions)
+  }
+
+  /**
+   * Set the map-specific options of maps by map ID (and the render and list options)
+   *
+   * @param mapOptionsByMapId - Map-specific options to set by map ID
+   * @param renderAndListOptions - Render and list options to set
+   * @param setOptionsOptions - Options when setting the options
+   */
+  setMapsOptionsByMapId(
+    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions>>,
+    renderAndListOptions?: Partial<BaseRenderOptions>,
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ): void {
+    if (renderAndListOptions) {
+      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.tileCache.setOptions(renderAndListOptions)
+    }
+    this.warpedMapList.setMapsOptionsByMapId(
+      mapOptionsByMapId,
+      renderAndListOptions,
+      setOptionsOptions
+    )
+  }
+
+  /**
+   * Resets the list options
+   *
+   * An empty array resets all options, undefined resets no options.
+   * Only resets the list options, not the render options
+   *
+   * @param listOptionKeys - Keys of the render and list options to reset
+   * @param setOptionsOptions - Options when setting the options
+   */
+  resetOptions(
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    this.warpedMapList.resetOptions(listOptionKeys, setOptionsOptions)
+  }
+
+  /**
+   * Resets the map-specific options of maps (and the list options)
+   *
+   * An empty array resets all options, undefined resets no options.
+   * Only resets the list options, not the render options
+   *
+   * @param mapIds - Map IDs for which to reset the options
+   * @param mapOptionKeys - Keys of the map-specific options to reset
+   * @param listOptionKeys - Keys of the render and list options to reset
+   * @param setOptionsOptions - Options when setting the options
+   */
+  resetMapsOptions(
+    mapIds: string[],
+    mapOptionKeys?: string[],
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    this.warpedMapList.resetMapsOptions(
+      mapIds,
+      mapOptionKeys,
+      listOptionKeys,
+      setOptionsOptions
+    )
+  }
+
+  /**
+   * Resets the map-specific options of maps by map ID (and the list options)
+   *
+   * An empty array or map resets all options (for all maps), undefined resets no options.
+   * Only resets the list options, not the render options
+   *
+   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
+   * @param listOptionKeys - Keys of the render and list options to reset
+   * @param setOptionsOptions - Options when setting the options
+   */
+  resetMapsOptionsByMapId(
+    mapOptionkeysByMapId?: Map<string, string[]>,
+    listOptionKeys?: string[],
+    setOptionsOptions?: Partial<SetOptionsOptions>
+  ) {
+    this.warpedMapList.resetMapsOptionsByMapId(
+      mapOptionkeysByMapId,
+      listOptionKeys,
+      setOptionsOptions
+    )
   }
 
   protected loadMissingImageInfosInViewport(): Promise<void>[] {
@@ -128,9 +275,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
+    const geoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getGeoBufferedRectangle()
+    )
+
     return Array.from(
       this.warpedMapList.getWarpedMaps({
-        geoBbox: this.viewport.geoRectangleBbox
+        geoBbox: geoBufferedViewportRectangleBbox
       })
     )
       .filter(
@@ -173,11 +324,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return
     }
 
-    this.warpedMapList.partialWarpedMapListOptions.projection =
-      this.viewport.projection
-    this.warpedMapList.setMapsProjection(this.viewport.projection, {
-      onlyVisible: false
-    })
+    if (
+      !isEqualProjection(
+        this.warpedMapList.options.projection,
+        this.viewport.projection
+      )
+    ) {
+      this.warpedMapList.options.projection = this.viewport.projection
+      this.warpedMapList.setOptions({ projection: this.viewport.projection })
+    }
   }
 
   protected requestFetchableTiles(): void {
@@ -254,21 +409,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
     const viewport = this.viewport
 
-    const projectedGeoBufferedRectangle =
-      this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
-    const geoBufferedRectangleBbox = computeBbox(
-      projectedGeoBufferedRectangle.map((point) =>
-        proj4(
-          viewport.projection.definition,
-          lonLatProjection.definition,
-          point
-        )
-      )
+    const geoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getGeoBufferedRectangle(viewportBufferRatio)
     )
 
-    return new Set(
+    const mapsInViewport = new Set(
       Array.from(
-        this.warpedMapList.getWarpedMaps({ geoBbox: geoBufferedRectangleBbox })
+        this.warpedMapList.getWarpedMaps({
+          geoBbox: geoBufferedViewportRectangleBbox
+        })
       )
         .sort((warpedMapA, warpedMapB) => {
           if (warpedMapA && warpedMapB) {
@@ -288,6 +437,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         })
         .map((warpedMap) => warpedMap.mapId)
     )
+
+    return mapsInViewport
   }
 
   protected getMapFetchableTilesForViewport(
@@ -305,7 +456,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.visible) {
+    if (!warpedMap.options.visible) {
       return []
     }
 
@@ -448,7 +599,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.visible) {
+    if (!warpedMap.options.visible) {
       return []
     }
 
@@ -531,14 +682,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           // filter out duplicate mapIds
           return a.indexOf(v) === i
         })
-        .sort((mapIdA, mapIdB) => {
-          const zIndexA = this.warpedMapList.getMapZIndex(mapIdA)
-          const zIndexB = this.warpedMapList.getMapZIndex(mapIdB)
-          if (zIndexA !== undefined && zIndexB !== undefined) {
-            return zIndexA - zIndexB
-          }
-          return 0
-        })
+        .sort((mapId0, mapId1) =>
+          this.warpedMapList.orderMapIdsByZIndex(mapId0, mapId1)
+        )
     )
 
     this.mapsInPreviousViewport = this.mapsInViewport
@@ -560,13 +706,17 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     for (const mapId of mapsEnteringViewport) {
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTER, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTERED, {
+          mapIds: [mapId]
+        })
       )
     }
     for (const mapId of mapsLeavingViewport) {
       this.clearMap(mapId)
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEAVE, mapId)
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEFT, {
+          mapIds: [mapId]
+        })
       )
     }
 
@@ -605,7 +755,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected mapTileLoaded(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected mapTileRemoved(event: Event): void {}
+  protected mapTileDeleted(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected imageInfoLoaded(event: Event): void {}
@@ -617,28 +767,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected warpedMapRemoved(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected preChange(event: Event): void {}
+  protected prepareChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected optionsChanged(event: Event): void {}
+  protected immediateChange(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected gcpsChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected resourceMaskChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected transformationChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected distortionChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected internalProjectionChanged(event: Event): void {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected projectionChanged(event: Event): void {}
+  protected animatedChange(event: Event): void {}
 
   protected addEventListeners() {
     this.tileCache.addEventListener(
@@ -647,8 +782,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
+      WarpedMapEventType.MAPTILEDELETED,
+      this.mapTileDeleted.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -667,43 +802,18 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.PRECHANGE,
-      this.preChange.bind(this)
+      WarpedMapEventType.PREPARECHANGE,
+      this.prepareChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.OPTIONSCHANGED,
-      this.optionsChanged.bind(this)
+      WarpedMapEventType.ANIMATEDCHANGE,
+      this.animatedChange.bind(this)
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.GCPSCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.RESOURCEMASKCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.DISTORTIONCHANGED,
-      this.distortionChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-      this.internalProjectionChanged.bind(this)
-    )
-
-    this.warpedMapList.addEventListener(
-      WarpedMapEventType.PROJECTIONCHANGED,
-      this.projectionChanged.bind(this)
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.immediateChange.bind(this)
     )
   }
 
@@ -714,8 +824,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILEREMOVED,
-      this.mapTileRemoved.bind(this)
+      WarpedMapEventType.MAPTILEDELETED,
+      this.mapTileDeleted.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
@@ -734,43 +844,18 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.PRECHANGE,
-      this.preChange.bind(this)
+      WarpedMapEventType.PREPARECHANGE,
+      this.prepareChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.OPTIONSCHANGED,
-      this.optionsChanged.bind(this)
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.immediateChange.bind(this)
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.GCPSCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.RESOURCEMASKCHANGED,
-      this.gcpsChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.TRANSFORMATIONCHANGED,
-      this.transformationChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.DISTORTIONCHANGED,
-      this.distortionChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.INTERNALPROJECTIONCHANGED,
-      this.internalProjectionChanged.bind(this)
-    )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.PROJECTIONCHANGED,
-      this.projectionChanged.bind(this)
+      WarpedMapEventType.ANIMATEDCHANGE,
+      this.animatedChange.bind(this)
     )
   }
 }

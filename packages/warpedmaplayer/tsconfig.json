@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {}
+  },
+  "references": [
+    { "path": "../project" },
+    { "path": "../render" },
+    { "path": "../transform" },
+    { "path": "../stdlib" },
+    { "path": "../types" }
+  ],
+  "include": ["./src/**/*"]
+}

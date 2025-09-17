@@ -479,31 +479,6 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 (point: Point) => Point
 ```
 
-### `ProjectedGcpTransformer#setProjection(projection)`
-
-Set the projection.
-
-To transform 'toGeo' or 'toResource' to or from a different projection
-than set on a transformer's construction (but using the same internal projection)
-it's possible to specify the requested projection in the transform options.
-
-This way we circumvent a possibly expensive recomputation
-of the toGeo and/or toResource transformations.
-
-To do this more systematically, it's possible to set
-a projected gcp transformer's projection using this method
-
-Combine this with a deep clone of the transformer instance
-to keep the original transformer as well.
-
-###### Parameters
-
-* `projection` (`{name?: string; definition: ProjectionDefinition}`)
-
-###### Returns
-
-this (`this`).
-
 ### `ProjectedGcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
@@ -542,6 +517,32 @@ Create a Projected GCP Transformer from a Georeferenced Map
 ###### Returns
 
 A Projected GCP Transformer (`ProjectedGcpTransformer`).
+
+### `ProjectedGcpTransformer.setProjection(projectedTransformer, projection)`
+
+Set the projection.
+
+To transform 'toGeo' or 'toResource' to or from a different projection
+than set on a transformer's construction (but using the same internal projection)
+it's possible to specify the requested projection in the transform options.
+
+This way we circumvent a possibly expensive recomputation
+of the toGeo and/or toResource transformations.
+
+To do this more systematically, it's possible to set
+a projected gcp transformer's projection using this method.
+
+Combine this with a deep clone of the transformer instance
+to keep the original transformer as well.
+
+###### Parameters
+
+* `projectedTransformer` (`ProjectedGcpTransformer`)
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+
+###### Returns
+
+this (`ProjectedGcpTransformer`).
 
 ### `ProjectedGcpTransformerInputs`
 
@@ -609,12 +610,40 @@ string | PROJJSONDefinition
 
 ### `lonLatProjection`
 
+lonLatProjection
+
+`EPSG:4326` projection with definition: `"+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees"`
+
 ###### Fields
 
 * `definition` (`string`)
 * `name` (`string`)
 
+### `projectionDefinitionToAntialiasedDefinition(stringProjectionDefinition)`
+
+###### Parameters
+
+* `stringProjectionDefinition` (`string`)
+
+###### Returns
+
+`string`.
+
+### `projectionToAntialiasedProjection(projection)`
+
+###### Parameters
+
+* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+
+###### Returns
+
+`{name?: string; definition: ProjectionDefinition}`.
+
 ### `webMercatorProjection`
+
+webMercatorProjection
+
+`EPSG:3857` projection with definition: `"+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs"`
 
 ###### Fields
 

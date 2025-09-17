@@ -46,13 +46,14 @@ export type {
   Gcp,
   MultiGeometryOptions,
   Bbox,
+  BboxOptions,
   Size,
   Fit,
   HomogeneousTransform,
   Matrix4
 } from './geometry.js'
 
-export type { ImageInformations } from './iiif.js'
+export type { ImageInfoByMapId } from './iiif.js'
 
 export type {
   SvgAttributes,

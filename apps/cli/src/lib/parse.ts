@@ -145,7 +145,7 @@ export function mergeAnnotationInputsInMap(
   }
 
   // Merge other properties
-  mergeOptionsUnlessUndefined(map, {
+  map = mergeOptionsUnlessUndefined(map, {
     resourceMask: annotationInputs?.resourceMask,
     gcps: annotationInputs?.gcps,
     resourceCrs:

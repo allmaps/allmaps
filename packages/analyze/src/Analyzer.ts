@@ -526,20 +526,19 @@ export class Analyzer {
       projectedTransformer.getToGeoTransformation()
     const rmse = toProjectedGeoTransformation.getRmse()
     const destinationErrors = toProjectedGeoTransformation.getErrors()
+    // Note: this could be spead up, since it recomputes this.warpedMap.projectedGeoTransformedResourcePoints
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    const resourceErrors = toProjectedGeoTransformation
-      .getErrors()
-      .map((error) => error / helmertMeasures.scale)
+    const resourceErrors = destinationErrors.map(
+      (error) => error / helmertMeasures.scale
+    )
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
     const resourceMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.resourceMaskBbox
     )
-    const resourceRelativeErrors = toProjectedGeoTransformation
-      .getErrors()
-      .map(
-        (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
-      )
+    const resourceRelativeErrors = destinationErrors.map(
+      (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
+    )
 
     this.measures = {
       mapId: this.mapId,

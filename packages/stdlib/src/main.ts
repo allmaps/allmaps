@@ -1,5 +1,27 @@
+import { Line } from '@allmaps/types'
+import {
+  differenceWith,
+  fromPairs,
+  toPairs,
+  isEqual,
+  cloneDeep,
+  pick
+} from 'lodash-es'
+
 export function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
+}
+
+export function radiansToDegrees(radians: number) {
+  return radians * (180 / Math.PI)
+}
+
+export function angle(line: Line) {
+  return Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0])
+}
+
+export function bearing(line: Line) {
+  return angle(line) - Math.PI / 2
 }
 
 // Define vanilla groupBy function, since official one is only baseline 2024
@@ -121,17 +143,36 @@ export function equalSet<T>(set1: Set<T> | null, set2: Set<T> | null): boolean {
   return [...set1].every((x) => set2.has(x))
 }
 
-export function maxOfNumberOrUndefined(
-  number1: number | undefined,
-  number2: number | undefined
-): number | undefined {
-  if (number1 !== undefined && number2 !== undefined) {
-    return Math.max(number1, number2)
-  } else if (number1 !== undefined) {
-    return number1
-  } else if (number2 !== undefined) {
-    return number2
+// From https://gist.github.com/Yimiprod/7ee176597fef230d1451
+export function objectDifference(
+  newObject: object,
+  baseObject: object
+): object {
+  return fromPairs(
+    differenceWith(toPairs(newObject), toPairs(baseObject), isEqual)
+  )
+}
+
+export function objectOmitDifference(
+  newObject: object,
+  baseObject: object
+): object {
+  const keysToOmit = Object.keys(objectDifference(newObject, baseObject))
+  return pick(newObject, keysToOmit)
+}
+
+// Basic omit function as replacement for lodash omit, since it will be removed in v5
+// See: https://github.com/lodash/lodash/issues/2930#issuecomment-272298477
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function omit<T extends Record<string, any>>(
+  object: T,
+  keys: string[]
+): Partial<T> {
+  const result = cloneDeep(object) as T
+  for (const key of keys) {
+    delete result[key]
   }
+  return result
 }
 
 export function isValidHttpUrl(string: string) {
@@ -144,4 +185,9 @@ export function isValidHttpUrl(string: string) {
   }
 
   return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export function camelCaseToWords(string: string): string {
+  const result = string.replace(/([A-Z])/g, ' $1')
+  return result.charAt(0).toUpperCase() + result.slice(1)
 }
