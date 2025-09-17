@@ -1,7 +1,7 @@
 import { proj4, lonLatProjection, isEqualProjection } from '@allmaps/project'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
-import { supportedGcpFileFormatsWithResourceYAxisUp } from '../types.js'
+import { supportedGcpFileFormatsWithResourceYAxisUp } from '../shared/constants.js'
 
 import type { Gcp, Point } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -9,9 +9,10 @@ import type { Projection } from '@allmaps/project'
 
 import type {
   GcpFileFormat,
+  GcpFileFormatWithResourceYAxisUp,
   GcpResourceOrigin,
   GcpResourceYAxis
-} from '../types.js'
+} from '../shared/types.js'
 
 /**
  * Print GCPs from Georeferenced Map to file string.
@@ -81,7 +82,7 @@ export function printGcps(
     gcpResourceYAxis:
       options?.gcpFileFormat &&
       supportedGcpFileFormatsWithResourceYAxisUp.includes(
-        options?.gcpFileFormat
+        options?.gcpFileFormat as GcpFileFormatWithResourceYAxisUp
       )
         ? 'up'
         : 'down'

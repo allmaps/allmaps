@@ -6,7 +6,7 @@ import type {
   ProjectedGcpTransformerOptions,
   ProjectedGcpTransformOptions,
   Projection
-} from './types'
+} from './types.js'
 
 // Note: put EPSG defintion (or WKT definition) first in the list of definitions below,
 // such that other systems (like QGIS) are able to interpret the definition as a standardised CRS

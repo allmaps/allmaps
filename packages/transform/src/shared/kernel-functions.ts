@@ -1,4 +1,4 @@
-import { KernelFunctionOptions } from './types'
+import type { KernelFunctionOptions } from './types.js'
 
 /**
  * Linear kernel

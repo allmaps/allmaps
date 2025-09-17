@@ -38,15 +38,15 @@ export type TransformationType =
   | 'projective'
   | 'linear'
 
-export const supportedtransformationTypes: TransformationType[] = [
-  // 'straight', // Consider to remove this
-  'helmert',
-  'polynomial', // Note: no 'polynomial1' here
-  'polynomial2',
-  'polynomial3',
-  'thinPlateSpline',
-  'projective'
-]
+// export const SupportedTransformationTypes: TransformationType[] = [
+//   'straight',
+//   'helmert',
+//   'polynomial', // Note: no 'polynomial1' here
+//   'polynomial2',
+//   'polynomial3',
+//   'thinPlateSpline',
+//   'projective'
+// ]
 
 // Stored here as object to facilitate parsing in CLI and elsewhere
 export type GcpsInputs = {

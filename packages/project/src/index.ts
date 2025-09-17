@@ -16,7 +16,7 @@ export {
   projectionDefinitionToAntialiasedDefinition
 } from './shared/project-functions.js'
 
-export {
+export type {
   ProjectionDefinition,
   Projection,
   ProjectedGcpTransformOptions,
