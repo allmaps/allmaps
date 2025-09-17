@@ -37,10 +37,8 @@
     "allmaps"
   ],
   "scripts": {
-    "dev": "vite",
-    "watch": "vite build --watch",
-    "build": "vite build",
-    "preview": "vite preview",
+    "watch": "tsc --watch",
+    "build": "tsc",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
@@ -66,9 +64,6 @@
     "prettier": "^3.4.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
-    "vite": "^5.0.3",
-    "vite-plugin-dts": "^3.8.3",
-    "vite-plugin-no-bundle": "^4.0.0"
+    "typescript": "^5.7.0"
   }
 }

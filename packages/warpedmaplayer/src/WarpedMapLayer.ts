@@ -8,7 +8,7 @@ import type { Point, Bbox, Ring } from '@allmaps/types'
 import type {
   WebGL2RenderOptions,
   WebGL2WarpedMapOptions
-} from '@allmaps/render'
+} from '@allmaps/render/webgl2'
 
 const NO_RENDERER_ERROR_MESSAGE =
   'Renderer not defined. Add the layer to a map before calling this function.'

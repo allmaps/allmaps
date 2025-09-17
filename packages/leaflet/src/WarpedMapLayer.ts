@@ -1,14 +1,17 @@
 import * as L from 'leaflet'
 
-import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
+import {
+  WebGL2Renderer,
+  WebGL2RenderOptions,
+  WebGL2WarpedMap,
+  WebGL2WarpedMapOptions
+} from '@allmaps/render/webgl2'
 import {
   WarpedMapList,
   Viewport,
   WarpedMapEvent,
   WarpedMapEventType,
-  WebGL2RenderOptions,
   ProjectionOptions,
-  WebGL2WarpedMapOptions,
   SetOptionsOptions
 } from '@allmaps/render'
 import {

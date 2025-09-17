@@ -10,7 +10,7 @@ import type { LngLatBoundsLike } from 'maplibre-gl'
 
 import type { Rectangle, Point } from '@allmaps/types'
 
-import type { WebGL2RenderOptions } from '@allmaps/render'
+import type { WebGL2RenderOptions } from '@allmaps/render/webgl2'
 
 export type SpecificMapLibreWarpedMapLayerOptions = {
   layerId: string

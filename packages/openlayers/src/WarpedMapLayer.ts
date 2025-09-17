@@ -11,11 +11,13 @@ import type { Extent } from 'ol/extent'
 import type {
   ProjectionOptions,
   SetOptionsOptions,
-  WarpedMapList,
+  WarpedMapList
+} from '@allmaps/render'
+import type {
   WebGL2RenderOptions,
   WebGL2WarpedMap,
   WebGL2WarpedMapOptions
-} from '@allmaps/render'
+} from '@allmaps/render/webgl2'
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
 import { Bbox, Point, Ring } from '@allmaps/types'
 
@@ -567,7 +569,7 @@ export class WarpedMapLayer
    * @param setOptionsOptions - Options when setting the options
    * @example
    * ```js
-   * warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+   * warpedMapLayer.setMapOptions([myMapId], { transformationType: 'thinPlateSpline' })
    * ```
    */
   setMapsOptions(
