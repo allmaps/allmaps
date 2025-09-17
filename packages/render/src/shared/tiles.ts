@@ -5,8 +5,8 @@ import {
   squaredDistance,
   sizeToResolution
 } from '@allmaps/stdlib'
-import { MapPruneConstants, MapPruneInfo } from './types'
-import { FetchableTile } from '../tilecache/FetchableTile'
+import { MapPruneConstants, MapPruneInfo } from './types.js'
+import { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import type { Image } from '@allmaps/iiif-parser'
 import type {

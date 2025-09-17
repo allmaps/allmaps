@@ -1,16 +1,17 @@
 import { proj4, lonLatProjection, isEqualProjection } from '@allmaps/project'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
-import { supportedGcpFileFormatsWithResourceYAxisUp } from '../types.js'
+import { supportedGcpFileFormatsWithResourceYAxisUp } from '../shared/constants.js'
 
 import type { Gcp, Point } from '@allmaps/types'
 import type { Projection } from '@allmaps/project'
 
 import type {
   GcpFileFormat,
+  GcpFileFormatWithResourceYAxisUp,
   GcpResourceOrigin,
   GcpResourceYAxis
-} from '../types.js'
+} from '../shared/types.js'
 
 /**
  * Parse GCPs from file string.
@@ -51,7 +52,9 @@ export function parseGcps(
     gcpResourceOrigin: 'top-left',
     gcpResourceYAxis:
       gcpFileFormat &&
-      supportedGcpFileFormatsWithResourceYAxisUp.includes(gcpFileFormat)
+      supportedGcpFileFormatsWithResourceYAxisUp.includes(
+        gcpFileFormat as GcpFileFormatWithResourceYAxisUp
+      )
         ? 'up'
         : 'down'
   }

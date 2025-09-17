@@ -31,11 +31,15 @@ export {
 export { checkCommand } from './output/bash.js'
 
 export {
-  GcpFileFormat,
   supportedGcpFileFormats,
-  GcpResourceOrigin,
   supportedGcpResourceOrigin,
-  GcpResourceYAxis,
   supportedGcpResourceYAxis,
   supportedGcpFileFormatsWithResourceYAxisUp
-} from './types.js'
+} from './shared/constants.js'
+
+export type {
+  GcpFileFormat,
+  GcpFileFormatWithResourceYAxisUp,
+  GcpResourceOrigin,
+  GcpResourceYAxis
+} from './shared/types.js'

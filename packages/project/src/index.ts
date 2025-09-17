@@ -14,7 +14,7 @@ export {
   isEqualProjection
 } from './shared/project-functions.js'
 
-export {
+export type {
   ProjectionDefinition,
   Projection,
   ProjectedGcpTransformOptions,

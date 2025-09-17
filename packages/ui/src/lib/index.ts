@@ -66,4 +66,4 @@ export {
   Straight
 }
 
-export * from './shared/types.js'
+export type { MapMonsterColor, MapMonsterMood } from './shared/types.js'

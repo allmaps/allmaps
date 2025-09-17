@@ -604,7 +604,7 @@ export function parseInverseOptions(options: {
 export function parseCommanderGcpFileFormatOption(
   string: string
 ): GcpFileFormat {
-  if (supportedGcpFileFormats.includes(string)) {
+  if (supportedGcpFileFormats.includes(string as GcpFileFormat)) {
     return string as GcpFileFormat
   } else {
     throw new Error(
@@ -616,7 +616,7 @@ export function parseCommanderGcpFileFormatOption(
 export function parseCommanderGcpResourceOrigin(
   string: string
 ): GcpResourceOrigin {
-  if (supportedGcpResourceOrigin.includes(string)) {
+  if (supportedGcpResourceOrigin.includes(string as GcpResourceOrigin)) {
     return string as GcpResourceOrigin
   } else {
     throw new Error(
@@ -628,7 +628,7 @@ export function parseCommanderGcpResourceOrigin(
 export function parseCommanderGcpResourceYAxis(
   string: string
 ): GcpResourceYAxis {
-  if (supportedGcpResourceYAxis.includes(string)) {
+  if (supportedGcpResourceYAxis.includes(string as GcpResourceYAxis)) {
     return string as GcpResourceYAxis
   } else {
     throw new Error(

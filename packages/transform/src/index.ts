@@ -13,8 +13,6 @@ export { Projective } from './transformation-types/Projective.js'
 export { RBF } from './transformation-types/RBF.js'
 export { Straight } from './transformation-types/Straight.js'
 
-export { supportedtransformationTypes } from './shared/types.js'
-
 export {
   transformationTypeToTypeAndOrder,
   typeAndOrderToTransformationType
