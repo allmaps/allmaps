@@ -133,8 +133,6 @@ export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
 export type CanvasRenderOptions = BaseRenderOptions
 export type IntArrayRenderOptions = BaseRenderOptions
 
-export type WarpedMapLayerOptions = Partial<WebGL2RenderOptions>
-
 export type TileCacheOptions = {
   fetchFn: FetchFn
 }

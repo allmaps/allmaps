@@ -18,7 +18,6 @@ export type {
   BaseRenderOptions,
   CanvasRenderOptions,
   IntArrayRenderOptions,
-  WarpedMapLayerOptions,
   SetOptionsOptions,
   SelectionOptions,
   ProjectionOptions,

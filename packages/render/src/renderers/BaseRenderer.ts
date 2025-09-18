@@ -103,15 +103,23 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   /**
+   * Get the default options of the renderer and list
+   */
+  getDefaultOptions(): BaseRenderOptions & GetWarpedMapOptions<W> {
+    return mergeOptions(
+      DEFAULT_BASE_RENDER_OPTIONS,
+      this.warpedMapList.getDefaultOptions()
+    )
+  }
+
+  /**
    * Get the default options of a map
    *
-   * These come from the default option settings and it's georeferenced map proporties
+   * These come from the default option settings for WebGL2WarpedMaps and the map's georeferenced map proporties
    *
    * @param mapId - Map ID for which the options apply
    */
-  getMapDefaultOptions(): GetWarpedMapOptions<W>
-  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined
-  getMapDefaultOptions(mapId?: string): GetWarpedMapOptions<W> | undefined {
+  getMapDefaultOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
     return this.warpedMapList.getMapDefaultOptions(mapId)
   }
 

@@ -1308,11 +1308,11 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Parameters
 
 * `baseOptions` (`T`)
-* `additionalOptions` (`U[0]`)
+* `additionalOptions` (`Partial<U> | undefined`)
 
 ###### Returns
 
-`T & Partial<{[K in keyof U[number]]: Exclude<U[number][K], undefined>}>`.
+`T & Partial<U>`.
 
 ### `mergePartialOptions(partialOptions)`
 
