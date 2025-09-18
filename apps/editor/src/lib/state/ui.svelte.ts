@@ -2,6 +2,8 @@ import { setContext, getContext } from 'svelte'
 
 import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 
+import type { Bbox, Point } from '@allmaps/types'
+
 import type { PresetBaseMapID, ClickedItem } from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
@@ -46,7 +48,10 @@ export class UiState extends UiEventTarget {
   #basemapPresets = $state(basemapPresets)
 
   #firstUse = $state(true)
-  #showAboutDialog = $state(false)
+
+  #showAboutModal = $state(false)
+  #showAnnotationModal = $state(false)
+  #showKeyboardModal = $state(false)
 
   #retinaTiles = $state(true)
 
@@ -73,8 +78,24 @@ export class UiState extends UiEventTarget {
     }
   }
 
-  zoomToExtent() {
+  handleZoomToExtent() {
     this.dispatchEvent(new CustomEvent(UiEvents.ZOOM_TO_EXTENT))
+  }
+
+  handleFitBbox(bbox: Bbox) {
+    this.dispatchEvent(
+      new CustomEvent<Bbox>(UiEvents.FIT_BBOX, {
+        detail: bbox
+      })
+    )
+  }
+
+  handleSetCenter(center: Point) {
+    this.dispatchEvent(
+      new CustomEvent<Point>(UiEvents.SET_CENTER, {
+        detail: center
+      })
+    )
   }
 
   get basemapPresets() {
@@ -97,12 +118,28 @@ export class UiState extends UiEventTarget {
     return this.#firstUse
   }
 
-  get showAboutDialog() {
-    return this.#showAboutDialog
+  get showAboutModal() {
+    return this.#showAboutModal
   }
 
-  set showAboutDialog(show: boolean) {
-    this.#showAboutDialog = show
+  set showAboutModal(show: boolean) {
+    this.#showAboutModal = show
+  }
+
+  get showAnnotationModal() {
+    return this.#showAnnotationModal
+  }
+
+  set showAnnotationModal(show: boolean) {
+    this.#showAnnotationModal = show
+  }
+
+  get showKeyboardModal() {
+    return this.#showKeyboardModal
+  }
+
+  set showKeyboardModal(show: boolean) {
+    this.#showKeyboardModal = show
   }
 
   get retinaTiles() {
@@ -119,7 +156,7 @@ export class UiState extends UiEventTarget {
 
   set lastClickedItem(item: ClickedItem) {
     this.dispatchEvent(
-      new CustomEvent(UiEvents.CLICKED_ITEM, {
+      new CustomEvent<ClickedItem>(UiEvents.CLICKED_ITEM, {
         detail: item
       })
     )

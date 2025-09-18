@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Logo } from '@allmaps/ui'
+  import { Logo } from '@allmaps/components'
 </script>
 
 <div class="flex flex-col justify-center items-center gap-4">

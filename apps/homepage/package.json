@@ -58,7 +58,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "maplibre-gl": "^5.6.1",
-    "phosphor-svelte": "^2.0.1",
+    "phosphor-svelte": "^3.0.1",
     "pmtiles": "^3.0.5",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.1.2",

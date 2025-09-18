@@ -48,8 +48,15 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "svelte": "./dist/index.js"
-    }
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./icons": {
+      "types": "./dist/icons.d.ts",
+      "svelte": "./dist/icons.js",
+      "default": "./dist/icons.js"
+    },
+    "./css/*": "./dist/css/*"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"

@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { Logo } from '@allmaps/ui'
+  import Logo from '$lib/components/Logo.svelte'
 </script>
 
-<!-- TODO: move to @allmaps/ui -->
 <footer class="w-full h-72 flex justify-center items-center">
   <div class="w-12">
     <a href="https://allmaps.org">

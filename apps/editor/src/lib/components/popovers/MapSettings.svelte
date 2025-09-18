@@ -1,12 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state'
 
+  import { Select } from '@allmaps/components'
+
   import { createRouteUrl, getRouteId, gotoRoute } from '$lib/shared/router.js'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/state/url.svelte.js'
-
-  import Select from '$lib/components/Select.svelte'
 
   const uiState = getUiState()
   const urlState = getUrlState()

@@ -6,6 +6,7 @@
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { Image } from '@allmaps/iiif-parser'
   import { parseAnnotation } from '@allmaps/annotation'
+  import { GcpTransformer } from '@allmaps/transform'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
@@ -17,7 +18,6 @@
 
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
-  import { GcpTransformer } from '@allmaps/transform'
   import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 
   import type { Viewport } from '$lib/types/shared.js'

@@ -29,6 +29,7 @@
     GeoreferencedMap
   } from '@allmaps/annotation'
   import type { TransformationType } from '@allmaps/transform'
+  import type { Point, Bbox } from '@allmaps/types'
 
   import type {
     InsertMapEvent,
@@ -110,6 +111,7 @@
     const map = mapsState.getMapById(mapId)
     if (map) {
       const gcps = getCompleteGcps(map)
+
       warpedMapLayer.setMapGcps(getFullMapId(mapId), gcps)
     }
   }
@@ -264,6 +266,21 @@
     }
   }
 
+  function handleZoomToExtent() {}
+
+  function handleFitBbox(event: CustomEvent<Bbox>) {
+    geoMap?.fitBounds(event.detail, {
+      duration: 300,
+      padding: MAPLIBRE_PADDING
+    })
+  }
+
+  function handleSetCenter(center: CustomEvent<Point>) {
+    geoMap?.setCenter(center.detail, {
+      duration: 300
+    })
+  }
+
   $effect(() => {
     if (geoMap) {
       warpedMapLayer = new WarpedMapLayer()
@@ -310,6 +327,9 @@
 
   onMount(() => {
     uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
+    uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
+    uiState.addEventListener(UiEvents.FIT_BBOX, handleFitBbox)
+    uiState.addEventListener(UiEvents.SET_CENTER, handleSetCenter)
 
     mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
@@ -342,6 +362,9 @@
       warpedMapLayer.clear()
 
       uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
+      uiState.removeEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
+      uiState.removeEventListener(UiEvents.FIT_BBOX, handleFitBbox)
+      uiState.removeEventListener(UiEvents.SET_CENTER, handleSetCenter)
 
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)

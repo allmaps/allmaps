@@ -18,12 +18,14 @@
   import { setViewportsState } from '$lib/state/viewports.svelte.js'
   import { setHeadState } from '$lib/state/head.svelte.js'
 
-  import { Banner, Stats, Loading } from '@allmaps/ui'
+  import { Banner, Stats, Loading } from '@allmaps/components'
 
   import Head from '$lib/components/Head.svelte'
   import Header from '$lib/components/Header.svelte'
   import Controls from '$lib/components/Controls.svelte'
-  import About from '$lib/components/About.svelte'
+  import About from '$lib/components/modals/About.svelte'
+  import Annotation from '$lib/components/modals/Annotation.svelte'
+  import Keyboard from '$lib/components/modals/Keyboard.svelte'
   import Error from '$lib/components/Error.svelte'
   import Command from '$lib/components/Command.svelte'
 
@@ -32,7 +34,7 @@
   import type { View } from '$lib/types/shared.js'
 
   import '../app.css'
-  import '@allmaps/ui/css/fonts.css'
+  import '@allmaps/components/css/fonts.css'
 
   const { children }: { children: Snippet } = $props()
 
@@ -143,5 +145,7 @@
 </div>
 {#if isView}
   <Command />
+  <Annotation />
   <About />
+  <Keyboard />
 {/if}

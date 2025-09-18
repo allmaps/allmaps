@@ -4,14 +4,12 @@
   const scopeState = getScopeState()
 </script>
 
-{#if scopeState.scope === 'images'}
-  <div>
+<div class="max-w-sm">
+  {#if scopeState.scope === 'images'}
     No images have been georeferenced. Select an image and start by drawing a
     mask or by placing ground control points (GCPs)
-  </div>
-{:else}
-  <div>
+  {:else}
     This image has not yet been georeferenced. Start by drawing a mask or by
     placing ground control points (GCPs)
-  </div>
-{/if}
+  {/if}
+</div>

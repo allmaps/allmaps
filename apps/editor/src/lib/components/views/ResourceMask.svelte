@@ -10,7 +10,7 @@
   import { X as XIcon, Check as CheckIcon } from 'phosphor-svelte'
 
   import { pink, red, green } from '@allmaps/tailwind'
-  import { computeBbox } from '@allmaps/stdlib'
+  import { computeBbox, combineBboxes } from '@allmaps/stdlib'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
@@ -33,6 +33,7 @@
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
   import type { GcpTransformer } from '@allmaps/transform'
+  import type { Point, Bbox } from '@allmaps/types'
 
   import type { DbImageService, DbMap3, ResourceMask } from '$lib/types/maps.js'
 
@@ -103,7 +104,21 @@
   }
 
   function handleZoomToExtent() {
-    console.log('Zoom to extent')
+    if (resourceMap && resourceDraw) {
+      const resourceFeatures = resourceDraw.getSnapshot()
+
+      const bboxes = resourceFeatures.map((feature) =>
+        computeBbox(feature.geometry)
+      )
+      const bbox = combineBboxes(...bboxes)
+
+      if (bbox) {
+        resourceMap.fitBounds(bbox, {
+          duration: 200,
+          padding: MAPLIBRE_PADDING
+        })
+      }
+    }
   }
 
   function saveViewport() {

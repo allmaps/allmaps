@@ -1,20 +1,14 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { fade } from 'svelte/transition'
 
   import {
     Images as ImagesIcon,
     Polygon as PolygonIcon,
     MapPinSimple as MapPinSimpleIcon,
     MapTrifold as MapTrifoldIcon,
-    CaretRight as CaretRightIcon
-  } from 'phosphor-svelte'
-
-  import {
-    Info as InfoIcon,
-    ListNumbers as ListNumbersIcon,
-    Code as CodeIcon,
-    Export as ExportIcon,
-    Gear as GearIcon
+    CaretRight as CaretRightIcon,
+    List as ListIcon
   } from 'phosphor-svelte'
 
   import { createRouteUrl, getRouteId } from '$lib/shared/router.js'
@@ -25,23 +19,22 @@
   import MapButtons from '$lib/components/MapButtons.svelte'
   import ImageSelector from '$lib/components/ImageSelector.svelte'
   import Maps from '$lib/components/popovers/Maps.svelte'
+  import Scope from '$lib/components/Scope.svelte'
 
   const sourceState = getSourceState()
   const mapsMergedState = getMapsMergedState()
 
-  let mapsPopoverOpen = $state(false)
-
   let resultsEnabled = $derived(mapsMergedState.completeMaps.length > 0)
 
   let isMapView = $derived(
-    page.route.id === '/mask' ||
-      page.route.id === '/georeference' ||
-      page.route.id === '/results'
-  )
-
-  let showGeocoder = $derived(
     page.route.id === '/georeference' || page.route.id === '/results'
   )
+
+  let isImageView = $derived(
+    page.route.id === '/mask' || page.route.id === '/georeference'
+  )
+
+  let isResultsView = $derived(page.route.id === '/results')
 </script>
 
 {#snippet separator()}
@@ -50,9 +43,9 @@
   </div>
 {/snippet}
 
-<div class="w-full h-full flex flex-col items-center p-2 gap-2">
+<div class="w-full h-full flex flex-col items-center justify-between p-2 gap-2">
   <div
-    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-center"
+    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-start md:items-center"
   >
     <div></div>
     <nav
@@ -66,7 +59,7 @@
         class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-blue/25 hover:bg-blue/10 flex items-center justify-center gap-2"
       >
         <ImagesIcon size={28} class="inline" />
-        <span class="hidden md:inline-block">Images</span>
+        <span class="hidden lg:inline-block">Images</span>
       </a>
       {@render separator()}
       <a
@@ -77,7 +70,7 @@
         class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-green/25 hover:bg-green/10 flex items-center justify-center gap-2"
       >
         <PolygonIcon size={28} class="inline" />
-        <span class="hidden md:inline-block">Draw mask</span>
+        <span class="hidden lg:inline-block">Draw mask</span>
       </a>
       {@render separator()}
       <a
@@ -88,7 +81,7 @@
         class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-yellow/25 hover:bg-yellow/10 flex items-center justify-center gap-2"
       >
         <MapPinSimpleIcon size={28} class="inline" />
-        <span class="hidden md:inline-block">Georeference</span>
+        <span class="hidden lg:inline-block">Georeference</span>
       </a>
       {@render separator()}
       <a
@@ -107,38 +100,53 @@
         ]}
       >
         <MapTrifoldIcon size={28} class="inline" />
-        <span class="hidden md:inline-block">Results</span>
+        <span class="hidden lg:inline-block">Results</span>
       </a>
     </nav>
-    {#if isMapView}
-      <div>
-        <MapButtons {showGeocoder} />
-      </div>
-    {/if}
+
+    <div>
+      {#if isMapView || isImageView}
+        <MapButtons
+          geocoderEnabled={isMapView}
+          zoomToExtentEnabled={isMapView || isImageView}
+          mapSettingsEnabled={isMapView}
+        />
+      {/if}
+    </div>
   </div>
 
+  <!-- class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto" -->
   <div
-    class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto"
+    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-center"
   >
     <div></div>
-
-    <div class="flex flex-row gap-2 items-center justify-center">
+    <div>
+      {#if isResultsView && resultsEnabled}
+        <div
+          class="bg-white z-50 p-1 rounded-lg shadow-md w-48"
+          transition:fade={{ duration: 100 }}
+        >
+          <Scope />
+        </div>
+      {/if}
+    </div>
+    <div class="flex flex-row gap-2 items-center justify-center place-self-end">
       {#if sourceState.imageCount > 1}
         <ImageSelector />
       {/if}
 
-      <div class=" bg-white rounded-md shadow-md sm:p-2">
-        <Popover bind:open={mapsPopoverOpen}>
-          {#snippet button()}
-            <div
-              class="flex flex-row gap-2 p-1 sm:gap-2 items-center cursor-pointer"
-            >
-              <ListNumbersIcon /><span>Maps</span>
-            </div>
-          {/snippet}
-          {#snippet contents()}<Maps />{/snippet}
-        </Popover>
-      </div>
+      <Popover interactOutsideBehavior={'ignore'}>
+        {#snippet button()}
+          <div
+            class="bg-white rounded-md shadow-md p-2
+            flex flex-row gap-1 items-center justify-center"
+          >
+            <ListIcon class="size-5" />
+            <span>Maps</span>
+          </div>
+        {/snippet}
+        {#snippet contents()}<Maps />{/snippet}
+      </Popover>
     </div>
   </div>
 </div>

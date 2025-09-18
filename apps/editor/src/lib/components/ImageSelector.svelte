@@ -31,14 +31,14 @@
 
 {#if sourceState.activeImageIndex !== undefined}
   <div
-    class="flex bg-white rounded-md shadow-md p-1 gap-1 sm:p-2 sm:gap-2 items-center"
+    class="flex bg-white rounded-md shadow-md p-2 gap-1 sm:gap-2 items-center"
   >
     <div class="hidden sm:inline-block whitespace-nowrap leading-tight">
       <span class="hidden md:inline-block">Image&nbsp;</span
       >{sourceState.activeImageIndex + 1} of {sourceState.imageCount}
     </div>
     <button
-      class="cursor-pointer p-1 rounded-full transition-colors duration-200
+      class="cursor-pointer p-0 rounded-full transition-colors duration-200
        bg-white hover:bg-gray-100/80"
       onclick={handlePreviousClick}
       title="Previous image"
@@ -46,7 +46,7 @@
       <ArrowLeftIcon class="size-6" />
     </button>
     <button
-      class="cursor-pointer p-1 rounded-full transition-colors duration-200
+      class="cursor-pointer p-0 rounded-full transition-colors duration-200
        bg-white hover:bg-gray-100/80"
       onclick={handleNextClick}
       title="Next image"

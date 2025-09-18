@@ -13,7 +13,7 @@
   } from '$lib/shared/geocoder/types.js'
   import type { GeocoderProvider } from '$lib/shared/geocoder/provider.js'
 
-  import LoadingSmall from '$lib/images/loading-small.webp'
+  import LoadingSmall from '$lib/components/LoadingSmall.svelte'
 
   const FEATURES_PER_PROVIDER = 5
 
@@ -22,12 +22,18 @@
   }
 
   type Props = {
+    open?: boolean
     providers: GeocoderProvider[]
     onselect?: (event: CustomEvent<GeocoderGeoJsonFeature>) => void
     showProviderUrls?: boolean
   }
 
-  let { providers, onselect, showProviderUrls = false }: Props = $props()
+  let {
+    providers,
+    onselect,
+    showProviderUrls = false,
+    open = $bindable(false)
+  }: Props = $props()
 
   let value = $state('')
   let inputValue = $state('')
@@ -89,7 +95,7 @@
   })
 </script>
 
-<Combobox.Root type="single" loop bind:value {items}>
+<Combobox.Root type="single" loop bind:open bind:value {items}>
   <div
     bind:this={customAnchor}
     class="px-2 w-full flex flex-row items-center gap-2
@@ -126,7 +132,7 @@
       <Combobox.Viewport>
         {#if fetching}
           <div class="p-2 text-sm text-gray flex items-center gap-2">
-            <img src={LoadingSmall} alt="Loading" class="w-4 h-4" />
+            <LoadingSmall />
             <span class="text-sm text-gray-600">Loading</span>
           </div>
         {:else}

@@ -1,0 +1,46 @@
+<svg
+  viewBox="0 0 100 100"
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .cls-1{fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:3px;}</style>
+  </defs>
+  <rect
+    class="cls-1"
+    x="-83.396729"
+    y="16.617216"
+    width="67.029999"
+    height="67.029999"
+    transform="rotate(-89.864295)"
+  />
+  <line
+    class="cls-1"
+    x1="16.466393"
+    y1="61.098034"
+    x2="83.484322"
+    y2="61.247643"
+  />
+  <line
+    class="cls-1"
+    x1="16.516262"
+    y1="38.758724"
+    x2="83.534187"
+    y2="38.908333"
+  />
+  <line
+    class="cls-1"
+    x1="61.244751"
+    y1="16.519154"
+    x2="61.095142"
+    y2="83.537079"
+  />
+  <line
+    class="cls-1"
+    x1="38.905441"
+    y1="16.469286"
+    x2="38.755833"
+    y2="83.487213"
+  />
+</svg>

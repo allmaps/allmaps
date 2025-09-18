@@ -4,13 +4,14 @@
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
 
+  import { Footer } from '@allmaps/components'
+
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
   import Title from '$lib/components/Title.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
   import Organizations from '$lib/components/Organizations.svelte'
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
-  import Footer from '$lib/components/Footer.svelte'
 
   import { organizationsWithCollectionsOnHomepage } from '$lib/shared/organizations.js'
 

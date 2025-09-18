@@ -1,7 +1,13 @@
 <script lang="ts">
-  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { Select } from '@allmaps/components'
 
-  import Select from '$lib/components/Select.svelte'
+  import {
+    Polynomial1,
+    ThinPlateSpline,
+    Helmert
+  } from '@allmaps/components/icons'
+
+  import { getMapsState } from '$lib/state/maps.svelte.js'
 
   import type { DbMap3, DbTransformation } from '$lib/types/maps.js'
 
@@ -13,16 +19,14 @@
 
   let { map }: Props = $props()
 
-  type Item = {
-    value: DbTransformation
-    label: string
-    disabled?: boolean
-  }
-
-  const transformationTypes: Item[] = [
-    { value: 'polynomial1', label: 'Polynomial' },
-    { value: 'thinPlateSpline', label: 'Thin plate spline' },
-    { value: 'helmert', label: 'Helmert' }
+  const items = [
+    { value: 'polynomial1', label: 'Polynomial', Icon: Polynomial1 },
+    {
+      value: 'thinPlateSpline',
+      label: 'Thin plate spline',
+      Icon: ThinPlateSpline
+    },
+    { value: 'helmert', label: 'Helmert', Icon: Helmert }
   ]
 
   let value = $state<DbTransformation>(map.transformation || 'polynomial1')
@@ -41,9 +45,4 @@
   })
 </script>
 
-<Select
-  items={transformationTypes}
-  bind:value
-  type="single"
-  onValueChange={handleValueChange}
-/>
+<Select {items} bind:value type="single" onValueChange={handleValueChange} />

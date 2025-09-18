@@ -1,10 +1,14 @@
 <script lang="ts">
   import { Combobox } from 'bits-ui'
-  import CaretUpDown from 'phosphor-svelte/lib/CaretUpDown'
-  import Check from 'phosphor-svelte/lib/Check'
-  import Globe from 'phosphor-svelte/lib/globe'
-  import CaretDoubleUp from 'phosphor-svelte/lib/CaretDoubleUp'
-  import CaretDoubleDown from 'phosphor-svelte/lib/CaretDoubleDown'
+
+  import {
+    CaretUpDown as CaretUpDownIcon,
+    Check as CheckIcon,
+    Globe as GlobeIcon,
+    CaretDoubleUp as CaretDoubleUpIcon,
+    CaretDoubleDown as CaretDoubleDownIcon
+  } from 'phosphor-svelte'
+
   import { fly } from 'svelte/transition'
 
   import type { PickerProjection } from '$lib/shared/projections/projections.js'
@@ -103,7 +107,7 @@
       </div>
       {#if selected}
         <div class="ml-auto">
-          <Check />
+          <CheckIcon />
         </div>
       {/if}
     {/snippet}
@@ -135,8 +139,7 @@
   }}
 >
   <div class="relative">
-    <Globe
-      weight="thin"
+    <GlobeIcon
       class="absolute start-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
     />
     <Combobox.Input
@@ -151,7 +154,7 @@
       aria-label="Search an EPSG projection"
     />
     <Combobox.Trigger class="absolute end-3 top-1/2 size-6 -translate-y-1/2">
-      <CaretUpDown class="text-muted-foreground ml-auto size-6" />
+      <CaretUpDownIcon />
     </Combobox.Trigger>
   </div>
   <Combobox.Portal>
@@ -167,7 +170,7 @@
               <Combobox.ScrollUpButton
                 class="flex w-full items-center justify-center"
               >
-                <CaretDoubleUp class="size-3" />
+                <CaretDoubleUpIcon class="size-3" />
               </Combobox.ScrollUpButton>
               <Combobox.Viewport class="p-1 max-h-120">
                 {#if topProjections.length > 0}
@@ -191,7 +194,7 @@
               <Combobox.ScrollDownButton
                 class="flex w-full items-center justify-center"
               >
-                <CaretDoubleDown class="size-3" />
+                <CaretDoubleDownIcon class="size-3" />
               </Combobox.ScrollDownButton>
             </div>
           </div>

@@ -55,22 +55,33 @@
   {#snippet button()}
     <div
       bind:clientWidth={infoButtonWidth}
-      class="w-full min-w-0 truncate rounded-full px-2 py-1.5
-        bg-gray/10 hover:bg-gray/20
+      class="w-full min-w-0 truncate rounded-full pl-3 pr-2 py-1.5
+        bg-gray/10 hover:bg-gray/20 group
           transition-all duration-100
           border-2 inset-shadow-none hover:inset-shadow-xs
           {open ? 'border-pink bg-white' : 'border-gray/10'}
           cursor-pointer text-sm text-black leading-tight
           flex gap-2 items-center justify-between"
     >
-      <span class="flex w-full justify-start">
-        {#each headState.labels as label}
+      <span class="flex w-full justify-start-safe @container">
+        {#each headState.labels as label, index (index)}
+          {@const last = index === headState.labels.length - 1}
           <span class="truncate min-w-12 font-medium">{label}</span>
-          <span class="text-gray-500 px-1">/</span>
+          {#if !last}
+            <span class="text-gray-500 px-1">/</span>
+          {/if}
         {/each}
-        <span class="truncate">{urlState.url}</span>
+        <span class="truncate hidden @min-lg:inline">
+          {#if headState.labels.length > 0}
+            <span class="text-gray-500 px-1">/</span>
+          {/if}
+          <span>{urlState.url}</span>
+        </span>
       </span>
-      <InfoIcon class="size-6 shrink-0" weight="bold" />
+      <InfoIcon
+        class="size-6 shrink-0 text-gray-700 group-hover:text-black transition-all duration-100"
+        weight="bold"
+      />
     </div>
   {/snippet}
   {#snippet contents()}

@@ -2,7 +2,7 @@
   import { page } from '$app/state'
   import { afterNavigate } from '$app/navigation'
 
-  import { Collection, Thumbnail } from '@allmaps/ui'
+  import { Collection, Thumbnail } from '@allmaps/components'
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
   import { darkblue } from '@allmaps/tailwind'
 
@@ -21,7 +21,6 @@
   let itemWidth = $state(0)
 
   let beforeTimeoutActiveImageId = $state<string>()
-  let justClicked = $state(false)
   let clickTimer = $state<number>()
 
   function handleImageClick(event: MouseEvent, imageId: string) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fromError } from 'zod-validation-error'
 
-  import { MapMonster } from '@allmaps/ui'
+  import { MapMonster } from '@allmaps/components'
   import { red } from '@allmaps/tailwind'
 
   type Props = {

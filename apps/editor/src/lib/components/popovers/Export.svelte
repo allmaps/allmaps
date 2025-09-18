@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Label, Switch } from 'bits-ui'
+  import { Code as CodeIcon } from 'phosphor-svelte'
 
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
@@ -12,7 +13,7 @@
   } from '$lib/shared/urls.js'
 
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
-  import Scope from '$lib/components/drawer/Scope.svelte'
+  import Scope from '$lib/components/Scope.svelte'
   import ExportItem from '$lib/components/ExportItem.svelte'
   import Cloud from '$lib/components/Cloud.svelte'
 
@@ -22,6 +23,12 @@
 
 <div class="flex flex-col gap-4">
   {#if scopeState.mapsCount}
+    <div class="flex items-center gap-2">
+      <span class="shrink-0">Export options for</span>
+      <div class="w-46">
+        <Scope />
+      </div>
+    </div>
     {#if scopeState.allmapsId}
       <ExportItem
         url={getViewerUrl(scopeState.allmapsId)}
@@ -31,7 +38,19 @@
       <ExportItem
         url={getAnnotationUrl(scopeState.allmapsId)}
         label="Georeference Annotation"
-      />
+      >
+        <button
+          onclick={() => (uiState.showAnnotationModal = true)}
+          class="hidden md:flex flex-row gap-1.5 px-3 py-2 rounded-full cursor-pointer
+        items-center text-sm font-medium text-white
+      bg-darkblue/90 hover:bg-darkblue/100 shadow-none hover:shadow-md transition-all"
+        >
+          <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
+            class="hidden sm:inline-block"
+            >Code
+          </span>
+        </button>
+      </ExportItem>
 
       <ExportItem
         url={getGeoJsonUrl(scopeState.allmapsId)}
@@ -72,6 +91,5 @@
   {:else}
     <StartGeoreferencing />
   {/if}
-  <Scope />
   <Cloud />
 </div>

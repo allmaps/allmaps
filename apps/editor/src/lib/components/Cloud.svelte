@@ -4,14 +4,11 @@
   import { green } from '@allmaps/tailwind'
 </script>
 
-<div
-  class="cloud flex items-center justify-center gap-2 text-sm text-green"
-  style="--green: {green}"
->
+<p class="cloud text-sm text-green" style="--green: {green}">
   <CloudCheckIcon class="size-5" weight="duotone" />
 
-  <p>All edits are automatically saved in the Allmaps database</p>
-</div>
+  <span>All edits are automatically saved in the Allmaps database</span>
+</p>
 
 <style>
   :global(.cloud path:first-of-type) {

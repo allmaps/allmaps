@@ -1,7 +1,7 @@
 <script lang="ts">
   // import { page } from '$app/state'
 
-  import { Header } from '@allmaps/ui'
+  import { Header } from '@allmaps/components'
 
   // import { getUrlState } from '$lib/state/url.svelte'
 

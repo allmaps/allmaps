@@ -16,27 +16,38 @@
   let exportPopoverOpen = $state(false)
 
   function handleMenuItemClick() {
-    uiState.showAboutDialog = true
+    uiState.showAboutModal = true
   }
 </script>
 
-<div>
+<div class="flex flex-row gap-1">
+  <!-- <button
+    onclick={() => (uiState.showAnnotationModal = true)}
+    class="hidden md:flex flex-row gap-1.5 px-3 py-2 rounded-full cursor-pointer
+        items-center font-medium text-pink
+      bg-gray/0 hover:bg-gray/10 shadow-none hover:shadow-md transition-all"
+  >
+    <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
+      class="hidden sm:inline-block">Annotation</span
+    >
+  </button> -->
+
   <Popover bind:open={exportPopoverOpen}>
     {#snippet button()}
       <div
         class="flex flex-row gap-1.5 px-3 py-2 rounded-full
         items-center font-medium text-white
-      bg-green/90 hover:bg-green/100 shadow-none hover:shadow-md transition-all
+      bg-green/80 hover:bg-green/100 shadow-none hover:shadow-md transition-all
         "
       >
         <ExportIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
-          >Export</span
+          class="hidden sm:inline-block">Export</span
         >
       </div>
     {/snippet}
-    {#snippet title()}<div class="flex items-center gap-2">
+    <!-- {#snippet title()}<div class="flex items-center gap-2">
         <ExportIcon class="size-6" size="100%" /><span>Export options for</span>
-      </div>{/snippet}
+      </div>{/snippet} -->
     {#snippet contents()}<Export />{/snippet}
   </Popover>
 
@@ -52,10 +63,16 @@
       sideOffset={8}
     >
       <DropdownMenu.Item
-        onclick={handleMenuItemClick}
+        onclick={() => (uiState.showKeyboardModal = true)}
         class="flex h-10 select-none cursor-pointer items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-gray-100"
       >
-        About Allmaps Editor
+        Keyboard shortcuts…
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        onclick={() => (uiState.showAboutModal = true)}
+        class="flex h-10 select-none cursor-pointer items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-gray-100"
+      >
+        About Allmaps Editor…
       </DropdownMenu.Item>
     </DropdownMenu.Content>
   </DropdownMenu.Root>
