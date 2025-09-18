@@ -1207,9 +1207,6 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.6
         version: 4.17.12
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       eslint:
         specifier: ^9.18.0
         version: 9.33.0(jiti@2.5.1)
@@ -1240,12 +1237,6 @@ importers:
       svelte-check:
         specifier: ^4.0.0
         version: 4.3.1(picomatch@4.0.3)(svelte@5.38.1)(typescript@5.9.2)
-      tailwind-merge:
-        specifier: ^3.3.1
-        version: 3.3.1
-      tailwind-variants:
-        specifier: ^1.0.0
-        version: 1.0.0(tailwindcss@4.1.11)
       tailwindcss:
         specifier: ^4.1.0
         version: 4.1.11
@@ -2183,15 +2174,6 @@ importers:
       typescript:
         specifier: ^5.7.0
         version: 5.9.2
-      vite:
-        specifier: ^5.0.3
-        version: 5.4.19(@types/node@22.17.1)(lightningcss@1.30.1)
-      vite-plugin-dts:
-        specifier: ^3.8.3
-        version: 3.9.1(@types/node@22.17.1)(rollup@4.46.2)(typescript@5.9.2)(vite@5.4.19(@types/node@22.17.1)(lightningcss@1.30.1))
-      vite-plugin-no-bundle:
-        specifier: ^4.0.0
-        version: 4.0.0
 
   workers/preview:
     devDependencies:
@@ -8491,18 +8473,6 @@ packages:
 
   tabbable@6.2.0:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
-
-  tailwind-merge@3.0.2:
-    resolution: {integrity: sha512-l7z+OYZ7mu3DTqrL88RiKrKIqO3NcpEO8V/Od04bNpvk0kiIFndGEoqfuzvj4yuhRkHKjRkII2z+KS2HfPcSxw==}
-
-  tailwind-merge@3.3.1:
-    resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
-
-  tailwind-variants@1.0.0:
-    resolution: {integrity: sha512-2WSbv4ulEEyuBKomOunut65D8UZwxrHoRfYnxGcQNnHqlSCp2+B7Yz2W+yrNDrxRodOXtGD/1oCcKGNBnUqMqA==}
-    engines: {node: '>=16.x', pnpm: '>=7.x'}
-    peerDependencies:
-      tailwindcss: '*'
 
   tailwindcss@3.4.17:
     resolution: {integrity: sha512-w33E2aCvSDP0tW9RZuNXadXlkHXqFzSkQew/aIa2i/Sj8fThxwovwlXHSPXTbAHwEIhBFXAedUhP2tueAKP8Og==}
@@ -17514,15 +17484,6 @@ snapshots:
   svg-parser@2.0.4: {}
 
   tabbable@6.2.0: {}
-
-  tailwind-merge@3.0.2: {}
-
-  tailwind-merge@3.3.1: {}
-
-  tailwind-variants@1.0.0(tailwindcss@4.1.11):
-    dependencies:
-      tailwind-merge: 3.0.2
-      tailwindcss: 4.1.11
 
   tailwindcss@3.4.17:
     dependencies:

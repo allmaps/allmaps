@@ -19,8 +19,7 @@
     "access": "public"
   },
   "repository": {
-    "type": "git",
-    "url": "https://github.com/allmaps/allmaps.git",
+    "url": "git+https://github.com/allmaps/allmaps.git",
     "directory": "packages/components"
   },
   "scripts": {
@@ -32,7 +31,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --write .",
-    "lint": "prettier --check src && eslint src --ext .ts,.svelte"
+    "lint": "prettier --check src && eslint src --ext .ts,.svelte",
+    "types": "tsc --noEmit"
   },
   "files": [
     "dist",
@@ -74,7 +74,6 @@
     "@tailwindcss/vite": "^4.0.0",
     "@types/lodash-es": "^4.17.6",
     "bits-ui": "^2.8.11",
-    "clsx": "^2.1.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-svelte": "^3.0.0",
@@ -85,8 +84,6 @@
     "publint": "^0.3.2",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
-    "tailwind-merge": "^3.3.1",
-    "tailwind-variants": "^1.0.0",
     "tailwindcss": "^4.1.0",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5.0.0",
