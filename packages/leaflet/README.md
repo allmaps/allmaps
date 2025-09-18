@@ -122,7 +122,6 @@ SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 ###### Extends
 
 * `Event`
-* `Event`
 
 ### `WarpedMapEvent#data?`
 
@@ -146,10 +145,6 @@ Creates a WarpedMapLayer
   * Georeference Annotation or URL of a Georeference Annotation
 * `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
   * Options for the layer
-* `annotationOrAnnotationUrl` (`unknown`)
-  * Georeference Annotation or URL of a Georeference Annotation
-* `options?` (`Partial<LeafletWarpedMapLayerOptions> | undefined`)
-  * Options for the layer
 
 ###### Returns
 
@@ -163,7 +158,6 @@ Creates a WarpedMapLayer
 
 ###### Parameters
 
-* `e` (`L.ZoomAnimEvent`)
 * `e` (`L.ZoomAnimEvent`)
 
 ###### Returns
@@ -246,8 +240,6 @@ Adds a Georeference Annotation
 
 * `annotation` (`unknown`)
   * Georeference Annotation
-* `annotation` (`unknown`)
-  * Georeference Annotation
 
 ###### Returns
 
@@ -287,8 +279,6 @@ Bring maps forward
 
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
 
 ###### Returns
 
@@ -300,8 +290,6 @@ Bring maps to front
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
 * `mapIds` (`Iterable<string>`)
   * IDs of the maps
 
@@ -408,6 +396,18 @@ There are no parameters.
 
 * L.LatLngBounds in array form of all visible maps
 
+### `WarpedMapLayer#getDefaultOptions()`
+
+Get the default options the layer
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions> & object & SpecificWarpedMapListOptions & Partial<...> & SpecificWebGL2WarpedMapOptions & SpecificTriangulatedWarpedMapOptions & WarpedMapOptions`.
+
 ### `WarpedMapLayer#getLayerOptions()`
 
 Get the layer options
@@ -420,21 +420,20 @@ There are no parameters.
 
 `{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; ... 63 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
-### `WarpedMapLayer#getMapDefaultOptions()`
+### `WarpedMapLayer#getMapDefaultOptions(mapId)`
 
 Get the default options of a map
 
-These come from the default option settings and it's georeferenced map proporties
+These come from the default option settings for WebGL2WarpedMaps and the map's georeferenced map proporties
 
 ###### Parameters
 
-There are no parameters.
+* `mapId` (`string`)
+  * Map ID for which the options apply
 
 ###### Returns
 
-`SpecificWebGL2WarpedMapOptions &
-  SpecificTriangulatedWarpedMapOptions &
-  WarpedMapOptions`.
+`WebGL2WarpedMapOptions | undefined`.
 
 ### `WarpedMapLayer#getMapIds()`
 
@@ -548,6 +547,20 @@ Note: more selection options are available on this function of WarpedMapList
 ###### Returns
 
 The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Ring | undefined`).
+
+### `WarpedMapLayer#getOpacity()`
+
+Get the layer opacity
+
+Returns a number between 0 and 1 (the default)
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`number`.
 
 ### `WarpedMapLayer#getWarpedMap(mapId)`
 
@@ -842,7 +855,7 @@ Set the layer options
 
 ###### Parameters
 
-* `layerOptions` (`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; ... 63 more ...; distortionMeasure?: DistortionMeasure | undefined; }`)
+* `layerOptions` (`Partial<WebGL2RenderOptions> | Partial<LeafletWarpedMapLayerOptions>`)
   * Layer options to set
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
   * Options when setting the options
@@ -867,7 +880,8 @@ Set the map-specific options of maps (and the layer options)
   * Map IDs for which to set the options
 * `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
-* `layerOptions?` (`  | Partial<SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
+* `layerOptions?` (`  | Partial<WebGL2RenderOptions>
+    | Partial<LeafletWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
@@ -891,11 +905,25 @@ Set the map-specific options of maps by map ID (and the layer options)
 
 * `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
   * Map-specific options to set by map ID
-* `layerOptions?` (`  | Partial<SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
+* `layerOptions?` (`  | Partial<WebGL2RenderOptions>
+    | Partial<LeafletWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
 * `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
   * Options when setting the options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setOpacity(opacity)`
+
+Set the layer opacity
+
+###### Parameters
+
+* `opacity` (`number`)
+  * Layer opacity to set
 
 ###### Returns
 

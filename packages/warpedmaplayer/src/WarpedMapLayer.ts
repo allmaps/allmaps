@@ -2,7 +2,11 @@ import { WebGL2Renderer, WebGL2WarpedMap } from '@allmaps/render/webgl2'
 import { WarpedMapList, WarpedMapEventType } from '@allmaps/render'
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
 
-import type { SetOptionsOptions, ProjectionOptions } from '@allmaps/render'
+import type {
+  SetOptionsOptions,
+  ProjectionOptions,
+  BaseRenderOptions
+} from '@allmaps/render'
 import type { Point, Bbox, Ring } from '@allmaps/types'
 
 import type {
@@ -306,15 +310,36 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Get the layer opacity
+   *
+   * Returns a number between 0 and 1 (the default)
+   */
+  getOpacity(): number {
+    return this.getLayerOptions().opacity ?? this.getDefaultOptions().opacity
+  }
+
+  /**
+   * Get the default options the layer
+   */
+  getDefaultOptions(): SpecificWarpedMapLayerOptions &
+    BaseRenderOptions &
+    WebGL2WarpedMapOptions {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return mergeOptions(
+      this.defaultSpecificWarpedMapLayerOptions,
+      this.renderer.getDefaultOptions()
+    )
+  }
+
+  /**
    * Get the default options of a map
    *
-   * These come from the default option settings and it's georeferenced map proporties
+   * These come from the default option settings for WebGL2WarpedMaps and the map's georeferenced map proporties
    *
    * @param mapId - Map ID for which the options apply
    */
-  getMapDefaultOptions(): WebGL2WarpedMapOptions
-  getMapDefaultOptions(mapId: string): WebGL2WarpedMapOptions | undefined
-  getMapDefaultOptions(mapId?: string): WebGL2WarpedMapOptions | undefined {
+  getMapDefaultOptions(mapId: string): WebGL2WarpedMapOptions | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.getMapDefaultOptions(mapId)
@@ -360,6 +385,15 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Set the layer opacity
+   *
+   * @param opacity - Layer opacity to set
+   */
+  setOpacity(opacity: number) {
+    this.setLayerOptions({ opacity })
+  }
+
+  /**
    * Set the layer options
    *
    * @param layerOptions - Layer options to set
@@ -370,9 +404,9 @@ export abstract class BaseWarpedMapLayer<
    * ```
    */
   setLayerOptions(
-    layerOptions: Partial<
-      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-    >,
+    layerOptions:
+      | Partial<SpecificWarpedMapLayerOptions>
+      | Partial<WebGL2RenderOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -396,9 +430,9 @@ export abstract class BaseWarpedMapLayer<
   setMapsOptions(
     mapIds: string[],
     mapOptions: Partial<WebGL2WarpedMapOptions>,
-    layerOptions?: Partial<
-      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-    >,
+    layerOptions?:
+      | Partial<SpecificWarpedMapLayerOptions>
+      | Partial<WebGL2RenderOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -423,9 +457,9 @@ export abstract class BaseWarpedMapLayer<
    */
   setMapsOptionsByMapId(
     mapOptionsByMapId: Map<string, Partial<WebGL2WarpedMapOptions>>,
-    layerOptions?: Partial<
-      SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-    >,
+    layerOptions?:
+      | Partial<SpecificWarpedMapLayerOptions>
+      | Partial<WebGL2RenderOptions>,
     setOptionsOptions?: Partial<SetOptionsOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)

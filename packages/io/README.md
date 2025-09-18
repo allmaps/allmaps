@@ -169,6 +169,14 @@ MIT
 'qgis' | 'arcgis-csv' | 'arcgis-tsv' | 'gdal'
 ```
 
+### `GcpFileFormatWithResourceYAxisUp`
+
+###### Type
+
+```ts
+'qgis' | 'arcgis-csv' | 'arcgis-tsv'
+```
+
 ### `GcpResourceOrigin`
 
 ###### Type
@@ -221,7 +229,7 @@ MIT
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 * `options` (`{
     projectedTransformer?: ProjectedGcpTransformer | undefined
     imageFilenames?: {[key: string]: string} | undefined
@@ -242,7 +250,7 @@ MIT
 
 ###### Parameters
 
-* `maps` (`Array<{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: str...`)
+* `maps` (`Array<{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ ty...`)
 * `options` (`{
     projectedTransformers?: Array<ProjectedGcpTransformer> | undefined
     imageFilenames?: {[key: string]: string} | undefined
@@ -444,7 +452,7 @@ and will be infered from the map by default.
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 * `options?` (`  | Partial<{
         gcpFileFormat: GcpFileFormat
         gcpResourceYAxis: GcpResourceYAxis
@@ -480,35 +488,3 @@ and will be infered from the map by default.
 ###### Returns
 
 `Array<string>`.
-
-### `supportedGcpFileFormats`
-
-###### Type
-
-```ts
-Array<string>
-```
-
-### `supportedGcpFileFormatsWithResourceYAxisUp`
-
-###### Type
-
-```ts
-Array<string>
-```
-
-### `supportedGcpResourceOrigin`
-
-###### Type
-
-```ts
-Array<string>
-```
-
-### `supportedGcpResourceYAxis`
-
-###### Type
-
-```ts
-Array<string>
-```

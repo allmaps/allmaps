@@ -128,7 +128,6 @@ SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 ###### Extends
 
 * `Event`
-* `Event`
 
 ### `WarpedMapEvent#data?`
 
