@@ -89,7 +89,7 @@ export class WebGL2Renderer
 
   lastAnimationFrameRequestId: number | undefined
   animating = false
-  transformaterTransitionStart: number | undefined
+  animationStart: number | undefined
   animationProgress = 0
 
   disableRender = false
@@ -853,22 +853,21 @@ export class WebGL2Renderer
 
     this.animating = true
     this.animationProgress = 0
-    this.transformaterTransitionStart = undefined
+    this.animationStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
       ((now: number) => this.animationFrame(now, mapIds)).bind(this)
     )
   }
 
   private animationFrame(now: number, mapIds: string[]) {
-    if (!this.transformaterTransitionStart) {
-      this.transformaterTransitionStart = now
+    if (!this.animationStart) {
+      this.animationStart = now
     }
 
-    if (now - this.transformaterTransitionStart < ANIMATION_DURATION) {
+    if (now - this.animationStart < ANIMATION_DURATION) {
       // Animation is ongoing
       // animationProgress goes from 0 to 1 throughout animation
-      this.animationProgress =
-        (now - this.transformaterTransitionStart) / ANIMATION_DURATION
+      this.animationProgress = (now - this.animationStart) / ANIMATION_DURATION
 
       // This changed() is needed to trigger the repaint of the canvas
       this.changed()
@@ -889,7 +888,7 @@ export class WebGL2Renderer
 
     this.animating = false
     this.animationProgress = 0
-    this.transformaterTransitionStart = undefined
+    this.animationStart = undefined
 
     this.changed()
   }

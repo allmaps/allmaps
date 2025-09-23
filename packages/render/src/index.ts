@@ -18,7 +18,7 @@ export type {
   BaseRenderOptions,
   CanvasRenderOptions,
   IntArrayRenderOptions,
-  SetOptionsOptions,
+  AnimationOptions,
   SelectionOptions,
   ProjectionOptions,
   TransformationOptions

@@ -40,7 +40,11 @@ import type {
   DistortionMeasure
 } from '@allmaps/transform'
 
-import type { SetOptionsOptions, WarpedMapOptions } from '../shared/types.js'
+import type {
+  AnimationOptions,
+  AnimationOptionsInternal,
+  WarpedMapOptions
+} from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
@@ -393,7 +397,7 @@ export class WarpedMap extends EventTarget {
   setMapOptions(
     mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
     if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
       this.mapOptions = mapOptions
@@ -401,21 +405,23 @@ export class WarpedMap extends EventTarget {
     if (listOptions !== undefined && Object.keys(listOptions).length > 0) {
       this.listOptions = listOptions
     }
-    return this.setOptions(setOptionsOptions)
+    return this.setOptions(animationOptions)
   }
 
   setListOptions(
     listOptions?: Partial<WarpedMapOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ): object {
-    return this.setMapOptions(undefined, listOptions, setOptionsOptions)
+    return this.setMapOptions(undefined, listOptions, animationOptions)
   }
 
   setDefaultOptions() {
     this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
-  setOptions(setOptionsOptions?: Partial<SetOptionsOptions>): object {
+  setOptions(
+    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+  ): object {
     const previousOptions = cloneDeep(this.options || {})
 
     this.options = mergeOptionsUnlessUndefined(
@@ -427,18 +433,18 @@ export class WarpedMap extends EventTarget {
 
     let changedOptions = objectDifference(this.options, previousOptions)
 
-    if (setOptionsOptions?.optionKeysToOmit) {
+    if (animationOptions?.optionKeysToOmit) {
       // If some options should be omitted from changing,
       // like when setting all options exect those that should be animated,
       // then omit those options and set the options accordingly
-      changedOptions = omit(changedOptions, setOptionsOptions?.optionKeysToOmit)
+      changedOptions = omit(changedOptions, animationOptions?.optionKeysToOmit)
       this.options = mergeOptionsUnlessUndefined(
         previousOptions,
         changedOptions
       )
     }
 
-    if (setOptionsOptions?.init) {
+    if (animationOptions?.init) {
       // On init we should set the properties in a specific order
       // and update the projected transformer properties only once at the end
 

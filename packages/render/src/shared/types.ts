@@ -138,10 +138,12 @@ export type TileCacheOptions = {
 }
 
 // The options when setting options
-export type SetOptionsOptions = {
+export type AnimationOptions = {
+  animate: boolean
+}
+export type AnimationOptionsInternal = {
   optionKeysToOmit: string[]
   init: boolean
-  animate: boolean
 }
 
 export type Renderer = {

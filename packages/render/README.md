@@ -244,6 +244,12 @@ MIT
 
 ## API
 
+### `AnimationOptions`
+
+###### Fields
+
+* `animate` (`boolean`)
+
 ### `BaseRenderOptions`
 
 ###### Type
@@ -296,14 +302,6 @@ object & SpecificWarpedMapListOptions & Partial<WebGL2WarpedMapOptions>
 * `geoPoint?` (`[number, number]`)
 * `mapIds?` (`Iterable<string>`)
 * `onlyVisible?` (`boolean`)
-
-### `SetOptionsOptions`
-
-###### Fields
-
-* `animate` (`boolean`)
-* `init` (`boolean`)
-* `optionKeysToOmit` (`Array<string>`)
 
 ### `SpecificBaseRenderOptions`
 
@@ -1992,34 +1990,34 @@ Set the internal projection
 
 `void`.
 
-### `WarpedMap#setListOptions(listOptions, setOptionsOptions)`
+### `WarpedMap#setListOptions(listOptions, animationOptions)`
 
 ###### Parameters
 
 * `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
 
 ###### Returns
 
 `object`.
 
-### `WarpedMap#setMapOptions(mapOptions, listOptions, setOptionsOptions)`
+### `WarpedMap#setMapOptions(mapOptions, listOptions, animationOptions)`
 
 ###### Parameters
 
 * `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
 * `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
+* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
 
 ###### Returns
 
 `object`.
 
-### `WarpedMap#setOptions(setOptionsOptions)`
+### `WarpedMap#setOptions(animationOptions)`
 
 ###### Parameters
 
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
+* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
 
 ###### Returns
 
@@ -2684,7 +2682,7 @@ WarpedMap instances (`Iterable<W>`).
 
 `void`.
 
-### `WarpedMapList#internalSetMapsOptionsByMapId(mapOptionsByMapId, listOptions, setOptionsOptions)`
+### `WarpedMapList#internalSetMapsOptionsByMapId(mapOptionsByMapId, listOptions, animationOptions)`
 
 Internal set map options
 
@@ -2692,7 +2690,7 @@ Internal set map options
 
 * `mapOptionsByMapId?` (`Map<string, Partial<WarpedMapListOptions> | undefined> | undefined`)
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
 
 ###### Returns
 
@@ -2798,7 +2796,7 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapList#resetMapsOptions(mapIds, mapOptionKeys, listOptionKeys, setOptionsOptions)`
+### `WarpedMapList#resetMapsOptions(mapIds, mapOptionKeys, listOptionKeys, animationOptions)`
 
 Resets the map-specific options of maps (and the list options)
 
@@ -2812,14 +2810,14 @@ An empty array resets all options, undefined resets no options.
   * Keys of the map-specific options to reset
 * `listOptionKeys?` (`Array<string> | undefined`)
   * Keys of the list options to reset
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#resetMapsOptionsByMapId(mapOptionkeysByMapId, listOptionKeys, setOptionsOptions)`
+### `WarpedMapList#resetMapsOptionsByMapId(mapOptionkeysByMapId, listOptionKeys, animationOptions)`
 
 Resets the map-specific options of maps by map ID (and the list options)
 
@@ -2831,14 +2829,14 @@ An empty array or map resets all options (for all maps), undefined resets no opt
   * Keys of map-specific options to reset by map ID
 * `listOptionKeys?` (`Array<string> | undefined`)
   * Keys of the list options to reset
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#resetOptions(listOptionKeys, setOptionsOptions)`
+### `WarpedMapList#resetOptions(listOptionKeys, animationOptions)`
 
 Resets the list options
 
@@ -2848,8 +2846,8 @@ An empty array resets all options, undefined resets no options.
 
 * `listOptionKeys?` (`Array<string> | undefined`)
   * Keys of the list options to reset
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
@@ -2889,7 +2887,7 @@ Changes the z-index of the specified maps to send them to back
 
 `void`.
 
-### `WarpedMapList#setMapsOptions(mapIds, mapOptions, listOptions, setOptionsOptions)`
+### `WarpedMapList#setMapsOptions(mapIds, mapOptions, listOptions, animationOptions)`
 
 Set the map-specific options of maps (and the list options)
 
@@ -2901,14 +2899,14 @@ Set the map-specific options of maps (and the list options)
   * Map-specific options
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
   * list options
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setMapsOptionsByMapId(mapOptionsByMapId, listOptions, setOptionsOptions)`
+### `WarpedMapList#setMapsOptionsByMapId(mapOptionsByMapId, listOptions, animationOptions)`
 
 Set the map-specific options of maps by map ID (and the list options)
 
@@ -2922,14 +2920,14 @@ but only one animation should be fired
   * Map-specific options by map ID
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
   * List options
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapList#setOptions(options, setOptionsOptions)`
+### `WarpedMapList#setOptions(options, animationOptions)`
 
 Set the options of this list
 
@@ -2939,8 +2937,8 @@ Note: Map-specific options set here will be passed to newly added maps.
 
 * `options?` (`Partial<WarpedMapListOptions> | undefined`)
   * List Options
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
@@ -3270,6 +3268,14 @@ false
 
 ```ts
 0
+```
+
+### `WebGL2Renderer#animationStart`
+
+###### Type
+
+```ts
+number | undefined
 ```
 
 ### `WebGL2Renderer#cancelThrottledFunctions()`
@@ -3668,14 +3674,6 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
-### `WebGL2Renderer#transformaterTransitionStart`
-
-###### Type
-
-```ts
-number | undefined
-```
-
 ### `WebGL2Renderer#updateMapsForViewport(tiles)`
 
 ###### Parameters
@@ -4042,11 +4040,11 @@ There are no parameters.
 
 `void`.
 
-### `WebGL2WarpedMap#setOptions(setOptionsOptions)`
+### `WebGL2WarpedMap#setOptions(animationOptions)`
 
 ###### Parameters
 
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
 
 ###### Returns
 
