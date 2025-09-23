@@ -4,6 +4,7 @@ import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 import { WebGL2Renderer } from '@allmaps/render/webgl2'
 import { Viewport, WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
+import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
 
 import type { FrameState } from 'ol/Map.js'
 import type { Extent } from 'ol/extent'
@@ -11,7 +12,7 @@ import type { Extent } from 'ol/extent'
 import type {
   BaseRenderOptions,
   ProjectionOptions,
-  SetOptionsOptions,
+  AnimationOptions,
   WarpedMapList
 } from '@allmaps/render'
 import type {
@@ -19,8 +20,8 @@ import type {
   WebGL2WarpedMap,
   WebGL2WarpedMapOptions
 } from '@allmaps/render/webgl2'
-import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
-import { Bbox, Point, Ring } from '@allmaps/types'
+import type { Bbox, Gcp, Point, Ring } from '@allmaps/types'
+import type { TransformationType } from '@allmaps/transform'
 
 export type SpecificOpenLayersWarpedMapLayerOptions = object
 
@@ -573,7 +574,7 @@ export class WarpedMapLayer
    * Set the layer options
    *
    * @param layerOptions - Layer options to set
-   * @param setOptionsOptions - Options when setting the options
+   * @param animationOptions - Animation options
    * @example
    * ```js
    * warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
@@ -583,24 +584,146 @@ export class WarpedMapLayer
     layerOptions:
       | Partial<SpecificWarpedMapLayerOptions>
       | Partial<WebGL2RenderOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     this.options = mergeOptions(this.options, layerOptions)
-    this.renderer.setOptions(layerOptions, setOptionsOptions)
+    this.renderer.setOptions(layerOptions, animationOptions)
+  }
+
+  /**
+   * Set the GCPs of a map
+   *
+   * This only sets the map-specific `gcps` option of the map
+   * (or more specifically of the warped map used for rendering),
+   * overwriting the original GCPs inferred from the Georeference Annotation.
+   *
+   * The original GCPs can be reset by resetting the map-specific GCPs option,
+   * and stay accessible in the warped map's `map` property.
+   *
+   * @param mapId - Map ID for which to set the options
+   * @param gcps - GCPs to set
+   * @param animationOptions - Animation options
+   */
+  setMapGcps(
+    mapId: string,
+    gcps: Gcp[],
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapOptions(mapId, { gcps }, undefined, animationOptions)
+  }
+
+  /**
+   * Set the resource mask of a map
+   *
+   * This only sets the map-specific `resourceMask` option of the map
+   * (or more specifically of the warped map used for rendering),
+   * overwriting the original resource mask inferred from the Georeference Annotation.
+   *
+   * The original resource mask can be reset by resetting the map-specific resource mask option,
+   * and stays accessible in the warped map's `map` property.
+   *
+   * @param mapId - Map ID for which to set the options
+   * @param resourceMask - Resource mask to set
+   * @param animationOptions - Animation options
+   */
+  setMapResourceMask(
+    mapId: string,
+    resourceMask: Ring,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapOptions(
+      mapId,
+      { resourceMask },
+      undefined,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the transformation type of a map
+   *
+   * This only sets the map-specific `transformationType` option of the map
+   * (or more specifically of the warped map used for rendering),
+   * overwriting the original transformation type inferred from the Georeference Annotation.
+   *
+   * The original transformation type can be reset by resetting the map-specific transformation type option,
+   * and stays accessible in the warped map's `map` property.
+   *
+   * @param mapId - Map ID for which to set the options
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setMapTransformationType(
+    mapId: string,
+    transformationType: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapOptions(
+      mapId,
+      { transformationType },
+      undefined,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the map-specific options of a map (and the layer options)
+   *
+   * In general setting a map-specific option
+   * also sets the corresponding option of the map,
+   * since these are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * A special case is setting a map-specific option to `undefined`:
+   * then the corresponding option is derived from the default, georeferenced map or layer option.
+   * This is equivalent to using the reset function for map-specific option.
+   *
+   * @param mapId - Map ID for which to set the options
+   * @param mapOptions - Map-specific options to set
+   * @param layerOptions - Layer options to set
+   * @param animationOptions - Animation options
+   * @example
+   * ```js
+   * warpedMapLayer.setMapOptions(myMapId, { transformationType: 'thinPlateSpline' })
+   * ```
+   */
+  setMapOptions(
+    mapId: string,
+    mapOptions: Partial<WebGL2WarpedMapOptions>,
+    layerOptions?:
+      | Partial<SpecificWarpedMapLayerOptions>
+      | Partial<WebGL2RenderOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapsOptions(
+      [mapId],
+      mapOptions,
+      layerOptions,
+      animationOptions
+    )
   }
 
   /**
    * Set the map-specific options of maps (and the layer options)
    *
+   * In general setting a map-specific option
+   * also sets the corresponding option of the map,
+   * since these are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * A special case is setting a map-specific option to `undefined`:
+   * then the corresponding option is derived from the default, georeferenced map or layer option.
+   * This is equivalent to using the reset function for map-specific option.
+   *
    * @param mapIds - Map IDs for which to set the options
    * @param mapOptions - Map-specific options to set
    * @param layerOptions - Layer options to set
-   * @param setOptionsOptions - Options when setting the options
+   * @param animationOptions - Animation options
    * @example
    * ```js
-   * warpedMapLayer.setMapOptions([myMapId], { transformationType: 'thinPlateSpline' })
+   * warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
    * ```
    */
   setMapsOptions(
@@ -609,7 +732,7 @@ export class WarpedMapLayer
     layerOptions?:
       | Partial<SpecificWarpedMapLayerOptions>
       | Partial<WebGL2RenderOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -620,23 +743,32 @@ export class WarpedMapLayer
       mapIds,
       mapOptions,
       layerOptions,
-      setOptionsOptions
+      animationOptions
     )
   }
 
   /**
    * Set the map-specific options of maps by map ID (and the layer options)
    *
+   * In general setting a map-specific option
+   * also sets the corresponding option of the map,
+   * since these are the result of merging the default, georeferenced map,
+   * layer and map-specific options of that map.
+   *
+   * A special case is setting a map-specific option to `undefined`:
+   * then the corresponding option is derived from the default, georeferenced map or layer option.
+   * This is equivalent to using the reset function for map-specific option.
+   *
    * @param mapOptionsByMapId - Map-specific options to set by map ID
    * @param layerOptions - Layer options to set
-   * @param setOptionsOptions - Options when setting the options
+   * @param animationOptions - Animation options
    */
   setMapsOptionsByMapId(
     mapOptionsByMapId: Map<string, Partial<WebGL2WarpedMapOptions>>,
     layerOptions?:
       | Partial<SpecificWarpedMapLayerOptions>
       | Partial<WebGL2RenderOptions>,
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -646,7 +778,7 @@ export class WarpedMapLayer
     this.renderer.setMapsOptionsByMapId(
       mapOptionsByMapId,
       layerOptions,
-      setOptionsOptions
+      animationOptions
     )
   }
 
@@ -657,15 +789,15 @@ export class WarpedMapLayer
    * Doesn't reset render options or specific warped map layer options
    *
    * @param layerOptionKeys - Keys of the options to reset
-   * @param setOptionsOptions - Options when setting the options
+   * @param animationOptions - Animation options
    */
   resetLayerOptions(
     layerOptionKeys?: string[],
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    this.renderer.resetOptions(layerOptionKeys, setOptionsOptions)
+    this.renderer.resetOptions(layerOptionKeys, animationOptions)
   }
 
   /**
@@ -677,13 +809,13 @@ export class WarpedMapLayer
    * @param mapIds - Map IDs for which to reset the options
    * @param mapOptionKeys - Keys of the map-specific options to reset
    * @param layerOptionKeys - Keys of the layer options to reset
-   * @param setOptionsOptions - Options when setting the options
+   * @param animationOptions - Animation options
    */
   resetMapsOptions(
     mapIds: string[],
     mapOptionKeys?: string[],
     layerOptionKeys?: string[],
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -691,7 +823,7 @@ export class WarpedMapLayer
       mapIds,
       mapOptionKeys,
       layerOptionKeys,
-      setOptionsOptions
+      animationOptions
     )
   }
 
@@ -703,19 +835,19 @@ export class WarpedMapLayer
    *
    * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
    * @param layerOptionKeys - Keys of the layer options to reset
-   * @param setOptionsOptions - Options when setting the options
+   * @param animationOptions - Animation options
    */
   resetMapsOptionsByMapId(
     mapOptionkeysByMapId: Map<string, string[]>,
     layerOptionKeys?: string[],
-    setOptionsOptions?: Partial<SetOptionsOptions>
+    animationOptions?: Partial<AnimationOptions>
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     this.renderer.resetMapsOptionsByMapId(
       mapOptionkeysByMapId,
       layerOptionKeys,
-      setOptionsOptions
+      animationOptions
     )
   }
 

@@ -755,7 +755,7 @@ Map ID of the map that was removed, or an error (`Promise<string | Error | undef
 WebGL2Renderer
 ```
 
-### `WarpedMapLayer#resetLayerOptions(layerOptionKeys, setOptionsOptions)`
+### `WarpedMapLayer#resetLayerOptions(layerOptionKeys, animationOptions)`
 
 Reset the layer options
 
@@ -766,14 +766,14 @@ Doesn't reset render options or specific warped map layer options
 
 * `layerOptionKeys?` (`Array<string> | undefined`)
   * Keys of the options to reset
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#resetMapsOptions(mapIds, mapOptionKeys, layerOptionKeys, setOptionsOptions)`
+### `WarpedMapLayer#resetMapsOptions(mapIds, mapOptionKeys, layerOptionKeys, animationOptions)`
 
 Reset the map-specific options of maps (and the layer options)
 
@@ -788,14 +788,14 @@ Doesn't reset render options or specific warped map layer options
   * Keys of the map-specific options to reset
 * `layerOptionKeys?` (`Array<string> | undefined`)
   * Keys of the layer options to reset
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#resetMapsOptionsByMapId(mapOptionkeysByMapId, layerOptionKeys, setOptionsOptions)`
+### `WarpedMapLayer#resetMapsOptionsByMapId(mapOptionkeysByMapId, layerOptionKeys, animationOptions)`
 
 Reset the map-specific options of maps by map ID (and the layer options)
 
@@ -808,8 +808,8 @@ Doesn't reset render options or specific warped map layer options
   * Keys of map-specific options to reset by map ID
 * `layerOptionKeys?` (`Array<string> | undefined`)
   * Keys of the layer options to reset
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
@@ -849,7 +849,7 @@ Send maps to back
 
 `void`.
 
-### `WarpedMapLayer#setLayerOptions(layerOptions, setOptionsOptions)`
+### `WarpedMapLayer#setLayerOptions(layerOptions, animationOptions)`
 
 Set the layer options
 
@@ -857,8 +857,8 @@ Set the layer options
 
 * `layerOptions` (`Partial<WebGL2RenderOptions> | Partial<LeafletWarpedMapLayerOptions>`)
   * Layer options to set
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
@@ -870,9 +870,134 @@ Set the layer options
 warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
 ```
 
-### `WarpedMapLayer#setMapsOptions(mapIds, mapOptions, layerOptions, setOptionsOptions)`
+### `WarpedMapLayer#setMapGcps(mapId, gcps, animationOptions)`
+
+Set the GCPs of a map
+
+This only sets the map-specific `gcps` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original GCPs inferred from the Georeference Annotation.
+
+The original GCPs can be reset by resetting the map-specific GCPs option,
+and stay accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which to set the options
+* `gcps` (`Array<Gcp>`)
+  * GCPs to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapOptions(mapId, mapOptions, layerOptions, animationOptions)`
+
+Set the map-specific options of a map (and the layer options)
+
+In general setting a map-specific option
+also sets the corresponding option of the map,
+since these are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+A special case is setting a map-specific option to `undefined`:
+then the corresponding option is derived from the default, georeferenced map or layer option.
+This is equivalent to using the reset function for map-specific option.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which to set the options
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  * Map-specific options to set
+* `layerOptions?` (`  | Partial<WebGL2RenderOptions>
+    | Partial<LeafletWarpedMapLayerOptions>
+    | undefined`)
+  * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+###### Examples
+
+```ts
+warpedMapLayer.setMapOptions(myMapId, { transformationType: 'thinPlateSpline' })
+```
+
+### `WarpedMapLayer#setMapResourceMask(mapId, resourceMask, animationOptions)`
+
+Set the resource mask of a map
+
+This only sets the map-specific `resourceMask` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original resource mask inferred from the Georeference Annotation.
+
+The original resource mask can be reset by resetting the map-specific resource mask option,
+and stays accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which to set the options
+* `resourceMask` (`Array<Point>`)
+  * Resource mask to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapTransformationType(mapId, transformationType, animationOptions)`
+
+Set the transformation type of a map
+
+This only sets the map-specific `transformationType` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original transformation type inferred from the Georeference Annotation.
+
+The original transformation type can be reset by resetting the map-specific transformation type option,
+and stays accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which to set the options
+* `transformationType` (`  | 'straight'
+    | 'helmert'
+    | 'polynomial'
+    | 'polynomial1'
+    | 'polynomial2'
+    | 'polynomial3'
+    | 'thinPlateSpline'
+    | 'projective'
+    | 'linear'`)
+  * Transformation type to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapsOptions(mapIds, mapOptions, layerOptions, animationOptions)`
 
 Set the map-specific options of maps (and the layer options)
+
+In general setting a map-specific option
+also sets the corresponding option of the map,
+since these are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+A special case is setting a map-specific option to `undefined`:
+then the corresponding option is derived from the default, georeferenced map or layer option.
+This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
@@ -884,8 +1009,8 @@ Set the map-specific options of maps (and the layer options)
     | Partial<LeafletWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
@@ -894,12 +1019,21 @@ Set the map-specific options of maps (and the layer options)
 ###### Examples
 
 ```ts
-warpedMapLayer.setMapOptions([myMapId], { transformationType: 'thinPlateSpline' })
+warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
 ```
 
-### `WarpedMapLayer#setMapsOptionsByMapId(mapOptionsByMapId, layerOptions, setOptionsOptions)`
+### `WarpedMapLayer#setMapsOptionsByMapId(mapOptionsByMapId, layerOptions, animationOptions)`
 
 Set the map-specific options of maps by map ID (and the layer options)
+
+In general setting a map-specific option
+also sets the corresponding option of the map,
+since these are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+A special case is setting a map-specific option to `undefined`:
+then the corresponding option is derived from the default, georeferenced map or layer option.
+This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
@@ -909,8 +1043,8 @@ Set the map-specific options of maps by map ID (and the layer options)
     | Partial<LeafletWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
-* `setOptionsOptions?` (`Partial<SetOptionsOptions> | undefined`)
-  * Options when setting the options
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 

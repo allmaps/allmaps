@@ -38,7 +38,7 @@ import type { Line, Point, Tile, HomogeneousTransform } from '@allmaps/types'
 import type {
   LineGroup,
   PointGroup,
-  SetOptionsOptions,
+  AnimationOptions,
   SpecificWebGL2WarpedMapOptions,
   WebGL2WarpedMapOptions
 } from '../shared/types.js'
@@ -247,8 +247,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }
 
-  setOptions(setOptionsOptions?: Partial<SetOptionsOptions>) {
-    const changedOptions = super.setOptions(setOptionsOptions)
+  setOptions(animationOptions?: Partial<AnimationOptions>) {
+    const changedOptions = super.setOptions(animationOptions)
 
     this.options.opacity =
       (this.listOptions?.opacity ?? this.defaultOptions.opacity) *
