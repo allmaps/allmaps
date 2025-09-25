@@ -9,11 +9,11 @@
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
+  import { Geocoder } from '@allmaps/components'
   import {
-    Geocoder,
     GeocodeEarthGeocoderProvider,
     WorldHistoricalGazetteerGeocoderProvider
-  } from '@allmaps/components'
+  } from '@allmaps/components/geocoder'
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
@@ -24,7 +24,7 @@
   import { formatTimeAgo } from '$lib/shared/format.js'
 
   import type { Bbox } from '@allmaps/types'
-  import type { GeocoderGeoJsonFeature } from '@allmaps/components'
+  import type { GeocoderGeoJsonFeature } from '@allmaps/components/geocoder'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
