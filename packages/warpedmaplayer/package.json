@@ -15,7 +15,6 @@
   ],
   "description": "Base plugin classes for Allmaps",
   "type": "module",
-  "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "files": [
     "dist"
