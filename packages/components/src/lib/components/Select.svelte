@@ -1,7 +1,7 @@
-<script lang="ts">
+<script lang="ts" generics="Item extends SelectBaseItem">
   import { scale } from 'svelte/transition'
 
-  import { Select, type WithoutChildren } from 'bits-ui'
+  import { Select } from 'bits-ui'
 
   import {
     Check as CheckIcon,
@@ -10,49 +10,42 @@
     CaretDoubleDown as CaretDoubleDownIcon
   } from 'phosphor-svelte'
 
-  import type { Component } from 'svelte'
-  import type { IconComponentProps } from 'phosphor-svelte'
+  import type { SelectBaseItem } from '$lib/shared/types.js'
 
-  type SelectItem = {
-    value: string
-    label: string
-    Icon?: Component<IconComponentProps>
-    disabled?: boolean
-  }
-
-  type Props = WithoutChildren<Select.RootProps> & {
+  type Props = {
+    value?: string
     placeholder?: string
-    items: SelectItem[]
-    type?: 'single' | 'multiple'
-    onValueChange?: (value: string | string[]) => void
+    items: Item[]
+    onselect?: (item: Item) => void
   }
 
-  let {
-    value = $bindable(),
-    items,
-    placeholder,
-    type,
-    onValueChange
-  }: Props = $props()
+  let { value = $bindable(), items, placeholder, onselect }: Props = $props()
 
-  let selectedItem = $derived<SelectItem | undefined>(
-    value ? items.find((item) => item.value === value) : undefined
-  )
+  $effect(() => {
+    if (onselect && selectedItem) {
+      onselect(selectedItem)
+    }
+  })
+
+  let selectedItem = $derived.by<Item | undefined>(() => {
+    if (value) {
+      const item = items.find((item) => item.value === value)
+
+      if (item) {
+        return item as Item
+      }
+    }
+  })
 
   let Icon = $derived(selectedItem ? selectedItem.Icon : undefined)
 </script>
 
-<!--
-TypeScript Discriminated Unions + destructing (required for "bindable") do not
-get along, so we shut typescript up by casting `value` to `never`, however,
-from the perspective of the consumer of this component, it will be typed appropriately.
--->
-<Select.Root bind:value={value as never} {type} {onValueChange}>
+<Select.Root bind:value type="single">
   <Select.Trigger
-    class="cursor-pointer w-full px-1 py-0.5 rounded-lg bg-white outline-none
+    class="cursor-pointer w-full px-1 py-1 rounded-lg bg-white outline-none
     inline-flex items-center justify-between gap-2 text-left
     border-solid border-gray-100 border-1 transition-colors
-    focus-within:border-pink inset-shadow-xs text-sm sm:text-base"
+    focus-within:border-pink inset-shadow-xs"
   >
     <Icon class="size-5 shrink-0" />
     <span class="w-full"
@@ -64,8 +57,11 @@ from the perspective of the consumer of this component, it will be typed appropr
     <Select.Content
       forceMount
       sideOffset={4}
-      class="rounded-lg bg-white p-1 shadow-lg outline-hidden z-50
-      w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)]"
+      class="outline-hidden z-50
+      bg-white p-1 shadow-lg rounded-md
+        border-1 border-gray-200 overflow-auto
+        max-h-[calc((var(--bits-popover-content-available-height))-(--spacing(2)))]
+        w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)]"
     >
       {#snippet child({ wrapperProps, props, open })}
         {#if open}
@@ -82,10 +78,10 @@ from the perspective of the consumer of this component, it will be typed appropr
                     {value}
                     {label}
                     {disabled}
-                    class="w-full text-sm sm:text-base select-none
-              inline-flex items-center justify-between gap-2 text-left
-              rounded-sm px-1 py-2
-            hover:bg-gray-100 cursor-pointer outline-hidden transition-all"
+                    class="w-full select-none
+                    inline-flex items-center justify-between gap-2 text-left
+                    rounded-sm px-1 py-2
+                  hover:bg-gray-100 cursor-pointer outline-hidden transition-all"
                   >
                     {#snippet children({ selected }: { selected: boolean })}
                       <Icon class="size-5 shrink-0" />

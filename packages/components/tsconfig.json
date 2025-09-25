@@ -13,11 +13,10 @@
   "references": [
     { "path": "../annotation" },
     { "path": "../bearing" },
-    { "path": "../basemap" },
-    { "path": "../maplibre" },
+    { "path": "../iiif-parser" },
+    { "path": "../project" },
     { "path": "../render" },
     { "path": "../stdlib" },
-    { "path": "../project" },
     { "path": "../transform" },
     { "path": "../types" }
   ]

@@ -1,25 +1,20 @@
 <script lang="ts">
-  import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
-  import projectionsData from '$lib/shared/projections/projections.json' with { type: 'json' }
+  import { ProjectionPicker } from '$lib/index.js'
+  import { getProjectionsState } from '$lib/state.js'
+
   import {
-    createSearchProjectionsWithFuse,
-    createSuggestProjectionsWithFlatbush
+    createFullTextIndex,
+    createBboxIndex
   } from '$lib/shared/projections/projections.js'
 
-  const projections = projectionsData.map((projectionData) => {
-    return {
-      code: projectionData.code,
-      name: 'EPSG:' + projectionData.code + ' - ' + projectionData.name,
-      definition: projectionData.definition,
-      bbox: projectionData.bbox as [number, number, number, number]
-    }
-  })
+  import type { PickerProjection } from '@allmaps/components/projections'
 
-  let selectedProjection = $state(undefined)
+  const projectionsState = getProjectionsState()
 
-  const searchProjectionsWithFuse = createSearchProjectionsWithFuse(projections)
-  const suggestProjectionsWithFlatbush =
-    createSuggestProjectionsWithFlatbush(projections)
+  let value = $state<PickerProjection>()
+
+  const fullTextIndex = createFullTextIndex(projectionsState.projections)
+  const bboxIndex = createBboxIndex(projectionsState.projections)
 </script>
 
 <main class="container mx-auto p-4 space-y-8">
@@ -28,11 +23,11 @@
   <section>
     <h1 class="text-xl font-bold mb-4">Projections</h1>
     <ProjectionPicker
-      {projections}
-      bind:selectedProjection
-      searchProjections={searchProjectionsWithFuse}
-      geoBbox={[4.01001, 50.762522, 4.523621, 51.024121]}
-      suggestProjections={suggestProjectionsWithFlatbush}
+      projections={projectionsState.projections}
+      bind:value
+      {fullTextIndex}
+      {bboxIndex}
+      bbox={[4.01001, 50.762522, 4.523621, 51.024121]}
     ></ProjectionPicker>
   </section>
 </main>

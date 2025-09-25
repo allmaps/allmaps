@@ -53,5 +53,18 @@
       var(--lighter-color) 10px,
       var(--lighter-color) 20px
     );
+
+    animation-name: animation;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+  }
+
+  @keyframes animation {
+    from {
+      background-position-x: -250px;
+    }
+    to {
+      background-position-x: 0;
+    }
   }
 </style>
