@@ -17,6 +17,8 @@
     "precommit": "turbo run precommit",
     "remove-tsbuildinfo": "find . -maxdepth 3 -name \"tsconfig.tsbuildinfo\" -type f -delete",
     "remove-vite-timestamp": "find . -maxdepth 3 -name \"vite.config.*.timestamp-*\" -type f -delete",
+    "remove-node-modules": "find . -name node_modules -type d -prune -exec trash {} +",
+    "reset": "pnpm run remove-tsbuildinfo && pnpm run remove-vite-timestamp && pnpm run remove-node-modules && pnpm run init",
     "prepare": "husky install",
     "version-prerelease": "lerna version prerelease",
     "publish-beta": "lerna publish from-git --dist-tag beta",
