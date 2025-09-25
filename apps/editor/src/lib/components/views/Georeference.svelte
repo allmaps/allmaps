@@ -51,6 +51,7 @@
   } from '$lib/shared/constants.js'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
+  import type { LngLatBounds } from 'maplibre-gl'
 
   import type { GcpTransformer } from '@allmaps/transform'
   import type { Bbox } from '@allmaps/types'
@@ -884,6 +885,11 @@
     }
   }
 
+  function handleMoveend(bounds: LngLatBounds) {
+    const bbox = bounds.toArray().flat() as Bbox
+    uiState.lastBbox = bbox
+  }
+
   $effect(() => {
     if (mapsState.activeGcpId) {
       makeGcpFeatureActive(mapsState.activeGcpId, true)
@@ -1033,5 +1039,5 @@
     bind:transformer
     initialViewport={resourceViewport}
   />
-  <Geo bind:geoMap initialViewport={geoViewport} />
+  <Geo bind:geoMap initialViewport={geoViewport} onmoveend={handleMoveend} />
 </div>

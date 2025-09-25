@@ -24,11 +24,12 @@
 
 {#if sourceState.source?.parsedIiif}
   <!-- TODO: move contents to grid cell in layout so max-h is no longer needed -->
-  <div class=" max-h-[calc(100vh-200px)] overflow-auto">
+  <!-- --bits-popover-content-available-height -->
+  <div class="max-h-[calc(100vh-200px)] overflow-auto">
     <!-- Manifests information -->
 
     {#if manifest}
-      <div class="max-h-96 overflow-y-auto">
+      <div class="">
         <!-- Manifest label -->
         {#if manifest.label}
           <div class="flex flex-col gap-2">

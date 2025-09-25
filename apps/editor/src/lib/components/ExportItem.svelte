@@ -22,8 +22,8 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  <div class="flex flex-row items-center gap-2">
-    <a class="font-bold contents" href={openUrl || url}
+  <div class="flex flex-row items-center justify-between gap-2">
+    <a class="inline-flex gap-2 items-center font-bold" href={openUrl || url}
       ><span>{label}</span> <ArrowSquareOutIcon /></a
     >
 

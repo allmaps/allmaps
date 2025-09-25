@@ -19,7 +19,7 @@
 
 <div
   id="dot-pattern"
-  class="w-full h-full overflow-auto"
+  class="w-full h-full"
   style="--background-image: {backgroundImage}"
 >
   {@render children()}

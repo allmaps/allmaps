@@ -25,10 +25,11 @@
   {#if scopeState.mapsCount}
     <div class="flex items-center gap-2">
       <span class="shrink-0">Export options for</span>
-      <div class="w-46">
+      <div class="w-48">
         <Scope />
       </div>
     </div>
+
     {#if scopeState.allmapsId}
       <ExportItem
         url={getViewerUrl(scopeState.allmapsId)}
@@ -40,7 +41,7 @@
         label="Georeference Annotation"
       >
         <button
-          onclick={() => (uiState.showAnnotationModal = true)}
+          onclick={() => (uiState.modalsVisible.annotation = true)}
           class="hidden md:flex flex-row gap-1.5 px-3 py-2 rounded-full cursor-pointer
         items-center text-sm font-medium text-white
       bg-darkblue/90 hover:bg-darkblue/100 shadow-none hover:shadow-md transition-all"

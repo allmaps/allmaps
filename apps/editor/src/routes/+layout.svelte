@@ -2,30 +2,35 @@
   import { page } from '$app/state'
   import { onNavigate, afterNavigate } from '$app/navigation'
 
-  import { createRouteUrl, gotoRoute, getRouteId } from '$lib/shared/router.js'
+  import { Banner, Stats, Loading } from '@allmaps/components'
+  import { setProjectionsState } from '@allmaps/components/state'
 
-  import { setUrlState } from '$lib/state/url.svelte.js'
-  import { setSourceState } from '$lib/state/source.svelte.js'
-  import { setMapsState } from '$lib/state/maps.svelte.js'
+  import { setApiState } from '$lib/state/api.svelte.js'
   import { setErrorState } from '$lib/state/error.svelte.js'
-  import { setScopeState } from '$lib/state/scope.svelte.js'
-  import { setUiState } from '$lib/state/ui.svelte.js'
+  import { setExamplesState } from '$lib/state/examples.svelte.js'
+  import { setHeadState } from '$lib/state/head.svelte.js'
+  import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setMapsHistoryState } from '$lib/state/maps-history.svelte.js'
   import { setMapsMergedState } from '$lib/state/maps-merged.svelte.js'
-  import { setApiState } from '$lib/state/api.svelte.js'
-  import { setExamplesState } from '$lib/state/examples.svelte.js'
-  import { setImageInfoState } from '$lib/state/image-info.svelte.js'
+  import { setMapsState } from '$lib/state/maps.svelte.js'
+  import { setScopeState } from '$lib/state/scope.svelte.js'
+  import { setSourceState } from '$lib/state/source.svelte.js'
+  import { setUiState } from '$lib/state/ui.svelte.js'
+  import { setUrlState } from '$lib/state/url.svelte.js'
   import { setViewportsState } from '$lib/state/viewports.svelte.js'
-  import { setHeadState } from '$lib/state/head.svelte.js'
 
-  import { Banner, Stats, Loading } from '@allmaps/components'
+  import { createRouteUrl, gotoRoute, getRouteId } from '$lib/shared/router.js'
 
   import Head from '$lib/components/Head.svelte'
   import Header from '$lib/components/Header.svelte'
   import Controls from '$lib/components/Controls.svelte'
+
   import About from '$lib/components/modals/About.svelte'
   import Annotation from '$lib/components/modals/Annotation.svelte'
+  import EditGcps from '$lib/components/modals/EditGcps.svelte'
+  import Export from '$lib/components/modals/Export.svelte'
   import Keyboard from '$lib/components/modals/Keyboard.svelte'
+
   import Error from '$lib/components/Error.svelte'
   import Command from '$lib/components/Command.svelte'
 
@@ -48,7 +53,7 @@
   const urlState = setUrlState(page.url, errorState)
   setExamplesState()
 
-  setUiState(urlState)
+  const uiState = setUiState(urlState)
   setImageInfoState()
 
   const sourceState = setSourceState(urlState, errorState)
@@ -65,10 +70,17 @@
 
   setScopeState(sourceState, mapsState, mapsMergedState)
   setHeadState(sourceState)
+  setProjectionsState()
 
   function handleKeypress(event: KeyboardEvent) {
     if (!isView) {
       return
+    }
+
+    if (event.target instanceof Element) {
+      if (['BUTTON', 'INPUT'].includes(event.target.nodeName)) {
+        return
+      }
     }
 
     if (event.key === '[') {
@@ -81,6 +93,25 @@
       const nextImageId = sourceState.getNextActiveImageId()
 
       gotoRoute(createRouteUrl(page, getRouteId(page), { image: nextImageId }))
+    } else if (event.key === '{') {
+      const previousMapId = mapsState.previousMapId
+      if (previousMapId) {
+        uiState.lastClickedItem = {
+          type: 'map',
+          mapId: previousMapId
+        }
+        mapsState.activeMapId = previousMapId
+      }
+    } else if (event.key === '}') {
+      const nextMapId = mapsState.nextMapId
+      if (nextMapId) {
+        uiState.lastClickedItem = {
+          type: 'map',
+          mapId: nextMapId
+        }
+
+        mapsState.activeMapId = nextMapId
+      }
     } else if (event.key === '1') {
       gotoRoute(createRouteUrl(page, 'images'))
     } else if (event.key === '2') {
@@ -144,8 +175,10 @@
   </div>
 </div>
 {#if isView}
-  <Command />
-  <Annotation />
   <About />
+  <Annotation />
+  <Command />
+  <EditGcps />
+  <Export />
   <Keyboard />
 {/if}

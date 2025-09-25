@@ -2,7 +2,7 @@
   import { page } from '$app/state'
   import { afterNavigate } from '$app/navigation'
 
-  import { Collection, Thumbnail } from '@allmaps/components'
+  import { Grid, Thumbnail } from '@allmaps/components'
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
   import { darkblue } from '@allmaps/tailwind'
 
@@ -59,7 +59,7 @@
 
 <div class="max-w-(--breakpoint-lg) m-auto p-4">
   {#if sourceState.imageCount > 0}
-    <Collection childrenCount={sourceState.imageCount}>
+    <Grid childrenCount={sourceState.imageCount}>
       {#each [...sourceState.images] as image, index (image.uri)}
         {@const canvas = sourceState.getCanvasByImageId(image.uri)}
         <!-- TODO: don't bind ALL widths! -->
@@ -111,6 +111,6 @@
           </a>
         </li>
       {/each}
-    </Collection>
+    </Grid>
   {/if}
 </div>

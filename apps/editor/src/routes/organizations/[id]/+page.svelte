@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { Footer } from '@allmaps/components'
+
   import Title from '$lib/components/Title.svelte'
   import Organization from '$lib/components/Organization.svelte'
-  import Footer from '$lib/components/Footer.svelte'
 
   let { data: organization } = $props()
 

@@ -1,4 +1,5 @@
 import { setContext, getContext } from 'svelte'
+import { browser } from '$app/environment'
 
 import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 
@@ -16,6 +17,8 @@ type BasemapPreset = {
   attribution: string
   value: PresetBaseMapID
 }
+
+type ModalsVisible = Record<string, boolean>
 
 const basemapPresets: BasemapPreset[] = [
   {
@@ -49,32 +52,42 @@ export class UiState extends UiEventTarget {
 
   #firstUse = $state(true)
 
-  #showAboutModal = $state(false)
-  #showAnnotationModal = $state(false)
-  #showKeyboardModal = $state(false)
+  #modalsVisible = $state<ModalsVisible>({
+    about: false,
+    annotation: false,
+    keyboard: false,
+    export: false,
+    editGcps: false
+  })
 
   #retinaTiles = $state(true)
 
   #lastClickedItem = $state<ClickedItem>()
+
+  #imagesScrollTop = $state(0)
+
+  #lastBbox = $state<Bbox>()
 
   constructor(urlState: UrlState) {
     super()
 
     this.#urlState = urlState
 
-    // TODO: move localStorage code to shared ts file
-    const firstUseKey = `${String(UI_KEY)}-first-use`
+    if (browser) {
+      // TODO: move localStorage code to shared ts file
+      const firstUseKey = `${String(UI_KEY)}-first-use`
 
-    try {
-      const firstUse = localStorage.getItem(firstUseKey)
+      try {
+        const firstUse = localStorage.getItem(firstUseKey)
 
-      if (firstUse) {
-        this.#firstUse = false
+        if (firstUse) {
+          this.#firstUse = false
+        }
+
+        localStorage.setItem(firstUseKey, String(false))
+      } catch {
+        console.warn('Error reading from localStorage')
       }
-
-      localStorage.setItem(firstUseKey, String(false))
-    } catch {
-      console.warn('Error reading from localStorage')
     }
   }
 
@@ -118,28 +131,16 @@ export class UiState extends UiEventTarget {
     return this.#firstUse
   }
 
-  get showAboutModal() {
-    return this.#showAboutModal
+  get modalsVisible() {
+    return this.#modalsVisible
   }
 
-  set showAboutModal(show: boolean) {
-    this.#showAboutModal = show
-  }
+  set modalsVisible(state: ModalsVisible) {
+    const visibleKey = Object.keys(state).find((key) => state[key])
 
-  get showAnnotationModal() {
-    return this.#showAnnotationModal
-  }
-
-  set showAnnotationModal(show: boolean) {
-    this.#showAnnotationModal = show
-  }
-
-  get showKeyboardModal() {
-    return this.#showKeyboardModal
-  }
-
-  set showKeyboardModal(show: boolean) {
-    this.#showKeyboardModal = show
+    this.#modalsVisible = Object.fromEntries(
+      Object.keys(this.#modalsVisible).map((key) => [key, key === visibleKey])
+    )
   }
 
   get retinaTiles() {
@@ -162,6 +163,22 @@ export class UiState extends UiEventTarget {
     )
 
     this.#lastClickedItem = item
+  }
+
+  get imagesScrollTop() {
+    return this.#imagesScrollTop
+  }
+
+  set imagesScrollTop(value: number) {
+    this.#imagesScrollTop = value
+  }
+
+  get lastBbox() {
+    return this.#lastBbox
+  }
+
+  set lastBbox(bbox: Bbox | undefined) {
+    this.#lastBbox = bbox
   }
 }
 

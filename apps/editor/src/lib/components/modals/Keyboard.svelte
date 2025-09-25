@@ -8,17 +8,16 @@
 
   import { getUiState } from '$lib/state/ui.svelte'
 
-  import Modal from '$lib/components/Modal.svelte'
+  import { Modal } from '@allmaps/components'
 
   const uitState = getUiState()
-
-  function handleClose() {
-    uitState.showKeyboardModal = false
-  }
 </script>
 
-<Modal bind:open={uitState.showKeyboardModal}>
-  <table>
+<Modal bind:open={uitState.modalsVisible.keyboard}>
+  {#snippet title()}
+    Keyboard shortcuts
+  {/snippet}
+  <table class="w-auto md:w-lg">
     <tbody class="first:pt-0">
       <tr class="border-b-2 border-pink font-bold"
         ><td class="p-1" colspan="2">Images and maps</td></tr
@@ -31,6 +30,14 @@
       <tr>
         <td class="p-1">Next image</td>
         <td class="p-1"><Kbd>&#93;</Kbd></td>
+      </tr>
+      <tr>
+        <td class="p-1">Previous map</td>
+        <td class="p-1"><Kbd>&#123;</Kbd></td>
+      </tr>
+      <tr>
+        <td class="p-1">Next map</td>
+        <td class="p-1"><Kbd>&#125;</Kbd></td>
       </tr>
 
       <tr class="border-b-2 border-pink font-bold"

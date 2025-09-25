@@ -7,6 +7,8 @@
 
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
+  import type { LngLatBounds } from 'maplibre-gl'
+
   import type { Viewport } from '$lib/types/shared.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
@@ -16,14 +18,15 @@
   type Props = {
     initialViewport?: Viewport
     terrain?: boolean
-
     geoMap?: Map
+    onmoveend?: (bounds: LngLatBounds) => void
   }
 
   let {
     initialViewport,
     terrain = true,
-    geoMap = $bindable<Map | undefined>()
+    geoMap = $bindable<Map | undefined>(),
+    onmoveend
   }: Props = $props()
 
   const defaultViewport = {
@@ -59,6 +62,8 @@
       // @ts-expect-error incorrect MapLibre types
       addTerrain(newGeoMap, maplibregl)
     }
+
+    newGeoMap.on('moveend', () => onmoveend?.(newGeoMap.getBounds()))
 
     newGeoMap.once('load', () => {
       geoMap = newGeoMap

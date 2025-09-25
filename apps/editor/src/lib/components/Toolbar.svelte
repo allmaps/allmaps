@@ -8,31 +8,15 @@
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import Popover from '$lib/components/Popover.svelte'
+  import { Popover } from '@allmaps/components'
+
   import Export from '$lib/components/popovers/Export.svelte'
 
   const uiState = getUiState()
-
-  let exportPopoverOpen = $state(false)
-
-  function handleMenuItemClick() {
-    uiState.showAboutModal = true
-  }
 </script>
 
-<div class="flex flex-row gap-1">
-  <!-- <button
-    onclick={() => (uiState.showAnnotationModal = true)}
-    class="hidden md:flex flex-row gap-1.5 px-3 py-2 rounded-full cursor-pointer
-        items-center font-medium text-pink
-      bg-gray/0 hover:bg-gray/10 shadow-none hover:shadow-md transition-all"
-  >
-    <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
-      class="hidden sm:inline-block">Annotation</span
-    >
-  </button> -->
-
-  <Popover bind:open={exportPopoverOpen}>
+<div class="flex flex-row gap-1 items-center">
+  <Popover>
     {#snippet button()}
       <div
         class="flex flex-row gap-1.5 px-3 py-2 rounded-full
@@ -45,17 +29,14 @@
         >
       </div>
     {/snippet}
-    <!-- {#snippet title()}<div class="flex items-center gap-2">
-        <ExportIcon class="size-6" size="100%" /><span>Export options for</span>
-      </div>{/snippet} -->
     {#snippet contents()}<Export />{/snippet}
   </Popover>
 
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
-      class="cursor-pointer focus-visible p-1 inline-flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+      class="size-8 cursor-pointer focus-visible aspect-square p-1 inline-flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
     >
-      <DotsThreeIcon class="h-6 w-6 text-foreground" />
+      <DotsThreeIcon class="size-6 text-foreground" />
     </DropdownMenu.Trigger>
     <DropdownMenu.Content
       class="z-50 w-full max-w-[229px] rounded-xl border border-gray-100 bg-white px-1 py-1.5 shadow-md
@@ -63,13 +44,13 @@
       sideOffset={8}
     >
       <DropdownMenu.Item
-        onclick={() => (uiState.showKeyboardModal = true)}
+        onclick={() => (uiState.modalsVisible.keyboard = true)}
         class="flex h-10 select-none cursor-pointer items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-gray-100"
       >
         Keyboard shortcuts…
       </DropdownMenu.Item>
       <DropdownMenu.Item
-        onclick={() => (uiState.showAboutModal = true)}
+        onclick={() => (uiState.modalsVisible.about = true)}
         class="flex h-10 select-none cursor-pointer items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-gray-100"
       >
         About Allmaps Editor…

@@ -4,6 +4,7 @@ import {
   PointSchema,
   ResourceMaskSchema,
   DbTransformationSchema,
+  DbResourceCrsSchema,
   DbImageServiceSchema,
   DbGcp1Schema,
   DbGcps1Schema,
@@ -32,6 +33,8 @@ export type ResourceMask = z.infer<typeof ResourceMaskSchema>
 export type DbImageService = z.infer<typeof DbImageServiceSchema>
 
 export type DbTransformation = z.infer<typeof DbTransformationSchema>
+
+export type DbResourceCrs = z.infer<typeof DbResourceCrsSchema>
 
 // ============================================================================
 // Map version 1

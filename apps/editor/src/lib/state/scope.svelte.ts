@@ -19,7 +19,10 @@ export class ScopeState {
 
   #scope = $state<Scope>('image')
 
-  #hasImagesScope = $state<boolean>(true)
+  #hasMapScope
+  #hasImageScope = $state(true)
+  #hasImagesScope
+  #scopes
 
   #allmapsId = $derived.by(() => {
     if (this.#scope === 'images' && this.#sourceState.source) {
@@ -61,15 +64,26 @@ export class ScopeState {
     this.#mapsState = mapsState
     this.#mapsMergedState = mapsMergedState
 
-    $effect(() => {
-      if (sourceState.source) {
-        if (sourceState.source.type === 'image') {
-          this.#hasImagesScope = false
-        } else {
-          this.#hasImagesScope = true
-        }
-      }
-    })
+    // $effect(() => {
+    //   if (sourceState.source) {
+    //     if (sourceState.source.type === 'image') {
+    //       this.#hasImagesScope = false
+    //     } else {
+    //       this.#hasImagesScope = true
+    //     }
+    //   }
+    // })
+
+    this.#hasImagesScope = $derived(this.#sourceState.imageCount > 1)
+    this.#hasMapScope = $derived(this.#mapsState.mapsCountForActiveImage > 0)
+
+    this.#scopes = $derived<Scope[]>(
+      [
+        this.#hasImagesScope ? ('images' as const) : undefined,
+        this.#hasImageScope ? ('image' as const) : undefined,
+        this.#hasMapScope ? ('map' as const) : undefined
+      ].flatMap((scope) => scope ?? [])
+    )
   }
 
   get hasImagesScope() {
@@ -82,6 +96,10 @@ export class ScopeState {
 
   get scope() {
     return this.#scope
+  }
+
+  get scopes() {
+    return this.#scopes
   }
 
   get annotation() {

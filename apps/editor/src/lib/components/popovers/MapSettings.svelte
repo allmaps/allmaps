@@ -50,12 +50,7 @@
 
 <div class="grid grid-cols-1 gap-2 *:break-all">
   <label for="basemap-preset">Background map:</label>
-  <Select
-    items={uiState.basemapPresets}
-    bind:value={basemapPreset}
-    onValueChange={handleBasemapPresetChange}
-    type="single"
-  />
+  <Select items={uiState.basemapPresets} bind:value={basemapPreset} />
 
   <form class="contents" onsubmit={handleBasemapUrlSubmit}>
     <label for="background-xyz-url">Custom XYZ layer:</label>

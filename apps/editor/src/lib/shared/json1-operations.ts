@@ -56,7 +56,7 @@ function parseMapOp(mapId: string, op: unknown): ParsedOp | ParsedOp[] {
     }
   }
 
-  throw new Error('Cannot parse operation')
+  throw new Error('Cannot parse map operation')
 }
 
 function parsePropOp(
@@ -67,7 +67,10 @@ function parsePropOp(
   if (isArray(op)) {
     if (isArray(op[0])) {
       return op.map((op) => parsePropOp(mapId, prop, op)).flat()
-    } else if (prop === 'transformation' && isObject(op[0])) {
+    } else if (
+      (prop === 'transformation' || prop === 'resourceCrs') &&
+      isObject(op[0])
+    ) {
       return {
         mapId,
         type: prop,
@@ -85,7 +88,7 @@ function parsePropOp(
     }
   }
 
-  throw new Error('Cannot parse operation')
+  throw new Error('Cannot parse prop operation')
 }
 
 export function parseOperations(op: unknown): ParsedOp[] {
@@ -98,5 +101,5 @@ export function parseOperations(op: unknown): ParsedOp[] {
     }
   }
 
-  throw new Error('Cannot parse operation')
+  throw new Error('Cannot parse operations')
 }

@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { Geocoder } from '@allmaps/components'
+
   import {
-    Geocoder,
     GeocodeEarthGeocoderProvider,
     WorldHistoricalGazetteerGeocoderProvider
-  } from '@allmaps/components'
+  } from '@allmaps/components/geocoder'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import type { GeocoderGeoJsonFeature } from '@allmaps/components'
+  import type { GeocoderGeoJsonFeature } from '@allmaps/components/geocoder'
   import type { Bbox } from '@allmaps/types'
 
   import { env } from '$env/dynamic/public'

@@ -12,13 +12,14 @@
     "moduleResolution": "bundler"
   },
   "references": [
-    { "path": "../../packages/id" },
-    { "path": "../../packages/maplibre" },
     { "path": "../../packages/annotation" },
+    { "path": "../../packages/id" },
     { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/io" },
+    { "path": "../../packages/maplibre" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/transform" },
     { "path": "../../packages/tailwind" },
+    { "path": "../../packages/transform" },
     { "path": "../../packages/types" }
   ]
 }

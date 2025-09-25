@@ -12,16 +12,20 @@
   } from 'phosphor-svelte'
 
   import { createRouteUrl, getRouteId } from '$lib/shared/router.js'
+
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+  import { getScopeState } from '$lib/state/scope.svelte.js'
 
-  import Popover from '$lib/components/Popover.svelte'
+  import { Popover } from '@allmaps/components'
+
   import MapButtons from '$lib/components/MapButtons.svelte'
   import ImageSelector from '$lib/components/ImageSelector.svelte'
   import Maps from '$lib/components/popovers/Maps.svelte'
   import Scope from '$lib/components/Scope.svelte'
 
   const sourceState = getSourceState()
+  const scopeState = getScopeState()
   const mapsMergedState = getMapsMergedState()
 
   let resultsEnabled = $derived(mapsMergedState.completeMaps.length > 0)
@@ -45,7 +49,8 @@
 
 <div class="w-full h-full flex flex-col items-center justify-between p-2 gap-2">
   <div
-    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-start md:items-center"
+    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-start md:items-center
+      pointer-events-none *:pointer-events-auto"
   >
     <div></div>
     <nav
@@ -78,7 +83,8 @@
           image: sourceState.activeImageId || undefined
         })}
         data-state={getRouteId(page) === 'georeference' ? 'active' : undefined}
-        class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-yellow/25 hover:bg-yellow/10 flex items-center justify-center gap-2"
+        class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-yellow/25 hover:bg-yellow/10
+          flex items-center justify-center gap-2"
       >
         <MapPinSimpleIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Georeference</span>
@@ -104,7 +110,7 @@
       </a>
     </nav>
 
-    <div>
+    <div class="contents">
       {#if isMapView || isImageView}
         <MapButtons
           geocoderEnabled={isMapView}
@@ -117,16 +123,21 @@
 
   <!-- class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto" -->
   <div
-    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-center"
+    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-center
+      pointer-events-none *:pointer-events-auto"
   >
     <div></div>
     <div>
-      {#if isResultsView && resultsEnabled}
+      {#if isResultsView && resultsEnabled && scopeState.mapsCount > 1}
         <div
-          class="bg-white z-50 p-1 rounded-lg shadow-md w-48"
+          class="flex items-center gap-2
+            bg-white z-50 p-1 rounded-lg shadow-md"
           transition:fade={{ duration: 100 }}
         >
-          <Scope />
+          <span class="hidden sm:inline-block pl-1">Show maps from</span>
+          <div class="w-48">
+            <Scope />
+          </div>
         </div>
       {/if}
     </div>

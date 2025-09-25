@@ -12,6 +12,7 @@
   import Confirm from '$lib/components/Confirm.svelte'
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import SelectTransformation from '$lib/components/SelectTransformation.svelte'
+  import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
 
   import type { DbMap } from '$lib/types/maps.js'
 
@@ -87,10 +88,10 @@
       {@const gcpCount = Object.values(map.gcps).length}
       {@const isActiveMap = mapsState.activeMapId === map.id}
       <li
-        class="col-span-3 sm:col-span-9 grid grid-cols-subgrid"
+        class="col-span-9 grid grid-cols-subgrid"
         transition:slide={{ duration: 250, axis: 'y' }}
       >
-        <div class="col-span-2 sm:col-span-8 grid grid-cols-subgrid group">
+        <div class="col-span-8 grid grid-cols-subgrid group">
           <div>
             {#if hasResourceMask(map)}
               <button
@@ -114,15 +115,10 @@
             {/if}
           </div>
           <div
-            class="col-span-1 sm:col-span-7 place-self-start self-center flex gap-1 sm:gap-2 items-center"
+            class="col-span-7 place-self-start self-center flex gap-1 sm:gap-2 items-center"
           >
             <span>Map {index + 1}</span>
-            <span class="hidden sm:inline font-light text-sm text-gray-800"
-              >{gcpCount} {gcpCount === 1 ? 'GCP' : 'GCPs'}
-            </span>
-            <div class="w-[140px] sm:w-[200px]">
-              <SelectTransformation {map} />
-            </div>
+            <div></div>
           </div>
         </div>
         <div class="place-self-end self-center">
@@ -134,84 +130,106 @@
           </Confirm>
         </div>
 
-        {#if isActiveMap && gcpCount > 0}
-          {@const gcps = Object.values(map.gcps).toSorted(
-            (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
-          )}
-          <ol
-            class="col-span-3 sm:col-span-9 grid grid-cols-subgrid"
-            transition:slide={{ duration: 250, axis: 'y' }}
+        {#if isActiveMap}
+          <div
+            class="pl-7 pb-2 col-span-9
+              grid grid-cols-[min-content_1fr] gap-x-4 gap-y-2 items-center
+              text-sm"
           >
-            {#each gcps as gcp, index}
-              {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
-              <li class="contents">
-                <div
-                  class="col-span-2 sm:col-span-8 grid gap-0 grid-cols-subgrid"
-                >
-                  <button
-                    class="inline-block h-8 cursor-pointer"
-                    onclick={() => handleGcpClick(map.id, gcp.id)}
-                    aria-label="Select GCP {index + 1}"
-                  >
-                    <div class="inline-flex size-4 justify-center items-center">
-                      <span
-                        class="size-3 rounded-full bg-pink transition-all"
-                        class:size-3={!isActiveGcp}
-                        class:size-4={isActiveGcp}
-                      ></span>
-                    </div>
-                    <span class="relative top-2 text-sm">
-                      {index + 1}
-                    </span>
-                  </button>
+            <label for="select-transformation">Transformation:</label>
+            <SelectTransformation {map} id="select-transformation" />
 
-                  <div
-                    class="sm:col-span-7 hidden sm:grid text-xs sm:text-base items-center gap-1 grid-cols-subgrid geograph-tnum place-items-end"
-                  >
-                    {#if gcp.resource}
-                      <span inert class="text-gray-300">(</span><span
-                        >{formatResourceCoordinate(gcp.resource[0])}<span
-                          inert
-                          class="text-gray-300">,</span
-                        ></span
-                      ><span class="space-x-1">
-                        <span>{formatResourceCoordinate(gcp.resource[1])}</span
-                        ><span inert class="text-gray-300">)</span></span
+            <label for="select-projection">Projection:</label>
+            <ProjectionPicker {map} id="select-projection" />
+          </div>
+          {#if gcpCount > 0}
+            {@const gcps = Object.values(map.gcps).toSorted(
+              (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
+            )}
+            <ol
+              class="col-span-9 grid grid-cols-subgrid"
+              transition:slide={{ duration: 250, axis: 'y' }}
+            >
+              {#each gcps as gcp, index}
+                {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
+                <li class="contents">
+                  <div class="col-span-8 grid gap-0 grid-cols-subgrid">
+                    <button
+                      class="inline-block h-8 cursor-pointer"
+                      onclick={() => handleGcpClick(map.id, gcp.id)}
+                      aria-label="Select GCP {index + 1}"
+                    >
+                      <div
+                        class="inline-flex size-4 justify-center items-center"
                       >
-                    {:else}
-                      <span class="col-span-3"></span>
-                    {/if}
-                    <span inert class="text-gray-300">⇒</span>
-                    {#if gcp.geo}
-                      <span inert class="text-gray-300">(</span><span
-                        >{formatGeoCoordinate(gcp.geo[0])}<span
-                          inert
-                          class="text-gray-300">,</span
-                        ></span
-                      >
-                      <span class="space-x-1">
-                        <span>{formatGeoCoordinate(gcp.geo[1])}</span><span
-                          inert
-                          class="text-gray-300">)</span
-                        ></span
-                      >
-                    {:else}
-                      <span class="col-span-3"></span>
-                    {/if}
+                        <span
+                          class="size-3 rounded-full bg-pink transition-all"
+                          class:size-3={!isActiveGcp}
+                          class:size-4={isActiveGcp}
+                        ></span>
+                      </div>
+                      <span class="relative top-2 text-sm">
+                        {index + 1}
+                      </span>
+                    </button>
+
+                    <div
+                      class="col-span-7 grid text-xs sm:text-base items-center gap-1 grid-cols-subgrid geograph-tnum place-items-end"
+                    >
+                      {#if gcp.resource}
+                        <span inert class="text-gray-300">(</span><span
+                          >{formatResourceCoordinate(gcp.resource[0])}<span
+                            inert
+                            class="text-gray-600">,</span
+                          ></span
+                        ><span class="space-x-1">
+                          <span
+                            >{formatResourceCoordinate(gcp.resource[1])}</span
+                          ><span inert class="text-gray-300">)</span></span
+                        >
+                      {:else}
+                        <span class="col-span-3"></span>
+                      {/if}
+                      <span inert class="text-gray-300">⇒</span>
+                      {#if gcp.geo}
+                        <span inert class="text-gray-300">(</span><span
+                          >{formatGeoCoordinate(gcp.geo[0])}<span
+                            inert
+                            class="text-gray-600">,</span
+                          ></span
+                        >
+                        <span class="space-x-1">
+                          <span>{formatGeoCoordinate(gcp.geo[1])}</span><span
+                            inert
+                            class="text-gray-300">)</span
+                          ></span
+                        >
+                      {:else}
+                        <span class="col-span-3"></span>
+                      {/if}
+                    </div>
                   </div>
-                </div>
-                <div class="place-self-end self-center">
-                  <Confirm
-                    onconfirm={() =>
-                      mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
-                    question="Do you really want to delete this GCP?"
-                  >
-                    <TrashIcon />
-                  </Confirm>
-                </div>
-              </li>
-            {/each}
-          </ol>
+                  <div class="place-self-end self-center">
+                    <Confirm
+                      onconfirm={() =>
+                        mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
+                      question="Do you really want to delete this GCP?"
+                    >
+                      <TrashIcon />
+                    </Confirm>
+                  </div>
+                </li>
+              {/each}
+            </ol>
+          {/if}
+
+          <div class="col-span-9 place-self-end">
+            <button
+              class="cursor-pointer px-2 py-1 rounded-full underline"
+              onclick={() => (uiState.modalsVisible.editGcps = true)}
+              >Edit GCPs or import from file</button
+            >
+          </div>
         {/if}
       </li>
     {/each}

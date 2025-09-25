@@ -1,12 +1,27 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+  import { beforeNavigate } from '$app/navigation'
   import { blue } from '@allmaps/tailwind'
 
   import DotsPattern from '$lib/components/DotsPattern.svelte'
   import Images from '$lib/components/views/Images.svelte'
+
+  import { getUiState } from '$lib/state/ui.svelte.js'
+
+  const uiState = getUiState()
+
+  let scrollContainer: HTMLDivElement
+
+  beforeNavigate(() => {
+    uiState.imagesScrollTop = scrollContainer.scrollTop
+  })
+
+  onMount(() => {
+    scrollContainer.scrollTop = uiState.imagesScrollTop
+  })
 </script>
 
-<!-- TODO: make sure scroll bars are not behind Controls.svelte -->
-<div class="w-full h-full bg-blue/75 overflow-auto">
+<div class="w-full h-full bg-blue/75 overflow-auto" bind:this={scrollContainer}>
   <DotsPattern color={blue}>
     <div class="py-14">
       <Images />

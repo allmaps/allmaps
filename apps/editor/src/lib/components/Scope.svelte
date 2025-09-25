@@ -11,11 +11,13 @@
 
   const scopeState = getScopeState()
 
-  const items = [
-    { value: 'images' as const, label: 'All images', Icon: ImagesIcon },
-    { value: 'image' as const, label: 'Current image', Icon: ImageIcon },
-    { value: 'map' as const, label: 'Current map', Icon: MapTrifoldIcon }
-  ]
+  let items = $derived(
+    [
+      { value: 'images' as const, label: 'All images', Icon: ImagesIcon },
+      { value: 'image' as const, label: 'Current image', Icon: ImageIcon },
+      { value: 'map' as const, label: 'Current map', Icon: MapTrifoldIcon }
+    ].filter((items) => scopeState.scopes.includes(items.value))
+  )
 </script>
 
-<Select {items} bind:value={scopeState.scope} type="single" />
+<Select {items} bind:value={scopeState.scope} />

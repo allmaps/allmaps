@@ -67,6 +67,7 @@
   async function setGeoreferenceAnnotation(
     annotation: Annotation | AnnotationPage
   ) {
+    console.log('setGeoreferenceAnnotation', annotation)
     if (!geoMap) {
       return
     }
@@ -103,7 +104,11 @@
     const map = mapsState.getMapById(mapId)
     if (map) {
       const resourceMask = getResourceMask(map)
-      warpedMapLayer.setMapResourceMask(getFullMapId(mapId), resourceMask)
+      // warpedMapLayer.setMapResourceMask(/(mapId), resourceMask)
+
+      warpedMapLayer.setMapsOptions([getFullMapId(mapId)], {
+        resourceMask
+      })
     }
   }
 
@@ -112,7 +117,11 @@
     if (map) {
       const gcps = getCompleteGcps(map)
 
-      warpedMapLayer.setMapGcps(getFullMapId(mapId), gcps)
+      warpedMapLayer.setMapsOptions([getFullMapId(mapId)], {
+        gcps
+      })
+
+      // warpedMapLayer.setMapGcps(getFullMapId(mapId), gcps)
     }
   }
 
@@ -177,10 +186,7 @@
       }
     }
 
-    warpedMapLayer.setMapTransformationType(
-      getFullMapId(mapId),
-      transformationType
-    )
+    warpedMapLayer.setMapsOptions([getFullMapId(mapId)], { transformationType })
   }
 
   function getGeoViewport(): Viewport | undefined {
@@ -294,7 +300,7 @@
 
   $effect(() => {
     if (geoMapReady && mapsState.connected === true && scopeState.annotation) {
-      setGeoreferenceAnnotation(scopeState.annotation)
+      // setGeoreferenceAnnotation(scopeState.annotation)
     }
   })
 

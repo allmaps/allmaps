@@ -35,7 +35,8 @@ import type {
   DbGcp3,
   DbMap3,
   DbMaps3,
-  DbTransformation
+  DbTransformation,
+  DbResourceCrs
 } from '$lib/types/maps.js'
 import type {
   InsertMap,
@@ -46,7 +47,8 @@ import type {
   InsertGcp,
   ReplaceGcp,
   RemoveGcp,
-  SetTransformation
+  SetTransformation,
+  SetResourceCrs
 } from '$lib/types/events.js'
 
 import { PUBLIC_ALLMAPS_API_WS_URL } from '$env/static/public'
@@ -60,6 +62,8 @@ export class MapsState extends MapsEventTarget {
   #doc: ReturnType<Client.Connection['get']> | undefined
 
   #maps = $state.raw<DbMaps3 | undefined>()
+  #mapsCount = $derived(this.#maps ? Object.keys(this.#maps).length : 0)
+
   #connecting = false
   #connected = $state(false)
 
@@ -167,7 +171,7 @@ export class MapsState extends MapsEventTarget {
 
   #handleSnapshot(err: ShareDBError) {
     if (err) {
-      console.error(err)
+      console.error('ShareDB error:', err)
       return
     }
 
@@ -367,6 +371,24 @@ export class MapsState extends MapsEventTarget {
               detail
             })
           )
+        } else if (type === 'resourceCrs') {
+          let resourceCrs: DbResourceCrs | undefined
+
+          if ('i' in instruction) {
+            // TODO: use Zod to validate the data
+            resourceCrs = instruction.i as DbResourceCrs
+          }
+
+          const detail = {
+            mapId,
+            resourceCrs
+          }
+
+          this.dispatchEvent(
+            new CustomEvent<SetResourceCrs>(MapsEvents.SET_RESOURCE_CRS, {
+              detail
+            })
+          )
         }
       }
     }
@@ -407,6 +429,10 @@ export class MapsState extends MapsEventTarget {
     }
   }
 
+  get mapsCountForActiveImage(): number {
+    return this.#mapsCount
+  }
+
   set activeMapId(mapId: string) {
     if (this.#isMapIdValid(mapId)) {
       this.#activeMapId = mapId
@@ -415,6 +441,32 @@ export class MapsState extends MapsEventTarget {
 
   get activeMap() {
     return this.#activeMap
+  }
+
+  get previousMapId() {
+    if (this.#maps && this.activeMapId) {
+      const mapIds = Object.keys(this.#maps)
+      const currentIndex = mapIds.indexOf(this.activeMapId)
+
+      if (currentIndex > 0) {
+        return mapIds[currentIndex - 1]
+      } else {
+        return mapIds[mapIds.length - 1]
+      }
+    }
+  }
+
+  get nextMapId() {
+    if (this.#maps && this.activeMapId) {
+      const mapIds = Object.keys(this.#maps)
+      const currentIndex = mapIds.indexOf(this.activeMapId)
+
+      if (currentIndex < mapIds.length - 1) {
+        return mapIds[currentIndex + 1]
+      } else {
+        return mapIds[0]
+      }
+    }
   }
 
   get activeGcpId(): string | undefined {
@@ -454,7 +506,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   removeMap({ mapId }: RemoveMap) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -462,7 +514,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   insertResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -471,7 +523,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   replaceResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -480,7 +532,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   removeResourceMaskPoint({ mapId, index }: RemoveResourceMaskPoint) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -489,7 +541,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   insertGcp({ mapId, gcp }: InsertGcp) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -503,7 +555,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   replaceGcp({ mapId, gcp }: ReplaceGcp) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -513,7 +565,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   removeGcp({ mapId, gcpId }: RemoveGcp) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -522,7 +574,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   setTransformation({ mapId, transformation }: SetTransformation) {
-    if (!this.#doc || !this.#maps || mapId in this.#maps === false) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
       return
     }
 
@@ -538,6 +590,24 @@ export class MapsState extends MapsEventTarget {
       }
     } else if (map.transformation) {
       this.#doc.submitOp(removeOp([mapId, 'transformation'], false))
+    }
+  }
+
+  setResourceCrs({ mapId, resourceCrs }: SetResourceCrs) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
+      return
+    }
+
+    const map = this.#maps[mapId]
+
+    if (resourceCrs) {
+      if (map.resourceCrs) {
+        this.#doc.submitOp(replaceOp([mapId, 'resourceCrs'], true, resourceCrs))
+      } else {
+        this.#doc.submitOp(insertOp([mapId, 'resourceCrs'], resourceCrs))
+      }
+    } else if (map.resourceCrs) {
+      this.#doc.submitOp(removeOp([mapId, 'resourceCrs'], false))
     }
   }
 

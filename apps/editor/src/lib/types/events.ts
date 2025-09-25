@@ -1,5 +1,10 @@
 import type { Point, ClickedItem } from '$lib/types/shared.js'
-import type { DbMap3, DbGcp3, DbTransformation } from '$lib/types/maps.js'
+import type {
+  DbMap3,
+  DbGcp3,
+  DbTransformation,
+  DbResourceCrs
+} from '$lib/types/maps.js'
 
 // ============================================================================
 // Events
@@ -49,6 +54,11 @@ export type RemoveGcp = {
 export type SetTransformation = {
   mapId: string
   transformation?: DbTransformation
+}
+
+export type SetResourceCrs = {
+  mapId: string
+  resourceCrs?: DbResourceCrs
 }
 
 export type InsertMapEvent = CustomEvent<InsertMap>
