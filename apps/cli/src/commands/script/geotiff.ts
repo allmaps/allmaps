@@ -6,7 +6,7 @@ import {
   mergeOptionsUnlessUndefined,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { getGeoreferencedMapsGeotiffScripts } from '@allmaps/io'
+import { generateGeoreferencedMapsGeotiffScripts } from '@allmaps/io'
 
 import {
   addProjectedGcpTransformerInputOptions,
@@ -91,7 +91,7 @@ export function geotiff() {
       projectedTransformers.push(projectedTransformer)
     }
 
-    const geotiffScripts = await getGeoreferencedMapsGeotiffScripts(
+    const geotiffScripts = await generateGeoreferencedMapsGeotiffScripts(
       maps,
       mergeOptions(options, { projectedTransformers })
     )

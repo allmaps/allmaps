@@ -1,34 +1,17 @@
 export {
   parseGcps,
-  parseGcpLines,
-  parseQgisGcpLines,
-  parseArcGisCsvGcpLines,
-  parseArcGisTsvGcpLines,
-  parseGdalGcpLines,
   parseGdalCoordinateLines,
-  parseGcpProjectionFromGcpString,
-  parseGcpProjectionDefinitionFromGcpString,
-  parseGcpProjectionDefinitionFromLine
+  parseGcpProjectionFromGcpString
 } from './input/gcps.js'
 
+export { generateGeoreferencedMapGcps } from './output/gcps.js'
+export { generateGeoreferencedMapsGeotiffScripts } from './output/geotiff.js'
+export { generateCheckCommand } from './output/bash.js'
 export {
-  printGeoreferencedMapGcps,
-  printGcps,
-  printQgisHeader,
-  printQgisGcpLines,
-  printArcGisCsvGcpLines,
-  printArcGisTsvGcpLines,
-  printGdalGcpLines
-} from './output/gcps.js'
-
-export {
-  getGdalPreamble,
-  getGeoreferencedMapGdalwarpScripts,
-  getGdalbuildvrtScript,
-  getGeoreferencedMapsGeotiffScripts
-} from './output/geotiff.js'
-
-export { checkCommand } from './output/bash.js'
+  generateLeafletExample,
+  generateMapLibreExample,
+  generateOpenLayersExample
+} from './output/plugins.js'
 
 export {
   supportedGcpFileFormats,

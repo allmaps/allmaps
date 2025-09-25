@@ -1,6 +1,6 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { printGeoreferencedMapGcps } from '@allmaps/io'
+import { generateGeoreferencedMapGcps } from '@allmaps/io'
 
 import { parseJsonInput, printString } from '../../lib/io.js'
 import {
@@ -26,7 +26,7 @@ export function gcps() {
     const maps = parseAnnotationsValidateMaps(jsonValues, annotationInputs)
 
     const gcpStrings = maps.map((map) =>
-      printGeoreferencedMapGcps(map, mergeOptions(options, annotationInputs))
+      generateGeoreferencedMapGcps(map, mergeOptions(options, annotationInputs))
     )
     printString([...gcpStrings].join('\n\n'))
   })

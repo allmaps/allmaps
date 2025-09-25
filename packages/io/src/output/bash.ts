@@ -1,4 +1,4 @@
-export function checkCommand(command: string, message: string) {
+export function generateCheckCommand(command: string, message: string) {
   return `
 if ! command -v ${command} &> /dev/null
 then

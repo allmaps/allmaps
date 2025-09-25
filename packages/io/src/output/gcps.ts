@@ -15,15 +15,15 @@ import type {
 } from '../shared/types.js'
 
 /**
- * Print GCPs from Georeferenced Map to file string.
+ * Generate GCPs from Georeferenced Map to file string.
  *
  * A projection can be specified files to print files,
  * and will be infered from the map's resourceCrs by default.
- * It's definition will be included in QGIS GCP files.
+ * Its definition will be included in QGIS GCP files.
  * The resource height must specified when parsing GCPs with resource origin in bottom left,
  * and will be infered from the map by default.
  */
-export function printGeoreferencedMapGcps(
+export function generateGeoreferencedMapGcps(
   map: GeoreferencedMap,
   options?: Partial<{
     gcpFileFormat: GcpFileFormat
@@ -48,7 +48,7 @@ export function printGeoreferencedMapGcps(
     options
   )
 
-  return printGcps(map.gcps, mergedOptions)
+  return generateGcps(map.gcps, mergedOptions)
 }
 
 /**
@@ -60,7 +60,7 @@ export function printGeoreferencedMapGcps(
  * The resource height must specified when parsing GCPs with resource origin in bottom left,
  * and will be infered from the map by default.
  */
-export function printGcps(
+export function generateGcps(
   gcps: Gcp[],
   options?: Partial<{
     gcpFileFormat: GcpFileFormat
@@ -159,18 +159,18 @@ export function printGcps(
     return gcp
   })
 
-  // Print
+  // Generate
   let headerLines: string[] = []
   let gcpLines: string[]
   if (mergedOptions.gcpFileFormat === 'qgis') {
-    headerLines = printQgisHeader(mergedOptions)
-    gcpLines = printQgisGcpLines(gcps)
+    headerLines = generateQgisHeader(mergedOptions)
+    gcpLines = generateQgisGcpLines(gcps)
   } else if (mergedOptions.gcpFileFormat === 'arcgis-csv') {
-    gcpLines = printArcGisCsvGcpLines(gcps)
+    gcpLines = generateArcGisCsvGcpLines(gcps)
   } else if (mergedOptions.gcpFileFormat === 'arcgis-tsv') {
-    gcpLines = printArcGisTsvGcpLines(gcps)
+    gcpLines = generateArcGisTsvGcpLines(gcps)
   } else if (mergedOptions.gcpFileFormat === 'gdal') {
-    gcpLines = printGdalGcpLines(gcps)
+    gcpLines = generateGdalGcpLines(gcps)
   } else {
     throw 'Unrecognised GCP file format while printing GCPs'
   }
@@ -178,7 +178,7 @@ export function printGcps(
   return [...headerLines, ...gcpLines].join('\n')
 }
 
-export function printQgisHeader(
+export function generateQgisHeader(
   options?: Partial<{
     gcpProjection: Projection
   }>
@@ -197,7 +197,7 @@ export function printQgisHeader(
   return headerLines
 }
 
-export function printQgisGcpLines(gcp: Gcp[]): string[] {
+export function generateQgisGcpLines(gcp: Gcp[]): string[] {
   const gcpLines = gcp.map((gcp) =>
     [gcp.geo[0], gcp.geo[1], gcp.resource[0], gcp.resource[1]]
       .map(String)
@@ -207,7 +207,7 @@ export function printQgisGcpLines(gcp: Gcp[]): string[] {
   return gcpLines
 }
 
-export function printArcGisCsvGcpLines(gcp: Gcp[]): string[] {
+export function generateArcGisCsvGcpLines(gcp: Gcp[]): string[] {
   const gcpLines = gcp.map((gcp, index) =>
     [index + 1, gcp.resource[0], gcp.resource[1], gcp.geo[0], gcp.geo[1]]
       .map(String)
@@ -217,7 +217,7 @@ export function printArcGisCsvGcpLines(gcp: Gcp[]): string[] {
   return gcpLines
 }
 
-export function printArcGisTsvGcpLines(gcp: Gcp[]): string[] {
+export function generateArcGisTsvGcpLines(gcp: Gcp[]): string[] {
   const gcpLines = gcp.map((gcp) =>
     [gcp.resource[0], gcp.resource[1], gcp.geo[0], gcp.geo[1]]
       .map(String)
@@ -227,7 +227,7 @@ export function printArcGisTsvGcpLines(gcp: Gcp[]): string[] {
   return gcpLines
 }
 
-export function printGdalGcpLines(gcp: Gcp[]): string[] {
+export function generateGdalGcpLines(gcp: Gcp[]): string[] {
   const gcpLines = gcp.map((gcp) =>
     [gcp.resource[0], gcp.resource[1], gcp.geo[0], gcp.geo[1]]
       .map(String)

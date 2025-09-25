@@ -2,7 +2,7 @@ import { Command } from '@commander-js/extra-typings'
 import path from 'path'
 
 import { generateId } from '@allmaps/id'
-import { checkCommand } from '@allmaps/io'
+import { generateCheckCommand } from '@allmaps/io'
 
 import { readLines, printString } from '../../lib/io.js'
 
@@ -13,7 +13,7 @@ function preamble(outputDir: string) {
 
 mkdir -p ${outputDir}
 
-${checkCommand('dezoomify-rs', dezoomifyNotFoundMessage)}
+${generateCheckCommand('dezoomify-rs', dezoomifyNotFoundMessage)}
 `.trim()
 }
 

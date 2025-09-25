@@ -57,7 +57,9 @@ const georeferencedMaps = parseAnnotation(annotation)
 const georeferencedMap = parseAnnotation(annotation)
 
 // Print GCPs to QGIS format
-const gcpString = printGeoreferencedMapGcps(georeferencedMap, { gcpFileFormat: 'qgis' })
+const gcpString = generateGeoreferencedMapGcps(georeferencedMap, {
+  gcpFileFormat: 'qgis'
+})
 
 // Log GCPs (or write to file)
 console.log(gcpString)
@@ -70,10 +72,10 @@ GCPs are printed in "EPSG:4326" by default, but their projection can be specifie
 GCPs can be parsed from common [GCP file formats](#gcp-file-formats).
 
 ```js
-import { readFileSync} from 'fs'
+import { readFileSync } from 'fs'
 
 // Read a GCP file
-const gcpString = readFileSync('./gcps.points', { encoding: 'utf8', flag: 'r' });
+const gcpString = readFileSync('./gcps.points', { encoding: 'utf8', flag: 'r' })
 
 // parse the GCPs and, if found in a QGIS file format, their projection
 const { gcps, gcpProjection } = parseGcps(gcpString)
@@ -193,7 +195,7 @@ MIT
 'up' | 'down'
 ```
 
-### `checkCommand(command, message)`
+### `generateCheckCommand(command, message)`
 
 ###### Parameters
 
@@ -204,53 +206,40 @@ MIT
 
 `string`.
 
-### `getGdalPreamble(options)`
+### `generateGeoreferencedMapGcps(map, options)`
+
+Generate GCPs from Georeferenced Map to file string.
+
+A projection can be specified files to print files,
+and will be infered from the map's resourceCrs by default.
+Its definition will be included in QGIS GCP files.
+The resource height must specified when parsing GCPs with resource origin in bottom left,
+and will be infered from the map by default.
 
 ###### Parameters
 
-* `options` (`{outputDir?: string | undefined}`)
+* `map` (`any`)
+* `options?` (`  | Partial<{
+        gcpFileFormat: GcpFileFormat
+        gcpResourceYAxis: GcpResourceYAxis
+        gcpResourceWidth: number
+        gcpResourceHeight: number
+        resourceWidth: number
+        resourceHeight: number
+        gcpResourceOrigin: GcpResourceOrigin
+        gcpProjection: Projection
+      }>
+    | undefined`)
 
 ###### Returns
 
 `string`.
 
-### `getGdalbuildvrtScript(basenames, options)`
+### `generateGeoreferencedMapsGeotiffScripts(maps, options)`
 
 ###### Parameters
 
-* `basenames` (`Array<string>`)
-* `options` (`{outputDir?: string | undefined}`)
-
-###### Returns
-
-`string`.
-
-### `getGeoreferencedMapGdalwarpScripts(map, options)`
-
-###### Parameters
-
-* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
-* `options` (`{
-    projectedTransformer?: ProjectedGcpTransformer | undefined
-    imageFilenames?: {[key: string]: string} | undefined
-    sourceDir?: string | undefined
-    outputDir?: string | undefined
-    jpgQuality?: number | undefined
-  }`)
-
-###### Returns
-
-`Promise<{
-  basename: string
-  checkScript: string
-  gdalWarpScript: string
-}>`.
-
-### `getGeoreferencedMapsGeotiffScripts(maps, options)`
-
-###### Parameters
-
-* `maps` (`Array<{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: str...`)
+* `maps` (`Array<any>`)
 * `options` (`{
     projectedTransformers?: Array<ProjectedGcpTransformer> | undefined
     imageFilenames?: {[key: string]: string} | undefined
@@ -263,56 +252,41 @@ MIT
 
 `Promise<Array<string>>`.
 
-### `parseArcGisCsvGcpLines(lines)`
+### `generateLeafletExample(annotationUrl, center, zoom)`
 
 ###### Parameters
 
-* `lines` (`Array<string>`)
+* `annotationUrl` (`string`)
+* `center` (`[number, number]`)
+* `zoom` (`number`)
 
 ###### Returns
 
-`Array<Gcp>`.
+`string`.
 
-### `parseArcGisTsvGcpLines(lines)`
+### `generateMapLibreExample(annotationUrl, center, zoom)`
 
 ###### Parameters
 
-* `lines` (`Array<string>`)
+* `annotationUrl` (`string`)
+* `center` (`[number, number]`)
+* `zoom` (`number`)
 
 ###### Returns
 
-`Array<Gcp>`.
+`string`.
 
-### `parseGcpLines(lines, options)`
+### `generateOpenLayersExample(annotationUrl, center, zoom)`
 
 ###### Parameters
 
-* `lines` (`Array<string>`)
-* `options` (`{gcpFileFormat: GcpFileFormat}`)
+* `annotationUrl` (`string`)
+* `center` (`[number, number]`)
+* `zoom` (`number`)
 
 ###### Returns
 
-`Array<Gcp>`.
-
-### `parseGcpProjectionDefinitionFromGcpString(gcpString)`
-
-###### Parameters
-
-* `gcpString` (`string`)
-
-###### Returns
-
-`string | undefined`.
-
-### `parseGcpProjectionDefinitionFromLine(line)`
-
-###### Parameters
-
-* `line` (`string`)
-
-###### Returns
-
-`string | undefined`.
+`string`.
 
 ### `parseGcpProjectionFromGcpString(gcpString)`
 
@@ -360,131 +334,3 @@ The resource height must specified when parsing GCPs with resource origin in bot
 ###### Returns
 
 `Array<Array<number>>`.
-
-### `parseGdalGcpLines(lines)`
-
-###### Parameters
-
-* `lines` (`Array<string>`)
-
-###### Returns
-
-`Array<Gcp>`.
-
-### `parseQgisGcpLines(lines)`
-
-###### Parameters
-
-* `lines` (`Array<string>`)
-
-###### Returns
-
-`Array<Gcp>`.
-
-### `printArcGisCsvGcpLines(gcp)`
-
-###### Parameters
-
-* `gcp` (`Array<Gcp>`)
-
-###### Returns
-
-`Array<string>`.
-
-### `printArcGisTsvGcpLines(gcp)`
-
-###### Parameters
-
-* `gcp` (`Array<Gcp>`)
-
-###### Returns
-
-`Array<string>`.
-
-### `printGcps(gcps, options)`
-
-Print GCPs to file string.
-
-A projection can be specified files to print files,
-and will be infered from the map's resourceCrs by default.
-It's definition will be included in QGIS GCP files.
-The resource height must specified when parsing GCPs with resource origin in bottom left,
-and will be infered from the map by default.
-
-###### Parameters
-
-* `gcps` (`Array<Gcp>`)
-* `options?` (`  | Partial<{
-        gcpFileFormat: GcpFileFormat
-        gcpResourceYAxis: GcpResourceYAxis
-        gcpResourceWidth: number
-        gcpResourceHeight: number
-        resourceWidth: number
-        resourceHeight: number
-        gcpResourceOrigin: GcpResourceOrigin
-        gcpProjection: Projection
-      }>
-    | undefined`)
-
-###### Returns
-
-`string`.
-
-### `printGdalGcpLines(gcp)`
-
-###### Parameters
-
-* `gcp` (`Array<Gcp>`)
-
-###### Returns
-
-`Array<string>`.
-
-### `printGeoreferencedMapGcps(map, options)`
-
-Print GCPs from Georeferenced Map to file string.
-
-A projection can be specified files to print files,
-and will be infered from the map's resourceCrs by default.
-It's definition will be included in QGIS GCP files.
-The resource height must specified when parsing GCPs with resource origin in bottom left,
-and will be infered from the map by default.
-
-###### Parameters
-
-* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
-* `options?` (`  | Partial<{
-        gcpFileFormat: GcpFileFormat
-        gcpResourceYAxis: GcpResourceYAxis
-        gcpResourceWidth: number
-        gcpResourceHeight: number
-        resourceWidth: number
-        resourceHeight: number
-        gcpResourceOrigin: GcpResourceOrigin
-        gcpProjection: Projection
-      }>
-    | undefined`)
-
-###### Returns
-
-`string`.
-
-### `printQgisGcpLines(gcp)`
-
-###### Parameters
-
-* `gcp` (`Array<Gcp>`)
-
-###### Returns
-
-`Array<string>`.
-
-### `printQgisHeader(options)`
-
-###### Parameters
-
-* `options?` (`Partial<{gcpProjection: Projection}> | undefined`)
-
-###### Returns
-
-`Array<string>`.

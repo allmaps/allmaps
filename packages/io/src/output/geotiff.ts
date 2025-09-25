@@ -12,7 +12,7 @@ import {
   mergeOptionsUnlessUndefined,
   rectanglesToScale
 } from '@allmaps/stdlib'
-import { checkCommand } from './bash.js'
+import { generateCheckCommand } from './bash.js'
 
 import type { GeojsonPolygon, Gcp, Size, Rectangle } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
@@ -21,7 +21,7 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 const jqNotFoundMessage = 'Please install jq: https://jqlang.github.io/jq/.'
 const gdalNotFoundMessage = 'Please install GDAL.'
 
-export async function getGeoreferencedMapsGeotiffScripts(
+export async function generateGeoreferencedMapsGeotiffScripts(
   maps: GeoreferencedMap[],
   options: Partial<{
     projectedTransformers: ProjectedGcpTransformer[]
@@ -39,7 +39,7 @@ export async function getGeoreferencedMapsGeotiffScripts(
       ? options.projectedTransformers[index]
       : undefined
     const { basename, checkScript, gdalWarpScript } =
-      await getGeoreferencedMapGdalwarpScripts(
+      await generateGeoreferencedMapGdalwarpScripts(
         map,
         mergeOptionsUnlessUndefined(options, { projectedTransformer })
       )
@@ -48,10 +48,10 @@ export async function getGeoreferencedMapsGeotiffScripts(
     gdalwarpScripts.push(checkScript, gdalWarpScript)
   }
 
-  const gdalbuildvrtScript = getGdalbuildvrtScript(basenames, options)
+  const gdalbuildvrtScript = generateGdalbuildvrtScript(basenames, options)
 
   const gdalScripts = [
-    getGdalPreamble(options),
+    generateGdalPreamble(options),
     '',
     ...gdalwarpScripts,
     '',
@@ -61,21 +61,21 @@ export async function getGeoreferencedMapsGeotiffScripts(
   return gdalScripts
 }
 
-export function getGdalPreamble(options: Partial<{ outputDir: string }>) {
+export function generateGdalPreamble(options: Partial<{ outputDir: string }>) {
   const mergedOptions = mergeOptions({ outputDir: '.' }, options)
 
   return `#!/usr/bin/env bash
 
 mkdir -p ${mergedOptions.outputDir}
 
-${checkCommand('gdalinfo', gdalNotFoundMessage)}
-${checkCommand('gdalbuildvrt', gdalNotFoundMessage)}
-${checkCommand('gdal_translate', gdalNotFoundMessage)}
-${checkCommand('gdalwarp', gdalNotFoundMessage)}
-${checkCommand('jq', jqNotFoundMessage)}`.trim()
+${generateCheckCommand('gdalinfo', gdalNotFoundMessage)}
+${generateCheckCommand('gdalbuildvrt', gdalNotFoundMessage)}
+${generateCheckCommand('gdal_translate', gdalNotFoundMessage)}
+${generateCheckCommand('gdalwarp', gdalNotFoundMessage)}
+${generateCheckCommand('jq', jqNotFoundMessage)}`.trim()
 }
 
-export async function getGeoreferencedMapGdalwarpScripts(
+export async function generateGeoreferencedMapGdalwarpScripts(
   map: GeoreferencedMap,
   options: Partial<{
     projectedTransformer: ProjectedGcpTransformer
@@ -109,7 +109,7 @@ export async function getGeoreferencedMapGdalwarpScripts(
   }
 
   const geoMask = mergedOptions.projectedTransformer.transformToGeo(
-    map.resourceMask,
+    [map.resourceMask],
     {
       projection: lonLatProjection,
       maxDepth: 6
@@ -147,12 +147,12 @@ export async function getGeoreferencedMapGdalwarpScripts(
 
   return {
     basename,
-    checkScript: checkImageExistsAndCorrectSize(
+    checkScript: generateCheckImageExistsAndCorrectSize(
       imageFilename,
       basename,
       resourceFullMaskSize
     ),
-    gdalWarpScript: gdalwarpScriptInternal(
+    gdalWarpScript: generateGdalwarpScriptInternal(
       imageFilename,
       basename,
       mergedOptions.outputDir,
@@ -167,7 +167,7 @@ export async function getGeoreferencedMapGdalwarpScripts(
   }
 }
 
-export function getGdalbuildvrtScript(
+export function generateGdalbuildvrtScript(
   basenames: string[],
   options: Partial<{ outputDir: string }>
 ) {
@@ -190,7 +190,7 @@ gdalbuildvrt ${vrtFilename} \\
 //    gdal_translate -of MBTILES merged.vrt merged.mbtiles
 //    pmtiles convert merged.mbtiles merged.pmtiles
 
-function checkImageExistsAndCorrectSize(
+function generateCheckImageExistsAndCorrectSize(
   imageFilename: string,
   basename: string,
   resourceSize: Size
@@ -220,7 +220,7 @@ else
 fi`.trim()
 }
 
-function gdalwarpScriptInternal(
+function generateGdalwarpScriptInternal(
   imageFilename: string,
   basename: string,
   outputDir: string,
