@@ -91,9 +91,6 @@ export type Size = [number, number]
  * Two ways two rectangles (or shapes in general) can overlap:
  * - 'contain': The first contains the second
  * - 'cover': The first is covered by the second
- *
- * @export
- * @typedef {Fit}
  */
 export type Fit = 'cover' | 'contain'
 
@@ -109,9 +106,6 @@ export type Fit = 'cover' | 'contain'
  * See: https://openlayers.org/en/latest/apidoc/module-ol_transform.html
  *
  * Note: The weights array of a Polynomial1 Transformation has a different order. See the corresponding conversion functions.
- *
- * @export
- * @typedef {HomogeneousTransform}
  */
 export type HomogeneousTransform = [
   number,
