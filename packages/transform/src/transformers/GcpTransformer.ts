@@ -93,7 +93,11 @@ export class GcpTransformer extends BaseGcpTransformer {
     type: TransformationType = 'polynomial',
     partialGcpTransformerOptions?: Partial<GcpTransformerOptions>
   ) {
-    const generalGcps = gcps.map(gcpToGeneralGcp)
+    const generalGcps = gcps
+      // Allow incomplete GCPs, but filter them out
+      .filter((gcp) => gcp.geo && gcp.resource)
+      .map(gcpToGeneralGcp)
+
     partialGcpTransformerOptions = mergePartialOptions(
       { differentHandedness: true },
       partialGcpTransformerOptions

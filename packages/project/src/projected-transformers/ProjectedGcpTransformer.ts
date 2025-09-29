@@ -118,12 +118,13 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       preToResource
     }
 
-    gcps = gcps.map((gcp) => {
-      return {
+    gcps = gcps
+      // Allow incomplete GCPs, but filter them out
+      .filter((gcp) => gcp.geo && gcp.resource)
+      .map((gcp) => ({
         resource: gcp.resource,
         geo: lonLatToProjection(gcp.geo)
-      }
-    })
+      }))
 
     super(gcps, type, partialGcpTransformerOptions)
 
