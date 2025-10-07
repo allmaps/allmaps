@@ -120,6 +120,7 @@ export const TransformationSchema = z
   })
 
 export const ProjectionSchema = z.object({
+  id: z.string().url().optional(),
   name: z.string().optional(),
   definition: z.union([z.string(), z.unknown()])
 })
