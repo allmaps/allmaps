@@ -400,7 +400,7 @@ There are no parameters.
 SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 ```
 
-### `TriangulatedWarpedMap#georeferencedMapOptions?`
+### `TriangulatedWarpedMap#georeferencedMapOptions`
 
 ###### Type
 
@@ -408,7 +408,7 @@ SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 { resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
-### `TriangulatedWarpedMap#listOptions?`
+### `TriangulatedWarpedMap#listOptions`
 
 ###### Type
 
@@ -416,7 +416,7 @@ SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 { resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
-### `TriangulatedWarpedMap#mapOptions?`
+### `TriangulatedWarpedMap#mapOptions`
 
 ###### Type
 
@@ -1213,7 +1213,7 @@ Creates an instance of WarpedMap.
   * ID of the map
 * `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
-* `options?` (`Partial<WarpedMapOptions> | undefined`)
+* `options` (`Partial<WarpedMapOptions> | undefined`)
   * options
 
 ###### Returns
@@ -1372,7 +1372,7 @@ Array<Point>
 { type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...
 ```
 
-### `WarpedMap#georeferencedMapOptions?`
+### `WarpedMap#georeferencedMapOptions`
 
 ###### Type
 
@@ -1497,7 +1497,7 @@ unknown
 {name?: string; definition: ProjectionDefinition}
 ```
 
-### `WarpedMap#listOptions?`
+### `WarpedMap#listOptions`
 
 ###### Type
 
@@ -1533,7 +1533,7 @@ boolean
 string
 ```
 
-### `WarpedMap#mapOptions?`
+### `WarpedMap#mapOptions`
 
 ###### Type
 
@@ -2143,6 +2143,36 @@ Set the transformationType
 ###### Returns
 
 `void`.
+
+### `WarpedMap#shouldRenderLines()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`boolean`.
+
+### `WarpedMap#shouldRenderMap()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`boolean`.
+
+### `WarpedMap#shouldRenderPoints()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`boolean`.
 
 ### `WarpedMap#tileZoomLevelForViewport?`
 
@@ -3674,11 +3704,12 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
-### `WebGL2Renderer#updateMapsForViewport(tiles)`
+### `WebGL2Renderer#updateMapsForViewport(allFechableTilesForViewport, allRequestedTilesForViewport)`
 
 ###### Parameters
 
-* `tiles` (`Array<FetchableTile>`)
+* `allFechableTilesForViewport` (`Array<FetchableTile>`)
+* `allRequestedTilesForViewport` (`Array<FetchableTile>`)
 
 ###### Returns
 
@@ -3833,7 +3864,7 @@ There are no parameters.
 
 `void`.
 
-### `WebGL2WarpedMap#georeferencedMapOptions?`
+### `WebGL2WarpedMap#georeferencedMapOptions`
 
 ###### Type
 
@@ -3924,7 +3955,7 @@ WebGLProgram
 null
 ```
 
-### `WebGL2WarpedMap#listOptions?`
+### `WebGL2WarpedMap#listOptions`
 
 ###### Type
 
@@ -3932,7 +3963,7 @@ null
 { renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
-### `WebGL2WarpedMap#mapOptions?`
+### `WebGL2WarpedMap#mapOptions`
 
 ###### Type
 
@@ -4070,7 +4101,7 @@ There are no parameters.
 
 `boolean`.
 
-### `WebGL2WarpedMap#shouldRenderMaps()`
+### `WebGL2WarpedMap#shouldRenderMap()`
 
 ###### Parameters
 

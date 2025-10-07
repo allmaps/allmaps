@@ -131,9 +131,9 @@ export function createWebGL2WarpedMapFactory(
  * Class for WarpedMaps that are rendered with WebGL 2
  */
 export class WebGL2WarpedMap extends TriangulatedWarpedMap {
-  declare mapOptions?: Partial<WebGL2WarpedMapOptions>
-  declare listOptions?: Partial<WebGL2WarpedMapOptions>
-  declare georeferencedMapOptions?: Partial<WebGL2WarpedMapOptions>
+  declare mapOptions: Partial<WebGL2WarpedMapOptions>
+  declare listOptions: Partial<WebGL2WarpedMapOptions>
+  declare georeferencedMapOptions: Partial<WebGL2WarpedMapOptions>
   declare defaultOptions: WebGL2WarpedMapOptions
   declare options: WebGL2WarpedMapOptions
 
@@ -260,13 +260,17 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return changedOptions
   }
 
-  shouldRenderMaps(): boolean {
-    return this.options.visible !== false && this.options.renderMaps !== false
+  shouldRenderMap(): boolean {
+    return (
+      super.shouldRenderMap() &&
+      this.options.renderMaps !== false &&
+      this.options.opacity !== 0
+    )
   }
 
   shouldRenderLines(): boolean {
     return (
-      this.options.visible !== false &&
+      super.shouldRenderLines() &&
       this.options.renderLines !== false &&
       (this.options.renderFullMask ||
         this.options.renderAppliableMask ||
@@ -277,7 +281,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   shouldRenderPoints(): boolean {
     return (
-      this.options.visible !== false &&
+      super.shouldRenderPoints() &&
       this.options.renderPoints !== false &&
       (this.options.renderGcps || this.options.renderTransformedGcps)
     )
@@ -295,7 +299,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       projectedGeoToClipHomogeneousTransform
     )
 
-    if (this.shouldRenderMaps()) {
+    if (this.shouldRenderMap()) {
       this.updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)
     }
     if (this.shouldRenderLines()) {

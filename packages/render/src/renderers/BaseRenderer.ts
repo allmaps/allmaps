@@ -66,6 +66,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
   mapsInPreviousViewport: Set<string> = new Set()
   mapsInViewport: Set<string> = new Set()
+  mapsWithFetchableTilesForViewport: Set<string> = new Set()
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
@@ -398,17 +399,24 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       }
     }
 
-    // Request all those fetchable tiles
-    this.tileCache.requestFetchableTiles([
+    const allFetchableTilesForViewport = [
       ...fetchableTilesForViewport,
       ...overviewFetchableTilesForViewport
-    ])
+    ]
+    const allRequestedTilesForViewport = allFetchableTilesForViewport.filter(
+      (fetchableTile) =>
+        this.warpedMapList.getWarpedMap(fetchableTile.mapId)?.shouldRenderMap()
+    )
 
-    this.updateMapsForViewport([
-      ...fetchableTilesForViewport,
-      ...overviewFetchableTilesForViewport
-    ])
+    // Request all fetchable tiles to render, and prune tile cache
+    this.tileCache.requestFetchableTiles(allRequestedTilesForViewport)
     this.pruneTileCache(mapsInViewportForOverviewPrune)
+
+    // Update map for viewport based on all fetchable tiles
+    this.updateMapsForViewport(
+      allFetchableTilesForViewport,
+      allRequestedTilesForViewport
+    )
   }
 
   protected findMapsInViewport(viewportBufferRatio = 0): Set<string> {
@@ -678,18 +686,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return overviewFetchableTiles
   }
 
-  protected updateMapsForViewport(tiles: FetchableTile[]): {
+  protected updateMapsForViewport(
+    allFechableTilesForViewport: FetchableTile[],
+    allRequestedTilesForViewport: FetchableTile[]
+  ): {
     mapsEnteringViewport: string[]
     mapsLeavingViewport: string[]
   } {
-    // Sort to process by zIndex later
-    this.mapsWithRequestedTilesForViewport = new Set(
-      tiles
+    this.mapsWithFetchableTilesForViewport = new Set(
+      allFechableTilesForViewport
         .map((tile) => tile.mapId)
-        .filter((v, i, a) => {
-          // filter out duplicate mapIds
-          return a.indexOf(v) === i
-        })
+        .filter((v, i, a) => a.indexOf(v) === i) // filter out duplicate mapIds
+        .sort((mapId0, mapId1) =>
+          this.warpedMapList.orderMapIdsByZIndex(mapId0, mapId1)
+        )
+    )
+    this.mapsWithRequestedTilesForViewport = new Set(
+      allRequestedTilesForViewport
+        .map((tile) => tile.mapId)
+        .filter((v, i, a) => a.indexOf(v) === i) // filter out duplicate mapIds
         .sort((mapId0, mapId1) =>
           this.warpedMapList.orderMapIdsByZIndex(mapId0, mapId1)
         )
