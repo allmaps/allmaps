@@ -300,7 +300,7 @@ export class WebGL2Renderer
   clear() {
     this.warpedMapList.clear()
     this.mapsInViewport = new Set()
-    this.mapsWithRequestedTilesForViewport = new Set()
+    this.mapsWithFetchableTilesForViewport = new Set()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
     this.tileCache.clear()
   }
@@ -330,12 +330,18 @@ export class WebGL2Renderer
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
-  protected updateMapsForViewport(tiles: FetchableTile[]): {
+  protected updateMapsForViewport(
+    allFechableTilesForViewport: FetchableTile[],
+    allRequestedTilesForViewport: FetchableTile[]
+  ): {
     mapsEnteringViewport: string[]
     mapsLeavingViewport: string[]
   } {
     const { mapsEnteringViewport, mapsLeavingViewport } =
-      super.updateMapsForViewport(tiles)
+      super.updateMapsForViewport(
+        allFechableTilesForViewport,
+        allRequestedTilesForViewport
+      )
 
     this.updateVertexBuffers(mapsEnteringViewport)
 
@@ -439,10 +445,10 @@ export class WebGL2Renderer
 
     this.setMapProgramUniforms()
 
-    for (const mapId of this.mapsWithRequestedTilesForViewport) {
+    for (const mapId of this.mapsWithFetchableTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderMaps()) {
+      if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderMap()) {
         continue
       }
 
@@ -460,7 +466,7 @@ export class WebGL2Renderer
   private renderLinesInternal(): void {
     this.setLinesProgramUniforms()
 
-    for (const mapId of this.mapsWithRequestedTilesForViewport) {
+    for (const mapId of this.mapsWithFetchableTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderLines()) {
@@ -486,7 +492,7 @@ export class WebGL2Renderer
   private renderPointsInternal(): void {
     this.setPointsProgramUniforms()
 
-    for (const mapId of this.mapsWithRequestedTilesForViewport) {
+    for (const mapId of this.mapsWithFetchableTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
       if (!webgl2WarpedMap! || !webgl2WarpedMap.shouldRenderPoints()) {

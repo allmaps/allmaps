@@ -18,6 +18,7 @@ import {
   getPropertyFromDoubleCacheOrComputation,
   mixLineStrings,
   sizeToRectangle,
+  mergeOptions,
   mergeOptionsUnlessUndefined,
   objectDifference,
   omit
@@ -157,9 +158,9 @@ export class WarpedMap extends EventTarget {
   georeferencedMap: GeoreferencedMap
 
   defaultOptions!: WarpedMapOptions
-  georeferencedMapOptions?: Partial<WarpedMapOptions>
-  listOptions?: Partial<WarpedMapOptions>
-  mapOptions?: Partial<WarpedMapOptions>
+  georeferencedMapOptions: Partial<WarpedMapOptions>
+  listOptions: Partial<WarpedMapOptions>
+  mapOptions: Partial<WarpedMapOptions>
   options!: WarpedMapOptions
 
   imageInfo?: unknown
@@ -255,7 +256,7 @@ export class WarpedMap extends EventTarget {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
+    options: Partial<WarpedMapOptions> = {}
   ) {
     super()
 
@@ -400,10 +401,10 @@ export class WarpedMap extends EventTarget {
     animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
     if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
-      this.mapOptions = mapOptions
+      this.mapOptions = mergeOptions(this.mapOptions, mapOptions)
     }
     if (listOptions !== undefined && Object.keys(listOptions).length > 0) {
-      this.listOptions = listOptions
+      this.listOptions = mergeOptions(this.listOptions, listOptions)
     }
     return this.setOptions(animationOptions)
   }
@@ -501,6 +502,18 @@ export class WarpedMap extends EventTarget {
     }
 
     return changedOptions
+  }
+
+  shouldRenderMap(): boolean {
+    return this.options.visible !== false
+  }
+
+  shouldRenderLines(): boolean {
+    return this.options.visible !== false
+  }
+
+  shouldRenderPoints(): boolean {
+    return this.options.visible !== false
   }
 
   /**

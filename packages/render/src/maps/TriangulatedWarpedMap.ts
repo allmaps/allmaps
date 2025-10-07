@@ -65,9 +65,9 @@ type GcpTriangulation = {
  * @param projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
  */
 export class TriangulatedWarpedMap extends WarpedMap {
-  declare mapOptions?: Partial<TriangulatedWarpedMapOptions>
-  declare listOptions?: Partial<TriangulatedWarpedMapOptions>
-  declare georeferencedMapOptions?: Partial<TriangulatedWarpedMapOptions>
+  declare mapOptions: Partial<TriangulatedWarpedMapOptions>
+  declare listOptions: Partial<TriangulatedWarpedMapOptions>
+  declare georeferencedMapOptions: Partial<TriangulatedWarpedMapOptions>
   declare defaultOptions: TriangulatedWarpedMapOptions
   declare options: TriangulatedWarpedMapOptions
 
