@@ -15,7 +15,7 @@ This package works in browsers and in Node.js as an ESM or an UMD module.
 Install with pnpm:
 
 ```sh
-pnpm install @allmaps/maplibre
+pnpm install @allmaps/warpedmaplayer
 ```
 
 You can optionally build this package locally by running:
@@ -64,66 +64,66 @@ export type WarpedMapEventData = {
 
 ### Options
 
-Options can be set on a `WarpedMapLayer` both as *layer options*, which apply to all maps, or as individual *map options*. For each map, the final options that are applied to it result from merging the *default options*, options specified in the *georeference annotation* (like `resourceMask`, `transformationType`, `internalProjection` and `gcps`), *layer options* and *map options*. When merging options, `undefined` options are neglected, so setting a layer or map option to undefined effectively resets it.
+Options can be set on a `WarpedMapLayer` both as _layer options_, which apply to all maps, or as individual _map options_. For each map, the final options that are applied to it result from merging the _default options_, options specified in the _georeference annotation_ (like `resourceMask`, `transformationType`, `internalProjection` and `gcps`), _layer options_ and _map options_. When merging options, `undefined` options are neglected, so setting a layer or map option to undefined effectively resets it.
 
 The following options are available:
 
-| Key                          | Description                                               | Default                                                                |
-| ---------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `applyMask`                  | Apply the resource mask (if false, the full mask is used) | `true`                                                                 |
-| `colorize`                   | Colorize the map                                                    | `false`                                                                |
-| `colorizeColor`              | Color to colorize the map                                                    | `"#ff56ba"`                                                            |
-| `debugTiles`                 | Debug: show the tile boundaries                                                    | `false`                                                                |
-| `debugTriangles`             | Debug: show the triangulation triangles                                                    | `false`                                                                |
-| `debugTriangulation`         | Debug: show the triangulation triangle points                                                    | `false`                                                                |
-| `distortionColor00`          | First color in the `'log2sigma'` distortion                                                    | `"#fe5e60"`                                                            |
-| `distortionColor01`          | Second color in the `'log2sigma'` distortion                                                    | `"#3b44ad"`                                                            |
-| `distortionColor1`           | Color in the `'twoOmega'` distortion                                                   | `"#64c18f"`                                                            |
-| `distortionColor2`           | Color in the `'airyKavr'` distortion                                                    | `"#ffc742"`                                                            |
-| `distortionColor3`           | Color in the `'signDetJ'` distortion                                                    | `"#fe5e60"`                                                            |
-| `distortionMeasures`         | Distortion measures to be computed                                                    | `['log2sigma', 'twoOmega']`                                            |
-| `gcps`                       | Ground control points                                                    | `[]` (overwritten by the GCPs in the georeference annotation)                                                                   |
-| `internalProjection`         | Internal projection (see [@allmaps/project](../project/README.md))                                                    | `WebMercatorProjection` (possibly overwritten by the internal projection in the georeference annotation) |
-| `opacity`                    | Opacity                                                  | `1`                                                                    |
-| `projection`                 | Projection (see [@allmaps/project](../project/README.md))                                                    | `WebMercatorProjection` |
-| `removeColor`                | Remove color                                                    | `false`                                                                |
-| `removeColorColor`           | Color to remove                                                    | `"#222222"`                                                            |
-| `removeColorHardness`        | Hardness when removing color                                                    | `0.7`                                                                  |
-| `removeColorThreshold`       | Threshold when removing color                                                    | `0`                                                                    |
-| `renderAppliableMask`        | Render the *appliable mask*, which is the resource mask as specified in the georeferenced annotation (or options), even when the mask is not applied (see the `applyMask` option) and the full mask is used                                                    | `false`                                                                |
-| `renderAppliableMaskColor`   | Color when rendering the appliable mask                                                    | `"#ff56ba"`                                                            |
-| `renderAppliableMaskSize`    | Size in viewport pixels when rendering the appliable mask                                                    | `8`                                                                    |
-| `renderFullMask`             | Render the full mask                                                    | `false`                                                                |
-| `renderFullMaskColor`        | Color when rendering the full mask                                                    | `"#64c18f"`                                                            |
-| `renderFullMaskSize`         | Size in viewport pixels when rendering the full mask                                                    | `8`                                                                    |
-| `renderGcps`                 | Render the GCPs                                                    | `false`                                                                |
-| `renderGcpsColor`            | Color when rendering the GCPs                                                    | `"#63d8e6"`                                                            |
-| `renderGcpsSize`            | Size in viewport pixels when rendering the GCPs                                                    | `16`                                                            |
-| `renderGrid`                 | Render the grid                                                    | `false`                                                                |
-| `renderGridColor`            | Color when rendering the grid                                                    | `"#222222"`                                                            |
-| `renderMask`                 | Render the mask                                                    | `false`                                                                |
-| `renderMaskColor`            | Color when rendering the mask                                                    | `"#ff56ba"`                                                            |
-| `renderMaskSize`             | Size in viewport pixels when rendering the mask                                                    | `8`                                                                    |
-| `renderTransformedGcps`      | Render the transformed GCPs                                                    | `false`                                                                |
-| `renderTransformedGcpsColor` | Color when rendering the transformed GCPs                                                    | `"#ff56ba"`                                                            |
-| `renderTransformedGcpsSize`              | Size in viewport pixels when rendering the transformed GCPs                                                    | `16`                                                                |
-| `renderVectors`              | Render the vectors connecting each GCP with its respective transformed GCP                                                    | `false`                                                                |
-| `renderVectorsColor`         | Color when rendering the vectors                                                    | `"#222222"`                                                            |
-| `renderVectorsSize`          | Size in viewport pixels when rendering the vectors                                                    | `6`                                                                    |
-| `resourceMask`               | Resource mask                                                    | `[]` (overwritten by the resource mask in the georeference annotation)                                                                  |
-| `saturation`                 | Saturation                                                    | `1`                                                                    |
-| `transformationType`         | Transformation type                                                    | `"polynomial"` (possibly overwritten by the transformation type in the georeference annotation)                                                         |
-| `visible`                    | Visible                                                    | `true`                                                                 |
+| Key                          | Description                                                                                                                                                                                                 | Default                                                                                                  |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `applyMask`                  | Apply the resource mask (if false, the full mask is used)                                                                                                                                                   | `true`                                                                                                   |
+| `colorize`                   | Colorize the map                                                                                                                                                                                            | `false`                                                                                                  |
+| `colorizeColor`              | Color to colorize the map                                                                                                                                                                                   | `"#ff56ba"`                                                                                              |
+| `debugTiles`                 | Debug: show the tile boundaries                                                                                                                                                                             | `false`                                                                                                  |
+| `debugTriangles`             | Debug: show the triangulation triangles                                                                                                                                                                     | `false`                                                                                                  |
+| `debugTriangulation`         | Debug: show the triangulation triangle points                                                                                                                                                               | `false`                                                                                                  |
+| `distortionColor00`          | First color in the `'log2sigma'` distortion                                                                                                                                                                 | `"#fe5e60"`                                                                                              |
+| `distortionColor01`          | Second color in the `'log2sigma'` distortion                                                                                                                                                                | `"#3b44ad"`                                                                                              |
+| `distortionColor1`           | Color in the `'twoOmega'` distortion                                                                                                                                                                        | `"#64c18f"`                                                                                              |
+| `distortionColor2`           | Color in the `'airyKavr'` distortion                                                                                                                                                                        | `"#ffc742"`                                                                                              |
+| `distortionColor3`           | Color in the `'signDetJ'` distortion                                                                                                                                                                        | `"#fe5e60"`                                                                                              |
+| `distortionMeasures`         | Distortion measures to be computed                                                                                                                                                                          | `['log2sigma', 'twoOmega']`                                                                              |
+| `gcps`                       | Ground control points                                                                                                                                                                                       | `[]` (overwritten by the GCPs in the georeference annotation)                                            |
+| `internalProjection`         | Internal projection (see [@allmaps/project](../project/README.md))                                                                                                                                          | `WebMercatorProjection` (possibly overwritten by the internal projection in the georeference annotation) |
+| `opacity`                    | Opacity                                                                                                                                                                                                     | `1`                                                                                                      |
+| `projection`                 | Projection (see [@allmaps/project](../project/README.md))                                                                                                                                                   | `WebMercatorProjection`                                                                                  |
+| `removeColor`                | Remove color                                                                                                                                                                                                | `false`                                                                                                  |
+| `removeColorColor`           | Color to remove                                                                                                                                                                                             | `"#222222"`                                                                                              |
+| `removeColorHardness`        | Hardness when removing color                                                                                                                                                                                | `0.7`                                                                                                    |
+| `removeColorThreshold`       | Threshold when removing color                                                                                                                                                                               | `0`                                                                                                      |
+| `renderAppliableMask`        | Render the _appliable mask_, which is the resource mask as specified in the georeferenced annotation (or options), even when the mask is not applied (see the `applyMask` option) and the full mask is used | `false`                                                                                                  |
+| `renderAppliableMaskColor`   | Color when rendering the appliable mask                                                                                                                                                                     | `"#ff56ba"`                                                                                              |
+| `renderAppliableMaskSize`    | Size in viewport pixels when rendering the appliable mask                                                                                                                                                   | `8`                                                                                                      |
+| `renderFullMask`             | Render the full mask                                                                                                                                                                                        | `false`                                                                                                  |
+| `renderFullMaskColor`        | Color when rendering the full mask                                                                                                                                                                          | `"#64c18f"`                                                                                              |
+| `renderFullMaskSize`         | Size in viewport pixels when rendering the full mask                                                                                                                                                        | `8`                                                                                                      |
+| `renderGcps`                 | Render the GCPs                                                                                                                                                                                             | `false`                                                                                                  |
+| `renderGcpsColor`            | Color when rendering the GCPs                                                                                                                                                                               | `"#63d8e6"`                                                                                              |
+| `renderGcpsSize`             | Size in viewport pixels when rendering the GCPs                                                                                                                                                             | `16`                                                                                                     |
+| `renderGrid`                 | Render the grid                                                                                                                                                                                             | `false`                                                                                                  |
+| `renderGridColor`            | Color when rendering the grid                                                                                                                                                                               | `"#222222"`                                                                                              |
+| `renderMask`                 | Render the mask                                                                                                                                                                                             | `false`                                                                                                  |
+| `renderMaskColor`            | Color when rendering the mask                                                                                                                                                                               | `"#ff56ba"`                                                                                              |
+| `renderMaskSize`             | Size in viewport pixels when rendering the mask                                                                                                                                                             | `8`                                                                                                      |
+| `renderTransformedGcps`      | Render the transformed GCPs                                                                                                                                                                                 | `false`                                                                                                  |
+| `renderTransformedGcpsColor` | Color when rendering the transformed GCPs                                                                                                                                                                   | `"#ff56ba"`                                                                                              |
+| `renderTransformedGcpsSize`  | Size in viewport pixels when rendering the transformed GCPs                                                                                                                                                 | `16`                                                                                                     |
+| `renderVectors`              | Render the vectors connecting each GCP with its respective transformed GCP                                                                                                                                  | `false`                                                                                                  |
+| `renderVectorsColor`         | Color when rendering the vectors                                                                                                                                                                            | `"#222222"`                                                                                              |
+| `renderVectorsSize`          | Size in viewport pixels when rendering the vectors                                                                                                                                                          | `6`                                                                                                      |
+| `resourceMask`               | Resource mask                                                                                                                                                                                               | `[]` (overwritten by the resource mask in the georeference annotation)                                   |
+| `saturation`                 | Saturation                                                                                                                                                                                                  | `1`                                                                                                      |
+| `transformationType`         | Transformation type                                                                                                                                                                                         | `"polynomial"` (possibly overwritten by the transformation type in the georeference annotation)          |
+| `visible`                    | Visible                                                                                                                                                                                                     | `true`                                                                                                   |
 
-### What is a *map*?
+### What is a _map_?
 
 Leaflet, OpenLayer and MapLibre each have their concept of a 'map' as the central class their API (see Leaflet [`Map`](https://leafletjs.com/reference.html#map), OpenLayers [`Map`](https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html) and MapLibre [`Map`](https://maplibre.org/maplibre-gl-js/docs/API/classes/maplibregl.Map/)). It generally refers to a `<div>` an a page where tiles or WebGL logic is used to render a projection of the world.
 
 In Allmaps the concept 'map' is rather related to a Georeference Annotation. There are different classes named 'map', one for each phase a map takes through the Allmaps rendering pipeline:
 
-* When a Georeference Annotation is parsed, an instance of the `GeoreferencedMap` class is created from it.
-* When this map is loaded into an application for rendering, an instance of the `WarpedMap` class is created from it.
-* Inside the WebGL2 Renderer, the `WebGL2WarpedMap` class is used to render the map.
+- When a Georeference Annotation is parsed, an instance of the `GeoreferencedMap` class is created from it.
+- When this map is loaded into an application for rendering, an instance of the `WarpedMap` class is created from it.
+- Inside the WebGL2 Renderer, the `WebGL2WarpedMap` class is used to render the map.
 
 All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used though-out Allmaps (and in the API below) to identify a map. It is returned after adding a georeference annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
 
@@ -141,10 +141,10 @@ Creates a WarpedMapLayer instance
 
 ###### Parameters
 
-* `defaultSpecificWarpedMapLayerOptions` (`SpecificWarpedMapLayerOptions`)
-* `options?` (`  | Partial<SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
-    | undefined`)
-  * options
+- `defaultSpecificWarpedMapLayerOptions` (`SpecificWarpedMapLayerOptions`)
+- `options?` (`  | Partial<SpecificWarpedMapLayerOptions & Partial<WebGL2RenderOptions>>
+  | undefined`)
+  - options
 
 ###### Returns
 
@@ -166,8 +166,8 @@ Adds a Georeference Annotation
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Georeference Annotation
+- `annotation` (`unknown`)
+  - Georeference Annotation
 
 ###### Returns
 
@@ -179,8 +179,8 @@ Adds a Georeference Annotation by URL
 
 ###### Parameters
 
-* `annotationUrl` (`string`)
-  * URL of a Georeference Annotation
+- `annotationUrl` (`string`)
+  - URL of a Georeference Annotation
 
 ###### Returns
 
@@ -192,8 +192,8 @@ Adds a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced Map
+- `georeferencedMap` (`unknown`)
+  - Georeferenced Map
 
 ###### Returns
 
@@ -205,8 +205,8 @@ Bring maps forward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -218,8 +218,8 @@ Bring maps to front
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -257,7 +257,7 @@ HTMLDivElement
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -267,7 +267,7 @@ HTMLDivElement
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -319,8 +319,8 @@ These come from the default option settings for WebGL2WarpedMaps and the map's g
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -346,8 +346,8 @@ Get the map-specific options of a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -362,8 +362,8 @@ layer and map-specific options of that map.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -375,8 +375,8 @@ Get the z-index of a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to get the z-index
+- `mapId` (`string`)
+  - Map ID for which to get the z-index
 
 ###### Returns
 
@@ -393,9 +393,9 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `mapIds` (`Array<string>`)
+  - Map IDs
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -412,9 +412,9 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `mapIds` (`Array<string>`)
+  - Map IDs
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -431,9 +431,9 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `mapIds` (`Array<string>`)
+  - Map IDs
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -459,8 +459,8 @@ Get the WarpedMap instance for a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID of the requested WarpedMap instance
+- `mapId` (`string`)
+  - Map ID of the requested WarpedMap instance
 
 ###### Returns
 
@@ -486,8 +486,8 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
+- `mapIds` (`Array<string>`)
+  - Map IDs
 
 ###### Returns
 
@@ -498,14 +498,14 @@ Note: more selection options are available on this function of WarpedMapList
 ###### Type
 
 ```ts
-WebGL2RenderingContext | null | undefined
+;WebGL2RenderingContext | null | undefined
 ```
 
 ### `BaseWarpedMapLayer#nativePassWarpedMapEvent(event)`
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -545,8 +545,8 @@ Removes a Georeference Annotation
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Georeference Annotation
+- `annotation` (`unknown`)
+  - Georeference Annotation
 
 ###### Returns
 
@@ -558,8 +558,8 @@ Removes a Georeference Annotation by URL
 
 ###### Parameters
 
-* `annotationUrl` (`string`)
-  * URL of a Georeference Annotation
+- `annotationUrl` (`string`)
+  - URL of a Georeference Annotation
 
 ###### Returns
 
@@ -571,8 +571,8 @@ Removes a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced Map
+- `georeferencedMap` (`unknown`)
+  - Georeferenced Map
 
 ###### Returns
 
@@ -584,8 +584,8 @@ Removes a Georeferenced Map by its ID
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID of the georeferenced map to remove
+- `mapId` (`string`)
+  - Map ID of the georeferenced map to remove
 
 ###### Returns
 
@@ -608,10 +608,10 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `layerOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `layerOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -626,14 +626,14 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which to reset the options
-* `mapOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the map-specific options to reset
-* `layerOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the layer options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which to reset the options
+- `mapOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the map-specific options to reset
+- `layerOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the layer options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -648,12 +648,12 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `mapOptionkeysByMapId` (`Map<string, Array<string>>`)
-  * Keys of map-specific options to reset by map ID
-* `layerOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the layer options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapOptionkeysByMapId` (`Map<string, Array<string>>`)
+  - Keys of map-specific options to reset by map ID
+- `layerOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the layer options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -665,8 +665,8 @@ Send maps backward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -678,8 +678,8 @@ Send maps to back
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * IDs of the maps
+- `mapIds` (`Array<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -691,10 +691,10 @@ Set the layer options
 
 ###### Parameters
 
-* `layerOptions` (`Partial<WebGL2RenderOptions> | Partial<SpecificWarpedMapLayerOptions>`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `layerOptions` (`Partial<WebGL2RenderOptions> | Partial<SpecificWarpedMapLayerOptions>`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -719,12 +719,12 @@ and stay accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `gcps` (`Array<Gcp>`)
-  * GCPs to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `gcps` (`Array<Gcp>`)
+  - GCPs to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -745,16 +745,16 @@ This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
-  * Map-specific options to set
-* `layerOptions?` (`  | Partial<WebGL2RenderOptions>
-    | Partial<SpecificWarpedMapLayerOptions>
-    | undefined`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  - Map-specific options to set
+- `layerOptions?` (`  | Partial<WebGL2RenderOptions>
+  | Partial<SpecificWarpedMapLayerOptions>
+  | undefined`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -779,12 +779,12 @@ and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `resourceMask` (`Array<Point>`)
-  * Resource mask to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `resourceMask` (`Array<Point>`)
+  - Resource mask to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -803,20 +803,20 @@ and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
-  * Transformation type to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `transformationType` (`  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+  | 'linear'`)
+  - Transformation type to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -837,16 +837,16 @@ This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
-  * Map-specific options to set
-* `layerOptions?` (`  | Partial<WebGL2RenderOptions>
-    | Partial<SpecificWarpedMapLayerOptions>
-    | undefined`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which to set the options
+- `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  - Map-specific options to set
+- `layerOptions?` (`  | Partial<WebGL2RenderOptions>
+  | Partial<SpecificWarpedMapLayerOptions>
+  | undefined`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -855,7 +855,9 @@ This is equivalent to using the reset function for map-specific option.
 ###### Examples
 
 ```ts
-warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+warpedMapLayer.setMapsOptions([myMapId], {
+  transformationType: 'thinPlateSpline'
+})
 ```
 
 ### `BaseWarpedMapLayer#setMapsOptionsByMapId(mapOptionsByMapId, layerOptions, animationOptions)`
@@ -873,14 +875,14 @@ This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
-  * Map-specific options to set by map ID
-* `layerOptions?` (`  | Partial<WebGL2RenderOptions>
-    | Partial<SpecificWarpedMapLayerOptions>
-    | undefined`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
+  - Map-specific options to set by map ID
+- `layerOptions?` (`  | Partial<WebGL2RenderOptions>
+  | Partial<SpecificWarpedMapLayerOptions>
+  | undefined`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -892,8 +894,8 @@ Set the layer opacity
 
 ###### Parameters
 
-* `opacity` (`number`)
-  * Layer opacity to set
+- `opacity` (`number`)
+  - Layer opacity to set
 
 ###### Returns
 
@@ -903,7 +905,7 @@ Set the layer opacity
 
 ###### Parameters
 
-* `canvas?` (`HTMLCanvasElement | undefined`)
+- `canvas?` (`HTMLCanvasElement | undefined`)
 
 ###### Returns
 
@@ -913,7 +915,7 @@ Set the layer opacity
 
 ###### Parameters
 
-* `renderer?` (`WebGL2Renderer | undefined`)
+- `renderer?` (`WebGL2Renderer | undefined`)
 
 ###### Returns
 
