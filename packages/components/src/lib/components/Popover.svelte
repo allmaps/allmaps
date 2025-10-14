@@ -15,6 +15,7 @@
     contentsWidth?: number
     disabled?: boolean
     interactOutsideBehavior?: 'ignore' | 'close'
+    customAnchor?: HTMLElement
   }
 
   let {
@@ -24,7 +25,8 @@
     open = $bindable(false),
     contentsWidth,
     disabled = false,
-    interactOutsideBehavior = 'close'
+    interactOutsideBehavior = 'close',
+    customAnchor
   }: Props = $props()
 </script>
 
@@ -36,11 +38,12 @@
     {@render button()}
   </Popover.Trigger>
   <Popover.Portal>
+    <!-- class="outline-0 max-w-screen w-2xl px-3" -->
     <Popover.Content
       forceMount
       sideOffset={4}
       {interactOutsideBehavior}
-      class="z-50 outline-0 max-w-screen w-2xl px-3"
+      {customAnchor}
     >
       {#snippet child({ wrapperProps, props, open })}
         {#if open}
@@ -55,7 +58,7 @@
               <div
                 {...props}
                 style:width={contentsWidth ? `${contentsWidth}px` : 'auto'}
-                class="px-2 max-w-full z-50"
+                class="px-2 max-w-screen"
               >
                 <div
                   class="bg-white p-2 shadow-lg rounded-md

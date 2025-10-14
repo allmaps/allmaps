@@ -9,7 +9,7 @@
   import type { PickerProjection } from '$lib/shared/projections/projections.js'
 
   const MAX_PROJECTIONS_COUNT = 100 as const
-  const MAX_BBOX_PROJECTIONS_COUNT = 10 as const
+  const MAX_BBOX_PROJECTIONS_COUNT = 6 as const
 
   type ProjectionPickerItem = ComboboxBaseItem & PickerProjection
 
@@ -36,8 +36,8 @@
   ): ProjectionPickerItem {
     return {
       ...projection,
-      value: projection.code,
-      label: `EPSG:${projection.code} - ${projection.name}`
+      value: projection.id || '',
+      label: projection.name || ''
     }
   }
 
@@ -46,19 +46,22 @@
       const lowerCaseSearchValue = query.toLowerCase()
       return (
         projection.name?.toLowerCase().includes(lowerCaseSearchValue) ||
-        projection.code?.includes(lowerCaseSearchValue)
+        projection.id?.includes(lowerCaseSearchValue)
       )
     })
   }
 
-  let inputValue = $state('')
+  let inputValue = $state(value || '')
 
-  // const undefinedProjection: PickerProjection = {
-  //   code: 'undefined',
-  //   name: '',
-  //   comment: 'Default',
-  //   definition: 'undefined'
-  // }
+  const currentProjection = projections.find(
+    (projection) => projection.id === value
+  )
+
+  const undefinedProjection: PickerProjection = {
+    id: undefined,
+    name: 'No projection',
+    definition: ''
+  }
 
   let bboxProjections = $derived<PickerProjection[]>(
     bbox && searchProjectionsByBbox
@@ -67,17 +70,16 @@
   )
 
   let suggestedProjections = $derived(
-    [...bboxProjections]
-      // [currentProjection, undefinedProjection]
+    [undefinedProjection, currentProjection, ...bboxProjections]
       .filter((projection) => projection !== undefined)
       .filter(
         (projection, index, self) =>
-          self.findIndex((p) => projection.code === p.code) === index
+          self.findIndex((p) => projection.id === p.id) === index
       )
   )
 
   let suggestedProjectionsCodes = $derived(
-    suggestedProjections.map((projection) => projection.code)
+    suggestedProjections.map((projection) => projection.id)
   )
 
   function handleInput(value: string) {
@@ -88,7 +90,7 @@
     (!inputValue ? projections : searchProjectionsByString(inputValue))
       .slice(0, MAX_PROJECTIONS_COUNT)
       .filter(
-        (projection) => !suggestedProjectionsCodes.includes(projection.code)
+        (projection) => !suggestedProjectionsCodes.includes(projection.id)
       )
   )
 

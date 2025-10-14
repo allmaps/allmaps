@@ -38,7 +38,21 @@
     openOnFocus = false
   }: Props = $props()
 
-  let inputValue = $state('')
+  let selectedItem = $derived.by<Item | undefined>(() => {
+    if (value) {
+      const item = items
+        .flat()
+        .find((item) => 'value' in item && item.value === value)
+
+      if (item) {
+        return item as Item
+      }
+    }
+  })
+
+  // const initialValue = $state.snapshot(field.value)
+
+  let inputValue = $state(selectedItem?.label || '')
 
   let open = $state(false)
 
@@ -54,17 +68,6 @@
 
   $effect(() => {
     oninput?.(inputValue)
-  })
-
-  let selectedItem = $derived.by<Item | undefined>(() => {
-    if (value) {
-      const item = items
-        .flat()
-        .find((item) => 'value' in item && item.value === value)
-      if (item) {
-        return item as Item
-      }
-    }
   })
 
   function handleInputFocus() {

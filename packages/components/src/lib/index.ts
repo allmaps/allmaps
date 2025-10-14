@@ -1,4 +1,5 @@
 import Banner from '$lib/components/Banner.svelte'
+import Checkbox from '$lib/components/Checkbox.svelte'
 import Combobox from '$lib/components/Combobox.svelte'
 import Footer from '$lib/components/Footer.svelte'
 import Geocoder from '$lib/components/Geocoder.svelte'
@@ -15,11 +16,14 @@ import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
 import Select from '$lib/components/Select.svelte'
 import SelectDistortionMeasure from '$lib/components/SelectDistortionMeasure.svelte'
 import SelectTransformation from '$lib/components/SelectTransformation.svelte'
+import Slider from '$lib/components/Slider.svelte'
 import Stats from '$lib/components/Stats.svelte'
+import Switch from '$lib/components/Switch.svelte'
 import Thumbnail from '$lib/components/Thumbnail.svelte'
 
 export {
   Banner,
+  Checkbox,
   Combobox,
   Footer,
   Geocoder,
@@ -36,7 +40,9 @@ export {
   Select,
   SelectDistortionMeasure,
   SelectTransformation,
+  Slider,
   Stats,
+  Switch,
   Thumbnail
 }
 

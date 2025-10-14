@@ -4,37 +4,59 @@ import type { PickerProjection } from '@allmaps/components/projections'
 
 const PROJECTIONS_KEY = Symbol('projections')
 
-const PROJECTIONS_URL = 'https://pages.allmaps.org/projections/projections.json'
-
 export class ProjectionsState {
-  #projections = $state.raw<PickerProjection[]>()
+  #projectionsUrl: string
+
+  #projections = $state.raw<PickerProjection[]>([])
+  #projectionsById = $derived<Record<string, PickerProjection>>(
+    Object.fromEntries(
+      this.#projections.map((projection) => [projection.id, projection])
+    )
+  )
+
   #fetching = false
 
-  async #fetchProjections() {
-    if (this.#fetching) {
+  #ready = $state(false)
+
+  constructor(projectionsUrl: string) {
+    this.#projectionsUrl = projectionsUrl
+  }
+
+  async fetchProjections() {
+    if (this.#fetching || this.#ready) {
       return
     }
 
     this.#fetching = true
-
-    fetch(PROJECTIONS_URL)
+    fetch(this.#projectionsUrl)
       .then((response) => response.json())
-      .then((data) => (this.#projections = data as PickerProjection[]))
+      .then((data) => {
+        this.#projections = data as PickerProjection[]
+        this.#ready = true
+      })
       .finally(() => (this.#fetching = false))
   }
 
   get projections() {
-    if (!this.#projections) {
-      this.#fetchProjections()
+    if (!this.#ready) {
+      this.fetchProjections()
       return []
     } else {
       return this.#projections
     }
   }
+
+  get projectionsById() {
+    return this.#projectionsById
+  }
+
+  get ready() {
+    return this.#ready
+  }
 }
 
-export function setProjectionsState() {
-  return setContext(PROJECTIONS_KEY, new ProjectionsState())
+export function setProjectionsState(projectionsUrl: string) {
+  return setContext(PROJECTIONS_KEY, new ProjectionsState(projectionsUrl))
 }
 
 export function getProjectionsState() {

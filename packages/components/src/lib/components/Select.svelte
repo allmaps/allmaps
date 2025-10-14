@@ -17,9 +17,16 @@
     placeholder?: string
     items: Item[]
     onselect?: (item: Item) => void
+    to?: HTMLElement
   }
 
-  let { value = $bindable(), items, placeholder, onselect }: Props = $props()
+  let {
+    value = $bindable(),
+    items,
+    placeholder,
+    onselect,
+    to
+  }: Props = $props()
 
   $effect(() => {
     if (onselect && selectedItem) {
@@ -53,7 +60,7 @@
     >
     <CaretUpDownIcon class="size-5 shrink-0" />
   </Select.Trigger>
-  <Select.Portal>
+  <Select.Portal {to}>
     <Select.Content
       forceMount
       sideOffset={4}

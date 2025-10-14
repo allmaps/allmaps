@@ -6,7 +6,7 @@
   import type { Snippet } from 'svelte'
 
   type Props = {
-    title: Snippet
+    title?: Snippet
     open: boolean
     closeButton?: boolean
     children: Snippet
@@ -29,20 +29,22 @@
 <Dialog.Root bind:open>
   <Dialog.Portal>
     <Dialog.Overlay
-      class="fixed
-      inset-0 z-[100] bg-black/90 p-4
+      class="absolute z-50
+      inset-0 bg-black/90
       data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out"
     />
     <!-- The regular onclick handler of the overlay doesn't seem to work well,
       maybe this will be better in a new version of bits-ui -->
     <Dialog.Content
-      class="isolate fixed flex items-center justify-center w-full h-full z-[150] p-4 sm:p-8 md:p-16"
+      class="fixed flex items-center justify-center w-full h-full p-4 md:p-16 z-[51]"
       onmousedown={handleContentClick}
     >
       <div
-        class="rounded-lg z-50 max-w-full max-h-full
+        class="rounded-lg max-w-full max-h-full
         bg-white shadow-lg outline-none border-gray-100
-          p-2 sm:p-4 flex flex-col gap-2 sm:gap-4"
+          inset-shadow-sm
+          flex flex-col
+          p-2 sm:p-4 gap-2 sm:gap-4"
       >
         {#if title}
           <div class="flex items-start sm:items-center justify-between">
@@ -55,7 +57,7 @@
             </Dialog.Close>
           </div>
         {/if}
-        <div class="overflow-auto">
+        <div class="overflow-auto rounded-md">
           <section {...restProps}>
             {@render children()}
           </section>

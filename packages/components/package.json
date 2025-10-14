@@ -79,7 +79,7 @@
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "bits-ui": "^2.11.0",
+    "bits-ui": "^2.11.4",
     "flatbush": "^4.4.0",
     "fuse.js": "^7.1.0",
     "lodash-es": "^4.17.21",
