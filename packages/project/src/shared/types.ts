@@ -10,6 +10,7 @@ import { PROJJSONDefinition } from 'proj4/dist/lib/core'
 export type ProjectionDefinition = string | PROJJSONDefinition
 
 export type Projection<Definition = ProjectionDefinition> = {
+  id?: string
   name?: string
   definition: Definition
 }

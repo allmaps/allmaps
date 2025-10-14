@@ -52,7 +52,7 @@ const webMercatorEquivalentDefinitions = [
  * `EPSG:4326` projection with definition: `"+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees"`
  */
 export const lonLatProjection: Projection<string> = {
-  name: 'EPSG:4326',
+  name: 'EPSG:4326 - WGS 84',
   definition: lonLatEquivalentDefinitions[0]
 }
 /**
@@ -61,7 +61,7 @@ export const lonLatProjection: Projection<string> = {
  * `EPSG:3857` projection with definition: `"+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs"`
  */
 export const webMercatorProjection: Projection<string> = {
-  name: 'EPSG:3857',
+  name: 'EPSG:3857 - WGS 84 / Pseudo-Mercator',
   definition: webMercatorEquivalentDefinitions[0]
 }
 
