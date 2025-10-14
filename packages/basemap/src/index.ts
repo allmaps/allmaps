@@ -117,3 +117,10 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
     )
   })
 }
+
+export function removeTerrain(map: Map) {
+  map.removeLayer('contour-lines')
+  map.removeLayer('hillshade')
+  map.removeSource('contour-source')
+  map.removeSource('terrain')
+}
