@@ -34,7 +34,10 @@ export function parseGcps(
   }>
 ): { gcps: Gcp[]; gcpProjection?: Projection } {
   // For more about these file formats, see https://observablehq.com/d/ccc0f30809e756f6
-  const gcpLines = gcpString.trim().split('\n')
+  const gcpLines = gcpString
+    .trim()
+    .split('\n')
+    .map((line) => line.trim())
 
   if (gcpLines.length === 0) {
     throw new Error('No coordinates')
@@ -65,6 +68,16 @@ export function parseGcps(
 
   // Parse
   let gcps = parseGcpLines(gcpLines, mergedOptions)
+
+  // Check for invalied coordinates
+  const allGcpsValid = gcps.every(
+    ({ geo, resource }) =>
+      geo.every((c) => !isNaN(c)) && resource.every((c) => !isNaN(c))
+  )
+
+  if (!allGcpsValid) {
+    throw new Error('Invalid coordinates encountered while parsing GCPs')
+  }
 
   // Process scales
   gcps = gcps.map((gcp) => {
@@ -174,7 +187,7 @@ export function parseQgisGcpLines(lines: string[]): Gcp[] {
         })
         .map(Number)
     )
-    .map(coordinateArrayToGcp)
+    .map((coordinateArray) => coordinateArrayToGcp(coordinateArray))
 
   return gcps
 }
@@ -182,7 +195,7 @@ export function parseQgisGcpLines(lines: string[]): Gcp[] {
 export function parseArcGisCsvGcpLines(lines: string[]): Gcp[] {
   const coordinates = lines
     .map((line) => line.replace(/\s+/g, '').split(',').slice(1).map(Number))
-    .map(coordinateArrayToGcp)
+    .map((coordinateArray) => coordinateArrayToGcp(coordinateArray))
 
   return coordinates
 }
@@ -190,17 +203,19 @@ export function parseArcGisCsvGcpLines(lines: string[]): Gcp[] {
 export function parseArcGisTsvGcpLines(lines: string[]): Gcp[] {
   const coordinates = lines
     .map((line) => line.split('\t').map(Number))
-    .map(coordinateArrayToGcp)
+    .map((coordinateArray) => coordinateArrayToGcp(coordinateArray))
 
   return coordinates
 }
 
 export function parseGdalGcpLines(lines: string[]): Gcp[] {
-  return parseGdalCoordinateLines(lines).map(coordinateArrayToGcp)
+  return parseGdalCoordinateLines(lines).map((coordinateArray) =>
+    coordinateArrayToGcp(coordinateArray, 4)
+  )
 }
 
 export function parseGdalCoordinateLines(lines: string[]): number[][] {
-  // String from mutliline file where each line contains multiple coordinates separated by whitespace
+  // String from multiline file where each line contains multiple coordinates separated by whitespace
   return lines.map((line) =>
     line.split(/\s+/).map((coordinate) => Number(coordinate.trim()))
   )
@@ -261,7 +276,22 @@ export function parseGcpFileFormatFromGcpString(
   }
 }
 
-function coordinateArrayToGcp(coordinateArray: number[]): Gcp {
+function coordinateArrayToGcp(
+  coordinateArray: number[],
+  expectedLength?: number
+): Gcp {
+  if (expectedLength && coordinateArray.length !== expectedLength) {
+    throw new Error(
+      `Encountered ${coordinateArray.length} numbers instead of ${expectedLength} while parsing GCP from line.`
+    )
+  }
+
+  if (coordinateArray.length < 4) {
+    throw new Error(
+      `Encountered ${coordinateArray.length} numbers instead of at least 4 while parsing GCP from line.`
+    )
+  }
+
   return {
     resource: [coordinateArray[0], coordinateArray[1]] as Point,
     geo: [coordinateArray[2], coordinateArray[3]] as Point

@@ -1,5 +1,3 @@
-import path from 'path'
-
 import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import { generateChecksum, generateId } from '@allmaps/id'
 
@@ -21,16 +19,27 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 const jqNotFoundMessage = 'Please install jq: https://jqlang.github.io/jq/.'
 const gdalNotFoundMessage = 'Please install GDAL.'
 
+function pathJoin(...parts: string[]) {
+  // In order for this script to be used in the browser,
+  // we cannot use import { join } from 'path'
+  const sep = '/'
+  return parts.join(sep).replace(new RegExp(sep + '{1,}', 'g'), sep)
+}
+
 export async function generateGeoreferencedMapsGeotiffScripts(
   maps: GeoreferencedMap[],
-  options: Partial<{
+  options?: Partial<{
     projectedTransformers: ProjectedGcpTransformer[]
     imageFilenames: { [key: string]: string }
     sourceDir: string
     outputDir: string
     jpgQuality: number
   }>
-): Promise<string[]> {
+): Promise<string> {
+  if (!options) {
+    options = {}
+  }
+
   const basenames: string[] = []
   const gdalwarpScripts: string[] = []
 
@@ -58,7 +67,7 @@ export async function generateGeoreferencedMapsGeotiffScripts(
     gdalbuildvrtScript
   ]
 
-  return gdalScripts
+  return gdalScripts.join('\n')
 }
 
 export function generateGdalPreamble(options: Partial<{ outputDir: string }>) {
@@ -105,11 +114,11 @@ export async function generateGeoreferencedMapGdalwarpScripts(
   ) {
     imageFilename = mergedOptions.imageFilenames[map.resource.id]
   } else {
-    imageFilename = path.join(mergedOptions.sourceDir, `${imageId}.jpg`)
+    imageFilename = pathJoin(mergedOptions.sourceDir, `${imageId}.jpg`)
   }
 
   const geoMask = mergedOptions.projectedTransformer.transformToGeo(
-    [map.resourceMask],
+    map.resourceMask,
     {
       projection: lonLatProjection,
       maxDepth: 6
@@ -176,11 +185,11 @@ export function generateGdalbuildvrtScript(
   const outputVrt = basenames.length > 1 ? 'merged.vrt' : `${basenames[0]}.vrt`
   const inputTiffs = basenames.map((basename) => `${basename}-warped.tif`)
 
-  const vrtFilename = path.join(mergedOptions.outputDir, outputVrt)
+  const vrtFilename = pathJoin(mergedOptions.outputDir, outputVrt)
 
   return `
 gdalbuildvrt ${vrtFilename} \\
-  ${inputTiffs.map((tiff) => path.join(mergedOptions.outputDir, tiff)).join(' ')}`.trim()
+  ${inputTiffs.map((tiff) => pathJoin(mergedOptions.outputDir, tiff)).join(' ')}`.trim()
 }
 
 // TODO: consider adding gdal2tiles export:
@@ -256,9 +265,9 @@ function generateGdalwarpScriptInternal(
     transformationMessage = `Transformation type "${transformationType}" is not supported. Using default polynomial transformation while warping. Note that the mask is still processed with transformation type "${transformationType}". This can be undone using "-t polynomial".`
   }
 
-  const vrtFilename = path.join(outputDir, `${basename}.vrt`)
-  const geojsonFilename = path.join(outputDir, `${basename}.geojson`)
-  const geotiffFilename = path.join(outputDir, `${basename}-warped.tif`)
+  const vrtFilename = pathJoin(outputDir, `${basename}.vrt`)
+  const geojsonFilename = pathJoin(outputDir, `${basename}.geojson`)
+  const geotiffFilename = pathJoin(outputDir, `${basename}-warped.tif`)
 
   const script =
     `${transformationMessage ? `echo "${transformationMessage}"` : ''}

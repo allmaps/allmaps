@@ -218,7 +218,7 @@ and will be infered from the map by default.
 
 ###### Parameters
 
-* `map` (`any`)
+* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 * `options?` (`  | Partial<{
         gcpFileFormat: GcpFileFormat
         gcpResourceYAxis: GcpResourceYAxis
@@ -239,18 +239,19 @@ and will be infered from the map by default.
 
 ###### Parameters
 
-* `maps` (`Array<any>`)
-* `options` (`{
-    projectedTransformers?: Array<ProjectedGcpTransformer> | undefined
-    imageFilenames?: {[key: string]: string} | undefined
-    sourceDir?: string | undefined
-    outputDir?: string | undefined
-    jpgQuality?: number | undefined
-  }`)
+* `maps` (`Array<{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: str...`)
+* `options?` (`  | Partial<{
+        projectedTransformers: ProjectedGcpTransformer[]
+        imageFilenames: {[key: string]: string}
+        sourceDir: string
+        outputDir: string
+        jpgQuality: number
+      }>
+    | undefined`)
 
 ###### Returns
 
-`Promise<Array<string>>`.
+`Promise<string>`.
 
 ### `generateLeafletExample(annotationUrl, center, zoom)`
 
