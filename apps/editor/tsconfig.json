@@ -13,12 +13,13 @@
   },
   "references": [
     { "path": "../../packages/annotation" },
+    { "path": "../../packages/basemap" },
     { "path": "../../packages/id" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/io" },
     { "path": "../../packages/maplibre" },
-    { "path": "../../packages/stdlib" },
     { "path": "../../packages/project" },
+    { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/types" }
