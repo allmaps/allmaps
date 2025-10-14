@@ -142,10 +142,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   async removeGeoreferencedMapById(
     mapId: string
   ): Promise<string | Error | undefined> {
-    const warpedMap = this.warpedMapsById.get(mapId)
-    if (warpedMap) {
-      return this.removeGeoreferencedMap(warpedMap)
-    }
+    return this.removeGeoreferencedMapByIdInternal(mapId)
   }
 
   /**
@@ -702,6 +699,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     georeferencedMap: GeoreferencedMap
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
+    return this.removeGeoreferencedMapByIdInternal(mapId)
+  }
+
+  private async removeGeoreferencedMapByIdInternal(
+    mapId: string
+  ): Promise<string> {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       this.warpedMapsById.delete(mapId)
