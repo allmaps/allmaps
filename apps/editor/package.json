@@ -18,6 +18,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/editor --include-dependencies",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
