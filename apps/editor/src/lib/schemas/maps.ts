@@ -20,9 +20,8 @@ export const DbImageServiceSchema = z.enum([
   'ImageService3'
 ])
 
-export const DbResourceCrsSchema = z.object({
-  name: z.string().optional(),
-  definition: z.string()
+export const DbProjectionSchema = z.object({
+  id: z.string()
 })
 
 // ============================================================================
@@ -115,7 +114,7 @@ export const DbMap3Schema = z.object({
   gcps: DbGcps3Schema,
   resourceMask: ResourceMaskSchema,
   transformation: DbTransformationSchema.optional(),
-  resourceCrs: DbResourceCrsSchema.optional()
+  resourceCrs: DbProjectionSchema.optional()
 })
 
 export const DbMaps3Schema = z.record(z.string(), DbMap3Schema)

@@ -7,6 +7,7 @@
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
   import { formatSourceType } from '$lib/shared/metadata.js'
 
+  import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/state/url.svelte.js'
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getHeadState } from '$lib/state/head.svelte.js'
@@ -16,13 +17,14 @@
   import URLInput from '$lib/components/URLInput.svelte'
   import Metadata from '$lib/components/Metadata.svelte'
 
+  const uiState = getUiState()
   const urlState = getUrlState()
   const sourceState = getSourceState()
   const headState = getHeadState()
 
-  let autofocus = $state(false)
+  let bodyWidth = $state(0)
 
-  let open = $state(false)
+  // let open = $state(false)
 
   let infoButtonWidth = $state(0)
 
@@ -39,10 +41,6 @@
     return false
   }
 
-  $effect.pre(() => {
-    autofocus = !hasTouch()
-  })
-
   let sourceType = $derived(
     sourceState.source?.type
       ? formatSourceType(sourceState.source.type)
@@ -54,7 +52,15 @@
   }
 </script>
 
-<Popover bind:open contentsWidth={infoButtonWidth}>
+<svelte:body bind:clientWidth={bodyWidth} />
+
+<Popover
+  bind:open={
+    () => uiState.getPopoverOpen('info'),
+    (open) => uiState.setPopoverOpen('info', open)
+  }
+  contentsWidth={bodyWidth > 10240 ? infoButtonWidth : undefined}
+>
   {#snippet button()}
     <div
       bind:clientWidth={infoButtonWidth}
@@ -62,16 +68,27 @@
         bg-gray/10 hover:bg-gray/20 group
         transition-all duration-100
         border-2 inset-shadow-none hover:inset-shadow-xs
-        {open ? 'border-gray-200 bg-white' : 'border-gray/10'}
+        {uiState.getPopoverOpen('info')
+        ? 'border-gray-200 bg-white'
+        : 'border-gray/10'}
         cursor-pointer text-sm text-black leading-tight
         flex gap-2 items-center justify-between"
     >
       <span class="flex w-full justify-start-safe @container">
         {#each headState.labels as label, index (index)}
+          {@const first = index === 0}
           {@const last = index === headState.labels.length - 1}
-          <span class="truncate min-w-12 font-medium">{label}</span>
+
+          <span
+            class={[
+              'truncate min-w-12 font-medium',
+              !first && 'hidden @min-md:inline'
+            ]}>{label}</span
+          >
           {#if !last}
-            <span class="text-gray-500 px-1">/</span>
+            <span class={['text-gray-500 px-1', 'hidden @min-md:inline']}
+              >/</span
+            >
           {/if}
         {/each}
         <span class={['truncate', hasLabels && 'hidden @min-lg:inline']}>
@@ -88,7 +105,7 @@
     </div>
   {/snippet}
   {#snippet contents()}
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 max-w-2xl">
       <span class="text-center text-sm"
         >You're georeferencing a {sourceType} from this URL:</span
       >

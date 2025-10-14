@@ -20,6 +20,7 @@ import {
   toDbMap3s,
   isGcpComplete
 } from '$lib/shared/maps.js'
+
 import { MapsEvents } from '$lib/shared/maps-events.js'
 
 import { MapsEventTarget } from '$lib/shared/maps-events.js'
@@ -28,19 +29,24 @@ import type { Error as ShareDBError } from 'sharedb-client-browser/dist/sharedb-
 
 import type { SourceState } from '$lib/state/source.svelte'
 import type { ErrorState } from '$lib/state/error.svelte'
+import type { MapsHistoryState } from '$lib/state/maps-history.svelte'
 
 import type { Point } from '$lib/types/shared.js'
 import type {
+  ResourceMask,
   DbMaps,
   DbGcp3,
   DbMap3,
   DbMaps3,
   DbTransformation,
-  DbResourceCrs
+  DbProjection,
+  DbGcps3
 } from '$lib/types/maps.js'
 import type {
   InsertMap,
   RemoveMap,
+  ReplaceGcps,
+  ReplaceResourceMask,
   InsertResourceMaskPoint,
   ReplaceResourceMaskPoint,
   RemoveResourceMaskPoint,
@@ -61,6 +67,8 @@ export class MapsState extends MapsEventTarget {
 
   #doc: ReturnType<Client.Connection['get']> | undefined
 
+  // TODO: also keep transformer for each map!
+  // Or, use WarpedMap class
   #maps = $state.raw<DbMaps3 | undefined>()
   #mapsCount = $derived(this.#maps ? Object.keys(this.#maps).length : 0)
 
@@ -72,6 +80,7 @@ export class MapsState extends MapsEventTarget {
 
   #sourceState: SourceState
   #errorState: ErrorState
+  #mapsHistoryState: MapsHistoryState
 
   #activeMapId = $state<string | null>()
   #activeGcpIdPerMap = $state<Record<string, string>>({})
@@ -117,11 +126,16 @@ export class MapsState extends MapsEventTarget {
     trailing: true
   })
 
-  constructor(sourceState: SourceState, errorState: ErrorState) {
+  constructor(
+    sourceState: SourceState,
+    errorState: ErrorState,
+    mapsHistoryState: MapsHistoryState
+  ) {
     super()
 
     this.#sourceState = sourceState
     this.#errorState = errorState
+    this.#mapsHistoryState = mapsHistoryState
 
     this.#rws = new ReconnectingWebSocket(PUBLIC_ALLMAPS_API_WS_URL, [], {
       maxEnqueuedMessages: 0
@@ -149,6 +163,11 @@ export class MapsState extends MapsEventTarget {
 
   #connectToImageId(imageId: string) {
     if (this.#doc) {
+      if (this.connectedImageId) {
+        const maps = $state.snapshot(this.#sortedMaps) as DbMap3[]
+        this.#mapsHistoryState.saveMapsForImageId(this.connectedImageId, maps)
+      }
+
       this.#doc.off('op', this.#handleOperation.bind(this))
 
       this.#doc.destroy(() => {
@@ -259,11 +278,32 @@ export class MapsState extends MapsEventTarget {
         } else if (type === 'resourceMask') {
           const index = key
 
-          if (typeof index !== 'number') {
-            throw new Error('Resource mask point index must be a number')
-          }
+          if (index === undefined) {
+            // When index is not defined, tHe whole mask is replaced
+            // with a replace operation.
+            if (isReplaceInstruction(instruction)) {
+              // TODO: use Zod to validate the data
+              const resourceMask = instruction.i as ResourceMask
 
-          if (isInsertInstruction(instruction)) {
+              const detail = {
+                mapId,
+                resourceMask
+              }
+
+              this.dispatchEvent(
+                new CustomEvent<ReplaceResourceMask>(
+                  MapsEvents.REPLACE_RESOURCE_MASK,
+                  { detail }
+                )
+              )
+            } else {
+              throw new Error(
+                'Resource masks can only be replaced as a whole, not removed or inserted'
+              )
+            }
+          } else if (typeof index !== 'number') {
+            throw new Error('Resource mask point index must be a number')
+          } else if (isInsertInstruction(instruction)) {
             // TODO: use Zod to validate the data
             const point = instruction.i as Point
 
@@ -313,11 +353,32 @@ export class MapsState extends MapsEventTarget {
         } else if (type === 'gcps') {
           const gcpId = key
 
-          if (typeof gcpId !== 'string') {
-            throw new Error('GCP ID must be a string')
-          }
+          if (gcpId === undefined) {
+            // When index is not defined, tHe whole mask is replaced
+            // with a replace operation.
+            if (isReplaceInstruction(instruction)) {
+              // TODO: use Zod to validate the data
+              const gcps = instruction.i as DbGcps3
+              const gcpList = Object.values(gcps)
 
-          if (isInsertInstruction(instruction)) {
+              const detail = {
+                mapId,
+                gcps: gcpList
+              }
+
+              this.dispatchEvent(
+                new CustomEvent<ReplaceGcps>(MapsEvents.REPLACE_GCPS, {
+                  detail
+                })
+              )
+            } else {
+              throw new Error(
+                'GCPs can only be replaced as a whole, not removed or inserted'
+              )
+            }
+          } else if (typeof gcpId !== 'string') {
+            throw new Error('GCP ID must be a string')
+          } else if (isInsertInstruction(instruction)) {
             // TODO: use Zod to validate the data
             const gcp = instruction.i as DbGcp3
 
@@ -372,11 +433,11 @@ export class MapsState extends MapsEventTarget {
             })
           )
         } else if (type === 'resourceCrs') {
-          let resourceCrs: DbResourceCrs | undefined
+          let resourceCrs: DbProjection | undefined
 
           if ('i' in instruction) {
             // TODO: use Zod to validate the data
-            resourceCrs = instruction.i as DbResourceCrs
+            resourceCrs = instruction.i as DbProjection
           }
 
           const detail = {
@@ -412,6 +473,20 @@ export class MapsState extends MapsEventTarget {
     }
 
     return false
+  }
+
+  get #sortedMaps() {
+    if (this.#maps) {
+      return Object.values(this.#maps).toSorted((a, b) => {
+        if (a.index !== undefined && b.index !== undefined) {
+          return a.index - b.index
+        }
+
+        return 0
+      })
+    }
+
+    return []
   }
 
   getMapById(mapId: string): DbMap3 | undefined {
@@ -511,6 +586,25 @@ export class MapsState extends MapsEventTarget {
     }
 
     this.#doc.submitOp(removeOp([mapId]))
+  }
+
+  replaceResourceMask({ mapId, resourceMask }: ReplaceResourceMask) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
+      return
+    }
+
+    this.#doc.submitOp(replaceOp([mapId, 'resourceMask'], true, resourceMask))
+    this.activeMapId = mapId
+  }
+
+  replaceGcps({ mapId, gcps }: ReplaceGcps) {
+    if (!this.#doc || !this.#maps || !(mapId in this.#maps)) {
+      return
+    }
+
+    const dbGcps = Object.fromEntries(gcps.map((gcp) => [gcp.id, gcp]))
+    this.#doc.submitOp(replaceOp([mapId, 'gcps'], true, dbGcps))
+    this.activeMapId = mapId
   }
 
   insertResourceMaskPoint({ mapId, index, point }: ReplaceResourceMaskPoint) {
@@ -616,14 +710,8 @@ export class MapsState extends MapsEventTarget {
   }
 
   get maps(): DbMap3[] {
-    if (this.#connected && this.#maps) {
-      return Object.values(this.#maps).toSorted((a, b) => {
-        if (a.index !== undefined && b.index !== undefined) {
-          return a.index - b.index
-        }
-
-        return 0
-      })
+    if (this.#connected) {
+      return this.#sortedMaps
     }
 
     return []
@@ -638,8 +726,15 @@ export class MapsState extends MapsEventTarget {
   }
 }
 
-export function setMapsState(sourceState: SourceState, errorState: ErrorState) {
-  return setContext(MAPS_KEY, new MapsState(sourceState, errorState))
+export function setMapsState(
+  sourceState: SourceState,
+  errorState: ErrorState,
+  mapsHistoryState: MapsHistoryState
+) {
+  return setContext(
+    MAPS_KEY,
+    new MapsState(sourceState, errorState, mapsHistoryState)
+  )
 }
 
 export function getMapsState() {

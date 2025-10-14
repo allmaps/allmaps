@@ -5,6 +5,7 @@ import type {
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage
 } from '@allmaps/iiif-parser'
+import type { PickerProjection } from '@allmaps/components/projections'
 
 import type {
   DbMap1,
@@ -18,12 +19,14 @@ import type {
   DbGcp3,
   DbGcp,
   DbTransformation,
+  DbProjection,
   ResourceMask,
   CompleteDbGcp3
 } from '$lib/types/maps.js'
-import type { Point } from '$lib/types/shared.js'
+import type { ProjectionsById, Point } from '$lib/types/shared.js'
 
 import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
+import { getApiUrl } from './urls'
 
 export function isDbMap1(dbMap: DbMap): dbMap is DbMap1 {
   return dbMap.version === 1
@@ -67,13 +70,20 @@ export function getTransformation(dbMap: DbMap): DbTransformation | undefined {
   return undefined
 }
 
-export function getGcps(dbMap: DbMap): DbGcp3[] {
-  let gcps: DbGcp[]
+export function getResourceCrs(dbMap: DbMap): DbProjection | undefined {
   if (isDbMap3(dbMap)) {
-    gcps = Object.values(dbMap.gcps)
-  } else {
-    gcps = Object.values(dbMap.gcps)
+    if (dbMap.resourceCrs) {
+      return dbMap.resourceCrs
+    }
   }
+
+  return undefined
+}
+
+export function getGcps(dbMap: DbMap): DbGcp3[] {
+  let gcps = Object.values(dbMap.gcps).sort(
+    (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
+  )
 
   return toDbGcps3(gcps)
 }
@@ -137,7 +147,8 @@ export async function createMapWithFullImageResourceMask(
 
 export function toDbGcps3(gcps: DbGcp[]): DbGcp3[] {
   return gcps.map((gcp, index) => {
-    index = 'index' in gcp ? gcp.index || 0 : index
+    const gcpIndex =
+      'index' in gcp && gcp.index !== undefined ? gcp.index : index
 
     let geo
     let resource
@@ -152,11 +163,24 @@ export function toDbGcps3(gcps: DbGcp[]): DbGcp3[] {
 
     return {
       id: gcp.id,
-      index,
+      index: gcpIndex,
       geo,
       resource
     }
   })
+}
+
+export function toDbProjection(projection: PickerProjection) {
+  if (!projection.id) {
+    return
+  }
+
+  // projection.id has form https://api.allmaps.org/projections/81959313a5c376fc
+  // This function returns the hash
+  const id = projection.id.split('/').slice(-1)[0]
+  if (id) {
+    return { id }
+  }
 }
 
 export function toDbMap3(dbMap: DbMap): DbMap3 {
@@ -256,8 +280,25 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
   }
 }
 
-export function toGeoreferencedMap(dbMap: DbMap): GeoreferencedMap {
+export function toGeoreferencedMapProjection(
+  projection: DbProjection,
+  projectionsById: ProjectionsById
+) {
+  if (!projection) {
+    return
+  }
+
+  const projectionId = getApiUrl(`projections/${projection?.id}`)
+  return projectionsById[projectionId]
+}
+
+export function toGeoreferencedMap(
+  dbMap: DbMap,
+  projectionsById: ProjectionsById
+): GeoreferencedMap {
   const dbMap3 = toDbMap3(dbMap)
+
+  const dbResourceCrs = getResourceCrs(dbMap3)
 
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
@@ -267,14 +308,20 @@ export function toGeoreferencedMap(dbMap: DbMap): GeoreferencedMap {
       ...dbMap3.resource,
       id: dbMap3.resource.uri || dbMap3.resource.id
     },
-    transformation: toGeoreferencedMapTransformation(getTransformation(dbMap3)),
     gcps: getCompleteGcps(dbMap3),
-    resourceMask: getResourceMask(dbMap3)
+    resourceMask: getResourceMask(dbMap3),
+    transformation: toGeoreferencedMapTransformation(getTransformation(dbMap3)),
+    resourceCrs: dbResourceCrs
+      ? toGeoreferencedMapProjection(dbResourceCrs, projectionsById)
+      : undefined
   }
 }
 
-export function toGeoreferencedMaps(dbMaps: DbMap[]): GeoreferencedMap[] {
-  return dbMaps.map(toGeoreferencedMap)
+export function toGeoreferencedMaps(
+  dbMaps: DbMap[],
+  projectionsById: ProjectionsById
+): GeoreferencedMap[] {
+  return dbMaps.map((map) => toGeoreferencedMap(map, projectionsById))
 }
 
 export function getSortedGcps(gcps: DbGcp3[]) {

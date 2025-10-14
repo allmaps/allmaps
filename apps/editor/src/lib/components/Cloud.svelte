@@ -4,9 +4,14 @@
   import { green } from '@allmaps/tailwind'
 </script>
 
-<p class="cloud text-sm text-green" style="--green: {green}">
-  <CloudCheckIcon class="size-5" weight="duotone" />
-
+<p
+  class="text-center self-center cloud text-sm text-green"
+  style="--green: {green}"
+>
+  <CloudCheckIcon
+    class="relative size-6 inline-block -top-0.5 pr-1"
+    weight="duotone"
+  />
   <span>All edits are automatically saved in the Allmaps database</span>
 </p>
 

@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     port: ports.editor,
     fs: {
+      strict: false,
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },

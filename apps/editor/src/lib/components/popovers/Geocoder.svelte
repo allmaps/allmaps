@@ -26,10 +26,10 @@
     const feature = event.detail
 
     if (feature?.bbox) {
-      uiState.handleFitBbox(feature.bbox as Bbox)
+      uiState.dispatchFitBbox(feature.bbox as Bbox)
     } else if (feature.geometry) {
       if (feature.geometry.type === 'Point') {
-        uiState.handleSetCenter(
+        uiState.dispatchSetCenter(
           feature.geometry.coordinates as [number, number]
         )
       }

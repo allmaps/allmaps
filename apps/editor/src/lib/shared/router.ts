@@ -2,11 +2,11 @@ import { goto } from '$app/navigation'
 
 import type { Page } from '@sveltejs/kit'
 
-import type { RouteID, Params } from '$lib/types/shared.js'
+import type { View, MaybeView, Params } from '$lib/types/shared.js'
 
 export function createRouteUrl(
   page: Page,
-  id: RouteID,
+  view: View | undefined,
   params?: Partial<Params>
 ) {
   const searchParams = new URLSearchParams(page.url.searchParams)
@@ -21,7 +21,11 @@ export function createRouteUrl(
     }
   }
 
-  return `/${id}?${searchParams}`
+  if (view) {
+    return `/${view}?${searchParams}`
+  } else {
+    return `/?${searchParams}`
+  }
 }
 
 export function gotoRoute(url: string) {
@@ -31,6 +35,12 @@ export function gotoRoute(url: string) {
   })
 }
 
-export function getRouteId(page: Page) {
-  return page.route.id?.slice(1) as RouteID
+export function getView(page: Page): View | undefined {
+  const regex = /\/\(views\)\/(?<routeId>\w+)/
+
+  const routeId = page.route?.id || ''
+
+  const match = routeId.match(regex)
+  const view = match?.groups?.routeId as MaybeView
+  return view
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Map as MapLibreMap } from 'maplibre-gl'
+  import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl'
 
   import {
     TerraDraw,
@@ -12,11 +12,9 @@
   import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter'
 
   import { pink } from '@allmaps/tailwind'
-  import {
-    computeBbox,
-    combineBboxes,
-    polygonToGeojsonPolygon
-  } from '@allmaps/stdlib'
+  import { computeBbox, combineBboxes } from '@allmaps/stdlib'
+
+  import { getProjectionsState } from '@allmaps/components/state'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
@@ -29,13 +27,13 @@
     getBboxViewport,
     sortGeoViewports
   } from '$lib/shared/viewport.js'
-  import { transformResourceMaskToGeo } from '$lib/shared/transform.js'
   import { getResourceMask } from '$lib/shared/maps.js'
   import {
     getGcpResourcePoint,
     getGcpGeoPoint,
     createMapWithFullImageResourceMask,
-    getSortedGcps
+    getSortedGcps,
+    getFullMapId
   } from '$lib/shared/maps.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
@@ -51,7 +49,7 @@
   } from '$lib/shared/constants.js'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
-  import type { LngLatBounds } from 'maplibre-gl'
+  import type { LngLatBoundsLike } from 'maplibre-gl'
 
   import type { GcpTransformer } from '@allmaps/transform'
   import type { Bbox } from '@allmaps/types'
@@ -64,12 +62,16 @@
   import type {
     InsertMapEvent,
     RemoveMapEvent,
+    ReplaceResourceMaskEvent,
+    ReplaceGcpsEvent,
     InsertGcpEvent,
     ReplaceGcpEvent,
     RemoveGcpEvent,
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
     RemoveResourceMaskPointEvent,
+    SetTransformationEvent,
+    SetResourceCrsEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
 
@@ -78,11 +80,16 @@
   const uiState = getUiState()
   const urlState = getUrlState()
   const viewportsState = getViewportsState()
+  const projectionsState = getProjectionsState()
 
   let resourceMap = $state.raw<MapLibreMap>()
   let geoMap = $state.raw<MapLibreMap>()
 
-  let transformer = $state.raw<GcpTransformer>()
+  let resourceTransformer = $state.raw<GcpTransformer>()
+
+  let mapIds = $derived(
+    mapsState.activeMapId ? [getFullMapId(mapsState.activeMapId)] : []
+  )
 
   let resourceDraw: TerraDraw | undefined
   let geoDraw: TerraDraw | undefined
@@ -134,12 +141,22 @@
     }
   }
   function handleInsertMap(event: InsertMapEvent) {
-    addMap(event.detail.map)
+    addResourceMask(event.detail.map)
   }
 
   function handleRemoveMap(event: RemoveMapEvent) {
     const mapId = event.detail.mapId
-    removeMap(mapId)
+    removeResourceMask(mapId)
+  }
+
+  function handleReplaceResourceMask(event: ReplaceResourceMaskEvent) {
+    const mapId = event.detail.mapId
+    replaceMapFromState(mapId)
+  }
+
+  function handleReplaceGcps(event: ReplaceGcpsEvent) {
+    const mapId = event.detail.mapId
+    replaceMapFromState(mapId)
   }
 
   function handleInsertGcp(event: InsertGcpEvent) {
@@ -188,6 +205,16 @@
   }
 
   function handleRemoveResourceMaskPoint(event: RemoveResourceMaskPointEvent) {
+    const mapId = event.detail.mapId
+    replaceMapFromState(mapId)
+  }
+
+  function handleSetTransformation(event: SetTransformationEvent) {
+    const mapId = event.detail.mapId
+    replaceMapFromState(mapId)
+  }
+
+  function handleSetResourceCrs(event: SetResourceCrsEvent) {
     const mapId = event.detail.mapId
     replaceMapFromState(mapId)
   }
@@ -344,10 +371,15 @@
     })
   }
 
-  function handleSetCenter(center: CustomEvent<Point>) {
-    geoMap?.setCenter(center.detail, {
+  function handleSetCenter(event: CustomEvent<Point>) {
+    geoMap?.setCenter(event.detail, {
       duration: 300
     })
+  }
+
+  function handleToggleRenderMasks() {
+    uiState.georeferenceOptions.renderMasks =
+      !uiState.georeferenceOptions.renderMasks
   }
 
   export function getResourceMaskFeature(
@@ -379,53 +411,29 @@
     }
   }
 
-  function getGeoMaskFeature(map: DbMap3) {
-    const geoMask = transformResourceMaskToGeo(map)
-
-    return {
-      type: 'Feature' as const,
-      id: map.id,
-      geometry: polygonToGeojsonPolygon([geoMask]),
-      properties: {
-        mode: 'polygon',
-        index: map.index || 0
-      }
-    }
-  }
-
-  function addMap(map: DbMap3) {
+  function addResourceMask(map: DbMap3) {
     if (!resourceDraw || !geoDraw) {
       return
     }
 
-    if (!transformer) {
+    if (!resourceTransformer) {
       return
     }
 
-    if (resourceDraw.getSnapshotFeature(map.id)) {
-      resourceDraw.removeFeatures([map.id])
-    }
-
-    if (geoDraw.getSnapshotFeature(map.id)) {
-      geoDraw.removeFeatures([map.id])
-    }
-
     try {
-      const resourceMaskFeature = getResourceMaskFeature(transformer, map)
-      resourceDraw.addFeatures([resourceMaskFeature])
+      if (map.id === mapsState.activeMapId) {
+        const resourceMaskFeature = getResourceMaskFeature(
+          resourceTransformer,
+          map
+        )
+        resourceDraw.addFeatures([resourceMaskFeature])
+      }
     } catch {
       // Couldn't create resource mask feature. This is fine.
     }
-
-    try {
-      const geoMaskFeature = getGeoMaskFeature(map)
-      geoDraw.addFeatures([geoMaskFeature])
-    } catch {
-      // Couldn't create geo mask feature. This is fine.
-    }
   }
 
-  function removeMap(mapId: string) {
+  function removeResourceMask(mapId: string) {
     if (resourceDraw && resourceDraw.getSnapshotFeature(mapId)) {
       resourceDraw.removeFeatures([mapId])
     }
@@ -437,7 +445,7 @@
 
   function replaceMapFromState(mapId: string) {
     // TODO: only initialize single map!
-    initializeMaps(mapsState.maps)
+    initializeResourceMasks(mapsState.maps)
   }
 
   function replaceGcpFromState(gcpId: string) {
@@ -452,7 +460,7 @@
       addGcp(gcp)
 
       // TODO: only initialize single map!
-      initializeMaps(mapsState.maps)
+      initializeResourceMasks(mapsState.maps)
     } else {
       console.error(`Error setting new geometries for GCP ${gcpId}`)
     }
@@ -530,7 +538,7 @@
   }
 
   function gcpCoordinatesFromGcpId(gcpId: string): GcpCoordinates {
-    if (resourceDraw && geoDraw && transformer) {
+    if (resourceDraw && geoDraw && resourceTransformer) {
       let resourcePoint: Point | undefined
       let geoPoint: Point | undefined
 
@@ -538,7 +546,10 @@
       const geoFeature = geoDraw.getSnapshotFeature(gcpId)
 
       if (resourceFeature) {
-        resourcePoint = resourceFeatureToPoint(transformer, resourceFeature)
+        resourcePoint = resourceFeatureToPoint(
+          resourceTransformer,
+          resourceFeature
+        )
       }
 
       if (geoFeature) {
@@ -704,14 +715,15 @@
   }
 
   function createResourceGcpFeature(gcp: DbGcp3) {
-    if (!transformer) {
+    if (!resourceTransformer) {
       console.error('Cannot create resource feature, transformer not set')
       return
     }
 
     const resourcePoint = getGcpResourcePoint(gcp)
     if (resourcePoint) {
-      const resourceCoordinates = transformer.transformToGeo(resourcePoint)
+      const resourceCoordinates =
+        resourceTransformer.transformToGeo(resourcePoint)
       return createGcpFeature(gcp.id, resourceCoordinates, gcp.index)
     }
   }
@@ -742,8 +754,11 @@
     }
   }
 
-  function initializeMaps(maps: DbMap3[]) {
-    maps.forEach((map) => addMap(map))
+  function initializeResourceMasks(maps: DbMap3[]) {
+    clearFeatures(resourceDraw, 'polygon')
+    clearFeatures(geoDraw, 'polygon')
+
+    maps.forEach((map) => addResourceMask(map))
   }
 
   function initializeGcps(imageId: string, map: DbMap3, animate = false) {
@@ -843,18 +858,23 @@
     }
   }
 
-  function getPolygonDrawOptions() {
-    return {
-      modeName: 'polygon',
-      styles: {
-        polygonFillColor: '#ffffff' as const,
-        polygonFillOpacity: 0,
-        polygonOutlineColor: pink,
-        polygonOutlineWidth: ({ id }: { id?: number | string }) =>
-          currentDisplayMapId === id ? 6 : 2
-      }
-    }
-  }
+  // function getPolygonDrawOptions(visible = true) {
+  //   return {
+  //     modeName: 'polygon',
+  //     styles: {
+  //       polygonFillColor: '#ffffff' as const,
+  //       polygonFillOpacity: 0,
+  //       polygonOutlineColor: pink,
+  //       polygonOutlineWidth: ({ id }: { id?: number | string }) => {
+  //         if (!visible) {
+  //           return 0
+  //         }
+
+  //         return currentDisplayMapId === id ? 6 : 2
+  //       }
+  //     }
+  //   }
+  // }
 
   function addLabelLayer(map?: MapLibreMap) {
     if (!map) {
@@ -885,7 +905,8 @@
     }
   }
 
-  function handleMoveend(bounds: LngLatBounds) {
+  function handleMoveend(boundsLike: LngLatBoundsLike) {
+    let bounds = LngLatBounds.convert(boundsLike)
     const bbox = bounds.toArray().flat() as Bbox
     uiState.lastBbox = bbox
   }
@@ -897,14 +918,24 @@
   })
 
   $effect(() => {
+    if (geoMap && uiState.basemapPreset) {
+      // geoMap.moveLayer('warped-map-layer')
+      // geoMap.moveLayer('td-polygon')
+      // geoMap.moveLayer('td-polygon')
+      // geoMap.moveLayer('td-linestring')
+      // geoMap.moveLayer('td-point')
+    }
+  })
+
+  $effect(() => {
     if (
       mapsReady &&
-      transformer &&
+      resourceTransformer &&
       mapsState.connected &&
       mapsState.connectedImageId &&
       mapsState.connectedImageId !== currentDisplayImageId
     ) {
-      initializeMaps(mapsState.maps)
+      initializeResourceMasks(mapsState.maps)
     }
   })
 
@@ -917,26 +948,23 @@
       mapsState.connectedImageId !== currentDisplayImageId &&
       mapsState.activeMap
     ) {
-      // fitBounds = true
-      // animate = false
       initializeGcps(mapsState.connectedImageId, mapsState.activeMap)
-      // makeResourceMaskFeatureActive(mapsState.activeMapId)
     }
   })
 
   $effect(() => {
     if (resourceMap) {
       const resourcePointMode = new TerraDrawPointMode(getPointDrawOptions())
-      const resourcePolygonMode = new TerraDrawRenderMode(
-        getPolygonDrawOptions()
-      )
+      // const resourcePolygonMode = new TerraDrawRenderMode(
+      //   getPolygonDrawOptions()
+      // )
 
       resourceDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
           map: resourceMap,
           coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
         }),
-        modes: [resourcePolygonMode, resourcePointMode],
+        modes: [resourcePointMode],
         idStrategy
       })
 
@@ -951,17 +979,26 @@
     }
   })
 
+  // $effect(() => {
+  //   if (uiState.georeferenceOptions.renderMasks) {
+  //     resourceDraw?.updateModeOptions('polygon', getPolygonDrawOptions(true))
+  //   } else {
+  //     resourceDraw?.updateModeOptions('polygon', getPolygonDrawOptions(false))
+  //   }
+  // })
+
   $effect(() => {
     if (geoMap) {
       const geoPointMode = new TerraDrawPointMode(getPointDrawOptions())
-      const geoPolygonMode = new TerraDrawRenderMode(getPolygonDrawOptions())
+
+      const adapter = new TerraDrawMapLibreGLAdapter({
+        map: geoMap,
+        coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
+      })
 
       geoDraw = new TerraDraw({
-        adapter: new TerraDrawMapLibreGLAdapter({
-          map: geoMap,
-          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
-        }),
-        modes: [geoPolygonMode, geoPointMode],
+        adapter,
+        modes: [geoPointMode],
         idStrategy
       })
 
@@ -970,6 +1007,12 @@
       geoDraw.on('change', handleGeoDrawChange)
       geoDraw.on('finish', handleGeoDrawFinish)
 
+      // const sources = Object.values(geoMap.getStyle().sources)
+      // const layers = Object.values(geoMap.getStyle().layers)
+
+      // const terraDrawSources = sources.filter(isTerraDrawSource)
+      // const terraDrawLayers = layers.filter(isTerraDrawLayer)
+
       addLabelLayer(geoMap)
 
       geoMapReady = true
@@ -977,13 +1020,25 @@
   })
 
   onMount(() => {
+    projectionsState.fetchProjections()
+
     uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
     uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
     uiState.addEventListener(UiEvents.FIT_BBOX, handleFitBbox)
     uiState.addEventListener(UiEvents.SET_CENTER, handleSetCenter)
+    uiState.addEventListener(
+      UiEvents.TOGGLE_RENDER_MASKS,
+      handleToggleRenderMasks
+    )
 
     mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
+
+    mapsState.addEventListener(
+      MapsEvents.REPLACE_RESOURCE_MASK,
+      handleReplaceResourceMask
+    )
+    mapsState.addEventListener(MapsEvents.REPLACE_GCPS, handleReplaceGcps)
 
     mapsState.addEventListener(MapsEvents.INSERT_GCP, handleInsertGcp)
     mapsState.addEventListener(MapsEvents.REPLACE_GCP, handleReplaceGcp)
@@ -1002,16 +1057,38 @@
       handleRemoveResourceMaskPoint
     )
 
+    mapsState.addEventListener(
+      MapsEvents.SET_TRANSFORMATION,
+      handleSetTransformation
+    )
+    mapsState.addEventListener(
+      MapsEvents.SET_RESOURCE_CRS,
+      handleSetResourceCrs
+    )
+
     return () => {
+      // geoDraw?.stop()
+      // resourceDraw?.stop()
+
       saveViewport()
 
       uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
       uiState.removeEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
       uiState.removeEventListener(UiEvents.FIT_BBOX, handleFitBbox)
       uiState.removeEventListener(UiEvents.SET_CENTER, handleSetCenter)
+      uiState.removeEventListener(
+        UiEvents.TOGGLE_RENDER_MASKS,
+        handleToggleRenderMasks
+      )
 
       mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
+
+      mapsState.removeEventListener(
+        MapsEvents.REPLACE_RESOURCE_MASK,
+        handleReplaceResourceMask
+      )
+      mapsState.removeEventListener(MapsEvents.REPLACE_GCPS, handleReplaceGcps)
 
       mapsState.removeEventListener(MapsEvents.INSERT_GCP, handleInsertGcp)
       mapsState.removeEventListener(MapsEvents.REPLACE_GCP, handleReplaceGcp)
@@ -1029,15 +1106,33 @@
         MapsEvents.REMOVE_RESOURCE_MASK_POINT,
         handleRemoveResourceMaskPoint
       )
+
+      mapsState.removeEventListener(
+        MapsEvents.SET_TRANSFORMATION,
+        handleSetTransformation
+      )
+      mapsState.addEventListener(
+        MapsEvents.SET_RESOURCE_CRS,
+        handleSetResourceCrs
+      )
     }
   })
 </script>
 
-<div class="w-full h-full grid grid-rows-2 sm:grid-rows-1 sm:grid-cols-2">
+<div
+  class="w-full h-full grid grid-rows-2 sm:grid-rows-1 sm:grid-cols-2 gap-0.5"
+>
   <Resource
     bind:resourceMap
-    bind:transformer
+    bind:transformer={resourceTransformer}
     initialViewport={resourceViewport}
   />
-  <Geo bind:geoMap initialViewport={geoViewport} onmoveend={handleMoveend} />
+  <Geo
+    bind:geoMap
+    {mapIds}
+    initialViewport={geoViewport}
+    onmoveend={handleMoveend}
+    warpedMapsOpacity={uiState.georeferenceOptions.warpedMapLayerOpacity}
+    renderMasks={uiState.georeferenceOptions.renderMasks}
+  />
 </div>

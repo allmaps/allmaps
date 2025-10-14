@@ -4,7 +4,7 @@ import {
   PointSchema,
   ResourceMaskSchema,
   DbTransformationSchema,
-  DbResourceCrsSchema,
+  DbProjectionSchema,
   DbImageServiceSchema,
   DbGcp1Schema,
   DbGcps1Schema,
@@ -27,14 +27,19 @@ import {
   DbMapsSchema
 } from '../schemas/maps.js'
 
+import type { GeoreferencedMap } from '@allmaps/annotation'
+
 export type Point = z.infer<typeof PointSchema>
 export type ResourceMask = z.infer<typeof ResourceMaskSchema>
+
+// TODO: export GCPs as type from '@allmaps/annotation'?
+export type GCPs = GeoreferencedMap['gcps']
 
 export type DbImageService = z.infer<typeof DbImageServiceSchema>
 
 export type DbTransformation = z.infer<typeof DbTransformationSchema>
 
-export type DbResourceCrs = z.infer<typeof DbResourceCrsSchema>
+export type DbProjection = z.infer<typeof DbProjectionSchema>
 
 // ============================================================================
 // Map version 1

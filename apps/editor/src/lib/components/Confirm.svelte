@@ -1,15 +1,17 @@
 <script lang="ts">
-  import { Popover } from 'bits-ui'
+  import { Popover } from '@allmaps/components'
+
+  import YesNo from '$lib/components/YesNo.svelte'
 
   import type { Snippet } from 'svelte'
 
   type Props = {
-    question?: string
-    children: Snippet
+    button: Snippet
+    question?: Snippet
     onconfirm?: () => void
   }
 
-  let { question, children, onconfirm }: Props = $props()
+  let { button, question, onconfirm }: Props = $props()
 
   let isOpen = $state(false)
 
@@ -23,38 +25,20 @@
   }
 </script>
 
-<Popover.Root bind:open={isOpen}>
-  <Popover.Trigger>
-    {#snippet child({ props }: { props: Record<string, unknown> })}
-      <button {...props} class="cursor-pointer">
-        {@render children?.()}
-      </button>
-    {/snippet}
-  </Popover.Trigger>
-  <Popover.Portal>
-    <Popover.Content
-      class="border-gray-100 bg-white shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out
-        data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
-        z-50 w-52 rounded-md border p-4 space-y-2"
-      sideOffset={8}
-    >
-      <div>
+<Popover bind:open={isOpen}>
+  {#snippet button()}
+    {@render button()}
+  {/snippet}
+  {#snippet contents()}
+    <div class="w-48 flex flex-col gap-2 items-center">
+      <span>
         {#if question}
-          {question}
+          {@render question()}
         {:else}
           Are you sure?
         {/if}
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <button
-          class="cursor-pointer border border-red-600 rounded-sm bg-red hover:opacity-80"
-          onclick={handleNoClick}>No</button
-        >
-        <button
-          class="cursor-pointer border border-green-600 rounded-sm bg-green hover:opacity-80"
-          onclick={handleYesClick}>Yes</button
-        >
-      </div>
-    </Popover.Content>
-  </Popover.Portal>
-</Popover.Root>
+      </span>
+      <YesNo onYes={handleYesClick} onNo={handleNoClick} />
+    </div>
+  {/snippet}
+</Popover>

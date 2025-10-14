@@ -88,24 +88,24 @@ export class SourceState {
     }
   }
 
-  async #fetchCollectionManifestsAndAddImages(parsedIiif: IIIFCollection) {
-    for await (const next of parsedIiif.fetchNext({
-      fetchCollections: true,
-      fetchManifests: true,
-      fetchImages: false
-    })) {
-      if (next.item.type === 'manifest') {
-        for (const canvas of next.item.canvases) {
-          this.#imagesByImageId.set(canvas.image.uri, canvas.image)
-          this.#canvasesByImageId.set(canvas.image.uri, canvas)
-          this.#allmapsIdsByImageId.set(
-            canvas.image.uri,
-            await generateId(canvas.image.uri)
-          )
-        }
-      }
-    }
-  }
+  // async #fetchCollectionManifestsAndAddImages(parsedIiif: IIIFCollection) {
+  //   for await (const next of parsedIiif.fetchNext({
+  //     fetchCollections: true,
+  //     fetchManifests: true,
+  //     fetchImages: false
+  //   })) {
+  //     if (next.item.type === 'manifest') {
+  //       for (const canvas of next.item.canvases) {
+  //         this.#imagesByImageId.set(canvas.image.uri, canvas.image)
+  //         this.#canvasesByImageId.set(canvas.image.uri, canvas)
+  //         this.#allmapsIdsByImageId.set(
+  //           canvas.image.uri,
+  //           await generateId(canvas.image.uri)
+  //         )
+  //       }
+  //     }
+  //   }
+  // }
 
   // callbackProject: (state) => {
   //   if (!state.callback) {
@@ -137,7 +137,7 @@ export class SourceState {
 
     if (parsedIiif.type === 'collection') {
       sourceType = 'collection'
-      await this.#fetchCollectionManifestsAndAddImages(parsedIiif)
+      // await this.#fetchCollectionManifestsAndAddImages(parsedIiif)
 
       source = {
         ...baseSource,
@@ -210,6 +210,7 @@ export class SourceState {
   }
 
   async #load(url: string) {
+    this.#loading = true
     this.#errorState.error = null
 
     try {
@@ -299,7 +300,14 @@ export class SourceState {
   }
 
   get activeImageId() {
-    if (this.#isImageIdValid(this.#urlState.imageId)) {
+    if (this.#loading) {
+      return
+    }
+
+    if (
+      this.#isImageIdValid(this.#urlState.imageId) &&
+      this.#urlState.imageId
+    ) {
       return this.#urlState.imageId
     }
 

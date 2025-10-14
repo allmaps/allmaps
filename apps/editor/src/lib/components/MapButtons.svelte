@@ -2,7 +2,7 @@
   import {
     MagnifyingGlass as MagnifyingGlassIcon,
     CornersOut as CornersOutIcon,
-    GlobeSimple as GlobeSimpleIcon
+    GearSix as GearSixIcon
   } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
@@ -21,34 +21,51 @@
   let { zoomToExtentEnabled, geocoderEnabled, mapSettingsEnabled }: Props =
     $props()
 
-  let geocoderOpen = $state(false)
+  // let geocoderOpen = $state(false)
 
   const uiState = getUiState()
 
   function handleZoomToExtentClick() {
-    uiState.handleZoomToExtent()
+    uiState.dispatchZoomToExtent()
   }
 </script>
 
 <div class="flex flex-col sm:flex-row gap-1 justify-self-end">
-  <Popover disabled={!mapSettingsEnabled}>
+  <Popover
+    bind:open={
+      () => uiState.getPopoverOpen('mapSettings'),
+      (open) => uiState.setPopoverOpen('mapSettings', open)
+    }
+    disabled={!mapSettingsEnabled}
+  >
     {#snippet button()}
       <div class="bg-white size-8 transition-all rounded-full p-1.5 shadow-md">
-        <GlobeSimpleIcon size="100%" weight="regular" />
+        <GearSixIcon size="100%" weight="regular" />
       </div>
     {/snippet}
 
     {#snippet contents()}<MapSettings />{/snippet}
   </Popover>
 
-  <Popover disabled={!geocoderEnabled} bind:open={geocoderOpen}>
+  <Popover
+    disabled={!geocoderEnabled}
+    bind:open={
+      () => uiState.getPopoverOpen('geocoder'),
+      (open) => uiState.setPopoverOpen('geocoder', open)
+    }
+  >
     {#snippet button()}
       <div class="bg-white size-8 transition-all rounded-full p-1.5 shadow-md">
         <MagnifyingGlassIcon size="100%" weight="regular" />
       </div>
     {/snippet}
 
-    {#snippet contents()}<Geocoder bind:open={geocoderOpen} />{/snippet}
+    {#snippet contents()}<Geocoder
+        bind:open={
+          () => uiState.getPopoverOpen('geocoder'),
+          (open) => uiState.setPopoverOpen('geocoder', open)
+        }
+      />{/snippet}
   </Popover>
 
   <button

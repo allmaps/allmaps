@@ -5,7 +5,7 @@ import { ErrorState } from '$lib/state/error.svelte'
 
 import type { Bbox } from '@allmaps/types'
 
-import type { ParamKey } from '$lib/types/shared.js'
+import type { ParamKey, CollectionPath } from '$lib/types/shared.js'
 
 const URL_KEY = Symbol('url')
 
@@ -17,6 +17,7 @@ export class UrlState {
   #errorState: ErrorState
 
   #urlParam = $derived(this.#getParam('url'))
+  #pathParam = $derived(this.#getParam('path'))
 
   #manifestIdParam = $derived(this.#getParam('manifest'))
   #imageIdParam = $derived(this.#getParam('image'))
@@ -42,6 +43,17 @@ export class UrlState {
     }
   })
 
+  #path = $derived.by<CollectionPath>(() => {
+    const parsedPath = this.#pathParam?.split(',').map((part: string) =>
+      part
+        .split('.')
+        .map((p) => parseInt(p))
+        .slice(0, 2)
+    )
+
+    return parsedPath?.map(([index, page]) => ({ index, page })) || []
+  })
+
   constructor(url: URL, errorState: ErrorState) {
     this.#url = new SvelteURL(url)
     this.#errorState = errorState
@@ -58,6 +70,10 @@ export class UrlState {
 
   get url() {
     return this.#urlParam
+  }
+
+  get path() {
+    return this.#path
   }
 
   get manifestId() {
@@ -80,7 +96,7 @@ export class UrlState {
     return this.#basemapUrlParam
   }
 
-  get basemapPreset() {
+  get basemapPresetId() {
     return this.#basemapPresetParam
   }
 

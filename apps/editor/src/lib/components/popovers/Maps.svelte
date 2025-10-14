@@ -3,21 +3,33 @@
 
   import { Trash as TrashIcon } from 'phosphor-svelte'
 
-  import { getResourceMask } from '$lib/shared/maps.js'
+  import {
+    toDbGcps3,
+    toGeoreferencedMap,
+    getResourceMask
+  } from '$lib/shared/maps.js'
+  import { generateRandomId } from '$lib/shared/ids.js'
+
   import { getMaskDimensions, getMaskExtent } from '$lib/shared/geometry.js'
+
+  import { getProjectionsState } from '@allmaps/components/state'
 
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
 
   import Confirm from '$lib/components/Confirm.svelte'
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
-  import SelectTransformation from '$lib/components/SelectTransformation.svelte'
-  import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
+  import SelectTransformation from '$lib/components/SelectTransformationWrapper.svelte'
+  import ProjectionPicker from '$lib/components/ProjectionPickerWrapper.svelte'
 
-  import type { DbMap } from '$lib/types/maps.js'
+  import EditGcps from '$lib/components/modals/EditGcps.svelte'
+  import EditResourceMask from '$lib/components/modals/EditResourceMask.svelte'
+
+  import type { DbMap, ResourceMask, GCPs } from '$lib/types/maps.js'
 
   const mapsState = getMapsState()
   const uiState = getUiState()
+  const projectionsState = getProjectionsState()
 
   let mapCount = $derived(
     mapsState.maps ? Object.values(mapsState.maps).length : 0
@@ -76,6 +88,19 @@
     mapsState.activeMapId = mapId
     mapsState.activeGcpId = gcpId
   }
+
+  function handleGcpsEdited(mapId: string, gcps: GCPs) {
+    const gcpsWithId = gcps.map((gcp, index) => ({
+      ...gcp,
+      id: generateRandomId()
+    }))
+    const dbGcps = toDbGcps3(gcpsWithId)
+    mapsState.replaceGcps({ mapId, gcps: dbGcps })
+  }
+
+  function handleResourceMaskEdited(mapId: string, resourceMask: ResourceMask) {
+    mapsState.replaceResourceMask({ mapId, resourceMask })
+  }
 </script>
 
 {#if mapCount === 0}
@@ -108,7 +133,7 @@
                     class="group-hover:fill-pink/10 {isActiveMap
                       ? 'fill-pink/25'
                       : 'fill-none'}"
-                    class:fill-none={mapsState.activeMapId !== map.id}
+                    class:fill-none={!isActiveMap}
                   />
                 </svg>
               </button>
@@ -118,21 +143,48 @@
             class="col-span-7 place-self-start self-center flex gap-1 sm:gap-2 items-center"
           >
             <span>Map {index + 1}</span>
-            <div></div>
+
+            <div>
+              {#if isActiveMap}
+                <button
+                  class="cursor-pointer px-2 py-1 rounded-full hover:underline text-sm text-pink"
+                  onclick={() => uiState.setModalOpen('editResourceMask', true)}
+                  >Edit or import mask…</button
+                >
+              {/if}
+
+              {#if uiState.getModalOpen('editResourceMask')}
+                <!-- TODO: what happens if ShareDB updates the map while editing? -->
+                <EditResourceMask
+                  bind:open={
+                    () => uiState.getModalOpen('editResourceMask'),
+                    (open) => uiState.setModalOpen('editResourceMask', open)
+                  }
+                  map={toGeoreferencedMap(
+                    map,
+                    projectionsState.projectionsById
+                  )}
+                  onsubmit={(resourceMask) =>
+                    handleResourceMaskEdited(map.id, resourceMask)}
+                />
+              {/if}
+            </div>
           </div>
         </div>
         <div class="place-self-end self-center">
-          <Confirm
-            onconfirm={() => mapsState.removeMap({ mapId: map.id })}
-            question="Do you really want to delete this map?"
-          >
-            <TrashIcon />
+          <Confirm onconfirm={() => mapsState.removeMap({ mapId: map.id })}>
+            {#snippet button()}
+              <TrashIcon />
+            {/snippet}
+            {#snippet question()}
+              Do you really want to delete this map?
+            {/snippet}
           </Confirm>
         </div>
 
         {#if isActiveMap}
           <div
-            class="pl-7 pb-2 col-span-9
+            class="sm:pl-7 pb-2 col-span-9
               grid grid-cols-[min-content_1fr] gap-x-4 gap-y-2 items-center
               text-sm"
           >
@@ -213,9 +265,13 @@
                     <Confirm
                       onconfirm={() =>
                         mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
-                      question="Do you really want to delete this GCP?"
                     >
-                      <TrashIcon />
+                      {#snippet button()}
+                        <TrashIcon />
+                      {/snippet}
+                      {#snippet question()}
+                        Do you really want to delete this GCP?
+                      {/snippet}
                     </Confirm>
                   </div>
                 </li>
@@ -225,10 +281,22 @@
 
           <div class="col-span-9 place-self-end">
             <button
-              class="cursor-pointer px-2 py-1 rounded-full underline"
-              onclick={() => (uiState.modalsVisible.editGcps = true)}
-              >Edit GCPs or import from file</button
+              class="cursor-pointer px-2 py-1 rounded-full hover:underline text-sm text-pink"
+              onclick={() => uiState.setModalOpen('editGcps', true)}
+              >Edit or import GCPs…</button
             >
+
+            {#if uiState.getModalOpen('editGcps')}
+              <!-- TODO: what happens if ShareDB updates the map while editing? -->
+              <EditGcps
+                bind:open={
+                  () => uiState.getModalOpen('editGcps'),
+                  (open) => uiState.setModalOpen('editGcps', open)
+                }
+                map={toGeoreferencedMap(map, projectionsState.projectionsById)}
+                onsubmit={(gcps) => handleGcpsEdited(map.id, gcps)}
+              />
+            {/if}
           </div>
         {/if}
       </li>

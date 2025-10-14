@@ -4,16 +4,16 @@
   import { Copy as CopyIcon, Check as CheckIcon } from 'phosphor-svelte'
 
   type Props = {
-    text: string
+    value: string
   }
 
-  let { text }: Props = $props()
+  let { value }: Props = $props()
 
   let showCheckInterval = $state<number | null>(null)
 
   async function handleClick() {
     try {
-      await navigator.clipboard.writeText(text)
+      await navigator.clipboard.writeText(value)
 
       showCheckInterval = window.setTimeout(() => {
         showCheckInterval = null

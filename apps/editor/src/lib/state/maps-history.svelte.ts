@@ -1,23 +1,20 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteMap } from 'svelte/reactivity'
 
-import { toGeoreferencedMap } from '$lib/shared/maps.js'
-
-import type { GeoreferencedMap } from '@allmaps/annotation'
-
 import type { SourceState } from '$lib/state/source.svelte'
-import type { MapsState } from '$lib/state/maps.svelte'
+
+import type { DbMap3 } from '$lib/types/maps.js'
 
 const MAPS_HISTORY_KEY = Symbol('maps-history')
 
 export class MapsHistoryState {
   #lastSourceUrl: string | undefined
 
-  #mapsByImageId: SvelteMap<string, GeoreferencedMap[]> = $state(
-    new SvelteMap()
-  )
+  // TODO: also keep transformer for each map!
+  // Or, use WarpedMap class
+  #mapsByImageId: SvelteMap<string, DbMap3[]> = $state(new SvelteMap())
 
-  constructor(sourceState: SourceState, mapsState: MapsState) {
+  constructor(sourceState: SourceState) {
     $effect(() => {
       if (this.#lastSourceUrl !== sourceState.source?.url) {
         this.#mapsByImageId.clear()
@@ -25,13 +22,10 @@ export class MapsHistoryState {
 
       this.#lastSourceUrl = sourceState.source?.url
     })
+  }
 
-    $effect(() => {
-      if (mapsState.connectedImageId && mapsState.maps) {
-        const maps = Object.values(mapsState.maps).map(toGeoreferencedMap)
-        this.#mapsByImageId.set(mapsState.connectedImageId, maps)
-      }
-    })
+  saveMapsForImageId(imageId: string, maps: DbMap3[]) {
+    this.#mapsByImageId.set(imageId, maps)
   }
 
   get mapsByImageId() {
@@ -39,14 +33,8 @@ export class MapsHistoryState {
   }
 }
 
-export function setMapsHistoryState(
-  sourceState: SourceState,
-  mapsState: MapsState
-) {
-  return setContext(
-    MAPS_HISTORY_KEY,
-    new MapsHistoryState(sourceState, mapsState)
-  )
+export function setMapsHistoryState(sourceState: SourceState) {
+  return setContext(MAPS_HISTORY_KEY, new MapsHistoryState(sourceState))
 }
 
 export function getMapsHistoryState() {

@@ -2,7 +2,15 @@ import { setContext, getContext } from 'svelte'
 
 import { generateAnnotation } from '@allmaps/annotation'
 
-import { toGeoreferencedMap, toGeoreferencedMaps } from '$lib/shared/maps.js'
+import {
+  getFullMapId,
+  toGeoreferencedMap,
+  toGeoreferencedMaps
+} from '$lib/shared/maps.js'
+
+import type { GeoreferencedMap } from '@allmaps/annotation'
+
+import type { ProjectionsState } from '@allmaps/components/state'
 
 import type { SourceState } from '$lib/state/source.svelte'
 import type { MapsState } from '$lib/state/maps.svelte'
@@ -16,6 +24,7 @@ export class ScopeState {
   #sourceState: SourceState
   #mapsState: MapsState
   #mapsMergedState: MapsMergedState
+  #projectionsState: ProjectionsState
 
   #scope = $state<Scope>('image')
 
@@ -38,41 +47,57 @@ export class ScopeState {
     }
   })
 
-  #annotation = $derived.by(() => {
+  #maps = $derived.by<GeoreferencedMap[]>(() => {
     if (this.#scope === 'images') {
-      return generateAnnotation(this.#mapsMergedState.maps)
+      return this.#mapsMergedState.maps
     } else if (this.#scope === 'image') {
       if (this.#mapsState.maps) {
-        return generateAnnotation(toGeoreferencedMaps(this.#mapsState.maps))
+        return toGeoreferencedMaps(
+          this.#mapsState.maps,
+          this.#projectionsState.projectionsById
+        )
       }
     } else if (this.#scope === 'map') {
       const map = this.#mapsState.activeMap
       if (map) {
-        return generateAnnotation(toGeoreferencedMap(map))
+        return [toGeoreferencedMap(map, this.#projectionsState.projectionsById)]
       }
     }
 
-    return generateAnnotation([])
+    return []
   })
+
+  #mapIds = $derived.by<string[]>(() => {
+    if (this.#scope === 'images') {
+      return this.#mapsMergedState.maps.flatMap((map) => (map.id ? map.id : []))
+    } else if (this.#scope === 'image') {
+      if (this.#mapsState.maps) {
+        return Object.values(this.#mapsState.maps).map((map) =>
+          getFullMapId(map.id)
+        )
+      }
+    } else if (this.#scope === 'map') {
+      const map = this.#mapsState.activeMap
+      if (map) {
+        return [getFullMapId(map.id)]
+      }
+    }
+
+    return []
+  })
+
+  #annotation = $derived(generateAnnotation(this.#maps))
 
   constructor(
     sourceState: SourceState,
     mapsState: MapsState,
-    mapsMergedState: MapsMergedState
+    mapsMergedState: MapsMergedState,
+    projectionsState: ProjectionsState
   ) {
     this.#sourceState = sourceState
     this.#mapsState = mapsState
     this.#mapsMergedState = mapsMergedState
-
-    // $effect(() => {
-    //   if (sourceState.source) {
-    //     if (sourceState.source.type === 'image') {
-    //       this.#hasImagesScope = false
-    //     } else {
-    //       this.#hasImagesScope = true
-    //     }
-    //   }
-    // })
+    this.#projectionsState = projectionsState
 
     this.#hasImagesScope = $derived(this.#sourceState.imageCount > 1)
     this.#hasMapScope = $derived(this.#mapsState.mapsCountForActiveImage > 0)
@@ -100,6 +125,14 @@ export class ScopeState {
 
   get scopes() {
     return this.#scopes
+  }
+
+  get maps() {
+    return this.#maps
+  }
+
+  get mapIds() {
+    return this.#mapIds
   }
 
   get annotation() {
@@ -130,11 +163,12 @@ export class ScopeState {
 export function setScopeState(
   sourceState: SourceState,
   mapsState: MapsState,
-  mapsMergedState: MapsMergedState
+  mapsMergedState: MapsMergedState,
+  projectionsState: ProjectionsState
 ) {
   return setContext(
     SCOPE_KEY,
-    new ScopeState(sourceState, mapsState, mapsMergedState)
+    new ScopeState(sourceState, mapsState, mapsMergedState, projectionsState)
   )
 }
 

@@ -26,6 +26,11 @@ export function polygonDifference(
     }
   }
 
+  const lengthDifference = Math.abs(oldPolygon.length - newPolygon.length)
+  if (lengthDifference > 1) {
+    throw new Error('Only one point can be added, removed or changed at a time')
+  }
+
   if (oldPolygon.length < newPolygon.length) {
     // point inserted
     return {

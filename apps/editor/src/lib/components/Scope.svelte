@@ -9,6 +9,12 @@
 
   import { getScopeState } from '$lib/state/scope.svelte.js'
 
+  type Props = {
+    to?: HTMLElement
+  }
+
+  const { to }: Props = $props()
+
   const scopeState = getScopeState()
 
   let items = $derived(
@@ -20,4 +26,4 @@
   )
 </script>
 
-<Select {items} bind:value={scopeState.scope} />
+<Select {items} bind:value={scopeState.scope} {to} />

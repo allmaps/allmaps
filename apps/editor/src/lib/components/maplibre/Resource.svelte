@@ -12,7 +12,7 @@
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 
   import {
-    makeFakeStraightAnnotation,
+    generateFakeStraightAnnotation,
     computeTransformedAnnotationBbox
   } from '$lib/shared/annotation.js'
 
@@ -21,6 +21,7 @@
   import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 
   import type { Viewport } from '$lib/types/shared.js'
+  import type { ResourceMask } from '$lib/types/maps.js'
 
   import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
 
@@ -51,6 +52,7 @@
   type Props = {
     initialViewport?: Viewport
     resourceMap?: MapLibreMap
+    resourceMask?: ResourceMask
     transformer?: GcpTransformer
     warpedMapLayerBounds?: LngLatBoundsLike
   }
@@ -58,18 +60,23 @@
   let {
     initialViewport,
     resourceMap = $bindable<MapLibreMap | undefined>(),
+    resourceMask = [],
     transformer = $bindable<GcpTransformer | undefined>(),
     warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>()
   }: Props = $props()
 
-  async function makeStraightAnnotation(imageId: string) {
+  async function updateStraightAnnotation(imageId: string) {
+    straightAnnotation = await generateStraightAnnotation(imageId)
+  }
+
+  async function generateStraightAnnotation(imageId: string) {
     const imageInfo = await imageInfoState.fetchImageInfo(imageId)
     const parsedImage = Image.parse(imageInfo)
 
     const width = parsedImage.width
     const height = parsedImage.height
 
-    straightAnnotation = makeFakeStraightAnnotation(imageId, width, height)
+    return generateFakeStraightAnnotation(imageId, width, height)
   }
 
   async function updateMap(annotation: Annotation | AnnotationPage) {
@@ -81,6 +88,10 @@
 
     await warpedMapLayer.addGeoreferenceAnnotation(annotation)
 
+    if (resourceMask) {
+      // warpedMapLayer.setMapResourceMask(annotation.id)
+    }
+
     // TODO: get transformer from warpedMapLayer's WarpedMapList
     const maps = parseAnnotation(annotation)
     const map = maps[0]
@@ -91,7 +102,13 @@
 
   $effect(() => {
     if (sourceState.activeImageId) {
-      makeStraightAnnotation(sourceState.activeImageId)
+      updateStraightAnnotation(sourceState.activeImageId)
+    }
+  })
+
+  $effect(() => {
+    if (resourceMask.length && warpedMapLayer) {
+      // warpedMapLayer.setMapResourceMask(sourceState.activeImageId, resourceMask)
     }
   })
 

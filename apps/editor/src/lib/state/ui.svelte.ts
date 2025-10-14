@@ -3,62 +3,111 @@ import { browser } from '$app/environment'
 
 import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 
+import type { PickerProjection } from '@allmaps/components/projections'
+
 import type { Bbox, Point } from '@allmaps/types'
 
-import type { PresetBaseMapID, ClickedItem } from '$lib/types/shared.js'
+import type {
+  BasemapPresetId,
+  AllmapsPluginId,
+  ClickedItem,
+  BasemapPresetItem,
+  AllmapsPluginItem
+} from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
+import type { SourceState } from '$lib/state/source.svelte.js'
 
 const UI_KEY = Symbol('ui')
 
-type BasemapPreset = {
-  label: string
-  url: string
-  attribution: string
-  value: PresetBaseMapID
+type Modal =
+  | 'command'
+  | 'about'
+  | 'annotation'
+  | 'keyboard'
+  | 'export'
+  | 'editGcps'
+  | 'editResourceMask'
+type Popover = 'export' | 'geocoder' | 'info' | 'maps' | 'mapSettings'
+
+type ModalOpen = Modal | undefined
+type PopoverOpen = Popover | undefined
+
+type GeoreferenceOptions = {
+  warpedMapLayerOpacity: number
+  renderMasks: boolean
+  onlyRenderActiveMap: boolean
 }
 
-type ModalsVisible = Record<string, boolean>
+type ResultsOptions = {
+  warpedMapLayerOpacity: number
+  renderMasks: boolean
+}
 
-const basemapPresets: BasemapPreset[] = [
+const basemapPresets: BasemapPresetItem[] = [
+  {
+    label: 'Protomaps',
+    value: 'protomaps',
+    type: 'protomaps',
+    attribution:
+      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+  },
   {
     label: 'ESRI World Topo',
+    value: 'esri-world-topo',
+    type: 'raster',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
     attribution:
-      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community',
-    value: 'esri-world-topo'
+      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
   },
 
   {
     label: 'Esri World Imagery',
+    value: 'esri-world-imagery',
+    type: 'raster',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     // TODO: also add https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/12/1340/2108
     attribution:
-      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-    value: 'esri-world-imagery'
+      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   },
   {
     label: 'OpenStreetMap',
+    value: 'osm',
+    type: 'raster',
     url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: 'OpenStreetMap',
-    value: 'osm'
+    attribution: 'OpenStreetMap'
   }
 ]
+
+const allmapsPlugins: AllmapsPluginItem[] = [
+  {
+    label: 'MapLibre GL',
+    value: 'maplibre'
+  },
+  {
+    label: 'Leaflet',
+    value: 'leaflet'
+  },
+  {
+    label: 'OpenLayers',
+    value: 'openlayers'
+  }
+]
+
+type ProjectionIndices = {
+  fullText: ((query: string) => PickerProjection[]) | undefined
+  bbox: ((bbox: Bbox) => PickerProjection[]) | undefined
+}
 
 export class UiState extends UiEventTarget {
   #urlState: UrlState
 
-  #basemapPresets = $state(basemapPresets)
-
   #firstUse = $state(true)
 
-  #modalsVisible = $state<ModalsVisible>({
-    about: false,
-    annotation: false,
-    keyboard: false,
-    export: false,
-    editGcps: false
-  })
+  #sourceUrl = $state<string>()
+
+  #modalOpen = $state<ModalOpen>()
+  #popoverOpen = $state<PopoverOpen>()
 
   #retinaTiles = $state(true)
 
@@ -68,7 +117,25 @@ export class UiState extends UiEventTarget {
 
   #lastBbox = $state<Bbox>()
 
-  constructor(urlState: UrlState) {
+  #projectionIndices = $state.raw<ProjectionIndices>({
+    fullText: undefined,
+    bbox: undefined
+  })
+
+  #selectedAllmapsPluginId = $state<AllmapsPluginId>('maplibre')
+
+  #georeferenceOptions = $state<GeoreferenceOptions>({
+    warpedMapLayerOpacity: 0,
+    renderMasks: true,
+    onlyRenderActiveMap: true
+  })
+
+  #resultsOptions = $state<ResultsOptions>({
+    warpedMapLayerOpacity: 1,
+    renderMasks: false
+  })
+
+  constructor(urlState: UrlState, sourceState: SourceState) {
     super()
 
     this.#urlState = urlState
@@ -89,13 +156,33 @@ export class UiState extends UiEventTarget {
         console.warn('Error reading from localStorage')
       }
     }
+
+    $effect(() => {
+      // If source changes, close modals/popovers
+      if (sourceState.source?.url !== this.#sourceUrl) {
+        this.closeModalsAndPopovers()
+        this.#sourceUrl = sourceState.source?.url
+      }
+    })
   }
 
-  handleZoomToExtent() {
+  dispatchZoomToExtent() {
     this.dispatchEvent(new CustomEvent(UiEvents.ZOOM_TO_EXTENT))
   }
 
-  handleFitBbox(bbox: Bbox) {
+  dispatchToggleVisible(visible: boolean) {
+    this.dispatchEvent(
+      new CustomEvent(UiEvents.TOGGLE_VISIBLE, {
+        detail: visible
+      })
+    )
+  }
+
+  dispatchToggleRenderMasks() {
+    this.dispatchEvent(new CustomEvent(UiEvents.TOGGLE_RENDER_MASKS))
+  }
+
+  dispatchFitBbox(bbox: Bbox) {
     this.dispatchEvent(
       new CustomEvent<Bbox>(UiEvents.FIT_BBOX, {
         detail: bbox
@@ -103,7 +190,7 @@ export class UiState extends UiEventTarget {
     )
   }
 
-  handleSetCenter(center: Point) {
+  dispatchSetCenter(center: Point) {
     this.dispatchEvent(
       new CustomEvent<Point>(UiEvents.SET_CENTER, {
         detail: center
@@ -112,12 +199,12 @@ export class UiState extends UiEventTarget {
   }
 
   get basemapPresets() {
-    return this.#basemapPresets
+    return basemapPresets
   }
 
-  get basemapPreset(): BasemapPreset {
-    const basemapPreset = this.#basemapPresets.find(
-      (preset) => preset.value === this.#urlState.basemapPreset
+  get basemapPreset(): BasemapPresetItem {
+    const basemapPreset = this.basemapPresets.find(
+      (preset) => preset.value === this.#urlState.basemapPresetId
     )
 
     if (basemapPreset) {
@@ -127,20 +214,57 @@ export class UiState extends UiEventTarget {
     }
   }
 
+  get allmapsPlugins() {
+    return allmapsPlugins
+  }
+
+  get selectedAllmapsPluginId() {
+    return this.#selectedAllmapsPluginId
+  }
+
+  getSelectedAllmapsPlugin() {
+    const selectedAllmapsPlugin = this.allmapsPlugins.find(
+      (plugin) => plugin.value === this.#selectedAllmapsPluginId
+    )
+
+    if (selectedAllmapsPlugin) {
+      return selectedAllmapsPlugin
+    } else {
+      return this.allmapsPlugins[0]
+    }
+  }
+
+  set selectedAllmapsPluginId(selectedPluginId: AllmapsPluginId) {
+    this.#selectedAllmapsPluginId = selectedPluginId
+  }
+
   get firstUse() {
     return this.#firstUse
   }
 
-  get modalsVisible() {
-    return this.#modalsVisible
+  getModalOpen(modal: Modal) {
+    return this.#modalOpen === modal
   }
 
-  set modalsVisible(state: ModalsVisible) {
-    const visibleKey = Object.keys(state).find((key) => state[key])
+  setModalOpen(modal: Modal, open: boolean) {
+    this.#modalOpen = open ? modal : undefined
+  }
 
-    this.#modalsVisible = Object.fromEntries(
-      Object.keys(this.#modalsVisible).map((key) => [key, key === visibleKey])
-    )
+  get hasModalOpen() {
+    return this.#modalOpen !== undefined
+  }
+
+  getPopoverOpen(popover: Popover) {
+    return this.#popoverOpen === popover
+  }
+
+  setPopoverOpen(popover: Popover, open: boolean) {
+    this.#popoverOpen = open ? popover : undefined
+  }
+
+  closeModalsAndPopovers() {
+    this.#modalOpen = undefined
+    this.#popoverOpen = undefined
   }
 
   get retinaTiles() {
@@ -180,18 +304,42 @@ export class UiState extends UiEventTarget {
   set lastBbox(bbox: Bbox | undefined) {
     this.#lastBbox = bbox
   }
+
+  get projectionIndices() {
+    return this.#projectionIndices
+  }
+
+  set projectionIndices(indices: ProjectionIndices) {
+    this.#projectionIndices = indices
+  }
+
+  get georeferenceOptions() {
+    return this.#georeferenceOptions
+  }
+
+  set georeferenceOptions(options: Partial<GeoreferenceOptions>) {
+    this.#georeferenceOptions = { ...this.#georeferenceOptions, ...options }
+  }
+
+  get resultsOptions() {
+    return this.#resultsOptions
+  }
+
+  set resultsOptions(options: Partial<ResultsOptions>) {
+    this.#resultsOptions = { ...this.#resultsOptions, ...options }
+  }
 }
 
-export function setUiState(urlState: UrlState) {
-  return setContext(UI_KEY, new UiState(urlState))
+export function setUiState(urlState: UrlState, sourceState: SourceState) {
+  return setContext(UI_KEY, new UiState(urlState, sourceState))
 }
 
 export function getUiState() {
-  const uitState = getContext<ReturnType<typeof setUiState>>(UI_KEY)
+  const uiState = getContext<ReturnType<typeof setUiState>>(UI_KEY)
 
-  if (!uitState) {
+  if (!uiState) {
     throw new Error('UiState is not set')
   }
 
-  return uitState
+  return uiState
 }

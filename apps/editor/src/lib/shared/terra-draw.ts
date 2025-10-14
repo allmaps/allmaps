@@ -1,4 +1,4 @@
-import { generateRandomId } from '$lib/shared/id.js'
+import { generateRandomId } from '$lib/shared/ids.js'
 
 import type { TerraDraw } from 'terra-draw'
 

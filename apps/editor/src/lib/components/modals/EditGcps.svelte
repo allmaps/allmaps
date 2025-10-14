@@ -1,114 +1,95 @@
 <script lang="ts">
-  import { generateGeoreferencedMapGcps, parseGcps } from '@allmaps/io'
-
-  import { toGeoreferencedMap } from '$lib/shared/maps.js'
-
-  import { getUiState } from '$lib/state/ui.svelte'
-  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { parseGcps } from '@allmaps/io'
 
   import { Modal } from '@allmaps/components'
 
-  const uitState = getUiState()
-  const mapsState = getMapsState()
+  import Textarea from '$lib/components/Textarea.svelte'
+  import Message from '$lib/components/Message.svelte'
+  import YesNo from '$lib/components/YesNo.svelte'
+  import FileUpload from '$lib/components/UploadFile.svelte'
 
-  let files = $state<FileList>()
+  import type { GeoreferencedMap } from '@allmaps/annotation'
 
-  let gcps = $state<string>()
+  import type { GCPs } from '$lib/types/maps.js'
+  import type { Message as MessageType } from '$lib/types/shared.js'
 
-  mapsState.activeMap
-
-  let georeferencedMap = $derived(
-    mapsState.activeMap ? toGeoreferencedMap(mapsState.activeMap) : undefined
-  )
-
-  $effect(() => {
-    try {
-      gcps = georeferencedMap
-        ? generateGeoreferencedMapGcps(georeferencedMap)
-        : undefined
-    } catch {
-      gcps = undefined
-    }
-  })
-
-  // let newGcps = $derived.by(() => {
-  //   try {
-  //     return gcps ? parseGcps(gcps) : undefined
-  //   } catch {
-  //     return undefined
-  //   }
-  // })
-
-  async function parseGcpFile(files: FileList) {
-    const file = files.item(0)
-    const text = await file?.text()
-    if (text) {
-      try {
-        const { gcps } = parseGcps(text)
-        if (georeferencedMap && gcps.length) {
-          return gcps
-        }
-      } catch {
-        return []
-      }
-    }
-
-    return []
+  type Props = {
+    open: boolean
+    map: GeoreferencedMap
+    onsubmit: (gcps: GCPs) => void
   }
 
+  let { open = $bindable(), map, onsubmit }: Props = $props()
+
+  function generateGeoreferencedMapGcps(map: GeoreferencedMap): string {
+    // TODO: Use generateGeoreferencedMapGcps from @allmaps/io
+    // Ask Manuel how to return GCPs in lat/lon
+    const gcps = Object.values(map.gcps)
+
+    return gcps
+      .map(({ geo, resource }) =>
+        [...resource, ...geo.map((coord) => coord.toFixed(8))].join(' ')
+      )
+      .join('\n')
+  }
+
+  let gcpsString = $state<string>(generateGeoreferencedMapGcps(map))
+  let gcps = $state<GCPs>(map.gcps)
+  let message = $state<MessageType>(getMessageFromGcps(map.gcps))
+
+  function getMessageFromGcps(gcps: GCPs): MessageType {
+    return {
+      text: `Successfully parsed ${gcps.length} GCPs`,
+      type: 'success'
+    }
+  }
   $effect(() => {
-    if (files) {
-      parseGcpFile(files).then((parsedGcps) => {
-        if (parsedGcps.length) {
-          // TODO: use parsedGcps
-        }
-      })
+    try {
+      const parsedGcps = parseGcps(gcpsString.trim())
+      message = getMessageFromGcps(parsedGcps.gcps)
+      gcps = parsedGcps.gcps
+    } catch (err) {
+      gcps = []
+      message = {
+        text: err instanceof Error ? err.message : String(err),
+        type: 'error'
+      }
     }
   })
+
+  function handleCancel() {
+    open = false
+  }
+
+  function handleSave() {
+    onsubmit($state.snapshot(gcps) as GCPs)
+    open = false
+  }
 </script>
 
-<Modal
-  bind:open={uitState.modalsVisible.editGcps}
-  class="flex flex-col gap-2 max-w-xl"
->
+<Modal bind:open class="flex flex-col gap-2 max-w-xl">
   {#snippet title()}
     Edit Ground Control Points
   {/snippet}
+  <p>Edit the GCPs of the current map in the text field below.</p>
   <p>
-    You can use the formats used by QGIS, GDAL, ESRI. You can use the Upload
+    You can use the formats used by QGIS, GDAL and ESRI. You can use the Upload
     button to read the GCPs from a file on your computer.
   </p>
 
-  {#if gcps}
-    <textarea
-      name="gcps"
-      rows={10}
-      class="w-full h-auto font-mono inset-shadow-2xs
-      p-2 rounded-md
-      bg-[:#2e3440ff] text-[#d8dee9ff]"
-      bind:value={gcps}
-    ></textarea>
+  <Textarea rows={10} bind:value={gcpsString} />
 
-    <div>
-      <label for="upload">
-        <span
-          class="cursor-pointer border border-gray-300 rounded-lg px-2 py-1"
-        >
-          Upload a GCP file
-        </span>
-        <input bind:files id="upload" type="file" class="hidden" />
-      </label>
-    </div>
+  <div class="grid grid-cols-[1fr_max-content] gap-2">
+    <Message {message} />
+    <FileUpload bind:value={gcpsString} />
+  </div>
 
-    <!-- <div>{JSON.stringify(newGcps)}</div> -->
-    <div class="flex flex-row justify-center gap-2">
-      <button
-        class="cursor-pointer"
-        onclick={() => (uitState.modalsVisible.editGcps = false)}>Cancel</button
-      >
-      <button class="cursor-pointer">Save</button>
-    </div>
-  {:else}
-    <div>No GCPs...</div>
-  {/if}
+  <YesNo
+    yes="Save"
+    no="Cancel"
+    yesDisabled={!gcps.length}
+    onNo={handleCancel}
+    onYes={handleSave}
+    class="flex flex-row self-center gap-2"
+  />
 </Modal>

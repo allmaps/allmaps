@@ -65,10 +65,10 @@ function parsePropOp(
   op: unknown
 ): ParsedOp | ParsedOp[] {
   if (isArray(op)) {
-    if (isArray(op[0])) {
-      return op.map((op) => parsePropOp(mapId, prop, op)).flat()
-    } else if (
-      (prop === 'transformation' || prop === 'resourceCrs') &&
+    if (
+      ['resourceMask', 'gcps', 'transformation', 'resourceCrs'].includes(
+        prop
+      ) &&
       isObject(op[0])
     ) {
       return {
@@ -76,6 +76,8 @@ function parsePropOp(
         type: prop,
         instruction: op[0] as Instruction
       }
+    } else if (isArray(op[0])) {
+      return op.map((op) => parsePropOp(mapId, prop, op)).flat()
     } else if (typeof op[0] === 'string' || typeof op[0] === 'number') {
       const key = op[0]
 

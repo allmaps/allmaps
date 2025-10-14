@@ -1,6 +1,8 @@
 import type {
   InsertMap,
   RemoveMap,
+  ReplaceResourceMask,
+  ReplaceGcps,
   InsertResourceMaskPoint,
   ReplaceResourceMaskPoint,
   RemoveResourceMaskPoint,
@@ -14,6 +16,8 @@ import type {
 export const MapsEvents = {
   INSERT_MAP: 'INSERT_MAP' as const,
   REMOVE_MAP: 'REMOVE_MAP' as const,
+  REPLACE_RESOURCE_MASK: 'REPLACE_RESOURCE_MASK' as const,
+  REPLACE_GCPS: 'REPLACE_GCPS' as const,
   INSERT_RESOURCE_MASK_POINT: 'INSERT_RESOURCE_MASK_POINT' as const,
   REPLACE_RESOURCE_MASK_POINT: 'REPLACE_RESOURCE_MASK_POINT' as const,
   REMOVE_RESOURCE_MASK_POINT: 'REMOVE_RESOURCE_MASK_POINT' as const,
@@ -27,6 +31,8 @@ export const MapsEvents = {
 interface MapsEventMap {
   INSERT_MAP: InsertMap
   REMOVE_MAP: RemoveMap
+  REPLACE_RESOURCE_MASK: ReplaceResourceMask
+  REPLACE_GCPS: ReplaceGcps
   INSERT_RESOURCE_MASK_POINT: InsertResourceMaskPoint
   REPLACE_RESOURCE_MASK_POINT: ReplaceResourceMaskPoint
   REMOVE_RESOURCE_MASK_POINT: RemoveResourceMaskPoint

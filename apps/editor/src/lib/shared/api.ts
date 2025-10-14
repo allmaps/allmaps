@@ -16,6 +16,11 @@ export async function checkSource(source: Source) {
 }
 
 export async function createSource(source: Source) {
+  if (source.type === 'collection') {
+    console.warn("Don't create collection sources via API.")
+    return
+  }
+
   const checksum = await generateChecksum(source.sourceIiif)
 
   const apiUrl = `${PUBLIC_ALLMAPS_API_URL}/${source.type}s/${source.allmapsId}`

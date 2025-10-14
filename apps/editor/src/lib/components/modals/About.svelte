@@ -1,22 +1,28 @@
 <script lang="ts">
   import { getUiState } from '$lib/state/ui.svelte'
 
-  import { Modal } from '@allmaps/components'
+  import { Modal, Logo } from '@allmaps/components'
 
-  import Title from '$lib/components/Title.svelte'
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
 
-  const uitState = getUiState()
+  const uiState = getUiState()
 </script>
 
-<Modal bind:open={uitState.modalsVisible.about} closeButton={true}>
+<Modal
+  bind:open={
+    () => uiState.getModalOpen('about'),
+    (open) => uiState.setModalOpen('about', open)
+  }
+  closeButton={true}
+>
   {#snippet title()}
-    About Allmaps Editor
+    <span class="flex items-center gap-2">
+      <div class="size-8"><Logo /></div>
+      <span>Allmaps <span class="font-light">Editor</span></span>
+    </span>
   {/snippet}
   <div class="max-w-md">
-    <Title />
-
-    <div class="px-4">
+    <div class="">
       <p>Allmaps Editor is a web-based tool for georeferencing IIIF maps.</p>
       <p>
         For more information about Allmaps, see <a href="https://allmaps.org"
@@ -26,8 +32,7 @@
     </div>
 
     <!-- TODO: Add link to terms of use -->
-
-    <div class="bg-yellow p-4 text-black rounded-xl">
+    <div class="bg-yellow p-2 text-black rounded-md">
       <TermsOfUse />
     </div>
   </div>

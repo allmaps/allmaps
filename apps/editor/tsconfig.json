@@ -18,6 +18,7 @@
     { "path": "../../packages/io" },
     { "path": "../../packages/maplibre" },
     { "path": "../../packages/stdlib" },
+    { "path": "../../packages/project" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/types" }

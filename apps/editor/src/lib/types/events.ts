@@ -1,9 +1,10 @@
 import type { Point, ClickedItem } from '$lib/types/shared.js'
 import type {
+  ResourceMask,
   DbMap3,
   DbGcp3,
   DbTransformation,
-  DbResourceCrs
+  DbProjection
 } from '$lib/types/maps.js'
 
 // ============================================================================
@@ -17,6 +18,16 @@ export type InsertMap = {
 
 export type RemoveMap = {
   mapId: string
+}
+
+export type ReplaceResourceMask = {
+  mapId: string
+  resourceMask: ResourceMask
+}
+
+export type ReplaceGcps = {
+  mapId: string
+  gcps: DbGcp3[]
 }
 
 export type InsertResourceMaskPoint = {
@@ -58,11 +69,14 @@ export type SetTransformation = {
 
 export type SetResourceCrs = {
   mapId: string
-  resourceCrs?: DbResourceCrs
+  resourceCrs?: DbProjection
 }
 
 export type InsertMapEvent = CustomEvent<InsertMap>
 export type RemoveMapEvent = CustomEvent<RemoveMap>
+
+export type ReplaceResourceMaskEvent = CustomEvent<ReplaceResourceMask>
+export type ReplaceGcpsEvent = CustomEvent<ReplaceGcps>
 
 export type InsertResourceMaskPointEvent = CustomEvent<InsertResourceMaskPoint>
 export type ReplaceResourceMaskPointEvent =
@@ -74,5 +88,6 @@ export type ReplaceGcpEvent = CustomEvent<ReplaceGcp>
 export type RemoveGcpEvent = CustomEvent<RemoveGcp>
 
 export type SetTransformationEvent = CustomEvent<SetTransformation>
+export type SetResourceCrsEvent = CustomEvent<SetResourceCrs>
 
 export type ClickedItemEvent = CustomEvent<ClickedItem>

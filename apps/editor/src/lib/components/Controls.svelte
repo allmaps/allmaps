@@ -8,14 +8,17 @@
     MapPinSimple as MapPinSimpleIcon,
     MapTrifold as MapTrifoldIcon,
     CaretRight as CaretRightIcon,
-    List as ListIcon
+    Rows as RowsIcon
+    // ArrowRight as CaretRightIcon,
+    // CaretDown as CaretDownIcon
   } from 'phosphor-svelte'
 
-  import { createRouteUrl, getRouteId } from '$lib/shared/router.js'
+  import { createRouteUrl, getView } from '$lib/shared/router.js'
 
+  import { getUiState } from '$lib/state/ui.svelte.js'
   import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
-  import { getScopeState } from '$lib/state/scope.svelte.js'
 
   import { Popover } from '@allmaps/components'
 
@@ -24,21 +27,31 @@
   import Maps from '$lib/components/popovers/Maps.svelte'
   import Scope from '$lib/components/Scope.svelte'
 
+  const uiState = getUiState()
   const sourceState = getSourceState()
-  const scopeState = getScopeState()
+  const mapsState = getMapsState()
   const mapsMergedState = getMapsMergedState()
 
-  let resultsEnabled = $derived(mapsMergedState.completeMaps.length > 0)
+  let imagesViewButton: HTMLAnchorElement
+  let maskViewButton: HTMLAnchorElement
+  let georeferenceViewButton: HTMLAnchorElement
+  let resultsViewButton: HTMLAnchorElement
+
+  let resultsEnabled = $derived(
+    mapsMergedState.completeMaps.length > 0 || mapsState.activeMap !== undefined
+  )
 
   let isMapView = $derived(
-    page.route.id === '/georeference' || page.route.id === '/results'
+    page.route.id === '/(views)/georeference' ||
+      page.route.id === '/(views)/results'
   )
 
   let isImageView = $derived(
-    page.route.id === '/mask' || page.route.id === '/georeference'
+    page.route.id === '/(views)/mask' ||
+      page.route.id === '/(views)/georeference'
   )
 
-  let isResultsView = $derived(page.route.id === '/results')
+  let isResultsView = $derived(page.route.id === '/(views)/results')
 </script>
 
 {#snippet separator()}
@@ -49,7 +62,10 @@
 
 <div class="w-full h-full flex flex-col items-center justify-between p-2 gap-2">
   <div
-    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-start md:items-center
+    class:opacity-50={uiState.getPopoverOpen('info') ||
+      uiState.getPopoverOpen('export')}
+    class="w-full grid grid-cols-[1fr_max-content_1fr] gap-2 items-start sm:items-center
+      transition-opacity duration-200
       pointer-events-none *:pointer-events-auto"
   >
     <div></div>
@@ -60,7 +76,7 @@
         href={createRouteUrl(page, 'images', {
           image: sourceState.activeImageId || undefined
         })}
-        data-state={getRouteId(page) === 'images' ? 'active' : undefined}
+        data-state={getView(page) === 'images' ? 'active' : undefined}
         class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-blue/25 hover:bg-blue/10 flex items-center justify-center gap-2"
       >
         <ImagesIcon size={28} class="inline" />
@@ -68,10 +84,11 @@
       </a>
       {@render separator()}
       <a
+        bind:this={maskViewButton}
         href={createRouteUrl(page, 'mask', {
           image: sourceState.activeImageId || undefined
         })}
-        data-state={getRouteId(page) === 'mask' ? 'active' : undefined}
+        data-state={getView(page) === 'mask' ? 'active' : undefined}
         class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-green/25 hover:bg-green/10 flex items-center justify-center gap-2"
       >
         <PolygonIcon size={28} class="inline" />
@@ -79,15 +96,25 @@
       </a>
       {@render separator()}
       <a
+        bind:this={georeferenceViewButton}
         href={createRouteUrl(page, 'georeference', {
           image: sourceState.activeImageId || undefined
         })}
-        data-state={getRouteId(page) === 'georeference' ? 'active' : undefined}
+        data-state={getView(page) === 'georeference' ? 'active' : undefined}
         class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-yellow/25 hover:bg-yellow/10
           flex items-center justify-center gap-2"
       >
         <MapPinSimpleIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Georeference</span>
+
+        <!-- <Popover customAnchor={georeferenceViewButton}>
+          {#snippet button()}
+            <CaretDownIcon size={16} weight="bold" />
+          {/snippet}
+          {#snippet contents()}
+
+          {/snippet}
+        </Popover> -->
       </a>
       {@render separator()}
       <a
@@ -96,7 +123,7 @@
               image: sourceState.activeImageId || undefined
             })
           : undefined}
-        data-state={getRouteId(page) === 'results' ? 'active' : undefined}
+        data-state={getView(page) === 'results' ? 'active' : undefined}
         class={[
           !resultsEnabled && 'text-gray-400',
           resultsEnabled
@@ -107,6 +134,7 @@
       >
         <MapTrifoldIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Results</span>
+        <!-- <CaretDownIcon size={16} weight="bold" /> -->
       </a>
     </nav>
 
@@ -123,18 +151,18 @@
 
   <!-- class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto" -->
   <div
-    class="w-full z-10 grid grid-cols-[1fr_max-content_1fr] gap-2 items-center
+    class="w-full grid grid-cols-[1fr_max-content_1fr] gap-2 items-center
       pointer-events-none *:pointer-events-auto"
   >
     <div></div>
     <div>
-      {#if isResultsView && resultsEnabled && scopeState.mapsCount > 1}
+      {#if isResultsView && resultsEnabled}
         <div
           class="flex items-center gap-2
             bg-white z-50 p-1 rounded-lg shadow-md"
           transition:fade={{ duration: 100 }}
         >
-          <span class="hidden sm:inline-block pl-1">Show maps from</span>
+          <span class="hidden sm:inline-block pl-1">Show</span>
           <div class="w-48">
             <Scope />
           </div>
@@ -145,14 +173,21 @@
       {#if sourceState.imageCount > 1}
         <ImageSelector />
       {/if}
-
-      <Popover interactOutsideBehavior={'ignore'}>
+      <Popover
+        bind:open={
+          () => uiState.getPopoverOpen('maps'),
+          (open) => uiState.setPopoverOpen('maps', open)
+        }
+        interactOutsideBehavior={'ignore'}
+      >
         {#snippet button()}
           <div
-            class="bg-white rounded-md shadow-md p-2
-            flex flex-row gap-1 items-center justify-center"
+            class="bg-pink rounded-md shadow-md p-2 font-medium text-white
+            flex flex-row gap-1 items-center justify-center
+            hover:bg-pink/90 transition-all"
           >
-            <ListIcon class="size-5" />
+            <RowsIcon class="size-5" weight="bold" />
+            <!-- <span>Masks &amp; GCPs</span> -->
             <span>Maps</span>
           </div>
         {/snippet}

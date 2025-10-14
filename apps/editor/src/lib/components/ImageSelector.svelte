@@ -6,7 +6,7 @@
     ArrowRight as ArrowRightIcon
   } from 'phosphor-svelte'
 
-  import { createRouteUrl, getRouteId, gotoRoute } from '$lib/shared/router.js'
+  import { createRouteUrl, getView, gotoRoute } from '$lib/shared/router.js'
 
   import { getSourceState } from '$lib/state/source.svelte'
 
@@ -14,7 +14,7 @@
 
   function handlePreviousClick() {
     gotoRoute(
-      createRouteUrl(page, getRouteId(page), {
+      createRouteUrl(page, getView(page), {
         image: sourceState.getPreviousActiveImageId()
       })
     )
@@ -22,7 +22,7 @@
 
   function handleNextClick() {
     gotoRoute(
-      createRouteUrl(page, getRouteId(page), {
+      createRouteUrl(page, getView(page), {
         image: sourceState.getNextActiveImageId()
       })
     )

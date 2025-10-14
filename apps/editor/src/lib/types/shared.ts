@@ -5,9 +5,11 @@ import type {
 } from '@allmaps/iiif-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { PickerProjection } from '@allmaps/components/projections'
 
 export type ParamKey =
   | 'url'
+  | 'path'
   | 'manifest'
   | 'image'
   | 'map'
@@ -20,6 +22,7 @@ export type ParamKey =
 export type Params = { [key in ParamKey]?: string | null }
 
 export type Organization = {
+  id: string
   title: string
   label?: string | ((title: string) => string)
   subtitle?: string
@@ -39,7 +42,7 @@ export type GCP = {
 export type Point = [number, number]
 
 export type View = 'images' | 'mask' | 'georeference' | 'results'
-export type RouteID = View | ''
+export type MaybeView = View | undefined
 
 export type Scope = 'images' | 'image' | 'map'
 
@@ -95,8 +98,48 @@ export type Viewport = {
   bearing: number
 }
 
-export type PresetBaseMapID = 'esri-world-topo' | 'esri-world-imagery' | 'osm'
+export type AllmapsPluginId = 'maplibre' | 'leaflet' | 'openlayers'
+
+export type AllmapsPluginItem = {
+  label: string
+  value: AllmapsPluginId
+}
+
+export type BasemapPresetId =
+  | 'protomaps'
+  | 'esri-world-topo'
+  | 'esri-world-imagery'
+  | 'osm'
+
+export type BasemapProtomapsPresetItem = {
+  label: string
+  type: 'protomaps'
+  attribution: string
+  value: BasemapPresetId
+}
+
+export type BasemapRasterPresetItem = {
+  label: string
+  url: string
+  type: 'raster'
+  attribution: string
+  value: BasemapPresetId
+}
+
+export type BasemapPresetItem =
+  | BasemapProtomapsPresetItem
+  | BasemapRasterPresetItem
 
 export type ClickedItem =
   | { type: 'map'; mapId: string }
   | { type: 'gcp'; mapId: string; gcpId: string }
+
+// export type GetProjectionById = (id: string) => PickerProjection | undefined
+export type ProjectionsById = Record<string, PickerProjection>
+
+export type Message = { text: string; type: 'error' | 'success' }
+
+export type CollectionPath = {
+  index: number
+  page?: number
+}[]

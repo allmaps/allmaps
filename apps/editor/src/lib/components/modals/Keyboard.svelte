@@ -10,15 +10,59 @@
 
   import { Modal } from '@allmaps/components'
 
-  const uitState = getUiState()
+  const uiState = getUiState()
 </script>
 
-<Modal bind:open={uitState.modalsVisible.keyboard}>
+<Modal
+  bind:open={
+    () => uiState.getModalOpen('keyboard'),
+    (open) => uiState.setModalOpen('keyboard', open)
+  }
+>
   {#snippet title()}
     Keyboard shortcuts
   {/snippet}
   <table class="w-auto md:w-lg">
     <tbody class="first:pt-0">
+      <tr class="border-b-2 border-pink font-bold"
+        ><td class="p-1" colspan="2">General</td></tr
+      >
+
+      <tr>
+        <td class="p-1">Show command palette</td>
+        <td class="p-1"><Kbd>Cmd</Kbd>+<Kbd>K</Kbd></td>
+      </tr>
+
+      <!-- <tr>
+        <td class="p-1">Toggle georeferenced map opacity</td>
+        <td class="p-1"><Kbd>Space</Kbd></td>
+      </tr>
+
+      <tr>
+        <td class="p-1">Increase georeferenced map opacity</td>
+        <td class="p-1"><Kbd>Ctrl</Kbd><span>+</span><Kbd>+</Kbd></td>
+      </tr>
+
+      <tr>
+        <td class="p-1">Decrease georeferenced map opacity</td>
+        <td class="p-1"><Kbd>Ctrl</Kbd><span>+</span><Kbd>-</Kbd></td>
+      </tr>
+
+      <tr>
+        <td class="p-1">Toggle mask rendering</td>
+        <td class="p-1"><Kbd>M</Kbd></td>
+      </tr>
+
+      <tr>
+        <td class="p-1">Toggle background</td>
+        <td class="p-1"><Kbd>B</Kbd></td>
+      </tr> -->
+
+      <!-- <tr>
+        <td class="p-1">Show Keyboard shortcuts</td>
+        <td class="p-1"><Kbd>Ctrl</Kbd>+<Kbd>k</Kbd></td>
+      </tr> -->
+
       <tr class="border-b-2 border-pink font-bold"
         ><td class="p-1" colspan="2">Images and maps</td></tr
       >
@@ -79,7 +123,7 @@
       </tr>
 
       <tr>
-        <td class="p-1">Add vertex</td>
+        <td class="p-1">Add point</td>
         <td class="p-1">
           <div class="flex flex-row items-center gap-1">
             <MouseLeftClickIcon class="size-6" />
@@ -89,7 +133,7 @@
       </tr>
 
       <tr>
-        <td class="p-1">Delete vertex</td>
+        <td class="p-1">Delete point</td>
         <td class="p-1">
           <div class="flex flex-row items-center gap-1">
             <MouseRightClickIcon class="size-6" />

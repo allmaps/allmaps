@@ -81,7 +81,7 @@
           >Allmaps Viewer</a
         > or use them in tools like MapLibre, OpenLayers, Leaflet or QGIS.
       </p>
-      <URLInput onSubmit={handleInputSubmit} {autofocus} />
+      <URLInput onSubmit={handleInputSubmit} />
       <!-- TODO: enable when homepage is updated! -->
       <!-- <p>
         <a

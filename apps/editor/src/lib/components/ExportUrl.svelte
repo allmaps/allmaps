@@ -9,10 +9,11 @@
     url: string
     openUrl?: string
     label: string
+    header?: Snippet
     children?: Snippet
   }
 
-  let { url, openUrl, label, children }: Props = $props()
+  let { url, openUrl, label, header, children }: Props = $props()
 
   let input: HTMLInputElement
 
@@ -23,14 +24,21 @@
 
 <div class="flex flex-col gap-2">
   <div class="flex flex-row items-center justify-between gap-2">
-    <a class="inline-flex gap-2 items-center font-bold" href={openUrl || url}
-      ><span>{label}</span> <ArrowSquareOutIcon /></a
-    >
+    <h3 class="font-bold text-lg">
+      <a class="inline-flex gap-2 items-center" href={openUrl || url}
+        ><span>{label}</span> <ArrowSquareOutIcon /></a
+      >
+    </h3>
 
-    {#if children}
-      <div>{@render children()}</div>
+    {#if header}
+      <div>{@render header()}</div>
     {/if}
   </div>
+  {#if children}
+    <div class="contents">
+      {@render children()}
+    </div>
+  {/if}
   <div class="flex justify-between items-center gap-2">
     <input
       bind:this={input}
@@ -41,6 +49,6 @@
       focus-visible:border-pink inset-shadow-xs"
       onfocus={handleFocus}
     />
-    <Copy text={url} />
+    <Copy value={url} />
   </div>
 </div>

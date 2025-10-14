@@ -7,9 +7,7 @@
   import { TerraDraw, TerraDrawPolygonMode } from 'terra-draw'
   import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter'
 
-  import { X as XIcon, Check as CheckIcon } from 'phosphor-svelte'
-
-  import { pink, red, green } from '@allmaps/tailwind'
+  import { pink } from '@allmaps/tailwind'
   import { computeBbox, combineBboxes } from '@allmaps/stdlib'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
@@ -17,7 +15,7 @@
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import { generateId } from '$lib/shared/id.js'
+  import { generateId } from '$lib/shared/ids.js'
   import { polygonDifference } from '$lib/shared/geometry.js'
   import { getResourceMask } from '$lib/shared/maps.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
@@ -29,19 +27,21 @@
     clearFeatures
   } from '$lib/shared/terra-draw.js'
 
+  import Resource from '$lib/components/maplibre/Resource.svelte'
+  import YesNo from '$lib/components/YesNo.svelte'
+
   import type { GeoJSONStoreFeatures } from 'terra-draw'
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
   import type { GcpTransformer } from '@allmaps/transform'
-  import type { Point, Bbox } from '@allmaps/types'
 
   import type { DbImageService, DbMap3, ResourceMask } from '$lib/types/maps.js'
-
-  import Resource from '$lib/components/maplibre/Resource.svelte'
 
   import type {
     InsertMapEvent,
     RemoveMapEvent,
+    ReplaceResourceMaskEvent,
+    ReplaceGcpsEvent,
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
     RemoveResourceMaskPointEvent,
@@ -455,6 +455,11 @@
     replaceFeatureFromState(mapId)
   }
 
+  function handleReplaceResourceMask(event: ReplaceResourceMaskEvent) {
+    const mapId = event.detail.mapId
+    replaceFeatureFromState(mapId)
+  }
+
   function handleReplaceResourceMaskPoint(
     event: ReplaceResourceMaskPointEvent
   ) {
@@ -559,12 +564,23 @@
     }
   })
 
+  $effect(() => {
+    if (sourceState.activeImageId) {
+      clearFeatures(resourceDraw)
+    }
+  })
+
   onMount(() => {
     uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
     uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
 
     mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
+
+    mapsState.addEventListener(
+      MapsEvents.REPLACE_RESOURCE_MASK,
+      handleReplaceResourceMask
+    )
 
     mapsState.addEventListener(
       MapsEvents.INSERT_RESOURCE_MASK_POINT,
@@ -589,6 +605,11 @@
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
 
       mapsState.removeEventListener(
+        MapsEvents.REPLACE_RESOURCE_MASK,
+        handleReplaceResourceMask
+      )
+
+      mapsState.removeEventListener(
         MapsEvents.INSERT_RESOURCE_MASK_POINT,
         handleInsertResourceMaskPoint
       )
@@ -610,6 +631,7 @@
       bind:resourceMap
       bind:transformer
       bind:warpedMapLayerBounds
+      resourceMask={mapsState.activeMap?.resourceMask}
       initialViewport={resourceViewport}
     />
   {/if}
@@ -622,25 +644,13 @@
         class="p-1 rounded-lg bg-white flex gap-2 shadow pointer-events-auto
           font-medium"
       >
-        <button
-          onclick={abortDrawing}
-          class="bg-red-100 z-50 p-2 rounded-md text-sm flex items-center gap-1
-          transition-all cursor-pointer hover:bg-red-200"
-        >
-          <XIcon class="size-4" weight="bold" color={red} />
-          <span>Cancel</span>
-        </button>
-
-        <button
-          onclick={finishDrawing}
-          disabled={!canFinishDrawing}
-          class="bg-green-100 z-50 p-2 rounded-md text-sm flex items-center gap-1
-          cursor-pointer hover:bg-green-200
-          transition-all disabled:opacity-50"
-        >
-          <CheckIcon class="size-4" weight="bold" color={green} />
-          <span>Finish</span>
-        </button>
+        <YesNo
+          yes="Finish"
+          no="Cancel"
+          onYes={finishDrawing}
+          onNo={abortDrawing}
+          yesDisabled={!canFinishDrawing}
+        />
       </div>
     </div>
   {/if}
