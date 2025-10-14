@@ -9,7 +9,6 @@ assets = { directory = ".svelte-kit/cloudflare", binding = "ASSETS" }
 name = "editor-develop"
 
 [vars]
-NODE_OPTIONS = "--max-old-space-size=4096"
 PUBLIC_ALLMAPS_API_WS_URL = "wss://dev.api.allmaps.org"
 PUBLIC_ALLMAPS_API_URL = "https://dev.api.allmaps.org"
 PUBLIC_ALLMAPS_ANNOTATIONS_API_URL = "https://dev.annotations.allmaps.org"
@@ -20,7 +19,6 @@ PUBLIC_EXAMPLES_API_URL = "https://sammeltassen-allmaps.web.val.run"
 PUBLIC_STATS_WEBSITE_ID = ""
 
 [env.dev.vars]
-NODE_OPTIONS = "--max-old-space-size=4096"
 PUBLIC_ALLMAPS_API_WS_URL = "wss://dev.api.allmaps.org"
 PUBLIC_ALLMAPS_API_URL = "https://dev.api.allmaps.org"
 PUBLIC_ALLMAPS_ANNOTATIONS_API_URL = "https://dev.annotations.allmaps.org"
