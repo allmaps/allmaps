@@ -1,6 +1,6 @@
 import type { Bbox, Point } from '@allmaps/types'
 
-import type { ClickedItem } from '$lib/types/shared'
+import type { ClickedItem } from '$lib/types/shared.js'
 
 export const UiEvents = {
   CLICKED_ITEM: 'CLICKED_ITEM' as const,

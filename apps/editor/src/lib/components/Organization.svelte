@@ -13,14 +13,14 @@
   import Example from '$lib/components/Example.svelte'
 
   import type {
-    Organization,
+    OrganizationWithId,
     Example as ExampleType
   } from '$lib/types/shared.js'
 
   type Props = {
     count?: number
     perPage?: number
-    organization: Organization
+    organization: OrganizationWithId
     showMoreLink?: boolean
   }
 
@@ -47,7 +47,7 @@
   })
 </script>
 
-{#snippet header(organization: Organization)}
+{#snippet header(organization: OrganizationWithId)}
   <div class="contents md:flex flex-col gap-2 sm:gap-4">
     <svelte:element
       this={showMoreLink ? 'a' : 'div'}

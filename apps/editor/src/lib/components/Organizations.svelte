@@ -1,10 +1,10 @@
 <script lang="ts">
   import Organization from '$lib/components/Organization.svelte'
 
-  import type { Organization as OrganizationType } from '$lib/types/shared.js'
+  import type { OrganizationWithId } from '$lib/types/shared.js'
 
   type Props = {
-    organizations: OrganizationType[]
+    organizations: OrganizationWithId[]
   }
 
   let { organizations }: Props = $props()
