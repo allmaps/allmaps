@@ -16,7 +16,12 @@ export default defineConfig({
   },
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
   ssr: {
-    noExternal: ['maplibre-gl', 'maplibre-contour']
+    noExternal: [
+      'terra-draw',
+      'terra-draw-maplibre-gl-adapter',
+      'maplibre-gl',
+      'maplibre-contour'
+    ]
   },
   optimizeDeps: {
     include: ['sharedb-client-browser/dist/sharedb-client-umd.cjs']

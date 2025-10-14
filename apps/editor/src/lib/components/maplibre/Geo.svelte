@@ -3,7 +3,6 @@
   import { SvelteSet } from 'svelte/reactivity'
 
   import { Map, addProtocol } from 'maplibre-gl'
-  import maplibregl from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
 
   import { pink } from '@allmaps/tailwind'
@@ -29,7 +28,7 @@
   import { UiEvents } from '$lib/shared/ui-events.js'
   import { MapsEvents } from '$lib/shared/maps-events.js'
 
-  import type { LngLatBoundsLike } from 'maplibre-gl'
+  import type { LngLatBoundsLike, MapMouseEvent } from 'maplibre-gl'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { TransformationType } from '@allmaps/transform'
@@ -223,7 +222,7 @@
     }
   }
 
-  function findFirstMapFromEvent(event: maplibregl.MapMouseEvent) {
+  function findFirstMapFromEvent(event: MapMouseEvent) {
     if (warpedMapLayer) {
       const mapIds = warpedMapLayer.getWarpedMapList().getMapIds({
         geoPoint: [event.lngLat.lng, event.lngLat.lat],
@@ -234,7 +233,7 @@
     }
   }
 
-  function handleClick(event: maplibregl.MapMouseEvent) {
+  function handleClick(event: MapMouseEvent) {
     // const mapId = findFirstMapFromEvent(event)
     // if (mapId) {
     //   mapsState.activeMapId = mapId
@@ -242,7 +241,7 @@
     // }
   }
 
-  function handleContextmenu(event: maplibregl.MapMouseEvent) {
+  function handleContextmenu(event: MapMouseEvent) {
     // const mapId = findFirstMapFromEvent(event)
     // console.log('contextmenu', mapId)
   }
@@ -450,4 +449,4 @@
   })
 </script>
 
-<div bind:this={geoMapContainer} class="w-full h-full"></div>
+<div bind:this={geoMapContainer} class="h-full w-full"></div>

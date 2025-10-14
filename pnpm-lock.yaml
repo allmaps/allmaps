@@ -154,8 +154,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       maplibre-gl:
-        specifier: ^5.7.0
-        version: 5.7.1
+        specifier: ^5.9.0
+        version: 5.9.0
       ot-json1:
         specifier: ^1.0.2
         version: 1.0.2
@@ -179,7 +179,7 @@ importers:
         version: 1.13.0
       terra-draw-maplibre-gl-adapter:
         specifier: ^1.1.2
-        version: 1.1.2(maplibre-gl@5.7.1)(terra-draw@1.13.0)
+        version: 1.1.2(maplibre-gl@5.9.0)(terra-draw@1.13.0)
       zod:
         specifier: ^3.22.4
         version: 3.25.76
@@ -3492,6 +3492,10 @@ packages:
 
   '@maplibre/maplibre-gl-style-spec@23.3.0':
     resolution: {integrity: sha512-IGJtuBbaGzOUgODdBRg66p8stnwj9iDXkgbYKoYcNiiQmaez5WVRfXm4b03MCDwmZyX93csbfHFWEJJYHnn5oA==}
+    hasBin: true
+
+  '@maplibre/maplibre-gl-style-spec@24.2.0':
+    resolution: {integrity: sha512-cE80g83fRcBbZbQC70siOUxUK6YJ/5ZkClDZbmm+hzrUbv+J6yntkMmcpdz9DbOrWOM7FHKR5rruc6Q/hWx5cA==}
     hasBin: true
 
   '@maplibre/vt-pbf@4.0.3':
@@ -6812,6 +6816,10 @@ packages:
 
   maplibre-gl@5.7.1:
     resolution: {integrity: sha512-iCOQB6W/EGgQx8aU4SyfU5a5/GR2E+ELF92NMsqYfs3x+vnY+8mARmz4gor6XZHCz3tv19mnotVDRlRTMNKyGw==}
+    engines: {node: '>=16.14.0', npm: '>=8.1.0'}
+
+  maplibre-gl@5.9.0:
+    resolution: {integrity: sha512-YxW9glb/YrDXGDhqy1u+aG113+L86ttAUpTd6sCkGHyUKMXOX8qbGHJQVqxOczy+4CtRKnqcCfSura2MzB0nQA==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   markdown-extensions@2.0.0:
@@ -10961,6 +10969,16 @@ snapshots:
       tinyqueue: 3.0.0
 
   '@maplibre/maplibre-gl-style-spec@23.3.0':
+    dependencies:
+      '@mapbox/jsonlint-lines-primitives': 2.0.2
+      '@mapbox/unitbezier': 0.0.1
+      json-stringify-pretty-compact: 4.0.0
+      minimist: 1.2.8
+      quickselect: 3.0.0
+      rw: 1.3.3
+      tinyqueue: 3.0.0
+
+  '@maplibre/maplibre-gl-style-spec@24.2.0':
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.2
       '@mapbox/unitbezier': 0.0.1
@@ -15336,6 +15354,31 @@ snapshots:
       supercluster: 8.0.1
       tinyqueue: 3.0.0
 
+  maplibre-gl@5.9.0:
+    dependencies:
+      '@mapbox/geojson-rewind': 0.5.2
+      '@mapbox/jsonlint-lines-primitives': 2.0.2
+      '@mapbox/point-geometry': 1.1.0
+      '@mapbox/tiny-sdf': 2.0.7
+      '@mapbox/unitbezier': 0.0.1
+      '@mapbox/vector-tile': 2.0.4
+      '@mapbox/whoots-js': 3.1.0
+      '@maplibre/maplibre-gl-style-spec': 24.2.0
+      '@maplibre/vt-pbf': 4.0.3
+      '@types/geojson': 7946.0.16
+      '@types/geojson-vt': 3.2.5
+      '@types/supercluster': 7.1.3
+      earcut: 3.0.2
+      geojson-vt: 4.0.2
+      gl-matrix: 3.4.4
+      kdbush: 4.0.2
+      murmurhash-js: 1.0.0
+      pbf: 4.0.1
+      potpack: 2.1.0
+      quickselect: 3.0.0
+      supercluster: 8.0.1
+      tinyqueue: 3.0.0
+
   markdown-extensions@2.0.0: {}
 
   markdown-table@3.0.4: {}
@@ -18128,9 +18171,9 @@ snapshots:
       minizlib: 3.1.0
       yallist: 5.0.0
 
-  terra-draw-maplibre-gl-adapter@1.1.2(maplibre-gl@5.7.1)(terra-draw@1.13.0):
+  terra-draw-maplibre-gl-adapter@1.1.2(maplibre-gl@5.9.0)(terra-draw@1.13.0):
     dependencies:
-      maplibre-gl: 5.7.1
+      maplibre-gl: 5.9.0
       terra-draw: 1.13.0
 
   terra-draw@1.13.0: {}
