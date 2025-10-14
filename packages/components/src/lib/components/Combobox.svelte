@@ -50,8 +50,7 @@
     }
   })
 
-  // const initialValue = $state.snapshot(field.value)
-
+  // svelte-ignore state_referenced_locally
   let inputValue = $state(selectedItem?.label || '')
 
   let open = $state(false)
