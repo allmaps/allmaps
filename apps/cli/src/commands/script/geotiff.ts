@@ -96,6 +96,6 @@ export function geotiff() {
       mergeOptions(options, { projectedTransformers })
     )
 
-    printString(geotiffScripts.join('\n'))
+    printString(geotiffScripts)
   })
 }
