@@ -161,16 +161,14 @@
 />
 
 <Head />
-<div
-  class="fixed w-screen h-screen grid grid-rows-[min-content_min-content_1fr]"
->
+<div class="fixed grid h-dvh w-dvw grid-rows-[min-content_min-content_1fr]">
   <div>
     <Banner />
   </div>
   <div class="z-20">
     <Header />
   </div>
-  <div class="grid w-full h-full min-h-0">
+  <div class="grid h-full min-h-0 w-full">
     <!-- {#if sourceState.loading}
       <div class="w-full h-full top-0 left-0">
         <Loading />
@@ -184,7 +182,7 @@
       {@render children()}
     </div>
 
-    <div class="z-10 col-span-full row-span-full min-h-0 pointer-events-none">
+    <div class="pointer-events-none z-10 col-span-full row-span-full min-h-0">
       <Controls />
     </div>
   </div>
