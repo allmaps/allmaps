@@ -3,11 +3,7 @@
 
   import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl'
 
-  import {
-    TerraDraw,
-    TerraDrawPointMode,
-    TerraDrawRenderMode
-  } from 'terra-draw'
+  import { TerraDraw, TerraDrawPointMode } from 'terra-draw'
 
   import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter'
 
@@ -1120,7 +1116,7 @@
 </script>
 
 <div
-  class="w-full h-full grid grid-rows-2 sm:grid-rows-1 sm:grid-cols-2 gap-0.5"
+  class="grid h-full w-full grid-rows-2 gap-0.5 sm:grid-cols-2 sm:grid-rows-1"
 >
   <Resource
     bind:resourceMap
