@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { CanvasSchema, ImageSchema } from '../schemas/iiif.js'
-import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
+import { CanvasSchema } from '../schemas/iiif.js'
+import { AnnotationImageBody3Schema } from '../schemas/presentation.3.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
 import { EmbeddedImage, Image } from './image.js'
 
@@ -30,9 +30,8 @@ import {
 } from '../lib/convert.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
-type ImageType = z.infer<typeof ImageSchema>
 type EmbeddedImageType =
-  | z.infer<typeof AnnotationBody3Schema>
+  | z.infer<typeof AnnotationImageBody3Schema>
   | z.infer<typeof ImageResource2Schema>
 
 const CanvasTypeString = 'canvas'
@@ -120,18 +119,24 @@ export class Canvas {
 
       const annotationBodyOrBodies = parsedCanvas.items[0].items[0].body
 
-      let annotationBody: ImageType | EmbeddedImageType
+      let annotationBody: EmbeddedImageType | undefined
       if (Array.isArray(annotationBodyOrBodies)) {
-        annotationBody = annotationBodyOrBodies[0]
+        annotationBody = annotationBodyOrBodies.find(
+          (body) => body.type === 'Image'
+        )
       } else if (annotationBodyOrBodies.type === 'Image') {
         annotationBody = annotationBodyOrBodies
       } else if (annotationBodyOrBodies.type === 'Choice') {
-        annotationBody = annotationBodyOrBodies.items[0]
-      } else {
-        throw new Error('Invalid IIIF Canvas')
+        annotationBody = annotationBodyOrBodies.items.find(
+          (body) => body.type === 'Image'
+        )
       }
 
-      this.image = new EmbeddedImage(annotationBody, parsedCanvas)
+      if (annotationBody) {
+        this.image = new EmbeddedImage(annotationBody, parsedCanvas)
+      } else {
+        throw new Error('No image found on IIIF Canvas')
+      }
     } else {
       throw new Error('Invalid IIIF Canvas')
     }

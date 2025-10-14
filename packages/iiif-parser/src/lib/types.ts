@@ -25,7 +25,7 @@ export type MetadataItem = {
 
 export type Metadata = MetadataItem[]
 
-export type FetchNextOptions = {
+export type FetchNextItemOptions = {
   maxDepth?: number
   fetchCollections?: boolean
   fetchManifests?: boolean
@@ -33,7 +33,7 @@ export type FetchNextOptions = {
   fetchFn: typeof fetch
 }
 
-export type FetchNextResults<Item> = {
+export type FetchNextItemResults<Item> = {
   item: Item
   depth: number
   parent: {

@@ -18,7 +18,7 @@ import {
 } from '../schemas/image.2.js'
 import { ImageServiceSchema } from '../schemas/image-service.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
-import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
+import { AnnotationImageBody3Schema } from '../schemas/presentation.3.js'
 
 import { getTileZoomLevels, getTileImageRequest } from '../lib/tiles.js'
 import { getImageRequest } from '../lib/image-requests.js'
@@ -34,7 +34,7 @@ type ImageServiceType = z.infer<typeof ImageServiceSchema>
 type CanvasType = z.infer<typeof CanvasSchema>
 type ImageType = z.infer<typeof ImageSchema>
 type EmbeddedImageType =
-  | z.infer<typeof AnnotationBody3Schema>
+  | z.infer<typeof AnnotationImageBody3Schema>
   | z.infer<typeof ImageResource2Schema>
 
 const ImageTypeString = 'image' as const
