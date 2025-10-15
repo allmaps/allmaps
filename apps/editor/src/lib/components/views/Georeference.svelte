@@ -958,7 +958,8 @@
       resourceDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
           map: resourceMap,
-          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
+          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION,
+          ignoreMismatchedPointerEvents: true
         }),
         modes: [resourcePointMode],
         idStrategy
@@ -989,7 +990,8 @@
 
       const adapter = new TerraDrawMapLibreGLAdapter({
         map: geoMap,
-        coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
+        coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION,
+        ignoreMismatchedPointerEvents: true
       })
 
       geoDraw = new TerraDraw({

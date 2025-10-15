@@ -49,8 +49,8 @@
     "sharedb": "^5.0.2",
     "sharedb-client-browser": "^5.0.2",
     "shiki": "^3.13.0",
-    "terra-draw": "^1.13.0",
-    "terra-draw-maplibre-gl-adapter": "^1.1.2",
+    "terra-draw": "^1.18.0",
+    "terra-draw-maplibre-gl-adapter": "^1.2.2",
     "zod": "^3.22.4",
     "zod-validation-error": "^3.4.0"
   },

@@ -525,7 +525,8 @@
       resourceDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
           map: resourceMap,
-          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION
+          coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION,
+          ignoreMismatchedPointerEvents: true
         }),
         modes: [polygonMode],
         idStrategy
@@ -625,7 +626,7 @@
   })
 </script>
 
-<div class="relative w-full h-full">
+<div class="relative h-full w-full">
   {#if mapsState.connectedImageId}
     <Resource
       bind:resourceMap
@@ -637,12 +638,12 @@
   {/if}
   {#if isDrawing}
     <div
-      class="absolute top-16 w-full flex items-center justify-center pointer-events-none"
+      class="pointer-events-none absolute top-16 flex w-full items-center justify-center"
     >
       <div
         transition:fade={{ duration: 100 }}
-        class="p-1 rounded-lg bg-white flex gap-2 shadow pointer-events-auto
-          font-medium"
+        class="pointer-events-auto flex gap-2 rounded-lg bg-white p-1 font-medium
+          shadow"
       >
         <YesNo
           yes="Finish"
