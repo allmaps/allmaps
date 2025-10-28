@@ -32,6 +32,17 @@
     "georeference",
     "map"
   ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "test": "NODE_ENV=test vitest",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "types": "tsc --noEmit",
+    "format": "prettier --write src test",
+    "documentation": "remark . --output --use remark-api",
+    "bench": "node bench/index.js"
+  },
+  "license": "MIT",
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@turf/distance": "^7.2.0",
@@ -45,25 +56,12 @@
     "@types/geojson": "^7946.0.10",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "chai": "^4.3.6",
-    "chai-shallow-deep-equal": "^1.4.6",
+    "vitest": "^4.0.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
     "prettier": "^3.4.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "^5.7.0"
-  },
-  "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
-    "test": "NODE_ENV=test mocha",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "types": "tsc --noEmit",
-    "format": "prettier --write src test",
-    "documentation": "remark . --output --use remark-api",
-    "bench": "node bench/index.js"
-  },
-  "license": "MIT"
+  }
 }

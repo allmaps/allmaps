@@ -27,7 +27,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "NODE_ENV=test mocha --slow 500ms --reporter-option maxDiffSize=0",
+    "test": "NODE_ENV=test vitest",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test"
@@ -58,17 +58,15 @@
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
-    "@types/node": "^18.14.2",
+    "@types/node": "^24",
     "@types/stream-json": "^1.7.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "chai": "^4.3.6",
-    "chai-roughly": "^1.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
     "prettier": "^3.4.2",
     "typescript": "^5.7.0",
+    "vitest": "^4.0.4",
     "zod": "^3.22.4"
   }
 }

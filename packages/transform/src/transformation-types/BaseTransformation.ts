@@ -123,7 +123,7 @@ export abstract class BaseTransformation {
     return this.destinationTransformedSourcePoints
   }
 
-  getMeasures(): TransformationTypeMeasures {
+  getMeasures(): Partial<TransformationTypeMeasures> {
     return {}
   }
 

@@ -32,3 +32,13 @@ MIT
 ###### Returns
 
 `{ version: 8; name?: string; metadata?: unknown; center?: Array<number>; zoom?: number; bearing?: number; pitch?: number; light?: LightSpecification; ... 5 more ...; layers: Array<LayerSpecification>; }`.
+
+### `removeTerrain(map)`
+
+###### Parameters
+
+* `map` (`Map`)
+
+###### Returns
+
+`void`.

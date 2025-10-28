@@ -68,10 +68,8 @@ export type Polynomial1Measures = {
   scales: Point
   shears: Point
 }
-export type TransformationTypeMeasures =
-  | HelmertMeasures
-  | Polynomial1Measures
-  | object
+export type TransformationTypeMeasures = HelmertMeasures | Polynomial1Measures
+// | object
 
 // Stored here as object to facilitate parsing in CLI
 export type InverseOptions = {

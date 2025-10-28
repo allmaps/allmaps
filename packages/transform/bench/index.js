@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { GcpTransformer } from '../dist/index.js'
+import { GcpTransformer } from '../src/index.js'
 
 import { gcps10 } from '../test/input/gcps-test.js'
 

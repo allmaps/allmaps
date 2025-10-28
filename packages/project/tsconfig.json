@@ -5,7 +5,12 @@
     "outDir": "./dist",
     "paths": {},
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
-  "references": [{ "path": "../types" }, { "path": "../transform" }, { "path": "../stdlib" }],
+  "references": [
+    { "path": "../types" },
+    { "path": "../transform" },
+    { "path": "../stdlib" }
+  ],
   "include": ["./src/**/*"]
 }

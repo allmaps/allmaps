@@ -35,7 +35,6 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "test": "NODE_ENV=test mocha",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
@@ -56,7 +55,6 @@
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
     "prettier": "^3.4.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",

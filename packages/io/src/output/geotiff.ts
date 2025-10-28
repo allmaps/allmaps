@@ -215,7 +215,7 @@ required_width_${basename}=${resourceSize[0]}
 required_height_${basename}=${resourceSize[1]}
 
 width_${basename}=( $(gdalinfo -json ${imageFilename} | jq '.size[0]') )
-height_${basename}=( $(gdalinfo -json  ${imageFilename} | jq '.size[1]') )
+height_${basename}=( $(gdalinfo -json ${imageFilename} | jq '.size[1]') )
 
 if [ "$width_${basename}" -eq "$required_width_${basename}" ] &&
    [ "$height_${basename}" -eq "$required_height_${basename}" ]; then
