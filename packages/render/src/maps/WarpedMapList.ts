@@ -318,6 +318,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const projectedGeoMaskPoints = this.getProjectedGeoMaskPoints(
       partialSelectionAndProjectionOptions
     )
+
+    if (projectedGeoMaskPoints.length === 0) {
+      return
+    }
+
     return computeBbox(projectedGeoMaskPoints)
   }
 
