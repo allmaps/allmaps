@@ -4,4 +4,6 @@
   import Error from '$lib/components/Error.svelte'
 </script>
 
-<Error error={page.error} />
+<div class="fixed grid h-dvh w-dvw">
+  <Error error={page.error} />
+</div>

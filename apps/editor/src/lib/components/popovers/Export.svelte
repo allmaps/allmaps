@@ -44,10 +44,10 @@
       >
         {#snippet header()}
           <button
-            onclick={() => uiState.setModalOpen('annotation', true)}
-            class="flex flex-row gap-1.5 px-3 py-1 rounded-full cursor-pointer
-        items-center text-sm font-medium text-white
-      bg-darkblue/90 hover:bg-darkblue/100 shadow-none hover:shadow-md transition-all"
+            onclick={() => (uiState.modalOpen.annotation = true)}
+            class="bg-darkblue/90 hover:bg-darkblue/100 flex cursor-pointer flex-row items-center gap-1.5
+        rounded-full px-3 py-1 text-sm
+      font-medium text-white shadow-none transition-all hover:shadow-md"
           >
             <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
               class="hidden sm:inline-block"
@@ -68,11 +68,10 @@
       </ExportUrl>
 
       <button
-        onclick={() => uiState.setModalOpen('export', true)}
-        class="bg-green drop-shadow-xs cursor-pointer px-4 py-2 rounded-full
-        self-center font-medium text-white
-        hover:bg-green/90 hover:drop-shadow-lg/30 transition-all"
-        >Show more export options</button
+        onclick={() => (uiState.modalOpen.export = true)}
+        class="bg-green drop-shadow-xs hover:bg-green/90 hover:drop-shadow-lg/30 cursor-pointer self-center
+        rounded-full px-4 py-2
+        font-medium text-white transition-all">Show more export options</button
       >
     {/if}
   {:else}

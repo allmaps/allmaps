@@ -3,9 +3,13 @@
 
   import { red, green } from '@allmaps/tailwind'
 
+  type Color = 'red' | 'green' | 'gray'
+
   type Props = {
     yes?: string
     no?: string
+    yesColor?: Color
+    noColor?: Color
     onYes?: () => void
     onNo?: () => void
     noDisabled?: boolean
@@ -15,34 +19,47 @@
   let {
     yes = 'Yes',
     no = 'No',
+    yesColor = 'green',
+    noColor = 'red',
     onYes,
     onNo,
     noDisabled = false,
     yesDisabled = false,
     ...restProps
   }: Props = $props()
+
+  let colorClasses: Record<Color, { bg: string; text: string }> = {
+    red: { bg: 'bg-red-100 hover:bg-red-100/70', text: 'text-red' },
+    green: { bg: 'bg-green-100 hover:bg-green-100/70', text: 'text-green' },
+    gray: { bg: 'bg-gray-100 hover:bg-gray-100/70', text: 'text-gray' }
+  }
+
+  let noColorClass = $derived(colorClasses[noColor])
+  let yesColorClass = $derived(colorClasses[yesColor])
 </script>
 
-<div class="flex flex-row gap-2 items-center" {...restProps}>
+<div class="flex flex-row items-center gap-2" {...restProps}>
   <button
     onclick={onNo}
     disabled={noDisabled}
-    class="bg-red-100 p-2 rounded-md text-sm flex items-center gap-1
-      cursor-pointer hover:bg-red-100/70
-      transition-all disabled:opacity-50"
+    class={[
+      'flex cursor-pointer items-center gap-1 rounded-md p-2 text-sm transition-all disabled:opacity-50',
+      noColorClass.bg
+    ]}
   >
-    <XIcon class="size-4" weight="bold" color={red} />
+    <XIcon class={['size-4', noColorClass.text]} weight="bold" />
     <span>{no}</span>
   </button>
 
   <button
     onclick={onYes}
     disabled={yesDisabled}
-    class="bg-green-100 p-2 rounded-md text-sm flex items-center gap-1
-      cursor-pointer hover:bg-green-100/70
-      transition-all disabled:opacity-50"
+    class={[
+      'flex cursor-pointer items-center gap-1 rounded-md p-2 text-sm transition-all disabled:opacity-50',
+      yesColorClass.bg
+    ]}
   >
-    <CheckIcon class="size-4" weight="bold" color={green} />
+    <CheckIcon class={['size-4', yesColorClass.text]} weight="bold" />
     <span>{yes}</span>
   </button>
 </div>

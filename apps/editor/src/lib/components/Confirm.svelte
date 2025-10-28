@@ -30,7 +30,7 @@
     {@render button()}
   {/snippet}
   {#snippet contents()}
-    <div class="w-48 flex flex-col gap-2 items-center">
+    <div class="flex w-48 flex-col items-center gap-2">
       <span>
         {#if question}
           {@render question()}
@@ -38,7 +38,14 @@
           Are you sure?
         {/if}
       </span>
-      <YesNo onYes={handleYesClick} onNo={handleNoClick} />
+      <YesNo
+        onYes={handleYesClick}
+        yes="Delete"
+        yesColor="red"
+        onNo={handleNoClick}
+        no="Cancel"
+        noColor="gray"
+      />
     </div>
   {/snippet}
 </Popover>

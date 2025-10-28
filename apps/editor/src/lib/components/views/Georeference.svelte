@@ -15,7 +15,7 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
-  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
 
   import {
@@ -137,12 +137,12 @@
     }
   }
   function handleInsertMap(event: InsertMapEvent) {
-    addResourceMask(event.detail.map)
+    // addResourceMask(event.detail.map)
   }
 
   function handleRemoveMap(event: RemoveMapEvent) {
     const mapId = event.detail.mapId
-    removeResourceMask(mapId)
+    // removeResourceMask(mapId)
   }
 
   function handleReplaceResourceMask(event: ReplaceResourceMaskEvent) {
@@ -225,8 +225,8 @@
     let dataGeoViewport: Viewport | undefined
 
     if (geoMap) {
-      navPlaceGeoViewport = getNavPlaceViewport(geoMap, sourceState.navPlace)
-      urlGeoViewport = getBboxViewport(geoMap, urlState.bbox)
+      navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
+      urlGeoViewport = getBboxViewport(urlState.params.bbox)
 
       if (mapsState.activeMap?.gcps) {
         // TODO: get viewport from data
@@ -407,41 +407,9 @@
     }
   }
 
-  function addResourceMask(map: DbMap3) {
-    if (!resourceDraw || !geoDraw) {
-      return
-    }
-
-    if (!resourceTransformer) {
-      return
-    }
-
-    try {
-      if (map.id === mapsState.activeMapId) {
-        const resourceMaskFeature = getResourceMaskFeature(
-          resourceTransformer,
-          map
-        )
-        resourceDraw.addFeatures([resourceMaskFeature])
-      }
-    } catch {
-      // Couldn't create resource mask feature. This is fine.
-    }
-  }
-
-  function removeResourceMask(mapId: string) {
-    if (resourceDraw && resourceDraw.getSnapshotFeature(mapId)) {
-      resourceDraw.removeFeatures([mapId])
-    }
-
-    if (geoDraw && geoDraw.getSnapshotFeature(mapId)) {
-      geoDraw.removeFeatures([mapId])
-    }
-  }
-
   function replaceMapFromState(mapId: string) {
     // TODO: only initialize single map!
-    initializeResourceMasks(mapsState.maps)
+    // initializeResourceMasks(mapsState.maps)
   }
 
   function replaceGcpFromState(gcpId: string) {
@@ -456,7 +424,7 @@
       addGcp(gcp)
 
       // TODO: only initialize single map!
-      initializeResourceMasks(mapsState.maps)
+      // initializeResourceMasks(mapsState.maps)
     } else {
       console.error(`Error setting new geometries for GCP ${gcpId}`)
     }
@@ -750,13 +718,6 @@
     }
   }
 
-  function initializeResourceMasks(maps: DbMap3[]) {
-    clearFeatures(resourceDraw, 'polygon')
-    clearFeatures(geoDraw, 'polygon')
-
-    maps.forEach((map) => addResourceMask(map))
-  }
-
   function initializeGcps(imageId: string, map: DbMap3, animate = false) {
     if (!resourceDraw || !geoDraw) {
       console.error('Cannot set GCPs, maps not ready')
@@ -914,16 +875,6 @@
   })
 
   $effect(() => {
-    if (geoMap && uiState.basemapPreset) {
-      // geoMap.moveLayer('warped-map-layer')
-      // geoMap.moveLayer('td-polygon')
-      // geoMap.moveLayer('td-polygon')
-      // geoMap.moveLayer('td-linestring')
-      // geoMap.moveLayer('td-point')
-    }
-  })
-
-  $effect(() => {
     if (
       mapsReady &&
       resourceTransformer &&
@@ -931,7 +882,7 @@
       mapsState.connectedImageId &&
       mapsState.connectedImageId !== currentDisplayImageId
     ) {
-      initializeResourceMasks(mapsState.maps)
+      // initializeResourceMasks(mapsState.maps)
     }
   })
 
@@ -951,9 +902,6 @@
   $effect(() => {
     if (resourceMap) {
       const resourcePointMode = new TerraDrawPointMode(getPointDrawOptions())
-      // const resourcePolygonMode = new TerraDrawRenderMode(
-      //   getPolygonDrawOptions()
-      // )
 
       resourceDraw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({
@@ -1124,6 +1072,8 @@
     bind:resourceMap
     bind:transformer={resourceTransformer}
     initialViewport={resourceViewport}
+    resourceMask={mapsState.activeMap?.resourceMask}
+    renderMasks={uiState.georeferenceOptions.renderMasks}
   />
   <Geo
     bind:geoMap

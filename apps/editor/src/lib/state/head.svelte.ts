@@ -5,6 +5,8 @@ import { parseLanguageString } from '$lib/shared/iiif.js'
 
 import type { SourceState } from '$lib/state/source.svelte'
 
+import type { SearchParams } from '$lib/types/shared.js'
+
 import { PUBLIC_ALLMAPS_PREVIEW_URL } from '$env/static/public'
 
 const ogImageSize = [1200, 627]
@@ -19,9 +21,7 @@ const HEAD_KEY = Symbol('head')
 export class HeadState {
   #sourceState: SourceState
 
-  #parsedIiif = $derived.by(() => {
-    return this.#sourceState.source?.parsedIiif
-  })
+  #parsedIiif = $derived.by(() => this.#sourceState.parsedIiif)
 
   #sourceLabel = $derived.by(() => {
     if (
@@ -32,13 +32,10 @@ export class HeadState {
     }
   })
 
-  #canvas = $derived.by(() => {
-    return this.#sourceState.activeImageId
-      ? this.#sourceState.getCanvasByImageId(this.#sourceState.activeImageId)
-      : undefined
-  })
+  #canvas = $derived.by(() => this.#sourceState.activeCanvas)
 
   #sourceLabelString = $derived(parseLanguageString(this.#sourceLabel, 'en'))
+  #manifestLabelString = $derived(parseLanguageString(this.#sourceLabel, 'en'))
   #canvasLabelString = $derived(parseLanguageString(this.#canvas?.label, 'en'))
 
   constructor(sourceState: SourceState) {

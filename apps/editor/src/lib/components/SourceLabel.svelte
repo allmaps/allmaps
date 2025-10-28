@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import { getSourceState } from '$lib/state/source.svelte'
 
   import { parseLanguageString } from '$lib/shared/iiif.js'
@@ -10,4 +10,4 @@
 
 {#if label.length}
   <span title={label} class="inline-block truncate">{label}</span>
-{/if}
+{/if} -->

@@ -3,12 +3,22 @@
 
   import { Map as MapLibreMap } from 'maplibre-gl'
 
+  import { ProjectedGcpTransformer, lonLatProjection } from '@allmaps/project'
+  import { computeBbox, combineBboxes } from '@allmaps/stdlib'
+  import { WarpedMapLayer } from '@allmaps/maplibre'
+
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
   import { getScopeState } from '$lib/state/scope.svelte.js'
+  import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
   import { getFullMapId } from '$lib/shared/maps.js'
-  import { sortGeoViewports } from '$lib/shared/viewport.js'
+  import {
+    getNavPlaceViewport,
+    getBboxViewport,
+    sortGeoViewports
+  } from '$lib/shared/viewport.js'
 
   import { UiEvents } from '$lib/shared/ui-events.js'
   import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
@@ -18,6 +28,7 @@
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
   import type { Point, Bbox } from '@allmaps/types'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
 
   import type { ClickedItemEvent } from '$lib/types/events.js'
   import type { Viewport } from '$lib/types/shared.js'
@@ -28,42 +39,20 @@
   const uiState = getUiState()
   const viewportsState = getViewportsState()
   const scopeState = getScopeState()
+  const sourceState = getSourceState()
+  const urlState = getUrlState()
 
-  const geoViewport = $derived(
-    viewportsState.getViewport({
-      view: 'results'
+  const geoViewport = $derived(getGeoViewport())
+
+  let warpedMapLayer = $state.raw<WarpedMapLayer>()
+
+  export function computeGeoreferencedMapBbox(map: GeoreferencedMap) {
+    const transformer = ProjectedGcpTransformer.fromGeoreferencedMap(map, {
+      projection: lonLatProjection
     })
-  )
-
-  // async function setGeoreferenceAnnotation(
-  //   annotation: Annotation | AnnotationPage
-  // ) {
-  //   if (!geoMap || !geoMapReady) {
-  //     return
-  //   }
-
-  //   // warpedMapLayer.clear()
-  //   // await warpedMapLayer.addGeoreferenceAnnotation(annotation)
-  //   currentActiveMapId = mapsState.activeMapId
-
-  //   const geoViewport = getGeoViewport()
-
-  //   if (geoViewport) {
-  //     geoMap.flyTo({
-  //       ...geoViewport,
-  //       duration: 0,
-  //       padding: MAPLIBRE_PADDING
-  //     })
-  //   } else {
-  //     // const bounds = warpedMapLayer.getBounds()
-  //     // if (bounds) {
-  //     //   geoMap.fitBounds(bounds, {
-  //     //     duration: 0,
-  //     //     padding: MAPLIBRE_PADDING
-  //     //   })
-  //     // }
-  //   }
-  // }
+    const geoMask = transformer.transformToGeo([map.resourceMask])
+    return computeBbox(geoMask)
+  }
 
   function getGeoViewport(): Viewport | undefined {
     let stateGeoViewport: Viewport | undefined
@@ -71,20 +60,20 @@
     let urlGeoViewport: Viewport | undefined
     let dataGeoViewport: Viewport | undefined
 
-    // const view = geoMap?.getView()
+    navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
+    urlGeoViewport = getBboxViewport(urlState.params.bbox)
 
-    // if (view) {
-    //   navPlaceGeoViewport = getNavPlaceViewport(view, sourceState.navPlace)
-    //   urlGeoViewport = getBboxViewport(view, urlState.bbox)
-
-    //   if (mapsMergedState.completeMaps.length) {
-    //     const extent = warpedMapLayer.getBounds()
-
-    //     if (extent) {
-    //       dataGeoViewport = getExtentViewport(view, extent)
-    //     }
-    //   }
-    // }
+    if (scopeState.maps) {
+      const bboxes: Bbox[] = []
+      for (const map of scopeState.maps) {
+        const bbox = computeGeoreferencedMapBbox(map)
+        bboxes.push(bbox)
+      }
+      if (bboxes.length > 0) {
+        const combinedBbox = combineBboxes(...bboxes)
+        dataGeoViewport = getBboxViewport(combinedBbox)
+      }
+    }
 
     stateGeoViewport = viewportsState.getViewport({
       view: 'results'
@@ -164,6 +153,28 @@
   }
 
   $effect(() => {
+    if (scopeState.activeMapId && geoMap) {
+      const bbox = warpedMapLayer?.getMapsBbox([scopeState.activeMapId], {
+        projection: lonLatProjection
+      })
+
+      if (bbox) {
+        const bounds = [
+          [bbox[0], bbox[1]],
+          [bbox[2], bbox[3]]
+        ] as LngLatBoundsLike
+
+        warpedMapLayer?.bringMapsToFront([scopeState.activeMapId])
+
+        geoMap.fitBounds(bounds, {
+          duration: 300,
+          padding: MAPLIBRE_PADDING
+        })
+      }
+    }
+  })
+
+  $effect(() => {
     if (geoMap && warpedMapLayerBounds) {
       geoMap.fitBounds(warpedMapLayerBounds, {
         duration: 200,
@@ -200,6 +211,7 @@
 <Geo
   bind:geoMap
   bind:warpedMapLayerBounds
+  bind:warpedMapLayer
   mapIds={scopeState.mapIds}
   initialViewport={geoViewport}
   warpedMapsOpacity={uiState.resultsOptions.warpedMapLayerOpacity}

@@ -2,29 +2,22 @@ import { goto } from '$app/navigation'
 
 import type { Page } from '@sveltejs/kit'
 
-import type { View, MaybeView, Params } from '$lib/types/shared.js'
+import type { View, MaybeView } from '$lib/types/shared.js'
 
-export function createRouteUrl(
-  page: Page,
-  view: View | undefined,
-  params?: Partial<Params>
-) {
-  const searchParams = new URLSearchParams(page.url.searchParams)
-  // TODO: consider only setting valid URL params
-  for (const [param, value] of Object.entries(params || {})) {
-    if (value !== undefined) {
-      if (value) {
-        searchParams.set(param, value)
-      } else {
-        searchParams.delete(param)
-      }
-    }
-  }
-
+export function getViewUrl(view: MaybeView): string {
   if (view) {
-    return `/${view}?${searchParams}`
+    return `/${view}`
   } else {
-    return `/?${searchParams}`
+    return `/`
+  }
+}
+
+export function getNewParamsFromUrl(url: string) {
+  return {
+    url,
+    manifestId: undefined,
+    imageId: undefined,
+    path: undefined
   }
 }
 

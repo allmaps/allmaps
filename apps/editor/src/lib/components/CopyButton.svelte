@@ -9,14 +9,14 @@
 
   let { value }: Props = $props()
 
-  let showCheckInterval = $state<number | null>(null)
+  let showCheckInterval = $state<number>()
 
   async function handleClick() {
     try {
       await navigator.clipboard.writeText(value)
 
       showCheckInterval = window.setTimeout(() => {
-        showCheckInterval = null
+        showCheckInterval = undefined
       }, 1000)
     } catch {
       console.error('Copying to clipboard failed')
@@ -33,8 +33,8 @@
 </script>
 
 <button
-  class="cursor-pointer relative size-8 rounded-full aspect-square
-   flex justify-center items-center"
+  class="relative flex aspect-square size-8 cursor-pointer
+   items-center justify-center rounded-full"
   title="Copy to clipboard"
   onclick={handleClick}
 >

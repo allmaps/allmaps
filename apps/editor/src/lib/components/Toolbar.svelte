@@ -1,58 +1,82 @@
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui'
 
-  import { Export as ExportIcon, List as ListIcon } from 'phosphor-svelte'
+  import {
+    Export as ExportIcon,
+    List as ListIcon,
+    ArrowUDownLeft as ArrowUDownLeftIcon
+  } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
+
+  import { isCallbackValid } from '$lib/shared/organizations.js'
 
   import { Popover } from '@allmaps/components'
 
   import Export from '$lib/components/popovers/Export.svelte'
 
   const uiState = getUiState()
+  const sourceState = getSourceState()
+  const mapsMergedState = getMapsMergedState()
+  const urlState = getUrlState()
+
+  let exportDisabled = $derived(
+    sourceState.parsedManifest === undefined ||
+      mapsMergedState.completeMaps.length === 0
+  )
 </script>
 
-<div class="flex flex-row gap-1 items-center">
-  <Popover
-    bind:open={
-      () => uiState.getPopoverOpen('export'),
-      (open) => uiState.setPopoverOpen('export', open)
-    }
-  >
-    {#snippet button()}
-      <div
-        class="flex flex-row gap-1.5 px-3 py-2 rounded-full
-          items-center font-medium text-white
-          bg-green/100 hover:bg-green/90 shadow-none hover:shadow-md transition-all"
-      >
-        <ExportIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
-          class="hidden sm:inline-block">Export</span
+<div class="flex flex-row items-center gap-1">
+  {#if urlState.params.callback && isCallbackValid(urlState.params.callback)}
+    <a
+      class="bg-green hover:not-group-disabled:bg-green/90 hover:not-group-disabled:shadow-md flex flex-row items-center
+          gap-1.5 rounded-full px-3 py-2 font-medium text-white shadow-none transition-all group-disabled:bg-green-300"
+      href={urlState.params.callback}
+    >
+      <ArrowUDownLeftIcon
+        class="size-5 shrink-0"
+        size="100%"
+        weight="bold"
+      /><span class="hidden sm:inline-block">Done</span>
+    </a>{:else}
+    <Popover bind:open={uiState.popoverOpen.export} disabled={exportDisabled}>
+      {#snippet button()}
+        <div
+          class="bg-green hover:not-group-disabled:bg-green/90 hover:not-group-disabled:shadow-md flex flex-row items-center
+          gap-1.5 rounded-full px-3 py-2 font-medium text-white shadow-none transition-all group-disabled:bg-green-300"
         >
-      </div>
-    {/snippet}
-    {#snippet contents()}<Export />{/snippet}
-  </Popover>
+          <ExportIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
+            class="hidden sm:inline-block">Export</span
+          >
+        </div>
+      {/snippet}
+      {#snippet contents()}<Export />{/snippet}
+    </Popover>
+  {/if}
 
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
-      class="size-8 cursor-pointer focus-visible aspect-square p-1 inline-flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+      class="focus-visible inline-flex aspect-square size-8 cursor-pointer items-center justify-center rounded-full p-1 transition-colors hover:bg-gray-100"
     >
-      <ListIcon class="size-6 text-foreground" />
+      <ListIcon class="text-foreground size-6" />
     </DropdownMenu.Trigger>
     <DropdownMenu.Content
-      class="w-full max-w-[229px] rounded-lg border border-gray-100 bg-white px-1 py-1.5 shadow-md
-      data-[state=open]:animate-scale-in"
+      class="data-[state=open]:animate-scale-in w-full max-w-[229px] rounded-lg border border-gray-100 bg-white px-1 py-1.5
+      shadow-md"
       sideOffset={8}
     >
       <DropdownMenu.Item
-        onclick={() => uiState.setModalOpen('keyboard', true)}
-        class="flex h-10 select-none cursor-pointer items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-gray-100"
+        onclick={() => (uiState.modalOpen.keyboard = true)}
+        class="ring-0! ring-transparent! data-highlighted:bg-muted flex h-10 cursor-pointer select-none items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium hover:bg-gray-100"
       >
         Keyboard shortcuts…
       </DropdownMenu.Item>
       <DropdownMenu.Item
-        onclick={() => uiState.setModalOpen('about', true)}
-        class="flex h-10 select-none cursor-pointer items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium ring-0! ring-transparent! data-highlighted:bg-muted hover:bg-gray-100"
+        onclick={() => (uiState.modalOpen.about = true)}
+        class="ring-0! ring-transparent! data-highlighted:bg-muted flex h-10 cursor-pointer select-none items-center rounded-md py-3 pl-3 pr-1.5 text-sm font-medium hover:bg-gray-100"
       >
         About Allmaps Editor…
       </DropdownMenu.Item>

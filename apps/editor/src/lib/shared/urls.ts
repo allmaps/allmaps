@@ -13,8 +13,8 @@ export function getAnnotationUrl(allmapsId: string) {
   return `${PUBLIC_ALLMAPS_ANNOTATIONS_API_URL}/${allmapsId}`
 }
 
-export function getViewerUrl(allmapsId: string) {
-  return `${PUBLIC_ALLMAPS_VIEWER_URL}/?url=${getAnnotationUrl(allmapsId)}`
+export function getViewerUrl(allmapsId: string, isFullMapId = false) {
+  return `${PUBLIC_ALLMAPS_VIEWER_URL}/?url=${isFullMapId ? allmapsId : getAnnotationUrl(allmapsId)}`
 }
 
 export function getGeoJsonUrl(allmapsId: string) {

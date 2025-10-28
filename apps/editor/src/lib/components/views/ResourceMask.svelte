@@ -195,6 +195,10 @@
   }
 
   function makeResourceMaskFeatureActive(mapId?: string, redraw = false) {
+    if (activeMapId === mapId) {
+      return
+    }
+
     activeMapId = mapId
 
     if (resourceDraw && redraw) {
@@ -632,7 +636,6 @@
       bind:resourceMap
       bind:transformer
       bind:warpedMapLayerBounds
-      resourceMask={mapsState.activeMap?.resourceMask}
       initialViewport={resourceViewport}
     />
   {/if}

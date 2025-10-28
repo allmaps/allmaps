@@ -1,115 +1,239 @@
 <script lang="ts">
-  import { page } from '$app/state'
-  import { browser } from '$app/environment'
+  import {
+    Info as InfoIcon,
+    ArrowRight as ArrowRightIcon
+  } from 'phosphor-svelte'
 
-  import { Info as InfoIcon } from 'phosphor-svelte'
-
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
-  import { formatSourceType } from '$lib/shared/metadata.js'
+  import {
+    gotoRoute,
+    getViewUrl,
+    getNewParamsFromUrl
+  } from '$lib/shared/router.js'
+  import { parseLanguageString } from '$lib/shared/iiif.js'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
-  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
   import { getSourceState } from '$lib/state/source.svelte.js'
-  import { getHeadState } from '$lib/state/head.svelte.js'
+  import { getErrorState } from '$lib/state/error.svelte.js'
 
-  import { Popover } from '@allmaps/components'
+  import { Popover, LoadingSmall } from '@allmaps/components'
 
   import URLInput from '$lib/components/URLInput.svelte'
   import Metadata from '$lib/components/Metadata.svelte'
+  import IIIFSource from '$lib/components/IIIFSource.svelte'
+
+  import type { CollectionPath, SourceType } from '$lib/types/shared.js'
+
+  type SegmentsArgs = {
+    path: CollectionPath
+    sourceUrl?: string
+    hasError: boolean
+    sourceType?: SourceType
+    collectionLabel?: string
+    canEdit: boolean
+    editLabels: string[]
+  }
 
   const uiState = getUiState()
   const urlState = getUrlState()
   const sourceState = getSourceState()
-  const headState = getHeadState()
+  const errorState = getErrorState()
 
   let bodyWidth = $state(0)
 
-  // let open = $state(false)
-
   let infoButtonWidth = $state(0)
 
-  let hasLabels = $derived(headState.labels.length > 0)
+  let hasError = $derived(errorState.error !== undefined)
 
-  function hasTouch() {
-    if (browser) {
-      // See:
-      //  - https://css-tricks.com/touch-devices-not-judged-size/
-      //  - https://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
-      return window.matchMedia('(pointer: coarse)').matches
+  let sourceUrl = $derived(urlState.params.url)
+  let path = $derived(urlState.params.path)
+  let sourceType = $derived(sourceState.source?.type)
+  let canEdit = $derived(sourceState.canEdit)
+  let collectionLabel = $derived.by(() => {
+    if (
+      sourceState.parsedIiif &&
+      sourceState.parsedIiif.type === 'collection'
+    ) {
+      return parseLanguageString(sourceState.parsedIiif.label, 'en')
+    }
+  })
+
+  let editLabels = $derived.by(() => {
+    let manifestLabel: string | undefined
+    let canvasLabel: string | undefined
+
+    if (sourceState.parsedManifest?.label) {
+      manifestLabel = parseLanguageString(
+        sourceState.parsedManifest?.label,
+        'en'
+      )
+    } else if (sourceState.parsedManifest) {
+      manifestLabel = 'Manifest'
     }
 
-    return false
-  }
+    if (sourceState.activeCanvas?.label) {
+      canvasLabel = parseLanguageString(sourceState.activeCanvas?.label, 'en')
+    } else if (sourceState.activeImageIndex !== undefined) {
+      canvasLabel = `Image ${sourceState.activeImageIndex + 1}`
+    }
 
-  let sourceType = $derived(
-    sourceState.source?.type
-      ? formatSourceType(sourceState.source.type)
-      : 'IIIF resource'
-  )
+    // If the manifest and canvas labels are the same, don't show the canvas label
+    if (manifestLabel === canvasLabel) {
+      canvasLabel = undefined
+    }
+
+    return [manifestLabel, canvasLabel].filter((label) => label !== undefined)
+  })
 
   function handleInputSubmit(url: string) {
-    gotoRoute(createRouteUrl(page, 'images', { url }))
+    gotoRoute(
+      urlState.generateUrl(getViewUrl('images'), getNewParamsFromUrl(url))
+    )
   }
 </script>
 
 <svelte:body bind:clientWidth={bodyWidth} />
 
+{#snippet url(sourceUrl: string)}
+  <span class="truncate">{sourceUrl}</span>
+{/snippet}
+
+{#snippet separator()}
+  <span class="text-gray-500">/</span>
+{/snippet}
+
+{#snippet arrow()}
+  <ArrowRightIcon class="inline-block size-4 text-gray-500" weight="bold" />
+{/snippet}
+
+{#snippet renderLabels(labels: string[])}
+  {#each labels as label, index (index)}
+    {@const first = index === 0}
+    {@const last = index === editLabels.length - 1}
+
+    <span class={['min-w-6 truncate font-medium']}>{label}</span>
+    {#if !last}
+      <!-- <span class="@min-md:inline hidden text-gray-500">/</span> -->
+      {@render separator()}
+    {/if}
+  {/each}
+{/snippet}
+
+{#snippet segments({
+  sourceUrl,
+  path,
+  hasError,
+  sourceType,
+  collectionLabel,
+  canEdit,
+  editLabels
+}: SegmentsArgs)}
+  {#if sourceUrl}
+    {#if hasError}
+      {@render url(sourceUrl)}
+      {@render arrow()}
+      <span
+        class="border-1 border-red rounded-md bg-red-400 px-1 py-0 text-xs text-white"
+        >Error loading URL</span
+      >
+    {:else if sourceType}
+      <span class="@min-4xl:contents hidden">
+        <IIIFSource {sourceType} />
+      </span>
+      <span class="@min-2xl:contents hidden">
+        {@render url(sourceUrl)}
+      </span>
+
+      {#if sourceType === 'manifest'}
+        <span class="@min-2xl:contents hidden">
+          {@render separator()}
+        </span>
+        {@render renderLabels(editLabels)}
+      {:else if sourceType === 'collection'}
+        {#if collectionLabel}
+          <span class="@min-2xl:contents hidden">
+            {@render separator()}
+          </span>
+          <span class="min-w-6 truncate font-medium">{collectionLabel}</span>
+        {/if}
+        {#if canEdit}
+          {@render separator()}
+          {#if path.length > 1}
+            <span>…</span>
+            {@render separator()}
+          {/if}
+          <span class="@min-4xl:contents hidden">
+            <IIIFSource sourceType="manifest" />
+          </span>
+          {@render renderLabels(editLabels)}
+        {:else}
+          {@render arrow()}
+          <span
+            class="border-blue border-1 rounded-md bg-blue-200 px-1 py-0 text-xs"
+            >Browse to find maps in this collection <span
+              class="@min-4xl:inline hidden">and start georeferencing</span
+            ></span
+          >
+        {/if}
+      {/if}
+    {:else}
+      <span class="opacity-50">
+        <LoadingSmall />
+      </span>
+      {@render url(sourceUrl)}
+    {/if}
+  {:else}
+    <span class="text-gray-500">No URL loaded</span>
+  {/if}
+{/snippet}
+
 <Popover
-  bind:open={
-    () => uiState.getPopoverOpen('info'),
-    (open) => uiState.setPopoverOpen('info', open)
-  }
-  contentsWidth={bodyWidth > 10240 ? infoButtonWidth : undefined}
+  bind:open={uiState.popoverOpen.info}
+  contentsWidth={bodyWidth < 876 ? bodyWidth : undefined}
 >
   {#snippet button()}
     <div
       bind:clientWidth={infoButtonWidth}
-      class="w-full min-w-0 truncate rounded-full pl-3 pr-2 py-1.5
-        bg-gray/10 hover:bg-gray/20 group
-        transition-all duration-100
-        border-2 inset-shadow-none hover:inset-shadow-xs
-        {uiState.getPopoverOpen('info')
+      class="bg-gray/10 hover:bg-gray/20 inset-shadow-none hover:inset-shadow-xs group w-full min-w-0
+        truncate rounded-full border-2
+        py-1.5 pl-3
+        pr-2 transition-all duration-100
+        {uiState.popoverOpen.info
         ? 'border-gray-200 bg-white'
         : 'border-gray/10'}
-        cursor-pointer text-sm text-black leading-tight
-        flex gap-2 items-center justify-between"
+        flex cursor-pointer items-center justify-between
+        gap-2 text-sm leading-tight text-black"
     >
-      <span class="flex w-full justify-start-safe @container">
-        {#each headState.labels as label, index (index)}
-          {@const first = index === 0}
-          {@const last = index === headState.labels.length - 1}
-
-          <span
-            class={[
-              'truncate min-w-12 font-medium',
-              !first && 'hidden @min-md:inline'
-            ]}>{label}</span
-          >
-          {#if !last}
-            <span class={['text-gray-500 px-1', 'hidden @min-md:inline']}
-              >/</span
-            >
-          {/if}
-        {/each}
-        <span class={['truncate', hasLabels && 'hidden @min-lg:inline']}>
-          {#if hasLabels}
-            <span class="text-gray-500 px-1">/</span>
-          {/if}
-          <span>{urlState.url}</span>
-        </span>
+      <span
+        class="justify-start-safe @container flex w-full items-center gap-2"
+      >
+        {@render segments({
+          sourceUrl,
+          path,
+          hasError,
+          sourceType,
+          collectionLabel,
+          canEdit,
+          editLabels
+        })}
       </span>
       <InfoIcon
-        class="size-6 shrink-0 text-gray-700 group-hover:text-black transition-all duration-100"
+        class="size-6 shrink-0 text-gray-700 transition-all duration-100 group-hover:text-black"
         weight="bold"
       />
     </div>
   {/snippet}
   {#snippet contents()}
-    <div class="flex flex-col gap-2 max-w-2xl">
-      <span class="text-center text-sm"
-        >You're georeferencing a {sourceType} from this URL:</span
-      >
+    <div class="flex max-w-2xl flex-col gap-2">
+      <span class="text-center text-sm">
+        {#if sourceType}
+          You're georeferencing a <IIIFSource {sourceType} /> from this URL:
+        {/if}
+      </span>
       <URLInput onSubmit={handleInputSubmit} />
+      <span class="text-center text-sm"
+        >Georeference another IIIF resource by entering its URL</span
+      >
       <Metadata />
     </div>
   {/snippet}

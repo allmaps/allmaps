@@ -67,7 +67,7 @@
   }
 </script>
 
-<Modal bind:open class="flex flex-col gap-2 max-w-xl">
+<Modal bind:open class="flex max-w-xl flex-col gap-2">
   {#snippet title()}
     Edit Ground Control Points
   {/snippet}
@@ -87,9 +87,10 @@
   <YesNo
     yes="Save"
     no="Cancel"
+    noColor="gray"
     yesDisabled={!gcps.length}
     onNo={handleCancel}
     onYes={handleSave}
-    class="flex flex-row self-center gap-2"
+    class="flex flex-row gap-2 self-center"
   />
 </Modal>

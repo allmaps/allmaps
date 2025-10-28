@@ -1,61 +1,49 @@
 <script lang="ts">
-  import { untrack } from 'svelte'
   import { page } from '$app/state'
 
   import { Label } from 'bits-ui'
   import { Slider, Select, Checkbox } from '@allmaps/components'
 
-  import { createRouteUrl, getView, gotoRoute } from '$lib/shared/router.js'
-
   import { getUiState } from '$lib/state/ui.svelte.js'
-  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
-  import type { BasemapPresetItem } from '$lib/types/shared.js'
+  import { gotoRoute } from '$lib/shared/router.js'
+
+  import type { BasemapPresetId, BasemapPresetItem } from '$lib/types/shared.js'
 
   const uiState = getUiState()
   const urlState = getUrlState()
 
-  let basemapPresetId = $state(uiState.basemapPreset.value)
+  let basemapPresetId = $state<BasemapPresetId>(
+    uiState.basemapPreset.value || 'protomaps'
+  )
 
   let backgroundGeoreferenceAnnotationUrl = $state(
-    urlState.backgroundGeoreferenceAnnotationUrl
+    urlState.params.backgroundGeoreferenceAnnotationUrl
   )
-  let basemapUrl = $state(urlState.basemapUrl)
+  let basemapXyzUrl = $state(urlState.params.basemapXyzUrl)
 
-  function handleBasemapUrlSubmit(event: Event) {
+  function handleBasemapXyzUrlSubmit(event: Event) {
     event.preventDefault()
-
-    gotoRoute(
-      createRouteUrl(page, getView(page), {
-        'basemap-url': basemapUrl
-      })
-    )
+    urlState.params.basemapXyzUrl = basemapXyzUrl || undefined
   }
 
   function handleBackgroundGeoreferenceAnnotationUrlSubmit(event: Event) {
     event.preventDefault()
 
-    gotoRoute(
-      createRouteUrl(page, getView(page), {
-        'background-georeference-annotation-url':
-          backgroundGeoreferenceAnnotationUrl
-      })
-    )
+    urlState.params.backgroundGeoreferenceAnnotationUrl =
+      backgroundGeoreferenceAnnotationUrl || undefined
   }
 
   function handleBasemapPresetChange(item: BasemapPresetItem) {
-    untrack(() => {
-      gotoRoute(
-        createRouteUrl(page, getView(page), {
-          'basemap-preset': item.value
-        })
-      )
-    })
+    if (item.value !== urlState.params.basemapPresetId) {
+      urlState.params.basemapPresetId = item.value
+    }
   }
 </script>
 
 <div class="grid grid-cols-1 gap-2 *:break-all">
-  <h3 class="font-bold text-lg">Georeference</h3>
+  <h3 class="text-lg font-bold">Georeference</h3>
 
   <Label.Root for="georeference-warped-map-layer-opacity" class="text-sm ">
     Opacity:
@@ -70,7 +58,7 @@
     >Show mask</Checkbox
   >
 
-  <h3 class="font-bold text-lg">Results</h3>
+  <h3 class="text-lg font-bold">Results</h3>
 
   <Label.Root for="results-warped-map-layer-opacity" class="text-sm ">
     Opacity:
@@ -84,7 +72,7 @@
     >Show masks</Checkbox
   >
 
-  <h3 class="font-bold text-lg">Global:</h3>
+  <h3 class="text-lg font-bold">Global:</h3>
 
   <label for="basemap-preset">Background map:</label>
   <Select
@@ -93,20 +81,20 @@
     onselect={handleBasemapPresetChange}
   />
 
-  <form class="contents" onsubmit={handleBasemapUrlSubmit}>
+  <form class="contents" onsubmit={handleBasemapXyzUrlSubmit}>
     <label for="background-xyz-url">Custom XYZ layer:</label>
     <div class="flex gap-2">
       <input
-        bind:value={basemapUrl}
+        bind:value={basemapXyzUrl}
         id="basemap-url"
         type="text"
         autocomplete="off"
         placeholder="XYZ template URL"
-        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray-100 border-1 transition-colors
-      focus-visible:border-pink inset-shadow-xs"
+        class="border-1 focus-visible:border-pink inset-shadow-xs w-full rounded-lg border-solid border-gray-100 bg-white px-2 py-1
+      outline-none transition-colors"
       />
       <button
-        class="cursor-pointer shrink-0 px-2 py-1 border border-gray-100 rounded-md hover:bg-gray-100"
+        class="shrink-0 cursor-pointer rounded-md border border-gray-100 px-2 py-1 hover:bg-gray-100"
         type="submit">Load</button
       >
     </div>
@@ -126,11 +114,11 @@
         type="text"
         autocomplete="off"
         placeholder="Georeference Annotation URL"
-        class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray-100 border-1 transition-colors
-      focus-visible:border-pink inset-shadow-xs"
+        class="border-1 focus-visible:border-pink inset-shadow-xs w-full rounded-lg border-solid border-gray-100 bg-white px-2 py-1
+      outline-none transition-colors"
       />
       <button
-        class="cursor-pointer shrink-0 px-2 py-1 border border-gray-100 rounded-md hover:bg-gray-100"
+        class="shrink-0 cursor-pointer rounded-md border border-gray-100 px-2 py-1 hover:bg-gray-100"
         type="submit">Load</button
       >
     </div>

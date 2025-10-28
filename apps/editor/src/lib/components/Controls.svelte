@@ -13,17 +13,20 @@
     // CaretDown as CaretDownIcon
   } from 'phosphor-svelte'
 
-  import { createRouteUrl, getView } from '$lib/shared/router.js'
+  import { Popover } from '@allmaps/components'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+  import { getScopeState } from '$lib/state/scope.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
-  import { Popover } from '@allmaps/components'
+  import { getView, getViewUrl } from '$lib/shared/router.js'
 
   import MapButtons from '$lib/components/MapButtons.svelte'
   import ImageSelector from '$lib/components/ImageSelector.svelte'
+  import MapSelector from '$lib/components/MapSelector.svelte'
   import Maps from '$lib/components/popovers/Maps.svelte'
   import Scope from '$lib/components/Scope.svelte'
 
@@ -31,15 +34,19 @@
   const sourceState = getSourceState()
   const mapsState = getMapsState()
   const mapsMergedState = getMapsMergedState()
+  const scopeState = getScopeState()
+  const urlState = getUrlState()
 
-  let imagesViewButton: HTMLAnchorElement
-  let maskViewButton: HTMLAnchorElement
-  let georeferenceViewButton: HTMLAnchorElement
-  let resultsViewButton: HTMLAnchorElement
+  // let imagesViewButton: HTMLAnchorElement
+  // let maskViewButton: HTMLAnchorElement
+  // let georeferenceViewButton: HTMLAnchorElement
+  // let resultsViewButton: HTMLAnchorElement
 
   let resultsEnabled = $derived(
     mapsMergedState.completeMaps.length > 0 || mapsState.activeMap !== undefined
   )
+
+  let editEnabled = $derived(sourceState.canEdit)
 
   let isMapView = $derived(
     page.route.id === '/(views)/georeference' ||
@@ -55,54 +62,70 @@
 </script>
 
 {#snippet separator()}
-  <div class="h-full flex items-center justify-center">
+  <div class="flex h-full items-center justify-center">
     <CaretRightIcon size={16} class="inline" weight="bold" color="#aaa" />
   </div>
 {/snippet}
 
-<div class="w-full h-full flex flex-col items-center justify-between p-2 gap-2">
+<div class="flex h-full w-full flex-col items-center justify-between gap-2 p-2">
   <div
-    class:opacity-50={uiState.getPopoverOpen('info') ||
-      uiState.getPopoverOpen('export')}
-    class="w-full grid grid-cols-[1fr_max-content_1fr] gap-2 items-start sm:items-center
+    class:opacity-50={uiState.popoverOpen.info || uiState.popoverOpen.export}
+    class="pointer-events-none grid w-full grid-cols-[1fr_max-content_1fr] items-start gap-2
       transition-opacity duration-200
-      pointer-events-none *:pointer-events-auto"
+      *:pointer-events-auto sm:items-center"
   >
     <div></div>
     <nav
-      class="p-1 grid grid-cols-[1fr_min-content_1fr_min-content_1fr_min-content_1fr] rounded-lg shadow-md font-semibold bg-white gap-0.5 sm:gap-1"
+      class="grid grid-cols-[1fr_min-content_1fr_min-content_1fr_min-content_1fr] gap-0.5 rounded-lg bg-white p-1 font-semibold shadow-md sm:gap-1"
     >
       <a
-        href={createRouteUrl(page, 'images', {
-          image: sourceState.activeImageId || undefined
+        href={urlState.generateUrl(getViewUrl('images'), {
+          imageId: sourceState.activeImageId || undefined
         })}
         data-state={getView(page) === 'images' ? 'active' : undefined}
-        class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-blue/25 hover:bg-blue/10 flex items-center justify-center gap-2"
+        class="data-[state=active]:bg-blue/25 hover:bg-blue/10 flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2"
       >
         <ImagesIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Images</span>
       </a>
       {@render separator()}
       <a
-        bind:this={maskViewButton}
-        href={createRouteUrl(page, 'mask', {
-          image: sourceState.activeImageId || undefined
-        })}
-        data-state={getView(page) === 'mask' ? 'active' : undefined}
-        class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-green/25 hover:bg-green/10 flex items-center justify-center gap-2"
+        href={editEnabled
+          ? urlState.generateUrl(getViewUrl('mask'), {
+              imageId: sourceState.activeImageId || undefined
+            })
+          : undefined}
+        data-state={editEnabled && getView(page) === 'mask'
+          ? 'active'
+          : undefined}
+        class={[
+          !editEnabled && 'text-gray-400',
+          editEnabled
+            ? 'data-[state=active]:bg-green/25 hover:bg-green/10'
+            : 'data-[state=active]:bg-green-100/25',
+          'flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2'
+        ]}
       >
         <PolygonIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Draw mask</span>
       </a>
       {@render separator()}
       <a
-        bind:this={georeferenceViewButton}
-        href={createRouteUrl(page, 'georeference', {
-          image: sourceState.activeImageId || undefined
-        })}
-        data-state={getView(page) === 'georeference' ? 'active' : undefined}
-        class="rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 data-[state=active]:bg-yellow/25 hover:bg-yellow/10
-          flex items-center justify-center gap-2"
+        href={editEnabled
+          ? urlState.generateUrl(getViewUrl('georeference'), {
+              imageId: sourceState.activeImageId || undefined
+            })
+          : undefined}
+        data-state={editEnabled && getView(page) === 'georeference'
+          ? 'active'
+          : undefined}
+        class={[
+          !editEnabled && 'text-gray-400',
+          editEnabled
+            ? 'data-[state=active]:bg-yellow/25 hover:bg-yellow/10'
+            : 'data-[state=active]:bg-yellow-100/25',
+          'flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2'
+        ]}
       >
         <MapPinSimpleIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Georeference</span>
@@ -119,17 +142,19 @@
       {@render separator()}
       <a
         href={resultsEnabled
-          ? createRouteUrl(page, 'results', {
-              image: sourceState.activeImageId || undefined
+          ? urlState.generateUrl(getViewUrl('results'), {
+              imageId: sourceState.activeImageId || undefined
             })
           : undefined}
-        data-state={getView(page) === 'results' ? 'active' : undefined}
+        data-state={resultsEnabled && getView(page) === 'results'
+          ? 'active'
+          : undefined}
         class={[
           !resultsEnabled && 'text-gray-400',
           resultsEnabled
             ? 'data-[state=active]:bg-pink/25 hover:bg-pink/10'
             : 'data-[state=active]:bg-pink-100/25',
-          'rounded-md transition-colors px-2 py-1 sm:px-4 sm:py-2 bg-white duration-200 flex items-center justify-center gap-2'
+          'flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2'
         ]}
       >
         <MapTrifoldIcon size={28} class="inline" />
@@ -151,48 +176,49 @@
 
   <!-- class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto" -->
   <div
-    class="w-full grid grid-cols-[1fr_max-content_1fr] gap-2 items-center
-      pointer-events-none *:pointer-events-auto"
+    class="pointer-events-none grid w-full grid-cols-[1fr_max-content_1fr] items-center
+      gap-2 *:pointer-events-auto"
   >
     <div></div>
     <div>
       {#if isResultsView && resultsEnabled}
         <div
-          class="flex items-center gap-2
-            bg-white z-50 p-1 rounded-lg shadow-md"
+          class="z-50 flex items-center
+            gap-2 rounded-lg bg-white p-1 shadow-md"
           transition:fade={{ duration: 100 }}
         >
-          <span class="hidden sm:inline-block pl-1">Show</span>
+          <span class="hidden pl-1 sm:inline-block">Show</span>
           <div class="w-48">
             <Scope />
           </div>
         </div>
       {/if}
     </div>
-    <div class="flex flex-row gap-2 items-center justify-center place-self-end">
-      {#if sourceState.imageCount > 1}
+    <div class="flex flex-row items-center justify-center gap-2 place-self-end">
+      {#if isResultsView && scopeState.mapsCount > 1}
+        <MapSelector />
+      {:else if sourceState.imageCount > 1}
         <ImageSelector />
       {/if}
-      <Popover
-        bind:open={
-          () => uiState.getPopoverOpen('maps'),
-          (open) => uiState.setPopoverOpen('maps', open)
-        }
-        interactOutsideBehavior={'ignore'}
-      >
-        {#snippet button()}
-          <div
-            class="bg-pink rounded-md shadow-md p-2 font-medium text-white
-            flex flex-row gap-1 items-center justify-center
-            hover:bg-pink/90 transition-all"
-          >
-            <RowsIcon class="size-5" weight="bold" />
-            <!-- <span>Masks &amp; GCPs</span> -->
-            <span>Maps</span>
-          </div>
-        {/snippet}
-        {#snippet contents()}<Maps />{/snippet}
-      </Popover>
+      {#if editEnabled}
+        <Popover
+          bind:open={uiState.popoverOpen.maps}
+          interactOutsideBehavior={'ignore'}
+        >
+          {#snippet button()}
+            <div
+              class="bg-pink hover:bg-pink/90 flex flex-row items-center justify-center
+            gap-1 rounded-md p-2 font-medium text-white
+            shadow-md transition-all"
+            >
+              <RowsIcon class="size-5" weight="bold" />
+              <!-- <span>Masks &amp; GCPs</span> -->
+              <span>Maps</span>
+            </div>
+          {/snippet}
+          {#snippet contents()}<Maps />{/snippet}
+        </Popover>
+      {/if}
     </div>
   </div>
 </div>

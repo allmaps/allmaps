@@ -158,7 +158,7 @@
   }
 </script>
 
-<Modal bind:open class="flex flex-col gap-2 max-w-xl">
+<Modal bind:open class="flex max-w-xl flex-col gap-2">
   {#snippet title()}
     Edit Mask
   {/snippet}
@@ -167,22 +167,22 @@
     Edit the mask of the current map in the text field below. Supported formats:
   </p>
 
-  <ul class="list-disc list-inside">
+  <ul class="list-inside list-disc">
     <li>
       Plain text list of coordinate pairs, one per line, e.g. <code
-        class="text-gray-700 font-mono bg-gray-100/50 px-1 border border-gray-100 rounded-sm"
+        class="rounded-sm border border-gray-100 bg-gray-100/50 px-1 font-mono text-gray-700"
         >x,y</code
       >
     </li>
     <li>
       JSON array of coordinate pairs, e.g. <code
-        class="text-gray-700 font-mono bg-gray-100/50 px-1 border border-gray-100 rounded-sm"
+        class="rounded-sm border border-gray-100 bg-gray-100/50 px-1 font-mono text-gray-700"
         >[[x1,y1],[x2,y2],[x3,y3]]</code
       >
     </li>
     <li>
       SVG polygon, e.g. <code
-        class="text-gray-700 font-mono bg-gray-100/50 px-1 border border-gray-100 rounded-sm"
+        class="rounded-sm border border-gray-100 bg-gray-100/50 px-1 font-mono text-gray-700"
         >&lt;polygon points="x1,y1 x2,y2 x3,y3"/&gt;</code
       >
     </li>
@@ -203,9 +203,10 @@
   <YesNo
     yes="Save"
     no="Cancel"
+    noColor="gray"
     yesDisabled={!resourceMask.length}
     onNo={handleCancel}
     onYes={handleSave}
-    class="flex flex-row self-center gap-2"
+    class="flex flex-row gap-2 self-center"
   />
 </Modal>

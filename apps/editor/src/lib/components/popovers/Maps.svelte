@@ -107,7 +107,7 @@
   <StartGeoreferencing />
 {:else}
   <ol
-    class="grid auto-rows-auto grid-cols-[repeat(2,_max-content)_1fr] sm:grid-cols-[repeat(8,_max-content)_1fr] gap-1 sm:gap-2"
+    class="grid auto-rows-auto grid-cols-[repeat(2,_max-content)_1fr] gap-1 sm:grid-cols-[repeat(8,_max-content)_1fr] sm:gap-2"
   >
     {#each mapsState.maps as map, index (map.id)}
       {@const gcpCount = Object.values(map.gcps).length}
@@ -116,16 +116,16 @@
         class="col-span-9 grid grid-cols-subgrid"
         transition:slide={{ duration: 250, axis: 'y' }}
       >
-        <div class="col-span-8 grid grid-cols-subgrid group">
+        <div class="group col-span-8 grid grid-cols-subgrid">
           <div>
             {#if hasResourceMask(map)}
               <button
-                class="size-16 relative cursor-pointer"
+                class="relative size-16 cursor-pointer"
                 onclick={() => handleMapClick(map.id)}
                 aria-label="Select map {index + 1}"
               >
                 <svg
-                  class="w-full h-full fill-none stroke-pink stroke-2"
+                  class="stroke-pink h-full w-full fill-none stroke-2"
                   viewBox={thumbnailViewbox(map)}
                 >
                   <polygon
@@ -140,26 +140,23 @@
             {/if}
           </div>
           <div
-            class="col-span-7 place-self-start self-center flex gap-1 sm:gap-2 items-center"
+            class="col-span-7 flex items-center gap-1 place-self-start self-center sm:gap-2"
           >
             <span>Map {index + 1}</span>
 
             <div>
               {#if isActiveMap}
                 <button
-                  class="cursor-pointer px-2 py-1 rounded-full hover:underline text-sm text-pink"
-                  onclick={() => uiState.setModalOpen('editResourceMask', true)}
+                  class="text-pink cursor-pointer rounded-full px-2 py-1 text-sm hover:underline"
+                  onclick={() => (uiState.modalOpen.editResourceMask = true)}
                   >Edit or import mask…</button
                 >
               {/if}
 
-              {#if uiState.getModalOpen('editResourceMask')}
+              {#if uiState.modalOpen.editResourceMask}
                 <!-- TODO: what happens if ShareDB updates the map while editing? -->
                 <EditResourceMask
-                  bind:open={
-                    () => uiState.getModalOpen('editResourceMask'),
-                    (open) => uiState.setModalOpen('editResourceMask', open)
-                  }
+                  bind:open={uiState.modalOpen.editResourceMask}
                   map={toGeoreferencedMap(
                     map,
                     projectionsState.projectionsById
@@ -184,9 +181,9 @@
 
         {#if isActiveMap}
           <div
-            class="sm:pl-7 pb-2 col-span-9
-              grid grid-cols-[min-content_1fr] gap-x-4 gap-y-2 items-center
-              text-sm"
+            class="col-span-9 grid grid-cols-[min-content_1fr]
+              items-center gap-x-4 gap-y-2 pb-2 text-sm
+              sm:pl-7"
           >
             <label for="select-transformation">Transformation:</label>
             <SelectTransformation {map} id="select-transformation" />
@@ -205,17 +202,17 @@
               {#each gcps as gcp, index}
                 {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
                 <li class="contents">
-                  <div class="col-span-8 grid gap-0 grid-cols-subgrid">
+                  <div class="col-span-8 grid grid-cols-subgrid gap-0">
                     <button
                       class="inline-block h-8 cursor-pointer"
                       onclick={() => handleGcpClick(map.id, gcp.id)}
                       aria-label="Select GCP {index + 1}"
                     >
                       <div
-                        class="inline-flex size-4 justify-center items-center"
+                        class="inline-flex size-4 items-center justify-center"
                       >
                         <span
-                          class="size-3 rounded-full bg-pink transition-all"
+                          class="bg-pink size-3 rounded-full transition-all"
                           class:size-3={!isActiveGcp}
                           class:size-4={isActiveGcp}
                         ></span>
@@ -226,7 +223,7 @@
                     </button>
 
                     <div
-                      class="col-span-7 grid text-xs sm:text-base items-center gap-1 grid-cols-subgrid geograph-tnum place-items-end"
+                      class="geograph-tnum col-span-7 grid grid-cols-subgrid place-items-end items-center gap-1 text-xs sm:text-base"
                     >
                       {#if gcp.resource}
                         <span inert class="text-gray-300">(</span><span
@@ -281,18 +278,15 @@
 
           <div class="col-span-9 place-self-end">
             <button
-              class="cursor-pointer px-2 py-1 rounded-full hover:underline text-sm text-pink"
-              onclick={() => uiState.setModalOpen('editGcps', true)}
+              class="text-pink cursor-pointer rounded-full px-2 py-1 text-sm hover:underline"
+              onclick={() => (uiState.modalOpen.editGcps = true)}
               >Edit or import GCPs…</button
             >
 
-            {#if uiState.getModalOpen('editGcps')}
+            {#if uiState.modalOpen.editGcps}
               <!-- TODO: what happens if ShareDB updates the map while editing? -->
               <EditGcps
-                bind:open={
-                  () => uiState.getModalOpen('editGcps'),
-                  (open) => uiState.setModalOpen('editGcps', open)
-                }
+                bind:open={uiState.modalOpen.editGcps}
                 map={toGeoreferencedMap(map, projectionsState.projectionsById)}
                 onsubmit={(gcps) => handleGcpsEdited(map.id, gcps)}
               />

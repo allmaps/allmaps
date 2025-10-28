@@ -9,6 +9,8 @@
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setUrlState } from '$lib/state/url.svelte.js'
 
+  import { searchParams } from '$lib/shared/params.js'
+
   import type { Snippet } from 'svelte'
 
   import '../app.css'
@@ -16,8 +18,8 @@
 
   const { children }: { children: Snippet } = $props()
 
-  const errorState = setErrorState()
-  const urlState = setUrlState(page.url, errorState)
+  setErrorState()
+  const urlState = setUrlState(page.url, searchParams)
 
   setExamplesState()
   setImageInfoState()

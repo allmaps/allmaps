@@ -6,7 +6,13 @@
 
   import { Footer } from '@allmaps/components'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
+  import { getUrlState } from '$lib/shared/params.js'
+
+  import {
+    gotoRoute,
+    getViewUrl,
+    getNewParamsFromUrl
+  } from '$lib/shared/router.js'
 
   import Title from '$lib/components/Title.svelte'
   import URLInput from '$lib/components/URLInput.svelte'
@@ -14,6 +20,8 @@
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
 
   import { organizationsWithCollectionsOnHomepage } from '$lib/shared/organizations.js'
+
+  const urlState = getUrlState()
 
   let autofocus = $state(false)
 
@@ -33,7 +41,9 @@
   })
 
   function handleInputSubmit(url: string) {
-    gotoRoute(createRouteUrl(page, 'images', { url }))
+    gotoRoute(
+      urlState.generateUrl(getViewUrl('images'), getNewParamsFromUrl(url))
+    )
   }
 
   onMount(() => {
@@ -61,20 +71,20 @@
 
 <div class="flex flex-col items-center gap-4">
   <div
-    class="absolute -z-10 top-0 w-full h-full overflow-hidden flex justify-center items-center sm:p-8"
+    class="absolute top-0 -z-10 flex h-full w-full items-center justify-center overflow-hidden sm:p-8"
   >
     <div
       id="masks"
-      class="bg-no-repeat w-full max-w-5xl h-full scale-120 sm:scale-150 transition-transform"
+      class="scale-120 h-full w-full max-w-5xl bg-no-repeat transition-transform sm:scale-150"
     ></div>
   </div>
   <section
-    class="max-w-2xl w-full flex flex-col p-4 gap-6 items-center justify-center bg-no-repeat my-2 sm:my-6"
+    class="my-2 flex w-full max-w-2xl flex-col items-center justify-center gap-6 bg-no-repeat p-4 sm:my-6"
   >
-    <div class="max-w-md w-full flex flex-col gap-6 items-center">
+    <div class="flex w-full max-w-md flex-col items-center gap-6">
       <Title />
 
-      <p class="text-black text-center">
+      <p class="text-center text-black">
         Find a map from a IIIF-enabled map collection, copy its IIIF URL and
         paste it below to start georeferencing. You can view georeferenced maps
         in <a href="https://viewer.allmaps.org" class="underline"
@@ -90,15 +100,15 @@
           >Learn more about georeferencing IIIF maps</a
         >
       </p> -->
-      <p class="text-xs text-center text-gray-600">
+      <p class="text-center text-xs text-gray-600">
         <TermsOfUse />
       </p>
     </div>
   </section>
-  <section class="w-full bg-[#f2feff] flex flex-col items-center pb-16">
+  <section class="flex w-full flex-col items-center bg-[#f2feff] pb-16">
     <div class="max-w-(--breakpoint-lg) flex flex-col items-center p-2">
-      <div class="flex flex-col items-center p-8 space-y-4 text-center">
-        <h2 class="text-black text-2xl font-bold">
+      <div class="flex flex-col items-center space-y-4 p-8 text-center">
+        <h2 class="text-2xl font-bold text-black">
           Or pick a map from these collections
         </h2>
       </div>

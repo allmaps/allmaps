@@ -13,18 +13,13 @@
   const uiState = getUiState()
 </script>
 
-<Modal
-  bind:open={
-    () => uiState.getModalOpen('keyboard'),
-    (open) => uiState.setModalOpen('keyboard', open)
-  }
->
+<Modal bind:open={uiState.modalOpen.keyboard}>
   {#snippet title()}
     Keyboard shortcuts
   {/snippet}
-  <table class="w-auto md:w-lg">
+  <table class="md:w-lg w-auto">
     <tbody class="first:pt-0">
-      <tr class="border-b-2 border-pink font-bold"
+      <tr class="border-pink border-b-2 font-bold"
         ><td class="p-1" colspan="2">General</td></tr
       >
 
@@ -63,7 +58,7 @@
         <td class="p-1"><Kbd>Ctrl</Kbd>+<Kbd>k</Kbd></td>
       </tr> -->
 
-      <tr class="border-b-2 border-pink font-bold"
+      <tr class="border-pink border-b-2 font-bold"
         ><td class="p-1" colspan="2">Images and maps</td></tr
       >
 
@@ -84,7 +79,7 @@
         <td class="p-1"><Kbd>&#125;</Kbd></td>
       </tr>
 
-      <tr class="border-b-2 border-pink font-bold"
+      <tr class="border-pink border-b-2 font-bold"
         ><td class="p-1" colspan="2">Switch view</td></tr
       >
 
@@ -108,7 +103,7 @@
         <td class="p-1"><Kbd>4</Kbd></td>
       </tr>
 
-      <tr class="border-b-2 border-pink font-bold"
+      <tr class="border-pink border-b-2 font-bold"
         ><td class="p-1" colspan="2">Editing</td></tr
       >
 

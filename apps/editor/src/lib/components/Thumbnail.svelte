@@ -1,39 +1,32 @@
 <script lang="ts">
-  import type {
-    Collection as IIIFCollection,
-    EmbeddedCollection as IIIFEmbeddedCollection,
-    Manifest as IIIFManifest,
-    EmbeddedManifest as IIIFEmbeddedManifest,
-    Image as IIIFImage,
-    EmbeddedImage as IIIFEmbeddedImage,
-    ImageRequest
-  } from '@allmaps/iiif-parser'
+  import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
+
+  import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
   import type { Fit } from '@allmaps/types'
 
-  type IIIFResource =
-    | IIIFCollection
-    | IIIFEmbeddedCollection
-    | IIIFManifest
-    | IIIFEmbeddedManifest
-    | IIIFImage
-    | IIIFEmbeddedImage
+  import type { IIIFResource } from '$lib/types/shared.js'
 
   type Props = {
     parsedIiif: IIIFResource
     width?: number
     height?: number
     mode: Fit
-    onclick?: (event: MouseEvent) => void
+    // onclick?: (event: MouseEvent) => void
   }
 
   let {
     parsedIiif,
     width = 250,
     height = width,
-    mode = 'cover',
-    onclick
+    mode = 'cover'
+    // onclick
   }: Props = $props()
+
+  async function fetchAndParseImageInfo(imageId: string) {
+    const imageInfo = await fetchImageInfo(imageId)
+    return IIIFImage.parse(imageInfo)
+  }
 
   let firstThumbnail = $derived.by(() => {
     if ('thumbnail' in parsedIiif) {
@@ -43,11 +36,6 @@
 
   let imageWidth = $derived(firstThumbnail?.width ?? width)
   let imageHeight = $derived(firstThumbnail?.height ?? height)
-
-  // let parsedImage = $derived(Image.parse(imageInfo))
-  // let imageRequest = $derived(
-  //   parsedImage && parsedImage.getImageRequest({ width, height }, mode)
-  // )
 
   let borderBoxWidth = $derived(mode === 'cover' ? width : imageWidth)
   let borderBoxHeight = $derived(mode === 'cover' ? height : imageHeight)
@@ -63,11 +51,35 @@
 >
   {#if firstThumbnail}
     <img
-      class="w-full h-full {mode === 'cover'
+      class="h-full w-full {mode === 'cover'
         ? 'object-cover'
         : 'object-contain'}"
       alt={`Thumbnail for`}
       src={firstThumbnail.id}
     />
+  {:else if parsedIiif.type === 'image'}
+    {#await fetchAndParseImageInfo(parsedIiif.uri) then parsedImage}
+      {@const imageRequest = parsedImage.getImageRequest(
+        { width, height },
+        mode
+      )}
+      {#if !Array.isArray(imageRequest)}
+        <img
+          class="h-full w-full {mode === 'cover'
+            ? 'object-cover'
+            : 'object-contain'}"
+          alt={`Thumbnail for ${parsedImage.uri}`}
+          src={parsedImage.getImageUrl(imageRequest)}
+        />
+      {:else}
+        <div class="flex h-full w-full items-center justify-center">
+          <span>Cannot display tiled images yet</span>
+        </div>
+      {/if}
+    {/await}
+  {:else}
+    <div class="flex h-full w-full items-center justify-center">
+      <span>No Thumbnail Available</span>
+    </div>
   {/if}
 </div>

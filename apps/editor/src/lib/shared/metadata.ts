@@ -8,14 +8,7 @@ import type {
   Manifest as IIIFManifest
 } from '@allmaps/iiif-parser'
 
-import type { SourceType } from '$lib/types/shared.js'
-
-type IIIFResource = {
-  metadata?: Metadata
-  description?: LanguageString
-  label?: LanguageString
-  summary?: LanguageString
-}
+import type { SourceType, IIIFPresentationResource } from '$lib/types/shared.js'
 
 const formatter = new Intl.RelativeTimeFormat(undefined, {
   numeric: 'auto'
@@ -66,11 +59,11 @@ export function formatLabels(labels: string[], maxLength = 64): string {
 
 export function formatSourceType(sourceType: SourceType) {
   if (sourceType === 'image') {
-    return 'IIIF Image'
+    return 'Image'
   } else if (sourceType === 'manifest') {
-    return 'IIIF Manifest'
+    return 'Manifest'
   } else if (sourceType === 'collection') {
-    return 'IIIF Collection'
+    return 'Collection'
   }
 }
 
@@ -167,13 +160,16 @@ export function findYearFromManifest(manifest?: IIIFManifest) {
   }
 }
 
-function findYearFromIIIFResource(iiifResource: IIIFResource) {
+function findYearFromIIIFResource(iiifResource: IIIFPresentationResource) {
   const metadataYears = findYearsFromMetadata(iiifResource.metadata)
   const descriptionYears = findYearsFromLanguageString(
     Object(iiifResource.description)
   )
   const labelYears = findYearsFromLanguageString(Object(iiifResource.label))
-  const summaryYears = findYearsFromLanguageString(Object(iiifResource.summary))
+  const summaryYears =
+    'summary' in iiifResource
+      ? findYearsFromLanguageString(Object(iiifResource.summary))
+      : []
 
   const allYears = [
     ...metadataYears,

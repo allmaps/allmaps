@@ -30,16 +30,13 @@
   }
 </script>
 
-<div class="flex flex-col sm:flex-row gap-1 justify-self-end">
+<div class="flex flex-col gap-1 justify-self-end sm:flex-row">
   <Popover
-    bind:open={
-      () => uiState.getPopoverOpen('mapSettings'),
-      (open) => uiState.setPopoverOpen('mapSettings', open)
-    }
+    bind:open={uiState.popoverOpen.mapSettings}
     disabled={!mapSettingsEnabled}
   >
     {#snippet button()}
-      <div class="bg-white size-8 transition-all rounded-full p-1.5 shadow-md">
+      <div class="size-8 rounded-full bg-white p-1.5 shadow-md transition-all">
         <GearSixIcon size="100%" weight="regular" />
       </div>
     {/snippet}
@@ -47,30 +44,21 @@
     {#snippet contents()}<MapSettings />{/snippet}
   </Popover>
 
-  <Popover
-    disabled={!geocoderEnabled}
-    bind:open={
-      () => uiState.getPopoverOpen('geocoder'),
-      (open) => uiState.setPopoverOpen('geocoder', open)
-    }
-  >
+  <Popover disabled={!geocoderEnabled} bind:open={uiState.popoverOpen.geocoder}>
     {#snippet button()}
-      <div class="bg-white size-8 transition-all rounded-full p-1.5 shadow-md">
+      <div class="size-8 rounded-full bg-white p-1.5 shadow-md transition-all">
         <MagnifyingGlassIcon size="100%" weight="regular" />
       </div>
     {/snippet}
 
     {#snippet contents()}<Geocoder
-        bind:open={
-          () => uiState.getPopoverOpen('geocoder'),
-          (open) => uiState.setPopoverOpen('geocoder', open)
-        }
+        bind:open={uiState.popoverOpen.geocoder}
       />{/snippet}
   </Popover>
 
   <button
     disabled={!zoomToExtentEnabled}
-    class="bg-white size-8 transition-all rounded-full p-1.5 shadow-md not-disabled:cursor-pointer disabled:text-gray"
+    class="not-disabled:cursor-pointer disabled:text-gray size-8 rounded-full bg-white p-1.5 shadow-md transition-all"
     onclick={handleZoomToExtentClick}
   >
     <CornersOutIcon size="100%" weight="regular" />

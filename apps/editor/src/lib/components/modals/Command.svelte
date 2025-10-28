@@ -1,13 +1,10 @@
 <script lang="ts">
-  import { page } from '$app/state'
-
   import { Command } from 'bits-ui'
 
   import { Modal, Kbd } from '@allmaps/components'
 
   import {
     MagnifyingGlass as MagnifyingGlassIcon,
-    Clipboard as ClipboardIcon,
     Shuffle as ShuffleIcon,
     Link as LinkIcon,
     Copy as CopyIcon
@@ -15,8 +12,13 @@
 
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
+  import {
+    gotoRoute,
+    getViewUrl,
+    getNewParamsFromUrl
+  } from '$lib/shared/router.js'
   import { getAnnotationUrl, getViewerUrl } from '$lib/shared/urls.js'
 
   import { PUBLIC_EXAMPLES_API_URL } from '$env/static/public'
@@ -25,8 +27,7 @@
 
   const scopeState = getScopeState()
   const uiState = getUiState()
-
-  // let dialogOpen = $state(false)
+  const urlState = getUrlState()
 
   let value = $state('')
 
@@ -44,15 +45,20 @@
   }
 
   async function handleRandomIiifResource() {
-    const fetchedExamples = (await fetch(
-      `${PUBLIC_EXAMPLES_API_URL}/?count=1`
-    ).then((response) => response.json())) as Example[]
-
     try {
+      const fetchedExamples = (await fetch(
+        `${PUBLIC_EXAMPLES_API_URL}/?count=1`
+      ).then((response) => response.json())) as Example[]
+
       const url = fetchedExamples[0].manifestId
-      gotoRoute(createRouteUrl(page, 'images', { url }))
+
+      if (url) {
+        gotoRoute(
+          urlState.generateUrl(getViewUrl('images'), getNewParamsFromUrl(url))
+        )
+      }
     } catch {
-      // Ignore
+      console.error('Failed to fetch random IIIF resource')
     }
   }
 
@@ -74,22 +80,16 @@
         JSON.stringify(scopeState.annotation, null, 2)
       )
     }
-    // dialogOpen = false
   }
 
   function handleOpenUrl() {
-    gotoRoute(createRouteUrl(page, 'images', { url: value }))
-    // dialogOpen = false
+    gotoRoute(
+      urlState.generateUrl(getViewUrl('images'), getNewParamsFromUrl(value))
+    )
   }
 </script>
 
-<Modal
-  bind:open={
-    () => uiState.getModalOpen('command'),
-    (open) => uiState.setModalOpen('command', open)
-  }
-  closeButton={true}
->
+<Modal bind:open={uiState.modalOpen.command} closeButton={true}>
   <Command.Root
     class="flex h-full w-full flex-col self-start overflow-hidden rounded-xl
     "
@@ -97,30 +97,30 @@
     <div class="flex items-center gap-2 p-2">
       <MagnifyingGlassIcon class="size-4 shrink-0" />
       <Command.Input
-        class="focus-override inline-flex w-full border-none truncate rounded-lg bg-white transition-colors
-        placeholder:text-foreground-alt/50 focus:outline-none focus:ring-0 "
+        class="focus-override placeholder:text-foreground-alt/50 inline-flex w-full truncate rounded-lg border-none bg-white
+        transition-colors focus:outline-none focus:ring-0 "
         placeholder="Search for something or paste a IIIF URL…"
         bind:value
       />
       <Kbd>Esc</Kbd>
     </div>
-    <div
-      class="flex p-2 items-center gap-1
-        text-sm bg-green-100 text-green-600 rounded-md"
+    <!-- <div
+      class="flex items-center gap-1 rounded-md
+        bg-green-100 p-2 text-sm text-green-600"
     >
       <ClipboardIcon weight="bold" class="size-4 shrink-0" />
       <p>Paste a URL to open a new IIIF resource and start georeferencing</p>
-    </div>
+    </div> -->
     <Command.List class="overflow-y-auto overflow-x-hidden pb-2">
       <Command.Viewport>
         <Command.Empty
-          class="flex w-full items-center justify-center pb-6 pt-8 text-sm text-muted-foreground"
+          class="text-muted-foreground flex w-full items-center justify-center pb-6 pt-8 text-sm"
         >
           No results found.
         </Command.Empty>
         <Command.Group>
           <Command.GroupHeading
-            class="px-3 pb-2 pt-4 text-xs text-muted-foreground"
+            class="text-muted-foreground px-3 pb-2 pt-4 text-xs"
           >
             Georeference a new map
           </Command.GroupHeading>
@@ -160,7 +160,7 @@
         </Command.Group>
         <Command.Group>
           <Command.GroupHeading
-            class="px-3 pb-2 pt-4 text-xs text-muted-foreground"
+            class="text-muted-foreground px-3 pb-2 pt-4 text-xs"
           >
             Copy to Clipboard
           </Command.GroupHeading>

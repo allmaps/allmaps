@@ -1,32 +1,23 @@
 import type {
   Image as IIIFImage,
+  EmbeddedImage as IIIFEmbeddedImage,
+  Canvas as IIIFCanvas,
   Manifest as IIIFManifest,
-  Collection as IIIFCollection
+  EmbeddedManifest as IIIFEmbeddedManifest,
+  Collection as IIIFCollection,
+  EmbeddedCollection as IIIFEmbeddedCollection
 } from '@allmaps/iiif-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { GeojsonPolygon } from '@allmaps/types'
 import type { PickerProjection } from '@allmaps/components/projections'
-
-export type ParamKey =
-  | 'url'
-  | 'path'
-  | 'manifest'
-  | 'image'
-  | 'map'
-  | 'callback'
-  | 'bbox'
-  | 'basemap-url'
-  | 'basemap-preset'
-  | 'background-georeference-annotation-url'
-
-export type Params = { [key in ParamKey]?: string | null }
 
 export type Organization = {
   title: string
   label?: string | ((title: string) => string)
   subtitle?: string
   baseUrls: string[]
-  allowRedirect?: boolean
+  allowCallback?: boolean
 }
 
 export type OrganizationWithId = Organization & {
@@ -47,6 +38,18 @@ export type Scope = 'images' | 'image' | 'map'
 
 export type SourceType = 'image' | 'manifest' | 'collection'
 
+export type IIIFPresentationResource =
+  | IIIFCollection
+  | IIIFEmbeddedCollection
+  | IIIFCanvas
+  | IIIFManifest
+  | IIIFEmbeddedManifest
+
+export type IIIFResource =
+  | IIIFPresentationResource
+  | IIIFEmbeddedImage
+  | IIIFImage
+
 type BaseSource = {
   url: string
   allmapsId: string
@@ -55,17 +58,17 @@ type BaseSource = {
   parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
 }
 
-type ImageSource = {
+export type ImageSource = {
   type: 'image'
   parsedIiif: IIIFImage
 }
 
-type ManifestSource = {
+export type ManifestSource = {
   type: 'manifest'
   parsedIiif: IIIFManifest
 }
 
-type CollectionSource = {
+export type CollectionSource = {
   type: 'collection'
   parsedIiif: IIIFCollection
 }
@@ -91,11 +94,15 @@ export type Example = {
   imageId: string
 }
 
-export type Viewport = {
-  zoom: number
-  center: [number, number]
-  bearing: number
-}
+export type Viewport =
+  | {
+      zoom: number
+      center: [number, number]
+      bearing: number
+    }
+  | {
+      bounds: [number, number, number, number]
+    }
 
 export type AllmapsPluginId = 'maplibre' | 'leaflet' | 'openlayers'
 
@@ -142,3 +149,37 @@ export type CollectionPath = {
   index: number
   page?: number
 }[]
+
+export type SearchParam<T> = {
+  key: string
+  default?: T
+  toString?: (value: T) => string | undefined
+  parse?: (value: string | undefined) => T | undefined
+}
+
+export type SearchParams = {
+  [K in string]: SearchParam<any>
+}
+
+// Extract the type T from SearchParam<T>
+export type ExtractSearchParamType<T> =
+  T extends SearchParam<infer U> ? U : never
+
+export type SearchParamsInput<
+  T extends SearchParams,
+  K extends keyof T = keyof T
+> = {
+  [P in K]?: ExtractSearchParamType<T[P]>
+}
+
+export type Breadcrumb = {
+  label?: string
+  path: CollectionPath
+  type: 'collection' | 'manifest' | 'canvas'
+  id: string
+}
+
+export type WarpedResourceMask = {
+  id: string
+  polygon: GeojsonPolygon
+}

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state'
 
-  import { Banner, Stats, Loading } from '@allmaps/components'
+  import { Banner, Loading } from '@allmaps/components'
 
   import { setProjectionsState } from '@allmaps/components/state'
 
   import { getErrorState } from '$lib/state/error.svelte.js'
-  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
   import { setApiState } from '$lib/state/api.svelte.js'
   import { setHeadState } from '$lib/state/head.svelte.js'
   import { setMapsHistoryState } from '$lib/state/maps-history.svelte.js'
@@ -19,7 +19,7 @@
   import { setViewportsState } from '$lib/state/viewports.svelte.js'
   // import { setWarpedMapLayerState } from '$lib/state/warpedmaplayer.svelte'
 
-  import { createRouteUrl, gotoRoute, getView } from '$lib/shared/router.js'
+  import { gotoRoute, getViewUrl } from '$lib/shared/router.js'
 
   import Head from '$lib/components/Head.svelte'
   import Header from '$lib/components/Header.svelte'
@@ -85,7 +85,7 @@
 
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-      uiState.setModalOpen('command', !uiState.getModalOpen('command'))
+      uiState.modalOpen.command = !uiState.modalOpen.command
     }
 
     if (!shouldHandleKeyboardEvent(event)) {
@@ -115,11 +115,15 @@
     if (event.key === '[') {
       const previousImageId = sourceState.getPreviousActiveImageId()
 
-      gotoRoute(createRouteUrl(page, getView(page), { image: previousImageId }))
+      gotoRoute(
+        urlState.generateUrl(page.url.pathname, { imageId: previousImageId })
+      )
     } else if (event.key === ']') {
       const nextImageId = sourceState.getNextActiveImageId()
 
-      gotoRoute(createRouteUrl(page, getView(page), { image: nextImageId }))
+      gotoRoute(
+        urlState.generateUrl(page.url.pathname, { imageId: nextImageId })
+      )
     } else if (event.key === '{') {
       const previousMapId = mapsState.previousMapId
       if (previousMapId) {
@@ -128,7 +132,6 @@
           mapId: previousMapId
         }
         mapsState.activeMapId = previousMapId
-        console.log('set previous map', previousMapId)
       }
     } else if (event.key === '}') {
       const nextMapId = mapsState.nextMapId
@@ -141,13 +144,13 @@
         mapsState.activeMapId = nextMapId
       }
     } else if (event.key === '1') {
-      gotoRoute(createRouteUrl(page, 'images'))
+      gotoRoute(urlState.generateUrl(getViewUrl('images')))
     } else if (event.key === '2') {
-      gotoRoute(createRouteUrl(page, 'mask'))
+      gotoRoute(urlState.generateUrl(getViewUrl('mask')))
     } else if (event.key === '3') {
-      gotoRoute(createRouteUrl(page, 'georeference'))
+      gotoRoute(urlState.generateUrl(getViewUrl('georeference')))
     } else if (event.key === '4') {
-      gotoRoute(createRouteUrl(page, 'results'))
+      gotoRoute(urlState.generateUrl(getViewUrl('results')))
     } else if (event.key === 'm') {
       uiState.dispatchToggleRenderMasks()
     }
@@ -169,22 +172,27 @@
     <Header />
   </div>
   <div class="grid h-full min-h-0 w-full">
-    <!-- {#if sourceState.loading}
-      <div class="w-full h-full top-0 left-0">
-        <Loading />
-      </div>
-    {:else if errorState.error}
+    {#if errorState.error}
       <Error error={errorState.error} />
     {:else}
-         {/if} -->
+      <div class="col-span-full row-span-full min-h-0 min-w-0">
+        {@render children()}
+      </div>
 
-    <div class="col-span-full row-span-full min-h-0">
-      {@render children()}
-    </div>
+      {#if sourceState.fetching}
+        <div class="col-span-full row-span-full">
+          <div class="flex h-full w-full items-center justify-center">
+            <div class="z-50 rounded-lg bg-white p-1 shadow-lg">
+              <Loading />
+            </div>
+          </div>
+        </div>
+      {/if}
 
-    <div class="pointer-events-none z-10 col-span-full row-span-full min-h-0">
-      <Controls />
-    </div>
+      <div class="pointer-events-none z-10 col-span-full row-span-full min-h-0">
+        <Controls />
+      </div>
+    {/if}
   </div>
 </div>
 

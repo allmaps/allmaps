@@ -57,6 +57,7 @@
     initialViewport?: Viewport
     terrain?: boolean
     geoMap?: Map
+    warpedMapLayer?: WarpedMapLayer
     warpedMapLayerBounds?: LngLatBoundsLike
     warpedMapsOpacity?: number
     renderMasks?: boolean
@@ -68,9 +69,10 @@
     mapIds,
     initialViewport,
     geoMap = $bindable<Map | undefined>(),
-    warpedMapsOpacity = $bindable(1),
-    renderMasks = $bindable(false),
-    onlyRenderActiveMap = $bindable(false),
+    warpedMapLayer = $bindable<WarpedMapLayer | undefined>(),
+    warpedMapsOpacity = 1,
+    renderMasks = false,
+    onlyRenderActiveMap = false,
     onmoveend,
     warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>()
   }: Props = $props()
@@ -98,7 +100,7 @@
   const uiState = getUiState()
 
   let geoMapContainer: HTMLDivElement
-  let warpedMapLayer = $state.raw<WarpedMapLayer>()
+  // let warpedMapLayer = $state.raw<WarpedMapLayer>()
 
   const defaultViewport = {
     center: [0, 0] as [number, number],
@@ -106,11 +108,7 @@
     bearing: 0
   }
 
-  const viewport = {
-    center: initialViewport?.center || defaultViewport.center,
-    zoom: initialViewport?.zoom || defaultViewport.zoom,
-    bearing: initialViewport?.bearing || defaultViewport.bearing
-  }
+  const viewport = initialViewport || defaultViewport
 
   async function addGeoreferencedMap(map: GeoreferencedMap) {
     if (!map.id) {
@@ -118,8 +116,13 @@
     }
 
     if (warpedMapLayer) {
-      await warpedMapLayer.addGeoreferencedMap(map)
-      currentMapIds.add(map.id)
+      try {
+        await warpedMapLayer.addGeoreferencedMap(map)
+        currentMapIds.add(map.id)
+      } catch {
+        // Couldn't add Georeferenced Map. This probably means that
+        // the map hasn't been fully georeferenced.
+      }
     }
   }
 
@@ -234,16 +237,16 @@
   }
 
   function handleClick(event: MapMouseEvent) {
-    // const mapId = findFirstMapFromEvent(event)
-    // if (mapId) {
-    //   mapsState.activeMapId = mapId
-    //   console.log('click', mapId)
-    // }
+    const mapId = findFirstMapFromEvent(event)
+    if (mapId) {
+      mapsState.activeMapId = mapId
+      // TODO: implement click handling
+    }
   }
 
   function handleContextmenu(event: MapMouseEvent) {
     // const mapId = findFirstMapFromEvent(event)
-    // console.log('contextmenu', mapId)
+    // TODO: implement contextmenu handling
   }
 
   function handleInsertMap(event: InsertMapEvent) {}

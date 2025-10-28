@@ -28,10 +28,16 @@ export class ScopeState {
 
   #scope = $state<Scope>('image')
 
-  #hasMapScope
   #hasImageScope = $state(true)
-  #hasImagesScope
-  #scopes
+  #hasImagesScope = $derived.by(() => this.#sourceState.imageCount > 1)
+  #hasMapScope = $derived.by(() => this.#mapsState.mapsCountForActiveImage > 0)
+  #scopes = $derived.by<Scope[]>(() =>
+    [
+      this.#hasImagesScope ? ('images' as const) : undefined,
+      this.#hasImageScope ? ('image' as const) : undefined,
+      this.#hasMapScope ? ('map' as const) : undefined
+    ].flatMap((scope) => scope ?? [])
+  )
 
   #allmapsId = $derived.by(() => {
     if (this.#scope === 'images' && this.#sourceState.source) {
@@ -86,6 +92,10 @@ export class ScopeState {
     return []
   })
 
+  // ScopeState keeps its own activeMapId. This is used when viewing maps from other images
+  // (i.e. not from the current ShareDB connection) in the Results view
+  #activeMapId = $state<string>()
+
   #annotation = $derived(generateAnnotation(this.#maps))
 
   constructor(
@@ -99,16 +109,13 @@ export class ScopeState {
     this.#mapsMergedState = mapsMergedState
     this.#projectionsState = projectionsState
 
-    this.#hasImagesScope = $derived(this.#sourceState.imageCount > 1)
-    this.#hasMapScope = $derived(this.#mapsState.mapsCountForActiveImage > 0)
-
-    this.#scopes = $derived<Scope[]>(
-      [
-        this.#hasImagesScope ? ('images' as const) : undefined,
-        this.#hasImageScope ? ('image' as const) : undefined,
-        this.#hasMapScope ? ('map' as const) : undefined
-      ].flatMap((scope) => scope ?? [])
-    )
+    $effect(() => {
+      if (this.#mapsState.activeMapId) {
+        this.#activeMapId = getFullMapId(this.#mapsState.activeMapId)
+      } else {
+        this.#activeMapId = this.#mapIds[0]
+      }
+    })
   }
 
   get hasImagesScope() {
@@ -157,6 +164,42 @@ export class ScopeState {
     }
 
     return 0
+  }
+
+  get activeMapIndex(): number | undefined {
+    const index = this.#mapIds.findIndex((mapId) => mapId === this.#activeMapId)
+
+    if (index !== -1) {
+      return index
+    }
+  }
+
+  get previousMapId() {
+    const activeIndex = this.activeMapIndex
+    if (activeIndex !== undefined) {
+      return this.mapIds[
+        (activeIndex - 1 + this.mapIds.length) % this.mapIds.length
+      ]
+    }
+  }
+
+  get nextMapId() {
+    const activeIndex = this.activeMapIndex
+    if (activeIndex !== undefined) {
+      return this.mapIds[
+        (activeIndex + 1 + this.mapIds.length) % this.mapIds.length
+      ]
+    }
+  }
+
+  get activeMapId(): string | undefined {
+    return this.#activeMapId
+  }
+
+  set activeMapId(mapId: string | undefined) {
+    if (mapId && this.#mapIds.includes(mapId)) {
+      this.#activeMapId = mapId
+    }
   }
 }
 

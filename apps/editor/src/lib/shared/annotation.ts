@@ -4,10 +4,13 @@ import { GcpTransformer } from '@allmaps/transform'
 
 import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 
+import type { ResourceMask } from '$lib/types/maps.js'
+
 export function generateFakeStraightAnnotation(
   imageId: string,
   width: number,
-  height: number
+  height: number,
+  resourceMask?: ResourceMask
 ) {
   const georeferencedMap = [
     {
@@ -20,7 +23,7 @@ export function generateFakeStraightAnnotation(
         height,
         type: 'ImageService2'
       },
-      resourceMask: [
+      resourceMask: resourceMask || [
         [0, 0],
         [0, height],
         [width, height],
@@ -46,6 +49,7 @@ export function generateFakeStraightAnnotation(
 
   return generateAnnotation(georeferencedMap)
 }
+
 export function computeTransformedAnnotationBbox(
   annotation: Annotation | AnnotationPage
 ) {

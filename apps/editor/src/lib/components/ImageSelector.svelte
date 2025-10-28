@@ -6,52 +6,47 @@
     ArrowRight as ArrowRightIcon
   } from 'phosphor-svelte'
 
-  import { createRouteUrl, getView, gotoRoute } from '$lib/shared/router.js'
-
   import { getSourceState } from '$lib/state/source.svelte'
+  import { getUrlState } from '$lib/shared/params.js'
 
   const sourceState = getSourceState()
+  const urlState = getUrlState()
 
-  function handlePreviousClick() {
-    gotoRoute(
-      createRouteUrl(page, getView(page), {
-        image: sourceState.getPreviousActiveImageId()
-      })
-    )
-  }
-
-  function handleNextClick() {
-    gotoRoute(
-      createRouteUrl(page, getView(page), {
-        image: sourceState.getNextActiveImageId()
-      })
-    )
-  }
+  let previousHref = $derived(
+    urlState.generateUrl(page.url.pathname, {
+      imageId: sourceState.getPreviousActiveImageId()
+    })
+  )
+  let nextHref = $derived(
+    urlState.generateUrl(page.url.pathname, {
+      imageId: sourceState.getNextActiveImageId()
+    })
+  )
 </script>
 
 {#if sourceState.activeImageIndex !== undefined}
   <div
-    class="flex bg-white rounded-md shadow-md p-2 gap-1 sm:gap-2 items-center"
+    class="flex items-center gap-1 rounded-md bg-white p-2 shadow-md sm:gap-2"
   >
-    <div class="hidden sm:inline-block whitespace-nowrap leading-tight">
+    <div class="hidden whitespace-nowrap leading-tight sm:inline-block">
       <span class="hidden md:inline-block">Image&nbsp;</span
       >{sourceState.activeImageIndex + 1} of {sourceState.imageCount}
     </div>
-    <button
-      class="cursor-pointer p-0 rounded-full transition-colors duration-200
-       bg-white hover:bg-gray-100/80"
-      onclick={handlePreviousClick}
+    <a
+      class="cursor-pointer rounded-full bg-white p-0 transition-colors
+       duration-200 hover:bg-gray-100/80"
+      href={previousHref}
       title="Previous image"
     >
       <ArrowLeftIcon class="size-6" />
-    </button>
-    <button
-      class="cursor-pointer p-0 rounded-full transition-colors duration-200
-       bg-white hover:bg-gray-100/80"
-      onclick={handleNextClick}
+    </a>
+    <a
+      class="cursor-pointer rounded-full bg-white p-0 transition-colors
+       duration-200 hover:bg-gray-100/80"
+      href={nextHref}
       title="Next image"
     >
       <ArrowRightIcon class="size-6" />
-    </button>
+    </a>
   </div>
 {/if}

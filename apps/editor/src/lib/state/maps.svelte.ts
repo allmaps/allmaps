@@ -31,7 +31,7 @@ import type { SourceState } from '$lib/state/source.svelte'
 import type { ErrorState } from '$lib/state/error.svelte'
 import type { MapsHistoryState } from '$lib/state/maps-history.svelte'
 
-import type { Point } from '$lib/types/shared.js'
+import type { Point, SearchParams } from '$lib/types/shared.js'
 import type {
   ResourceMask,
   DbMaps,
@@ -76,13 +76,11 @@ export class MapsState extends MapsEventTarget {
   #connected = $state(false)
 
   #connectedImageId = $state<string>()
-  #imageId: string | undefined
 
-  #sourceState: SourceState
   #errorState: ErrorState
   #mapsHistoryState: MapsHistoryState
 
-  #activeMapId = $state<string | null>()
+  #activeMapId = $state<string>()
   #activeGcpIdPerMap = $state<Record<string, string>>({})
 
   #activeMap = $derived.by(() => {
@@ -122,8 +120,8 @@ export class MapsState extends MapsEventTarget {
   })
 
   #throttledConnectToImageId = throttle(this.#connectToImageId, 1000, {
-    leading: true,
-    trailing: true
+    // leading: true,
+    // trailing: true
   })
 
   constructor(
@@ -133,7 +131,6 @@ export class MapsState extends MapsEventTarget {
   ) {
     super()
 
-    this.#sourceState = sourceState
     this.#errorState = errorState
     this.#mapsHistoryState = mapsHistoryState
 
@@ -147,15 +144,18 @@ export class MapsState extends MapsEventTarget {
     this.#connection = new Client.Connection(this.#rws)
 
     $effect(() => {
-      if (sourceState.activeImageId) {
-        this.#imageId = sourceState.activeImageId
-
-        sourceState.fetchImageInfo(this.#imageId)
+      if (
+        sourceState.activeImageId &&
+        this.#connectedImageId !== sourceState.activeImageId
+      ) {
+        // // TODO: move to source state, run fetchImageInfo when
+        // // sourceState.activeImageId changes there instead of here
+        // sourceState.fetchImageInfo(this.#imageId)
 
         if (!this.#connecting) {
           this.#connected = false
           this.#connecting = true
-          this.#throttledConnectToImageId(this.#imageId)
+          this.#throttledConnectToImageId(sourceState.activeImageId)
         }
       }
     })
@@ -195,15 +195,6 @@ export class MapsState extends MapsEventTarget {
     }
 
     if (!this.#doc) {
-      return
-    }
-
-    if (
-      this.#imageId &&
-      this.#sourceState.activeImageId &&
-      this.#imageId !== this.#connectedImageId
-    ) {
-      this.#throttledConnectToImageId(this.#imageId)
       return
     }
 
@@ -455,7 +446,7 @@ export class MapsState extends MapsEventTarget {
     }
   }
 
-  #isMapIdValid(mapId: string | null) {
+  #isMapIdValid(mapId?: string) {
     if (this.#maps && mapId && this.#connected) {
       return mapId in this.#maps
     }
@@ -509,7 +500,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   set activeMapId(mapId: string) {
-    if (this.#isMapIdValid(mapId)) {
+    if (this.#isMapIdValid(mapId) && this.#activeMapId !== mapId) {
       this.#activeMapId = mapId
     }
   }

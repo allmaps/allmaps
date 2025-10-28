@@ -1,14 +1,8 @@
 import { isGeojsonGeometry, computeBbox } from '@allmaps/stdlib'
 
-import { LngLat } from 'maplibre-gl'
-
-import type { Map as MapLibreMap } from 'maplibre-gl'
-
 import type { Bbox } from '@allmaps/types'
 
 import type { Viewport } from '$lib/types/shared.js'
-
-import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
 
 type Viewports = {
   state: Viewport
@@ -17,31 +11,16 @@ type Viewports = {
   data: Viewport
 }
 
-export function getNavPlaceViewport(
-  map: MapLibreMap,
-  navPlace?: object
-): Viewport | undefined {
+export function getNavPlaceViewport(navPlace?: object): Viewport | undefined {
   if (isGeojsonGeometry(navPlace)) {
     const bbox = computeBbox(navPlace)
-    return getBboxViewport(map, bbox)
+    return getBboxViewport(bbox)
   }
 }
 
-export function getBboxViewport(
-  map: MapLibreMap,
-  bbox?: Bbox
-): Viewport | undefined {
+export function getBboxViewport(bbox?: Bbox): Viewport | undefined {
   if (bbox) {
-    const camera = map.cameraForBounds(bbox, {
-      padding: MAPLIBRE_PADDING
-    })
-    if (camera && camera.center && camera.zoom) {
-      return {
-        center: LngLat.convert(camera.center).toArray(),
-        zoom: camera.zoom,
-        bearing: 0
-      }
-    }
+    return { bounds: bbox }
   }
 }
 

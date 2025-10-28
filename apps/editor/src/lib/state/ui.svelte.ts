@@ -8,15 +8,17 @@ import type { PickerProjection } from '@allmaps/components/projections'
 import type { Bbox, Point } from '@allmaps/types'
 
 import type {
-  BasemapPresetId,
   AllmapsPluginId,
   ClickedItem,
   BasemapPresetItem,
-  AllmapsPluginItem
+  AllmapsPluginItem,
+  WarpedResourceMask
 } from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
 import type { SourceState } from '$lib/state/source.svelte.js'
+
+import type { searchParams } from '$lib/shared/params'
 
 const UI_KEY = Symbol('ui')
 
@@ -100,7 +102,7 @@ type ProjectionIndices = {
 }
 
 export class UiState extends UiEventTarget {
-  #urlState: UrlState
+  #urlState: UrlState<typeof searchParams>
 
   #firstUse = $state(true)
 
@@ -135,10 +137,61 @@ export class UiState extends UiEventTarget {
     renderMasks: false
   })
 
-  constructor(urlState: UrlState, sourceState: SourceState) {
+  #warpedResourceMasks = $state.raw<WarpedResourceMask[]>([])
+
+  // Proxy objects for dynamic modal/popover access
+  /**
+   * Dynamic access to modal state. Use like: uiState.modalOpen.command = true
+   * Available modals: command, about, annotation, keyboard, export, editGcps, editResourceMask
+   */
+  modalOpen: Record<Modal, boolean>
+
+  /**
+   * Dynamic access to popover state. Use like: uiState.popoverOpen.export = true
+   * Available popovers: export, geocoder, info, maps, mapSettings
+   */
+  popoverOpen: Record<Popover, boolean>
+
+  constructor(
+    urlState: UrlState<typeof searchParams>,
+    sourceState: SourceState
+  ) {
     super()
 
     this.#urlState = urlState
+
+    // Create proxy objects for modal and popover access
+    this.modalOpen = new Proxy({} as Record<Modal, boolean>, {
+      get: (target, prop: string | symbol) => {
+        if (typeof prop === 'string') {
+          return this.#getModalOpen(prop as Modal)
+        }
+        return undefined
+      },
+      set: (target, prop: string | symbol, value: boolean) => {
+        if (typeof prop === 'string') {
+          this.#setModalOpen(prop as Modal, value)
+          return true
+        }
+        return false
+      }
+    })
+
+    this.popoverOpen = new Proxy({} as Record<Popover, boolean>, {
+      get: (target, prop: string | symbol) => {
+        if (typeof prop === 'string') {
+          return this.#getPopoverOpen(prop as Popover)
+        }
+        return undefined
+      },
+      set: (target, prop: string | symbol, value: boolean) => {
+        if (typeof prop === 'string') {
+          this.#setPopoverOpen(prop as Popover, value)
+          return true
+        }
+        return false
+      }
+    })
 
     if (browser) {
       // TODO: move localStorage code to shared ts file
@@ -204,7 +257,7 @@ export class UiState extends UiEventTarget {
 
   get basemapPreset(): BasemapPresetItem {
     const basemapPreset = this.basemapPresets.find(
-      (preset) => preset.value === this.#urlState.basemapPresetId
+      (preset) => preset.value === this.#urlState.params.basemapPresetId
     )
 
     if (basemapPreset) {
@@ -242,11 +295,11 @@ export class UiState extends UiEventTarget {
     return this.#firstUse
   }
 
-  getModalOpen(modal: Modal) {
+  #getModalOpen(modal: Modal) {
     return this.#modalOpen === modal
   }
 
-  setModalOpen(modal: Modal, open: boolean) {
+  #setModalOpen(modal: Modal, open: boolean) {
     this.#modalOpen = open ? modal : undefined
   }
 
@@ -254,11 +307,11 @@ export class UiState extends UiEventTarget {
     return this.#modalOpen !== undefined
   }
 
-  getPopoverOpen(popover: Popover) {
+  #getPopoverOpen(popover: Popover) {
     return this.#popoverOpen === popover
   }
 
-  setPopoverOpen(popover: Popover, open: boolean) {
+  #setPopoverOpen(popover: Popover, open: boolean) {
     this.#popoverOpen = open ? popover : undefined
   }
 
@@ -328,9 +381,20 @@ export class UiState extends UiEventTarget {
   set resultsOptions(options: Partial<ResultsOptions>) {
     this.#resultsOptions = { ...this.#resultsOptions, ...options }
   }
+
+  get warpedResourceMasks() {
+    return this.#warpedResourceMasks
+  }
+
+  set warpedResourceMasks(warpedResourceMasks: WarpedResourceMask[]) {
+    this.#warpedResourceMasks = warpedResourceMasks
+  }
 }
 
-export function setUiState(urlState: UrlState, sourceState: SourceState) {
+export function setUiState(
+  urlState: UrlState<typeof searchParams>,
+  sourceState: SourceState
+) {
   return setContext(UI_KEY, new UiState(urlState, sourceState))
 }
 

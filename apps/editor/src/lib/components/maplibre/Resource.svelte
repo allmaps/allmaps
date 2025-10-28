@@ -7,6 +7,7 @@
   import { Image } from '@allmaps/iiif-parser'
   import { parseAnnotation } from '@allmaps/annotation'
   import { GcpTransformer } from '@allmaps/transform'
+  import { pink } from '@allmaps/tailwind'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
@@ -38,6 +39,8 @@
   const sourceState = getSourceState()
   const imageInfoState = getImageInfoState()
 
+  let currentImageId = $state<string>()
+
   let resourceMapContainer: HTMLDivElement
   let warpedMapLayer: WarpedMapLayer | undefined
 
@@ -48,11 +51,13 @@
   )
 
   let mapLoaded = $state(false)
+  let mapLoading = $state(false)
 
   type Props = {
     initialViewport?: Viewport
     resourceMap?: MapLibreMap
     resourceMask?: ResourceMask
+    renderMasks?: boolean
     transformer?: GcpTransformer
     warpedMapLayerBounds?: LngLatBoundsLike
   }
@@ -60,23 +65,45 @@
   let {
     initialViewport,
     resourceMap = $bindable<MapLibreMap | undefined>(),
-    resourceMask = [],
+    resourceMask,
+    renderMasks,
     transformer = $bindable<GcpTransformer | undefined>(),
     warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>()
   }: Props = $props()
 
-  async function updateStraightAnnotation(imageId: string) {
-    straightAnnotation = await generateStraightAnnotation(imageId)
+  let renderOptions = $derived(
+    renderMasks && resourceMask && resourceMask.length > 0
+      ? {
+          renderMaskColor: pink,
+          renderMaskSize: 6,
+          renderAppliableMask: true,
+          applyMask: false
+        }
+      : {
+          applyMask: false,
+          renderAppliableMask: false
+        }
+  )
+
+  async function updateStraightAnnotation(
+    imageId: string,
+    resourceMask?: ResourceMask
+  ) {
+    straightAnnotation = await generateStraightAnnotation(imageId, resourceMask)
+    currentImageId = imageId
   }
 
-  async function generateStraightAnnotation(imageId: string) {
+  async function generateStraightAnnotation(
+    imageId: string,
+    resourceMask?: ResourceMask
+  ) {
     const imageInfo = await imageInfoState.fetchImageInfo(imageId)
     const parsedImage = Image.parse(imageInfo)
 
     const width = parsedImage.width
     const height = parsedImage.height
 
-    return generateFakeStraightAnnotation(imageId, width, height)
+    return generateFakeStraightAnnotation(imageId, width, height, resourceMask)
   }
 
   async function updateMap(annotation: Annotation | AnnotationPage) {
@@ -88,10 +115,6 @@
 
     await warpedMapLayer.addGeoreferenceAnnotation(annotation)
 
-    if (resourceMask) {
-      // warpedMapLayer.setMapResourceMask(annotation.id)
-    }
-
     // TODO: get transformer from warpedMapLayer's WarpedMapList
     const maps = parseAnnotation(annotation)
     const map = maps[0]
@@ -101,19 +124,30 @@
   }
 
   $effect(() => {
-    if (sourceState.activeImageId) {
-      updateStraightAnnotation(sourceState.activeImageId)
+    if (
+      sourceState.activeImageId &&
+      currentImageId !== sourceState.activeImageId
+    ) {
+      updateStraightAnnotation(sourceState.activeImageId, resourceMask)
     }
   })
 
   $effect(() => {
-    if (resourceMask.length && warpedMapLayer) {
-      // warpedMapLayer.setMapResourceMask(sourceState.activeImageId, resourceMask)
+    if (mapLoaded && warpedMapLayer && renderOptions) {
+      warpedMapLayer.setLayerOptions(renderOptions)
     }
   })
 
   $effect(() => {
-    if (straightAnnotation && !mapLoaded) {
+    if (straightAnnotation && mapLoaded) {
+      updateMap(straightAnnotation)
+    }
+  })
+
+  $effect(() => {
+    if (straightAnnotation && !mapLoaded && !mapLoading) {
+      mapLoading = true
+
       const newResourceMap = new MapLibreMap({
         container: resourceMapContainer,
         style: emptyMapStyle,
@@ -139,21 +173,16 @@
         }
       }
 
-      warpedMapLayer = new WarpedMapLayer()
+      warpedMapLayer = new WarpedMapLayer(renderOptions)
 
       newResourceMap.once('style.load', () => {
         // @ts-expect-error "as const" is missing for WarpedMapLayer type
         newResourceMap.addLayer(warpedMapLayer)
 
+        mapLoading = false
         mapLoaded = true
         resourceMap = newResourceMap
-
-        if (straightAnnotation) {
-          updateMap(straightAnnotation)
-        }
       })
-    } else if (straightAnnotation) {
-      updateMap(straightAnnotation)
     }
   })
 
@@ -166,4 +195,4 @@
   })
 </script>
 
-<div bind:this={resourceMapContainer} class="w-full h-full"></div>
+<div bind:this={resourceMapContainer} class="h-full w-full"></div>

@@ -1,5 +1,20 @@
 import type { Organization, OrganizationWithId } from '$lib/types/shared.js'
 
+export function isCallbackValid(callback: string) {
+  try {
+    const url = new URL(callback)
+    const organization = organizations.find(
+      ({ baseUrls, allowCallback }) =>
+        allowCallback === true &&
+        baseUrls.some((baseUrl) => url.href.startsWith(baseUrl))
+    )
+
+    return organization !== undefined
+  } catch {
+    return false
+  }
+}
+
 export const organizationsWithCollectionsOnHomepage: OrganizationWithId[] = [
   {
     title: 'Leiden University Libraries',
@@ -10,7 +25,7 @@ export const organizationsWithCollectionsOnHomepage: OrganizationWithId[] = [
     id: 'lmec',
     title: 'Leventhal Map & Education Center',
     label: (title: string) => `the ${title}`,
-    allowRedirect: true,
+    allowCallback: true,
     subtitle:
       'Norman B. Leventhal Map & Education Center at the Boston Public Library',
     baseUrls: [
@@ -107,12 +122,12 @@ const otherOrganizations: (Organization | OrganizationWithId)[] = [
   {
     title: 'DigHimapper',
     baseUrls: ['https://dighimapper.eu'],
-    allowRedirect: true
+    allowCallback: true
   },
   {
     title: 'Gouda Tijdmachine',
     baseUrls: ['https://www.goudatijdmachine.nl'],
-    allowRedirect: true
+    allowCallback: true
   }
 ]
 

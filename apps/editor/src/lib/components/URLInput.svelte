@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getUrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
   import iiifLogoBlack from '$lib/images/iiif-black.svg'
 
@@ -17,11 +17,11 @@
     placeholder = 'Open a IIIF resource from a URL'
   }: Props = $props()
 
-  let value = $state(urlState.url)
+  let value = $state(urlState.params.url)
 
   $effect(() => {
-    if (urlState.url) {
-      value = urlState.url
+    if (urlState.params.url) {
+      value = urlState.params.url
     } else {
       value = ''
     }
@@ -40,8 +40,8 @@
 
 <form
   onsubmit={handleSubmit}
-  class="text-sm flex items-center cursor-pointer px-3 py-0.5 gap-1 w-full rounded-full shadow-xs bg-white
-    border border-gray-300 focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500 transition-all"
+  class="shadow-xs flex w-full cursor-pointer items-center gap-1 rounded-full border border-gray-300 bg-white px-3
+    py-0.5 text-sm transition-all focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500"
 >
   <img src={iiifLogoBlack} class="size-4 opacity-75" alt="IIIF logo" />
   <input
@@ -50,7 +50,7 @@
     bind:value
     bind:this={input}
     onfocus={() => input.select()}
-    class="bg-transparent w-full px-2 py-1 focus:outline-hidden truncate"
+    class="focus:outline-hidden w-full truncate bg-transparent px-2 py-1"
     {placeholder}
   />
 </form>

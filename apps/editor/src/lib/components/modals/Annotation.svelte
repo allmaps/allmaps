@@ -11,24 +11,20 @@
   const scopeState = getScopeState()
   const uiState = getUiState()
 
-  let selectPortal = $state.raw<HTMLElement>()
+  let selectPortal = $state<HTMLElement>()
 </script>
 
-<Modal
-  bind:open={
-    () => uiState.getModalOpen('annotation'),
-    (open) => uiState.setModalOpen('annotation', open)
-  }
-  size="lg"
-  class="max-w-3xl"
->
+<Modal bind:open={uiState.modalOpen.annotation} size="lg" class="max-w-3xl">
+  <div bind:this={selectPortal}></div>
   {#snippet title()}
-    <div class="flex items-center gap-2 flex-col sm:flex-row">
+    <div class="flex flex-col items-center gap-2 sm:flex-row">
       <span class="shrink-0 text-sm md:text-base"
         >Georeference Annotation for
       </span>
       <div class="w-48 text-base font-normal">
-        <Scope to={selectPortal} />
+        <!-- Somehow, selectPortal is set to null when the modal closes,
+         which causes an error in the bits-ui component -->
+        <Scope to={selectPortal ? selectPortal : undefined} />
       </div>
     </div>
   {/snippet}
@@ -40,5 +36,4 @@
   {:else}
     <StartGeoreferencing />
   {/if}
-  <div bind:this={selectPortal}></div>
 </Modal>
