@@ -37,7 +37,9 @@ import type {
   RequiredStatement,
   Annotations,
   Homepage,
-  Rendering
+  Rendering,
+  ConstructorOptions,
+  ParseOptions
 } from '../lib/types.js'
 
 type CanvasType = z.infer<typeof CanvasSchema>
@@ -107,6 +109,10 @@ export class EmbeddedManifest {
  * @property metadata - Metadata of Manifest
  */
 export class Manifest extends EmbeddedManifest {
+  source?: unknown
+
+  #itemParseOptions: Partial<ParseOptions> = {}
+
   canvases: Canvas[] = []
 
   homepage?: Homepage
@@ -119,8 +125,13 @@ export class Manifest extends EmbeddedManifest {
 
   readonly embedded = false
 
-  constructor(parsedManifest: ManifestType) {
+  constructor(
+    parsedManifest: ManifestType,
+    options?: Partial<ConstructorOptions>
+  ) {
     super(parsedManifest)
+
+    this.source = options?.source
 
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0
@@ -167,10 +178,9 @@ export class Manifest extends EmbeddedManifest {
    * @param majorVersion - IIIF API version of Manifest. If not provided, it will be determined automatically
    * @returns Parsed IIIF Manifest
    */
-  static parse(
-    iiifManifest: unknown,
-    majorVersion: MajorVersion | null = null
-  ) {
+  static parse(iiifManifest: unknown, options?: Partial<ParseOptions>) {
+    const { majorVersion, keepSource } = options || {}
+
     let parsedManifest
 
     if (majorVersion === 2) {
@@ -181,7 +191,10 @@ export class Manifest extends EmbeddedManifest {
       parsedManifest = ManifestSchema.parse(iiifManifest)
     }
 
-    return new Manifest(parsedManifest)
+    return new Manifest(
+      parsedManifest,
+      keepSource ? { source: iiifManifest } : {}
+    )
   }
 
   get images() {
@@ -192,14 +205,16 @@ export class Manifest extends EmbeddedManifest {
     image: Image | EmbeddedImage,
     fetchFn: typeof fetch
   ): Promise<Image> {
-    if (image instanceof EmbeddedImage) {
+    if (image instanceof Image) {
+      return image
+    } else {
       const url = `${image.uri}/info.json`
 
       const iiifImage = await fetchFn(url).then((response) => response.json())
-      const fetchedImage = Image.parse(iiifImage)
+      const fetchedImage = Image.parse(iiifImage, {
+        keepSource: this.source !== undefined
+      })
       return fetchedImage
-    } else {
-      return image
     }
   }
 

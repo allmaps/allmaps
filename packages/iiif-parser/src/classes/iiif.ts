@@ -15,7 +15,7 @@ import { Image } from './image.js'
 import { Manifest } from './manifest.js'
 import { Collection } from './collection.js'
 
-import type { MajorVersion } from '../lib/types.js'
+import type { ParseOptions } from '../lib/types.js'
 
 /**
  * Base class that contains a static parse function for IIIF resources
@@ -27,10 +27,10 @@ export class IIIF {
    * @param majorVersion - IIIF API version of resource. If not provided, it will be determined automatically
    * @returns Parsed IIIF resource
    */
-  static parse(
-    iiifResource: unknown,
-    majorVersion: MajorVersion | null = null
-  ) {
+  static parse(iiifResource: unknown, options?: Partial<ParseOptions>) {
+    const { majorVersion, keepSource } = options || {}
+    const constructorOptions = keepSource ? { source: iiifResource } : {}
+
     if (iiifResource && typeof iiifResource === 'object') {
       if (
         majorVersion === 1 ||
@@ -38,26 +38,26 @@ export class IIIF {
           iiifResource['@context'] === Image1ContextString)
       ) {
         const parsedImage = Image1Schema.parse(iiifResource)
-        return new Image(parsedImage)
+        return new Image(parsedImage, constructorOptions)
       } else if (majorVersion === 2 || '@id' in iiifResource) {
         if (
           'protocol' in iiifResource &&
           iiifResource.protocol === 'http://iiif.io/api/image'
         ) {
           const parsedImage = Image2Schema.parse(iiifResource)
-          return new Image(parsedImage)
+          return new Image(parsedImage, constructorOptions)
         } else if (
           '@type' in iiifResource &&
           iiifResource['@type'] === 'sc:Manifest'
         ) {
           const parsedManifest = Manifest2Schema.parse(iiifResource)
-          return new Manifest(parsedManifest)
+          return new Manifest(parsedManifest, constructorOptions)
         } else if (
           '@type' in iiifResource &&
           iiifResource['@type'] === 'sc:Collection'
         ) {
           const parsedCollection = Collection2Schema.parse(iiifResource)
-          return new Collection(parsedCollection)
+          return new Collection(parsedCollection, constructorOptions)
         }
       } else if (majorVersion === 3 || 'id' in iiifResource) {
         if (
@@ -65,16 +65,16 @@ export class IIIF {
           iiifResource.protocol === 'http://iiif.io/api/image'
         ) {
           const parsedImage = Image3Schema.parse(iiifResource)
-          return new Image(parsedImage)
+          return new Image(parsedImage, constructorOptions)
         } else if ('type' in iiifResource && iiifResource.type === 'Manifest') {
           const parsedManifest = Manifest3Schema.parse(iiifResource)
-          return new Manifest(parsedManifest)
+          return new Manifest(parsedManifest, constructorOptions)
         } else if (
           'type' in iiifResource &&
           iiifResource.type === 'Collection'
         ) {
           const parsedCollection = Collection3Schema.parse(iiifResource)
-          return new Collection(parsedCollection)
+          return new Collection(parsedCollection, constructorOptions)
         }
       }
     }

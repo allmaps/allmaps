@@ -83,3 +83,12 @@ export type Annotations = {
   type: 'AnnotationPage'
   // items?: object[]
 }[]
+
+export type ConstructorOptions = {
+  source: unknown
+}
+
+export type ParseOptions = {
+  majorVersion: MajorVersion
+  keepSource: boolean
+}

@@ -16,7 +16,8 @@ import type {
   Summary,
   Annotations,
   Homepage,
-  Rendering
+  Rendering,
+  ConstructorOptions
 } from '../lib/types.js'
 import {
   parseVersion2String,
@@ -93,10 +94,9 @@ export class Canvas {
       this.rendering = parseVersion2Rendering(parsedCanvas.rendering)
       this.homepage = parseVersion2Related(parsedCanvas.related)
 
-      this.image = new EmbeddedImage(
-        parsedCanvas.images[0].resource,
+      this.image = new EmbeddedImage(parsedCanvas.images[0].resource, {
         parsedCanvas
-      )
+      })
     } else if ('id' in parsedCanvas) {
       // IIIF Presentation API 3.0
 
@@ -133,7 +133,9 @@ export class Canvas {
       }
 
       if (annotationBody) {
-        this.image = new EmbeddedImage(annotationBody, parsedCanvas)
+        this.image = new EmbeddedImage(annotationBody, {
+          parsedCanvas
+        })
       } else {
         throw new Error('No image found on IIIF Canvas')
       }

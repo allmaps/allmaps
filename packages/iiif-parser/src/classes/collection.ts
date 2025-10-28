@@ -33,7 +33,9 @@ import type {
   RequiredStatement,
   Annotations,
   Homepage,
-  Rendering
+  Rendering,
+  ParseOptions,
+  ConstructorOptions
 } from '../lib/types.js'
 
 import {
@@ -118,10 +120,9 @@ export class EmbeddedCollection {
    * @returns Parsed IIIF Collection
    * @static
    */
-  static parse(
-    iiifCollection: unknown,
-    majorVersion: MajorVersion | null = null
-  ) {
+  static parse(iiifCollection: unknown, options?: Partial<ParseOptions>) {
+    const { majorVersion, keepSource } = options || {}
+
     let parsedCollection
 
     if (majorVersion === 2) {
@@ -132,7 +133,10 @@ export class EmbeddedCollection {
       parsedCollection = CollectionSchema.parse(iiifCollection)
     }
 
-    return new Collection(parsedCollection)
+    return new Collection(
+      parsedCollection,
+      keepSource ? { source: iiifCollection } : {}
+    )
   }
 }
 
@@ -146,6 +150,8 @@ export class EmbeddedCollection {
  * @property type - Resource type, equals 'collection'
  */
 export class Collection extends EmbeddedCollection {
+  source?: unknown
+
   items: (Collection | EmbeddedCollection | Manifest | EmbeddedManifest)[] = []
 
   embedded = false
@@ -158,8 +164,13 @@ export class Collection extends EmbeddedCollection {
 
   annotations?: Annotations
 
-  constructor(parsedCollection: CollectionType) {
+  constructor(
+    parsedCollection: CollectionType,
+    options?: Partial<ConstructorOptions>
+  ) {
     super(parsedCollection)
+
+    this.source = options?.source
 
     if ('@type' in parsedCollection) {
       // IIIF Presentation API 2.0
@@ -188,7 +199,7 @@ export class Collection extends EmbeddedCollection {
 
       const items = [...manifests, ...collections, ...members]
 
-      this.items = items.map(this.#itemConstructor)
+      this.items = items.map((item) => this.#itemConstructor(item))
     } else if ('type' in parsedCollection) {
       // IIIF Presentation API 3.0
 
@@ -201,7 +212,9 @@ export class Collection extends EmbeddedCollection {
       this.annotations = parsedCollection.annotations
 
       if ('items' in parsedCollection) {
-        this.items = parsedCollection.items.map(this.#itemConstructor)
+        this.items = parsedCollection.items.map((item) =>
+          this.#itemConstructor(item)
+        )
       }
     } else {
       // TODO: improve error message
@@ -248,10 +261,10 @@ export class Collection extends EmbeddedCollection {
    * @param majorVersion - IIIF API version of Collection. If not provided, it will be determined automatically
    * @returns Parsed IIIF Collection
    */
-  static parse(
-    iiifCollection: unknown,
-    majorVersion: MajorVersion | null = null
-  ) {
+  static parse(iiifCollection: unknown, options?: Partial<ParseOptions>) {
+    const { majorVersion, keepSource } = options || {}
+    const constructorOptions = { keepSource }
+
     let parsedCollection
 
     if (majorVersion === 2) {
@@ -262,7 +275,14 @@ export class Collection extends EmbeddedCollection {
       parsedCollection = CollectionSchema.parse(iiifCollection)
     }
 
-    return new Collection(parsedCollection)
+    return new Collection(
+      parsedCollection,
+      keepSource
+        ? {
+            source: iiifCollection
+          }
+        : {}
+    )
   }
 
   get canvases(): Canvas[] {
@@ -288,21 +308,25 @@ export class Collection extends EmbeddedCollection {
   async fetchItemWithIndex(index: number, fetchFn = fetch) {
     let item = this.items[index]
 
-    if (item instanceof EmbeddedManifest) {
+    if (item.type === 'manifest' && item.embedded === true) {
       const manifestUri = item.uri
       const iiifManifest = await fetchFn(manifestUri).then((response) =>
         response.json()
       )
 
-      const newParsedManifest = Manifest.parse(iiifManifest)
+      const newParsedManifest = Manifest.parse(iiifManifest, {
+        keepSource: this.source !== undefined
+      })
 
       this.items[index] = newParsedManifest
-    } else if (item instanceof EmbeddedCollection) {
+    } else if (item.type === 'collection' && item.embedded === true) {
       const collectionUri = item.uri
       const iiifCollection = await fetchFn(collectionUri).then((response) =>
         response.json()
       )
-      const newParsedCollection = Collection.parse(iiifCollection)
+      const newParsedCollection = Collection.parse(iiifCollection, {
+        keepSource: this.source !== undefined
+      })
       this.items[index] = newParsedCollection
     }
 
@@ -311,7 +335,51 @@ export class Collection extends EmbeddedCollection {
 
   async fetchItemWithId(id: string, fetchFn = fetch) {
     const index = this.items.findIndex((item) => item.uri === id)
-    await this.fetchItemWithIndex(index, fetchFn)
+    if (index >= 0) {
+      return await this.fetchItemWithIndex(index, fetchFn)
+    }
+  }
+
+  getItemAtPath(path: number[]) {
+    let parsedIiif:
+      | Collection
+      | EmbeddedCollection
+      | Manifest
+      | EmbeddedManifest
+      | Canvas = this as Collection
+
+    for (const index of path) {
+      if ('items' in parsedIiif) {
+        parsedIiif = parsedIiif.items[index]
+      } else if ('canvases' in parsedIiif) {
+        parsedIiif = parsedIiif.canvases[index] as Canvas
+      } else {
+        return undefined
+      }
+
+      // If we navigated to an invalid index, return undefined
+      if (!parsedIiif) {
+        return undefined
+      }
+    }
+
+    return parsedIiif
+  }
+
+  async fetchUntilPath(path: number[]) {
+    let parsedCollection = this as Collection
+    for (const index of path) {
+      const item = parsedCollection.items[index]
+      if (item && item.embedded === true) {
+        await parsedCollection.fetchItemWithIndex(index)
+      }
+
+      if (parsedCollection.items[index] instanceof Collection) {
+        parsedCollection = parsedCollection.items[index]
+      } else {
+        break
+      }
+    }
   }
 
   async fetchAllItems(
@@ -369,7 +437,11 @@ export class Collection extends EmbeddedCollection {
         if (options.fetchImages) {
           yield* item.fetchNextItem(fetchFn, depth + 1)
         }
-      } else if (item instanceof EmbeddedManifest && options.fetchManifests) {
+      } else if (
+        item.type === 'manifest' &&
+        item.embedded === true &&
+        options.fetchManifests
+      ) {
         const newParsedManifest = await this.fetchItemWithIndex(index)
 
         if (newParsedManifest instanceof Manifest) {
@@ -387,7 +459,8 @@ export class Collection extends EmbeddedCollection {
           }
         }
       } else if (
-        item instanceof EmbeddedCollection &&
+        item.type === 'collection' &&
+        item.embedded === true &&
         options.fetchCollections
       ) {
         const newParsedCollection = await this.fetchItemWithIndex(index)
