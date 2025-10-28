@@ -7,6 +7,7 @@
 
   type Props = {
     title?: Snippet
+    overlay?: Snippet
     open: boolean
     closeButton?: boolean
     children: Snippet
@@ -14,6 +15,7 @@
 
   let {
     title,
+    overlay,
     open = $bindable(false),
     children,
     ...restProps
@@ -39,11 +41,16 @@
       class="fixed flex items-center justify-center w-full h-full p-4 md:p-16 z-[51]"
       onmousedown={handleContentClick}
     >
+      {#if overlay}
+        <div class="absolute top-0 w-full h-full pointer-events-none">
+          {@render overlay()}
+        </div>
+      {/if}
       <div
         class="rounded-lg max-w-full max-h-full
         bg-white shadow-lg outline-none border-gray-100
           inset-shadow-sm
-          flex flex-col
+          flex flex-col z-[52]
           p-2 sm:p-4 gap-2 sm:gap-4"
       >
         {#if title}

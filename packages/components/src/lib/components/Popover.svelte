@@ -32,13 +32,12 @@
 
 <Popover.Root bind:open>
   <Popover.Trigger
-    class="min-w-0 rounded-md not-disabled:cursor-pointer disabled:text-gray"
+    class="min-w-0 rounded-md not-disabled:cursor-pointer disabled:text-gray group"
     {disabled}
   >
     {@render button()}
   </Popover.Trigger>
   <Popover.Portal>
-    <!-- class="outline-0 max-w-screen w-2xl px-3" -->
     <Popover.Content
       forceMount
       sideOffset={4}
