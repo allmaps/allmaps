@@ -34,6 +34,11 @@
     "precommit": {
       "dependsOn": ["types", "lint", "build", "test", "documentation"]
     },
+    "watch": {
+      "inputs": ["src/**/*.*"],
+      "outputs": ["dist/**", "build/**"],
+      "dependsOn": ["test", "^build"]
+    },
     "dev": {
       "persistent": true,
       "cache": false
