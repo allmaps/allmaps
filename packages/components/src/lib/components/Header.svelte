@@ -11,7 +11,7 @@
   let { appName, children }: Props = $props()
 </script>
 
-<header class="shadow-md p-0.5 md:p-1">
+<header class="shadow-md p-1">
   <nav class="mx-auto flex justify-between items-center gap-3">
     <a href="/" class="flex gap-2 no-underline">
       <div class="w-8 inline">

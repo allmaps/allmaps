@@ -41,8 +41,8 @@
   let selectPortal = $state<HTMLElement>()
 </script>
 
-<Modal bind:open={uiState.modalOpen.export} class="flex flex-col gap-2">
-  <div bind:this={selectPortal}></div>
+<Modal bind:open={uiState.modalOpen.export}>
+  <div class="contents" bind:this={selectPortal}></div>
   {#snippet title()}
     <div class="flex flex-col items-center gap-2 sm:flex-row">
       <span class="shrink-0 text-sm md:text-base">Export options for </span>

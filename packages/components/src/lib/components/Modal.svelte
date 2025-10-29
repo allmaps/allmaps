@@ -1,75 +1,85 @@
 <script lang="ts">
-  import { Dialog } from 'bits-ui'
+  import { fade } from 'svelte/transition'
 
   import { X as XIcon } from 'phosphor-svelte'
 
   import type { Snippet } from 'svelte'
 
   type Props = {
-    title?: Snippet
-    overlay?: Snippet
     open: boolean
-    closeButton?: boolean
+    title?: Snippet
+    closeButtonInTitle?: boolean
+    background?: Snippet
     children: Snippet
-  } & Record<string, unknown>
+  }
+
+  let dialog = $state<HTMLDialogElement>()
 
   let {
-    title,
-    overlay,
     open = $bindable(false),
-    children,
-    ...restProps
+    title,
+    closeButtonInTitle = true,
+    background,
+    children
   }: Props = $props()
 
-  function handleContentClick(event: MouseEvent) {
-    if (event.target === event.currentTarget) {
+  function handleClose() {
+    open = false
+  }
+
+  function handleMousedown(event: MouseEvent) {
+    if (event.target === dialog) {
       open = false
     }
   }
+
+  $effect(() => {
+    if (dialog) {
+      if (open) {
+        dialog.showModal()
+      } else {
+        dialog.close()
+      }
+    }
+  })
 </script>
 
-<Dialog.Root bind:open>
-  <Dialog.Portal>
-    <Dialog.Overlay
-      class="absolute z-50
-      inset-0 bg-black/90
-      data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out"
-    />
-    <!-- The regular onclick handler of the overlay doesn't seem to work well,
-      maybe this will be better in a new version of bits-ui -->
-    <Dialog.Content
-      class="fixed flex items-center justify-center w-full h-full p-4 md:p-16 z-[51]"
-      onmousedown={handleContentClick}
-    >
-      {#if overlay}
-        <div class="absolute top-0 w-full h-full pointer-events-none">
-          {@render overlay()}
-        </div>
-      {/if}
+{#if open}
+  <dialog
+    transition:fade={{ duration: 100 }}
+    bind:this={dialog}
+    class="data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out h-full max-h-full w-full max-w-full items-center justify-center bg-transparent
+    backdrop:bg-black/90 open:flex"
+    onclose={handleClose}
+    onmousedown={handleMousedown}
+  >
+    {#if background && open}
       <div
-        class="rounded-lg max-w-full max-h-full
-        bg-white shadow-lg outline-none border-gray-100
-          inset-shadow-sm
-          flex flex-col z-[52]
-          p-2 sm:p-4 gap-2 sm:gap-4"
+        class="pointer-events-none fixed inset-0 flex items-center justify-center"
       >
-        {#if title}
-          <div class="flex items-start sm:items-center justify-between">
-            <h3 class="text-xl font-medium">{@render title()}</h3>
-            <Dialog.Close
-              class="cursor-pointer rounded-full p-1 bg-white hover:bg-gray-100/80 transition-colors duration-200"
+        {@render background()}
+      </div>
+    {/if}
+    <div
+      class="absolute m-4 flex max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] flex-col gap-2
+          rounded-lg bg-white p-2 shadow-lg outline-none sm:gap-4 sm:p-4 md:m-16 md:max-h-[calc(100%-8rem)] md:max-w-[calc(100%-8rem)]"
+    >
+      {#if title}
+        <div class="flex justify-between items-center">
+          <h3 class="text-xl font-medium">{@render title()}</h3>
+          {#if closeButtonInTitle}
+            <button
+              onclick={() => (open = false)}
+              class="cursor-pointer rounded-full bg-white p-1 transition-colors duration-200 hover:bg-gray-100/80"
             >
               <span class="sr-only">Close</span>
               <XIcon class="size-5" size="100%" weight="bold" />
-            </Dialog.Close>
-          </div>
-        {/if}
-        <div class="overflow-auto rounded-md">
-          <section {...restProps}>
-            {@render children()}
-          </section>
+            </button>
+          {/if}
         </div>
-      </div>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+      {/if}
+
+      {@render children?.()}
+    </div>
+  </dialog>
+{/if}

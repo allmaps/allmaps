@@ -89,7 +89,7 @@
   }
 </script>
 
-<Modal bind:open={uiState.modalOpen.command} closeButton={true}>
+<Modal bind:open={uiState.modalOpen.command}>
   <Command.Root
     class="flex h-full w-full flex-col self-start overflow-hidden rounded-xl
     "

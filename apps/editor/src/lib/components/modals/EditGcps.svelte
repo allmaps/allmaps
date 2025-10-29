@@ -67,7 +67,7 @@
   }
 </script>
 
-<Modal bind:open class="flex max-w-xl flex-col gap-2">
+<Modal bind:open>
   {#snippet title()}
     Edit Ground Control Points
   {/snippet}

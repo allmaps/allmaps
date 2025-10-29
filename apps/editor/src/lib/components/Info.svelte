@@ -177,7 +177,7 @@
         {/if}
       {/if}
     {:else}
-      <span class="opacity-50">
+      <span class="shrink-0 opacity-50">
         <LoadingSmall />
       </span>
       {@render url(sourceUrl)}

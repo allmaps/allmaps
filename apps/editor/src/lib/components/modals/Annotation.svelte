@@ -14,8 +14,8 @@
   let selectPortal = $state<HTMLElement>()
 </script>
 
-<Modal bind:open={uiState.modalOpen.annotation} size="lg" class="max-w-3xl">
-  <div bind:this={selectPortal}></div>
+<Modal bind:open={uiState.modalOpen.annotation}>
+  <div class="contents" bind:this={selectPortal}></div>
   {#snippet title()}
     <div class="flex flex-col items-center gap-2 sm:flex-row">
       <span class="shrink-0 text-sm md:text-base"
