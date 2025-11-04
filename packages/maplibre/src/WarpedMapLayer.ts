@@ -14,6 +14,9 @@ import type { WebGL2RenderOptions } from '@allmaps/render/webgl2'
 
 export type SpecificMapLibreWarpedMapLayerOptions = {
   layerId: string
+
+  // TODO: These options are not configurable, so
+  // we should consider removing them from the options.
   layerType: 'custom'
   layerRenderingMode: '2d'
 }
