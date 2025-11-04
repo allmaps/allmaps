@@ -74,11 +74,20 @@ export class UrlState<T extends SearchParams> {
           const newSearchParams = new URLSearchParams(this.#url.searchParams)
 
           const stringValue = this.#stringifyParam(value, prop as keyof T)
+
           const paramConfig = this.#searchParams[
             prop as keyof T
           ] as SearchParam<any>
 
-          if (stringValue !== undefined) {
+          let defaultStringValue: string | undefined = undefined
+          if (this.#searchParams[prop].default) {
+            defaultStringValue = this.#stringifyParam(
+              this.#searchParams[prop].default,
+              prop as keyof T
+            )
+          }
+
+          if (stringValue !== undefined && stringValue !== defaultStringValue) {
             newSearchParams.set(paramConfig.key, stringValue)
           } else {
             newSearchParams.delete(paramConfig.key)

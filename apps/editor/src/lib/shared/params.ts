@@ -84,7 +84,8 @@ export const searchParams = {
     key: 'bg-url'
   },
   basemapPresetId: {
-    key: 'bg-preset'
+    key: 'bg-preset',
+    default: 'protomaps'
   },
   backgroundGeoreferenceAnnotationUrl: {
     key: 'bg-annotation-url'
