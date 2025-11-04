@@ -14,6 +14,9 @@ export default defineConfig({
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },
+  define: {
+    __ALLMAPS_EDITOR_VERSION__: JSON.stringify(process.env.npm_package_version)
+  },
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
   ssr: {
     noExternal: [
