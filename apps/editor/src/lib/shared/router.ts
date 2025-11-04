@@ -15,9 +15,11 @@ export function getViewUrl(view: MaybeView): string {
 export function getNewParamsFromUrl(url: string) {
   return {
     url,
+    mapId: undefined,
     manifestId: undefined,
     imageId: undefined,
-    path: undefined
+    path: undefined,
+    page: undefined
   }
 }
 

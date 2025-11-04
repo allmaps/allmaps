@@ -5,4 +5,6 @@ export const MAPLIBRE_PADDING = {
   right: 10 + 20
 }
 
+export const MAPLIBRE_FIT_BOUNDS_DURATION = 300
+
 export const TERRA_DRAW_COORDINATE_PRECISION = 32

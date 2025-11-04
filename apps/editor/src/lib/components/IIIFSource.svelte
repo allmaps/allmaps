@@ -7,12 +7,13 @@
 
   type Props = {
     sourceType: SourceType
+    plural?: boolean
   }
 
-  let { sourceType }: Props = $props()
+  let { sourceType, plural = false }: Props = $props()
 
   const colorClasses: Record<SourceType, string> = {
-    image: 'text-yellow fill-yellow bg-yellow-100/50 border-yellow',
+    image: 'text-yellow-600 fill-yellow-600 bg-yellow-100 border-yellow-600',
     manifest: 'text-orange fill-orange bg-orange-100 border-orange',
     collection: 'text-purple fill-purple bg-purple-100 border-purple'
   }
@@ -27,5 +28,5 @@
   <span class="size-3">
     <IIIFLogo />
   </span>
-  <span>{formatSourceType(sourceType)}</span>
+  <span>{formatSourceType(sourceType, plural)}</span>
 </span>

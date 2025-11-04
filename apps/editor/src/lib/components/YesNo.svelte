@@ -43,7 +43,8 @@
     onclick={onNo}
     disabled={noDisabled}
     class={[
-      'flex cursor-pointer items-center gap-1 rounded-md p-2 text-sm transition-all disabled:opacity-50',
+      noDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
+      'flex items-center gap-1 rounded-md p-2 text-sm transition-all disabled:opacity-50',
       noColorClass.bg
     ]}
   >
@@ -55,7 +56,8 @@
     onclick={onYes}
     disabled={yesDisabled}
     class={[
-      'flex cursor-pointer items-center gap-1 rounded-md p-2 text-sm transition-all disabled:opacity-50',
+      yesDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
+      'flex items-center gap-1 rounded-md p-2 text-sm transition-all disabled:opacity-50',
       yesColorClass.bg
     ]}
   >

@@ -1,5 +1,7 @@
 import { generateId, generateRandomId } from '@allmaps/id'
 
+import { getApiUrl } from '$lib/shared/urls.js'
+
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
   Image as IIIFImage,
@@ -26,7 +28,6 @@ import type {
 import type { ProjectionsById, Point } from '$lib/types/shared.js'
 
 import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
-import { getApiUrl } from './urls'
 
 export function isDbMap1(dbMap: DbMap): dbMap is DbMap1 {
   return dbMap.version === 1

@@ -24,8 +24,7 @@
   const urlState = getUrlState()
 
   let exportDisabled = $derived(
-    sourceState.parsedManifest === undefined ||
-      mapsMergedState.completeMaps.length === 0
+    !sourceState.canEdit || mapsMergedState.completeMaps.length === 0
   )
 </script>
 

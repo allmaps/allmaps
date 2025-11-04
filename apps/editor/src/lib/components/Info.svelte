@@ -137,10 +137,19 @@
         >Error loading URL</span
       >
     {:else if sourceType}
-      <span class="@min-4xl:contents hidden">
+      <span
+        class={[
+          sourceType !== 'image' ? '@min-4xl:contents hidden' : 'contents'
+        ]}
+      >
         <IIIFSource {sourceType} />
       </span>
-      <span class="@min-2xl:contents hidden">
+
+      <span
+        class={[
+          sourceType !== 'image' ? '@min-2xl:contents hidden' : 'contents'
+        ]}
+      >
         {@render url(sourceUrl)}
       </span>
 
@@ -170,8 +179,10 @@
           {@render arrow()}
           <span
             class="border-blue border-1 rounded-md bg-blue-200 px-1 py-0 text-xs"
-            >Browse to find maps in this collection <span
-              class="@min-4xl:inline hidden">and start georeferencing</span
+            >Browse to find maps <span class="@min-1xl:inline hidden"
+              >in this collection <span class="@min-4xl:inline hidden"
+                >and start georeferencing</span
+              ></span
             ></span
           >
         {/if}

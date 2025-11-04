@@ -25,7 +25,7 @@ import {
   DbGcpSchema,
   DbMapSchema,
   DbMapsSchema
-} from '../schemas/maps.js'
+} from '$lib/schemas/maps.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 

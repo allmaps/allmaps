@@ -1,8 +1,10 @@
 <script
   lang="ts"
-  generics="T extends SearchParams & { path: SearchParam<CollectionPath>, manifestId: SearchParam<string> }"
+  generics="T extends SearchParams & { page: SearchParam<number>,path: SearchParam<CollectionPath>, manifestId: SearchParam<string> }"
 >
-  import Breadcrumbs from './Breadcrumbs.svelte'
+  import Breadcrumbs from '$lib/components/Breadcrumbs.svelte'
+  import Pagination from '$lib/components/Pagination.svelte'
+  import CollectionItem from '$lib/components/CollectionItem.svelte'
 
   import { LoadingSmall } from '@allmaps/components'
 
@@ -23,6 +25,7 @@
 
   type Props = {
     parsedIiifAtPath?: IIIFResource
+    page?: number | undefined
     path?: CollectionPath
     fetching?: boolean
     breadcrumbs: Breadcrumb[]
@@ -31,6 +34,7 @@
 
   let {
     parsedIiifAtPath,
+    page = $bindable<number | undefined>(),
     path = $bindable<CollectionPath>(),
     fetching = false,
     breadcrumbs,
@@ -42,16 +46,64 @@
       ? parsedIiifAtPath.thumbnail?.[0]
       : undefined
   )
+
+  let someItemThumbnails = $derived(
+    parsedIiifAtPath &&
+      parsedIiifAtPath.type === 'collection' &&
+      'items' in parsedIiifAtPath
+      ? parsedIiifAtPath.items.some(
+          (item) => 'thumbnail' in item && item.thumbnail
+        )
+      : false
+  )
+
+  let lastPathItem = $derived(path[path.length - 1])
+
+  let paginationPage = $derived.by(() => {
+    if (path.length === 0) {
+      return page !== undefined ? page : 0
+    } else if (lastPathItem && lastPathItem.page !== undefined) {
+      return lastPathItem.page
+    }
+    return 0
+  })
+
+  const paginationPerPage = 20
+
+  function handlePageChange(newPage: number) {
+    if (path.length === 0) {
+      if (newPage > 0) {
+        page = newPage
+      } else {
+        page = undefined
+      }
+    } else {
+      const newPath = [...path]
+      const lastPathItem = newPath[newPath.length - 1]
+
+      newPath[newPath.length - 1] = {
+        ...lastPathItem,
+        page: newPage
+      }
+
+      path = newPath
+    }
+  }
 </script>
 
 <Breadcrumbs {breadcrumbs} />
 
 {#if parsedIiifAtPath && (parsedIiifAtPath.type === 'manifest' || parsedIiifAtPath.type === 'collection') && parsedIiifAtPath.description}
-  <p
-    class="inset-shadow-sm max-h-48 w-full overflow-y-auto rounded-md bg-blue-100 p-2 italic text-blue-900"
+  <div
+    class="inset-shadow-sm max-h-48 w-full overflow-y-auto rounded-md bg-blue-100 p-2 text-blue-900"
   >
-    {parseLanguageString(parsedIiifAtPath.description, 'en')}
-  </p>
+    <h3 class="font-medium">
+      {parseLanguageString(parsedIiifAtPath.label, 'en')}
+    </h3>
+    <p class="italic">
+      {parseLanguageString(parsedIiifAtPath.description, 'en')}
+    </p>
+  </div>
 {/if}
 
 <!-- {#if thumbnail}
@@ -64,20 +116,34 @@
     <span class="text-sm">Loading</span>
   </div>
 {:else if parsedIiifAtPath && parsedIiifAtPath.type === 'collection' && 'items' in parsedIiifAtPath}
-  <ol class="flex list-decimal flex-row flex-wrap gap-2">
-    {#each parsedIiifAtPath.items as item, index}
-      {@const newPath = [...path, { index }]}
-      {@const newManifestId = item.type === 'manifest' ? item.uri : undefined}
+  {@const items = parsedIiifAtPath.items.slice(
+    paginationPage * paginationPerPage,
+    (paginationPage + 1) * paginationPerPage
+  )}
+  <ol class="grid grid-cols-1 gap-2 md:grid-cols-2">
+    {#each items as item, index}
+      {@const newPath = [
+        ...path,
+        { index: index + paginationPage * paginationPerPage }
+      ]}
       <li class="flex items-center gap-2">
-        <a
-          href={paramsToUrl({
-            path: newPath,
-            manifestId: newManifestId
-          } as SearchParamsInput<T>)}
-          class="border-1 cursor-pointer rounded-lg border-blue-600 bg-blue-200 px-2 py-1"
-          >{parseLanguageString(item.label)}</a
-        >
+        <CollectionItem
+          showThumbnail={someItemThumbnails}
+          {item}
+          bind:path={() => newPath, (newPath) => (path = newPath)}
+          {paramsToUrl}
+        />
       </li>
     {/each}
   </ol>
+  {#if parsedIiifAtPath.items.length > paginationPerPage}
+    <div class="flex justify-center">
+      <Pagination
+        bind:page={paginationPage}
+        count={parsedIiifAtPath.items.length}
+        perPage={paginationPerPage}
+        onPageChange={handlePageChange}
+      />
+    </div>
+  {/if}
 {/if}

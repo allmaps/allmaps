@@ -37,7 +37,7 @@
     "watch": {
       "inputs": ["src/**/*.*"],
       "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["test", "^build"]
+      "dependsOn": ["^test", "^build"]
     },
     "dev": {
       "persistent": true,

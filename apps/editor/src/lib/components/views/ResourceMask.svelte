@@ -41,7 +41,6 @@
     InsertMapEvent,
     RemoveMapEvent,
     ReplaceResourceMaskEvent,
-    ReplaceGcpsEvent,
     InsertResourceMaskPointEvent,
     ReplaceResourceMaskPointEvent,
     RemoveResourceMaskPointEvent,
@@ -138,7 +137,7 @@
     }
   }
 
-  export function getResourceMaskFromFeature(
+  function getResourceMaskFromFeature(
     transformer: GcpTransformer,
     feature: GeoJSONStoreFeatures
   ): ResourceMask {

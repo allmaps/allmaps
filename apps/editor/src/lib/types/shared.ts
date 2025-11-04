@@ -143,7 +143,7 @@ export type ClickedItem =
 // export type GetProjectionById = (id: string) => PickerProjection | undefined
 export type ProjectionsById = Record<string, PickerProjection>
 
-export type Message = { text: string; type: 'error' | 'success' }
+export type Message = { text: string; type: 'error' | 'success' | 'info' }
 
 export type CollectionPath = {
   index: number

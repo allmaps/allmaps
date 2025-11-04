@@ -22,6 +22,8 @@
   const imageInfoState = getImageInfoState()
   const urlState = getUrlState()
 
+  const paginationPerPage = 20
+
   let itemWidth = $state(0)
 
   let beforeTimeoutActiveImageId = $state<string>()
@@ -50,16 +52,21 @@
 
   let paginationPage = $derived.by(() => {
     if (lastPathItem && lastPathItem.page !== undefined) {
-      return lastPathItem.page + 1
+      return lastPathItem.page
     }
-    return 1
+    return 0
   })
 
-  const paginationPerPage = 20
+  let images = $derived(
+    [...sourceState.images].slice(
+      paginationPage * paginationPerPage,
+      (paginationPage + 1) * paginationPerPage
+    )
+  )
 
   function handlePageChange(newPage: number) {
     const newPath = [...urlState.params.path]
-    newPath[newPath.length - 1].page = newPage - 1
+    newPath[newPath.length - 1].page = newPage
     urlState.params.path = newPath
   }
 
@@ -102,6 +109,7 @@
     <Collection
       parsedIiifAtPath={sourceState.parsedIiifAtPath}
       fetching={sourceState.fetchingInsideCollection}
+      bind:page={urlState.params.page}
       bind:path={urlState.params.path}
       {breadcrumbs}
       {paramsToUrl}
@@ -110,7 +118,7 @@
 
   {#if sourceState.imageCount > 0}
     <Grid childrenCount={Math.min(sourceState.imageCount, paginationPerPage)}>
-      {#each [...sourceState.images].slice((paginationPage - 1) * paginationPerPage, paginationPage * paginationPerPage) as image, index (image.uri)}
+      {#each images as image, index (image.uri)}
         {@const canvas = sourceState.getCanvasByImageId(image.uri)}
         <!-- TODO: don't bind ALL widths! -->
         <li

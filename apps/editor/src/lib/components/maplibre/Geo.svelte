@@ -127,7 +127,7 @@
   }
 
   async function removeGeoreferencedMap(mapId: string) {
-    if (warpedMapLayer) {
+    if (warpedMapLayer && currentMapIds.has(mapId)) {
       warpedMapLayer.removeGeoreferencedMapById(mapId)
       currentMapIds.delete(mapId)
     }
@@ -167,7 +167,12 @@
     const map = mapsState.getMapById(mapId)
     if (map && warpedMapLayer) {
       const gcps = getCompleteGcps(map)
-      warpedMapLayer.setMapGcps(getFullMapId(mapId), gcps)
+
+      try {
+        warpedMapLayer.setMapGcps(getFullMapId(mapId), gcps)
+      } catch {
+        removeGeoreferencedMap(getFullMapId(mapId))
+      }
     }
   }
 
@@ -202,10 +207,14 @@
         }
       }
 
-      warpedMapLayer.setMapTransformationType(
-        getFullMapId(mapId),
-        transformationType
-      )
+      try {
+        warpedMapLayer.setMapTransformationType(
+          getFullMapId(mapId),
+          transformationType
+        )
+      } catch {
+        removeGeoreferencedMap(getFullMapId(mapId))
+      }
     }
   }
 
@@ -251,7 +260,10 @@
 
   function handleInsertMap(event: InsertMapEvent) {}
 
-  function handleRemoveMap(event: RemoveMapEvent) {}
+  function handleRemoveMap(event: RemoveMapEvent) {
+    const mapId = event.detail.mapId
+    removeGeoreferencedMap(mapId)
+  }
 
   function handleReplaceResourceMask(event: ReplaceResourceMaskEvent) {
     const mapId = event.detail.mapId

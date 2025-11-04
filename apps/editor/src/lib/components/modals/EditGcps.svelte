@@ -43,16 +43,27 @@
       type: 'success'
     }
   }
+
   $effect(() => {
-    try {
-      const parsedGcps = parseGcps(gcpsString.trim())
-      message = getMessageFromGcps(parsedGcps.gcps)
-      gcps = parsedGcps.gcps
-    } catch (err) {
+    const trimmedGcpsString = gcpsString.trim()
+
+    if (trimmedGcpsString.length > 0) {
+      try {
+        const parsedGcps = parseGcps(gcpsString.trim())
+        message = getMessageFromGcps(parsedGcps.gcps)
+        gcps = parsedGcps.gcps
+      } catch (err) {
+        gcps = []
+        message = {
+          text: err instanceof Error ? err.message : String(err),
+          type: 'error'
+        }
+      }
+    } else {
       gcps = []
       message = {
-        text: err instanceof Error ? err.message : String(err),
-        type: 'error'
+        text: 'No GCPs provided',
+        type: 'info'
       }
     }
   })

@@ -13,7 +13,6 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
 
-  import { getFullMapId } from '$lib/shared/maps.js'
   import {
     getNavPlaceViewport,
     getBboxViewport,
@@ -21,7 +20,10 @@
   } from '$lib/shared/viewport.js'
 
   import { UiEvents } from '$lib/shared/ui-events.js'
-  import { MAPLIBRE_PADDING } from '$lib/shared/constants.js'
+  import {
+    MAPLIBRE_PADDING,
+    MAPLIBRE_FIT_BOUNDS_DURATION
+  } from '$lib/shared/constants.js'
 
   import Geo from '$lib/components/maplibre/Geo.svelte'
 
@@ -46,7 +48,7 @@
 
   let warpedMapLayer = $state.raw<WarpedMapLayer>()
 
-  export function computeGeoreferencedMapBbox(map: GeoreferencedMap) {
+  function computeGeoreferencedMapBbox(map: GeoreferencedMap) {
     const transformer = ProjectedGcpTransformer.fromGeoreferencedMap(map, {
       projection: lonLatProjection
     })
@@ -113,23 +115,26 @@
   }
 
   function handleLastClickedItem(event: ClickedItemEvent) {
-    if (event.detail.type === 'map') {
-      const mapId = getFullMapId(event.detail.mapId)
-      // warpedMapLayer.bringMapsToFront([mapId])
-      // const warpedMap = warpedMapLayer.getWarpedMap(mapId)
-      // if (warpedMap && geoMap) {
-      //   geoMap.fitBounds(warpedMap.projectedGeoMaskBbox, {
-      //     duration: 200,
-      //     padding: MAPLIBRE_PADDING
-      //   })
-      // }
-    }
+    // TODO: can this be removed?
+    // This is now handled in an $effect
+    //
+    // if (event.detail.type === 'map') {
+    // const mapId = getFullMapId(event.detail.mapId)
+    // warpedMapLayer.bringMapsToFront([mapId])
+    // const warpedMap = warpedMapLayer.getWarpedMap(mapId)
+    // if (warpedMap && geoMap) {
+    //   geoMap.fitBounds(warpedMap.projectedGeoMaskBbox, {
+    //     duration: 200,
+    //     padding: MAPLIBRE_PADDING
+    //   })
+    // }
+    // }
   }
 
   function handleZoomToExtent() {
     if (geoMap && warpedMapLayerBounds) {
       geoMap.fitBounds(warpedMapLayerBounds, {
-        duration: 300,
+        duration: MAPLIBRE_FIT_BOUNDS_DURATION,
         padding: MAPLIBRE_PADDING
       })
     }
@@ -137,14 +142,14 @@
 
   function handleFitBbox(event: CustomEvent<Bbox>) {
     geoMap?.fitBounds(event.detail, {
-      duration: 300,
+      duration: MAPLIBRE_FIT_BOUNDS_DURATION,
       padding: MAPLIBRE_PADDING
     })
   }
 
   function handleSetCenter(event: CustomEvent<Point>) {
     geoMap?.setCenter(event.detail, {
-      duration: 300
+      duration: MAPLIBRE_FIT_BOUNDS_DURATION
     })
   }
 
@@ -167,7 +172,7 @@
         warpedMapLayer?.bringMapsToFront([scopeState.activeMapId])
 
         geoMap.fitBounds(bounds, {
-          duration: 300,
+          duration: MAPLIBRE_FIT_BOUNDS_DURATION,
           padding: MAPLIBRE_PADDING
         })
       }

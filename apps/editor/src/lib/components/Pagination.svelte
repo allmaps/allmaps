@@ -19,9 +19,22 @@
     perPage = 25,
     onPageChange
   }: Props = $props()
+
+  function handlePageChange(newPage: number) {
+    if (onPageChange) {
+      // The Bits UI Pagination component is 1-based, so we subtract 1
+      onPageChange(newPage - 1)
+    }
+  }
 </script>
 
-<Pagination.Root bind:page {count} {perPage} {onPageChange}>
+<!-- The Bits UI Pagination component is 1-based, so we subtract 1 -->
+<Pagination.Root
+  bind:page={() => page + 1, (newPage) => (page = newPage - 1)}
+  {count}
+  {perPage}
+  onPageChange={handlePageChange}
+>
   {#snippet children({ pages, range })}
     <div class="my-8 flex items-center">
       <Pagination.PrevButton
@@ -37,7 +50,7 @@
             <div
               class="text-foreground-alt select-none text-[15px] font-medium"
             >
-              ...
+              …
             </div>
           {:else}
             <Pagination.Page
@@ -45,7 +58,7 @@
               class="hover:bg-dark-10 data-selected:bg-foreground data-selected:text-background
                inline-flex size-10 cursor-pointer select-none items-center justify-center rounded-[9px]
                bg-transparent text-[15px] font-medium active:scale-[0.98] disabled:cursor-not-allowed
-               disabled:opacity-50  hover:disabled:bg-transparent"
+               disabled:opacity-50 hover:disabled:bg-transparent"
             >
               {page.value}
             </Pagination.Page>

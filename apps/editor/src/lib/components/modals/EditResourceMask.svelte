@@ -135,16 +135,26 @@
   }
 
   $effect(() => {
-    try {
-      const parsedResourceMask = parseResourceMask(resourceMaskString.trim())
-      message = getMessageFromResourceMask(parsedResourceMask)
-      resourceMask = parsedResourceMask
-    } catch (err) {
+    const trimmedResourceMaskString = resourceMaskString.trim()
+    if (trimmedResourceMaskString.length > 0) {
+      try {
+        const parsedResourceMask = parseResourceMask(resourceMaskString.trim())
+        message = getMessageFromResourceMask(parsedResourceMask)
+        resourceMask = parsedResourceMask
+      } catch (err) {
+        resourceMask = []
+        message = {
+          text: err instanceof Error ? err.message : String(err),
+          type: 'error'
+        }
+      }
+    } else {
       resourceMask = []
       message = {
-        text: err instanceof Error ? err.message : String(err),
-        type: 'error'
+        text: 'No mask provided',
+        type: 'info'
       }
+      return
     }
   })
 

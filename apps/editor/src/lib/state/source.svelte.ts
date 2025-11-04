@@ -172,6 +172,25 @@ export class SourceState {
     return this.#getParsedIiifAtPath(this.#urlState.params.path)
   })
 
+  #parsedIiifParents = $derived.by<IIIFResource[]>(() => {
+    // Update this derived when fetching states change
+    this.#fetchingInsideCollection
+
+    const parents: IIIFResource[] = []
+    let currentPath: CollectionPath = []
+
+    for (let i = 0; i < this.#urlState.params.path.length; i++) {
+      currentPath = this.#urlState.params.path.slice(0, i)
+      const parsedIiifAtPath = this.#getParsedIiifAtPath(currentPath)
+
+      if (parsedIiifAtPath) {
+        parents.push(parsedIiifAtPath)
+      }
+    }
+
+    return parents
+  })
+
   #imageCount = $derived(this.#imagesByImageId.size)
 
   constructor(urlState: UrlState<typeof searchParams>, errorState: ErrorState) {
@@ -239,7 +258,9 @@ export class SourceState {
   }
 
   async #fetchIiif(url: string, sourceIiif: unknown) {
-    let parsedIiif = IIIF.parse(sourceIiif, { keepSource: true })
+    let parsedIiif = IIIF.parse(sourceIiif, {
+      keepSource: true
+    })
 
     const baseSource = {
       url,
@@ -366,9 +387,6 @@ export class SourceState {
     this.#fetching = false
     this.#fetchingInsideCollection = false
     this.#source = undefined
-    // this.#imagesByImageId = new SvelteMap()
-    // this.#canvasesByImageId = new SvelteMap()
-    // this.#allmapsIdsByImageId = new SvelteMap()
   }
 
   get imagesByImageId() {

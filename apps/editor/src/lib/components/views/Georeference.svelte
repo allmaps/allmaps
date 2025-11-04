@@ -23,7 +23,6 @@
     getBboxViewport,
     sortGeoViewports
   } from '$lib/shared/viewport.js'
-  import { getResourceMask } from '$lib/shared/maps.js'
   import {
     getGcpResourcePoint,
     getGcpGeoPoint,
@@ -41,6 +40,7 @@
   } from '$lib/shared/terra-draw.js'
   import {
     MAPLIBRE_PADDING,
+    MAPLIBRE_FIT_BOUNDS_DURATION,
     TERRA_DRAW_COORDINATE_PRECISION
   } from '$lib/shared/constants.js'
 
@@ -56,18 +56,10 @@
   import type { DbMap3, DbGcp3 } from '$lib/types/maps.js'
   import type { Point, GcpCoordinates, Viewport } from '$lib/types/shared.js'
   import type {
-    InsertMapEvent,
-    RemoveMapEvent,
-    ReplaceResourceMaskEvent,
     ReplaceGcpsEvent,
     InsertGcpEvent,
     ReplaceGcpEvent,
     RemoveGcpEvent,
-    InsertResourceMaskPointEvent,
-    ReplaceResourceMaskPointEvent,
-    RemoveResourceMaskPointEvent,
-    SetTransformationEvent,
-    SetResourceCrsEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
 
@@ -117,6 +109,13 @@
 
   let activeGcpId = $state<string>()
 
+  function getHighestGcpIndex(gcps: DbGcp3[]) {
+    return gcps.reduce((highestIndex, gcp) => {
+      const gcpIndex = gcp.index || 0
+      return gcpIndex > highestIndex ? gcpIndex : highestIndex
+    }, 0)
+  }
+
   function getFirstGcpWithMissingResourcePoint(incompleteGcps: DbGcp3[]) {
     return getSortedGcps(incompleteGcps).find(
       (gcp) => !getGcpResourcePoint(gcp)
@@ -135,24 +134,20 @@
     if (geoDraw && geoDraw.getSnapshotFeature(gcpId)) {
       geoDraw.removeFeatures([gcpId])
     }
-  }
-  function handleInsertMap(event: InsertMapEvent) {
-    // addResourceMask(event.detail.map)
-  }
 
-  function handleRemoveMap(event: RemoveMapEvent) {
-    const mapId = event.detail.mapId
-    // removeResourceMask(mapId)
-  }
-
-  function handleReplaceResourceMask(event: ReplaceResourceMaskEvent) {
-    const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
+    updateDisplayIndexes()
   }
 
   function handleReplaceGcps(event: ReplaceGcpsEvent) {
     const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
+
+    if (
+      mapId === currentDisplayMapId &&
+      mapsState.connectedImageId &&
+      mapsState.activeMap
+    ) {
+      initializeGcps(mapsState.connectedImageId, mapsState.activeMap)
+    }
   }
 
   function handleInsertGcp(event: InsertGcpEvent) {
@@ -160,8 +155,6 @@
     if (mapId === currentDisplayMapId) {
       addGcp(event.detail.gcp)
     }
-
-    replaceMapFromState(mapId)
   }
 
   function handleReplaceGcp(event: ReplaceGcpEvent) {
@@ -170,8 +163,6 @@
       const gcpId = event.detail.gcp.id
       replaceGcpFromState(gcpId)
     }
-
-    replaceMapFromState(mapId)
   }
 
   function handleRemoveGcp(event: RemoveGcpEvent) {
@@ -184,35 +175,6 @@
       const gcpId = event.detail.gcpId
       removeGcp(gcpId)
     }
-
-    replaceMapFromState(mapId)
-  }
-
-  function handleInsertResourceMaskPoint(event: InsertResourceMaskPointEvent) {
-    const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
-  }
-
-  function handleReplaceResourceMaskPoint(
-    event: ReplaceResourceMaskPointEvent
-  ) {
-    const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
-  }
-
-  function handleRemoveResourceMaskPoint(event: RemoveResourceMaskPointEvent) {
-    const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
-  }
-
-  function handleSetTransformation(event: SetTransformationEvent) {
-    const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
-  }
-
-  function handleSetResourceCrs(event: SetResourceCrsEvent) {
-    const mapId = event.detail.mapId
-    replaceMapFromState(mapId)
   }
 
   function getGeoViewport(
@@ -305,22 +267,20 @@
       if (resourceGcpFeature) {
         resourceMap?.flyTo({
           center: resourceGcpFeature.geometry.coordinates as Point,
-          duration: 300
+          duration: MAPLIBRE_FIT_BOUNDS_DURATION
         })
       }
 
       if (geoGcpFeature) {
         geoMap?.flyTo({
           center: geoGcpFeature.geometry.coordinates as Point,
-          duration: 300
+          duration: MAPLIBRE_FIT_BOUNDS_DURATION
         })
       }
     } else if (event.detail.type === 'map') {
       const map = mapsState.getMapById(event.detail.mapId)
 
       if (mapsState.connectedImageId && map) {
-        // fitBounds = true
-        // animate = true
         initializeGcps(mapsState.connectedImageId, map, true)
       }
     }
@@ -362,54 +322,20 @@
 
   function handleFitBbox(event: CustomEvent<Bbox>) {
     geoMap?.fitBounds(event.detail, {
-      duration: 300,
+      duration: MAPLIBRE_FIT_BOUNDS_DURATION,
       padding: MAPLIBRE_PADDING
     })
   }
 
   function handleSetCenter(event: CustomEvent<Point>) {
     geoMap?.setCenter(event.detail, {
-      duration: 300
+      duration: MAPLIBRE_FIT_BOUNDS_DURATION
     })
   }
 
   function handleToggleRenderMasks() {
     uiState.georeferenceOptions.renderMasks =
       !uiState.georeferenceOptions.renderMasks
-  }
-
-  export function getResourceMaskFeature(
-    transformer: GcpTransformer,
-    map: DbMap3
-  ) {
-    const resourceMask = getResourceMask(map)
-
-    if (resourceMask.length < 3) {
-      throw new Error('Resource mask is must have 3 or more vertices')
-    }
-
-    const geoCoordinates = transformer.transformToGeo([
-      ...resourceMask,
-      resourceMask[0]
-    ])
-
-    return {
-      type: 'Feature' as const,
-      id: map.id,
-      geometry: {
-        type: 'Polygon' as const,
-        coordinates: [geoCoordinates]
-      },
-      properties: {
-        mode: 'polygon',
-        index: map.index || 0
-      }
-    }
-  }
-
-  function replaceMapFromState(mapId: string) {
-    // TODO: only initialize single map!
-    // initializeResourceMasks(mapsState.maps)
   }
 
   function replaceGcpFromState(gcpId: string) {
@@ -422,9 +348,6 @@
     if (gcp) {
       removeGcp(gcp.id)
       addGcp(gcp)
-
-      // TODO: only initialize single map!
-      // initializeResourceMasks(mapsState.maps)
     } else {
       console.error(`Error setting new geometries for GCP ${gcpId}`)
     }
@@ -484,8 +407,10 @@
       return
     }
 
-    const resourceFeature = createResourceGcpFeature(gcp)
-    const geoFeature = createGeoGcpFeature(gcp)
+    const displayIndex = displayIndexFromGcpId(gcp.id)
+
+    const resourceFeature = createResourceGcpFeature(gcp, displayIndex)
+    const geoFeature = createGeoGcpFeature(gcp, displayIndex)
 
     if (resourceFeature) {
       resourceDraw.addFeatures([resourceFeature])
@@ -498,6 +423,32 @@
     return {
       resource: resourceFeature,
       geo: geoFeature
+    }
+  }
+
+  function updateDisplayIndexes() {
+    if (!resourceDraw || !geoDraw) {
+      return
+    }
+
+    const map = mapsState.activeMap
+
+    if (!map) {
+      return
+    }
+
+    for (const gcp of getSortedGcps(Object.values(map.gcps))) {
+      if (resourceDraw.hasFeature(gcp.id)) {
+        resourceDraw.updateFeatureProperties(gcp.id, {
+          displayIndex: displayIndexFromGcpId(gcp.id)
+        })
+      }
+
+      if (geoDraw.hasFeature(gcp.id)) {
+        geoDraw.updateFeatureProperties(gcp.id, {
+          displayIndex: displayIndexFromGcpId(gcp.id)
+        })
+      }
     }
   }
 
@@ -561,6 +512,23 @@
     ]
 
     return coordinates
+  }
+
+  function displayIndexFromGcpId(gcpId: string): number {
+    const map = mapsState.activeMap
+
+    if (map) {
+      const sortedGcps = getSortedGcps(Object.values(map.gcps))
+      const displayIndex = sortedGcps.findIndex((gcp) => gcp.id === gcpId)
+
+      if (displayIndex !== -1) {
+        return displayIndex
+      } else {
+        return sortedGcps.length - 1
+      }
+    }
+
+    return 0
   }
 
   function gcpIndexFromGcpId(gcpId: string): number {
@@ -649,6 +617,11 @@
         resource: newGcp.resource || existingGcp.resource,
         geo: newGcp.geo || existingGcp.geo
       })
+    } else {
+      const displayIndex = displayIndexFromGcpId(gcpId) + 1
+      draw.updateFeatureProperties(gcpId, {
+        displayIndex
+      })
     }
 
     const gcp = gcpFromGcpId(gcpId)
@@ -678,7 +651,7 @@
     }
   }
 
-  function createResourceGcpFeature(gcp: DbGcp3) {
+  function createResourceGcpFeature(gcp: DbGcp3, displayIndex: number) {
     if (!resourceTransformer) {
       console.error('Cannot create resource feature, transformer not set')
       return
@@ -688,21 +661,25 @@
     if (resourcePoint) {
       const resourceCoordinates =
         resourceTransformer.transformToGeo(resourcePoint)
-      return createGcpFeature(gcp.id, resourceCoordinates, gcp.index)
+      return createGcpFeature(gcp.id, resourceCoordinates, displayIndex)
     }
   }
 
-  function createGeoGcpFeature(gcp: DbGcp3) {
+  function createGeoGcpFeature(gcp: DbGcp3, displayIndex: number) {
     const geoPoint = getGcpGeoPoint(gcp)
     if (geoPoint) {
-      return createGcpFeature(gcp.id, geoPoint, gcp.index)
+      return createGcpFeature(gcp.id, geoPoint, displayIndex)
     }
   }
 
-  function createGcpFeature(id: string, coordinates: Point, index?: number) {
-    if (!index) {
-      index = Math.random()
-    }
+  function createGcpFeature(
+    id: string,
+    coordinates: Point,
+    displayIndex: number
+  ) {
+    // if (!index) {
+    //   index = Math.random()
+    // }
 
     return {
       type: 'Feature' as const,
@@ -713,19 +690,26 @@
       },
       properties: {
         mode: 'point',
-        index
+        displayIndex
       }
     }
   }
 
-  function initializeGcps(imageId: string, map: DbMap3, animate = false) {
+  function resetGcps() {
     if (!resourceDraw || !geoDraw) {
-      console.error('Cannot set GCPs, maps not ready')
+      console.error('Cannot reset GCPs, maps not ready')
       return
     }
 
     clearFeatures(resourceDraw, 'point')
     clearFeatures(geoDraw, 'point')
+
+    currentDisplayImageId = undefined
+    currentDisplayMapId = undefined
+  }
+
+  function initializeGcps(imageId: string, map: DbMap3, animate = false) {
+    resetGcps()
 
     const gcpFeatures = Object.values(map.gcps).map(addGcp)
 
@@ -815,24 +799,6 @@
     }
   }
 
-  // function getPolygonDrawOptions(visible = true) {
-  //   return {
-  //     modeName: 'polygon',
-  //     styles: {
-  //       polygonFillColor: '#ffffff' as const,
-  //       polygonFillOpacity: 0,
-  //       polygonOutlineColor: pink,
-  //       polygonOutlineWidth: ({ id }: { id?: number | string }) => {
-  //         if (!visible) {
-  //           return 0
-  //         }
-
-  //         return currentDisplayMapId === id ? 6 : 2
-  //       }
-  //     }
-  //   }
-  // }
-
   function addLabelLayer(map?: MapLibreMap) {
     if (!map) {
       return
@@ -847,7 +813,8 @@
         source: 'td-point',
         layout: {
           'text-size': 14,
-          'text-field': ['to-string', ['+', 1, ['floor', ['get', 'index']]]],
+          'text-field': ['to-string', ['+', 1, ['get', 'displayIndex']]],
+          // 'text-field': ['to-string', ['+', 1, ['floor', ['get', 'displayIndex']]]],
           'text-anchor': 'top-left',
           'text-radial-offset': 0.8,
           'text-justify': 'auto',
@@ -877,25 +844,16 @@
   $effect(() => {
     if (
       mapsReady &&
-      resourceTransformer &&
-      mapsState.connected &&
-      mapsState.connectedImageId &&
-      mapsState.connectedImageId !== currentDisplayImageId
-    ) {
-      // initializeResourceMasks(mapsState.maps)
-    }
-  })
-
-  $effect(() => {
-    if (
-      mapsReady &&
       mapsState.connected &&
       mapsState.activeMapId !== currentDisplayMapId &&
       mapsState.connectedImageId &&
-      mapsState.connectedImageId !== currentDisplayImageId &&
-      mapsState.activeMap
+      mapsState.connectedImageId !== currentDisplayImageId
     ) {
-      initializeGcps(mapsState.connectedImageId, mapsState.activeMap)
+      if (mapsState.activeMap) {
+        initializeGcps(mapsState.connectedImageId, mapsState.activeMap)
+      } else {
+        resetGcps()
+      }
     }
   })
 
@@ -923,14 +881,6 @@
       resourceMapReady = true
     }
   })
-
-  // $effect(() => {
-  //   if (uiState.georeferenceOptions.renderMasks) {
-  //     resourceDraw?.updateModeOptions('polygon', getPolygonDrawOptions(true))
-  //   } else {
-  //     resourceDraw?.updateModeOptions('polygon', getPolygonDrawOptions(false))
-  //   }
-  // })
 
   $effect(() => {
     if (geoMap) {
@@ -977,45 +927,13 @@
       handleToggleRenderMasks
     )
 
-    mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
-    mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
-
-    mapsState.addEventListener(
-      MapsEvents.REPLACE_RESOURCE_MASK,
-      handleReplaceResourceMask
-    )
     mapsState.addEventListener(MapsEvents.REPLACE_GCPS, handleReplaceGcps)
 
     mapsState.addEventListener(MapsEvents.INSERT_GCP, handleInsertGcp)
     mapsState.addEventListener(MapsEvents.REPLACE_GCP, handleReplaceGcp)
     mapsState.addEventListener(MapsEvents.REMOVE_GCP, handleRemoveGcp)
 
-    mapsState.addEventListener(
-      MapsEvents.INSERT_RESOURCE_MASK_POINT,
-      handleInsertResourceMaskPoint
-    )
-    mapsState.addEventListener(
-      MapsEvents.REPLACE_RESOURCE_MASK_POINT,
-      handleReplaceResourceMaskPoint
-    )
-    mapsState.addEventListener(
-      MapsEvents.REMOVE_RESOURCE_MASK_POINT,
-      handleRemoveResourceMaskPoint
-    )
-
-    mapsState.addEventListener(
-      MapsEvents.SET_TRANSFORMATION,
-      handleSetTransformation
-    )
-    mapsState.addEventListener(
-      MapsEvents.SET_RESOURCE_CRS,
-      handleSetResourceCrs
-    )
-
     return () => {
-      // geoDraw?.stop()
-      // resourceDraw?.stop()
-
       saveViewport()
 
       uiState.removeEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
@@ -1027,40 +945,11 @@
         handleToggleRenderMasks
       )
 
-      mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
-      mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
-
-      mapsState.removeEventListener(
-        MapsEvents.REPLACE_RESOURCE_MASK,
-        handleReplaceResourceMask
-      )
       mapsState.removeEventListener(MapsEvents.REPLACE_GCPS, handleReplaceGcps)
 
       mapsState.removeEventListener(MapsEvents.INSERT_GCP, handleInsertGcp)
       mapsState.removeEventListener(MapsEvents.REPLACE_GCP, handleReplaceGcp)
       mapsState.removeEventListener(MapsEvents.REMOVE_GCP, handleRemoveGcp)
-
-      mapsState.removeEventListener(
-        MapsEvents.INSERT_RESOURCE_MASK_POINT,
-        handleInsertResourceMaskPoint
-      )
-      mapsState.removeEventListener(
-        MapsEvents.REPLACE_RESOURCE_MASK_POINT,
-        handleReplaceResourceMaskPoint
-      )
-      mapsState.removeEventListener(
-        MapsEvents.REMOVE_RESOURCE_MASK_POINT,
-        handleRemoveResourceMaskPoint
-      )
-
-      mapsState.removeEventListener(
-        MapsEvents.SET_TRANSFORMATION,
-        handleSetTransformation
-      )
-      mapsState.addEventListener(
-        MapsEvents.SET_RESOURCE_CRS,
-        handleSetResourceCrs
-      )
     }
   })
 </script>

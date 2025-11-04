@@ -117,6 +117,9 @@ export class UiState extends UiEventTarget {
 
   #imagesScrollTop = $state(0)
 
+  // Keep track of scroll position for collection items, store path + scrollTop
+  // #collectionScrollTop = $state<SvelteMap<string, number>>(() => new Map())
+
   #lastBbox = $state<Bbox>()
 
   #projectionIndices = $state.raw<ProjectionIndices>({

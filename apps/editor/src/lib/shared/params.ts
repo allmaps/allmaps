@@ -17,6 +17,19 @@ export const searchParams = {
   mapId: {
     key: 'map'
   },
+  page: {
+    key: 'page',
+    default: 0,
+    parse: (value?: string) => {
+      if (value) {
+        const page = parseInt(value)
+        if (Number.isFinite(page)) {
+          return page
+        }
+      }
+    },
+    toString: (value: number) => value.toString()
+  },
   bbox: {
     key: 'bbox',
     toString: (value?: Bbox) =>

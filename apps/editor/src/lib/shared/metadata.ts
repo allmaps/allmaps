@@ -57,13 +57,13 @@ export function formatLabels(labels: string[], maxLength = 64): string {
   return uniqLabels.join(' / ')
 }
 
-export function formatSourceType(sourceType: SourceType) {
+export function formatSourceType(sourceType: SourceType, plural = false) {
   if (sourceType === 'image') {
-    return 'Image'
+    return plural ? 'Images' : 'Image'
   } else if (sourceType === 'manifest') {
-    return 'Manifest'
+    return plural ? 'Manifests' : 'Manifest'
   } else if (sourceType === 'collection') {
-    return 'Collection'
+    return plural ? 'Collections' : 'Collection'
   }
 }
 
