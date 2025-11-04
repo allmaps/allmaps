@@ -35,9 +35,9 @@ export class MapsMergedState {
     }
 
     return this.#mergeMapsByImageId(
-      this.#apiState.mapsByImageId,
+      activeImageMapsByImageId,
       mapsHistoryMapsByImageId,
-      activeImageMapsByImageId
+      this.#apiState.mapsByImageId
     )
   })
 
