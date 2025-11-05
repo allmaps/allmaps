@@ -74,6 +74,7 @@
   let geoMap = $state.raw<MapLibreMap>()
 
   let resourceTransformer = $state.raw<GcpTransformer>()
+  let resourceWarpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
 
   let mapIds = $derived(
     mapsState.activeMapId ? [getFullMapId(mapsState.activeMapId)] : []
@@ -109,12 +110,12 @@
 
   let activeGcpId = $state<string>()
 
-  function getHighestGcpIndex(gcps: DbGcp3[]) {
-    return gcps.reduce((highestIndex, gcp) => {
-      const gcpIndex = gcp.index || 0
-      return gcpIndex > highestIndex ? gcpIndex : highestIndex
-    }, 0)
-  }
+  // function getHighestGcpIndex(gcps: DbGcp3[]) {
+  //   return gcps.reduce((highestIndex, gcp) => {
+  //     const gcpIndex = gcp.index || 0
+  //     return gcpIndex > highestIndex ? gcpIndex : highestIndex
+  //   }, 0)
+  // }
 
   function getFirstGcpWithMissingResourcePoint(incompleteGcps: DbGcp3[]) {
     return getSortedGcps(incompleteGcps).find(
@@ -298,6 +299,11 @@
       if (bbox) {
         resourceMap.fitBounds(bbox, {
           duration: 200,
+          padding: MAPLIBRE_PADDING
+        })
+      } else if (resourceWarpedMapLayerBounds) {
+        resourceMap?.fitBounds(resourceWarpedMapLayerBounds, {
+          duration: MAPLIBRE_FIT_BOUNDS_DURATION,
           padding: MAPLIBRE_PADDING
         })
       }
@@ -677,10 +683,6 @@
     coordinates: Point,
     displayIndex: number
   ) {
-    // if (!index) {
-    //   index = Math.random()
-    // }
-
     return {
       type: 'Feature' as const,
       id,
@@ -697,7 +699,6 @@
 
   function resetGcps() {
     if (!resourceDraw || !geoDraw) {
-      console.error('Cannot reset GCPs, maps not ready')
       return
     }
 
@@ -799,6 +800,16 @@
     }
   }
 
+  function removeLabelLayer(map?: MapLibreMap) {
+    if (!map) {
+      return
+    }
+
+    if (map.getLayer('labels')) {
+      map.removeLayer('labels')
+    }
+  }
+
   function addLabelLayer(map?: MapLibreMap) {
     if (!map) {
       return
@@ -814,7 +825,6 @@
         layout: {
           'text-size': 14,
           'text-field': ['to-string', ['+', 1, ['get', 'displayIndex']]],
-          // 'text-field': ['to-string', ['+', 1, ['floor', ['get', 'displayIndex']]]],
           'text-anchor': 'top-left',
           'text-radial-offset': 0.8,
           'text-justify': 'auto',
@@ -882,38 +892,54 @@
     }
   })
 
-  $effect(() => {
-    if (geoMap) {
-      const geoPointMode = new TerraDrawPointMode(getPointDrawOptions())
+  function initializeGeoDraw(geoMap: MapLibreMap) {
+    const geoPointMode = new TerraDrawPointMode(getPointDrawOptions())
 
-      const adapter = new TerraDrawMapLibreGLAdapter({
-        map: geoMap,
-        coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION,
-        ignoreMismatchedPointerEvents: true
-      })
+    const adapter = new TerraDrawMapLibreGLAdapter({
+      map: geoMap,
+      coordinatePrecision: TERRA_DRAW_COORDINATE_PRECISION,
+      ignoreMismatchedPointerEvents: true
+    })
 
-      geoDraw = new TerraDraw({
-        adapter,
-        modes: [geoPointMode],
-        idStrategy
-      })
+    geoDraw = new TerraDraw({
+      adapter,
+      modes: [geoPointMode],
+      idStrategy
+    })
 
-      geoDraw.start()
-      geoDraw.setMode('point')
-      geoDraw.on('change', handleGeoDrawChange)
-      geoDraw.on('finish', handleGeoDrawFinish)
+    geoDraw.start()
+    geoDraw.setMode('point')
+    geoDraw.on('change', handleGeoDrawChange)
+    geoDraw.on('finish', handleGeoDrawFinish)
 
-      // const sources = Object.values(geoMap.getStyle().sources)
-      // const layers = Object.values(geoMap.getStyle().layers)
+    // const sources = Object.values(geoMap.getStyle().sources)
+    // const layers = Object.values(geoMap.getStyle().layers)
 
-      // const terraDrawSources = sources.filter(isTerraDrawSource)
-      // const terraDrawLayers = layers.filter(isTerraDrawLayer)
+    // const terraDrawSources = sources.filter(isTerraDrawSource)
+    // const terraDrawLayers = layers.filter(isTerraDrawLayer)
 
-      addLabelLayer(geoMap)
+    addLabelLayer(geoMap)
+  }
 
+  function handleBeforeSetStyle() {
+    if (geoMap && geoDraw) {
+      resetGcps()
+
+      geoDraw.off('change', handleGeoDrawChange)
+      geoDraw.off('finish', handleGeoDrawFinish)
+      removeLabelLayer(geoMap)
+      geoDraw.stop()
+      geoDraw = undefined
+      geoMapReady = false
+    }
+  }
+
+  async function handleAfterSetStyle() {
+    if (geoMap && !geoDraw) {
+      initializeGeoDraw(geoMap)
       geoMapReady = true
     }
-  })
+  }
 
   onMount(() => {
     projectionsState.fetchProjections()
@@ -960,15 +986,19 @@
   <Resource
     bind:resourceMap
     bind:transformer={resourceTransformer}
+    bind:warpedMapLayerBounds={resourceWarpedMapLayerBounds}
     initialViewport={resourceViewport}
     resourceMask={mapsState.activeMap?.resourceMask}
     renderMasks={uiState.georeferenceOptions.renderMasks}
   />
+
   <Geo
     bind:geoMap
     {mapIds}
     initialViewport={geoViewport}
     onmoveend={handleMoveend}
+    onBeforeSetStyle={handleBeforeSetStyle}
+    onAfterSetStyle={handleAfterSetStyle}
     warpedMapsOpacity={uiState.georeferenceOptions.warpedMapLayerOpacity}
     renderMasks={uiState.georeferenceOptions.renderMasks}
   />

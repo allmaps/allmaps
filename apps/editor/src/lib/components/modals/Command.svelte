@@ -91,14 +91,13 @@
 
 <Modal bind:open={uiState.modalOpen.command}>
   <Command.Root
-    class="flex h-full w-full flex-col self-start overflow-hidden rounded-xl
-    "
+    class="focus:outline-hidden flex h-full w-full flex-col self-start overflow-hidden rounded-xl"
   >
     <div class="flex items-center gap-2 p-2">
       <MagnifyingGlassIcon class="size-4 shrink-0" />
       <Command.Input
         class="focus-override placeholder:text-foreground-alt/50 inline-flex w-full truncate rounded-lg border-none bg-white
-        transition-colors focus:outline-none focus:ring-0 "
+        transition-colors focus:outline-none focus:ring-0"
         placeholder="Search for something or paste a IIIF URL…"
         bind:value
       />

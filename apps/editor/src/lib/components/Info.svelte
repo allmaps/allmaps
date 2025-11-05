@@ -242,9 +242,6 @@
         {/if}
       </span>
       <URLInput onSubmit={handleInputSubmit} />
-      <span class="text-center text-sm"
-        >Georeference another IIIF resource by entering its URL</span
-      >
       <Metadata />
     </div>
   {/snippet}

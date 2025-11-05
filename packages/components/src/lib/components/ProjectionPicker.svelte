@@ -31,6 +31,15 @@
     onselect
   }: Props = $props()
 
+  let open = $state(false)
+  let hasOpened = $state(false)
+
+  $effect(() => {
+    if (open) {
+      hasOpened = true
+    }
+  })
+
   function projectionToItem(
     projection: PickerProjection
   ): ProjectionPickerItem {
@@ -51,15 +60,15 @@
     })
   }
 
-  let inputValue = $state(value || '')
-
   const currentProjection = projections.find(
     (projection) => projection.id === value
   )
 
-  const undefinedProjection: PickerProjection = {
-    id: undefined,
-    name: 'No projection',
+  let inputValue = $state(currentProjection?.name || '')
+
+  const defaultProjection: PickerProjection = {
+    id: '__DEFAULT__',
+    name: 'Default projection',
     definition: ''
   }
 
@@ -70,7 +79,7 @@
   )
 
   let suggestedProjections = $derived(
-    [undefinedProjection, currentProjection, ...bboxProjections]
+    [defaultProjection, currentProjection, ...bboxProjections]
       .filter((projection) => projection !== undefined)
       .filter(
         (projection, index, self) =>
@@ -87,20 +96,25 @@
   }
 
   const filteredProjections = $derived(
-    (!inputValue ? projections : searchProjectionsByString(inputValue))
+    searchProjectionsByString(inputValue)
       .slice(0, MAX_PROJECTIONS_COUNT)
       .filter(
         (projection) => !suggestedProjectionsCodes.includes(projection.id)
       )
   )
 
-  let items = $derived<ProjectionPickerItem[][]>([
-    suggestedProjections.map(projectionToItem),
-    filteredProjections.map(projectionToItem)
-  ])
+  let items = $derived<ProjectionPickerItem[][]>(
+    hasOpened
+      ? [
+          suggestedProjections.map(projectionToItem),
+          filteredProjections.map(projectionToItem)
+        ]
+      : [currentProjection ? [projectionToItem(currentProjection)] : []]
+  )
 </script>
 
 <Combobox
+  bind:open
   placeholder="Search projection…"
   {items}
   {value}

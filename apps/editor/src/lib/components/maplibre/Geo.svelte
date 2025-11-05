@@ -10,10 +10,10 @@
   // import { basemapStyle, addTerrain, removeTerrain } from '@allmaps/basemap'
 
   import { getProjectionsState } from '@allmaps/components/state'
-
   import { getMapsState } from '$lib/state/maps.svelte'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
   import {
     getResourceMask,
@@ -48,7 +48,7 @@
     SetResourceCrsEvent
   } from '$lib/types/events.js'
 
-  import type { Viewport } from '$lib/types/shared.js'
+  import type { Viewport, BasemapPreset } from '$lib/types/shared.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -63,6 +63,9 @@
     renderMasks?: boolean
     onlyRenderActiveMap?: boolean
     onmoveend?: (bounds: LngLatBoundsLike) => void
+    onBeforeSetStyle?: () => void
+    onAfterSetStyle?: () => void
+    onMapIdsChanged?: (mapIds: string[]) => void
   }
 
   let {
@@ -74,10 +77,17 @@
     renderMasks = false,
     onlyRenderActiveMap = false,
     onmoveend,
-    warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>()
+    warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>(),
+    onBeforeSetStyle,
+    onAfterSetStyle,
+    onMapIdsChanged
   }: Props = $props()
 
+  let backgroundWarpedMapLayer = $state.raw<WarpedMapLayer>()
+
   let currentMapIds = $state<SvelteSet<string>>(new SvelteSet([]))
+
+  let currentBackgroundGeoreferenceAnnotationUrl = $state<string>()
 
   let renderMaskOptions = $derived(
     renderMasks
@@ -98,9 +108,21 @@
   const mapsState = getMapsState()
   const mapsMergedState = getMapsMergedState()
   const uiState = getUiState()
+  const urlState = getUrlState()
+
+  let basemapPreset = $derived.by<BasemapPreset>(() => {
+    if (urlState.params.basemapXyzUrl) {
+      return {
+        url: urlState.params.basemapXyzUrl,
+        type: 'raster',
+        attribution: 'Custom XYZ URL'
+      }
+    } else {
+      return uiState.basemapPreset
+    }
+  })
 
   let geoMapContainer: HTMLDivElement
-  // let warpedMapLayer = $state.raw<WarpedMapLayer>()
 
   const defaultViewport = {
     center: [0, 0] as [number, number],
@@ -134,6 +156,7 @@
   }
 
   async function setGeoreferencedMaps(maps: GeoreferencedMap[]) {
+    let currentMapIdsChanged = false
     const newMapIds = new Set<string>()
 
     for (const map of maps) {
@@ -142,7 +165,8 @@
       }
 
       if (!currentMapIds.has(map.id)) {
-        addGeoreferencedMap(map)
+        await addGeoreferencedMap(map)
+        currentMapIdsChanged = true
       }
 
       newMapIds.add(map.id)
@@ -150,8 +174,13 @@
 
     for (const currentMapId of currentMapIds) {
       if (!newMapIds.has(currentMapId)) {
-        removeGeoreferencedMap(currentMapId)
+        await removeGeoreferencedMap(currentMapId)
+        currentMapIdsChanged = true
       }
+    }
+
+    if (currentMapIdsChanged) {
+      onMapIdsChanged?.([...currentMapIds])
     }
   }
 
@@ -229,6 +258,10 @@
 
         warpedMapLayer.setMapOptions(getFullMapId(mapId), {
           internalProjection: projection
+        })
+      } else {
+        warpedMapLayer.setMapOptions(getFullMapId(mapId), {
+          internalProjection: undefined
         })
       }
     }
@@ -318,8 +351,49 @@
 
   $effect(() => {
     if (geoMap) {
-      geoMap.setStyle(getStyle(uiState.basemapPreset))
+      onBeforeSetStyle?.()
+      geoMap.setStyle(getStyle(basemapPreset))
       geoMap.moveLayer('warped-map-layer')
+      onAfterSetStyle?.()
+    }
+  })
+
+  $effect(() => {
+    if (geoMap && warpedMapLayer) {
+      if (!backgroundWarpedMapLayer) {
+        backgroundWarpedMapLayer = new WarpedMapLayer({
+          layerId: 'background-warped-map-layer'
+        })
+
+        // @ts-expect-error MapLibre types are incompatible
+        geoMap.addLayer(backgroundWarpedMapLayer)
+        geoMap.moveLayer('background-warped-map-layer', 'warped-map-layer')
+      }
+
+      const backgroundGeoreferenceAnnotationUrl =
+        urlState.params.backgroundGeoreferenceAnnotationUrl
+
+      if (
+        currentBackgroundGeoreferenceAnnotationUrl &&
+        currentBackgroundGeoreferenceAnnotationUrl !==
+          backgroundGeoreferenceAnnotationUrl
+      ) {
+        backgroundWarpedMapLayer.removeGeoreferenceAnnotationByUrl(
+          currentBackgroundGeoreferenceAnnotationUrl
+        )
+      }
+
+      if (
+        backgroundGeoreferenceAnnotationUrl &&
+        currentBackgroundGeoreferenceAnnotationUrl !==
+          backgroundGeoreferenceAnnotationUrl
+      ) {
+        currentBackgroundGeoreferenceAnnotationUrl =
+          backgroundGeoreferenceAnnotationUrl
+        backgroundWarpedMapLayer.addGeoreferenceAnnotationByUrl(
+          backgroundGeoreferenceAnnotationUrl
+        )
+      }
     }
   })
 
@@ -352,7 +426,7 @@
 
     const newGeoMap = new Map({
       container: geoMapContainer,
-      style: getStyle(uiState.basemapPreset),
+      style: getStyle(basemapPreset),
       ...viewport,
       maxPitch: 0,
       minZoom: 2,
@@ -375,7 +449,6 @@
 
     newGeoMap.once('load', () => {
       geoMap = newGeoMap
-
       warpedMapLayer = new WarpedMapLayer(renderOptions)
 
       // @ts-expect-error MapLibre types are incompatible

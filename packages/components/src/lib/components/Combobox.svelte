@@ -25,6 +25,7 @@
     oninput?: (value: string) => void
     icon?: Component
     openOnFocus?: boolean
+    open?: boolean
   }
 
   let {
@@ -35,7 +36,8 @@
     onselect,
     oninput,
     icon: Icon,
-    openOnFocus = false
+    openOnFocus = false,
+    open = $bindable(false)
   }: Props = $props()
 
   let selectedItem = $derived.by<Item | undefined>(() => {
@@ -52,8 +54,6 @@
 
   // svelte-ignore state_referenced_locally
   let inputValue = $state(selectedItem?.label || '')
-
-  let open = $state(false)
 
   let customAnchor = $state.raw<HTMLElement>(null!)
 

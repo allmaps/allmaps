@@ -83,9 +83,9 @@ export class ScopeState {
         )
       }
     } else if (this.#scope === 'map') {
-      const map = this.#mapsState.activeMap
-      if (map) {
-        return [getFullMapId(map.id)]
+      const mapId = this.#mapsState.activeMapId
+      if (mapId) {
+        return [getFullMapId(mapId)]
       }
     }
 

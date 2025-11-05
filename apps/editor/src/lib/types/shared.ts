@@ -117,24 +117,23 @@ export type BasemapPresetId =
   | 'esri-world-imagery'
   | 'osm'
 
-export type BasemapProtomapsPresetItem = {
-  label: string
+export type BasemapProtomapsPreset = {
   type: 'protomaps'
-  attribution: string
-  value: BasemapPresetId
+  attribution?: string
 }
 
-export type BasemapRasterPresetItem = {
-  label: string
+export type BasemapRasterPreset = {
   url: string
   type: 'raster'
-  attribution: string
-  value: BasemapPresetId
+  attribution?: string
 }
 
-export type BasemapPresetItem =
-  | BasemapProtomapsPresetItem
-  | BasemapRasterPresetItem
+export type BasemapPreset = BasemapProtomapsPreset | BasemapRasterPreset
+
+export type BasemapPresetItem = {
+  label: string
+  value: BasemapPresetId
+} & BasemapPreset
 
 export type ClickedItem =
   | { type: 'map'; mapId: string }

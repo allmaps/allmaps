@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Map as MapLibreMap } from 'maplibre-gl'
+  import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl'
 
   import { ProjectedGcpTransformer, lonLatProjection } from '@allmaps/project'
   import { computeBbox, combineBboxes } from '@allmaps/stdlib'
@@ -13,12 +13,17 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
 
+  // ----
+  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+  // ====
+
   import {
     getNavPlaceViewport,
     getBboxViewport,
     sortGeoViewports
   } from '$lib/shared/viewport.js'
-
+  import { getFullMapId } from '$lib/shared/maps.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
   import {
     MAPLIBRE_PADDING,
@@ -43,6 +48,11 @@
   const scopeState = getScopeState()
   const sourceState = getSourceState()
   const urlState = getUrlState()
+
+  // ----
+  const mapsState = getMapsState()
+  const mapsMergedState = getMapsMergedState()
+  // ====
 
   const geoViewport = $derived(getGeoViewport())
 
@@ -115,20 +125,29 @@
   }
 
   function handleLastClickedItem(event: ClickedItemEvent) {
-    // TODO: can this be removed?
-    // This is now handled in an $effect
-    //
-    // if (event.detail.type === 'map') {
-    // const mapId = getFullMapId(event.detail.mapId)
-    // warpedMapLayer.bringMapsToFront([mapId])
-    // const warpedMap = warpedMapLayer.getWarpedMap(mapId)
-    // if (warpedMap && geoMap) {
-    //   geoMap.fitBounds(warpedMap.projectedGeoMaskBbox, {
-    //     duration: 200,
-    //     padding: MAPLIBRE_PADDING
-    //   })
-    // }
-    // }
+    if (geoMap && warpedMapLayer && event.detail.type === 'map') {
+      const mapId = getFullMapId(event.detail.mapId)
+      warpedMapLayer.bringMapsToFront([mapId])
+      const bbox = warpedMapLayer?.getMapsBbox([mapId], {
+        projection: lonLatProjection
+      })
+      if (bbox) {
+        const bounds = [
+          [bbox[0], bbox[1]],
+          [bbox[2], bbox[3]]
+        ] as LngLatBoundsLike
+        geoMap.fitBounds(bounds, {
+          duration: MAPLIBRE_FIT_BOUNDS_DURATION,
+          padding: MAPLIBRE_PADDING
+        })
+      }
+    }
+  }
+
+  function handleMoveend(boundsLike: LngLatBoundsLike) {
+    let bounds = LngLatBounds.convert(boundsLike)
+    const bbox = bounds.toArray().flat() as Bbox
+    uiState.lastBbox = bbox
   }
 
   function handleZoomToExtent() {
@@ -157,18 +176,26 @@
     uiState.resultsOptions.renderMasks = !uiState.resultsOptions.renderMasks
   }
 
+  function fitWarpedMapLayerBounds() {
+    if (geoMap && warpedMapLayerBounds) {
+      //         console.log('nu dezeeeeeeeee fitounds')
+      geoMap.fitBounds(warpedMapLayerBounds, {
+        duration: MAPLIBRE_FIT_BOUNDS_DURATION,
+        padding: MAPLIBRE_PADDING
+      })
+    }
+  }
+
   $effect(() => {
     if (scopeState.activeMapId && geoMap) {
       const bbox = warpedMapLayer?.getMapsBbox([scopeState.activeMapId], {
         projection: lonLatProjection
       })
-
       if (bbox) {
         const bounds = [
           [bbox[0], bbox[1]],
           [bbox[2], bbox[3]]
         ] as LngLatBoundsLike
-
         warpedMapLayer?.bringMapsToFront([scopeState.activeMapId])
 
         geoMap.fitBounds(bounds, {
@@ -179,14 +206,23 @@
     }
   })
 
-  $effect(() => {
+  function handleMapIdsChanged() {
+    // I've introduced this function/event because
+    // I couldn't easily find a way to respond to the contents
+    // of scopeState.mapIds actually changing.
+    // Watching scopeState.mapIds in an effect also runs
+    // When it's reassigned with the same values.
+    // Since Geo.svelte already keeps track of changes in mapIds,
+    // this was the easiest thing to do.
+    // TODO: can we do without this event?
+
     if (geoMap && warpedMapLayerBounds) {
       geoMap.fitBounds(warpedMapLayerBounds, {
         duration: 200,
         padding: MAPLIBRE_PADDING
       })
     }
-  })
+  }
 
   onMount(() => {
     uiState.addEventListener(UiEvents.CLICKED_ITEM, handleLastClickedItem)
@@ -219,6 +255,8 @@
   bind:warpedMapLayer
   mapIds={scopeState.mapIds}
   initialViewport={geoViewport}
+  onmoveend={handleMoveend}
+  onMapIdsChanged={handleMapIdsChanged}
   warpedMapsOpacity={uiState.resultsOptions.warpedMapLayerOpacity}
   renderMasks={uiState.resultsOptions.renderMasks}
 />

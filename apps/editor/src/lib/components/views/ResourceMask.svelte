@@ -49,6 +49,7 @@
 
   import {
     MAPLIBRE_PADDING,
+    MAPLIBRE_FIT_BOUNDS_DURATION,
     TERRA_DRAW_COORDINATE_PRECISION
   } from '$lib/shared/constants.js'
 
@@ -114,6 +115,11 @@
       if (bbox) {
         resourceMap.fitBounds(bbox, {
           duration: 200,
+          padding: MAPLIBRE_PADDING
+        })
+      } else if (warpedMapLayerBounds) {
+        resourceMap?.fitBounds(warpedMapLayerBounds, {
+          duration: MAPLIBRE_FIT_BOUNDS_DURATION,
           padding: MAPLIBRE_PADDING
         })
       }

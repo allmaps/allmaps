@@ -65,11 +65,14 @@
   })
 
   function handleSelect(projection: PickerProjection) {
-    if (typeof projection.definition !== 'string') {
+    if (!projection.definition) {
+      mapsState.setResourceCrs({
+        mapId: map.id,
+        resourceCrs: undefined
+      })
+    } else if (typeof projection.definition !== 'string') {
       console.error('Only projections with string definitions are supported')
-    }
-
-    if (projection.id !== projectionId) {
+    } else if (projection.id !== projectionId) {
       mapsState.setResourceCrs({
         mapId: map.id,
         resourceCrs: toDbProjection(projection)

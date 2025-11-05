@@ -35,7 +35,7 @@
         url={getViewerUrl(scopeState.allmapsId)}
         label="View in Allmaps Viewer"
       >
-        <p>View the georeferenced map</p>
+        <!-- <p>View the georeferenced map</p> -->
       </ExportUrl>
 
       <ExportUrl
@@ -55,7 +55,7 @@
             </span>
           </button>
         {/snippet}
-        <p>This Web Annotation contains all georeference data. You can use</p>
+        <!-- <p>This Web Annotation contains all georeference data. You can use</p> -->
       </ExportUrl>
 
       <ExportUrl

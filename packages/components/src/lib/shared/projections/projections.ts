@@ -36,16 +36,10 @@ export function createFullTextIndex(
 
   try {
     const fuse = new Fuse(projections, {
-      // Fields to search
-      keys: ['name'],
-      // Lower means stricter matching
-      threshold: 0.2,
-      // Minimum characters that must match
-      minMatchCharLength: 1
+      keys: ['name']
     })
 
     return function (query: string): PickerProjection[] {
-      console.log('Searching projections for', query)
       return fuse.search(query).map((result) => result.item)
     }
   } catch (err) {

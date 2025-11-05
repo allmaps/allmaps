@@ -122,7 +122,7 @@ export class UiState extends UiEventTarget {
 
   #lastBbox = $state<Bbox>()
 
-  #projectionIndices = $state.raw<ProjectionIndices>({
+  #projectionIndices = $state<ProjectionIndices>({
     fullText: undefined,
     bbox: undefined
   })

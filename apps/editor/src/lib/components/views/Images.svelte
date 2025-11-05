@@ -131,7 +131,7 @@
               imageId: image.uri
             })}
             onclick={(event) => handleImageClick(event, image.uri)}
-            ondblclick={(event) => handleImageDoubleClick(image.uri)}
+            ondblclick={() => handleImageDoubleClick(image.uri)}
           >
             <div class="relative aspect-square">
               {#await fetchImageInfo(image.uri)}
@@ -163,11 +163,17 @@
                 <Status imageId={image.uri} />
               </div>
             </div>
-            <div class="text-center text-xs text-blue-900">
+            <div class="text-center text-sm text-blue-900">
               {canvas?.label
                 ? truncate(parseLanguageString(canvas?.label, 'en'))
                 : `Image ${index + 1}`}
             </div>
+            {#if canvas?.width && canvas?.height}
+              <div class="text-center text-xs text-blue-800">
+                {canvas?.width} ×
+                {canvas?.height} pixels
+              </div>
+            {/if}
           </a>
         </li>
       {/each}

@@ -16,10 +16,7 @@ import type {
   LayerSpecification
 } from 'maplibre-gl'
 
-import type {
-  BasemapPresetItem,
-  BasemapRasterPresetItem
-} from '$lib/types/shared.js'
+import type { BasemapPreset, BasemapRasterPreset } from '$lib/types/shared.js'
 
 export function getCenterZoomFromBbox(
   map: MapLibreMap,
@@ -39,13 +36,13 @@ export function getCenterZoomFromBbox(
   }
 }
 
-export function getStyle(basemap: BasemapPresetItem) {
+export function getStyle(basemap: BasemapPreset) {
   if (basemap.type === 'raster') {
     return getXyzLayerStyle(basemap)
-  } else if (basemap.value === 'protomaps') {
+  } else if (basemap.type === 'protomaps') {
     return getProtomapsStyle()
   } else {
-    throw new Error(`Unknown basemap type: ${basemap.type}`)
+    throw new Error(`Unknown basemap type`)
   }
 }
 
@@ -55,7 +52,7 @@ export function getProtomapsStyle(): StyleSpecification {
 }
 
 export function getXyzLayerStyle(
-  basemap: BasemapRasterPresetItem
+  basemap: BasemapRasterPreset
 ): StyleSpecification {
   return {
     version: 8 as const,
