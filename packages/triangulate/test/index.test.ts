@@ -3,7 +3,7 @@ import { describe, test } from 'vitest'
 // TODO: move to test helper file in /test/
 import { expectToBeCloseToArrayArrayArray } from '../../stdlib/test/helper-functions.js'
 
-import { triangulate, triangulateToUnique } from '../dist/index.js'
+import { triangulate, triangulateToUnique } from '../src/index.js'
 
 import type { Rectangle } from '@allmaps/types'
 

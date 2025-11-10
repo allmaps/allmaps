@@ -27,7 +27,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc && chmod +x dist/index.js",
-    "test": "NODE_ENV=test vitest",
+    "test": "NODE_ENV=test vitest run",
     "types": "tsc --noEmit",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test"

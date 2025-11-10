@@ -30,7 +30,7 @@
     "watch": "tsc --watch",
     "build": "tsc",
     "types": "tsc --noEmit",
-    "test": "NODE_ENV=test vitest",
+    "test": "NODE_ENV=test vitest run",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "documentation": "remark . --output --use remark-api",
     "format": "prettier --write src test"
