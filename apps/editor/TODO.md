@@ -1,70 +1,17 @@
-First:
-
-- [x] Add URL params
-
-  - `userBaseMapUrl`
-  - `userAnnotationUrl`
-  - `callback`
-  - `bbox`
-    ```js
-    bbox = bboxStringParts.map((str) => parseFloat(str))
-    const extent = [
-      ...fromLonLat([bbox[0], bbox[1]]),
-      ...fromLonLat([bbox[2], bbox[3]])
-    ]
-    ```
-
-- [x] Index voor DbMap, net zoals DbGcp
-- [x] Als je een masker selecteert moet ie best centreren op dat masker is resource en geo (en dat gebeurt nu niet!). Idem voor het selecteren van een punt.
-- [ ] En de Results moet de Scope volgen
-- [ ] Get correct geo viewport on Results page
-- [ ] navPlace
-- [ ] Callback/projects
-- [ ] Fix loading screen when started with ?url= parameter
-- [x] Een bevestigend scherm voor je een masker of GCP effectief wist zou veel leed kunnen voorkomen.
-- [x] Why multple https://dev.api.allmaps.org/manifests/862e3f4c5dc3bc08/maps fetches in the beginning?
-- [x] Clear viewports state when loading new URL
-- [x] Clear map-history when loading new URL
+- [ ] Fix outline for all buttons
+- [ ] Add option to enable/disable hillshade/terrain
+- [ ] Check navPlace
 - [x] Check StartGeoreferencing component
-- [x] Correct order when first adding GCPs in resource, then in geo
-- [x] Better selection rectangles around images
-- [x] Error page
 - [x] Fix aspect ratio loading example images
 - [x] Check old URLs
-- [x] Copy button in Annotation
-- [x] Remember map positions (in local storage?)
-- [x] Select transformation
-- [x] Results disabled when no maps
 - [ ] Support opening Georeference Annotations, show message that data is fetched from API
-
-Then:
-
-- [ ] Show message on results page when no results
-- [x] Fix `masks.svg`
-- [ ] Add IIIF Collection support
-- [ ] Improve error messages (including CORS). Add links to docs, other IIIF viewers, IIIF validators, etc.
-- [x] Improve intro screen (smaller!) Use Toast?
-- [ ] Improve settings drawer
-- [ ] Warped map preview in Georeference view. Add opacity slider
-- [ ] Buttons in geo views
-  - [ ] Geocoder
-  - [ ] Compass!
-  - [ ] Button to zoom to map's extent, phosphor icon corners-out
-- [ ] `navPlace`
-- [ ] Add more export options
-- [ ] Make sure links to docs work
-- [ ] Add image sneak peek
+- [x] Show message on results page when no results
+- [ ] Add compass
 - [ ] Export Annotation, Manifest with embedded annotation, XYZ tile service URL, GeoTIFF, GeoJSON
-- [ ] QGIS import & export
-- [ ] Import GCPs from file
-- [ ] Editable GCP coordinates
-- [ ] Projections
 - [ ] Tutorial on homepage
 - [ ] Improved multiplayer mode Allow working together on georeferencing a map by sharing a URL
 - [ ] Offline support
 - [ ] Mention KNAW in README
-- [x] Smaller cloud icon
-- [x] Use next.bits-ui.com
 
 James:
 
