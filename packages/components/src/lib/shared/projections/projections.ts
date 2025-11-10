@@ -8,7 +8,7 @@ import type { Bbox } from '@allmaps/types'
 import type { Projection } from '@allmaps/project'
 
 export type PickerProjection = Projection & {
-  // id: string
+  id: string
   epsg?: number
   bbox?: Bbox
 }
