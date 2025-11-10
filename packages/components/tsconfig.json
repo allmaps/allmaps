@@ -1,6 +1,8 @@
 {
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
     "allowJs": true,
     "checkJs": true,
     "esModuleInterop": true,
