@@ -108,7 +108,6 @@
 
 {#snippet renderLabels(labels: string[])}
   {#each labels as label, index (index)}
-    {@const first = index === 0}
     {@const last = index === editLabels.length - 1}
 
     <span class={['min-w-6 truncate font-medium']}>{label}</span>
@@ -133,13 +132,13 @@
       {@render url(sourceUrl)}
       {@render arrow()}
       <span
-        class="border-1 border-red rounded-md bg-red-400 px-1 py-0 text-xs text-white"
+        class="rounded-md border-1 border-red bg-red-400 px-1 py-0 text-xs text-white"
         >Error loading URL</span
       >
     {:else if sourceType}
       <span
         class={[
-          sourceType !== 'image' ? '@min-4xl:contents hidden' : 'contents'
+          sourceType !== 'image' ? 'hidden @min-4xl:contents' : 'contents'
         ]}
       >
         <IIIFSource {sourceType} />
@@ -147,20 +146,20 @@
 
       <span
         class={[
-          sourceType !== 'image' ? '@min-2xl:contents hidden' : 'contents'
+          sourceType !== 'image' ? 'hidden @min-2xl:contents' : 'contents'
         ]}
       >
         {@render url(sourceUrl)}
       </span>
 
       {#if sourceType === 'manifest'}
-        <span class="@min-2xl:contents hidden">
+        <span class="hidden @min-2xl:contents">
           {@render separator()}
         </span>
         {@render renderLabels(editLabels)}
       {:else if sourceType === 'collection'}
         {#if collectionLabel}
-          <span class="@min-2xl:contents hidden">
+          <span class="hidden @min-2xl:contents">
             {@render separator()}
           </span>
           <span class="min-w-6 truncate font-medium">{collectionLabel}</span>
@@ -171,16 +170,16 @@
             <span>…</span>
             {@render separator()}
           {/if}
-          <span class="@min-4xl:contents hidden">
+          <span class="hidden @min-4xl:contents">
             <IIIFSource sourceType="manifest" />
           </span>
           {@render renderLabels(editLabels)}
         {:else}
           {@render arrow()}
           <span
-            class="border-blue border-1 rounded-md bg-blue-200 px-1 py-0 text-xs"
+            class="rounded-md border-1 border-blue bg-blue-200 px-1 py-0 text-xs"
             >Browse to find maps <span class="@min-1xl:inline hidden"
-              >in this collection <span class="@min-4xl:inline hidden"
+              >in this collection <span class="hidden @min-4xl:inline"
                 >and start georeferencing</span
               ></span
             ></span
@@ -205,10 +204,10 @@
   {#snippet button()}
     <div
       bind:clientWidth={infoButtonWidth}
-      class="bg-gray/10 hover:bg-gray/20 inset-shadow-none hover:inset-shadow-xs group w-full min-w-0
-        truncate rounded-full border-2
-        py-1.5 pl-3
-        pr-2 transition-all duration-100
+      class="group w-full min-w-0 truncate rounded-full border-2 bg-gray/10
+        py-1.5 pr-2 pl-3
+        inset-shadow-none transition-all
+        duration-100 hover:bg-gray/20 hover:inset-shadow-xs
         {uiState.popoverOpen.info
         ? 'border-gray-200 bg-white'
         : 'border-gray/10'}

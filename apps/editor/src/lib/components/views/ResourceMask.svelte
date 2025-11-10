@@ -70,7 +70,6 @@
   let resourceMapReady = $state(false)
 
   let isDrawing = $state(false)
-  let currentlyDrawingMapId = $state<string>()
   let canFinishDrawing = $state(true)
 
   let currentDisplayImageId = $state<string>()
@@ -291,8 +290,6 @@
 
       if (type === 'update') {
         const id = ensureStringId(ids[0])
-        if (id === currentlyDrawingMapId) {
-        }
 
         if (id && resourceDraw && getPolygonFeature(resourceDraw, id)) {
           makeResourceMaskFeatureActive(id)
@@ -305,12 +302,10 @@
           resourceDraw &&
           getPolygonFeature(resourceDraw, id)
         ) {
-          currentlyDrawingMapId = id
           isDrawing = true
         }
       } else if (type === 'delete') {
         if (!hasApiOrigin) {
-          currentlyDrawingMapId = undefined
           isDrawing = false
         }
       }
@@ -424,7 +419,6 @@
     const feature = getPolygonFeature(resourceDraw, id)
 
     if (feature) {
-      currentlyDrawingMapId = undefined
       isDrawing = false
 
       if (context.action === 'edit') {

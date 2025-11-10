@@ -35,11 +35,11 @@
   {perPage}
   onPageChange={handlePageChange}
 >
-  {#snippet children({ pages, range })}
+  {#snippet children({ pages })}
     <div class="my-8 flex items-center">
       <Pagination.PrevButton
-        class="not-disabled:hover:bg-current/10 inline-flex size-10 cursor-pointer items-center justify-center
-        rounded-xl transition-colors
+        class="inline-flex size-10 cursor-pointer items-center justify-center rounded-xl
+        transition-colors not-disabled:hover:bg-current/10
         disabled:cursor-not-allowed hover:disabled:bg-transparent"
       >
         <CaretLeftIcon class="size-6" />
@@ -47,14 +47,14 @@
       <div class="flex items-center gap-2">
         {#each pages as page (page.key)}
           {#if page.type === 'ellipsis'}
-            <div class="select-none text-[15px] font-medium">…</div>
+            <div class="text-[15px] font-medium select-none">…</div>
           {:else}
             <Pagination.Page
               {page}
-              class="not-disabled:hover:bg-current/10 data-selected:bg-current/10 inline-flex
-                size-10 cursor-pointer select-none items-center justify-center rounded-xl
-                transition-colors disabled:cursor-not-allowed
-                disabled:opacity-50 hover:disabled:bg-transparent"
+              class="inline-flex size-10 cursor-pointer
+                items-center justify-center rounded-xl transition-colors select-none not-disabled:hover:bg-current/10
+                disabled:cursor-not-allowed disabled:opacity-50
+                hover:disabled:bg-transparent data-selected:bg-current/10"
             >
               {page.value}
             </Pagination.Page>
@@ -62,8 +62,8 @@
         {/each}
       </div>
       <Pagination.NextButton
-        class="not-disabled:hover:bg-current/10 inline-flex size-10 cursor-pointer items-center
-        justify-center rounded-xl transition-colors
+        class="inline-flex size-10 cursor-pointer items-center justify-center
+        rounded-xl transition-colors not-disabled:hover:bg-current/10
         disabled:cursor-not-allowed hover:disabled:bg-transparent"
       >
         <CaretRightIcon class="size-6" />

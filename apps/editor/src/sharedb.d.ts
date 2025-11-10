@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // Adapted from
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/sharedb/index.d.ts
 

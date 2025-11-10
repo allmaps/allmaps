@@ -40,8 +40,8 @@
 
 <form
   onsubmit={handleSubmit}
-  class="shadow-xs flex w-full cursor-pointer items-center gap-1 rounded-full border border-gray-300 bg-white px-3
-    py-0.5 text-sm transition-all focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500"
+  class="flex w-full cursor-pointer items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-0.5
+    text-sm shadow-xs transition-all focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500"
 >
   <img src={iiifLogoBlack} class="size-4 opacity-75" alt="IIIF logo" />
   <input
@@ -50,7 +50,7 @@
     bind:value
     bind:this={input}
     onfocus={() => input.select()}
-    class="focus:outline-hidden w-full truncate bg-transparent px-2 py-1"
+    class="w-full truncate bg-transparent px-2 py-1 focus:outline-hidden"
     {placeholder}
   />
 </form>

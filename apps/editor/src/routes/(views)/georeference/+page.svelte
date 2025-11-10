@@ -5,7 +5,7 @@
   import Georeference from '$lib/components/views/Georeference.svelte'
 </script>
 
-<div class="w-full h-full bg-yellow/50">
+<div class="h-full w-full bg-yellow/50">
   <DotsPattern color={yellow} opacity={0.5}>
     <Georeference />
   </DotsPattern>

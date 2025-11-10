@@ -83,7 +83,7 @@
           imageId: sourceState.activeImageId || undefined
         })}
         data-state={getView(page) === 'images' ? 'active' : undefined}
-        class="data-[state=active]:bg-blue/25 hover:bg-blue/10 flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2"
+        class="flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 hover:bg-blue/10 data-[state=active]:bg-blue/25 sm:px-4 sm:py-2"
       >
         <ImagesIcon size={28} class="inline" />
         <span class="hidden lg:inline-block">Images</span>
@@ -101,7 +101,7 @@
         class={[
           !editEnabled && 'text-gray-400',
           editEnabled
-            ? 'data-[state=active]:bg-green/25 hover:bg-green/10'
+            ? 'hover:bg-green/10 data-[state=active]:bg-green/25'
             : 'data-[state=active]:bg-green-100/25',
           'flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2'
         ]}
@@ -122,7 +122,7 @@
         class={[
           !editEnabled && 'text-gray-400',
           editEnabled
-            ? 'data-[state=active]:bg-yellow/25 hover:bg-yellow/10'
+            ? 'hover:bg-yellow/10 data-[state=active]:bg-yellow/25'
             : 'data-[state=active]:bg-yellow-100/25',
           'flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2'
         ]}
@@ -152,7 +152,7 @@
         class={[
           !resultsEnabled && 'text-gray-400',
           resultsEnabled
-            ? 'data-[state=active]:bg-pink/25 hover:bg-pink/10'
+            ? 'hover:bg-pink/10 data-[state=active]:bg-pink/25'
             : 'data-[state=active]:bg-pink-100/25',
           'flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 sm:px-4 sm:py-2'
         ]}
@@ -203,13 +203,13 @@
       {#if editEnabled}
         <Popover
           bind:open={uiState.popoverOpen.maps}
-          interactOutsideBehavior={'ignore'}
+          interactOutsideBehavior="ignore"
         >
           {#snippet button()}
             <div
-              class="bg-pink hover:bg-pink/90 flex flex-row items-center justify-center
-            gap-1 rounded-md p-2 font-medium text-white
-            shadow-md transition-all"
+              class="flex flex-row items-center justify-center gap-1 rounded-md
+            bg-pink p-2 font-medium text-white shadow-md
+            transition-all hover:bg-pink/90"
             >
               <RowsIcon class="size-5" weight="bold" />
               <!-- <span>Masks &amp; GCPs</span> -->

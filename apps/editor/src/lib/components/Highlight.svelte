@@ -11,8 +11,8 @@
   let { value, lang }: Props = $props()
 </script>
 
-<div class="relative rounded-md overflow-auto">
-  <div class="contents *:overflow-auto *:p-2 *:whitespace-pre-wrap *:break-all">
+<div class="relative overflow-auto rounded-md">
+  <div class="contents *:overflow-auto *:p-2 *:break-all *:whitespace-pre-wrap">
     <!-- eslint-disable-next-line svelte/no-at-html-tags -->
     {@html highlight(value, lang)}
   </div>

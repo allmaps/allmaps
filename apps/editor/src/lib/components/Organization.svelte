@@ -48,7 +48,7 @@
 </script>
 
 {#snippet header(organization: OrganizationWithId)}
-  <div class="contents md:flex flex-col gap-2 sm:gap-4">
+  <div class="contents flex-col gap-2 sm:gap-4 md:flex">
     <svelte:element
       this={showMoreLink ? 'a' : 'div'}
       class="flex flex-col items-start gap-2"
@@ -57,7 +57,7 @@
       {#await import(`$lib/images/organizations/${organization.id}.svg`) then { default: src }}
         <img class="inline-block h-16" {src} alt={organization.title} />
       {/await}
-      <h3 class="text-black font-bold text-xl">{organization.title}</h3>
+      <h3 class="text-xl font-bold text-black">{organization.title}</h3>
       <!-- <h4 class="text-black">{organization.subtitle}</h4> -->
     </svelte:element>
   </div>
@@ -76,18 +76,18 @@
   })}
     {@const page = examples.slice(range.start, range.end)}
     <div
-      class="grid grid-cols-2 md:grid-cols-4 auto-rows-auto md:grid-rows-2 gap-8 bg-white rounded-2xl shadow-md p-4"
+      class="grid auto-rows-auto grid-cols-2 gap-8 rounded-2xl bg-white p-4 shadow-md md:grid-cols-4 md:grid-rows-2"
     >
       {#if showMoreLink}
         <div
-          class="col-span-2 md:col-span-1 md:row-span-2 grid grid-rows-subgrid"
+          class="col-span-2 grid grid-rows-subgrid md:col-span-1 md:row-span-2"
         >
           <div class="flex flex-col gap-2 md:contents">
             {@render header(organization)}
             <div class="md:self-end">
               <a
                 href="/organizations/{organization.id}"
-                class="font-bold text-pink hover:underline after:content-['_›']"
+                class="font-bold text-pink after:content-['_›'] hover:underline"
                 >More from this collection
               </a>
             </div>
@@ -106,14 +106,14 @@
     {#if usePagination}
       <div class="my-8 flex items-center justify-center text-xs">
         <Pagination.PrevButton
-          class="mr-6 inline-flex size-10 items-center justify-center rounded-lg bg-transparent hover:bg-blue-200 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
+          class="disabled:text-muted-foreground mr-6 inline-flex size-10 items-center justify-center rounded-lg bg-transparent hover:bg-blue-200 disabled:cursor-not-allowed hover:disabled:bg-transparent"
         >
           <CaretLeftIcon class="size-6" />
         </Pagination.PrevButton>
         <div class="flex items-center gap-2.5">
           {#each pages as page (page.key)}
             {#if page.type === 'ellipsis'}
-              <div class="font-medium text-foreground-alt">...</div>
+              <div class="text-foreground-alt font-medium">...</div>
             {:else}
               <Pagination.Page
                 {page}
@@ -125,7 +125,7 @@
           {/each}
         </div>
         <Pagination.NextButton
-          class="ml-6 inline-flex size-10 items-center justify-center rounded-lg bg-transparent hover:bg-blue-200 disabled:cursor-not-allowed disabled:text-muted-foreground hover:disabled:bg-transparent"
+          class="disabled:text-muted-foreground ml-6 inline-flex size-10 items-center justify-center rounded-lg bg-transparent hover:bg-blue-200 disabled:cursor-not-allowed hover:disabled:bg-transparent"
         >
           <CaretRightIcon class="size-6" />
         </Pagination.NextButton>

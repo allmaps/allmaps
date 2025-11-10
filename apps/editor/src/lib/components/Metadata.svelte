@@ -27,17 +27,17 @@
         <!-- Manifest label and URI -->
         {#if manifest.label}
           <div class="flex flex-col gap-2 border-b border-gray-200 pb-4">
-            <h4 class="text-lg font-semibold leading-tight text-gray-900">
+            <h4 class="text-lg leading-tight font-semibold text-gray-900">
               {parseLanguageString(manifest.label, 'en')}
             </h4>
             <a
               href={manifest.uri}
               target="_blank"
               rel="noopener noreferrer"
-              class="hover:text-pink group inline-flex items-center gap-1.5 text-xs text-gray-500 transition-colors"
+              class="group inline-flex items-center gap-1.5 text-xs text-gray-500 transition-colors hover:text-pink"
             >
               <LinkIcon size="12" class="shrink-0" />
-              <span class="break-all font-mono group-hover:underline"
+              <span class="font-mono break-all group-hover:underline"
                 >{manifest.uri}</span
               >
               <ArrowSquareOutIcon
@@ -52,7 +52,7 @@
         {#if manifest.description}
           <div class="flex flex-col gap-2">
             <h5
-              class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+              class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
               Description
             </h5>
@@ -66,7 +66,7 @@
         {#if manifest.summary}
           <div class="flex flex-col gap-2">
             <h5
-              class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+              class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
               Summary
             </h5>
@@ -78,7 +78,7 @@
 
         <!-- navDate -->
         {#if manifest.navDate}
-          <div class="flex items-start gap-3 rounded-lg bg-gray-50 p-3">
+          <div class="bg-gray-50 flex items-start gap-3 rounded-lg p-3">
             <CalendarIcon size="18" class="mt-0.5 shrink-0 text-gray-600" />
             <div class="flex flex-col gap-0.5">
               <span class="text-xs font-medium text-gray-500">Date</span>
@@ -91,7 +91,7 @@
 
         <!-- Required Statement / Attribution -->
         {#if manifest.requiredStatement}
-          <div class="rounded-lg border border-gray-200 bg-amber-50/50 p-4">
+          <div class="bg-amber-50/50 rounded-lg border border-gray-200 p-4">
             <h5 class="mb-2 text-xs font-semibold text-gray-700">
               {parseLanguageString(manifest.requiredStatement.label, 'en')}
             </h5>
@@ -105,20 +105,20 @@
         {#if manifest.metadata && manifest.metadata.length > 0}
           <div class="flex flex-col gap-3">
             <h5
-              class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+              class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
               Additional Information
             </h5>
             <dl
-              class="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4"
+              class="bg-gray-50 grid grid-cols-1 gap-4 rounded-lg border border-gray-200 p-4"
             >
               {#each manifest.metadata as item (item.label)}
                 {#if item.label && item.value}
                   <div class="flex flex-col gap-1">
-                    <dt class="break-all text-xs font-medium text-gray-600">
+                    <dt class="text-xs font-medium break-all text-gray-600">
                       {parseLanguageString(item.label, 'en')}
                     </dt>
-                    <dd class="break-all text-sm text-gray-900">
+                    <dd class="text-sm break-all text-gray-900">
                       {parseLanguageString(item.value, 'en')}
                     </dd>
                   </div>
@@ -132,7 +132,7 @@
         {#if manifest.homepage && manifest.homepage.length > 0}
           <div class="flex flex-col gap-2">
             <h5
-              class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+              class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
               Related Links
             </h5>
@@ -142,7 +142,7 @@
                   href={homepage.id}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="hover:border-pink group inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-all hover:bg-pink-50 hover:text-pink-700"
+                  class="group hover:bg-pink-50 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-all hover:border-pink hover:text-pink-700"
                 >
                   <LinkIcon size="16" class="shrink-0" />
                   <span class="break-all">
@@ -164,7 +164,7 @@
         {#if manifest.seeAlso && manifest.seeAlso.length > 0}
           <div class="flex flex-col gap-2">
             <h5
-              class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+              class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
               See Also
             </h5>
@@ -174,7 +174,7 @@
                   href={seeAlso.id}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="hover:border-pink group inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-all hover:bg-pink-50 hover:text-pink-700"
+                  class="group hover:bg-pink-50 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 transition-all hover:border-pink hover:text-pink-700"
                 >
                   <LinkIcon size="16" class="shrink-0" />
                   <span class="break-all">

@@ -1,8 +1,6 @@
 <script lang="ts">
   import { X as XIcon, Check as CheckIcon } from 'phosphor-svelte'
 
-  import { red, green } from '@allmaps/tailwind'
-
   type Color = 'red' | 'green' | 'gray'
 
   type Props = {

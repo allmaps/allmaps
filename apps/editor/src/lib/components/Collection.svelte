@@ -41,11 +41,11 @@
     paramsToUrl
   }: Props = $props()
 
-  let thumbnail = $derived(
-    parsedIiifAtPath && 'thumbnail' in parsedIiifAtPath
-      ? parsedIiifAtPath.thumbnail?.[0]
-      : undefined
-  )
+  // let thumbnail = $derived(
+  //   parsedIiifAtPath && 'thumbnail' in parsedIiifAtPath
+  //     ? parsedIiifAtPath.thumbnail?.[0]
+  //     : undefined
+  // )
 
   let someItemThumbnails = $derived(
     parsedIiifAtPath &&
@@ -95,7 +95,7 @@
 
 {#if parsedIiifAtPath && (parsedIiifAtPath.type === 'manifest' || parsedIiifAtPath.type === 'collection') && parsedIiifAtPath.description}
   <div
-    class="inset-shadow-sm max-h-48 w-full overflow-y-auto rounded-md bg-blue-100 p-2 text-blue-900"
+    class="max-h-48 w-full overflow-y-auto rounded-md bg-blue-100 p-2 text-blue-900 inset-shadow-sm"
   >
     <h3 class="font-medium">
       {parseLanguageString(parsedIiifAtPath.label, 'en')}
@@ -121,7 +121,7 @@
     (paginationPage + 1) * paginationPerPage
   )}
   <ol class="grid grid-cols-1 gap-2 md:grid-cols-2">
-    {#each items as item, index}
+    {#each items as item, index (item.uri)}
       {@const newPath = [
         ...path,
         { index: index + paginationPage * paginationPerPage }

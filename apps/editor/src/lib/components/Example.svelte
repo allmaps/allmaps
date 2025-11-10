@@ -20,23 +20,23 @@
 
 {#await imageInfoState.fetchImageInfo(example.imageId)}
   <li
-    class="bg-[#fafafa] animate-pulse aspect-square space-y-2 text-gray-500 hover:text-gray-800 rounded-md text-xs
-flex items-center justify-center transition-colors"
+    class="flex aspect-square animate-pulse items-center justify-center space-y-2 rounded-md bg-[#fafafa]
+text-xs text-gray-500 transition-colors hover:text-gray-800"
   >
     <p>Loading…</p>
   </li>
 {:then imageInfo}
   <li
-    class="bg-[#fafafa] aspect-square space-y-2 text-gray-500 hover:text-gray-800 rounded-md text-xs
-flex items-center justify-center
-transition-colors"
+    class="flex aspect-square items-center justify-center space-y-2 rounded-md bg-[#fafafa]
+text-xs text-gray-500 transition-colors
+hover:text-gray-800"
   >
     <a
       href={`/images?url=${encodeURIComponent(exampleUrl)}`}
-      class="w-full inline-block rounded-md relative overflow-hidden space-y-2 p-4"
+      class="relative inline-block w-full space-y-2 overflow-hidden rounded-md p-4"
     >
       <Thumbnail {imageInfo} width={300} mode="contain" alt={example.title} />
-      <div class="text-center inline-block w-full">
+      <div class="inline-block w-full text-center">
         {truncate(example.title)}
       </div>
     </a>

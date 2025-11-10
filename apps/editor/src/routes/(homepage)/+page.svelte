@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { page } from '$app/state'
   import { goto } from '$app/navigation'
-  import { browser } from '$app/environment'
+  import { resolve } from '$app/paths'
 
   import { Footer } from '@allmaps/components'
 
@@ -22,23 +22,6 @@
   import { organizationsWithCollectionsOnHomepage } from '$lib/shared/organizations.js'
 
   const urlState = getUrlState()
-
-  let autofocus = $state(false)
-
-  function hasTouch() {
-    if (browser) {
-      // See:
-      //  - https://css-tricks.com/touch-devices-not-judged-size/
-      //  - https://stackoverflow.com/questions/4817029/whats-the-best-way-to-detect-a-touch-screen-device-using-javascript
-      return window.matchMedia('(pointer: coarse)').matches
-    }
-
-    return false
-  }
-
-  $effect.pre(() => {
-    autofocus = !hasTouch()
-  })
 
   function handleInputSubmit(url: string) {
     gotoRoute(
@@ -62,7 +45,7 @@
           )
         }
 
-        const newUrl = `${page.url.origin}${pathWithSearchParams}`
+        const newUrl = resolve(`${page.url.origin}${pathWithSearchParams}`)
         goto(newUrl)
       }
     }
@@ -75,7 +58,7 @@
   >
     <div
       id="masks"
-      class="scale-120 h-full w-full max-w-5xl bg-no-repeat transition-transform sm:scale-150"
+      class="h-full w-full max-w-5xl scale-120 bg-no-repeat transition-transform sm:scale-150"
     ></div>
   </div>
   <section
@@ -106,7 +89,7 @@
     </div>
   </section>
   <section class="flex w-full flex-col items-center bg-[#f2feff] pb-16">
-    <div class="max-w-(--breakpoint-lg) flex flex-col items-center p-2">
+    <div class="flex max-w-(--breakpoint-lg) flex-col items-center p-2">
       <div class="flex flex-col items-center space-y-4 p-8 text-center">
         <h2 class="text-2xl font-bold text-black">
           Or pick a map from these collections

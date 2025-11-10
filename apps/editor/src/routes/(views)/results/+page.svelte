@@ -5,7 +5,7 @@
   import Results from '$lib/components/views/Results.svelte'
 </script>
 
-<div class="w-full h-full bg-pink/50">
+<div class="h-full w-full bg-pink/50">
   <DotsPattern color={pink} opacity={0.3}>
     <Results />
   </DotsPattern>

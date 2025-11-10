@@ -8,7 +8,7 @@
   {#if headState.tags}
     <title>{headState.tags.title}</title>
     <meta name="description" content={headState.tags.description} />
-    {#each headState.tags.og as tag}
+    {#each headState.tags.og as tag (tag)}
       <meta {...tag} />
     {/each}
   {/if}

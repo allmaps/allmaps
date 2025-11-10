@@ -40,7 +40,7 @@
     </p>
     <!-- TODO: Add link to terms of use -->
     <div
-      class="inset-shadow-sm border-1 rounded-md border-green-400 bg-green-100 p-2 text-green-600"
+      class="rounded-md border-1 border-green-400 bg-green-100 p-2 text-green-600 inset-shadow-sm"
     >
       <TermsOfUse />
     </div>

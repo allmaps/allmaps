@@ -271,7 +271,7 @@
   class="pointer-events-none h-full w-full"
 >
   {#if warpedResourceMasksLoaded}
-    {#each animatedPolygons as { id, polygon, x, y, rotation, scale }, index}
+    {#each animatedPolygons as { id, polygon, x, y, rotation, scale }, index (index)}
       <g transform="translate({x}, {y}) rotate({rotation}) scale({scale})">
         <a
           target="_blank"

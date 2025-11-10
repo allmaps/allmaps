@@ -11,7 +11,7 @@
     onconfirm?: () => void
   }
 
-  let { button, question, onconfirm }: Props = $props()
+  let { button: confirmButton, question, onconfirm }: Props = $props()
 
   let isOpen = $state(false)
 
@@ -27,7 +27,7 @@
 
 <Popover bind:open={isOpen}>
   {#snippet button()}
-    {@render button()}
+    {@render confirmButton()}
   {/snippet}
   {#snippet contents()}
     <div class="flex w-48 flex-col items-center gap-2">
