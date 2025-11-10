@@ -1,8 +1,8 @@
-import { triangulate } from '../dist/index.js'
+import { triangulate } from '../src/index.js'
 
-let start, ops, result
+import type { Polygon } from '@allmaps/types'
 
-const polygon = [
+const polygon: Polygon = [
   [
     [138, 32],
     [77, 35],
@@ -17,14 +17,16 @@ const polygon = [
   ]
 ]
 
-function logBenchmark(polygon, distance) {
-  start = Date.now()
-  ops = 0
+function logBenchmark(polygon: Polygon, distance?: number) {
+  let start = Date.now()
+  let ops = 0
+
   while (Date.now() - start < 1000) {
     triangulate(polygon, distance)
     ops++
   }
-  result = triangulate(polygon, distance)
+
+  let result = triangulate(polygon, distance)
   console.log(
     Math.round((ops * 1000) / (Date.now() - start)) +
       ' ops/s to compute ' +
