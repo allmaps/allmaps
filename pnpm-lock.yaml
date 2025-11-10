@@ -20,6 +20,9 @@ importers:
       husky:
         specifier: ^8
         version: 8.0.3
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       turbo:
         specifier: ^2.5.5
         version: 2.5.5
@@ -347,9 +350,6 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.3.0
-      postcss:
-        specifier: ^8.4.18
-        version: 8.5.6
       prettier:
         specifier: ^3.4.2
         version: 3.6.2
@@ -374,6 +374,9 @@ importers:
       vite:
         specifier: ^6.2.6
         version: 6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)
+      vite-plugin-devtools-json:
+        specifier: ^1.0.0
+        version: 1.0.0(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1))
 
   apps/here:
     dependencies:
@@ -465,9 +468,6 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.3.0
-      postcss:
-        specifier: ^8.4.18
-        version: 8.5.6
       prettier:
         specifier: ^3.4.2
         version: 3.6.2
@@ -492,6 +492,9 @@ importers:
       vite:
         specifier: ^6.2.6
         version: 6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)
+      vite-plugin-devtools-json:
+        specifier: ^1.0.0
+        version: 1.0.0(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1))
       vite-plugin-qrcode:
         specifier: ^0.2.4
         version: 0.2.4(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1))
@@ -677,9 +680,6 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.3.0
-      postcss:
-        specifier: ^8.4.18
-        version: 8.5.6
       prettier:
         specifier: ^3.4.2
         version: 3.6.2
@@ -707,6 +707,9 @@ importers:
       vite:
         specifier: ^6.2.6
         version: 6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)
+      vite-plugin-devtools-json:
+        specifier: ^1.0.0
+        version: 1.0.0(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1))
 
   apps/tiles:
     dependencies:
@@ -774,9 +777,6 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.3.0
-      postcss:
-        specifier: ^8.4.18
-        version: 8.5.6
       prettier:
         specifier: ^3.4.2
         version: 3.6.2
@@ -801,6 +801,9 @@ importers:
       vite:
         specifier: ^6.2.6
         version: 6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)
+      vite-plugin-devtools-json:
+        specifier: ^1.0.0
+        version: 1.0.0(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1))
 
   apps/viewer:
     dependencies:
@@ -1249,6 +1252,9 @@ importers:
       vite:
         specifier: ^6.2.6
         version: 6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)
+      vite-plugin-devtools-json:
+        specifier: ^1.0.0
+        version: 1.0.0(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1))
 
   packages/id:
     devDependencies:
@@ -8582,6 +8588,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   slash@3.0.0:
@@ -18921,6 +18928,11 @@ snapshots:
     dependencies:
       uuid: 11.1.0
       vite: rolldown-vite@7.1.16(@types/node@24.9.1)(esbuild@0.25.8)(jiti@2.6.1)(tsx@4.20.4)(yaml@2.8.1)
+
+  vite-plugin-devtools-json@1.0.0(vite@6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)):
+    dependencies:
+      uuid: 11.1.0
+      vite: 6.3.5(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.4)(yaml@2.8.1)
 
   vite-plugin-dts@3.9.1(@types/node@24.9.1)(rollup@4.46.2)(typescript@5.9.2)(vite@5.4.19(@types/node@24.9.1)(lightningcss@1.30.2)):
     dependencies:

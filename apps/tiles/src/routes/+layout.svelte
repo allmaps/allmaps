@@ -3,7 +3,7 @@
 
   import { onNavigate, afterNavigate } from '$app/navigation'
 
-  import { setUrlState } from '@allmaps/components'
+  import { setUrlState } from '@allmaps/components/state'
 
   import { setUiState } from '$lib/state/ui.svelte.js'
 
