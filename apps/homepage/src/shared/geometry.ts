@@ -49,27 +49,28 @@ export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
 
 export function geometryToPath(
   geojsonPolygon: GeojsonPolygon,
-  scaleTo: number
+  width: number,
+  height?: number,
+  scale = 1
 ) {
-  const width = scaleTo
-  const height = scaleTo
+  height = height || width
 
   mercator.scale(1).translate([0, 0])
 
   const bounds = path.bounds(geojsonPolygon)
-  const scale =
-    1 /
+  const scaleFactor =
+    scale /
     Math.max(
       (bounds[1][0] - bounds[0][0]) / width,
       (bounds[1][1] - bounds[0][1]) / height
     )
 
   const translate: [number, number] = [
-    (width - scale * (bounds[1][0] + bounds[0][0])) / 2,
-    (height - scale * (bounds[1][1] + bounds[0][1])) / 2
+    (width - scaleFactor * (bounds[1][0] + bounds[0][0])) / 2,
+    (height - scaleFactor * (bounds[1][1] + bounds[0][1])) / 2
   ]
 
-  mercator.scale(scale).translate(translate)
+  mercator.scale(scaleFactor).translate(translate)
 
   const d = path(geojsonPolygon)
 

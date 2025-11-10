@@ -1,0 +1,30 @@
+body {
+  --sl-content-width: 100dvw;
+}
+
+@media print {
+  @page {
+    size: 30cm 20cm;
+    margin: 0;
+  }
+
+  /* Specific margins for different sides */
+  /* @page {
+    margin-top: 0.5in;
+    margin-bottom: 0.75in;
+    margin-left: 1.25in;
+    margin-right: 1in;
+  } */
+}
+
+.content-panel {
+  padding: 0;
+}
+
+main {
+  padding: 0;
+}
+
+footer {
+  display: none;
+}
