@@ -35,10 +35,10 @@
 </script>
 
 {#if mapsMergedState.fetched}
-  <div class="flex items-center flex-row gap-2" transition:fade>
+  <div class="flex flex-row items-center gap-2" transition:fade>
     {#if mapsCounted.complete > 0}
       <div
-        class="bg-green rounded-full px-2 py-0.5 drop-shadow-md text-xs font-bold flex items-center flex-row gap-2"
+        class="flex flex-row items-center gap-2 rounded-full bg-green px-2 py-0.5 text-xs font-bold drop-shadow-md"
       >
         <span>{mapsCounted.complete}</span>
         <MapTrifoldIcon class="size-4" weight="bold" />
@@ -46,7 +46,7 @@
     {/if}
     {#if mapsCounted.incomplete > 0}
       <div
-        class="bg-yellow rounded-full px-2 py-0.5 drop-shadow-md text-xs font-bold flex items-center flex-row gap-2"
+        class="flex flex-row items-center gap-2 rounded-full bg-yellow px-2 py-0.5 text-xs font-bold drop-shadow-md"
       >
         <span>{mapsCounted.incomplete}</span>
         <WarningIcon class="size-4" weight="bold" />

@@ -21,7 +21,7 @@
 
 <span
   class={[
-    'border-1 inline-flex items-center gap-1 rounded-md px-1 py-0 text-xs',
+    'inline-flex items-center gap-1 rounded-md border-1 px-1 py-0 text-xs',
     colorClasses[sourceType]
   ]}
 >

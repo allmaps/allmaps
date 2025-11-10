@@ -31,7 +31,7 @@ import type { SourceState } from '$lib/state/source.svelte'
 import type { ErrorState } from '$lib/state/error.svelte'
 import type { MapsHistoryState } from '$lib/state/maps-history.svelte'
 
-import type { Point, SearchParams } from '$lib/types/shared.js'
+import type { Point } from '$lib/types/shared.js'
 import type {
   ResourceMask,
   DbMaps,
@@ -307,7 +307,9 @@ export class MapsState extends MapsEventTarget {
             this.dispatchEvent(
               new CustomEvent<InsertResourceMaskPoint>(
                 MapsEvents.INSERT_RESOURCE_MASK_POINT,
-                { detail }
+                {
+                  detail
+                }
               )
             )
           } else if (isReplaceInstruction(instruction)) {
@@ -323,7 +325,9 @@ export class MapsState extends MapsEventTarget {
             this.dispatchEvent(
               new CustomEvent<ReplaceResourceMaskPoint>(
                 MapsEvents.REPLACE_RESOURCE_MASK_POINT,
-                { detail }
+                {
+                  detail
+                }
               )
             )
           } else if (isRemoveInstruction(instruction)) {
@@ -335,7 +339,9 @@ export class MapsState extends MapsEventTarget {
             this.dispatchEvent(
               new CustomEvent<RemoveResourceMaskPoint>(
                 MapsEvents.REMOVE_RESOURCE_MASK_POINT,
-                { detail }
+                {
+                  detail
+                }
               )
             )
           } else {

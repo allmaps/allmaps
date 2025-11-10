@@ -2,7 +2,7 @@
   import { fromError } from 'zod-validation-error'
 
   import { MapMonster } from '@allmaps/components'
-  import { red, shades } from '@allmaps/tailwind'
+  import { shades } from '@allmaps/tailwind'
 
   import { FetchError, type FetchErrorDetails } from '$lib/shared/errors.js'
 
@@ -161,7 +161,7 @@
   </p>
   <p>This is the output of the Allmaps IIIF parser:</p>
   <p
-    class="max-h-96 overflow-y-auto break-all rounded-md bg-[#2e3440ff] p-2 font-mono text-sm text-[#eceff4]"
+    class="max-h-96 overflow-y-auto rounded-md bg-[#2e3440ff] p-2 font-mono text-sm break-all text-[#eceff4]"
   >
     {details.message}
   </p>

@@ -104,7 +104,7 @@
   afterNavigate(() => (beforeTimeoutActiveImageId = undefined))
 </script>
 
-<div class="max-w-(--breakpoint-lg) m-auto flex flex-col gap-4 p-4">
+<div class="m-auto flex max-w-(--breakpoint-lg) flex-col gap-4 p-4">
   {#if sourceState.parsedIiif && sourceState.parsedIiif.type === 'collection'}
     <Collection
       parsedIiifAtPath={sourceState.parsedIiifAtPath}

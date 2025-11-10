@@ -24,8 +24,8 @@
 
 <div class="flex flex-col gap-2">
   <div class="flex flex-row items-center justify-between gap-2">
-    <h3 class="font-bold text-lg">
-      <a class="inline-flex gap-2 items-center" href={openUrl || url}
+    <h3 class="text-lg font-bold">
+      <a class="inline-flex items-center gap-2" href={openUrl || url}
         ><span>{label}</span> <ArrowSquareOutIcon /></a
       >
     </h3>
@@ -39,14 +39,14 @@
       {@render children()}
     </div>
   {/if}
-  <div class="flex justify-between items-center gap-2">
+  <div class="flex items-center justify-between gap-2">
     <input
       bind:this={input}
       readonly
       type="text"
       value={url}
-      class="w-full px-2 py-1 rounded-lg bg-white outline-none border-solid border-gray-100 border-1 transition-colors
-      focus-visible:border-pink inset-shadow-xs"
+      class="w-full rounded-lg border-1 border-solid border-gray-100 bg-white px-2 py-1 inset-shadow-xs transition-colors
+      outline-none focus-visible:border-pink"
       onfocus={handleFocus}
     />
     <Copy value={url} />

@@ -89,7 +89,7 @@
     <div>Type:</div>
     <a class="underline" href={typeUrl}>{typeString}</a>
     <div>URL:</div>
-    <a class="underline break-all" href={sourceState.source.url}
+    <a class="break-all underline" href={sourceState.source.url}
       >{sourceState.source?.url}</a
     >
   {/if}
@@ -104,9 +104,9 @@
   {#if metadataStrings.length}
     <div class="col-span-2">Metadata:</div>
     <dl
-      class="grid grid-cols-subgrid col-span-2 gap-2 w-full max-h-36 overflow-auto shadow-inner p-2 bg-[rgba(220,220,220,0.1)] rounded-md"
+      class="col-span-2 grid max-h-36 w-full grid-cols-subgrid gap-2 overflow-auto rounded-md bg-[rgba(220,220,220,0.1)] p-2 shadow-inner"
     >
-      {#each metadataStrings as { label, value }}
+      {#each metadataStrings as { label, value }, index (index)}
         <dt>{label}</dt>
         <dd class="break-all">{value}</dd>
       {/each}
@@ -118,7 +118,7 @@
     <div>URL:</div>
     <div>
       <a
-        class="underline break-all"
+        class="break-all underline"
         href={`${sourceState.activeImage?.uri}/info.json`}
         >{sourceState.activeImage?.uri}</a
       >

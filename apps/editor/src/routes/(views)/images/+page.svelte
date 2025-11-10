@@ -21,7 +21,7 @@
   })
 </script>
 
-<div class="bg-blue/75 h-full w-full overflow-auto" bind:this={scrollContainer}>
+<div class="h-full w-full overflow-auto bg-blue/75" bind:this={scrollContainer}>
   <DotsPattern color={blue}>
     <div class="py-14">
       <Images />

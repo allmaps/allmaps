@@ -5,11 +5,11 @@
 </script>
 
 <p
-  class="text-center self-center cloud text-sm text-green"
+  class="cloud self-center text-center text-sm text-green"
   style="--green: {green}"
 >
   <CloudCheckIcon
-    class="relative size-6 inline-block -top-0.5 pr-1"
+    class="relative -top-0.5 inline-block size-6 pr-1"
     weight="duotone"
   />
   <span>All edits are automatically saved in the Allmaps database</span>

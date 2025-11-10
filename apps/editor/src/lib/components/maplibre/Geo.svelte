@@ -34,7 +34,6 @@
   import type { TransformationType } from '@allmaps/transform'
 
   import type {
-    InsertMapEvent,
     RemoveMapEvent,
     ReplaceResourceMaskEvent,
     ReplaceGcpsEvent,
@@ -55,13 +54,11 @@
   type Props = {
     mapIds: string[]
     initialViewport?: Viewport
-    terrain?: boolean
     geoMap?: Map
     warpedMapLayer?: WarpedMapLayer
     warpedMapLayerBounds?: LngLatBoundsLike
     warpedMapsOpacity?: number
     renderMasks?: boolean
-    onlyRenderActiveMap?: boolean
     onmoveend?: (bounds: LngLatBoundsLike) => void
     onBeforeSetStyle?: () => void
     onAfterSetStyle?: () => void
@@ -75,7 +72,6 @@
     warpedMapLayer = $bindable<WarpedMapLayer | undefined>(),
     warpedMapsOpacity = 1,
     renderMasks = false,
-    onlyRenderActiveMap = false,
     onmoveend,
     warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>(),
     onBeforeSetStyle,
@@ -85,7 +81,7 @@
 
   let backgroundWarpedMapLayer = $state.raw<WarpedMapLayer>()
 
-  let currentMapIds = $state<SvelteSet<string>>(new SvelteSet([]))
+  let currentMapIds = new SvelteSet<string>([])
 
   let currentBackgroundGeoreferenceAnnotationUrl = $state<string>()
 
@@ -286,12 +282,11 @@
     }
   }
 
-  function handleContextmenu(event: MapMouseEvent) {
+  function handleContextmenu() {
+    // event: MapMouseEvent
     // const mapId = findFirstMapFromEvent(event)
     // TODO: implement contextmenu handling
   }
-
-  function handleInsertMap(event: InsertMapEvent) {}
 
   function handleRemoveMap(event: RemoveMapEvent) {
     const mapId = event.detail.mapId
@@ -457,7 +452,6 @@
 
     uiState.addEventListener(UiEvents.TOGGLE_VISIBLE, handleToggleVisible)
 
-    mapsState.addEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
     mapsState.addEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
 
     mapsState.addEventListener(
@@ -501,7 +495,6 @@
 
       uiState.removeEventListener(UiEvents.TOGGLE_VISIBLE, handleToggleVisible)
 
-      mapsState.removeEventListener(MapsEvents.INSERT_MAP, handleInsertMap)
       mapsState.removeEventListener(MapsEvents.REMOVE_MAP, handleRemoveMap)
 
       mapsState.removeEventListener(

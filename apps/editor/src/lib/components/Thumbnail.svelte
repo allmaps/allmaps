@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fetchJson, fetchImageInfo } from '@allmaps/stdlib'
+  import { fetchImageInfo } from '@allmaps/stdlib'
 
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
@@ -54,7 +54,7 @@
       class="h-full w-full {mode === 'cover'
         ? 'object-cover'
         : 'object-contain'}"
-      alt={`Thumbnail for`}
+      alt={`Thumbnail for ${firstThumbnail.id}`}
       src={firstThumbnail.id}
     />
   {:else if parsedIiif.type === 'image'}

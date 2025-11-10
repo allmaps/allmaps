@@ -14,8 +14,8 @@
 
 {#if message.type === 'success'}
   <div
-    class="inset-shadow-xs flex items-center gap-2 rounded
-    bg-green-100 p-2 text-green-600"
+    class="flex items-center gap-2 rounded bg-green-100
+    p-2 text-green-600 inset-shadow-xs"
   >
     <CheckCircleIcon class="shrink-0" weight="bold" />
     <p>{message.text}</p>

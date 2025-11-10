@@ -17,7 +17,7 @@ const URL_KEY = Symbol('url')
 // Infer the actual type returned by params getter (handles parse function and defaults)
 type InferParamType<T> =
   T extends SearchParam<infer U>
-    ? T extends { parse: (...args: any[]) => any }
+    ? T extends { parse: (...args: unknown[]) => unknown }
       ? U
       : string
     : never
@@ -29,6 +29,9 @@ type ParamsProxy<T extends SearchParams> = {
     : InferParamType<T[K]> | undefined
 }
 
+// TODO: add another generic parameter
+// R extends RouteId | Pathname
+// import type { RouteId, Pathname } from '$app/types'
 export class UrlState<T extends SearchParams> {
   #url: SvelteURL
 
@@ -57,7 +60,7 @@ export class UrlState<T extends SearchParams> {
           if (parsedValue === undefined) {
             const paramConfig = this.#searchParams[
               prop as keyof T
-            ] as SearchParam<any>
+            ] as SearchParam<unknown>
             if (paramConfig && 'default' in paramConfig) {
               return paramConfig.default
             }
@@ -69,7 +72,7 @@ export class UrlState<T extends SearchParams> {
       },
       // TODO: Setting a single parameter triggers updates for all other parameters
       // We might be able to optimize this by using the SvelteURLSearchParams class.
-      set: (target, prop: string | symbol, value: any) => {
+      set: (target, prop: string | symbol, value: unknown) => {
         if (typeof prop === 'string' && prop in this.#searchParams) {
           const newSearchParams = new URLSearchParams(this.#url.searchParams)
 
@@ -77,7 +80,7 @@ export class UrlState<T extends SearchParams> {
 
           const paramConfig = this.#searchParams[
             prop as keyof T
-          ] as SearchParam<any>
+          ] as SearchParam<unknown>
 
           let defaultStringValue: string | undefined = undefined
           if (this.#searchParams[prop].default) {
@@ -116,7 +119,9 @@ export class UrlState<T extends SearchParams> {
     urlSearchParams: URLSearchParams,
     key: K
   ): InferParamType<T[K]> | undefined {
-    const param = this.#searchParams[key] as SearchParam<any>
+    const param = this.#searchParams[key] as SearchParam<
+      ExtractSearchParamType<T[K]>
+    >
     if (!param) {
       return undefined
     }
@@ -128,25 +133,27 @@ export class UrlState<T extends SearchParams> {
 
     // If param has a parse function, use it
     if (Object.hasOwn(param, 'parse') && param.parse) {
-      return param.parse(value)
+      return param.parse(value) as InferParamType<T[K]>
     }
 
     // Default behavior: return the string value
-    return value as any
+    return value as InferParamType<T[K]>
   }
 
   #stringifyParam<K extends keyof T>(
-    value: InferParamType<T[K]>,
+    value: unknown,
     key: K
   ): string | undefined {
-    const param = this.#searchParams[key] as SearchParam<any>
+    const param = this.#searchParams[key] as SearchParam<
+      ExtractSearchParamType<T[K]>
+    >
     if (!param || value === undefined || value === null) {
       return undefined
     }
 
     // If param has a toString function, use it
     if (Object.hasOwn(param, 'toString') && param.toString) {
-      return param.toString(value)
+      return param.toString(value as ExtractSearchParamType<T[K]>)
     }
 
     // Default behavior: use JavaScript's toString
@@ -163,18 +170,20 @@ export class UrlState<T extends SearchParams> {
     key: K,
     value: string
   ): InferParamType<T[K]> | undefined {
-    const param = this.#searchParams[key] as SearchParam<any>
+    const param = this.#searchParams[key] as SearchParam<
+      ExtractSearchParamType<T[K]>
+    >
     if (!param) {
       return undefined
     }
 
     // If param has a parse function, use it
     if (param.parse) {
-      return param.parse(value)
+      return param.parse(value) as InferParamType<T[K]>
     }
 
     // Default behavior: return the string value
-    return value as any
+    return value as InferParamType<T[K]>
   }
 
   /**
@@ -205,8 +214,10 @@ export class UrlState<T extends SearchParams> {
     for (const key in params) {
       if (key in this.#searchParams) {
         const value = params[key]
-        const stringValue = this.#stringifyParam(value as any, key as keyof T)
-        const paramConfig = this.#searchParams[key] as SearchParam<any>
+        const stringValue = this.#stringifyParam(value, key as keyof T)
+        const paramConfig = this.#searchParams[key] as SearchParam<
+          ExtractSearchParamType<T[keyof T]>
+        >
 
         if (stringValue !== undefined && stringValue !== null) {
           newSearchParams.set(paramConfig.key, stringValue)

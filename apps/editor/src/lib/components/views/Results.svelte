@@ -13,11 +13,6 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
 
-  // ----
-  import { getMapsState } from '$lib/state/maps.svelte.js'
-  import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
-  // ====
-
   import {
     getNavPlaceViewport,
     getBboxViewport,
@@ -48,11 +43,6 @@
   const scopeState = getScopeState()
   const sourceState = getSourceState()
   const urlState = getUrlState()
-
-  // ----
-  const mapsState = getMapsState()
-  const mapsMergedState = getMapsMergedState()
-  // ====
 
   const geoViewport = $derived(getGeoViewport())
 
@@ -174,16 +164,6 @@
 
   function handleToggleRenderMasks() {
     uiState.resultsOptions.renderMasks = !uiState.resultsOptions.renderMasks
-  }
-
-  function fitWarpedMapLayerBounds() {
-    if (geoMap && warpedMapLayerBounds) {
-      //         console.log('nu dezeeeeeeeee fitounds')
-      geoMap.fitBounds(warpedMapLayerBounds, {
-        duration: MAPLIBRE_FIT_BOUNDS_DURATION,
-        padding: MAPLIBRE_PADDING
-      })
-    }
   }
 
   $effect(() => {

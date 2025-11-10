@@ -45,9 +45,9 @@
         {#snippet header()}
           <button
             onclick={() => (uiState.modalOpen.annotation = true)}
-            class="bg-darkblue/90 hover:bg-darkblue/100 flex cursor-pointer flex-row items-center gap-1.5
-        rounded-full px-3 py-1 text-sm
-      font-medium text-white shadow-none transition-all hover:shadow-md"
+            class="flex cursor-pointer flex-row items-center gap-1.5 rounded-full bg-darkblue/90
+        px-3 py-1 text-sm font-medium
+      text-white shadow-none transition-all hover:bg-darkblue/100 hover:shadow-md"
           >
             <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
               class="hidden sm:inline-block"
@@ -69,9 +69,10 @@
 
       <button
         onclick={() => (uiState.modalOpen.export = true)}
-        class="bg-green drop-shadow-xs hover:bg-green/90 hover:drop-shadow-lg/30 cursor-pointer self-center
-        rounded-full px-4 py-2
-        font-medium text-white transition-all">Show more export options</button
+        class="cursor-pointer self-center rounded-full bg-green px-4 py-2
+        font-medium text-white drop-shadow-xs
+        transition-all hover:bg-green/90 hover:drop-shadow-lg/30"
+        >Show more export options</button
       >
     {/if}
   {:else}

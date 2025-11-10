@@ -58,7 +58,7 @@
 
   <button
     disabled={!zoomToExtentEnabled}
-    class="not-disabled:cursor-pointer disabled:text-gray size-8 rounded-full bg-white p-1.5 shadow-md transition-all"
+    class="size-8 rounded-full bg-white p-1.5 shadow-md transition-all not-disabled:cursor-pointer disabled:text-gray"
     onclick={handleZoomToExtentClick}
   >
     <CornersOutIcon size="100%" weight="regular" />

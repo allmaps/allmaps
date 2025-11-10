@@ -91,13 +91,13 @@
 
 <Modal bind:open={uiState.modalOpen.command}>
   <Command.Root
-    class="focus:outline-hidden flex h-full w-full flex-col self-start overflow-hidden rounded-xl"
+    class="flex h-full w-full flex-col self-start overflow-hidden rounded-xl focus:outline-hidden"
   >
     <div class="flex items-center gap-2 p-2">
       <MagnifyingGlassIcon class="size-4 shrink-0" />
       <Command.Input
         class="focus-override placeholder:text-foreground-alt/50 inline-flex w-full truncate rounded-lg border-none bg-white
-        transition-colors focus:outline-none focus:ring-0"
+        transition-colors focus:ring-0 focus:outline-none"
         placeholder="Search for something or paste a IIIF URL…"
         bind:value
       />
@@ -110,16 +110,16 @@
       <ClipboardIcon weight="bold" class="size-4 shrink-0" />
       <p>Paste a URL to open a new IIIF resource and start georeferencing</p>
     </div> -->
-    <Command.List class="overflow-y-auto overflow-x-hidden pb-2">
+    <Command.List class="overflow-x-hidden overflow-y-auto pb-2">
       <Command.Viewport>
         <Command.Empty
-          class="text-muted-foreground flex w-full items-center justify-center pb-6 pt-8 text-sm"
+          class="text-muted-foreground flex w-full items-center justify-center pt-8 pb-6 text-sm"
         >
           No results found.
         </Command.Empty>
         <Command.Group>
           <Command.GroupHeading
-            class="text-muted-foreground px-3 pb-2 pt-4 text-xs"
+            class="text-muted-foreground px-3 pt-4 pb-2 text-xs"
           >
             Georeference a new map
           </Command.GroupHeading>
@@ -127,7 +127,7 @@
             {#if mightBeUrl}
               <Command.Item
                 {value}
-                class="flex h-10 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none data-[selected]:bg-gray-100"
+                class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
                 onSelect={handleOpenUrl}
               >
                 <CopyIcon class="size-4 shrink-0" />
@@ -139,7 +139,7 @@
             {/if}
 
             <Command.Item
-              class="flex h-10 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
               keywords={['iiif resource', 'open']}
               onSelect={handleNewIiifResource}
             >
@@ -148,7 +148,7 @@
             </Command.Item>
 
             <Command.Item
-              class="flex h-10 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
               keywords={['iiif', 'resource', 'open', 'random', 'example']}
               onSelect={handleRandomIiifResource}
             >
@@ -159,13 +159,13 @@
         </Command.Group>
         <Command.Group>
           <Command.GroupHeading
-            class="text-muted-foreground px-3 pb-2 pt-4 text-xs"
+            class="text-muted-foreground px-3 pt-4 pb-2 text-xs"
           >
             Copy to Clipboard
           </Command.GroupHeading>
           <Command.GroupItems>
             <Command.Item
-              class="flex h-10 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
               keywords={[
                 'copy',
                 'georeference',
@@ -183,7 +183,7 @@
             </Command.Item>
 
             <Command.Item
-              class="flex h-10 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
               keywords={['copy', 'georeference', 'viewer', 'clipboard']}
               onSelect={handleCopyViewerUrlToClipboard}
             >
@@ -192,7 +192,7 @@
             </Command.Item>
 
             <Command.Item
-              class="flex h-10 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
               keywords={['copy', 'georeference', 'annotation', 'clipboard']}
               onSelect={handleCopyGeoreferenceAnnotationToClipboard}
             >

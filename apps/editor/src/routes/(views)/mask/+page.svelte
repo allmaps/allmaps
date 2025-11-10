@@ -5,7 +5,7 @@
   import ResourceMask from '$lib/components/views/ResourceMask.svelte'
 </script>
 
-<div class="bg-green/50 h-full w-full">
+<div class="h-full w-full bg-green/50">
   <DotsPattern color={green} opacity={0.3}>
     <ResourceMask />
   </DotsPattern>

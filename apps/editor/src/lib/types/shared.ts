@@ -149,7 +149,7 @@ export type CollectionPath = {
   page?: number
 }[]
 
-export type SearchParam<T> = {
+export type SearchParam<T = unknown> = {
   key: string
   default?: T
   toString?: (value: T) => string | undefined
@@ -157,6 +157,7 @@ export type SearchParam<T> = {
 }
 
 export type SearchParams = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [K in string]: SearchParam<any>
 }
 

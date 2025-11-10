@@ -21,7 +21,7 @@
   <div
     class="flex items-center gap-1 rounded-md bg-white p-2 shadow-md sm:gap-2"
   >
-    <div class="hidden whitespace-nowrap leading-tight sm:inline-block">
+    <div class="hidden leading-tight whitespace-nowrap sm:inline-block">
       <span class="hidden md:inline-block">Map&nbsp;</span
       >{scopeState.activeMapIndex + 1} of {scopeState.mapsCount}
     </div>

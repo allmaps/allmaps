@@ -82,7 +82,7 @@ export function getResourceCrs(dbMap: DbMap): DbProjection | undefined {
 }
 
 export function getGcps(dbMap: DbMap): DbGcp3[] {
-  let gcps = Object.values(dbMap.gcps).sort(
+  const gcps = Object.values(dbMap.gcps).sort(
     (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
   )
 

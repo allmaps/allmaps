@@ -90,7 +90,7 @@
   }
 
   function handleGcpsEdited(mapId: string, gcps: GCPs) {
-    const gcpsWithId = gcps.map((gcp, index) => ({
+    const gcpsWithId = gcps.map((gcp) => ({
       ...gcp,
       id: generateRandomId()
     }))
@@ -125,7 +125,7 @@
                 aria-label="Select map {index + 1}"
               >
                 <svg
-                  class="stroke-pink h-full w-full fill-none stroke-2"
+                  class="h-full w-full fill-none stroke-pink stroke-2"
                   viewBox={thumbnailViewbox(map)}
                 >
                   <polygon
@@ -147,7 +147,7 @@
             <div>
               {#if isActiveMap}
                 <button
-                  class="text-pink cursor-pointer rounded-full px-2 py-1 text-sm hover:underline"
+                  class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
                   onclick={() => (uiState.modalOpen.editResourceMask = true)}
                   >Edit or import mask…</button
                 >
@@ -199,7 +199,7 @@
               class="col-span-9 grid grid-cols-subgrid"
               transition:slide={{ duration: 250, axis: 'y' }}
             >
-              {#each gcps as gcp, index}
+              {#each gcps as gcp, index (gcp.id)}
                 {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
                 <li class="contents">
                   <div class="col-span-8 grid grid-cols-subgrid gap-0">
@@ -212,7 +212,7 @@
                         class="inline-flex size-4 items-center justify-center"
                       >
                         <span
-                          class="bg-pink size-3 rounded-full transition-all"
+                          class="size-3 rounded-full bg-pink transition-all"
                           class:size-3={!isActiveGcp}
                           class:size-4={isActiveGcp}
                         ></span>
@@ -278,7 +278,7 @@
 
           <div class="col-span-9 place-self-end">
             <button
-              class="text-pink cursor-pointer rounded-full px-2 py-1 text-sm hover:underline"
+              class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
               onclick={() => (uiState.modalOpen.editGcps = true)}
               >Edit or import GCPs…</button
             >

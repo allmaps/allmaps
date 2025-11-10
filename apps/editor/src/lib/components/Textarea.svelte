@@ -7,13 +7,13 @@
 </script>
 
 <div
-  class="relative rounded-md inset-shadow-2xs
-  bg-[:#2e3440ff] text-[#d8dee9ff] overflow-hidden"
+  class="relative overflow-hidden rounded-md
+  bg-[:#2e3440ff] text-[#d8dee9ff] inset-shadow-2xs"
 >
   <textarea
     {rows}
     spellcheck="false"
-    class="w-full h-auto p-2 font-mono align-top"
+    class="h-auto w-full p-2 align-top font-mono"
     bind:value
     {...restProps}
   ></textarea>

@@ -3,8 +3,8 @@ import { setContext, getContext } from 'svelte'
 import { IIIF, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
 import { parseAnnotation } from '@allmaps/annotation'
 
-import { UrlState } from '$lib/state/url.svelte'
-import { ErrorState } from '$lib/state/error.svelte'
+import type { UrlState } from '$lib/state/url.svelte.js'
+import type { ErrorState } from '$lib/state/error.svelte.js'
 
 import { searchParams } from '$lib/shared/params.js'
 import { superFetch } from '$lib/shared/fetch.js'
@@ -41,6 +41,7 @@ export class SourceState {
 
   #parsedManifest = $derived.by<IIIFManifest | undefined>(() => {
     // Update this derived when fetching states change
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.#fetchingInsideCollection
 
     if (this.#source && this.#source.type === 'manifest') {
@@ -63,7 +64,7 @@ export class SourceState {
     }
   })
 
-  #manifestImageIdsDontMatch = $state(false)
+  // #manifestImageIdsDontMatch = $state(false)
 
   #editSource = $derived.by<ManifestSource | ImageSource | undefined>(() => {
     const sourceType = this.#source?.type
@@ -167,29 +168,30 @@ export class SourceState {
 
   #parsedIiifAtPath = $derived.by<IIIFResource | undefined>(() => {
     // Update this derived when fetching states change
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     this.#fetchingInsideCollection
 
     return this.#getParsedIiifAtPath(this.#urlState.params.path)
   })
 
-  #parsedIiifParents = $derived.by<IIIFResource[]>(() => {
-    // Update this derived when fetching states change
-    this.#fetchingInsideCollection
+  // #parsedIiifParents = $derived.by<IIIFResource[]>(() => {
+  //   // Update this derived when fetching states change
+  //   this.#fetchingInsideCollection
 
-    const parents: IIIFResource[] = []
-    let currentPath: CollectionPath = []
+  //   const parents: IIIFResource[] = []
+  //   let currentPath: CollectionPath = []
 
-    for (let i = 0; i < this.#urlState.params.path.length; i++) {
-      currentPath = this.#urlState.params.path.slice(0, i)
-      const parsedIiifAtPath = this.#getParsedIiifAtPath(currentPath)
+  //   for (let i = 0; i < this.#urlState.params.path.length; i++) {
+  //     currentPath = this.#urlState.params.path.slice(0, i)
+  //     const parsedIiifAtPath = this.#getParsedIiifAtPath(currentPath)
 
-      if (parsedIiifAtPath) {
-        parents.push(parsedIiifAtPath)
-      }
-    }
+  //     if (parsedIiifAtPath) {
+  //       parents.push(parsedIiifAtPath)
+  //     }
+  //   }
 
-    return parents
-  })
+  //   return parents
+  // })
 
   #imageCount = $derived(this.#imagesByImageId.size)
 
@@ -258,7 +260,7 @@ export class SourceState {
   }
 
   async #fetchIiif(url: string, sourceIiif: unknown) {
-    let parsedIiif = IIIF.parse(sourceIiif, {
+    const parsedIiif = IIIF.parse(sourceIiif, {
       keepSource: true
     })
 

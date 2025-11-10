@@ -90,10 +90,10 @@
         weight="bold"
       />
       <ol class="contents">
-        {#each Object.entries(itemsTypesCount) as [type, count]}
+        {#each Object.entries(itemsTypesCount) as [type, count] (type)}
           <li class="contents">
             <span
-              class="border-1 border-blue col-start-3 rounded-xl bg-white/80 px-2 py-0.5 text-center text-xs tabular-nums"
+              class="col-start-3 rounded-xl border-1 border-blue bg-white/80 px-2 py-0.5 text-center text-xs tabular-nums"
               >{count}</span
             >
             <div class="col-start-4">
@@ -117,7 +117,7 @@
   class={[
     'grid grid-rows-[1fr_min-content] gap-2',
     showThumbnail ? 'h-62 grid-cols-[min-content_1fr]' : 'grid-cols-1',
-    'border-1 group w-full cursor-pointer rounded-lg border-blue-600 bg-blue-200 p-2 transition-colors hover:bg-blue-100 md:gap-4'
+    'group w-full cursor-pointer rounded-lg border-1 border-blue-600 bg-blue-200 p-2 transition-colors hover:bg-blue-100 md:gap-4'
   ]}
 >
   {#if showThumbnail}
@@ -126,7 +126,7 @@
     >
       {#if thumbnail}
         <img
-          class="inset-shadow-xs h-full w-full rounded object-contain"
+          class="h-full w-full rounded object-contain inset-shadow-xs"
           src={thumbnail.id}
           alt="Thumbnail"
         />
