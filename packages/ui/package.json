@@ -38,12 +38,7 @@
     "watch": "svelte-package --watch",
     "build": "svelte-kit sync && svelte-package && publint",
     "html-build": "vite build",
-    "lerna-html-build": "lerna run html-build --scope @allmaps/ui --include-dependencies",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check src && eslint src --ext .ts,.svelte",
-    "format": "prettier --write src",
-    "types": "tsc --noEmit"
+    "lerna-html-build": "lerna run html-build --scope @allmaps/ui --include-dependencies"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
