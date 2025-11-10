@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { z } from 'zod'
 import { fromZodError } from 'zod-validation-error'
@@ -24,15 +24,15 @@ type TestFile = {
 }
 
 fs.readdirSync(inputDir)
-  .filter((filename) => filename.endsWith('.json'))
-  .map((filename): TestFile => {
+  .filter((filename: string) => filename.endsWith('.json'))
+  .map((filename: string): TestFile => {
     const basename = path.basename(filename, '.json')
 
     const match = /(?<type>\w+)\.(?<id>.+)/.exec(basename)
 
     let type: string | undefined
     if (match) {
-      let { groups: { type: matchedType } = {} } = match
+      const { groups: { type: matchedType } = {} } = match
       type = matchedType
     }
 

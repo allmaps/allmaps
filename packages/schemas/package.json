@@ -27,8 +27,8 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src",
     "types": "tsc --noEmit"
   },
   "license": "MIT",

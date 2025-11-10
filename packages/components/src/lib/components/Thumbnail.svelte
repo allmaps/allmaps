@@ -106,8 +106,8 @@
       style:top={mode === 'contain' ? getTopStyle(tilesWidth, tilesHeight) : ''}
       style:height="{(borderBoxHeight / borderBoxWidth) * 100}%"
     >
-      {#each imageRequest as row, rowIndex}
-        {#each row as tile, columnIndex}
+      {#each imageRequest as row, rowIndex (rowIndex)}
+        {#each row as tile, columnIndex (columnIndex)}
           <img
             class="max-w-full h-full"
             src={parsedImage.getImageUrl(tile)}

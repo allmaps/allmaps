@@ -263,7 +263,6 @@ export class Collection extends EmbeddedCollection {
    */
   static parse(iiifCollection: unknown, options?: Partial<ParseOptions>) {
     const { majorVersion, keepSource } = options || {}
-    const constructorOptions = { keepSource }
 
     let parsedCollection
 
@@ -306,7 +305,7 @@ export class Collection extends EmbeddedCollection {
   }
 
   async fetchItemWithIndex(index: number, fetchFn = fetch) {
-    let item = this.items[index]
+    const item = this.items[index]
 
     if (item.type === 'manifest' && item.embedded === true) {
       const manifestUri = item.uri

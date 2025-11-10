@@ -41,7 +41,7 @@ const tests = [
   }
 ]
 
-for (let { filename, region, size, expectedUrl } of tests) {
+for (const { filename, region, size, expectedUrl } of tests) {
   let regionStr = 'full'
   if (region) {
     regionStr = `${region.x},${region.y},${region.width},${region.height}`

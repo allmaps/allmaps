@@ -20,10 +20,7 @@
     "lerna-build": "lerna run build --scope @allmaps/viewer --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check src && eslint src --ext .ts,.svelte",
-    "format": "prettier --write src",
-    "types": "tsc --noEmit"
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",

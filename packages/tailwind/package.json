@@ -29,9 +29,9 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test",
+    "format": "prettier --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",

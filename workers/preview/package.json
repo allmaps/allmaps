@@ -19,9 +19,9 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev --port $(../../port.js preview) --env dev",
     "lerna-build": "lerna run build --scope @allmaps/preview --include-dependencies",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test"
+    "format": "prettier --write src"
   },
   "license": "MIT",
   "devDependencies": {

@@ -34,8 +34,8 @@
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",

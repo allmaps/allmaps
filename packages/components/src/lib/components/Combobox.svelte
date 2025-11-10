@@ -130,7 +130,7 @@
                   {#each groups as group, index (index)}
                     {@const lastGroup = index === items.length - 1}
                     {#each group as item (item.value)}
-                      {@const { value, label, Icon } = item}
+                      {@const { value, label } = item}
                       <Combobox.Item
                         class="flex items-center justify-between h-10 w-full select-none rounded-md p-1 text-sm
             cursor-pointer truncate outline-none data-[highlighted]:bg-gray-100"

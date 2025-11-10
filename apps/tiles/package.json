@@ -26,17 +26,17 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
+    "@allmaps/components": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
-    "@allmaps/components": "workspace:^",
     "ol": "^8.2.0"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
-    "@sveltejs/adapter-static": "^3.0.0",
     "@eslint/compat": "^1.2.5",
     "@eslint/js": "^9.18.0",
+    "@sveltejs/adapter-static": "^3.0.0",
     "@sveltejs/kit": "^2.21.5",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tailwindcss/vite": "^4.0.0",

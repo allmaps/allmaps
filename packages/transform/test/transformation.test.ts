@@ -183,7 +183,7 @@ describe('Thin plate spline transformation distortion', async () => {
 
   // TODO getToGeoTransformation shouldn't return a BaseTransformation but a
   // GeoHelmertTransformation. Until then:
-  // @ts-ignore
+  // @ts-expect-error return GeoHelmertTransformation
   const referenceScale = toGeoHelmertTransformation.getMeasures().scale
 
   const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')

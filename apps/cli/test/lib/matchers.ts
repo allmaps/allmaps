@@ -1,26 +1,29 @@
 import { expect } from 'vitest'
 
 declare module 'vitest' {
-  interface Assertion<T = any> {
-    toRoughlyEqual(expected: any, precision: number): void
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface Assertion {
+    toRoughlyEqual(expected: unknown, precision: number): void
     toRoughlyEqualText(expected: string, decimalPlaces: number): void
   }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface AsymmetricMatchersContaining {
-    toRoughlyEqual(expected: any, precision: number): void
+    toRoughlyEqual(expected: unknown, precision: number): void
     toRoughlyEqualText(expected: string, decimalPlaces: number): void
   }
 }
 
 function deepEqualWithPrecision(
-  actual: any,
-  expected: any,
+  actual: unknown,
+  expected: unknown,
   precision: number,
   path: string = 'root'
 ): {
   pass: boolean
   failPath?: string
-  actualValue?: any
-  expectedValue?: any
+  actualValue?: unknown
+  expectedValue?: unknown
 } {
   // Handle null/undefined
   if (actual === expected) {
@@ -128,7 +131,7 @@ function deepEqualWithPrecision(
 }
 
 expect.extend({
-  toRoughlyEqual(received: any, expected: any, precision: number) {
+  toRoughlyEqual(received: unknown, expected: unknown, precision: number) {
     const result = deepEqualWithPrecision(received, expected, precision)
 
     if (!result.pass) {

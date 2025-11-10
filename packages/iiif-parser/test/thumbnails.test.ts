@@ -63,7 +63,7 @@ const tests = [
   }
 ]
 
-for (let { filename, thumbnailSize, mode, expectedUrl } of tests) {
+for (const { filename, thumbnailSize, mode, expectedUrl } of tests) {
   describe(`${thumbnailSize.width}×${thumbnailSize.height} thumbnail for ${filename}`, () => {
     test('should match expected URL', () => {
       const image = readJson(filename)

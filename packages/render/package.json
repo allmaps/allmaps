@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/render",
-  "version": "1.0.0-beta.76",
+  "version": "1.0.0-beta.78",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -37,9 +37,9 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test",
+    "format": "prettier --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",

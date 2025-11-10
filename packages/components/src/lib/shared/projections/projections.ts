@@ -23,7 +23,7 @@ export const webMercatorPickerProjection: PickerProjection = {
   epsg: 3857
 }
 
-function emptyIndex(_: unknown): PickerProjection[] {
+function emptyIndex(): PickerProjection[] {
   return []
 }
 

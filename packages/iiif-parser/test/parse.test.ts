@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { z } from 'zod'
 
@@ -25,8 +25,8 @@ type TestFile = {
 }
 
 fs.readdirSync(inputDir)
-  .filter((filename) => filename.endsWith('.json'))
-  .map((filename): TestFile => {
+  .filter((filename: string) => filename.endsWith('.json'))
+  .map((filename: string): TestFile => {
     const basename = path.basename(filename, '.json')
 
     const inputFilename = path.join(inputDir, `${basename}.json`)
@@ -91,12 +91,12 @@ function runTests(file: TestFile) {
         expect(file.expected.errors.sort()).to.deep.equal(file.errors.sort())
       })
     } else if (file.output && file.expected.errors) {
-      test('should not parse', (done) => {
+      test('should not parse', () => {
         throw new Error(file.expected.errors.join('\n'))
         // done(new Error(file.expected.errors))
       })
     } else if (file.errors && file.expected.output) {
-      test('should parse correctly', (done) => {
+      test('should parse correctly', () => {
         let message
 
         if (file.zodError) {
@@ -109,7 +109,7 @@ function runTests(file: TestFile) {
         // done(new Error(message))
       })
     } else {
-      test('should have a matching output or errors JSON file', (done) => {
+      test('should have a matching output or errors JSON file', () => {
         // done(
         //   new Error(
         //     `File not found "${file.basename}.parsed.json" or "${file.basename}.errors.json"`

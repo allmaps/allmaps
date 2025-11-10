@@ -37,19 +37,19 @@
     "build": "tsc",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test"
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src"
   },
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
-    "@allmaps/transform": "workspace:^",
     "@allmaps/project": "workspace:^",
-    "@allmaps/stdlib": "workspace:^"
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/transform": "workspace:^"
   },
   "devDependencies": {
-    "@allmaps/types": "workspace:^",
     "@allmaps/render": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

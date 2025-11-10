@@ -16,8 +16,7 @@ import type {
   Summary,
   Annotations,
   Homepage,
-  Rendering,
-  ConstructorOptions
+  Rendering
 } from '../lib/types.js'
 import {
   parseVersion2String,
