@@ -94,7 +94,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       typescript:
         specifier: ^5.7.0
@@ -348,7 +348,7 @@ importers:
         specifier: ^16.0.0
         version: 16.3.0
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
@@ -466,7 +466,7 @@ importers:
         specifier: ^16.0.0
         version: 16.3.0
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
@@ -565,7 +565,7 @@ importers:
         specifier: ^3.0.5
         version: 3.2.1
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
@@ -678,7 +678,7 @@ importers:
         specifier: ^16.0.0
         version: 16.3.0
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
@@ -775,7 +775,7 @@ importers:
         specifier: ^16.0.0
         version: 16.3.0
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
@@ -884,7 +884,7 @@ importers:
         specifier: ^8.4.18
         version: 8.5.6
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.1.2
@@ -976,7 +976,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1037,7 +1037,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1083,7 +1083,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1132,7 +1132,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1220,7 +1220,7 @@ importers:
         specifier: ^16.0.0
         version: 16.3.0
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.4.0
@@ -1271,7 +1271,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1311,7 +1311,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1369,7 +1369,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1421,7 +1421,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1482,7 +1482,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1543,7 +1543,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1598,7 +1598,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1680,7 +1680,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1732,7 +1732,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       typescript:
         specifier: ^5.7.0
@@ -1790,7 +1790,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1823,7 +1823,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1878,7 +1878,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1930,7 +1930,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -1963,7 +1963,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -2039,7 +2039,7 @@ importers:
         specifier: ^8.4.18
         version: 8.5.6
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-svelte:
         specifier: ^3.1.2
@@ -2097,7 +2097,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.2(eslint@8.57.1)
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       remark-api:
         specifier: ^1.1.0
@@ -2193,7 +2193,7 @@ importers:
         specifier: ^0.4.4
         version: 0.4.4
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       react:
         specifier: ^18.3.1
@@ -2274,7 +2274,7 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.6.2
         version: 3.6.2
       typescript:
         specifier: ^5.7.0
