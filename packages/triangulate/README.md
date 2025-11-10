@@ -6,14 +6,14 @@ If a `distance` parameter is provided, the triangles are well-conditioned and no
 
 The following options can be passed:
 
-* `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
-* `minimumTriangleAngle`: The minimum angle (in radians) of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. Default: `0.01`.
+- `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
+- `minimumTriangleAngle`: The minimum angle (in radians) of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. Default: `0.01`.
 
 This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
 
 ## How it works
 
-It uses a modern **constrained Delaunay triangulation algorithm** for polygons, built using [Delaunator](https://github.com/mapbox/delaunator) and [Contrainautor](https://github.com/kninnug/Constrainautor).
+It uses a modern **constrained Delaunay triangulation algorithm** for polygons, built using [Delaunator](https://github.com/mapbox/delaunator) and [Constrainautor](https://github.com/kninnug/Constrainautor).
 
 To learn more on how it works, check out this [Observable notebook](https://observablehq.com/d/efde1d04f1a9bc17).
 
@@ -67,22 +67,22 @@ MIT
 
 ###### Fields
 
-* `minimumTriangleAngle` (`number`)
-* `steinerPoints` (`Array<Point>`)
+- `minimumTriangleAngle` (`number`)
+- `steinerPoints` (`Array<Point>`)
 
 ### `TriangulationToUnique`
 
 ###### Fields
 
-* `gridPoints` (`Array<Point>`)
-* `gridPointsInPolygon` (`Array<Point>`)
-* `interpolatedPolygon` (`Array<Array<Point>>`)
-* `interpolatedPolygonPoints` (`Array<Point>`)
-* `triangles` (`Array<Triangle>`)
-* `uniquePointIndexEdges` (`Array<TypedLine<number>>`)
-* `uniquePointIndexInterpolatedPolygon` (`Array<Array<number>>`)
-* `uniquePointIndexTriangles` (`Array<TypedTriangle<number>>`)
-* `uniquePoints` (`Array<Point>`)
+- `gridPoints` (`Array<Point>`)
+- `gridPointsInPolygon` (`Array<Point>`)
+- `interpolatedPolygon` (`Array<Array<Point>>`)
+- `interpolatedPolygonPoints` (`Array<Point>`)
+- `triangles` (`Array<Triangle>`)
+- `uniquePointIndexEdges` (`Array<TypedLine<number>>`)
+- `uniquePointIndexInterpolatedPolygon` (`Array<Array<number>>`)
+- `uniquePointIndexTriangles` (`Array<TypedTriangle<number>>`)
+- `uniquePoints` (`Array<Point>`)
 
 ### `triangulate(polygon, distance, triangulationOptions)`
 
@@ -92,12 +92,12 @@ Grid points are placed inside the polygon to obtain small, well conditioned tria
 
 ###### Parameters
 
-* `polygon` (`Array<Array<Point>>`)
-  * Polygon
-* `distance?` (`number | undefined`)
-  * Distance that conditions the triangles
-* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
-  * Triangulation Options.
+- `polygon` (`Array<Array<Point>>`)
+  - Polygon
+- `distance?` (`number | undefined`)
+  - Distance that conditions the triangles
+- `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
+  - Triangulation Options.
 
 ###### Returns
 
@@ -113,12 +113,12 @@ This function returns the triangulation as an array of unique points, and triang
 
 ###### Parameters
 
-* `polygon` (`Array<Array<Point>>`)
-  * Polygon
-* `distance?` (`number | undefined`)
-  * Distance that conditions the triangles
-* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
-  * Triangulation Options.
+- `polygon` (`Array<Array<Point>>`)
+  - Polygon
+- `distance?` (`number | undefined`)
+  - Distance that conditions the triangles
+- `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
+  - Triangulation Options.
 
 ###### Returns
 
@@ -128,16 +128,16 @@ Triangulation Object with uniquePointIndexTriangles and uniquePoints (`{ interpo
 
 ### Stability
 
-* Constrainautor doesn't allow self-intersection polygons and will raise an error for such inputs.
+- Constrainautor doesn't allow self-intersection polygons and will raise an error for such inputs.
 
 ### Benchmark
 
 For a 10 point polygon (with diameter ~ 200), here are some benchmarks for computing the triangulation with given distances:
 
-* `triangulate(polygon, 1000)` (no grid points): 74544 ops/s to compute 8 triangles
-* `triangulate(polygon, 100)`: 56849 ops/s to compute 11 triangles
-* `triangulate(polygon, 10)`: 2163 ops/s to compute 435 triangles
-* `triangulate(polygon, 1)`: 3 ops/s to compute 38352 triangles
+- `triangulate(polygon, 1000)` (no grid points): 74544 ops/s to compute 8 triangles
+- `triangulate(polygon, 100)`: 56849 ops/s to compute 11 triangles
+- `triangulate(polygon, 10)`: 2163 ops/s to compute 435 triangles
+- `triangulate(polygon, 1)`: 3 ops/s to compute 38352 triangles
 
 See [`./bench/index.js`](`./bench/index.js`).
 
