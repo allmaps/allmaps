@@ -1,6 +1,6 @@
 # @allmaps/project
 
-This module extends the GCP Transformer class from [@allmaps/transform](../../packages/transform/) with projection functions: the Projected GCP Transformer class and its methods can **transform _and project_ Points, LineStrings, Polygons** and other spatial features from image 'resource' space to a '_projected_ geo' space.
+This module extends the GCP Transformer class from [@allmaps/transform](../../packages/transform/) with projection functions: the Projected GCP Transformer class and its methods can **transform *and project* Points, LineStrings, Polygons** and other spatial features from image 'resource' space to a '*projected* geo' space.
 
 Projections are handled by the [Proj4js](https://github.com/proj4js/proj4js) library. This package this supports any projection (or more generally, coordinate reference system or CRS) supported by Proj4js.
 
@@ -14,7 +14,7 @@ Like instances of the `GcpTransformer` class, instances of the `ProjectedGcpTran
 
 The **projection** defines the 'projected geo' space of the viewport. Since we will render our geometries in the projected space of our viewport, it is logical to make the transformer aware of this space by supplying its projection, so it can bring the results to this space. It defaults to WebMercator `EPSG:3857`, the projection used by default in most webmaps.
 
-The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account _only_ for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different than the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to its 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
+The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account *only* for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different than the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to its 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
 
 The GCPs must be provided in lon-lat `EPSG:4326` projection (since this is the default projection used by GeoJSON and Georeference Annotations) and are projected to the 'projected geo' space before building the GCP Transformer (who will project them to the 'internal projected geo' space).
 
@@ -247,7 +247,7 @@ Notice how this returns a lineString in WebMercator coordinates with the same po
 
 ### Transforming to a different projection
 
-Since `projection` is a _transform_ option, it can be set on every transform method call. This allows us to change the requested projection from the one specified during a projected transformer creation to _any_ projection. Thus, we don't need to create a projected transformer for every projection of interest: we can reuse a transformer and its toGeo and/or toResource transformations (who's computation can be expensive when there are many GCPs).
+Since `projection` is a *transform* option, it can be set on every transform method call. This allows us to change the requested projection from the one specified during a projected transformer creation to *any* projection. Thus, we don't need to create a projected transformer for every projection of interest: we can reuse a transformer and its toGeo and/or toResource transformations (who's computation can be expensive when there are many GCPs).
 
 We can request the result of a 'toGeo' transform using the projected transformer above as follows:
 
@@ -277,7 +277,7 @@ const projectedGeoLineString = projectedTransformer.transformToGeo(
 
 Notice how this returns a result very close to the earlier result for projectedTransformer with internalProjection `EPSG:31370` and default projection WebMercator `EPSG:3857`.
 
-To change a projected transformer's projection in the _transformer_ options (such that it will always be used by default), use the `setProjection()` method.
+To change a projected transformer's projection in the *transformer* options (such that it will always be used by default), use the `setProjection()` method.
 
 Passing a projection in a transform call, as above, has been implemented as passing a `postToGeo` function that projects from the transformer's internal projection to the requested projection.
 
@@ -289,16 +289,16 @@ Since the Projected GCP Transformer class extends the GCP Transformer class, a l
 
 When creating an instance from the Projected GCP Transformer class:
 
-- The **GCPs** are specified using the `Gcp` type and with geo component in lon-lat 'EPSG:4326'.
-- The same **transformation types** are supported: `polynomial`, `thinPlateSpline`, ...
-- Two **extra options** can be set: `projection` specifies the projected geo space (defaults to WebMercator `EPSG:3857`), and `intenalProjection` specifies the projected using when computing the transformation (also defaults to WebMercator `EPSG:3857`). As with a GCP Transformer, the `differentHandedness` is true by default.
+* The **GCPs** are specified using the `Gcp` type and with geo component in lon-lat 'EPSG:4326'.
+* The same **transformation types** are supported: `polynomial`, `thinPlateSpline`, ...
+* Two **extra options** can be set: `projection` specifies the projected geo space (defaults to WebMercator `EPSG:3857`), and `intenalProjection` specifies the projected using when computing the transformation (also defaults to WebMercator `EPSG:3857`). As with a GCP Transformer, the `differentHandedness` is true by default.
 
 When using its main methods:
 
-- The method `transformToGeo()` transforms input geometries from 'resource' space to 'projected geo' space, as the method `transformToResource()` transforms input geometries from 'projected geo' space to 'resource' space.
-- Inputs are following the Allmaps Geometries types. To handle GeoJSON Geometries or SVG Geometries, convert to and from these geometry types using the functions available in [@allmaps/stdlib](../../packages/stdlib/).
-- **GCP Transform options** can be specified and manage a.o. how geometries are refined and which distortions are computed. The projection functions are now considered when refining geometries and recursively adding midpoints.
-- A **'return type function'** can be used to extract distortion information or modify the results.
+* The method `transformToGeo()` transforms input geometries from 'resource' space to 'projected geo' space, as the method `transformToResource()` transforms input geometries from 'projected geo' space to 'resource' space.
+* Inputs are following the Allmaps Geometries types. To handle GeoJSON Geometries or SVG Geometries, convert to and from these geometry types using the functions available in [@allmaps/stdlib](../../packages/stdlib/).
+* **GCP Transform options** can be specified and manage a.o. how geometries are refined and which distortions are computed. The projection functions are now considered when refining geometries and recursively adding midpoints.
+* A **'return type function'** can be used to extract distortion information or modify the results.
 
 For faster transformation between SVG Geometries and GeoJSON Geometries, the same shortcut static methods are available for GcpTransformers: `transformSvgToGeojson()`, `transformSvgStringToGeojsonFeatureCollection()`, `transformGeojsonToSvg()`, `transformGeojsonFeatureCollectionToSvgString()`.
 
@@ -324,7 +324,7 @@ An extra 'transform option' is available for Projected GCP Transformers:
 
 As with a GCP Transformer, passing this transform option during the transformer's construction here it the default when using the transform methods.
 
-Like other GCP _Transform_ options, this option can be set when constructing a transformer _and_ when transform geometries. This can be useful, since it allows us to reusing the toGeo and/or toResource transformations of a transformer (which can be expensive to compute for when there are many GCPs) to transform to a new projection. (See example above.)
+Like other GCP *Transform* options, this option can be set when constructing a transformer *and* when transform geometries. This can be useful, since it allows us to reusing the toGeo and/or toResource transformations of a transformer (which can be expensive to compute for when there are many GCPs) to transform to a new projection. (See example above.)
 
 ## Typing
 
@@ -378,7 +378,7 @@ MIT
 
 ###### Fields
 
-- `internalProjection?` (`{name?: string; definition: ProjectionDefinition}`)
+* `internalProjection?` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 
 ### `ProjectedGcpTransformOptions`
 
@@ -404,12 +404,12 @@ Create a ProjectedGcpTransformer
 
 ###### Parameters
 
-- `gcps` (`Array<Gcp>`)
-  - An array of Ground Control Points (GCPs) in lon-lat 'EPSG:4326'
-- `type` (`TransformationType | undefined`)
-  - The transformation type
-- `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
-  - Projected GCP Transformer options
+* `gcps` (`Array<Gcp>`)
+  * An array of Ground Control Points (GCPs) in lon-lat 'EPSG:4326'
+* `type` (`TransformationType | undefined`)
+  * The transformation type
+* `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
+  * Projected GCP Transformer options
 
 ###### Returns
 
@@ -417,7 +417,7 @@ Create a ProjectedGcpTransformer
 
 ###### Extends
 
-- `GcpTransformer`
+* `GcpTransformer`
 
 ### `ProjectedGcpTransformer#gcps`
 
@@ -434,7 +434,7 @@ Get GCPs in interal projected coordinates (`Array<Gcp>`).
 ###### Type
 
 ```ts
-{name?: string; definition: ProjectionDefinition}
+{id?: string; name?: string; definition: ProjectionDefinition}
 ```
 
 ### `ProjectedGcpTransformer#internalProjectionToProjection`
@@ -442,7 +442,7 @@ Get GCPs in interal projected coordinates (`Array<Gcp>`).
 ###### Type
 
 ```ts
-;(point: Point) => Point
+(point: Point) => Point
 ```
 
 ### `ProjectedGcpTransformer#lonLatToProjection`
@@ -450,7 +450,7 @@ Get GCPs in interal projected coordinates (`Array<Gcp>`).
 ###### Type
 
 ```ts
-;(point: Point) => Point
+(point: Point) => Point
 ```
 
 ### `ProjectedGcpTransformer#lonlatGcps`
@@ -466,7 +466,7 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 ###### Type
 
 ```ts
-{name?: string; definition: ProjectionDefinition}
+{id?: string; name?: string; definition: ProjectionDefinition}
 ```
 
 ### `ProjectedGcpTransformer#projectionToInternalProjection`
@@ -474,7 +474,7 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 ###### Type
 
 ```ts
-;(point: Point) => Point
+(point: Point) => Point
 ```
 
 ### `ProjectedGcpTransformer#projectionToLonLat`
@@ -482,16 +482,16 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 ###### Type
 
 ```ts
-;(point: Point) => Point
+(point: Point) => Point
 ```
 
 ### `ProjectedGcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
 
-- `point` (`[number, number]`)
-- `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
-- `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
+* `point` (`[number, number]`)
+* `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
+* `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
@@ -501,9 +501,9 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 
 ###### Parameters
 
-- `point` (`[number, number]`)
-- `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
-- `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
+* `point` (`[number, number]`)
+* `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
+* `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
 ###### Returns
 
@@ -515,10 +515,10 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-- `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
-  - A Georeferenced Map
-- `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
-  - Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+  * A Georeferenced Map
+* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+  * Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
 
 ###### Returns
 
@@ -543,8 +543,8 @@ to keep the original transformer as well.
 
 ###### Parameters
 
-- `projectedTransformer` (`ProjectedGcpTransformer`)
-- `projection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projectedTransformer` (`ProjectedGcpTransformer`)
+* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 
 ###### Returns
 
@@ -555,7 +555,7 @@ this (`ProjectedGcpTransformer`).
 ###### Type
 
 ```ts
-;GcpsInputs &
+GcpsInputs &
   TransformationTypeInputs &
   InternalProjectionInputs &
   ProjectionInputs
@@ -573,8 +573,9 @@ this (`ProjectedGcpTransformer`).
 
 ###### Fields
 
-- `definition` (`Definition`)
-- `name?` (`string`)
+* `definition` (`Definition`)
+* `id?` (`string`)
+* `name?` (`string`)
 
 ### `ProjectionDefinition`
 
@@ -588,27 +589,27 @@ string | PROJJSONDefinition
 
 ###### Fields
 
-- `projection?` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection?` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 
 ### `defaultProjectedGcpTransformOptions`
 
 ###### Fields
 
-- `projection` (`{name?: string; definition: string}`)
+* `projection` (`{id?: string; name?: string; definition: string}`)
 
 ### `defaultProjectedGcpTransformerOptions`
 
 ###### Fields
 
-- `internalProjection` (`{name?: string; definition: string}`)
-- `projection` (`{name?: string; definition: string}`)
+* `internalProjection` (`{id?: string; name?: string; definition: string}`)
+* `projection` (`{id?: string; name?: string; definition: string}`)
 
 ### `isEqualProjection(projection0, projection1)`
 
 ###### Parameters
 
-- `projection0` (`Projection | undefined`)
-- `projection1` (`Projection | undefined`)
+* `projection0` (`Projection | undefined`)
+* `projection1` (`Projection | undefined`)
 
 ###### Returns
 
@@ -622,14 +623,14 @@ lonLatProjection
 
 ###### Fields
 
-- `definition` (`string`)
-- `name` (`string`)
+* `definition` (`string`)
+* `name` (`string`)
 
 ### `projectionDefinitionToAntialiasedDefinition(stringProjectionDefinition)`
 
 ###### Parameters
 
-- `stringProjectionDefinition` (`string`)
+* `stringProjectionDefinition` (`string`)
 
 ###### Returns
 
@@ -639,11 +640,11 @@ lonLatProjection
 
 ###### Parameters
 
-- `projection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 
 ###### Returns
 
-`{name?: string; definition: ProjectionDefinition}`.
+`{id?: string; name?: string; definition: ProjectionDefinition}`.
 
 ### `webMercatorProjection`
 
@@ -653,5 +654,5 @@ webMercatorProjection
 
 ###### Fields
 
-- `definition` (`string`)
-- `name` (`string`)
+* `definition` (`string`)
+* `name` (`string`)
