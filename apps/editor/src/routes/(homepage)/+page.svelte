@@ -2,7 +2,6 @@
   import { onMount } from 'svelte'
   import { page } from '$app/state'
   import { goto } from '$app/navigation'
-  import { resolve } from '$app/paths'
 
   import { Footer } from '@allmaps/components'
 
@@ -45,8 +44,7 @@
           )
         }
 
-        const newUrl = resolve(`${page.url.origin}${pathWithSearchParams}`)
-        goto(newUrl)
+        goto(`${page.url.origin}${pathWithSearchParams}`)
       }
     }
   })
