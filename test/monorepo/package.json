@@ -1,0 +1,14 @@
+{
+  "name": "test-monorepo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "_test": "NODE_ENV=test vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "vitest": "^4.0.4"
+  },
+  "dependencies": {}
+}

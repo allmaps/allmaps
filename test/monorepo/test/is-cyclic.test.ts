@@ -1,4 +1,6 @@
-import { getParsedPackageJsons } from './shared.ts'
+import { describe, expect, test } from 'vitest'
+
+import { getParsedPackageJsons } from '../lib/shared.ts'
 
 // Tests Allmaps dependencies for cyclic dependencies
 
@@ -32,8 +34,11 @@ for (const {
     })
 }
 
-try {
-  JSON.stringify(allmapsModules, null, 2)
-} catch (err) {
-  throw new Error('Allmaps modules contain cyclic dependency!')
-}
+describe(`Test dependency for cyclic dependencies`, () => {
+  test('modules can be stringified (no cyclic dependencies)', () => {
+    // JSON.stringify will throw on cyclic structures. The test fails if
+    // stringify throws, which indicates a cyclic dependency in the
+    // @allmaps/ module graph.
+    expect(() => JSON.stringify(allmapsModules, null, 2)).not.toThrow()
+  })
+})

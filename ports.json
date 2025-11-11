@@ -15,5 +15,6 @@
   "leaflet": 5512,
   "maplibre": 5513,
   "preview": 5514,
-  "editor": 5515
+  "editor": 5515,
+  "testPlugins": 5516
 }
