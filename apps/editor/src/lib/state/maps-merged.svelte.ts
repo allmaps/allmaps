@@ -16,6 +16,9 @@ import type { MapsHistoryState } from '$lib/state/maps-history.svelte.js'
 const MAPS_MERGED_KEY = Symbol('maps-merged')
 
 export class MapsMergedState {
+  #apiBaseUrl: string
+  #annotationsApiBaseUrl: string
+
   #apiState: ApiState
   #mapsHistoryState: MapsHistoryState
   #mapsState: MapsState
@@ -46,11 +49,15 @@ export class MapsMergedState {
   )
 
   constructor(
+    apiBaseUrl: string,
+    annotationsApiBaseUrl: string,
     mapsState: MapsState,
     mapsHistoryState: MapsHistoryState,
     apiState: ApiState,
     projectionsState: ProjectionsState
   ) {
+    this.#apiBaseUrl = apiBaseUrl
+    this.#annotationsApiBaseUrl = annotationsApiBaseUrl
     this.#apiState = apiState
     this.#mapsHistoryState = mapsHistoryState
     this.#mapsState = mapsState
@@ -89,7 +96,12 @@ export class MapsMergedState {
       Object.entries(mapsByImageId).map(([imageId, maps]) => [
         imageId,
         maps.map((map) =>
-          toGeoreferencedMap(map, this.#projectionsState.projectionsById)
+          toGeoreferencedMap(
+            this.#apiBaseUrl,
+            this.#annotationsApiBaseUrl,
+            map,
+            this.#projectionsState.projectionsById
+          )
         )
       ])
     )
@@ -117,6 +129,8 @@ export class MapsMergedState {
 }
 
 export function setMapsMergedState(
+  apiBaseUrl: string,
+  annotationsApiBaseUrl: string,
   mapsState: MapsState,
   mapsHistoryState: MapsHistoryState,
   apiState: ApiState,
@@ -124,7 +138,14 @@ export function setMapsMergedState(
 ) {
   return setContext(
     MAPS_MERGED_KEY,
-    new MapsMergedState(mapsState, mapsHistoryState, apiState, projectionsState)
+    new MapsMergedState(
+      apiBaseUrl,
+      annotationsApiBaseUrl,
+      mapsState,
+      mapsHistoryState,
+      apiState,
+      projectionsState
+    )
   )
 }
 

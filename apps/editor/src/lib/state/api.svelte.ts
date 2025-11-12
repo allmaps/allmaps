@@ -12,6 +12,8 @@ import type { SourceState } from '$lib/state/source.svelte.js'
 const API_KEY = Symbol('api')
 
 export class ApiState {
+  #apiBaseUrl: string
+
   #lastSourceUrl: string | undefined
 
   #maps: GeoreferencedMap[] = $state([])
@@ -32,7 +34,9 @@ export class ApiState {
     return mapsByImageId
   })
 
-  constructor(sourceState: SourceState) {
+  constructor(apiBaseUrl: string, sourceState: SourceState) {
+    this.#apiBaseUrl = apiBaseUrl
+
     $effect(() => {
       if (
         sourceState.source &&
@@ -62,12 +66,12 @@ export class ApiState {
 
   async #createSource(source: Source) {
     try {
-      await checkSource(source)
+      await checkSource(this.#apiBaseUrl, source)
     } catch {
       // If fetch fails, resource does not exist in Allmaps API
       // PUT source to API to create resource
       try {
-        await createSource(source)
+        await createSource(this.#apiBaseUrl, source)
       } catch {
         console.error('Error creating source in Allmaps API:', source.url)
       }
@@ -75,7 +79,7 @@ export class ApiState {
   }
 
   async #fetchMaps(source: Source) {
-    const fetchedMaps = await fetchMaps(source)
+    const fetchedMaps = await fetchMaps(this.#apiBaseUrl, source)
     const mapOrMaps = validateGeoreferencedMap(fetchedMaps)
 
     if (Array.isArray(mapOrMaps)) {
@@ -98,8 +102,8 @@ export class ApiState {
   }
 }
 
-export function setApiState(sourceState: SourceState) {
-  return setContext(API_KEY, new ApiState(sourceState))
+export function setApiState(apiBaseUrl: string, sourceState: SourceState) {
+  return setContext(API_KEY, new ApiState(apiBaseUrl, sourceState))
 }
 
 export function getApiState() {
