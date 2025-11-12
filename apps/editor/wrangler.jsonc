@@ -3,6 +3,14 @@
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2025-01-01",
   "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
+  "observability": {
+    "logs": {
+      "enabled": false,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    }
+  },
   "vars": {
     "PUBLIC_ALLMAPS_API_WS_URL": "wss://api.allmaps.org",
     "PUBLIC_ALLMAPS_API_URL": "https://api.allmaps.org",
