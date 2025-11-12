@@ -47,9 +47,9 @@ export async function parseIiif(
   const parsedIiif = IIIF.parse(sourceIiif)
 
   if (parsedIiif.type === 'collection') {
-    await parsedIiif.fetchAll({ ...options, fetchFn })
+    await parsedIiif.fetchAllItems({ ...options, fetchFn })
   } else if (parsedIiif.type === 'manifest' && options && options.fetchImages) {
-    await parsedIiif.fetchAll(fetchFn)
+    await parsedIiif.fetchAllItems(fetchFn)
   }
 
   return parsedIiif

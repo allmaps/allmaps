@@ -1,72 +1,235 @@
 import { setContext, getContext } from 'svelte'
-import { SvelteMap } from 'svelte/reactivity'
 
-import { fetchJson } from '@allmaps/stdlib'
-import { IIIF } from '@allmaps/iiif-parser'
+import { IIIF, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
 import { parseAnnotation } from '@allmaps/annotation'
-import { generateId } from '@allmaps/id'
 
-import { UrlState } from '$lib/state/url.svelte'
-import { ErrorState } from '$lib/state/error.svelte'
+import type { UrlState } from '$lib/state/url.svelte.js'
+import type { ErrorState } from '$lib/state/error.svelte.js'
+
+import { searchParams } from '$lib/shared/params.js'
+import { superFetch } from '$lib/shared/fetch.js'
+import { generateId } from '$lib/shared/ids.js'
+import { parseLanguageString } from '$lib/shared/iiif.js'
 
 import type {
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage,
-  Canvas as IIIFCanvas,
-  Collection as IIIFCollection
+  Canvas as IIIFCanvas
 } from '@allmaps/iiif-parser'
-import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { PartOf, PartOfItem } from '@allmaps/annotation'
 
-import type { Source, SourceType } from '$lib/types/shared.js'
+import type {
+  ImageSource,
+  ManifestSource,
+  Source,
+  CollectionPath,
+  Breadcrumb,
+  IIIFResource
+} from '$lib/types/shared.js'
 
 import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
-
-type PartOf = GeoreferencedMap['resource']['partOf']
-
-type PartOfItem = {
-  id: string
-  type: string
-}
 
 const SOURCE_KEY = Symbol('source')
 
 export class SourceState {
-  #urlState: UrlState
+  #urlState: UrlState<typeof searchParams>
   #errorState: ErrorState
 
   #source = $state<Source>()
 
-  #loading = $state(false)
+  #abortController: AbortController | undefined
 
-  #imagesByImageId = $state<SvelteMap<string, IIIFImage | EmbeddedIIIFImage>>(
-    new SvelteMap()
+  #parsedManifest = $derived.by<IIIFManifest | undefined>(() => {
+    // Update this derived when fetching states change
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    this.#fetchingInsideCollection
+
+    if (this.#source && this.#source.type === 'manifest') {
+      return this.#source.parsedIiif
+    } else if (
+      this.#source &&
+      this.#source.type === 'collection' &&
+      this.#urlState.params.manifestId
+    ) {
+      const parsedIiifAtPath = this.#parsedIiifAtPath
+
+      // TODO: check if parsedIiif.uri === this.#urlState.params.manifestId
+      if (
+        parsedIiifAtPath?.type === 'manifest' &&
+        !parsedIiifAtPath.embedded &&
+        parsedIiifAtPath instanceof IIIFManifest
+      ) {
+        return parsedIiifAtPath
+      }
+    }
+  })
+
+  // #manifestImageIdsDontMatch = $state(false)
+
+  #editSource = $derived.by<ManifestSource | ImageSource | undefined>(() => {
+    const sourceType = this.#source?.type
+    if (sourceType === 'manifest' || sourceType === 'image') {
+      return this.#source
+    } else if (sourceType === 'collection' && this.#parsedManifest) {
+      return {
+        url: this.#parsedManifest.uri,
+        allmapsId: generateId(this.#parsedManifest.uri),
+        sourceIiif: this.#parsedManifest.source,
+        type: 'manifest',
+        parsedIiif: this.#parsedManifest
+      }
+    }
+  })
+
+  #fetching = $state(false)
+  #fetchingInsideCollection = $state(false)
+
+  #imagesByImageId = $derived.by<Map<string, IIIFImage | EmbeddedIIIFImage>>(
+    () => {
+      const sourceType = this.#editSource?.type
+
+      if (sourceType === 'manifest') {
+        const canvases = this.#editSource?.parsedIiif.canvases || []
+        return new Map(
+          canvases.map((canvas) => [canvas.image.uri, canvas.image])
+        )
+      } else if (sourceType === 'image') {
+        const parsedIiif = this.#editSource?.parsedIiif
+
+        if (parsedIiif) {
+          return new Map([[parsedIiif.uri, parsedIiif]])
+        }
+      }
+
+      return new Map()
+    }
   )
+
+  #canvasesByImageId = $derived.by<Map<string, IIIFCanvas>>(() => {
+    const sourceType = this.#editSource?.type
+
+    if (sourceType === 'manifest') {
+      const canvases = this.#editSource?.parsedIiif.canvases || []
+      return new Map(canvases.map((canvas) => [canvas.image.uri, canvas]))
+    }
+
+    return new Map()
+  })
+
+  #allmapsIdsByImageId = $derived.by<Map<string, string>>(() => {
+    const sourceType = this.#editSource?.type
+
+    if (sourceType === 'manifest') {
+      const canvases = this.#editSource?.parsedIiif.canvases || []
+      return new Map(
+        canvases.map((canvas) => [
+          canvas.image.uri,
+          generateId(canvas.image.uri)
+        ])
+      )
+    } else if (sourceType === 'image') {
+      const parsedIiif = this.#editSource?.parsedIiif
+      if (parsedIiif) {
+        return new Map([[parsedIiif.uri, generateId(parsedIiif.uri)]])
+      }
+    }
+
+    return new Map()
+  })
+
+  #breadcrumbs = $derived.by<Breadcrumb[]>(() => {
+    const crumbs: Breadcrumb[] = []
+
+    for (let i = 0; i <= this.#urlState.params.path.length; i++) {
+      const path = this.#urlState.params.path.slice(0, i)
+      const parsedIiifAtPath = this.#getParsedIiifAtPath(path)
+
+      let label: string | undefined
+
+      if (
+        parsedIiifAtPath &&
+        ['collection', 'manifest'].includes(parsedIiifAtPath.type)
+      ) {
+        if ('label' in parsedIiifAtPath) {
+          label = parseLanguageString(parsedIiifAtPath.label)
+        }
+
+        crumbs.push({
+          label,
+          path,
+          type: parsedIiifAtPath.type,
+          id: parsedIiifAtPath.uri
+        })
+      }
+    }
+
+    return crumbs
+  })
+
+  #parsedIiifAtPath = $derived.by<IIIFResource | undefined>(() => {
+    // Update this derived when fetching states change
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    this.#fetchingInsideCollection
+
+    return this.#getParsedIiifAtPath(this.#urlState.params.path)
+  })
+
+  // #parsedIiifParents = $derived.by<IIIFResource[]>(() => {
+  //   // Update this derived when fetching states change
+  //   this.#fetchingInsideCollection
+
+  //   const parents: IIIFResource[] = []
+  //   let currentPath: CollectionPath = []
+
+  //   for (let i = 0; i < this.#urlState.params.path.length; i++) {
+  //     currentPath = this.#urlState.params.path.slice(0, i)
+  //     const parsedIiifAtPath = this.#getParsedIiifAtPath(currentPath)
+
+  //     if (parsedIiifAtPath) {
+  //       parents.push(parsedIiifAtPath)
+  //     }
+  //   }
+
+  //   return parents
+  // })
 
   #imageCount = $derived(this.#imagesByImageId.size)
 
-  #canvasesByImageId = $state<SvelteMap<string, IIIFCanvas>>(new SvelteMap())
-  #allmapsIdsByImageId = $state<SvelteMap<string, string>>(new SvelteMap())
-
-  constructor(urlState: UrlState, errorState: ErrorState) {
+  constructor(urlState: UrlState<typeof searchParams>, errorState: ErrorState) {
     this.#urlState = urlState
     this.#errorState = errorState
 
     $effect(() => {
-      const url = urlState.url
+      const newUrl = urlState.params.url
 
-      this.#reset()
+      if (newUrl) {
+        const currentSourceUrl = this.#source?.url
+        if (!currentSourceUrl || currentSourceUrl !== newUrl) {
+          this.#fetch(newUrl)
+        }
+      } else {
+        this.#reset()
+      }
+    })
 
-      if (url) {
-        this.#load(url)
+    $effect(() => {
+      this.#fetchingInsideCollection = true
+
+      const parsedIiif = this.#source?.parsedIiif
+      if (
+        parsedIiif &&
+        parsedIiif.type === 'collection' &&
+        'items' in parsedIiif
+      ) {
+        parsedIiif
+          .fetchUntilPath(this.#urlState.params.path.map(({ index }) => index))
+          .finally(() => (this.#fetchingInsideCollection = false))
       }
     })
   }
 
-  get imagesByImageId() {
-    return this.#imagesByImageId
-  }
-
   async fetchImageInfo(imageId: string) {
+    // TODO: run fetch function in parsedManifest or parsedCollection
     if (this.#source?.type === 'manifest') {
       const canvas = this.getCanvasByImageId(imageId)
       const image = canvas?.image
@@ -81,106 +244,60 @@ export class SourceState {
           } else {
             console.warn("Image IDs don't match:", imageId, fetchedImage.uri)
 
-            this.#imagesByImageId.delete(imageId)
-            this.#imagesByImageId.set(fetchedImage.uri, fetchedImage)
-            // TODO: update #canvasesByImageId
-
-            this.#allmapsIdsByImageId.set(
-              fetchedImage.uri,
-              await generateId(fetchedImage.uri)
-            )
+            // this.#manifestImageIdsDontMatch = true
           }
         }
       }
     }
   }
 
-  async #fetchCollectionManifestsAndAddImages(parsedIiif: IIIFCollection) {
-    for await (const next of parsedIiif.fetchNext({
-      fetchCollections: true,
-      fetchManifests: true,
-      fetchImages: false
-    })) {
-      if (next.item.type === 'manifest') {
-        for (const canvas of next.item.canvases) {
-          this.#imagesByImageId.set(canvas.image.uri, canvas.image)
-          this.#canvasesByImageId.set(canvas.image.uri, canvas)
-          this.#allmapsIdsByImageId.set(
-            canvas.image.uri,
-            await generateId(canvas.image.uri)
-          )
-        }
-      }
+  #getParsedIiifAtPath(path: CollectionPath) {
+    if (this.#source && this.#source.type === 'collection') {
+      return this.#source?.parsedIiif.getItemAtPath(
+        path.map(({ index }) => index)
+      )
     }
   }
 
-  // callbackProject: (state) => {
-  //   if (!state.callback) {
-  //     return
-  //   }
-
-  //   for (let project of state.projects) {
-  //     for (let hostname of project.hostnames) {
-  //       const url = new URL(state.callback)
-  //       if (url.hostname === hostname) {
-  //         return project.label
-  //       }
-  //     }
-  //   }
-  // },
-
-  async #loadIiif(url: string, sourceIiif: unknown) {
-    const parsedIiif = IIIF.parse(sourceIiif)
-
-    let sourceType: SourceType
+  async #fetchIiif(url: string, sourceIiif: unknown) {
+    const parsedIiif = IIIF.parse(sourceIiif, {
+      keepSource: true
+    })
 
     const baseSource = {
       url,
-      allmapsId: await generateId(parsedIiif.uri),
+      allmapsId: generateId(parsedIiif.uri),
       sourceIiif
     }
 
     let source: Source
 
     if (parsedIiif.type === 'collection') {
-      sourceType = 'collection'
-      await this.#fetchCollectionManifestsAndAddImages(parsedIiif)
-
-      source = {
-        ...baseSource,
-        type: sourceType,
-        parsedIiif
-      }
-    } else if (parsedIiif.type === 'manifest') {
-      sourceType = 'manifest'
-      for (const canvas of parsedIiif.canvases) {
-        this.#imagesByImageId.set(canvas.image.uri, canvas.image)
-        this.#canvasesByImageId.set(canvas.image.uri, canvas)
-        this.#allmapsIdsByImageId.set(
-          canvas.image.uri,
-          await generateId(canvas.image.uri)
+      if (this.#urlState.params.path) {
+        await parsedIiif.fetchUntilPath(
+          this.#urlState.params.path.map(({ index }) => index)
         )
       }
 
       source = {
         ...baseSource,
-        type: sourceType,
+        type: 'collection',
+        parsedIiif
+      }
+    } else if (parsedIiif.type === 'manifest') {
+      source = {
+        ...baseSource,
+        type: 'manifest',
         parsedIiif
       }
     } else if (parsedIiif.type === 'image') {
-      sourceType = 'image'
-      this.#imagesByImageId.set(parsedIiif.uri, parsedIiif)
-      this.#allmapsIdsByImageId.set(
-        parsedIiif.uri,
-        await generateId(parsedIiif.uri)
-      )
-
       source = {
         ...baseSource,
-        type: sourceType,
+        type: 'image',
         parsedIiif
       }
     } else {
+      this.#reset()
       throw new Error('Unknown IIIF type')
     }
 
@@ -210,17 +327,28 @@ export class SourceState {
 
     // TODO: also support Canvases
     if (manifestPartOf) {
-      await this.#load(manifestPartOf.id)
+      await this.#fetch(manifestPartOf.id)
     } else {
-      await this.#load(map.resource.id)
+      await this.#fetch(map.resource.id)
     }
   }
 
-  async #load(url: string) {
+  async #fetch(url: string) {
+    if (this.#abortController) {
+      this.#abortController.abort()
+    }
+
+    this.#abortController = new AbortController()
+
+    this.#fetching = true
     this.#errorState.error = null
 
     try {
-      const sourceData = await fetchJson(url)
+      const sourceData = await superFetch(url, {
+        signal: this.#abortController.signal
+      })
+
+      this.#abortController = undefined
 
       if (
         sourceData &&
@@ -230,6 +358,8 @@ export class SourceState {
         ['Annotation', 'AnnotationPage'].includes(sourceData.type)
       ) {
         if (url.startsWith(PUBLIC_ALLMAPS_ANNOTATIONS_API_URL)) {
+          // TODO: show message, Allmaps doesn't use georeference data from annotation
+          // but loads from API
           await this.#loadGeoreferenceAnnotation(sourceData)
         } else {
           throw new Error(
@@ -237,17 +367,17 @@ export class SourceState {
           )
         }
       } else {
-        await this.#loadIiif(url, sourceData)
+        await this.#fetchIiif(url, sourceData)
       }
     } catch (err) {
       this.#errorState.error = err
       this.#reset()
     } finally {
-      this.#loading = false
+      this.#fetching = false
     }
   }
 
-  #isImageIdValid(imageId: string | null) {
+  #isImageIdValid(imageId?: string) {
     if (!imageId) {
       return false
     }
@@ -256,15 +386,24 @@ export class SourceState {
   }
 
   #reset() {
-    this.#loading = false
+    this.#fetching = false
+    this.#fetchingInsideCollection = false
     this.#source = undefined
-    this.#imagesByImageId = new SvelteMap()
-    this.#canvasesByImageId = new SvelteMap()
-    this.#allmapsIdsByImageId = new SvelteMap()
+  }
+
+  get imagesByImageId() {
+    return this.#imagesByImageId
   }
 
   get source() {
     return this.#source
+  }
+  get parsedIiif() {
+    return this.#source?.parsedIiif
+  }
+
+  get parsedManifest() {
+    return this.#parsedManifest
   }
 
   get url() {
@@ -279,19 +418,27 @@ export class SourceState {
     return this.#imageCount
   }
 
-  get loading() {
-    return this.#loading
+  get fetching() {
+    return this.#fetching
   }
 
-  get label() {
-    if (
-      this.#source &&
-      this.#source.parsedIiif &&
-      'label' in this.#source.parsedIiif
-    ) {
-      return this.#source.parsedIiif.label
-    }
+  get fetchingInsideCollection() {
+    return this.#fetchingInsideCollection
   }
+
+  set fetchingInsideCollection(value: boolean) {
+    this.#fetchingInsideCollection = value
+  }
+
+  // get label() {
+  //   if (
+  //     this.#source &&
+  //     this.#source.parsedIiif &&
+  //     'label' in this.#source.parsedIiif
+  //   ) {
+  //     return this.#source.parsedIiif.label
+  //   }
+  // }
 
   get navPlace() {
     // TODO: read navPlace from correct IIIF resource
@@ -301,13 +448,30 @@ export class SourceState {
       this.#source.parsedIiif &&
       'navPlace' in this.#source.parsedIiif
     ) {
+      // TODO get first navplace
+
       return this.#source.parsedIiif.navPlace
     }
   }
 
+  get canEdit() {
+    return this.#editSource !== undefined
+  }
+
+  get parsedIiifAtPath() {
+    return this.#parsedIiifAtPath
+  }
+
   get activeImageId() {
-    if (this.#isImageIdValid(this.#urlState.imageId)) {
-      return this.#urlState.imageId
+    if (this.#fetching) {
+      return
+    }
+
+    if (
+      this.#isImageIdValid(this.#urlState.params.imageId) &&
+      this.#urlState.params.imageId
+    ) {
+      return this.#urlState.params.imageId
     }
 
     const imagesArray = [...this.images]
@@ -346,6 +510,10 @@ export class SourceState {
     }
   }
 
+  get breadcrumbs() {
+    return this.#breadcrumbs
+  }
+
   getPreviousActiveImageId() {
     const imagesArray = [...this.images]
 
@@ -382,7 +550,10 @@ export class SourceState {
   }
 }
 
-export function setSourceState(urlState: UrlState, errorState: ErrorState) {
+export function setSourceState(
+  urlState: UrlState<typeof searchParams>,
+  errorState: ErrorState
+) {
   return setContext(SOURCE_KEY, new SourceState(urlState, errorState))
 }
 

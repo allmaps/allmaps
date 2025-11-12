@@ -18,7 +18,7 @@ import {
 } from '../schemas/image.2.js'
 import { ImageServiceSchema } from '../schemas/image-service.js'
 import { ImageResource2Schema } from '../schemas/presentation.2.js'
-import { AnnotationBody3Schema } from '../schemas/presentation.3.js'
+import { AnnotationImageBody3Schema } from '../schemas/presentation.3.js'
 
 import { getTileZoomLevels, getTileImageRequest } from '../lib/tiles.js'
 import { getImageRequest } from '../lib/image-requests.js'
@@ -28,16 +28,26 @@ import {
 } from '../lib/profile.js'
 
 import type { SizeObject, ImageRequest, TileZoomLevel } from '@allmaps/types'
-import type { Fit, MajorVersion, Tileset } from '../lib/types.js'
+import type {
+  Fit,
+  MajorVersion,
+  Tileset,
+  ConstructorOptions,
+  ParseOptions
+} from '../lib/types.js'
 
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
 type CanvasType = z.infer<typeof CanvasSchema>
 type ImageType = z.infer<typeof ImageSchema>
 type EmbeddedImageType =
-  | z.infer<typeof AnnotationBody3Schema>
+  | z.infer<typeof AnnotationImageBody3Schema>
   | z.infer<typeof ImageResource2Schema>
 
 const ImageTypeString = 'image' as const
+
+type ImageConstructorOptions = {
+  parsedCanvas?: CanvasType
+}
 
 /**
  * Parsed IIIF Image, embedded in a Canvas
@@ -70,14 +80,14 @@ export class EmbeddedImage {
 
   majorVersion: MajorVersion
 
-  constructor(parsedImage: ImageType)
-  constructor(parsedEmbeddedImage: EmbeddedImageType, parsedCanvas: CanvasType)
-  constructor(...args: [ImageType] | [EmbeddedImageType, CanvasType]) {
-    const parsedImage = args[0]
-    const parsedCanvas = args[1]
+  constructor(
+    parsedImage: ImageType | EmbeddedImageType,
+    options?: Partial<ImageConstructorOptions>
+  ) {
+    const { parsedCanvas } = options || {}
 
-    if (args.length === 2) {
-      const parsedEmbeddedImage = args[0]
+    if (parsedCanvas && 'service' in parsedImage) {
+      const parsedEmbeddedImage = parsedImage
 
       let imageService: ImageServiceType | undefined
       let majorVersion: MajorVersion | undefined
@@ -338,13 +348,17 @@ export class EmbeddedImage {
  * @property sizes - Array of parsed sizes
  */
 export class Image extends EmbeddedImage {
+  source?: unknown
+
   tileZoomLevels: TileZoomLevel[]
   sizes?: SizeObject[]
 
   readonly embedded = false
 
-  constructor(parsedImage: ImageType) {
+  constructor(parsedImage: ImageType, options?: Partial<ConstructorOptions>) {
     super(parsedImage)
+
+    this.source = options?.source
 
     const profileProperties = getProfileProperties(parsedImage)
 
@@ -371,7 +385,9 @@ export class Image extends EmbeddedImage {
    * @returns Parsed IIIF Image
    * @static
    */
-  static parse(iiifImage: unknown, majorVersion: MajorVersion | null = null) {
+  static parse(iiifImage: unknown, parseOptions?: Partial<ParseOptions>) {
+    const { majorVersion, keepSource } = parseOptions || {}
+
     let parsedImage
 
     if (majorVersion === 1) {
@@ -384,7 +400,7 @@ export class Image extends EmbeddedImage {
       parsedImage = ImageSchema.parse(iiifImage)
     }
 
-    return new Image(parsedImage)
+    return new Image(parsedImage, keepSource ? { source: iiifImage } : {})
   }
 
   // TODO: rename this to getImageRequest

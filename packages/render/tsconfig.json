@@ -3,8 +3,9 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["vite-plugin-glsl/ext"],
-    "paths": {}
+    "types": ["vite-plugin-glsl/ext", "vite/client"],
+    "paths": {},
+    "esModuleInterop": true,
   },
   "references": [
     { "path": "../annotation" },

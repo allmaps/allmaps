@@ -1,8 +1,6 @@
-if(bool(u_debug)) {
-  float viewportWidth = 4.0;
+float viewportWidth = 4.0;
 
-  // Triangles
-
+if(bool(u_debugTriangles)) {
   // Old approach with color
   // float triangleIndex = floor(v_trianglePointIndex / 3.0);
   // color = vec4(abs(sin(triangleIndex)), abs(sin(triangleIndex + 1.0f)), abs(sin(triangleIndex + 2.0f)), 1);
@@ -17,9 +15,9 @@ if(bool(u_debug)) {
   if(barycentricTriangleDist < TriangleDistThreshold) {
     color = vec4(0.0, 0.0, 0.0, 1.0);
   }
+}
 
-  // Tiles
-
+if(bool(u_debugTiles)) {
   float resourceDist = min(cachedTilesTexturePoint.x, cachedTilesTexturePoint.y);
   // Convert the desired border width from pixels to normalized units (0-1)
   // This makes the border width consistent regardless of triangle size

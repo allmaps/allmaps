@@ -4,13 +4,21 @@
   import Map from 'ol/Map.js'
   import XYZ from 'ol/source/XYZ.js'
   import TileLayer from 'ol/layer/Tile.js'
-  import { fromLonLat } from 'ol/proj.js'
+  import { toLonLat, fromLonLat } from 'ol/proj.js'
 
-  import { view } from '$lib/shared/stores/view.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
+
+  import type { Point } from '@allmaps/types'
 
   import type { TileJSON } from '$lib/types.js'
 
-  export let tileJson: TileJSON
+  type Props = {
+    tileJson: TileJSON
+  }
+
+  let { tileJson }: Props = $props()
+
+  const uiState = getUiState()
 
   onMount(async () => {
     const tileUrl = tileJson.tiles[0]
@@ -38,12 +46,17 @@
       ...fromLonLat([tileJson.bounds[2], tileJson.bounds[3]])
     ]
 
-    $view = map.getView()
+    const view = map.getView()
 
-    $view.fit(bbox, {
+    view.fit(bbox, {
       padding: [25, 25, 25, 25]
     })
+
+    const center = view.getCenter()
+
+    uiState.zoom = view.getZoom()
+    uiState.center = center ? (toLonLat(center) as Point) : undefined
   })
 </script>
 
-<div id="ol" class="w-full h-full" />
+<div id="ol" class="w-full h-full"></div>

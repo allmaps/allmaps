@@ -3,7 +3,8 @@ import { z } from 'zod'
 import {
   Manifest2Schema,
   Manifest3Schema,
-  ManifestSchema
+  ManifestSchema,
+  CanvasSchema
 } from '../schemas/iiif.js'
 
 import { EmbeddedManifest2Schema } from '../schemas/presentation.2.js'
@@ -27,7 +28,7 @@ import type {
   LanguageString,
   Metadata,
   MajorVersion,
-  FetchNextResults,
+  FetchNextItemResults,
   NavDate,
   NavPlace,
   Thumbnail,
@@ -36,9 +37,12 @@ import type {
   RequiredStatement,
   Annotations,
   Homepage,
-  Rendering
+  Rendering,
+  ConstructorOptions,
+  ParseOptions
 } from '../lib/types.js'
 
+type CanvasType = z.infer<typeof CanvasSchema>
 type ManifestType = z.infer<typeof ManifestSchema>
 type EmbeddedManifestType =
   | z.infer<typeof EmbeddedManifest2Schema>
@@ -61,6 +65,11 @@ export class EmbeddedManifest {
   type: typeof ManifestTypeString = ManifestTypeString
 
   label?: LanguageString
+  description?: LanguageString
+  metadata?: Metadata
+  navDate?: NavDate
+  navPlace?: NavPlace
+  thumbnail?: Thumbnail
 
   majorVersion: MajorVersion
 
@@ -71,12 +80,21 @@ export class EmbeddedManifest {
       this.majorVersion = 2
 
       this.label = parseVersion2String(parsedManifest.label)
+      this.description = parseVersion2String(parsedManifest.description)
+      this.metadata = parseVersion2Metadata(parsedManifest.metadata)
+      this.navDate = parsedManifest.navDate
+      this.navPlace = parsedManifest.navPlace
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
       this.uri = parsedManifest.id
       this.majorVersion = 3
 
       this.label = parseVersion3String(parsedManifest.label)
+      this.description = parseVersion3String(parsedManifest.description)
+      this.metadata = parseVersion3Metadata(parsedManifest.metadata)
+      this.navDate = parsedManifest.navDate
+      this.navPlace = parsedManifest.navPlace
+      this.thumbnail = parsedManifest.thumbnail
     } else {
       throw new Error('Unsupported Manifest')
     }
@@ -91,15 +109,13 @@ export class EmbeddedManifest {
  * @property metadata - Metadata of Manifest
  */
 export class Manifest extends EmbeddedManifest {
+  source?: unknown
+
+  #itemParseOptions: Partial<ParseOptions> = {}
+
   canvases: Canvas[] = []
 
-  description?: LanguageString
-  metadata?: Metadata
-
-  navDate?: NavDate
-  navPlace?: NavPlace
   homepage?: Homepage
-  thumbnail?: Thumbnail
   rendering?: Rendering
   seeAlso?: SeeAlso
   summary?: Summary
@@ -109,20 +125,19 @@ export class Manifest extends EmbeddedManifest {
 
   readonly embedded = false
 
-  constructor(parsedManifest: ManifestType) {
+  constructor(
+    parsedManifest: ManifestType,
+    options?: Partial<ConstructorOptions>
+  ) {
     super(parsedManifest)
+
+    this.source = options?.source
 
     if ('@type' in parsedManifest) {
       // IIIF Presentation API 2.0
 
-      this.description = parseVersion2String(parsedManifest.description)
-      this.metadata = parseVersion2Metadata(parsedManifest.metadata)
-
       const sequence = parsedManifest.sequences[0]
-      this.canvases = sequence.canvases.map((canvas) => new Canvas(canvas))
-
-      this.navDate = parsedManifest.navDate
-      this.navPlace = parsedManifest.navPlace
+      this.canvases = this.#canvasesConstructor(sequence.canvases)
 
       this.requiredStatement = parseVersion2Attribution(
         parsedManifest.attribution
@@ -133,15 +148,7 @@ export class Manifest extends EmbeddedManifest {
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
 
-      this.description = parseVersion3String(parsedManifest.description)
-      this.metadata = parseVersion3Metadata(parsedManifest.metadata)
-
-      this.metadata = parseVersion3Metadata(parsedManifest.metadata)
-
-      this.navDate = parsedManifest.navDate
-      this.navPlace = parsedManifest.navPlace
       this.homepage = parsedManifest.homepage
-      this.thumbnail = parsedManifest.thumbnail
       this.rendering = parsedManifest.rendering
       this.seeAlso = parsedManifest.seeAlso
       this.summary = parsedManifest.summary
@@ -149,10 +156,20 @@ export class Manifest extends EmbeddedManifest {
 
       this.annotations = parsedManifest.annotations
 
-      this.canvases = parsedManifest.items.map((canvas) => new Canvas(canvas))
+      this.canvases = this.#canvasesConstructor(parsedManifest.items)
     } else {
       throw new Error('Unsupported Manifest')
     }
+  }
+
+  #canvasesConstructor(parsedCanvases: CanvasType[]) {
+    return parsedCanvases.flatMap((canvas) => {
+      try {
+        return new Canvas(canvas)
+      } catch {
+        return []
+      }
+    })
   }
 
   /**
@@ -161,10 +178,9 @@ export class Manifest extends EmbeddedManifest {
    * @param majorVersion - IIIF API version of Manifest. If not provided, it will be determined automatically
    * @returns Parsed IIIF Manifest
    */
-  static parse(
-    iiifManifest: unknown,
-    majorVersion: MajorVersion | null = null
-  ) {
+  static parse(iiifManifest: unknown, options?: Partial<ParseOptions>) {
+    const { majorVersion, keepSource } = options || {}
+
     let parsedManifest
 
     if (majorVersion === 2) {
@@ -175,7 +191,10 @@ export class Manifest extends EmbeddedManifest {
       parsedManifest = ManifestSchema.parse(iiifManifest)
     }
 
-    return new Manifest(parsedManifest)
+    return new Manifest(
+      parsedManifest,
+      keepSource ? { source: iiifManifest } : {}
+    )
   }
 
   get images() {
@@ -186,33 +205,35 @@ export class Manifest extends EmbeddedManifest {
     image: Image | EmbeddedImage,
     fetchFn: typeof fetch
   ): Promise<Image> {
-    if (image instanceof EmbeddedImage) {
+    if (image instanceof Image) {
+      return image
+    } else {
       const url = `${image.uri}/info.json`
 
       const iiifImage = await fetchFn(url).then((response) => response.json())
-      const fetchedImage = Image.parse(iiifImage)
+      const fetchedImage = Image.parse(iiifImage, {
+        keepSource: this.source !== undefined
+      })
       return fetchedImage
-    } else {
-      return image
     }
   }
 
-  async fetchAll(
+  async fetchAllItems(
     fetchFn: typeof fetch = globalThis.fetch
-  ): Promise<FetchNextResults<Image>[]> {
-    const results: FetchNextResults<Image>[] = []
+  ): Promise<FetchNextItemResults<Image>[]> {
+    const results: FetchNextItemResults<Image>[] = []
 
-    for await (const next of this.fetchNext(fetchFn)) {
+    for await (const next of this.fetchNextItem(fetchFn)) {
       results.push(next)
     }
 
     return results
   }
 
-  async *fetchNext(
+  async *fetchNextItem(
     fetchFn: typeof fetch = globalThis.fetch,
     depth = 0
-  ): AsyncGenerator<FetchNextResults<Image>, void, void> {
+  ): AsyncGenerator<FetchNextItemResults<Image>, void, void> {
     for (const canvas of this.canvases) {
       const fetchedImage = await this.#fetchImage(canvas.image, fetchFn)
       canvas.image = fetchedImage

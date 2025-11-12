@@ -2,35 +2,41 @@ import { goto } from '$app/navigation'
 
 import type { Page } from '@sveltejs/kit'
 
-import type { RouteID, Params } from '$lib/types/shared.js'
+import type { View, MaybeView } from '$lib/types/shared.js'
 
-export function createRouteUrl(
-  page: Page,
-  id: RouteID,
-  params?: Partial<Params>
-) {
-  const searchParams = new URLSearchParams(page.url.searchParams)
-  // TODO: consider only setting valid URL params
-  for (const [param, value] of Object.entries(params || {})) {
-    if (value !== undefined) {
-      if (value) {
-        searchParams.set(param, value)
-      } else {
-        searchParams.delete(param)
-      }
-    }
+export function getViewUrl(view: MaybeView): string {
+  if (view) {
+    return `/${view}`
+  } else {
+    return `/`
   }
+}
 
-  return `/${id}?${searchParams}`
+export function getNewParamsFromUrl(url: string) {
+  return {
+    url,
+    mapId: undefined,
+    manifestId: undefined,
+    imageId: undefined,
+    path: undefined,
+    page: undefined
+  }
 }
 
 export function gotoRoute(url: string) {
+  // eslint-disable-next-line svelte/no-navigation-without-resolve
   goto(url, {
     replaceState: false,
     keepFocus: true
   })
 }
 
-export function getRouteId(page: Page) {
-  return page.route.id?.slice(1) as RouteID
+export function getView(page: Page): View | undefined {
+  const regex = /\/\(views\)\/(?<routeId>\w+)/
+
+  const routeId = page.route?.id || ''
+
+  const match = routeId.match(regex)
+  const view = match?.groups?.routeId as MaybeView
+  return view
 }

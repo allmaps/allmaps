@@ -1,9 +1,10 @@
-import classifyPoint from 'robust-point-in-polygon'
+import inside from 'point-in-polygon-hao'
 
 import {
   doBboxesIntersect,
   pixelToIntArrayIndex,
-  pointToPixel
+  pointToPixel,
+  closeRing
 } from '@allmaps/stdlib'
 
 import { GetImageDataValue, GetImageDataSize } from './types.js'
@@ -12,7 +13,10 @@ import {
   tileToTileOriginPoint,
   clipTilePointToTile
 } from './tiles.js'
-import { applyTransform, invertTransform } from './matrix.js'
+import {
+  applyHomogeneousTransform,
+  invertHomogeneousTransform
+} from './homogeneous-transform.js'
 
 import type { WarpedMapList } from '../maps/WarpedMapList.js'
 import type { Viewport } from '../viewport/Viewport.js'
@@ -54,8 +58,8 @@ export async function renderToIntArray<W extends WarpedMap, D>(
     }
 
     const cachedTiles = tileCache.getMapCachedTiles(warpedMap.mapId)
-    const canvasToProjectedGeoTransform = invertTransform(
-      viewport.projectedGeoToCanvasTransform
+    const canvasToProjectedGeoHomogeneousTransform = invertHomogeneousTransform(
+      viewport.projectedGeoToCanvasHomogeneousTransform
     )
 
     // Step through all viewport pixels and set their color
@@ -73,19 +77,17 @@ export async function renderToIntArray<W extends WarpedMap, D>(
         const canvasPixel = [canvasPixelX, canvasPixelY] as Point
 
         // Get resourcePoint corresponding to this canvasPixel
-        const projectedGeoPoint = applyTransform(
-          canvasToProjectedGeoTransform,
+        const projectedGeoPoint = applyHomogeneousTransform(
+          canvasToProjectedGeoHomogeneousTransform,
           canvasPixel
         )
         const resourcePoint =
           warpedMap.projectedTransformer.transformToResource(projectedGeoPoint)
 
         // Apply mask: Check if resourcePoint is inside resource mask
-        // classifyPoint returns an integer which determines the position of point relative to polygon:
-        //   -1 if point lies inside polygon
-        //    0 if point lies on the polygon's edge
-        //    1 if point lies outside polygon
-        if (classifyPoint(warpedMap.resourceMask, resourcePoint) === 1) {
+        if (
+          inside(resourcePoint, [closeRing(warpedMap.resourceMask)]) === false
+        ) {
           continue
         }
 

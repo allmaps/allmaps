@@ -3,8 +3,14 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "paths": {}
+    "paths": {},
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
-  "references": [{ "path": "../types" }, { "path": "../transform" }, { "path": "../stdlib" }],
+  "references": [
+    { "path": "../types" },
+    { "path": "../transform" },
+    { "path": "../stdlib" }
+  ],
   "include": ["./src/**/*"]
 }

@@ -1,11 +1,18 @@
 {
   "name": "@allmaps/bearing",
-  "version": "1.0.0-beta.4",
-  "author": {
-    "name": "Bert Spaan",
-    "email": "hello@bertspaan.nl",
-    "url": "https://bertspaan.nl"
-  },
+  "version": "1.0.0-beta.8",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
   "description": "Compute bearing of georeferenced map",
   "type": "module",
   "exports": "./dist/index.js",
@@ -27,29 +34,28 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "build": "tsc",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test"
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src"
   },
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
-    "@turf/bearing": "^7.2.0"
+    "@allmaps/transform": "workspace:^"
   },
   "devDependencies": {
+    "@allmaps/render": "workspace:^",
+    "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "^5.7.0"

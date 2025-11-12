@@ -84,6 +84,13 @@ export type SvgGeometry =
 
 Bbox (`[number, number, number, number]`). Defined as \[xMin, yMin, xMax, yMax]
 
+### `BboxOptions`
+
+###### Fields
+
+* `clipLngLat` (`boolean`)
+* `clipWebMercator` (`boolean`)
+
 ### `Color`
 
 ###### Type
@@ -247,7 +254,28 @@ GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon
 
 * `[bin: string]` (`{count: number; color: Color}`)
 
-### `ImageInformations`
+### `HomogeneousTransform`
+
+Weights array of a 2D Homogeneous Transform Matrix
+
+These coefficients are used in the same order in multiple places
+
+* CSS Transform defined by a 2D matrix. Use `toString()` before using this as input for a CSS `matrix()` function.
+* WebGL 2D transform matrices.
+* OpenLayers' transform class.
+
+See: <https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix>
+See: <https://openlayers.org/en/latest/apidoc/module-ol_transform.html>
+
+Note: The weights array of a Polynomial1 Transformation has a different order. See the corresponding conversion functions.
+
+###### Type
+
+```ts
+[number, number, number, number, number, number]
+```
+
+### `ImageInfoByMapId`
 
 ###### Type
 
@@ -307,7 +335,7 @@ Array<Point>
 
 ###### Fields
 
-* `isMultiGeometry` (`false`)
+* `isMultiGeometry` (`boolean`)
 
 ### `MultiLineString`
 
@@ -377,6 +405,7 @@ So far no requirement on winding order. This is only applied when exporting to G
 
 Two numbers indicating the size of a Bbox as \[width, height] or \[xSize, ySize] (`[number, number]`).
 Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
+Alternatively, two numbers indicating the dimensions of a matrix: rows, cols (which is a different handedness!)
 
 ### `SizeObject`
 
@@ -475,14 +504,6 @@ SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect
 * `rows` (`number`)
 * `scaleFactor` (`number`)
 * `width` (`number`)
-
-### `Transform`
-
-###### Type
-
-```ts
-[number, number, number, number, number, number]
-```
 
 ### `Triangle`
 

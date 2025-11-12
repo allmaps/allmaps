@@ -1,11 +1,13 @@
+export type HexColor = `#${string}`
+
 export type Shades = [
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string
+  HexColor,
+  HexColor,
+  HexColor,
+  HexColor,
+  HexColor,
+  HexColor,
+  HexColor,
+  HexColor,
+  HexColor
 ]

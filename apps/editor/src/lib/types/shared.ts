@@ -1,28 +1,27 @@
 import type {
   Image as IIIFImage,
+  EmbeddedImage as IIIFEmbeddedImage,
+  Canvas as IIIFCanvas,
   Manifest as IIIFManifest,
-  Collection as IIIFCollection
+  EmbeddedManifest as IIIFEmbeddedManifest,
+  Collection as IIIFCollection,
+  EmbeddedCollection as IIIFEmbeddedCollection
 } from '@allmaps/iiif-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-
-export type ParamKey =
-  | 'url'
-  | 'manifest'
-  | 'image'
-  | 'map'
-  | 'callback'
-  | 'bbox'
-  | 'basemap-url'
-  | 'basemap-preset'
-  | 'background-georeference-annotation-url'
-
-export type Params = { [key in ParamKey]?: string | null }
+import type { GeojsonPolygon } from '@allmaps/types'
+import type { PickerProjection } from '@allmaps/components/projections'
 
 export type Organization = {
-  id: string
   title: string
+  label?: string | ((title: string) => string)
   subtitle?: string
+  baseUrls: string[]
+  allowCallback?: boolean
+}
+
+export type OrganizationWithId = Organization & {
+  id: string
 }
 
 export type GCP = {
@@ -33,11 +32,23 @@ export type GCP = {
 export type Point = [number, number]
 
 export type View = 'images' | 'mask' | 'georeference' | 'results'
-export type RouteID = View | ''
+export type MaybeView = View | undefined
 
 export type Scope = 'images' | 'image' | 'map'
 
 export type SourceType = 'image' | 'manifest' | 'collection'
+
+export type IIIFPresentationResource =
+  | IIIFCollection
+  | IIIFEmbeddedCollection
+  | IIIFCanvas
+  | IIIFManifest
+  | IIIFEmbeddedManifest
+
+export type IIIFResource =
+  | IIIFPresentationResource
+  | IIIFEmbeddedImage
+  | IIIFImage
 
 type BaseSource = {
   url: string
@@ -47,17 +58,17 @@ type BaseSource = {
   parsedIiif: IIIFImage | IIIFManifest | IIIFCollection
 }
 
-type ImageSource = {
+export type ImageSource = {
   type: 'image'
   parsedIiif: IIIFImage
 }
 
-type ManifestSource = {
+export type ManifestSource = {
   type: 'manifest'
   parsedIiif: IIIFManifest
 }
 
-type CollectionSource = {
+export type CollectionSource = {
   type: 'collection'
   parsedIiif: IIIFCollection
 }
@@ -83,14 +94,92 @@ export type Example = {
   imageId: string
 }
 
-export type Viewport = {
-  zoom: number
-  center: number[]
-  rotation: number
+export type Viewport =
+  | {
+      zoom: number
+      center: [number, number]
+      bearing: number
+    }
+  | {
+      bounds: [number, number, number, number]
+    }
+
+export type AllmapsPluginId = 'maplibre' | 'leaflet' | 'openlayers'
+
+export type AllmapsPluginItem = {
+  label: string
+  value: AllmapsPluginId
 }
 
-export type PresetBaseMapID = 'esri-world-topo' | 'esri-world-imagery' | 'osm'
+export type BasemapPresetId =
+  | 'protomaps'
+  | 'esri-world-topo'
+  | 'esri-world-imagery'
+  | 'osm'
+
+export type BasemapProtomapsPreset = {
+  type: 'protomaps'
+  attribution?: string
+}
+
+export type BasemapRasterPreset = {
+  url: string
+  type: 'raster'
+  attribution?: string
+}
+
+export type BasemapPreset = BasemapProtomapsPreset | BasemapRasterPreset
+
+export type BasemapPresetItem = {
+  label: string
+  value: BasemapPresetId
+} & BasemapPreset
 
 export type ClickedItem =
   | { type: 'map'; mapId: string }
   | { type: 'gcp'; mapId: string; gcpId: string }
+
+// export type GetProjectionById = (id: string) => PickerProjection | undefined
+export type ProjectionsById = Record<string, PickerProjection>
+
+export type Message = { text: string; type: 'error' | 'success' | 'info' }
+
+export type CollectionPath = {
+  index: number
+  page?: number
+}[]
+
+export type SearchParam<T = unknown> = {
+  key: string
+  default?: T
+  toString?: (value: T) => string | undefined
+  parse?: (value: string | undefined) => T | undefined
+}
+
+export type SearchParams = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [K in string]: SearchParam<any>
+}
+
+// Extract the type T from SearchParam<T>
+export type ExtractSearchParamType<T> =
+  T extends SearchParam<infer U> ? U : never
+
+export type SearchParamsInput<
+  T extends SearchParams,
+  K extends keyof T = keyof T
+> = {
+  [P in K]?: ExtractSearchParamType<T[P]>
+}
+
+export type Breadcrumb = {
+  label?: string
+  path: CollectionPath
+  type: 'collection' | 'manifest' | 'canvas'
+  id: string
+}
+
+export type WarpedResourceMask = {
+  id: string
+  polygon: GeojsonPolygon
+}

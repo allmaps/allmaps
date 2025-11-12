@@ -1,4 +1,4 @@
-import classifyPoint from 'robust-point-in-polygon'
+import inside from 'point-in-polygon-hao'
 
 import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
 
@@ -9,9 +9,10 @@ import {
   polygonSelfIntersectionPoints,
   arrayRepeated,
   bboxToDiameter,
-  isPoint
+  isPoint,
+  closeRing
 } from '@allmaps/stdlib'
-import { Helmert, Polynomial } from '@allmaps/transform'
+import { Helmert, Polynomial1 } from '@allmaps/transform'
 import {
   AnalysisOptions,
   AnalysisItem,
@@ -237,7 +238,9 @@ export class Analyzer {
       const gcpsOutside = []
       for (const gcp of this.georeferencedMap.gcps) {
         if (
-          classifyPoint(this.georeferencedMap.resourceMask, gcp.resource) == 1
+          inside(gcp.resource, [
+            closeRing(this.georeferencedMap.resourceMask)
+          ]) === false
         ) {
           gcpsOutside.push(gcp)
         }
@@ -248,12 +251,7 @@ export class Analyzer {
           code,
           resourcePoint: gcp.resource,
           gcpIndex: index,
-          message:
-            'GCP ' +
-            index +
-            ' with resource coordinates [' +
-            gcp.resource +
-            '] outside mask.'
+          message: `GCP ${index} with resource coordinates [${gcp.resource}] outside mask.`
         })
       })
     }
@@ -262,10 +260,13 @@ export class Analyzer {
     code = 'maskpointoutsidefullmask'
     if (codes.includes(code) && this.warpedMap) {
       const resourceMaskOutsideFullMaskPoints = []
+
+      const closedResourceFullMask = [
+        closeRing(this.warpedMap.resourceFullMask)
+      ]
+
       for (const resourcePoint of this.warpedMap.resourceMask) {
-        if (
-          classifyPoint(this.warpedMap.resourceFullMask, resourcePoint) == 1
-        ) {
+        if (inside(resourcePoint, closedResourceFullMask) === false) {
           resourceMaskOutsideFullMaskPoints.push(resourcePoint)
         }
       }
@@ -276,12 +277,7 @@ export class Analyzer {
             code,
             resourcePoint: resourceMaskOutsideFullMaskPoint,
             gcpIndex: index,
-            message:
-              'Mask point ' +
-              index +
-              ' with resource coordinates [' +
-              resourceMaskOutsideFullMaskPoint +
-              '] outside full mask.'
+            message: `Mask point ${index} with resource coordinates [${resourceMaskOutsideFullMaskPoint}] outside full mask.`
           })
         }
       )
@@ -314,17 +310,14 @@ export class Analyzer {
       const measures = this.getMeasures()
       if (
         measures &&
-        measures.polynomialShear &&
-        (measures.polynomialShear[0] > MAX_SHEAR ||
-          measures.polynomialShear[1] > MAX_SHEAR)
+        measures.polynomial1Measures &&
+        (measures.polynomial1Measures.shears[0] > MAX_SHEAR ||
+          measures.polynomial1Measures.shears[1] > MAX_SHEAR)
       ) {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message:
-            'A polynomial transformation shows a shear higher then ' +
-            MAX_SHEAR +
-            '.'
+          message: `A polynomial transformation shows a shear higher then ${MAX_SHEAR}.`
         })
       }
     }
@@ -360,7 +353,7 @@ export class Analyzer {
           code,
           geoPoint: gcp.geo,
           gcpIndex: index,
-          message: 'GCP ' + index + ' missing resource coordinates.'
+          message: `GCP ${index} missing resource coordinates.`
         })
       })
     }
@@ -378,7 +371,7 @@ export class Analyzer {
           code,
           resourcePoint: gcp.resource,
           gcpIndex: index,
-          message: 'GCP ' + index + ' missing geo coordinates.'
+          message: `GCP ${index} missing geo coordinates.`
         })
       })
     }
@@ -397,10 +390,7 @@ export class Analyzer {
       this.errors.push({
         mapId: this.mapId,
         code,
-        message:
-          'There are ' +
-          this.georeferencedMap.gcps.length +
-          ' GCPs, but a minimum of 2 are required (for a Helmert transform).'
+        message: `There are ${this.georeferencedMap.gcps.length} GCPs, but a minimum of 2 are required (for a Helmert transform).`
       })
     }
 
@@ -410,10 +400,7 @@ export class Analyzer {
       this.errors.push({
         mapId: this.mapId,
         code,
-        message:
-          'There are ' +
-          this.georeferencedMap.gcps.length +
-          ' GCPs, but a minimum of 3 are required.'
+        message: `There are ${this.georeferencedMap.gcps.length} GCPs, but a minimum of 3 are required.`
       })
     }
 
@@ -429,10 +416,7 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: resourceRepeatedPoint,
-          message:
-            'GCP resource coordinates [' +
-            resourceRepeatedPoint +
-            '] are repeated.'
+          message: `GCP resource coordinates [${resourceRepeatedPoint}] are repeated.`
         })
       })
     }
@@ -447,8 +431,7 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           geoPoint: geoRepeatedPoint,
-          message:
-            'GCP geo coordinates [' + geoRepeatedPoint + '] are repeated.'
+          message: `GCP geo coordinates [${geoRepeatedPoint}] are repeated.`
         })
       })
     }
@@ -482,10 +465,7 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: resourceMaskRepeatedPoint,
-          message:
-            'Mask resource coordinates [' +
-            resourceMaskRepeatedPoint +
-            '] are repeated.'
+          message: `Mask resource coordinates [${resourceMaskRepeatedPoint}] are repeated.`
         })
       })
     }
@@ -502,10 +482,7 @@ export class Analyzer {
             mapId: this.mapId,
             code,
             resourcePoint: resourceMaskSelfIntersectionPoint,
-            message:
-              'The mask self-intersects at resource coordinates [' +
-              resourceMaskSelfIntersectionPoint +
-              '].'
+            message: `The mask self-intersects at resource coordinates [${resourceMaskSelfIntersectionPoint}].`
           })
         }
       )
@@ -528,16 +505,11 @@ export class Analyzer {
     const projectedPolynomialTransformer =
       this.warpedMap.getProjectedTransformer('polynomial')
     const toProjectedGeoPolynomialTransformation =
-      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial
+      projectedPolynomialTransformer.getToGeoTransformation() as Polynomial1
 
-    const polynomialRmse = toProjectedGeoPolynomialTransformation.rmse
-    const polynomialParameters =
-      toProjectedGeoPolynomialTransformation.polynomialParameters
-    const polynomialScale = toProjectedGeoPolynomialTransformation.scale
-    const polynomialRotation = toProjectedGeoPolynomialTransformation.rotation
-    const polynomialShear = toProjectedGeoPolynomialTransformation.shear
-    const polynomialTranslation =
-      toProjectedGeoPolynomialTransformation.translation
+    const polynomial1Rmse = toProjectedGeoPolynomialTransformation.getRmse()
+    const polynomial1Measures =
+      toProjectedGeoPolynomialTransformation.getMeasures()
 
     // Helmert
     const projectedHelmertTransformer =
@@ -545,47 +517,35 @@ export class Analyzer {
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
 
-    const helmertRmse = toProjectedGeoHelmertTransformation.rmse
-    const helmertParameters =
-      toProjectedGeoHelmertTransformation.helmertParameters
-    const helmertScale = toProjectedGeoHelmertTransformation.scale
-    const helmertRotation = toProjectedGeoHelmertTransformation.rotation
-    const helmertTranslation = toProjectedGeoHelmertTransformation.translation
+    const helmertRmse = toProjectedGeoHelmertTransformation.getRmse()
+    const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
     const toProjectedGeoTransformation =
       projectedTransformer.getToGeoTransformation()
-    const rmse = toProjectedGeoTransformation.rmse
-    const destinationErrors = toProjectedGeoTransformation.errors
+    const rmse = toProjectedGeoTransformation.getRmse()
+    const destinationErrors = toProjectedGeoTransformation.getErrors()
+    // Note: this could be spead up, since it recomputes this.warpedMap.projectedGeoTransformedResourcePoints
     // Note: we scale using the helmert transform instead of computing errors in resource
     // TODO: check if it's indeed deviding by scale
-    const resourceErrors = toProjectedGeoTransformation.errors.map(
-      (error) => error / toProjectedGeoHelmertTransformation.scale
+    const resourceErrors = destinationErrors.map(
+      (error) => error / helmertMeasures.scale
     )
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
     const resourceMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.resourceMaskBbox
     )
-    const resourceRelativeErrors = toProjectedGeoTransformation.errors.map(
-      (error) =>
-        error /
-        (toProjectedGeoHelmertTransformation.scale * resourceMaskBboxDiameter)
+    const resourceRelativeErrors = destinationErrors.map(
+      (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
     )
 
     this.measures = {
       mapId: this.mapId,
-      polynomialRmse,
-      polynomialParameters,
-      polynomialScale,
-      polynomialRotation,
-      polynomialShear,
-      polynomialTranslation,
+      polynomial1Rmse,
+      polynomial1Measures,
       helmertRmse,
-      helmertParameters,
-      helmertScale,
-      helmertRotation,
-      helmertTranslation,
+      helmertMeasures,
       rmse,
       destinationErrors,
       resourceErrors,

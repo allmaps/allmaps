@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { GcpTransformer } from '../dist/index.js'
+import { GcpTransformer } from '../src/index.js'
 
 import { gcps10 } from '../test/input/gcps-test.js'
 
@@ -10,7 +9,8 @@ function logBenchmarkCreateGcpTransformer(input, type) {
   ops = 0
   while (Date.now() - start < 1000) {
     const transformer = new GcpTransformer(input, type)
-    transformer.getToGeoTransformation()
+    const transformation = transformer.getToGeoTransformation()
+    transformation.solve()
     ops++
   }
   console.log(

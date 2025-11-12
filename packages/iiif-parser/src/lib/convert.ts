@@ -237,10 +237,16 @@ export function parseVersion2Related(related?: Related2): Homepage | undefined {
       ]
     } else if (Array.isArray(related)) {
       return related.map((item) => {
-        return {
-          id: item['@id'],
-          label: parseVersion2String(item.label),
-          format: item.format
+        if (typeof item === 'string') {
+          return {
+            id: item
+          }
+        } else {
+          return {
+            id: item['@id'],
+            label: parseVersion2String(item.label),
+            format: item.format
+          }
         }
       })
     } else {

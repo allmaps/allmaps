@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
-import tailwind from '@astrojs/tailwind'
+import tailwindcss from '@tailwindcss/vite'
 import svelte from '@astrojs/svelte'
 
 import ports from '../../ports.json' with { type: 'json' }
@@ -9,7 +9,7 @@ const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
 
 const isDevelop = import.meta.env.DEV
 const branch = isDevelop ? 'develop' : 'main'
-const editLinkBaseUrl = `https://github.com/allmaps/allmaps.github.io/tree/${branch}/`
+const editLinkBaseUrl = `https://github.com/allmaps/allmaps/tree/${branch}/apps/homepage/`
 
 export default defineConfig({
   server: { port: ports.homepage, host: true },
@@ -19,6 +19,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Allmaps',
+      defaultLocale: 'en',
       logo: {
         src: './src/images/allmaps-logo.svg'
       },
@@ -35,9 +36,13 @@ export default defineConfig({
           ]
         : undefined,
       favicon: '/favicon.png',
-      social: {
-        github: 'https://github.com/allmaps/allmaps'
-      },
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/allmaps/allmaps'
+        }
+      ],
       editLink: {
         baseUrl: editLinkBaseUrl
       },
@@ -92,19 +97,20 @@ export default defineConfig({
         ThemeProvider: './src/components/overrides/ThemeProvider.astro'
       },
       customCss: [
+        './src/css/layer-order.css',
         './src/css/overrides.css',
-        './src/css/tailwind.css',
         './src/css/fonts.css',
-        './src/css/starlight.css'
+        './src/css/starlight.css',
+        './src/css/tailwind.css'
       ]
     }),
-    svelte(),
-    tailwind({ applyBaseStyles: false })
+    svelte()
   ],
-  // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
+
   vite: {
     ssr: {
       noExternal: ['maplibre-gl', 'maplibre-contour']
-    }
+    },
+    plugins: [tailwindcss()]
   }
 })

@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { UrlState } from '$lib/state/url.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
   import iiifLogoBlack from '$lib/images/iiif-black.svg'
 
+  let urlState = getUrlState()
+
   type Props = {
-    urlState: UrlState
     onSubmit: (url: string) => void
-    autofocus?: boolean
+    // autofocus?: boolean
     placeholder?: string
   }
 
   let {
-    urlState,
     onSubmit,
-    autofocus = false,
+    // autofocus = false,
     placeholder = 'Open a IIIF resource from a URL'
   }: Props = $props()
 
-  let value = $state(urlState.url)
+  let value = $state(urlState.params.url)
 
   $effect(() => {
-    if (urlState.url) {
-      value = urlState.url
+    if (urlState.params.url) {
+      value = urlState.params.url
     } else {
       value = ''
     }
@@ -40,17 +40,17 @@
 
 <form
   onsubmit={handleSubmit}
-  class="text-sm flex items-center cursor-pointer px-3 py-0.5 gap-1 w-full rounded-full shadow-xs focus-within:shadow-lg bg-white
-    border border-gray-300 focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500 transition-all"
+  class="flex w-full cursor-pointer items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-0.5
+    text-sm shadow-xs transition-all focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500"
 >
   <img src={iiifLogoBlack} class="size-4 opacity-75" alt="IIIF logo" />
-  <!-- svelte-ignore a11y_autofocus -->
   <input
+    name="url"
     type="input"
-    {autofocus}
     bind:value
     bind:this={input}
-    class="bg-transparent w-full px-2 py-1 focus:outline-hidden truncate"
+    onfocus={() => input.select()}
+    class="w-full truncate bg-transparent px-2 py-1 focus:outline-hidden"
     {placeholder}
   />
 </form>

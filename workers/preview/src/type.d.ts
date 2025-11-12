@@ -1,4 +1,4 @@
-interface CacheStorage {
+type CacheStorage = {
   default: Cache
 }
 

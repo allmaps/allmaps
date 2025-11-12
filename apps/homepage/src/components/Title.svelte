@@ -28,41 +28,36 @@
   const HOVER_TIMEOUT = 1000
 
   let topElement: HTMLElement
-  let titleElement: HTMLElement
 
   const maskCount = 5
-  let finishedAnimationCount = 0
+  let finishedAnimationCount = $state(0)
 
   let scrolledDown = false
-  let introFinished = false
+  let introFinished = $derived(finishedAnimationCount === maskCount)
 
-  $: {
-    if (finishedAnimationCount === maskCount) {
-      introFinished = true
-    }
-  }
+  let interactive = $derived(introFinished && !scrolledDown)
 
-  $: interactive = introFinished && !scrolledDown
+  let mouseX = $state(0)
+  let mouseY = $state(0)
 
-  let mouseX = 0
-  let mouseY = 0
-
-  let width = 0
-  let height = 0
+  let width = $state(0)
+  let height = $state(0)
 
   let scaleTo = 420
   let distance = 260 + scaleTo / 2
 
   const gradientMultiplier = 1 / 4
 
-  $: gradientX =
+  let gradientX = $derived(
     width === 0
       ? '50%'
       : `${((mouseX / width) * 100 - 50) * gradientMultiplier + 50}%`
-  $: gradientY =
+  )
+  let gradientY = $derived(
     height === 0
       ? '50%'
       : `${((mouseY / height) * 100 - 50) * gradientMultiplier + 50}%`
+  )
 
   let timeout: number = 0
 
@@ -120,15 +115,16 @@
   const gradientFrom = '#25318f'
   const gradientTo = '#101656'
 
-  let loading = false
-  let showMap: GeoreferencedMap | undefined
-  let bounds: Bbox | undefined
-  let showBasemap = false
-  let warpedMapReady = false
+  let loading = $state(false)
+  let showMap = $state<GeoreferencedMap>()
+  let bounds = $state<Bbox>()
+  let showBasemap = $state(false)
+  let warpedMapReady = $state(false)
 
-  let maps: (GeoreferencedMap | undefined)[] = Array(maskCount).fill(undefined)
-  let masks: (string | undefined)[] = Array(maskCount).fill(undefined)
-  let maskIntroFinished = Array(maskCount).fill(false)
+  let maps = $state<(GeoreferencedMap | undefined)[]>(
+    Array(maskCount).fill(undefined)
+  )
+  let masks = $state<(string | undefined)[]>(Array(maskCount).fill(undefined))
 
   const maskColors = ['#63D8E6', '#FE5E60', '#ffc742', '#C552B5', '#64C18F']
 
@@ -162,10 +158,7 @@
       //    resource coordinates using projectedTransformer
       // 3. Transform these resource coordinates to lat/lon using transformer
 
-      const pixelScreenSize: Size = [
-        titleElement.clientWidth,
-        titleElement.clientHeight
-      ]
+      const pixelScreenSize: Size = [width, height]
       const pixelPathRectSize: Size = [
         pixelPathRect.width,
         pixelPathRect.height
@@ -213,18 +206,6 @@
     for (let i = array.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       ;[array[i], array[j]] = [array[j], array[i]]
-    }
-  }
-
-  function handleResize(entries: ResizeObserverEntry[]) {
-    for (const entry of entries) {
-      if (entry.contentBoxSize) {
-        width = entry.contentBoxSize[0].inlineSize
-        height = entry.contentBoxSize[0].blockSize
-      } else {
-        width = entry.contentRect.width
-        height = entry.contentRect.height
-      }
     }
   }
 
@@ -282,14 +263,7 @@
     return [Math.cos(radians) * distance, Math.sin(radians) * distance]
   }
 
-  onMount(async () => {
-    mouseX = titleElement.clientWidth / 2
-    mouseY = titleElement.clientHeight / 2
-
-    width = titleElement.clientWidth
-    height = titleElement.clientHeight
-
-    new ResizeObserver(handleResize).observe(titleElement)
+  onMount(() => {
     new IntersectionObserver(handleIntersection, {
       threshold: 1
     }).observe(topElement)
@@ -322,8 +296,9 @@
 <div bind:this={topElement}></div>
 <div
   id="title"
-  bind:this={titleElement}
-  on:mousemove={handleMousemove}
+  bind:clientHeight={height}
+  bind:clientWidth={width}
+  onmousemove={handleMousemove}
   style="
     --gradient-x: {gradientX}; --gradient-y: {gradientY};
     --gradient-from: {gradientFrom}; --gradient-to: {gradientTo};"
@@ -354,7 +329,7 @@
                 start: 3,
                 easing: expoOut
               }}
-              on:introend={() => finishedAnimationCount++}
+              onintroend={() => finishedAnimationCount++}
             >
               <g
                 transform={pointToTranslate(
@@ -368,9 +343,9 @@
                 <path
                   role="presentation"
                   class="pointer-events-auto cursor-pointer [fill-opacity:0.5] transition-all duration-300"
-                  on:click={(event) => handleMaskClick(event, index)}
-                  on:mouseenter={(event) => handleMaskMouseenter(event, index)}
-                  on:mouseleave={handleMaskMouseleave}
+                  onclick={(event) => handleMaskClick(event, index)}
+                  onmouseenter={(event) => handleMaskMouseenter(event, index)}
+                  onmouseleave={handleMaskMouseleave}
                   transform="translate(-{scaleTo / 2} -{scaleTo / 2})"
                   d={mask}
                   style:fill={maskColors[index]}
@@ -405,7 +380,7 @@
           <button
             transition:fade
             class="bg-pink rounded-full px-6 py-4 text-white font-bold cursor-pointer"
-            on:click={handleCloseWarpedMap}>Back to homepage</button
+            onclick={handleCloseWarpedMap}>Back to homepage</button
           >
         </div>
       {/if}

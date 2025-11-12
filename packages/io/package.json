@@ -1,0 +1,65 @@
+{
+  "name": "@allmaps/io",
+  "version": "1.0.0-beta.2",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "description": "Import properties and export derivatives of Georeference Annotations",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/io"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "io"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc && pnpm run documentation",
+    "types": "tsc --noEmit",
+    "documentation": "remark . --output --use remark-api",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/project": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
+    "stream-json": "^1.9.1"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.0",
+    "@types/stream-json": "^1.7.2",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
+    "typescript": "^5.7.0"
+  }
+}

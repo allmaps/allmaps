@@ -16,19 +16,21 @@ import {
   midPoint,
   scalePoints,
   rotatePoint,
-  mergeOptions
+  mergeOptions,
+  bindPointWebMercatorProjection
 } from '@allmaps/stdlib'
 import {
   lonLatProjection,
   webMercatorProjection,
-  proj4
+  proj4,
+  isEqualProjection
 } from '@allmaps/project'
 
 import {
-  composeTransform,
-  applyTransform,
-  invertTransform
-} from '../shared/matrix.js'
+  composeHomogeneousTransform,
+  applyHomogeneousTransform,
+  invertHomogeneousTransform
+} from '../shared/homogeneous-transform.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'
 
 import type {
@@ -36,7 +38,7 @@ import type {
   Rectangle,
   Size,
   Bbox,
-  Transform,
+  HomogeneousTransform,
   Fit,
   Polygon
 } from '@allmaps/types'
@@ -99,10 +101,10 @@ const defaultFitOptions = {
  * @property canvasResolution - Resolution of the canvas in canvas pixels (viewportSize*devicePixelRatio), as width * height.
  * @property canvasBbox - Bounding box of the canvas, in canvas pixels.
  * @property projectedGeoPerCanvasScale - Scale of the viewport, in projected geospatial coordinates per canvas pixel (projectedGeoPerViewportScale/devicePixelRatio).
- * @property projectedGeoToViewportTransform - Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
- * @property projectedGeoToCanvasTransform - Transform from projected geo coordinates to canvas pixels.
- * @property projectedGeoToClipTransform - Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
- * @property viewportToClipTransform - Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
+ * @property projectedGeoToViewportHomogeneousTransform - Homogeneous Transform from projected geo coordinates to viewport pixels. Equivalent to OpenLayers coordinateToPixelTransform.
+ * @property projectedGeoToCanvasHomogeneousTransform - Homogeneous Transform from projected geo coordinates to canvas pixels.
+ * @property projectedGeoToClipHomogeneousTransform - Homogeneous Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
+ * @property viewportToClipHomogeneousTransform - Homogeneous Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
  */
 export class Viewport {
   geoCenter: Point
@@ -136,10 +138,16 @@ export class Viewport {
   canvasBbox: Bbox
 
   projectedGeoPerCanvasScale: number
-  projectedGeoToViewportTransform: Transform = [1, 0, 0, 1, 0, 0]
-  projectedGeoToCanvasTransform: Transform = [1, 0, 0, 1, 0, 0]
-  projectedGeoToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
-  viewportToClipTransform: Transform = [1, 0, 0, 1, 0, 0]
+  projectedGeoToViewportHomogeneousTransform: HomogeneousTransform = [
+    1, 0, 0, 1, 0, 0
+  ]
+  projectedGeoToCanvasHomogeneousTransform: HomogeneousTransform = [
+    1, 0, 0, 1, 0, 0
+  ]
+  projectedGeoToClipHomogeneousTransform: HomogeneousTransform = [
+    1, 0, 0, 1, 0, 0
+  ]
+  viewportToClipHomogeneousTransform: HomogeneousTransform = [1, 0, 0, 1, 0, 0]
 
   /**
    * Creates a new Viewport
@@ -188,11 +196,14 @@ export class Viewport {
     this.projectedGeoResolution = sizeToResolution(this.projectedGeoSize)
 
     // TODO: improve this with an interpolated back-projection, resulting in a ring
+    // TODO: like in getGeoBufferedRectangle, project to lnglat without wrapping, using `+over`
     this.geoRectangle = this.projectedGeoRectangle.map((point) => {
       return proj4(
         this.projection.definition,
         lonLatProjection.definition,
-        point
+        isEqualProjection(this.projection, webMercatorProjection)
+          ? bindPointWebMercatorProjection(point)
+          : point
       )
     }) as Rectangle
     this.geoRectangleBbox = computeBbox(this.geoRectangle)
@@ -214,12 +225,14 @@ export class Viewport {
     this.projectedGeoPerCanvasScale =
       this.projectedGeoPerViewportScale / this.devicePixelRatio
 
-    this.projectedGeoToViewportTransform =
-      this.composeProjectedGeoToViewportTransform()
-    this.projectedGeoToCanvasTransform =
-      this.composeProjectedGeoToCanvasTransform()
-    this.projectedGeoToClipTransform = this.composeProjectedGeoToClipTransform()
-    this.viewportToClipTransform = this.composeViewportToClipTransform()
+    this.projectedGeoToViewportHomogeneousTransform =
+      this.composeProjectedGeoToViewportHomogeneousTransform()
+    this.projectedGeoToCanvasHomogeneousTransform =
+      this.composeProjectedGeoToCanvasHomogeneousTransform()
+    this.projectedGeoToClipHomogeneousTransform =
+      this.composeProjectedGeoToClipHomogeneousTransform()
+    this.viewportToClipHomogeneousTransform =
+      this.composeViewportToClipHomogeneousTransform()
   }
 
   /**
@@ -459,22 +472,40 @@ export class Viewport {
     )
   }
 
-  getProjectedGeoBufferedRectangle(bufferFraction: number): Rectangle {
+  getProjectedGeoBufferedRectangle(bufferFraction?: number): Rectangle {
     const viewportBufferedBbox = bufferBboxByRatio(
       this.viewportBbox,
       bufferFraction
     )
     const viewportBufferedRectangle = bboxToRectangle(viewportBufferedBbox)
     return viewportBufferedRectangle.map((point) =>
-      applyTransform(
-        invertTransform(this.projectedGeoToViewportTransform),
+      applyHomogeneousTransform(
+        invertHomogeneousTransform(
+          this.projectedGeoToViewportHomogeneousTransform
+        ),
         point
       )
     ) as Rectangle
   }
 
-  private composeProjectedGeoToViewportTransform(): Transform {
-    return composeTransform(
+  getGeoBufferedRectangle(bufferFraction?: number): Rectangle {
+    return this.getProjectedGeoBufferedRectangle(bufferFraction).map((point) =>
+      proj4(
+        this.projection.definition,
+        lonLatProjection.definition,
+        isEqualProjection(this.projection, webMercatorProjection)
+          ? bindPointWebMercatorProjection(point)
+          : point
+      )
+    ) as Rectangle
+    // TODO: solve this for random viewport projections:
+    // Don't bind points but project to lnglat without wrapping, using `+over`
+    // (when supported, see https://github.com/proj4js/proj4js/pull/396)
+    // then, where bbox is computed from this, use bbox clipping option.
+  }
+
+  private composeProjectedGeoToViewportHomogeneousTransform(): HomogeneousTransform {
+    return composeHomogeneousTransform(
       this.viewportCenter[0],
       this.viewportCenter[1],
       1 / this.projectedGeoPerViewportScale,
@@ -485,8 +516,8 @@ export class Viewport {
     )
   }
 
-  private composeProjectedGeoToCanvasTransform(): Transform {
-    return composeTransform(
+  private composeProjectedGeoToCanvasHomogeneousTransform(): HomogeneousTransform {
+    return composeHomogeneousTransform(
       this.canvasCenter[0],
       this.canvasCenter[1],
       1 / this.projectedGeoPerCanvasScale,
@@ -497,8 +528,8 @@ export class Viewport {
     )
   }
 
-  private composeProjectedGeoToClipTransform(): Transform {
-    return composeTransform(
+  private composeProjectedGeoToClipHomogeneousTransform(): HomogeneousTransform {
+    return composeHomogeneousTransform(
       0,
       0,
       2 / (this.projectedGeoPerViewportScale * this.viewportSize[0]),
@@ -509,8 +540,8 @@ export class Viewport {
     )
   }
 
-  private composeViewportToClipTransform(): Transform {
-    return composeTransform(
+  private composeViewportToClipHomogeneousTransform(): HomogeneousTransform {
+    return composeHomogeneousTransform(
       0,
       0,
       2 / this.viewportSize[0],

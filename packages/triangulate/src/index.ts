@@ -1,5 +1,6 @@
 import {
   getGridPointsInBbox,
+  interpolateRing,
   interpolatePolygon,
   pointInPolygon
 } from './shared.js'
@@ -13,7 +14,6 @@ import {
 
 import Delaunator from 'delaunator'
 
-// @ts-expect-error Ignore missing types
 import Constrainautor from '@kninnug/constrainautor'
 
 import type {
@@ -49,6 +49,8 @@ const defaultTriangulationOptions = {
   steinerPoints: [],
   minimumTriangleAngle: MINIMUM_TRIANGLE_ANGLE
 } as TriangluationOptions
+
+export { interpolateRing, interpolatePolygon }
 
 /**
  * Triangulate a polygon to triangles smaller then a distance

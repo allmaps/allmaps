@@ -2,60 +2,88 @@ import Fuse from 'fuse.js'
 import Flatbush from 'flatbush'
 
 import { bboxToResolution } from '@allmaps/stdlib'
+import { webMercatorProjection } from '@allmaps/project'
 
 import type { Bbox } from '@allmaps/types'
+import type { Projection } from '@allmaps/project'
 
-export type Projection = {
-  code: string
-  definition?: string
-  name: string
+export type PickerProjection = Projection & {
+  id: string
+  epsg?: number
   bbox?: Bbox
-  comment?: string
 }
-type ProjectionWithBbox = Projection & { bbox: Bbox; bboxArea: number }
+type PickerProjectionWithBbox = PickerProjection & {
+  bbox: Bbox
+  bboxArea: number
+}
 
-export function createSearchProjectionsWithFuse(
-  projections: Projection[]
-): (query: string) => Projection[] {
-  const fuse = new Fuse(projections, {
-    keys: ['name'], // Fields to search
-    threshold: 0.3, // Lower means stricter matching
-    minMatchCharLength: 3 // Minimum characters that must match
-  })
+export const webMercatorPickerProjection: PickerProjection = {
+  ...webMercatorProjection,
+  id: 'https://api.allmaps.org/projections/7bd0cfae6ba3f42d',
+  epsg: 3857
+}
 
-  return function searchProjections(query: string): Projection[] {
-    return fuse.search(query).map((result) => result.item)
+function emptyIndex(): PickerProjection[] {
+  return []
+}
+
+export function createFullTextIndex(
+  projections: PickerProjection[]
+): (query: string) => PickerProjection[] {
+  if (projections.length === 0) {
+    return emptyIndex
   }
-}
 
-export function createSuggestProjectionsWithFlatbush(
-  projections: Projection[]
-): (bbox: Bbox) => Projection[] {
-  const projectionWithBbox: ProjectionWithBbox[] = []
-  projections.forEach((projection) => {
-    if (projection.bbox != undefined) {
-      projectionWithBbox.push({
-        ...projection,
-        bbox: projection.bbox,
-        bboxArea: bboxToResolution(projection.bbox)
-      })
+  try {
+    const fuse = new Fuse(projections, {
+      keys: ['name']
+    })
+
+    return function (query: string): PickerProjection[] {
+      return fuse.search(query).map((result) => result.item)
     }
-  })
-
-  const flatbushIndex = new Flatbush(projectionWithBbox.length)
-  for (const p of projectionWithBbox) {
-    flatbushIndex.add(p.bbox[0], p.bbox[1], p.bbox[2], p.bbox[3])
+  } catch (err) {
+    console.error('Error creating full text index for projections', err)
+    return emptyIndex
   }
-  flatbushIndex.finish()
+}
 
-  return function suggestProjections(bbox: Bbox): Projection[] {
-    return flatbushIndex
-      .search(...bbox)
-      .map((i) => projectionWithBbox[i])
-      .sort(
-        (projection0, projection1) =>
-          projection0.bboxArea - projection1.bboxArea
-      )
-      .slice(0, 3)
+export function createBboxIndex(
+  projections: PickerProjection[]
+): (bbox: Bbox) => PickerProjection[] {
+  if (projections.length === 0) {
+    return emptyIndex
+  }
+
+  try {
+    const projectionWithBbox: PickerProjectionWithBbox[] = []
+    projections.forEach((projection) => {
+      if (projection.bbox != undefined) {
+        projectionWithBbox.push({
+          ...projection,
+          bbox: projection.bbox,
+          bboxArea: bboxToResolution(projection.bbox)
+        })
+      }
+    })
+
+    const flatbushIndex = new Flatbush(projectionWithBbox.length)
+    for (const { bbox } of projectionWithBbox) {
+      flatbushIndex.add(bbox[0], bbox[1], bbox[2], bbox[3])
+    }
+    flatbushIndex.finish()
+
+    return function (bbox: Bbox): PickerProjection[] {
+      return flatbushIndex
+        .search(...bbox)
+        .map((index) => projectionWithBbox[index])
+        .sort(
+          (projection0, projection1) =>
+            projection0.bboxArea - projection1.bboxArea
+        )
+    }
+  } catch (err) {
+    console.error('Error creating bbox index for projections', err)
+    return emptyIndex
   }
 }

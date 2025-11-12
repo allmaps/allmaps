@@ -1,11 +1,17 @@
 <script lang="ts">
   import Item from '$lib/components/Item.svelte'
 
-  import { itemCount } from '$lib/shared/stores/counts.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
-  export let apiMaps: unknown[]
-  export let showProperties: boolean
-  export let showUrls: boolean
+  type Props = {
+    apiMaps: unknown[]
+    showProperties: boolean
+    showUrls: boolean
+  }
+
+  let { apiMaps, showProperties, showUrls }: Props = $props()
+
+  const uiState = getUiState()
 
   const strokeColors = [
     'stroke-blue',
@@ -28,10 +34,10 @@
     'bg-yellow/20'
   ]
 
-  $itemCount = apiMaps.length
+  uiState.itemCount = apiMaps.length
 </script>
 
-{#each apiMaps as apiMap, index}
+{#each apiMaps as apiMap, index (index)}
   <Item
     {apiMap}
     {showProperties}

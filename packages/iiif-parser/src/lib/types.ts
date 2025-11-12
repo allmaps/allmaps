@@ -15,7 +15,7 @@ export type ProfileProperties = {
 }
 
 export type LanguageString = {
-  [language: string]: string[]
+  [language: string]: (string | number | boolean)[]
 }
 
 export type MetadataItem = {
@@ -25,7 +25,7 @@ export type MetadataItem = {
 
 export type Metadata = MetadataItem[]
 
-export type FetchNextOptions = {
+export type FetchNextItemOptions = {
   maxDepth?: number
   fetchCollections?: boolean
   fetchManifests?: boolean
@@ -33,7 +33,7 @@ export type FetchNextOptions = {
   fetchFn: typeof fetch
 }
 
-export type FetchNextResults<Item> = {
+export type FetchNextItemResults<Item> = {
   item: Item
   depth: number
   parent: {
@@ -83,3 +83,12 @@ export type Annotations = {
   type: 'AnnotationPage'
   // items?: object[]
 }[]
+
+export type ConstructorOptions = {
+  source: unknown
+}
+
+export type ParseOptions = {
+  majorVersion: MajorVersion
+  keepSource: boolean
+}

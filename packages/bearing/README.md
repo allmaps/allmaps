@@ -1,6 +1,6 @@
 # @allmaps/bearing
 
-Computes the bearing of a Georeferenced Map. Uses [Turf.js](https://turfjs.org/docs/api/bearing) internally.
+Computes the bearing of a Georeferenced Map.
 
 ```js
 import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
@@ -11,7 +11,7 @@ const annotation = await fetch(
 ).then((response) => response.json())
 
 const maps = parseAnnotation(annotation)
-const bearing = computeGeoreferencedMapBearing(map[0])
+const bearing = computeGeoreferencedMapBearing(maps[0])
 console.log(bearing)
 ```
 
@@ -21,14 +21,29 @@ MIT
 
 ## API
 
-### `computeGeoreferencedMapBearing(map)`
+### `computeGeoreferencedMapBearing(georeferencedMap, options)`
 
 Computes the bearing of a Georeferenced Map.
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
   * Georeferenced Map
+* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+
+###### Returns
+
+The bearing of the map in degrees, measured from the north line (`number`).
+
+### `computeWarpedMapBearing(warpedMap, options)`
+
+Computes the bearing of a Warped Map.
+
+###### Parameters
+
+* `warpedMap` (`WarpedMap`)
+  * Warped Map
+* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 

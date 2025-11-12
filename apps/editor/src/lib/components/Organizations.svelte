@@ -1,17 +1,17 @@
 <script lang="ts">
   import Organization from '$lib/components/Organization.svelte'
 
-  import type { Organization as OrganizationType } from '$lib/types/shared.js'
+  import type { OrganizationWithId } from '$lib/types/shared.js'
 
   type Props = {
-    organizations: OrganizationType[]
+    organizations: OrganizationWithId[]
   }
 
   let { organizations }: Props = $props()
 </script>
 
 <ul class="flex flex-col gap-8">
-  {#each organizations as organization}
+  {#each organizations as organization (organization.id)}
     <li class="contents">
       <Organization {organization} showMoreLink={true} />
     </li>

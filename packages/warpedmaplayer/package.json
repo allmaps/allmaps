@@ -1,0 +1,66 @@
+{
+  "name": "@allmaps/warpedmaplayer",
+  "version": "1.0.0-beta.39",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "description": "Base plugin classes for Allmaps",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/warpedmaplayer"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "iiif",
+    "georeference",
+    "map",
+    "plugin",
+    "allmaps"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "types": "tsc --noEmit",
+    "build:types": "tsc --declaration --esModuleInterop",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src",
+    "documentation": "remark . --output --use remark-api"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@allmaps/project": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/stdlib": "workspace:^"
+  },
+  "devDependencies": {
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/types": "workspace:^",
+    "@types/eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
+    "typescript": "^5.7.0"
+  }
+}

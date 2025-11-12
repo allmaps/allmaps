@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.34",
+  "version": "1.0.0-beta.39",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -38,14 +38,12 @@
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
-    "build": "vite build && pnpm run documentation",
+    "build": "vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",
@@ -53,6 +51,7 @@
     "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@allmaps/warpedmaplayer": "workspace:^",
     "maplibre-gl": "^4.5.0"
   },
   "devDependencies": {
@@ -63,8 +62,7 @@
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "^5.7.0",

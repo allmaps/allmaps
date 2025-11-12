@@ -1,4 +1,4 @@
-import * as Comlink from 'comlink'
+import { proxy as comlinkProxy, type Remote as ComlinkRemote } from 'comlink'
 
 import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile } from './CacheableTile.js'
@@ -12,11 +12,11 @@ import type { FetchFn } from '@allmaps/types'
  * Class for tiles that can be cached, and whose data can be processed to its imageData using a WebWorker.
  */
 export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
-  #worker: Comlink.Remote<FetchAndGetImageDataWorkerType>
+  #worker: ComlinkRemote<FetchAndGetImageDataWorkerType>
 
   constructor(
     fetchableTile: FetchableTile,
-    worker: Comlink.Remote<FetchAndGetImageDataWorkerType>,
+    worker: ComlinkRemote<FetchAndGetImageDataWorkerType>,
     fetchFn?: FetchFn
   ) {
     super(fetchableTile, fetchFn)
@@ -33,7 +33,7 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
       this.#worker
         .getImageData(
           this.tileUrl,
-          Comlink.proxy(() => this.abortController.abort()),
+          comlinkProxy(() => this.abortController.abort()),
           this.fetchFn,
           this.tile.tileZoomLevel.width,
           this.tile.tileZoomLevel.height
@@ -41,7 +41,9 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
         .then((response) => {
           this.data = response
           this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
+            new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+              tileUrl: this.tileUrl
+            })
           )
         })
         .catch((err) => {
@@ -57,7 +59,9 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, this.tileUrl)
+          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
+            tileUrl: this.tileUrl
+          })
         )
       }
     }
@@ -65,7 +69,7 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
     return this.data
   }
 
-  static createFactory(worker: Comlink.Remote<FetchAndGetImageDataWorkerType>) {
+  static createFactory(worker: ComlinkRemote<FetchAndGetImageDataWorkerType>) {
     return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
       new CacheableWorkerImageDataTile(fetchableTile, worker, fetchFn)
   }

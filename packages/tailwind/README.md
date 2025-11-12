@@ -14,15 +14,15 @@ MIT
 
 ```ts
 [
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string,
-  string
+  `#${string}`,
+  `#${string}`,
+  `#${string}`,
+  `#${string}`,
+  `#${string}`,
+  `#${string}`,
+  `#${string}`,
+  `#${string}`,
+  `#${string}`
 ]
 ```
 
@@ -62,124 +62,43 @@ MIT
 
 ###### Fields
 
-* `blue` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `darkblue` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `gray` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `green` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `orange` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `pink` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `purple` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `red` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
-* `yellow` (`[
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]`)
+* `blue` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `darkblue` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `gray` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `green` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `orange` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `pink` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `purple` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `red` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
+* `yellow` (``[   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`,   `#${string}`
+  ]``)
 
 ### `themeColors`
 
 ###### Fields
 
-* `black` (`string`)
-* `blue` (`string`)
+* `black` (`` `#${string}` ``)
+* `blue` (`` `#${string}` ``)
 * `current` (`string`)
-* `darkblue` (`string`)
-* `gray` (`string`)
-* `green` (`string`)
+* `darkblue` (`` `#${string}` ``)
+* `gray` (`` `#${string}` ``)
+* `green` (`` `#${string}` ``)
 * `inherit` (`string`)
-* `orange` (`string`)
-* `pink` (`string`)
-* `purple` (`string`)
-* `red` (`string`)
+* `orange` (`` `#${string}` ``)
+* `pink` (`` `#${string}` ``)
+* `purple` (`` `#${string}` ``)
+* `red` (`` `#${string}` ``)
 * `transparent` (`string`)
-* `white` (`string`)
-* `yellow` (`string`)
+* `white` (`` `#${string}` ``)
+* `yellow` (`` `#${string}` ``)
 
 ### `transparent`
 

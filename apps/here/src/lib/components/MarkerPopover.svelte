@@ -12,6 +12,8 @@
 
   let descriptionLines = $derived(popoverContents?.description?.split('\n'))
 
+  let isOpen = $derived(popoverContents !== undefined)
+
   function closeMarkerDialog() {
     popoverContents = undefined
   }
@@ -25,16 +27,7 @@
   />
 {/snippet}
 
-<Dialog.Root
-  bind:open={
-    () => popoverContents !== undefined,
-    (open) => {
-      if (!open) {
-        closeMarkerDialog()
-      }
-    }
-  }
->
+<Dialog.Root bind:open={() => isOpen, () => closeMarkerDialog()}>
   <Dialog.Portal>
     {#if popoverContents}
       <Dialog.Overlay
@@ -82,7 +75,7 @@
               {/if}
             {/if}
             {#if descriptionLines}
-              {#each descriptionLines as line}
+              {#each descriptionLines as line (line)}
                 <p class="text-sm">
                   {line}
                 </p>

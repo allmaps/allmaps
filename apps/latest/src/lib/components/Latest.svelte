@@ -7,20 +7,30 @@
   import Loading from '$lib/components/Loading.svelte'
   import Items from '$lib/components/Items.svelte'
 
-  import { loading } from '$lib/shared/stores/loading.js'
+  import { setUiState } from '$lib/state/ui.svelte.js'
 
-  export let count = 100
-  export let showHeader = false
-  export let showProperties = true
-  export let showUrls = true
+  type Props = {
+    count?: number
+    showHeader?: boolean
+    showProperties?: boolean
+    showUrls?: boolean
+  }
 
-  let apiMaps: unknown[] = []
+  let {
+    count = 100,
+    showHeader = false,
+    showProperties = true,
+    showUrls = true
+  }: Props = $props()
+
+  const uiState = setUiState()
+
+  let apiMaps: unknown[] = $state([])
 
   // Add config:
   // - switch between resource mask and geo mask
   // - sort!
   // - hide errors
-  //
 
   onMount(async () => {
     const mapsUrl = `https://api.allmaps.org/maps?limit=${count}`
@@ -36,7 +46,7 @@
       // TODO: create Error component
       console.error(err)
     } finally {
-      $loading = false
+      uiState.loading = false
     }
   })
 </script>
@@ -45,7 +55,7 @@
   {#if showHeader}
     <Header />
   {/if}
-  {#if $loading}
+  {#if uiState.loading}
     <Loading {count} />
   {:else}
     <Items {apiMaps} {showProperties} {showUrls} />

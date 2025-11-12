@@ -65,7 +65,7 @@ export type TypedGeometry<P> =
   | TypedMultiPolygon<P>
 
 export type MultiGeometryOptions = {
-  isMultiGeometry: false
+  isMultiGeometry: boolean
 }
 
 export type Gcp = { resource: Point; geo: Point }
@@ -75,9 +75,15 @@ export type Gcp = { resource: Point; geo: Point }
  */
 export type Bbox = [number, number, number, number]
 
+export type BboxOptions = {
+  clipLngLat: boolean
+  clipWebMercator: boolean
+}
+
 /**
  * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].
  * Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
+ * Alternatively, two numbers indicating the dimensions of a matrix: rows, cols (which is a different handedness!)
  */
 export type Size = [number, number]
 
@@ -85,14 +91,30 @@ export type Size = [number, number]
  * Two ways two rectangles (or shapes in general) can overlap:
  * - 'contain': The first contains the second
  * - 'cover': The first is covered by the second
- *
- * @export
- * @typedef {Fit}
  */
 export type Fit = 'cover' | 'contain'
 
-// TODO: change name to something like 'helmert transformation signature'
-export type Transform = [number, number, number, number, number, number]
+/**
+ * Weights array of a 2D Homogeneous Transform Matrix
+ *
+ * These coefficients are used in the same order in multiple places
+ * - CSS Transform defined by a 2D matrix. Use `toString()` before using this as input for a CSS `matrix()` function.
+ * - WebGL 2D transform matrices.
+ * - OpenLayers' transform class.
+ *
+ * See: https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
+ * See: https://openlayers.org/en/latest/apidoc/module-ol_transform.html
+ *
+ * Note: The weights array of a Polynomial1 Transformation has a different order. See the corresponding conversion functions.
+ */
+export type HomogeneousTransform = [
+  number,
+  number,
+  number,
+  number,
+  number,
+  number
+]
 
 export type Matrix4 = [
   number,

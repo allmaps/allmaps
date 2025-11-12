@@ -1,49 +1,79 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { GcpTransformer } from '@allmaps/transform'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 import {
   geojsonFeaturesToGeojsonFeatureCollection,
   geojsonGeometryToGeojsonFeature,
-  geometryToGeojsonGeometry
+  geometryToGeojsonGeometry,
+  mergeOptionsUnlessUndefined,
+  mergePartialOptions
 } from '@allmaps/stdlib'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import {
+  mustContainGcpsMessage,
   parseAnnotationsValidateMaps,
-  parseGcps,
-  parseTransformationType,
-  parseTransformOptions
+  parseProjectedGcpTransformOptions,
+  parseProjectedGcpTransformerInputOptionsAndMap,
+  parseProjectedGcpTransformerOptions
 } from '../../lib/parse.js'
-import { addTransformOptions } from '../../lib/options.js'
+import {
+  addProjectedGcpTransformerInputOptions,
+  addProjectedGcpTransformerOptions,
+  addProjectedGcpTransformOptions
+} from '../../lib/options.js'
 
 export function resourceMask() {
-  const command = addTransformOptions(
-    new Command('resource-mask')
-      .argument('[files...]')
-      .summary('transform resource masks to GeoJSON')
-      .description(
-        'Transform SVG resource masks of input Georeference Annotations to GeoJSON using a GCP Transformer and its transformation built from the GCPs and transformation type specified in a Georeference Annotation itself.\n' +
-          "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
+  const command = addProjectedGcpTransformerOptions(
+    addProjectedGcpTransformOptions(
+      addProjectedGcpTransformerInputOptions(
+        new Command('resource-mask')
+          .argument('[files...]')
+          .summary('transform resource masks to GeoJSON')
+          .description(
+            'Transform SVG resource masks of input Georeference Annotations to GeoJSON using a Projected GCP Transformer and its transformation built from the GCPs, transformation type and internal projection specified in a Georeference Annotation itself.\n' +
+              "This is a faster alternative for 'transform svg' where the resource mask from the Georeference Annotation specified in the arguments is also the input SVG."
+          )
       )
+    )
   )
 
   return command.action(async (files, options) => {
     const jsonValues = await parseJsonInput(files)
     const maps = parseAnnotationsValidateMaps(jsonValues)
-    const partialTransformOptions = parseTransformOptions(options)
+    const partialProjectedGcpTransformerOptions =
+      parseProjectedGcpTransformerOptions(options)
+    const partialProjectedGcpTransformOptions =
+      parseProjectedGcpTransformOptions(options)
 
     const features = []
     for (const map of maps) {
-      // Note: adding "&& {}" to make typescript happy
-      const gcps = parseGcps(options && {}, map)
-      const transformationType = parseTransformationType(options && {}, map)
+      const projectedGcpTransformerInputOptions =
+        parseProjectedGcpTransformerInputOptionsAndMap(options, map)
+      const { gcps, transformationType, internalProjection } =
+        projectedGcpTransformerInputOptions
+      let { projection } = projectedGcpTransformerInputOptions
 
-      const transformer = new GcpTransformer(
+      if (gcps === undefined) {
+        throw new Error(mustContainGcpsMessage)
+      }
+      if (projection === undefined) {
+        projection = lonLatProjection
+      }
+
+      const projectedTransformer = new ProjectedGcpTransformer(
         gcps,
         transformationType,
-        partialTransformOptions
+        mergeOptionsUnlessUndefined(
+          mergePartialOptions(
+            partialProjectedGcpTransformerOptions,
+            partialProjectedGcpTransformOptions
+          ),
+          { internalProjection, projection }
+        )
       )
-      const polygon = transformer.transformToGeo([map.resourceMask])
+
+      const polygon = projectedTransformer.transformToGeo([map.resourceMask])
       const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
       features.push(

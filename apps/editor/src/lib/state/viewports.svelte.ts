@@ -1,5 +1,7 @@
 import { setContext, getContext } from 'svelte'
 
+import { SvelteMap } from 'svelte/reactivity'
+
 import type { SourceState } from '$lib/state/source.svelte'
 
 import type { View, Viewport } from '$lib/types/shared.js'
@@ -9,12 +11,12 @@ const VIEWPORTS_KEY = Symbol('viewports')
 type Path =
   | { view: View }
   | { view: View; imageId: string }
-  | { view: View; imageId: string; pane: string }
+  | { view: View; imageId: string; mapId: string; pane: string }
 
 export class ViewportsState {
   #lastSourceUrl: string | undefined
 
-  #viewports = new Map<string, Viewport>()
+  #viewports = new SvelteMap<string, Viewport>()
 
   constructor(sourceState: SourceState) {
     $effect(() => {
@@ -30,6 +32,7 @@ export class ViewportsState {
     return JSON.stringify({
       view: path.view,
       imageId: 'imageId' in path ? path.imageId : undefined,
+      mapId: 'mapId' in path ? path.mapId : undefined,
       pane: 'pane' in path ? path.pane : undefined
     })
   }

@@ -360,7 +360,7 @@ Array<{id: string; type: 'AnnotationPage'}>
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
 ### `Canvas#height`
@@ -398,7 +398,7 @@ Image | EmbeddedImage
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
 ### `Canvas#metadata?`
@@ -459,7 +459,7 @@ Array<{id: string; type?: string; format?: string; profile?: string}>
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
 ### `Canvas#thumbnail?`
@@ -500,11 +500,12 @@ string
 number
 ```
 
-### `new Collection(parsedCollection)`
+### `new Collection(parsedCollection, options)`
 
 ###### Parameters
 
 * `parsedCollection` (`Collection2 | Collection3`)
+* `options?` (`Partial<ConstructorOptions> | undefined`)
 
 ###### Returns
 
@@ -530,14 +531,6 @@ Array<{id: string; type: 'AnnotationPage'}>
 Array<Canvas>
 ```
 
-### `Collection#description?`
-
-###### Type
-
-```ts
-{[language: string]: Array<string>}
-```
-
 ### `Collection#embedded`
 
 ###### Type
@@ -546,29 +539,73 @@ Array<Canvas>
 false
 ```
 
-### `Collection#fetchAll(options)`
+### `Collection#fetchAllItems(options)`
 
 ###### Parameters
 
-* `options?` (`Partial<FetchNextOptions> | undefined`)
+* `options?` (`Partial<FetchNextItemOptions> | undefined`)
 
 ###### Returns
 
-`Promise<Array<FetchNextResults<Image | Manifest | Collection>>>`.
+`Promise<Array<FetchNextItemResults<Image | Manifest | Collection>>>`.
 
-### `Collection#fetchNext(options, depth)`
+### `Collection#fetchItemWithId(id, fetchFn)`
 
 ###### Parameters
 
-* `options?` (`Partial<FetchNextOptions> | undefined`)
+* `id` (`string`)
+* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+    | undefined`)
+
+###### Returns
+
+`Promise<EmbeddedManifest | EmbeddedCollection | undefined>`.
+
+### `Collection#fetchItemWithIndex(index, fetchFn)`
+
+###### Parameters
+
+* `index` (`number`)
+* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+    | undefined`)
+
+###### Returns
+
+`Promise<Manifest | EmbeddedManifest | Collection | EmbeddedCollection>`.
+
+### `Collection#fetchNextItem(options, depth)`
+
+###### Parameters
+
+* `options?` (`Partial<FetchNextItemOptions> | undefined`)
 * `depth` (`number | undefined`)
 
 ###### Returns
 
 `AsyncGenerator<
-  FetchNextResults<Image | Manifest | Collection>,
+  FetchNextItemResults<Image | Manifest | Collection>,
   void,
   void >`.
+
+### `Collection#fetchUntilPath(path)`
+
+###### Parameters
+
+* `path` (`Array<number>`)
+
+###### Returns
+
+`Promise<void>`.
+
+### `Collection#getItemAtPath(path)`
+
+###### Parameters
+
+* `path` (`Array<number>`)
+
+###### Returns
+
+`EmbeddedManifest | EmbeddedCollection | Canvas | undefined`.
 
 ### `Collection#homepage?`
 
@@ -600,30 +637,6 @@ Array<Image | EmbeddedImage>
 Array<never>
 ```
 
-### `Collection#metadata?`
-
-###### Type
-
-```ts
-Array<MetadataItem>
-```
-
-### `Collection#navDate?`
-
-###### Type
-
-```ts
-Date
-```
-
-### `Collection#navPlace?`
-
-###### Type
-
-```ts
-object
-```
-
 ### `Collection#rendering?`
 
 ###### Type
@@ -653,29 +666,23 @@ Array<{
 Array<{id: string; type?: string; format?: string; profile?: string}>
 ```
 
+### `Collection#source?`
+
+###### Type
+
+```ts
+unknown
+```
+
 ### `Collection#summary?`
 
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
-### `Collection#thumbnail?`
-
-###### Type
-
-```ts
-Array<{
-  id: string
-  type?: string
-  format?: string
-  width?: number
-  height?: number
-}>
-```
-
-### `Collection.parse(iiifCollection, majorVersion)`
+### `Collection.parse(iiifCollection, options)`
 
 Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
 
@@ -683,8 +690,7 @@ Parses a IIIF Collection and returns a [Collection](#collection) containing the 
 
 * `iiifCollection` (`unknown`)
   * Source data of IIIF Collection
-* `majorVersion` (`MajorVersion | null | undefined`)
-  * IIIF API version of Collection. If not provided, it will be determined automatically
+* `options?` (`Partial<ParseOptions> | undefined`)
 
 ###### Returns
 
@@ -700,6 +706,14 @@ Parsed IIIF Collection (`Collection`).
 
 `EmbeddedCollection`.
 
+### `EmbeddedCollection#description?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string | number | boolean>}
+```
+
 ### `EmbeddedCollection#embedded`
 
 ###### Type
@@ -713,7 +727,7 @@ true
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
 ### `EmbeddedCollection#majorVersion`
@@ -722,6 +736,44 @@ true
 
 ```ts
 1 | 2 | 3
+```
+
+### `EmbeddedCollection#metadata?`
+
+###### Type
+
+```ts
+Array<MetadataItem>
+```
+
+### `EmbeddedCollection#navDate?`
+
+###### Type
+
+```ts
+Date
+```
+
+### `EmbeddedCollection#navPlace?`
+
+###### Type
+
+```ts
+object
+```
+
+### `EmbeddedCollection#thumbnail?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  format?: string
+  width?: number
+  height?: number
+}>
 ```
 
 ### `EmbeddedCollection#type`
@@ -740,7 +792,7 @@ CollectionTypeString
 string
 ```
 
-### `EmbeddedCollection.parse(iiifCollection, majorVersion)`
+### `EmbeddedCollection.parse(iiifCollection, options)`
 
 Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
 
@@ -748,18 +800,18 @@ Parses a IIIF Collection and returns a [Collection](#collection) containing the 
 
 * `iiifCollection` (`unknown`)
   * Source data of IIIF Collection
-* `majorVersion` (`MajorVersion | null | undefined`)
-  * IIIF API version of Collection. If not provided, it will be determined automatically
+* `options?` (`Partial<ParseOptions> | undefined`)
 
 ###### Returns
 
 Parsed IIIF Collection (`Collection`).
 
-### `new EmbeddedImage(parsedImage)`
+### `new EmbeddedImage(parsedImage, options)`
 
 ###### Parameters
 
-* `parsedImage` (`{ '@context': "http://library.stanford.edu/iiif/image-api/1.1/context.json"; '@id': string; width: number; height: number; profile?: string | undefined; scale_factors?: Array<number> | undefined; tile_width?: number | undefined; tile_height?: number | undefined; } | { ...; } | { ...; }`)
+* `parsedImage` (`{ '@context': "http://library.stanford.edu/iiif/image-api/1.1/context.json"; '@id': string; width: number; height: number; profile?: string | undefined; scale_factors?: Array<number> | undefined; tile_width?: number | undefined; tile_height?: number | undefined; } | { ...; } | { ...; } | EmbeddedImageType`)
+* `options?` (`Partial<ImageConstructorOptions> | undefined`)
 
 ###### Returns
 
@@ -879,6 +931,14 @@ number
 
 `EmbeddedManifest`.
 
+### `EmbeddedManifest#description?`
+
+###### Type
+
+```ts
+{[language: string]: Array<string | number | boolean>}
+```
+
 ### `EmbeddedManifest#embedded`
 
 ###### Type
@@ -892,7 +952,7 @@ true
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
 ### `EmbeddedManifest#majorVersion`
@@ -901,6 +961,44 @@ true
 
 ```ts
 1 | 2 | 3
+```
+
+### `EmbeddedManifest#metadata?`
+
+###### Type
+
+```ts
+Array<MetadataItem>
+```
+
+### `EmbeddedManifest#navDate?`
+
+###### Type
+
+```ts
+Date
+```
+
+### `EmbeddedManifest#navPlace?`
+
+###### Type
+
+```ts
+object
+```
+
+### `EmbeddedManifest#thumbnail?`
+
+###### Type
+
+```ts
+Array<{
+  id: string
+  type?: string
+  format?: string
+  width?: number
+  height?: number
+}>
 ```
 
 ### `EmbeddedManifest#type`
@@ -931,7 +1029,7 @@ There are no parameters.
 
 `IIIF`.
 
-### `IIIF.parse(iiifResource, majorVersion)`
+### `IIIF.parse(iiifResource, options)`
 
 Parses as IIIF resource and returns a class containing the parsed version
 
@@ -939,18 +1037,18 @@ Parses as IIIF resource and returns a class containing the parsed version
 
 * `iiifResource` (`unknown`)
   * Source data of a IIIF resource
-* `majorVersion` (`MajorVersion | null | undefined`)
-  * IIIF API version of resource. If not provided, it will be determined automatically
+* `options?` (`Partial<ParseOptions> | undefined`)
 
 ###### Returns
 
 Parsed IIIF resource (`Image | Manifest | Collection`).
 
-### `new Image(parsedImage)`
+### `new Image(parsedImage, options)`
 
 ###### Parameters
 
 * `parsedImage` (`{ '@context': "http://library.stanford.edu/iiif/image-api/1.1/context.json"; '@id': string; width: number; height: number; profile?: string | undefined; scale_factors?: Array<number> | undefined; tile_width?: number | undefined; tile_height?: number | undefined; } | { ...; } | { ...; }`)
+* `options?` (`Partial<ConstructorOptions> | undefined`)
 
 ###### Returns
 
@@ -1016,6 +1114,14 @@ Image request object that can be used to fetch the requested tile (`{region?: Re
 Array<SizeObject>
 ```
 
+### `Image#source?`
+
+###### Type
+
+```ts
+unknown
+```
+
 ### `Image#tileZoomLevels`
 
 ###### Type
@@ -1024,7 +1130,7 @@ Array<SizeObject>
 Array<TileZoomLevel>
 ```
 
-### `Image.parse(iiifImage, majorVersion)`
+### `Image.parse(iiifImage, parseOptions)`
 
 Parses a IIIF image and returns a [Image](#image) containing the parsed version
 
@@ -1032,8 +1138,7 @@ Parses a IIIF image and returns a [Image](#image) containing the parsed version
 
 * `iiifImage` (`unknown`)
   * Source data of IIIF Image
-* `majorVersion` (`MajorVersion | null | undefined`)
-  * IIIF API version of Image. If not provided, it will be determined automatically
+* `parseOptions?` (`Partial<ParseOptions> | undefined`)
 
 ###### Returns
 
@@ -1050,7 +1155,7 @@ Parsed IIIF Image (`Image`).
 
 ###### Fields
 
-* `[language: string]` (`Array<string>`)
+* `[language: string]` (`Array<string | number | boolean>`)
 
 ### `MajorVersion`
 
@@ -1060,11 +1165,12 @@ Parsed IIIF Image (`Image`).
 1 | 2 | 3
 ```
 
-### `new Manifest(parsedManifest)`
+### `new Manifest(parsedManifest, options)`
 
 ###### Parameters
 
 * `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | ...`)
+* `options?` (`Partial<ConstructorOptions> | undefined`)
 
 ###### Returns
 
@@ -1090,14 +1196,6 @@ Array<{id: string; type: 'AnnotationPage'}>
 Array<never>
 ```
 
-### `Manifest#description?`
-
-###### Type
-
-```ts
-{[language: string]: Array<string>}
-```
-
 ### `Manifest#embedded`
 
 ###### Type
@@ -1106,7 +1204,7 @@ Array<never>
 false
 ```
 
-### `Manifest#fetchAll(fetchFn)`
+### `Manifest#fetchAllItems(fetchFn)`
 
 ###### Parameters
 
@@ -1115,7 +1213,7 @@ false
 
 ###### Returns
 
-`Promise<Array<FetchNextResults<Image>>>`.
+`Promise<Array<FetchNextItemResults<Image>>>`.
 
 ### `Manifest#fetchImageByUri(imageUri, fetchFn)`
 
@@ -1129,7 +1227,7 @@ false
 
 `Promise<Image | undefined>`.
 
-### `Manifest#fetchNext(fetchFn, depth)`
+### `Manifest#fetchNextItem(fetchFn, depth)`
 
 ###### Parameters
 
@@ -1139,7 +1237,7 @@ false
 
 ###### Returns
 
-`AsyncGenerator<FetchNextResults<Image>, void, void>`.
+`AsyncGenerator<FetchNextItemResults<Image>, void, void>`.
 
 ### `Manifest#homepage?`
 
@@ -1161,30 +1259,6 @@ Array<{
 
 ```ts
 Array<Image | EmbeddedImage>
-```
-
-### `Manifest#metadata?`
-
-###### Type
-
-```ts
-Array<MetadataItem>
-```
-
-### `Manifest#navDate?`
-
-###### Type
-
-```ts
-Date
-```
-
-### `Manifest#navPlace?`
-
-###### Type
-
-```ts
-object
 ```
 
 ### `Manifest#rendering?`
@@ -1216,29 +1290,23 @@ Array<{
 Array<{id: string; type?: string; format?: string; profile?: string}>
 ```
 
+### `Manifest#source?`
+
+###### Type
+
+```ts
+unknown
+```
+
 ### `Manifest#summary?`
 
 ###### Type
 
 ```ts
-{[language: string]: Array<string>}
+{[language: string]: Array<string | number | boolean>}
 ```
 
-### `Manifest#thumbnail?`
-
-###### Type
-
-```ts
-Array<{
-  id: string
-  type?: string
-  format?: string
-  width?: number
-  height?: number
-}>
-```
-
-### `Manifest.parse(iiifManifest, majorVersion)`
+### `Manifest.parse(iiifManifest, options)`
 
 Parses a IIIF resource and returns a [Manifest](#manifest) containing the parsed version
 
@@ -1246,8 +1314,7 @@ Parses a IIIF resource and returns a [Manifest](#manifest) containing the parsed
 
 * `iiifManifest` (`unknown`)
   * Source data of IIIF Manifest
-* `majorVersion` (`MajorVersion | null | undefined`)
-  * IIIF API version of Manifest. If not provided, it will be determined automatically
+* `options?` (`Partial<ParseOptions> | undefined`)
 
 ###### Returns
 
@@ -1283,6 +1350,7 @@ Array<MetadataItem>
 
 Two numbers indicating the size of a Bbox as \[width, height] or \[xSize, ySize] (`[number, number]`).
 Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
+Alternatively, two numbers indicating the dimensions of a matrix: rows, cols (which is a different handedness!)
 
 ### `TileZoomLevel`
 

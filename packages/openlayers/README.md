@@ -1,16 +1,15 @@
 # @allmaps/openlayers
 
-Allmaps plugin for OpenLayers. Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://preview.iiif.io/api/georef/extension/georef/).
+Allmaps plugin for OpenLayers. Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/).
 
-Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
 
 [![Example of the Allmaps plugin for OpenLayers](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/openlayers/example.jpg)](https://observablehq.com/@allmaps/openlayers-plugin)
 
 Examples:
 
 * [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
-* [HTML example using ESM and Skypack](https://allmaps.org/allmaps/packages/openlayers/examples/skypack.html)
-* [HTML example using UMD and jsDelivr](https://allmaps.org/allmaps/packages/openlayers/examples/jsdelivr.html)
+* [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
 
 ## How it works
 
@@ -32,18 +31,6 @@ You can optionally build this package locally by running:
 
 ```sh
 pnpm run build
-```
-
-As an alternative to loading using import, ESM and UMD bundled versions of the code are also provided under `/dist/bundled` (once the code is built). These are also published online, so can load them directly in a HTML script tag using a CDN.
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/@allmaps/openlayers/dist/bundled/allmaps-openlayers-8.umd.js"></script>
-```
-
-When loading the bundled package, its classes are available under the `Allmaps` global variable:
-
-```js
-const warpedMapLayer = new Allmaps.WarpedMapLayer()
 ```
 
 ## Usage
@@ -93,39 +80,17 @@ Or:
 await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-### Events
+### WarpedMapLayer API and Events
 
-The following events are emitted to inform you of the state of the WarpedMapLayer:
-
-| Description                                                   | Type                      | Data                               |
-| ------------------------------------------------------------- | ------------------------- | ---------------------------------- |
-| A warped map has been added to the warped map list            | `warpedmapadded`          | `mapId: string`                    |
-| A warped map has been removed from the warped map list        | `warpedmapremoved`        | `mapId: string`                    |
-| A warped map enters the viewport                              | `warpedmapenter`          | `mapId: string`                    |
-| A warped map leaves the viewport                              | `warpedmapleave`          | `mapId: string`                    |
-| The visibility of some warpedMaps has changed                 | `visibilitychanged`       | `mapIds: string[]`                 |
-| The cache loaded a first tile of a map                        | `firstmaptileloaded`      | `{mapId: string, tileUrl: string}` |
-| All tiles requested for the current viewport have been loaded | `allrequestedtilesloaded` |                                    |
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins) and a list of events emitted by a WarpedMapLayer.
 
 You can listen to them in the typical OpenLayers way. Here's an example:
 
 ```js
 warpedMapLayer.on('warpedmapadded', (event) => {
-  console.log(event.mapId, warpedMapLayer.getExtent())
+  console.log(event.mapIds, warpedMapLayer.getExtent())
 })
 ```
-
-### What is a *map*?
-
-An OpenLayers map is an instance of the OpenLayers [`Map`](https://openlayers.org/en/latest/apidoc/module-ol_Map-Map.html) class, the central class of the OpenLayers API, used to create a map on a page and manipulate it.
-
-In Allmaps there are multiple classes describing maps, one for each phase a map takes through the Allmaps rendering pipeline:
-
-* When a Georeference Annotation is parsed, an instance of the Georeferenced Map class is created from it.
-* When this map is loaded into an application for rendering, an instance of the Warped Map class is created from it.
-* Inside the WebGL2 rendering package, the `WebGL2WarpedMap` class is used to render the map.
-
-All these map phases originating from the same Georeference Annotation have the same unique `mapId` property. This string value is used thoughout Allmaps (and in the API below) to identify a map. It is returned after adding a Georeference Annotation to a warpedMapLayer, so you can use it later to call functions on a specific map.
 
 ## License
 
@@ -156,12 +121,20 @@ MIT
 unknown
 ```
 
+### `OpenLayersWarpedMapLayerOptions`
+
+###### Type
+
+```ts
+object & Partial<WebGL2RenderOptions>
+```
+
 ### `new WarpedMapEvent(type, data)`
 
 ###### Parameters
 
 * `type` (`WarpedMapEventType`)
-* `data?` (`unknown`)
+* `data?` (`Partial<WarpedMapEventData> | undefined`)
 
 ###### Returns
 
@@ -176,7 +149,11 @@ unknown
 ###### Type
 
 ```ts
-unknown
+{
+  mapIds?: Array<string> | undefined
+  tileUrl?: string | undefined
+  optionKeys?: Array<string> | undefined
+}
 ```
 
 ### `new WarpedMapLayer(options)`
@@ -185,7 +162,7 @@ Creates a WarpedMapLayer instance
 
 ###### Parameters
 
-* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
+* `options?` (`Partial<OpenLayersWarpedMapLayerOptions> | undefined`)
   * the WebGL2 renderer options
 
 ###### Returns
@@ -195,6 +172,7 @@ Creates a WarpedMapLayer instance
 ###### Extends
 
 * `Layer`
+* `BaseWarpedMapLayer`
 
 ### `WarpedMapLayer#addEventListeners()`
 
@@ -208,7 +186,7 @@ There are no parameters.
 
 ### `WarpedMapLayer#addGeoreferenceAnnotation(annotation)`
 
-Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+Adds a Georeference Annotation
 
 ###### Parameters
 
@@ -217,39 +195,33 @@ Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 
 ###### Returns
 
-`Promise<Array<string | Error>>`.
-
-* the map IDs of the maps that were added, or an error per map
+Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
 ### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl)`
 
-Adds a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+Adds a Georeference Annotation by URL
 
 ###### Parameters
 
 * `annotationUrl` (`string`)
-  * Georeference Annotation
+  * URL of a Georeference Annotation
 
 ###### Returns
 
-`Promise<Array<string | Error>>`.
-
-* the map IDs of the maps that were added, or an error per map
+Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
 ### `WarpedMapLayer#addGeoreferencedMap(georeferencedMap)`
 
-Adds a Georeferenced map.
+Adds a Georeferenced Map
 
 ###### Parameters
 
 * `georeferencedMap` (`unknown`)
-  * Georeferenced map
+  * Georeferenced Map
 
 ###### Returns
 
-`Promise<string | Error>`.
-
-* the map ID of the map that was added, or an error
+Map ID of the map that was added, or an error (`Promise<string | Error>`).
 
 ### `WarpedMapLayer#bringMapsForward(mapIds)`
 
@@ -295,7 +267,7 @@ HTMLCanvasElement
 
 ### `WarpedMapLayer#clear()`
 
-Clears: removes all maps
+Removes all warped maps from the layer
 
 ###### Parameters
 
@@ -310,7 +282,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-HTMLElement
+HTMLDivElement
 ```
 
 ### `WarpedMapLayer#contextLost(event)`
@@ -333,6 +305,14 @@ HTMLElement
 
 `void`.
 
+### `WarpedMapLayer#defaultSpecificWarpedMapLayerOptions`
+
+###### Type
+
+```ts
+object
+```
+
 ### `WarpedMapLayer#dispose()`
 
 Disposes all WebGL resources and cached tiles
@@ -345,21 +325,9 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapLayer#getCanvas()`
+### `WarpedMapLayer#getDefaultOptions()`
 
-Gets the HTML canvas element of the layer
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-HTML Canvas element (`HTMLCanvasElement | null`).
-
-### `WarpedMapLayer#getContainer()`
-
-Gets the HTML container element of the layer
+Get the default options the layer
 
 ###### Parameters
 
@@ -367,11 +335,16 @@ There are no parameters.
 
 ###### Returns
 
-HTML element (`HTMLElement`).
+`object &
+  SpecificWarpedMapListOptions &
+  Partial<WebGL2WarpedMapOptions> &
+  SpecificWebGL2WarpedMapOptions &
+  SpecificTriangulatedWarpedMapOptions &
+  WarpedMapOptions`.
 
-### `WarpedMapLayer#getExtent()`
+### `WarpedMapLayer#getLayerOptions()`
 
-Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in projected coordinates.
+Get the layer options
 
 ###### Parameters
 
@@ -379,9 +352,7 @@ There are no parameters.
 
 ###### Returns
 
-`Extent | undefined`.
-
-* bounding box of all warped maps
+`{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 59 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapLayer#getLonLatExtent()`
 
@@ -397,50 +368,26 @@ There are no parameters.
 
 * Bounding box of all warped maps
 
-### `WarpedMapLayer#getMapOpacity(mapId)`
+### `WarpedMapLayer#getMapDefaultOptions(mapId)`
 
-Gets the opacity of a single map
+Get the default options of a map
 
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-Opacity of the map (`number | undefined`).
-
-### `WarpedMapLayer#getMapZIndex(mapId)`
-
-Returns the z-index of a single map
+These come from the default option settings for WebGL2WarpedMaps and the map's georeferenced map proporties
 
 ###### Parameters
 
 * `mapId` (`string`)
-  * ID of the warped map
+  * Map ID for which the options apply
 
 ###### Returns
 
-`number | undefined`.
+`WebGL2WarpedMapOptions | undefined`.
 
-* z-index of the warped map
+### `WarpedMapLayer#getMapIds()`
 
-### `WarpedMapLayer#getWarpedMap(mapId)`
+Get mapIds for selected maps
 
-Returns a single map's warped map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-the warped map (`WebGL2WarpedMap | undefined`).
-
-### `WarpedMapLayer#getWarpedMapList()`
-
-Returns the WarpedMapList object that contains a list of the warped maps of all loaded maps
+Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
@@ -448,57 +395,170 @@ There are no parameters.
 
 ###### Returns
 
-the warped map list (`WarpedMapList<WebGL2WarpedMap>`).
+`Array<string>`.
+
+### `WarpedMapLayer#getMapMapOptions(mapId)`
+
+Get the map-specific options of a map
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which the options apply
+
+###### Returns
+
+`Partial<WebGL2WarpedMapOptions> | undefined`.
+
+### `WarpedMapLayer#getMapOptions(mapId)`
+
+Get the options of a map
+
+These options are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which the options apply
+
+###### Returns
+
+`WebGL2WarpedMapOptions | undefined`.
+
+### `WarpedMapLayer#getMapZIndex(mapId)`
+
+Get the z-index of a map
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID for which to get the z-index
+
+###### Returns
+
+The z-index of a map (`number | undefined`).
+
+### `WarpedMapLayer#getMapsBbox(mapIds, projectionOptions)`
+
+Get the bounding box of the maps
+
+By default the result is returned in the list's projection, which is `EPSG:3857` by default
+Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs
+* `projectionOptions?` (`ProjectionOptions | undefined`)
+
+###### Returns
+
+The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Bbox | undefined`).
+
+### `WarpedMapLayer#getMapsCenter(mapIds, projectionOptions)`
+
+Get the center of the bounding box of the maps
+
+By default the result is returned in the list's projection, which is `EPSG:3857` by default
+Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs
+* `projectionOptions?` (`ProjectionOptions | undefined`)
+
+###### Returns
+
+The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Point | undefined`).
+
+### `WarpedMapLayer#getMapsConvexHull(mapIds, projectionOptions)`
+
+Get the convex hull of the maps
+
+By default the result is returned in the list's projection, which is `EPSG:3857` by default
+Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs
+* `projectionOptions?` (`ProjectionOptions | undefined`)
+
+###### Returns
+
+The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection (`Ring | undefined`).
+
+### `WarpedMapLayer#getOpacity()`
+
+Get the layer opacity
+
+Returns a number between 0 and 1 (the default)
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`number`.
+
+### `WarpedMapLayer#getWarpedMap(mapId)`
+
+Get the WarpedMap instance for a map
+
+###### Parameters
+
+* `mapId` (`string`)
+  * Map ID of the requested WarpedMap instance
+
+###### Returns
+
+`WebGL2WarpedMap | undefined`.
+
+### `WarpedMapLayer#getWarpedMapList()`
+
+Get the WarpedMapList object that contains a list of the warped maps of all loaded maps
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`WarpedMapList<WebGL2WarpedMap>`.
+
+### `WarpedMapLayer#getWarpedMaps(mapIds)`
+
+Get the WarpedMap instances for selected maps
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs
+
+###### Returns
+
+`Iterable<WebGL2WarpedMap>`.
 
 ### `WarpedMapLayer#gl`
 
 ###### Type
 
 ```ts
-WebGL2RenderingContext
+WebGL2RenderingContext | null | undefined
 ```
 
-### `WarpedMapLayer#hideMap(mapId)`
-
-Make a single map invisible
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#hideMaps(mapIds)`
-
-Make multiple maps invisible
-
-###### Parameters
-
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#isMapVisible(mapId)`
-
-Returns the visibility of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-
-###### Returns
-
-`boolean | undefined`.
-
-* whether the map is visible
-
-### `WarpedMapLayer#passWarpedMapEvent(event)`
+### `WarpedMapLayer#nativePassWarpedMapEvent(event)`
 
 ###### Parameters
 
@@ -507,6 +567,24 @@ Returns the visibility of a single map
 ###### Returns
 
 `void`.
+
+### `WarpedMapLayer#nativeUpdate()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#options`
+
+###### Type
+
+```ts
+object & Partial<WebGL2RenderOptions>
+```
 
 ### `WarpedMapLayer#removeEventListeners()`
 
@@ -520,7 +598,7 @@ There are no parameters.
 
 ### `WarpedMapLayer#removeGeoreferenceAnnotation(annotation)`
 
-Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
+Removes a Georeference Annotation
 
 ###### Parameters
 
@@ -529,49 +607,46 @@ Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/).
 
 ###### Returns
 
-`Promise<Array<string | Error>>`.
-
-* the map IDs of the maps that were removed, or an error per map
+Map IDs of the maps that were removed, or an error per map (`Promise<Array<string | Error>>`).
 
 ### `WarpedMapLayer#removeGeoreferenceAnnotationByUrl(annotationUrl)`
 
-Removes a [Georeference Annotation](https://iiif.io/api/extension/georef/) by URL.
+Removes a Georeference Annotation by URL
 
 ###### Parameters
 
 * `annotationUrl` (`string`)
-  * Georeference Annotation
+  * URL of a Georeference Annotation
 
 ###### Returns
 
-`Promise<Array<string | Error>>`.
-
-* the map IDs of the maps that were removed, or an error per map
+Map IDs of the maps that were removed, or an error per map (`Promise<Array<string | Error>>`).
 
 ### `WarpedMapLayer#removeGeoreferencedMap(georeferencedMap)`
 
-Removes a Georeferenced map.
+Removes a Georeferenced Map
 
 ###### Parameters
 
 * `georeferencedMap` (`unknown`)
-  * Georeferenced map
+  * Georeferenced Map
 
 ###### Returns
 
-`Promise<string | Error>`.
-
-* the map ID of the map that was remvoed, or an error
+Map ID of the map that was removed, or an error (`Promise<string | Error>`).
 
 ### `WarpedMapLayer#removeGeoreferencedMapById(mapId)`
+
+Removes a Georeferenced Map by its ID
 
 ###### Parameters
 
 * `mapId` (`string`)
+  * Map ID of the georeferenced map to remove
 
 ###### Returns
 
-`void`.
+Map ID of the map that was removed, or an error (`Promise<string | Error | undefined>`).
 
 ### `WarpedMapLayer#render(frameState)`
 
@@ -594,114 +669,61 @@ The rendered element (`HTMLElement`).
 WebGL2Renderer
 ```
 
-### `WarpedMapLayer#resetColorize()`
+### `WarpedMapLayer#resetLayerOptions(layerOptionKeys, animationOptions)`
 
-Resets the colorization for all maps
+Reset the layer options
+
+An empty array resets all options, undefined resets no options.
+Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-There are no parameters.
+* `layerOptionKeys?` (`Array<string> | undefined`)
+  * Keys of the options to reset
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#resetGrid()`
+### `WarpedMapLayer#resetMapsOptions(mapIds, mapOptionKeys, layerOptionKeys, animationOptions)`
 
-Resets the grid for all maps
+Reset the map-specific options of maps (and the layer options)
+
+An empty array resets all options, undefined resets no options.
+Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-There are no parameters.
+* `mapIds` (`Array<string>`)
+  * Map IDs for which to reset the options
+* `mapOptionKeys?` (`Array<string> | undefined`)
+  * Keys of the map-specific options to reset
+* `layerOptionKeys?` (`Array<string> | undefined`)
+  * Keys of the layer options to reset
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#resetMapColorize(mapId)`
+### `WarpedMapLayer#resetMapsOptionsByMapId(mapOptionkeysByMapId, layerOptionKeys, animationOptions)`
 
-Resets the colorization of a single map
+Reset the map-specific options of maps by map ID (and the layer options)
 
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapGrid(mapId)`
-
-Resets the grid of a single map
+An empty array or map resets all options (for all maps), undefined resets no options.
+Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapOpacity(mapId)`
-
-Resets the opacity of a single map to fully opaque
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapRemoveColor(mapId)`
-
-Resets the color for a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetMapSaturation(mapId)`
-
-Resets the saturation of a single map to the original colors
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetRemoveColor()`
-
-Resets the color removal for all maps
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#resetSaturation()`
-
-Resets the saturation of a single map to the original colors
-
-###### Parameters
-
-There are no parameters.
+* `mapOptionkeysByMapId` (`Map<string, Array<string>>`)
+  * Keys of map-specific options to reset by map ID
+* `layerOptionKeys?` (`Array<string> | undefined`)
+  * Keys of the layer options to reset
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
@@ -762,274 +784,209 @@ Send maps to back
 
 `void`.
 
-### `WarpedMapLayer#setColorize(hexColor)`
+### `WarpedMapLayer#setLayerOptions(layerOptions, animationOptions)`
 
-Sets the colorization for all maps
+Set the layer options
 
 ###### Parameters
 
-* `hexColor` (`string`)
-  * desired hex color
+* `layerOptions` (`object | Partial<WebGL2RenderOptions>`)
+  * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setGrid(enabled)`
+###### Examples
 
-Sets the grid for all maps
+```ts
+warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
+```
 
-###### Parameters
+### `WarpedMapLayer#setMapGcps(mapId, gcps, animationOptions)`
 
-* `enabled` (`boolean`)
-  * whether to show the grid
+Set the GCPs of a map
 
-###### Returns
+This only sets the map-specific `gcps` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original GCPs inferred from the Georeference Annotation.
 
-`void`.
-
-### `WarpedMapLayer#setImageInformations(imageInformations)`
-
-Sets the object that caches image information
-
-###### Parameters
-
-* `imageInformations` (`Map<string, unknown>`)
-  * Object that caches image information
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapColorize(mapId, hexColor)`
-
-Sets the colorization for a single mapID of the map
+The original GCPs can be reset by resetting the map-specific GCPs option,
+and stay accessible in the warped map's `map` property.
 
 ###### Parameters
 
 * `mapId` (`string`)
-  * ID of the map
-* `hexColor` (`string`)
-  * desired hex color
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapGcps(mapId, gcps)`
-
-Sets the GCOs of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
+  * Map ID for which to set the options
 * `gcps` (`Array<Gcp>`)
+  * GCPs to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setMapGrid(mapId, enabled)`
+### `WarpedMapLayer#setMapOptions(mapId, mapOptions, layerOptions, animationOptions)`
 
-Sets the grid for a single mapID of the map
+Set the map-specific options of a map (and the layer options)
+
+In general setting a map-specific option
+also sets the corresponding option of the map,
+since these are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+A special case is setting a map-specific option to `undefined`:
+then the corresponding option is derived from the default, georeferenced map or layer option.
+This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
 * `mapId` (`string`)
-  * ID of the map
-* `enabled` (`boolean`)
-  * whether to show the grid
+  * Map ID for which to set the options
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  * Map-specific options to set
+* `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
+  * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setMapOpacity(mapId, opacity)`
+###### Examples
 
-Sets the opacity of a single map
+```ts
+warpedMapLayer.setMapOptions(myMapId, { transformationType: 'thinPlateSpline' })
+```
 
-###### Parameters
+### `WarpedMapLayer#setMapResourceMask(mapId, resourceMask, animationOptions)`
 
-* `mapId` (`string`)
-  * ID of the map
-* `opacity` (`number`)
-  * opacity between 0 and 1, where 0 is fully transparent and 1 is fully opaque
+Set the resource mask of a map
 
-###### Returns
+This only sets the map-specific `resourceMask` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original resource mask inferred from the Georeference Annotation.
 
-`void`.
-
-### `WarpedMapLayer#setMapRemoveColor(mapId, options)`
-
-Removes a color from a single map
+The original resource mask can be reset by resetting the map-specific resource mask option,
+and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
 * `mapId` (`string`)
-  * ID of the map
-* `options` (`{
-    hexColor?: string | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapResourceMask(mapId, resourceMask)`
-
-Sets the resource mask of a single map
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
+  * Map ID for which to set the options
 * `resourceMask` (`Array<Point>`)
-  * new resource mask
+  * Resource mask to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setMapSaturation(mapId, saturation)`
+### `WarpedMapLayer#setMapTransformationType(mapId, transformationType, animationOptions)`
 
-Sets the saturation of a single map
+Set the transformation type of a map
 
-###### Parameters
+This only sets the map-specific `transformationType` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original transformation type inferred from the Georeference Annotation.
 
-* `mapId` (`string`)
-  * ID of the map
-* `saturation` (`number`)
-  * saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setMapTransformationType(mapId, transformation)`
-
-Sets the transformation type of a single map
+The original transformation type can be reset by resetting the map-specific transformation type option,
+and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
 * `mapId` (`string`)
-  * ID of the map
-* `transformation` (`  | 'straight'
+  * Map ID for which to set the options
+* `transformationType` (`  | 'straight'
     | 'helmert'
     | 'polynomial'
     | 'polynomial1'
     | 'polynomial2'
     | 'polynomial3'
+    | 'thinPlateSpline'
     | 'projective'
-    | 'thinPlateSpline'`)
-  * new transformation type
+    | 'linear'`)
+  * Transformation type to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setMapsDistortionMeasure(mapIds, distortionMeasure)`
+### `WarpedMapLayer#setMapsOptions(mapIds, mapOptions, layerOptions, animationOptions)`
 
-Sets the distortion measure of multiple maps
+Set the map-specific options of maps (and the layer options)
+
+In general setting a map-specific option
+also sets the corresponding option of the map,
+since these are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+A special case is setting a map-specific option to `undefined`:
+then the corresponding option is derived from the default, georeferenced map or layer option.
+This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
-* `distortionMeasure?` (`DistortionMeasure | undefined`)
-  * new distortion measure
+* `mapIds` (`Array<string>`)
+  * Map IDs for which to set the options
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  * Map-specific options to set
+* `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
+  * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setMapsTransformationType(mapIds, transformation)`
+###### Examples
 
-Sets the transformation type of multiple maps
+```ts
+warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+```
+
+### `WarpedMapLayer#setMapsOptionsByMapId(mapOptionsByMapId, layerOptions, animationOptions)`
+
+Set the map-specific options of maps by map ID (and the layer options)
+
+In general setting a map-specific option
+also sets the corresponding option of the map,
+since these are the result of merging the default, georeferenced map,
+layer and map-specific options of that map.
+
+A special case is setting a map-specific option to `undefined`:
+then the corresponding option is derived from the default, georeferenced map or layer option.
+This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
-* `transformation` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'projective'
-    | 'thinPlateSpline'`)
-  * new transformation type
+* `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
+  * Map-specific options to set by map ID
+* `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
+  * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
 
 ###### Returns
 
 `void`.
 
-### `WarpedMapLayer#setOptions(options)`
+### `WarpedMapLayer#setOpacity(opacity)`
 
-Sets the options
-
-###### Parameters
-
-* `options?` (`Partial<WebGL2RendererOptions> | undefined`)
-  * Options
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setRemoveColor(options)`
-
-Removes a color from all maps
+Set the layer opacity
 
 ###### Parameters
 
-* `options` (`{
-    hexColor?: string | undefined
-    threshold?: number | undefined
-    hardness?: number | undefined
-  }`)
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#setSaturation(saturation)`
-
-Sets the saturation of a single map
-
-###### Parameters
-
-* `saturation` (`number`)
-  * saturation between 0 and 1, where 0 is grayscale and 1 are the original colors
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#showMap(mapId)`
-
-Make a single map visible
-
-###### Parameters
-
-* `mapId` (`string`)
-  * ID of the map
-
-###### Returns
-
-`void`.
-
-### `WarpedMapLayer#showMaps(mapIds)`
-
-Make multiple maps visible
-
-###### Parameters
-
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+* `opacity` (`number`)
+  * Layer opacity to set
 
 ###### Returns
 

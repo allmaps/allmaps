@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/triangulate",
-  "version": "1.0.0-beta.26",
+  "version": "1.0.0-beta.30",
   "author": {
     "name": "Manuel Claeys Bouuaert",
     "email": "manuel.claeys.b@gmail.com",
@@ -31,10 +31,9 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "bench": "node bench/index.js",
-    "build": "tsc && pnpm run documentation",
-    "preversion": "pnpm run lint && pnpm test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "bench": "node ./bench/index.ts",
+    "build": "tsc",
+    "test": "NODE_ENV=test vitest run",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --write src test",
     "types": "tsc --noEmit",
@@ -44,24 +43,21 @@
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "@kninnug/constrainautor": "^4.0.0",
+    "@kninnug/constrainautor": "^4.0.1",
     "delaunator": "^5.0.1",
-    "robust-point-in-polygon": "^1.0.3"
+    "point-in-polygon-hao": "^1.2.4"
   },
   "devDependencies": {
     "@types/delaunator": "^5.0.3",
     "@types/eslint": "^8.56.0",
-    "@types/robust-point-in-polygon": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "chai": "^4.3.6",
-    "chai-shallow-deep-equal": "^1.4.6",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.4"
   }
 }

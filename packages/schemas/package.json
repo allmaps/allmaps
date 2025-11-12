@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/schemas",
-  "version": "1.0.0-beta.20",
+  "version": "1.0.0-beta.23",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -27,10 +27,8 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "preversion": "pnpm run lint && pnpm test",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test",
-    "test": "NODE_ENV=test pnpm run build && mocha",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src",
     "types": "tsc --noEmit"
   },
   "license": "MIT",
@@ -45,8 +43,7 @@
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "mocha": "^10.8.2",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "typescript": "^5.7.0"
   }
 }

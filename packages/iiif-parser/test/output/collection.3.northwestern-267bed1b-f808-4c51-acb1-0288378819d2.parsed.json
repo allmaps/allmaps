@@ -14,7 +14,16 @@
       "label": {
         "none": ["Congo regnum Christian, in Africa."]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/e574e739-3f8b-4d06-b412-3fe840099452/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -23,7 +32,16 @@
       "label": {
         "none": ["Meridiani equidistant pro ratione 56, paralleli 30 1/2"]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/00e0e9f5-e289-46a4-b380-ec282591e08c/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -34,7 +52,16 @@
           "Tractus littorales Guineæ a Promontorio Verde usque ad Sinum Catenbelae"
         ]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/13ee1c14-9acd-488c-81c8-ecb145ef332f/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -45,7 +72,16 @@
           "Carte de toutes les isles connues a la coste de Zanguebar et Madagascar que l'on trouve dans la route de l'Inde"
         ]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/5926d45f-0e2b-4171-a1d7-997e968cddcb/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -54,7 +90,16 @@
       "label": {
         "none": ["Totius Africæ accuratissima tabula"]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/12ec88fe-a9f2-4c2b-82d9-84438aba4cbd/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -65,7 +110,16 @@
           "Æthiopia superior vel interior vulgo Abissinorum sive Presbiteri Ioannis Imperium."
         ]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/18211f53-8c11-436e-92ba-97c2f07d29cb/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -74,7 +128,16 @@
       "label": {
         "none": ["Fessæ et Marocchi regna."]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/1afe2de6-774d-4161-bacb-307261719c93/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -85,7 +148,16 @@
           "A new and accurate map of Africa : drawn from the best & most approved modern maps and charts, and regulated by astronomical observations"
         ]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/1f5b2d67-1b03-4ccf-a726-fe96b00ca8db/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -94,7 +166,16 @@
       "label": {
         "none": ["Insula S. Laurentii, vulgo Madagascar."]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/2a24953c-2c73-4c82-a980-0d4f79ab50f8/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "embedded": true,
@@ -103,7 +184,16 @@
       "label": {
         "none": ["Mauritania nuova tavola."]
       },
-      "majorVersion": 3
+      "majorVersion": 3,
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 400,
+          "id": "https://api.dc.library.northwestern.edu/api/v2/works/a0984553-00ab-4a04-812f-5249e3a0a5ca/thumbnail",
+          "type": "Image",
+          "width": 400
+        }
+      ]
     },
     {
       "uri": "https://api.dc.library.northwestern.edu/api/v2/collections/267bed1b-f808-4c51-acb1-0288378819d2?as=iiif&page=2",

@@ -2,7 +2,7 @@ import { setContext, getContext } from 'svelte'
 
 import type { Point, Size } from '@allmaps/types'
 
-const URL_KEY = Symbol('url')
+const UI_KEY = Symbol('ui')
 
 type RowSizes = {
   left: Size
@@ -78,11 +78,11 @@ export class UiState {
 }
 
 export function setUiState() {
-  return setContext(URL_KEY, new UiState())
+  return setContext(UI_KEY, new UiState())
 }
 
 export function getUiState() {
-  const uiState = getContext<ReturnType<typeof setUiState>>(URL_KEY)
+  const uiState = getContext<ReturnType<typeof setUiState>>(UI_KEY)
 
   if (!uiState) {
     throw new Error('UiState is not set')

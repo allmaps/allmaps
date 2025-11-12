@@ -155,6 +155,7 @@
                 wrap-break-word inset-shadow text-pink"
           >
             <p>
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
               {@html displayPostcardText}
             </p>
             <p class="uppercase text-gray-300 text-xs">Now</p>
@@ -196,10 +197,11 @@
         <CopyButton
           text={postcardText}
           label="Copy message"
-          class="disabled:cursor-not-allowed disabled:bg-pink/50 bg-pink
+          class="disabled:cursor-not-allowed  bg-pink
               active:translate-[1px] hover:translate-[0.5px] shadow-none hover:shadow-lg
               hover:bg-pink-100 select-none
               text-white hover:text-pink
+              disabled:bg-pink/50 disabled:text-white disabled:shadow-none
               cursor-pointer transition-all px-4 py-2 rounded-lg
               flex flex-row gap-2 items-center"
           disabled={!imageLoaded}

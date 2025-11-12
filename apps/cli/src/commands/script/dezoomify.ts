@@ -1,21 +1,19 @@
 import { Command } from '@commander-js/extra-typings'
-
 import path from 'path'
 
 import { generateId } from '@allmaps/id'
+import { generateCheckCommand } from '@allmaps/io'
 
-import { printString } from '../../lib/io.js'
-import { checkCommand } from '../../lib/bash.js'
-import { readLines } from '../../lib/io.js'
+import { readLines, printString } from '../../lib/io.js'
 
 const dezoomifyNotFoundMessage = 'Please install dezoomify-rs'
 
-export function preamble(outputDir: string) {
+function preamble(outputDir: string) {
   return `#!/usr/bin/env bash
 
 mkdir -p ${outputDir}
 
-${checkCommand('dezoomify-rs', dezoomifyNotFoundMessage)}
+${generateCheckCommand('dezoomify-rs', dezoomifyNotFoundMessage)}
 `.trim()
 }
 

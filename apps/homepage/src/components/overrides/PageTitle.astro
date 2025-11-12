@@ -1,8 +1,7 @@
 ---
-import AstroPageTitle from '@astrojs/starlight/components/PageTitle.astro'
-import type { Props } from '@astrojs/starlight/props'
+import Default from '@astrojs/starlight/components/PageTitle.astro'
 
-const isHomepage = Astro.props.slug === ''
+const isHomepage = Astro.url.pathname === '/'
 ---
 
-{!isHomepage && <AstroPageTitle {...Astro.props} />}
+{!isHomepage && <Default {...Astro.props} />}

@@ -43,7 +43,7 @@ export const Homepage3Schema = z
   .transform(ensureArray)
 
 export const ThumbnailItem3Schema = z.object({
-  id: z.string().url(),
+  id: z.string(),
   type: z.string().optional(),
   format: z.string().optional(),
   width: z.number().int().optional(),
@@ -96,12 +96,26 @@ export const Metadata3Schema = MetadataItem3Schema.array()
 
 export const RequiredStatement3Schema = MetadataItem3Schema
 
-export const AnnotationBody3Schema = z.object({
+export const AnnotationImageBody3Schema = z.object({
   type: z.literal('Image'),
   width: z.number().int().optional(),
   height: z.number().int().optional(),
   service: ImageServiceSchema.array()
 })
+
+export const AnnotationVideoBody3Schema = z.object({
+  type: z.literal('Video')
+})
+
+export const AnnotationSoundBody3Schema = z.object({
+  type: z.literal('Sound')
+})
+
+export const AnnotationBody3Schema = z.union([
+  AnnotationImageBody3Schema,
+  AnnotationVideoBody3Schema,
+  AnnotationSoundBody3Schema
+])
 
 const Choice3Schema = z.object({
   type: z.literal('Choice'),
@@ -127,7 +141,7 @@ export const Canvas3Schema = z.object({
   type: z.literal('Canvas'),
   width: z.number().int(),
   height: z.number().int(),
-  items: AnnotationPage3Schema.array().length(1),
+  items: AnnotationPage3Schema.array(),
   label: LanguageValue3Schema.optional(),
   description: LanguageValue3Schema.optional(),
   metadata: Metadata3Schema.optional(),
@@ -145,7 +159,7 @@ export const Canvas3Schema = z.object({
 export const Manifest3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Manifest'),
-  items: Canvas3Schema.array().nonempty(),
+  items: Canvas3Schema.array(),
   label: LanguageValue3Schema.optional(),
   description: LanguageValue3Schema.optional(),
   metadata: Metadata3Schema.optional(),
@@ -164,6 +178,12 @@ export type EmbeddedManifest3 = {
   id: string
   type: 'Manifest'
   label?: z.infer<typeof LanguageValue3Schema>
+  description?: z.infer<typeof LanguageValue3Schema>
+  metadata?: z.infer<typeof Metadata3Schema>
+  navPlace?: z.infer<typeof NavPlaceSchema>
+  navDate?: z.infer<typeof NavDateSchema>
+  homepage?: z.infer<typeof Homepage3Schema>
+  thumbnail?: z.infer<typeof Thumbnail3Schema>
 }
 
 export type Collection3 = {
@@ -176,7 +196,9 @@ export type Collection3 = {
   )[]
   label?: z.infer<typeof LanguageValue3Schema>
   description?: z.infer<typeof LanguageValue3Schema>
+  metadata?: z.infer<typeof Metadata3Schema>
   navPlace?: z.infer<typeof NavPlaceSchema>
+  navDate?: z.infer<typeof NavDateSchema>
   homepage?: z.infer<typeof Homepage3Schema>
   thumbnail?: z.infer<typeof Thumbnail3Schema>
   rendering?: z.infer<typeof Rendering3Schema>
@@ -184,8 +206,6 @@ export type Collection3 = {
   summary?: z.infer<typeof Summary3Schema>
   requiredStatement?: z.infer<typeof RequiredStatement3Schema>
   annotations?: z.infer<typeof NonPaintingAnnotations3>
-  metadata?: z.infer<typeof Metadata3Schema>
-  navDate?: z.infer<typeof NavDateSchema>
 }
 
 // @ts-expect-error - Lazy type is not correctly inferred
@@ -194,7 +214,12 @@ export const EmbeddedManifest3Schema: z.ZodType<EmbeddedManifest3> = z.lazy(
     z.object({
       id: z.string().url(),
       type: z.literal('Manifest'),
-      label: LanguageValue3Schema.optional()
+      label: LanguageValue3Schema.optional(),
+      description: LanguageValue3Schema.optional(),
+      metadata: Metadata3Schema.optional(),
+      navDate: NavDateSchema.optional(),
+      navPlace: NavPlaceSchema.optional(),
+      thumbnail: Thumbnail3Schema.optional()
     })
 )
 
@@ -215,8 +240,8 @@ export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
     metadata: Metadata3Schema.optional(),
     navDate: NavDateSchema.optional(),
     navPlace: NavPlaceSchema.optional(),
-    homepage: Homepage3Schema.optional(),
     thumbnail: Thumbnail3Schema.optional(),
+    homepage: Homepage3Schema.optional(),
     rendering: Rendering3Schema.optional(),
     seeAlso: SeeAlso3Schema.optional(),
     summary: Summary3Schema.optional(),
@@ -228,5 +253,10 @@ export const Collection3Schema: z.ZodType<Collection3> = z.lazy(() =>
 export const EmbeddedCollection3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Collection'),
-  label: LanguageValue3Schema.optional()
+  label: LanguageValue3Schema.optional(),
+  description: LanguageValue3Schema.optional(),
+  metadata: Metadata3Schema.optional(),
+  navDate: NavDateSchema.optional(),
+  navPlace: NavPlaceSchema.optional(),
+  thumbnail: Thumbnail3Schema.optional()
 })

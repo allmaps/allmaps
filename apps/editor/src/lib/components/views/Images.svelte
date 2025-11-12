@@ -1,36 +1,96 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { afterNavigate } from '$app/navigation'
 
-  import { Collection, Thumbnail } from '@allmaps/ui'
+  import { Grid, Thumbnail } from '@allmaps/components'
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
   import { darkblue } from '@allmaps/tailwind'
 
+  import Collection from '$lib/components/Collection.svelte'
   import Status from '$lib/components/Status.svelte'
+  import Pagination from '$lib/components/Pagination.svelte'
 
-  import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
+  import { gotoRoute, getViewUrl } from '$lib/shared/router.js'
   import { parseLanguageString } from '$lib/shared/iiif.js'
   import { truncate } from '$lib/shared/strings.js'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
+  import { getUrlState } from '$lib/shared/params.js'
 
   const sourceState = getSourceState()
   const imageInfoState = getImageInfoState()
+  const urlState = getUrlState()
+
+  const paginationPerPage = 20
 
   let itemWidth = $state(0)
 
-  function handleImageClick(event: Event, imageId: string) {
-    gotoRoute(createRouteUrl(page, 'images', { image: imageId }))
-    event.preventDefault()
+  let beforeTimeoutActiveImageId = $state<string>()
+  let clickTimer = $state<number>()
+
+  type SearchParams = Parameters<typeof urlState.generateSearchParams>[0]
+
+  function paramsToUrl(params: SearchParams) {
+    return `${page.url.pathname}?${urlState.generateSearchParams(params).toString()}`
   }
 
-  function handleImageDblclick(event: Event, imageId: string) {
-    gotoRoute(createRouteUrl(page, 'mask', { image: imageId }))
+  let breadcrumbs = $derived(
+    sourceState.breadcrumbs.map(({ label, path, type, id }, index) => ({
+      label: label || `Level ${index + 1}`,
+      href: paramsToUrl({
+        path,
+        manifestId: type === 'manifest' ? id : undefined,
+        imageId: null
+      })
+    }))
+  )
+
+  let lastPathItem = $derived(
+    urlState.params.path[urlState.params.path.length - 1]
+  )
+
+  let paginationPage = $derived.by(() => {
+    if (lastPathItem && lastPathItem.page !== undefined) {
+      return lastPathItem.page
+    }
+    return 0
+  })
+
+  let images = $derived(
+    [...sourceState.images].slice(
+      paginationPage * paginationPerPage,
+      (paginationPage + 1) * paginationPerPage
+    )
+  )
+
+  function handlePageChange(newPage: number) {
+    const newPath = [...urlState.params.path]
+    newPath[newPath.length - 1].page = newPage
+    urlState.params.path = newPath
+  }
+
+  function handleImageClick(event: MouseEvent, imageId: string) {
     event.preventDefault()
+    window.clearTimeout(clickTimer)
+
+    beforeTimeoutActiveImageId = imageId
+    clickTimer = window.setTimeout(
+      () => gotoRoute(urlState.generateUrl(getViewUrl('images'), { imageId })),
+      600
+    )
+  }
+
+  function handleImageDoubleClick(imageId: string) {
+    window.clearTimeout(clickTimer)
+    gotoRoute(urlState.generateUrl(getViewUrl('mask'), { imageId }))
   }
 
   function isActive(imageId: string) {
-    return imageId === sourceState.activeImageId
+    return (
+      (!beforeTimeoutActiveImageId && imageId === sourceState.activeImageId) ||
+      imageId === beforeTimeoutActiveImageId
+    )
   }
 
   async function fetchImageInfo(url: string) {
@@ -40,28 +100,43 @@
 
     return imageInfo
   }
+
+  afterNavigate(() => (beforeTimeoutActiveImageId = undefined))
 </script>
 
-<div class="max-w-(--breakpoint-lg) m-auto p-4">
+<div class="m-auto flex max-w-(--breakpoint-lg) flex-col gap-4 p-4">
+  {#if sourceState.parsedIiif && sourceState.parsedIiif.type === 'collection'}
+    <Collection
+      parsedIiifAtPath={sourceState.parsedIiifAtPath}
+      fetching={sourceState.fetchingInsideCollection}
+      bind:page={urlState.params.page}
+      bind:path={urlState.params.path}
+      {breadcrumbs}
+      {paramsToUrl}
+    />
+  {/if}
+
   {#if sourceState.imageCount > 0}
-    <Collection childrenCount={sourceState.imageCount}>
-      {#each [...sourceState.images] as image, index (image.uri)}
+    <Grid childrenCount={Math.min(sourceState.imageCount, paginationPerPage)}>
+      {#each images as image, index (image.uri)}
         {@const canvas = sourceState.getCanvasByImageId(image.uri)}
         <!-- TODO: don't bind ALL widths! -->
         <li
           bind:clientWidth={itemWidth}
-          class="overflow-hidden bg-white/20 p-2 rounded-lg w-full h-full max-w-xl"
+          class="h-full w-full max-w-xl overflow-hidden rounded-lg bg-white/20 p-2"
         >
           <a
             class="flex flex-col gap-2"
+            href={urlState.generateUrl(getViewUrl('mask'), {
+              imageId: image.uri
+            })}
             onclick={(event) => handleImageClick(event, image.uri)}
-            ondblclick={(event) => handleImageDblclick(event, image.uri)}
-            href={createRouteUrl(page, 'mask', { image: image.uri })}
+            ondblclick={() => handleImageDoubleClick(image.uri)}
           >
             <div class="relative aspect-square">
               {#await fetchImageInfo(image.uri)}
                 <div
-                  class="aspect-square animate-pulse bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
+                  class="flex aspect-square animate-pulse items-center justify-center bg-white/30 p-2 text-center text-sm text-gray-800"
                 >
                   <p>Loading…</p>
                 </div>
@@ -78,24 +153,39 @@
               {:catch error}
                 <div>
                   <p
-                    class="aspect-square bg-white/30 p-2 flex items-center justify-center text-sm text-gray-800 text-center"
+                    class="flex aspect-square items-center justify-center bg-white/30 p-2 text-center text-sm text-gray-800"
                   >
                     Error: {error.message}
                   </p>
                 </div>
               {/await}
-              <div class="absolute bottom-0 w-full flex justify-end p-2">
+              <div class="absolute bottom-0 flex w-full justify-end p-2">
                 <Status imageId={image.uri} />
               </div>
             </div>
-            <div class="text-center text-blue-900 text-xs">
+            <div class="text-center text-sm text-blue-900">
               {canvas?.label
                 ? truncate(parseLanguageString(canvas?.label, 'en'))
                 : `Image ${index + 1}`}
             </div>
+            {#if canvas?.width && canvas?.height}
+              <div class="text-center text-xs text-blue-800">
+                {canvas?.width} ×
+                {canvas?.height} pixels
+              </div>
+            {/if}
           </a>
         </li>
       {/each}
-    </Collection>
+    </Grid>
+
+    {#if sourceState.imageCount > paginationPerPage}
+      <Pagination
+        bind:page={paginationPage}
+        count={sourceState.imageCount}
+        perPage={paginationPerPage}
+        onPageChange={handlePageChange}
+      />
+    {/if}
   {/if}
 </div>

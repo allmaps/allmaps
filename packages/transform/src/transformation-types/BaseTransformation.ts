@@ -2,10 +2,13 @@ import { distance, rms } from '@allmaps/stdlib'
 
 import type { Point } from '@allmaps/types'
 
-import type { TransformationType } from '../shared/types.js'
+import type {
+  TransformationTypeMeasures,
+  TransformationType
+} from '../shared/types.js'
 
 /**
- * Transformation class. Abstract class, extended by the various transformations.
+ * Base class for transformation.
  */
 export abstract class BaseTransformation {
   sourcePoints: Point[]
@@ -13,13 +16,19 @@ export abstract class BaseTransformation {
 
   destinationTransformedSourcePoints?: Point[]
 
+  abstract weightsArrays?: object
+
+  type: TransformationType
+
   pointCount: number
   pointCountMinimum: number
 
-  type: string
+  private errors?: number[]
+  private rmse?: number
 
   /**
    * Create a transformation
+   *
    * @param sourcePoints - The source points
    * @param destinationPoints - The destination points
    * @param type - The transformation type
@@ -52,45 +61,98 @@ export abstract class BaseTransformation {
     }
   }
 
-  computeDestinationTransformedSourcePoints(): Point[] {
-    this.destinationTransformedSourcePoints = this.sourcePoints.map(
-      (sourcePoint) => this.evaluateFunction(sourcePoint)
-    )
+  /**
+   * Note: since (writing to and) reading from matrices is expensive,
+   * we convert to and convert from ml-matrix Matrix types in this function,
+   * in order not to use them in the evaluate functions.
+   */
+  abstract solve(): void
+
+  /**
+   * Set weights.
+   *
+   * The weights might be obtained in other ways then through solving
+   * (e.g. through solving multiple transformation together when staping).
+   * This function can be used to set weights computed elsewhere.
+   */
+  setWeightsArrays(weightsArrays: object): void {
+    this.weightsArrays = weightsArrays
+    this.processWeightsArrays()
+  }
+
+  processWeightsArrays(): void {
+    return
+  }
+
+  /**
+   * Evaluate the transformation function at a new point
+   *
+   * @param newSourcePoint - a source point
+   * @returns the source point, transformed to destination space
+   */
+  abstract evaluateFunction(newSourcePoint: Point): Point
+
+  /**
+   * Evaluate the transformation function's partial derivative to x at a new point
+   *
+   * @param newSourcePoint - a source point
+   * @returns the x and y component of the partial derivative to x at the source point
+   */
+  abstract evaluatePartialDerivativeX(newSourcePoint: Point): Point
+
+  /**
+   * Evaluate the transformation function's partial derivative to y at a new point
+   *
+   * @param newSourcePoint - a source point
+   * @returns the x and y component of the partial derivative to y at the source point
+   */
+  abstract evaluatePartialDerivativeY(newSourcePoint: Point): Point
+
+  /**
+   * Get the destination-transformed source points.
+   *
+   * @returns source points, transformed to destination domain
+   */
+  getDestinationTransformedSourcePoints(): Point[] {
+    if (!this.destinationTransformedSourcePoints) {
+      this.destinationTransformedSourcePoints = this.sourcePoints.map(
+        (sourcePoint) => this.evaluateFunction(sourcePoint)
+      )
+    }
 
     return this.destinationTransformedSourcePoints
   }
 
-  get errors() {
-    let destinationTransformedSourcePoints =
-      this.destinationTransformedSourcePoints
-    if (!destinationTransformedSourcePoints) {
-      destinationTransformedSourcePoints =
-        this.computeDestinationTransformedSourcePoints()
-    }
-
-    return this.destinationPoints.map((destinationPoint, index) =>
-      distance(destinationPoint, destinationTransformedSourcePoints[index])
-    )
+  getMeasures(): Partial<TransformationTypeMeasures> {
+    return {}
   }
 
-  get rmse() {
-    let destinationTransformedSourcePoints =
-      this.destinationTransformedSourcePoints
-    if (!destinationTransformedSourcePoints) {
-      destinationTransformedSourcePoints =
-        this.computeDestinationTransformedSourcePoints()
-    }
+  getErrors() {
+    if (!this.errors) {
+      const destinationTransformedSourcePoints =
+        this.getDestinationTransformedSourcePoints()
 
-    if (!this.destinationTransformedSourcePoints) {
-      this.computeDestinationTransformedSourcePoints()
+      this.errors = this.destinationPoints.map((destinationPoint, index) =>
+        distance(destinationPoint, destinationTransformedSourcePoints[index])
+      )
     }
-
-    return rms(this.destinationPoints, destinationTransformedSourcePoints)
+    return this.errors
   }
 
-  abstract evaluateFunction(_newSourcePoint: Point): Point
+  getRmse() {
+    if (!this.rmse) {
+      const destinationTransformedSourcePoints =
+        this.getDestinationTransformedSourcePoints()
 
-  abstract evaluatePartialDerivativeX(_newSourcePoint: Point): Point
+      if (!this.destinationTransformedSourcePoints) {
+        this.getDestinationTransformedSourcePoints()
+      }
 
-  abstract evaluatePartialDerivativeY(_newSourcePoint: Point): Point
+      this.rmse = rms(
+        this.destinationPoints,
+        destinationTransformedSourcePoints
+      )
+    }
+    return this.rmse
+  }
 }

@@ -1,19 +1,27 @@
 import { Command } from '@commander-js/extra-typings'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
-import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
+import {
+  parseAnnotationInputOptions,
+  parseAnnotationsValidateMaps
+} from '../../lib/parse.js'
+import { addAnnotationInputOptions } from '../../lib/options.js'
 
 export function parse() {
-  return new Command('parse')
-    .argument('[files...]')
-    .summary('parse Georeference Annotation')
-    .description(
-      "Parses and validates Georeference Annotations and outputs Allmaps' internal format"
-    )
-    .action(async (files) => {
-      const jsonValues = await parseJsonInput(files)
+  const command = addAnnotationInputOptions(
+    new Command('parse')
+      .argument('[files...]')
+      .summary('parse Georeference Annotation')
+      .description(
+        "Parse and validate Georeference Annotations to Georeferenced Maps - Allmaps' internal map format"
+      )
+  )
 
-      const maps = parseAnnotationsValidateMaps(jsonValues)
-      printJson(maps)
-    })
+  return command.action(async (files, options) => {
+    const jsonValues = await parseJsonInput(files)
+    const annotationInputs = parseAnnotationInputOptions(options)
+
+    const maps = parseAnnotationsValidateMaps(jsonValues, annotationInputs)
+    printJson(maps)
+  })
 }

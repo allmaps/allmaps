@@ -1,10 +1,6 @@
-import { fromLonLat } from 'ol/proj'
-import { getCenter } from 'ol/extent'
-
 import { isGeojsonGeometry, computeBbox } from '@allmaps/stdlib'
 
-import type View from 'ol/View'
-import type { Extent } from 'ol/extent'
+import type { Bbox } from '@allmaps/types'
 
 import type { Viewport } from '$lib/types/shared.js'
 
@@ -15,44 +11,16 @@ type Viewports = {
   data: Viewport
 }
 
-export function getExtentViewport(
-  view: View,
-  extent: Extent
-): Viewport | undefined {
-  const resolution = view.getResolutionForExtent(extent)
-  const zoom = view.getZoomForResolution(resolution)
-  const center = getCenter(extent)
-
-  if (zoom) {
-    return {
-      center,
-      zoom,
-      rotation: 0
-    }
-  }
-}
-
-export function getNavPlaceViewport(
-  view: View,
-  navPlace?: object
-): Viewport | undefined {
+export function getNavPlaceViewport(navPlace?: object): Viewport | undefined {
   if (isGeojsonGeometry(navPlace)) {
     const bbox = computeBbox(navPlace)
-    return getBboxViewport(view, bbox)
+    return getBboxViewport(bbox)
   }
 }
 
-export function getBboxViewport(
-  view: View,
-  bbox?: number[]
-): Viewport | undefined {
+export function getBboxViewport(bbox?: Bbox): Viewport | undefined {
   if (bbox) {
-    const extent = [
-      ...fromLonLat([bbox[0], bbox[1]]),
-      ...fromLonLat([bbox[2], bbox[3]])
-    ]
-
-    return getExtentViewport(view, extent)
+    return { bounds: bbox }
   }
 }
 

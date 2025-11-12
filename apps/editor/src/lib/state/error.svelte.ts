@@ -3,7 +3,7 @@ import { setContext, getContext } from 'svelte'
 const ERROR_KEY = Symbol('error')
 
 export class ErrorState {
-  #error = $state<Error | null>(null)
+  #error = $state<Error>()
 
   set error(error: unknown) {
     if (error) {
@@ -14,7 +14,7 @@ export class ErrorState {
         this.#error = new Error('Unknown error')
       }
     } else {
-      this.#error = null
+      this.#error = undefined
     }
   }
 

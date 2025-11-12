@@ -7,13 +7,21 @@ export { ProjectedGcpTransformer } from './projected-transformers/ProjectedGcpTr
 export {
   lonLatProjection,
   webMercatorProjection,
+  defaultProjectedGcpTransformerOptions,
+  defaultProjectedGcpTransformOptions,
   lonLatToWebMercator,
   webMercatorToLonLat,
-  isEqualProjection
+  isEqualProjection,
+  projectionToAntialiasedProjection,
+  projectionDefinitionToAntialiasedDefinition
 } from './shared/project-functions.js'
 
-export {
+export type {
+  ProjectionDefinition,
   Projection,
   ProjectedGcpTransformOptions,
-  ProjectedGcpTransformerOptions
+  ProjectedGcpTransformerOptions,
+  ProjectionInputs,
+  InternalProjectionInputs,
+  ProjectedGcpTransformerInputs
 } from './shared/types.js'

@@ -1,10 +1,18 @@
-import { GcpTransformerOptions, GcpTransformOptions } from '@allmaps/transform'
+import {
+  GcpsInputs,
+  GcpTransformerOptions,
+  GcpTransformOptions,
+  TransformationTypeInputs
+} from '@allmaps/transform'
 
-export type ProjectionDefinition = string
+import { PROJJSONDefinition } from 'proj4/dist/lib/core'
 
-export type Projection = {
+export type ProjectionDefinition = string | PROJJSONDefinition
+
+export type Projection<Definition = ProjectionDefinition> = {
+  id?: string
   name?: string
-  definition: ProjectionDefinition
+  definition: Definition
 }
 
 export type ProjectedGcpTransformerOptions = {
@@ -12,6 +20,16 @@ export type ProjectedGcpTransformerOptions = {
   projection: Projection
 } & GcpTransformerOptions
 
-export type ProjectedGcpTransformOptions = {
-  projection: Projection
-} & GcpTransformOptions
+export type ProjectedGcpTransformOptions = ProjectionInputs &
+  GcpTransformOptions
+
+export type ProjectionInputs = {
+  projection?: Projection
+}
+export type InternalProjectionInputs = {
+  internalProjection?: Projection
+}
+export type ProjectedGcpTransformerInputs = GcpsInputs &
+  TransformationTypeInputs &
+  InternalProjectionInputs &
+  ProjectionInputs

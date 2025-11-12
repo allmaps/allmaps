@@ -8,6 +8,26 @@ MIT
 
 ## API
 
+### `angle(line)`
+
+###### Parameters
+
+* `line` (`[Point, Point]`)
+
+###### Returns
+
+`number`.
+
+### `arrayMatrixSize(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`[number, number]`.
+
 ### `arrayRepeated(array, isEqualObject)`
 
 ###### Parameters
@@ -100,6 +120,60 @@ MIT
 
 `number`.
 
+### `bearing(line)`
+
+###### Parameters
+
+* `line` (`[Point, Point]`)
+
+###### Returns
+
+`number`.
+
+### `bindPoint(point, min, max)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `min` (`[number, number]`)
+* `max` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `bindPointLngLatProjection(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `bindPointWebMercatorProjection(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `bindValue(value, min, max)`
+
+###### Parameters
+
+* `value` (`number`)
+* `min` (`number`)
+* `max` (`number`)
+
+###### Returns
+
+`number`.
+
 ### `bufferBbox(bbox, dist0, dist1)`
 
 ###### Parameters
@@ -117,11 +191,21 @@ MIT
 ###### Parameters
 
 * `bbox` (`[number, number, number, number]`)
-* `ratio` (`number`)
+* `ratio?` (`number | undefined`)
 
 ###### Returns
 
 `[number, number, number, number]`.
+
+### `camelCaseToWords(string)`
+
+###### Parameters
+
+* `string` (`string`)
+
+###### Returns
+
+`string`.
 
 ### `closeMultiPolygon(multiPolygon)`
 
@@ -163,11 +247,12 @@ MIT
 
 `Bbox | undefined`.
 
-### `computeBbox(points)`
+### `computeBbox(points, options)`
 
 ###### Parameters
 
 * `points` (`Geometry | GeojsonGeometry`)
+* `options?` (`Partial<BboxOptions> | undefined`)
 
 ###### Returns
 
@@ -717,7 +802,24 @@ MIT
 
 `T`.
 
-### `getPropertyFromTrippleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
+### `getPropertyFromQuadrupleCacheOrComputation(cache, key0, key1, key2, key3, computation, checkUse, checkStore)`
+
+###### Parameters
+
+* `cache` (`Map<K0, Map<K1, Map<K2, Map<K3, T>>>>`)
+* `key0` (`K0`)
+* `key1` (`K1`)
+* `key2` (`K2`)
+* `key3` (`K3`)
+* `computation` (`() => T`)
+* `checkUse` (`((t: T) => boolean) | undefined`)
+* `checkStore` (`((t: T) => boolean) | undefined`)
+
+###### Returns
+
+`T`.
+
+### `getPropertyFromTripleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
 
 ###### Parameters
 
@@ -732,6 +834,17 @@ MIT
 ###### Returns
 
 `T`.
+
+### `groupBy(arr, key)`
+
+###### Parameters
+
+* `arr` (`Array<T>`)
+* `key` (`(i: T) => K`)
+
+###### Returns
+
+`{[P in K]: Array<T>}`.
 
 ### `hexToFractionalOpaqueRgba(hex)`
 
@@ -1163,22 +1276,11 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `map` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
 
 ###### Returns
 
 `{type: 'polygon'; attributes?: SvgAttributes; coordinates: Ring}`.
-
-### `maxOfNumberOrUndefined(number1, number2)`
-
-###### Parameters
-
-* `number1` (`number | undefined`)
-* `number2` (`number | undefined`)
-
-###### Returns
-
-`number | undefined`.
 
 ### `mergeGeojsonFeaturesCollections(geojsonFeatureCollections)`
 
@@ -1190,38 +1292,37 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 `{type: 'FeatureCollection'; features: GeojsonFeature[]}`.
 
-### `mergeOptions(options0, options1)`
+### `mergeOptions(baseOptions, additionalPartialOptions)`
 
 ###### Parameters
 
-* `options0` (`Options0`)
-* `options1?` (`Options1 | undefined`)
+* `baseOptions` (`T`)
+* `additionalPartialOptions` (`U[0]`)
 
 ###### Returns
 
-`Options0 & Options1`.
+`T & U[number]`.
 
-### `mergeOptionsUnlessUndefined(options0, options1)`
+### `mergeOptionsUnlessUndefined(baseOptions, additionalOptions)`
 
 ###### Parameters
 
-* `options0` (`Options0`)
-* `options1?` (`Options1 | undefined`)
+* `baseOptions` (`T`)
+* `additionalOptions` (`Partial<U> | undefined`)
 
 ###### Returns
 
-`Options0 &
-  Partial<{[K in keyof Options1]: Exclude<Options1[K], undefined>}>`.
+`T & Partial<U>`.
 
-### `mergePartialOptions(partialOptionsArray)`
+### `mergePartialOptions(partialOptions)`
 
 ###### Parameters
 
-* `partialOptionsArray` (`Partial<Options> | undefined`)
+* `partialOptions` (`U[0]`)
 
 ###### Returns
 
-`{[P in keyof Options]?: Options[P] | undefined}`.
+`{[P in keyof U[number]]?: U[number][P] | undefined}`.
 
 ### `midPoint(points)`
 
@@ -1232,6 +1333,18 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Returns
 
 `[number, number]`.
+
+### `mixLineStrings(lineString0, lineString1, t)`
+
+###### Parameters
+
+* `lineString0` (`Array<Point>`)
+* `lineString1` (`Array<Point>`)
+* `t` (`number`)
+
+###### Returns
+
+`Array<Point>`.
 
 ### `mixNumbers(number0, number1, t)`
 
@@ -1287,6 +1400,108 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Returns
 
 `{type: 'MultiPolygon'; coordinates: number[][][][]}`.
+
+### `multiplyArrayMatrix(arrayMatrix, factor)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<number>>`)
+* `factor` (`number`)
+
+###### Returns
+
+`Array<Array<number>>`.
+
+### `newArrayMatrix(rows, cols, value)`
+
+Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as a ml-matrix Matrix
+
+###### Parameters
+
+* `rows` (`number`)
+* `cols` (`number`)
+* `value` (`T | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
+### `newBlockArrayMatrix(blocks, emptyValue)`
+
+###### Parameters
+
+* `blocks` (`Array<Array<Array<Array<T>>>>`)
+* `emptyValue` (`T | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
+### `objectDifference(newObject, baseObject)`
+
+###### Parameters
+
+* `newObject` (`object`)
+* `baseObject` (`object`)
+
+###### Returns
+
+`object`.
+
+### `objectOmitDifference(newObject, baseObject)`
+
+###### Parameters
+
+* `newObject` (`object`)
+* `baseObject` (`object`)
+
+###### Returns
+
+`object`.
+
+### `omit(object, keys)`
+
+###### Parameters
+
+* `object` (`T`)
+* `keys` (`Array<string>`)
+
+###### Returns
+
+`{[P in keyof T]?: T[P] | undefined}`.
+
+### `optionKeysByMapIdToUndefinedOptionsByMapId(optionKeysByMapId)`
+
+###### Parameters
+
+* `optionKeysByMapId` (`Map<string, T> | undefined`)
+
+###### Returns
+
+`Map<string, Record<T[number], undefined>> | undefined`.
+
+### `optionKeysToUndefinedOptions(optionKeys)`
+
+###### Parameters
+
+* `optionKeys` (`T | undefined`)
+
+###### Returns
+
+`Record<T[number], undefined> | undefined`.
+
+### `pasteArrayMatrix(arrayMatrix, rowsStart, colsStart, subArrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rowsStart` (`number`)
+* `colsStart` (`number`)
+* `subArrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `pixelToIntArrayIndex(pixel, size, channels, flipY)`
 
@@ -1377,6 +1592,16 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 `Point | undefined`.
 
+### `radiansToDegrees(radians)`
+
+###### Parameters
+
+* `radians` (`number`)
+
+###### Returns
+
+`number`.
+
 ### `rectangleToSize(rectangle)`
 
 ###### Parameters
@@ -1397,6 +1622,19 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Returns
 
 `number`.
+
+### `removeUndefinedOptions(optionsArray)`
+
+###### Parameters
+
+* `optionsArray` (`U[0]`)
+
+###### Returns
+
+`{   [P in keyof {[K in keyof U[number]]: Exclude<U[number][K], undefined>}]?:
+    | {[K in keyof U[number]]: Exclude<U[number][K], undefined>}[P]
+    | undefined
+}`.
 
 ### `rgbToHex(color)`
 
@@ -1505,6 +1743,16 @@ HEX string, e (`string`).g. '#0033ffff'
 
 `[number, number]`.
 
+### `shallowCopyArrayMatrix(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `sizeToBbox(size)`
 
 ###### Parameters
@@ -1597,6 +1845,20 @@ Example for square rectangles '\*' and '+':
 
 `number`.
 
+### `sliceArrayMatrix(arrayMatrix, rowsStart, colsStart, rowsEnd, colsEnd)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rowsStart` (`number`)
+* `colsStart` (`number`)
+* `rowsEnd?` (`number | undefined`)
+* `colsEnd?` (`number | undefined`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `squaredDistance(from)`
 
 ###### Parameters
@@ -1628,6 +1890,18 @@ Example for square rectangles '\*' and '+':
 ###### Returns
 
 `Generator<SvgGeometry, void, unknown>`.
+
+### `subArrayMatrix(arrayMatrix, rows, cols)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rows` (`Array<number>`)
+* `cols` (`Array<number>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `subSetArray(arr1, arr2)`
 
@@ -1707,6 +1981,16 @@ Return angle alpha made at point A by points B and C
 ###### Returns
 
 `Array<Point>`.
+
+### `transposeArrayMatrix(arrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
 
 ### `triangleAngles(triangle)`
 

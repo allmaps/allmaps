@@ -41,7 +41,9 @@ export class CacheableImageDataTile extends CacheableTile<ImageData> {
       this.data = context.getImageData(0, 0, width, height)
 
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, this.tileUrl)
+        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+          tileUrl: this.tileUrl
+        })
       )
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -49,7 +51,9 @@ export class CacheableImageDataTile extends CacheableTile<ImageData> {
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, this.tileUrl)
+          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
+            tileUrl: this.tileUrl
+          })
         )
       }
     }

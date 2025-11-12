@@ -1,10 +1,11 @@
-import classifyPoint from 'robust-point-in-polygon'
+import inside from 'point-in-polygon-hao'
 
 import {
   distance,
   stepDistanceAngle,
   lineAngle,
-  closeRing
+  closeRing,
+  closePolygon
 } from '@allmaps/stdlib'
 
 import type {
@@ -64,19 +65,11 @@ export function getGridPointsInBbox(bbox: Bbox, gridSize: number): Point[] {
 }
 
 // Returns true if point is inside of polygon with holes
-// Note: classifyPoint return -1 when inside (i.e. not outside or on edge)
 export function pointInPolygon(point: Point, polygon: Polygon): boolean {
-  // Check that inside outer ring
-  let inside = classifyPoint(polygon[0], point) == -1
-  if (!inside) {
-    return inside
+  try {
+    return inside(point, closePolygon(polygon)) === true
+  } catch (error) {
+    console.error('Error determining if point is inside polygon:', error)
+    return false
   }
-  // Check that not inside inner rings
-  for (let i = 1; i < polygon.length; i++) {
-    if (classifyPoint(polygon[i], point) == -1) {
-      inside = false
-      break
-    }
-  }
-  return inside
 }

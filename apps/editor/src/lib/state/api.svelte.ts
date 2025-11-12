@@ -36,8 +36,11 @@ export class ApiState {
     $effect(() => {
       if (
         sourceState.source &&
-        this.#lastSourceUrl !== sourceState.source?.url
+        this.#lastSourceUrl !== sourceState.source?.url &&
+        (sourceState.source.type === 'manifest' ||
+          sourceState.source.type === 'image')
       ) {
+        // TODO: don't use sourceState.source, use sourceState.parsedManifest
         this.#fetchMapsOrCreateSource(sourceState.source)
       }
 

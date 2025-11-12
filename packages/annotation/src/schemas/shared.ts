@@ -55,7 +55,14 @@ export const PartOfSchema = z
   .transform(ensureArray)
 
 const ValidTransformationSchema = z.object({
-  type: z.enum(['helmert', 'polynomial', 'thinPlateSpline', 'projective']),
+  type: z.enum([
+    'helmert',
+    'polynomial',
+    'thinPlateSpline',
+    'projective',
+    'straight',
+    'linear'
+  ]),
   options: z.object({}).passthrough().optional()
 })
 
@@ -113,6 +120,7 @@ export const TransformationSchema = z
   })
 
 export const ProjectionSchema = z.object({
+  id: z.string().url().optional(),
   name: z.string().optional(),
   definition: z.union([z.string(), z.unknown()])
 })

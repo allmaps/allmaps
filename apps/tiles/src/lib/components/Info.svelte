@@ -1,32 +1,18 @@
 <script lang="ts">
-  import { toLonLat } from 'ol/proj.js'
-
   import { MapMonster } from '@allmaps/ui'
-  import { darkblue } from '@allmaps/tailwind'
 
-  import { view } from '$lib/shared/stores/view.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
-  let zoom: number | undefined
-  let center: number[] | undefined
+  const uiState = getUiState()
 
-  $: {
-    if ($view) {
-      const viewZoom = $view.getZoom()
-      if (viewZoom) {
-        zoom = Math.round(viewZoom)
-      }
-
-      const viewCenter = $view.getCenter()
-      if (viewCenter) {
-        center = toLonLat(viewCenter)
-      }
-    }
+  type Props = {
+    tileUrl?: string
   }
 
-  export let tileUrl: string | undefined
+  let { tileUrl }: Props = $props()
 
-  const speechBalloonBackgroundColor = darkblue
-  const speechBalloonTextColor = 'white'
+  const speechBalloonBackgroundColor = 'white'
+  const speechBalloonTextColor = 'black'
 </script>
 
 <div class="p-4 drop-shadow-md">
@@ -55,12 +41,13 @@
       >
       or
 
-      {#if zoom && center && tileUrl}
+      {#if uiState.zoom && uiState.center && tileUrl}
         <a
           class="underline"
-          href="https://www.openhistoricalmap.org/edit#map={zoom}/{center[1]}/{center[0]}&background=custom:{encodeURIComponent(
-            tileUrl
-          )}">OpenHistoricalMap</a
+          href="https://www.openhistoricalmap.org/edit#map={uiState.zoom}/{uiState
+            .center[1]}/{uiState
+            .center[0]}&background=custom:{encodeURIComponent(tileUrl)}"
+          >OpenHistoricalMap</a
         >
       {:else}
         OpenHistoricalMap

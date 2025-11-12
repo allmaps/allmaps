@@ -1,45 +1,63 @@
-import { generateAnnotation } from '@allmaps/annotation'
+import { computeBbox } from '@allmaps/stdlib'
+import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
 
-export function makeFakeStraightAnnotation(
-  imageUri: string,
+import type { Annotation, AnnotationPage } from '@allmaps/annotation'
+
+import type { ResourceMask } from '$lib/types/maps.js'
+
+export function generateFakeStraightAnnotation(
+  imageId: string,
   width: number,
-  height: number
+  height: number,
+  resourceMask?: ResourceMask
 ) {
-  const offsetLng = 0.01
-  const offsetLat = 0
-
   const georeferencedMap = [
     {
+      id: imageId,
       '@context': 'https://schemas.allmaps.org/map/2/context.json',
       type: 'GeoreferencedMap',
       resource: {
-        id: imageUri,
+        id: imageId,
         width,
         height,
         type: 'ImageService2'
       },
-      resourceMask: [
+      resourceMask: resourceMask || [
         [0, 0],
         [0, height],
         [width, height],
         [width, 0]
       ],
+      transformation: { type: 'straight' },
       gcps: [
         {
           resource: [0, 0],
-          geo: [offsetLng, offsetLat + height / 10_000]
+          geo: [0, height / 10_000]
         },
         {
           resource: [width, 0],
-          geo: [offsetLng + width / 10_000, offsetLat + height / 10_000]
+          geo: [width / 10_000, height / 10_000]
         },
         {
           resource: [width, height],
-          geo: [offsetLng + width / 10_000, offsetLat]
+          geo: [width / 10_000, 0]
         }
       ]
     }
   ]
 
   return generateAnnotation(georeferencedMap)
+}
+
+export function computeTransformedAnnotationBbox(
+  annotation: Annotation | AnnotationPage
+) {
+  const maps = parseAnnotation(annotation)
+  const map = maps[0]
+
+  const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+
+  const geoMask = transformer.transformToGeo([map.resourceMask])
+  return computeBbox(geoMask)
 }

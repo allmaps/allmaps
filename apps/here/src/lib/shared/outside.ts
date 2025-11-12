@@ -1,12 +1,6 @@
-import classifyPoint from 'robust-point-in-polygon'
-
 import { distance } from '@allmaps/stdlib'
 
 import type { Point, Line, Ring } from '@allmaps/types'
-
-export function pointInsidePolygon(point: Point, polygon: Ring) {
-  return classifyPoint(polygon, point) < 1
-}
 
 export function lineBearing(from: Point, to: Point): number {
   const dx = to[0] - from[0]
@@ -26,7 +20,7 @@ export function pointOnPolygon(from: Point, to: Point, polygon: Ring) {
     return null
   }
 
-  let intersections: Point[] = []
+  const intersections: Point[] = []
 
   // Find the intersection of the line with each edge of the polygon
   for (let i = 0; i < polygon.length; i++) {

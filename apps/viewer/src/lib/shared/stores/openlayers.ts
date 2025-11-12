@@ -262,7 +262,7 @@ export function addMapToVectorSource(mapId: string) {
     const feature = new GeoJSON().readFeature(
       geometryToGeojsonGeometry([warpedMap.projectedGeoMask]),
       {
-        dataProjection: warpedMap.projection.definition
+        dataProjection: String(warpedMap.projection.definition)
       }
     ) as Feature
     feature.setId(warpedMap.mapId)

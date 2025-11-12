@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/ui",
-  "version": "1.0.0-beta.35",
+  "version": "1.0.0-beta.39",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -21,10 +21,6 @@
       "types": "./dist/components/kit/index.d.ts",
       "svelte": "./dist/components/kit/index.js"
     },
-    "./geocoder": {
-      "types": "./dist/geocoder.d.ts",
-      "default": "./dist/geocoder.js"
-    },
     "./css/*": "./dist/css/*"
   },
   "files": [
@@ -42,13 +38,7 @@
     "watch": "svelte-package --watch",
     "build": "svelte-kit sync && svelte-package && publint",
     "html-build": "vite build",
-    "lerna-html-build": "lerna run html-build --scope @allmaps/ui --include-dependencies",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check src && eslint src --ext .ts,.svelte",
-    "format": "prettier --write src",
-    "types": "tsc --noEmit",
-    "preversion": "pnpm run types && pnpm run lint"
+    "lerna-html-build": "lerna run html-build --scope @allmaps/ui --include-dependencies"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
@@ -65,7 +55,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.35.1",
     "postcss": "^8.4.18",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.1.2",
     "publint": "^0.1.9",
     "svelte": "^4.2.7",

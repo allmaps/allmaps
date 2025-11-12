@@ -4,7 +4,7 @@ precision highp float;
 
 #include ../helpers.frag;
 
-uniform mat4 u_renderTransform;
+uniform mat4 u_renderHomogeneousTransform;
 uniform float u_animationProgress;
 
 in float a_viewportSize;
@@ -25,7 +25,7 @@ out float v_viewportTotalSize;
 void main() {
   vec2 clipPoint = mix(a_clipPreviousPoint, a_clipPoint, easing(u_animationProgress));
 
-  gl_Position = u_renderTransform * vec4(clipPoint, 0.0f, 1.0f);
+  gl_Position = u_renderHomogeneousTransform * vec4(clipPoint, 0.0f, 1.0f);
 
   v_viewportFeatherSize = 1.0;
 
