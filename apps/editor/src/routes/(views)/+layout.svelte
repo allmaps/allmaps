@@ -15,6 +15,7 @@
   import { setScopeState } from '$lib/state/scope.svelte.js'
   import { setSourceState } from '$lib/state/source.svelte.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import { setViewportsState } from '$lib/state/viewports.svelte.js'
   // import { setWarpedMapLayerState } from '$lib/state/warpedmaplayer.svelte'
@@ -35,32 +36,59 @@
 
   import type { Snippet } from 'svelte'
 
+  import type { Env } from '$lib/types/env.js'
+
   const { children }: { children: Snippet } = $props()
+
+  const varsState = getVarsState<Env>()
+
+  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
+  const previewUrl = varsState.get('PUBLIC_ALLMAPS_PREVIEW_URL')
+  const apiWsUrl = varsState.get('PUBLIC_ALLMAPS_API_WS_URL')
 
   const errorState = getErrorState()
   const urlState = getUrlState()
-  const sourceState = setSourceState(urlState, errorState)
+  const sourceState = setSourceState(
+    varsState.get('PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'),
+    urlState,
+    errorState
+  )
   const uiState = setUiState(urlState, sourceState)
-  const apiState = setApiState(sourceState)
+  const apiState = setApiState(apiBaseUrl, sourceState)
 
   setViewportsState(sourceState)
 
-  const projectionsState = setProjectionsState(
-    'https://dev.api.allmaps.org/projections'
-  )
+  const projectionsState = setProjectionsState(`${apiBaseUrl}/projections`)
 
   const mapsHistoryState = setMapsHistoryState(sourceState)
-  const mapsState = setMapsState(sourceState, errorState, mapsHistoryState)
+  const mapsState = setMapsState(
+    apiWsUrl,
+    sourceState,
+    errorState,
+    mapsHistoryState
+  )
 
   const mapsMergedState = setMapsMergedState(
+    apiBaseUrl,
+    annotationsApiBaseUrl,
     mapsState,
     mapsHistoryState,
     apiState,
     projectionsState
   )
 
-  setScopeState(sourceState, mapsState, mapsMergedState, projectionsState)
-  setHeadState(sourceState)
+  setScopeState(
+    apiBaseUrl,
+    annotationsApiBaseUrl,
+    sourceState,
+    mapsState,
+    mapsMergedState,
+    projectionsState
+  )
+  setHeadState(previewUrl, sourceState)
 
   // setWarpedMapLayerState(
   //   mapsState,

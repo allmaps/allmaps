@@ -5,8 +5,6 @@ import { parseLanguageString } from '$lib/shared/iiif.js'
 
 import type { SourceState } from '$lib/state/source.svelte'
 
-import { PUBLIC_ALLMAPS_PREVIEW_URL } from '$env/static/public'
-
 const ogImageSize = [1200, 627]
 
 const truncateOptions = {
@@ -17,6 +15,7 @@ const truncateOptions = {
 const HEAD_KEY = Symbol('head')
 
 export class HeadState {
+  #previewUrl: string
   #sourceState: SourceState
 
   #parsedIiif = $derived.by(() => this.#sourceState.parsedIiif)
@@ -35,7 +34,8 @@ export class HeadState {
   #sourceLabelString = $derived(parseLanguageString(this.#sourceLabel, 'en'))
   #canvasLabelString = $derived(parseLanguageString(this.#canvas?.label, 'en'))
 
-  constructor(sourceState: SourceState) {
+  constructor(previewUrl: string, sourceState: SourceState) {
+    this.#previewUrl = previewUrl
     this.#sourceState = sourceState
   }
 
@@ -68,7 +68,7 @@ export class HeadState {
   #getOgImageUrl() {
     // TODO: use active manifest when source type is collection!
     if (this.#sourceState.source) {
-      return `${PUBLIC_ALLMAPS_PREVIEW_URL}/${this.#sourceState.source.type}s/${this.#sourceState.source.allmapsId}`
+      return `${this.#previewUrl}/${this.#sourceState.source.type}s/${this.#sourceState.source.allmapsId}`
     }
   }
 
@@ -138,8 +138,8 @@ export class HeadState {
   }
 }
 
-export function setHeadState(sourceState: SourceState) {
-  return setContext(HEAD_KEY, new HeadState(sourceState))
+export function setHeadState(previewUrl: string, sourceState: SourceState) {
+  return setContext(HEAD_KEY, new HeadState(previewUrl, sourceState))
 }
 
 export function getHeadState() {

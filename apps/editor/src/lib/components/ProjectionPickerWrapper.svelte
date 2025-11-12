@@ -9,6 +9,7 @@
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import { getApiUrl } from '$lib/shared/urls.js'
   import { toDbProjection } from '$lib/shared/maps.js'
@@ -16,6 +17,7 @@
   import type { PickerProjection } from '@allmaps/components/projections'
 
   import type { DbMap3 } from '$lib/types/maps.js'
+  import type { Env } from '$lib/types/env.js'
 
   type Props = {
     map: DbMap3
@@ -26,10 +28,13 @@
   const mapsState = getMapsState()
   const projectionsState = getProjectionsState()
   const uiState = getUiState()
+  const varsState = getVarsState<Env>()
+
+  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
 
   let projectionId = $derived(
     map.resourceCrs?.id
-      ? getApiUrl(`projections/${map.resourceCrs?.id}`)
+      ? getApiUrl(apiBaseUrl, `projections/${map.resourceCrs?.id}`)
       : undefined
   )
 

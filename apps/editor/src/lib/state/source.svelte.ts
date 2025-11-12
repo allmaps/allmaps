@@ -27,11 +27,11 @@ import type {
   IIIFResource
 } from '$lib/types/shared.js'
 
-import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
-
 const SOURCE_KEY = Symbol('source')
 
 export class SourceState {
+  #annotationsApiBaseUrl: string
+
   #urlState: UrlState<typeof searchParams>
   #errorState: ErrorState
 
@@ -195,7 +195,13 @@ export class SourceState {
 
   #imageCount = $derived(this.#imagesByImageId.size)
 
-  constructor(urlState: UrlState<typeof searchParams>, errorState: ErrorState) {
+  constructor(
+    annotationsApiBaseUrl: string,
+    urlState: UrlState<typeof searchParams>,
+    errorState: ErrorState
+  ) {
+    this.#annotationsApiBaseUrl = annotationsApiBaseUrl
+
     this.#urlState = urlState
     this.#errorState = errorState
 
@@ -357,7 +363,7 @@ export class SourceState {
         typeof sourceData.type === 'string' &&
         ['Annotation', 'AnnotationPage'].includes(sourceData.type)
       ) {
-        if (url.startsWith(PUBLIC_ALLMAPS_ANNOTATIONS_API_URL)) {
+        if (url.startsWith(this.#annotationsApiBaseUrl)) {
           // TODO: show message, Allmaps doesn't use georeference data from annotation
           // but loads from API
           await this.#loadGeoreferenceAnnotation(sourceData)
@@ -551,10 +557,14 @@ export class SourceState {
 }
 
 export function setSourceState(
+  annotationsApiBaseUrl: string,
   urlState: UrlState<typeof searchParams>,
   errorState: ErrorState
 ) {
-  return setContext(SOURCE_KEY, new SourceState(urlState, errorState))
+  return setContext(
+    SOURCE_KEY,
+    new SourceState(annotationsApiBaseUrl, urlState, errorState)
+  )
 }
 
 export function getSourceState() {

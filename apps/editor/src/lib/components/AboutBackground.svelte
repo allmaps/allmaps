@@ -7,6 +7,7 @@
   import { getViewerUrl } from '$lib/shared/urls.js'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
   import { validateGeoreferencedMap } from '@allmaps/annotation'
@@ -15,7 +16,15 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { GeojsonPolygon } from '@allmaps/types'
 
+  import type { Env } from '$lib/types/env.js'
+
   const uiState = getUiState()
+  const varsState = getVarsState<Env>()
+
+  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
 
   const count = 40
   const polygonWidth = 80
@@ -276,7 +285,7 @@
         <a
           target="_blank"
           class="pointer-events-auto"
-          href={getViewerUrl(id, true)}
+          href={getViewerUrl(viewerBaseUrl, annotationsApiBaseUrl, id, true)}
           title="Open in Allmaps Viewer"
         >
           <path

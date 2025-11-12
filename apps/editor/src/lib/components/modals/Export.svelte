@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import { getAnnotationUrl, getGeoJsonUrl } from '$lib/shared/urls.js'
 
@@ -18,12 +19,19 @@
     generateMapLibreExample
   } from '@allmaps/io'
 
+  import type { Env } from '$lib/types/env.js'
+
   const uiState = getUiState()
   const scopeState = getScopeState()
+  const varsState = getVarsState<Env>()
+
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
 
   let geotiffScript = $derived(
     scopeState.allmapsId
-      ? `curl "${getAnnotationUrl(scopeState.allmapsId)}" | \\\n  allmaps script geotiff`
+      ? `curl "${getAnnotationUrl(annotationsApiBaseUrl, scopeState.allmapsId)}" | \\\n  allmaps script geotiff`
       : ''
   )
 
@@ -56,8 +64,8 @@
 
   {#if scopeState.allmapsId}
     <ExportUrl
-      url={getGeoJsonUrl(scopeState.allmapsId)}
-      openUrl={`https://geojson.io/#data=data:text/x-url,${encodeURIComponent(getGeoJsonUrl(scopeState.allmapsId))}`}
+      url={getGeoJsonUrl(annotationsApiBaseUrl, scopeState.allmapsId)}
+      openUrl={`https://geojson.io/#data=data:text/x-url,${encodeURIComponent(getGeoJsonUrl(annotationsApiBaseUrl, scopeState.allmapsId))}`}
       label="GeoJSON"
     >
       <p>Export the mask of current map view as a GeoJSON file.</p>
@@ -76,7 +84,7 @@
 
     <Highlight
       value={generateAllmapsPluginCodeExample(
-        getAnnotationUrl(scopeState.allmapsId),
+        getAnnotationUrl(annotationsApiBaseUrl, scopeState.allmapsId),
         [0, 0],
         14
       )}

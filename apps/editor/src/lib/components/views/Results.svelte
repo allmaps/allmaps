@@ -11,6 +11,7 @@
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
 
   import {
@@ -34,6 +35,7 @@
 
   import type { ClickedItemEvent } from '$lib/types/events.js'
   import type { Viewport } from '$lib/types/shared.js'
+  import type { Env } from '$lib/types/env.js'
 
   let geoMap = $state.raw<MapLibreMap>()
   let warpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
@@ -43,6 +45,11 @@
   const scopeState = getScopeState()
   const sourceState = getSourceState()
   const urlState = getUrlState()
+  const varsState = getVarsState<Env>()
+
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
 
   const geoViewport = $derived(getGeoViewport())
 
@@ -116,7 +123,7 @@
 
   function handleLastClickedItem(event: ClickedItemEvent) {
     if (geoMap && warpedMapLayer && event.detail.type === 'map') {
-      const mapId = getFullMapId(event.detail.mapId)
+      const mapId = getFullMapId(annotationsApiBaseUrl, event.detail.mapId)
       warpedMapLayer.bringMapsToFront([mapId])
       const bbox = warpedMapLayer?.getMapsBbox([mapId], {
         projection: lonLatProjection
