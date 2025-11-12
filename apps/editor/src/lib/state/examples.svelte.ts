@@ -4,21 +4,25 @@ import { SvelteMap } from 'svelte/reactivity'
 
 import { uniqBy } from 'lodash-es'
 
-import { PUBLIC_EXAMPLES_API_URL } from '$env/static/public'
-
 import type { Example } from '$lib/types/shared.js'
 
 const EXAMPLES_KEY = Symbol('maps-history')
 
 export class ExamplesState {
+  #examplesApiUrl: string
+
   #examplesByOrganizationId = $state<SvelteMap<string, Example[]>>(
     new SvelteMap()
   )
 
+  constructor(examplesApiUrl: string) {
+    this.#examplesApiUrl = examplesApiUrl
+  }
+
   async fetchExamples(organizationId: string, count: number) {
     // TODO: parse with Zod
     const fetchedExamples = (await fetch(
-      `${PUBLIC_EXAMPLES_API_URL}/?org=${organizationId}&count=${count}`
+      `${this.#examplesApiUrl}/?org=${organizationId}&count=${count}`
     ).then((response) => response.json())) as Example[]
 
     const examples = uniqBy(fetchedExamples, 'imageId')
@@ -43,8 +47,8 @@ export class ExamplesState {
   }
 }
 
-export function setExamplesState() {
-  return setContext(EXAMPLES_KEY, new ExamplesState())
+export function setExamplesState(examplesApiUrl: string) {
+  return setContext(EXAMPLES_KEY, new ExamplesState(examplesApiUrl))
 }
 
 export function getExamplesState() {

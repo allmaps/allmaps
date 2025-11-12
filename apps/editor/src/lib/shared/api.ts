@@ -3,19 +3,17 @@ import { fetchJson } from '@allmaps/stdlib'
 
 import type { Source } from '$lib/types/shared.js'
 
-import { PUBLIC_ALLMAPS_API_URL } from '$env/static/public'
-
-export async function fetchMaps(source: Source) {
-  const url = `${PUBLIC_ALLMAPS_API_URL}/${source.type}s/${source.allmapsId}/maps`
+export async function fetchMaps(apiBaseUrl: string, source: Source) {
+  const url = `${apiBaseUrl}/${source.type}s/${source.allmapsId}/maps`
   return await fetchJson(url)
 }
 
-export async function checkSource(source: Source) {
-  const url = `${PUBLIC_ALLMAPS_API_URL}/${source.type}s/${source.allmapsId}`
+export async function checkSource(apiBaseUrl: string, source: Source) {
+  const url = `${apiBaseUrl}/${source.type}s/${source.allmapsId}`
   return await fetchJson(url)
 }
 
-export async function createSource(source: Source) {
+export async function createSource(apiBaseUrl: string, source: Source) {
   if (source.type === 'collection') {
     console.warn("Don't create collection sources via API.")
     return
@@ -23,7 +21,7 @@ export async function createSource(source: Source) {
 
   const checksum = await generateChecksum(source.sourceIiif)
 
-  const apiUrl = `${PUBLIC_ALLMAPS_API_URL}/${source.type}s/${source.allmapsId}`
+  const apiUrl = `${apiBaseUrl}/${source.type}s/${source.allmapsId}`
 
   const apiData = {
     url: source.url,

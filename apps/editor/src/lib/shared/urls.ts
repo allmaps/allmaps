@@ -1,26 +1,34 @@
-import {
-  PUBLIC_ALLMAPS_API_URL,
-  PUBLIC_ALLMAPS_ANNOTATIONS_API_URL,
-  PUBLIC_ALLMAPS_VIEWER_URL,
-  PUBLIC_ALLMAPS_TILE_SERVER_URL
-} from '$env/static/public'
-
-export function getApiUrl(allmapsId: string) {
-  return `${PUBLIC_ALLMAPS_API_URL}/${allmapsId}`
+export function getApiUrl(apiBaseUrl: string, allmapsId: string) {
+  return `${apiBaseUrl}/${allmapsId}`
 }
 
-export function getAnnotationUrl(allmapsId: string) {
-  return `${PUBLIC_ALLMAPS_ANNOTATIONS_API_URL}/${allmapsId}`
+export function getAnnotationUrl(
+  annotationsApiBaseUrl: string,
+  allmapsId: string
+) {
+  return `${annotationsApiBaseUrl}/${allmapsId}`
 }
 
-export function getViewerUrl(allmapsId: string, isFullMapId = false) {
-  return `${PUBLIC_ALLMAPS_VIEWER_URL}/?url=${isFullMapId ? allmapsId : getAnnotationUrl(allmapsId)}`
+export function getViewerUrl(
+  viewerBaseUrl: string,
+  annotationsApiBaseUrl: string,
+  allmapsId: string,
+  isFullMapId = false
+) {
+  return `${viewerBaseUrl}/?url=${isFullMapId ? allmapsId : getAnnotationUrl(annotationsApiBaseUrl, allmapsId)}`
 }
 
-export function getGeoJsonUrl(allmapsId: string) {
-  return `${getAnnotationUrl(allmapsId)}.geojson`
+export function getGeoJsonUrl(
+  annotationsApiBaseUrl: string,
+  allmapsId: string
+) {
+  return `${getAnnotationUrl(annotationsApiBaseUrl, allmapsId)}.geojson`
 }
 
-export function getXyzTilesUrl(allmapsId: string, retinaTiles = true) {
-  return `${PUBLIC_ALLMAPS_TILE_SERVER_URL}/${allmapsId}/{z}/{x}/{y}${retinaTiles ? '@2x' : ''}.png`
+export function getXyzTilesUrl(
+  tileServerBaseUrl: string,
+  allmapsId: string,
+  retinaTiles = true
+) {
+  return `${tileServerBaseUrl}/${allmapsId}/{z}/{x}/{y}${retinaTiles ? '@2x' : ''}.png`
 }

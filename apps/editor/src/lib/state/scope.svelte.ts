@@ -21,6 +21,9 @@ import type { Scope } from '$lib/types/shared.js'
 const SCOPE_KEY = Symbol('scope')
 
 export class ScopeState {
+  #apiBaseUrl: string
+  #annotationsApiBaseUrl: string
+
   #sourceState: SourceState
   #mapsState: MapsState
   #mapsMergedState: MapsMergedState
@@ -59,6 +62,8 @@ export class ScopeState {
     } else if (this.#scope === 'image') {
       if (this.#mapsState.maps) {
         return toGeoreferencedMaps(
+          this.#apiBaseUrl,
+          this.#annotationsApiBaseUrl,
           this.#mapsState.maps,
           this.#projectionsState.projectionsById
         )
@@ -66,7 +71,14 @@ export class ScopeState {
     } else if (this.#scope === 'map') {
       const map = this.#mapsState.activeMap
       if (map) {
-        return [toGeoreferencedMap(map, this.#projectionsState.projectionsById)]
+        return [
+          toGeoreferencedMap(
+            this.#apiBaseUrl,
+            this.#annotationsApiBaseUrl,
+            map,
+            this.#projectionsState.projectionsById
+          )
+        ]
       }
     }
 
@@ -79,13 +91,13 @@ export class ScopeState {
     } else if (this.#scope === 'image') {
       if (this.#mapsState.maps) {
         return Object.values(this.#mapsState.maps).map((map) =>
-          getFullMapId(map.id)
+          getFullMapId(this.#annotationsApiBaseUrl, map.id)
         )
       }
     } else if (this.#scope === 'map') {
       const mapId = this.#mapsState.activeMapId
       if (mapId) {
-        return [getFullMapId(mapId)]
+        return [getFullMapId(this.#annotationsApiBaseUrl, mapId)]
       }
     }
 
@@ -99,11 +111,16 @@ export class ScopeState {
   #annotation = $derived(generateAnnotation(this.#maps))
 
   constructor(
+    apiBaseUrl: string,
+    annotationsApiBaseUrl: string,
     sourceState: SourceState,
     mapsState: MapsState,
     mapsMergedState: MapsMergedState,
     projectionsState: ProjectionsState
   ) {
+    this.#apiBaseUrl = apiBaseUrl
+    this.#annotationsApiBaseUrl = annotationsApiBaseUrl
+
     this.#sourceState = sourceState
     this.#mapsState = mapsState
     this.#mapsMergedState = mapsMergedState
@@ -111,7 +128,10 @@ export class ScopeState {
 
     $effect(() => {
       if (this.#mapsState.activeMapId) {
-        this.#activeMapId = getFullMapId(this.#mapsState.activeMapId)
+        this.#activeMapId = getFullMapId(
+          annotationsApiBaseUrl,
+          this.#mapsState.activeMapId
+        )
       } else {
         this.#activeMapId = this.#mapIds[0]
       }
@@ -204,6 +224,8 @@ export class ScopeState {
 }
 
 export function setScopeState(
+  apiBaseUrl: string,
+  annotationsApiBaseUrl: string,
   sourceState: SourceState,
   mapsState: MapsState,
   mapsMergedState: MapsMergedState,
@@ -211,7 +233,14 @@ export function setScopeState(
 ) {
   return setContext(
     SCOPE_KEY,
-    new ScopeState(sourceState, mapsState, mapsMergedState, projectionsState)
+    new ScopeState(
+      apiBaseUrl,
+      annotationsApiBaseUrl,
+      sourceState,
+      mapsState,
+      mapsMergedState,
+      projectionsState
+    )
   )
 }
 

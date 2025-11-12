@@ -13,6 +13,7 @@
   import { getMapsState } from '$lib/state/maps.svelte'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
 
   import {
@@ -48,6 +49,7 @@
   } from '$lib/types/events.js'
 
   import type { Viewport, BasemapPreset } from '$lib/types/shared.js'
+  import type { Env } from '$lib/types/env.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -105,6 +107,12 @@
   const mapsMergedState = getMapsMergedState()
   const uiState = getUiState()
   const urlState = getUrlState()
+  const varsState = getVarsState<Env>()
+
+  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
 
   let basemapPreset = $derived.by<BasemapPreset>(() => {
     if (urlState.params.basemapXyzUrl) {
@@ -194,9 +202,12 @@
       const gcps = getCompleteGcps(map)
 
       try {
-        warpedMapLayer.setMapGcps(getFullMapId(mapId), gcps)
+        warpedMapLayer.setMapGcps(
+          getFullMapId(annotationsApiBaseUrl, mapId),
+          gcps
+        )
       } catch {
-        removeGeoreferencedMap(getFullMapId(mapId))
+        removeGeoreferencedMap(getFullMapId(annotationsApiBaseUrl, mapId))
       }
     }
   }
@@ -205,7 +216,10 @@
     const map = mapsState.getMapById(mapId)
     if (map && warpedMapLayer) {
       const resourceMask = getResourceMask(map)
-      warpedMapLayer.setMapResourceMask(getFullMapId(mapId), resourceMask)
+      warpedMapLayer.setMapResourceMask(
+        getFullMapId(annotationsApiBaseUrl, mapId),
+        resourceMask
+      )
     }
   }
 
@@ -234,11 +248,11 @@
 
       try {
         warpedMapLayer.setMapTransformationType(
-          getFullMapId(mapId),
+          getFullMapId(annotationsApiBaseUrl, mapId),
           transformationType
         )
       } catch {
-        removeGeoreferencedMap(getFullMapId(mapId))
+        removeGeoreferencedMap(getFullMapId(annotationsApiBaseUrl, mapId))
       }
     }
   }
@@ -249,16 +263,22 @@
       const resourceCrs = getResourceCrs(map)
       if (resourceCrs) {
         const allmapsProjectionId = `projections/${resourceCrs.id}`
-        const projectionId = getApiUrl(allmapsProjectionId)
+        const projectionId = getApiUrl(apiBaseUrl, allmapsProjectionId)
         const projection = projectionsState.projectionsById[projectionId]
 
-        warpedMapLayer.setMapOptions(getFullMapId(mapId), {
-          internalProjection: projection
-        })
+        warpedMapLayer.setMapOptions(
+          getFullMapId(annotationsApiBaseUrl, mapId),
+          {
+            internalProjection: projection
+          }
+        )
       } else {
-        warpedMapLayer.setMapOptions(getFullMapId(mapId), {
-          internalProjection: undefined
-        })
+        warpedMapLayer.setMapOptions(
+          getFullMapId(annotationsApiBaseUrl, mapId),
+          {
+            internalProjection: undefined
+          }
+        )
       }
     }
   }

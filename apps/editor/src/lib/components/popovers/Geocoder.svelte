@@ -11,13 +11,12 @@
   import type { GeocoderGeoJsonFeature } from '@allmaps/components/geocoder'
   import type { Bbox } from '@allmaps/types'
 
-  import { env } from '$env/dynamic/public'
-
   type Props = {
+    geocodeEarthKey: string
     open?: boolean
   }
 
-  let { open = $bindable(false) }: Props = $props()
+  let { geocodeEarthKey, open = $bindable(false) }: Props = $props()
 
   const uiState = getUiState()
 
@@ -39,7 +38,7 @@
 
 <Geocoder
   providers={[
-    new GeocodeEarthGeocoderProvider(env.PUBLIC_GEOCODE_EARTH_KEY),
+    new GeocodeEarthGeocoderProvider(geocodeEarthKey),
     new WorldHistoricalGazetteerGeocoderProvider()
   ]}
   onselect={handleGeocoderSelect}
