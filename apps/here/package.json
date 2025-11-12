@@ -20,6 +20,7 @@
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/here --include-dependencies",
     "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env dev",
     "tail": "wrangler tail",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
