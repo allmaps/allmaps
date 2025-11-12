@@ -17,6 +17,7 @@
   },
   "scripts": {
     "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env dev",
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
     "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
