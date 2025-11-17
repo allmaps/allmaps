@@ -9,7 +9,7 @@
 </script>
 
 <section
-  class="not-content min-h-0 flex justify-center items-start max-w-7xl mx-auto"
+  class="brochure-page not-content m-0 min-h-0 flex justify-center items-start max-w-7xl mx-auto print:text-sm"
 >
   {@render children()}
 </section>

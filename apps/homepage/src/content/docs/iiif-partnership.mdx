@@ -14,6 +14,12 @@ import BrochureSection from '../../components/brochure/BrochureSection.svelte'
 
 import '../../css/brochure.css'
 
+{/* TODO:
+  - Allmaps + IIIF logos
+  - OpenGraph image
+  - Longer benefits
+*/}
+
 <BrochurePage>
   <BrochureTitle client:load />
 </BrochurePage>
@@ -25,7 +31,7 @@ import '../../css/brochure.css'
 </BrochurePage>
 
 <BrochureSection colorClasses="bg-blue/5 [&_h2]:text-blue [&_h3]:text-blue [&_h4]:text-blue [&_a]:text-blue">
-## FAQ
+## Frequently Asked Questions
 
 ### Why Allmaps?
 
@@ -41,11 +47,11 @@ Allmaps is purposefully not called a platform, since platforms are easy to jump 
 
 ### What is georeferencing?
 
-Georeferencing relates a couple of points (pixels) in an image to geospatial coordinates. These are called *control points*. The process often also includes cropping the image to the part containing the map. This is called the *mask*.
+Georeferencing relates a couple of points (pixels) in an image to geospatial coordinates. These are called *ground control points*, or GCPs. The process often also includes cropping the image to the part containing the map. This is called the *mask*.
 
 Based on three or more control points, it’s possible to compute all the other points in the image. This can be used to convert between pixels and geospatial coordinates.
 
-Georeferencing usually results in new versions (or derivatives) of the original image. Allmaps stores the control points and mask in a light-weight and standardised Web Annotation, and produces derivatives on the fly.
+Georeferencing usually results in new versions or derivatives of the original image. Allmaps stores the control points and mask in a light-weight and standardized Web Annotation, and produces derivatives on the fly.
 
 ### Why the IIIF-Allmaps Partnership?
 
@@ -53,7 +59,7 @@ One of the benefits of IIIF is the ability to share codebases across implementat
 
 For Allmaps, the partnership marks the start of a new phase. While the project has been generously supported by various institutions through a series of grants, structural maintenance has been a concern as more and more institutions and individuals rely on the ecosystem. Securing its open source and open data character, the Allmaps team is keen on developing a funding structure that offers dedicated services to partners without compromising its core values and creating too much overhead. The partnership with the IIIF Consortium is the logical outcome of this process.
 
-### How is Allmaps organised?
+### How is Allmaps organized?
 
 Allmaps is a collaboration between Delft University of Technology Library and independent developer and cartographer Bert Spaan; both based in the Netherlands. Institutional partners and independent contractors have significantly contributed since its founding in 2021\. Allmaps is currently establishing a legal entity for its maintenance and further development, while preserving the commitment to open data and open source. This process is monitored by the Allmaps Advisory Board which will also represent the interests of other IIIF Consortium members.
 
@@ -63,12 +69,12 @@ The Advisory Board is the first step in formalizing the governance structure of 
 
 Allmaps has just released a new version of Allmaps Editor. The following items (and more\!) are on the roadmap for the coming years:
 
-* A new version of **Allmaps Viewer** with an improved background map, a new 'list' view and advanced functionality for analyzing and comparing maps.
+* A new version of **[Allmaps Viewer](https://viewer.allmaps.org/)** with an improved background map and advanced functionality for analyzing and comparing maps.
 * Support for **version history** of georeferenced maps (and to pin a specific version).
 * **Institutional accounts** with API access that can be used to ingest and patch annotations, and to tag versions.
 * A new application called **Allmaps Curator** that can be used to create collections of maps and set up crowdsourcing projects with groups of people.
 * A new application called **Allmaps Explore** through which all georeferenced maps in the Allmaps database can be explored and reused.
-* A customizable version of the **Allmaps Arcade** game
+* A customizable version of the **[Allmaps Arcade](https://arcade.allmaps.org/)** game
 * A template for creating **slideshows** ('narrative maps') with Allmaps
 
 ### Which licenses are used by Allmaps?
@@ -78,12 +84,6 @@ Applications use the GNU GPLv3 license; packages use the MIT License. All georef
 </BrochureSection>
 
 <BrochureSection colorClasses="bg-pink/5 [&_h2]:text-pink [&_h3]:text-pink [&_h4]:text-pink [&_a]:text-pink">
-
-## Contact
-
-For more information about Allmaps and listed benefits, please contact the Allmaps team at [hello@allmaps.org](mailto:hello@allmaps.org) or through the \#allmaps channel in the IIIF Slack.
-
-To indicate your organisation’s interest in a membership top-up, please reach out to the IIIF Consortium staff at [staff@iiif.io](mailto:staff@iiif.io).
 
 ## Further reading
 
