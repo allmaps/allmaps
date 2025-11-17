@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Check as CheckIcon } from 'phosphor-svelte'
+  import {
+    Check as CheckIcon,
+    FilePdf as FilePdfIcon,
+    ArrowSquareOut as ArrowSquareOutIcon
+  } from 'phosphor-svelte'
 
   import { MapMonster } from '@allmaps/ui'
   import { shades } from '@allmaps/tailwind'
@@ -14,16 +18,16 @@
 {/snippet}
 
 <div
-  class="flex flex-col md:grid md:grid-cols-2 print:grid print:grid-rows-1 print:grid-cols-2 gap-4 p-4 h-full"
+  class="flex flex-col lg:grid lg:grid-cols-2 print:grid print:grid-rows-1 print:grid-cols-2 gap-4 p-4 h-full"
 >
   <div
     class="bg-pink/5 p-4 md:p-8 rounded-xl flex flex-col gap-4 justify-between"
   >
-    <div class="flex flex-col gap-4 text-sm">
+    <div class="flex flex-col gap-4">
       <h3 class="text-pink text-4xl">Benefits for IIIF Members</h3>
       <p>
         IIIF Consortium Members can support the maintenance and further
-        development of Allmaps by becoming an <strong>Allmaps Supporter</strong>
+        development of Allmaps by becoming <strong>Allmaps Supporter</strong>
         or <strong>Allmaps Innovator</strong>. In exchange they obtain benefits
         that offer more control of their collections in Allmaps, ease
         integrations with collection portals, and include training and support.
@@ -38,21 +42,43 @@
         >
         or the
         <code>#allmaps</code>
-        channel in the IIIF Slack. To indicate your interest in becoming an Allmaps
+        channel in the IIIF Slack. To indicate your interest in becoming Allmaps
         Supporter or Allmaps Innovator, reach out to the IIIF Consortium staff at
         <a href="mailto:staff@iiif.io" class="text-pink underline"
           >staff@iiif.io</a
         >.
       </p>
+      <p>
+        If you want to print this website or attach it to an email, you can use
+        this <a
+          class="underline text-pink"
+          href="https://files.allmaps.org/documents/allmaps-iiif-partnership.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          >PDF version<ArrowSquareOutIcon
+            weight="bold"
+            class="inline-flex items-center size-4 mx-0.5 relative"
+          /></a
+        >.
+      </p>
 
-      <!-- *Allmaps Supporters and Innovators can reconsider their contribution on a
-      yearly basis. The partnership between IIIF and Allmaps runs for three
-      subsequent years (2026-28) after which it will be evaluated by the IIIF
-      Executive Committee before continuation.*
-      \* *These benefits will be
-      expanded on a yearly basis through the work sponsored by the Innovators.
-      For non-institutional members (without holdings), please contact the
-      Allmaps team to discuss alternative benefits.* -->
+      <p>
+        <em>
+          Allmaps Supporters and Allmaps Innovators can reconsider their
+          contribution on a yearly basis. The partnership between IIIF and
+          Allmaps runs for three subsequent years (2026-28) after which it will
+          be evaluated by the IIIF Executive Committee before continuation.</em
+        >
+      </p>
+
+      <p>
+        <em>
+          These benefits will be expanded on a yearly basis through the work
+          sponsored by the Allmaps Innovators. For non-institutional members
+          (without holdings), please contact the Allmaps team to discuss
+          alternative benefits.
+        </em>
+      </p>
     </div>
     <div class="place-self-end">
       <MapMonster
@@ -69,7 +95,7 @@
   </div>
 
   <div class="bg-green/5 p-4 md:p-8 rounded-xl">
-    <table class="text-sm min-w-full text-left border-collapse table-fixed">
+    <table class="min-w-full text-left border-collapse table-fixed">
       <thead class="text-green">
         <tr
           class="[&_th]:p-2 [&_th]:align-bottom [&_th]:border-b-green-500 [&_th]:border-b-2 text-green font-bold"

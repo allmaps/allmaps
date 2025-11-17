@@ -1573,8 +1573,8 @@ importers:
         specifier: workspace:^
         version: link:../transform
       proj4:
-        specifier: ^2.19.0
-        version: 2.19.10
+        specifier: ^2.20.0
+        version: 2.20.0
     devDependencies:
       '@allmaps/annotation':
         specifier: workspace:^
@@ -8122,8 +8122,8 @@ packages:
     resolution: {integrity: sha512-QE8RApCM3IaRRxVzxrjbgNMpQEX6Wu0p0KBeoSiSEw5/bsGwZHsshF4LCxH2jp/r6BU+bqA3LrMDEYNfJnpD8Q==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
-  proj4@2.19.10:
-    resolution: {integrity: sha512-uL6/C6kA8+ncJAEDmUeV8PmNJcTlRLDZZa4/87CzRpb8My4p+Ame4LhC4G3H/77z2icVqcu3nNL9h5buSdnY+g==}
+  proj4@2.20.0:
+    resolution: {integrity: sha512-9Mj5kUxQ6xBE5IzzkQcm0cRUH21FNp+wFp0AK7gBdPsiIc1iNwgNyCS4Lp55sPJum9DO8UNepZxEzrGPmm8RAg==}
 
   promise-all-reject-late@1.0.1:
     resolution: {integrity: sha512-vuf0Lf0lOxyQREH7GDIOUMLS7kz+gs8i6B+Yi8dC68a2sychGrHTJYghMBD6k7eUcH0H5P73EckCA48xijWqXw==}
@@ -17341,7 +17341,7 @@ snapshots:
 
   proggy@3.0.0: {}
 
-  proj4@2.19.10:
+  proj4@2.20.0:
     dependencies:
       mgrs: 1.0.0
       wkt-parser: 1.5.2

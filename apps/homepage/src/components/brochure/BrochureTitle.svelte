@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { fade } from 'svelte/transition'
 
   import turfRewind from '@turf/rewind'
 
@@ -17,15 +18,73 @@
     polygon: GeojsonPolygon
   }
 
+  let width = $state(0)
+  let titleWidth = $state(0)
+  let titleHeight = $state(0)
+
   let warpedResourceMasks = $state<WarpedResourceMask[]>([])
 
-  // A4: 210 x 297 mm
-  // MacBook Pro: 3024 x 1964: 1.54 ratio
-  // 1600 x 900 px: 1.77 ratio
+  type Sizes = [15, 10] | [12, 8] | [8, 12]
 
-  const count = 15 * 10 - 20 - 25
-  // const polygonWidth = 80
-  // const polygonHeight = 80
+  let size = $derived.by<Sizes>(() => {
+    if (width >= 900) {
+      return [15, 10]
+    } else if (width >= 700) {
+      return [12, 8]
+    } else {
+      return [8, 12]
+    }
+  })
+
+  let columns = $derived(size[0])
+  let rows = $derived(size[1])
+
+  let titleColumnRowBbox = $derived.by(() => {
+    if (columns === 15) {
+      return { columnStart: 2, columnEnd: 8, rowStart: 3, rowEnd: 5 }
+    } else if (columns === 12) {
+      return { columnStart: 2, columnEnd: 8, rowStart: 3, rowEnd: 5 }
+    } else {
+      return { columnStart: 2, columnEnd: 8, rowStart: 3, rowEnd: 5 }
+    }
+  })
+
+  let subtitleColumnRowBbox = $derived.by(() => {
+    if (columns === 15) {
+      return { columnStart: 2, columnEnd: 11, rowStart: 6, rowEnd: 7 }
+    } else if (columns === 12) {
+      return { columnStart: 2, columnEnd: 11, rowStart: 6, rowEnd: 7 }
+    } else {
+      return { columnStart: 2, columnEnd: 8, rowStart: 6, rowEnd: 7 }
+    }
+  })
+
+  let titleFontSize = $derived.by(() => {
+    if (columns === 15) {
+      return '13.4cqi'
+    } else if (columns === 12) {
+      return '13.4cqi'
+    } else {
+      return '13.4cqi'
+    }
+  })
+
+  let subtitleFontSize = $derived.by(() => {
+    if (columns === 15) {
+      return '5cqi'
+    } else if (columns === 12) {
+      return '5cqi'
+    } else {
+      return '5.1cqi'
+    }
+  })
+
+  // let titleRows = $derived(
+  //   titleColumnRowBbox.rowEnd - titleColumnRowBbox.rowStart
+  // )
+  // let subtitleRows = $derived(
+  //   subtitleColumnRowBbox.rowEnd - subtitleColumnRowBbox.rowStart
+  // )
 
   const strokeColors = [
     'stroke-blue',
@@ -91,7 +150,7 @@
   }
 
   async function fetchMaps() {
-    const mapsUrl = `https://api.allmaps.org/maps?limit=${count}`
+    const mapsUrl = `https://api.allmaps.org/maps?limit=180`
 
     const response = await fetch(mapsUrl)
     const apiMaps = await response.json()
@@ -103,7 +162,7 @@
     warpedResourceMasks = apiMaps.flatMap((apiMap) => {
       try {
         const { id, polygon } = getWarpedResourceMask(apiMap)
-        if (id) {
+        if (id && polygon.coordinates[0].length > 0) {
           return { id, polygon }
         } else {
           return []
@@ -129,40 +188,83 @@
   })
 </script>
 
-<ol class="grid grid-cols-15 w-full list-none m-0 p-[0.5dvw] gap-[0.5dvw]">
-  <li
-    class="m-0 self-center row-start-3 col-start-2 col-span-10 row-span-2 inline-flex items-center"
-  >
-    <h1 class="text-[6.2dvw] m-0 px-0 py-2">Open up your maps</h1>
-  </li>
-  <!-- <li
-    class="m-0 row-start-4 col-start-2 col-span-8 row-span-1 inline-flex items-center"
-  >
-    <h1 class="text-5xl m-0 px-2 py-2">more accessible</h1>
-  </li> -->
-  <li class="m-0 row-start-6 col-start-2 col-span-10 inline-flex items-center">
-    <h2 class="text-[3.1dvw] m-0 px-4 py-2 font-normal">
-      Announcing the Allmaps - IIIF Partnership
-    </h2>
-  </li>
-  {#if warpedResourceMasksLoaded}
-    {#each warpedResourceMasks as { id, polygon }, index}
+<ol
+  bind:clientWidth={width}
+  style:--columns={columns}
+  style:--rows={rows}
+  class="grid w-full list-none m-0 p-4 gap-2"
+>
+  {#each Array(columns) as _, column}
+    {#each Array(rows) as _, row}
+      {@const index = row * columns + column}
       <li
+        style:grid-column={column + 1}
+        style:grid-row={row + 1}
         class={[
           bgColors[index % bgColors.length],
           'aspect-square inline-block m-0 p-0 rounded-md'
         ]}
       >
-        <svg viewBox="0 0 100 100" class="m-0">
-          <path
-            class={[
-              strokeColors[index % strokeColors.length],
-              'stroke-[3px] fill-none'
-            ]}
-            d={geometryToPath(polygon, 100, 100, 0.8)}
-          />
-        </svg>
+        {#if warpedResourceMasks[index]}
+          {@const { polygon } = warpedResourceMasks[index]}
+          <svg
+            transition:fade={{
+              duration: 400,
+              delay: Math.random() * 3000
+            }}
+            viewBox="0 0 100 100"
+            class="m-0 block"
+          >
+            <path
+              class={[
+                strokeColors[index % strokeColors.length],
+                'stroke-[3px] fill-none'
+              ]}
+              d={geometryToPath(polygon, 100, 100, 0.8)}
+            />
+          </svg>
+        {/if}
       </li>
     {/each}
-  {/if}
+  {/each}
+  <li
+    style:grid-column-start={titleColumnRowBbox.columnStart}
+    style:grid-column-end={titleColumnRowBbox.columnEnd}
+    style:grid-row-start={titleColumnRowBbox.rowStart}
+    style:grid-row-end={titleColumnRowBbox.rowEnd}
+    bind:clientWidth={titleWidth}
+    bind:clientHeight={titleHeight}
+    class="m-0 overflow-hidden bg-white z-10 min-h-0 min-w-0 max-w-full max-h-full @container px-4
+    flex flex-col justify-center"
+  >
+    <h1
+      style:font-size={titleFontSize}
+      style:line-height="1.2"
+      class="m-0 p-0 overflow-hidden min-w-0 max-w-full font-bold"
+    >
+      Open up your <br /> map collections
+    </h1>
+  </li>
+  <li
+    style:grid-column-start={subtitleColumnRowBbox.columnStart}
+    style:grid-column-end={subtitleColumnRowBbox.columnEnd}
+    style:grid-row-start={subtitleColumnRowBbox.rowStart}
+    style:grid-row-end={subtitleColumnRowBbox.rowEnd}
+    class="m-0 inline-flex items-center bg-white z-10 max-w-full max-h-full @container px-4"
+  >
+    <h2
+      style:font-size={subtitleFontSize}
+      style:line-height="1.4"
+      class="m-0 font-medium"
+    >
+      Announcing the Allmaps - IIIF Partnership
+    </h2>
+  </li>
 </ol>
+
+<style>
+  ol {
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+  }
+</style>
