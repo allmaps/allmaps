@@ -8,22 +8,8 @@
   const { children }: Props = $props()
 </script>
 
-<section>
+<section
+  class="not-content min-h-0 flex justify-center items-start max-w-7xl mx-auto"
+>
   {@render children()}
 </section>
-
-<style scoped>
-  section {
-    margin: 0;
-    aspect-ratio: 3 / 2;
-    min-height: 0;
-    /* page-break-before: always; */
-    /* width: 297mm; */
-    /* height: 210mm; */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    overflow: hidden;
-  }
-</style>

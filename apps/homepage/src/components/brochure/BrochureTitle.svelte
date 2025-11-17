@@ -23,7 +23,7 @@
   // MacBook Pro: 3024 x 1964: 1.54 ratio
   // 1600 x 900 px: 1.77 ratio
 
-  const count = 15 * 10 - 20 - 10
+  const count = 15 * 10 - 20 - 25
   // const polygonWidth = 80
   // const polygonHeight = 80
 
