@@ -3,28 +3,39 @@ import Default from '@astrojs/starlight/components/PageFrame.astro'
 
 import Header from './Header.astro'
 
-import Title from '../Title.svelte'
-import Footer from '../../components/Footer.svelte'
+import HomepageTitle from '../HomepageTitle.svelte'
+import Footer from '../Footer.svelte'
 
-const isHomepage = Astro.url.pathname === '/'
+const { type } = Astro.locals.starlightRoute.entry.data
 ---
 
 {
-  isHomepage ? (
+  type === 'homepage' && (
     <div class="homepage">
-      <Title client:load />
+      <HomepageTitle client:load />
       <header class="header">
         <Header {...Astro.props} />
       </header>
       <slot />
       <Footer />
     </div>
-  ) : (
+  )
+}
+{
+  type === 'empty' && (
+    <div class="empty-page">
+      <slot />
+    </div>
+  )
+}
+{
+  type === 'normal' && (
     <Default {...Astro.props}>
       <slot />
       <Fragment slot="header">
         <slot name="header" />
       </Fragment>
+
       <Fragment slot="sidebar">
         <slot name="sidebar" />
       </Fragment>
