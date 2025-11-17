@@ -82,6 +82,8 @@
     'https://annotations.allmaps.org/maps/38ae25630336748e@a4fd6fad900c8b7d',
     // Edinburgh
     'https://annotations.allmaps.org/maps/efa06f142ae9e0b5@a33dde3c5d208f26',
+    // Kiev
+    'https://annotations.allmaps.org/maps/ae4326c425f1ec09@abfbeb454e0b7749',
     // Den Haag
     'https://annotations.allmaps.org/maps/6bfaa2dde9a941f2@cc6c19cb2433bfc4',
     // Świnoujście
