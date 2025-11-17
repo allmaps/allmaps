@@ -1,0 +1,28 @@
+body {
+  --sl-content-width: 75dvw;
+}
+
+@media print {
+  @page {
+    size: 30cm 20cm;
+    margin: 0;
+  }
+
+  section.page {
+    margin: 0;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+  }
+}
+
+.content-panel {
+  padding: 0;
+}
+
+main {
+  padding: 0;
+}
+
+footer {
+  display: none;
+}

@@ -1,7 +1,8 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro'
 
-const isHomepage = Astro.url.pathname === '/'
+const { type } = Astro.locals.starlightRoute.entry.data
+let showTitle = type === 'normal'
 ---
 
-{!isHomepage && <Default {...Astro.props} />}
+{showTitle && <Default {...Astro.props} />}
