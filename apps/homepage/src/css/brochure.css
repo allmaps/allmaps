@@ -1,5 +1,9 @@
 body {
-  --sl-content-width: 75dvw;
+  --sl-content-width: 100%;
+}
+
+.sl-anchor-link {
+  display: none;
 }
 
 @media print {
@@ -8,10 +12,22 @@ body {
     margin: 0;
   }
 
-  section.page {
+  section.brochure-page {
     margin: 0;
     aspect-ratio: 3 / 2;
     overflow: hidden;
+    max-width: 100%;
+  }
+
+  section.brochure-section {
+    margin: 0;
+    max-width: 100%;
+    /* min-height: 100vh;
+    break-before: page;
+    break-after: page;
+    break-inside: avoid;
+    display: flex;
+    flex-direction: column; */
   }
 }
 

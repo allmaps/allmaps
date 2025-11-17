@@ -36,14 +36,6 @@
       institution:
         'Leventhal Map & Education Center at the Boston Public Library'
     },
-    // {
-    //   annotationUrl: 'https://annotations.allmaps.org/maps/cc899a8e3ce0d851',
-    //   manifestId:
-    //     'https://gallica.bnf.fr/iiif/ark:/12148/btv1b53189540m/manifest.json',
-
-    //   label: 'Hong Kong, Victoria',
-    //   institution: 'Bibliothèque nationale de France'
-    // },
     {
       annotationUrl: 'https://annotations.allmaps.org/maps/e6063da500ea194a',
       manifestId:
@@ -156,12 +148,12 @@
 {/snippet}
 
 <ol
-  class="m-0 w-full h-full flex flex-col md:grid md:grid-rows-1 md:grid-cols-3 print:grid print:grid-rows-1 print:grid-cols-3 list-none p-4 gap-4"
+  class="m-0 w-full h-full flex flex-col lg:grid lg:grid-rows-1 lg:grid-cols-3 print:grid print:grid-rows-1 print:grid-cols-3 list-none p-4 gap-4"
 >
   <li
-    class="p-4 md:p-6 lg:p-8 bg-yellow/5 rounded-xl grid grid-rows-[1fr_min-content] gap-4"
+    class="p-4 md:p-6 lg:p-8 bg-yellow/5 rounded-xl grid grid-cols-1 sm:grid-cols-[2fr_1fr] lg:grid-cols-1 lg:grid-rows-[1fr_min-content] print:grid-cols-1 print:grid-rows-[1fr_min-content] gap-8"
   >
-    <div class="flex flex-col gap-4 text-sm">
+    <div class="flex flex-col gap-4">
       <h3 class="text-yellow text-4xl">Works with any IIIF map</h3>
       <p>
         Allmaps is an ecosystem for working with maps, plans and aerial photos.
@@ -171,7 +163,7 @@
       <p>
         Allmaps is IIIF-first and does not require specific infrastructure or
         expertise to turn digitized images into interactive maps. The only
-        institutional requirement is the <a
+        requirement is a map collection that is availeble through the <a
           class="underline text-yellow"
           href="https://iiif.io/api/image/">IIIF Image API</a
         >, and, preferably, the
@@ -181,7 +173,8 @@
         >.
       </p>
     </div>
-    <div class="max-w-90 place-self-end md:place-self-auto">
+    <!-- place-self-end md:place-self-auto -->
+    <div class="w-full justify-self-end">
       {#if maskedMaps[0]}
         {@render renderMaskedMap(
           'map0',
@@ -193,9 +186,9 @@
     </div>
   </li>
   <li
-    class="p-4 md:p-6 lg:p-8 bg-blue/5 rounded-xl grid grid-rows-[1fr_min-content] gap-4"
+    class="p-4 md:p-6 lg:p-8 bg-blue/5 rounded-xl grid grid-cols-1 sm:grid-cols-[1fr_2fr] lg:grid-cols-1 lg:grid-rows-[1fr_min-content] print:grid-cols-1 print:grid-rows-[1fr_min-content] gap-8"
   >
-    <div class="flex flex-col gap-4 text-sm">
+    <div class="flex flex-col gap-4">
       <h3 class="text-blue text-4xl">Open & light-weight</h3>
       <p>
         Georeferencing is the process of annotating images with geospatial
@@ -214,9 +207,8 @@
         to existing workflows and institutional requirements.
       </p>
     </div>
-    <div
-      class="max-w-90 place-self-end md:place-self-auto md:-order-1 print:-order-1 print:place-self-auto"
-    >
+    <!-- place-self-end md:place-self-auto md:-order-1 print:-order-1 print:place-self-auto -->
+    <div class="w-full justify-self-end sm:-order-1">
       {#if maskedMaps[1]}
         {@render renderMaskedMap(
           'map1',
@@ -228,9 +220,9 @@
     </div>
   </li>
   <li
-    class="p-4 md:p-6 lg:p-8 bg-orange/5 rounded-xl grid grid-rows-[1fr_min-content] gap-4"
+    class="p-4 md:p-6 lg:p-8 bg-orange/5 rounded-xl grid grid-cols-1 sm:grid-cols-[2fr_1fr] lg:grid-cols-1 lg:grid-rows-[1fr_min-content] print:grid-cols-1 print:grid-rows-[1fr_min-content] gap-8"
   >
-    <div class="flex flex-col gap-4 text-sm">
+    <div class="flex flex-col gap-4">
       <h3 class="text-orange text-4xl">Making maps accessible</h3>
       <p>
         Allmaps is a collaboration between <a
@@ -251,7 +243,8 @@
         and institutions.
       </p>
     </div>
-    <div class="max-w-90 place-self-end md:place-self-auto">
+    <!-- place-self-end md:place-self-auto -->
+    <div class="w-full justify-self-end">
       {#if maskedMaps[2]}
         {@render renderMaskedMap(
           'map2',
