@@ -15,9 +15,9 @@ import BrochureSection from '../../components/brochure/BrochureSection.svelte'
 import '../../css/brochure.css'
 
 {/* TODO:
-  - Allmaps + IIIF logos
   - OpenGraph image
   - Longer benefits
+  - Automatically create PDF
 */}
 
 <BrochurePage>
@@ -51,7 +51,7 @@ Georeferencing relates a couple of points (pixels) in an image to geospatial coo
 
 Based on three or more control points, it’s possible to compute all the other points in the image. This can be used to convert between pixels and geospatial coordinates.
 
-Georeferencing usually results in new versions or derivatives of the original image. Allmaps stores the control points and mask in a light-weight and standardized Web Annotation, and produces derivatives on the fly.
+Georeferencing usually results in new versions (or derivatives) of the original image. Allmaps stores the control points and mask in a light-weight and standardized Web Annotation, and produces derivatives on the fly.
 
 ### Why the IIIF-Allmaps Partnership?
 
@@ -79,7 +79,7 @@ Allmaps has just released a new version of Allmaps Editor. The following items (
 
 ### Which licenses are used by Allmaps?
 
-Applications use the GNU GPLv3 license; packages use the MIT License. All georeference annotations generated through Allmaps Editor or otherwise added to the Allmaps database are licensed as CC0 (public domain) and published daily as a data dump. Allmaps’ packages can be used independently of Allmaps’ infrastructure, i.e. it’s possible to host your own annotations (using different licenses).
+Applications use the GNU GPLv3 license; packages use the MIT License. All Georeference Annotations generated through Allmaps Editor or otherwise added to the Allmaps database are licensed as CC0 (public domain) and published daily as an open dataset. Allmaps’ packages can be used independently of Allmaps’ infrastructure, i.e. it’s possible to host your own annotations (using different licenses).
 
 </BrochureSection>
 

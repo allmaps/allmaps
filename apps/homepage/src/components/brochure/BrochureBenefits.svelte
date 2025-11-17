@@ -48,11 +48,11 @@
           >staff@iiif.io</a
         >.
       </p>
-      <p>
+      <p class="print:hidden">
         If you want to print this website or attach it to an email, you can use
         this <a
           class="underline text-pink"
-          href="https://files.allmaps.org/documents/allmaps-iiif-partnership.pdf"
+          href="https://files.allmaps.org/documents/allmaps-iiif-partnership-brochure.pdf"
           target="_blank"
           rel="noopener noreferrer"
           >PDF version<ArrowSquareOutIcon
@@ -73,10 +73,10 @@
 
       <p>
         <em>
-          These benefits will be expanded on a yearly basis through the work
-          sponsored by the Allmaps Innovators. For non-institutional members
-          (without holdings), please contact the Allmaps team to discuss
-          alternative benefits.
+          Benefits will be expanded on a yearly basis through the work sponsored
+          by the Allmaps Innovators. For non-institutional members (without
+          holdings), please contact the Allmaps team to discuss alternative
+          benefits.
         </em>
       </p>
     </div>
@@ -98,7 +98,7 @@
     <table class="min-w-full text-left border-collapse table-fixed">
       <thead class="text-green">
         <tr
-          class="[&_th]:p-2 [&_th]:align-bottom [&_th]:border-b-green-500 [&_th]:border-b-2 text-green font-bold"
+          class="[&_th]:p-1 sm:[&_th]:p-2 [&_th]:align-bottom [&_th]:border-b-green-500 [&_th]:border-b-2 text-green font-bold"
         >
           <th>Features</th>
           <th class="text-center w-24">All</th>
@@ -106,7 +106,7 @@
           <th class="text-center w-24">Allmaps Innovator</th>
         </tr>
       </thead>
-      <tbody class="[&_td]:p-2">
+      <tbody class="[&_td]:p-1 sm:[&_td]:p-2">
         <tr>
           <td
             >Allmaps Editor, Allmaps Viewer and other apps & TypeScript modules</td
@@ -173,7 +173,7 @@
         </tr>
 
         <tr
-          class="[&_td]:p-2 [&_td]:bg-green-100 [&_td]:border-t-green-500 [&_td]:border-t-2 text-green font-bold"
+          class="[&_td]:bg-green-100 [&_td]:border-t-green-500 [&_td]:border-t-2 text-green font-bold"
         >
           <td class="rounded-bl-lg">Annual fee</td>
           <td></td>
