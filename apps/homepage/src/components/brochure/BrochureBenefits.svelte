@@ -11,7 +11,7 @@
 
 {#snippet check()}
   <span
-    class="text-green bg-green-100 border-green-200 border rounded-full size-6 p-1 inline-flex items-center justify-center aspect-square"
+    class="text-green bg-green-100 border-green-200 border rounded-full size-6 print:size-5 p-1 inline-flex items-center justify-center aspect-square"
   >
     <CheckIcon size={16} weight="bold" />
   </span>
@@ -52,7 +52,7 @@
         If you want to print this website or attach it to an email, you can use
         this <a
           class="underline text-pink"
-          href="https://files.allmaps.org/documents/allmaps-iiif-partnership-brochure.pdf"
+          href="https://files.allmaps.org/documents/allmaps-iiif-partnership.pdf"
           target="_blank"
           rel="noopener noreferrer"
           >PDF version<ArrowSquareOutIcon
@@ -66,7 +66,7 @@
         <em>
           Allmaps Supporters and Allmaps Innovators can reconsider their
           contribution on a yearly basis. The partnership between IIIF and
-          Allmaps runs for three subsequent years (2026-28) after which it will
+          Allmaps runs for three subsequent years (2026–28) after which it will
           be evaluated by the IIIF Executive Committee before continuation.</em
         >
       </p>
@@ -94,108 +94,243 @@
     </div>
   </div>
 
-  <div class="bg-green/5 p-4 md:p-8 rounded-xl">
-    <table class="min-w-full text-left border-collapse table-fixed">
-      <thead class="text-green">
-        <tr
-          class="[&_th]:p-1 sm:[&_th]:p-2 [&_th]:align-bottom [&_th]:border-b-green-500 [&_th]:border-b-2 text-green font-bold"
+  <div class="flex flex-col gap-4 h-full">
+    <div
+      class="p-4 md:p-8 print:p-4 bg-green/5 rounded-xl flex flex-col gap-4 border-green grow"
+    >
+      <div class="flex justify-between gap-4">
+        <h3 class="text-green">Open source</h3>
+        <div
+          class="text-green bg-green-100 border-green-200 border rounded-full px-3 inline-flex items-center"
         >
-          <th>Features</th>
-          <th class="text-center w-24">All</th>
-          <th class="text-center w-24">Allmaps Supporter</th>
-          <th class="text-center w-24">Allmaps Innovator</th>
-        </tr>
-      </thead>
-      <tbody class="[&_td]:p-1 sm:[&_td]:p-2">
-        <tr>
-          <td
-            >Allmaps Editor, Allmaps Viewer and other apps & TypeScript modules</td
+          <span class="font-bold">Free</span>
+        </div>
+      </div>
+      <ul
+        class="m-0 p-0 list-none [&_li]:contents grid grid-cols-[min-content_1fr]
+          [&_.short]:hidden [&_.short]:print:block [&_.long]:print:hidden
+          gap-x-4 gap-y-2"
+      >
+        <li>
+          {@render check()}
+          <span class="short"
+            >Georeference any IIIF map with <a
+              class="text-green underline"
+              href="https://editor.allmaps.org">Allmaps Editor</a
+            ></span
           >
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Add your collection to Allmaps</td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Keep track of georeferenced maps</td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Custom flow for patrons</td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Open in Allmaps button</td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Training and support</td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Support the development of new apps and features</td>
-          <td></td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td
-            >Join the Allmaps Advisory Board and set priorities for the roadmap</td
+          <span class="long"
+            ><strong>Georeference any IIIF map</strong> with
+            <a class="text-green underline" href="https://editor.allmaps.org"
+              >Allmaps Editor</a
+            >.</span
           >
-          <td></td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Obtain beta access and offer feedback</td>
-          <td></td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-        <tr>
-          <td>Listed as partner on Allmaps homepage</td>
-          <td></td>
-          <td></td>
-          <td class="text-center">{@render check()}</td>
-        </tr>
-
-        <tr
-          class="[&_td]:bg-green-100 [&_td]:border-t-green-500 [&_td]:border-t-2 text-green font-bold"
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >View georeferenced maps with <a
+              href="https://viewer.allmaps.org"
+              class="text-green underline">Allmaps Viewer</a
+            ></span
+          >
+          <span class="long"
+            >View georeferenced maps with <a
+              href="https://viewer.allmaps.org"
+              class="text-green underline">Allmaps Viewer</a
+            > using Georeference Annotations.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Display georeferenced maps with our plugins for MapLibre,
+            OpenLayers and Leaflet</span
+          >
+          <span class="long"
+            >Display georeferenced maps on your own website with our plugins for <strong
+              >MapLibre, OpenLayers and Leaflet.</strong
+            ></span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Use our TypeScript modules in your own software</span
+          >
+          <span class="long"
+            >Use our <strong>TypeScript modules</strong> such as
+            <a
+              class="text-green underline"
+              href="https://github.com/allmaps/allmaps/tree/main/packages/transform"
+              ><code>@allmaps/transform</code></a
+            > in your own software.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Download open data that contain all maps georeferenced with Allmaps</span
+          >
+          <span class="long"
+            ><strong>Download open data</strong> that contain all maps georeferenced
+            with Allmaps.</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div
+      class="p-4 md:p-8 print:p-4 bg-green/5 rounded-xl flex flex-col gap-4 border-green border grow"
+    >
+      <div class="flex justify-between gap-4">
+        <h3 class="text-green">Allmaps Supporters</h3>
+        <div
+          class="text-green bg-green-100 border-green-200 border rounded-full px-3 inline-flex items-center"
         >
-          <td class="rounded-bl-lg">Annual fee</td>
-          <td></td>
-          <td class="text-center">$2,000</td>
-          <td class="rounded-br-lg text-center">$10,000</td>
-        </tr>
-      </tbody>
-    </table>
+          <span><span class="font-bold">$2,000</span> per year</span>
+        </div>
+      </div>
+      <ul
+        class="m-0 p-0 list-none [&_li]:contents grid grid-cols-[min-content_1fr]
+          [&_.short]:hidden [&_.short]:print:block [&_.long]:print:hidden
+          gap-x-4 gap-y-2"
+      >
+        <li class="nth-2:bg-red">
+          {@render check()}
+          <span class="short">Add your collection to Allmaps</span>
+          <span class="long">
+            <strong>Add your collection of maps to Allmaps</strong>, where it
+            can be georeferenced by staff and patrons in Allmaps Editor.
+            Suggestions from your collection will appear on the landing page of
+            Allmaps Editor.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short">Keep track of georeferenced maps</span>
+          <span class="long">
+            <strong
+              >Keep track of your maps that have been georeferenced with Allmaps</strong
+            >. Through an API and
+            <a class="text-green" href="https://latest.allmaps.org/"
+              >Allmaps Latest</a
+            > you can keep track of the crowd-sourced data in Allmaps, and export
+            it to your own systems at any time.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short">Custom flow for patrons</span>
+          <span class="long">
+            <strong>Offer a custom flow to your patrons</strong>. When visiting
+            Allmaps through your institutional portal, the interface will
+            include institutional branding and a backlink to your collections.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short">“Open in Allmaps” button</span>
+          <span class="long">
+            <strong>“Open in Allmaps” button</strong>. A customizable component
+            you can add to your collection interface to indicate if a map has
+            been georeferenced, and to open the resource in different parts of
+            Allmaps.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short">Training and support</span>
+          <span class="long">
+            <strong>Training and support</strong>. Allmaps offers one in-person
+            training as part of the IIIF Annual Conference and one remote
+            training as part of the Online Meeting. Support is offered through
+            the
+            <code>#maps</code>
+            and <code>#allmaps</code> channels in the IIIF Slack.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Access future benefits made possible by Allmaps Innovators</span
+          >
+          <span class="long">
+            Access <strong>future benefits</strong> made possible by Allmaps Innovators
+            such as Allmaps Explore for finding maps across institutions and Allmaps
+            Curator for managing crowdsourcing projects.</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div
+      class="p-4 md:p-8 print:p-4 bg-green/5 rounded-xl flex flex-col gap-4 border-green border-2 grow"
+    >
+      <div class="flex justify-between gap-4">
+        <h3 class="text-green">Allmaps Innovators</h3>
+        <div
+          class="text-green bg-green-100 border-green-200 border rounded-full px-3 inline-flex items-center"
+        >
+          <span><span class="font-bold">$10,000</span> per year</span>
+        </div>
+      </div>
+      <ul
+        class="m-0 p-0 list-none [&_li]:contents grid grid-cols-[min-content_1fr]
+          [&_.short]:hidden [&_.short]:print:block [&_.long]:print:hidden
+          gap-x-4 gap-y-2"
+      >
+        <li>
+          {@render check()}
+          <span class="short">All Allmaps Supporter benefits</span>
+          <span class="long"
+            ><strong>All Allmaps Supporter benefits</strong></span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Support the development of new apps and features</span
+          >
+          <span class="long"
+            >Support the development of <strong>new apps and features</strong> within
+            the Allmaps ecosystem that will open up to other members and the world.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Join the Allmaps Advisory Board and set priorities for the roadmap</span
+          >
+          <span class="long"
+            >Have a seat on the <strong>Allmaps Advisory Board</strong> and determine
+            the annual roadmap in consultation with the Allmaps team.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short">Obtain beta access and offer feedback</span>
+          <span class="long"
+            >Obtain <strong>beta access</strong> and offer feedback to new apps and
+            features.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short"
+            >Contribute to establishing a governance structure for Allmaps</span
+          >
+          <span class="long"
+            >Contribute to establishing a <strong>governance</strong> structure for
+            Allmaps.</span
+          >
+        </li>
+        <li>
+          {@render check()}
+          <span class="short">Listed as partner on Allmaps homepage</span>
+          <span class="long"
+            >Listed as a partner on the Allmaps homepage with logo.</span
+          >
+        </li>
+      </ul>
+    </div>
   </div>
 </div>
-
-<!-- * **Add your collection of maps to Allmaps**, where it can be georeferenced by staff and patrons in Allmaps Editor. Suggestions from your collection will appear on the Editor’s landing page;
-* **Keep track of your maps that have been georeferenced with Allmaps**. Through an API and Allmaps Latest you can keep track of the crowd-sourced data in Allmaps, and export it to your own systems at any time;
-* **Offer a custom flow to your patrons**. When visiting Allmaps through your institutional portal, the interface will include institutional branding and a backlink to your collections;
-* **“Open in Allmaps” button**. A customizable component you can add to your collection interface to indicate if a map has been georeferenced, and to open the resource in different parts of Allmaps;
-* **Training and support**. Allmaps offers one in-person training as part of the IIIF Annual Conference and one remote training as part of the Online Meeting. Support is offered through the \#maps and \#allmaps channels in the IIIF Slack;
-* Enjoy **future benefits** made possible by Allmaps Innovators such as Allmaps Explore for finding maps across institutions and Allmaps Curator for managing crowdsourcing projects.
-
-An **Allmaps Innovator** pays $10,000 on top of their annual IIIF membership fee and receives the same benefits as Allmaps Supporters, plus:
-
-* Support the development of **new apps and features** within the Allmaps ecosystem that will open up to other members and the world;
-* Have a seat on the **Allmaps Advisory Board** and determine the annual roadmap in consultation with the Allmaps team;
-* Obtain **beta access** and offer feedback to new apps and features;
-* Contribute to establishing a **governance** structure for Allmaps;
-* Listed as a partner on the Allmaps homepage with logo. -->

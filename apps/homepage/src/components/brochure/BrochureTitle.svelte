@@ -19,8 +19,12 @@
     path: string
   }
 
+  let printing = $state(false)
+
   let width = $state(0)
-  let maxDelay = $state(3000)
+
+  let duration = $derived(printing ? 0 : 400)
+  let maxDelay = $derived(printing ? 0 : 3000)
 
   let warpedResourceMasks = $state<WarpedResourceMask[]>([])
 
@@ -185,9 +189,8 @@
   }
 
   onMount(() => {
-    if (window.matchMedia('print').matches) {
-      maxDelay = 0
-    }
+    const params = new URLSearchParams(window.location.search)
+    printing = params.has('print')
 
     if (warpedResourceMasks.length === 0) {
       try {
@@ -223,7 +226,7 @@
             {@const { path } = warpedResourceMasks[index]}
             <svg
               transition:fade={{
-                duration: 400,
+                duration,
                 delay: Math.random() * maxDelay
               }}
               viewBox="0 0 100 100"
