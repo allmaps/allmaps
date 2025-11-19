@@ -50,12 +50,12 @@
       </p>
       <p class="print:hidden">
         If you want to print this website or attach it to an email, you can use
-        this <a
+        <a
           class="underline text-pink"
           href="https://files.allmaps.org/documents/allmaps-iiif-partnership.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          >PDF version<ArrowSquareOutIcon
+          >this PDF<ArrowSquareOutIcon
             weight="bold"
             class="inline-flex items-center size-4 mx-0.5 relative"
           /></a
