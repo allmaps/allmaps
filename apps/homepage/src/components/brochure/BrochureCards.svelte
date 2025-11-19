@@ -166,7 +166,7 @@
       <p>
         Allmaps is IIIF-first and does not require specific infrastructure or
         expertise to turn digitized images into interactive maps. The only
-        requirement is a map collection that is availeble through the <a
+        requirement is a map collection that is available through the <a
           class="underline text-yellow"
           href="https://iiif.io/api/image/">IIIF Image API</a
         >, and, preferably, the
