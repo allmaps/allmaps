@@ -21,7 +21,7 @@
 
   let printing = $state(false)
 
-  let width = $state(0)
+  let width = $state(1200)
 
   let duration = $derived(printing ? 0 : 400)
   let maxDelay = $derived(printing ? 0 : 3000)
