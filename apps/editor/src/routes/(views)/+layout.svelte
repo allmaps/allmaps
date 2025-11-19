@@ -97,6 +97,9 @@
   //   projectionsState
   // )
 
+  const bannerEnabled = varsState.get('VITE_BANNER_ENABLED')
+  const bannerText = varsState.get('VITE_BANNER_TEXT')
+
   function shouldHandleKeyboardEvent(event: KeyboardEvent) {
     if (event.target instanceof Element) {
       if (['BUTTON', 'INPUT'].includes(event.target.nodeName)) {
@@ -194,7 +197,7 @@
 <Head />
 <div class="fixed grid h-dvh w-dvw grid-rows-[min-content_min-content_1fr]">
   <div>
-    <Banner />
+    <Banner bannerTextEnabled={bannerEnabled} {bannerText} />
   </div>
   <div class="z-20">
     <Header />
