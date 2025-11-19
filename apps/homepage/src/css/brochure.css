@@ -22,12 +22,6 @@ body {
   section.brochure-section {
     margin: 0;
     max-width: 100%;
-    /* min-height: 100vh;
-    break-before: page;
-    break-after: page;
-    break-inside: avoid;
-    display: flex;
-    flex-direction: column; */
   }
 }
 
