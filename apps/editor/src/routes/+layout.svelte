@@ -41,5 +41,5 @@
   afterNavigate(() => urlState.updateUrl(page.url))
 </script>
 
-<Stats />
+<Stats statsWebsiteId={varsState.get('PUBLIC_STATS_WEBSITE_ID')} />
 {@render children()}
