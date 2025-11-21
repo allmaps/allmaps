@@ -1,4 +1,4 @@
-import { WarpedMapWithImageInfo } from '../maps/WarpedMap.js'
+import { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import { fetchableTileKey, tileKey } from '../shared/tiles.js'
 
 import type { Tile, ImageRequest } from '@allmaps/types'
@@ -21,17 +21,17 @@ export class FetchableTile {
    * @param tile - the tile
    * @param warpedMap - A WarpedMap with fetched image information
    */
-  constructor(tile: Tile, warpedMap: WarpedMapWithImageInfo) {
+  constructor(tile: Tile, warpedMap: WarpedMapWithImage) {
     this.mapId = warpedMap.mapId
     this.tile = tile
 
-    const imageRequest = warpedMap.parsedImage.getTileImageRequest(
+    const imageRequest = warpedMap.image.getTileImageRequest(
       tile.tileZoomLevel,
       tile.column,
       tile.row
     )
     this.imageRequest = imageRequest
-    this.tileUrl = warpedMap.parsedImage.getImageUrl(imageRequest)
+    this.tileUrl = warpedMap.image.getImageUrl(imageRequest)
     this.tileKey = tileKey(tile)
     this.fetchableTileKey = fetchableTileKey(this)
   }

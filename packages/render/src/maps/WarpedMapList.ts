@@ -5,9 +5,11 @@ import {
   type GeoreferencedMap
 } from '@allmaps/annotation'
 import { proj4 } from '@allmaps/project'
+import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
 import { WarpedMap } from './WarpedMap.js'
+import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 import {
   bboxToCenter,
@@ -31,7 +33,6 @@ import type {
   WarpedMapFactory,
   WarpedMapListOptions
 } from '../shared/types.js'
-import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 const defaultSelectionOptions: SelectionOptions = {}
 
@@ -65,6 +66,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   warpedMapsById: Map<string, W>
   zIndices: Map<string, number>
 
+  imagesById: Map<string, Image>
+
   rtree?: RTree
 
   options: WarpedMapListOptions
@@ -84,6 +87,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
+    this.imagesById = new Map()
 
     this.warpedMapFactory = warpedMapFactory
 
@@ -191,6 +195,22 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
     )
     return results
+  }
+
+  /**
+   * Adds image informations, parses them to images and adds them to the image cache
+   *
+   * @param imageInfos - Image informations
+   * @returns Image IDs of the image informations that were added
+   */
+  addImageInfos(imageInfos: unknown[]): string[] {
+    const result = []
+    for (const imageInfo of imageInfos) {
+      const image = Image.parse(imageInfo)
+      this.imagesById.set(image.uri, image)
+      result.push(image.uri)
+    }
+    return result
   }
 
   /**
@@ -913,11 +933,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
   }
 
-  // This function and the listeners below transform an IMAGEINFOLOADED event by a WarpedMap
-  // to an IMAGEINFOLOADED of the WarpedMapList, which is listened to in the Renderer
-  private imageInfoLoaded(mapId: string) {
+  // This function and the listeners below transform an IMAGELOADED event by a WarpedMap
+  // to an IMAGELOADED of the WarpedMapList, which is listened to in the Renderer
+  private imageLoaded(mapId: string) {
     this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, {
+      new WarpedMapEvent(WarpedMapEventType.IMAGELOADED, {
         mapIds: [mapId]
       })
     )
@@ -925,15 +945,15 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   private addEventListenersToWarpedMap(warpedMap: W) {
     warpedMap.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this, warpedMap.mapId)
+      WarpedMapEventType.IMAGELOADED,
+      this.imageLoaded.bind(this, warpedMap.mapId)
     )
   }
 
   private removeEventListenersFromWarpedMap(warpedMap: W) {
     warpedMap.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this, warpedMap.mapId)
+      WarpedMapEventType.IMAGELOADED,
+      this.imageLoaded.bind(this, warpedMap.mapId)
     )
   }
 }

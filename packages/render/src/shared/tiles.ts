@@ -232,7 +232,7 @@ function tilesByColumnToTiles(
 
 export function getTilesCoveringTileAtScaleFactor(
   tile: Tile,
-  parsedImage: Image,
+  image: Image,
   scaleFactor: number,
   validTile?: (tile: Tile) => boolean
 ) {
@@ -252,7 +252,7 @@ export function getTilesCoveringTileAtScaleFactor(
   )
   return getTilesAtScaleFactor(
     scaleFactor,
-    parsedImage,
+    image,
     columnStart,
     columnEnd,
     rowStart,
@@ -263,17 +263,17 @@ export function getTilesCoveringTileAtScaleFactor(
 
 export function getTilesAtScaleFactor(
   scaleFactor: number,
-  parsedImage: Image,
+  image: Image,
   columnStart?: number,
   columnEnd?: number,
   rowStart?: number,
   rowEnd?: number,
   validTile: (tile: Tile) => boolean = (_tile: Tile) => true
 ) {
-  const tileZoomLevel = parsedImage.tileZoomLevels.find(
+  const tileZoomLevel = image.tileZoomLevels.find(
     (tileZoomLevel) => tileZoomLevel.scaleFactor === scaleFactor
   )
-  const imageSize = [parsedImage.width, parsedImage.height] as Size
+  const imageSize = [image.width, image.height] as Size
 
   if (!tileZoomLevel) {
     return []
@@ -484,7 +484,7 @@ export function getTileZoomLevelOriginalResolution(
 
 export function getTilesAtOtherScaleFactors(
   tile: Tile,
-  parsedImage: Image,
+  image: Image,
   scaleFactor: number,
   TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF: number,
   TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF: number,
@@ -494,7 +494,7 @@ export function getTilesAtOtherScaleFactors(
 
   const tilesAtLowerScaleFactor = recursivelyGetTilesAtLowerScaleFactor(
     tile,
-    parsedImage,
+    image,
     scaleFactor,
     TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
     validTile
@@ -507,7 +507,7 @@ export function getTilesAtOtherScaleFactors(
   if (tilesAtOtherScaleFactors.length === 0) {
     const tileAtHigherScaleFactor = recursivelyGetTilesAtHigherScaleFactor(
       tile,
-      parsedImage,
+      image,
       scaleFactor,
       TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
       validTile
@@ -522,7 +522,7 @@ export function getTilesAtOtherScaleFactors(
 
 export function recursivelyGetTilesAtHigherScaleFactor(
   tile: Tile,
-  parsedImage: Image,
+  image: Image,
   scaleFactor: number,
   log2ScaleFactorDiff: number,
   validTile?: (tile: Tile) => boolean
@@ -530,7 +530,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
   const higherScaleFactor = 2 ** (Math.log2(scaleFactor) + 1)
   if (
     higherScaleFactor >
-      parsedImage.tileZoomLevels
+      image.tileZoomLevels
         .map((tileZoomLevel) => tileZoomLevel.scaleFactor)
         .reduce((a, c) => a + c, 0) -
         scaleFactor ||
@@ -540,7 +540,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
   }
   const tileAtHigherScaleFactor = getTileAtHigherScaleFactor(
     tile,
-    parsedImage,
+    image,
     higherScaleFactor,
     validTile
   )
@@ -549,7 +549,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
   } else {
     return recursivelyGetTilesAtHigherScaleFactor(
       tile,
-      parsedImage,
+      image,
       higherScaleFactor,
       log2ScaleFactorDiff--,
       validTile
@@ -559,7 +559,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
 
 export function recursivelyGetTilesAtLowerScaleFactor(
   tile: Tile,
-  parsedImage: Image,
+  image: Image,
   scaleFactor: number,
   log2ScaleFactorDiff: number,
   validTile?: (tile: Tile) => boolean
@@ -570,13 +570,13 @@ export function recursivelyGetTilesAtLowerScaleFactor(
   }
   const tilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
     tile,
-    parsedImage,
+    image,
     lowerScaleFactor,
     validTile
   )
   const allTilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
     tile,
-    parsedImage,
+    image,
     lowerScaleFactor,
     (_tile) => true
   )
@@ -587,7 +587,7 @@ export function recursivelyGetTilesAtLowerScaleFactor(
       ...tilesAtLowerScaleFactor,
       ...recursivelyGetTilesAtLowerScaleFactor(
         tile,
-        parsedImage,
+        image,
         lowerScaleFactor,
         log2ScaleFactorDiff--,
         validTile
@@ -598,17 +598,12 @@ export function recursivelyGetTilesAtLowerScaleFactor(
 
 export function getTileAtHigherScaleFactor(
   tile: Tile,
-  parsedImage: Image,
+  image: Image,
   higherScaleFactor: number,
   validTile?: (tile: Tile) => boolean
 ): Tile | undefined {
   const tilesCoveringTileAtHigherScaleFactor =
-    getTilesCoveringTileAtScaleFactor(
-      tile,
-      parsedImage,
-      higherScaleFactor,
-      validTile
-    )
+    getTilesCoveringTileAtScaleFactor(tile, image, higherScaleFactor, validTile)
 
   if (tilesCoveringTileAtHigherScaleFactor.length === 0) {
     return undefined
@@ -619,13 +614,13 @@ export function getTileAtHigherScaleFactor(
 
 export function getTilesAtLowerScaleFactor(
   tile: Tile,
-  parsedImage: Image,
+  image: Image,
   lowerScaleFactor: number,
   validTile?: (tile: Tile) => boolean
 ): (Tile | undefined)[] {
   const tilesCoveringTileAtLowerScaleFactor = getTilesCoveringTileAtScaleFactor(
     tile,
-    parsedImage,
+    image,
     lowerScaleFactor,
     validTile
   )
@@ -664,13 +659,13 @@ export function keyFromScaleFactorRowColumn(
   return `${scaleFactor}:${row}:${column}`
 }
 
-export function tileUrl(tile: Tile, parsedImage: Image): string {
-  const imageRequest = parsedImage.getTileImageRequest(
+export function tileUrl(tile: Tile, image: Image): string {
+  const imageRequest = image.getTileImageRequest(
     tile.tileZoomLevel,
     tile.column,
     tile.row
   )
-  return parsedImage.getImageUrl(imageRequest)
+  return image.getImageUrl(imageRequest)
 }
 
 // TileCache

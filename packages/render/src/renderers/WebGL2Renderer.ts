@@ -286,11 +286,11 @@ export class WebGL2Renderer
       )
 
     // Not awaiting this, using events to trigger new render calls
-    this.loadMissingImageInfosInViewport()
+    this.loadMissingImagesInViewport()
 
     // Don't fire throttled function unless it could result in something
     // Otherwise we have to wait for that cycle to finish before useful cycle can be started
-    if (this.someImageInfosInViewport()) {
+    if (this.someImagesInViewport()) {
       this.throttledPrepareRenderInternal()
     }
 
@@ -903,10 +903,10 @@ export class WebGL2Renderer
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
-  protected imageInfoLoaded(event: Event) {
+  protected imageLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, event.data)
+        new WarpedMapEvent(WarpedMapEventType.IMAGELOADED, event.data)
       )
     }
   }

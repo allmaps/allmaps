@@ -50,7 +50,7 @@ export class IntArrayRenderer<D>
   async render(viewport: Viewport): Promise<Uint8ClampedArray> {
     this.viewport = viewport
 
-    await Promise.allSettled(this.loadMissingImageInfosInViewport())
+    await Promise.allSettled(this.loadMissingImagesInViewport())
 
     this.assureProjection()
 

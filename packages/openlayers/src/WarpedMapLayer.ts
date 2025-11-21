@@ -362,6 +362,21 @@ export class WarpedMapLayer
   }
 
   /**
+   * Adds image information to the WarpedMapList's image information cache
+   *
+   * @param imageInfos - Image informations
+   * @returns Image IDs of the image informations that were added
+   */
+  addImageInfos(imageInfos: unknown[]): string[] {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    const result = this.renderer.warpedMapList.addImageInfos(imageInfos)
+    this.nativeUpdate()
+
+    return result
+  }
+
+  /**
    * Get the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
   getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
@@ -951,7 +966,7 @@ export class WarpedMapLayer
     )
 
     this.renderer.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
+      WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
     )
 
@@ -1037,7 +1052,7 @@ export class WarpedMapLayer
     )
 
     this.renderer.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
+      WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
     )
 

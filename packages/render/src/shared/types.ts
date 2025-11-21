@@ -4,7 +4,6 @@ import type {
   Line,
   Size,
   FetchFn,
-  ImageInfoByMapId,
   Bbox,
   TileZoomLevel,
   Ring,
@@ -37,7 +36,6 @@ export type TransformationOptions = {
 
 export type WarpedMapOptions = {
   fetchFn?: FetchFn
-  imageInfoByMapId?: ImageInfoByMapId
   gcps: Gcp[]
   resourceMask: Ring
   transformationType: TransformationType

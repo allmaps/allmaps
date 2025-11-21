@@ -279,7 +279,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
   }
 
-  protected loadMissingImageInfosInViewport(): Promise<void>[] {
+  protected loadMissingImagesInViewport(): Promise<void>[] {
     if (!this.viewport) {
       return []
     }
@@ -294,12 +294,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       })
     )
       .filter(
-        (warpedMap) => !warpedMap.hasImageInfo() && !warpedMap.loadingImageInfo
+        (warpedMap) => !warpedMap.hasImage() && !warpedMap.fetchingImageInfo
       )
-      .map((warpedMap) => warpedMap.loadImageInfo())
+      .map((warpedMap) => warpedMap.loadImage(this.warpedMapList.imagesById))
   }
 
-  protected someImageInfosInViewport(): boolean {
+  protected someImagesInViewport(): boolean {
     if (!this.viewport) {
       return false
     }
@@ -314,7 +314,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       )
     )
       .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
-      .map((warpedMap) => warpedMap.hasImageInfo())
+      .map((warpedMap) => warpedMap.hasImage())
       .some(Boolean)
   }
 
@@ -476,7 +476,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.hasImageInfo()) {
+    if (!warpedMap.hasImage()) {
       // Note: don't load image information here
       // this would imply waiting for the first throttling cycle to complete
       // before acting on a sucessful load
@@ -488,7 +488,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
     // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
     const tileZoomLevel = getTileZoomLevelForScale(
-      warpedMap.parsedImage.tileZoomLevels,
+      warpedMap.image.tileZoomLevels,
       warpedMap.getResourceToCanvasScale(viewport),
       SCALE_FACTOR_CORRECTION,
       LOG2_SCALE_FACTOR_CORRECTION
@@ -578,7 +578,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
       ),
       tileZoomLevel,
-      [warpedMap.parsedImage.width, warpedMap.parsedImage.height]
+      [warpedMap.image.width, warpedMap.image.height]
     )
 
     // Sort tiles to load in order of their distance to viewport center
@@ -619,7 +619,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.hasImageInfo()) {
+    if (!warpedMap.hasImage()) {
       // Note: don't load image information here
       // this would imply waiting for the first throttling cycle to complete
       // before acting on a sucessful load
@@ -638,7 +638,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     // Find the fitting overview zoomlevel, if any
-    const overviewTileZoomLevel = warpedMap.parsedImage.tileZoomLevels
+    const overviewTileZoomLevel = warpedMap.image.tileZoomLevels
       .filter(
         (tileZoomLevel) =>
           getTileZoomLevelResolution(tileZoomLevel) <=
@@ -674,7 +674,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // Find all tiles at overview scalefactor
     const overviewTiles = getTilesAtScaleFactor(
       overviewTileZoomLevel.scaleFactor,
-      warpedMap.parsedImage
+      warpedMap.image
     )
 
     // Make fechable tiles
@@ -781,7 +781,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected mapTileDeleted(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  protected imageInfoLoaded(event: Event): void {}
+  protected imageLoaded(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected warpedMapAdded(event: Event): void {}
@@ -810,8 +810,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
+      WarpedMapEventType.IMAGELOADED,
+      this.imageLoaded.bind(this)
     )
 
     this.warpedMapList.addEventListener(
@@ -852,8 +852,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     this.warpedMapList.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this)
+      WarpedMapEventType.IMAGELOADED,
+      this.imageLoaded.bind(this)
     )
 
     this.warpedMapList.removeEventListener(

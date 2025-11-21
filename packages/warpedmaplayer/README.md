@@ -35,14 +35,14 @@ Use this readme to understand the API of the WarpedMapLayer methods shared betwe
 The following events are emitted to inform you of the state of the `WarpedMapLayer`.
 
 | Type                            | Description                                                                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `georeferenceannotationadded`   | A georeference annotation has been added to the warped map list                                                                      |
 | `georeferenceannotationremoved` | A georeference annotation has been removed from the warped map list                                                                  |
 | `warpedmapadded`                | A warped map has been added to the warped map list                                                                                   |
 | `warpedmapremoved`              | A warped map has been removed from the warped map list                                                                               |
 | `warpedmapentered`              | A warped map has entered the viewport                                                                                                |
 | `warpedmapleft`                 | A warped map has left the viewport                                                                                                   |
-| `imageinfoloaded`               | The image information has been loaded from a map                                                                                     |
+| `imageloaded`                   | An image was loaded for a map from cache or by fetching image info                                                                   |
 | `maptileloaded`                 | A tile has been loaded to the tile cache for a map                                                                                   |
 | `maptiledeleted`                | A tile has been deleted from the tile cache for a map                                                                                |
 | `firstmaptileloaded`            | The cache loaded a first tile of a map                                                                                               |
@@ -69,7 +69,7 @@ Options can be set on a `WarpedMapLayer` both as *layer options*, which apply to
 The following options are available:
 
 | Key                          | Description                                                                                                                                                                                                 | Default                                                                                                  |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
 | `applyMask`                  | Apply the resource mask (if false, the full mask is used)                                                                                                                                                   | `true`                                                                                                   |
 | `colorize`                   | Colorize the map                                                                                                                                                                                            | `false`                                                                                                  |
 | `colorizeColor`              | Color to colorize the map                                                                                                                                                                                   | `"#ff56ba"`                                                                                              |
@@ -198,6 +198,19 @@ Adds a Georeferenced Map
 ###### Returns
 
 Map ID of the map that was added, or an error (`Promise<string | Error>`).
+
+### `BaseWarpedMapLayer#addImageInfos(imageInfos)`
+
+Adds image information to the WarpedMapList's image information cache
+
+###### Parameters
+
+* `imageInfos` (`Array<unknown>`)
+  * Image informations
+
+###### Returns
+
+Image IDs of the image informations that were added (`Array<string>`).
 
 ### `BaseWarpedMapLayer#bringMapsForward(mapIds)`
 
@@ -747,7 +760,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`  | Partial<WebGL2RenderOptions>
     | Partial<SpecificWarpedMapLayerOptions>
@@ -839,7 +852,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`  | Partial<WebGL2RenderOptions>
     | Partial<SpecificWarpedMapLayerOptions>

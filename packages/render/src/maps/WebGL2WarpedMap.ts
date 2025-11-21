@@ -137,11 +137,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   declare defaultOptions: WebGL2WarpedMapOptions
   declare options: WebGL2WarpedMapOptions
 
-  // De facto make this a WarpedMapWithImageInfo
+  // De facto make this a WarpedMapWithImage
   // (Multiple inhertance is not possible in TypeScript)
   declare imageId: string
-  declare imageInfo: unknown
-  declare parsedImage: Image
+  declare image: Image
 
   gl: WebGL2RenderingContext
   mapProgram!: WebGLProgram
@@ -923,10 +922,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Cached tiles texture array
 
     const requiredTextureWidth = Math.max(
-      ...this.parsedImage.tileZoomLevels.map((size) => size.width)
+      ...this.image.tileZoomLevels.map((size) => size.width)
     )
     const requiredTextureHeigt = Math.max(
-      ...this.parsedImage.tileZoomLevels.map((size) => size.height)
+      ...this.image.tileZoomLevels.map((size) => size.height)
     )
     const requiredTextureDepth = this.cachedTilesForTexture.length
 
@@ -1121,7 +1120,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const cachedTiles = []
     for (tile of getTilesAtOtherScaleFactors(
       tile,
-      this.parsedImage,
+      this.image,
       this.tileZoomLevelForViewport.scaleFactor,
       TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
       TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
