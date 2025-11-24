@@ -1389,6 +1389,9 @@ importers:
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../stdlib
+      '@allmaps/warpedmaplayer':
+        specifier: workspace:^
+        version: link:../warpedmaplayer
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
@@ -1399,9 +1402,6 @@ importers:
       '@allmaps/types':
         specifier: workspace:^
         version: link:../types
-      '@allmaps/warpedmaplayer':
-        specifier: workspace:^
-        version: link:../warpedmaplayer
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.12
@@ -1511,6 +1511,9 @@ importers:
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../stdlib
+      '@allmaps/warpedmaplayer':
+        specifier: workspace:^
+        version: link:../warpedmaplayer
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1524,9 +1527,6 @@ importers:
       '@allmaps/types':
         specifier: workspace:^
         version: link:../types
-      '@allmaps/warpedmaplayer':
-        specifier: workspace:^
-        version: link:../warpedmaplayer
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.12
