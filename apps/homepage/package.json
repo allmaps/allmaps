@@ -32,7 +32,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "check": "astro check",
-    "build": "astro build",
+    "build": "pnpm run copy-readmes && astro build",
     "lerna-build": "lerna run build --scope @allmaps/homepage --include-dependencies",
     "preview": "astro preview",
     "astro": "astro",
