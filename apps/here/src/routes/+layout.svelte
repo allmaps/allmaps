@@ -31,9 +31,9 @@
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
   const sensorsState = setSensorsState(errorState)
+  const uiState = setUiState()
 
-  setMapsState(sensorsState, imageInfoState, errorState)
-  setUiState()
+  setMapsState(sensorsState, imageInfoState, errorState, uiState)
   setGeocodeState(data.geocodeEarthKey)
 
   $effect.pre(() => {

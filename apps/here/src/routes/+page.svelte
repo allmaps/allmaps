@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
+  import { beforeNavigate } from '$app/navigation'
   import { page } from '$app/state'
 
   import { blue } from '@allmaps/tailwind'
@@ -11,6 +12,7 @@
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getErrorState } from '$lib/state/error.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
   import Title from '$lib/components/Title.svelte'
   import Thumbnail from '$lib/components/Thumbnail.svelte'
@@ -28,6 +30,7 @@
   const mapsState = getMapsState()
   const sensorsState = getSensorsState()
   const errorState = getErrorState()
+  const uiState = getUiState()
 
   let waitingForPositionTimeout = $state(false)
   let waitingForPosition = $derived(
@@ -42,7 +45,21 @@
 
   let ogImageUrl = $derived(`${page.url.href}allmaps-here.jpg`)
 
+  beforeNavigate(() => {
+    uiState.mapsScrollTop = document.documentElement.scrollTop
+  })
+
+  async function restoreScrollTop(scrollTop: number) {
+    // Wait for the DOM to be ready
+    await tick()
+    document.documentElement.scrollTop = scrollTop
+  }
+
   onMount(() => {
+    if (uiState.mapsScrollTop) {
+      restoreScrollTop(uiState.mapsScrollTop)
+    }
+
     window.setTimeout(() => {
       waitingForPositionTimeout = true
     }, 5000)
