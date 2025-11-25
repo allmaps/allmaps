@@ -282,7 +282,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return (
       super.shouldRenderPoints() &&
       this.options.renderPoints !== false &&
-      (this.options.renderGcps || this.options.renderTransformedGcps)
+      (this.options.renderGcps ||
+        this.options.renderTransformedGcps ||
+        this.options.debugTriangulation)
     )
   }
 
@@ -314,7 +316,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   clearTextures() {
     // TODO: implement clearing of texture: maybe a 1x1x1 texture that's empty
-    this.throttledUpdateTextures()
+    // this.throttledUpdateTextures()
   }
 
   /**
@@ -323,6 +325,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
+    if (this.cachedTilesByTileKey.has(cachedTile.tileKey)) {
+      return
+    }
     this.cachedTilesByTileKey.set(cachedTile.tileKey, cachedTile)
     this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
@@ -335,9 +340,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   removeCachedTileAndUpdateTextures(tileUrl: string) {
     const cachedTile = this.cachedTilesByTileUrl.get(tileUrl)
-    if (cachedTile) {
-      this.cachedTilesByTileKey.delete(cachedTile.tileKey)
+    if (!cachedTile) {
+      return
     }
+    this.cachedTilesByTileKey.delete(cachedTile.tileKey)
     this.cachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
   }
@@ -716,16 +722,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const colors = this.lineGroups.reduce(
-      (accumulator: number[][], lineGroup) =>
-        accumulator.concat(
+      (accumulator: number[][], lineGroup) => {
+        const color = hexToFractionalOpaqueRgba(
+          lineGroup.color ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.color
+        )
+        return accumulator.concat(
           lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) =>
-            Array(6).fill(
-              hexToFractionalOpaqueRgba(
-                lineGroup.color ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.color
-              )
-            )
+            Array(6).fill(color)
           )
-        ),
+        )
+      },
       []
     )
     createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
@@ -751,17 +757,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const borderColors = this.lineGroups.reduce(
-      (accumulator: number[][], lineGroup) =>
-        accumulator.concat(
+      (accumulator: number[][], lineGroup) => {
+        const color = hexToFractionalOpaqueRgba(
+          lineGroup.borderColor ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.borderColor
+        )
+        return accumulator.concat(
           lineGroup.projectedGeoLines.flatMap((_projectedGeoLine) =>
-            Array(6).fill(
-              hexToFractionalOpaqueRgba(
-                lineGroup.borderColor ??
-                  DEFAULT_RENDER_LINE_GROUP_OPTIONS.borderColor
-              )
-            )
+            Array(6).fill(color)
           )
-        ),
+        )
+      },
       []
     )
     createBuffer(
@@ -843,14 +848,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const colors = this.pointGroups.reduce(
-      (accumulator: number[][], pointGroup) =>
-        accumulator.concat(
-          pointGroup.projectedGeoPoints.map((_projectedGeoPoint) =>
-            hexToFractionalOpaqueRgba(
-              pointGroup.color ?? DEFAULT_RENDER_POINT_GROUP_OPTION.color
-            )
-          )
-        ),
+      (accumulator: number[][], pointGroup) => {
+        const color = hexToFractionalOpaqueRgba(
+          pointGroup.color ?? DEFAULT_RENDER_POINT_GROUP_OPTION.color
+        )
+        return accumulator.concat(
+          pointGroup.projectedGeoPoints.map((_projectedGeoPoint) => color)
+        )
+      },
       []
     )
     createBuffer(gl, program, new Float32Array(colors.flat()), 4, 'a_color')
@@ -875,15 +880,15 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     const borderColors = this.pointGroups.reduce(
-      (accumulator: number[][], pointGroup) =>
-        accumulator.concat(
-          pointGroup.projectedGeoPoints.map((_projectedGeoPoint) =>
-            hexToFractionalOpaqueRgba(
-              pointGroup.borderColor ??
-                DEFAULT_RENDER_POINT_GROUP_OPTION.borderColor
-            )
-          )
-        ),
+      (accumulator: number[][], pointGroup) => {
+        const color = hexToFractionalOpaqueRgba(
+          pointGroup.borderColor ??
+            DEFAULT_RENDER_POINT_GROUP_OPTION.borderColor
+        )
+        return accumulator.concat(
+          pointGroup.projectedGeoPoints.map((_projectedGeoPoint) => color)
+        )
+      },
       []
     )
     createBuffer(
@@ -901,20 +906,22 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Find out which tiles to include in texture
     this.updateCachedTilesForTextures()
 
-    // Don't update if same request is (non-null) subset of previous request
+    // Don't update if request without tiles, or if
+    // same request is (non-null) subset of previous request
     // This reduces (expensive) texture updates when just reducing the number of tiles
     // (But keeps them when all tiles are gone to free up texture)
     // And blocking updates on equal requests is important to
     // prevent triggering an infinite loop
     // caused by the TEXTURESUPDATED event at the end
     if (
-      this.cachedTilesForTexture.length !== 0 &&
-      subSetArray(
-        this.previousCachedTilesForTexture.map(
-          (textureTile) => textureTile.tileUrl
-        ),
-        this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl)
-      )
+      this.cachedTilesForTexture.length == 0 ||
+      (this.cachedTilesForTexture.length !== 0 &&
+        subSetArray(
+          this.previousCachedTilesForTexture.map(
+            (textureTile) => textureTile.tileUrl
+          ),
+          this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl)
+        ))
     ) {
       return
     }

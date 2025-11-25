@@ -6,10 +6,10 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   getTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel,
-  getTilesResolution,
   getTilesAtScaleFactor,
   getTileZoomLevelResolution,
-  squaredDistanceTileToPoint
+  squaredDistanceTileToPoint,
+  getTileResolution
 } from '../shared/tiles.js'
 
 import {
@@ -53,7 +53,8 @@ const SCALE_FACTOR_CORRECTION = 0
 const LOG2_SCALE_FACTOR_CORRECTION = 0.4
 
 const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
-const MAX_TOTAL_RESOLUTION_RATIO = 10
+const MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO = 10
+const MAX_TOTAL_MAPS_OVERVIEW = 40
 
 const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
 
@@ -382,19 +383,28 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       )
     }
 
+    let fetchableTilesForViewportResolution = fetchableTilesForViewport
+      .map((fetchableTile) => getTileResolution(fetchableTile.tile))
+      .reduce((a, c) => a + c, 0)
+    let overviewFetchableTilesForViewportResolution = 0
+
     // Get overview fetchable tiles for all maps in viewport with overview buffer
     // (and set properties for the current viewport for all maps in viewport with prune buffer)
     if (this.shouldAnticipateInteraction()) {
       for (const mapId of mapsInViewportForOverviewPrune) {
-        overviewFetchableTilesForViewport.push(
-          ...this.getMapOverviewFetchableTilesForViewport(
+        const mapOverviewFetchableTilesForViewport =
+          this.getMapOverviewFetchableTilesForViewport(
             mapId,
-            [
-              ...fetchableTilesForViewport,
-              ...overviewFetchableTilesForViewport
-            ],
+            fetchableTilesForViewportResolution +
+              overviewFetchableTilesForViewportResolution,
             mapsInViewportForOverviewRequest
           )
+        overviewFetchableTilesForViewportResolution +=
+          mapOverviewFetchableTilesForViewport
+            .map((fetchableTile) => getTileResolution(fetchableTile.tile))
+            .reduce((a, c) => a + c, 0)
+        overviewFetchableTilesForViewport.push(
+          ...mapOverviewFetchableTilesForViewport
         )
       }
     }
@@ -602,7 +612,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
   protected getMapOverviewFetchableTilesForViewport(
     mapId: string,
-    totalFetchableTilesForViewport: FetchableTile[],
+    totalFetchableTilesForViewportResolution: number,
     mapsInViewportForOverviewRequest: Set<string>
   ): FetchableTile[] {
     if (!this.viewport) {
@@ -626,14 +636,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    // No overview tiles if too many fetchable tiles in total already
-    const totalFetchableTilesResolution = getTilesResolution(
-      totalFetchableTilesForViewport.map((fetchableTile) => fetchableTile.tile)
-    )
+    // No overview tiles if too many fetchable tiles (normal and overview) in total already
+    // or if many maps to render
     const maxTotalFetchableTilesResolution =
-      this.viewport.canvasResolution * MAX_TOTAL_RESOLUTION_RATIO
-
-    if (totalFetchableTilesResolution > maxTotalFetchableTilesResolution) {
+      this.viewport.canvasResolution * MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO
+    if (
+      totalFetchableTilesForViewportResolution >
+        maxTotalFetchableTilesResolution ||
+      mapsInViewportForOverviewRequest.size > MAX_TOTAL_MAPS_OVERVIEW
+    ) {
       return []
     }
 
@@ -696,7 +707,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.mapsWithFetchableTilesForViewport = new Set(
       allFechableTilesForViewport
         .map((tile) => tile.mapId)
-        .filter((v, i, a) => a.indexOf(v) === i) // filter out duplicate mapIds
         .sort((mapId0, mapId1) =>
           this.warpedMapList.orderMapIdsByZIndex(mapId0, mapId1)
         )
@@ -704,7 +714,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.mapsWithRequestedTilesForViewport = new Set(
       allRequestedTilesForViewport
         .map((tile) => tile.mapId)
-        .filter((v, i, a) => a.indexOf(v) === i) // filter out duplicate mapIds
         .sort((mapId0, mapId1) =>
           this.warpedMapList.orderMapIdsByZIndex(mapId0, mapId1)
         )

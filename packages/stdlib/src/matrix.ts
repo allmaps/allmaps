@@ -13,10 +13,22 @@ export function newArrayMatrix<T = number>(
   if (rows <= 0 || cols <= 0) {
     throw new Error('Empty ArrayMatrix not supported')
   }
-  return Array.from(Array(rows), (_) => Array(cols).fill(value)) as T[][]
+  const result = new Array(rows)
+  for (let i = 0; i < rows; i++) {
+    const row = new Array(cols)
+    for (let j = 0; j < cols; j++) {
+      row[j] = value
+    }
+    result[i] = row
+  }
+  return result
 }
 
 export function arrayMatrixSize<T>(arrayMatrix: T[][]): Size {
+  return [arrayMatrix.length, arrayMatrix[0].length]
+}
+
+export function arrayMatrixSizeSafer<T>(arrayMatrix: T[][]): Size {
   if (arrayMatrix.length === 0) {
     throw new Error('ArrayMatrix may not be empty, but rows are empty')
   }
@@ -36,7 +48,21 @@ export function arrayMatrixSize<T>(arrayMatrix: T[][]): Size {
 }
 
 export function shallowCopyArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
-  return arrayMatrix.map((row) => [...row])
+  const rows = arrayMatrix.length
+  const result = new Array(rows)
+
+  for (let i = 0; i < rows; i++) {
+    const row = arrayMatrix[i]
+    const cols = row.length
+    const newRow = new Array(cols)
+
+    for (let j = 0; j < cols; j++) {
+      newRow[j] = row[j]
+    }
+    result[i] = newRow
+  }
+
+  return result
 }
 
 // Slice specific rows and columns of an arrayMatrix.

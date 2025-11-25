@@ -68,7 +68,6 @@ export const DEFAULT_WARPED_MAP_OPTIONS = {
 
 const DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
   minOffsetRatio: 0.01,
-  minOffsetDistance: 4,
   maxDepth: 5,
   differentHandedness: true
 }
@@ -431,11 +430,11 @@ export class WarpedMap extends EventTarget {
       this.mapOptions
     )
 
-    let changedOptions = objectDifference(this.options, previousOptions)
+    let changedOptions = objectDifference(options, previousOptions)
 
     if (animationOptions?.optionKeysToOmit) {
       // If some options should be omitted from changing,
-      // like when setting all options exect those that should be animated,
+      // like when setting all options exept those that should be animated,
       // then omit those options and set the options accordingly
       changedOptions = omit(changedOptions, animationOptions?.optionKeysToOmit)
       this.options = mergeOptionsUnlessUndefined(

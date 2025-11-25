@@ -448,10 +448,6 @@ export function getTileOriginalResolution(tile: Tile): number {
   return sizeToResolution(getTileOriginalSize(tile))
 }
 
-export function getTilesResolution(tiles: Tile[]): number {
-  return tiles.map((tile) => getTileResolution(tile)).reduce((a, c) => a + c, 0)
-}
-
 export function getTilesOriginalResolution(tiles: Tile[]): number {
   return tiles
     .map((tile) => getTileOriginalResolution(tile))
