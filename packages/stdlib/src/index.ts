@@ -193,7 +193,7 @@ export {
 export {
   mergeOptions,
   mergeOptionsUnlessUndefined,
-  mergeTwoOptionsUnlessUndefinedOrOmitted,
+  mergeTwoOptionsUnlessUndefined,
   mergePartialOptions,
   optionKeysToUndefinedOptions,
   optionKeysByMapIdToUndefinedOptionsByMapId

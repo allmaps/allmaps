@@ -72,25 +72,18 @@ export function mergeOptionsUnlessUndefined<
   } as T & Partial<U>
 }
 
-export function mergeTwoOptionsUnlessUndefinedOrOmitted<
+export function mergeTwoOptionsUnlessUndefined<
   T extends Record<string, any>,
   U extends Record<string, any>
->(
-  baseOptions: T,
-  additionalOption: Partial<U> | undefined,
-  keysToOmit?: string[]
-): T & Partial<U> {
-  if (!additionalOption) {
+>(baseOptions: T, additionalOption: Partial<U> | undefined): T & Partial<U> {
+  if (!additionalOption || Object.keys(additionalOption).length === 0) {
     return baseOptions as T & Partial<U>
   }
 
   // Build a filtered copy, excluding omitted keys and undefined values
   const filtered: Partial<U> = {}
   for (const key in additionalOption) {
-    if (
-      additionalOption[key] !== undefined &&
-      (!keysToOmit || !keysToOmit.includes(key))
-    ) {
+    if (additionalOption[key] !== undefined) {
       filtered[key] = additionalOption[key]
     }
   }

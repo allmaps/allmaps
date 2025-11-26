@@ -23,7 +23,7 @@ import {
   objectDifference,
   omit,
   mergePartialOptions,
-  mergeTwoOptionsUnlessUndefinedOrOmitted
+  mergeTwoOptionsUnlessUndefined
 } from '@allmaps/stdlib'
 
 import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
@@ -437,29 +437,21 @@ export class WarpedMap extends EventTarget {
       this.mapOptions
     )
 
+    // If some options should be omitted from changing,
+    // like when setting all options exept those that should be animated,
+    // then omit those options and set the options accordingly
+    const optionKeysToConsider =
+      animationOptions?.optionKeysPossiblyChanged?.filter((k) =>
+        animationOptions.optionKeysToOmit
+          ? !animationOptions.optionKeysToOmit.includes(k)
+          : true
+      )
     let changedOptions = objectDifference(
       options,
       this.options,
-      animationOptions?.optionKeysPossiblyChanged
+      optionKeysToConsider
     )
-
-    if (
-      animationOptions?.optionKeysToOmit &&
-      Object.keys(changedOptions).some((o) =>
-        animationOptions.optionKeysToOmit?.includes(o)
-      )
-    ) {
-      // If some options should be omitted from changing,
-      // like when setting all options exept those that should be animated,
-      // then omit those options and set the options accordingly
-      this.options = mergeTwoOptionsUnlessUndefinedOrOmitted(
-        this.options,
-        changedOptions,
-        animationOptions?.optionKeysToOmit
-      )
-    } else {
-      this.options = options
-    }
+    this.options = mergeTwoOptionsUnlessUndefined(this.options, changedOptions)
 
     if (animationOptions?.init) {
       // On init we should set the properties in a specific order
