@@ -104,10 +104,14 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Adds a georeferenced map to this list
    *
-   * @param georeferencedMap
+   * @param georeferencedMap - Georeferenced Map
+   * @param mapOptions - Map options
    * @returns Map ID of the map that was added
    */
-  async addGeoreferencedMap(georeferencedMap: unknown): Promise<string> {
+  async addGeoreferencedMap(
+    georeferencedMap: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ): Promise<string> {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMap)
     const validatedGeoreferencedMap = Array.isArray(
@@ -115,7 +119,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     )
       ? validatedGeoreferencedMapOrMaps[0]
       : validatedGeoreferencedMapOrMaps
-    return this.addGeoreferencedMapInternal(validatedGeoreferencedMap)
+    return this.addGeoreferencedMapInternal(
+      validatedGeoreferencedMap,
+      mapOptions
+    )
   }
 
   /**
@@ -152,14 +159,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Parses an annotation and adds its georeferenced map to this list
    *
-   * @param annotation
+   * @param annotation - Annotation
+   * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
-  async addGeoreferenceAnnotation(annotation: unknown) {
+  async addGeoreferenceAnnotation(
+    annotation: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     const settledResults = await Promise.allSettled(
-      maps.map((map) => this.addGeoreferencedMapInternal(map))
+      maps.map((map) => this.addGeoreferencedMapInternal(map, mapOptions))
     )
     // TODO: make sure reason contains Error
     for (const settledResult of settledResults) {
@@ -700,14 +711,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   private async addGeoreferencedMapInternal(
-    georeferencedMap: GeoreferencedMap
+    georeferencedMap: GeoreferencedMap,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
 
     const warpedMap = this.warpedMapFactory(
       mapId,
       georeferencedMap,
-      this.options
+      this.options,
+      mapOptions
     )
 
     this.warpedMapsById.set(mapId, warpedMap)

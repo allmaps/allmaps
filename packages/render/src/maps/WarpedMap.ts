@@ -21,7 +21,9 @@ import {
   mergeOptions,
   mergeOptionsUnlessUndefined,
   objectDifference,
-  omit
+  omit,
+  mergePartialOptions,
+  mergeTwoOptionsUnlessUndefinedOrOmitted
 } from '@allmaps/stdlib'
 
 import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
@@ -80,8 +82,9 @@ export function createWarpedMapFactory() {
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
-  ) => new WarpedMap(mapId, georeferencedMap, options)
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapOptions>
+  ) => new WarpedMap(mapId, georeferencedMap, listOptions, mapOptions)
 }
 
 /**
@@ -254,7 +257,8 @@ export class WarpedMap extends EventTarget {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options: Partial<WarpedMapOptions> = {}
+    listOptions: Partial<WarpedMapListOptions> = {},
+    mapOptions: Partial<WarpedMapOptions> = {}
   ) {
     super()
 
@@ -270,8 +274,8 @@ export class WarpedMap extends EventTarget {
     this.projectedTransformerDoubleCache = new Map()
     this.fetchingImageInfo = false
 
-    this.mapOptions = {}
-    this.listOptions = options
+    this.mapOptions = mapOptions
+    this.listOptions = listOptions
     this.georeferencedMapOptions = {
       transformationType: georeferencedMap.transformation
         ?.type as TransformationType,
@@ -280,7 +284,7 @@ export class WarpedMap extends EventTarget {
       resourceMask: georeferencedMap.resourceMask
     }
     this.setDefaultOptions()
-    this.setOptions({ init: true })
+    this.applyOptions({ init: true })
   }
 
   /**
@@ -398,13 +402,18 @@ export class WarpedMap extends EventTarget {
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
+    let optionKeysPossiblyChanged: string[] = []
     if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
       this.mapOptions = mergeOptions(this.mapOptions, mapOptions)
+      optionKeysPossiblyChanged.push(...Object.keys(mapOptions))
     }
     if (listOptions !== undefined && Object.keys(listOptions).length > 0) {
       this.listOptions = mergeOptions(this.listOptions, listOptions)
+      optionKeysPossiblyChanged.push(...Object.keys(listOptions))
     }
-    return this.setOptions(animationOptions)
+    return this.applyOptions(
+      mergePartialOptions(animationOptions, { optionKeysPossiblyChanged })
+    )
   }
 
   setListOptions(
@@ -418,11 +427,9 @@ export class WarpedMap extends EventTarget {
     this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
-  setOptions(
+  protected applyOptions(
     animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
-    const previousOptions = cloneDeep(this.options || {})
-
     const options = mergeOptionsUnlessUndefined(
       this.defaultOptions,
       this.georeferencedMapOptions,
@@ -430,16 +437,25 @@ export class WarpedMap extends EventTarget {
       this.mapOptions
     )
 
-    let changedOptions = objectDifference(options, previousOptions)
+    let changedOptions = objectDifference(
+      options,
+      this.options,
+      animationOptions?.optionKeysPossiblyChanged
+    )
 
-    if (animationOptions?.optionKeysToOmit) {
+    if (
+      animationOptions?.optionKeysToOmit &&
+      Object.keys(changedOptions).some((o) =>
+        animationOptions.optionKeysToOmit?.includes(o)
+      )
+    ) {
       // If some options should be omitted from changing,
       // like when setting all options exept those that should be animated,
       // then omit those options and set the options accordingly
-      changedOptions = omit(changedOptions, animationOptions?.optionKeysToOmit)
-      this.options = mergeOptionsUnlessUndefined(
-        previousOptions,
-        changedOptions
+      this.options = mergeTwoOptionsUnlessUndefinedOrOmitted(
+        this.options,
+        changedOptions,
+        animationOptions?.optionKeysToOmit
       )
     } else {
       this.options = options

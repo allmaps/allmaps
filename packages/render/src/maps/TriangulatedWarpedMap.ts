@@ -14,6 +14,7 @@ import { WarpedMap } from './WarpedMap.js'
 import type {
   SpecificTriangulatedWarpedMapOptions,
   TriangulatedWarpedMapOptions,
+  WarpedMapListOptions,
   WarpedMapOptions
 } from '../shared/types.js'
 
@@ -35,8 +36,10 @@ export function createTriangulatedWarpedMapFactory() {
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
-  ) => new TriangulatedWarpedMap(mapId, georeferencedMap, options)
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapOptions>
+  ) =>
+    new TriangulatedWarpedMap(mapId, georeferencedMap, listOptions, mapOptions)
 }
 
 type GcpTriangulation = {
@@ -111,9 +114,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<TriangulatedWarpedMap>
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapOptions>
   ) {
-    super(mapId, georeferencedMap, options)
+    super(mapId, georeferencedMap, listOptions, mapOptions)
 
     this.resourceTriangulationCache = new Map()
     this.projectedGcpTriangulationCache = new Map()

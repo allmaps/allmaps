@@ -52,14 +52,7 @@ export function shallowCopyArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
   const result = new Array(rows)
 
   for (let i = 0; i < rows; i++) {
-    const row = arrayMatrix[i]
-    const cols = row.length
-    const newRow = new Array(cols)
-
-    for (let j = 0; j < cols; j++) {
-      newRow[j] = row[j]
-    }
-    result[i] = newRow
+    result[i] = arrayMatrix[i].slice()
   }
 
   return result
@@ -134,9 +127,19 @@ export function pasteArrayMatrix<T>(
 }
 
 export function transposeArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
-  return arrayMatrix[0].map((_, colIndex) =>
-    arrayMatrix.map((row) => row[colIndex])
-  )
+  const rows = arrayMatrix.length
+  const cols = arrayMatrix[0].length
+  const result = new Array(cols)
+
+  for (let j = 0; j < cols; j++) {
+    const newRow = new Array(rows)
+    for (let i = 0; i < rows; i++) {
+      newRow[i] = arrayMatrix[i][j]
+    }
+    result[j] = newRow
+  }
+
+  return result
 }
 
 export function newBlockArrayMatrix<T = number>(

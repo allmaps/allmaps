@@ -40,7 +40,8 @@ import type {
   PointGroup,
   AnimationOptions,
   SpecificWebGL2WarpedMapOptions,
-  WebGL2WarpedMapOptions
+  WebGL2WarpedMapOptions,
+  WarpedMapListOptions
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
@@ -114,7 +115,8 @@ export function createWebGL2WarpedMapFactory(
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WebGL2WarpedMapOptions>
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WebGL2WarpedMapOptions>
   ) =>
     new WebGL2WarpedMap(
       mapId,
@@ -123,7 +125,8 @@ export function createWebGL2WarpedMapFactory(
       mapProgram,
       linesProgram,
       pointsProgram,
-      options
+      listOptions,
+      mapOptions
     )
 }
 
@@ -193,9 +196,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     mapProgram: WebGLProgram,
     linesProgram: WebGLProgram,
     pointsProgram: WebGLProgram,
-    options?: Partial<WebGL2WarpedMapOptions>
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WebGL2WarpedMapOptions>
   ) {
-    super(mapId, georeferencedMap, options)
+    super(mapId, georeferencedMap, listOptions, mapOptions)
 
     this.cachedTilesByTileKey = new Map()
     this.cachedTilesByTileUrl = new Map()
@@ -246,8 +250,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }
 
-  setOptions(animationOptions?: Partial<AnimationOptions>) {
-    const changedOptions = super.setOptions(animationOptions)
+  protected applyOptions(animationOptions?: Partial<AnimationOptions>) {
+    const changedOptions = super.applyOptions(animationOptions)
 
     this.options.opacity =
       (this.listOptions?.opacity ?? this.defaultOptions.opacity) *

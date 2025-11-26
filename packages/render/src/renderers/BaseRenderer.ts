@@ -89,19 +89,27 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Parses an annotation and adds its georeferenced map to this renderer's warped map list
    *
-   * @param annotation
+   * @param annotation - Annotation
+   * @param mapOptions - Map options
    */
-  async addGeoreferenceAnnotation(annotation: unknown) {
-    return this.warpedMapList.addGeoreferenceAnnotation(annotation)
+  async addGeoreferenceAnnotation(
+    annotation: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) {
+    return this.warpedMapList.addGeoreferenceAnnotation(annotation, mapOptions)
   }
 
   /**
    * Adds a georeferenced map to this renderer's warped map list
    *
-   * @param georeferencedMap
+   * @param georeferencedMap - Georeferenced Map
+   * @param mapOptions - Map options
    */
-  async addGeoreferencedMap(georeferencedMap: unknown) {
-    return this.warpedMapList.addGeoreferencedMap(georeferencedMap)
+  async addGeoreferencedMap(
+    georeferencedMap: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) {
+    return this.warpedMapList.addGeoreferencedMap(georeferencedMap, mapOptions)
   }
 
   /**

@@ -143,23 +143,50 @@ export function equalSet<T>(set1: Set<T> | null, set2: Set<T> | null): boolean {
   return [...set1].every((x) => set2.has(x))
 }
 
-// From https://gist.github.com/Yimiprod/7ee176597fef230d1451
+// Compare two objects, and return an object with all (key, value) pairs from the new object
+// that are (deeply) different from the base object
 export function objectDifference(
   newObject: object,
-  baseObject: object
+  baseObject: object,
+  objectKeysPossiblyChanged?: string[]
 ): object {
-  return fromPairs(
-    differenceWith(toPairs(newObject), toPairs(baseObject), isEqual)
-  )
+  const result: Record<string, any> = {}
+  if (objectKeysPossiblyChanged && objectKeysPossiblyChanged.length === 0) {
+    return result
+  }
+  const baseEntries = new Map()
+  let newKeys = newObject ? Object.keys(newObject) : []
+  if (objectKeysPossiblyChanged) {
+    newKeys = newKeys.filter((k) => objectKeysPossiblyChanged.includes(k))
+  }
+  const baseKeys = baseObject ? Object.keys(baseObject) : []
+
+  for (const key of baseKeys) {
+    if (baseObject.hasOwnProperty(key)) {
+      baseEntries.set(key, (baseObject as any)[key])
+    }
+  }
+
+  for (const key of newKeys) {
+    if (!newObject.hasOwnProperty(key)) continue
+
+    const newVal = (newObject as any)[key]
+
+    if (!baseEntries.has(key) || !isEqual(newVal, baseEntries.get(key))) {
+      result[key] = newVal
+    }
+  }
+
+  return result
 }
 
-export function objectOmitDifference(
-  newObject: object,
-  baseObject: object
-): object {
-  const keysToOmit = Object.keys(objectDifference(newObject, baseObject))
-  return pick(newObject, keysToOmit)
-}
+// export function objectOmitDifference(
+//   newObject: object,
+//   baseObject: object
+// ): object {
+//   const keysToOmit = Object.keys(objectDifference(newObject, baseObject))
+//   return pick(newObject, keysToOmit)
+// }
 
 // Basic omit function as replacement for lodash omit, since it will be removed in v5
 // See: https://github.com/lodash/lodash/issues/2930#issuecomment-272298477
