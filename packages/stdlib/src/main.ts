@@ -1,12 +1,5 @@
 import { Line } from '@allmaps/types'
-import {
-  differenceWith,
-  fromPairs,
-  toPairs,
-  isEqual,
-  cloneDeep,
-  pick
-} from 'lodash-es'
+import { isEqual, cloneDeep } from 'lodash-es'
 
 export function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180)
@@ -150,7 +143,7 @@ export function objectDifference(
   baseObject: object,
   objectKeysPossiblyChanged?: string[]
 ): object {
-  const result: Record<string, any> = {}
+  const result: Record<string, unknown> = {}
   if (objectKeysPossiblyChanged && objectKeysPossiblyChanged.length === 0) {
     return result
   }
@@ -162,15 +155,15 @@ export function objectDifference(
   const baseKeys = baseObject ? Object.keys(baseObject) : []
 
   for (const key of baseKeys) {
-    if (baseObject.hasOwnProperty(key)) {
-      baseEntries.set(key, (baseObject as any)[key])
+    if (Object.prototype.hasOwnProperty.call(baseObject, key)) {
+      baseEntries.set(key, (baseObject as Record<string, unknown>)[key])
     }
   }
 
   for (const key of newKeys) {
-    if (!newObject.hasOwnProperty(key)) continue
+    if (!Object.prototype.hasOwnProperty.call(newObject, key)) continue
 
-    const newVal = (newObject as any)[key]
+    const newVal = (newObject as Record<string, unknown>)[key]
 
     if (!baseEntries.has(key) || !isEqual(newVal, baseEntries.get(key))) {
       result[key] = newVal
