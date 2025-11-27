@@ -232,7 +232,7 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapLayer#addGeoreferenceAnnotation(annotation)`
+### `WarpedMapLayer#addGeoreferenceAnnotation(annotation, mapOptions)`
 
 Adds a Georeference Annotation
 
@@ -240,12 +240,14 @@ Adds a Georeference Annotation
 
 * `annotation` (`unknown`)
   * Georeference Annotation
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
-### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl)`
+### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl, mapOptions)`
 
 Adds a Georeference Annotation by URL
 
@@ -253,12 +255,14 @@ Adds a Georeference Annotation by URL
 
 * `annotationUrl` (`string`)
   * URL of a Georeference Annotation
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
-### `WarpedMapLayer#addGeoreferencedMap(georeferencedMap)`
+### `WarpedMapLayer#addGeoreferencedMap(georeferencedMap, mapOptions)`
 
 Adds a Georeferenced Map
 
@@ -266,6 +270,8 @@ Adds a Georeferenced Map
 
 * `georeferencedMap` (`unknown`)
   * Georeferenced Map
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  * Map options
 
 ###### Returns
 

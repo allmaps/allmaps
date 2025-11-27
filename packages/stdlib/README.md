@@ -378,11 +378,12 @@ MIT
 
 `number`.
 
-### `distance(from)`
+### `distance(from, to)`
 
 ###### Parameters
 
-* `from` (`[Point, Point]`)
+* `from` (`[number, number]`)
+* `to` (`[number, number]`)
 
 ###### Returns
 
@@ -1276,7 +1277,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -1323,6 +1324,17 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 ###### Returns
 
 `{[P in keyof U[number]]?: U[number][P] | undefined}`.
+
+### `mergeTwoOptionsUnlessUndefined(baseOptions, additionalOption)`
+
+###### Parameters
+
+* `baseOptions` (`T`)
+* `additionalOption` (`Partial<U> | undefined`)
+
+###### Returns
+
+`T & Partial<U>`.
 
 ### `midPoint(points)`
 
@@ -1437,23 +1449,13 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 `Array<Array<T>>`.
 
-### `objectDifference(newObject, baseObject)`
+### `objectDifference(newObject, baseObject, objectKeysPossiblyChanged)`
 
 ###### Parameters
 
 * `newObject` (`object`)
 * `baseObject` (`object`)
-
-###### Returns
-
-`object`.
-
-### `objectOmitDifference(newObject, baseObject)`
-
-###### Parameters
-
-* `newObject` (`object`)
-* `baseObject` (`object`)
+* `objectKeysPossiblyChanged?` (`Array<string> | undefined`)
 
 ###### Returns
 
@@ -1622,19 +1624,6 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 ###### Returns
 
 `number`.
-
-### `removeUndefinedOptions(optionsArray)`
-
-###### Parameters
-
-* `optionsArray` (`U[0]`)
-
-###### Returns
-
-`{   [P in keyof {[K in keyof U[number]]: Exclude<U[number][K], undefined>}]?:
-    | {[K in keyof U[number]]: Exclude<U[number][K], undefined>}[P]
-    | undefined
-}`.
 
 ### `rgbToHex(color)`
 
@@ -1859,11 +1848,12 @@ Example for square rectangles '\*' and '+':
 
 `Array<Array<T>>`.
 
-### `squaredDistance(from)`
+### `squaredDistance(from, to)`
 
 ###### Parameters
 
-* `from` (`[Point, Point]`)
+* `from` (`[number, number]`)
+* `to` (`Point | undefined`)
 
 ###### Returns
 
