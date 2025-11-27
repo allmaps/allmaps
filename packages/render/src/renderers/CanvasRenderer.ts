@@ -48,7 +48,7 @@ export class CanvasRenderer
         this.warpedMapList
       )
 
-    await Promise.allSettled(this.loadMissingImageInfosInViewport())
+    await Promise.allSettled(this.loadMissingImagesInViewport())
 
     this.assureProjection()
 

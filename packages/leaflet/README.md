@@ -232,7 +232,7 @@ There are no parameters.
 
 `void`.
 
-### `WarpedMapLayer#addGeoreferenceAnnotation(annotation)`
+### `WarpedMapLayer#addGeoreferenceAnnotation(annotation, mapOptions)`
 
 Adds a Georeference Annotation
 
@@ -240,12 +240,14 @@ Adds a Georeference Annotation
 
 * `annotation` (`unknown`)
   * Georeference Annotation
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
-### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl)`
+### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl, mapOptions)`
 
 Adds a Georeference Annotation by URL
 
@@ -253,12 +255,14 @@ Adds a Georeference Annotation by URL
 
 * `annotationUrl` (`string`)
   * URL of a Georeference Annotation
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
-### `WarpedMapLayer#addGeoreferencedMap(georeferencedMap)`
+### `WarpedMapLayer#addGeoreferencedMap(georeferencedMap, mapOptions)`
 
 Adds a Georeferenced Map
 
@@ -266,10 +270,25 @@ Adds a Georeferenced Map
 
 * `georeferencedMap` (`unknown`)
   * Georeferenced Map
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map ID of the map that was added, or an error (`Promise<string | Error>`).
+
+### `WarpedMapLayer#addImageInfos(imageInfos)`
+
+Adds image information to the WarpedMapList's image information cache
+
+###### Parameters
+
+* `imageInfos` (`Array<unknown>`)
+  * Image informations
+
+###### Returns
+
+Image IDs of the image informations that were added (`Array<string>`).
 
 ### `WarpedMapLayer#bringMapsForward(mapIds)`
 
@@ -418,7 +437,7 @@ There are no parameters.
 
 ###### Returns
 
-`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; ... 63 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; ... 62 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapLayer#getMapDefaultOptions(mapId)`
 
@@ -911,7 +930,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`  | Partial<WebGL2RenderOptions>
     | Partial<LeafletWarpedMapLayerOptions>
@@ -1003,7 +1022,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`  | Partial<WebGL2RenderOptions>
     | Partial<LeafletWarpedMapLayerOptions>

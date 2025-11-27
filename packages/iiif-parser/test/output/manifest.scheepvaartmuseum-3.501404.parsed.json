@@ -1,0 +1,124 @@
+{
+  "canvases": [
+    {
+      "height": 1710,
+      "image": {
+        "embedded": true,
+        "height": 1710,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": false,
+        "type": "image",
+        "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902",
+        "width": 2000
+      },
+      "label": {
+        "none": ["Image (1)"]
+      },
+      "type": "canvas",
+      "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902/canvas/p1",
+      "width": 2000
+    },
+    {
+      "height": 1712,
+      "image": {
+        "embedded": true,
+        "height": 1712,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": false,
+        "type": "image",
+        "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291",
+        "width": 2000
+      },
+      "label": {
+        "none": ["Image (2)"]
+      },
+      "type": "canvas",
+      "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291/canvas/p2",
+      "width": 2000
+    },
+    {
+      "height": 1338,
+      "image": {
+        "embedded": true,
+        "height": 1338,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": false,
+        "type": "image",
+        "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681",
+        "width": 2000
+      },
+      "label": {
+        "none": ["Image (3)"]
+      },
+      "type": "canvas",
+      "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681/canvas/p3",
+      "width": 2000
+    },
+    {
+      "height": 1004,
+      "image": {
+        "embedded": true,
+        "height": 1004,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": false,
+        "type": "image",
+        "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232",
+        "width": 2000
+      },
+      "label": {
+        "none": ["Image (4)"]
+      },
+      "type": "canvas",
+      "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232/canvas/p4",
+      "width": 2000
+    },
+    {
+      "height": 1681,
+      "image": {
+        "embedded": true,
+        "height": 1681,
+        "majorVersion": 3,
+        "supportsAnyRegionAndSize": false,
+        "type": "image",
+        "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351",
+        "width": 2000
+      },
+      "label": {
+        "none": ["Image (5)"]
+      },
+      "type": "canvas",
+      "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351/canvas/p5",
+      "width": 2000
+    }
+  ],
+  "embedded": false,
+  "label": {
+    "none": [
+      "Met de hand gekleurde kaart van Nieuw Nederland, Nieuw Engeland en een deel van Virginia"
+    ]
+  },
+  "majorVersion": 3,
+  "metadata": [
+    {
+      "label": {
+        "none": ["Creator"]
+      },
+      "value": {
+        "none": ["Visscher, Nicolaas Jansz."]
+      }
+    },
+    {
+      "label": {
+        "none": ["Institution name"]
+      },
+      "value": {
+        "none": ["Het Scheepvaartmuseum"]
+      }
+    }
+  ],
+  "summary": {
+    "none": ["landkaart"]
+  },
+  "type": "manifest",
+  "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/museum/501404/manifest.json"
+}

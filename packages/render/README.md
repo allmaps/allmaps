@@ -292,7 +292,7 @@ object & SpecificWarpedMapListOptions & Partial<WebGL2WarpedMapOptions>
 
 ###### Fields
 
-* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 
 ### `SelectionOptions`
 
@@ -341,7 +341,7 @@ object
     | 'projective'
     | 'linear'`)
 
-### `new TriangulatedWarpedMap(mapId, georeferencedMap, options)`
+### `new TriangulatedWarpedMap(mapId, georeferencedMap, listOptions, mapOptions)`
 
 Creates an instance of a TriangulatedWarpedMap.
 
@@ -349,10 +349,10 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
-* `options?` (`Partial<TriangulatedWarpedMap> | undefined`)
-  * Options
+* `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
+* `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
 
 ###### Returns
 
@@ -405,7 +405,7 @@ SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 ###### Type
 
 ```ts
-{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `TriangulatedWarpedMap#listOptions`
@@ -413,7 +413,7 @@ SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 ###### Type
 
 ```ts
-{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `TriangulatedWarpedMap#mapOptions`
@@ -421,7 +421,7 @@ SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
 ###### Type
 
 ```ts
-{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; ... 7 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ resourceResolution?: number | undefined; distortionMeasures?: Array<DistortionMeasure> | undefined; fetchFn?: FetchFn | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `TriangulatedWarpedMap#mixPreviousAndNew(t)`
@@ -626,7 +626,7 @@ Set the internal projection
 
 ###### Parameters
 
-* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
   * the internal projection
 
 ###### Returns
@@ -639,7 +639,7 @@ Set the projection
 
 ###### Parameters
 
-* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
   * the projection
 
 ###### Returns
@@ -1015,7 +1015,7 @@ number
 ###### Type
 
 ```ts
-{name?: string; definition: ProjectionDefinition}
+{id?: string; name?: string; definition: ProjectionDefinition}
 ```
 
 ### `Viewport#rotation`
@@ -1203,7 +1203,7 @@ Static method that creates a Viewport from a size and a polygon in projected geo
 
 A new Viewport object (`Viewport`).
 
-### `new WarpedMap(mapId, georeferencedMap, options)`
+### `new WarpedMap(mapId, georeferencedMap, listOptions, mapOptions)`
 
 Creates an instance of WarpedMap.
 
@@ -1211,10 +1211,10 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
-* `options` (`Partial<WarpedMapOptions> | undefined`)
-  * options
+* `listOptions` (`Partial<WarpedMapListOptions> | undefined`)
+* `mapOptions` (`Partial<WarpedMapOptions> | undefined`)
 
 ###### Returns
 
@@ -1232,6 +1232,16 @@ Creates an instance of WarpedMap.
 AbortController
 ```
 
+### `WarpedMap#applyOptions(animationOptions)`
+
+###### Parameters
+
+* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
+
+###### Returns
+
+`object`.
+
 ### `WarpedMap#clearProjectedTransformerCaches()`
 
 ###### Parameters
@@ -1247,7 +1257,17 @@ There are no parameters.
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn; imageInfoByMapId?: ImageInfoByMapId; gcps: Gcp[]; resourceMask: Ring; transformationType: TransformationType; ... 4 more ...; distortionMeasure: DistortionMeasure | undefined; }
+{
+  fetchFn?: FetchFn
+  gcps: Gcp[]
+  resourceMask: Ring
+  transformationType: TransformationType
+  internalProjection: Projection
+  projection: Projection
+  visible: boolean
+  applyMask: boolean
+  distortionMeasure: DistortionMeasure | undefined
+}
 ```
 
 ### `WarpedMap#destroy()`
@@ -1274,6 +1294,14 @@ There are no parameters.
 
 ```ts
 Array<never>
+```
+
+### `WarpedMap#fetchingImageInfo`
+
+###### Type
+
+```ts
+boolean
 ```
 
 ### `WarpedMap#gcps`
@@ -1369,7 +1397,7 @@ Array<Point>
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...
+{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
 ```
 
 ### `WarpedMap#georeferencedMapOptions`
@@ -1377,7 +1405,7 @@ Array<Point>
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ fetchFn?: FetchFn | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; transformationType?: TransformationType | undefined; ... 4 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `WarpedMap#getDefaultAndGeoreferencedMapOptions()`
@@ -1390,7 +1418,17 @@ There are no parameters.
 
 ###### Returns
 
-`{ fetchFn?: FetchFn; imageInfoByMapId?: ImageInfoByMapId; gcps: Gcp[]; resourceMask: Ring; transformationType: TransformationType; ... 4 more ...; distortionMeasure: DistortionMeasure | undefined; }`.
+`{
+  fetchFn?: FetchFn
+  gcps: Gcp[]
+  resourceMask: Ring
+  transformationType: TransformationType
+  internalProjection: Projection
+  projection: Projection
+  visible: boolean
+  applyMask: boolean
+  distortionMeasure: DistortionMeasure | undefined
+}`.
 
 ### `WarpedMap#getProjectedTransformer(transformationType, partialProjectedGcpTransformerOptions)`
 
@@ -1469,9 +1507,9 @@ Get scale of the warped map, in resource pixels per viewport pixels.
 
 `number`.
 
-### `WarpedMap#hasImageInfo()`
+### `WarpedMap#hasImage()`
 
-Check if this instance has image info
+Check if this instance has parsed image
 
 ###### Parameters
 
@@ -1481,12 +1519,12 @@ There are no parameters.
 
 `boolean`.
 
-### `WarpedMap#imageInfo?`
+### `WarpedMap#image?`
 
 ###### Type
 
 ```ts
-unknown
+Image
 ```
 
 ### `WarpedMap#internalProjection`
@@ -1494,7 +1532,7 @@ unknown
 ###### Type
 
 ```ts
-{name?: string; definition: ProjectionDefinition}
+{id?: string; name?: string; definition: ProjectionDefinition}
 ```
 
 ### `WarpedMap#listOptions`
@@ -1502,28 +1540,20 @@ unknown
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 58 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
-### `WarpedMap#loadImageInfo()`
+### `WarpedMap#loadImage(imagesById)`
 
-Fetch and parse the image info, and generate the image ID
+Load the parsed image from cache, or fetch and parse the image info to create it
 
 ###### Parameters
 
-There are no parameters.
+* `imagesById` (`Map<string, Image>`)
 
 ###### Returns
 
 `Promise<void>`.
-
-### `WarpedMap#loadingImageInfo`
-
-###### Type
-
-```ts
-boolean
-```
 
 ### `WarpedMap#mapId`
 
@@ -1538,7 +1568,7 @@ string
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn | undefined; imageInfoByMapId?: ImageInfoByMapId | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; ... 5 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ fetchFn?: FetchFn | undefined; gcps?: Array<Gcp> | undefined; resourceMask?: Ring | undefined; transformationType?: TransformationType | undefined; ... 4 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `WarpedMap#mixPreviousAndNew(t)`
@@ -1567,7 +1597,17 @@ false
 ###### Type
 
 ```ts
-{ fetchFn?: FetchFn; imageInfoByMapId?: ImageInfoByMapId; gcps: Gcp[]; resourceMask: Ring; transformationType: TransformationType; ... 4 more ...; distortionMeasure: DistortionMeasure | undefined; }
+{
+  fetchFn?: FetchFn
+  gcps: Gcp[]
+  resourceMask: Ring
+  transformationType: TransformationType
+  internalProjection: Projection
+  projection: Projection
+  visible: boolean
+  applyMask: boolean
+  distortionMeasure: DistortionMeasure | undefined
+}
 ```
 
 ### `WarpedMap#overviewFetchableTilesForViewport`
@@ -1594,14 +1634,6 @@ Array<never>
 }
 ```
 
-### `WarpedMap#parsedImage?`
-
-###### Type
-
-```ts
-Image
-```
-
 ### `WarpedMap#previousDistortionMeasure?`
 
 ###### Type
@@ -1615,7 +1647,7 @@ Image
 ###### Type
 
 ```ts
-{name?: string; definition: ProjectionDefinition}
+{id?: string; name?: string; definition: ProjectionDefinition}
 ```
 
 ### `WarpedMap#previousTransformationType`
@@ -1791,7 +1823,7 @@ Map<TransformationType, Map<string, ProjectedGcpTransformer>>
 ###### Type
 
 ```ts
-{name?: string; definition: ProjectionDefinition}
+{id?: string; name?: string; definition: ProjectionDefinition}
 ```
 
 ### `WarpedMap#resetForViewport()`
@@ -2007,16 +2039,6 @@ Set the internal projection
 
 * `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
 * `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
-* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
-
-###### Returns
-
-`object`.
-
-### `WarpedMap#setOptions(animationOptions)`
-
-###### Parameters
-
 * `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
 
 ###### Returns
@@ -2346,7 +2368,17 @@ There are no parameters.
 
 ###### Returns
 
-`{ fetchFn?: FetchFn; imageInfoByMapId?: ImageInfoByMapId; gcps: Gcp[]; resourceMask: Ring; transformationType: TransformationType; ... 4 more ...; distortionMeasure: DistortionMeasure | undefined; }`.
+`{
+  fetchFn?: FetchFn
+  gcps: Gcp[]
+  resourceMask: Ring
+  transformationType: TransformationType
+  internalProjection: Projection
+  projection: Projection
+  visible: boolean
+  applyMask: boolean
+  distortionMeasure: DistortionMeasure | undefined
+}`.
 
 ### `new WarpedMapEvent(type, data)`
 
@@ -2384,7 +2416,8 @@ Creates an instance of a WarpedMapList
 * `warpedMapFactory` (`(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapOptions>
   ) => W`)
   * Factory function for creating WarpedMap objects
 * `options?` (`Partial<WarpedMapListOptions> | undefined`)
@@ -2408,39 +2441,59 @@ Creates an instance of a WarpedMapList
 
 `void`.
 
-### `WarpedMapList#addGeoreferenceAnnotation(annotation)`
+### `WarpedMapList#addGeoreferenceAnnotation(annotation, mapOptions)`
 
 Parses an annotation and adds its georeferenced map to this list
 
 ###### Parameters
 
 * `annotation` (`unknown`)
+  * Annotation
+* `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
 
-### `WarpedMapList#addGeoreferencedMap(georeferencedMap)`
+### `WarpedMapList#addGeoreferencedMap(georeferencedMap, mapOptions)`
 
 Adds a georeferenced map to this list
 
 ###### Parameters
 
 * `georeferencedMap` (`unknown`)
+  * Georeferenced Map
+* `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
+  * Map options
 
 ###### Returns
 
 Map ID of the map that was added (`Promise<string>`).
 
-### `WarpedMapList#addGeoreferencedMapInternal(georeferencedMap)`
+### `WarpedMapList#addGeoreferencedMapInternal(georeferencedMap, mapOptions)`
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
 
 ###### Returns
 
 `Promise<string>`.
+
+### `WarpedMapList#addImageInfos(imageInfos)`
+
+Adds image informations, parses them to images and adds them to the image cache
+
+###### Parameters
+
+* `imageInfos` (`Array<unknown>`)
+  * Image informations
+
+###### Returns
+
+Image IDs of the image informations that were added (`Array<string>`).
 
 ### `WarpedMapList#addToOrUpdateRtree(warpedMap)`
 
@@ -2647,13 +2700,13 @@ There are no parameters.
 
 ###### Returns
 
-`{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 59 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+`{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 58 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapList#getOrComputeMapId(georeferencedMap)`
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -2702,7 +2755,7 @@ The selectionOptions allow a.o. to:
 
 WarpedMap instances (`Iterable<W>`).
 
-### `WarpedMapList#imageInfoLoaded(mapId)`
+### `WarpedMapList#imageLoaded(mapId)`
 
 ###### Parameters
 
@@ -2711,6 +2764,14 @@ WarpedMap instances (`Iterable<W>`).
 ###### Returns
 
 `void`.
+
+### `WarpedMapList#imagesById`
+
+###### Type
+
+```ts
+Map<string, Image>
+```
 
 ### `WarpedMapList#internalSetMapsOptionsByMapId(mapOptionsByMapId, listOptions, animationOptions)`
 
@@ -2820,7 +2881,7 @@ Map ID of the removed map, or an error (`Promise<string | Error | undefined>`).
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -2992,7 +3053,8 @@ Note: Map-specific options set here will be passed to newly added maps.
 (
   mapId: string,
   georeferencedMap: GeoreferencedMap,
-  options?: Partial<WarpedMapOptions>
+  listOptions?: Partial<WarpedMapListOptions>,
+  mapOptions?: Partial<WarpedMapOptions>
 ) => W
 ```
 
@@ -3027,9 +3089,8 @@ SpecificWarpedMapListOptions & Partial<WebGL2WarpedMapOptions>
     init?: RequestInit
   ) => Promise<Response>`)
 * `gcps` (`Array<Gcp>`)
-* `imageInfoByMapId?` (`Map<string, unknown>`)
-* `internalProjection` (`{name?: string; definition: ProjectionDefinition}`)
-* `projection` (`{name?: string; definition: ProjectionDefinition}`)
+* `internalProjection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
+* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 * `resourceMask` (`Array<Point>`)
 * `transformationType` (`  | 'straight'
     | 'helmert'
@@ -3053,7 +3114,8 @@ There are no parameters.
 `(
   mapId: string,
   georeferencedMap: GeoreferencedMap,
-  options?: Partial<WarpedMapOptions>
+  listOptions?: Partial<WarpedMapListOptions>,
+  mapOptions?: Partial<WarpedMapOptions>
 ) => WarpedMap`.
 
 ### `new IntArrayRenderer(getImageData, getImageDataValue, getImageDataSize, options)`
@@ -3414,7 +3476,7 @@ false
 WebGL2RenderingContext
 ```
 
-### `WebGL2Renderer#imageInfoLoaded(event)`
+### `WebGL2Renderer#imageLoaded(event)`
 
 ###### Parameters
 
@@ -3493,7 +3555,7 @@ WebGLProgram
 ###### Type
 
 ```ts
-{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 59 more ...; distortionMeasure?: DistortionMeasure | undefined; }
+{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 58 more ...; distortionMeasure?: DistortionMeasure | undefined; }
 ```
 
 ### `WebGL2Renderer#pointsProgram`
@@ -3745,7 +3807,7 @@ DebouncedFunc<() => void>
 
 `void`.
 
-### `new WebGL2WarpedMap(mapId, georeferencedMap, gl, mapProgram, linesProgram, pointsProgram, options)`
+### `new WebGL2WarpedMap(mapId, georeferencedMap, gl, mapProgram, linesProgram, pointsProgram, listOptions, mapOptions)`
 
 Creates an instance of WebGL2WarpedMap.
 
@@ -3753,7 +3815,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: ({ id: string; type: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ id: string; typ...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context
@@ -3761,8 +3823,8 @@ Creates an instance of WebGL2WarpedMap.
   * WebGL program for map
 * `linesProgram` (`WebGLProgram`)
 * `pointsProgram` (`WebGLProgram`)
-* `options?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * WarpedMapOptions
+* `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
+* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
 
 ###### Returns
 
@@ -3783,6 +3845,16 @@ Add cached tile to the textures of this map and update textures
 ###### Returns
 
 `void`.
+
+### `WebGL2WarpedMap#applyOptions(animationOptions)`
+
+###### Parameters
+
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+
+###### Returns
+
+`object`.
 
 ### `WebGL2WarpedMap#cachedTilesByTileKey`
 
@@ -3879,7 +3951,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
 ### `WebGL2WarpedMap#getCachedTilesAtOtherScaleFactors(tile)`
@@ -3905,20 +3977,20 @@ There are no parameters.
 WebGL2RenderingContext
 ```
 
+### `WebGL2WarpedMap#image`
+
+###### Type
+
+```ts
+Image
+```
+
 ### `WebGL2WarpedMap#imageId`
 
 ###### Type
 
 ```ts
 string
-```
-
-### `WebGL2WarpedMap#imageInfo`
-
-###### Type
-
-```ts
-unknown
 ```
 
 ### `WebGL2WarpedMap#initializeWebGL(mapProgram, linesProgram, pointsProgram)`
@@ -3970,7 +4042,7 @@ null
 ###### Type
 
 ```ts
-{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
 ### `WebGL2WarpedMap#mapOptions`
@@ -3978,7 +4050,7 @@ null
 ###### Type
 
 ```ts
-{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...
+{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...
 ```
 
 ### `WebGL2WarpedMap#mapProgram`
@@ -4005,14 +4077,6 @@ null
 SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions
-```
-
-### `WebGL2WarpedMap#parsedImage`
-
-###### Type
-
-```ts
-Image
 ```
 
 ### `WebGL2WarpedMap#pointGroups`
@@ -4080,16 +4144,6 @@ There are no parameters.
 ###### Returns
 
 `void`.
-
-### `WebGL2WarpedMap#setOptions(animationOptions)`
-
-###### Parameters
-
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-
-###### Returns
-
-`object`.
 
 ### `WebGL2WarpedMap#setPointGroups()`
 

@@ -10,7 +10,7 @@ export enum WarpedMapEventType {
   WARPEDMAPLEFT = 'warpedmapleft',
 
   // WarpedMap > WarpedMapList > Renderer > ...
-  IMAGEINFOLOADED = 'imageinfoloaded',
+  IMAGELOADED = 'imageloaded',
 
   // Tile > TileCache
   TILEFETCHED = 'tilefetched',

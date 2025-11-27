@@ -21,7 +21,9 @@ import {
   mergeOptions,
   mergeOptionsUnlessUndefined,
   objectDifference,
-  omit
+  omit,
+  mergePartialOptions,
+  mergeTwoOptionsUnlessUndefined
 } from '@allmaps/stdlib'
 
 import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
@@ -44,6 +46,7 @@ import type {
 import type {
   AnimationOptions,
   AnimationOptionsInternal,
+  WarpedMapListOptions,
   WarpedMapOptions
 } from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
@@ -67,7 +70,6 @@ export const DEFAULT_WARPED_MAP_OPTIONS = {
 
 const DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
   minOffsetRatio: 0.01,
-  minOffsetDistance: 4,
   maxDepth: 5,
   differentHandedness: true
 }
@@ -80,8 +82,9 @@ export function createWarpedMapFactory() {
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options?: Partial<WarpedMapOptions>
-  ) => new WarpedMap(mapId, georeferencedMap, options)
+    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapOptions>
+  ) => new WarpedMap(mapId, georeferencedMap, listOptions, mapOptions)
 }
 
 /**
@@ -95,9 +98,8 @@ export function createWarpedMapFactory() {
  * @param listOptions - Options from warped map list
  * @param mapOptions - Options specific to this map
  * @param options - Result of merging default, georeferenced map, list and specific map options
- * @param imageInfo - Image information
- * @param parsedImage - ID of the image
- * @param loadingImageInfo - Whether the image information is loading
+ * @param fetchingImageInfo - Whether the image information is loading
+ * @param image - Parsed IIIF image
  * @param mixed - Wether the options were last set by mixing previous and new properties, i.e. when rerendering during an ongoing animation
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
@@ -159,13 +161,12 @@ export class WarpedMap extends EventTarget {
 
   defaultOptions!: WarpedMapOptions
   georeferencedMapOptions: Partial<WarpedMapOptions>
-  listOptions: Partial<WarpedMapOptions>
+  listOptions: Partial<WarpedMapListOptions>
   mapOptions: Partial<WarpedMapOptions>
   options!: WarpedMapOptions
 
-  imageInfo?: unknown
-  parsedImage?: Image
-  loadingImageInfo: boolean
+  fetchingImageInfo: boolean
+  image?: Image
 
   protected abortController?: AbortController
 
@@ -256,7 +257,8 @@ export class WarpedMap extends EventTarget {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    options: Partial<WarpedMapOptions> = {}
+    listOptions: Partial<WarpedMapListOptions> = {},
+    mapOptions: Partial<WarpedMapOptions> = {}
   ) {
     super()
 
@@ -270,10 +272,10 @@ export class WarpedMap extends EventTarget {
 
     this.projectedTransformerCache = new Map()
     this.projectedTransformerDoubleCache = new Map()
-    this.loadingImageInfo = false
+    this.fetchingImageInfo = false
 
-    this.mapOptions = {}
-    this.listOptions = options
+    this.mapOptions = mapOptions
+    this.listOptions = listOptions
     this.georeferencedMapOptions = {
       transformationType: georeferencedMap.transformation
         ?.type as TransformationType,
@@ -282,7 +284,7 @@ export class WarpedMap extends EventTarget {
       resourceMask: georeferencedMap.resourceMask
     }
     this.setDefaultOptions()
-    this.setOptions({ init: true })
+    this.applyOptions({ init: true })
   }
 
   /**
@@ -400,13 +402,18 @@ export class WarpedMap extends EventTarget {
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
+    const optionKeysPossiblyChanged: string[] = []
     if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
       this.mapOptions = mergeOptions(this.mapOptions, mapOptions)
+      optionKeysPossiblyChanged.push(...Object.keys(mapOptions))
     }
     if (listOptions !== undefined && Object.keys(listOptions).length > 0) {
       this.listOptions = mergeOptions(this.listOptions, listOptions)
+      optionKeysPossiblyChanged.push(...Object.keys(listOptions))
     }
-    return this.setOptions(animationOptions)
+    return this.applyOptions(
+      mergePartialOptions(animationOptions, { optionKeysPossiblyChanged })
+    )
   }
 
   setListOptions(
@@ -420,30 +427,31 @@ export class WarpedMap extends EventTarget {
     this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
-  setOptions(
+  protected applyOptions(
     animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
-    const previousOptions = cloneDeep(this.options || {})
-
-    this.options = mergeOptionsUnlessUndefined(
+    const options = mergeOptionsUnlessUndefined(
       this.defaultOptions,
       this.georeferencedMapOptions,
       this.listOptions,
       this.mapOptions
     )
 
-    let changedOptions = objectDifference(this.options, previousOptions)
-
-    if (animationOptions?.optionKeysToOmit) {
-      // If some options should be omitted from changing,
-      // like when setting all options exect those that should be animated,
-      // then omit those options and set the options accordingly
-      changedOptions = omit(changedOptions, animationOptions?.optionKeysToOmit)
-      this.options = mergeOptionsUnlessUndefined(
-        previousOptions,
-        changedOptions
+    // If some options should be omitted from changing,
+    // like when setting all options exept those that should be animated,
+    // then omit those options and set the options accordingly
+    const optionKeysToConsider =
+      animationOptions?.optionKeysPossiblyChanged?.filter((k) =>
+        animationOptions.optionKeysToOmit
+          ? !animationOptions.optionKeysToOmit.includes(k)
+          : true
       )
-    }
+    const changedOptions = objectDifference(
+      options,
+      this.options,
+      optionKeysToConsider
+    )
+    this.options = mergeTwoOptionsUnlessUndefined(this.options, changedOptions)
 
     if (animationOptions?.init) {
       // On init we should set the properties in a specific order
@@ -728,54 +736,45 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Check if this instance has image info
+   * Check if this instance has parsed image
    *
    * @returns
    */
-  hasImageInfo(): this is WarpedMapWithImageInfo {
-    return (
-      (this.imageInfo !== undefined ||
-        this.options.imageInfoByMapId?.has(this.mapId)) ??
-      false
-    )
+  hasImage(): this is WarpedMapWithImage {
+    return this.image !== undefined
   }
 
   /**
-   * Fetch and parse the image info, and generate the image ID
+   * Load the parsed image from cache, or fetch and parse the image info to create it
    *
    * @returns
    */
-  async loadImageInfo(): Promise<void> {
+  async loadImage(imagesById: Map<string, Image>): Promise<void> {
     try {
-      this.loadingImageInfo = true
-      const imageUri = this.georeferencedMap.resource.id
+      const resourceId = this.georeferencedMap.resource.id
 
-      let imageInfo
-
-      if (this.options.imageInfoByMapId?.get(imageUri)) {
-        imageInfo = this.options.imageInfoByMapId.get(imageUri)
+      if (imagesById.has(resourceId)) {
+        this.image = imagesById.get(resourceId)!
       } else {
+        this.fetchingImageInfo = true
         this.abortController = new AbortController()
         const signal = this.abortController.signal
-        imageInfo = await fetchImageInfo(
-          imageUri,
+        const imageInfo = await fetchImageInfo(
+          resourceId,
           { signal },
           this.options.fetchFn
         )
         this.abortController = undefined
-
-        this.options.imageInfoByMapId?.set(imageUri, imageInfo)
+        this.image = Image.parse(imageInfo)
+        imagesById.set(resourceId, this.image)
       }
 
-      this.imageInfo = imageInfo
-      this.parsedImage = Image.parse(this.imageInfo)
-
-      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED))
+      this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGELOADED))
     } catch (err) {
-      this.loadingImageInfo = false
+      this.fetchingImageInfo = false
       throw err
     } finally {
-      this.loadingImageInfo = false
+      this.fetchingImageInfo = false
     }
   }
 
@@ -949,9 +948,9 @@ export class WarpedMap extends EventTarget {
 /**
  * Class for warped maps with image ID and parsed IIIF image.
  */
-export class WarpedMapWithImageInfo extends WarpedMap {
+export class WarpedMapWithImage extends WarpedMap {
   declare imageId: string
-  declare parsedImage: Image
+  declare image: Image
 
   constructor(
     mapId: string,
