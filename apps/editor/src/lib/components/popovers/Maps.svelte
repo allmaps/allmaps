@@ -16,6 +16,7 @@
 
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import Confirm from '$lib/components/Confirm.svelte'
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
@@ -26,10 +27,17 @@
   import EditResourceMask from '$lib/components/modals/EditResourceMask.svelte'
 
   import type { DbMap, ResourceMask, GCPs } from '$lib/types/maps.js'
+  import type { Env } from '$lib/types/env.js'
 
   const mapsState = getMapsState()
   const uiState = getUiState()
   const projectionsState = getProjectionsState()
+  const varsState = getVarsState<Env>()
+
+  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
 
   let mapCount = $derived(
     mapsState.maps ? Object.values(mapsState.maps).length : 0
@@ -158,6 +166,8 @@
                 <EditResourceMask
                   bind:open={uiState.modalOpen.editResourceMask}
                   map={toGeoreferencedMap(
+                    apiBaseUrl,
+                    annotationsApiBaseUrl,
                     map,
                     projectionsState.projectionsById
                   )}
@@ -287,7 +297,12 @@
               <!-- TODO: what happens if ShareDB updates the map while editing? -->
               <EditGcps
                 bind:open={uiState.modalOpen.editGcps}
-                map={toGeoreferencedMap(map, projectionsState.projectionsById)}
+                map={toGeoreferencedMap(
+                  apiBaseUrl,
+                  annotationsApiBaseUrl,
+                  map,
+                  projectionsState.projectionsById
+                )}
                 onsubmit={(gcps) => handleGcpsEdited(map.id, gcps)}
               />
             {/if}

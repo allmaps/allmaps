@@ -50,13 +50,13 @@
   "dependencies": {
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@allmaps/warpedmaplayer": "workspace:^",
     "lodash-es": "^4.17.21",
     "ol": "^8.2.0"
   },
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
-    "@allmaps/warpedmaplayer": "workspace:^",
     "@types/eslint": "^8.56.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

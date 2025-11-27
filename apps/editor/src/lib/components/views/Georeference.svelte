@@ -17,6 +17,7 @@
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getViewportsState } from '$lib/state/viewports.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import {
     getNavPlaceViewport,
@@ -62,6 +63,7 @@
     RemoveGcpEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
+  import type { Env } from '$lib/types/env.js'
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -69,6 +71,7 @@
   const urlState = getUrlState()
   const viewportsState = getViewportsState()
   const projectionsState = getProjectionsState()
+  const varsState = getVarsState<Env>()
 
   let resourceMap = $state.raw<MapLibreMap>()
   let geoMap = $state.raw<MapLibreMap>()
@@ -76,8 +79,14 @@
   let resourceTransformer = $state.raw<GcpTransformer>()
   let resourceWarpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
 
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
+
   let mapIds = $derived(
-    mapsState.activeMapId ? [getFullMapId(mapsState.activeMapId)] : []
+    mapsState.activeMapId
+      ? [getFullMapId(annotationsApiBaseUrl, mapsState.activeMapId)]
+      : []
   )
 
   let resourceDraw: TerraDraw | undefined

@@ -21,7 +21,7 @@ export const Presentation3ImageService2Schema = z.union([
 export const Presentation3ImageService3Schema = z.object({
   id: z.string().url(),
   type: ImageServiceTypesSchema,
-  profile: z.enum(complianceLevels)
+  profile: z.enum(complianceLevels).catch('level0')
 })
 
 export const ImageService3Schema = z.union([

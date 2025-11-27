@@ -37,6 +37,8 @@ export class UiState {
 
   #elementSizes = $state<ElementSizes>(defaultElementSizes)
 
+  #mapsScrollTop = $state(0)
+
   get color() {
     return this.#color
   }
@@ -74,6 +76,14 @@ export class UiState {
 
   set elementSizes(sizes: ElementSizes) {
     this.#elementSizes = sizes
+  }
+
+  get mapsScrollTop() {
+    return this.#mapsScrollTop
+  }
+
+  set mapsScrollTop(scrollTop: number) {
+    this.#mapsScrollTop = scrollTop
   }
 }
 

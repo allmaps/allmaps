@@ -1,3 +1,4 @@
+// @ts-check
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import tailwindcss from '@tailwindcss/vite'
@@ -11,6 +12,7 @@ const isDevelop = import.meta.env.DEV
 const branch = isDevelop ? 'develop' : 'main'
 const editLinkBaseUrl = `https://github.com/allmaps/allmaps/tree/${branch}/apps/homepage/`
 
+// https://astro.build/config
 export default defineConfig({
   server: { port: ports.homepage, host: true },
   devToolbar: {
@@ -106,7 +108,6 @@ export default defineConfig({
     }),
     svelte()
   ],
-
   vite: {
     ssr: {
       noExternal: ['maplibre-gl', 'maplibre-contour']

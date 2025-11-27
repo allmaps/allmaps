@@ -1,0 +1,202 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/museum/501404/manifest.json",
+  "type": "Manifest",
+  "label": {
+    "none": [
+      "Met de hand gekleurde kaart van Nieuw Nederland, Nieuw Engeland en een deel van Virginia"
+    ]
+  },
+  "summary": { "none": ["landkaart"] },
+  "metadata": [
+    {
+      "label": { "none": ["Creator"] },
+      "value": { "none": ["Visscher, Nicolaas Jansz."] }
+    },
+    {
+      "label": { "none": ["Institution name"] },
+      "value": { "none": ["Het Scheepvaartmuseum"] }
+    }
+  ],
+  "start": {
+    "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/501404/canvas/p1",
+    "type": "Canvas"
+  },
+  "items": [
+    {
+      "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902/canvas/p1",
+      "type": "Canvas",
+      "label": { "none": ["Image (1)"] },
+      "height": 1710,
+      "width": 2000,
+      "items": [
+        {
+          "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902/page/p1/1",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902/annotation/p1-image",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902/full/max/0/default.jpg",
+                "type": "Image",
+                "format": "image/png",
+                "height": 1710,
+                "width": 2000,
+                "service": [
+                  {
+                    "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902",
+                    "profile": "level3",
+                    "type": "ImageService3"
+                  }
+                ]
+              },
+              "target": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902/canvas/p1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291/canvas/p2",
+      "type": "Canvas",
+      "label": { "none": ["Image (2)"] },
+      "height": 1712,
+      "width": 2000,
+      "items": [
+        {
+          "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291/page/p2/2",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291/annotation/p2-image",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291/full/max/0/default.jpg",
+                "type": "Image",
+                "format": "image/png",
+                "height": 1712,
+                "width": 2000,
+                "service": [
+                  {
+                    "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291",
+                    "profile": "level3",
+                    "type": "ImageService3"
+                  }
+                ]
+              },
+              "target": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291/canvas/p2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681/canvas/p3",
+      "type": "Canvas",
+      "label": { "none": ["Image (3)"] },
+      "height": 1338,
+      "width": 2000,
+      "items": [
+        {
+          "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681/page/p3/3",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681/annotation/p3-image",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681/full/max/0/default.jpg",
+                "type": "Image",
+                "format": "image/png",
+                "height": 1338,
+                "width": 2000,
+                "service": [
+                  {
+                    "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681",
+                    "profile": "level3",
+                    "type": "ImageService3"
+                  }
+                ]
+              },
+              "target": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681/canvas/p3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232/canvas/p4",
+      "type": "Canvas",
+      "label": { "none": ["Image (4)"] },
+      "height": 1004,
+      "width": 2000,
+      "items": [
+        {
+          "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232/page/p4/4",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232/annotation/p4-image",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232/full/max/0/default.jpg",
+                "type": "Image",
+                "format": "image/png",
+                "height": 1004,
+                "width": 2000,
+                "service": [
+                  {
+                    "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232",
+                    "profile": "level3",
+                    "type": "ImageService3"
+                  }
+                ]
+              },
+              "target": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980232/canvas/p4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351/canvas/p5",
+      "type": "Canvas",
+      "label": { "none": ["Image (5)"] },
+      "height": 1681,
+      "width": 2000,
+      "items": [
+        {
+          "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351/page/p5/5",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351/annotation/p5-image",
+              "type": "Annotation",
+              "motivation": "painting",
+              "body": {
+                "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351/full/max/0/default.jpg",
+                "type": "Image",
+                "format": "image/png",
+                "height": 1681,
+                "width": 2000,
+                "service": [
+                  {
+                    "id": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351",
+                    "profile": "level3",
+                    "type": "ImageService3"
+                  }
+                ]
+              },
+              "target": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351/canvas/p5"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

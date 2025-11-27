@@ -3,6 +3,7 @@
 
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import {
     getAnnotationUrl,
@@ -17,8 +18,17 @@
   import ExportUrl from '$lib/components/ExportUrl.svelte'
   import Cloud from '$lib/components/Cloud.svelte'
 
+  import type { Env } from '$lib/types/env.js'
+
   const scopeState = getScopeState()
   const uiState = getUiState()
+  const varsState = getVarsState<Env>()
+
+  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
+  const tileServerBaseUrl = varsState.get('PUBLIC_ALLMAPS_TILE_SERVER_URL')
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
 </script>
 
 <div class="flex flex-col gap-4">
@@ -32,14 +42,18 @@
 
     {#if scopeState.allmapsId}
       <ExportUrl
-        url={getViewerUrl(scopeState.allmapsId)}
+        url={getViewerUrl(
+          viewerBaseUrl,
+          annotationsApiBaseUrl,
+          scopeState.allmapsId
+        )}
         label="View in Allmaps Viewer"
       >
         <!-- <p>View the georeferenced map</p> -->
       </ExportUrl>
 
       <ExportUrl
-        url={getAnnotationUrl(scopeState.allmapsId)}
+        url={getAnnotationUrl(annotationsApiBaseUrl, scopeState.allmapsId)}
         label="Georeference Annotation"
       >
         {#snippet header()}
@@ -59,7 +73,11 @@
       </ExportUrl>
 
       <ExportUrl
-        url={getXyzTilesUrl(scopeState.allmapsId, uiState.retinaTiles)}
+        url={getXyzTilesUrl(
+          tileServerBaseUrl,
+          scopeState.allmapsId,
+          uiState.retinaTiles
+        )}
         label="XYZ map tiles"
       >
         {#snippet header()}

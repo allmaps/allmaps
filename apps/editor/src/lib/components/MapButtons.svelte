@@ -6,11 +6,14 @@
   } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import { Popover } from '@allmaps/components'
 
   import MapSettings from '$lib/components/popovers/MapSettings.svelte'
   import Geocoder from '$lib/components/popovers/Geocoder.svelte'
+
+  import type { Env } from '$lib/types/env.js'
 
   type Props = {
     zoomToExtentEnabled: boolean
@@ -21,9 +24,10 @@
   let { zoomToExtentEnabled, geocoderEnabled, mapSettingsEnabled }: Props =
     $props()
 
-  // let geocoderOpen = $state(false)
-
   const uiState = getUiState()
+  const varsState = getVarsState<Env>()
+
+  const geocodeEarthKey = varsState.get('PUBLIC_GEOCODE_EARTH_KEY')
 
   function handleZoomToExtentClick() {
     uiState.dispatchZoomToExtent()
@@ -44,17 +48,25 @@
     {#snippet contents()}<MapSettings />{/snippet}
   </Popover>
 
-  <Popover disabled={!geocoderEnabled} bind:open={uiState.popoverOpen.geocoder}>
-    {#snippet button()}
-      <div class="size-8 rounded-full bg-white p-1.5 shadow-md transition-all">
-        <MagnifyingGlassIcon size="100%" weight="regular" />
-      </div>
-    {/snippet}
+  {#if geocodeEarthKey}
+    <Popover
+      disabled={!geocoderEnabled}
+      bind:open={uiState.popoverOpen.geocoder}
+    >
+      {#snippet button()}
+        <div
+          class="size-8 rounded-full bg-white p-1.5 shadow-md transition-all"
+        >
+          <MagnifyingGlassIcon size="100%" weight="regular" />
+        </div>
+      {/snippet}
 
-    {#snippet contents()}<Geocoder
-        bind:open={uiState.popoverOpen.geocoder}
-      />{/snippet}
-  </Popover>
+      {#snippet contents()}<Geocoder
+          {geocodeEarthKey}
+          bind:open={uiState.popoverOpen.geocoder}
+        />{/snippet}
+    </Popover>
+  {/if}
 
   <button
     disabled={!zoomToExtentEnabled}

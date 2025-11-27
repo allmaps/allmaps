@@ -57,8 +57,6 @@ import type {
   SetResourceCrs
 } from '$lib/types/events.js'
 
-import { PUBLIC_ALLMAPS_API_WS_URL } from '$env/static/public'
-
 const MAPS_KEY = Symbol('maps')
 
 export class MapsState extends MapsEventTarget {
@@ -125,6 +123,7 @@ export class MapsState extends MapsEventTarget {
   })
 
   constructor(
+    apiWsUrl: string,
     sourceState: SourceState,
     errorState: ErrorState,
     mapsHistoryState: MapsHistoryState
@@ -134,7 +133,7 @@ export class MapsState extends MapsEventTarget {
     this.#errorState = errorState
     this.#mapsHistoryState = mapsHistoryState
 
-    this.#rws = new ReconnectingWebSocket(PUBLIC_ALLMAPS_API_WS_URL, [], {
+    this.#rws = new ReconnectingWebSocket(apiWsUrl, [], {
       maxEnqueuedMessages: 0
     })
 
@@ -724,13 +723,14 @@ export class MapsState extends MapsEventTarget {
 }
 
 export function setMapsState(
+  apiWsUrl: string,
   sourceState: SourceState,
   errorState: ErrorState,
   mapsHistoryState: MapsHistoryState
 ) {
   return setContext(
     MAPS_KEY,
-    new MapsState(sourceState, errorState, mapsHistoryState)
+    new MapsState(apiWsUrl, sourceState, errorState, mapsHistoryState)
   )
 }
 

@@ -13,6 +13,7 @@
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import {
     gotoRoute,
@@ -21,13 +22,19 @@
   } from '$lib/shared/router.js'
   import { getAnnotationUrl, getViewerUrl } from '$lib/shared/urls.js'
 
-  import { PUBLIC_EXAMPLES_API_URL } from '$env/static/public'
-
   import type { Example } from '$lib/types/shared.js'
+  import type { Env } from '$lib/types/env.js'
 
   const scopeState = getScopeState()
   const uiState = getUiState()
   const urlState = getUrlState()
+  const varsState = getVarsState<Env>()
+
+  const examplesApiUrl = varsState.get('PUBLIC_EXAMPLES_API_URL')
+  const annotationsApiBaseUrl = varsState.get(
+    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
+  )
+  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
 
   let value = $state('')
 
@@ -46,9 +53,9 @@
 
   async function handleRandomIiifResource() {
     try {
-      const fetchedExamples = (await fetch(
-        `${PUBLIC_EXAMPLES_API_URL}/?count=1`
-      ).then((response) => response.json())) as Example[]
+      const fetchedExamples = (await fetch(`${examplesApiUrl}/?count=1`).then(
+        (response) => response.json()
+      )) as Example[]
 
       const url = fetchedExamples[0].manifestId
 
@@ -64,13 +71,17 @@
 
   function handleCopyGeoreferenceAnnotationUrlToClipboard() {
     if (scopeState.allmapsId) {
-      navigator.clipboard.writeText(getAnnotationUrl(scopeState.allmapsId))
+      navigator.clipboard.writeText(
+        getAnnotationUrl(annotationsApiBaseUrl, scopeState.allmapsId)
+      )
     }
   }
 
   function handleCopyViewerUrlToClipboard() {
     if (scopeState.allmapsId) {
-      navigator.clipboard.writeText(getViewerUrl(scopeState.allmapsId))
+      navigator.clipboard.writeText(
+        getViewerUrl(viewerBaseUrl, annotationsApiBaseUrl, scopeState.allmapsId)
+      )
     }
   }
 

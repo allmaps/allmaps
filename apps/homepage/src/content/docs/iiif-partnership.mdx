@@ -1,0 +1,104 @@
+---
+title: Allmaps - IIIF Partnership
+editUrl: false
+lastUpdated: false
+template: splash
+type: empty
+---
+
+import BrochurePage from '../../components/brochure/BrochurePage.svelte'
+import BrochureTitle from '../../components/brochure/BrochureTitle.svelte'
+import BrochureCards from '../../components/brochure/BrochureCards.svelte'
+import BrochureBenefits from '../../components/brochure/BrochureBenefits.svelte'
+import BrochureSection from '../../components/brochure/BrochureSection.svelte'
+
+import '../../css/brochure.css'
+
+{/* TODO:
+  - OpenGraph image
+*/}
+
+<BrochurePage>
+  <BrochureTitle client:load />
+</BrochurePage>
+<BrochurePage>
+  <BrochureCards client:load />
+</BrochurePage>
+<BrochurePage>
+  <BrochureBenefits />
+</BrochurePage>
+
+<BrochureSection colorClasses="bg-blue/5 [&_h2]:text-blue [&_h3]:text-blue [&_h4]:text-blue [&_a]:text-blue">
+## Frequently Asked Questions
+
+### Why Allmaps?
+
+Digitized maps draw the interest of patrons. Maps are best found *by location* and preferably studied *in comparison to other maps*. While many collections include maps, few institutions have the in-house GIS expertise required to improve their accessibility.
+
+Allmaps is *IIIF-first* and does not require specific infrastructure or expertise to turn digitized images into interactive maps. In fact, patrons are encouraged to do this by themselves. The only institutional requirement is the IIIF Image API, and, preferably, the IIIF Presentation API.
+
+Since Allmaps only generates lightweight annotations and no heavy derivatives (see below), it becomes much easier to share maps and to create collective portals to search across collections. For advanced use cases, it offers tooling to analyse and compare maps, or to import them into GIS applications.
+
+Alternative options rely on expert knowledge, generate derivatives, are closed source, or do not grant access to data. But supporting Allmaps is by no means exclusive and can be complemented with other workflows depending on institutional needs to patrons’ preferences.
+
+Allmaps is purposefully not called a platform, since platforms are easy to jump on but difficult to jump off. By focusing on modularity and data sovereignty, Allmaps has been developed as an open and extendable ecosystem.
+
+### What is georeferencing?
+
+Georeferencing relates a couple of points (pixels) in an image to geospatial coordinates. These are called *ground control points*, or GCPs. The process often also includes cropping the image to the part containing the map. This is called the *mask*.
+
+Based on three or more control points, it’s possible to compute all the other points in the image. This can be used to convert between pixels and geospatial coordinates.
+
+Georeferencing usually results in new versions (or derivatives) of the original image. Allmaps stores the control points and mask in a light-weight and standardized Web Annotation, and produces derivatives on the fly.
+
+### Why the IIIF-Allmaps Partnership?
+
+One of the benefits of IIIF is the ability to share codebases across implementations. Over the past ten years many open source tools developed by institutions and commercial partners have seen uptake within the IIIF Community at large. The sustainability of such tools has often been a challenge. Through the introduction of membership top-ups, the IIIF Consortium aims to play a more active role in organizing durable support for open source projects that benefit the community. It also promotes IIIF membership by offering dedicated services in return.
+
+For Allmaps, the partnership marks the start of a new phase. While the project has been generously supported by various institutions through a series of grants, structural maintenance has been a concern as more and more institutions and individuals rely on the ecosystem. Securing its open source and open data character, the Allmaps team is keen on developing a funding structure that offers dedicated services to partners without compromising its core values and creating too much overhead. The partnership with the IIIF Consortium is the logical outcome of this process.
+
+### How is Allmaps organized?
+
+Allmaps is a collaboration between Delft University of Technology Library and independent developer and cartographer Bert Spaan; both based in the Netherlands. Institutional partners and independent contractors have significantly contributed since its founding in 2021\. Allmaps is currently establishing a legal entity for its maintenance and further development, while preserving the commitment to open data and open source. This process is monitored by the Allmaps Advisory Board which will also represent the interests of other IIIF Consortium members.
+
+The Advisory Board is the first step in formalizing the governance structure of Allmaps, and will be filled with single representatives from each Innovator, Glen Robson from the IIIF Consortium, Jules Schoonman from TU Delft, and Bert Spaan. The board will also include representatives from other long-term institutional partners of Allmaps who are not (yet) members of the IIIF Consortium. The Advisory Board will meet twice annually.
+
+### What’s on the Allmaps roadmap?
+
+Allmaps has just released a new version of Allmaps Editor. The following items (and more\!) are on the roadmap for the coming years:
+
+* A new version of **[Allmaps Viewer](https://viewer.allmaps.org/)** with an improved background map and advanced functionality for analyzing and comparing maps.
+* Support for **version history** of georeferenced maps (and to pin a specific version).
+* **Institutional accounts** with API access that can be used to ingest and patch annotations, and to tag versions.
+* A new application called **Allmaps Curator** that can be used to create collections of maps and set up crowdsourcing projects with groups of people.
+* A new application called **Allmaps Explore** through which all georeferenced maps in the Allmaps database can be explored and reused.
+* A customizable version of the **[Allmaps Arcade](https://arcade.allmaps.org/)** game
+* A template for creating **slideshows** ('narrative maps') with Allmaps
+
+### Which licenses are used by Allmaps?
+
+Applications use the GNU GPLv3 license; packages use the MIT License. All Georeference Annotations generated through Allmaps Editor or otherwise added to the Allmaps database are licensed as CC0 (public domain) and published daily as an open dataset. Allmaps’ packages can be used independently of Allmaps’ infrastructure, i.e. it’s possible to host your own annotations (using different licenses).
+
+</BrochureSection>
+
+<BrochureSection colorClasses="bg-pink/5 [&_h2]:text-pink [&_h3]:text-pink [&_h4]:text-pink [&_a]:text-pink">
+
+## Further reading
+
+A selection of links to articles about Allmaps and recorded presentations:
+
+- [The Social Life of Allmaps: Reflecting on Software Communities in Sustaining the Digital Geohumanities](https://www.tandfonline.com/doi/full/10.1080/15420353.2025.2574896) (Journal of Map & Geography Libraries, 2025\)
+- [Teaching With Allmaps](https://youtu.be/m--5dKG2Bq0) (2025 IIIF Annual Conference)
+- [Allmaps Public Convening](https://youtube.com/playlist?list=PLIXSt4zVrYDzTkxJJGK9hxHEZgorBMl_l&si=Pm8Zooen2QaGDEKZ) (Leventhal Map & Education Center, 2024\)
+- [Allmaps makes it easier to find old maps and use them in research](https://www.tudelft.nl/en/2024/library/allmaps-makes-it-easier-to-find-old-maps-and-use-them-in-research) (TU Delft, 2024\)
+- [All the maps, all the time: an interview with Bert Spaan](https://www.leventhalmap.org/articles/bert-spaan-interview/) (Leventhal Map & Education Center, 2022\)
+
+## Acknowledgements
+
+The partnership between Allmaps and the IIIF Consortium grew out of a series of informal discussions and meetings held during the [Open Maps Meeting](https://openmapsmeeting.nl/) (The Hague, November 2024), [Allmaps Public Convening](https://lmec-ws.observablehq.cloud/allmaps-news/2024-convening) (Boston and online, November 2024), [Colocate2 Unconference](https://davidrumseymapcenter.github.io/colocate/) (Stanford, February 2025\) and the [IIIF Annual Conference](https://iiif.io/event/2025/leeds/) (Leeds, June 2025).
+
+The importance of the Allmaps-IIIF partnership was underscored after the [termination](https://www.leventhalmap.org/articles/neh-allmaps-statement-2025/) of a National Endowment for the Humanities (NEH) grant on April 17, 2025 that had been awarded to the Leventhal Map & Education Center (LMEC, Boston Public Library) and the American Geographical Society Library (AGSL, UWM Libraries) for the further development of Allmaps. The grant included the creation of a Consortium for Public Geography in support of the long-term maintenance and governance of the tools. Building on this idea, an Allmaps Planning group consisting of representatives from the IIIF Consortium staff, Executive Committee, Maps Community Group, Allmaps, LMEC and AGSL has held regular meetings to work out the structure of the partnership. It was approved by the Executive Committee in October 2025\.
+
+Funds to create the initial benefits for Allmaps Supporters were generously made available by the Beinecke Rare Book & Manuscript Library at Yale Library and Delft University of Technology Library.
+
+</BrochureSection>

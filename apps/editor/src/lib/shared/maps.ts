@@ -27,8 +27,6 @@ import type {
 } from '$lib/types/maps.js'
 import type { ProjectionsById, Point } from '$lib/types/shared.js'
 
-import { PUBLIC_ALLMAPS_ANNOTATIONS_API_URL } from '$env/static/public'
-
 export function isDbMap1(dbMap: DbMap): dbMap is DbMap1 {
   return dbMap.version === 1
 }
@@ -242,8 +240,8 @@ export function isGcpComplete(gcp: DbGcp3): gcp is CompleteDbGcp3 {
   return gcp.resource && gcp.geo ? true : false
 }
 
-export function getFullMapId(mapId: string) {
-  return `${PUBLIC_ALLMAPS_ANNOTATIONS_API_URL}/maps/${mapId}`
+export function getFullMapId(annotationsApiBaseUrl: string, mapId: string) {
+  return `${annotationsApiBaseUrl}/maps/${mapId}`
 }
 
 function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
@@ -282,6 +280,7 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
 }
 
 export function toGeoreferencedMapProjection(
+  apiBaseUrl: string,
   projection: DbProjection,
   projectionsById: ProjectionsById
 ) {
@@ -289,11 +288,13 @@ export function toGeoreferencedMapProjection(
     return
   }
 
-  const projectionId = getApiUrl(`projections/${projection?.id}`)
+  const projectionId = getApiUrl(apiBaseUrl, `projections/${projection?.id}`)
   return projectionsById[projectionId]
 }
 
 export function toGeoreferencedMap(
+  apiBaseUrl: string,
+  annotationsApiBaseUrl: string,
   dbMap: DbMap,
   projectionsById: ProjectionsById
 ): GeoreferencedMap {
@@ -304,7 +305,7 @@ export function toGeoreferencedMap(
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
-    id: getFullMapId(dbMap3.id),
+    id: getFullMapId(annotationsApiBaseUrl, dbMap3.id),
     resource: {
       ...dbMap3.resource,
       id: dbMap3.resource.uri || dbMap3.resource.id
@@ -313,16 +314,20 @@ export function toGeoreferencedMap(
     resourceMask: getResourceMask(dbMap3),
     transformation: toGeoreferencedMapTransformation(getTransformation(dbMap3)),
     resourceCrs: dbResourceCrs
-      ? toGeoreferencedMapProjection(dbResourceCrs, projectionsById)
+      ? toGeoreferencedMapProjection(apiBaseUrl, dbResourceCrs, projectionsById)
       : undefined
   }
 }
 
 export function toGeoreferencedMaps(
+  apiBaseUrl: string,
+  annotationsApiBaseUrl: string,
   dbMaps: DbMap[],
   projectionsById: ProjectionsById
 ): GeoreferencedMap[] {
-  return dbMaps.map((map) => toGeoreferencedMap(map, projectionsById))
+  return dbMaps.map((map) =>
+    toGeoreferencedMap(apiBaseUrl, annotationsApiBaseUrl, map, projectionsById)
+  )
 }
 
 export function getSortedGcps(gcps: DbGcp3[]) {

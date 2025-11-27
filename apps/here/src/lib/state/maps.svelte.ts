@@ -13,6 +13,7 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { SensorsState } from '$lib/state/sensors.svelte.js'
 import type { ImageInfoState } from '$lib/state/image-info.svelte.js'
 import type { ErrorState } from '$lib/state/error.svelte.js'
+import type { UiState } from '$lib/state/ui.svelte.js'
 
 import type { MapWithImageInfo } from '$lib/shared/types.ts'
 
@@ -28,6 +29,7 @@ const MAPS_KEY = Symbol('maps')
 export class MapsState {
   #sensorsState: SensorsState
   #imageInfoState: ImageInfoState
+  #uiState: UiState
 
   #fetchCount = $state(0)
   #loading = $state(false)
@@ -66,10 +68,12 @@ export class MapsState {
   constructor(
     sensorsState: SensorsState,
     imageInfoState: ImageInfoState,
-    errorState: ErrorState
+    errorState: ErrorState,
+    uiState: UiState
   ) {
     this.#sensorsState = sensorsState
     this.#imageInfoState = imageInfoState
+    this.#uiState = uiState
 
     $effect(() => {
       const newPosition = this.#sensorsState.position
@@ -132,6 +136,9 @@ export class MapsState {
     this.#fetchCount += 1
     this.#loading = false
     this.#lastPosition = position
+
+    // Reset scroll position when new maps are loaded
+    this.#uiState.mapsScrollTop = 0
   }
 
   get mapsFromCoordinates() {
@@ -190,11 +197,12 @@ export class MapsState {
 export function setMapsState(
   sensorsState: SensorsState,
   imageInfoState: ImageInfoState,
-  errorState: ErrorState
+  errorState: ErrorState,
+  uiState: UiState
 ) {
   return setContext(
     MAPS_KEY,
-    new MapsState(sensorsState, imageInfoState, errorState)
+    new MapsState(sensorsState, imageInfoState, errorState, uiState)
   )
 }
 

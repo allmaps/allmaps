@@ -17,6 +17,7 @@
   },
   "scripts": {
     "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env dev",
     "dev": "wrangler dev --port $(../../port.js preview) --env dev",
     "lerna-build": "lerna run build --scope @allmaps/preview --include-dependencies",
     "lint": "prettier --check src && eslint src --ext .js,.ts",
