@@ -4,7 +4,7 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { proj4 } from '@allmaps/project'
+import { proj4, webMercatorProjection } from '@allmaps/project'
 import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
@@ -29,14 +29,13 @@ import type {
   ProjectionOptions,
   SelectionOptions,
   AnimationOptions,
-  SpecificWarpedMapListOptions,
   WarpedMapFactory,
   WarpedMapListOptions
 } from '../shared/types.js'
 
 const defaultSelectionOptions: SelectionOptions = {}
 
-const DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS: SpecificWarpedMapListOptions = {
+const DEFAULT_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions = {
   createRTree: true,
   rtreeUpdatedOptions: [
     'gcps',
@@ -49,7 +48,8 @@ const DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS: SpecificWarpedMapListOptions = {
     'transformationType',
     'internalProjection',
     'distortionMeasure'
-  ]
+  ],
+  projection: webMercatorProjection
 }
 
 /**
@@ -92,7 +92,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.warpedMapFactory = warpedMapFactory
 
     this.options = mergeOptions(
-      DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS,
+      DEFAULT_WARPED_MAP_LIST_OPTIONS,
       options
     ) as WarpedMapListOptions
 
@@ -392,7 +392,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   getDefaultOptions(): WarpedMapListOptions & GetWarpedMapOptions<W> {
     // Could we get default options from abstract type <W> instead of WebGL2WarpedMap?
     return mergeOptions(
-      DEFAULT_SPECIFIC_WARPED_MAP_LIST_OPTIONS,
+      DEFAULT_WARPED_MAP_LIST_OPTIONS,
       WebGL2WarpedMap.getDefaultOptions() as GetWarpedMapOptions<W>
     )
   }
