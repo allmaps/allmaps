@@ -19,8 +19,9 @@ export type ParsedPackageJson = {
   devDependencies: Dependencies
 }
 
-const apps = glob(join(dirname, '../apps/**/package.json'))
-const packages = glob(join(dirname, '../packages/**/package.json'))
+const apps = glob(join(dirname, '../../../apps/**/package.json'))
+const packages = glob(join(dirname, '../../../packages/**/package.json'))
+const workers = glob(join(dirname, '../../../workers/**/package.json'))
 
 async function* combine<T>(...iterables: AsyncIterable<T>[]) {
   for (const iterable of iterables) {
@@ -31,7 +32,7 @@ async function* combine<T>(...iterables: AsyncIterable<T>[]) {
 export async function getParsedPackageJsons() {
   const parsedPackageJsons: Map<string, ParsedPackageJson> = new Map()
 
-  for await (const entry of combine(apps, packages)) {
+  for await (const entry of combine(apps, packages, workers)) {
     const packageJson = await readPackageJson(entry)
     const parsedPackageJson = parsePackageJson(packageJson)
     parsedPackageJsons.set(parsedPackageJson.name, parsedPackageJson)

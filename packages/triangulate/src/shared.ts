@@ -20,7 +20,7 @@ import type {
 // Return an array of points containing the first line point,
 // and betwen the first and last line point other points every `dist`
 function interpolateLine(line: Line, dist: number): LineString {
-  const lineDistance = distance(line)
+  const lineDistance = distance(...line)
   // Note: ciel - 1 instead of floor, such that for round numbers we don't include the last step
   const steps = Math.ceil(lineDistance / dist) - 1
   const angle = lineAngle(line)

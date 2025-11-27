@@ -286,11 +286,11 @@ export class WebGL2Renderer
       )
 
     // Not awaiting this, using events to trigger new render calls
-    this.loadMissingImageInfosInViewport()
+    this.loadMissingImagesInViewport()
 
     // Don't fire throttled function unless it could result in something
     // Otherwise we have to wait for that cycle to finish before useful cycle can be started
-    if (this.someImageInfosInViewport()) {
+    if (this.someImagesInViewport()) {
       this.throttledPrepareRenderInternal()
     }
 
@@ -570,9 +570,9 @@ export class WebGL2Renderer
       program,
       'u_removeColorColor'
     )
-    gl.uniform3f(
+    gl.uniform3fv(
       removeColorColorLocation,
-      ...hexToFractionalRgb(webgl2WarpedMap.options.removeColorColor)
+      hexToFractionalRgb(webgl2WarpedMap.options.removeColorColor)
     )
 
     const removeColorThresholdLocation = gl.getUniformLocation(
@@ -601,9 +601,9 @@ export class WebGL2Renderer
       program,
       'u_colorizeColor'
     )
-    gl.uniform3f(
+    gl.uniform3fv(
       colorizeColorLocation,
-      ...hexToFractionalRgb(webgl2WarpedMap.options.colorizeColor)
+      hexToFractionalRgb(webgl2WarpedMap.options.colorizeColor)
     )
 
     // Grid
@@ -611,9 +611,9 @@ export class WebGL2Renderer
     gl.uniform1f(gridLocation, webgl2WarpedMap.options.renderGrid ? 1 : 0)
 
     const colorGrid = gl.getUniformLocation(program, 'u_renderGridColor')
-    gl.uniform4f(
+    gl.uniform4fv(
       colorGrid,
-      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
+      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
     )
 
     // Distortion
@@ -635,45 +635,45 @@ export class WebGL2Renderer
       program,
       'u_distortionColor00'
     )
-    gl.uniform4f(
+    gl.uniform4fv(
       distortionColor00Location,
-      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
+      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
     )
 
     const distortionColor01Location = gl.getUniformLocation(
       program,
       'u_distortionColor01'
     )
-    gl.uniform4f(
+    gl.uniform4fv(
       distortionColor01Location,
-      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
+      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
     )
 
     const distortionColor1Location = gl.getUniformLocation(
       program,
       'u_distortionColor1'
     )
-    gl.uniform4f(
+    gl.uniform4fv(
       distortionColor1Location,
-      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
+      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
     )
 
     const distortionColor2Location = gl.getUniformLocation(
       program,
       'u_distortionColor2'
     )
-    gl.uniform4f(
+    gl.uniform4fv(
       distortionColor2Location,
-      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
+      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
     )
 
     const distortionColorLocation3 = gl.getUniformLocation(
       program,
       'u_distortionColor3'
     )
-    gl.uniform4f(
+    gl.uniform4fv(
       distortionColorLocation3,
-      ...hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
+      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
     )
 
     // Debug Triangles
@@ -903,10 +903,10 @@ export class WebGL2Renderer
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
-  protected imageInfoLoaded(event: Event) {
+  protected imageLoaded(event: Event) {
     if (event instanceof WarpedMapEvent) {
       this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, event.data)
+        new WarpedMapEvent(WarpedMapEventType.IMAGELOADED, event.data)
       )
     }
   }

@@ -4,7 +4,6 @@ import type {
   Line,
   Size,
   FetchFn,
-  ImageInfoByMapId,
   Bbox,
   TileZoomLevel,
   Ring,
@@ -37,7 +36,6 @@ export type TransformationOptions = {
 
 export type WarpedMapOptions = {
   fetchFn?: FetchFn
-  imageInfoByMapId?: ImageInfoByMapId
   gcps: Gcp[]
   resourceMask: Ring
   transformationType: TransformationType
@@ -142,6 +140,7 @@ export type AnimationOptions = {
   animate: boolean
 }
 export type AnimationOptionsInternal = {
+  optionKeysPossiblyChanged: string[]
   optionKeysToOmit: string[]
   init: boolean
 }
@@ -160,7 +159,8 @@ export type GetImageDataSize<D> = (data: D) => Size
 export type WarpedMapFactory<W> = (
   mapId: string,
   georeferencedMap: GeoreferencedMap,
-  options?: Partial<WarpedMapOptions>
+  listOptions?: Partial<WarpedMapListOptions>,
+  mapOptions?: Partial<WarpedMapOptions>
 ) => W
 
 export type CachableTileFactory<D> = (

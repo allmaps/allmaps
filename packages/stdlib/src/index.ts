@@ -171,7 +171,6 @@ export {
   subSetArray,
   equalSet,
   objectDifference,
-  objectOmitDifference,
   omit,
   isValidHttpUrl,
   camelCaseToWords
@@ -194,8 +193,8 @@ export {
 export {
   mergeOptions,
   mergeOptionsUnlessUndefined,
+  mergeTwoOptionsUnlessUndefined,
   mergePartialOptions,
-  removeUndefinedOptions,
   optionKeysToUndefinedOptions,
   optionKeysByMapIdToUndefinedOptionsByMapId
 } from './options.js'

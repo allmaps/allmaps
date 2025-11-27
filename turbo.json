@@ -2,32 +2,32 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build": {
-      "inputs": ["src/**/*.*"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"],
       "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["test", "^build"]
+      "dependsOn": ["^build"]
     },
     "types": {
-      "inputs": ["src/**/*.*"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"],
       "outputs": ["dist/**", "build/**"],
       "dependsOn": ["^types"]
     },
     "lint": {
-      "inputs": ["src/**/*.*"],
-      "outputs": ["dist/**", "build/**"],
+      "inputs": ["src/**", "package.json"],
+      "outputs": [],
       "dependsOn": ["^lint"]
     },
     "test": {
-      "inputs": ["dist/**/*.*", "src/**/*.*", "test/**/*.*"],
-      "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["^test"]
+      "inputs": ["src/**", "test/**", "package.json"],
+      "outputs": [],
+      "dependsOn": ["^build"]
     },
     "check": {
-      "inputs": ["src/**/*.*"],
-      "outputs": ["dist/**", "build/**"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"],
+      "outputs": [],
       "dependsOn": ["^check"]
     },
     "documentation": {
-      "inputs": ["src/**/*.*"],
+      "inputs": ["src/**", "package.json"],
       "outputs": ["README.md"],
       "dependsOn": ["^documentation"]
     },

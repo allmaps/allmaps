@@ -5,9 +5,11 @@ import {
   type GeoreferencedMap
 } from '@allmaps/annotation'
 import { proj4 } from '@allmaps/project'
+import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
 import { WarpedMap } from './WarpedMap.js'
+import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 import {
   bboxToCenter,
@@ -31,7 +33,6 @@ import type {
   WarpedMapFactory,
   WarpedMapListOptions
 } from '../shared/types.js'
-import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 const defaultSelectionOptions: SelectionOptions = {}
 
@@ -65,6 +66,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   warpedMapsById: Map<string, W>
   zIndices: Map<string, number>
 
+  imagesById: Map<string, Image>
+
   rtree?: RTree
 
   options: WarpedMapListOptions
@@ -84,6 +87,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
+    this.imagesById = new Map()
 
     this.warpedMapFactory = warpedMapFactory
 
@@ -100,10 +104,14 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Adds a georeferenced map to this list
    *
-   * @param georeferencedMap
+   * @param georeferencedMap - Georeferenced Map
+   * @param mapOptions - Map options
    * @returns Map ID of the map that was added
    */
-  async addGeoreferencedMap(georeferencedMap: unknown): Promise<string> {
+  async addGeoreferencedMap(
+    georeferencedMap: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ): Promise<string> {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMap)
     const validatedGeoreferencedMap = Array.isArray(
@@ -111,7 +119,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     )
       ? validatedGeoreferencedMapOrMaps[0]
       : validatedGeoreferencedMapOrMaps
-    return this.addGeoreferencedMapInternal(validatedGeoreferencedMap)
+    return this.addGeoreferencedMapInternal(
+      validatedGeoreferencedMap,
+      mapOptions
+    )
   }
 
   /**
@@ -148,14 +159,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Parses an annotation and adds its georeferenced map to this list
    *
-   * @param annotation
+   * @param annotation - Annotation
+   * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
-  async addGeoreferenceAnnotation(annotation: unknown) {
+  async addGeoreferenceAnnotation(
+    annotation: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     const settledResults = await Promise.allSettled(
-      maps.map((map) => this.addGeoreferencedMapInternal(map))
+      maps.map((map) => this.addGeoreferencedMapInternal(map, mapOptions))
     )
     // TODO: make sure reason contains Error
     for (const settledResult of settledResults) {
@@ -191,6 +206,22 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
     )
     return results
+  }
+
+  /**
+   * Adds image informations, parses them to images and adds them to the image cache
+   *
+   * @param imageInfos - Image informations
+   * @returns Image IDs of the image informations that were added
+   */
+  addImageInfos(imageInfos: unknown[]): string[] {
+    const result = []
+    for (const imageInfo of imageInfos) {
+      const image = Image.parse(imageInfo)
+      this.imagesById.set(image.uri, image)
+      result.push(image.uri)
+    }
+    return result
   }
 
   /**
@@ -680,14 +711,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   private async addGeoreferencedMapInternal(
-    georeferencedMap: GeoreferencedMap
+    georeferencedMap: GeoreferencedMap,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
 
     const warpedMap = this.warpedMapFactory(
       mapId,
       georeferencedMap,
-      this.options
+      this.options,
+      mapOptions
     )
 
     this.warpedMapsById.set(mapId, warpedMap)
@@ -913,11 +946,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
   }
 
-  // This function and the listeners below transform an IMAGEINFOLOADED event by a WarpedMap
-  // to an IMAGEINFOLOADED of the WarpedMapList, which is listened to in the Renderer
-  private imageInfoLoaded(mapId: string) {
+  // This function and the listeners below transform an IMAGELOADED event by a WarpedMap
+  // to an IMAGELOADED of the WarpedMapList, which is listened to in the Renderer
+  private imageLoaded(mapId: string) {
     this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.IMAGEINFOLOADED, {
+      new WarpedMapEvent(WarpedMapEventType.IMAGELOADED, {
         mapIds: [mapId]
       })
     )
@@ -925,15 +958,15 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   private addEventListenersToWarpedMap(warpedMap: W) {
     warpedMap.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this, warpedMap.mapId)
+      WarpedMapEventType.IMAGELOADED,
+      this.imageLoaded.bind(this, warpedMap.mapId)
     )
   }
 
   private removeEventListenersFromWarpedMap(warpedMap: W) {
     warpedMap.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
-      this.imageInfoLoaded.bind(this, warpedMap.mapId)
+      WarpedMapEventType.IMAGELOADED,
+      this.imageLoaded.bind(this, warpedMap.mapId)
     )
   }
 }

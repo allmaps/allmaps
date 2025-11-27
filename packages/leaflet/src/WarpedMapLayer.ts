@@ -424,15 +424,19 @@ export class WarpedMapLayer
    * Adds a Georeference Annotation
    *
    * @param annotation - Georeference Annotation
+   * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
   async addGeoreferenceAnnotation(
-    annotation: unknown
+    annotation: unknown,
+    mapOptions?: Partial<WebGL2WarpedMapOptions>
   ): Promise<(string | Error)[]> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const results =
-      await this.renderer.warpedMapList.addGeoreferenceAnnotation(annotation)
+    const results = await this.renderer.addGeoreferenceAnnotation(
+      annotation,
+      mapOptions
+    )
     this.nativeUpdate()
 
     return results
@@ -460,16 +464,18 @@ export class WarpedMapLayer
    * Adds a Georeference Annotation by URL
    *
    * @param annotationUrl - URL of a Georeference Annotation
+   * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
   async addGeoreferenceAnnotationByUrl(
-    annotationUrl: string
+    annotationUrl: string,
+    mapOptions?: Partial<WebGL2WarpedMapOptions>
   ): Promise<(string | Error)[]> {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
 
-    return this.addGeoreferenceAnnotation(annotation)
+    return this.addGeoreferenceAnnotation(annotation, mapOptions)
   }
 
   /**
@@ -491,15 +497,19 @@ export class WarpedMapLayer
    * Adds a Georeferenced Map
    *
    * @param georeferencedMap - Georeferenced Map
+   * @param mapOptions - Map options
    * @returns Map ID of the map that was added, or an error
    */
   async addGeoreferencedMap(
-    georeferencedMap: unknown
+    georeferencedMap: unknown,
+    mapOptions?: Partial<WebGL2WarpedMapOptions>
   ): Promise<string | Error> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const result =
-      this.renderer.warpedMapList.addGeoreferencedMap(georeferencedMap)
+    const result = this.renderer.addGeoreferencedMap(
+      georeferencedMap,
+      mapOptions
+    )
     this.nativeUpdate()
 
     return result
@@ -535,6 +545,21 @@ export class WarpedMapLayer
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result = this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
+    this.nativeUpdate()
+
+    return result
+  }
+
+  /**
+   * Adds image information to the WarpedMapList's image information cache
+   *
+   * @param imageInfos - Image informations
+   * @returns Image IDs of the image informations that were added
+   */
+  addImageInfos(imageInfos: unknown[]): string[] {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    const result = this.renderer.warpedMapList.addImageInfos(imageInfos)
     this.nativeUpdate()
 
     return result
@@ -1130,7 +1155,7 @@ export class WarpedMapLayer
     )
 
     this.renderer.addEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
+      WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
     )
 
@@ -1216,7 +1241,7 @@ export class WarpedMapLayer
     )
 
     this.renderer.removeEventListener(
-      WarpedMapEventType.IMAGEINFOLOADED,
+      WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
     )
 

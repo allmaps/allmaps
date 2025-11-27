@@ -38,19 +38,16 @@ export function removeUndefinedOptions<
 >(
   ...optionsArray: U
 ): Partial<{ [K in keyof U[number]]: Exclude<U[number][K], undefined> }> {
-  const mergedOptions = {}
-  for (const options of optionsArray) {
-    if (!options) {
-      continue
-    }
+  const mergedOptions: Record<string, any> = {}
+
+  for (let i = 0; i < optionsArray.length; i++) {
+    const options = optionsArray[i]
+    if (!options) continue
 
     for (const key in options) {
-      if (Object.prototype.hasOwnProperty.call(options, key)) {
-        const value = options[key]
-
-        if (value !== undefined) {
-          ;(mergedOptions as any)[key] = value
-        }
+      const value = options[key]
+      if (value !== undefined) {
+        mergedOptions[key] = value
       }
     }
   }
@@ -72,6 +69,28 @@ export function mergeOptionsUnlessUndefined<
   return {
     ...baseOptions,
     ...removeUndefinedOptions(...additionalOptions)
+  } as T & Partial<U>
+}
+
+export function mergeTwoOptionsUnlessUndefined<
+  T extends Record<string, any>,
+  U extends Record<string, any>
+>(baseOptions: T, additionalOption: Partial<U> | undefined): T & Partial<U> {
+  if (!additionalOption || Object.keys(additionalOption).length === 0) {
+    return baseOptions as T & Partial<U>
+  }
+
+  // Build a filtered copy, excluding omitted keys and undefined values
+  const filtered: Partial<U> = {}
+  for (const key in additionalOption) {
+    if (additionalOption[key] !== undefined) {
+      filtered[key] = additionalOption[key]
+    }
+  }
+
+  return {
+    ...baseOptions,
+    ...filtered
   } as T & Partial<U>
 }
 

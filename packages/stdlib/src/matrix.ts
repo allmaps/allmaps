@@ -13,10 +13,22 @@ export function newArrayMatrix<T = number>(
   if (rows <= 0 || cols <= 0) {
     throw new Error('Empty ArrayMatrix not supported')
   }
-  return Array.from(Array(rows), (_) => Array(cols).fill(value)) as T[][]
+  const result = new Array(rows)
+  for (let i = 0; i < rows; i++) {
+    const row = new Array(cols)
+    for (let j = 0; j < cols; j++) {
+      row[j] = value
+    }
+    result[i] = row
+  }
+  return result
 }
 
 export function arrayMatrixSize<T>(arrayMatrix: T[][]): Size {
+  return [arrayMatrix.length, arrayMatrix[0].length]
+}
+
+export function arrayMatrixSizeSafer<T>(arrayMatrix: T[][]): Size {
   if (arrayMatrix.length === 0) {
     throw new Error('ArrayMatrix may not be empty, but rows are empty')
   }
@@ -36,7 +48,14 @@ export function arrayMatrixSize<T>(arrayMatrix: T[][]): Size {
 }
 
 export function shallowCopyArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
-  return arrayMatrix.map((row) => [...row])
+  const rows = arrayMatrix.length
+  const result = new Array(rows)
+
+  for (let i = 0; i < rows; i++) {
+    result[i] = arrayMatrix[i].slice()
+  }
+
+  return result
 }
 
 // Slice specific rows and columns of an arrayMatrix.
@@ -108,9 +127,19 @@ export function pasteArrayMatrix<T>(
 }
 
 export function transposeArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
-  return arrayMatrix[0].map((_, colIndex) =>
-    arrayMatrix.map((row) => row[colIndex])
-  )
+  const rows = arrayMatrix.length
+  const cols = arrayMatrix[0].length
+  const result = new Array(cols)
+
+  for (let j = 0; j < cols; j++) {
+    const newRow = new Array(rows)
+    for (let i = 0; i < rows; i++) {
+      newRow[i] = arrayMatrix[i][j]
+    }
+    result[j] = newRow
+  }
+
+  return result
 }
 
 export function newBlockArrayMatrix<T = number>(
