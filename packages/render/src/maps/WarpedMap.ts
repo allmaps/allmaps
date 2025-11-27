@@ -402,7 +402,7 @@ export class WarpedMap extends EventTarget {
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
   ): object {
-    let optionKeysPossiblyChanged: string[] = []
+    const optionKeysPossiblyChanged: string[] = []
     if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
       this.mapOptions = mergeOptions(this.mapOptions, mapOptions)
       optionKeysPossiblyChanged.push(...Object.keys(mapOptions))
@@ -446,7 +446,7 @@ export class WarpedMap extends EventTarget {
           ? !animationOptions.optionKeysToOmit.includes(k)
           : true
       )
-    let changedOptions = objectDifference(
+    const changedOptions = objectDifference(
       options,
       this.options,
       optionKeysToConsider

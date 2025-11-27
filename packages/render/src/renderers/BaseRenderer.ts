@@ -391,7 +391,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       )
     }
 
-    let fetchableTilesForViewportResolution = fetchableTilesForViewport
+    const fetchableTilesForViewportResolution = fetchableTilesForViewport
       .map((fetchableTile) => getTileResolution(fetchableTile.tile))
       .reduce((a, c) => a + c, 0)
     let overviewFetchableTilesForViewportResolution = 0
