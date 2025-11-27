@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/homepage",
   "description": "Allmaps Homepage",
-  "version": "1.0.0-beta.28",
+  "version": "1.0.0-beta.29",
   "private": true,
   "contributors": [
     {
@@ -50,12 +50,8 @@
     "@astrojs/starlight": "^0.36.2",
     "@astrojs/svelte": "^7.2.1",
     "@tailwindcss/vite": "^4.1.16",
-    "astro": "^5.6.1",
-    "sharp": "^0.34.2",
-    "svelte": "^5.43.2",
-    "tailwindcss": "^4.1.16",
-    "typescript": "^5.9.3",
     "@turf/rewind": "^7.2.0",
+    "astro": "^5.6.1",
     "bits-ui": "^2.11.4",
     "d3-geo": "^3.1.1",
     "eslint": "^8.56.0",
@@ -65,7 +61,11 @@
     "pmtiles": "^3.0.5",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
-    "protomaps-themes-base": "2.0.0-alpha.5"
+    "protomaps-themes-base": "2.0.0-alpha.5",
+    "sharp": "^0.34.2",
+    "svelte": "^5.43.2",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
