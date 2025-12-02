@@ -1,7 +1,14 @@
 import { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import { fetchableTileKey, tileKey } from '../shared/tiles.js'
 
-import type { Tile, ImageRequest } from '@allmaps/types'
+import type { Tile, Size, ImageRequest } from '@allmaps/types'
+
+import type {
+  FetchableTileOptions,
+  Sprite,
+  SpritesInfo
+} from '../shared/types.js'
+import { mergePartialOptions } from '@allmaps/stdlib'
 
 /**
  * Class for tiles that can be fetched.
@@ -9,30 +16,100 @@ import type { Tile, ImageRequest } from '@allmaps/types'
 export class FetchableTile {
   readonly mapId: string
   readonly tile: Tile
-  readonly imageRequest: ImageRequest
   readonly tileUrl: string
   readonly tileKey: string
   readonly fetchableTileKey: string
+  readonly options?: Partial<FetchableTileOptions>
 
   /**
    * Creates an instance of FetchableTile.
    *
    * @constructor
    * @param tile - the tile
-   * @param warpedMap - A WarpedMap with fetched image information
+   * @param mapId - Map ID
+   * @param tileUrl - Tile URL
+   * @param imageRequest - Image Request
+   * @param options - FetchableTileOptions
    */
-  constructor(tile: Tile, warpedMap: WarpedMapWithImage) {
-    this.mapId = warpedMap.mapId
+  constructor(
+    tile: Tile,
+    mapId: string,
+    tileUrl: string,
+    options?: Partial<FetchableTileOptions>
+  ) {
     this.tile = tile
+    this.mapId = mapId
+    this.tileUrl = tileUrl
+    this.options = options
+    this.tileKey = tileKey(tile)
+    this.fetchableTileKey = fetchableTileKey(this)
+  }
 
-    const imageRequest = warpedMap.image.getTileImageRequest(
+  /**
+   * Creates an instance of FetchableTile from a WarpedMap.
+   *
+   * @constructor
+   * @param tile - the tile
+   * @param warpedMap - A WarpedMap with fetched image
+   */
+  static fromWarpedMap(
+    tile: Tile,
+    warpedMap: WarpedMapWithImage,
+    options?: Partial<FetchableTileOptions>
+  ) {
+    const tileImageRequest = warpedMap.image.getTileImageRequest(
       tile.tileZoomLevel,
       tile.column,
       tile.row
     )
-    this.imageRequest = imageRequest
-    this.tileUrl = warpedMap.image.getImageUrl(imageRequest)
-    this.tileKey = tileKey(tile)
-    this.fetchableTileKey = fetchableTileKey(this)
+    return new FetchableTile(
+      tile,
+      warpedMap.mapId,
+      warpedMap.image.getImageUrl(tileImageRequest),
+      mergePartialOptions(options, { imageRequest: tileImageRequest })
+    )
+  }
+
+  /**
+   * Creates an instance of FetchableTile from a sprite.
+   *
+   * @constructor
+   * @param sprite - Sprite
+   * @param imageSize - imageSize
+   * @param warpedMap - A WarpedMap with fetched image
+   */
+  static fromSprite(
+    sprite: Sprite,
+    imageSize: Size,
+    warpedMap: WarpedMapWithImage,
+    options?: Partial<FetchableTileOptions>
+  ) {
+    const width = warpedMap.tileSize[0]
+    const height = warpedMap.tileSize[1]
+    const tile = {
+      column: 0,
+      row: 0,
+      tileZoomLevel: {
+        scaleFactor: sprite.scaleFactor,
+        width,
+        height,
+        originalWidth: width * sprite.scaleFactor,
+        originalHeight: height * sprite.scaleFactor,
+        columns: 1,
+        rows: 1
+      },
+      imageSize
+    }
+    const tileImageRequest = warpedMap.image.getTileImageRequest(
+      tile.tileZoomLevel,
+      tile.column,
+      tile.row
+    )
+    return new FetchableTile(
+      tile,
+      warpedMap.mapId,
+      sprite.imageId,
+      mergePartialOptions(options, { imageRequest: tileImageRequest })
+    )
   }
 }

@@ -33,7 +33,13 @@ import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { Image } from '@allmaps/iiif-parser'
-import type { Line, Point, Tile, HomogeneousTransform } from '@allmaps/types'
+import type {
+  Line,
+  Point,
+  Tile,
+  HomogeneousTransform,
+  Size
+} from '@allmaps/types'
 
 import type {
   LineGroup,
@@ -144,6 +150,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   // (Multiple inhertance is not possible in TypeScript)
   declare imageId: string
   declare image: Image
+  declare tileSize: Size
 
   gl: WebGL2RenderingContext
   mapProgram!: WebGLProgram
@@ -329,11 +336,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
-    if (this.cachedTilesByTileKey.has(cachedTile.tileKey)) {
+    if (this.cachedTilesByTileKey.has(cachedTile.fetchableTile.tileKey)) {
       return
     }
-    this.cachedTilesByTileKey.set(cachedTile.tileKey, cachedTile)
-    this.cachedTilesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+    this.cachedTilesByTileKey.set(cachedTile.fetchableTile.tileKey, cachedTile)
+    this.cachedTilesByTileUrl.set(cachedTile.fetchableTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
   }
 
@@ -347,7 +354,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     if (!cachedTile) {
       return
     }
-    this.cachedTilesByTileKey.delete(cachedTile.tileKey)
+    this.cachedTilesByTileKey.delete(cachedTile.fetchableTile.tileKey)
     this.cachedTilesByTileUrl.delete(tileUrl)
     this.throttledUpdateTextures()
   }
@@ -922,22 +929,23 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       (this.cachedTilesForTexture.length !== 0 &&
         subSetArray(
           this.previousCachedTilesForTexture.map(
-            (textureTile) => textureTile.tileUrl
+            (textureTile) => textureTile.fetchableTile.tileUrl
           ),
-          this.cachedTilesForTexture.map((textureTile) => textureTile.tileUrl)
+          this.cachedTilesForTexture.map(
+            (textureTile) => textureTile.fetchableTile.tileUrl
+          )
         ))
     ) {
+      return
+    }
+    if (!this.image) {
       return
     }
 
     // Cached tiles texture array
 
-    const requiredTextureWidth = Math.max(
-      ...this.image.tileZoomLevels.map((size) => size.width)
-    )
-    const requiredTextureHeigt = Math.max(
-      ...this.image.tileZoomLevels.map((size) => size.height)
-    )
+    const requiredTextureWidth = this.tileSize[0]
+    const requiredTextureHeigt = this.tileSize[1]
     const requiredTextureDepth = this.cachedTilesForTexture.length
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
@@ -958,6 +966,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
       const imageData = this.cachedTilesForTexture[i].data
+      if (
+        imageData.width !== requiredTextureWidth ||
+        imageData.width !== requiredTextureWidth
+      ) {
+        throw new Error("Cached tile doesn't fit in texture")
+      }
 
       const pbo = gl.createBuffer()
       gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo)
@@ -991,15 +1005,19 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       this.cachedTilesForTexture.map((textureTile) => {
         if (
           textureTile &&
-          textureTile.imageRequest &&
-          textureTile.imageRequest.region
+          textureTile.fetchableTile &&
+          textureTile.fetchableTile.options &&
+          textureTile.fetchableTile.options.imageRequest &&
+          textureTile.fetchableTile.options.imageRequest.region
         ) {
           return [
-            textureTile.imageRequest.region.x,
-            textureTile.imageRequest.region.y,
-            textureTile.imageRequest.region.width,
-            textureTile.imageRequest.region.height
+            textureTile.fetchableTile.options.imageRequest.region.x,
+            textureTile.fetchableTile.options.imageRequest.region.y,
+            textureTile.fetchableTile.options.imageRequest.region.width,
+            textureTile.fetchableTile.options.imageRequest.region.height
           ]
+        } else {
+          throw new Error('Missing resource origin points and dimensions')
         }
       }) as number[][]
 
@@ -1031,7 +1049,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Cached tiles scale factors texture
 
     const cachedTilesScaleFactors = this.cachedTilesForTexture.map(
-      (textureTile) => textureTile.tile.tileZoomLevel.scaleFactor
+      (textureTile) => textureTile.fetchableTile.tile.tileZoomLevel.scaleFactor
     )
 
     gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
@@ -1059,6 +1077,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const cachedTiles = []
     const cachedTilesAtOtherScaleFactors = []
     const overviewCachedTiles = []
+    const spriteCachedTiles = []
 
     // Try to include tiles that were requested
     for (const fetchableTile of this.fetchableTilesForViewport) {
@@ -1096,10 +1115,19 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       }
     }
 
+    // Include sprite tiles
+    spriteCachedTiles.push(
+      ...Array.from(this.cachedTilesByTileUrl.values()).filter(
+        (cachedTile) =>
+          cachedTile.fetchableTile.options?.spritesInfo !== undefined
+      )
+    )
+
     let cachedTilesForTextures = [
       ...cachedTiles,
       ...cachedTilesAtOtherScaleFactors,
-      ...overviewCachedTiles
+      ...overviewCachedTiles,
+      ...spriteCachedTiles
     ]
 
     // Making tiles unique by tileUrl
@@ -1108,7 +1136,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       CachedTile<ImageData>
     > = new Map()
     cachedTilesForTextures.forEach((cachedTile) =>
-      cachedTilesForTexturesByTileUrl.set(cachedTile.tileUrl, cachedTile)
+      cachedTilesForTexturesByTileUrl.set(
+        cachedTile.fetchableTile.tileUrl,
+        cachedTile
+      )
     )
     cachedTilesForTextures = [...cachedTilesForTexturesByTileUrl.values()]
 

@@ -1,20 +1,21 @@
 import { FetchableTile } from './FetchableTile.js'
 
-import type { Tile, ImageRequest, FetchFn } from '@allmaps/types'
+import type { FetchFn } from '@allmaps/types'
+
+import type { WarpedMapWithImage } from '../maps/WarpedMap.js'
+import type { SpritesInfo } from '../shared/types.js'
 
 /**
  * Class for tiles that can be cached.
  */
 export abstract class CacheableTile<D> extends EventTarget {
-  readonly tile: Tile
-  readonly imageRequest: ImageRequest
-  readonly tileUrl: string
-  readonly tileKey: string
+  readonly fetchableTile: FetchableTile
   readonly fetchFn?: FetchFn
 
   protected abortController: AbortController
 
   protected data?: D
+  protected cachedTilesFromSpritesData?: CachedTile<D>[]
 
   /**
    * Creates an instance of CacheableTile.
@@ -26,16 +27,20 @@ export abstract class CacheableTile<D> extends EventTarget {
   constructor(fetchableTile: FetchableTile, fetchFn?: FetchFn) {
     super()
 
-    this.tile = fetchableTile.tile
-    this.imageRequest = fetchableTile.imageRequest
-    this.tileUrl = fetchableTile.tileUrl
-    this.tileKey = fetchableTile.tileKey
+    this.fetchableTile = fetchableTile
     this.fetchFn = fetchFn
 
     this.abortController = new AbortController()
   }
 
   abstract fetch(): Promise<D | undefined>
+
+  abstract applySprites(): Promise<void>
+  abstract spritesDataToCachedTiles(
+    clippedImageDatas: ImageData[],
+    spritesInfo: SpritesInfo,
+    warpedMapsByResourceId: Map<string, WarpedMapWithImage[]>
+  ): CachedTile<D>[]
 
   /**
    * Whether a tile has fetched its data
@@ -44,6 +49,10 @@ export abstract class CacheableTile<D> extends EventTarget {
    */
   isCachedTile(): this is CachedTile<D> {
     return this.data !== undefined
+  }
+
+  getCachedTilesFromSprites(): CachedTile<D>[] | undefined {
+    return this.cachedTilesFromSpritesData
   }
 
   /**

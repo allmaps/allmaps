@@ -1,3 +1,14 @@
+import {
+  bboxToCenter,
+  computeBbox,
+  squaredDistance,
+  intersectBboxes,
+  bboxToRectangle,
+  mergeOptions,
+  mergePartialOptions
+} from '@allmaps/stdlib'
+import { isEqualProjection } from '@allmaps/project'
+
 import { TileCache } from '../tilecache/TileCache.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'
 import { FetchableTile } from '../tilecache/FetchableTile.js'
@@ -12,19 +23,10 @@ import {
   getTileResolution
 } from '../shared/tiles.js'
 
-import {
-  bboxToCenter,
-  computeBbox,
-  squaredDistance,
-  intersectBboxes,
-  bboxToRectangle,
-  mergeOptions,
-  mergePartialOptions
-} from '@allmaps/stdlib'
-import { isEqualProjection } from '@allmaps/project'
+import type { ImageRequest, Size, Tile } from '@allmaps/types'
 
 import type { Viewport } from '../viewport/Viewport.js'
-import type { WarpedMap } from '../maps/WarpedMap.js'
+import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type {
   CachableTileFactory,
   WarpedMapFactory,
@@ -32,7 +34,9 @@ import type {
   MapPruneInfo,
   GetWarpedMapOptions,
   AnimationOptions,
-  SpecificBaseRenderOptions
+  SpecificBaseRenderOptions,
+  Sprite,
+  SpritesInfo
 } from '../shared/types.js'
 
 // TODO: move defaults for tunable options here
@@ -64,6 +68,7 @@ const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
 export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
+  spritesTileCache: TileCache<D>
 
   mapsInPreviousViewport: Set<string> = new Set()
   mapsInViewport: Set<string> = new Set()
@@ -74,16 +79,20 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   options: Partial<BaseRenderOptions>
 
   constructor(
-    cachableTileFactory: CachableTileFactory<D>,
     warpedMapFactory: WarpedMapFactory<W>,
+    cachableTileFactory: CachableTileFactory<D>,
     options?: Partial<BaseRenderOptions>
   ) {
     super()
 
-    this.tileCache = new TileCache(cachableTileFactory, options)
-    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
-
     this.options = mergeOptions(DEFAULT_BASE_RENDER_OPTIONS, options)
+
+    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
+    this.tileCache = new TileCache(cachableTileFactory, options)
+    this.spritesTileCache = new TileCache(
+      cachableTileFactory,
+      mergePartialOptions(options, { tileCacheForSprites: this.tileCache })
+    )
   }
 
   /**
@@ -110,6 +119,49 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap, mapOptions)
+  }
+
+  async addSpritesInfo(spritesInfo: SpritesInfo) {
+    const width = spritesInfo.imageSize[0]
+    const height = spritesInfo.imageSize[1]
+
+    const tile: Tile = {
+      column: 0,
+      row: 0,
+      tileZoomLevel: {
+        scaleFactor: 1, // Unused
+        width,
+        height,
+        originalWidth: 0, // Unused
+        originalHeight: 0, // Unused
+        columns: 1,
+        rows: 1
+      },
+      imageSize: spritesInfo.imageSize
+    }
+
+    const warpedMapsByResourceId: Map<string, WarpedMapWithImage[]> = new Map()
+    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+      if (!warpedMap.hasImage()) {
+        await warpedMap.loadImage(this.warpedMapList.imagesById)
+      }
+      if (!warpedMap.hasImage()) {
+        break // Make TS happy
+      }
+      if (!warpedMapsByResourceId.has(warpedMap.georeferencedMap.resource.id)) {
+        warpedMapsByResourceId.set(warpedMap.georeferencedMap.resource.id, [])
+      }
+      warpedMapsByResourceId
+        .get(warpedMap.georeferencedMap.resource.id)
+        ?.push(warpedMap)
+    }
+
+    this.spritesTileCache.requestFetchableTiles([
+      new FetchableTile(tile, spritesInfo.imageUrl, spritesInfo.imageUrl, {
+        spritesInfo,
+        warpedMapsByResourceId
+      })
+    ])
   }
 
   /**
@@ -427,7 +479,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     // Request all fetchable tiles to render, and prune tile cache
-    this.tileCache.requestFetchableTiles(allRequestedTilesForViewport)
+    // this.tileCache.requestFetchableTiles(allRequestedTilesForViewport)
     this.pruneTileCache(mapsInViewportForOverviewPrune)
 
     // Update map for viewport based on all fetchable tiles
@@ -589,6 +641,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
+    // If a sprite tile can be created, do so
+    // const spriteFechableTiles = warpedMap.
+
     // Find tiles covering this intersection of bboxes of to-resource-back-transformed viewport and mask
     // by computing the tiles covering this bbox's rectangle at the tilezoomlevel
     const tiles = computeTilesCoveringRingAtTileZoomLevel(
@@ -610,8 +665,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     // Make fetchable tiles
-    const fetchableTiles = tiles.map(
-      (tile) => new FetchableTile(tile, warpedMap)
+    const fetchableTiles = tiles.map((tile) =>
+      FetchableTile.fromWarpedMap(tile, warpedMap)
     )
     warpedMap.setFetchableTilesForViewport(fetchableTiles)
 
@@ -697,8 +752,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     // Make fechable tiles
-    const overviewFetchableTiles = overviewTiles.map(
-      (tile) => new FetchableTile(tile, warpedMap)
+    const overviewFetchableTiles = overviewTiles.map((tile) =>
+      FetchableTile.fromWarpedMap(tile, warpedMap)
     )
     warpedMap.setOverviewFetchableTilesForViewport(overviewFetchableTiles)
 

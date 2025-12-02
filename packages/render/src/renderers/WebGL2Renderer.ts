@@ -36,6 +36,7 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 // leads to import errors when publising on platforms like jsdelivr.
 // Using the inline query parameter solves this.
 import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
+import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -48,6 +49,7 @@ import type {
   SpecificWebGL2RenderOptions,
   WebGL2RenderOptions
 } from '../shared/types.js'
+import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
 const THROTTLE_PREPARE_RENDER_OPTIONS = {
@@ -157,11 +159,17 @@ export class WebGL2Renderer
     )
 
     const worker = new FetchAndGetImageDataWorker()
+    const spritesWorker = new ApplySpritesImageDataWorker()
     const wrappedWorker = comlinkWtap<FetchAndGetImageDataWorkerType>(worker)
+    const wrappedSpritesWorker =
+      comlinkWtap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
     super(
-      CacheableWorkerImageDataTile.createFactory(wrappedWorker),
       createWebGL2WarpedMapFactory(gl, mapProgram, linesProgram, pointsProgram),
+      CacheableWorkerImageDataTile.createFactory(
+        wrappedWorker,
+        wrappedSpritesWorker
+      ),
       options
     )
 

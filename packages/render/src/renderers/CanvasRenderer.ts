@@ -24,8 +24,8 @@ export class CanvasRenderer
     options?: Partial<CanvasRenderOptions>
   ) {
     super(
-      CacheableImageDataTile.createFactory(),
       createWarpedMapFactory(),
+      CacheableImageDataTile.createFactory(),
       options
     )
 

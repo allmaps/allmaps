@@ -34,8 +34,8 @@ export class IntArrayRenderer<D>
     options?: Partial<IntArrayRenderOptions>
   ) {
     super(
-      CacheableIntArrayTile.createFactory(getImageData),
       createWarpedMapFactory(),
+      CacheableIntArrayTile.createFactory(getImageData),
       options
     )
     this.getImageDataValue = getImageDataValue
