@@ -1,5 +1,6 @@
 export enum WarpedMapEventType {
   // WarpedMapList > ...
+  IMAGEINFOSADDED = 'imageinfosadded',
   GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
   GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
   WARPEDMAPADDED = 'warpedmapadded',
@@ -15,7 +16,7 @@ export enum WarpedMapEventType {
   // Tile > TileCache
   TILEFETCHED = 'tilefetched',
   TILEFETCHERROR = 'tilefetcherror',
-  SPRITESAPPLIED = 'spritesapplied',
+  CACHEDTILESFROMSPRITES = 'cachedtilesfromsprites',
 
   // TileCache > Renderer > ...
   MAPTILELOADED = 'maptileloaded',

@@ -17,7 +17,6 @@ import {
   applyHomogeneousTransform,
   invertHomogeneousTransform
 } from './homogeneous-transform.js'
-import { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import type { Point } from '@allmaps/types'
 

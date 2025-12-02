@@ -78,6 +78,7 @@ export class WebGL2Renderer
   implements Renderer
 {
   #worker: Worker
+  #spritesWorker: Worker
 
   gl: WebGL2RenderingContext
 
@@ -174,6 +175,7 @@ export class WebGL2Renderer
     )
 
     this.#worker = worker
+    this.#spritesWorker = spritesWorker
     this.gl = gl
 
     this.options = mergeOptions(
@@ -334,22 +336,19 @@ export class WebGL2Renderer
     this.gl.deleteProgram(this.pointsProgram)
 
     this.#worker.terminate()
+    this.#spritesWorker.terminate()
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
   protected updateMapsForViewport(
-    allFechableTilesForViewport: FetchableTile[],
-    allRequestedTilesForViewport: FetchableTile[]
+    allFechableTilesForViewport: FetchableTile[]
   ): {
     mapsEnteringViewport: string[]
     mapsLeavingViewport: string[]
   } {
     const { mapsEnteringViewport, mapsLeavingViewport } =
-      super.updateMapsForViewport(
-        allFechableTilesForViewport,
-        allRequestedTilesForViewport
-      )
+      super.updateMapsForViewport(allFechableTilesForViewport)
 
     this.updateVertexBuffers(mapsEnteringViewport)
 

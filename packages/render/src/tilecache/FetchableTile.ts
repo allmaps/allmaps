@@ -1,14 +1,11 @@
+import { mergePartialOptions } from '@allmaps/stdlib'
+
 import { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import { fetchableTileKey, tileKey } from '../shared/tiles.js'
 
-import type { Tile, Size, ImageRequest } from '@allmaps/types'
+import type { Tile, Size } from '@allmaps/types'
 
-import type {
-  FetchableTileOptions,
-  Sprite,
-  SpritesInfo
-} from '../shared/types.js'
-import { mergePartialOptions } from '@allmaps/stdlib'
+import type { FetchableTileOptions, Sprite } from '../shared/types.js'
 
 /**
  * Class for tiles that can be fetched.

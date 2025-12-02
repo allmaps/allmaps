@@ -166,7 +166,7 @@ export type WarpedMapFactory<W> = (
   mapOptions?: Partial<WarpedMapOptions>
 ) => W
 
-export type CachableTileFactory<D> = (
+export type CacheableTileFactory<D> = (
   fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>
@@ -178,9 +178,9 @@ export type FetchableTileOptions = {
 }
 
 export type SpritesInfo = {
+  sprites: Sprite[]
   imageUrl: string
   imageSize: Size
-  sprites: Sprite[]
 }
 
 export type Sprite = {
@@ -190,7 +190,7 @@ export type Sprite = {
   y: number
   width: number
   height: number
-  spriteTileScale: number
+  spriteTileScale?: number
 }
 
 export type RenderLineGroupOptions = {

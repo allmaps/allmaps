@@ -221,6 +221,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       this.imagesById.set(image.uri, image)
       result.push(image.uri)
     }
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGEINFOSADDED))
+
     return result
   }
 

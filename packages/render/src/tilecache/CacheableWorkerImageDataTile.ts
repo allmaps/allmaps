@@ -81,7 +81,7 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
     const warpedMapsByResourceId =
       this.fetchableTile.options?.warpedMapsByResourceId
     if (!data || !spritesInfo || !warpedMapsByResourceId) {
-      throw new Error('Info missing to apply sprites')
+      return
     }
 
     // TODO: this could be optimised:
@@ -106,7 +106,10 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
           warpedMapsByResourceId
         )
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.SPRITESAPPLIED, {
+          new WarpedMapEvent(WarpedMapEventType.CACHEDTILESFROMSPRITES, {
+            mapIds: this.cachedTilesFromSpritesData.map(
+              (cachedTile) => cachedTile.fetchableTile.mapId
+            ),
             tileUrl: this.fetchableTile.tileUrl
           })
         )

@@ -36,6 +36,7 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 
 | Type                            | Description                                                                                                                          |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `imageinfosloaded`              | Image infos have been directly loaded into the warped map list                                                                       |
 | `georeferenceannotationadded`   | A georeference annotation has been added to the warped map list                                                                      |
 | `georeferenceannotationremoved` | A georeference annotation has been removed from the warped map list                                                                  |
 | `warpedmapadded`                | A warped map has been added to the warped map list                                                                                   |
@@ -43,6 +44,7 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 | `warpedmapentered`              | A warped map has entered the viewport                                                                                                |
 | `warpedmapleft`                 | A warped map has left the viewport                                                                                                   |
 | `imageloaded`                   | An image was loaded for a map from cache or by fetching image info                                                                   |
+| `cachedtilesfromsprites`        | Tiles have been created from a fetched sprites image map                                                                |
 | `maptileloaded`                 | A tile has been loaded to the tile cache for a map                                                                                   |
 | `maptiledeleted`                | A tile has been deleted from the tile cache for a map                                                                                |
 | `firstmaptileloaded`            | The cache loaded a first tile of a map                                                                                               |
