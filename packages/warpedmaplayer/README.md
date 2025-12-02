@@ -220,6 +220,22 @@ Adds image information to the WarpedMapList's image information cache
 
 Image IDs of the image informations that were added (`Array<string>`).
 
+### `BaseWarpedMapLayer#addSprites(sprites, imageUrl, imageSize)`
+
+Adds sprites to the Renderer's sprite tile cache
+
+This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
+
+###### Parameters
+
+* `sprites` (`Array<Sprite>`)
+* `imageUrl` (`string`)
+* `imageSize` (`[number, number]`)
+
+###### Returns
+
+`Promise<void>`.
+
 ### `BaseWarpedMapLayer#bringMapsForward(mapIds)`
 
 Bring maps forward
