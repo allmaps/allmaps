@@ -57,7 +57,7 @@ const SCALE_FACTOR_CORRECTION = 0
 const LOG2_SCALE_FACTOR_CORRECTION = 0.4
 
 const SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = Infinity
-const SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1.5
+const SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
 
 const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
 const MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO = 10
@@ -874,12 +874,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           Math.log2(spriteCachedTilesScaleFactor)
         const scaleFactorDiffWithinHigherTolerance =
           log2ScaleFactorDiff <= SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
-        if (scaleFactorDiffWithinHigherTolerance) {
-          return false
-        }
         const scaleFactorDiffWithinLowerTolerance =
           -log2ScaleFactorDiff <= SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
-        if (scaleFactorDiffWithinLowerTolerance) {
+        if (
+          scaleFactorDiffWithinHigherTolerance &&
+          scaleFactorDiffWithinLowerTolerance
+        ) {
           return false
         }
       }
