@@ -390,9 +390,12 @@ export class WarpedMapLayer
   /**
    * Adds sprites to the Renderer's sprite tile cache
    *
+   * This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
    * This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
    *
-   * @param spritesInfo - Information on a sprites image
+   * @param sprites - Sprites
+   * @param imageUrl - Image url
+   * @param imageSize - Image size
    */
   async addSprites(
     sprites: Sprite[],
@@ -401,7 +404,7 @@ export class WarpedMapLayer
   ): Promise<void> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    this.renderer.addSprites(sprites, imageUrl, imageSize)
+    await this.renderer.addSprites(sprites, imageUrl, imageSize)
     this.nativeUpdate()
 
     return
@@ -1007,12 +1010,12 @@ export class WarpedMapLayer
     )
 
     this.renderer.tileCache.addEventListener(
-      WarpedMapEventType.CACHEDTILESFROMSPRITES,
+      WarpedMapEventType.MAPTILELOADED,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
-    this.renderer.tileCache.addEventListener(
-      WarpedMapEventType.MAPTILELOADED,
+    this.renderer.spritesTileCache.addEventListener(
+      WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -1103,12 +1106,12 @@ export class WarpedMapLayer
     )
 
     this.renderer.tileCache.removeEventListener(
-      WarpedMapEventType.CACHEDTILESFROMSPRITES,
+      WarpedMapEventType.MAPTILELOADED,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
-    this.renderer.tileCache.removeEventListener(
-      WarpedMapEventType.MAPTILELOADED,
+    this.renderer.spritesTileCache.removeEventListener(
+      WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
     )
 

@@ -246,13 +246,17 @@ Image IDs of the image informations that were added (`Array<string>`).
 
 Adds sprites to the Renderer's sprite tile cache
 
+This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
 This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
 
 ###### Parameters
 
 * `sprites` (`Array<Sprite>`)
+  * Sprites
 * `imageUrl` (`string`)
+  * Image url
 * `imageSize` (`[number, number]`)
+  * Image size
 
 ###### Returns
 

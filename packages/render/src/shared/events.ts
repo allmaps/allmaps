@@ -16,10 +16,13 @@ export enum WarpedMapEventType {
   // Tile > TileCache
   TILEFETCHED = 'tilefetched',
   TILEFETCHERROR = 'tilefetcherror',
-  CACHEDTILESFROMSPRITES = 'cachedtilesfromsprites',
+
+  // Tile > TileCache > Renderer
+  TILESFROMSPRITETILE = 'tilesfromspritetile',
 
   // TileCache > Renderer > ...
   MAPTILELOADED = 'maptileloaded',
+  MAPTILESLOADEDFROMSPRITES = 'maptilesloadedfromsprites',
   MAPTILEDELETED = 'maptiledeleted',
   FIRSTMAPTILELOADED = 'firstmaptileloaded',
   ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',

@@ -6,6 +6,7 @@ import { computeBboxTile } from '../shared/tiles.js'
 
 import type { FetchFn } from '@allmaps/types'
 
+import type { TileCache } from './TileCache.js'
 import type { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type {
   MapPruneConstants,
@@ -23,7 +24,7 @@ export abstract class CacheableTile<D> extends EventTarget {
   protected abortController: AbortController
 
   protected data?: D
-  protected cachedTilesFromSpritesData?: CachedTile<D>[]
+  protected cachedTilesFromSprites?: CachedTile<D>[]
 
   /**
    * Creates an instance of CacheableTile.
@@ -60,7 +61,7 @@ export abstract class CacheableTile<D> extends EventTarget {
   }
 
   getCachedTilesFromSprites(): CachedTile<D>[] | undefined {
-    return this.cachedTilesFromSpritesData
+    return this.cachedTilesFromSprites
   }
 
   /**

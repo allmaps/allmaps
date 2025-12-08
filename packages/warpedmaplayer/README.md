@@ -44,7 +44,7 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 | `warpedmapentered`              | A warped map has entered the viewport                                                                                                |
 | `warpedmapleft`                 | A warped map has left the viewport                                                                                                   |
 | `imageloaded`                   | An image was loaded for a map from cache or by fetching image info                                                                   |
-| `cachedtilesfromsprites`        | Tiles have been created from a fetched sprites image map                                                                |
+| `maptilesloadedfromsprites`     | Tiles have been loaded to the tile cache from a fetched sprites image map                                                                             |
 | `maptileloaded`                 | A tile has been loaded to the tile cache for a map                                                                                   |
 | `maptiledeleted`                | A tile has been deleted from the tile cache for a map                                                                                |
 | `firstmaptileloaded`            | The cache loaded a first tile of a map                                                                                               |
@@ -224,13 +224,17 @@ Image IDs of the image informations that were added (`Array<string>`).
 
 Adds sprites to the Renderer's sprite tile cache
 
+This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
 This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
 
 ###### Parameters
 
 * `sprites` (`Array<Sprite>`)
+  * Sprites
 * `imageUrl` (`string`)
+  * Image url
 * `imageSize` (`[number, number]`)
+  * Image size
 
 ###### Returns
 

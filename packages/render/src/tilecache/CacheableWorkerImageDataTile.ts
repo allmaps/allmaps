@@ -6,6 +6,7 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
 
+import type { TileCache } from './TileCache.js'
 import type { SpritesInfo } from '../shared/types.js'
 import type { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
@@ -100,16 +101,13 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
     return this.#spritesWorker
       .applySprites(data, spritesInfo.sprites, tileSizesByResourceId)
       .then((clippedImageDatas) => {
-        this.cachedTilesFromSpritesData = this.spritesDataToCachedTiles(
+        this.cachedTilesFromSprites = this.spritesDataToCachedTiles(
           clippedImageDatas,
           spritesInfo,
           warpedMapsByResourceId
         )
         this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.CACHEDTILESFROMSPRITES, {
-            mapIds: this.cachedTilesFromSpritesData.map(
-              (cachedTile) => cachedTile.fetchableTile.mapId
-            ),
+          new WarpedMapEvent(WarpedMapEventType.TILESFROMSPRITETILE, {
             tileUrl: this.fetchableTile.tileUrl
           })
         )
