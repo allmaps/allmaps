@@ -462,6 +462,17 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       .reduce((a, c) => a + c, 0)
     let overviewFetchableTilesForViewportResolution = 0
 
+    // Get sprite fetchable tiles from tileCache
+    const spriteFetchableTiles = this.tileCache
+      .getCachedTiles()
+      .filter((cachedTile) => cachedTile.isTileFromSprites())
+      .filter(
+        (cachedTile) =>
+          this.warpedMapList.getWarpedMap(cachedTile.fetchableTile.mapId)
+            ?.options.visible != false
+      )
+      .map((cachedTile) => cachedTile.fetchableTile)
+
     // Get overview fetchable tiles for all maps in viewport with overview buffer
     // (and set properties for the current viewport for all maps in viewport with prune buffer)
     if (this.shouldAnticipateInteraction()) {
@@ -471,7 +482,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
             mapId,
             fetchableTilesForViewportResolution +
               overviewFetchableTilesForViewportResolution,
-            mapsInViewportForOverviewRequest
+            mapsInViewportForOverviewRequest,
+            spriteFetchableTiles
           )
         overviewFetchableTilesForViewportResolution +=
           mapOverviewFetchableTilesForViewport
@@ -483,20 +495,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       }
     }
 
-    const spriteFetchableTiles = this.tileCache
-      .getCachedTiles()
-      .filter((cachedTile) => cachedTile.isTileFromSprites())
-      .filter(
-        (cachedTile) =>
-          this.warpedMapList.getWarpedMap(cachedTile.fetchableTile.mapId)
-            ?.options.visible != false
-      )
-      .map((cachedTile) => cachedTile.fetchableTile)
-
     const allFetchableTilesForViewport = [
       ...fetchableTilesForViewport,
-      ...overviewFetchableTilesForViewport,
-      ...spriteFetchableTiles
+      ...spriteFetchableTiles,
+      ...overviewFetchableTilesForViewport
     ]
     const allRequestedTilesForViewport = allFetchableTilesForViewport.filter(
       (fetchableTile) =>
@@ -701,7 +703,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected getMapOverviewFetchableTilesForViewport(
     mapId: string,
     totalFetchableTilesForViewportResolution: number,
-    mapsInViewportForOverviewRequest: Set<string>
+    mapsInViewportForOverviewRequest: Set<string>,
+    spriteFetchabelTiles: FetchableTile[]
   ): FetchableTile[] {
     if (!this.viewport) {
       return []
@@ -726,12 +729,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // No overview tiles if too many fetchable tiles (normal and overview) in total already
     // or if many maps to render
+    // or if tiles from sprites
     const maxTotalFetchableTilesResolution =
       this.viewport.canvasResolution * MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO
     if (
       totalFetchableTilesForViewportResolution >
         maxTotalFetchableTilesResolution ||
-      mapsInViewportForOverviewRequest.size > MAX_TOTAL_MAPS_OVERVIEW
+      mapsInViewportForOverviewRequest.size > MAX_TOTAL_MAPS_OVERVIEW ||
+      spriteFetchabelTiles.length > 0
     ) {
       return []
     }

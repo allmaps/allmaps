@@ -1095,6 +1095,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       }
     }
 
+    // Include tiles from sprites
+    spriteCachedTiles.push(
+      ...Array.from(this.cachedTilesByTileUrl.values()).filter((cachedTile) =>
+        cachedTile.isTileFromSprites()
+      )
+    )
+
     // Try to include tiles that are at overview zoomlevel
     for (const fetchableTile of this.overviewFetchableTilesForViewport) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
@@ -1115,18 +1122,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       }
     }
 
-    // Include tiles from sprites
-    spriteCachedTiles.push(
-      ...Array.from(this.cachedTilesByTileUrl.values()).filter((cachedTile) =>
-        cachedTile.isTileFromSprites()
-      )
-    )
-
     let cachedTilesForTextures = [
       ...cachedTiles,
       ...cachedTilesAtOtherScaleFactors,
-      ...overviewCachedTiles,
-      ...spriteCachedTiles
+      ...spriteCachedTiles,
+      ...overviewCachedTiles
     ]
 
     // Making tiles unique by tileUrl
