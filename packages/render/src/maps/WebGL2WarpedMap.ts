@@ -1115,11 +1115,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       }
     }
 
-    // Include sprite tiles
+    // Include tiles from sprites
     spriteCachedTiles.push(
-      ...Array.from(this.cachedTilesByTileUrl.values()).filter(
-        (cachedTile) =>
-          cachedTile.fetchableTile.options?.spritesInfo !== undefined
+      ...Array.from(this.cachedTilesByTileUrl.values()).filter((cachedTile) =>
+        cachedTile.isTileFromSprites()
       )
     )
 

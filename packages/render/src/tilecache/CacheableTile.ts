@@ -60,6 +60,10 @@ export abstract class CacheableTile<D> extends EventTarget {
     return this.data !== undefined
   }
 
+  isTileFromSprites() {
+    return this.fetchableTile.options?.spritesInfo != undefined
+  }
+
   getCachedTilesFromSprites(): CachedTile<D>[] | undefined {
     return this.cachedTilesFromSprites
   }
@@ -80,7 +84,7 @@ export abstract class CacheableTile<D> extends EventTarget {
     const tile = this.fetchableTile.tile
 
     // Don't prune if sprite
-    if (this.fetchableTile.options?.spritesInfo) {
+    if (this.isTileFromSprites()) {
       return false
     }
 

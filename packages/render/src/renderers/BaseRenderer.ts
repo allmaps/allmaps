@@ -485,10 +485,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     const spriteFetchableTiles = this.tileCache
       .getCachedTiles()
-      .filter(
-        (cachedTile) =>
-          cachedTile.fetchableTile.options?.spritesInfo != undefined
-      )
+      .filter((cachedTile) => cachedTile.isTileFromSprites())
       .filter(
         (cachedTile) =>
           this.warpedMapList.getWarpedMap(cachedTile.fetchableTile.mapId)
@@ -870,10 +867,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   ) {
     const spriteCachedTiles = this.tileCache
       .getMapCachedTiles(warpedMap.mapId)
-      .filter(
-        (cachedTile) =>
-          cachedTile.fetchableTile.options?.spritesInfo != undefined
-      )
+      .filter((cachedTile) => cachedTile.isTileFromSprites())
     const spriteCachedTilesScaleFactors = spriteCachedTiles.map(
       (cachedTile) => cachedTile.fetchableTile.tile.tileZoomLevel.scaleFactor
     )
