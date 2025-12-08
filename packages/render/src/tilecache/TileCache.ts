@@ -306,7 +306,7 @@ export class TileCache<D> extends EventTarget {
     if (this.tilesByTileUrl.has(tileUrl)) {
       return
     }
-    this.tilesByTileUrl.set(cachedTile.fetchableTile.tileUrl, cachedTile)
+    this.tilesByTileUrl.set(tileUrl, cachedTile)
     this.addTileUrlForMapId(tileUrl, mapId)
     this.addMapIdForTileUrl(mapId, tileUrl)
 

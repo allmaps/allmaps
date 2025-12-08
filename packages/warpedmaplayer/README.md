@@ -36,7 +36,7 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 
 | Type                            | Description                                                                                                                          |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| `imageinfosloaded`              | Image infos have been directly loaded into the warped map list                                                                       |
+| `imageinfosadded`              | Image infos have been directly added into the warped map list                                                                       |
 | `georeferenceannotationadded`   | A georeference annotation has been added to the warped map list                                                                      |
 | `georeferenceannotationremoved` | A georeference annotation has been removed from the warped map list                                                                  |
 | `warpedmapadded`                | A warped map has been added to the warped map list                                                                                   |

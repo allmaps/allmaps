@@ -6,7 +6,6 @@ import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
 
-import type { TileCache } from './TileCache.js'
 import type { SpritesInfo } from '../shared/types.js'
 import type { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
@@ -120,10 +119,9 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
     warpedMapsByResourceId: Map<string, WarpedMapWithImage[]>
   ): CachedTile<ImageData>[] {
     const cachedTiles: CachedWorkerImageDataTile[] = []
-    for (const [i, sprite] of spritesInfo.sprites.entries()) {
-      const warpedMaps = warpedMapsByResourceId.get(
-        spritesInfo.sprites[i].imageId
-      )
+    let index = 0
+    for (const sprite of spritesInfo.sprites) {
+      const warpedMaps = warpedMapsByResourceId.get(sprite.imageId)
       if (!warpedMaps) {
         break
       }
@@ -134,9 +132,10 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
           }),
           this.#worker,
           this.#spritesWorker,
-          clippedImageDatas[i]
+          clippedImageDatas[index]
         )
         cachedTiles.push(cachedTile)
+        index++
       }
     }
     return cachedTiles

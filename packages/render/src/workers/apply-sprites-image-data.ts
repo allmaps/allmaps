@@ -19,6 +19,11 @@ const ApplySpritesImageDataWorker = {
       for (const tileSize of tileSizes) {
         const clippedImageData = new ImageData(...tileSize)
 
+        // TODO: support sprites larger than one tiles: split imageData by tileSize
+        if (sprite.width > tileSize[0] || sprite.height > tileSize[1]) {
+          throw new Error('Sprites larger then one tile not supported yet')
+        }
+
         for (let y = 0; y < sprite.height; y++) {
           const srcStartIndex =
             ((sprite.y + y) * imageData.width + sprite.x) * 4

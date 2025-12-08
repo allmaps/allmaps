@@ -6,7 +6,6 @@ import { computeBboxTile } from '../shared/tiles.js'
 
 import type { FetchFn } from '@allmaps/types'
 
-import type { TileCache } from './TileCache.js'
 import type { WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type {
   MapPruneConstants,
@@ -29,8 +28,10 @@ export abstract class CacheableTile<D> extends EventTarget {
   /**
    * Creates an instance of CacheableTile.
    *
+   * Note that there can be multiple FetchableTiles with the same tileUrl, but only one CachedTile per tileUrl.
+   *
    * @constructor
-   * @param fetchableTile
+   * @param fetchableTile - The FetchableTile which created this CachedTile.
    * @param fetchFn - Optional fetch function to use
    */
   constructor(fetchableTile: FetchableTile, fetchFn?: FetchFn) {

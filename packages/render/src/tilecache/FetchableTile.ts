@@ -83,6 +83,12 @@ export class FetchableTile {
   ) {
     const width = warpedMap.tileSize[0]
     const height = warpedMap.tileSize[1]
+
+    // TODO: support sprites larger than one tiles: create multiple tile with column(s) and row(s)
+    // and unique tileUrls (using tileKeys)
+
+    // Create a dummy tile and tileImageRequest
+    // They are needed in the renderer
     const tile = {
       column: 0,
       row: 0,
@@ -102,6 +108,8 @@ export class FetchableTile {
       tile.column,
       tile.row
     )
+
+    // Create a fetchable tile with the sprite imageUrl as tileUrl
     return new FetchableTile(
       tile,
       warpedMap.mapId,

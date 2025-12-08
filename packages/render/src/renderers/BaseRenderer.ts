@@ -152,8 +152,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       if (!warpedMap.hasImage()) {
         break // Make TS happy
       }
-      if (!warpedMapsByResourceId.has(warpedMap.georeferencedMap.resource.id)) {
-        warpedMapsByResourceId.set(warpedMap.georeferencedMap.resource.id, [])
+      const resourceId = warpedMap.georeferencedMap.resource.id
+      if (!warpedMapsByResourceId.has(resourceId)) {
+        warpedMapsByResourceId.set(resourceId, [])
       }
       warpedMapsByResourceId
         .get(warpedMap.georeferencedMap.resource.id)
