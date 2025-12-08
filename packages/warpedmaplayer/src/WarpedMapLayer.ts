@@ -227,7 +227,7 @@ export abstract class BaseWarpedMapLayer<
   ): Promise<void> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    await this.renderer.addSprites(sprites, imageUrl, imageSize)
+    this.renderer.addSprites(sprites, imageUrl, imageSize)
     this.nativeUpdate()
 
     return

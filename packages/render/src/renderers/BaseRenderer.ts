@@ -161,22 +161,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         ?.push(warpedMap)
     }
 
-    const promise = new Promise((resolve) => {
-      this.spritesTileCache.addEventListener(
-        WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
-        resolve,
-        { once: true }
-      )
-    })
-
     this.spritesTileCache.requestFetchableTiles([
       new FetchableTile(tile, spritesInfo.imageUrl, spritesInfo.imageUrl, {
         spritesInfo,
         warpedMapsByResourceId
       })
     ])
-
-    return promise
   }
 
   /**
