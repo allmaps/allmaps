@@ -2,7 +2,7 @@ import { expose, transfer } from 'comlink'
 
 import type { Size } from '@allmaps/types'
 
-import type { Sprite } from '../shared/types'
+import type { Sprite } from '../shared/types.js'
 
 const ApplySpritesImageDataWorker = {
   async applySprites(
