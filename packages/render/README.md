@@ -369,7 +369,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
 * `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
@@ -1231,7 +1231,7 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `listOptions` (`Partial<WarpedMapListOptions> | undefined`)
 * `mapOptions` (`Partial<WarpedMapOptions> | undefined`)
@@ -1417,7 +1417,7 @@ Array<Point>
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...
+{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
 ```
 
 ### `WarpedMap#georeferencedMapOptions`
@@ -2504,7 +2504,7 @@ Map ID of the map that was added (`Promise<string>`).
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 * `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
 
 ###### Returns
@@ -2735,7 +2735,7 @@ There are no parameters.
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -2910,7 +2910,7 @@ Map ID of the removed map, or an error (`Promise<string | Error | undefined>`).
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
 
 ###### Returns
 
@@ -3198,7 +3198,7 @@ Render the map for a given viewport.
 
 ###### Parameters
 
-* `canvas` (`HTMLCanvasElement`)
+* `canvas` (`HTMLCanvasElement | OffscreenCanvas`)
 * `options?` (`Partial<BaseRenderOptions> | undefined`)
 
 ###### Returns
@@ -3215,7 +3215,7 @@ Render the map for a given viewport.
 ###### Type
 
 ```ts
-HTMLCanvasElement
+HTMLCanvasElement | OffscreenCanvas
 ```
 
 ### `CanvasRenderer#context`
@@ -3863,7 +3863,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context
