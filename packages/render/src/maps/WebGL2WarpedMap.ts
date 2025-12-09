@@ -171,8 +171,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   previousCachedTilesForTexture: CachedTile<ImageData>[] = []
 
   cachedTilesTextureArray: WebGLTexture | null = null
-  cachedTilesResourceOriginPointsAndDimensionsTexture: WebGLTexture | null =
-    null
+  cachedTilesResourceOriginPointsAndSizesTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
 
   // About renderHomogeneousTransform and InvertedRenderHomogeneousTransform:
@@ -238,7 +237,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.cachedTilesTextureArray = this.gl.createTexture()
     this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
-    this.cachedTilesResourceOriginPointsAndDimensionsTexture =
+    this.cachedTilesResourceOriginPointsAndSizesTexture =
       this.gl.createTexture()
   }
 
@@ -369,9 +368,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.deleteVertexArray(this.pointsVao)
     this.gl.deleteTexture(this.cachedTilesTextureArray)
     this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
-    this.gl.deleteTexture(
-      this.cachedTilesResourceOriginPointsAndDimensionsTexture
-    )
+    this.gl.deleteTexture(this.cachedTilesResourceOriginPointsAndSizesTexture)
 
     this.cancelThrottledFunctions()
 
@@ -999,9 +996,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Cached tiles resource origin points and dimensions texture
+    // Cached tiles resource origin points and sizes texture
 
-    const cachedTilesResourceOriginPointsAndDimensions =
+    const cachedTilesResourceOriginPointsAndSizes =
       this.cachedTilesForTexture.map((textureTile) => {
         if (
           textureTile &&
@@ -1017,13 +1014,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
             textureTile.fetchableTile.options.imageRequest.region.height
           ]
         } else {
-          throw new Error('Missing resource origin points and dimensions')
+          throw new Error('Missing resource origin points and sizes')
         }
       }) as number[][]
 
     gl.bindTexture(
       gl.TEXTURE_2D,
-      this.cachedTilesResourceOriginPointsAndDimensionsTexture
+      this.cachedTilesResourceOriginPointsAndSizesTexture
     )
 
     // A previous verions used gl.RGBA_INTEGER as this texture's format
@@ -1039,7 +1036,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       0,
       gl.RED_INTEGER,
       gl.INT,
-      new Int32Array(cachedTilesResourceOriginPointsAndDimensions.flat())
+      new Int32Array(cachedTilesResourceOriginPointsAndSizes.flat())
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)

@@ -2432,6 +2432,7 @@ There are no parameters.
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  spritesInfo?: SpritesInfo | undefined
 }
 ```
 
@@ -3496,6 +3497,18 @@ false
 
 `void`.
 
+### `WebGL2Renderer#getUniformLocation(gl, program, name)`
+
+###### Parameters
+
+* `gl` (`WebGLRenderingContext`)
+* `program` (`WebGLProgram`)
+* `name` (`string`)
+
+###### Returns
+
+`WebGLUniformLocation | null`.
+
 ### `WebGL2Renderer#gl`
 
 ###### Type
@@ -3804,6 +3817,14 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
+### `WebGL2Renderer#uniformCache`
+
+###### Type
+
+```ts
+Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>
+```
+
 ### `WebGL2Renderer#updateMapsForViewport(allFechableTilesForViewport)`
 
 ###### Parameters
@@ -3907,7 +3928,7 @@ Map<string, CachedTile<ImageData>>
 Array<never>
 ```
 
-### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndDimensionsTexture`
+### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndSizesTexture`
 
 ###### Type
 

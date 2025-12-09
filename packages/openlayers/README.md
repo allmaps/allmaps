@@ -160,6 +160,7 @@ object & Partial<WebGL2RenderOptions>
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  spritesInfo?: SpritesInfo | undefined
 }
 ```
 
