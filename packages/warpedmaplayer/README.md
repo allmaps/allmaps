@@ -32,10 +32,11 @@ Use this readme to understand the API of the WarpedMapLayer methods shared betwe
 
 ### Events
 
-The following events are emitted to inform you of the state of the `WarpedMapLayer`.
+The following events are emitted by the native map object to inform you of the state of the `WarpedMapLayer`.
 
 | Type                            | Description                                                                                                                          |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `imageinfosadded`              | Image infos have been directly added into the warped map list                                                                       |
 | `georeferenceannotationadded`   | A georeference annotation has been added to the warped map list                                                                      |
 | `georeferenceannotationremoved` | A georeference annotation has been removed from the warped map list                                                                  |
 | `warpedmapadded`                | A warped map has been added to the warped map list                                                                                   |
@@ -43,6 +44,7 @@ The following events are emitted to inform you of the state of the `WarpedMapLay
 | `warpedmapentered`              | A warped map has entered the viewport                                                                                                |
 | `warpedmapleft`                 | A warped map has left the viewport                                                                                                   |
 | `imageloaded`                   | An image was loaded for a map from cache or by fetching image info                                                                   |
+| `maptilesloadedfromsprites`     | Tiles have been loaded to the tile cache from a fetched sprites image map                                                                             |
 | `maptileloaded`                 | A tile has been loaded to the tile cache for a map                                                                                   |
 | `maptiledeleted`                | A tile has been deleted from the tile cache for a map                                                                                |
 | `firstmaptileloaded`            | The cache loaded a first tile of a map                                                                                               |
@@ -59,6 +61,7 @@ export type WarpedMapEventData = {
   mapIds: string[]
   tileUrl: string
   optionKeys: string[]
+  spritesInfo: SpritesInfo
 }
 ```
 
@@ -217,6 +220,26 @@ Adds image information to the WarpedMapList's image information cache
 ###### Returns
 
 Image IDs of the image informations that were added (`Array<string>`).
+
+### `BaseWarpedMapLayer#addSprites(sprites, imageUrl, imageSize)`
+
+Adds sprites to the Renderer's sprite tile cache
+
+This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
+This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
+
+###### Parameters
+
+* `sprites` (`Array<Sprite>`)
+  * Sprites
+* `imageUrl` (`string`)
+  * Image url
+* `imageSize` (`[number, number]`)
+  * Image size
+
+###### Returns
+
+`Promise<void>`.
 
 ### `BaseWarpedMapLayer#bringMapsForward(mapIds)`
 

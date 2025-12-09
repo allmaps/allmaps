@@ -1,5 +1,8 @@
+import { SpritesInfo } from './types'
+
 export enum WarpedMapEventType {
   // WarpedMapList > ...
+  IMAGEINFOSADDED = 'imageinfosadded',
   GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
   GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
   WARPEDMAPADDED = 'warpedmapadded',
@@ -16,8 +19,12 @@ export enum WarpedMapEventType {
   TILEFETCHED = 'tilefetched',
   TILEFETCHERROR = 'tilefetcherror',
 
+  // Tile > TileCache > Renderer
+  TILESFROMSPRITETILE = 'tilesfromspritetile',
+
   // TileCache > Renderer > ...
   MAPTILELOADED = 'maptileloaded',
+  MAPTILESLOADEDFROMSPRITES = 'maptilesloadedfromsprites',
   MAPTILEDELETED = 'maptiledeleted',
   FIRSTMAPTILELOADED = 'firstmaptileloaded',
   ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
@@ -39,6 +46,7 @@ export type WarpedMapEventData = {
   mapIds: string[]
   tileUrl: string
   optionKeys: string[]
+  spritesInfo: SpritesInfo
 }
 
 export class WarpedMapEvent extends Event {

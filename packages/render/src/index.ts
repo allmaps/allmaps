@@ -21,5 +21,7 @@ export type {
   AnimationOptions,
   SelectionOptions,
   ProjectionOptions,
-  TransformationOptions
+  TransformationOptions,
+  Sprite,
+  SpritesInfo
 } from './shared/types.js'

@@ -13,14 +13,15 @@ import type {
   BaseRenderOptions,
   ProjectionOptions,
   AnimationOptions,
-  WarpedMapList
+  WarpedMapList,
+  Sprite
 } from '@allmaps/render'
 import type {
   WebGL2RenderOptions,
   WebGL2WarpedMap,
   WebGL2WarpedMapOptions
 } from '@allmaps/render/webgl2'
-import type { Bbox, Gcp, Point, Ring } from '@allmaps/types'
+import type { Bbox, Gcp, Point, Ring, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 
 export type SpecificOpenLayersWarpedMapLayerOptions = object
@@ -387,6 +388,29 @@ export class WarpedMapLayer
   }
 
   /**
+   * Adds sprites to the Renderer's sprite tile cache
+   *
+   * This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
+   * This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
+   *
+   * @param sprites - Sprites
+   * @param imageUrl - Image url
+   * @param imageSize - Image size
+   */
+  async addSprites(
+    sprites: Sprite[],
+    imageUrl: string,
+    imageSize: Size
+  ): Promise<void> {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    await this.renderer.addSprites(sprites, imageUrl, imageSize)
+    this.nativeUpdate()
+
+    return
+  }
+
+  /**
    * Get the WarpedMapList object that contains a list of the warped maps of all loaded maps
    */
   getWarpedMapList(): WarpedMapList<WebGL2WarpedMap> {
@@ -413,7 +437,7 @@ export class WarpedMapLayer
    *
    * @param mapIds - Map IDs
    */
-  getWarpedMaps(mapIds: string[]): Iterable<WebGL2WarpedMap> {
+  getWarpedMaps(mapIds?: string[]): Iterable<WebGL2WarpedMap> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMaps({ mapIds })
@@ -946,6 +970,11 @@ export class WarpedMapLayer
     }
 
     this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.IMAGEINFOSADDED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -982,6 +1011,11 @@ export class WarpedMapLayer
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.spritesTileCache.addEventListener(
+      WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -1032,6 +1066,11 @@ export class WarpedMapLayer
     }
 
     this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMAGEINFOSADDED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
       WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -1068,6 +1107,11 @@ export class WarpedMapLayer
 
     this.renderer.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.spritesTileCache.removeEventListener(
+      WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
     )
 

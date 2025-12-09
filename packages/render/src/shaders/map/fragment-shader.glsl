@@ -30,7 +30,7 @@ uniform vec4 u_distortionColor3;
 uniform int u_scaleFactorForViewport;
 
 uniform lowp sampler2DArray u_cachedTilesTextureArray;
-uniform isampler2D u_cachedTilesResourceOriginPointsAndDimensionsTexture;
+uniform isampler2D u_cachedTilesResourceOriginPointsAndSizesTexture;
 uniform isampler2D u_cachedTilesScaleFactorsTexture;
 
 uniform float u_debugTriangles;
@@ -66,10 +66,10 @@ void main() {
   for(int index = 0; index < cachedTilesCount; index += 1) {
 
     // Read the information of the tile
-    float cachedTileResourceOriginPointX = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4)), 0));
-    float cachedTileResourceOriginPointY = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4) + 1), 0));
-    float cachedTileDimensionWidth = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4) + 2), 0));
-    float cachedTileDimensionHeight = float(texelFetch(u_cachedTilesResourceOriginPointsAndDimensionsTexture, ivec2(0, (index * 4) + 3), 0));
+    float cachedTileResourceOriginPointX = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4)), 0));
+    float cachedTileResourceOriginPointY = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4) + 1), 0));
+    float cachedTileDimensionWidth = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4) + 2), 0));
+    float cachedTileDimensionHeight = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4) + 3), 0));
 
     int cachedTileScaleFactor = texelFetch(u_cachedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
 

@@ -326,6 +326,26 @@ object
 * `createRTree` (`boolean`)
 * `rtreeUpdatedOptions` (`Array<string>`)
 
+### `Sprite`
+
+###### Fields
+
+* `height` (`number`)
+* `imageId` (`string`)
+* `scaleFactor` (`number`)
+* `spriteTileScale?` (`number`)
+* `width` (`number`)
+* `x` (`number`)
+* `y` (`number`)
+
+### `SpritesInfo`
+
+###### Fields
+
+* `imageSize` (`[number, number]`)
+* `imageUrl` (`string`)
+* `sprites` (`Array<Sprite>`)
+
 ### `TransformationOptions`
 
 ###### Fields
@@ -349,7 +369,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
 * `listOptions?` (`Partial<WarpedMapListOptions> | undefined`)
 * `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
@@ -1211,7 +1231,7 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
 * `listOptions` (`Partial<WarpedMapListOptions> | undefined`)
 * `mapOptions` (`Partial<WarpedMapOptions> | undefined`)
@@ -1397,7 +1417,7 @@ Array<Point>
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...
+{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...
 ```
 
 ### `WarpedMap#georeferencedMapOptions`
@@ -1549,7 +1569,7 @@ Load the parsed image from cache, or fetch and parse the image info to create it
 
 ###### Parameters
 
-* `imagesById` (`Map<string, Image>`)
+* `imagesById?` (`Map<string, Image> | undefined`)
 
 ###### Returns
 
@@ -2196,6 +2216,14 @@ There are no parameters.
 
 `boolean`.
 
+### `WarpedMap#tileSize?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
 ### `WarpedMap#tileZoomLevelForViewport?`
 
 ###### Type
@@ -2404,6 +2432,7 @@ There are no parameters.
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  spritesInfo?: SpritesInfo | undefined
 }
 ```
 
@@ -2475,7 +2504,7 @@ Map ID of the map that was added (`Promise<string>`).
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 * `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
 
 ###### Returns
@@ -2706,7 +2735,7 @@ There are no parameters.
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
@@ -2881,7 +2910,7 @@ Map ID of the removed map, or an error (`Promise<string | Error | undefined>`).
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
@@ -3468,6 +3497,18 @@ false
 
 `void`.
 
+### `WebGL2Renderer#getUniformLocation(gl, program, name)`
+
+###### Parameters
+
+* `gl` (`WebGLRenderingContext`)
+* `program` (`WebGLProgram`)
+* `name` (`string`)
+
+###### Returns
+
+`WebGLUniformLocation | null`.
+
 ### `WebGL2Renderer#gl`
 
 ###### Type
@@ -3776,12 +3817,19 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
-### `WebGL2Renderer#updateMapsForViewport(allFechableTilesForViewport, allRequestedTilesForViewport)`
+### `WebGL2Renderer#uniformCache`
+
+###### Type
+
+```ts
+Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>
+```
+
+### `WebGL2Renderer#updateMapsForViewport(allFechableTilesForViewport)`
 
 ###### Parameters
 
 * `allFechableTilesForViewport` (`Array<FetchableTile>`)
-* `allRequestedTilesForViewport` (`Array<FetchableTile>`)
 
 ###### Returns
 
@@ -3815,7 +3863,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context
@@ -3880,7 +3928,7 @@ Map<string, CachedTile<ImageData>>
 Array<never>
 ```
 
-### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndDimensionsTexture`
+### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndSizesTexture`
 
 ###### Type
 
@@ -4207,6 +4255,14 @@ DebouncedFunc<() => Promise<void>>
 ###### Returns
 
 `boolean`.
+
+### `WebGL2WarpedMap#tileSize`
+
+###### Type
+
+```ts
+[number, number]
+```
 
 ### `WebGL2WarpedMap#tileToCachedTile(tile)`
 

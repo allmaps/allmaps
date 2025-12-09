@@ -5,9 +5,10 @@ import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
 import type {
   AnimationOptions,
   ProjectionOptions,
-  BaseRenderOptions
+  BaseRenderOptions,
+  Sprite
 } from '@allmaps/render'
-import type { Point, Bbox, Ring, Gcp } from '@allmaps/types'
+import type { Point, Bbox, Ring, Gcp, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 import type {
   WebGL2RenderOptions,
@@ -207,6 +208,29 @@ export abstract class BaseWarpedMapLayer<
     this.nativeUpdate()
 
     return result
+  }
+
+  /**
+   * Adds sprites to the Renderer's sprite tile cache
+   *
+   * This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
+   * This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
+   *
+   * @param sprites - Sprites
+   * @param imageUrl - Image url
+   * @param imageSize - Image size
+   */
+  async addSprites(
+    sprites: Sprite[],
+    imageUrl: string,
+    imageSize: Size
+  ): Promise<void> {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    await this.renderer.addSprites(sprites, imageUrl, imageSize)
+    this.nativeUpdate()
+
+    return
   }
 
   /**
@@ -769,6 +793,11 @@ export abstract class BaseWarpedMapLayer<
     }
 
     this.renderer.warpedMapList.addEventListener(
+      WarpedMapEventType.IMAGEINFOSADDED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -805,6 +834,11 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.spritesTileCache.addEventListener(
+      WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -855,6 +889,11 @@ export abstract class BaseWarpedMapLayer<
     }
 
     this.renderer.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMAGEINFOSADDED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.warpedMapList.removeEventListener(
       WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -891,6 +930,11 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.spritesTileCache.removeEventListener(
+      WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
     )
 

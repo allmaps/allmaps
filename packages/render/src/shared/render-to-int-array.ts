@@ -18,13 +18,13 @@ import {
   invertHomogeneousTransform
 } from './homogeneous-transform.js'
 
+import type { Point } from '@allmaps/types'
+
 import type { WarpedMapList } from '../maps/WarpedMapList.js'
+import type { WarpedMap } from '../maps/WarpedMap.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { TileCache } from '../tilecache/TileCache.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
-
-import type { WarpedMap } from '../maps/WarpedMap.js'
-import type { Point } from '@allmaps/types'
 
 const CHANNELS = 4
 
@@ -97,7 +97,9 @@ export async function renderToIntArray<W extends WarpedMap, D>(
         let cachedTile: CachedTile<D> | undefined
         let foundCachedTile = false
         for (cachedTile of cachedTiles) {
-          if (resourcePointInTile(resourcePoint, cachedTile.tile)) {
+          if (
+            resourcePointInTile(resourcePoint, cachedTile.fetchableTile.tile)
+          ) {
             foundCachedTile = true
             break
           }
@@ -105,7 +107,7 @@ export async function renderToIntArray<W extends WarpedMap, D>(
 
         // If tile is found, set color of this resourcePoint, i.e. canvasPixel
         if (foundCachedTile && cachedTile) {
-          const tile = cachedTile.tile
+          const tile = cachedTile.fetchableTile.tile
           const tileSize = getImageDataSize(cachedTile.data)
 
           // Determine sub-pixel coordinates of the resourcePoint on the (scaled) tile: 'tilePoint'
