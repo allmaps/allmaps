@@ -84,13 +84,20 @@ await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 
 ### WarpedMapLayer API and Events
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins) and a list of events emitted by a WarpedMapLayer.
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins). It includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
-You can listen to them in the typical Leaflet way. Here's an example:
+You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
+
+```js
+warpedMapLayer.setLayerOptions({ visible: true })
+warpedMapLayer.setMapOptions(mapId, { visible: true })
+```
+
+You can listen to **events** in the typical way:
 
 ```js
 map.on('warpedmapadded', (event) => {
-  console.log(event.mapIds, WarpedMapLayer.getBounds())
+  console.log(event.mapIds)
 })
 ```
 

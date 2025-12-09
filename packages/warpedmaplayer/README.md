@@ -32,7 +32,7 @@ Use this readme to understand the API of the WarpedMapLayer methods shared betwe
 
 ### Events
 
-The following events are emitted to inform you of the state of the `WarpedMapLayer`.
+The following events are emitted by the native map object to inform you of the state of the `WarpedMapLayer`.
 
 | Type                            | Description                                                                                                                          |
 |---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
@@ -61,6 +61,7 @@ export type WarpedMapEventData = {
   mapIds: string[]
   tileUrl: string
   optionKeys: string[]
+  spritesInfo: SpritesInfo
 }
 ```
 
