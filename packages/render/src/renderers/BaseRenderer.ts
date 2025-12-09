@@ -51,10 +51,10 @@ const OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO = 10
 /**
  * 0 = no correction, -1 = shaper, +1 = less sharp
  * Normal has more effect on smaller scale factors
- * Log2 (i.e. per zoomlevel) has equal effect all scale factors
+ * Log2 (i.e. per zoomlevel) has equal effect on all scale factors
  */
 const SCALE_FACTOR_CORRECTION = 0
-const LOG2_SCALE_FACTOR_CORRECTION = 0.4
+const LOG2_SCALE_FACTOR_CORRECTION = -0.5
 
 const SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = Infinity
 const SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
@@ -583,11 +583,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Find TileZoomLevel for the current viewport
     // Note the equivalence of the following two:
-    // - warpedMap.getApproxResourceToCanvasScale(this.viewport)
-    // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerCanvasScale
+    // - warpedMap.getApproxResourceToViewportScale(this.viewport)
+    // - warpedMap.resourceToProjectedGeoScale * this.viewport.projectedGeoPerViewportScale
     const tileZoomLevel = getTileZoomLevelForScale(
       warpedMap.image.tileZoomLevels,
-      warpedMap.getResourceToCanvasScale(viewport),
+      warpedMap.getResourceToViewportScale(viewport),
       SCALE_FACTOR_CORRECTION,
       LOG2_SCALE_FACTOR_CORRECTION
     )
@@ -732,7 +732,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // or if many maps to render
     // or if tiles from sprites
     const maxTotalFetchableTilesResolution =
-      this.viewport.canvasResolution * MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO
+      this.viewport.viewportResolution * MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO
     if (
       totalFetchableTilesForViewportResolution >
         maxTotalFetchableTilesResolution ||
