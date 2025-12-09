@@ -1,5 +1,5 @@
 import { throttle } from 'lodash-es'
-import { wrap as comlinkWtap } from 'comlink'
+import { wrap as comlinkWrap } from 'comlink'
 
 import {
   hexToFractionalOpaqueRgba,
@@ -166,9 +166,9 @@ export class WebGL2Renderer
 
     const worker = new FetchAndGetImageDataWorker()
     const spritesWorker = new ApplySpritesImageDataWorker()
-    const wrappedWorker = comlinkWtap<FetchAndGetImageDataWorkerType>(worker)
+    const wrappedWorker = comlinkWrap<FetchAndGetImageDataWorkerType>(worker)
     const wrappedSpritesWorker =
-      comlinkWtap<ApplySpritesImageDataWorkerType>(spritesWorker)
+      comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
     super(
       createWebGL2WarpedMapFactory(gl, mapProgram, linesProgram, pointsProgram),
