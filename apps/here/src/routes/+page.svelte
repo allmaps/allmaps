@@ -46,18 +46,34 @@
   let ogImageUrl = $derived(`${page.url.href}allmaps-here.jpg`)
 
   beforeNavigate(() => {
-    uiState.mapsScrollTop = document.documentElement.scrollTop
+    // TODO: don't know if this try/catch is necessary
+    // I'm trying to solve a bug where the browser hangs when
+    // going back to this page
+    try {
+      uiState.mapsScrollTop = document.documentElement.scrollTop
+    } catch {
+      console.log("Couldn't access document.documentElement.scrollTop")
+    }
   })
 
   async function restoreScrollTop(scrollTop: number) {
+    // TODO: maybe await tick()? hangs the browser? Now trying with setTimeout.
     // Wait for the DOM to be ready
-    await tick()
-    document.documentElement.scrollTop = scrollTop
+    // await tick()
+
+    // TODO: don't know if this try/catch is necessary
+    // I'm trying to solve a bug where the browser hangs when
+    // going back to this page
+    try {
+      document.documentElement.scrollTop = scrollTop
+    } catch {
+      console.log("Couldn't set document.documentElement.scrollTop")
+    }
   }
 
   onMount(() => {
     if (uiState.mapsScrollTop) {
-      restoreScrollTop(uiState.mapsScrollTop)
+      setTimeout(() => restoreScrollTop(uiState.mapsScrollTop), 50)
     }
 
     window.setTimeout(() => {

@@ -7,8 +7,8 @@
   {#if childrenCount !== 1}
     <ol
       class="grid gap-3
-        grid-cols-[repeat(auto-fit,_minmax(min(160px,_100%),_1fr))]
-        sm:grid-cols-[repeat(auto-fit,_minmax(min(250px,_100%),_1fr))]"
+        grid-cols-[repeat(auto-fit,_minmax(160px,_1fr))]
+        sm:grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))]"
     >
       <slot />
     </ol>

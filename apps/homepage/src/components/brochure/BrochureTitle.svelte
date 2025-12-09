@@ -21,7 +21,15 @@
 
   let printing = $state(false)
 
-  let width = $state(1200)
+  let initialWidth = 1200
+
+  try {
+    initialWidth = window.innerWidth
+  } catch {
+    // window is not available.
+  }
+
+  let width = $state(initialWidth)
 
   let duration = $derived(printing ? 0 : 400)
   let maxDelay = $derived(printing ? 0 : 3000)
