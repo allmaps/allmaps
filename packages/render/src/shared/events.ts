@@ -1,3 +1,5 @@
+import { SpritesInfo } from './types'
+
 export enum WarpedMapEventType {
   // WarpedMapList > ...
   IMAGEINFOSADDED = 'imageinfosadded',
@@ -44,6 +46,7 @@ export type WarpedMapEventData = {
   mapIds: string[]
   tileUrl: string
   optionKeys: string[]
+  spritesInfo: SpritesInfo
 }
 
 export class WarpedMapEvent extends Event {

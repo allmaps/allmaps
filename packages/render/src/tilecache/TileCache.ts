@@ -437,7 +437,8 @@ export class TileCache<D> extends EventTarget {
       )
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.MAPTILESLOADEDFROMSPRITES, {
-          mapIds
+          mapIds,
+          spritesInfo: cacheableSpritesTile.fetchableTile.options?.spritesInfo
         })
       )
     }
