@@ -9,7 +9,7 @@
     { "path": "./packages/components" },
     { "path": "./packages/id" },
     { "path": "./packages/iiif-parser" },
-    { "path": "./packages/latest" },
+    { "path": "./apps/latest" },
     { "path": "./packages/leaflet" },
     { "path": "./packages/maplibre" },
     { "path": "./packages/openlayers" },
