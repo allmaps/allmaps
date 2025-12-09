@@ -109,6 +109,8 @@
   </div>
 {/snippet}
 
+<!-- TODO: prettier removes <T>, I don't want that... -->
+<!-- prettier-ignore -->
 <a
   href={paramsToUrl({
     path,
