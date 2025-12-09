@@ -896,6 +896,14 @@ export class WebGL2Renderer
       'u_animationProgress'
     )
     gl.uniform1f(animationProgressLocation, this.animationProgress)
+
+    // Device pixel ratio
+    const devicePixelRatioLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_devicePixelRatio'
+    )
+    gl.uniform1f(devicePixelRatioLocation, this.viewport.devicePixelRatio)
   }
 
   private setPointsProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {

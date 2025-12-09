@@ -6,6 +6,7 @@ precision highp float;
 
 uniform mat4 u_renderHomogeneousTransform;
 uniform float u_animationProgress;
+uniform float u_devicePixelRatio;
 
 in float a_viewportSize;
 in vec4 a_color;
@@ -30,7 +31,7 @@ void main() {
   v_viewportFeatherSize = 1.0;
 
   v_viewportTotalSize = a_viewportSize + a_viewportBorderSize + v_viewportFeatherSize;
-  gl_PointSize = v_viewportTotalSize;
+  gl_PointSize = v_viewportTotalSize * u_devicePixelRatio;
   // gl_PointSize is the diameter of the point.
   // The border is centered on the edge of a point with diameter = size
   // so adding half a border left and half a border right
