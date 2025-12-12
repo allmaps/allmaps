@@ -2,24 +2,37 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build": {
-      "inputs": ["src/**", "package.json", "tsconfig.json", "vite.config.ts", "svelte.config.js"],
+      "inputs": [
+        "src/**",
+        "package.json",
+        "tsconfig.json",
+        "vite.config.ts",
+        "svelte.config.js"
+      ],
       "outputs": ["dist/**", "build/**"],
       "dependsOn": ["^build"]
     },
     "types": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],
       "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["^types"]
+      "dependsOn": ["build", "^types"]
     },
     "lint": {
-      "inputs": ["src/**", "package.json", "eslint.config.js", ".prettierrc", "tsconfig.json", ".prettierignore"],
+      "inputs": [
+        "src/**",
+        "package.json",
+        "eslint.config.js",
+        ".prettierrc",
+        "tsconfig.json",
+        ".prettierignore"
+      ],
       "outputs": [],
-      "dependsOn": ["^lint"]
+      "dependsOn": ["build", "^lint"]
     },
     "test": {
       "inputs": ["src/**", "test/**", "package.json"],
       "outputs": [],
-      "dependsOn": ["^build"]
+      "dependsOn": ["build"]
     },
     "check": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],
