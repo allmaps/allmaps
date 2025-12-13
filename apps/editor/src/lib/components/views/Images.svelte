@@ -180,12 +180,14 @@
     </Grid>
 
     {#if sourceState.imageCount > paginationPerPage}
-      <Pagination
-        bind:page={paginationPage}
-        count={sourceState.imageCount}
-        perPage={paginationPerPage}
-        onPageChange={handlePageChange}
-      />
+      <div class="flex justify-center">
+        <Pagination
+          bind:page={paginationPage}
+          count={sourceState.imageCount}
+          perPage={paginationPerPage}
+          onPageChange={handlePageChange}
+        />
+      </div>
     {/if}
   {/if}
 </div>
