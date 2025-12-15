@@ -57,7 +57,7 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "vitest": "^4.0.4"
   }
 }

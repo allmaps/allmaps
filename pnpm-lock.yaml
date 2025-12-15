@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    typescript:
+      specifier: ^5.9.2
+      version: 5.9.3
+
 importers:
 
   .:
@@ -97,7 +103,7 @@ importers:
         specifier: ^3.6.2
         version: 3.7.4
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -254,7 +260,7 @@ importers:
         specifier: ^4.1.13
         version: 4.1.17
       typescript:
-        specifier: ^5.9.2
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.44.1
@@ -363,7 +369,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.17
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.20.0
@@ -481,7 +487,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.17
       typescript:
-        specifier: ^5.9.2
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.20.0
@@ -583,7 +589,7 @@ importers:
         specifier: ^4.1.16
         version: 4.1.17
       typescript:
-        specifier: ^5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
     devDependencies:
       '@allmaps/types':
@@ -699,7 +705,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.17
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.20.0
@@ -793,7 +799,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.17
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.20.0
@@ -902,7 +908,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.18(yaml@2.8.2)
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^5.0.3
@@ -951,7 +957,7 @@ importers:
         specifier: ^2.8.0
         version: 2.8.8
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -988,7 +994,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1049,7 +1055,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1095,7 +1101,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/bearing:
@@ -1144,7 +1150,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/components:
@@ -1241,7 +1247,7 @@ importers:
         specifier: ^4.1.0
         version: 4.1.17
       typescript:
-        specifier: ^5.0.0
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.20.0
@@ -1283,7 +1289,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1323,7 +1329,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1381,7 +1387,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/leaflet:
@@ -1433,7 +1439,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^5.0.3
@@ -1494,7 +1500,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^5.0.3
@@ -1558,7 +1564,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^5.0.3
@@ -1613,7 +1619,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1695,7 +1701,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^5.0.3
@@ -1741,7 +1747,7 @@ importers:
         specifier: ^3.6.2
         version: 3.7.4
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/stdlib:
@@ -1805,7 +1811,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1841,7 +1847,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.18(yaml@2.8.2)
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/transform:
@@ -1893,7 +1899,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1945,7 +1951,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vitest:
         specifier: ^4.0.4
@@ -1978,7 +1984,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   packages/ui:
@@ -2063,7 +2069,7 @@ importers:
         specifier: ^3.3.3
         version: 3.4.18(yaml@2.8.2)
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       vite:
         specifier: ^5.0.3
@@ -2112,7 +2118,7 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
 
   test/monorepo:
@@ -2206,7 +2212,7 @@ importers:
         specifier: ^4.1.14
         version: 4.1.17
       typescript:
-        specifier: ^5.9.3
+        specifier: 'catalog:'
         version: 5.9.3
       typescript-eslint:
         specifier: ^8.46.1
@@ -2317,7 +2323,7 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       upng-js:
         specifier: ^2.1.0
@@ -2389,7 +2395,7 @@ importers:
         specifier: ^3.6.2
         version: 3.7.4
       typescript:
-        specifier: ^5.7.0
+        specifier: 'catalog:'
         version: 5.9.3
       upng-js:
         specifier: ^2.1.0
