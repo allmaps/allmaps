@@ -980,6 +980,8 @@ export class WebGL2Renderer
     this.animationProgress = 0
     this.animationStart = undefined
 
+    this.previousSignificantViewport = this.viewport
+
     this.changed()
   }
 
