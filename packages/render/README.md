@@ -326,6 +326,26 @@ object
 * `createRTree` (`boolean`)
 * `rtreeUpdatedOptions` (`Array<string>`)
 
+### `Sprite`
+
+###### Fields
+
+* `height` (`number`)
+* `imageId` (`string`)
+* `scaleFactor` (`number`)
+* `spriteTileScale?` (`number`)
+* `width` (`number`)
+* `x` (`number`)
+* `y` (`number`)
+
+### `SpritesInfo`
+
+###### Fields
+
+* `imageSize` (`[number, number]`)
+* `imageUrl` (`string`)
+* `sprites` (`Array<Sprite>`)
+
 ### `TransformationOptions`
 
 ###### Fields
@@ -1549,7 +1569,7 @@ Load the parsed image from cache, or fetch and parse the image info to create it
 
 ###### Parameters
 
-* `imagesById` (`Map<string, Image>`)
+* `imagesById?` (`Map<string, Image> | undefined`)
 
 ###### Returns
 
@@ -2196,6 +2216,14 @@ There are no parameters.
 
 `boolean`.
 
+### `WarpedMap#tileSize?`
+
+###### Type
+
+```ts
+[number, number]
+```
+
 ### `WarpedMap#tileZoomLevelForViewport?`
 
 ###### Type
@@ -2404,6 +2432,7 @@ There are no parameters.
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  spritesInfo?: SpritesInfo | undefined
 }
 ```
 
@@ -3169,7 +3198,7 @@ Render the map for a given viewport.
 
 ###### Parameters
 
-* `canvas` (`HTMLCanvasElement`)
+* `canvas` (`HTMLCanvasElement | OffscreenCanvas`)
 * `options?` (`Partial<BaseRenderOptions> | undefined`)
 
 ###### Returns
@@ -3186,7 +3215,7 @@ Render the map for a given viewport.
 ###### Type
 
 ```ts
-HTMLCanvasElement
+HTMLCanvasElement | OffscreenCanvas
 ```
 
 ### `CanvasRenderer#context`
@@ -3467,6 +3496,18 @@ false
 ###### Returns
 
 `void`.
+
+### `WebGL2Renderer#getUniformLocation(gl, program, name)`
+
+###### Parameters
+
+* `gl` (`WebGLRenderingContext`)
+* `program` (`WebGLProgram`)
+* `name` (`string`)
+
+###### Returns
+
+`WebGLUniformLocation | null`.
 
 ### `WebGL2Renderer#gl`
 
@@ -3776,12 +3817,19 @@ DebouncedFunc<() => void>
 DebouncedFunc<() => void>
 ```
 
-### `WebGL2Renderer#updateMapsForViewport(allFechableTilesForViewport, allRequestedTilesForViewport)`
+### `WebGL2Renderer#uniformCache`
+
+###### Type
+
+```ts
+Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>
+```
+
+### `WebGL2Renderer#updateMapsForViewport(allFechableTilesForViewport)`
 
 ###### Parameters
 
 * `allFechableTilesForViewport` (`Array<FetchableTile>`)
-* `allRequestedTilesForViewport` (`Array<FetchableTile>`)
 
 ###### Returns
 
@@ -3880,7 +3928,7 @@ Map<string, CachedTile<ImageData>>
 Array<never>
 ```
 
-### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndDimensionsTexture`
+### `WebGL2WarpedMap#cachedTilesResourceOriginPointsAndSizesTexture`
 
 ###### Type
 
@@ -4207,6 +4255,14 @@ DebouncedFunc<() => Promise<void>>
 ###### Returns
 
 `boolean`.
+
+### `WebGL2WarpedMap#tileSize`
+
+###### Type
+
+```ts
+[number, number]
+```
 
 ### `WebGL2WarpedMap#tileToCachedTile(tile)`
 

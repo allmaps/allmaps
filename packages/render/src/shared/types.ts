@@ -1,4 +1,4 @@
-import { GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
   Point,
   Line,
@@ -7,14 +7,16 @@ import type {
   Bbox,
   TileZoomLevel,
   Ring,
-  Gcp
+  Gcp,
+  ImageRequest
 } from '@allmaps/types'
 import type { DistortionMeasure, TransformationType } from '@allmaps/transform'
 import type { Projection } from '@allmaps/project'
 
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { CacheableTile } from '../tilecache/CacheableTile.js'
-import type { WarpedMap } from '../maps/WarpedMap.js'
+import type { TileCache } from '../tilecache/TileCache.js'
+import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type { WebGL2WarpedMap } from '../webgl2.js'
 import type { TriangulatedWarpedMap } from '../maps/TriangulatedWarpedMap.js'
 
@@ -131,8 +133,9 @@ export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
 export type CanvasRenderOptions = BaseRenderOptions
 export type IntArrayRenderOptions = BaseRenderOptions
 
-export type TileCacheOptions = {
+export type TileCacheOptions<D> = {
   fetchFn: FetchFn
+  tileCacheForSprites: TileCache<D>
 }
 
 // The options when setting options
@@ -163,10 +166,32 @@ export type WarpedMapFactory<W> = (
   mapOptions?: Partial<WarpedMapOptions>
 ) => W
 
-export type CachableTileFactory<D> = (
+export type CacheableTileFactory<D> = (
   fetchableTile: FetchableTile,
   fetchFn?: FetchFn
 ) => CacheableTile<D>
+
+export type FetchableTileOptions = {
+  imageRequest: ImageRequest
+  spritesInfo: SpritesInfo
+  warpedMapsByResourceId: Map<string, WarpedMapWithImage[]>
+}
+
+export type SpritesInfo = {
+  sprites: Sprite[]
+  imageUrl: string
+  imageSize: Size
+}
+
+export type Sprite = {
+  imageId: string
+  scaleFactor: number
+  x: number
+  y: number
+  width: number
+  height: number
+  spriteTileScale?: number
+}
 
 export type RenderLineGroupOptions = {
   viewportSize: number

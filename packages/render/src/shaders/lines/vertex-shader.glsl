@@ -43,14 +43,7 @@ void main() {
 
   v_viewportFeatherSize = 1.0;
 
-  // TODO: figure out why size lines need to be devided by two
-  // to have the same effect as point sizes
-  // this could be related to dpr (but then one would expert multiplication by two?)
-  float viewportSize = a_viewportSize / 2.0;
-  float viewportBorderSize = a_viewportBorderSize / 2.0;
-  v_viewportFeatherSize = v_viewportFeatherSize / 2.0;
-
-  v_viewportTotalSize = viewportSize + viewportBorderSize + v_viewportFeatherSize;
+  v_viewportTotalSize = a_viewportSize + a_viewportBorderSize + v_viewportFeatherSize;
   float lineX = -1.0 * v_viewportTotalSize / 2.0 + a_isOtherPoint * (v_viewportLineLength + 2.0 * (v_viewportTotalSize / 2.0));
   float lineY = a_normalSign * v_viewportTotalSize / 2.0;
   v_linePoint = vec2(lineX, lineY);
@@ -61,9 +54,9 @@ void main() {
   // which also serves as minimal size.
   // Note: there seems to be a maximum size of 512? Could be due to graphics card (or Float32Array)?
 
-  v_viewportSize = viewportSize;
+  v_viewportSize = a_viewportSize;
   v_color = a_color;
-  v_viewportBorderSize = viewportBorderSize;
+  v_viewportBorderSize = a_viewportBorderSize;
   v_borderColor = a_borderColor;
 
   gl_Position =  u_viewportToClipHomogeneousTransform * vec4(viewportPoint + lineX * viewportNormalizedLine + lineY * viewportNormalizedLineNormal, 0, 1);

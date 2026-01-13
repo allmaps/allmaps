@@ -32,7 +32,7 @@ export class CacheableIntArrayTile<D> extends CacheableTile<D> {
   async fetch() {
     try {
       const response = await fetchUrl(
-        this.tileUrl,
+        this.fetchableTile.tileUrl,
         {
           signal: this.abortController.signal
         },
@@ -44,7 +44,7 @@ export class CacheableIntArrayTile<D> extends CacheableTile<D> {
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-          tileUrl: this.tileUrl
+          tileUrl: this.fetchableTile.tileUrl
         })
       )
     } catch (err) {
@@ -54,13 +54,22 @@ export class CacheableIntArrayTile<D> extends CacheableTile<D> {
       } else {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.tileUrl
+            tileUrl: this.fetchableTile.tileUrl
           })
         )
       }
     }
 
     return this.data
+  }
+
+  async applySprites() {
+    // TODO
+    return
+  }
+  spritesDataToCachedTiles() {
+    // TODO
+    return []
   }
 
   static createFactory<D>(getImageData: GetImageData<D>) {

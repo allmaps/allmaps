@@ -1,11 +1,4 @@
-import {
-  distance,
-  doBboxesIntersect,
-  bufferBboxByRatio,
-  squaredDistance,
-  sizeToResolution
-} from '@allmaps/stdlib'
-import { MapPruneConstants, MapPruneInfo } from './types.js'
+import { distance, squaredDistance, sizeToResolution } from '@allmaps/stdlib'
 import { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import type { Image } from '@allmaps/iiif-parser'
@@ -34,7 +27,7 @@ export function getTileZoomLevelForScale(
   tileZoomLevels: TileZoomLevel[],
   resourceToCanvasScale: number,
   scaleFactorCorrection: number,
-  log2scaleFactorCorrection: number
+  log2ScaleFactorCorrection: number
 ): TileZoomLevel {
   // Returning the TileZoomLevel with the scaleFactor closest to the map scale.
   // We use logarithms here because for scaleFactors 1 is as 'far' of 2 as 8 is of 16.
@@ -75,17 +68,17 @@ export function getTileZoomLevelForScale(
   // Notice how the scaleFactorCorrection corrects the scale for which the closest scaleFactor is searched.
   // Notice when this happens before taking a Math.log2(), it has more effect on smaller scales then on bigger.
 
-  let smallestdiffLogScaleFactor = Number.POSITIVE_INFINITY
+  let smallestLog2ScaleFactorDiff = Number.POSITIVE_INFINITY
   let bestTileZoomLevel = tileZoomLevels.at(-1) as TileZoomLevel
 
   for (const tileZoomLevel of tileZoomLevels) {
-    const diffLogScaleFactor = Math.abs(
+    const log2ScaleFactorDiff = Math.abs(
       Math.log2(tileZoomLevel.scaleFactor) -
         (Math.log2(resourceToCanvasScale + scaleFactorCorrection) +
-          log2scaleFactorCorrection)
+          log2ScaleFactorCorrection)
     )
-    if (diffLogScaleFactor < smallestdiffLogScaleFactor) {
-      smallestdiffLogScaleFactor = diffLogScaleFactor
+    if (log2ScaleFactorDiff < smallestLog2ScaleFactorDiff) {
+      smallestLog2ScaleFactorDiff = log2ScaleFactorDiff
       bestTileZoomLevel = tileZoomLevel
     }
   }
@@ -482,8 +475,8 @@ export function getTilesAtOtherScaleFactors(
   tile: Tile,
   image: Image,
   scaleFactor: number,
-  TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF: number,
-  TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF: number,
+  maxLowerLog2ScaleFactorDiff: number,
+  maxHigherLog2ScaleFactorDiff: number,
   validTile?: (tile: Tile) => boolean
 ): Tile[] {
   const tilesAtOtherScaleFactors = []
@@ -492,7 +485,7 @@ export function getTilesAtOtherScaleFactors(
     tile,
     image,
     scaleFactor,
-    TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
+    maxLowerLog2ScaleFactorDiff,
     validTile
   )
   for (const tileAtLowerScaleFactor of tilesAtLowerScaleFactor) {
@@ -501,11 +494,15 @@ export function getTilesAtOtherScaleFactors(
     }
   }
   if (tilesAtOtherScaleFactors.length === 0) {
+    const maxScaleFactor = Math.max(
+      ...image.tileZoomLevels.map((tileZoomLevel) => tileZoomLevel.scaleFactor)
+    )
     const tileAtHigherScaleFactor = recursivelyGetTilesAtHigherScaleFactor(
       tile,
       image,
       scaleFactor,
-      TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
+      maxHigherLog2ScaleFactorDiff,
+      maxScaleFactor,
       validTile
     )
     if (tileAtHigherScaleFactor) {
@@ -521,17 +518,11 @@ export function recursivelyGetTilesAtHigherScaleFactor(
   image: Image,
   scaleFactor: number,
   log2ScaleFactorDiff: number,
+  maxScaleFactor: number,
   validTile?: (tile: Tile) => boolean
 ): Tile | undefined {
   const higherScaleFactor = 2 ** (Math.log2(scaleFactor) + 1)
-  if (
-    higherScaleFactor >
-      image.tileZoomLevels
-        .map((tileZoomLevel) => tileZoomLevel.scaleFactor)
-        .reduce((a, c) => a + c, 0) -
-        scaleFactor ||
-    log2ScaleFactorDiff === 0
-  ) {
+  if (higherScaleFactor > maxScaleFactor || log2ScaleFactorDiff <= 0) {
     return undefined
   }
   const tileAtHigherScaleFactor = getTileAtHigherScaleFactor(
@@ -548,6 +539,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
       image,
       higherScaleFactor,
       log2ScaleFactorDiff--,
+      maxScaleFactor,
       validTile
     )
   }
@@ -561,7 +553,7 @@ export function recursivelyGetTilesAtLowerScaleFactor(
   validTile?: (tile: Tile) => boolean
 ): (Tile | undefined)[] {
   const lowerScaleFactor = 2 ** (Math.log2(scaleFactor) - 1)
-  if (lowerScaleFactor <= 0 || log2ScaleFactorDiff === 0) {
+  if (lowerScaleFactor <= 0 || log2ScaleFactorDiff <= 0) {
     return []
   }
   const tilesAtLowerScaleFactor = getTilesAtLowerScaleFactor(
@@ -662,81 +654,4 @@ export function tileUrl(tile: Tile, image: Image): string {
     tile.row
   )
   return image.getImageUrl(imageRequest)
-}
-
-// TileCache
-
-export function shouldPruneTile(
-  tile: Tile,
-  mapPruneInfo: MapPruneInfo,
-  mapPruneConstants: MapPruneConstants
-) {
-  // Don't prune if overview
-  // Note that resourceViewportRingBboxForViewport and tileZoomLevelForViewport are only undefined
-  // if overview tile, so we add them here to prevent TypeScript errors furter on
-  if (
-    mapPruneInfo.overviewTileZoomLevelForViewport &&
-    tile.tileZoomLevel.scaleFactor ==
-      mapPruneInfo.overviewTileZoomLevelForViewport.scaleFactor
-  ) {
-    return false
-  }
-
-  // Prune if the tileZoomLevelForViewport or resourceViewportRingBboxForViewport are undefined
-  // (this only happens if the map is too small to render)
-  if (
-    mapPruneInfo.resourceViewportRingBboxForViewport === undefined ||
-    mapPruneInfo.tileZoomLevelForViewport === undefined
-  ) {
-    return true
-  }
-
-  // Should prune if scale factor too much off
-  //
-  // Example:
-  // Available scaleFactors in tileZoomLevels:
-  // 1 (full original resolution), 2, 4, 8, 16 (zoomed out)
-  //
-  // Tile scale factor: 16, so log2 tile scale factor: 4
-  // Scale factor for viewport: 8, so log2 scale factor for viewport: 3
-  // Difference: 4 - 3 = 1, check if not more then max
-  // This is positive if tile scale factor is higher then scale factor for viewport, so tiles are lower original resolution
-  //
-  // Since there are less lower original resolution tiles,
-  // MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF can be higher then MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
-  //
-  const log2ScaleFactorDiff =
-    Math.log2(tile.tileZoomLevel.scaleFactor) -
-    Math.log2(mapPruneInfo.tileZoomLevelForViewport.scaleFactor)
-  // Check if scale factor not too high, i.e. tile resolution too low
-  const tileScaleFactorTooHigh =
-    log2ScaleFactorDiff > mapPruneConstants.maxHigherLog2ScaleFactorDiff
-  if (tileScaleFactorTooHigh) {
-    return true
-  }
-  // Check if scale factor not too low, i.e. tile resolution too high
-  const tileScaleFactorTooLow =
-    -log2ScaleFactorDiff > mapPruneConstants.maxLowerLog2ScaleFactorDiff
-  if (tileScaleFactorTooLow) {
-    return true
-  }
-
-  // Prune if too far away
-  // Note that we correct the tile bbox by buffering the scale factor difference (if positive)
-  // This allows us to keep all tiles that would be needed if we zoom out again
-  // Even if they currently don't overlap with the viewport ring bbox
-  if (
-    !doBboxesIntersect(
-      bufferBboxByRatio(
-        computeBboxTile(tile),
-        Math.max(0, log2ScaleFactorDiff)
-      ),
-      mapPruneInfo.resourceViewportRingBboxForViewport
-    )
-  ) {
-    return true
-  }
-
-  // By default, don't prune
-  return false
 }

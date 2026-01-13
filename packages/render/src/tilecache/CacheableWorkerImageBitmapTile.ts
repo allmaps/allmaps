@@ -32,17 +32,17 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
       )
       wrappedWorker
         .getImageBitmap(
-          this.tileUrl,
+          this.fetchableTile.tileUrl,
           comlinkProxy(this.abortController.signal),
           this.fetchFn,
-          this.tile.tileZoomLevel.width,
-          this.tile.tileZoomLevel.height
+          this.fetchableTile.tile.tileZoomLevel.width,
+          this.fetchableTile.tile.tileZoomLevel.height
         )
         .then((response) => {
           this.data = response
           this.dispatchEvent(
             new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-              tileUrl: this.tileUrl
+              tileUrl: this.fetchableTile.tileUrl
             })
           )
         })
@@ -53,13 +53,22 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
       } else {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.tileUrl
+            tileUrl: this.fetchableTile.tileUrl
           })
         )
       }
     }
 
     return this.data
+  }
+
+  async applySprites() {
+    // TODO
+    return
+  }
+  spritesDataToCachedTiles() {
+    // TODO
+    return []
   }
 
   // When calling createFactory, create the worker like this:

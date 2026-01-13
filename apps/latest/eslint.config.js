@@ -35,6 +35,10 @@ export default ts.config(
         parser: ts.parser,
         svelteConfig
       }
+    },
+    rules: {
+      'svelte/prefer-svelte-reactivity': 'warn',
+      'svelte/no-navigation-without-resolve': 'warn'
     }
   }
 )

@@ -80,15 +80,22 @@ Or:
 await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-### WarpedMapLayer API and Events
+### WarpedMapLayer API: Options and Events
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins) and a list of events emitted by a WarpedMapLayer.
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins). It includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
-You can listen to them in the typical OpenLayers way. Here's an example:
+You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
 
 ```js
-warpedMapLayer.on('warpedmapadded', (event) => {
-  console.log(event.mapIds, warpedMapLayer.getExtent())
+warpedMapLayer.setLayerOptions({ visible: true })
+warpedMapLayer.setMapOptions(mapId, { visible: true })
+```
+
+You can listen to **events** in the typical way:
+
+```js
+map.on('warpedmapadded', (event) => {
+  console.log(event.mapIds)
 })
 ```
 
@@ -153,6 +160,7 @@ object & Partial<WebGL2RenderOptions>
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  spritesInfo?: SpritesInfo | undefined
 }
 ```
 
@@ -241,6 +249,26 @@ Adds image information to the WarpedMapList's image information cache
 ###### Returns
 
 Image IDs of the image informations that were added (`Array<string>`).
+
+### `WarpedMapLayer#addSprites(sprites, imageUrl, imageSize)`
+
+Adds sprites to the Renderer's sprite tile cache
+
+This adds tiles from sprites to warped maps in WarpedMapList. Load maps before running this function.
+This uses the image info of related maps. When using addImageInfos(), call it before calling this function.
+
+###### Parameters
+
+* `sprites` (`Array<Sprite>`)
+  * Sprites
+* `imageUrl` (`string`)
+  * Image url
+* `imageSize` (`[number, number]`)
+  * Image size
+
+###### Returns
+
+`Promise<void>`.
 
 ### `WarpedMapLayer#bringMapsForward(mapIds)`
 
@@ -562,7 +590,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
+* `mapIds?` (`Array<string> | undefined`)
   * Map IDs
 
 ###### Returns

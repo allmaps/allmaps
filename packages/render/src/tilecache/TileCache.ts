@@ -3,13 +3,12 @@ import { equalSet } from '@allmaps/stdlib'
 import { CacheableTile, CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
-import { shouldPruneTile } from '../shared/tiles.js'
 import { FetchableTile } from './FetchableTile.js'
 
 import type { FetchFn } from '@allmaps/types'
 
 import type {
-  CachableTileFactory,
+  CacheableTileFactory,
   TileCacheOptions,
   MapPruneInfo
 } from '../shared/types.js'
@@ -21,8 +20,9 @@ const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
  * Class that fetches and caches IIIF tiles.
  */
 export class TileCache<D> extends EventTarget {
-  cachableTileFactory: CachableTileFactory<D>
+  cacheableTileFactory: CacheableTileFactory<D>
   fetchFn?: FetchFn
+  tileCacheForTilesFromSprites?: TileCache<D>
 
   protected tilesByTileUrl: Map<string, CacheableTile<D>> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
@@ -33,14 +33,14 @@ export class TileCache<D> extends EventTarget {
   protected fetchableTiles: FetchableTile[] = []
 
   constructor(
-    cachableTileFactory: CachableTileFactory<D>,
-    partialTileCacheOptions?: Partial<TileCacheOptions>
+    cacheableTileFactory: CacheableTileFactory<D>,
+    partialTileCacheOptions?: Partial<TileCacheOptions<D>>
   ) {
     super()
 
     this.setOptions(partialTileCacheOptions)
 
-    this.cachableTileFactory = cachableTileFactory
+    this.cacheableTileFactory = cacheableTileFactory
   }
 
   /**
@@ -70,10 +70,14 @@ export class TileCache<D> extends EventTarget {
    */
   getMapCacheableTiles(mapId: string): CacheableTile<D>[] {
     const cacheableTiles: CacheableTile<D>[] = []
+    const tileUrls = this.tileUrlsByMapId.get(mapId)
 
-    for (const cacheableTile of this.tilesByTileUrl.values()) {
-      if (this.tileUrlsByMapId.get(mapId)?.has(cacheableTile.tileUrl)) {
-        cacheableTiles.push(cacheableTile)
+    if (tileUrls) {
+      for (const tileUrl of tileUrls) {
+        const cacheableTile = this.tilesByTileUrl.get(tileUrl)
+        if (cacheableTile) {
+          cacheableTiles.push(cacheableTile)
+        }
       }
     }
 
@@ -118,13 +122,14 @@ export class TileCache<D> extends EventTarget {
    */
   getMapCachedTiles(mapId: string): CachedTile<D>[] {
     const cachedTiles: CachedTile<D>[] = []
+    const tileUrls = this.tileUrlsByMapId.get(mapId)
 
-    for (const cacheableTile of this.tilesByTileUrl.values()) {
-      if (
-        cacheableTile.isCachedTile() &&
-        this.tileUrlsByMapId.get(mapId)?.has(cacheableTile.tileUrl)
-      ) {
-        cachedTiles.push(cacheableTile)
+    if (tileUrls) {
+      for (const tileUrl of tileUrls) {
+        const cacheableTile = this.tilesByTileUrl.get(tileUrl)
+        if (cacheableTile && cacheableTile.isCachedTile()) {
+          cachedTiles.push(cacheableTile)
+        }
       }
     }
 
@@ -155,8 +160,10 @@ export class TileCache<D> extends EventTarget {
    *
    * @param partialTileCacheOptions - Options
    */
-  setOptions(partialTileCacheOptions?: Partial<TileCacheOptions>) {
+  setOptions(partialTileCacheOptions?: Partial<TileCacheOptions<D>>) {
     this.fetchFn = partialTileCacheOptions?.fetchFn
+    this.tileCacheForTilesFromSprites =
+      partialTileCacheOptions?.tileCacheForSprites
   }
 
   // TODO: this function needs a new name!
@@ -220,14 +227,11 @@ export class TileCache<D> extends EventTarget {
     for (const [tileUrl, mapIds] of this.mapIdsByTileUrl.entries()) {
       for (const mapId of mapIds) {
         const pruneInfo = pruneInfoByMapId.get(mapId)
-        const tile = this.tilesByTileUrl.get(tileUrl)?.tile
+        const cacheableTile = this.tilesByTileUrl.get(tileUrl)
 
-        if (tile) {
-          // Prune for each mapId that doesn't have pruneInfo
-          // Or for which it should be pruned
+        if (cacheableTile) {
           if (
-            !pruneInfo ||
-            shouldPruneTile(tile, pruneInfo, {
+            cacheableTile.shouldPrune(pruneInfo, {
               maxHigherLog2ScaleFactorDiff:
                 PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
               maxLowerLog2ScaleFactorDiff:
@@ -257,12 +261,12 @@ export class TileCache<D> extends EventTarget {
     this.clear()
   }
 
-  private requestFetchableTile(fetchableTile: FetchableTile) {
+  protected requestFetchableTile(fetchableTile: FetchableTile) {
     const mapId = fetchableTile.mapId
     const tileUrl = fetchableTile.tileUrl
 
     if (!this.tilesByTileUrl.has(tileUrl)) {
-      const cacheableTile = this.cachableTileFactory(
+      const cacheableTile = this.cacheableTileFactory(
         fetchableTile,
         this.fetchFn
       )
@@ -285,8 +289,8 @@ export class TileCache<D> extends EventTarget {
     this.addMapIdForTileUrl(mapId, tileUrl)
   }
 
-  private addCacheableTile(cacheableTile: CacheableTile<D>) {
-    this.tilesByTileUrl.set(cacheableTile.tileUrl, cacheableTile)
+  protected addCacheableTile(cacheableTile: CacheableTile<D>) {
+    this.tilesByTileUrl.set(cacheableTile.fetchableTile.tileUrl, cacheableTile)
 
     // This is an async function that we are not awaiting to continue
     // The results are handled inside the tile using events
@@ -294,7 +298,27 @@ export class TileCache<D> extends EventTarget {
     this.updateTilesFetchingCount(1)
   }
 
-  private removeCacheableTileForMapId(tileUrl: string, mapId: string) {
+  // Directly add cached tiles created from sprites
+  addCachedTile(cachedTile: CachedTile<D>) {
+    const mapId = cachedTile.fetchableTile.mapId
+    const tileUrl = cachedTile.fetchableTile.tileUrl
+
+    if (this.tilesByTileUrl.has(tileUrl)) {
+      return
+    }
+    this.tilesByTileUrl.set(tileUrl, cachedTile)
+    this.addTileUrlForMapId(tileUrl, mapId)
+    this.addMapIdForTileUrl(mapId, tileUrl)
+
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
+        mapIds: [mapId],
+        tileUrl
+      })
+    )
+  }
+
+  protected removeCacheableTileForMapId(tileUrl: string, mapId: string) {
     const cacheableTile = this.tilesByTileUrl.get(tileUrl)
 
     if (!cacheableTile) {
@@ -324,7 +348,7 @@ export class TileCache<D> extends EventTarget {
     )
   }
 
-  private tileFetched(event: Event) {
+  protected tileFetched(event: Event) {
     if (event instanceof WarpedMapEvent) {
       if (!event.data?.tileUrl) {
         throw new Error('Event data missing')
@@ -353,10 +377,15 @@ export class TileCache<D> extends EventTarget {
           )
         }
       }
+
+      // If this is a spritesTileChache
+      if (this.tileCacheForTilesFromSprites) {
+        this.tilesByTileUrl.get(tileUrl)?.applySprites()
+      }
     }
   }
 
-  private tileFetchError(event: Event) {
+  protected tileFetchError(event: Event) {
     if (event instanceof WarpedMapEvent) {
       if (!event.data?.tileUrl) {
         throw new Error('Event data missing')
@@ -369,7 +398,53 @@ export class TileCache<D> extends EventTarget {
     }
   }
 
-  private addMapIdForTileUrl(mapId: string, tileUrl: string) {
+  // If this is a spritesTileChache
+  protected tilesFromSpriteTile(event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      if (!event.data?.tileUrl) {
+        throw new Error('Event data missing')
+      }
+      const { tileUrl } = event.data
+
+      this.passTilesFromSprites(tileUrl)
+    }
+  }
+
+  // If this is a spritesTileChache
+  protected passTilesFromSprites(tileUrl?: string) {
+    let cacheableSpritesTiles: CacheableTile<D>[]
+    if (!tileUrl) {
+      cacheableSpritesTiles = Array.from(this.getCacheableTiles())
+    } else {
+      const cacheableSpritesTile = this.tilesByTileUrl.get(tileUrl)
+      cacheableSpritesTiles = cacheableSpritesTile ? [cacheableSpritesTile] : []
+    }
+
+    for (const cacheableSpritesTile of cacheableSpritesTiles) {
+      const cachedTilesFromSprites =
+        cacheableSpritesTile.getCachedTilesFromSprites()
+      if (!cachedTilesFromSprites) {
+        throw new Error('Cached tiles from sprites not found')
+      }
+      for (const cachedTile of cachedTilesFromSprites) {
+        if (!cachedTile.isCachedTile()) {
+          break
+        }
+        this.tileCacheForTilesFromSprites?.addCachedTile(cachedTile)
+      }
+      const mapIds = cachedTilesFromSprites.map(
+        (cachedTile) => cachedTile.fetchableTile.mapId
+      )
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.MAPTILESLOADEDFROMSPRITES, {
+          mapIds,
+          spritesInfo: cacheableSpritesTile.fetchableTile.options?.spritesInfo
+        })
+      )
+    }
+  }
+
+  protected addMapIdForTileUrl(mapId: string, tileUrl: string) {
     let mapIds = this.mapIdsByTileUrl.get(tileUrl)
 
     if (!mapIds) {
@@ -383,7 +458,7 @@ export class TileCache<D> extends EventTarget {
     return mapIds
   }
 
-  private removeMapIdForTileUrl(mapId: string, tileUrl: string) {
+  protected removeMapIdForTileUrl(mapId: string, tileUrl: string) {
     const mapIds = this.mapIdsByTileUrl.get(tileUrl)
 
     if (!mapIds) {
@@ -401,7 +476,7 @@ export class TileCache<D> extends EventTarget {
     return mapIds
   }
 
-  private addTileUrlForMapId(tileUrl: string, mapId: string) {
+  protected addTileUrlForMapId(tileUrl: string, mapId: string) {
     let tileUrls = this.tileUrlsByMapId.get(mapId)
 
     if (!tileUrls) {
@@ -415,7 +490,7 @@ export class TileCache<D> extends EventTarget {
     return tileUrls
   }
 
-  private removeTileUrlForMapId(tileUrl: string, mapId: string) {
+  protected removeTileUrlForMapId(tileUrl: string, mapId: string) {
     const tileUrls = this.tileUrlsByMapId.get(mapId)
 
     if (!tileUrls) {
@@ -437,7 +512,7 @@ export class TileCache<D> extends EventTarget {
     return this.tilesFetchingCount === 0
   }
 
-  private updateTilesFetchingCount(delta: number) {
+  protected updateTilesFetchingCount(delta: number) {
     this.tilesFetchingCount += delta
 
     if (this.tilesFetchingCount === 0) {
@@ -447,7 +522,7 @@ export class TileCache<D> extends EventTarget {
     }
   }
 
-  private addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {
+  protected addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHED,
       this.tileFetched.bind(this)
@@ -456,9 +531,13 @@ export class TileCache<D> extends EventTarget {
       WarpedMapEventType.TILEFETCHERROR,
       this.tileFetchError.bind(this)
     )
+    cacheableTile.addEventListener(
+      WarpedMapEventType.TILESFROMSPRITETILE,
+      this.tilesFromSpriteTile.bind(this)
+    )
   }
 
-  private removeEventListenersFromCacheableTile(
+  protected removeEventListenersFromCacheableTile(
     cacheableTile: CacheableTile<D>
   ) {
     cacheableTile.removeEventListener(
@@ -468,6 +547,10 @@ export class TileCache<D> extends EventTarget {
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHERROR,
       this.tileFetchError.bind(this)
+    )
+    cacheableTile.removeEventListener(
+      WarpedMapEventType.TILESFROMSPRITETILE,
+      this.tilesFromSpriteTile.bind(this)
     )
   }
 }

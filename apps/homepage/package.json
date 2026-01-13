@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/homepage",
   "description": "Allmaps Homepage",
-  "version": "1.0.0-beta.29",
+  "version": "1.0.0-beta.30",
   "private": true,
   "contributors": [
     {
@@ -47,6 +47,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
+    "@astrojs/check": "^0.9.6",
     "@astrojs/starlight": "^0.36.2",
     "@astrojs/svelte": "^7.2.1",
     "@tailwindcss/vite": "^4.1.16",

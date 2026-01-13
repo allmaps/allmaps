@@ -672,9 +672,11 @@ export class MapsState extends MapsEventTarget {
 
     if (transformation) {
       if (map.transformation) {
-        this.#doc.submitOp(
-          replaceOp([mapId, 'transformation'], true, transformation)
-        )
+        if (map.transformation !== transformation) {
+          this.#doc.submitOp(
+            replaceOp([mapId, 'transformation'], true, transformation)
+          )
+        }
       } else {
         this.#doc.submitOp(insertOp([mapId, 'transformation'], transformation))
       }
@@ -692,7 +694,11 @@ export class MapsState extends MapsEventTarget {
 
     if (resourceCrs) {
       if (map.resourceCrs) {
-        this.#doc.submitOp(replaceOp([mapId, 'resourceCrs'], true, resourceCrs))
+        if (map.resourceCrs.id !== resourceCrs.id) {
+          this.#doc.submitOp(
+            replaceOp([mapId, 'resourceCrs'], true, resourceCrs)
+          )
+        }
       } else {
         this.#doc.submitOp(insertOp([mapId, 'resourceCrs'], resourceCrs))
       }

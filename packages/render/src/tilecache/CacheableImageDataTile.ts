@@ -18,15 +18,15 @@ export class CacheableImageDataTile extends CacheableTile<ImageData> {
   async fetch() {
     try {
       const response = await fetchUrl(
-        this.tileUrl,
+        this.fetchableTile.tileUrl,
         {
           signal: this.abortController.signal
         },
         this.fetchFn
       )
 
-      const width = this.tile.tileZoomLevel.width
-      const height = this.tile.tileZoomLevel.height
+      const width = this.fetchableTile.tile.tileZoomLevel.width
+      const height = this.fetchableTile.tile.tileZoomLevel.height
 
       const blob = await response.blob()
       const bitmap = await createImageBitmap(blob)
@@ -42,7 +42,7 @@ export class CacheableImageDataTile extends CacheableTile<ImageData> {
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-          tileUrl: this.tileUrl
+          tileUrl: this.fetchableTile.tileUrl
         })
       )
     } catch (err) {
@@ -52,13 +52,22 @@ export class CacheableImageDataTile extends CacheableTile<ImageData> {
       } else {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.tileUrl
+            tileUrl: this.fetchableTile.tileUrl
           })
         )
       }
     }
 
     return this.data
+  }
+
+  async applySprites() {
+    // TODO
+    return
+  }
+  spritesDataToCachedTiles() {
+    // TODO
+    return []
   }
 
   static createFactory() {

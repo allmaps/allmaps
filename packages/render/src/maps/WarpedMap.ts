@@ -35,7 +35,8 @@ import type {
   Ring,
   Rectangle,
   Bbox,
-  TileZoomLevel
+  TileZoomLevel,
+  Size
 } from '@allmaps/types'
 import type {
   Helmert,
@@ -100,6 +101,7 @@ export function createWarpedMapFactory() {
  * @param options - Result of merging default, georeferenced map, list and specific map options
  * @param fetchingImageInfo - Whether the image information is loading
  * @param image - Parsed IIIF image
+ * @param tileSize - Size of the tiles
  * @param mixed - Wether the options were last set by mixing previous and new properties, i.e. when rerendering during an ongoing animation
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
@@ -167,6 +169,7 @@ export class WarpedMap extends EventTarget {
 
   fetchingImageInfo: boolean
   image?: Image
+  tileSize?: Size
 
   protected abortController?: AbortController
 
@@ -749,11 +752,11 @@ export class WarpedMap extends EventTarget {
    *
    * @returns
    */
-  async loadImage(imagesById: Map<string, Image>): Promise<void> {
+  async loadImage(imagesById?: Map<string, Image>): Promise<void> {
     try {
       const resourceId = this.georeferencedMap.resource.id
 
-      if (imagesById.has(resourceId)) {
+      if (imagesById && imagesById.has(resourceId)) {
         this.image = imagesById.get(resourceId)!
       } else {
         this.fetchingImageInfo = true
@@ -766,8 +769,14 @@ export class WarpedMap extends EventTarget {
         )
         this.abortController = undefined
         this.image = Image.parse(imageInfo)
-        imagesById.set(resourceId, this.image)
+        if (imagesById) {
+          imagesById.set(resourceId, this.image)
+        }
       }
+      this.tileSize = [
+        Math.max(...this.image.tileZoomLevels.map((size) => size.width)),
+        Math.max(...this.image.tileZoomLevels.map((size) => size.height))
+      ]
 
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGELOADED))
     } catch (err) {
@@ -951,6 +960,7 @@ export class WarpedMap extends EventTarget {
 export class WarpedMapWithImage extends WarpedMap {
   declare imageId: string
   declare image: Image
+  declare tileSize: Size
 
   constructor(
     mapId: string,

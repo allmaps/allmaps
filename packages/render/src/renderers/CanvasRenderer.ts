@@ -2,30 +2,30 @@ import { BaseRenderer } from './BaseRenderer.js'
 import { CacheableImageDataTile } from '../tilecache/CacheableImageDataTile.js'
 import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import { Viewport } from '../viewport/Viewport.js'
-
 import { renderToIntArray } from '../shared/render-to-int-array.js'
+
 import type { Renderer, CanvasRenderOptions } from '../shared/types.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
 
 import type { Size } from '@allmaps/types'
 
 /**
- * Class that renders WarpedMaps to a HTML Canvas element with the Canvas 2D API
+ * Class that renders WarpedMaps to a HTML Canvas element or OffscreenCanvas with the Canvas 2D API
  */
 export class CanvasRenderer
   extends BaseRenderer<WarpedMap, ImageData>
   implements Renderer
 {
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement | OffscreenCanvas
   context: CanvasRenderingContext2D
 
   constructor(
-    canvas: HTMLCanvasElement,
+    canvas: HTMLCanvasElement | OffscreenCanvas,
     options?: Partial<CanvasRenderOptions>
   ) {
     super(
-      CacheableImageDataTile.createFactory(),
       createWarpedMapFactory(),
+      CacheableImageDataTile.createFactory(),
       options
     )
 
