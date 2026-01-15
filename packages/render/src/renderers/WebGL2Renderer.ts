@@ -982,6 +982,9 @@ export class WebGL2Renderer
 
     this.previousSignificantViewport = this.viewport
 
+    // Unthrottled prepareRenderInternal to avoid flickering when maps are made visible/invisible
+    // and render is called before prepareRenderInternal throttled delay would have passed
+    this.prepareRenderInternal()
     this.changed()
   }
 
