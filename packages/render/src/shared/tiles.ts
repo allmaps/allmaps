@@ -631,6 +631,15 @@ export function keyFromMapIdTileUrl(mapId: string, tileUrl: string): string {
   return `${mapId}:${tileUrl}`
 }
 
+export function keyToMapIdTileUrl(key: string): {
+  mapId: string
+  tileUrl: string
+} {
+  // Note: not using split, since tileUrls can also contain ':'
+  const index = key.indexOf(':')
+  return { mapId: key.slice(0, index), tileUrl: key.slice(index + 1) }
+}
+
 export function tileKey(tile: Tile): string {
   return keyFromScaleFactorRowColumn(
     tile.tileZoomLevel.scaleFactor,

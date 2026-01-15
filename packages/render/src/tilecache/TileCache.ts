@@ -12,9 +12,13 @@ import type {
   TileCacheOptions,
   MapPruneInfo
 } from '../shared/types.js'
+import { keyFromMapIdTileUrl, keyToMapIdTileUrl } from '../shared/tiles.js'
 
 const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 4
 const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
+
+const REMOVE_CACHEABLE_TILE_FOR_MAPID_WAITINGLIST_LENGTH = 100
+// Set in number, not w.r.t. viewport resolution, since tilecache doesn't know viewport
 
 /**
  * Class that fetches and caches IIIF tiles.
@@ -29,6 +33,8 @@ export class TileCache<D> extends EventTarget {
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
   protected tilesFetchingCount = 0
+
+  protected removeCacheableTileForMapIdWaitinglist: string[] = []
 
   protected fetchableTiles: FetchableTile[] = []
 
@@ -238,7 +244,7 @@ export class TileCache<D> extends EventTarget {
                 PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
             })
           ) {
-            this.removeCacheableTileForMapId(tileUrl, mapId)
+            this.delayedRemoveCacheableTileForMapId(tileUrl, mapId)
           }
         }
       }
@@ -287,6 +293,8 @@ export class TileCache<D> extends EventTarget {
 
     this.addTileUrlForMapId(tileUrl, mapId)
     this.addMapIdForTileUrl(mapId, tileUrl)
+
+    this.cancelDelayedRemoveCacheableTileForMapId(tileUrl, mapId)
   }
 
   protected addCacheableTile(cacheableTile: CacheableTile<D>) {
@@ -310,12 +318,43 @@ export class TileCache<D> extends EventTarget {
     this.addTileUrlForMapId(tileUrl, mapId)
     this.addMapIdForTileUrl(mapId, tileUrl)
 
+    this.cancelDelayedRemoveCacheableTileForMapId(tileUrl, mapId)
+
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
         mapIds: [mapId],
         tileUrl
       })
     )
+  }
+
+  protected delayedRemoveCacheableTileForMapId(tileUrl: string, mapId: string) {
+    const key = keyFromMapIdTileUrl(mapId, tileUrl)
+    if (!this.removeCacheableTileForMapIdWaitinglist.includes(key)) {
+      this.removeCacheableTileForMapIdWaitinglist.push(key)
+    }
+    if (
+      this.removeCacheableTileForMapIdWaitinglist.length >
+      REMOVE_CACHEABLE_TILE_FOR_MAPID_WAITINGLIST_LENGTH
+    ) {
+      const keyToRemove = this.removeCacheableTileForMapIdWaitinglist.shift()
+      if (keyToRemove) {
+        const { mapId: mapIdToRemove, tileUrl: tileUrlToRemove } =
+          keyToMapIdTileUrl(keyToRemove)
+        this.removeCacheableTileForMapId(tileUrlToRemove, mapIdToRemove)
+      }
+    }
+  }
+
+  protected cancelDelayedRemoveCacheableTileForMapId(
+    tileUrl: string,
+    mapId: string
+  ) {
+    const key = keyFromMapIdTileUrl(tileUrl, mapId)
+    const index = this.removeCacheableTileForMapIdWaitinglist.indexOf(key)
+    if (index > -1) {
+      this.removeCacheableTileForMapIdWaitinglist.splice(index, 1)
+    }
   }
 
   protected removeCacheableTileForMapId(tileUrl: string, mapId: string) {
