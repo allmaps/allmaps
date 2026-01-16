@@ -14,13 +14,15 @@
     showHeader?: boolean
     showProperties?: boolean
     showUrls?: boolean
+    minItemWidth?: number
   }
 
   let {
     count = 100,
     showHeader = false,
     showProperties = true,
-    showUrls = true
+    showUrls = true,
+    minItemWidth
   }: Props = $props()
 
   const uiState = setUiState()
@@ -51,7 +53,7 @@
   })
 </script>
 
-<Collection>
+<Collection {minItemWidth}>
   {#if showHeader}
     <Header />
   {/if}
