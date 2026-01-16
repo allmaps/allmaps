@@ -56,15 +56,15 @@
   data-error={error}
   class={`${
     error ? 'bg-gray/20' : backgroundColor
-  } rounded-lg aspect-square p-1.5 relative overflow-hidden text-xs @lg:text-sm @4xl:text-base`}
+  } rounded-lg aspect-square p-1.5 relative overflow-hidden`}
 >
   <div
-    class="flex flex-col justify-between pointer-events-none [&>*]:pointer-events-auto h-full relative z-10"
+    class="flex flex-col justify-between pointer-events-none *:pointer-events-auto h-full relative z-10"
   >
     <div class="space-y-1">
       {#if displayMap}
         <div
-          class="break-all font-bold font-mono [mask-type:luminance] [text-shadow:0_0_1rem_#fff]"
+          class="break-all font-bold font-mono mask-type-luminance [text-shadow:0_0_1rem_#fff]"
         >
           {displayMap.hostname}
         </div>
