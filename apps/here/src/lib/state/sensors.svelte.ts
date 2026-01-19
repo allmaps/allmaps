@@ -85,8 +85,8 @@ export class SensorsState {
     if (this.#positionOverride) {
       return {
         coords: {
-          longitude: this.#positionOverride[0],
-          latitude: this.#positionOverride[1],
+          latitude: this.#positionOverride[0],
+          longitude: this.#positionOverride[1],
           accuracy: 0,
           altitude: 0,
           altitudeAccuracy: 0,
