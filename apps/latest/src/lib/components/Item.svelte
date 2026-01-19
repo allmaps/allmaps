@@ -56,10 +56,11 @@
   data-error={error}
   class={`${
     error ? 'bg-gray/20' : backgroundColor
-  } rounded-lg aspect-square p-1.5 relative overflow-hidden`}
+  } rounded-lg aspect-square p-1.5 relative overflow-hidden @container`}
 >
   <div
-    class="flex flex-col justify-between pointer-events-none *:pointer-events-auto h-full relative z-10"
+    class="flex flex-col justify-between pointer-events-none *:pointer-events-auto h-full relative z-10
+    text-xs @min-[200px]:text-base"
   >
     <div class="space-y-1">
       {#if displayMap}
