@@ -34,6 +34,7 @@
   let width = $state<number>(320)
 
   let bodyClientWidth = $state<number>(0)
+  let thumbnailError = $state(false)
 
   let pinRadius = $derived(bodyClientWidth < 500 ? 4 : 2)
 
@@ -113,6 +114,10 @@
     `maps/${navigating.to?.params?.mapId}` === allmapsId
   )
 
+  function handleError() {
+    thumbnailError = true
+  }
+
   onMount(() => {
     $effect(() => {
       imageInfoState.fetchImageInfo(map.resource.id)
@@ -122,96 +127,98 @@
 
 <svelte:body bind:clientWidth={bodyClientWidth} />
 
-{#if fetchedImageInfo && fetchedImageInfo.state === 'success'}
-  <li class="flex flex-col gap-3 bg-white/50 p-2 rounded-lg">
-    <a
-      bind:clientWidth={width}
-      class="aspect-square inline-block w-full relative text-transparent"
-      href={createRouteUrl(page, allmapsId)}
-    >
-      <div class={{ 'animate-pulse': navigatingToThisMap }}>
-        <Thumbnail
-          imageInfo={fetchedImageInfo.imageInfo}
-          mode="contain"
-          width={width * devicePixelRatio}
-          height={width * devicePixelRatio}
-        />
-      </div>
-      {#if svgSize && svgPositionCoordinates}
-        <div
-          class="group absolute top-0 w-full h-full flex items-center justify-center"
-        >
-          <svg
-            width="{svgSize[0]}%"
-            height="{svgSize[1]}%"
-            viewBox="0 0 {svgSize[0]} {svgSize[1]}"
+{#if fetchedImageInfo && fetchedImageInfo.state === 'success' && !thumbnailError}
+  <svelte:boundary onerror={handleError}>
+    <li class="flex flex-col gap-3 bg-white/50 p-2 rounded-lg">
+      <a
+        bind:clientWidth={width}
+        class="aspect-square inline-block w-full relative text-transparent"
+        href={createRouteUrl(page, allmapsId)}
+      >
+        <div class={{ 'animate-pulse': navigatingToThisMap }}>
+          <Thumbnail
+            imageInfo={fetchedImageInfo.imageInfo}
+            mode="contain"
+            width={width * devicePixelRatio}
+            height={width * devicePixelRatio}
+          />
+        </div>
+        {#if svgSize && svgPositionCoordinates}
+          <div
+            class="group absolute top-0 w-full h-full flex items-center justify-center"
           >
-            {#if resourceRouteCoordinates}
-              <polyline
-                points={polylinePoints}
-                fill="none"
-                stroke="white"
-                stroke-width="1.0"
-              />
-              <polyline
-                points={polylinePoints}
-                fill="none"
-                stroke={red}
-                stroke-width="0.6"
-              />
-            {/if}
-            <g
-              class="opacity-90 delay-300 transition-opacity group-hover:opacity-0"
+            <svg
+              width="{svgSize[0]}%"
+              height="{svgSize[1]}%"
+              viewBox="0 0 {svgSize[0]} {svgSize[1]}"
             >
-              <circle
-                cx={svgPositionCoordinates[0]}
-                cy={svgPositionCoordinates[1]}
-                r={pinRadius}
-                fill="white"
-              />
-              <circle
-                cx={svgPositionCoordinates[0]}
-                cy={svgPositionCoordinates[1]}
-                r={pinRadius * 0.5}
-                fill={pink}
-              />
-            </g>
-          </svg>
-          {#if pinOriginPosition}
-            <div
-              style:width="{svgSize[0]}%"
-              style:height="{svgSize[1]}%"
-              class="absolute"
-            >
+              {#if resourceRouteCoordinates}
+                <polyline
+                  points={polylinePoints}
+                  fill="none"
+                  stroke="white"
+                  stroke-width="1.0"
+                />
+                <polyline
+                  points={polylinePoints}
+                  fill="none"
+                  stroke={red}
+                  stroke-width="0.6"
+                />
+              {/if}
+              <g
+                class="opacity-90 delay-300 transition-opacity group-hover:opacity-0"
+              >
+                <circle
+                  cx={svgPositionCoordinates[0]}
+                  cy={svgPositionCoordinates[1]}
+                  r={pinRadius}
+                  fill="white"
+                />
+                <circle
+                  cx={svgPositionCoordinates[0]}
+                  cy={svgPositionCoordinates[1]}
+                  r={pinRadius * 0.5}
+                  fill={pink}
+                />
+              </g>
+            </svg>
+            {#if pinOriginPosition}
               <div
-                class="absolute w-8 -left-4 transition-all duration-200 delay-200 ease-out
+                style:width="{svgSize[0]}%"
+                style:height="{svgSize[1]}%"
+                class="absolute"
+              >
+                <div
+                  class="absolute w-8 -left-4 transition-all duration-200 delay-200 ease-out
                   opacity-0 group-hover:opacity-100 -translate-y-16 group-hover:translate-y-0
                   rotate-(--pin-rotation)
                   drop-shadow-lg"
-                style:rotate="{pinRotation}deg"
-                style:transform-origin="1rem 3.4rem"
-                style:left="calc({pinOriginPosition[0]}% - 1rem)"
-                style:top="calc({pinOriginPosition[1]}% - 3.4rem)"
-              >
-                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                {@html Pin}
-              </div>
-              <div
-                class="absolute w-12 -left-4 transition-all duration-200 delay-200 ease-out
+                  style:rotate="{pinRotation}deg"
+                  style:transform-origin="1rem 3.4rem"
+                  style:left="calc({pinOriginPosition[0]}% - 1rem)"
+                  style:top="calc({pinOriginPosition[1]}% - 3.4rem)"
+                >
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html Pin}
+                </div>
+                <div
+                  class="absolute w-12 -left-4 transition-all duration-200 delay-200 ease-out
                 opacity-0 group-hover:opacity-100 translate-x-16 group-hover:translate-x-0"
-                style:left="calc({pinOriginPosition[0]}%)"
-                style:top="calc({pinOriginPosition[1]}% - 0.4rem)"
-              >
-                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                {@html PinShadow}
+                  style:left="calc({pinOriginPosition[0]}%)"
+                  style:top="calc({pinOriginPosition[1]}% - 0.4rem)"
+                >
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  {@html PinShadow}
+                </div>
               </div>
-            </div>
-          {/if}
-        </div>
-      {/if}
-    </a>
-    <div class="text-center text-blue-700 leading-snug text-xs">
-      {title}
-    </div>
-  </li>
+            {/if}
+          </div>
+        {/if}
+      </a>
+      <div class="text-center text-blue-700 leading-snug text-xs">
+        {title}
+      </div>
+    </li>
+  </svelte:boundary>
 {/if}
