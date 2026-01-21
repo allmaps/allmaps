@@ -48,6 +48,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/warpedmaplayer": "workspace:^",

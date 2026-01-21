@@ -1508,6 +1508,9 @@ importers:
 
   packages/openlayers:
     dependencies:
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../project
       '@allmaps/render':
         specifier: workspace:^
         version: link:../render
