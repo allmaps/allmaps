@@ -5,6 +5,7 @@ import { WebGL2Renderer } from '@allmaps/render/webgl2'
 import { Viewport, WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
+import { projectionDefinitionToAntialiasedDefinition } from '@allmaps/project'
 
 import type { FrameState } from 'ol/Map.js'
 import type { Extent } from 'ol/extent'
@@ -173,15 +174,29 @@ export class WarpedMapLayer
       this.resizeCanvas(this.canvas, this.canvasSize)
     }
 
+    const rotation = frameState.viewState.rotation
+    const devicePixelRatio = window.devicePixelRatio
+    const projection = {
+      definition: projectionDefinitionToAntialiasedDefinition(
+        frameState.viewState.projection.getCode()
+      )
+    }
+    // TODO: add a way to understand other codes then the two default ones
+    // (e.g. by including a code-to-definition dictionnary)
+    // and assure wrapping (e.g. by adding `+over`)
+
+    const viewportSize = frameState.size as [number, number]
+    const viewportCenter = frameState.viewState.center as [number, number]
+    const projectedGeoPerViewportScale = frameState.viewState.resolution
+
     const viewport = new Viewport(
-      frameState.size as [number, number],
-      frameState.viewState.center as [number, number],
-      frameState.viewState.resolution,
+      viewportSize,
+      viewportCenter,
+      projectedGeoPerViewportScale,
       {
-        rotation: frameState.viewState.rotation,
-        devicePixelRatio: window.devicePixelRatio,
-        projection: { definition: frameState.viewState.projection.getCode() }
-        // TODO: add a way for viewport and renderer to understand other codes then the two default ones
+        rotation,
+        devicePixelRatio,
+        projection
       }
     )
 
