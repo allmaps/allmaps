@@ -4,7 +4,7 @@ import {
   mixNumbers,
   mixPoints,
   getPropertyFromDoubleCacheOrComputation,
-  getPropertyFromQuadrupleCacheOrComputation,
+  getPropertyFromQuintupleCacheOrComputation,
   mergeOptions,
   mixLineStrings
 } from '@allmaps/stdlib'
@@ -12,6 +12,8 @@ import {
 import { WarpedMap } from './WarpedMap.js'
 
 import type {
+  AnimationOptions,
+  AnimationOptionsInternal,
   SpecificTriangulatedWarpedMapOptions,
   TriangulatedWarpedMapOptions,
   WarpedMapListOptions,
@@ -87,7 +89,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
   >
   protected projectedGcpTriangulationCache: Map<
     number,
-    Map<string, Map<TransformationType, Map<string, GcpTriangulation>>>
+    Map<
+      string,
+      Map<TransformationType, Map<string, Map<string, GcpTriangulation>>>
+    >
   >
 
   resourceTrianglePoints: Point[] = []
@@ -135,7 +140,37 @@ export class TriangulatedWarpedMap extends WarpedMap {
     )
   }
 
-  /** Set default options */
+  /**
+   * Set the map-specific options (and the list options)
+   *
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setMapOptions(
+    mapOptions?: Partial<TriangulatedWarpedMapOptions>,
+    listOptions?: Partial<TriangulatedWarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+  ): object {
+    return super.setMapOptions(mapOptions, listOptions, animationOptions)
+  }
+
+  /**
+   * Set the list options
+   *
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setListOptions(
+    listOptions?: Partial<TriangulatedWarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ): object {
+    return super.setListOptions(listOptions, animationOptions)
+  }
+
+  /**
+   * Set the defaultOptions
+   */
   setDefaultOptions() {
     this.defaultOptions = TriangulatedWarpedMap.getDefaultOptions()
   }
@@ -172,7 +207,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    */
   protected setDistortionMeasure(distortionMeasure?: DistortionMeasure): void {
     super.setDistortionMeasure(distortionMeasure)
-    this.updateTrianglePointsDistortion()
+    this.updateTriangulation()
   }
 
   /**
@@ -327,12 +362,13 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
 
     // Compute triangulation
-    this.projectedGcpTriangulation = getPropertyFromQuadrupleCacheOrComputation(
+    this.projectedGcpTriangulation = getPropertyFromQuintupleCacheOrComputation(
       this.projectedGcpTriangulationCache,
       this.resourceResolution,
       String(this.resourceMask),
       this.transformationType,
       this.internalProjection.definition,
+      String(this.options.distortionMeasures),
       () => {
         const {
           uniquePoints,
@@ -381,12 +417,13 @@ export class TriangulatedWarpedMap extends WarpedMap {
     if (refinePrevious) {
       this.previousResourceResolution = this.resourceResolution
       this.projectedGcpPreviousTriangulation =
-        getPropertyFromQuadrupleCacheOrComputation(
+        getPropertyFromQuintupleCacheOrComputation(
           this.projectedGcpTriangulationCache,
           this.previousResourceResolution,
           String(this.resourceMask),
           this.previousTransformationType,
           this.previousInternalProjection.definition,
+          String(this.options.distortionMeasures),
           () => {
             if (!this.projectedGcpTriangulation) {
               // TODO: rewrite this function, make more readble?

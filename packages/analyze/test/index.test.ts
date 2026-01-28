@@ -129,24 +129,24 @@ describe('Analyze a georeferenced map with maskpointoutsidefullmask', () => {
   })
 })
 
-// describe('Analyze a georeferenced map with triangulationfoldsover', () => {
-//   test('should give warning code triangulationfoldsover', () => {
-//     const georeferencedMap = readJSONFile(
-//       path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
-//     )
+describe('Analyze a georeferenced map with triangulationfoldsover', () => {
+  test('should give warning code triangulationfoldsover', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
+    )
 
-//     const analyzer = new Analyzer(georeferencedMap)
+    const analyzer = new Analyzer(georeferencedMap)
 
-//     const warnings = analyzer.getWarnings({ codes: ['triangulationfoldsover'] })
-//     const errors = analyzer.getErrors()
+    const warnings = analyzer.getWarnings({ codes: ['triangulationfoldsover'] })
+    const errors = analyzer.getErrors()
 
-//     const warningCodes = warnings.map((i) => i.code)
-//     const errorCodes = errors.map((i) => i.code)
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
 
-//     expect(warningCodes).to.contain('triangulationfoldsover')
-//     expect(errorCodes).to.be.of.length(0)
-//   })
-// })
+    expect(warningCodes).to.contain('triangulationfoldsover')
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
 
 describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
   test('should give warning code polynomialsheartoohigh', () => {

@@ -286,23 +286,29 @@ export class Analyzer {
     // Transformation folds over
     // TODO: set to compute signDetJ for this test (ideally by updating from existing distortions)
     // TODO: add to readme when implemented
-    // code = 'triangulationfoldsover'
-    // if (
-    //   codes.includes(code) &&
-    //   this.warpedMap instanceof TriangulatedWarpedMap
-    // ) {
-    //   const signDetJs =
-    //     this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-    //       (gcpUniquePoint) => gcpUniquePoint.distortions.get('signDetJ')
-    //     )
-    //   if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
-    //     this.warnings.push({
-    //       mapId: this.mapId,
-    //       code,
-    //       message: 'The map folds over itself, for the selected transformation type.'
-    //     })
-    //   }
-    // }
+    code = 'triangulationfoldsover'
+    if (
+      codes.includes(code) &&
+      this.warpedMap instanceof TriangulatedWarpedMap
+    ) {
+      this.warpedMap.setMapOptions({
+        distortionMeasures: this.warpedMap.options.distortionMeasures.concat([
+          'signDetJ'
+        ])
+      })
+      const signDetJs =
+        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
+          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('signDetJ')
+        )
+      if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message:
+            'The map folds over itself, for the selected transformation type.'
+        })
+      }
+    }
 
     // Polynomial shear not too high
     code = 'polynomialsheartoohigh'
