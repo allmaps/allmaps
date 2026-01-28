@@ -281,7 +281,7 @@ export abstract class BaseWarpedMapLayer<
    * Get the center of the bounding box of the maps
    *
    * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -304,7 +304,7 @@ export abstract class BaseWarpedMapLayer<
    * Get the bounding box of the maps
    *
    * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -327,7 +327,7 @@ export abstract class BaseWarpedMapLayer<
    * Get the convex hull of the maps
    *
    * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
