@@ -24,14 +24,19 @@ import {
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
 const MAX_SHEAR = 0.1
+const MAX_LOG2SIGMA = 1
+const MIN_LOG2SIGMA = -1
+const MAX_TWOOMEGA = 0.5
 
 // Note: construction errors and failures to get info, warning or errors are always reported
 const defaultInfoCodes = ['maskequalsfullmask']
 const defaultWarningCodes = [
   'gcpoutsidemask',
   'maskpointoutsidefullmask'
-  // 'triangulationfoldsover'
   // 'polynomialsheartoohigh'
+  // 'log2sigmadistortiontoohigh'
+  // 'twoomegadistortiontoohigh'
+  // 'triangulationfoldsover'
 ]
 const defaultErrorCodes = [
   'constructingwarpedmapfailed',
@@ -283,9 +288,83 @@ export class Analyzer {
       )
     }
 
+    // Polynomial shear not too high
+    code = 'polynomialsheartoohigh'
+    if (codes.includes(code)) {
+      const measures = this.getMeasures()
+      if (
+        measures &&
+        measures.polynomial1Measures &&
+        (measures.polynomial1Measures.shears[0] > MAX_SHEAR ||
+          measures.polynomial1Measures.shears[1] > MAX_SHEAR)
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `A polynomial transformation shows a shear higher then ${MAX_SHEAR}.`
+        })
+      }
+    }
+
+    // log2sigma distortion too high
+    code = 'log2sigmadistortiontoohigh'
+    if (
+      codes.includes(code) &&
+      this.warpedMap instanceof TriangulatedWarpedMap
+    ) {
+      this.warpedMap.setMapOptions({
+        distortionMeasures: this.warpedMap.options.distortionMeasures.concat([
+          'log2sigma'
+        ])
+      })
+      const log2sigmas =
+        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
+          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('log2sigma')
+        )
+      if (
+        log2sigmas &&
+        log2sigmas.some(
+          (log2sigma) =>
+            log2sigma &&
+            (log2sigma > MAX_LOG2SIGMA || log2sigma < MIN_LOG2SIGMA)
+        )
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `In some triangulation points, the log2sigma distortion is higher then ${MAX_LOG2SIGMA} or lower then ${MIN_LOG2SIGMA}.`
+        })
+      }
+    }
+
+    // twoOmega distortion too high
+    code = 'twoomegadistortiontoohigh'
+    if (
+      codes.includes(code) &&
+      this.warpedMap instanceof TriangulatedWarpedMap
+    ) {
+      this.warpedMap.setMapOptions({
+        distortionMeasures: this.warpedMap.options.distortionMeasures.concat([
+          'twoOmega'
+        ])
+      })
+      const twoOmegas =
+        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
+          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('twoOmega')
+        )
+      if (
+        twoOmegas &&
+        twoOmegas.some((twoOmega) => twoOmega && twoOmega > MAX_TWOOMEGA)
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `In some triangulation points, the twoOmega distortion is higher then ${MAX_TWOOMEGA}.`
+        })
+      }
+    }
+
     // Transformation folds over
-    // TODO: set to compute signDetJ for this test (ideally by updating from existing distortions)
-    // TODO: add to readme when implemented
     code = 'triangulationfoldsover'
     if (
       codes.includes(code) &&
@@ -304,26 +383,7 @@ export class Analyzer {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message:
-            'The map folds over itself, for the selected transformation type.'
-        })
-      }
-    }
-
-    // Polynomial shear not too high
-    code = 'polynomialsheartoohigh'
-    if (codes.includes(code)) {
-      const measures = this.getMeasures()
-      if (
-        measures &&
-        measures.polynomial1Measures &&
-        (measures.polynomial1Measures.shears[0] > MAX_SHEAR ||
-          measures.polynomial1Measures.shears[1] > MAX_SHEAR)
-      ) {
-        this.warnings.push({
-          mapId: this.mapId,
-          code,
-          message: `A polynomial transformation shows a shear higher then ${MAX_SHEAR}.`
+          message: 'The warped map folds over itself.'
         })
       }
     }

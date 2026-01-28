@@ -129,25 +129,6 @@ describe('Analyze a georeferenced map with maskpointoutsidefullmask', () => {
   })
 })
 
-describe('Analyze a georeferenced map with triangulationfoldsover', () => {
-  test('should give warning code triangulationfoldsover', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
-    )
-
-    const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({ codes: ['triangulationfoldsover'] })
-    const errors = analyzer.getErrors()
-
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('triangulationfoldsover')
-    expect(errorCodes).to.be.of.length(0)
-  })
-})
-
 describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
   test('should give warning code polynomialsheartoohigh', () => {
     const georeferencedMap = readJSONFile(
@@ -163,6 +144,67 @@ describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
     const errorCodes = errors.map((i) => i.code)
 
     expect(warningCodes).to.contain('polynomialsheartoohigh')
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with log2sigmadistortiontoohigh', () => {
+  test('should give warning code log2sigmadistortiontoohigh', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-log2sigmadistortiontoohigh.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const warnings = analyzer.getWarnings({
+      codes: ['log2sigmadistortiontoohigh']
+    })
+    const errors = analyzer.getErrors()
+
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(warningCodes).to.contain('log2sigmadistortiontoohigh')
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with twoomegadistortiontoohigh', () => {
+  test('should give warning code twoomegadistortiontoohigh', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-twoomegadistortiontoohigh.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const warnings = analyzer.getWarnings({
+      codes: ['twoomegadistortiontoohigh']
+    })
+    const errors = analyzer.getErrors()
+
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(warningCodes).to.contain('twoomegadistortiontoohigh')
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with triangulationfoldsover', () => {
+  test('should give warning code triangulationfoldsover', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const warnings = analyzer.getWarnings({ codes: ['triangulationfoldsover'] })
+    const errors = analyzer.getErrors()
+
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(warningCodes).to.contain('triangulationfoldsover')
     expect(errorCodes).to.be.of.length(0)
   })
 })

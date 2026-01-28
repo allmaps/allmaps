@@ -25,8 +25,10 @@ An analyzer can analyze the following topics:
 | Info    | `maskequalsfullmask`                      | The mask contains the full image. transformation                     | Yes                 |
 | Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                           | Yes                 |
 | Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                               | Yes                 |
-| Warning | `triangulationfoldsover`                  | A mask point is outside the full mask.                               | No                  |
 | Warning | `polynomialsheartoohigh`                  | A polynomial transformation shows a shear higher then a set maximum. | No                  |
+| Warning | `log2sigmadistortiontoohigh`              | In some triangulation points, the `log2sigma` (area) distortion is higher then a set maximum or lower then a set minimum. | No                  |
+| Warning | `twoomegadistortiontoohigh`              | In some triangulation points, the `twoOmega` (angular) distortion is higher then a set maximum. | No                  |
+| Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                       | No                  |
 | Error   | `constructingwarpedmapfailed`             | A warped map map could not be constructed.                           | Yes                 |
 | Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                  | Yes                 |
 | Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                             | Yes                 |
