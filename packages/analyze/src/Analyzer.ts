@@ -28,10 +28,13 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 const DEFAULT_INFO_CODES = ['maskequalsfullmask']
 const DEFAULT_WARNING_CODES = [
   'gcpoutsidemask',
-  'maskpointoutsidefullmask'
-  // 'polynomialsheartoohigh'
-  // 'log2sigmadistortiontoohigh'
-  // 'twoomegadistortiontoohigh'
+  'maskpointoutsidefullmask',
+  // 'destinationrmsetoohigh',
+  // 'destinationhelmertrmsetoohigh',
+  'polynomial1sheartoohigh',
+  'destinationpolynomial1rmsetoohigh',
+  'log2sigmadistortiontoohigh',
+  'twoomegadistortiontoohigh'
   // 'triangulationfoldsover'
 ]
 const DEFAULT_ERROR_CODES = [
@@ -54,6 +57,7 @@ const DEFAULT_OPTIONS: AnalysisOptions = {
     ...DEFAULT_WARNING_CODES,
     ...DEFAULT_ERROR_CODES
   ],
+  maxRmseDiameterFraction: 0.05,
   maxShear: 0.1,
   maxLog2sigma: 1,
   minLog2sigma: -1,
@@ -291,8 +295,42 @@ export class Analyzer {
       )
     }
 
-    // Polynomial shear not too high
-    code = 'polynomialsheartoohigh'
+    // Destination RSME too high
+    code = 'destinationrmsetoohigh'
+    if (codes.includes(code)) {
+      const measures = this.getMeasures()
+      if (
+        measures &&
+        measures.destinationRmse / measures.projectedGeoDiameter >
+          options.maxRmseDiameterFraction
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `The RMSE is higher then ${options.maxRmseDiameterFraction} times the map diameter.`
+        })
+      }
+    }
+
+    // Destination RSME too high for Helmert transformation
+    code = 'destinationhelmertrmsetoohigh'
+    if (codes.includes(code)) {
+      const measures = this.getMeasures()
+      if (
+        measures &&
+        measures.destinationHelmertRmse / measures.projectedGeoDiameter >
+          options.maxRmseDiameterFraction
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `The RMSE is higher then ${options.maxRmseDiameterFraction} times the map diameter for a Helmert transformation.`
+        })
+      }
+    }
+
+    // Shear too high for Polynomial1 transformation
+    code = 'polynomial1sheartoohigh'
     if (codes.includes(code)) {
       const measures = this.getMeasures()
       if (
@@ -304,7 +342,24 @@ export class Analyzer {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message: `A polynomial transformation shows a shear higher then ${options.maxShear}.`
+          message: `The shear is higher then ${options.maxShear} for a polynomial transformation.`
+        })
+      }
+    }
+
+    // Destination RSME too high for Polynomial1 transformation
+    code = 'destinationpolynomial1rmsetoohigh'
+    if (codes.includes(code)) {
+      const measures = this.getMeasures()
+      if (
+        measures &&
+        measures.destinationPolynomial1Rmse / measures.projectedGeoDiameter >
+          options.maxRmseDiameterFraction
+      ) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `The RMSE is higher then ${options.maxRmseDiameterFraction} times the map diameter for a polynomial transformation.`
         })
       }
     }
@@ -579,13 +634,18 @@ export class Analyzer {
       return
     }
 
+    const projectedGeoDiameter = bboxToDiameter(
+      this.warpedMap.projectedGeoMaskBbox
+    )
+
     // Polynomial
     const projectedPolynomialTransformer =
       this.warpedMap.getProjectedTransformer('polynomial')
     const toProjectedGeoPolynomialTransformation =
       projectedPolynomialTransformer.getToGeoTransformation() as Polynomial1
 
-    const polynomial1Rmse = toProjectedGeoPolynomialTransformation.getRmse()
+    const destinationPolynomial1Rmse =
+      toProjectedGeoPolynomialTransformation.getDestinationRmse()
     const polynomial1Measures =
       toProjectedGeoPolynomialTransformation.getMeasures()
 
@@ -595,14 +655,15 @@ export class Analyzer {
     const toProjectedGeoHelmertTransformation =
       projectedHelmertTransformer.getToGeoTransformation() as Helmert
 
-    const helmertRmse = toProjectedGeoHelmertTransformation.getRmse()
+    const destinationHelmertRmse =
+      toProjectedGeoHelmertTransformation.getDestinationRmse()
     const helmertMeasures = toProjectedGeoHelmertTransformation.getMeasures()
 
     // Current transformation type
     const projectedTransformer = this.warpedMap.projectedTransformer
     const toProjectedGeoTransformation =
       projectedTransformer.getToGeoTransformation()
-    const rmse = toProjectedGeoTransformation.getRmse()
+    const rmse = toProjectedGeoTransformation.getDestinationRmse()
     const destinationErrors = toProjectedGeoTransformation.getErrors()
     // Note: this could be spead up, since it recomputes this.warpedMap.projectedGeoTransformedResourcePoints
     // Note: we scale using the helmert transform instead of computing errors in resource
@@ -620,11 +681,12 @@ export class Analyzer {
 
     this.measures = {
       mapId: this.mapId,
-      polynomial1Rmse,
+      projectedGeoDiameter,
+      destinationPolynomial1Rmse,
       polynomial1Measures,
-      helmertRmse,
+      destinationHelmertRmse,
       helmertMeasures,
-      rmse,
+      destinationRmse: rmse,
       destinationErrors,
       resourceErrors,
       resourceRelativeErrors

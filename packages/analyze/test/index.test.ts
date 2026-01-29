@@ -177,21 +177,47 @@ describe('Analyze a georeferenced map with maskpointoutsidefullmask', () => {
   })
 })
 
-describe('Analyze a georeferenced map with polynomialsheartoohigh', () => {
-  test('should give warning code polynomialsheartoohigh', () => {
+describe('Analyze a georeferenced map with polynomial1sheartoohigh', () => {
+  test('should give warning code polynomial1sheartoohigh', () => {
     const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-polynomialsheartoohigh.json')
+      path.join(inputDir, 'georeferenced-map-polynomial1sheartoohigh.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const warnings = analyzer.getWarnings({ codes: ['polynomialsheartoohigh'] })
+    const warnings = analyzer.getWarnings({
+      codes: ['polynomial1sheartoohigh']
+    })
     const errors = analyzer.getErrors()
 
     const warningCodes = warnings.map((i) => i.code)
     const errorCodes = errors.map((i) => i.code)
 
-    expect(warningCodes).to.contain('polynomialsheartoohigh')
+    expect(warningCodes).to.contain('polynomial1sheartoohigh')
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with destinationpolynomial1rmsetoohigh', () => {
+  test('should give warning code destinationpolynomial1rmsetoohigh', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(
+        inputDir,
+        'georeferenced-map-destinationpolynomial1rmsetoohigh.json'
+      )
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const warnings = analyzer.getWarnings({
+      codes: ['destinationpolynomial1rmsetoohigh']
+    })
+    const errors = analyzer.getErrors()
+
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(warningCodes).to.contain('destinationpolynomial1rmsetoohigh')
     expect(errorCodes).to.be.of.length(0)
   })
 })

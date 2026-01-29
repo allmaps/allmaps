@@ -10,6 +10,7 @@ import { Point } from '@allmaps/types'
  */
 export type AnalysisOptions = {
   codes: string[]
+  maxRmseDiameterFraction: number
   maxShear: number
   maxLog2sigma: number
   minLog2sigma: number
@@ -47,15 +48,17 @@ export type Analysis = {
 export type Measures = {
   mapId?: string
 
-  rmse: number
+  projectedGeoDiameter: number
+
+  destinationRmse: number
   destinationErrors: number[]
   resourceErrors: number[]
   resourceRelativeErrors: number[]
 
-  helmertRmse: number
+  destinationHelmertRmse: number
   helmertMeasures: HelmertMeasures
 
-  polynomial1Rmse: number
+  destinationPolynomial1Rmse: number
   polynomial1Measures: Polynomial1Measures
 }
 

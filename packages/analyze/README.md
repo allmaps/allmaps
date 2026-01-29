@@ -25,9 +25,12 @@ An analyzer can analyze the following topics:
 | Info    | `maskequalsfullmask`                      | The mask contains the full image. transformation                                                | Yes                 |
 | Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                      | Yes                 |
 | Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                          | Yes                 |
-| Warning | `polynomialsheartoohigh`                  | A polynomial transformation shows a shear higher then a set maximum.                            | No                  |
-| Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum. | No                  |
-| Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                             | No                  |
+| Warning | `destinationrmsetoohigh`                  | The RMSE is higher then the set maximum times the map diameter.                                 | No                  |
+| Warning | `destinationhelmertrmsetoohigh`           | The RMSE is higher then the set maximum times the map diameter for a helmert transformation.    | No                  |
+| Warning | `polynomial1sheartoohigh`                 | The shear is higher then a set maximum for a polynomial transformation.                         | Yes                 |
+| Warning | `destinationpolynomial1rmsetoohigh`       | The RMSE is higher then the set maximum times the map diameter for a polynomial transformation. | Yes                 |
+| Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum. | Yes                 |
+| Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                             | Yes                 |
 | Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                               | No                  |
 | Error   | `constructingwarpedmapfailed`             | A warped map map could not be constructed.                                                      | Yes                 |
 | Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                             | Yes                 |
@@ -44,18 +47,18 @@ An analyzer can analyze the following topics:
 An analyzer can also compute the following **Measures**:
 
 *   About the current transformation type:
-    *   `rmse`: The root-mean-square error of GCPs in projected geo coordinates
+    *   `destinationRmse`: The root-mean-square error of GCPs in projected geo coordinates
     *   `destinationErrors`: for each GCP, the error in projected geo coordinates
     *   `resourceErrors`: for each GCP, the error in projected geo coordinates, scaled to resource space
     *   `resourceRelativeErrors`: for each GCP, the error in projected resource coordinates, relative to the resource mask BBox diameter.
 *   About the Helmert transformation type:
-    *   `helmertRmse`: The root-mean-square error of GCPs in projected geo coordinates
+    *   `destinationHelmertRmse`: The root-mean-square error of GCPs in projected geo coordinates
     *   `helmertParameters`: The Helmert parameters. See [@allmaps/transform](../../packages/transform/).
     *   `helmertScale`: The scale
     *   `helmertRotation`: The rotation
     *   `helmertTranslation`: The translation
 *   About the polynomial transformation type:
-    *   `polynomialRmse`: The root-mean-square error of GCPs in projected geo coordinates
+    *   `destinationPolynomial1Rmse`: The root-mean-square error of GCPs in projected geo coordinates
     *   `polynomialParameters`: The polynomial parameters. See [@allmaps/transform](../../packages/transform/).
     *   `polynomialScale`: The scale
     *   `polynomialRotation`: The rotation
