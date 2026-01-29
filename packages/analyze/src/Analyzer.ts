@@ -10,7 +10,8 @@ import {
   arrayRepeated,
   bboxToDiameter,
   isPoint,
-  closeRing
+  closeRing,
+  mergeOptions
 } from '@allmaps/stdlib'
 import { Helmert, Polynomial1 } from '@allmaps/transform'
 import {
@@ -23,14 +24,9 @@ import {
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
-const MAX_SHEAR = 0.1
-const MAX_LOG2SIGMA = 1
-const MIN_LOG2SIGMA = -1
-const MAX_TWOOMEGA = 0.5
-
 // Note: construction errors and failures to get info, warning or errors are always reported
-const defaultInfoCodes = ['maskequalsfullmask']
-const defaultWarningCodes = [
+const DEFAULT_INFO_CODES = ['maskequalsfullmask']
+const DEFAULT_WARNING_CODES = [
   'gcpoutsidemask',
   'maskpointoutsidefullmask'
   // 'polynomialsheartoohigh'
@@ -38,7 +34,7 @@ const defaultWarningCodes = [
   // 'twoomegadistortiontoohigh'
   // 'triangulationfoldsover'
 ]
-const defaultErrorCodes = [
+const DEFAULT_ERROR_CODES = [
   'constructingwarpedmapfailed',
   'constructingtriangulatedwarpedmapfailed',
   'gcpincompleteresource',
@@ -51,11 +47,18 @@ const defaultErrorCodes = [
   'maskrepeatedpoint',
   'maskselfintersection'
 ]
-const defaultCodes = [
-  ...defaultInfoCodes,
-  ...defaultWarningCodes,
-  ...defaultErrorCodes
-]
+
+const DEFAULT_OPTIONS: AnalysisOptions = {
+  codes: [
+    ...DEFAULT_INFO_CODES,
+    ...DEFAULT_WARNING_CODES,
+    ...DEFAULT_ERROR_CODES
+  ],
+  maxShear: 0.1,
+  maxLog2sigma: 1,
+  minLog2sigma: -1,
+  maxTwoOmega: 0.5
+}
 
 /**
  * Class for Analyzer.
@@ -67,7 +70,7 @@ export class Analyzer {
   georeferencedMap: GeoreferencedMap
   warpedMap?: WarpedMap
 
-  options: AnalysisOptions = { codes: defaultCodes }
+  options: AnalysisOptions
 
   protected info: AnalysisItem[] = []
   protected warnings: AnalysisItem[] = []
@@ -87,11 +90,9 @@ export class Analyzer {
   constructor(warpedMap: WarpedMap, options?: AnalysisOptions)
   constructor(
     georeferencedOrWarpedMap: GeoreferencedMap | WarpedMap,
-    options?: AnalysisOptions
+    options?: Partial<AnalysisOptions>
   ) {
-    if (options !== undefined) {
-      this.options = options
-    }
+    this.options = mergeOptions(DEFAULT_OPTIONS, options)
 
     if (georeferencedOrWarpedMap instanceof WarpedMap) {
       this.georeferencedMap = georeferencedOrWarpedMap.georeferencedMap
@@ -144,16 +145,16 @@ export class Analyzer {
    *
    * Applying extra caution: wrapping the getters in a try catch
    *
-   * @param options - Analysis options
+   * @param partialOptions - Analysis options
    * @returns Analysis with info, warnings and errors
    */
-  public analyse(options?: AnalysisOptions): Analysis {
+  public analyse(partialOptions?: Partial<AnalysisOptions>): Analysis {
     let errors: AnalysisItem[] = []
     let info: AnalysisItem[] = []
     let warnings: AnalysisItem[] = []
 
     try {
-      errors = this.getErrors(options)
+      errors = this.getErrors(partialOptions)
     } catch (error) {
       this.errors.push({
         mapId: this.mapId,
@@ -164,7 +165,7 @@ export class Analyzer {
     }
     if (this.errors.length != 0) {
       try {
-        info = this.getInfo(options)
+        info = this.getInfo(partialOptions)
       } catch (error) {
         this.errors.push({
           mapId: this.mapId,
@@ -174,7 +175,7 @@ export class Analyzer {
         })
       }
       try {
-        warnings = this.getWarnings(options)
+        warnings = this.getWarnings(partialOptions)
       } catch (error) {
         this.errors.push({
           mapId: this.mapId,
@@ -194,11 +195,11 @@ export class Analyzer {
   /**
    * Get analysis informations
    *
-   * @param options - Analysis options
+   * @param partialOptions - Analysis options
    * @returns Analysis items with info
    */
-  public getInfo(options?: AnalysisOptions): AnalysisItem[] {
-    options = options || this.options
+  public getInfo(partialOptions?: Partial<AnalysisOptions>): AnalysisItem[] {
+    const options = mergeOptions(this.options, partialOptions)
     const codes = options.codes
 
     this.info = []
@@ -227,11 +228,13 @@ export class Analyzer {
   /**
    * Get analysis warnings
    *
-   * @param options - Analysis options
+   * @param partialOptions - Analysis options
    * @returns Analysis items with warning
    */
-  public getWarnings(options?: AnalysisOptions): AnalysisItem[] {
-    options = options || this.options
+  public getWarnings(
+    partialOptions?: Partial<AnalysisOptions>
+  ): AnalysisItem[] {
+    const options = mergeOptions(this.options, partialOptions)
     const codes = options.codes
     let code: string
 
@@ -295,13 +298,13 @@ export class Analyzer {
       if (
         measures &&
         measures.polynomial1Measures &&
-        (measures.polynomial1Measures.shears[0] > MAX_SHEAR ||
-          measures.polynomial1Measures.shears[1] > MAX_SHEAR)
+        (measures.polynomial1Measures.shears[0] > options.maxShear ||
+          measures.polynomial1Measures.shears[1] > options.maxShear)
       ) {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message: `A polynomial transformation shows a shear higher then ${MAX_SHEAR}.`
+          message: `A polynomial transformation shows a shear higher then ${options.maxShear}.`
         })
       }
     }
@@ -326,13 +329,14 @@ export class Analyzer {
         log2sigmas.some(
           (log2sigma) =>
             log2sigma &&
-            (log2sigma > MAX_LOG2SIGMA || log2sigma < MIN_LOG2SIGMA)
+            (log2sigma > options.maxLog2sigma ||
+              log2sigma < options.minLog2sigma)
         )
       ) {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message: `In some triangulation points, the log2sigma distortion is higher then ${MAX_LOG2SIGMA} or lower then ${MIN_LOG2SIGMA}.`
+          message: `In some triangulation points, the log2sigma distortion is higher then ${options.maxLog2sigma} or lower then ${options.minLog2sigma}.`
         })
       }
     }
@@ -354,12 +358,12 @@ export class Analyzer {
         )
       if (
         twoOmegas &&
-        twoOmegas.some((twoOmega) => twoOmega && twoOmega > MAX_TWOOMEGA)
+        twoOmegas.some((twoOmega) => twoOmega && twoOmega > options.maxTwoOmega)
       ) {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message: `In some triangulation points, the twoOmega distortion is higher then ${MAX_TWOOMEGA}.`
+          message: `In some triangulation points, the twoOmega distortion is higher then ${options.maxTwoOmega}.`
         })
       }
     }
@@ -394,11 +398,11 @@ export class Analyzer {
   /**
    * Get analysis errors
    *
-   * @param options - Analysis options
+   * @param partialOptions - Analysis options
    * @returns Analysis items with errors
    */
-  public getErrors(options?: AnalysisOptions): AnalysisItem[] {
-    options = options || this.options
+  public getErrors(partialOptions?: Partial<AnalysisOptions>): AnalysisItem[] {
+    const options = mergeOptions(this.options, partialOptions)
     const codes = options.codes
     let code: string
 

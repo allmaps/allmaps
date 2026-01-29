@@ -64,7 +64,31 @@ describe('Analyze a georeferenced map', () => {
 })
 
 describe('Analyze a georeferenced map with maskequalsfullmask', () => {
-  test('should give info code maskequalsfullmask', () => {
+  test('should give info code maskequalsfullmask if code passed in Analyzer constructor', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap, {
+      codes: ['maskequalsfullmask']
+    })
+
+    const info = analyzer.getInfo()
+    const warnings = analyzer.getWarnings()
+    const errors = analyzer.getErrors()
+
+    const infoCodes = info.map((i) => i.code)
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(infoCodes).to.contain('maskequalsfullmask')
+    expect(warningCodes).to.be.of.length(0)
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with maskequalsfullmask', () => {
+  test('should give info code maskequalsfullmask if code passed in getInfo()', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
     )
@@ -82,6 +106,30 @@ describe('Analyze a georeferenced map with maskequalsfullmask', () => {
     const errorCodes = errors.map((i) => i.code)
 
     expect(infoCodes).to.contain('maskequalsfullmask')
+    expect(warningCodes).to.be.of.length(0)
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with maskequalsfullmask', () => {
+  test('should not give info code maskequalsfullmask if codes passed without maskequalsfullmask', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const info = analyzer.getInfo({
+      codes: []
+    })
+    const warnings = analyzer.getWarnings()
+    const errors = analyzer.getErrors()
+
+    const infoCodes = info.map((i) => i.code)
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(infoCodes).to.not.contain('maskequalsfullmask')
     expect(warningCodes).to.be.of.length(0)
     expect(errorCodes).to.be.of.length(0)
   })
@@ -165,6 +213,29 @@ describe('Analyze a georeferenced map with log2sigmadistortiontoohigh', () => {
     const errorCodes = errors.map((i) => i.code)
 
     expect(warningCodes).to.contain('log2sigmadistortiontoohigh')
+    expect(errorCodes).to.be.of.length(0)
+  })
+})
+
+describe('Analyze a georeferenced map with log2sigmadistortiontoohigh', () => {
+  test('should not give warning code log2sigmadistortiontoohigh if passing higher/lower max values', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-log2sigmadistortiontoohigh.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const warnings = analyzer.getWarnings({
+      codes: ['log2sigmadistortiontoohigh'],
+      maxLog2sigma: 10,
+      minLog2sigma: -10
+    })
+    const errors = analyzer.getErrors()
+
+    const warningCodes = warnings.map((i) => i.code)
+    const errorCodes = errors.map((i) => i.code)
+
+    expect(warningCodes).to.be.of.length(0)
     expect(errorCodes).to.be.of.length(0)
   })
 })

@@ -10,6 +10,10 @@ import { Point } from '@allmaps/types'
  */
 export type AnalysisOptions = {
   codes: string[]
+  maxShear: number
+  maxLog2sigma: number
+  minLog2sigma: number
+  maxTwoOmega: number
 }
 
 /**
