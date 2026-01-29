@@ -320,23 +320,24 @@ export class Analyzer {
           'log2sigma'
         ])
       })
-      const log2sigmas =
-        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('log2sigma')
+      const gcpUniquePointsFiltered =
+        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.filter(
+          (gcpUniquePoint) => {
+            const log2sigma = gcpUniquePoint.distortions?.get('log2sigma')
+            return (
+              log2sigma &&
+              (log2sigma > options.maxLog2sigma ||
+                log2sigma < options.minLog2sigma)
+            )
+          }
         )
-      if (
-        log2sigmas &&
-        log2sigmas.some(
-          (log2sigma) =>
-            log2sigma &&
-            (log2sigma > options.maxLog2sigma ||
-              log2sigma < options.minLog2sigma)
-        )
-      ) {
+      if (gcpUniquePointsFiltered && gcpUniquePointsFiltered.length > 0) {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message: `In some triangulation points, the log2sigma distortion is higher then ${options.maxLog2sigma} or lower then ${options.minLog2sigma}.`
+          resourcePoint: gcpUniquePointsFiltered[0].resource,
+          projectedGeoPoint: gcpUniquePointsFiltered[0].geo,
+          message: `The area distortion (log2sigma) is higher then ${options.maxLog2sigma} or lower then ${options.minLog2sigma}.`
         })
       }
     }
@@ -352,18 +353,20 @@ export class Analyzer {
           'twoOmega'
         ])
       })
-      const twoOmegas =
-        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('twoOmega')
+      const gcpUniquePointsFiltered =
+        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.filter(
+          (gcpUniquePoint) => {
+            const twoOmega = gcpUniquePoint.distortions?.get('twoOmega')
+            return twoOmega && twoOmega > options.maxTwoOmega
+          }
         )
-      if (
-        twoOmegas &&
-        twoOmegas.some((twoOmega) => twoOmega && twoOmega > options.maxTwoOmega)
-      ) {
+      if (gcpUniquePointsFiltered && gcpUniquePointsFiltered.length > 0) {
         this.warnings.push({
           mapId: this.mapId,
           code,
-          message: `In some triangulation points, the twoOmega distortion is higher then ${options.maxTwoOmega}.`
+          resourcePoint: gcpUniquePointsFiltered[0].resource,
+          projectedGeoPoint: gcpUniquePointsFiltered[0].geo,
+          message: `The angular (twoOmega) distortion is higher then ${options.maxTwoOmega}.`
         })
       }
     }
@@ -379,14 +382,19 @@ export class Analyzer {
           'signDetJ'
         ])
       })
-      const signDetJs =
-        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.map(
-          (gcpUniquePoint) => gcpUniquePoint.distortions?.get('signDetJ')
+      const gcpUniquePointsFiltered =
+        this.warpedMap.projectedGcpTriangulation?.gcpUniquePoints.filter(
+          (gcpUniquePoint) => {
+            const signDetJ = gcpUniquePoint.distortions?.get('signDetJ')
+            return signDetJ && signDetJ == -1
+          }
         )
-      if (signDetJs && signDetJs.some((signDetJ) => signDetJ == -1)) {
+      if (gcpUniquePointsFiltered && gcpUniquePointsFiltered.length > 0) {
         this.warnings.push({
           mapId: this.mapId,
           code,
+          resourcePoint: gcpUniquePointsFiltered[0].resource,
+          projectedGeoPoint: gcpUniquePointsFiltered[0].geo,
           message: 'The warped map folds over itself.'
         })
       }

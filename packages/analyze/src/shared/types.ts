@@ -24,6 +24,7 @@ export type AnalysisItem = {
   code: string
   resourcePoint?: Point
   geoPoint?: Point
+  projectedGeoPoint?: Point
   gcpIndex?: number
   maskPointIndex?: number
   message: string

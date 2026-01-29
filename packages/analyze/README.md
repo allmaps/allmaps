@@ -20,26 +20,26 @@ Analysis items like info, warnings and errors are objects with a unique code, a 
 
 An analyzer can analyze the following topics:
 
-| Type    | Code                                      | Topic                                                                | Included by default |
-|---------|-------------------------------------------|----------------------------------------------------------------------|---------------------|
-| Info    | `maskequalsfullmask`                      | The mask contains the full image. transformation                     | Yes                 |
-| Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                           | Yes                 |
-| Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                               | Yes                 |
-| Warning | `polynomialsheartoohigh`                  | A polynomial transformation shows a shear higher then a set maximum. | No                  |
-| Warning | `log2sigmadistortiontoohigh`              | In some triangulation points, the `log2sigma` (area) distortion is higher then a set maximum or lower then a set minimum. | No                  |
-| Warning | `twoomegadistortiontoohigh`              | In some triangulation points, the `twoOmega` (angular) distortion is higher then a set maximum. | No                  |
-| Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                       | No                  |
-| Error   | `constructingwarpedmapfailed`             | A warped map map could not be constructed.                           | Yes                 |
-| Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                  | Yes                 |
-| Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                             | Yes                 |
-| Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                             | Yes                 |
-| Error   | `gcpamountlessthen2`                      | There are less then 2 GCPs.                                          | No                  |
-| Error   | `gcpamountlessthen3`                      | There are less then 3 GCPs.                                          | Yes                 |
-| Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                               | Yes                 |
-| Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                    | Yes                 |
-| Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                   | Yes                 |
-| Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                              | Yes                 |
-| Error   | `maskselfintersection`                    | The mask self-intersects.                                            | Yes                 |
+| Type    | Code                                      | Topic                                                                                           | Included by default |
+|---------|-------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------|
+| Info    | `maskequalsfullmask`                      | The mask contains the full image. transformation                                                | Yes                 |
+| Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                      | Yes                 |
+| Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                          | Yes                 |
+| Warning | `polynomialsheartoohigh`                  | A polynomial transformation shows a shear higher then a set maximum.                            | No                  |
+| Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum. | No                  |
+| Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                             | No                  |
+| Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                               | No                  |
+| Error   | `constructingwarpedmapfailed`             | A warped map map could not be constructed.                                                      | Yes                 |
+| Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                             | Yes                 |
+| Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                        | Yes                 |
+| Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                        | Yes                 |
+| Error   | `gcpamountlessthen2`                      | There are less then 2 GCPs.                                                                     | No                  |
+| Error   | `gcpamountlessthen3`                      | There are less then 3 GCPs.                                                                     | Yes                 |
+| Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                          | Yes                 |
+| Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                               | Yes                 |
+| Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                              | Yes                 |
+| Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                         | Yes                 |
+| Error   | `maskselfintersection`                    | The mask self-intersects.                                                                       | Yes                 |
 
 An analyzer can also compute the following **Measures**:
 
