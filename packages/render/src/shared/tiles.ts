@@ -60,8 +60,8 @@ export function getTileZoomLevelForScale(
   // diff = abs(1 - 1.80) = abs(-0.80) = 0.80
   //
   // scaleFactor = 4
-  // Math.log2(4) = 3
-  // diff = abs(3 - 1.80) = abs(0.20) = 0.20
+  // Math.log2(4) = 2
+  // diff = abs(2 - 1.80) = abs(0.20) = 0.20
   //
   // => Pick scaleFactor 4, which has minimum diff.
   // Notice how 3 lies in the middle of 2 and 4, but on the log scale log2(3) lies closer to log2(4) than log2(2)

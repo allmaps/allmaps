@@ -335,9 +335,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param cachedTile
    */
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
-    if (this.cachedTilesByTileKey.has(cachedTile.fetchableTile.tileKey)) {
-      return
-    }
     this.cachedTilesByTileKey.set(cachedTile.fetchableTile.tileKey, cachedTile)
     this.cachedTilesByTileUrl.set(cachedTile.fetchableTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
