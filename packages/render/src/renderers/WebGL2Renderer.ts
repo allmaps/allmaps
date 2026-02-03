@@ -374,15 +374,26 @@ export class WebGL2Renderer
   protected updateMapsForViewport(
     allFechableTilesForViewport: FetchableTile[]
   ): {
-    mapsEnteringViewport: string[]
-    mapsLeavingViewport: string[]
+    mapsInViewportEntering: string[]
+    mapsInViewportLeaving: string[]
+    mapsWithFetchableTilesForViewportEntering: string[]
+    mapsWithFetchableTilesForViewportLeaving: string[]
   } {
-    const { mapsEnteringViewport, mapsLeavingViewport } =
-      super.updateMapsForViewport(allFechableTilesForViewport)
+    const {
+      mapsWithFetchableTilesForViewportEntering,
+      mapsWithFetchableTilesForViewportLeaving,
+      mapsInViewportEntering,
+      mapsInViewportLeaving
+    } = super.updateMapsForViewport(allFechableTilesForViewport)
 
-    this.updateVertexBuffers(mapsEnteringViewport)
+    this.updateVertexBuffers(mapsWithFetchableTilesForViewportEntering)
 
-    return { mapsEnteringViewport, mapsLeavingViewport }
+    return {
+      mapsWithFetchableTilesForViewportEntering,
+      mapsWithFetchableTilesForViewportLeaving,
+      mapsInViewportEntering,
+      mapsInViewportLeaving
+    }
   }
 
   protected resetPrevious(mapIds?: string[]) {

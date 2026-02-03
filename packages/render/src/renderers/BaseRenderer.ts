@@ -44,9 +44,9 @@ const DEFAULT_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions = {}
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
-const OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO = 2
-const PRUNE_VIEWPORT_BUFFER_RATIO = 4
-const OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO = 10
+const OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO = 8
+const PRUNE_VIEWPORT_BUFFER_RATIO = 8
+const OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO = 16
 
 /**
  * 0 = no correction, -1 = shaper, +1 = less sharp
@@ -60,8 +60,7 @@ const SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = Infinity
 const SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
 const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
-const MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO = 10
-const MAX_TOTAL_MAPS_OVERVIEW = 40
+const MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO = 50
 
 const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
 
@@ -75,6 +74,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
   mapsInPreviousViewport: Set<string> = new Set()
   mapsInViewport: Set<string> = new Set()
+  mapsWithFetchableTilesForPreviousViewport: Set<string> = new Set()
   mapsWithFetchableTilesForViewport: Set<string> = new Set()
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
@@ -386,7 +386,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       this.findMapsInViewport(
         this.shouldAnticipateInteraction()
           ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
-          : 0
+          : 1
       )
     )
       .map((mapId) => this.warpedMapList.getWarpedMap(mapId) as WarpedMap)
@@ -429,20 +429,20 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const overviewFetchableTilesForViewport: FetchableTile[] = []
 
     const mapsInViewportForRequest = this.findMapsInViewport(
-      this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 0
+      this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
     )
     const mapsInViewportForOverviewRequest = this.findMapsInViewport(
       this.shouldAnticipateInteraction()
         ? OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO
-        : 0
+        : 1
     )
     const mapsInViewportForPrune = this.findMapsInViewport(
-      this.shouldAnticipateInteraction() ? PRUNE_VIEWPORT_BUFFER_RATIO : 0
+      this.shouldAnticipateInteraction() ? PRUNE_VIEWPORT_BUFFER_RATIO : 1
     )
     const mapsInViewportForOverviewPrune = this.findMapsInViewport(
       this.shouldAnticipateInteraction()
         ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
-        : 0
+        : 1
     )
 
     // For all maps, reset properties for the current viewport: the (overview) zoomlevels, resource viewport ring and fetchable tiles
@@ -514,7 +514,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.updateMapsForViewport(allFetchableTilesForViewport)
   }
 
-  protected findMapsInViewport(viewportBufferRatio = 0): Set<string> {
+  protected findMapsInViewport(viewportBufferRatio?: number): Set<string> {
     if (!this.viewport) {
       return new Set()
     }
@@ -606,7 +606,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
     const projectedGeoBufferedViewportRectangle =
       viewport.getProjectedGeoBufferedRectangle(
-        this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 0
+        this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
       )
     // Optimise computation time of backwards transformation:
     // Since this is the only place transformToResource is called
@@ -736,7 +736,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     if (
       totalFetchableTilesForViewportResolution >
         maxTotalFetchableTilesResolution ||
-      mapsInViewportForOverviewRequest.size > MAX_TOTAL_MAPS_OVERVIEW ||
       spriteFetchabelTiles.length > 0
     ) {
       return []
@@ -800,9 +799,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected updateMapsForViewport(
     allFechableTilesForViewport: FetchableTile[]
   ): {
-    mapsEnteringViewport: string[]
-    mapsLeavingViewport: string[]
+    mapsWithFetchableTilesForViewportEntering: string[]
+    mapsWithFetchableTilesForViewportLeaving: string[]
+    mapsInViewportEntering: string[]
+    mapsInViewportLeaving: string[]
   } {
+    this.mapsWithFetchableTilesForPreviousViewport =
+      this.mapsWithFetchableTilesForViewport
     this.mapsWithFetchableTilesForViewport = new Set(
       allFechableTilesForViewport
         .map((tile) => tile.mapId)
@@ -814,28 +817,30 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.mapsInPreviousViewport = this.mapsInViewport
     this.mapsInViewport = this.findMapsInViewport()
 
-    // TODO: handle everything as Set() once JS supports filter on sets.
-    // And speed up with anonymous functions with the Set.prototype.difference() once broadly supported
-    const mapsInPreviousViewportAsArray = Array.from(
-      this.mapsInPreviousViewport
-    )
-    const mapsInViewportAsArray = Array.from(this.mapsInViewport)
-
-    const mapsEnteringViewport = mapsInViewportAsArray.filter(
-      (mapId) => !mapsInPreviousViewportAsArray.includes(mapId)
-    )
-    const mapsLeavingViewport = mapsInPreviousViewportAsArray.filter(
-      (mapId) => !mapsInViewportAsArray.includes(mapId)
+    const {
+      mapsForViewportEntering: mapsWithFetchableTilesForViewportEntering,
+      mapsForViewportLeaving: mapsWithFetchableTilesForViewportLeaving
+    } = this.mapsInViewportsToEnteringAndLeaving(
+      Array.from(this.mapsWithFetchableTilesForPreviousViewport),
+      Array.from(this.mapsWithFetchableTilesForViewport)
     )
 
-    for (const mapId of mapsEnteringViewport) {
+    const {
+      mapsForViewportEntering: mapsInViewportEntering,
+      mapsForViewportLeaving: mapsInViewportLeaving
+    } = this.mapsInViewportsToEnteringAndLeaving(
+      Array.from(this.mapsInPreviousViewport),
+      Array.from(this.mapsInViewport)
+    )
+
+    for (const mapId of mapsInViewportEntering) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTERED, {
           mapIds: [mapId]
         })
       )
     }
-    for (const mapId of mapsLeavingViewport) {
+    for (const mapId of mapsInViewportLeaving) {
       this.clearMap(mapId)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEFT, {
@@ -845,8 +850,32 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     return {
-      mapsEnteringViewport,
-      mapsLeavingViewport
+      mapsWithFetchableTilesForViewportEntering,
+      mapsWithFetchableTilesForViewportLeaving,
+      mapsInViewportEntering,
+      mapsInViewportLeaving
+    }
+  }
+
+  protected mapsInViewportsToEnteringAndLeaving(
+    mapsForPreviousViewport: string[],
+    mapsForViewport: string[]
+  ): {
+    mapsForViewportEntering: string[]
+    mapsForViewportLeaving: string[]
+  } {
+    // TODO: handle everything as Set() once JS supports filter on sets.
+    // And speed up with anonymous functions with the Set.prototype.difference() once broadly supported
+    const mapsForViewportEntering = mapsForViewport.filter(
+      (mapId) => !mapsForPreviousViewport.includes(mapId)
+    )
+    const mapsForViewportLeaving = mapsForPreviousViewport.filter(
+      (mapId) => !mapsForViewport.includes(mapId)
+    )
+
+    return {
+      mapsForViewportEntering,
+      mapsForViewportLeaving
     }
   }
 
