@@ -1,5 +1,6 @@
 import inside from 'point-in-polygon-hao'
 
+import { validateGeoreferencedMap } from '@allmaps/annotation'
 import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
 
 import {
@@ -19,14 +20,17 @@ import {
   AnalysisItem,
   Analysis,
   Distortions,
-  Measures
+  Measures,
+  ProtoGeoreferencedMap
 } from './shared/types'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { Point } from '@allmaps/types'
 
 // Note: construction errors and failures to get info, warning or errors are always reported
 const DEFAULT_INFO_CODES = ['maskequalsfullmask']
 const DEFAULT_WARNING_CODES = [
+  'maskmissing',
   'gcpoutsidemask',
   'maskpointoutsidefullmask',
   // 'destinationrmsetoohigh',
@@ -38,12 +42,14 @@ const DEFAULT_WARNING_CODES = [
   // 'triangulationfoldsover'
 ]
 const DEFAULT_ERROR_CODES = [
-  'constructingwarpedmapfailed',
+  'constructinggeoreferencedmapfailed',
   'constructingtriangulatedwarpedmapfailed',
+  'constructingwarpedmapfailed',
   'gcpincompleteresource',
   'gcpincompleteregeo',
-  // 'gcpamountlessthen2',
-  'gcpamountlessthen3',
+  'gcpsmissing',
+  // 'gcpsamountlessthen2',
+  'gcpsamountlessthen3',
   'gcpresourcerepeatedpoint',
   'gcpgeorepeatedpoint',
   'masknotring',
@@ -71,7 +77,8 @@ const DEFAULT_OPTIONS: AnalysisOptions = {
 export class Analyzer {
   mapId?: string
 
-  georeferencedMap: GeoreferencedMap
+  protoGeoreferencedMap: ProtoGeoreferencedMap
+  georeferencedMap?: GeoreferencedMap
   warpedMap?: WarpedMap
 
   options: AnalysisOptions
@@ -88,31 +95,61 @@ export class Analyzer {
   /**
    * Creates an instance of Analyzer.
    *
-   * @param georeferencedOrWarpedMap - A Georeferenced Map or a Warped Map
+   * @param map - A (proto) Georeferenced Map or a Warped Map
    */
+  constructor(
+    protoGeoreferencedMap: ProtoGeoreferencedMap,
+    options?: AnalysisOptions
+  )
   constructor(georeferenceddMap: GeoreferencedMap, options?: AnalysisOptions)
   constructor(warpedMap: WarpedMap, options?: AnalysisOptions)
   constructor(
-    georeferencedOrWarpedMap: GeoreferencedMap | WarpedMap,
+    map: ProtoGeoreferencedMap | GeoreferencedMap | WarpedMap,
     options?: Partial<AnalysisOptions>
   ) {
     this.options = mergeOptions(DEFAULT_OPTIONS, options)
 
-    if (georeferencedOrWarpedMap instanceof WarpedMap) {
-      this.georeferencedMap = georeferencedOrWarpedMap.georeferencedMap
-      this.warpedMap = georeferencedOrWarpedMap
+    if (map instanceof WarpedMap) {
+      this.warpedMap = map
+      this.georeferencedMap = map.georeferencedMap
+      this.protoGeoreferencedMap = this.georeferencedMap
+    } else if ('type' in map && map.type === 'GeoreferencedMap') {
+      this.georeferencedMap = map as GeoreferencedMap
+      this.protoGeoreferencedMap = map
     } else {
-      this.georeferencedMap = georeferencedOrWarpedMap
+      this.protoGeoreferencedMap = map
     }
 
     // Note: since we cannot await in a constructor,
     // we can't compute a missing mapId here using generateChecksum()
     // and hence it can be undefined in this entire package
-    this.mapId = this.georeferencedMap.id
+    // (also because georeferencedMap is not guaranteed to exist)
+    this.mapId = this.georeferencedMap?.id
 
+    // Analyzing whether a GeoreferencedMap can be constructed (from a ProtoGeoreferencedMap)
+    // for a ProtoGeoreferencedMap
+    if (this.georeferencedMap === undefined) {
+      try {
+        const mapOrMaps = validateGeoreferencedMap(this.protoGeoreferencedMap)
+        this.georeferencedMap = Array.isArray(mapOrMaps)
+          ? mapOrMaps[0]
+          : mapOrMaps
+      } catch (error) {
+        this.constructionErrors.push({
+          mapId: this.mapId,
+          code: 'constructinggeoreferencedmapfailed',
+          message: 'Constructing a GeoreferencedMap failed.',
+          originalMessage: String(error)
+        })
+      }
+    }
+
+    // Analyzing whether a TriangulatedWarpedMap can be constructed (from a GeoreferencedMap)
+    // for a GeoreferencedMap, or for a WarpedMap that is not a TriangulatedWarpedMap
     if (
-      this.warpedMap == undefined ||
-      !(this.warpedMap instanceof TriangulatedWarpedMap)
+      this.georeferencedMap &&
+      (this.warpedMap == undefined ||
+        !(this.warpedMap instanceof TriangulatedWarpedMap))
     ) {
       try {
         this.warpedMap = new TriangulatedWarpedMap(
@@ -130,7 +167,9 @@ export class Analyzer {
       }
     }
 
-    if (this.warpedMap === undefined) {
+    // Analyzing whether a WarpedMap can be constructed (from a GeoreferencedMap)
+    // for a GeoreferencedMap
+    if (this.georeferencedMap && this.warpedMap === undefined) {
       try {
         this.warpedMap = new WarpedMap(this.mapId || '', this.georeferencedMap)
       } catch (error) {
@@ -145,14 +184,14 @@ export class Analyzer {
   }
 
   /**
-   * Analyse
+   * Analyzanalye
    *
    * Applying extra caution: wrapping the getters in a try catch
    *
    * @param partialOptions - Analysis options
    * @returns Analysis with info, warnings and errors
    */
-  public analyse(partialOptions?: Partial<AnalysisOptions>): Analysis {
+  public analyze(partialOptions?: Partial<AnalysisOptions>): Analysis {
     let errors: AnalysisItem[] = []
     let info: AnalysisItem[] = []
     let warnings: AnalysisItem[] = []
@@ -167,27 +206,25 @@ export class Analyzer {
         originalMessage: String(error)
       })
     }
-    if (this.errors.length != 0) {
-      try {
-        info = this.getInfo(partialOptions)
-      } catch (error) {
-        this.errors.push({
-          mapId: this.mapId,
-          code: 'infofailed',
-          message: 'Failed to get info.',
-          originalMessage: String(error)
-        })
-      }
-      try {
-        warnings = this.getWarnings(partialOptions)
-      } catch (error) {
-        this.errors.push({
-          mapId: this.mapId,
-          code: 'warningsfailed',
-          message: 'Failed to get warnings.',
-          originalMessage: String(error)
-        })
-      }
+    try {
+      info = this.getInfo(partialOptions)
+    } catch (error) {
+      this.errors.push({
+        mapId: this.mapId,
+        code: 'infofailed',
+        message: 'Failed to get info.',
+        originalMessage: String(error)
+      })
+    }
+    try {
+      warnings = this.getWarnings(partialOptions)
+    } catch (error) {
+      this.errors.push({
+        mapId: this.mapId,
+        code: 'warningsfailed',
+        message: 'Failed to get warnings.',
+        originalMessage: String(error)
+      })
     }
     return {
       info,
@@ -244,14 +281,31 @@ export class Analyzer {
 
     this.warnings = []
 
+    // Mask missing
+    code = 'maskmissing'
+    if (codes.includes(code)) {
+      if (!this.protoGeoreferencedMap.resourceMask) {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          message: `A mask is missing.`
+        })
+      }
+    }
+
     // GCPs not outside mask
     code = 'gcpoutsidemask'
-    if (codes.includes(code)) {
+    if (
+      codes.includes(code) &&
+      this.protoGeoreferencedMap.gcps &&
+      this.protoGeoreferencedMap.resourceMask
+    ) {
       const gcpsOutside = []
-      for (const gcp of this.georeferencedMap.gcps) {
+      for (const gcp of this.protoGeoreferencedMap.gcps) {
         if (
+          gcp.resource &&
           inside(gcp.resource, [
-            closeRing(this.georeferencedMap.resourceMask)
+            closeRing(this.protoGeoreferencedMap.resourceMask)
           ]) === false
         ) {
           gcpsOutside.push(gcp)
@@ -301,7 +355,7 @@ export class Analyzer {
       const measures = this.getMeasures()
       if (
         measures &&
-        measures.destinationRmse / measures.projectedGeoDiameter >
+        measures.destinationRmse / measures.projectedGeoMaskBboxDiameter >
           options.maxRmseDiameterFraction
       ) {
         this.warnings.push({
@@ -318,7 +372,8 @@ export class Analyzer {
       const measures = this.getMeasures()
       if (
         measures &&
-        measures.destinationHelmertRmse / measures.projectedGeoDiameter >
+        measures.destinationHelmertRmse /
+          measures.projectedGeoMaskBboxDiameter >
           options.maxRmseDiameterFraction
       ) {
         this.warnings.push({
@@ -353,7 +408,8 @@ export class Analyzer {
       const measures = this.getMeasures()
       if (
         measures &&
-        measures.destinationPolynomial1Rmse / measures.projectedGeoDiameter >
+        measures.destinationPolynomial1Rmse /
+          measures.projectedGeoMaskBboxDiameter >
           options.maxRmseDiameterFraction
       ) {
         this.warnings.push({
@@ -391,7 +447,9 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: gcpUniquePointsFiltered[0].resource,
-          projectedGeoPoint: gcpUniquePointsFiltered[0].geo,
+          geoPoint: this.warpedMap.projectedTransformer.projectionToLonLat(
+            gcpUniquePointsFiltered[0].geo
+          ),
           message: `The area distortion (log2sigma) is higher then ${options.maxLog2sigma} or lower then ${options.minLog2sigma}.`
         })
       }
@@ -420,7 +478,9 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: gcpUniquePointsFiltered[0].resource,
-          projectedGeoPoint: gcpUniquePointsFiltered[0].geo,
+          geoPoint: this.warpedMap.projectedTransformer.projectionToLonLat(
+            gcpUniquePointsFiltered[0].geo
+          ),
           message: `The angular (twoOmega) distortion is higher then ${options.maxTwoOmega}.`
         })
       }
@@ -449,7 +509,9 @@ export class Analyzer {
           mapId: this.mapId,
           code,
           resourcePoint: gcpUniquePointsFiltered[0].resource,
-          projectedGeoPoint: gcpUniquePointsFiltered[0].geo,
+          geoPoint: this.warpedMap.projectedTransformer.projectionToLonLat(
+            gcpUniquePointsFiltered[0].geo
+          ),
           message: 'The warped map folds over itself.'
         })
       }
@@ -473,9 +535,9 @@ export class Analyzer {
 
     // GCPs not incomplete
     code = 'gcpincompleteresource'
-    if (codes.includes(code)) {
+    if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const gcpsIncompleteResource = []
-      for (const gcp of this.georeferencedMap.gcps) {
+      for (const gcp of this.protoGeoreferencedMap.gcps) {
         if (gcp.resource == undefined || !isPoint(gcp.resource)) {
           gcpsIncompleteResource.push(gcp)
         }
@@ -491,9 +553,9 @@ export class Analyzer {
       })
     }
     code = 'gcpincompletegeo'
-    if (codes.includes(code)) {
+    if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const gcpsIncompleteGeo = []
-      for (const gcp of this.georeferencedMap.gcps) {
+      for (const gcp of this.protoGeoreferencedMap.gcps) {
         if (gcp.geo == undefined || !isPoint(gcp.geo)) {
           gcpsIncompleteGeo.push(gcp)
         }
@@ -517,31 +579,51 @@ export class Analyzer {
       return this.errors
     }
 
-    // GCPs amount not less then 2
-    code = 'gcpamountlessthen2'
-    if (codes.includes(code) && this.georeferencedMap.gcps.length < 2) {
+    // GCPs missing
+    code = 'gcpsmissing'
+    if (codes.includes(code) && !this.protoGeoreferencedMap.gcps) {
       this.errors.push({
         mapId: this.mapId,
         code,
-        message: `There are ${this.georeferencedMap.gcps.length} GCPs, but a minimum of 2 are required (for a Helmert transform).`
+        message: `GCPs are missing.`
+      })
+    }
+
+    // GCPs amount not less then 2
+    code = 'gcpsamountlessthen2'
+    if (
+      codes.includes(code) &&
+      this.protoGeoreferencedMap.gcps &&
+      this.protoGeoreferencedMap.gcps.length < 2
+    ) {
+      this.errors.push({
+        mapId: this.mapId,
+        code,
+        message: `There are ${this.protoGeoreferencedMap.gcps.length} GCPs, but a minimum of 2 are required (for a Helmert transform).`
       })
     }
 
     // GCPs amount not less then 3
-    code = 'gcpamountlessthen3'
-    if (codes.includes(code) && this.georeferencedMap.gcps.length < 3) {
+    code = 'gcpsamountlessthen3'
+    if (
+      codes.includes(code) &&
+      this.protoGeoreferencedMap.gcps &&
+      this.protoGeoreferencedMap.gcps.length < 3
+    ) {
       this.errors.push({
         mapId: this.mapId,
         code,
-        message: `There are ${this.georeferencedMap.gcps.length} GCPs, but a minimum of 3 are required.`
+        message: `There are ${this.protoGeoreferencedMap.gcps.length} GCPs, but a minimum of 3 are required.`
       })
     }
 
     // GCPs no repeated points
     code = 'gcpresourcerepeatedpoint'
-    if (codes.includes(code)) {
+    if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const resourceRepeatedPoints = arrayRepeated(
-        this.georeferencedMap.gcps.map((gcp) => gcp.resource),
+        this.protoGeoreferencedMap.gcps
+          .filter((gcp) => gcp.resource)
+          .map((gcp) => gcp.resource as Point),
         isEqualPoint
       )
       resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
@@ -554,9 +636,11 @@ export class Analyzer {
       })
     }
     code = 'gcpgeorepeatedpoint'
-    if (codes.includes(code)) {
+    if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const geoRepeatedPoints = arrayRepeated(
-        this.georeferencedMap.gcps.map((gcp) => gcp.geo),
+        this.protoGeoreferencedMap.gcps
+          .filter((gcp) => gcp.geo)
+          .map((gcp) => gcp.geo as Point),
         isEqualPoint
       )
       geoRepeatedPoints.forEach((geoRepeatedPoint) => {
@@ -571,8 +655,8 @@ export class Analyzer {
 
     // Mask valid as ring
     code = 'masknotring'
-    if (codes.includes(code)) {
-      const maskIsRing = isRing(this.georeferencedMap.resourceMask)
+    if (codes.includes(code) && this.protoGeoreferencedMap.resourceMask) {
+      const maskIsRing = isRing(this.protoGeoreferencedMap.resourceMask)
       if (!maskIsRing) {
         this.errors.push({
           mapId: this.mapId,
@@ -588,9 +672,9 @@ export class Analyzer {
 
     // Mask no repeated points
     code = 'maskrepeatedpoint'
-    if (codes.includes(code)) {
+    if (codes.includes(code) && this.protoGeoreferencedMap.resourceMask) {
       const resourceMaskRepeatedPoints = arrayRepeated(
-        this.georeferencedMap.resourceMask,
+        this.protoGeoreferencedMap.resourceMask,
         isEqualPoint
       )
       resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
@@ -605,9 +689,9 @@ export class Analyzer {
 
     // Mask no self-intersection
     code = 'maskselfintersection'
-    if (codes.includes(code)) {
+    if (codes.includes(code) && this.protoGeoreferencedMap.resourceMask) {
       const resourceMaskSelfIntersectionPoints = polygonSelfIntersectionPoints([
-        this.georeferencedMap.resourceMask
+        this.protoGeoreferencedMap.resourceMask
       ])
       resourceMaskSelfIntersectionPoints.forEach(
         (resourceMaskSelfIntersectionPoint) => {
@@ -634,7 +718,10 @@ export class Analyzer {
       return
     }
 
-    const projectedGeoDiameter = bboxToDiameter(
+    const resourceMaskBboxDiameter = bboxToDiameter(
+      this.warpedMap.resourceMaskBbox
+    )
+    const projectedGeoMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.projectedGeoMaskBbox
     )
 
@@ -663,7 +750,7 @@ export class Analyzer {
     const projectedTransformer = this.warpedMap.projectedTransformer
     const toProjectedGeoTransformation =
       projectedTransformer.getToGeoTransformation()
-    const rmse = toProjectedGeoTransformation.getDestinationRmse()
+    const destinationRmse = toProjectedGeoTransformation.getDestinationRmse()
     const destinationErrors = toProjectedGeoTransformation.getErrors()
     // Note: this could be spead up, since it recomputes this.warpedMap.projectedGeoTransformedResourcePoints
     // Note: we scale using the helmert transform instead of computing errors in resource
@@ -672,21 +759,19 @@ export class Analyzer {
       (error) => error / helmertMeasures.scale
     )
     // TODO: check if this is correct. Currenlty when we give one GCP a big offset, the others have larger resourceRelativeErrors
-    const resourceMaskBboxDiameter = bboxToDiameter(
-      this.warpedMap.resourceMaskBbox
-    )
     const resourceRelativeErrors = destinationErrors.map(
       (error) => error / (helmertMeasures.scale * resourceMaskBboxDiameter)
     )
 
     this.measures = {
       mapId: this.mapId,
-      projectedGeoDiameter,
+      projectedGeoMaskBboxDiameter,
+      resourceMaskBboxDiameter,
       destinationPolynomial1Rmse,
       polynomial1Measures,
       destinationHelmertRmse,
       helmertMeasures,
-      destinationRmse: rmse,
+      destinationRmse,
       destinationErrors,
       resourceErrors,
       resourceRelativeErrors

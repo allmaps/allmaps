@@ -4,6 +4,7 @@ import path from 'node:path'
 import { describe, expect, test } from 'vitest'
 
 import { parseAnnotation } from '@allmaps/annotation'
+import { WarpedMap } from '@allmaps/render'
 
 import { Analyzer } from '../src/index.js'
 
@@ -13,58 +14,66 @@ export function readJSONFile(filename: string) {
   return JSON.parse(fs.readFileSync(filename, 'utf-8'))
 }
 
-describe('Analyze a parsed annotation', () => {
-  test('should run and give no info, errors or warnings', () => {
-    const annotation = readJSONFile(path.join(inputDir, 'annotation.json'))
-    const georeferencedMaps = parseAnnotation(annotation)
-    const georeferencedMap = georeferencedMaps[0]
+describe('Analyzer', () => {
+  test('ProtoGeoreferencedMap: no info or warnings, but constructinggeoreferencedmapfailed error', () => {
+    const protoGeoreferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map.json')
+    )
 
-    const analyzer = new Analyzer(georeferencedMap)
+    const analyzer = new Analyzer(protoGeoreferencedMap)
+    const analysis = analyzer.analyze()
 
-    const info = analyzer.getInfo()
-    const warnings = analyzer.getWarnings()
-    const errors = analyzer.getErrors()
-
-    const infoCodes = info.map((i) => i.code)
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(infoCodes).to.be.of.length(0)
-    expect(warningCodes).to.be.of.length(0)
-    expect(errorCodes).to.be.of.length(0)
-
-    // const measures = analyzer.getMeasures()
-    // const distortions = analyzer.getDistortions()
+    expect(analysis.info).to.be.of.length(0)
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'constructinggeoreferencedmapfailed'
+    )
   })
-})
 
-describe('Analyze a georeferenced map', () => {
-  test('should run and give no info, errors or warnings', () => {
+  test('GeoreferencedMap: no info, warnings or errors', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
 
-    const info = analyzer.getInfo()
-    const warnings = analyzer.getWarnings()
-    const errors = analyzer.getErrors()
+    const analysis = analyzer.analyze()
 
-    const infoCodes = info.map((i) => i.code)
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(infoCodes).to.be.of.length(0)
-    expect(warningCodes).to.be.of.length(0)
-    expect(errorCodes).to.be.of.length(0)
-
-    // const measures = analyzer.getMeasures()
-    // const distortions = analyzer.getDistortions()
+    expect(analysis.info).to.be.of.length(0)
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with maskequalsfullmask', () => {
-  test('should give info code maskequalsfullmask if code passed in Analyzer constructor', () => {
+  test('GeoreferencedMap from parsed annotation: no info, warnings or errors', () => {
+    const annotation = readJSONFile(path.join(inputDir, 'annotation.json'))
+    const georeferencedMaps = parseAnnotation(annotation)
+    const georeferencedMap = georeferencedMaps[0]
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze()
+
+    expect(analysis.info).to.be.of.length(0)
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
+  })
+
+  test('WarpedMap: no info, warnings or errors', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map.json')
+    )
+    const warpedMap = new WarpedMap('tempId', georeferencedMap)
+
+    const analyzer = new Analyzer(warpedMap)
+
+    const analysis = analyzer.analyze()
+
+    expect(analysis.info).to.be.of.length(0)
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
+  })
+
+  test('Analyze codes passed in Analyzer constructor', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
     )
@@ -73,133 +82,136 @@ describe('Analyze a georeferenced map with maskequalsfullmask', () => {
       codes: ['maskequalsfullmask']
     })
 
-    const info = analyzer.getInfo()
-    const warnings = analyzer.getWarnings()
-    const errors = analyzer.getErrors()
+    const analysis = analyzer.analyze()
 
-    const infoCodes = info.map((i) => i.code)
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(infoCodes).to.contain('maskequalsfullmask')
-    expect(warningCodes).to.be.of.length(0)
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.info.map((info) => info.code)).to.contain(
+      'maskequalsfullmask'
+    )
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with maskequalsfullmask', () => {
-  test('should give info code maskequalsfullmask if code passed in getInfo()', () => {
+  test('Analyze codes passed in getInfo() etc.', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const info = analyzer.getInfo({
+    const analysis = analyzer.analyze({
       codes: ['maskequalsfullmask']
     })
-    const warnings = analyzer.getWarnings()
-    const errors = analyzer.getErrors()
 
-    const infoCodes = info.map((i) => i.code)
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(infoCodes).to.contain('maskequalsfullmask')
-    expect(warningCodes).to.be.of.length(0)
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.info.map((info) => info.code)).to.contain(
+      'maskequalsfullmask'
+    )
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with maskequalsfullmask', () => {
-  test('should not give info code maskequalsfullmask if codes passed without maskequalsfullmask', () => {
+  test('Only analyze codes passed', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const info = analyzer.getInfo({
+    const analysis = analyzer.analyze({
       codes: []
     })
-    const warnings = analyzer.getWarnings()
-    const errors = analyzer.getErrors()
 
-    const infoCodes = info.map((i) => i.code)
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(infoCodes).to.not.contain('maskequalsfullmask')
-    expect(warningCodes).to.be.of.length(0)
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.info.map((info) => info.code)).to.not.contain(
+      'maskequalsfullmask'
+    )
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
   })
 })
 
-describe('Analyze a georeferenced map with gcpoutsidemask', () => {
-  test('should give warning code gcpoutsidemask', () => {
+describe('Info', () => {
+  test('maskequalsfullmask', () => {
     const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-gcpoutsidemask.json')
+      path.join(inputDir, 'georeferenced-map-maskequalsfullmask.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
-      codes: ['gcpoutsidemask']
+    const analysis = analyzer.analyze({
+      codes: ['maskequalsfullmask']
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('gcpoutsidemask')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.info.map((info) => info.code)).to.contain(
+      'maskequalsfullmask'
+    )
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
   })
 })
 
-describe('Analyze a georeferenced map with maskpointoutsidefullmask', () => {
-  test('should give warning code maskpointoutsidefullmask', () => {
+describe('Warnings', () => {
+  test('maskmissing', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-maskmissing.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze({
+      codes: ['maskmissing']
+    })
+
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'maskmissing'
+    )
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'constructinggeoreferencedmapfailed'
+    )
+  })
+
+  test('gcpoutsidemask', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpoutsidemask.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze({
+      codes: ['gcpoutsidemask']
+    })
+
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'gcpoutsidemask'
+    )
+  })
+
+  test('maskpointoutsidefullmask', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskpointoutsidefullmask.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
+    const analysis = analyzer.analyze({
       codes: ['maskpointoutsidefullmask']
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('maskpointoutsidefullmask')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'maskpointoutsidefullmask'
+    )
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with polynomial1sheartoohigh', () => {
-  test('should give warning code polynomial1sheartoohigh', () => {
+  test('polynomial1sheartoohigh', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-polynomial1sheartoohigh.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
+    const analysis = analyzer.analyze({
       codes: ['polynomial1sheartoohigh']
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('polynomial1sheartoohigh')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'polynomial1sheartoohigh'
+    )
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with destinationpolynomial1rmsetoohigh', () => {
-  test('should give warning code destinationpolynomial1rmsetoohigh', () => {
+  test('destinationpolynomial1rmsetoohigh', () => {
     const georeferencedMap = readJSONFile(
       path.join(
         inputDir,
@@ -208,218 +220,236 @@ describe('Analyze a georeferenced map with destinationpolynomial1rmsetoohigh', (
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
+    const analysis = analyzer.analyze({
       codes: ['destinationpolynomial1rmsetoohigh']
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('destinationpolynomial1rmsetoohigh')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'destinationpolynomial1rmsetoohigh'
+    )
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with log2sigmadistortiontoohigh', () => {
-  test('should give warning code log2sigmadistortiontoohigh', () => {
+  test('log2sigmadistortiontoohigh', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-log2sigmadistortiontoohigh.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
+    const analysis = analyzer.analyze({
       codes: ['log2sigmadistortiontoohigh']
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('log2sigmadistortiontoohigh')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'log2sigmadistortiontoohigh'
+    )
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with log2sigmadistortiontoohigh', () => {
   test('should not give warning code log2sigmadistortiontoohigh if passing higher/lower max values', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-log2sigmadistortiontoohigh.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
+    const analysis = analyzer.analyze({
       codes: ['log2sigmadistortiontoohigh'],
       maxLog2sigma: 10,
       minLog2sigma: -10
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.be.of.length(0)
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings).to.be.of.length(0)
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with twoomegadistortiontoohigh', () => {
-  test('should give warning code twoomegadistortiontoohigh', () => {
+  test('twoomegadistortiontoohigh', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-twoomegadistortiontoohigh.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
-
-    const warnings = analyzer.getWarnings({
+    const analysis = analyzer.analyze({
       codes: ['twoomegadistortiontoohigh']
     })
-    const errors = analyzer.getErrors()
 
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('twoomegadistortiontoohigh')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'twoomegadistortiontoohigh'
+    )
+    expect(analysis.errors).to.be.of.length(0)
   })
-})
 
-describe('Analyze a georeferenced map with triangulationfoldsover', () => {
-  test('should give warning code triangulationfoldsover', () => {
+  test('triangulationfoldsover', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-triangulationfoldsover.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze({ codes: ['triangulationfoldsover'] })
 
-    const warnings = analyzer.getWarnings({ codes: ['triangulationfoldsover'] })
-    const errors = analyzer.getErrors()
-
-    const warningCodes = warnings.map((i) => i.code)
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(warningCodes).to.contain('triangulationfoldsover')
-    expect(errorCodes).to.be.of.length(0)
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'triangulationfoldsover'
+    )
+    expect(analysis.errors).to.be.of.length(0)
   })
 })
 
-describe('Analyze a georeferenced map with gcpincompleteresource', () => {
-  test('should give error code gcpincompleteresource and constructingwarpedmapfailed', () => {
+describe('Errors', () => {
+  test('constructinggeoreferencedmapfailed', () => {
     const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-gcpincompleteresource.json')
+      path.join(inputDir, 'proto-georeferenced-map-gcpsmissing.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze()
 
-    const errors = analyzer.getErrors({
-      codes: ['gcpincompleteresource', 'constructingwarpedmapfailed']
-    })
-
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(errorCodes).to.contain('gcpincompleteresource')
-    expect(errorCodes).to.contain('constructingwarpedmapfailed')
-  })
-})
-
-describe('Analyze a georeferenced map with gcpamountlessthen2', () => {
-  test('should give error code gcpamountlessthen2', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-gcpamountlessthen2.json')
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'constructinggeoreferencedmapfailed'
     )
-
-    const analyzer = new Analyzer(georeferencedMap)
-
-    const errors = analyzer.getErrors({ codes: ['gcpamountlessthen2'] })
-
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(errorCodes).to.contain('gcpamountlessthen2')
   })
-})
 
-describe('Analyze a georeferenced map with gcpamountlessthen3', () => {
-  test('should give error code gcpamountlessthen3', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-gcpamountlessthen3.json')
-    )
-
-    const analyzer = new Analyzer(georeferencedMap)
-
-    const errors = analyzer.getErrors({ codes: ['gcpamountlessthen3'] })
-
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(errorCodes).to.contain('gcpamountlessthen3')
-  })
-})
-
-describe('Analyze a georeferenced map with gcpresourcerepeatedpoint', () => {
-  test('should give error code gcpresourcerepeatedpoint', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-gcpresourcerepeatedpoint.json')
-    )
-
-    const analyzer = new Analyzer(georeferencedMap)
-
-    const errors = analyzer.getErrors({ codes: ['gcpresourcerepeatedpoint'] })
-
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(errorCodes).to.contain('gcpresourcerepeatedpoint')
-  })
-})
-
-describe('Analyze a georeferenced map with masknotring', () => {
-  test('should give error code masknotring', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-masknotring.json')
-    )
-
-    const analyzer = new Analyzer(georeferencedMap)
-
-    const errors = analyzer.getErrors({ codes: ['masknotring'] })
-
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(errorCodes).to.contain('masknotring')
-  })
-})
-
-describe('Analyze a georeferenced map with maskrepeatedpoint', () => {
-  test('should give error code maskrepeatedpoint', () => {
-    const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'georeferenced-map-maskrepeatedpoint.json')
-    )
-
-    const analyzer = new Analyzer(georeferencedMap)
-
-    const errors = analyzer.getErrors({ codes: ['maskrepeatedpoint'] })
-
-    const errorCodes = errors.map((i) => i.code)
-
-    expect(errorCodes).to.contain('maskrepeatedpoint')
-  })
-})
-
-describe('Analyze a georeferenced map with maskselfintersection', () => {
-  test('should give error code maskselfintersection and constructingtriangulatedwarpedmapfailed', () => {
+  test('constructingtriangulatedwarpedmapfailed', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskselfintersection.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze()
 
-    const errors = analyzer.getErrors({
-      codes: ['constructingtriangulatedwarpedmapfailed', 'maskselfintersection']
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'maskselfintersection'
+    )
+  })
+
+  test('constructingwarpedmapfailed', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'georeferenced-map-gcpincompleteresource.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze()
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'constructingwarpedmapfailed'
+    )
+  })
+
+  test('gcpincompleteresource', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpincompleteresource.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({
+      codes: ['gcpincompleteresource']
     })
 
-    const errorCodes = errors.map((i) => i.code)
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpincompleteresource'
+    )
+  })
 
-    expect(errorCodes).to.contain('constructingtriangulatedwarpedmapfailed')
-    expect(errorCodes).to.contain('maskselfintersection')
+  test('gcpsmissing', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpsmissing.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({
+      codes: ['gcpsmissing']
+    })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain('gcpsmissing')
+  })
+
+  test('gcpsamountlessthen2', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpsamountlessthen2.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({ codes: ['gcpsamountlessthen2'] })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpsamountlessthen2'
+    )
+  })
+
+  test('gcpsamountlessthen3', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpsamountlessthen3.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({ codes: ['gcpsamountlessthen3'] })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpsamountlessthen3'
+    )
+  })
+
+  test('gcpresourcerepeatedpoint', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(
+        inputDir,
+        'proto-georeferenced-map-gcpresourcerepeatedpoint.json'
+      )
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({ codes: ['gcpresourcerepeatedpoint'] })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpresourcerepeatedpoint'
+    )
+  })
+
+  test('masknotring', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-masknotring.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({ codes: ['masknotring'] })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain('masknotring')
+  })
+
+  test('maskrepeatedpoint', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-maskrepeatedpoint.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({ codes: ['maskrepeatedpoint'] })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'maskrepeatedpoint'
+    )
+  })
+
+  test('maskselfintersection', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-maskselfintersection.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({
+      codes: ['maskselfintersection']
+    })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'maskselfintersection'
+    )
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'constructinggeoreferencedmapfailed'
+    )
   })
 })

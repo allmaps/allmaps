@@ -6,6 +6,14 @@ import {
 import { Point } from '@allmaps/types'
 
 /**
+ * Proto version of GeoreferencedMap
+ */
+export type ProtoGeoreferencedMap = {
+  gcps?: { resource?: Point; geo?: Point }[]
+  resourceMask?: Point[]
+}
+
+/**
  * Analysis options
  */
 export type AnalysisOptions = {
@@ -25,11 +33,10 @@ export type AnalysisItem = {
   code: string
   resourcePoint?: Point
   geoPoint?: Point
-  projectedGeoPoint?: Point
   gcpIndex?: number
   maskPointIndex?: number
   message: string
-  originalMessage?: string
+  originalMessage?: unknown
   text?: string
 }
 
@@ -48,7 +55,8 @@ export type Analysis = {
 export type Measures = {
   mapId?: string
 
-  projectedGeoDiameter: number
+  resourceMaskBboxDiameter: number
+  projectedGeoMaskBboxDiameter: number
 
   destinationRmse: number
   destinationErrors: number[]

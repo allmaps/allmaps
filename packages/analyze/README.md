@@ -16,13 +16,88 @@ This packages analyzes maps to return information, warning and error items. Thre
 - **Warnings** are possibly problematic findings, but don't invalidate the map.
 - **Errors** are problematic findings that invalidate the map.
 
-Analysis items like info, warnings and errors are objects with a unique code, a message and possible additional descriptive attributes.
+Analysis items like info, warnings and errors are objects with a unique code, a message and possible additional descriptive attributes. The supported analysis items are listed below.
 
-An analyzer can analyze the following topics:
+An analyzer can also compute the following **Measures** and **Distortion**:
+
+## Installation
+
+This is an ESM-only module that works in browsers and Node.js.
+
+Install using npm:
+
+```sh
+npm install @allmaps/analyze
+```
+
+## Usage
+
+First, create an Analyzer instance from a ProtoGeoreferencedMap, GeoreferencedMap or WarpedMap.
+
+> [!NOTE]
+> A *ProtoGeoreferencedMap* is a type used in this package to describe a basic version of a GeoreferencedMap containing only (and maybe) GCPs and a mask, but not necessarily following the schema's defined in [@allmaps/annotation](../../packages/annotation/).
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { Analyzer } from '@allmaps/analyze'
+
+// Create an Analyzer for a Proto Georeferenced Map
+const protoGeoreferencedMap = {
+  "gcps": [
+    { "resource": [336, 1742], "geo": [2.2860069, 48.860451] },
+    { "resource": [294, 227], "geo": [2.2906458, 48.8637277] },
+    { "resource": [2252, 1108], "geo": [2.2945555, 48.8574745] },
+    { "resource": [1892, 773], "geo": [2.2945164, 48.8590133] }
+  ],
+  "resourceMask": [
+    [117, 120],
+    [113, 1776],
+    [4587, 1772],
+    [4568, 101]
+  ]
+}
+const analyzer = new Analyzer(protoGeoreferencedMap)
+
+// Or create an Analyzer for a Georeferenced Map
+const annotation = await fetch(annoationUrl).then((response) => response.json())
+const georeferencedMaps = parseAnnotation(annotation)
+const georeferencedMap = georeferencedMaps[0]
+const analyzer = new Analyzer(georeferencedMap)
+
+// Or create an Analyzer for a Warped Map
+await renderer.addGeoreferenceAnnotation(annotation)
+const warpedMap = renderer.warpedMapList.getWarpedMaps()[0]
+const analyzer = new Analyzer(warpedMap)
+```
+
+Then analyze for info, warnings or errors, or compute measures or distortion.
+
+```js
+// Run an analysis to get all info, warnings and errors
+const analysis = analyzer.analyze()
+// analysis.warnings = { { code: "maskpointoutsidefullmask", ... }, ... }
+
+// Or specifically get info, warnings and errors
+const info = analyzer.getInfo()
+const warnings = analyzer.getWarnings()
+const errors = analyzer.getErrors()
+
+// Or quickly check e.g. if there are any errors
+const hasErrors = analyzer.hasErrors()
+
+// Analyze measures and distortions
+const measures = analyzer.getMeasures()
+const distortions = analyzer.getDistortions()
+```
+
+## Info, Warnings, Errors
+
+An analyzer can analyze the following info, warnings and errors:
 
 | Type    | Code                                      | Topic                                                                                           | Included by default |
 |---------|-------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------|
 | Info    | `maskequalsfullmask`                      | The mask contains the full image. transformation                                                | Yes                 |
+| Warning | `maskmissing`                             | A mask is missing.                                                                              | Yes                 |
 | Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                      | Yes                 |
 | Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                          | Yes                 |
 | Warning | `destinationrmsetoohigh`                  | The RMSE is higher then the set maximum times the map diameter.                                 | No                  |
@@ -32,19 +107,23 @@ An analyzer can analyze the following topics:
 | Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum. | Yes                 |
 | Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                             | Yes                 |
 | Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                               | No                  |
-| Error   | `constructingwarpedmapfailed`             | A warped map map could not be constructed.                                                      | Yes                 |
+| Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                               | Yes                 |
 | Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                             | Yes                 |
+| Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                      | Yes                 |
 | Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                        | Yes                 |
 | Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                        | Yes                 |
-| Error   | `gcpamountlessthen2`                      | There are less then 2 GCPs.                                                                     | No                  |
-| Error   | `gcpamountlessthen3`                      | There are less then 3 GCPs.                                                                     | Yes                 |
+| Error   | `gcpsmissing`                             | GCPs are missing.                                                                               | No                  |
+| Error   | `gcpsamountlessthen2`                     | There are less then 2 GCPs.                                                                     | No                  |
+| Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                     | Yes                 |
 | Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                          | Yes                 |
 | Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                               | Yes                 |
 | Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                              | Yes                 |
 | Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                         | Yes                 |
 | Error   | `maskselfintersection`                    | The mask self-intersects.                                                                       | Yes                 |
 
-An analyzer can also compute the following **Measures**:
+## Measures
+
+An analyzer can also compute the following measures:
 
 *   About the current transformation type:
     *   `destinationRmse`: The root-mean-square error of GCPs in projected geo coordinates
@@ -65,54 +144,12 @@ An analyzer can also compute the following **Measures**:
     *   `polynomialShear`: The shear
     *   `polynomialTranslation`: The translation
 
-An analyzer can also compute the following **Distortion** information:
+## Distortions
+
+An analyzer can also compute the following distortion information:
 
 *   About the current transformation type:
     *   `meanDistortions`: For each computed distortion measure, the mean distortion over all triangulation points.
-
-## Installation
-
-This is an ESM-only module that works in browsers and Node.js.
-
-Install using npm:
-
-```sh
-npm install @allmaps/analyze
-```
-
-## Usage
-
-First, get a warpedMap, either by making it from an annotation, or by getting it from a renderer's warpedMapList. Then analyze it using this library.
-
-```js
-import { parseAnnotation } from '@allmaps/annotation'
-import { Analyzer } from '@allmaps/analyze'
-
-// Fetch an annotation
-const annotation = await fetch(annoationUrl).then((response) => response.json())
-
-// Create an Analyzer for a Georeferenced Map
-const georeferencedMaps = parseAnnotation(annotation)
-const georeferencedMap = georeferencedMaps[0]
-const analyzer = new Analyzer(warpedMap)
-
-// Or create an Analyzer for a Warped Map, e.g. extracted from a Renderer
-await renderer.addGeoreferenceAnnotation(annotation)
-const warpedMap = renderer.warpedMapList.getWarpedMaps()[0]
-const analyzer = new Analyzer(warpedMap)
-
-// Analyze to get all info, warnings and errors
-const info = analyzer.getInfo()
-const warnings = analyzer.getWarnings()
-const errors = analyzer.getErrors()
-
-// Or quickly check e.g. if there are any errors
-const hasErrors = analyzer.hasErrors()
-
-// Analyze measures and distortions
-const measures = analyzer.getMeasures()
-const distortions = analyzer.getDistortions()
-```
 
 ## License
 
