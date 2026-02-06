@@ -1,24 +1,29 @@
 # @allmaps/analyze
 
-This module analyzes warpedMaps: it checks them for possible error and computes accuracy measures.
-
-## Which map objects can be analyzed
-
-A Warped Map is an object used in [@allmaps/render](../../packages/render/) to describe how a Georeferenced Map (a parsed [Georeference Annotations](https://iiif.io/api/extension/georef/)) is warped by a transformer, e.g. during rendering. Hence, these objects contain a lot of information that can be used to infer the quality and accuracy of a map's warping.
-
-In a WebGL2Renderer a map is warped and triangulated, so the TriangulatedWarpedMaps is used, which extends WarpedMaps.
+This packages serves to analyze the *geometric* qualities of maps.
 
 ## How it works
 
-This packages analyzes maps to return information, warning and error items. Three types of analysis items exist:
+This packages analyzes maps and returns information, warning and error items:
 
 - **Info** are notable but not problematic informations on a warping.
 - **Warnings** are possibly problematic findings, but don't invalidate the map.
 - **Errors** are problematic findings that invalidate the map.
 
-Analysis items like info, warnings and errors are objects with a unique code, a message and possible additional descriptive attributes. The supported analysis items are listed below.
+Analysis items like info, warnings and errors are objects with a unique code, a message and possible additional descriptive attributes. All supported analysis items are listed below.
 
-An analyzer can also compute the following **Measures** and **Distortion**:
+An analyzer can also compute **Measures** like the RMSE of error-vectors and **Distortion** information like area scaling of a thin-plate spline transformation. They are equally described below.
+
+While this packages serves to analyze the *geometric* qualities of maps. It does not check the *online availability* of the resource (image) of a map.
+
+### Which maps can be analyzed?
+
+This package can analyze ProtoGeoreferencedMaps, GeoreferencedMaps or WarpedMaps.
+
+- A **ProtoGeoreferencedMap** is a type used in this package to describe a basic version of a GeoreferencedMap containing only (but not guaranteed) GCPs and a mask. Information on the resource image or context, present in a GeoreferencedMap may be omitted here.
+- A **GeoreferencedMap** is Allmaps' internal map format describing parsed [Georeference Annotations](https://iiif.io/api/extension/georef/). The [@allmaps/annotation](../../packages/annotation/) package defines these schema's and provides functions to parse and generate them.
+- A **WarpedMap** is an object used in the [@allmaps/render](../../packages/render/) package and describe how a Georeferenced Map is warped by a transformer, e.g. during rendering. Hence, these objects contain a lot of information that can be used to infer the quality and accuracy of a map's warping.
+  - This packages also check if WarpedMap's can be triangulated. For context: a WebGL2Renderer renders a WebGL2WarpedMap, which is an extension a TriangulatedWarpedMap, which is an extension of a WarpedMap.
 
 ## Installation
 
@@ -34,9 +39,6 @@ npm install @allmaps/analyze
 
 First, create an Analyzer instance from a ProtoGeoreferencedMap, GeoreferencedMap or WarpedMap.
 
-> [!NOTE]
-> A *ProtoGeoreferencedMap* is a type used in this package to describe a basic version of a GeoreferencedMap containing only (and maybe) GCPs and a mask, but not necessarily following the schema's defined in [@allmaps/annotation](../../packages/annotation/).
-
 ```js
 import { parseAnnotation } from '@allmaps/annotation'
 import { Analyzer } from '@allmaps/analyze'
@@ -45,7 +47,7 @@ import { Analyzer } from '@allmaps/analyze'
 const protoGeoreferencedMap = {
   "gcps": [
     { "resource": [336, 1742], "geo": [2.2860069, 48.860451] },
-    { "resource": [294, 227], "geo": [2.2906458, 48.8637277] },
+    { "resource": [294, 227], "geo": [2.2860069, 48.860451] }, // <- geo point repeated
     { "resource": [2252, 1108], "geo": [2.2945555, 48.8574745] },
     { "resource": [1892, 773], "geo": [2.2945164, 48.8590133] }
   ],
@@ -116,12 +118,12 @@ An analyzer can analyze the following info, warnings and errors:
 | Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum. | Yes                 |
 | Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                             | Yes                 |
 | Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                               | No                  |
-| Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                               | Yes                 |
+| Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                                   | Yes                 |
 | Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                             | Yes                 |
-| Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                      | Yes                 |
+| Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                          | Yes                 |
 | Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                        | Yes                 |
 | Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                        | Yes                 |
-| Error   | `gcpsmissing`                             | GCPs are missing.                                                                               | No                  |
+| Error   | `gcpsmissing`                             | GCPs are missing.                                                                               | Yes                 |
 | Error   | `gcpsamountlessthen2`                     | There are less then 2 GCPs.                                                                     | No                  |
 | Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                     | Yes                 |
 | Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                          | Yes                 |
