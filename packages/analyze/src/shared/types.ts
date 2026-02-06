@@ -49,6 +49,34 @@ export type Analysis = {
   errors: AnalysisItem[]
 }
 
+export type InfoCode = 'maskequalsfullmask' | 'gcpresourcepointismaskpoint'
+export type WarningCode =
+  | 'maskmissing'
+  | 'gcpoutsidemask'
+  | 'maskpointoutsidefullmask'
+  | 'destinationrmsetoohigh'
+  | 'destinationhelmertrmsetoohigh'
+  | 'polynomial1sheartoohigh'
+  | 'destinationpolynomial1rmsetoohigh'
+  | 'log2sigmadistortiontoohigh'
+  | 'twoomegadistortiontoohigh'
+  | 'triangulationfoldsover'
+export type ErrorCode =
+  | 'constructinggeoreferencedmapfailed'
+  | 'constructingtriangulatedwarpedmapfailed'
+  | 'constructingwarpedmapfailed'
+  | 'gcpincompleteresource'
+  | 'gcpincompleteregeo'
+  | 'gcpsnotlinearlyindependent'
+  | 'gcpsmissing'
+  | 'gcpsamountlessthen2'
+  | 'gcpsamountlessthen3'
+  | 'gcpresourcerepeatedpoint'
+  | 'gcpgeorepeatedpoint'
+  | 'masknotring'
+  | 'maskrepeatedpoint'
+  | 'maskselfintersection'
+
 /**
  * Measures
  */

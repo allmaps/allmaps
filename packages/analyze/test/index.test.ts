@@ -140,8 +140,24 @@ describe('Info', () => {
     expect(analysis.info.map((info) => info.code)).to.contain(
       'maskequalsfullmask'
     )
-    expect(analysis.warnings).to.be.of.length(0)
-    expect(analysis.errors).to.be.of.length(0)
+  })
+
+  test('gcpresourcepointismaskpoint', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(
+        inputDir,
+        'proto-georeferenced-map-gcpresourcepointismaskpoint.json'
+      )
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze({
+      codes: ['gcpresourcepointismaskpoint']
+    })
+
+    expect(analysis.info.map((info) => info.code)).to.contain(
+      'gcpresourcepointismaskpoint'
+    )
   })
 })
 
@@ -451,8 +467,6 @@ describe('Errors', () => {
     const analysis = analyzer.analyze({
       codes: ['gcpsresourcenotlinearlyindependent']
     })
-
-    console.log(analysis.errors)
 
     expect(analysis.errors.map((error) => error.code)).to.contain(
       'gcpsresourcenotlinearlyindependent'

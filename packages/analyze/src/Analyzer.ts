@@ -10,27 +10,35 @@ import {
   isRing,
   polygonSelfIntersectionPoints,
   arrayRepeated,
+  arrayContains,
   bboxToDiameter,
   isPoint,
   closeRing,
   mergeOptions
 } from '@allmaps/stdlib'
 import { Helmert, Polynomial1 } from '@allmaps/transform'
-import {
+
+import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { Point } from '@allmaps/types'
+
+import type {
   AnalysisOptions,
   AnalysisItem,
   Analysis,
   Distortions,
   Measures,
-  ProtoGeoreferencedMap
+  ProtoGeoreferencedMap,
+  InfoCode,
+  WarningCode,
+  ErrorCode
 } from './shared/types'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { Point } from '@allmaps/types'
-
 // Note: construction errors and failures to get info, warning or errors are always reported
-const DEFAULT_INFO_CODES = ['maskequalsfullmask']
-const DEFAULT_WARNING_CODES = [
+const DEFAULT_INFO_CODES: InfoCode[] = [
+  'maskequalsfullmask',
+  'gcpresourcepointismaskpoint'
+]
+const DEFAULT_WARNING_CODES: WarningCode[] = [
   'maskmissing',
   'gcpoutsidemask',
   'maskpointoutsidefullmask',
@@ -42,7 +50,7 @@ const DEFAULT_WARNING_CODES = [
   'twoomegadistortiontoohigh'
   // 'triangulationfoldsover'
 ]
-const DEFAULT_ERROR_CODES = [
+const DEFAULT_ERROR_CODES: ErrorCode[] = [
   'constructinggeoreferencedmapfailed',
   'constructingtriangulatedwarpedmapfailed',
   'constructingwarpedmapfailed',
@@ -244,11 +252,11 @@ export class Analyzer {
   public getInfo(partialOptions?: Partial<AnalysisOptions>): AnalysisItem[] {
     const options = mergeOptions(this.options, partialOptions)
     const codes = options.codes
+    let code
 
     this.info = []
 
-    // Mask equals full Mask
-    const code = 'maskequalsfullmask'
+    code = 'maskequalsfullmask'
     if (
       codes.includes(code) &&
       this.warpedMap &&
@@ -263,6 +271,47 @@ export class Analyzer {
         code,
         message: 'The mask contains the full image.'
       })
+    }
+
+    code = 'gcpresourcepointismaskpoint'
+    if (
+      codes.includes(code) &&
+      this.protoGeoreferencedMap.gcps &&
+      this.protoGeoreferencedMap.resourceMask
+    ) {
+      const gcpsResourcePointAlsoMaskPoint: {
+        gcpIndex: number
+        maskPointIndex: number
+        resourcePoint: Point
+      }[] = []
+      for (const [gcpIndex, gcp] of this.protoGeoreferencedMap.gcps.entries()) {
+        if (gcp.resource) {
+          const contains = arrayContains(
+            this.protoGeoreferencedMap.resourceMask,
+            gcp.resource,
+            isEqualPoint
+          )
+          if (contains) {
+            gcpsResourcePointAlsoMaskPoint.push({
+              gcpIndex,
+              maskPointIndex: contains.index,
+              resourcePoint: contains.item
+            })
+          }
+        }
+      }
+      gcpsResourcePointAlsoMaskPoint.forEach(
+        ({ gcpIndex, maskPointIndex, resourcePoint }) => {
+          this.info.push({
+            mapId: this.mapId,
+            code,
+            resourcePoint,
+            gcpIndex,
+            maskPointIndex,
+            message: `GCP ${gcpIndex} with resource coordinates [${resourcePoint}] is mask point ${maskPointIndex}.`
+          })
+        }
+      )
     }
 
     return this.info
@@ -283,7 +332,6 @@ export class Analyzer {
 
     this.warnings = []
 
-    // Mask missing
     code = 'maskmissing'
     if (codes.includes(code)) {
       if (!this.protoGeoreferencedMap.resourceMask) {
@@ -295,7 +343,6 @@ export class Analyzer {
       }
     }
 
-    // GCPs not outside mask
     code = 'gcpoutsidemask'
     if (
       codes.includes(code) &&
@@ -303,28 +350,27 @@ export class Analyzer {
       this.protoGeoreferencedMap.resourceMask
     ) {
       const gcpsOutside = []
-      for (const gcp of this.protoGeoreferencedMap.gcps) {
+      for (const [gcpIndex, gcp] of this.protoGeoreferencedMap.gcps.entries()) {
         if (
           gcp.resource &&
           inside(gcp.resource, [
             closeRing(this.protoGeoreferencedMap.resourceMask)
           ]) === false
         ) {
-          gcpsOutside.push(gcp)
+          gcpsOutside.push({ gcp, gcpIndex })
         }
       }
-      gcpsOutside.forEach((gcp, index) => {
+      gcpsOutside.forEach(({ gcp, gcpIndex }) => {
         this.warnings.push({
           mapId: this.mapId,
           code,
           resourcePoint: gcp.resource,
-          gcpIndex: index,
-          message: `GCP ${index} with resource coordinates [${gcp.resource}] outside mask.`
+          gcpIndex: gcpIndex,
+          message: `GCP ${gcpIndex} with resource coordinates [${gcp.resource}] outside mask.`
         })
       })
     }
 
-    // Mask points not outside full mask
     code = 'maskpointoutsidefullmask'
     if (codes.includes(code) && this.warpedMap) {
       const resourceMaskOutsideFullMaskPoints = []
@@ -333,25 +379,30 @@ export class Analyzer {
         closeRing(this.warpedMap.resourceFullMask)
       ]
 
-      for (const resourcePoint of this.warpedMap.resourceMask) {
-        if (inside(resourcePoint, closedResourceFullMask) === false) {
-          resourceMaskOutsideFullMaskPoints.push(resourcePoint)
+      for (const [
+        maskPointIndex,
+        resourceMaskPoint
+      ] of this.warpedMap.resourceMask.entries()) {
+        if (inside(resourceMaskPoint, closedResourceFullMask) === false) {
+          resourceMaskOutsideFullMaskPoints.push({
+            resourceMaskPoint,
+            maskPointIndex
+          })
         }
       }
       resourceMaskOutsideFullMaskPoints.forEach(
-        (resourceMaskOutsideFullMaskPoint, index) => {
+        ({ resourceMaskPoint, maskPointIndex }) => {
           this.warnings.push({
             mapId: this.mapId,
             code,
-            resourcePoint: resourceMaskOutsideFullMaskPoint,
-            gcpIndex: index,
-            message: `Mask point ${index} with resource coordinates [${resourceMaskOutsideFullMaskPoint}] outside full mask.`
+            resourcePoint: resourceMaskPoint,
+            maskPointIndex,
+            message: `Mask point ${maskPointIndex} with resource coordinates [${resourceMaskPoint}] outside full mask.`
           })
         }
       )
     }
 
-    // Destination RSME too high
     code = 'destinationrmsetoohigh'
     if (codes.includes(code)) {
       const measures = this.getMeasures()
@@ -368,7 +419,6 @@ export class Analyzer {
       }
     }
 
-    // Destination RSME too high for Helmert transformation
     code = 'destinationhelmertrmsetoohigh'
     if (codes.includes(code)) {
       const measures = this.getMeasures()
@@ -386,7 +436,6 @@ export class Analyzer {
       }
     }
 
-    // Shear too high for Polynomial1 transformation
     code = 'polynomial1sheartoohigh'
     if (codes.includes(code)) {
       const measures = this.getMeasures()
@@ -404,7 +453,6 @@ export class Analyzer {
       }
     }
 
-    // Destination RSME too high for Polynomial1 transformation
     code = 'destinationpolynomial1rmsetoohigh'
     if (codes.includes(code)) {
       const measures = this.getMeasures()
@@ -422,7 +470,6 @@ export class Analyzer {
       }
     }
 
-    // log2sigma distortion too high
     code = 'log2sigmadistortiontoohigh'
     if (
       codes.includes(code) &&
@@ -457,7 +504,6 @@ export class Analyzer {
       }
     }
 
-    // twoOmega distortion too high
     code = 'twoomegadistortiontoohigh'
     if (
       codes.includes(code) &&
@@ -488,7 +534,6 @@ export class Analyzer {
       }
     }
 
-    // Transformation folds over
     code = 'triangulationfoldsover'
     if (
       codes.includes(code) &&
@@ -535,7 +580,6 @@ export class Analyzer {
 
     this.errors = this.constructionErrors
 
-    // GCPs missing
     code = 'gcpsmissing'
     if (codes.includes(code) && !this.protoGeoreferencedMap.gcps) {
       this.errors.push({
@@ -545,40 +589,40 @@ export class Analyzer {
       })
     }
 
-    // GCPs incomplete
     code = 'gcpincompleteresource'
     if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const gcpsIncompleteResource = []
-      for (const gcp of this.protoGeoreferencedMap.gcps) {
+      for (const [gcpIndex, gcp] of this.protoGeoreferencedMap.gcps.entries()) {
         if (gcp.resource == undefined || !isPoint(gcp.resource)) {
-          gcpsIncompleteResource.push(gcp)
+          gcpsIncompleteResource.push({ gcp, gcpIndex })
         }
       }
-      gcpsIncompleteResource.forEach((gcp, index) => {
+      gcpsIncompleteResource.forEach(({ gcp, gcpIndex }) => {
         this.errors.push({
           mapId: this.mapId,
           code,
           geoPoint: gcp.geo,
-          gcpIndex: index,
-          message: `GCP ${index} missing resource coordinates.`
+          gcpIndex,
+          message: `GCP ${gcpIndex} missing resource coordinates.`
         })
       })
     }
+
     code = 'gcpincompletegeo'
     if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const gcpsIncompleteGeo = []
-      for (const gcp of this.protoGeoreferencedMap.gcps) {
+      for (const [gcpIndex, gcp] of this.protoGeoreferencedMap.gcps.entries()) {
         if (gcp.geo == undefined || !isPoint(gcp.geo)) {
-          gcpsIncompleteGeo.push(gcp)
+          gcpsIncompleteGeo.push({ gcp, gcpIndex })
         }
       }
-      gcpsIncompleteGeo.forEach((gcp, index) => {
+      gcpsIncompleteGeo.forEach(({ gcp, gcpIndex }) => {
         this.errors.push({
           mapId: this.mapId,
           code,
           resourcePoint: gcp.resource,
-          gcpIndex: index,
-          message: `GCP ${index} missing geo coordinates.`
+          gcpIndex,
+          message: `GCP ${gcpIndex} missing geo coordinates.`
         })
       })
     }
@@ -591,7 +635,6 @@ export class Analyzer {
       return this.errors
     }
 
-    // GCPs amount not less then 2
     code = 'gcpsamountlessthen2'
     if (
       codes.includes(code) &&
@@ -605,7 +648,6 @@ export class Analyzer {
       })
     }
 
-    // GCPs amount not less then 3
     code = 'gcpsamountlessthen3'
     if (
       codes.includes(code) &&
@@ -619,7 +661,6 @@ export class Analyzer {
       })
     }
 
-    // GCPs no repeated points
     code = 'gcpresourcerepeatedpoint'
     if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const resourceRepeatedPoints = arrayRepeated(
@@ -638,6 +679,7 @@ export class Analyzer {
         })
       })
     }
+
     code = 'gcpgeorepeatedpoint'
     if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const geoRepeatedPoints = arrayRepeated(
@@ -646,7 +688,6 @@ export class Analyzer {
           .map((gcp) => gcp.geo as Point),
         isEqualPoint
       )
-      console.log(geoRepeatedPoints)
       geoRepeatedPoints.forEach((geoRepeatedPoint) => {
         this.errors.push({
           mapId: this.mapId,
@@ -658,7 +699,6 @@ export class Analyzer {
       })
     }
 
-    // GCPs not linearly independent
     code = 'gcpsresourcenotlinearlyindependent'
     if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const resourcePoints = this.protoGeoreferencedMap.gcps
@@ -692,7 +732,6 @@ export class Analyzer {
       }
     }
 
-    // Mask valid as ring
     code = 'masknotring'
     if (codes.includes(code) && this.protoGeoreferencedMap.resourceMask) {
       const maskIsRing = isRing(this.protoGeoreferencedMap.resourceMask)
@@ -709,7 +748,6 @@ export class Analyzer {
       return this.errors
     }
 
-    // Mask no repeated points
     code = 'maskrepeatedpoint'
     if (codes.includes(code) && this.protoGeoreferencedMap.resourceMask) {
       const resourceMaskRepeatedPoints = arrayRepeated(
@@ -727,7 +765,6 @@ export class Analyzer {
       })
     }
 
-    // Mask no self-intersection
     code = 'maskselfintersection'
     if (codes.includes(code) && this.protoGeoreferencedMap.resourceMask) {
       const resourceMaskSelfIntersectionPoints = polygonSelfIntersectionPoints([

@@ -169,6 +169,7 @@ export {
   groupBy,
   isEqualArray,
   arrayRepeated,
+  arrayContains,
   subSetArray,
   equalSet,
   objectDifference,

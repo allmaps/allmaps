@@ -111,6 +111,19 @@ export function arrayRepeated<T>(
   return result
 }
 
+export function arrayContains<T>(
+  array: T[],
+  object: T,
+  isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
+): { item: T; index: number } | undefined {
+  for (let i = 0; i < array.length; i++) {
+    if (isEqualObject(array[i], object)) {
+      return { item: array[i], index: i }
+    }
+  }
+  return undefined
+}
+
 // TODO: replace with Set subset once available
 // Note: this checks equality of the object
 // which is only a good idea for primitive types (string, number), not JSON objects
