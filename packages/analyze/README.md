@@ -1,14 +1,20 @@
 # @allmaps/analyze
 
-This packages serves to analyze the *geometric* qualities of maps.
+This packages serves to analyze the *geometric* qualities of georeferenced maps.
+
+Examples:
+
+*   Check if there are enough GCPs and they are linearly independent
+*   Check if the mask doesn't self-intersect
+*   Check if the map is not to strongly warped
 
 ## How it works
 
 This packages analyzes maps and returns information, warning and error items:
 
-- **Info** are notable but not problematic informations on a warping.
-- **Warnings** are possibly problematic findings, but don't invalidate the map.
-- **Errors** are problematic findings that invalidate the map.
+*   **Info** are notable but not problematic informations on a warping.
+*   **Warnings** are possibly problematic findings, but don't invalidate the map.
+*   **Errors** are problematic findings that invalidate the map.
 
 Analysis items like info, warnings and errors are objects with a unique code, a message and possible additional descriptive attributes. All supported analysis items are listed below.
 
@@ -20,10 +26,10 @@ While this packages serves to analyze the *geometric* qualities of maps. It does
 
 This package can analyze ProtoGeoreferencedMaps, GeoreferencedMaps or WarpedMaps.
 
-- A **ProtoGeoreferencedMap** is a type used in this package to describe a basic version of a GeoreferencedMap containing only (but not guaranteed) GCPs and a mask. Information on the resource image or context, present in a GeoreferencedMap may be omitted here.
-- A **GeoreferencedMap** is Allmaps' internal map format describing parsed [Georeference Annotations](https://iiif.io/api/extension/georef/). The [@allmaps/annotation](../../packages/annotation/) package defines these schema's and provides functions to parse and generate them.
-- A **WarpedMap** is an object used in the [@allmaps/render](../../packages/render/) package and describe how a Georeferenced Map is warped by a transformer, e.g. during rendering. Hence, these objects contain a lot of information that can be used to infer the quality and accuracy of a map's warping.
-  - This packages also check if WarpedMap's can be triangulated. For context: a WebGL2Renderer renders a WebGL2WarpedMap, which is an extension a TriangulatedWarpedMap, which is an extension of a WarpedMap.
+*   A **ProtoGeoreferencedMap** is a type used in this package to describe a basic version of a GeoreferencedMap containing only (but not guaranteed) GCPs and a mask. Information on the resource image or context, present in a GeoreferencedMap may be omitted here.
+*   A **GeoreferencedMap** is Allmaps' internal map format describing parsed [Georeference Annotations](https://iiif.io/api/extension/georef/). The [@allmaps/annotation](../../packages/annotation/) package defines these schema's and provides functions to parse and generate them.
+*   A **WarpedMap** is an object used in the [@allmaps/render](../../packages/render/) package and describe how a Georeferenced Map is warped by a transformer, e.g. during rendering. Hence, these objects contain a lot of information that can be used to infer the quality and accuracy of a map's warping.
+    *   This packages also check if WarpedMap's can be triangulated. For context: a WebGL2Renderer renders a WebGL2WarpedMap, which is an extension a TriangulatedWarpedMap, which is an extension of a WarpedMap.
 
 ## Installation
 
@@ -177,7 +183,7 @@ MIT
 
 *   [Analyzer](#analyzer)
     *   [Parameters](#parameters)
-    *   [analyse](#analyse)
+    *   [analyze](#analyze)
         *   [Parameters](#parameters-1)
     *   [getInfo](#getinfo)
         *   [Parameters](#parameters-2)
@@ -195,18 +201,18 @@ This class describes how a georeferenced map is warped using a specific transfor
 
 #### Parameters
 
-*   `georeferencedOrWarpedMap` &#x20;
+*   `map` &#x20;
 *   `options` &#x20;
 
-#### analyse
+#### analyze
 
-Analyse
+Analyzanalye
 
 Applying extra caution: wrapping the getters in a try catch
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis with info, warnings and errors
 
@@ -216,7 +222,7 @@ Get analysis informations
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis items with info
 
@@ -226,7 +232,7 @@ Get analysis warnings
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis items with warning
 
@@ -236,7 +242,7 @@ Get analysis errors
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis items with errors
 
