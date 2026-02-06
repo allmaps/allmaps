@@ -75,7 +75,16 @@ Then analyze for info, warnings or errors, or compute measures or distortion.
 ```js
 // Run an analysis to get all info, warnings and errors
 const analysis = analyzer.analyze()
-// analysis.warnings = { { code: "maskpointoutsidefullmask", ... }, ... }
+// analysis.warnings = {
+//   {
+//     mapId: 'https://annotations.allmaps.org/images/5748b8df80495d97',
+//     code: 'gcpgeorepeatedpoint',
+//     geoPoint: [ 2.2860069, 48.860451 ],
+//     gcpIndex: 1,
+//     message: 'GCP 1 with geo coordinates [2.2860069,48.860451] is repeated.'
+//   },
+//   ...
+// }
 
 // Or specifically get info, warnings and errors
 const info = analyzer.getInfo()

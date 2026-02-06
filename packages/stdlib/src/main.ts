@@ -94,8 +94,8 @@ export function arrayUnique<T>(
 export function arrayRepeated<T>(
   array: T[],
   isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
-) {
-  const result = []
+): { item: T; index: number }[] {
+  const result: { item: T; index: number }[] = []
   for (let i = 0; i < array.length; i++) {
     let found = false
     for (let j = 0; j < i; j++) {
@@ -105,7 +105,7 @@ export function arrayRepeated<T>(
       }
     }
     if (found) {
-      result.push(array[i])
+      result.push({ item: array[i], index: i })
     }
   }
   return result

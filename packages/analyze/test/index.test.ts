@@ -408,6 +408,20 @@ describe('Errors', () => {
     )
   })
 
+  test('gcpgeorepeatedpoint', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpgeorepeatedpoint.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({ codes: ['gcpgeorepeatedpoint'] })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpgeorepeatedpoint'
+    )
+  })
+
   test('masknotring', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'proto-georeferenced-map-masknotring.json')

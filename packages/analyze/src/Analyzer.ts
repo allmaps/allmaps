@@ -630,8 +630,9 @@ export class Analyzer {
         this.errors.push({
           mapId: this.mapId,
           code,
-          resourcePoint: resourceRepeatedPoint,
-          message: `GCP resource coordinates [${resourceRepeatedPoint}] are repeated.`
+          resourcePoint: resourceRepeatedPoint.item,
+          gcpIndex: resourceRepeatedPoint.index,
+          message: `GCP ${resourceRepeatedPoint.index} with resource coordinates [${resourceRepeatedPoint.item}] is repeated.`
         })
       })
     }
@@ -643,12 +644,14 @@ export class Analyzer {
           .map((gcp) => gcp.geo as Point),
         isEqualPoint
       )
+      console.log(geoRepeatedPoints)
       geoRepeatedPoints.forEach((geoRepeatedPoint) => {
         this.errors.push({
           mapId: this.mapId,
           code,
-          geoPoint: geoRepeatedPoint,
-          message: `GCP geo coordinates [${geoRepeatedPoint}] are repeated.`
+          geoPoint: geoRepeatedPoint.item,
+          gcpIndex: geoRepeatedPoint.index,
+          message: `GCP ${geoRepeatedPoint.index} with geo coordinates [${geoRepeatedPoint.item}] is repeated.`
         })
       })
     }
@@ -681,8 +684,9 @@ export class Analyzer {
         this.errors.push({
           mapId: this.mapId,
           code,
-          resourcePoint: resourceMaskRepeatedPoint,
-          message: `Mask resource coordinates [${resourceMaskRepeatedPoint}] are repeated.`
+          resourcePoint: resourceMaskRepeatedPoint.item,
+          maskPointIndex: resourceMaskRepeatedPoint.index,
+          message: `Mask point ${resourceMaskRepeatedPoint.index} with resource coordinates [${resourceMaskRepeatedPoint.item}] is repeated.`
         })
       })
     }
