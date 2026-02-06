@@ -925,6 +925,9 @@ importers:
       '@allmaps/types':
         specifier: workspace:^
         version: link:../types
+      ml-matrix:
+        specifier: ^6.12.0
+        version: 6.12.1
       point-in-polygon-hao:
         specifier: ^1.2.4
         version: 1.2.4

@@ -333,6 +333,20 @@ describe('Errors', () => {
     )
   })
 
+  test('gcpsmissing', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpsmissing.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({
+      codes: ['gcpsmissing']
+    })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain('gcpsmissing')
+  })
+
   test('gcpincompleteresource', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'proto-georeferenced-map-gcpincompleteresource.json')
@@ -349,18 +363,20 @@ describe('Errors', () => {
     )
   })
 
-  test('gcpsmissing', () => {
+  test('gcpincompletegeo', () => {
     const georeferencedMap = readJSONFile(
-      path.join(inputDir, 'proto-georeferenced-map-gcpsmissing.json')
+      path.join(inputDir, 'proto-georeferenced-map-gcpincompletegeo.json')
     )
 
     const analyzer = new Analyzer(georeferencedMap)
 
     const analysis = analyzer.analyze({
-      codes: ['gcpsmissing']
+      codes: ['gcpincompletegeo']
     })
 
-    expect(analysis.errors.map((error) => error.code)).to.contain('gcpsmissing')
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpincompletegeo'
+    )
   })
 
   test('gcpsamountlessthen2', () => {
@@ -419,6 +435,46 @@ describe('Errors', () => {
 
     expect(analysis.errors.map((error) => error.code)).to.contain(
       'gcpgeorepeatedpoint'
+    )
+  })
+
+  test('gcpsresourcenotlinearlyindependent', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(
+        inputDir,
+        'proto-georeferenced-map-gcpsresourcenotlinearlyindependent.json'
+      )
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({
+      codes: ['gcpsresourcenotlinearlyindependent']
+    })
+
+    console.log(analysis.errors)
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpsresourcenotlinearlyindependent'
+    )
+  })
+
+  test('gcpsgeonotlinearlyindependent', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(
+        inputDir,
+        'proto-georeferenced-map-gcpsgeonotlinearlyindependent.json'
+      )
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+
+    const analysis = analyzer.analyze({
+      codes: ['gcpsgeonotlinearlyindependent']
+    })
+
+    expect(analysis.errors.map((error) => error.code)).to.contain(
+      'gcpsgeonotlinearlyindependent'
     )
   })
 

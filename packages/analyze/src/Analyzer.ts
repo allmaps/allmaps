@@ -1,4 +1,5 @@
 import inside from 'point-in-polygon-hao'
+import Matrix, { QrDecomposition } from 'ml-matrix'
 
 import { validateGeoreferencedMap } from '@allmaps/annotation'
 import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
@@ -47,6 +48,7 @@ const DEFAULT_ERROR_CODES = [
   'constructingwarpedmapfailed',
   'gcpincompleteresource',
   'gcpincompleteregeo',
+  'gcpsnotlinearlyindependent',
   'gcpsmissing',
   // 'gcpsamountlessthen2',
   'gcpsamountlessthen3',
@@ -533,7 +535,17 @@ export class Analyzer {
 
     this.errors = this.constructionErrors
 
-    // GCPs not incomplete
+    // GCPs missing
+    code = 'gcpsmissing'
+    if (codes.includes(code) && !this.protoGeoreferencedMap.gcps) {
+      this.errors.push({
+        mapId: this.mapId,
+        code,
+        message: `GCPs are missing.`
+      })
+    }
+
+    // GCPs incomplete
     code = 'gcpincompleteresource'
     if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
       const gcpsIncompleteResource = []
@@ -577,16 +589,6 @@ export class Analyzer {
       errorCodes.includes('gcpincompletegeo')
     ) {
       return this.errors
-    }
-
-    // GCPs missing
-    code = 'gcpsmissing'
-    if (codes.includes(code) && !this.protoGeoreferencedMap.gcps) {
-      this.errors.push({
-        mapId: this.mapId,
-        code,
-        message: `GCPs are missing.`
-      })
     }
 
     // GCPs amount not less then 2
@@ -654,6 +656,40 @@ export class Analyzer {
           message: `GCP ${geoRepeatedPoint.index} with geo coordinates [${geoRepeatedPoint.item}] is repeated.`
         })
       })
+    }
+
+    // GCPs not linearly independent
+    code = 'gcpsresourcenotlinearlyindependent'
+    if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
+      const resourcePoints = this.protoGeoreferencedMap.gcps
+        .filter((gcp) => gcp.resource)
+        .map((gcp) => gcp.resource as Point)
+      if (
+        resourcePoints.length > 0 &&
+        new QrDecomposition(new Matrix(resourcePoints)).isFullRank()
+      ) {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          message: `GCP resource coordinates are not linearly independent.`
+        })
+      }
+    }
+    code = 'gcpsgeonotlinearlyindependent'
+    if (codes.includes(code) && this.protoGeoreferencedMap.gcps) {
+      const geoPoints = this.protoGeoreferencedMap.gcps
+        .filter((gcp) => gcp.geo)
+        .map((gcp) => gcp.geo as Point)
+      if (
+        geoPoints.length > 0 &&
+        new QrDecomposition(new Matrix(geoPoints)).isFullRank()
+      ) {
+        this.errors.push({
+          mapId: this.mapId,
+          code,
+          message: `GCP geo coordinates are not linearly independent.`
+        })
+      }
     }
 
     // Mask valid as ring

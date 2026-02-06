@@ -49,6 +49,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "ml-matrix": "^6.12.0",
     "point-in-polygon-hao": "^1.2.4"
   },
   "devDependencies": {

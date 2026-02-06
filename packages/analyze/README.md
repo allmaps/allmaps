@@ -121,13 +121,15 @@ An analyzer can analyze the following info, warnings and errors:
 | Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                                   | Yes                 |
 | Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                             | Yes                 |
 | Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                          | Yes                 |
+| Error   | `gcpsmissing`                             | GCPs are missing.                                                                               | Yes                 |
 | Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                        | Yes                 |
 | Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                        | Yes                 |
-| Error   | `gcpsmissing`                             | GCPs are missing.                                                                               | Yes                 |
 | Error   | `gcpsamountlessthen2`                     | There are less then 2 GCPs.                                                                     | No                  |
 | Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                     | Yes                 |
 | Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                          | Yes                 |
 | Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                               | Yes                 |
+| Error   | `gcpsresourcenotlinearlyindependent`                | GCP resource coordinates are not linearly independent.                                                          | Yes                 |
+| Error   | `gcpsgeonotlinearlyindependent`                     | GCP geo coordinates are not linearly independent.                                                               | Yes                 |
 | Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                              | Yes                 |
 | Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                         | Yes                 |
 | Error   | `maskselfintersection`                    | The mask self-intersects.                                                                       | Yes                 |
