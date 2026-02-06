@@ -107,7 +107,8 @@ An analyzer can analyze the following info, warnings and errors:
 
 | Type    | Code                                      | Topic                                                                                           | Included by default |
 |---------|-------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------|
-| Info    | `maskequalsfullmask`                      | The mask contains the full image. transformation                                                | Yes                 |
+| Info    | `maskequalsfullmask`                      | The mask contains the full image.                                                               | Yes                 |
+| Info    | `gcpresourcepointismaskpoint`             | A GCP is mask point.                                                                            | Yes                 |
 | Warning | `maskmissing`                             | A mask is missing.                                                                              | Yes                 |
 | Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                      | Yes                 |
 | Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                          | Yes                 |
@@ -128,8 +129,8 @@ An analyzer can analyze the following info, warnings and errors:
 | Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                     | Yes                 |
 | Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                          | Yes                 |
 | Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                               | Yes                 |
-| Error   | `gcpsresourcenotlinearlyindependent`                | GCP resource coordinates are not linearly independent.                                                          | Yes                 |
-| Error   | `gcpsgeonotlinearlyindependent`                     | GCP geo coordinates are not linearly independent.                                                               | Yes                 |
+| Error   | `gcpsresourcenotlinearlyindependent`      | GCP resource coordinates are not linearly independent.                                          | Yes                 |
+| Error   | `gcpsgeonotlinearlyindependent`           | GCP geo coordinates are not linearly independent.                                               | Yes                 |
 | Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                              | Yes                 |
 | Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                         | Yes                 |
 | Error   | `maskselfintersection`                    | The mask self-intersects.                                                                       | Yes                 |
