@@ -5,8 +5,15 @@ import { defaultGcpTransformerOptions } from '@allmaps/transform'
 import type {
   ProjectedGcpTransformerOptions,
   ProjectedGcpTransformOptions,
-  Projection
+  Projection,
+  ProjectionDefinitionOptions
 } from './types.js'
+import { mergeOptions } from '@allmaps/stdlib'
+
+const DEFAULT_PROJECTION_DEFINITION_OPTIONS: ProjectionDefinitionOptions = {
+  type: 'proj4String',
+  over: true
+}
 
 // Note: putting projection with `+over` first in list below to always wrap around dateline
 // If we want other systems (like QGIS, in tileserver) to interpret the definition as a standardised CRS
@@ -30,6 +37,29 @@ const lonLatEquivalentDefinitions = [
   'WGS84'
 ]
 
+export function getLonLatDefinition(
+  partialProjectionDefinitionOptions?: Partial<ProjectionDefinitionOptions>
+): string {
+  const projectionDefinitionOptions = mergeOptions(
+    DEFAULT_PROJECTION_DEFINITION_OPTIONS,
+    partialProjectionDefinitionOptions
+  )
+  if (projectionDefinitionOptions.type == 'proj4String') {
+    if (projectionDefinitionOptions.over) {
+      return lonLatProj4StringDefinition + ' +over'
+    } else {
+      lonLatProj4StringDefinition
+    }
+  } else if (projectionDefinitionOptions.type == 'epsg') {
+    return lonLatEpsgDefinition
+  } else if (projectionDefinitionOptions.type == 'wkt') {
+    return lonLatWktDefinition
+  } else if (projectionDefinitionOptions.type == 'wkt2') {
+    return lonLatWkt2Definition
+  }
+  throw new Error('Projection definition not found')
+}
+
 const webMercatorEpsgDefinition = 'EPSG:3857'
 const webMercatorProj4StringDefinition =
   '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs'
@@ -48,6 +78,29 @@ const webMercatorEquivalentDefinitions = [
   'EPSG:900913',
   'EPSG:102113'
 ]
+
+export function getWebMercatorDefinition(
+  partialProjectionDefinitionOptions?: Partial<ProjectionDefinitionOptions>
+): string {
+  const projectionDefinitionOptions = mergeOptions(
+    DEFAULT_PROJECTION_DEFINITION_OPTIONS,
+    partialProjectionDefinitionOptions
+  )
+  if (projectionDefinitionOptions.type == 'proj4String') {
+    if (projectionDefinitionOptions.over) {
+      return webMercatorProj4StringDefinition + ' +over'
+    } else {
+      webMercatorProj4StringDefinition
+    }
+  } else if (projectionDefinitionOptions.type == 'epsg') {
+    return webMercatorEpsgDefinition
+  } else if (projectionDefinitionOptions.type == 'wkt') {
+    return webMercatorWktDefinition
+  } else if (projectionDefinitionOptions.type == 'wkt2') {
+    return webMercatorWkt2Definition
+  }
+  throw new Error('Projection definition not found')
+}
 
 /**
  * lonLatProjection
@@ -95,7 +148,8 @@ export const webMercatorToLonLat =
   lonLatProjectionToWebMecatorProjectionConverter.inverse
 
 export function projectionDefinitionToAntialiasedDefinition(
-  stringProjectionDefinition: string
+  stringProjectionDefinition: string,
+  partialProjectionDefinitionOptions?: Partial<ProjectionDefinitionOptions>
 ): string {
   stringProjectionDefinition = stringProjectionDefinition.replace(' +over', '')
   const lonLatIndex = lonLatEquivalentDefinitions.indexOf(
@@ -105,20 +159,22 @@ export function projectionDefinitionToAntialiasedDefinition(
     stringProjectionDefinition
   )
   if (lonLatIndex != -1) {
-    return lonLatProjection.definition
+    return getLonLatDefinition(partialProjectionDefinitionOptions)
   } else if (webMercatorIndex != -1) {
-    return webMercatorProjection.definition
+    return getWebMercatorDefinition(partialProjectionDefinitionOptions)
   } else {
     return stringProjectionDefinition
   }
 }
 
 export function projectionToAntialiasedProjection(
-  projection: Projection
+  projection: Projection,
+  partialProjectionDefinitionOptions?: Partial<ProjectionDefinitionOptions>
 ): Projection {
   return {
     definition: projectionDefinitionToAntialiasedDefinition(
-      String(projection?.definition)
+      String(projection?.definition),
+      partialProjectionDefinitionOptions
     )
   }
 }
