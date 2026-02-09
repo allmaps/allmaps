@@ -1,4 +1,8 @@
-import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import {
+  lonLatProjection,
+  ProjectedGcpTransformer,
+  projectionToAntialiasedProjection
+} from '@allmaps/project'
 import { generateChecksum, generateId } from '@allmaps/id'
 
 import {
@@ -167,8 +171,18 @@ export async function generateGeoreferencedMapGdalwarpScripts(
       mergedOptions.outputDir,
       mergedOptions.projectedTransformer.interalProjectedGcps,
       mergedOptions.projectedTransformer.type,
-      String(mergedOptions.projectedTransformer.internalProjection.definition),
-      String(mergedOptions.projectedTransformer.projection.definition),
+      String(
+        projectionToAntialiasedProjection(
+          mergedOptions.projectedTransformer.internalProjection,
+          { type: 'epsg' }
+        ).definition
+      ),
+      String(
+        projectionToAntialiasedProjection(
+          mergedOptions.projectedTransformer.projection,
+          { type: 'epsg' }
+        ).definition
+      ),
       mergedOptions.jpgQuality,
       geojsonMaskPolygon,
       size

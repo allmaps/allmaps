@@ -15,6 +15,11 @@ export type Projection<Definition = ProjectionDefinition> = {
   definition: Definition
 }
 
+export type ProjectionDefinitionOptions = {
+  type: 'proj4String' | 'epsg' | 'wkt' | 'wkt2'
+  over: boolean
+}
+
 export type ProjectedGcpTransformerOptions = {
   internalProjection: Projection
   projection: Projection
