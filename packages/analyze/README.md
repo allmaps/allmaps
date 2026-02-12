@@ -144,33 +144,33 @@ An analyzer can analyze the following info, warnings and errors:
 
 ## Measures
 
-An analyzer can also compute the following measures:
+An analyzer can also compute measures describing the warping with the current (or default) transformation type, and measures specifically describing warpings with Helmert and polynomial transformation types.
+
+The method `analyze.getMeasures()` returns an object with the following measures:
 
 *   About the current transformation type:
-    *   `destinationRmse`: The root-mean-square error of GCPs in projected geo coordinates
-    *   `destinationErrors`: for each GCP, the error in projected geo coordinates
-    *   `resourceErrors`: for each GCP, the error in projected geo coordinates, scaled to resource space
-    *   `resourceRelativeErrors`: for each GCP, the error in projected resource coordinates, relative to the resource mask BBox diameter.
+    *   `resourceMaskBboxDiameter`: The diameter of the bounding box of the resource mask.
+    *   `geoMaskBboxDiameter`: The diameter of the bounding box of the geo mask.
+    *   `projectedGeoMaskBboxDiameter`: The diameter of the bounding box of the projected geo mask.
+    *   `destinationRmse`: The root-mean-square error of GCPs in projected geo coordinates.
+    *   `destinationErrors`: for each GCP, the error in projected geo coordinates.
+    *   `resourceErrors`: for each GCP, the error in projected geo coordinates, scaled to resource space.
+    *   `resourceRelativeErrors`: for each GCP, the error in projected resource coordinates, relative to the diameter of the bounding box of the resource mask.
 *   About the Helmert transformation type:
-    *   `destinationHelmertRmse`: The root-mean-square error of GCPs in projected geo coordinates
-    *   `helmertParameters`: The Helmert parameters. See [@allmaps/transform](../../packages/transform/).
-    *   `helmertScale`: The scale
-    *   `helmertRotation`: The rotation
-    *   `helmertTranslation`: The translation
+    *   `destinationHelmertRmse`: The root-mean-square error of GCPs in projected geo coordinates.
+    *   `helmertMeasures`: The Helmert measures, including `translation`, `rotation` and `scale`. See [@allmaps/transform](../../packages/transform/).
 *   About the polynomial transformation type:
-    *   `destinationPolynomial1Rmse`: The root-mean-square error of GCPs in projected geo coordinates
-    *   `polynomialParameters`: The polynomial parameters. See [@allmaps/transform](../../packages/transform/).
-    *   `polynomialScale`: The scale
-    *   `polynomialRotation`: The rotation
-    *   `polynomialShear`: The shear
-    *   `polynomialTranslation`: The translation
+    *   `destinationPolynomial1Rmse`: The root-mean-square error of GCPs in projected geo coordinates.
+    *   `polynomial1Measures`: The polynomial measures, including `translation`, `rotation`, `scales` and `shears`. See [@allmaps/transform](../../packages/transform/).
 
 ## Distortions
 
-An analyzer can also compute the following distortion information:
+An analyzer can also compute distortion describing the distortion caused by the warping with the current (or default) transformation type.
+
+The method `analyze.getDistortions()` returns an object with the following measures:
 
 *   About the current transformation type:
-    *   `meanDistortions`: For each computed distortion measure, the mean distortion over all triangulation points.
+    *   `meanDistortions`: A Map with for each computed distortion measure, the mean distortion over all triangulation points.
 
 ## License
 

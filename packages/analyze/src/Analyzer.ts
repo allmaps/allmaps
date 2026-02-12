@@ -890,6 +890,7 @@ export class Analyzer {
     const resourceMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.resourceMaskBbox
     )
+    const geoMaskBboxDiameter = bboxToDiameter(this.warpedMap.geoMaskBbox)
     const projectedGeoMaskBboxDiameter = bboxToDiameter(
       this.warpedMap.projectedGeoMaskBbox
     )
@@ -934,16 +935,17 @@ export class Analyzer {
 
     this.measures = {
       mapId: this.mapId,
-      projectedGeoMaskBboxDiameter,
       resourceMaskBboxDiameter,
-      destinationPolynomial1Rmse,
-      polynomial1Measures,
-      destinationHelmertRmse,
-      helmertMeasures,
+      geoMaskBboxDiameter,
+      projectedGeoMaskBboxDiameter,
       destinationRmse,
       destinationErrors,
       resourceErrors,
-      resourceRelativeErrors
+      resourceRelativeErrors,
+      destinationHelmertRmse,
+      helmertMeasures,
+      destinationPolynomial1Rmse,
+      polynomial1Measures
     }
 
     return this.measures

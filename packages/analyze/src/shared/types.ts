@@ -88,6 +88,7 @@ export type Measures = {
   mapId?: string
 
   resourceMaskBboxDiameter: number
+  geoMaskBboxDiameter: number
   projectedGeoMaskBboxDiameter: number
 
   destinationRmse: number
