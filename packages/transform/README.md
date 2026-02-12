@@ -880,6 +880,14 @@ Create a transformation
 Array<Point>
 ```
 
+### `BaseTransformation#destinationRmse?`
+
+###### Type
+
+```ts
+number
+```
+
 ### `BaseTransformation#destinationTransformedSourcePoints?`
 
 ###### Type
@@ -935,6 +943,16 @@ Evaluate the transformation function's partial derivative to y at a new point
 
 the x and y component of the partial derivative to y at the source point (`[number, number]`).
 
+### `BaseTransformation#getDestinationRmse()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`number`.
+
 ### `BaseTransformation#getDestinationTransformedSourcePoints()`
 
 Get the destination-transformed source points.
@@ -967,16 +985,6 @@ There are no parameters.
 
 `Partial<HelmertMeasures> | Partial<Polynomial1Measures>`.
 
-### `BaseTransformation#getRmse()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`number`.
-
 ### `BaseTransformation#pointCount`
 
 ###### Type
@@ -1002,14 +1010,6 @@ There are no parameters.
 ###### Returns
 
 `void`.
-
-### `BaseTransformation#rmse?`
-
-###### Type
-
-```ts
-number
-```
 
 ### `BaseTransformation#setWeightsArrays(weightsArrays)`
 
@@ -1271,7 +1271,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * A Georeferenced Map
 * `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; geoIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...`)
   * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map

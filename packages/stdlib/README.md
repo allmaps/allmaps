@@ -18,6 +18,18 @@ MIT
 
 `number`.
 
+### `arrayContains(array, object, isEqualObject)`
+
+###### Parameters
+
+* `array` (`Array<T>`)
+* `object` (`T`)
+* `isEqualObject` (`((t0: T, t1: T) => boolean) | undefined`)
+
+###### Returns
+
+`{item: T; index: number} | undefined`.
+
 ### `arrayMatrixSize(arrayMatrix)`
 
 ###### Parameters
@@ -37,7 +49,7 @@ MIT
 
 ###### Returns
 
-`Array<T>`.
+`Array<{item: T; index: number}>`.
 
 ### `bboxToCenter(bbox)`
 
@@ -820,6 +832,24 @@ MIT
 
 `T`.
 
+### `getPropertyFromQuintupleCacheOrComputation(cache, key0, key1, key2, key3, key4, computation, checkUse, checkStore)`
+
+###### Parameters
+
+* `cache` (`Map<K0, Map<K1, Map<K2, Map<K3, Map<K4, T>>>>>`)
+* `key0` (`K0`)
+* `key1` (`K1`)
+* `key2` (`K2`)
+* `key3` (`K3`)
+* `key4` (`K4`)
+* `computation` (`() => T`)
+* `checkUse` (`((t: T) => boolean) | undefined`)
+* `checkStore` (`((t: T) => boolean) | undefined`)
+
+###### Returns
+
+`T`.
+
 ### `getPropertyFromTripleCacheOrComputation(cache, key0, key1, key2, computation, checkUse, checkStore)`
 
 ###### Parameters
@@ -1277,7 +1307,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: string; i...`)
+* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
 
 ###### Returns
 
