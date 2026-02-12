@@ -23,6 +23,9 @@ export type AnalysisOptions = {
   maxLog2sigma: number
   minLog2sigma: number
   maxTwoOmega: number
+  ransacThresholdFactor: number
+  ransacStopProbabilty: number
+  ransacMaxNbIterations: number
 }
 
 /**
@@ -53,6 +56,7 @@ export type InfoCode = 'maskequalsfullmask' | 'gcpresourcepointismaskpoint'
 export type WarningCode =
   | 'maskmissing'
   | 'gcpoutsidemask'
+  | 'gcpoutlier'
   | 'maskpointoutsidefullmask'
   | 'destinationrmsetoohigh'
   | 'destinationhelmertrmsetoohigh'

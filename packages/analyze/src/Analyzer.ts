@@ -1,5 +1,6 @@
 import inside from 'point-in-polygon-hao'
 import Matrix, { QrDecomposition } from 'ml-matrix'
+import { ransac } from 'ml-ransac'
 
 import { validateGeoreferencedMap } from '@allmaps/annotation'
 import { TriangulatedWarpedMap, WarpedMap } from '@allmaps/render'
@@ -14,12 +15,14 @@ import {
   bboxToDiameter,
   isPoint,
   closeRing,
-  mergeOptions
+  mergeOptions,
+  distance,
+  computeBbox
 } from '@allmaps/stdlib'
 import { Helmert, Polynomial1 } from '@allmaps/transform'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { Point } from '@allmaps/types'
+import type { Gcp, Point } from '@allmaps/types'
 
 import type {
   AnalysisOptions,
@@ -32,6 +35,7 @@ import type {
   WarningCode,
   ErrorCode
 } from './shared/types'
+import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
 // Note: construction errors and failures to get info, warning or errors are always reported
 const DEFAULT_INFO_CODES: InfoCode[] = [
@@ -41,6 +45,7 @@ const DEFAULT_INFO_CODES: InfoCode[] = [
 const DEFAULT_WARNING_CODES: WarningCode[] = [
   'maskmissing',
   'gcpoutsidemask',
+  'gcpoutlier',
   'maskpointoutsidefullmask',
   // 'destinationrmsetoohigh',
   // 'destinationhelmertrmsetoohigh',
@@ -77,7 +82,10 @@ const DEFAULT_OPTIONS: AnalysisOptions = {
   maxShear: 0.1,
   maxLog2sigma: 1,
   minLog2sigma: -1,
-  maxTwoOmega: 0.5
+  maxTwoOmega: 0.5,
+  ransacThresholdFactor: 0.1,
+  ransacStopProbabilty: 0.99,
+  ransacMaxNbIterations: 100
 }
 
 /**
@@ -308,7 +316,11 @@ export class Analyzer {
             resourcePoint,
             gcpIndex,
             maskPointIndex,
-            message: `GCP ${gcpIndex} with resource coordinates [${resourcePoint}] is mask point ${maskPointIndex}.`
+            message: `GCP ${
+              gcpIndex + 1
+            } with resource coordinates [${resourcePoint}] is mask point ${
+              maskPointIndex + 1
+            }.`
           })
         }
       )
@@ -366,7 +378,75 @@ export class Analyzer {
           code,
           resourcePoint: gcp.resource,
           gcpIndex: gcpIndex,
-          message: `GCP ${gcpIndex} with resource coordinates [${gcp.resource}] outside mask.`
+          message: `GCP ${gcpIndex + 1} with resource coordinates [${
+            gcp.resource
+          }] outside mask.`
+        })
+      })
+    }
+
+    // Checking for outliers using RANSAC
+    // See https://observablehq.com/d/decede2fed6b58d3
+    // See notebook for why a minimum of 4 points is required
+    code = 'gcpoutlier'
+    if (
+      codes.includes(code) &&
+      this.protoGeoreferencedMap.gcps &&
+      this.protoGeoreferencedMap.gcps.length > 4
+    ) {
+      const gcpsForRansac = []
+      for (const [gcpIndex, gcp] of this.protoGeoreferencedMap.gcps.entries()) {
+        if (gcp.geo && gcp.resource) {
+          gcpsForRansac.push({
+            gcp: gcp as Gcp,
+            gcpIndex
+          })
+        }
+      }
+      const gcps = gcpsForRansac.map((gcpForRansac) => gcpForRansac.gcp)
+      const diameter = bboxToDiameter(computeBbox(gcps.map((gcp) => gcp.geo)))
+      const { inliers } = ransac(
+        gcps.map((gcp) => gcp.resource),
+        gcps.map((gcp) => gcp.geo),
+        {
+          sampleSize: 2,
+          threshold: diameter * options.ransacThresholdFactor,
+          distanceFunction: distance,
+          fitFunction: (resourcePoints, geoPoints) => {
+            const reconstructedGcps = resourcePoints.map(
+              (resourcePoint, index) => {
+                return { resource: resourcePoint, geo: geoPoints[index] }
+              }
+            )
+            return new ProjectedGcpTransformer(
+              reconstructedGcps,
+              'helmert'
+            ) as unknown as number[]
+            // Note: fitFunction is supposed to return number[] but also works returning a custom object
+          },
+          modelFunction: (projectedTransformer) => (geoPoint) =>
+            (
+              projectedTransformer as unknown as ProjectedGcpTransformer
+            ).transformToGeo(geoPoint, { projection: lonLatProjection }),
+          seed: 0, // Note: setting the seed to make the algorithm deterministic
+          stopProbabilty: options.ransacStopProbabilty,
+          maxNbIterations: options.ransacMaxNbIterations
+        }
+      )
+      const gcpsOutlier = gcpsForRansac.filter(
+        (_gcpForRansac, gcpsForRansacIndex) =>
+          !inliers.includes(gcpsForRansacIndex)
+      )
+      gcpsOutlier.forEach(({ gcp, gcpIndex }) => {
+        this.warnings.push({
+          mapId: this.mapId,
+          code,
+          resourcePoint: gcp.resource,
+          geoPoint: gcp.geo,
+          gcpIndex: gcpIndex,
+          message: `GCP ${gcpIndex + 1} with resource coordinates [${
+            gcp.resource
+          }] and geo coordinates [${gcp.geo}] is possibly an outlier.`
         })
       })
     }
@@ -397,7 +477,9 @@ export class Analyzer {
             code,
             resourcePoint: resourceMaskPoint,
             maskPointIndex,
-            message: `Mask point ${maskPointIndex} with resource coordinates [${resourceMaskPoint}] outside full mask.`
+            message: `Mask point ${
+              maskPointIndex + 1
+            } with resource coordinates [${resourceMaskPoint}] outside full mask.`
           })
         }
       )
@@ -603,7 +685,7 @@ export class Analyzer {
           code,
           geoPoint: gcp.geo,
           gcpIndex,
-          message: `GCP ${gcpIndex} missing resource coordinates.`
+          message: `GCP ${gcpIndex + 1} missing resource coordinates.`
         })
       })
     }
@@ -622,7 +704,7 @@ export class Analyzer {
           code,
           resourcePoint: gcp.resource,
           gcpIndex,
-          message: `GCP ${gcpIndex} missing geo coordinates.`
+          message: `GCP ${gcpIndex + 1} missing geo coordinates.`
         })
       })
     }
@@ -675,7 +757,11 @@ export class Analyzer {
           code,
           resourcePoint: resourceRepeatedPoint.item,
           gcpIndex: resourceRepeatedPoint.index,
-          message: `GCP ${resourceRepeatedPoint.index} with resource coordinates [${resourceRepeatedPoint.item}] is repeated.`
+          message: `GCP ${
+            resourceRepeatedPoint.index + 1
+          } with resource coordinates [${
+            resourceRepeatedPoint.item
+          }] is repeated.`
         })
       })
     }
@@ -694,7 +780,9 @@ export class Analyzer {
           code,
           geoPoint: geoRepeatedPoint.item,
           gcpIndex: geoRepeatedPoint.index,
-          message: `GCP ${geoRepeatedPoint.index} with geo coordinates [${geoRepeatedPoint.item}] is repeated.`
+          message: `GCP ${geoRepeatedPoint.index + 1} with geo coordinates [${
+            geoRepeatedPoint.item
+          }] is repeated.`
         })
       })
     }
@@ -760,7 +848,11 @@ export class Analyzer {
           code,
           resourcePoint: resourceMaskRepeatedPoint.item,
           maskPointIndex: resourceMaskRepeatedPoint.index,
-          message: `Mask point ${resourceMaskRepeatedPoint.index} with resource coordinates [${resourceMaskRepeatedPoint.item}] is repeated.`
+          message: `Mask point ${
+            resourceMaskRepeatedPoint.index + 1
+          } with resource coordinates [${
+            resourceMaskRepeatedPoint.item
+          }] is repeated.`
         })
       })
     }

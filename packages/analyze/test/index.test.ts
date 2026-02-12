@@ -195,6 +195,43 @@ describe('Warnings', () => {
     )
   })
 
+  test('gcpoutlier (no warning if no outlier)', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-no-gcpoutlier.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze({
+      codes: ['gcpoutlier']
+    })
+
+    expect(analysis.warnings.map((warning) => warning.code)).to.not.contain(
+      'gcpoutlier'
+    )
+  })
+
+  test('gcpoutlier', () => {
+    const georeferencedMap = readJSONFile(
+      path.join(inputDir, 'proto-georeferenced-map-gcpoutlier.json')
+    )
+
+    const analyzer = new Analyzer(georeferencedMap)
+    const analysis = analyzer.analyze({
+      codes: ['gcpoutlier']
+    })
+
+    expect(analysis.warnings.map((warning) => warning.code)).to.contain(
+      'gcpoutlier'
+    )
+    expect(
+      analysis.warnings.filter((warning) => warning.code == 'gcpoutlier')
+    ).to.be.of.length(1)
+    expect(
+      analysis.warnings.filter((warning) => warning.code == 'gcpoutlier')[0]
+        .gcpIndex
+    ).to.equal(4)
+  })
+
   test('maskpointoutsidefullmask', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map-maskpointoutsidefullmask.json')

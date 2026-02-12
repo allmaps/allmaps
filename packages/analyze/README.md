@@ -111,35 +111,36 @@ const distortions = analyzer.getDistortions()
 
 An analyzer can analyze the following info, warnings and errors:
 
-| Type    | Code                                      | Topic                                                                                           | Included by default |
-|---------|-------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------|
-| Info    | `maskequalsfullmask`                      | The mask contains the full image.                                                               | Yes                 |
-| Info    | `gcpresourcepointismaskpoint`             | A GCP is mask point.                                                                            | Yes                 |
-| Warning | `maskmissing`                             | A mask is missing.                                                                              | Yes                 |
-| Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                      | Yes                 |
-| Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                          | Yes                 |
-| Warning | `destinationrmsetoohigh`                  | The RMSE is higher then the set maximum times the map diameter.                                 | No                  |
-| Warning | `destinationhelmertrmsetoohigh`           | The RMSE is higher then the set maximum times the map diameter for a helmert transformation.    | No                  |
-| Warning | `polynomial1sheartoohigh`                 | The shear is higher then a set maximum for a polynomial transformation.                         | Yes                 |
-| Warning | `destinationpolynomial1rmsetoohigh`       | The RMSE is higher then the set maximum times the map diameter for a polynomial transformation. | Yes                 |
-| Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum. | Yes                 |
-| Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                             | Yes                 |
-| Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                               | No                  |
-| Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                                   | Yes                 |
-| Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                             | Yes                 |
-| Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                          | Yes                 |
-| Error   | `gcpsmissing`                             | GCPs are missing.                                                                               | Yes                 |
-| Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                        | Yes                 |
-| Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                        | Yes                 |
-| Error   | `gcpsamountlessthen2`                     | There are less then 2 GCPs.                                                                     | No                  |
-| Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                     | Yes                 |
-| Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                          | Yes                 |
-| Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                               | Yes                 |
-| Error   | `gcpsresourcenotlinearlyindependent`      | GCP resource coordinates are not linearly independent.                                          | Yes                 |
-| Error   | `gcpsgeonotlinearlyindependent`           | GCP geo coordinates are not linearly independent.                                               | Yes                 |
-| Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                              | Yes                 |
-| Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                         | Yes                 |
-| Error   | `maskselfintersection`                    | The mask self-intersects.                                                                       | Yes                 |
+| Type    | Code                                      | Topic                                                                                                                                                              | Included by default |
+|---------|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| Info    | `maskequalsfullmask`                      | The mask contains the full image.                                                                                                                                  | Yes                 |
+| Info    | `gcpresourcepointismaskpoint`             | A GCP is a mask point.                                                                                                                                             | Yes                 |
+| Warning | `maskmissing`                             | A mask is missing.                                                                                                                                                 | Yes                 |
+| Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                                                                                         | Yes                 |
+| Warning | `gcpoutlier`                              | A GCP is possibly an outlier. See [this notebook](https://observablehq.com/d/decede2fed6b58d3) for more details about the RANSAC approach used to detect outliers. | Yes                 |
+| Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                                                                                             | Yes                 |
+| Warning | `destinationrmsetoohigh`                  | The RMSE is higher then the set maximum times the map diameter.                                                                                                    | No                  |
+| Warning | `destinationhelmertrmsetoohigh`           | The RMSE is higher then the set maximum times the map diameter for a helmert transformation.                                                                       | No                  |
+| Warning | `polynomial1sheartoohigh`                 | The shear is higher then a set maximum for a polynomial transformation.                                                                                            | Yes                 |
+| Warning | `destinationpolynomial1rmsetoohigh`       | The RMSE is higher then the set maximum times the map diameter for a polynomial transformation.                                                                    | Yes                 |
+| Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum.                                                                    | Yes                 |
+| Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                                                                                                | Yes                 |
+| Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                                                                                                  | No                  |
+| Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                                                                                                      | Yes                 |
+| Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                                                                                                | Yes                 |
+| Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                                                                                             | Yes                 |
+| Error   | `gcpsmissing`                             | GCPs are missing.                                                                                                                                                  | Yes                 |
+| Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                                                                                           | Yes                 |
+| Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                                                                                           | Yes                 |
+| Error   | `gcpsamountlessthen2`                     | There are less then 2 GCPs.                                                                                                                                        | No                  |
+| Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                                                                                        | Yes                 |
+| Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                                                                                             | Yes                 |
+| Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                                                                                                  | Yes                 |
+| Error   | `gcpsresourcenotlinearlyindependent`      | GCP resource coordinates are not linearly independent.                                                                                                             | Yes                 |
+| Error   | `gcpsgeonotlinearlyindependent`           | GCP geo coordinates are not linearly independent.                                                                                                                  | Yes                 |
+| Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                                                                                                 | Yes                 |
+| Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                                                                                            | Yes                 |
+| Error   | `maskselfintersection`                    | The mask self-intersects.                                                                                                                                          | Yes                 |
 
 ## Measures
 
