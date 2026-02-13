@@ -1,13 +1,4 @@
 {
-  "@context": "https://schemas.allmaps.org/map/2/context.json",
-  "type": "GeoreferencedMap",
-  "id": "https://annotations.allmaps.org/maps/nagwjzJ6qURmPEHV",
-  "resource": {
-    "id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
-    "width": 4708,
-    "height": 1860,
-    "type": "ImageService2"
-  },
   "gcps": [
     { "resource": [336, 1742], "geo": [2.2860069, 48.860451] },
     { "resource": [294, 227], "geo": [2.2906458, 48.8637277] },
@@ -20,6 +11,5 @@
     [4587, 1772],
     [4587, 1772],
     [4568, 101]
-  ],
-  "transformation": { "type": "thinPlateSpline" }
+  ]
 }

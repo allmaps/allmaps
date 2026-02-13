@@ -1,12 +1,12 @@
 {
   "@context": "https://schemas.allmaps.org/map/2/context.json",
   "type": "GeoreferencedMap",
-  "id": "https://annotations.allmaps.org/maps/nagwjzJ6qURmPEHV",
+  "id": "https://annotations.allmaps.org/images/5748b8df80495d97",
   "resource": {
-    "id": "https://iiif.archivelab.org/iiif/plangeneraldelex00unse$3",
+    "id": "https://iiif.archive.org/image/iiif/3/plangeneraldelex00unse%2Fplangeneraldelex00unse_jp2.zip%2Fplangeneraldelex00unse_jp2%2Fplangeneraldelex00unse_0003.jp2",
     "width": 4708,
     "height": 1860,
-    "type": "ImageService2"
+    "type": "ImageService3"
   },
   "gcps": [
     { "geo": [2.2860069, 48.860451] },
@@ -15,10 +15,10 @@
     { "resource": [1892, 773], "geo": [2.2945164, 48.8590133] }
   ],
   "resourceMask": [
-    [0, 0],
-    [4708, 0],
-    [4708, 1860],
-    [0, 1860]
+    [117, 120],
+    [113, 1776],
+    [4587, 1772],
+    [4568, 101]
   ],
   "transformation": { "type": "thinPlateSpline" }
 }

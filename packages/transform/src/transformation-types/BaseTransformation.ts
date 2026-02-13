@@ -24,7 +24,7 @@ export abstract class BaseTransformation {
   pointCountMinimum: number
 
   private errors?: number[]
-  private rmse?: number
+  private destinationRmse?: number
 
   /**
    * Create a transformation
@@ -139,8 +139,8 @@ export abstract class BaseTransformation {
     return this.errors
   }
 
-  getRmse() {
-    if (!this.rmse) {
+  getDestinationRmse() {
+    if (!this.destinationRmse) {
       const destinationTransformedSourcePoints =
         this.getDestinationTransformedSourcePoints()
 
@@ -148,11 +148,11 @@ export abstract class BaseTransformation {
         this.getDestinationTransformedSourcePoints()
       }
 
-      this.rmse = rms(
+      this.destinationRmse = rms(
         this.destinationPoints,
         destinationTransformedSourcePoints
       )
     }
-    return this.rmse
+    return this.destinationRmse
   }
 }

@@ -99,3 +99,47 @@ export function getPropertyFromQuadrupleCacheOrComputation<T, K0, K1, K2, K3>(
     return result
   }
 }
+
+export function getPropertyFromQuintupleCacheOrComputation<
+  T,
+  K0,
+  K1,
+  K2,
+  K3,
+  K4
+>(
+  cache: Map<K0, Map<K1, Map<K2, Map<K3, Map<K4, T>>>>>,
+  key0: K0,
+  key1: K1,
+  key2: K2,
+  key3: K3,
+  key4: K4,
+  computation: () => T,
+  checkUse: (t: T) => boolean = () => true,
+  checkStore: (t: T) => boolean = () => true
+): T {
+  if (
+    cache.get(key0)?.get(key1)?.get(key2)?.get(key3)?.has(key4) &&
+    checkUse(cache.get(key0)?.get(key1)?.get(key2)?.get(key3)?.get(key4) as T)
+  ) {
+    return cache.get(key0)?.get(key1)?.get(key2)?.get(key3)?.get(key4) as T
+  } else {
+    const result = computation()
+    if (checkStore(result)) {
+      if (!cache.get(key0)) {
+        cache.set(key0, new Map())
+      }
+      if (!cache.get(key0)?.get(key1)) {
+        cache.get(key0)?.set(key1, new Map())
+      }
+      if (!cache.get(key0)?.get(key1)?.get(key2)) {
+        cache.get(key0)?.get(key1)?.set(key2, new Map())
+      }
+      if (!cache.get(key0)?.get(key1)?.get(key2)?.get(key3)) {
+        cache.get(key0)?.get(key1)?.get(key2)?.set(key3, new Map())
+      }
+      cache.get(key0)?.get(key1)?.get(key2)?.get(key3)?.set(key4, result)
+    }
+    return result
+  }
+}

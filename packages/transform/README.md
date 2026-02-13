@@ -880,6 +880,14 @@ Create a transformation
 Array<Point>
 ```
 
+### `BaseTransformation#destinationRmse?`
+
+###### Type
+
+```ts
+number
+```
+
 ### `BaseTransformation#destinationTransformedSourcePoints?`
 
 ###### Type
@@ -935,6 +943,16 @@ Evaluate the transformation function's partial derivative to y at a new point
 
 the x and y component of the partial derivative to y at the source point (`[number, number]`).
 
+### `BaseTransformation#getDestinationRmse()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`number`.
+
 ### `BaseTransformation#getDestinationTransformedSourcePoints()`
 
 Get the destination-transformed source points.
@@ -967,16 +985,6 @@ There are no parameters.
 
 `Partial<HelmertMeasures> | Partial<Polynomial1Measures>`.
 
-### `BaseTransformation#getRmse()`
-
-###### Parameters
-
-There are no parameters.
-
-###### Returns
-
-`number`.
-
 ### `BaseTransformation#pointCount`
 
 ###### Type
@@ -1002,14 +1010,6 @@ There are no parameters.
 ###### Returns
 
 `void`.
-
-### `BaseTransformation#rmse?`
-
-###### Type
-
-```ts
-number
-```
 
 ### `BaseTransformation#setWeightsArrays(weightsArrays)`
 
