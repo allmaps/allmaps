@@ -21,3 +21,4 @@ vite.config.ts.timestamp-*
 .pnpm-store
 
 .turbo
+.claude

@@ -31,8 +31,9 @@ export async function generateTileJsonResponse(
     await warpedMapList.addGeoreferencedMap(georeferencedMap)
   }
 
-  const bounds = warpedMapList.getMapsBbox()
-  const center = warpedMapList.getMapsCenter()
+  // Get bounds and center in EPSG:4326 (lon/lat) as required by TileJSON spec
+  const bounds = warpedMapList.getMapsBbox({ projection: { definition: 'EPSG:4326' } })
+  const center = warpedMapList.getMapsCenter({ projection: { definition: 'EPSG:4326' } })
 
   if (!bounds || !center) {
     throw new Error('Could not compute bounding box and center of maps')

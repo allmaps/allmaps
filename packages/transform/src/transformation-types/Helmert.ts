@@ -166,4 +166,20 @@ export class Helmert extends BaseLinearWeightsTransformation {
 
     return newDestinationPointPartDerY
   }
+
+  getWeights(): { weights: Float64Array; sourcePoints: Float64Array } {
+    if (!this.weightsArray) {
+      this.solve()
+    }
+
+    if (!this.weightsArray) {
+      throw new Error('Helmert weights not computed')
+    }
+
+    // Helmert: [w0, w1, w2, w3]
+    return {
+      weights: new Float64Array(this.weightsArray),
+      sourcePoints: new Float64Array(0)
+    }
+  }
 }

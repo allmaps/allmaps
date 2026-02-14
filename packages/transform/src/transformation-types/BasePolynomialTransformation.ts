@@ -82,4 +82,23 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
       this.destinationPointsArrays
     )
   }
+
+  getWeights(): { weights: Float64Array; sourcePoints: Float64Array } {
+    if (!this.weightsArrays) {
+      this.solve()
+    }
+
+    if (!this.weightsArrays) {
+      throw new Error('Polynomial transformation weights not computed')
+    }
+
+    // Polynomial: [wx[0], wx[1], ..., wy[0], wy[1], ...]
+    return {
+      weights: new Float64Array([
+        ...this.weightsArrays[0],
+        ...this.weightsArrays[1]
+      ]),
+      sourcePoints: new Float64Array(0)
+    }
+  }
 }

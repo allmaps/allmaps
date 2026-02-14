@@ -1,0 +1,40 @@
+[package]
+name = "allmaps-render-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "WebAssembly-powered renderer for high-performance image transformations"
+repository = "https://github.com/allmaps/allmaps"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+# Minimal image crate - only needed formats
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+# Only include panic hook in debug builds
+console_error_panic_hook = { version = "0.1", optional = true }
+web-sys = { version = "0.3", features = ["console"] }
+
+[features]
+default = []
+# Enable console error panic hook for debugging
+console_error_panic_hook_feature = ["console_error_panic_hook"]
+
+[package.metadata.wasm-pack.profile.release]
+# Disable wasm-opt post-processing - rely on Cargo's opt-level='z' for size optimization
+# wasm-opt has issues with SIMD-enabled binaries
+wasm-opt = false
+
+[profile.release]
+# Optimize for size (z = maximum size reduction)
+opt-level = "z"
+# Link-time optimization for better code generation
+lto = true
+# Single codegen unit for better optimization (slower compile, smaller binary)
+codegen-units = 1
+# Strip debug symbols
+strip = true
+# Use abort on panic for smaller binary
+panic = "abort"

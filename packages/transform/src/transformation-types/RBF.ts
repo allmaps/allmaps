@@ -324,4 +324,45 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     }
     return newDestinationPointPartDerY
   }
+
+  getWeights(): { weights: Float64Array; sourcePoints: Float64Array } {
+    if (!this.weightsArrays) {
+      this.solve()
+    }
+
+    if (!this.rbfWeightsArrays || !this.affineWeightsArrays) {
+      throw new Error('ThinPlateSpline transformation weights not computed')
+    }
+
+    const n = this.sourcePoints.length
+
+    // Format: [n, rbfWx[n], rbfWy[n], affineWx[3], affineWy[3]]
+    const weights = new Float64Array(1 + 2 * n + 6)
+    weights[0] = n
+
+    for (let i = 0; i < n; i++) {
+      weights[1 + i] = this.rbfWeightsArrays[0][i]
+    }
+    for (let i = 0; i < n; i++) {
+      weights[1 + n + i] = this.rbfWeightsArrays[1][i]
+    }
+    for (let i = 0; i < 3; i++) {
+      weights[1 + 2 * n + i] = this.affineWeightsArrays[0][i]
+    }
+    for (let i = 0; i < 3; i++) {
+      weights[1 + 2 * n + 3 + i] = this.affineWeightsArrays[1][i]
+    }
+
+    // Flatten source points
+    const flatSourcePoints = new Float64Array(n * 2)
+    for (let i = 0; i < n; i++) {
+      flatSourcePoints[i * 2] = this.sourcePoints[i][0]
+      flatSourcePoints[i * 2 + 1] = this.sourcePoints[i][1]
+    }
+
+    return {
+      weights,
+      sourcePoints: flatSourcePoints
+    }
+  }
 }

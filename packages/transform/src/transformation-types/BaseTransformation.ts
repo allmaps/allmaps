@@ -109,6 +109,20 @@ export abstract class BaseTransformation {
   abstract evaluatePartialDerivativeY(newSourcePoint: Point): Point
 
   /**
+   * Get transformation weights in a format suitable for WASM rendering.
+   * This provides a standardized way to extract internal transformation parameters
+   * for use in WebAssembly-based rendering pipelines.
+   *
+   * @returns An object containing:
+   *   - weights: Transformation-specific weight parameters as Float64Array
+   *   - sourcePoints: Flattened source control points as Float64Array (for TPS only, empty otherwise)
+   */
+  abstract getWeights(): {
+    weights: Float64Array
+    sourcePoints: Float64Array
+  }
+
+  /**
    * Get the destination-transformed source points.
    *
    * @returns source points, transformed to destination domain
