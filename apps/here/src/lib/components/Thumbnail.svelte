@@ -114,7 +114,8 @@
     `maps/${navigating.to?.params?.mapId}` === allmapsId
   )
 
-  function handleError() {
+  function handleError(err: unknown) {
+    console.warn(`Error loading thumbnail for image ${map.resource.id}`, err)
     thumbnailError = true
   }
 

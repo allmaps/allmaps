@@ -152,7 +152,7 @@ export abstract class CacheableTile<D> extends EventTarget {
       !doBboxesIntersect(
         bufferBboxByRatio(
           computeBboxTile(tile),
-          Math.max(0, log2ScaleFactorDiff)
+          Math.pow(2, log2ScaleFactorDiff)
         ),
         mapPruneInfo.resourceViewportRingBboxForViewport
       )

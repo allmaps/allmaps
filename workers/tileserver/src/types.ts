@@ -19,7 +19,7 @@ export type Tilejson = {
 
 // TODO: align this with TransformationOptions from @allmaps/render
 export type TransformationOptions = {
-  'transformation.type': TransformationType
+  'transformation.type'?: TransformationType
 }
 
 export type TileResolution = 'normal' | 'retina'

@@ -13,7 +13,9 @@ export {
   webMercatorToLonLat,
   isEqualProjection,
   projectionToAntialiasedProjection,
-  projectionDefinitionToAntialiasedDefinition
+  projectionDefinitionToAntialiasedDefinition,
+  getLonLatDefinition,
+  getWebMercatorDefinition
 } from './shared/project-functions.js'
 
 export type {

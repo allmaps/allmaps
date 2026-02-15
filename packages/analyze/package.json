@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/analyze",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "author": {
     "name": "Manuel Claeys Bouuaert",
     "email": "manuel.claeys.b@gmail.com",
@@ -48,11 +48,15 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "ml-matrix": "^6.12.0",
+    "ml-ransac": "^1.0.0",
     "point-in-polygon-hao": "^1.2.4"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
+    "@types/node": "^24",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "documentation": "^14.0.0",

@@ -400,6 +400,13 @@ export class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Set the map-specific options (and the list options)
+   *
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
   setMapOptions(
     mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
@@ -419,6 +426,12 @@ export class WarpedMap extends EventTarget {
     )
   }
 
+  /**
+   * Set the list options
+   *
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
   setListOptions(
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
@@ -426,6 +439,9 @@ export class WarpedMap extends EventTarget {
     return this.setMapOptions(undefined, listOptions, animationOptions)
   }
 
+  /**
+   * Set the defaultOptions
+   */
   setDefaultOptions() {
     this.defaultOptions = WarpedMap.getDefaultOptions()
   }
@@ -507,7 +523,10 @@ export class WarpedMap extends EventTarget {
         this.setProjection(this.options.projection)
       }
 
-      if ('distortionMeasure' in changedOptions) {
+      if (
+        'distortionMeasure' in changedOptions ||
+        'distortionMeasures' in changedOptions
+      ) {
         this.setDistortionMeasure(this.options.distortionMeasure)
       }
     }

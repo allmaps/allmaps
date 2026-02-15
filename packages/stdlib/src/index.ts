@@ -44,7 +44,8 @@ export {
   getPropertyFromCacheOrComputation,
   getPropertyFromDoubleCacheOrComputation,
   getPropertyFromTripleCacheOrComputation,
-  getPropertyFromQuadrupleCacheOrComputation
+  getPropertyFromQuadrupleCacheOrComputation,
+  getPropertyFromQuintupleCacheOrComputation
 } from './cache.js'
 
 export {
@@ -168,6 +169,7 @@ export {
   groupBy,
   isEqualArray,
   arrayRepeated,
+  arrayContains,
   subSetArray,
   equalSet,
   objectDifference,
