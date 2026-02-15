@@ -7,7 +7,7 @@ import type { TransformationType } from '@allmaps/transform'
 export function optionsFromQuery(req: IRequest): TransformationOptions {
   const query = req.query
 
-  let transformationType: TransformationType = 'polynomial'
+  let transformationType: TransformationType | undefined = undefined
   const queryTransformationType = query?.['transformation.type']
 
   if (
