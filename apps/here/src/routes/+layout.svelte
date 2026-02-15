@@ -57,7 +57,7 @@
 </script>
 
 <Stats statsWebsiteId={env.PUBLIC_STATS_WEBSITE_ID} />
-<main class="absolute w-full h-full flex flex-col">
+<main class="absolute w-full h-dvh flex flex-col">
   {#if errorState.error}
     <Error />
   {:else}
