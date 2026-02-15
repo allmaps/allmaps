@@ -1266,6 +1266,10 @@ importers:
         version: 1.0.0(vite@6.4.1(@types/node@24.10.11)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))
 
   packages/id:
+    dependencies:
+      js-sha1:
+        specifier: ^0.7.0
+        version: 0.7.0
     devDependencies:
       '@allmaps/types':
         specifier: workspace:^
