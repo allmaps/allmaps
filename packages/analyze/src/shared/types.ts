@@ -6,10 +6,26 @@ import {
 import { Point } from '@allmaps/types'
 
 /**
+ * Proto version of GeoreferencedMap
+ */
+export type ProtoGeoreferencedMap = {
+  gcps?: { resource?: Point; geo?: Point }[]
+  resourceMask?: Point[]
+}
+
+/**
  * Analysis options
  */
 export type AnalysisOptions = {
   codes: string[]
+  maxRmseDiameterFraction: number
+  maxShear: number
+  maxLog2sigma: number
+  minLog2sigma: number
+  maxTwoOmega: number
+  ransacThresholdFactor: number
+  ransacStopProbabilty: number
+  ransacMaxNbIterations: number
 }
 
 /**
@@ -23,7 +39,7 @@ export type AnalysisItem = {
   gcpIndex?: number
   maskPointIndex?: number
   message: string
-  originalMessage?: string
+  originalMessage?: unknown
   text?: string
 }
 
@@ -36,21 +52,54 @@ export type Analysis = {
   errors: AnalysisItem[]
 }
 
+export type InfoCode = 'maskequalsfullmask' | 'gcpresourcepointismaskpoint'
+export type WarningCode =
+  | 'maskmissing'
+  | 'gcpoutsidemask'
+  | 'gcpoutlier'
+  | 'maskpointoutsidefullmask'
+  | 'destinationrmsetoohigh'
+  | 'destinationhelmertrmsetoohigh'
+  | 'polynomial1sheartoohigh'
+  | 'destinationpolynomial1rmsetoohigh'
+  | 'log2sigmadistortiontoohigh'
+  | 'twoomegadistortiontoohigh'
+  | 'triangulationfoldsover'
+export type ErrorCode =
+  | 'constructinggeoreferencedmapfailed'
+  | 'constructingtriangulatedwarpedmapfailed'
+  | 'constructingwarpedmapfailed'
+  | 'gcpincompleteresource'
+  | 'gcpincompleteregeo'
+  | 'gcpsnotlinearlyindependent'
+  | 'gcpsmissing'
+  | 'gcpsamountlessthen2'
+  | 'gcpsamountlessthen3'
+  | 'gcpresourcerepeatedpoint'
+  | 'gcpgeorepeatedpoint'
+  | 'masknotring'
+  | 'maskrepeatedpoint'
+  | 'maskselfintersection'
+
 /**
  * Measures
  */
 export type Measures = {
   mapId?: string
 
-  rmse: number
+  resourceMaskBboxDiameter: number
+  geoMaskBboxDiameter: number
+  projectedGeoMaskBboxDiameter: number
+
+  destinationRmse: number
   destinationErrors: number[]
   resourceErrors: number[]
   resourceRelativeErrors: number[]
 
-  helmertRmse: number
+  destinationHelmertRmse: number
   helmertMeasures: HelmertMeasures
 
-  polynomial1Rmse: number
+  destinationPolynomial1Rmse: number
   polynomial1Measures: Polynomial1Measures
 }
 

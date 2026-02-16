@@ -47,7 +47,8 @@ import type {
   AnimationOptions,
   SpecificWebGL2WarpedMapOptions,
   WebGL2WarpedMapOptions,
-  WarpedMapListOptions
+  WarpedMapListOptions,
+  AnimationOptionsInternal
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
@@ -251,7 +252,37 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  /** Set default options */
+  /**
+   * Set the map-specific options (and the list options)
+   *
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setMapOptions(
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    listOptions?: Partial<WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+  ): object {
+    return super.setMapOptions(mapOptions, listOptions, animationOptions)
+  }
+
+  /**
+   * Set the list options
+   *
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setListOptions(
+    listOptions?: Partial<WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ): object {
+    return super.setListOptions(listOptions, animationOptions)
+  }
+
+  /**
+   * Set the defaultOptions
+   */
   setDefaultOptions() {
     this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }

@@ -6,6 +6,7 @@ import type { TransformationType } from '@allmaps/transform'
 // TODO: simplify when this will be aligned with TransformationOptions from @allmaps/render
 export function optionsFromQuery(req: IRequest): TransformationOptions {
   const query = req.query
+
   const queryTransformationType = query?.['transformation.type']
 
   // Only override transformation type if explicitly provided in query

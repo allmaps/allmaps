@@ -1,59 +1,35 @@
 # @allmaps/analyze
 
-This module analyzes warpedMaps: it checks them for possible error and computes accuracy measures.
+This packages serves to analyze the *geometric* qualities of georeferenced maps.
 
-A Warped Map is an object used in [@allmaps/render](../../packages/render/) to store information about a georeferencedMap (which in turn are parsed [Georeference Annotations](https://iiif.io/api/extension/georef/)) as it is warped by a transformer in order to be rendered. Hence, these objects have a lot of information that can e used to infer the quality and accuracy of a map's warping.
+Examples:
 
-In a WebGL2Renderer a map is warped and triangulated, so the TriangulatedWarpedMaps is used, which extends WarpedMaps.
+*   Check if there are enough GCPs and they are linearly independent
+*   Check if the mask doesn't self-intersect
+*   Check if the map is not to strongly warped
 
 ## How it works
 
-This packages analyzes maps to return information, warning and error items. These items are objects with a code and message attribute, and possible additional information.
+This packages analyzes maps and returns information, warning and error items:
 
 *   **Info** are notable but not problematic informations on a warping.
-    *   Code `maskequalsfullmask`: The mask contains the full image.
 *   **Warnings** are possibly problematic findings, but don't invalidate the map.
-    *   Code `gcpoutsidemask`: A GCP is outside the mask.
-    *   Code `maskpointoutsidefullmask`: A mask point is outside the full mask.
-    *   Code `polynomialsheartoohigh`: A polynomial transformation shows a shear higher then a set maximum.
 *   **Errors** are problematic findings that invalidate the map.
-    *   Code `constructingwarpedmapfailed`: A warped map map could not be constructed.
-    *   Code `constructingtriangulatedwarpedmapfailed`: A triangulated warped map could not be constructed.
-    *   Code `gcpincompleteresource`: A GCP has incomplete source coordinates.
-    *   Code `gcpincompleteregeo`: A GCP has incomplete source coordinates.
-    *   Code `gcpamountlessthen2`: There are less then 2 GCPs.
-    *   Code `gcpamountlessthen3`: There are less then 3 GCPs.
-    *   Code `gcpresourcerepeatedpoint`: GCP resource coordinates are repeated.
-    *   Code `gcpgeorepeatedpoint`: GCP geo coordinates are repeated.
-    *   Code `masknotring`: The mask is not a valid ring (an array of points).
-    *   Code `maskrepeatedpoint`: Mask resource coordinates are repeated.
-    *   Code `maskselfintersection`: The mask self-intersects.
 
-An analyzer can also compute the following **Measures**:
+Analysis items like info, warnings and errors are objects with a unique code, a message and possible additional descriptive attributes. All supported analysis items are listed below.
 
-*   About the current transformation type:
-    *   `rmse`: The root-mean-square error of GCPs in projected geo coordinates
-    *   `destinationErrors`: for each GCP, the error in projected geo coordinates
-    *   `resourceErrors`: for each GCP, the error in projected geo coordinates, scaled to resource space
-    *   `resourceRelativeErrors`: for each GCP, the error in projected resource coordinates, relative to the resource mask BBox diameter.
-*   About the Helmert transformation type:
-    *   `helmertRmse`: The root-mean-square error of GCPs in projected geo coordinates
-    *   `helmertParameters`: The Helmert parameters. See [@allmaps/transform](../../packages/transform/).
-    *   `helmertScale`: The scale
-    *   `helmertRotation`: The rotation
-    *   `helmertTranslation`: The translation
-*   About the polynomial transformation type:
-    *   `polynomialRmse`: The root-mean-square error of GCPs in projected geo coordinates
-    *   `polynomialParameters`: The polynomial parameters. See [@allmaps/transform](../../packages/transform/).
-    *   `polynomialScale`: The scale
-    *   `polynomialRotation`: The rotation
-    *   `polynomialShear`: The shear
-    *   `polynomialTranslation`: The translation
+An analyzer can also compute **Measures** like the RMSE of error-vectors and **Distortion** information like area scaling of a thin-plate spline transformation. They are equally described below.
 
-An analyzer can also compute the following **Distortion** information:
+While this packages serves to analyze the *geometric* qualities of maps. It does not check the *online availability* of the resource (image) of a map.
 
-*   About the current transformation type:
-    *   `meanDistortions`: For each computed distortion measure, the mean distortion over all triangulation points.
+### Which maps can be analyzed?
+
+This package can analyze ProtoGeoreferencedMaps, GeoreferencedMaps or WarpedMaps.
+
+*   A **ProtoGeoreferencedMap** is a type used in this package to describe a basic version of a GeoreferencedMap containing only (but not guaranteed) GCPs and a mask. Information on the resource image or context, present in a GeoreferencedMap may be omitted here.
+*   A **GeoreferencedMap** is Allmaps' internal map format describing parsed [Georeference Annotations](https://iiif.io/api/extension/georef/). The [@allmaps/annotation](../../packages/annotation/) package defines these schema's and provides functions to parse and generate them.
+*   A **WarpedMap** is an object used in the [@allmaps/render](../../packages/render/) package and describe how a Georeferenced Map is warped by a transformer, e.g. during rendering. Hence, these objects contain a lot of information that can be used to infer the quality and accuracy of a map's warping.
+    *   This packages also check if WarpedMap's can be triangulated. For context: a WebGL2Renderer renders a WebGL2WarpedMap, which is an extension a TriangulatedWarpedMap, which is an extension of a WarpedMap.
 
 ## Installation
 
@@ -67,33 +43,58 @@ npm install @allmaps/analyze
 
 ## Usage
 
-First, get a warpedMap, either by making it from an annotation, or by getting it from a renderer's warpedMapList. Then analyze it using this library.
+First, create an Analyzer instance from a ProtoGeoreferencedMap, GeoreferencedMap or WarpedMap.
 
 ```js
 import { parseAnnotation } from '@allmaps/annotation'
-import { TriangulatedWarpedMap } from '@allmaps/render'
 import { Analyzer } from '@allmaps/analyze'
 
-// Fetch an annotation
-const annotation = await fetch(annoationUrl).then((response) => response.json())
+// Create an Analyzer for a Proto Georeferenced Map
+const protoGeoreferencedMap = {
+  "gcps": [
+    { "resource": [336, 1742], "geo": [2.2860069, 48.860451] },
+    { "resource": [294, 227], "geo": [2.2860069, 48.860451] }, // <- geo point repeated
+    { "resource": [2252, 1108], "geo": [2.2945555, 48.8574745] },
+    { "resource": [1892, 773], "geo": [2.2945164, 48.8590133] }
+  ],
+  "resourceMask": [
+    [117, 120],
+    [113, 1776],
+    [4587, 1772],
+    [4568, 101]
+  ]
+}
+const analyzer = new Analyzer(protoGeoreferencedMap)
 
-// Create a warpedMap from the annotation
+// Or create an Analyzer for a Georeferenced Map
+const annotation = await fetch(annoationUrl).then((response) => response.json())
 const georeferencedMaps = parseAnnotation(annotation)
 const georeferencedMap = georeferencedMaps[0]
-const triangualtedWarpedMap = new TriangulatedWarpedMap(
-  georeferencedMap.id,
-  georeferencedMap
-)
+const analyzer = new Analyzer(georeferencedMap)
 
-// Or add the annotation the a renderer and extract a warpedMap
-// ... create a webGL2Renderer, see the render package
+// Or create an Analyzer for a Warped Map
 await renderer.addGeoreferenceAnnotation(annotation)
-const triangulatedWarpedMap = renderer.warpedMapList.getWarpedMaps()[0]
+const warpedMap = renderer.warpedMapList.getWarpedMaps()[0]
+const analyzer = new Analyzer(warpedMap)
+```
 
-// Create Analyzer for the warpedMap
-const analyzer = new Analyzer(triangulatedWarpedMap)
+Then analyze for info, warnings or errors, or compute measures or distortion.
 
-// Analyze to get all info, warnings and errors
+```js
+// Run an analysis to get all info, warnings and errors
+const analysis = analyzer.analyze()
+// analysis.warnings = {
+//   {
+//     mapId: 'https://annotations.allmaps.org/images/5748b8df80495d97',
+//     code: 'gcpgeorepeatedpoint',
+//     geoPoint: [ 2.2860069, 48.860451 ],
+//     gcpIndex: 1,
+//     message: 'GCP 1 with geo coordinates [2.2860069,48.860451] is repeated.'
+//   },
+//   ...
+// }
+
+// Or specifically get info, warnings and errors
 const info = analyzer.getInfo()
 const warnings = analyzer.getWarnings()
 const errors = analyzer.getErrors()
@@ -105,6 +106,71 @@ const hasErrors = analyzer.hasErrors()
 const measures = analyzer.getMeasures()
 const distortions = analyzer.getDistortions()
 ```
+
+## Info, Warnings, Errors
+
+An analyzer can analyze the following info, warnings and errors:
+
+| Type    | Code                                      | Topic                                                                                                                                                              | Included by default |
+|---------|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| Info    | `maskequalsfullmask`                      | The mask contains the full image.                                                                                                                                  | Yes                 |
+| Info    | `gcpresourcepointismaskpoint`             | A GCP is a mask point.                                                                                                                                             | Yes                 |
+| Warning | `maskmissing`                             | A mask is missing.                                                                                                                                                 | Yes                 |
+| Warning | `gcpoutsidemask`                          | A GCP is outside the mask.                                                                                                                                         | Yes                 |
+| Warning | `gcpoutlier`                              | A GCP is possibly an outlier. See [this notebook](https://observablehq.com/d/decede2fed6b58d3) for more details about the RANSAC approach used to detect outliers. | Yes                 |
+| Warning | `maskpointoutsidefullmask`                | A mask point is outside the full mask.                                                                                                                             | Yes                 |
+| Warning | `destinationrmsetoohigh`                  | The RMSE is higher then the set maximum times the map diameter.                                                                                                    | No                  |
+| Warning | `destinationhelmertrmsetoohigh`           | The RMSE is higher then the set maximum times the map diameter for a helmert transformation.                                                                       | No                  |
+| Warning | `polynomial1sheartoohigh`                 | The shear is higher then a set maximum for a polynomial transformation.                                                                                            | Yes                 |
+| Warning | `destinationpolynomial1rmsetoohigh`       | The RMSE is higher then the set maximum times the map diameter for a polynomial transformation.                                                                    | Yes                 |
+| Warning | `log2sigmadistortiontoohigh`              | The area distortion (`log2sigma`) is higher then the set maximum or lower then the set minimum.                                                                    | Yes                 |
+| Warning | `twoomegadistortiontoohigh`               | The angular distortion (`twoOmega`) is higher then the set maximum.                                                                                                | Yes                 |
+| Warning | `triangulationfoldsover`                  | The warped map folds over itself.                                                                                                                                  | No                  |
+| Error   | `constructinggeoreferencedmapfailed`      | A georeferenced map could not be constructed.                                                                                                                      | Yes                 |
+| Error   | `constructingtriangulatedwarpedmapfailed` | A triangulated warped map could not be constructed.                                                                                                                | Yes                 |
+| Error   | `constructingwarpedmapfailed`             | A warped map could not be constructed.                                                                                                                             | Yes                 |
+| Error   | `gcpsmissing`                             | GCPs are missing.                                                                                                                                                  | Yes                 |
+| Error   | `gcpincompleteresource`                   | A GCP has incomplete source coordinates.                                                                                                                           | Yes                 |
+| Error   | `gcpincompleteregeo`                      | A GCP has incomplete source coordinates.                                                                                                                           | Yes                 |
+| Error   | `gcpsamountlessthen2`                     | There are less then 2 GCPs.                                                                                                                                        | No                  |
+| Error   | `gcpsamountlessthen3`                     | There are less then 3 GCPs.                                                                                                                                        | Yes                 |
+| Error   | `gcpresourcerepeatedpoint`                | GCP resource coordinates are repeated.                                                                                                                             | Yes                 |
+| Error   | `gcpgeorepeatedpoint`                     | GCP geo coordinates are repeated.                                                                                                                                  | Yes                 |
+| Error   | `gcpsresourcenotlinearlyindependent`      | GCP resource coordinates are not linearly independent.                                                                                                             | Yes                 |
+| Error   | `gcpsgeonotlinearlyindependent`           | GCP geo coordinates are not linearly independent.                                                                                                                  | Yes                 |
+| Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                                                                                                 | Yes                 |
+| Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                                                                                            | Yes                 |
+| Error   | `maskselfintersection`                    | The mask self-intersects.                                                                                                                                          | Yes                 |
+
+## Measures
+
+An analyzer can also compute measures describing the warping with the current (or default) transformation type, and measures specifically describing warpings with Helmert and polynomial transformation types.
+
+The method `analyze.getMeasures()` returns an object with the following measures:
+
+*   About the current transformation type:
+    *   `resourceMaskBboxDiameter`: The diameter of the bounding box of the resource mask.
+    *   `geoMaskBboxDiameter`: The diameter of the bounding box of the geo mask.
+    *   `projectedGeoMaskBboxDiameter`: The diameter of the bounding box of the projected geo mask.
+    *   `destinationRmse`: The root-mean-square error of GCPs in projected geo coordinates.
+    *   `destinationErrors`: for each GCP, the error in projected geo coordinates.
+    *   `resourceErrors`: for each GCP, the error in projected geo coordinates, scaled to resource space.
+    *   `resourceRelativeErrors`: for each GCP, the error in projected resource coordinates, relative to the diameter of the bounding box of the resource mask.
+*   About the Helmert transformation type:
+    *   `destinationHelmertRmse`: The root-mean-square error of GCPs in projected geo coordinates.
+    *   `helmertMeasures`: The Helmert measures, including `translation`, `rotation` and `scale`. See [@allmaps/transform](../../packages/transform/).
+*   About the polynomial transformation type:
+    *   `destinationPolynomial1Rmse`: The root-mean-square error of GCPs in projected geo coordinates.
+    *   `polynomial1Measures`: The polynomial measures, including `translation`, `rotation`, `scales` and `shears`. See [@allmaps/transform](../../packages/transform/).
+
+## Distortions
+
+An analyzer can also compute distortion describing the distortion caused by the warping with the current (or default) transformation type.
+
+The method `analyze.getDistortions()` returns an object with the following measures:
+
+*   About the current transformation type:
+    *   `meanDistortions`: A Map with for each computed distortion measure, the mean distortion over all triangulation points.
 
 ## License
 
@@ -118,7 +184,7 @@ MIT
 
 *   [Analyzer](#analyzer)
     *   [Parameters](#parameters)
-    *   [analyse](#analyse)
+    *   [analyze](#analyze)
         *   [Parameters](#parameters-1)
     *   [getInfo](#getinfo)
         *   [Parameters](#parameters-2)
@@ -136,18 +202,18 @@ This class describes how a georeferenced map is warped using a specific transfor
 
 #### Parameters
 
-*   `georeferencedOrWarpedMap` &#x20;
+*   `map` &#x20;
 *   `options` &#x20;
 
-#### analyse
+#### analyze
 
-Analyse
+Analyzanalye
 
 Applying extra caution: wrapping the getters in a try catch
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis with info, warnings and errors
 
@@ -157,7 +223,7 @@ Get analysis informations
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis items with info
 
@@ -167,7 +233,7 @@ Get analysis warnings
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis items with warning
 
@@ -177,7 +243,7 @@ Get analysis errors
 
 ##### Parameters
 
-*   `options`  Analysis options
+*   `partialOptions`  Analysis options
 
 Returns **any** Analysis items with errors
 
