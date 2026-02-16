@@ -19,10 +19,14 @@
     "deploy": "wrangler deploy",
     "deploy:dev": "wrangler deploy --env dev",
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
+    "lint": "prettier --check src test scripts && eslint src test scripts --ext .js,.ts",
     "lerna-build": "lerna run build --scope @allmaps/tileserver --include-dependencies",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test"
+    "format": "prettier --write src test scripts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "benchmark": "tsx scripts/benchmark.ts",
+    "compare": "tsx scripts/compare-outputs.ts"
   },
   "license": "MIT",
   "devDependencies": {
@@ -31,12 +35,15 @@
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
     "@cloudflare/workers-types": "^4.20240320.1",
     "@types/eslint": "^8.56.0",
+    "@types/node": "catalog:",
+    "@types/pixelmatch": "^5.2.6",
     "@types/upng-js": "^2.1.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
@@ -46,8 +53,10 @@
     "jpeg-js": "^0.4.4",
     "pixelmatch": "^5.3.0",
     "prettier": "^3.6.2",
-    "typescript": "^5.7.0",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:",
     "upng-js": "^2.1.0",
+    "vitest": "catalog:",
     "wrangler": "^4.0.0"
   }
 }

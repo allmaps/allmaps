@@ -79,7 +79,7 @@
     "svelte": "^5.43.2",
     "svelte-check": "^4.3.2",
     "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2",
+    "typescript": "catalog:",
     "typescript-eslint": "^8.44.1",
     "vite": "npm:rolldown-vite@latest",
     "vite-plugin-devtools-json": "^1.0.0",

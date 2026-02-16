@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Atlas of the City of Lynn",
+    "tile": "manifests/23379602e8187445/13/2481/3026.png",
+    "annotation": "manifests/23379602e8187445/annotation.json"
+  },
+  {
+    "name": "British Isles TPS",
+    "tile": "maps/135dfd2d58dc26ec/6/30/19.png",
+    "annotation": "maps/135dfd2d58dc26ec/annotation.json"
+  }
+]

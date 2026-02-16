@@ -19,7 +19,8 @@
     ".": "./dist/index.js",
     "./intarray": "./dist/intarray.js",
     "./canvas": "./dist/canvas.js",
-    "./webgl2": "./dist/webgl2.js"
+    "./webgl2": "./dist/webgl2.js",
+    "./wasm": "./dist/wasm.js"
   },
   "files": [
     "dist"
@@ -53,6 +54,7 @@
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/project": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
@@ -76,7 +78,7 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "vite": "^5.0.3",
     "vite-plugin-dts": "^3.8.3",
     "vite-plugin-glsl": "^1.3.0",

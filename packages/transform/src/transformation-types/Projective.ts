@@ -152,4 +152,27 @@ export class Projective extends BaseTransformation {
 
     return newDestinationPointPartDerY
   }
+
+  getWeights(): { weights: Float64Array; sourcePoints: Float64Array } {
+    if (!this.weightsArrays) {
+      this.solve()
+    }
+
+    if (!this.weightsArrays) {
+      throw new Error('Projective transformation weights not computed')
+    }
+
+    // Projective: 3x3 matrix flattened column-major
+    const flatWeights: number[] = []
+    for (let col = 0; col < 3; col++) {
+      for (let row = 0; row < 3; row++) {
+        flatWeights.push(this.weightsArrays[col][row])
+      }
+    }
+
+    return {
+      weights: new Float64Array(flatWeights),
+      sourcePoints: new Float64Array(0)
+    }
+  }
 }

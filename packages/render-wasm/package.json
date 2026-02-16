@@ -1,0 +1,50 @@
+{
+  "name": "@allmaps/render-wasm",
+  "version": "1.0.0-beta.0",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    }
+  ],
+  "description": "WebAssembly-powered renderer for high-performance image transformations",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "pkg"
+  ],
+  "main": "./pkg/allmaps_render_wasm.js",
+  "types": "./pkg/allmaps_render_wasm.d.ts",
+  "exports": {
+    ".": {
+      "types": "./pkg/allmaps_render_wasm.d.ts",
+      "default": "./pkg/allmaps_render_wasm.js"
+    },
+    "./wasm": {
+      "types": "./pkg/wasm.d.ts",
+      "default": "./pkg/allmaps_render_wasm_bg.wasm"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/render-wasm"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "wasm",
+    "webassembly",
+    "rendering",
+    "georeference"
+  ],
+  "scripts": {
+    "build": "RUSTFLAGS='-C target-feature=+simd128' PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target web --out-dir pkg && cp src/wasm.d.ts pkg/",
+    "build:nodejs": "RUSTFLAGS='-C target-feature=+simd128' PATH=\"$HOME/.cargo/bin:$PATH\" wasm-pack build --target nodejs --out-dir pkg-nodejs",
+    "build:all": "pnpm run build && pnpm run build:nodejs"
+  }
+}

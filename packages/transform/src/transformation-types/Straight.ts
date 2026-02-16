@@ -97,4 +97,24 @@ export class Straight extends BaseTransformation {
 
     return newDestinationPointPartDerY
   }
+
+  getWeights(): { weights: Float64Array; sourcePoints: Float64Array } {
+    if (!this.weightsArrays) {
+      this.solve()
+    }
+
+    if (!this.weightsArrays) {
+      throw new Error('Weights not computed')
+    }
+
+    // Straight: [tx, ty, scale]
+    return {
+      weights: new Float64Array([
+        this.weightsArrays.translation[0],
+        this.weightsArrays.translation[1],
+        this.weightsArrays.scale
+      ]),
+      sourcePoints: new Float64Array(0)
+    }
+  }
 }

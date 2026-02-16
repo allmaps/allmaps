@@ -7,8 +7,11 @@ import type { TransformationType } from '@allmaps/transform'
 export function optionsFromQuery(req: IRequest): TransformationOptions {
   const query = req.query
 
-  let transformationType: TransformationType | undefined = undefined
   const queryTransformationType = query?.['transformation.type']
+
+  // Only override transformation type if explicitly provided in query
+  // Otherwise, let the map use its natural transformation type
+  let transformationType: TransformationType | undefined = undefined
 
   if (
     queryTransformationType === 'thin-plate-spline' ||
@@ -17,9 +20,15 @@ export function optionsFromQuery(req: IRequest): TransformationOptions {
     transformationType = 'thinPlateSpline'
   } else if (queryTransformationType === 'helmert') {
     transformationType = 'helmert'
+  } else if (queryTransformationType === 'polynomial') {
+    transformationType = 'polynomial'
   }
 
-  return {
-    ['transformation.type']: transformationType
+  // Only include transformation.type if explicitly set
+  const options: TransformationOptions = {}
+  if (transformationType !== undefined) {
+    options['transformation.type'] = transformationType
   }
+
+  return options
 }
