@@ -44,6 +44,54 @@ Publish to Cloudflare Workers:
 
     wrangler publish
 
+## Deployment (Cloudflare Pages)
+
+This worker uses **Cloudflare Pages** for automatic deployments, which builds the WASM renderer from Rust source during deployment.
+
+### Configure in Cloudflare Dashboard
+
+1. Go to your Cloudflare Pages project settings
+2. Navigate to **Settings** → **Builds & deployments**
+3. Configure the build settings:
+
+```
+Framework preset:        None
+Build command:          ./build.sh
+Build output directory: dist
+Root directory:         workers/tileserver
+```
+
+4. Set environment variables in **Settings** → **Environment variables**:
+
+```
+NODE_VERSION=24
+```
+
+5. Save and trigger a new deployment
+
+### What Happens During Build
+
+The `build.sh` script automatically:
+- Installs Rust and wasm-pack (cached after first build)
+- Adds wasm32-unknown-unknown target
+- Builds all dependencies including `@allmaps/render-wasm`
+- Compiles the WASM renderer from Rust source
+- Builds the tileserver worker
+
+**Build times:**
+- First build: ~3-5 minutes (installs Rust toolchain)
+- Subsequent builds: ~1-2 minutes (Rust is cached)
+
+### Local Build Testing
+
+To test the full build process locally:
+
+```bash
+./build.sh
+```
+
+This mimics what Cloudflare Pages does during deployment.
+
 ## API
 
 ### Supplying a Georeference Annotation
