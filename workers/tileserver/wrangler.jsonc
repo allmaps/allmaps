@@ -19,6 +19,7 @@
     }
   },
   "vars": {
+    "NODE_VERSION": "24",
     "USE_CACHE": true,
     "API_BASE_URL": "https://api.allmaps.org",
     "TILE_SERVER_BASE_URL": "https://allmaps.xyz",
@@ -28,6 +29,7 @@
     "dev": {
       "name": "tileserver-develop",
       "vars": {
+        "NODE_VERSION": "24",
         "USE_CACHE": true,
         "API_BASE_URL": "https://api.allmaps.org",
         "TILE_SERVER_BASE_URL": "https://dev.allmaps.xyz",
