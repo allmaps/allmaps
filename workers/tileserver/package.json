@@ -21,7 +21,6 @@
     "deploy:dev": "wrangler deploy --env dev",
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
     "lint": "prettier --check src test scripts && eslint src test scripts --ext .js,.ts",
-    "lerna-build": "lerna run build --scope @allmaps/tileserver --include-dependencies",
     "types": "tsc --noEmit",
     "format": "prettier --write src test scripts",
     "test": "vitest run",
