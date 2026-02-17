@@ -1,4 +1,3 @@
-import flowbitePlugin from 'flowbite/plugin'
 import { theme } from '@allmaps/tailwind'
 
 import type { Config } from 'tailwindcss'
