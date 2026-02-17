@@ -1,20 +1,11 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
-    <meta name="viewport" content="width=device-width, user-scalable=no" />
-
-    <title>Allmaps Viewer</title>
-    <!-- <meta name="description" content=""> -->
-    <meta property="og:url" content="https://viewer.allmaps.org" />
-    <meta property="og:title" content="Allmaps Viewer" />
-    <!-- <meta property="og:description" content="" /> -->
-    <!-- 1200x630 pixels -->
-    <!-- <meta property="og:image" content="https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo.png" /> -->
-    %sveltekit.head%
-  </head>
-  <body>
-    <div style="display: contents">%sveltekit.body%</div>
-  </body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
 </html>
