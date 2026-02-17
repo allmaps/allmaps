@@ -1,0 +1,133 @@
+{
+  "type": "Feature",
+  "properties": {
+    "@context": "https://schemas.allmaps.org/map/2/context.json",
+    "id": "https://annotations.allmaps.org/maps/c4e43e93c588312c",
+    "type": "GeoreferencedMap",
+    "created": "2026-01-28T22:15:00.864Z",
+    "modified": "2026-01-28T22:15:00.864Z",
+    "resource": {
+      "id": "https://rosetta.slv.vic.gov.au/iiif/2/IE15489245:FL21306640.jpg",
+      "uri": "https://rosetta.slv.vic.gov.au/iiif/2/IE15489245:FL21306640.jpg",
+      "type": "ImageService2",
+      "width": 7000,
+      "height": 2319,
+      "partOf": [
+        {
+          "type": "Canvas",
+          "id": "https://rosetta.slv.vic.gov.au/delivery/iiif/presentation/2.1/IE15489245/canvas/FL21306640",
+          "label": {
+            "none": ["Map 1"]
+          },
+          "partOf": [
+            {
+              "type": "Manifest",
+              "id": "https://rosetta.slv.vic.gov.au/delivery/iiif/presentation/2.1/IE15489245/manifest",
+              "label": {
+                "none": [
+                  "V.R. Melbourne yard proposed alterations & additions to trackwork etc., consequent on the removal of North Melbourne Loco Depot to South Kensington."
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "gcps": [
+      {
+        "id": "4cfc84f1089cc0d3",
+        "index": 0.6173296799298263,
+        "resource": [2308, 2223],
+        "geo": [144.9419991751252, -37.80010756746368]
+      },
+      {
+        "id": "673f6d578af4367d",
+        "index": 2.8079002405035496,
+        "resource": [1874, 1900],
+        "geo": [144.94358086523312, -37.80238012332012]
+      },
+      {
+        "id": "98f199f998084043",
+        "index": 3.5435299972423326,
+        "resource": [1692, 1294],
+        "geo": [144.9430325432417, -37.8054531733417]
+      },
+      {
+        "id": "a1c6d068d6951117",
+        "index": 1.5912228302500275,
+        "resource": [2185, 1808],
+        "geo": [144.94162390602196, -37.802157556352455]
+      },
+      {
+        "id": "ccaf46ff4b0e3974",
+        "index": 4.886061631856632,
+        "resource": [2006, 1195],
+        "geo": [144.94107784642102, -37.805147793007926]
+      },
+      {
+        "id": "4e5ea0b0f0d2bcf5",
+        "index": 5.363530390659175,
+        "resource": [6198, 65],
+        "geo": [144.91487182347208, -37.801554092486015]
+      }
+    ],
+    "resourceMask": [
+      [49, 16],
+      [49, 187],
+      [1125, 669],
+      [1530, 2238],
+      [3184, 2214],
+      [4329, 1870],
+      [6198, 1157],
+      [6242, 39],
+      [5824, 41],
+      [3050, 779],
+      [2847, 41]
+    ],
+    "transformation": {
+      "type": "polynomial",
+      "options": {
+        "order": 1
+      }
+    },
+    "_allmaps": {
+      "id": "https://annotations.allmaps.org/maps/c4e43e93c588312c",
+      "version": "https://annotations.allmaps.org/maps/c4e43e93c588312c@1902a36ddd4b7d5e",
+      "image": {
+        "id": "https://annotations.allmaps.org/images/0bdead6ca2338e9b",
+        "version": "https://annotations.allmaps.org/images/0bdead6ca2338e9b@ca13e169bc699fa6",
+        "canvases": [
+          {
+            "id": "https://annotations.allmaps.org/canvases/dad330db357b08d6",
+            "manifests": [
+              {
+                "id": "https://annotations.allmaps.org/manifests/8fa1d851b7f7d1e0"
+              }
+            ]
+          }
+        ]
+      },
+      "scale": 1.864962,
+      "area": 2474668.48
+    }
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [144.948927038, -37.814325003],
+        [144.949362948, -37.813580422],
+        [144.944610878, -37.809283797],
+        [144.946359417, -37.801623854],
+        [144.93710474, -37.798349458],
+        [144.929863519, -37.797508494],
+        [144.917657411, -37.796795515],
+        [144.914562858, -37.801574677],
+        [144.916891343, -37.802419866],
+        [144.93419148, -37.804872623],
+        [144.933438527, -37.808501059],
+        [144.948927038, -37.814325003]
+      ]
+    ]
+  }
+}

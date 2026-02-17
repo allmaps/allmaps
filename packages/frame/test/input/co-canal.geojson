@@ -1,0 +1,209 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/7b478a66b60e91b3",
+        "type": "GeoreferencedMap",
+        "created": "2025-02-14T09:28:46.855Z",
+        "modified": "2025-02-14T09:28:46.855Z",
+        "resource": {
+          "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+          "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+          "type": "ImageService2",
+          "width": 5212,
+          "height": 7072,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+              "label": {
+                "none": ["Page 1"]
+              },
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://www.loc.gov/item/88695674/manifest.json",
+                  "label": {
+                    "none": [
+                      "Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "3b10ebcc0011c9f3",
+            "index": 0,
+            "resource": [1845, 6663],
+            "geo": [-77.0594799, 38.8902923]
+          },
+          {
+            "id": "d31de5ca564b7398",
+            "index": 1,
+            "resource": [2097, 4799],
+            "geo": [-77.1574461, 38.9909944]
+          },
+          {
+            "id": "da658b37af6320b2",
+            "index": 2,
+            "resource": [1714, 3801],
+            "geo": [-77.2411204, 39.020656]
+          }
+        ],
+        "resourceMask": [
+          [945, 3624],
+          [947, 6728],
+          [2385, 6744],
+          [2397, 3619],
+          [1991, 3623]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/7b478a66b60e91b3",
+          "version": "https://annotations.allmaps.org/maps/7b478a66b60e91b3@d89a7a9518f777f7",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/7f2494dd1ad9ed7a",
+            "version": "https://annotations.allmaps.org/images/7f2494dd1ad9ed7a@f9301dc207e73954",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/7f2494dd1ad9ed7a",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/718f750d5408814f"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 0.134809,
+          "area": 247537039.9
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.298223904, 38.99308434],
+            [-77.109668954, 38.845137569],
+            [-77.022009293, 38.911718124],
+            [-77.210995113, 39.061322098],
+            [-77.235227578, 39.042117749],
+            [-77.298223904, 38.99308434]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/d1e107975cac64ec",
+        "type": "GeoreferencedMap",
+        "created": "2025-02-14T09:28:46.855Z",
+        "modified": "2025-02-14T09:28:46.855Z",
+        "resource": {
+          "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+          "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+          "type": "ImageService2",
+          "width": 5212,
+          "height": 7072,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd384:g3842:g3842c:ct008615",
+              "label": {
+                "none": ["Page 1"]
+              },
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://www.loc.gov/item/88695674/manifest.json",
+                  "label": {
+                    "none": [
+                      "Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "4f0c45548f89e555",
+            "index": 0,
+            "resource": [3779, 4107],
+            "geo": [-77.7284148, 39.32293]
+          },
+          {
+            "id": "b44b3341e4005823",
+            "index": 1,
+            "resource": [4496, 4795],
+            "geo": [-77.4326706, 39.4060591]
+          },
+          {
+            "id": "cd592bf29a06186b",
+            "index": 2,
+            "resource": [3113, 6933],
+            "geo": [-77.0225611, 38.8574708]
+          }
+        ],
+        "resourceMask": [
+          [2697, 501],
+          [2683, 6946],
+          [5226, 6946],
+          [5228, 492]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/d1e107975cac64ec",
+          "version": "https://annotations.allmaps.org/maps/d1e107975cac64ec@b5b7598ae3113a49",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/7f2494dd1ad9ed7a",
+            "version": "https://annotations.allmaps.org/images/7f2494dd1ad9ed7a@f9301dc207e73954",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/7f2494dd1ad9ed7a",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/718f750d5408814f"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 0.036377,
+          "area": 12364615984.39
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-78.901351248, 39.485187801],
+            [-77.079484307, 38.759929258],
+            [-76.721086804, 39.32817122],
+            [-78.547191831, 40.051756727],
+            [-78.901351248, 39.485187801]
+          ]
+        ]
+      }
+    }
+  ]
+}

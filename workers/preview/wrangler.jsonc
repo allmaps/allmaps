@@ -1,0 +1,41 @@
+{
+  "name": "preview",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-05-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "public", "binding": "ASSETS" },
+  "rules": [
+    {
+      "type": "CompiledWasm",
+      "globs": ["**/*.wasm"],
+      "fallthrough": true
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": false,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    }
+  },
+  "vars": {
+    "NODE_VERSION": "24",
+    "USE_CACHE": true,
+    "API_BASE_URL": "https://api.allmaps.org",
+    "BROWSER_CACHE_HOURS": 720,
+    "CLOUDFLARE_CACHE_HOURS": 24
+  },
+  "env": {
+    "dev": {
+      "name": "preview-develop",
+      "vars": {
+        "NODE_VERSION": "24",
+        "USE_CACHE": true,
+        "API_BASE_URL": "https://api.allmaps.org",
+        "BROWSER_CACHE_HOURS": 1,
+        "CLOUDFLARE_CACHE_HOURS": 1
+      }
+    }
+  }
+}
