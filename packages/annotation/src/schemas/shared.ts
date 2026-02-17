@@ -54,6 +54,28 @@ export const PartOfSchema = z
   .union([PartOfItemSchema.array(), PartOfItemSchema])
   .transform(ensureArray)
 
+export const HomepageItemSchema = z.object({
+  id: z.string().url(),
+  type: z.string().optional(),
+  label: LanguageValueSchema.optional(),
+  format: z.string().optional(),
+  language: z.union([z.string(), z.array(z.string())]).optional()
+})
+
+export const HomepageSchema = z
+  .union([HomepageItemSchema.array(), HomepageItemSchema])
+  .transform(ensureArray)
+
+export const ProviderItemSchema = z.object({
+  id: z.string().url().optional(),
+  label: LanguageValueSchema.optional(),
+  homepage: HomepageSchema.optional()
+})
+
+export const ProviderSchema = z
+  .union([ProviderItemSchema.array(), ProviderItemSchema])
+  .transform(ensureArray)
+
 const ValidTransformationSchema = z.object({
   type: z.enum([
     'helmert',

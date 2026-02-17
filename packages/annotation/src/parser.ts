@@ -29,7 +29,8 @@ function parseResource(annotation: AnnotationAllVersions): Resource {
     id: parseImageId(annotation),
     ...parseImageDimensions(annotation),
     type: parseResourceType(annotation),
-    partOf: parsePartOf(annotation)
+    partOf: parsePartOf(annotation),
+    provider: parseProvider(annotation)
   }
 }
 
@@ -57,6 +58,12 @@ function parseResourceType(annotation: AnnotationAllVersions): ResourceType {
 function parsePartOf(annotation: AnnotationAllVersions): PartOf {
   if (isAnnotation1(annotation)) {
     return annotation.target.source.partOf
+  }
+}
+
+function parseProvider(annotation: AnnotationAllVersions) {
+  if (isAnnotation1(annotation)) {
+    return annotation.target.source.provider
   }
 }
 
