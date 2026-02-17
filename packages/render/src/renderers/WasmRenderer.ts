@@ -28,6 +28,12 @@ interface WasmModule {
     width: number,
     height: number
   ): Uint8Array
+  encode_rgba_to_jpeg(
+    pixels: Uint8Array,
+    width: number,
+    height: number,
+    quality: number
+  ): Uint8Array
   render_warped_tile_rgba(
     jpeg_tiles: Uint8Array,
     tile_offsets: Uint32Array,
@@ -100,9 +106,28 @@ interface WasmModule {
     output_width: number,
     output_height: number
   ): Uint8Array
+  render_warped_tile_jpeg(
+    jpeg_tiles: Uint8Array,
+    tile_offsets: Uint32Array,
+    tile_widths: Uint32Array,
+    tile_heights: Uint32Array,
+    tile_columns: Float64Array,
+    tile_rows: Float64Array,
+    tile_scale_factors: Float64Array,
+    tile_original_widths: Float64Array,
+    tile_original_heights: Float64Array,
+    transform_type: string,
+    transform_args: Float64Array,
+    source_points: Float64Array,
+    mask_polygon: Float64Array,
+    canvas_to_geo: Float64Array,
+    output_width: number,
+    output_height: number,
+    quality: number
+  ): Uint8Array
 }
 
-export type OutputFormat = 'png' | 'webp'
+export type OutputFormat = 'png' | 'webp' | 'jpeg'
 
 /**
  * Extract transformation weights in flat format for WASM
@@ -216,6 +241,8 @@ export class WasmRenderer
     // Encode output based on format
     if (this.outputFormat === 'webp') {
       return this.encodeWebP(outputPixels, outputWidth, outputHeight)
+    } else if (this.outputFormat === 'jpeg') {
+      return this.encodeJPEG(outputPixels, outputWidth, outputHeight)
     } else {
       return this.encodePNG(outputPixels, outputWidth, outputHeight)
     }
@@ -334,6 +361,23 @@ export class WasmRenderer
       new Uint8Array(pixels),
       width,
       height
+    )
+  }
+
+  /**
+   * Encode RGBA pixels to JPEG using WASM
+   */
+  private encodeJPEG(
+    pixels: Uint8ClampedArray,
+    width: number,
+    height: number,
+    quality: number = 85
+  ): Uint8Array {
+    return this.wasmModule.encode_rgba_to_jpeg(
+      new Uint8Array(pixels),
+      width,
+      height,
+      quality
     )
   }
 }
