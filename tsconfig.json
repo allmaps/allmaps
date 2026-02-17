@@ -4,6 +4,7 @@
     { "path": "./packages/analyze" },
     { "path": "./packages/annotation" },
     { "path": "./packages/attach" },
+    { "path": "./packages/background-color" },
     { "path": "./packages/basemap" },
     { "path": "./packages/bearing" },
     { "path": "./packages/components" },
