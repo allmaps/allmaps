@@ -1,6 +1,8 @@
 import { throttle } from 'lodash-es'
 import { wrap as comlinkWrap } from 'comlink'
 
+// TODO: convert colors to fractional rgb
+// when setting options, not every render call
 import {
   hexToFractionalOpaqueRgba,
   hexToFractionalRgb,
