@@ -122,7 +122,7 @@ export function createWebGL2WarpedMapFactory(
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    listOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
   ) =>
     new WebGL2WarpedMap(
@@ -203,10 +203,15 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     mapProgram: WebGLProgram,
     linesProgram: WebGLProgram,
     pointsProgram: WebGLProgram,
-    listOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
   ) {
-    super(mapId, georeferencedMap, listOptions, mapOptions)
+    super(
+      mapId,
+      georeferencedMap,
+      listOptions as Partial<WarpedMapListOptions<TriangulatedWarpedMap>>,
+      mapOptions
+    )
 
     this.cachedTilesByTileKey = new Map()
     this.cachedTilesByTileUrl = new Map()

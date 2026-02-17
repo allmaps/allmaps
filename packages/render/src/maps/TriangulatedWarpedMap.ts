@@ -38,7 +38,7 @@ export function createTriangulatedWarpedMapFactory() {
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    listOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions<TriangulatedWarpedMap>>,
     mapOptions?: Partial<WarpedMapOptions>
   ) =>
     new TriangulatedWarpedMap(mapId, georeferencedMap, listOptions, mapOptions)
@@ -119,10 +119,15 @@ export class TriangulatedWarpedMap extends WarpedMap {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    listOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions<TriangulatedWarpedMap>>,
     mapOptions?: Partial<WarpedMapOptions>
   ) {
-    super(mapId, georeferencedMap, listOptions, mapOptions)
+    super(
+      mapId,
+      georeferencedMap,
+      listOptions as Partial<WarpedMapListOptions<WarpedMap>>,
+      mapOptions
+    )
 
     this.resourceTriangulationCache = new Map()
     this.projectedGcpTriangulationCache = new Map()

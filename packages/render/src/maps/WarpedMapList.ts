@@ -8,7 +8,7 @@ import { proj4, webMercatorProjection } from '@allmaps/project'
 import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
-import { WarpedMap } from './WarpedMap.js'
+import { createWarpedMapFactory, WarpedMap } from './WarpedMap.js'
 import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 import {
@@ -29,28 +29,11 @@ import type {
   ProjectionOptions,
   SelectionOptions,
   AnimationOptions,
-  WarpedMapFactory,
-  WarpedMapListOptions
+  WarpedMapListOptions,
+  WarpedMapFactory
 } from '../shared/types.js'
 
 const defaultSelectionOptions: SelectionOptions = {}
-
-const DEFAULT_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions = {
-  createRTree: true,
-  rtreeUpdatedOptions: [
-    'gcps',
-    'resourceMask',
-    'transformationType',
-    'internalProjection',
-    'projection'
-  ],
-  animatedOptions: [
-    'transformationType',
-    'internalProjection',
-    'distortionMeasure'
-  ],
-  projection: webMercatorProjection
-}
 
 /**
  * An ordered list of WarpedMaps. This class contains an optional RTree
@@ -58,11 +41,11 @@ const DEFAULT_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions = {
  * @template W - The type of WarpedMap objects in this list
  */
 export class WarpedMapList<W extends WarpedMap> extends EventTarget {
-  warpedMapFactory: WarpedMapFactory<W>
-
   /**
    * Maps in this list, indexed by their ID
    */
+  DEFAULT_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions<W>
+
   warpedMapsById: Map<string, W>
   zIndices: Map<string, number>
 
@@ -70,7 +53,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   rtree?: RTree
 
-  options: WarpedMapListOptions
+  options: WarpedMapListOptions<W>
 
   /**
    * Creates an instance of a WarpedMapList
@@ -79,22 +62,35 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param warpedMapFactory - Factory function for creating WarpedMap objects
    * @param options - Options of this list, which will be set on newly added maps as their list options
    */
-  constructor(
-    warpedMapFactory: WarpedMapFactory<W>,
-    options?: Partial<WarpedMapListOptions>
-  ) {
+  constructor(options?: Partial<WarpedMapListOptions<W>>) {
     super()
+
+    this.DEFAULT_WARPED_MAP_LIST_OPTIONS = {
+      createRTree: true,
+      rtreeUpdatedOptions: [
+        'gcps',
+        'resourceMask',
+        'transformationType',
+        'internalProjection',
+        'projection'
+      ],
+      animatedOptions: [
+        'transformationType',
+        'internalProjection',
+        'distortionMeasure'
+      ],
+      projection: webMercatorProjection,
+      warpedMapFactory: createWarpedMapFactory<W>()
+    }
 
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
     this.imagesById = new Map()
 
-    this.warpedMapFactory = warpedMapFactory
-
     this.options = mergeOptions(
-      DEFAULT_WARPED_MAP_LIST_OPTIONS,
+      this.DEFAULT_WARPED_MAP_LIST_OPTIONS,
       options
-    ) as WarpedMapListOptions
+    ) as WarpedMapListOptions<W>
 
     if (this.options.createRTree) {
       this.rtree = new RTree()
@@ -206,6 +202,25 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
     )
     return results
+  }
+
+  /**
+   * Set the warpedMapFactory option
+   *
+   * This updates the maps in this list using a factory.
+   *
+   * This function is used when creating a WarpedMapList from scratch
+   * and later including it in a specific renderer (e.g. a WebGL2Renderer)
+   * which has a specific warpedMapFactory (e.g. including the WebGL context)
+   * which could not be applied in the initial WarpedMapList.
+   * This function recreates the WarpedMaps using the factory.
+   *
+   * @param warpedMapFactory
+   * @returns this
+   */
+  setWarpedMapFactory(warpedMapFactory: WarpedMapFactory<W>) {
+    this.options.warpedMapFactory = warpedMapFactory
+    return this.updateWarpedMapsUsingFactoryInternal(warpedMapFactory)
   }
 
   /**
@@ -392,10 +407,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the default options of the list
    */
-  getDefaultOptions(): WarpedMapListOptions & GetWarpedMapOptions<W> {
+  getDefaultOptions(): WarpedMapListOptions<W> & GetWarpedMapOptions<W> {
     // Could we get default options from abstract type <W> instead of WebGL2WarpedMap?
     return mergeOptions(
-      DEFAULT_WARPED_MAP_LIST_OPTIONS,
+      this.DEFAULT_WARPED_MAP_LIST_OPTIONS,
       WebGL2WarpedMap.getDefaultOptions() as GetWarpedMapOptions<W>
     )
   }
@@ -417,7 +432,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the options of this list
    */
-  getOptions(): Partial<WarpedMapListOptions> {
+  getOptions(): Partial<WarpedMapListOptions<W>> {
     return this.options
   }
 
@@ -455,7 +470,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setOptions(
-    options?: Partial<WarpedMapListOptions>,
+    options?: Partial<WarpedMapListOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.options = mergeOptions(this.options, options)
@@ -472,13 +487,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    */
   setMapsOptions(
     mapIds: string[],
-    mapOptions?: Partial<WarpedMapListOptions>,
-    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptions?: Partial<WarpedMapListOptions<W>>,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     const optionsByMapId = new Map<
       string,
-      Partial<WarpedMapListOptions> | undefined
+      Partial<WarpedMapListOptions<W>> | undefined
     >()
     for (const mapId of mapIds) {
       optionsByMapId.set(mapId, mapOptions)
@@ -502,8 +517,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setMapsOptionsByMapId(
-    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions>>,
-    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions<W>>>,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.internalSetMapsOptionsByMapId(
@@ -529,9 +544,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       listOptionKeys = Object.keys(this.getDefaultOptions())
     }
     this.setOptions(
-      optionKeysToUndefinedOptions(
-        listOptionKeys
-      ) as Partial<WarpedMapListOptions>,
+      optionKeysToUndefinedOptions(listOptionKeys) as Partial<
+        WarpedMapListOptions<W>
+      >,
       animationOptions
     )
   }
@@ -562,12 +577,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
     this.setMapsOptions(
       mapIds,
-      optionKeysToUndefinedOptions(
-        mapOptionKeys
-      ) as Partial<WarpedMapListOptions>,
-      optionKeysToUndefinedOptions(
-        listOptionKeys
-      ) as Partial<WarpedMapListOptions>,
+      optionKeysToUndefinedOptions(mapOptionKeys) as Partial<
+        WarpedMapListOptions<W>
+      >,
+      optionKeysToUndefinedOptions(listOptionKeys) as Partial<
+        WarpedMapListOptions<W>
+      >,
       animationOptions
     )
   }
@@ -602,11 +617,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.setMapsOptionsByMapId(
       optionKeysByMapIdToUndefinedOptionsByMapId(mapOptionkeysByMapId) as Map<
         string,
-        Partial<WarpedMapListOptions>
+        Partial<WarpedMapListOptions<W>>
       >,
-      optionKeysToUndefinedOptions(
-        listOptionKeys
-      ) as Partial<WarpedMapListOptions>,
+      optionKeysToUndefinedOptions(listOptionKeys) as Partial<
+        WarpedMapListOptions<W>
+      >,
       animationOptions
     )
   }
@@ -719,7 +734,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): Promise<string> {
     const mapId = await this.getOrComputeMapId(georeferencedMap)
 
-    const warpedMap = this.warpedMapFactory(
+    const warpedMap = this.options.warpedMapFactory(
       mapId,
       georeferencedMap,
       this.options,
@@ -734,6 +749,29 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, { mapIds: [mapId] })
     )
     return mapId
+  }
+
+  private updateWarpedMapsUsingFactoryInternal(
+    warpedMapFactory: WarpedMapFactory<W>
+  ) {
+    for (const warpedMap of this.warpedMapsById.values()) {
+      const updatedWarpedMap = warpedMapFactory(
+        warpedMap.mapId,
+        warpedMap.georeferencedMap,
+        this.options,
+        warpedMap.mapOptions as Partial<GetWarpedMapOptions<W>>
+      )
+
+      this.warpedMapsById.set(warpedMap.mapId, updatedWarpedMap)
+
+      // Note: zIndices don't have to be updated since they only use mapId
+      // Note: RTree doesn't have to be updated since they only use mapId and geoMask
+
+      this.removeEventListenersFromWarpedMap(warpedMap)
+      this.addEventListenersToWarpedMap(updatedWarpedMap)
+    }
+
+    return this
   }
 
   private async removeGeoreferencedMapInternal(
@@ -808,8 +846,11 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * Internal set map options
    */
   private internalSetMapsOptionsByMapId(
-    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions> | undefined>,
-    listOptions?: Partial<WarpedMapListOptions>,
+    mapOptionsByMapId?: Map<
+      string,
+      Partial<WarpedMapListOptions<W>> | undefined
+    >,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     // If there are no maps yet, return

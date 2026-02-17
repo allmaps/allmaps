@@ -2,7 +2,6 @@ import { doBboxesIntersect } from '@allmaps/stdlib'
 
 import { BaseRenderer } from './BaseRenderer.js'
 import { Viewport } from '../viewport/Viewport.js'
-import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import {
   CacheableRawJpegTile,
   type RawJpegData
@@ -159,11 +158,7 @@ export class WasmRenderer
       return wasmModule.decode_jpeg_test(new Uint8Array(jpegBytes))
     }
 
-    super(
-      createWarpedMapFactory(),
-      CacheableRawJpegTile.createFactory(decodeJpegForDimensions),
-      options
-    )
+    super(CacheableRawJpegTile.createFactory(decodeJpegForDimensions), options)
     this.wasmModule = wasmModule
     this.outputFormat = options?.outputFormat || 'png'
 

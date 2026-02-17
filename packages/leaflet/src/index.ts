@@ -3,7 +3,14 @@ export {
   type LeafletWarpedMapLayerOptions
 } from './WarpedMapLayer.js'
 
-export { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
+export {
+  WarpedMapEvent,
+  WarpedMapEventType,
+  WarpedMapList,
+  WarpedMap,
+  TriangulatedWarpedMap,
+  WebGL2WarpedMap
+} from '@allmaps/render'
 
 import {
   WarpedMapLayer,

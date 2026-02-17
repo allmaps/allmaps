@@ -1,5 +1,5 @@
 import { json } from 'itty-router'
-import { WarpedMapList, createWarpedMapFactory } from '@allmaps/render'
+import { WarpedMapList } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
 
@@ -21,7 +21,7 @@ export async function generateTileJsonResponse(
     transformationType = options['transformation.type']
   }
 
-  const warpedMapList = new WarpedMapList(createWarpedMapFactory(), {
+  const warpedMapList = new WarpedMapList({
     fetchFn: cachedFetch as FetchFn,
     createRTree: false,
     transformationType

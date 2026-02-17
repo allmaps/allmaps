@@ -47,6 +47,8 @@ import type {
 import type {
   AnimationOptions,
   AnimationOptionsInternal,
+  GetWarpedMapOptions,
+  WarpedMapFactory,
   WarpedMapListOptions,
   WarpedMapOptions
 } from '../shared/types.js'
@@ -79,13 +81,19 @@ const DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
   ...DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS
 }
 
-export function createWarpedMapFactory() {
-  return (
+export function createWarpedMapFactory<W extends WarpedMap>() {
+  return ((
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    listOptions?: Partial<WarpedMapListOptions>,
-    mapOptions?: Partial<WarpedMapOptions>
-  ) => new WarpedMap(mapId, georeferencedMap, listOptions, mapOptions)
+    listOptions?: Partial<WarpedMapListOptions<W>>,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) =>
+    new WarpedMap(
+      mapId,
+      georeferencedMap,
+      listOptions as Partial<WarpedMapListOptions<WarpedMap>>,
+      mapOptions as Partial<WarpedMapOptions>
+    )) as WarpedMapFactory<W>
 }
 
 /**
@@ -163,7 +171,7 @@ export class WarpedMap extends EventTarget {
 
   defaultOptions!: WarpedMapOptions
   georeferencedMapOptions: Partial<WarpedMapOptions>
-  listOptions: Partial<WarpedMapListOptions>
+  listOptions: Partial<WarpedMapListOptions<WarpedMap>>
   mapOptions: Partial<WarpedMapOptions>
   options!: WarpedMapOptions
 
@@ -260,7 +268,7 @@ export class WarpedMap extends EventTarget {
   constructor(
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    listOptions: Partial<WarpedMapListOptions> = {},
+    listOptions: Partial<WarpedMapListOptions<WarpedMap>> = {},
     mapOptions: Partial<WarpedMapOptions> = {}
   ) {
     super()

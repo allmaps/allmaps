@@ -16,6 +16,7 @@ import type { Projection } from '@allmaps/project'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { CacheableTile } from '../tilecache/CacheableTile.js'
 import type { TileCache } from '../tilecache/TileCache.js'
+import type { WarpedMapList } from '../maps/WarpedMapList.js'
 import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type { WebGL2WarpedMap } from '../webgl2.js'
 import type { TriangulatedWarpedMap } from '../maps/TriangulatedWarpedMap.js'
@@ -117,21 +118,27 @@ export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
       ? WarpedMapOptions
       : never
 
-export type SpecificWarpedMapListOptions = {
+export type SpecificWarpedMapListOptions<W extends WarpedMap> = {
   createRTree: boolean
   rtreeUpdatedOptions: string[]
   animatedOptions: string[]
+  warpedMapFactory: WarpedMapFactory<W>
 }
-export type WarpedMapListOptions = SpecificWarpedMapListOptions &
-  Partial<WebGL2WarpedMapOptions>
+export type WarpedMapListOptions<W extends WarpedMap> =
+  SpecificWarpedMapListOptions<W> & Partial<WebGL2WarpedMapOptions>
 
-export type SpecificBaseRenderOptions = object
-export type BaseRenderOptions = SpecificBaseRenderOptions & WarpedMapListOptions
-export type SpecificWebGL2RenderOptions = object
+export type SpecificBaseRenderOptions<W extends WarpedMap> = {
+  warpedMapList?: WarpedMapList<W>
+}
+export type BaseRenderOptions<W extends WarpedMap> =
+  SpecificBaseRenderOptions<W> & Partial<WarpedMapListOptions<W>>
+export type SpecificWebGL2RenderOptions = {
+  warpedMapFactory: WarpedMapFactory<WebGL2WarpedMap>
+}
 export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
-  BaseRenderOptions
-export type CanvasRenderOptions = BaseRenderOptions
-export type IntArrayRenderOptions = BaseRenderOptions
+  BaseRenderOptions<WebGL2WarpedMap>
+export type CanvasRenderOptions = BaseRenderOptions<WarpedMap>
+export type IntArrayRenderOptions = BaseRenderOptions<WarpedMap>
 
 export type TileCacheOptions<D> = {
   fetchFn: FetchFn
@@ -159,11 +166,11 @@ export type GetImageDataValue<D> = (data: D, index: number) => number
 
 export type GetImageDataSize<D> = (data: D) => Size
 
-export type WarpedMapFactory<W> = (
+export type WarpedMapFactory<W extends WarpedMap> = (
   mapId: string,
   georeferencedMap: GeoreferencedMap,
-  listOptions?: Partial<WarpedMapListOptions>,
-  mapOptions?: Partial<WarpedMapOptions>
+  listOptions?: Partial<WarpedMapListOptions<W>>,
+  mapOptions?: Partial<GetWarpedMapOptions<W>>
 ) => W
 
 export type CacheableTileFactory<D> = (

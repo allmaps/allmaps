@@ -29,7 +29,6 @@ import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type {
   CacheableTileFactory,
-  WarpedMapFactory,
   BaseRenderOptions,
   MapPruneInfo,
   GetWarpedMapOptions,
@@ -38,9 +37,6 @@ import type {
   SpritesInfo,
   Sprite
 } from '../shared/types.js'
-
-// TODO: move defaults for tunable options here
-const DEFAULT_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions = {}
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -68,6 +64,8 @@ const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
  * Abstract base class for renderers
  */
 export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
+  DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions<W>
+
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
   spritesTileCache: TileCache<D>
@@ -79,18 +77,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
-  options: Partial<BaseRenderOptions>
+  options: BaseRenderOptions<W>
 
   constructor(
-    warpedMapFactory: WarpedMapFactory<W>,
     cacheableTileFactory: CacheableTileFactory<D>,
-    options?: Partial<BaseRenderOptions>
+    options?: Partial<BaseRenderOptions<W>>
   ) {
     super()
 
-    this.options = mergeOptions(DEFAULT_BASE_RENDER_OPTIONS, options)
+    // TODO: move defaults for tunable options here
+    this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {}
 
-    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
+    this.options = mergeOptions(
+      this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
+      options
+    )
+
+    this.warpedMapList = this.options.warpedMapList
+      ? this.getWarpedMapListFromOptions()
+      : new WarpedMapList(options)
     this.tileCache = new TileCache(cacheableTileFactory, options)
     this.spritesTileCache = new TileCache(
       cacheableTileFactory,
@@ -182,9 +187,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the default options of the renderer and list
    */
-  getDefaultOptions(): BaseRenderOptions & GetWarpedMapOptions<W> {
+  getDefaultOptions(): BaseRenderOptions<W> & GetWarpedMapOptions<W> {
     return mergeOptions(
-      DEFAULT_BASE_RENDER_OPTIONS,
+      this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
       this.warpedMapList.getDefaultOptions()
     )
   }
@@ -203,7 +208,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the render and list options
    */
-  getOptions(): Partial<BaseRenderOptions> {
+  getOptions(): Partial<BaseRenderOptions<W>> {
     return mergePartialOptions(this.options, this.warpedMapList.getOptions())
   }
 
@@ -235,7 +240,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setOptions(
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.options = mergeOptions(this.options, renderAndListOptions)
@@ -253,12 +258,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    */
   setMapsOptions(
     mapIds: string[],
-    mapOptions?: Partial<BaseRenderOptions>,
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    mapOptions?: Partial<BaseRenderOptions<W>>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     if (renderAndListOptions) {
-      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.options = mergeOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptions(
@@ -277,12 +282,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setMapsOptionsByMapId(
-    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions>>,
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions<W>>>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     if (renderAndListOptions) {
-      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.options = mergeOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptionsByMapId(
@@ -353,6 +358,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       listOptionKeys,
       animationOptions
     )
+  }
+
+  protected getWarpedMapListFromOptions(): WarpedMapList<W> {
+    if (!this.options.warpedMapList) {
+      throw new Error('No WarpedMapList')
+    }
+    return this.options.warpedMapList
   }
 
   protected loadMissingImagesInViewport(): Promise<void>[] {

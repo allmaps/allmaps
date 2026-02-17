@@ -12,6 +12,7 @@ import {
 import { supportedDistortionMeasures } from '@allmaps/transform'
 
 import { BaseRenderer } from './BaseRenderer.js'
+import { WarpedMapList } from '../maps/WarpedMapList.js'
 import {
   WebGL2WarpedMap,
   createWebGL2WarpedMapFactory
@@ -39,6 +40,7 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 // Using the inline query parameter solves this.
 import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
 import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
+import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -51,7 +53,6 @@ import type {
   SpecificWebGL2RenderOptions,
   WebGL2RenderOptions
 } from '../shared/types.js'
-import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
 const THROTTLE_PREPARE_RENDER_OPTIONS = {
@@ -69,9 +70,6 @@ const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 const ANIMATION_DURATION = 750
 
-export const DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions =
-  {}
-
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
  */
@@ -82,9 +80,11 @@ export class WebGL2Renderer
   #worker: Worker
   #spritesWorker: Worker
 
+  DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions
+
   gl: WebGL2RenderingContext
 
-  declare options: Partial<WebGL2RenderOptions>
+  declare options: WebGL2RenderOptions
 
   mapProgram: WebGLProgram
   linesProgram: WebGLProgram
@@ -172,21 +172,34 @@ export class WebGL2Renderer
     const wrappedSpritesWorker =
       comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
+    const warpedMapFactory = createWebGL2WarpedMapFactory(
+      gl,
+      mapProgram,
+      linesProgram,
+      pointsProgram
+    )
+
     super(
-      createWebGL2WarpedMapFactory(gl, mapProgram, linesProgram, pointsProgram),
       CacheableWorkerImageDataTile.createFactory(
         wrappedWorker,
         wrappedSpritesWorker
       ),
-      options
+      mergeOptions(
+        {
+          warpedMapFactory
+        },
+        options
+      )
     )
+
+    this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS = { warpedMapFactory }
 
     this.#worker = worker
     this.#spritesWorker = spritesWorker
     this.gl = gl
 
     this.options = mergeOptions(
-      DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
+      this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
       this.options
     )
 
@@ -371,6 +384,15 @@ export class WebGL2Renderer
     }
 
     return programCache.get(name)!
+  }
+
+  protected getWarpedMapListFromOptions() {
+    if (!this.options.warpedMapList || !this.options.warpedMapFactory) {
+      throw new Error('No WarpedMapList or WarpedMapFactory')
+    }
+    return this.options.warpedMapList.setWarpedMapFactory(
+      this.options.warpedMapFactory
+    )
   }
 
   protected updateMapsForViewport(
