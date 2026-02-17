@@ -23,7 +23,9 @@
     "USE_CACHE": true,
     "API_BASE_URL": "https://api.allmaps.org",
     "TILE_SERVER_BASE_URL": "https://allmaps.xyz",
-    "TILE_VIEWER_BASE_URL": "https://tiles.allmaps.org"
+    "TILE_VIEWER_BASE_URL": "https://tiles.allmaps.org",
+    "BROWSER_CACHE_HOURS": 720,
+    "CLOUDFLARE_CACHE_HOURS": 24
   },
   "env": {
     "dev": {
@@ -33,7 +35,9 @@
         "USE_CACHE": true,
         "API_BASE_URL": "https://api.allmaps.org",
         "TILE_SERVER_BASE_URL": "https://dev.allmaps.xyz",
-        "TILE_VIEWER_BASE_URL": "https://tiles.allmaps.org"
+        "TILE_VIEWER_BASE_URL": "https://tiles.allmaps.org",
+        "BROWSER_CACHE_HOURS": 1,
+        "CLOUDFLARE_CACHE_HOURS": 1
       }
     }
   }

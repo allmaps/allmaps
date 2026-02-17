@@ -18,7 +18,8 @@ import wasmInit, * as wasmModule from '@allmaps/render-wasm'
 import wasmFile from '../../../packages/render-wasm/pkg/allmaps_render_wasm_bg.wasm'
 
 // Initialize WASM module (Cloudflare Workers support top-level await)
-await wasmInit(wasmFile)
+// Use new wasm-bindgen initialization API with module_or_path parameter
+await wasmInit({ module_or_path: wasmFile })
 
 const TILE_WIDTH = 256
 
