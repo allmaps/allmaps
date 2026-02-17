@@ -1103,6 +1103,43 @@ importers:
         specifier: ^4.0.4
         version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/background-color:
+    dependencies:
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+    devDependencies:
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.2(eslint@8.57.1)
+      prettier:
+        specifier: ^3.6.2
+        version: 3.7.4
+      remark-api:
+        specifier: ^1.1.0
+        version: 1.1.0
+      remark-cli:
+        specifier: ^12.0.1
+        version: 12.0.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/basemap:
     dependencies:
       '@protomaps/basemaps':
