@@ -1277,6 +1277,61 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0(vite@6.4.1(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2))
 
+  packages/frame:
+    dependencies:
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../stdlib
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@turf/area':
+        specifier: ^7.2.0
+        version: 7.3.4
+      '@turf/centroid':
+        specifier: ^7.2.0
+        version: 7.3.4
+      '@turf/helpers':
+        specifier: ^7.2.0
+        version: 7.3.1
+      '@turf/intersect':
+        specifier: ^7.2.0
+        version: 7.3.4
+      polylabel:
+        specifier: ^2.0.0
+        version: 2.0.1
+    devDependencies:
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@types/node':
+        specifier: ^24
+        version: 24.10.2
+      '@types/polylabel':
+        specifier: ^1.1.3
+        version: 1.1.3
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.2(eslint@8.57.1)
+      prettier:
+        specifier: ^3.6.2
+        version: 3.7.4
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.4
+        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/id:
     dependencies:
       js-sha1:
@@ -2259,12 +2314,21 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../../packages/annotation
+      '@allmaps/frame':
+        specifier: workspace:^
+        version: link:../../packages/frame
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
       '@allmaps/render':
         specifier: workspace:^
         version: link:../../packages/render
+      '@allmaps/render-wasm':
+        specifier: workspace:^
+        version: link:../../packages/render-wasm
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
@@ -4500,11 +4564,17 @@ packages:
     resolution: {integrity: sha512-h5x5ga/hh82COe+GoD4+gKUeV4T3iaYOxqLt41GRKApinPI7DMidhCmNVTjKfhCWFJIGXaFJee07XczdT4jdZQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
+  '@turf/area@7.3.4':
+    resolution: {integrity: sha512-UEQQFw2XwHpozSBAMEtZI3jDsAad4NnHL/poF7/S6zeDCjEBCkt3MYd6DSGH/cvgcOozxH/ky3/rIVSMZdx4vA==}
+
   '@turf/bearing@7.3.1':
     resolution: {integrity: sha512-ex78l/LiY6uO6jO8AJepyWE6/tiWEbXjKLOgqUfJSkW23UcMVlhbAKzXDjbsdz9T66sXFC/6QNAh8oaZzmoo6w==}
 
   '@turf/boolean-clockwise@7.3.1':
     resolution: {integrity: sha512-ik9j0CCrsp/JZ42tbCnyZg86YFoavEU/nyal3HsEgdY5WFYq43aMYqLPRi6yNqE48THEk3fl1BcfgJqAiUhDFA==}
+
+  '@turf/centroid@7.3.4':
+    resolution: {integrity: sha512-6c3kyTSKBrmiPMe75UkHw6MgedroZ6eR5usEvdlDhXgA3MudFPXIZkMFmMd1h9XeJ9xFfkmq+HPCdF0cOzvztA==}
 
   '@turf/clone@7.3.1':
     resolution: {integrity: sha512-r7xDOfw9ohA7PhZW+8X9RMsO4szB4YqkhEROaELJyLtQ1bo8VNFtndpZdE6YHQpD7Pjlvlb6i99q8w1QLisEPg==}
@@ -4518,6 +4588,12 @@ packages:
   '@turf/helpers@7.3.1':
     resolution: {integrity: sha512-zkL34JVhi5XhsuMEO0MUTIIFEJ8yiW1InMu4hu/oRqamlY4mMoZql0viEmH6Dafh/p+zOl8OYvMJ3Vm3rFshgg==}
 
+  '@turf/helpers@7.3.4':
+    resolution: {integrity: sha512-U/S5qyqgx3WTvg4twaH0WxF3EixoTCfDsmk98g1E3/5e2YKp7JKYZdz0vivsS5/UZLJeZDEElOSFH4pUgp+l7g==}
+
+  '@turf/intersect@7.3.4':
+    resolution: {integrity: sha512-VsqMEMeRWWs2mjwI7sTlUgH1cEfugTGhQ0nF8ncHG7YKd9HUUTzIKpn9FJeoguPWIYITcy1ar4yJEOU/hteBVw==}
+
   '@turf/invariant@7.3.1':
     resolution: {integrity: sha512-IdZJfDjIDCLH+Gu2yLFoSM7H23sdetIo5t4ET1/25X8gi3GE2XSqbZwaGjuZgNh02nisBewLqNiJs2bo+hrqZA==}
 
@@ -4526,6 +4602,9 @@ packages:
 
   '@turf/meta@7.3.1':
     resolution: {integrity: sha512-NWsfOE5RVtWpLQNkfOF/RrYvLRPwwruxhZUV0UFIzHqfiRJ50aO9Y6uLY4bwCUe2TumLJQSR4yaoA72Rmr2mnQ==}
+
+  '@turf/meta@7.3.4':
+    resolution: {integrity: sha512-tlmw9/Hs1p2n0uoHVm1w3ugw1I6L8jv9YZrcdQa4SH5FX5UY0ATrKeIvfA55FlL//PGuYppJp+eyg/0eb4goqw==}
 
   '@turf/midpoint@7.3.1':
     resolution: {integrity: sha512-hx3eT9ut0Qyl8fyitCREp9l+v5Q4uBILht5+VKQS3p5eK2ijLEsKw4VikNZhh2rZ7bHGrs6obG5/P5ZqDTObiA==}
@@ -4656,6 +4735,9 @@ packages:
 
   '@types/pixelmatch@5.2.6':
     resolution: {integrity: sha512-wC83uexE5KGuUODn6zkm9gMzTwdY5L0chiK+VrKcDfEjzxh1uadlWTvOmAbCpnM9zx/Ww3f8uKlYQVnO/TrqVg==}
+
+  '@types/polylabel@1.1.3':
+    resolution: {integrity: sha512-9Zw2KoDpi+T4PZz2G6pO2xArE0m/GSMTW1MIxF2s8ZY8x9XDO6fv9um0ydRGvcbkFLlaq8yNK6eZxnmMZtDgWQ==}
 
   '@types/prop-types@15.7.15':
     resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
@@ -5152,6 +5234,9 @@ packages:
 
   before-after-hook@4.0.0:
     resolution: {integrity: sha512-q6tR3RPqIB1pMiTRMFcZwuG5T8vwp+vUvEG0vuI6B+Rikh5BfPp2fQ82c925FOs+b0lcFQ8CFrL+KbilfZFhOQ==}
+
+  bignumber.js@9.3.1:
+    resolution: {integrity: sha512-Ko0uX15oIUS7wJ3Rb30Fs6SkVbLmPBAKdlm7q9+ak9bbIeFf0MwuBsQV6z7+X768/cHsfg+WlysDWJcmthjsjQ==}
 
   bin-links@4.0.4:
     resolution: {integrity: sha512-cMtq4W5ZsEwcutJrVId+a/tjt8GSbS+h0oNkdl6+6rBuEv8Ot33Bevj5KPm40t309zuhVic8NjpuL42QCiJWWA==}
@@ -7877,6 +7962,12 @@ packages:
   point-in-polygon-hao@1.2.4:
     resolution: {integrity: sha512-x2pcvXeqhRHlNRdhLs/tgFapAbSSe86wa/eqmj1G6pWftbEs5aVRJhRGM6FYSUERKu0PjekJzMq0gsI2XyiclQ==}
 
+  polyclip-ts@0.16.8:
+    resolution: {integrity: sha512-JPtKbDRuPEuAjuTdhR62Gph7Is2BS1Szx69CFOO3g71lpJDFo78k4tFyi+qFOMVPePEzdSKkpGU3NBXPHHjvKQ==}
+
+  polylabel@2.0.1:
+    resolution: {integrity: sha512-B6Yu+Bdl/8SGtjVhyUfZzD3DwciCS9SPVtHiNdt8idHHatvTHp5Ss8XGDRmQFtfF1ZQnfK+Cj5dXdpkUXBbXgA==}
+
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
     engines: {node: '>=14.0.0'}
@@ -8672,6 +8763,9 @@ packages:
 
   spdx-license-ids@3.0.22:
     resolution: {integrity: sha512-4PRT4nh1EImPbt2jASOKHX7PB7I+e4IWNLvkKFDxNhJlfjbYlleYQh285Z/3mPTHSAK/AvdMmw5BNNuYH8ShgQ==}
+
+  splaytree-ts@1.0.2:
+    resolution: {integrity: sha512-0kGecIZNIReCSiznK3uheYB8sbstLjCZLiwcQwbmLhgHJj2gz6OnSPkVzJQCMnmEz1BQ4gPK59ylhBoEWOhGNA==}
 
   split-string@3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
@@ -12378,6 +12472,13 @@ snapshots:
       '@tufjs/canonical-json': 2.0.0
       minimatch: 9.0.5
 
+  '@turf/area@7.3.4':
+    dependencies:
+      '@turf/helpers': 7.3.4
+      '@turf/meta': 7.3.4
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
   '@turf/bearing@7.3.1':
     dependencies:
       '@turf/helpers': 7.3.1
@@ -12389,6 +12490,13 @@ snapshots:
     dependencies:
       '@turf/helpers': 7.3.1
       '@turf/invariant': 7.3.1
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
+  '@turf/centroid@7.3.4':
+    dependencies:
+      '@turf/helpers': 7.3.4
+      '@turf/meta': 7.3.4
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
@@ -12417,6 +12525,19 @@ snapshots:
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 
+  '@turf/helpers@7.3.4':
+    dependencies:
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
+  '@turf/intersect@7.3.4':
+    dependencies:
+      '@turf/helpers': 7.3.4
+      '@turf/meta': 7.3.4
+      '@types/geojson': 7946.0.16
+      polyclip-ts: 0.16.8
+      tslib: 2.8.1
+
   '@turf/invariant@7.3.1':
     dependencies:
       '@turf/helpers': 7.3.1
@@ -12435,6 +12556,12 @@ snapshots:
     dependencies:
       '@turf/helpers': 7.3.1
       '@types/geojson': 7946.0.16
+
+  '@turf/meta@7.3.4':
+    dependencies:
+      '@turf/helpers': 7.3.4
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
 
   '@turf/midpoint@7.3.1':
     dependencies:
@@ -12585,6 +12712,8 @@ snapshots:
   '@types/pixelmatch@5.2.6':
     dependencies:
       '@types/node': 24.10.2
+
+  '@types/polylabel@1.1.3': {}
 
   '@types/prop-types@15.7.15': {}
 
@@ -13346,6 +13475,8 @@ snapshots:
       is-decimal: 2.0.1
 
   before-after-hook@4.0.0: {}
+
+  bignumber.js@9.3.1: {}
 
   bin-links@4.0.4:
     dependencies:
@@ -17050,6 +17181,15 @@ snapshots:
     dependencies:
       robust-predicates: 3.0.2
 
+  polyclip-ts@0.16.8:
+    dependencies:
+      bignumber.js: 9.3.1
+      splaytree-ts: 1.0.2
+
+  polylabel@2.0.1:
+    dependencies:
+      tinyqueue: 3.0.0
+
   postcss-import@15.1.0(postcss@8.5.6):
     dependencies:
       postcss: 8.5.6
@@ -17954,6 +18094,8 @@ snapshots:
       spdx-license-ids: 3.0.22
 
   spdx-license-ids@3.0.22: {}
+
+  splaytree-ts@1.0.2: {}
 
   split-string@3.1.0:
     dependencies:
