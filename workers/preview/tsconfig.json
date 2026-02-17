@@ -11,6 +11,7 @@
     "types": ["@cloudflare/workers-types"]
   },
   "references": [
+    { "path": "../../packages/frame" },
     { "path": "../../packages/render" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/types" },
