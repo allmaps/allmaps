@@ -184,7 +184,12 @@ export class WebGL2Renderer
         wrappedWorker,
         wrappedSpritesWorker
       ),
-      options
+      mergeOptions(
+        {
+          warpedMapFactory
+        },
+        options
+      )
     )
 
     this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS = { warpedMapFactory }

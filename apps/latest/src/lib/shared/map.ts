@@ -1,6 +1,6 @@
 import turfRewind from '@turf/rewind'
 
-import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import { ProjectedGcpTransformer } from '@allmaps/project'
 import { validateGeoreferencedMap } from '@allmaps/annotation'
 import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
@@ -36,8 +36,7 @@ export function getDisplayMap(
         // since faster when many gcps and accurate enough
         const projectedTransformer =
           ProjectedGcpTransformer.fromGeoreferencedMap(map, {
-            transformationType: 'polynomial',
-            projection: lonLatProjection
+            transformationType: 'polynomial'
           })
 
         const polygon = projectedTransformer.transformToGeo([map.resourceMask])

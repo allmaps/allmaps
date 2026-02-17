@@ -70,6 +70,7 @@ export class WarpedMapLayer
 
   resizeObserver: ResizeObserver | undefined
 
+  // TODO: enable passing only options to the constructor
   /**
    * Creates a WarpedMapLayer
    * @param annotationOrAnnotationUrl - Georeference Annotation or URL of a Georeference Annotation
@@ -162,9 +163,7 @@ export class WarpedMapLayer
   getBounds(): number[][] | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:4326' }
-    })
+    const bbox = this.renderer.warpedMapList.getMapsBbox()
     if (bbox) {
       return [
         [bbox[1], bbox[0]],
@@ -636,8 +635,7 @@ export class WarpedMapLayer
   /**
    * Get the center of the bounding box of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -659,8 +657,7 @@ export class WarpedMapLayer
   /**
    * Get the bounding box of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -682,8 +679,7 @@ export class WarpedMapLayer
   /**
    * Get the convex hull of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -727,7 +723,7 @@ export class WarpedMapLayer
    * Get the default options the layer
    */
   getDefaultOptions(): SpecificWarpedMapLayerOptions &
-    BaseRenderOptions &
+    BaseRenderOptions<WebGL2WarpedMap> &
     WebGL2WarpedMapOptions {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 

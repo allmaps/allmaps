@@ -330,8 +330,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the center of the bounding box of the maps in this list
    *
-   * The result is returned in the list's projection, `EPSG:3857` by default
-   * Use `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
@@ -350,8 +349,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the bounding box of the maps in this list
    *
-   * The result is returned in the list's projection, `EPSG:3857` by default
-   * Use `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
@@ -378,8 +376,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the convex hull of the maps in this list
    *
-   * The result is returned in the list's projection, `EPSG:3857` by default
-   * Use `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
@@ -835,7 +832,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     } else {
       const projectedGeoMaskPoints: Point[] = []
       for (const warpedMap of warpedMaps) {
-        projectedGeoMaskPoints.push(...warpedMap.projectedGeoMask)
+        projectedGeoMaskPoints.push(...warpedMap.geoMask)
       }
 
       return projectedGeoMaskPoints

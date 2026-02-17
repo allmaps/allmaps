@@ -334,9 +334,8 @@ There are no parameters.
 ###### Returns
 
 `SpecificWarpedMapLayerOptions &
-  object &
-  SpecificWarpedMapListOptions &
-  Partial<WebGL2WarpedMapOptions> &
+  SpecificBaseRenderOptions<WebGL2WarpedMap> &
+  Partial<WarpedMapListOptions<WebGL2WarpedMap>> &
   SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions`.
@@ -428,8 +427,7 @@ The z-index of a map (`number | undefined`).
 
 Get the bounding box of the maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -447,8 +445,7 @@ The bbox of all selected maps, in the chosen projection, or undefined if there w
 
 Get the center of the bounding box of the maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -466,8 +463,7 @@ The center of the bbox of all selected maps, in the chosen projection, or undefi
 
 Get the convex hull of the maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 

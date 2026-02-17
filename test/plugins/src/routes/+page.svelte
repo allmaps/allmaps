@@ -28,12 +28,7 @@
 
     warpedMapList = new WarpedMapList()
     await warpedMapList.addGeoreferenceAnnotation(annotation)
-    const center = warpedMapList.getMapsCenter({
-      projection: { definition: 'EPSG:4326' }
-    })
-    const bbox = warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:4326' }
-    })
+    const bbox = warpedMapList.getMapsBbox()
 
     const protocol = new Protocol()
     addProtocol('pmtiles', protocol.tile)
@@ -42,17 +37,12 @@
       container,
       // @ts-expect-error MapLibre types are incompatible
       style: basemapStyle('en'),
-      center,
-      zoom: 7,
       maxPitch: 0,
       hash: true,
-      attributionControl: false,
-      canvasContextAttributes: {
-        preserveDrawingBuffer: true
-      }
+      attributionControl: false
     })
 
-    map.once('load', () => {
+    map.on('load', () => {
       warpedMapLayer = new WarpedMapLayer({ warpedMapList })
       warpedMapLayer.addGeoreferenceAnnotationByUrl(
         'https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a'

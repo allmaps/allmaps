@@ -125,9 +125,7 @@ export class WarpedMapLayer
    * @returns - Bounding box of all warped maps
    */
   getLonLatExtent(): Extent | undefined {
-    return this.renderer.warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:4326' }
-    })
+    return this.renderer.warpedMapList.getMapsBbox()
   }
 
   /**
@@ -472,8 +470,7 @@ export class WarpedMapLayer
   /**
    * Get the center of the bounding box of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -495,8 +492,7 @@ export class WarpedMapLayer
   /**
    * Get the bounding box of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -518,8 +514,7 @@ export class WarpedMapLayer
   /**
    * Get the convex hull of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -563,7 +558,7 @@ export class WarpedMapLayer
    * Get the default options the layer
    */
   getDefaultOptions(): SpecificWarpedMapLayerOptions &
-    BaseRenderOptions &
+    BaseRenderOptions<WebGL2WarpedMap> &
     WebGL2WarpedMapOptions {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 

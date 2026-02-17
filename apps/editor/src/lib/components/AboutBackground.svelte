@@ -210,8 +210,7 @@
     const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
       map,
       {
-        transformationType: 'polynomial',
-        projection: lonLatProjection
+        transformationType: 'polynomial'
       }
     )
 

@@ -16,7 +16,8 @@ import {
   midPoint,
   scalePoints,
   rotatePoint,
-  mergeOptions
+  mergeOptions,
+  mergePartialOptions
 } from '@allmaps/stdlib'
 import {
   lonLatProjection,
@@ -248,7 +249,9 @@ export class Viewport {
     >
   ): Viewport {
     const projectedGeoConvexHull = warpedMapList.getMapsConvexHull(
-      partialExtendedViewportOptions
+      mergePartialOptions(partialExtendedViewportOptions, {
+        projection: webMercatorProjection
+      })
     )
 
     if (!projectedGeoConvexHull) {
@@ -372,7 +375,9 @@ export class Viewport {
     >
   ): Viewport {
     const projectedGeoConvexHull = warpedMapList.getMapsConvexHull(
-      partialExtendedViewportOptions
+      mergePartialOptions(partialExtendedViewportOptions, {
+        projection: webMercatorProjection
+      })
     )
 
     if (!projectedGeoConvexHull) {

@@ -819,6 +819,16 @@ There are no parameters.
 
 `[Array<number>, Array<number>]`.
 
+### `BasePolynomialTransformation#getWeights()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `BasePolynomialTransformation#order`
 
 ###### Type
@@ -984,6 +994,23 @@ There are no parameters.
 ###### Returns
 
 `Partial<HelmertMeasures> | Partial<Polynomial1Measures>`.
+
+### `BaseTransformation#getWeights()`
+
+Get transformation weights in a format suitable for WASM rendering.
+This provides a standardized way to extract internal transformation parameters
+for use in WebAssembly-based rendering pipelines.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+An object containing: (`{weights: Float64Array; sourcePoints: Float64Array}`).
+
+* weights: Transformation-specific weight parameters as Float64Array
+* sourcePoints: Flattened source control points as Float64Array (for TPS only, empty otherwise)
 
 ### `BaseTransformation#pointCount`
 
@@ -1659,6 +1686,16 @@ Get two 1x4 coefsArrays, populating the 2Nx4 coefsArrayMatrices
 
 `[Array<number>, Array<number>]`.
 
+### `Helmert#getWeights()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `Helmert#solve()`
 
 ###### Parameters
@@ -2014,6 +2051,16 @@ Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
 
 `[number, number]`.
 
+### `Projective#getWeights()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `Projective#solve()`
 
 ###### Parameters
@@ -2181,6 +2228,16 @@ The coefsArray has a 1xN kernel part and a 1x3 affine part.
 
 `Array<number>`.
 
+### `RBF#getWeights()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `RBF#kernelFunction`
 
 ###### Type
@@ -2327,6 +2384,16 @@ SplitGcpLineInfo & {
 ###### Returns
 
 `[number, number]`.
+
+### `Straight#getWeights()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
 
 ### `Straight#solve()`
 

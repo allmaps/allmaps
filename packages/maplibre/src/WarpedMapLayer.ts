@@ -99,16 +99,14 @@ export class WarpedMapLayer
    *
    * This is the default MapLibre getBounds() function
    *
-   * Result is in longitude/latitude `EPSG:4326` coordinates.
+   * The result is returned in lon-lat `EPSG:4326`.
    *
    * @returns bounding box of all warped maps
    */
   getBounds(): LngLatBoundsLike | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:4326' }
-    })
+    const bbox = this.renderer.warpedMapList.getMapsBbox()
     if (bbox) {
       return [
         [bbox[0], bbox[1]],

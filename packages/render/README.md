@@ -234,7 +234,7 @@ In this package the following naming conventions are used:
 * `viewport...` indicates properties described in viewport coordinates (i.e. with pixel size as perceived by the user)
 * `canvas...` indicates properties described in canvas coordinates, so viewport device pixel ratio (i.e. with effective pixel size in memory)
 * `resource...` indicates properties described in resource coordinates (i.e. IIIF tile coordinates of zoomlevel 1)
-* `geo...` indicates properties described in geospatial coordinates ('WGS84', i.e. `[lon, lat]`)
+* `geo...` indicates properties described in geospatial coordinates (always 'WGS84' projection `{ description: 'EPSG:4326' }` i.e. `[lon, lat]`)
 * `projectedGeo...` indicates properties described in projected geospatial coordinates (following a CRS, by default 'EPSG:3857' WebMercator)
 * `tile...` indicates properties described IIIF tile coordinates
 
@@ -2730,8 +2730,7 @@ Get the z-index of a map
 
 Get the bounding box of the maps in this list
 
-The result is returned in the list's projection, `EPSG:3857` by default
-Use `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 ###### Parameters
 
@@ -2746,8 +2745,7 @@ The bbox of all selected maps, in the chosen projection, or undefined if there w
 
 Get the center of the bounding box of the maps in this list
 
-The result is returned in the list's projection, `EPSG:3857` by default
-Use `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 ###### Parameters
 
@@ -2762,8 +2760,7 @@ The center of the bbox of all selected maps, in the chosen projection, or undefi
 
 Get the convex hull of the maps in this list
 
-The result is returned in the list's projection, `EPSG:3857` by default
-Use `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 ###### Parameters
 

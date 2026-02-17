@@ -121,7 +121,7 @@ function processPointString(
     outputPoints.push(
       partialInverseOptions.inverse
         ? projectedTransformer.transformToResource(point)
-        : projectedTransformer.transformToGeo(point)
+        : projectedTransformer.transformToProjectedGeo(point)
     )
   })
 

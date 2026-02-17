@@ -112,9 +112,9 @@ function computeBearingInternal(
   const resourceTopCenter = midPoint(resourceTopLeft, resourceTopRight)
   const resourceBottomCenter = midPoint(resourceBottomLeft, resourceBottomRight)
   const projectedGeoTopCenter =
-    projectedTransformer.transformToGeo(resourceTopCenter)
+    projectedTransformer.transformToProjectedGeo(resourceTopCenter)
   const projectedGeoBottomCenter =
-    projectedTransformer.transformToGeo(resourceBottomCenter)
+    projectedTransformer.transformToProjectedGeo(resourceBottomCenter)
 
   return radiansToDegrees(
     bearing([projectedGeoBottomCenter, projectedGeoTopCenter])

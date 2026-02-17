@@ -2,7 +2,7 @@ import turfRewind from '@turf/rewind'
 import { geoProjection, geoPath } from 'd3-geo'
 
 import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
-import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import { ProjectedGcpTransformer } from '@allmaps/project'
 
 import type { Polygon as GeojsonPolygon } from 'geojson'
 
@@ -20,9 +20,7 @@ export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
     if (map.resourceMask.length >= 3) {
       try {
         const projectedTransformer =
-          ProjectedGcpTransformer.fromGeoreferencedMap(map, {
-            projection: lonLatProjection
-          })
+          ProjectedGcpTransformer.fromGeoreferencedMap(map)
 
         let polygon = projectedTransformer.transformToGeo([map.resourceMask])
         const geojsonPolygon = geometryToGeojsonGeometry(polygon)

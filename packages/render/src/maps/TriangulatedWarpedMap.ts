@@ -394,7 +394,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
         const resourceResolution = this.resourceResolution
         const resourceUniquePoints = uniquePoints as Point[]
         const gcpUniquePoints = resourceUniquePoints.map((resourcePoint) =>
-          this.projectedTransformer.transformToGeo(
+          this.projectedTransformer.transformToProjectedGeo(
             resourcePoint,
             {
               distortionMeasures: this.options.distortionMeasures,
@@ -442,7 +442,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
               gcpUniquePoints:
                 this.projectedGcpTriangulation.gcpUniquePoints.map(
                   (projectedGcp) =>
-                    this.projectedPreviousTransformer.transformToGeo(
+                    this.projectedPreviousTransformer.transformToProjectedGeo(
                       projectedGcp.resource,
                       {
                         distortionMeasures: this.options.distortionMeasures,
@@ -527,7 +527,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     // we first refine the mask in the same way as during a triangulation
     // and then transform point-by-point instead of as a ring or polygon that should be defined
     this.projectedGeoTriangulationAppliableMask =
-      this.projectedTransformer.transformToGeo(
+      this.projectedTransformer.transformToProjectedGeo(
         interpolatePolygon(
           [this.resourceAppliableMask],
           this.resourceResolution!
