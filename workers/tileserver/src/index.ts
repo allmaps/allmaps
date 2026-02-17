@@ -14,6 +14,8 @@ type Env = {
   API_BASE_URL: string
   TILE_SERVER_BASE_URL: string
   TILE_VIEWER_BASE_URL: string
+  BROWSER_CACHE_HOURS: number
+  CLOUDFLARE_CACHE_HOURS: number
 }
 
 type CFArgs = [Env, ExecutionContext]

@@ -1,24 +1,27 @@
-import { ONE_HOUR } from './fetch.js'
-
 const cache = caches.default
 
-// Cache durations
-const BROWSER_CACHE_MAX_AGE = 1 * ONE_HOUR // 1 hour for browsers
-const CDN_CACHE_MAX_AGE = 24 * ONE_HOUR // 24 hours for Cloudflare CDN
+type Env = {
+  BROWSER_CACHE_HOURS: number
+  CLOUDFLARE_CACHE_HOURS: number
+}
 
 export async function match(url: string) {
   return await cache.match(url)
 }
 
-export async function headers(response: Response) {
+export async function headers(response: Response, request: Request, env: Env) {
+  // Convert hours to seconds
+  const browserCacheSeconds = env.BROWSER_CACHE_HOURS * 60 * 60
+  const cloudflareCacheSeconds = env.CLOUDFLARE_CACHE_HOURS * 60 * 60
+
   // Set cache headers for both browser and CDN
   response.headers.set(
     'Cache-Control',
-    `public, max-age=${BROWSER_CACHE_MAX_AGE}, s-maxage=${CDN_CACHE_MAX_AGE}`
+    `public, max-age=${browserCacheSeconds}, s-maxage=${cloudflareCacheSeconds}`
   )
 
   // Cloudflare-specific cache header for longer CDN caching
-  response.headers.set('CDN-Cache-Control', `max-age=${CDN_CACHE_MAX_AGE}`)
+  response.headers.set('CDN-Cache-Control', `max-age=${cloudflareCacheSeconds}`)
 
   return response
 }
