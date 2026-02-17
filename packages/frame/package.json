@@ -1,0 +1,62 @@
+{
+  "name": "@allmaps/frame",
+  "version": "1.0.0-beta.1",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    }
+  ],
+  "description": "Find optimal viewport frames for georeferenced map previews",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/frame"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "frame",
+    "viewport",
+    "crop"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "test": "NODE_ENV=test vitest run",
+    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --write src test",
+    "types": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@allmaps/stdlib": "workspace:^",
+    "@allmaps/types": "workspace:^",
+    "@turf/area": "^7.2.0",
+    "@turf/centroid": "^7.2.0",
+    "@turf/helpers": "^7.2.0",
+    "@turf/intersect": "^7.2.0",
+    "polylabel": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.0",
+    "@types/node": "^24",
+    "@types/polylabel": "^1.1.3",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2",
+    "typescript": "catalog:",
+    "vitest": "^4.0.4"
+  }
+}

@@ -1,0 +1,1543 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/974a52da721c5461",
+        "type": "GeoreferencedMap",
+        "created": "2025-04-08T17:53:12.760Z",
+        "modified": "2025-04-08T17:53:12.760Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/ecee9dca-ca63-4263-a271-c4d4a80357be",
+          "uri": "https://dlc.services/iiif-img/7/28/ecee9dca-ca63-4263-a271-c4d4a80357be",
+          "type": "ImageService2",
+          "width": 8499,
+          "height": 12907,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/ecee9dca-ca63-4263-a271-c4d4a80357be/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=7",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "85a1862a5e2c1732",
+            "index": 0,
+            "resource": [4728, 7745],
+            "geo": [-91.0602098, 33.6252457]
+          },
+          {
+            "id": "9380ce79cc023275",
+            "index": 1,
+            "resource": [556, 4385],
+            "geo": [-91.2660153, 33.8109827]
+          },
+          {
+            "id": "e88004fa75747431",
+            "index": 2,
+            "resource": [5581, 11581],
+            "geo": [-91.0405165, 33.4383019]
+          }
+        ],
+        "resourceMask": [
+          [227, 285],
+          [127, 12732],
+          [8332, 12812],
+          [8292, 265]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/974a52da721c5461",
+          "version": "https://annotations.allmaps.org/maps/974a52da721c5461@1d3b65f87344029f",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/1465e39256f332b9",
+            "version": "https://annotations.allmaps.org/images/1465e39256f332b9@9acfe8b0e6a501eb",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/1829613737345075",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/cfe57c5beff1eb1f",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.191547,
+          "area": 2770885317.79
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.254982945, 34.007050797],
+            [-91.348970074, 33.418872008],
+            [-90.897810197, 33.362404006],
+            [-90.81081994, 33.956212346],
+            [-91.254982945, 34.007050797]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/92dfae547d66f1d5",
+        "type": "GeoreferencedMap",
+        "created": "2025-04-08T17:53:04.564Z",
+        "modified": "2025-04-08T17:53:04.564Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/4f935976-fd94-410e-b5d4-012121f45a25",
+          "uri": "https://dlc.services/iiif-img/7/28/4f935976-fd94-410e-b5d4-012121f45a25",
+          "type": "ImageService2",
+          "width": 8541,
+          "height": 12170,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/4f935976-fd94-410e-b5d4-012121f45a25/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=9",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "14e695c4d17b93c8",
+            "index": 0,
+            "resource": [3031, 1880],
+            "geo": [-91.1877372, 32.8176079]
+          },
+          {
+            "id": "dcb704da16addf83",
+            "index": 1,
+            "resource": [5409, 4236],
+            "geo": [-91.0339742, 32.7256486]
+          },
+          {
+            "id": "f0484f6f76038519",
+            "index": 2,
+            "resource": [4279, 7575],
+            "geo": [-91.0658927, 32.5592817]
+          }
+        ],
+        "resourceMask": [
+          [252, 325],
+          [252, 12005],
+          [8289, 12080],
+          [8327, 269]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/92dfae547d66f1d5",
+          "version": "https://annotations.allmaps.org/maps/92dfae547d66f1d5@874e33ca19d092c0",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/e07796a9d38b941a",
+            "version": "https://annotations.allmaps.org/images/e07796a9d38b941a@14f2924f1241e612",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/2d31fec1feef44b6",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/f1bae706f3dafde0",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.189011,
+          "area": 2648617578.36
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.356370069, 32.868616617],
+            [-91.24857508, 32.318311891],
+            [-90.801692788, 32.379141674],
+            [-90.908587134, 32.935922801],
+            [-91.356370069, 32.868616617]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/1063272e3b1e0d62",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:52.233Z",
+        "modified": "2022-07-10T08:00:52.233Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/bf5f01d1-bb98-44c6-8f79-fc67830c6310",
+          "uri": "https://dlc.services/iiif-img/7/28/bf5f01d1-bb98-44c6-8f79-fc67830c6310",
+          "type": "ImageService2",
+          "width": 8503,
+          "height": 12392,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/bf5f01d1-bb98-44c6-8f79-fc67830c6310/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=13",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "a98a4f6b503e0a86",
+            "resource": [5027, 3148],
+            "geo": [-91.6174935, 30.8362195],
+            "index": 0
+          },
+          {
+            "id": "d8ae82f2e7c54217",
+            "resource": [4144, 4801],
+            "geo": [-91.6007839, 30.7483126],
+            "index": 1
+          },
+          {
+            "id": "dcc5465b5962df61",
+            "resource": [5837, 7559],
+            "geo": [-91.4338002, 30.6932282],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [202, 395],
+          [203, 12095],
+          [8303, 12088],
+          [8292, 389]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/1063272e3b1e0d62",
+          "version": "https://annotations.allmaps.org/maps/1063272e3b1e0d62@ad75b0a8ae3a69ce",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/d09fd2d111db6772",
+            "version": "https://annotations.allmaps.org/images/d09fd2d111db6772@b538aab5340923f2",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/591d18c1e513cdfc",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/f95dc1311c1daa5c",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.189249,
+          "area": 2644342875.48
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.921907804, 30.800519878],
+            [-91.529014729, 30.359123428],
+            [-91.173391608, 30.593685923],
+            [-91.566690437, 31.034755386],
+            [-91.921907804, 30.800519878]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/378d081242f33819",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:52.187Z",
+        "modified": "2022-07-10T08:00:52.187Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/d5a61d34-8534-4124-ac78-e00681e23d09",
+          "uri": "https://dlc.services/iiif-img/7/28/d5a61d34-8534-4124-ac78-e00681e23d09",
+          "type": "ImageService2",
+          "width": 8624,
+          "height": 12159,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/d5a61d34-8534-4124-ac78-e00681e23d09/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=14",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "a6220fe270dece3f",
+            "resource": [6889, 1489],
+            "geo": [-91.202228, 30.5066148],
+            "index": 0
+          },
+          {
+            "id": "cad005137ee16cda",
+            "resource": [5740, 4984],
+            "geo": [-91.1377753, 30.3402115],
+            "index": 1
+          },
+          {
+            "id": "f9c4c0b7b60d4c53",
+            "resource": [3707, 5038],
+            "geo": [-91.2252529, 30.27948],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [274, 296],
+          [304, 12010],
+          [8398, 12000],
+          [8378, 270]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/378d081242f33819",
+          "version": "https://annotations.allmaps.org/maps/378d081242f33819@5c4d481488f6fcfe",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/f0cb53e6b122c132",
+            "version": "https://annotations.allmaps.org/images/f0cb53e6b122c132@6fabd4b0a9f80ca9",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/cbedced68c2707fb",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/d61e94640bdd0874",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.189055,
+          "area": 2656187789.81
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.531859096, 30.361186271],
+            [-91.145450979, 29.915469095],
+            [-90.790436723, 30.149444891],
+            [-91.176931812, 30.59606065],
+            [-91.531859096, 30.361186271]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/5746a9c9e717e08f",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:52.137Z",
+        "modified": "2022-07-10T08:00:52.137Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/f57f62d6-7cd4-4d72-8707-b26458f54e50",
+          "uri": "https://dlc.services/iiif-img/7/28/f57f62d6-7cd4-4d72-8707-b26458f54e50",
+          "type": "ImageService2",
+          "width": 8518,
+          "height": 12087,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/f57f62d6-7cd4-4d72-8707-b26458f54e50/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=11",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "0ef484c3340a5d5d",
+            "resource": [4530, 525],
+            "geo": [-91.2509053, 31.8964358],
+            "index": 0
+          },
+          {
+            "id": "2f04ba4f576649db",
+            "resource": [2662, 10295],
+            "geo": [-91.5263537, 31.4843161],
+            "index": 1
+          },
+          {
+            "id": "a77ac34cb0cd7ac9",
+            "resource": [1558, 4771],
+            "geo": [-91.4852019, 31.7509914],
+            "index": 2
+          },
+          {
+            "id": "da2ab1bb8b4e373c",
+            "resource": [4210, 8210],
+            "geo": [-91.4074151, 31.5544385],
+            "index": 3
+          }
+        ],
+        "resourceMask": [
+          [213, 288],
+          [186, 11989],
+          [8278, 11998],
+          [8318, 323]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/5746a9c9e717e08f",
+          "version": "https://annotations.allmaps.org/maps/5746a9c9e717e08f@c7bced5d1a1ebc5f",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/79316d48b2df4977",
+            "version": "https://annotations.allmaps.org/images/79316d48b2df4977@84b6cbb93cd28177",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/5aba79b770ab984b",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/78df853efb88e833",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.188751,
+          "area": 2656864553.54
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.474979594, 31.974343448],
+            [-91.688224436, 31.446389959],
+            [-91.260632567, 31.320040775],
+            [-91.047171191, 31.84661787],
+            [-91.474979594, 31.974343448]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/34643c2fde5d1e93",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:52.090Z",
+        "modified": "2022-07-10T08:00:52.090Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/32bf91c2-50bc-4e23-a58d-712ffff80b50",
+          "uri": "https://dlc.services/iiif-img/7/28/32bf91c2-50bc-4e23-a58d-712ffff80b50",
+          "type": "ImageService2",
+          "width": 8531,
+          "height": 12121,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/32bf91c2-50bc-4e23-a58d-712ffff80b50/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=1",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "3aa8188253ab86aa",
+            "resource": [7593, 6082],
+            "geo": [-89.1789667, 36.5605859],
+            "index": 0
+          },
+          {
+            "id": "8de773b3f98392d6",
+            "resource": [1412, 7807],
+            "geo": [-89.5554732, 36.5812043],
+            "index": 1
+          },
+          {
+            "id": "bedfd07768bcfd04",
+            "resource": [4229, 11311],
+            "geo": [-89.4686572, 36.3781842],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [233, 11971],
+          [8338, 11989],
+          [8370, 261],
+          [251, 248]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/34643c2fde5d1e93",
+          "version": "https://annotations.allmaps.org/maps/34643c2fde5d1e93@7ee3ed27231447fe",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/5afd35005c52ed7d",
+            "version": "https://annotations.allmaps.org/images/5afd35005c52ed7d@39f89de792034f4d",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/a650561edc839ae8",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/a9c3352980e58c91",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.189162,
+          "area": 2658242688.43
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-89.703072356, 36.412058301],
+            [-89.254422005, 36.2821235],
+            [-89.020894085, 36.810919667],
+            [-89.470418821, 36.940851846],
+            [-89.703072356, 36.412058301]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/84b72fa45af29db9",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:52.044Z",
+        "modified": "2022-07-10T08:00:52.044Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/12c287c9-baa2-42d3-b21f-81fbbb44bd66",
+          "uri": "https://dlc.services/iiif-img/7/28/12c287c9-baa2-42d3-b21f-81fbbb44bd66",
+          "type": "ImageService2",
+          "width": 8444,
+          "height": 12189,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/12c287c9-baa2-42d3-b21f-81fbbb44bd66/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=0",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "88044b18f64fc88f",
+            "resource": [4459, 5941],
+            "geo": [-89.2617081, 37.0999905],
+            "index": 0
+          },
+          {
+            "id": "a095a4f49d6f81ce",
+            "resource": [6302, 8290],
+            "geo": [-89.1512117, 36.9885035],
+            "index": 1
+          },
+          {
+            "id": "fda649d47585ad4b",
+            "resource": [6201, 6006],
+            "geo": [-89.1573562, 37.0969508],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [118, 284],
+          [136, 12007],
+          [8179, 12004],
+          [8212, 289]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/84b72fa45af29db9",
+          "version": "https://annotations.allmaps.org/maps/84b72fa45af29db9@6c32c086b23afbac",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/80e17d049472136d",
+            "version": "https://annotations.allmaps.org/images/80e17d049472136d@a6cc9c9281184db6",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/6094aa0862fcad26",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/0a63ae2da63a3747",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.188768,
+          "area": 2653557329.7
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-89.521976321, 37.368482662],
+            [-89.520413551, 36.811845923],
+            [-89.038622215, 36.812203813],
+            [-89.037129654, 37.368462058],
+            [-89.521976321, 37.368482662]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/e41e1fcc887bd1a6",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.997Z",
+        "modified": "2022-07-10T08:00:51.997Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/54dc4283-ca3c-478f-a40d-b886e478823f",
+          "uri": "https://dlc.services/iiif-img/7/28/54dc4283-ca3c-478f-a40d-b886e478823f",
+          "type": "ImageService2",
+          "width": 8708,
+          "height": 12284,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/54dc4283-ca3c-478f-a40d-b886e478823f/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=2",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "23b1482a2d621952",
+            "resource": [7781, 4834],
+            "geo": [-89.3828374, 36.0943447],
+            "index": 0
+          },
+          {
+            "id": "56dfbff1e9433747",
+            "resource": [3071, 5094],
+            "geo": [-89.6456626, 36.1620338],
+            "index": 1
+          },
+          {
+            "id": "ccdee2bc6fdf9870",
+            "resource": [527, 8036],
+            "geo": [-89.8458875, 36.0738275],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [306, 370],
+          [8421, 313],
+          [8496, 12027],
+          [416, 12081]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/e41e1fcc887bd1a6",
+          "version": "https://annotations.allmaps.org/maps/e41e1fcc887bd1a6@dbdc03733bfd92f9",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/0711065ad69b3ab6",
+            "version": "https://annotations.allmaps.org/images/0711065ad69b3ab6@8ec89c7fe210fbf3",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/b259ddd9b965a2a3",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/e218c7e75e489b11",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.18959,
+          "area": 2638732402.76
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-89.698531668, 36.418950149],
+            [-89.936080246, 35.895552602],
+            [-89.493357164, 35.761973083],
+            [-89.253833322, 36.284915193],
+            [-89.698531668, 36.418950149]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/408b4fe67fa6a28f",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.947Z",
+        "modified": "2022-07-10T08:00:51.947Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/3c3da1f8-ffab-40dd-a72e-0d41b8bae1a1",
+          "uri": "https://dlc.services/iiif-img/7/28/3c3da1f8-ffab-40dd-a72e-0d41b8bae1a1",
+          "type": "ImageService2",
+          "width": 8512,
+          "height": 12678,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/3c3da1f8-ffab-40dd-a72e-0d41b8bae1a1/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=3",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "b21c704f31baab5c",
+            "resource": [2845, 3714],
+            "geo": [-89.9281705, 35.7560646],
+            "index": 0
+          },
+          {
+            "id": "c1dad25b1fe34632",
+            "resource": [6356, 1561],
+            "geo": [-89.6888528, 35.7742791],
+            "index": 1
+          },
+          {
+            "id": "ff7a279aeac28cd4",
+            "resource": [4736, 9586],
+            "geo": [-89.979339, 35.4643801],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [180, 269],
+          [8296, 219],
+          [8394, 12583],
+          [307, 12672]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/408b4fe67fa6a28f",
+          "version": "https://annotations.allmaps.org/maps/408b4fe67fa6a28f@9bed016e4490a49c",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/7cf73dce7e8576bb",
+            "version": "https://annotations.allmaps.org/images/7cf73dce7e8576bb@4fdd7bac4299fced",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/afbcf1041a82ade6",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/6a572d61bc727f2e",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.188829,
+          "area": 2813885957.72
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-89.979755455, 35.960021567],
+            [-90.290706273, 35.425535693],
+            [-89.864189801, 35.258674729],
+            [-89.552716369, 35.790876345],
+            [-89.979755455, 35.960021567]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/4e13bee2d1949fa7",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.898Z",
+        "modified": "2022-07-10T08:00:51.898Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/81143897-3ea7-42f3-97c3-e2a936c37026",
+          "uri": "https://dlc.services/iiif-img/7/28/81143897-3ea7-42f3-97c3-e2a936c37026",
+          "type": "ImageService2",
+          "width": 8484,
+          "height": 12203,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/81143897-3ea7-42f3-97c3-e2a936c37026/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=4",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "1aa7cb7a815c1c5a",
+            "resource": [6448, 5736],
+            "geo": [-90.0959363, 35.0670427],
+            "index": 0
+          },
+          {
+            "id": "5583f5574f32e726",
+            "resource": [4728, 4299],
+            "geo": [-90.1495673, 35.1641335],
+            "index": 1
+          },
+          {
+            "id": "8cc157929866e2cc",
+            "resource": [3800, 9804],
+            "geo": [-90.337829, 34.9476688],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [298, 12119],
+          [8390, 11984],
+          [8231, 279],
+          [110, 414]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/4e13bee2d1949fa7",
+          "version": "https://annotations.allmaps.org/maps/4e13bee2d1949fa7@f6dc74200a0c937f",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/7e576e5bc2e815a8",
+            "version": "https://annotations.allmaps.org/images/7e576e5bc2e815a8@2aa5467a1ab86875",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/66a3ce37d09b3e3a",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/9c0da33e6b3d7322",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.189016,
+          "area": 2656537629.88
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-90.579978603, 34.921001239],
+            [-90.152728647, 34.759410133],
+            [-89.864110992, 35.263768287],
+            [-90.292879846, 35.425959213],
+            [-90.579978603, 34.921001239]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/ff88d816b07acea7",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.837Z",
+        "modified": "2022-07-10T08:00:51.837Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/ca464be3-9ebb-43cd-a85b-c0eed8634073",
+          "uri": "https://dlc.services/iiif-img/7/28/ca464be3-9ebb-43cd-a85b-c0eed8634073",
+          "type": "ImageService2",
+          "width": 8342,
+          "height": 12212,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/ca464be3-9ebb-43cd-a85b-c0eed8634073/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=10",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "17571773e45fbce6",
+            "resource": [7648, 1945],
+            "geo": [-90.9016856, 32.3128662],
+            "index": 0
+          },
+          {
+            "id": "47bc3334988b5fa2",
+            "resource": [4548, 11636],
+            "geo": [-91.2336212, 31.9182592],
+            "index": 1
+          },
+          {
+            "id": "f3b6023fe25153ad",
+            "resource": [4939, 1243],
+            "geo": [-91.0349805, 32.3858439],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [135, 285],
+          [151, 11976],
+          [8239, 11975],
+          [8231, 278]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/ff88d816b07acea7",
+          "version": "https://annotations.allmaps.org/maps/ff88d816b07acea7@6433030a4d7749ba",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/eee67fa51fb9b7bb",
+            "version": "https://annotations.allmaps.org/images/eee67fa51fb9b7bb@eafcee6af51ff5ae",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/ec4442eed75994c2",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/77eedb202e71fcbc",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.188106,
+          "area": 2674313846.28
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.276263184, 32.502188136],
+            [-91.475264143, 31.969307928],
+            [-91.041451757, 31.846959229],
+            [-90.841919152, 32.379991732],
+            [-91.276263184, 32.502188136]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/ac79c53138d6b057",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.788Z",
+        "modified": "2022-07-10T08:00:51.788Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/eb7e341d-0887-416c-bcd6-fea2684b55c4",
+          "uri": "https://dlc.services/iiif-img/7/28/eb7e341d-0887-416c-bcd6-fea2684b55c4",
+          "type": "ImageService2",
+          "width": 8482,
+          "height": 12247,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/eb7e341d-0887-416c-bcd6-fea2684b55c4/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=8",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "2bab415985bb5d68",
+            "resource": [2574, 3611],
+            "geo": [-91.2212138, 33.269773],
+            "index": 0
+          },
+          {
+            "id": "4bb87fb200beda7d",
+            "resource": [2580, 9131],
+            "geo": [-91.2224916, 33.0049047],
+            "index": 1
+          },
+          {
+            "id": "8a3c47cd881d7d90",
+            "resource": [5775, 875],
+            "geo": [-91.0380653, 33.3995773],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [232, 302],
+          [217, 11997],
+          [8292, 12007],
+          [8308, 315]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/ac79c53138d6b057",
+          "version": "https://annotations.allmaps.org/maps/ac79c53138d6b057@607f6f778c716b2f",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/2a6f0e533b554184",
+            "version": "https://annotations.allmaps.org/images/2a6f0e533b554184@ca107e3fbcce36c3",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/6865fc8ceb13fbc7",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/a0c3adb4f6ef87f0",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.18803,
+          "area": 2670931610.23
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.353655527, 33.429628922],
+            [-91.357941368, 32.868475989],
+            [-90.897949957, 32.864270518],
+            [-90.893608031, 33.425279041],
+            [-91.353655527, 33.429628922]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/f130cdaf7cede264",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.738Z",
+        "modified": "2022-07-10T08:00:51.738Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/1a079678-18d4-455c-ae23-d3ba06c31607",
+          "uri": "https://dlc.services/iiif-img/7/28/1a079678-18d4-455c-ae23-d3ba06c31607",
+          "type": "ImageService2",
+          "width": 8581,
+          "height": 12244,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/1a079678-18d4-455c-ae23-d3ba06c31607/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=12",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "2042d03f0954e6a3",
+            "resource": [6543, 9617],
+            "geo": [-91.5384431, 30.9349465],
+            "index": 0
+          },
+          {
+            "id": "c0ee4c816d6e5271",
+            "resource": [4525, 11626],
+            "geo": [-91.6820095, 30.8774],
+            "index": 1
+          },
+          {
+            "id": "d433f697e36e60a7",
+            "resource": [4700, 4021],
+            "geo": [-91.5281035, 31.2147126],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [225, 345],
+          [266, 12046],
+          [8352, 12011],
+          [8315, 313],
+          [4709, 306]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/f130cdaf7cede264",
+          "version": "https://annotations.allmaps.org/maps/f130cdaf7cede264@6bc6f5f6e2e09b4b",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/abffbac6aee48a36",
+            "version": "https://annotations.allmaps.org/images/abffbac6aee48a36@304cb2696623224f",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/b945fa5d7489c33c",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/7c9de3c9581049d8",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.18932,
+          "area": 2642503128.78
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.691681524, 31.450740375],
+            [-91.912287668, 30.926787537],
+            [-91.489602359, 30.798925679],
+            [-91.268844559, 31.322680325],
+            [-91.456913212, 31.380712188],
+            [-91.691681524, 31.450740375]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/978b03ad7bbea41f",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:51.688Z",
+        "modified": "2022-07-10T08:00:51.688Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/438a181d-69b0-477d-9496-98e500833f99",
+          "uri": "https://dlc.services/iiif-img/7/28/438a181d-69b0-477d-9496-98e500833f99",
+          "type": "ImageService2",
+          "width": 8497,
+          "height": 12268,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/438a181d-69b0-477d-9496-98e500833f99/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=6",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "53bc266e2364e60d",
+            "resource": [7930, 1397],
+            "geo": [-90.5416447, 34.2189363],
+            "index": 0
+          },
+          {
+            "id": "5eced2991f28df03",
+            "resource": [1707, 4605],
+            "geo": [-90.9400698, 34.2585292],
+            "index": 1
+          },
+          {
+            "id": "f8b2f273f2480e9f",
+            "resource": [1552, 11258],
+            "geo": [-91.1598094, 33.9990703],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [286, 12066],
+          [8408, 12012],
+          [8318, 287],
+          [215, 363]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/978b03ad7bbea41f",
+          "version": "https://annotations.allmaps.org/maps/978b03ad7bbea41f@50052ffc7ee20e84",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/1c63989b50c0cfb7",
+            "version": "https://annotations.allmaps.org/images/1c63989b50c0cfb7@4bff77a08e77a472",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/1db03d73355ada29",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/77b228acf2d28bb1",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.18886,
+          "area": 2664440742.72
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-91.245823958, 34.000968899],
+            [-90.857741434, 33.785534571],
+            [-90.487756135, 34.252523874],
+            [-90.875637088, 34.466577524],
+            [-91.245823958, 34.000968899]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/fcd402aabc32c72c",
+        "type": "GeoreferencedMap",
+        "created": "2022-07-10T08:00:50.176Z",
+        "modified": "2022-07-10T08:00:50.176Z",
+        "resource": {
+          "id": "https://dlc.services/iiif-img/7/28/b03c37e5-99ea-4550-b405-b16a99753803",
+          "uri": "https://dlc.services/iiif-img/7/28/b03c37e5-99ea-4550-b405-b16a99753803",
+          "type": "ImageService2",
+          "width": 8608,
+          "height": 12788,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-img/7/28/b03c37e5-99ea-4550-b405-b16a99753803/info.json",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://examples.allmaps.org/manifests/harold-fisk-mississippi.json"
+                }
+              ]
+            },
+            {
+              "type": "Canvas",
+              "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=allmaps&n1=&n2=5",
+              "partOf": []
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "217318583cfacc0a",
+            "resource": [5690, 4833],
+            "geo": [-90.383561, 34.6407443],
+            "index": 0
+          },
+          {
+            "id": "7a9b312d32407e9a",
+            "resource": [4336, 8635],
+            "geo": [-90.5691537, 34.5245219],
+            "index": 1
+          },
+          {
+            "id": "8541cd0bdca72093",
+            "resource": [6558, 9030],
+            "geo": [-90.479701, 34.4521759],
+            "index": 2
+          }
+        ],
+        "resourceMask": [
+          [207, 397],
+          [8313, 266],
+          [8390, 12604],
+          [281, 12650]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/fcd402aabc32c72c",
+          "version": "https://annotations.allmaps.org/maps/fcd402aabc32c72c@d447ad2300a12278",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/34d26562a2e9a890",
+            "version": "https://annotations.allmaps.org/images/34d26562a2e9a890@c831269c3da72ff0",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/fae20a382b07c58f",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/fc2c32dc51b145d8"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/76096e87f420b9ae",
+                "manifests": []
+              }
+            ]
+          },
+          "scale": 0.192509,
+          "area": 2690047239.76
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-90.492062205, 34.956517787],
+            [-90.885957843, 34.468755366],
+            [-90.511275298, 34.263720167],
+            [-90.114761617, 34.754929668],
+            [-90.492062205, 34.956517787]
+          ]
+        ]
+      }
+    }
+  ]
+}
