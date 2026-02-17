@@ -1,0 +1,53 @@
+{
+  "name": "@allmaps/background-color",
+  "version": "1.0.0-beta.0",
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    }
+  ],
+  "description": "Detects the background color from an ImageBitmap object",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/background-color"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "types": "tsc --noEmit",
+    "documentation": "remark . --output --use remark-api",
+    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "format": "prettier --write src"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@allmaps/stdlib": "workspace:^"
+  },
+  "devDependencies": {
+    "@allmaps/types": "workspace:^",
+    "@types/eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
+    "typescript": "catalog:"
+  }
+}
