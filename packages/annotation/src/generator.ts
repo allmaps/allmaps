@@ -23,7 +23,8 @@ import type {
   Source,
   PartOf,
   ResourceType,
-  Projection
+  Projection,
+  Provider
 } from './types.js'
 
 function generateSvgSelector(
@@ -64,6 +65,7 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
   let height: number | undefined
 
   let partOf: PartOf
+  let provider: Provider
 
   if (isGeoreferencedMap2(georeferencedMap)) {
     if (georeferencedMap.resource.type === 'Canvas') {
@@ -73,7 +75,8 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
         type: georeferencedMap.resource.type,
         height: georeferencedMap.resource.height,
         width: georeferencedMap.resource.width,
-        partOf: georeferencedMap.resource.partOf
+        partOf: georeferencedMap.resource.partOf,
+        provider: georeferencedMap.resource.provider
       }
 
       return source
@@ -83,6 +86,7 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
       width = georeferencedMap.resource.width
       height = georeferencedMap.resource.height
       partOf = georeferencedMap.resource.partOf
+      provider = georeferencedMap.resource.provider
     }
   } else {
     id = georeferencedMap.image.uri
@@ -96,7 +100,8 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
     type,
     height,
     width,
-    partOf
+    partOf,
+    provider
   }
 }
 

@@ -7,7 +7,8 @@ import {
   PointGeometrySchema,
   TransformationSchema,
   ProjectionSchema,
-  ContextSchema
+  ContextSchema,
+  ProviderSchema
 } from '../shared.js'
 
 const polygonRegex =
@@ -48,7 +49,8 @@ export const Source1Schema = z.object({
   type: ImageServiceSchema,
   height: z.number().positive(),
   width: z.number().positive(),
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const Source2Schema = z.object({
@@ -56,7 +58,8 @@ export const Source2Schema = z.object({
   type: ImageServiceSchema,
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const Canvas3Schema = z.object({
@@ -64,7 +67,8 @@ export const Canvas3Schema = z.object({
   type: z.literal('Canvas'),
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const SourceSchema = z.union([

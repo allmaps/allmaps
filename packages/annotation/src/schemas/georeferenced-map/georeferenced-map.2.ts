@@ -6,7 +6,8 @@ import {
   PartOfSchema,
   ResourceMaskSchema,
   TransformationSchema,
-  ProjectionSchema
+  ProjectionSchema,
+  ProviderSchema
 } from '../shared.js'
 
 export const GCPSchema = z.object({
@@ -19,7 +20,8 @@ export const ResourceSchema = z.object({
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
   type: ResourceTypeSchema,
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const GeoreferencedMapSchema = z.object({
