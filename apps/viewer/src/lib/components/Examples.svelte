@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  import { env } from '$env/dynamic/public'
   import examples from '$lib/components/examples.js'
 </script>
 
@@ -14,7 +14,7 @@
         <img
           alt={`Preview of ${example.title}`}
           class="border-2 bg-white/50 border-pink/20 rounded-lg aspect-3/2 overflow-clip"
-          src={`${PUBLIC_PREVIEW_URL}/${example.allmapsId}.jpg?fit=best&background=fff&width=600&height=400`}
+          src={`${env.PUBLIC_PREVIEW_URL}/${example.allmapsId}.jpg?fit=best&background=fff&width=600&height=400`}
         />
 
         <span class="underline">{example.title}</span>
