@@ -8,11 +8,17 @@
       "enabled": false
     }
   },
-  "vars": { "NODE_VERSION": "24" },
+  "vars": {
+    "NODE_VERSION": "24",
+    "PUBLIC_PREVIEW_URL": "https://preview.allmaps.org"
+  },
   "env": {
     "dev": {
       "name": "viewer-develop",
-      "vars": { "NODE_VERSION": "24" }
+      "vars": {
+        "NODE_VERSION": "24",
+        "PUBLIC_PREVIEW_URL": "https://dev.preview.allmaps.org"
+      }
     }
   }
 }

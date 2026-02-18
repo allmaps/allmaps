@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 .svelte-kit
+.wrangler
 
 dist
 build
@@ -14,6 +15,8 @@ lerna-debug.log
 .env
 .env.*
 !.env.example
+!.env.test
+!.env.development
 
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
