@@ -2,7 +2,6 @@
   import { onMount, untrack, tick } from 'svelte'
 
   import maplibregl from 'maplibre-gl'
-  import { Protocol } from 'pmtiles'
 
   import { basemapStyle, addTerrain, removeTerrain } from '@allmaps/basemap'
   import { WarpedMapLayer } from '@allmaps/maplibre'
@@ -490,8 +489,8 @@
       return
     }
 
-    const protocol = new Protocol()
-    maplibregl.addProtocol('pmtiles', protocol.tile)
+    // const protocol = new Protocol()
+    // maplibregl.addProtocol('pmtiles', protocol.tile)
 
     map = new maplibregl.Map({
       container,

@@ -42,8 +42,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/components": "workspace:^",
     "bits-ui": "catalog:",
-    "maplibre-gl": "catalog:",
-    "pmtiles": "^4.3.2"
+    "maplibre-gl": "catalog:"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
