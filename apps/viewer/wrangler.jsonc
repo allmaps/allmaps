@@ -2,6 +2,7 @@
   "name": "viewer",
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
   "observability": {
     "logs": {
