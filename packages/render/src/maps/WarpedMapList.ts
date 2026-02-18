@@ -764,8 +764,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       // Note: zIndices don't have to be updated since they only use mapId
       // Note: RTree doesn't have to be updated since they only use mapId and geoMask
 
-      this.removeEventListenersFromWarpedMap(warpedMap)
       this.addEventListenersToWarpedMap(updatedWarpedMap)
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, {
+          mapIds: [warpedMap.mapId]
+        })
+      )
     }
 
     return this
