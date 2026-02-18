@@ -10,20 +10,12 @@ export default defineConfig({
   server: {
     port: ports.viewer,
     fs: {
+      strict: false,
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },
-
-  // This define and rollupOptions are
-  // a last resort workaround to solve a Cloudflare deploy error.
-  define: {
-    'import.meta.url': JSON.stringify('http://localhost')
+  ssr: {
+    noExternal: ['maplibre-gl', 'maplibre-contour']
   },
-  build: {
-    rollupOptions: {
-      external: ['node:module']
-    }
-  },
-
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
 }) satisfies UserConfig
