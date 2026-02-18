@@ -526,12 +526,12 @@ export abstract class BaseWarpedMapLayer<
    */
   setMapTransformationType(
     mapId: string,
-    transformationType: TransformationType,
+    transformationType?: TransformationType,
     animationOptions?: Partial<AnimationOptions>
   ) {
     return this.setMapOptions(
       mapId,
-      { transformationType },
+      { transformationType: transformationType },
       undefined,
       animationOptions
     )
