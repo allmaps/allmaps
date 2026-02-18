@@ -13,5 +13,10 @@ export default defineConfig({
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },
+  define: {
+    'process.env.PUBLIC_PREVIEW_URL': JSON.stringify(
+      process.env.PUBLIC_PREVIEW_URL ?? 'https://dev.preview.allmaps.org'
+    )
+  },
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
 }) satisfies UserConfig
