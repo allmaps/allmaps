@@ -1777,9 +1777,6 @@ importers:
       '@allmaps/project':
         specifier: workspace:^
         version: link:../project
-      '@allmaps/render-wasm':
-        specifier: workspace:^
-        version: link:../render-wasm
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../stdlib
@@ -1845,14 +1842,14 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
       vite:
-        specifier: ^5.0.3
-        version: 5.4.21(@types/node@24.10.2)(lightningcss@1.30.2)
+        specifier: 'catalog:'
+        version: 7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^3.8.3
-        version: 3.9.1(@types/node@24.10.2)(rollup@4.53.3)(typescript@5.9.3)(vite@5.4.21(@types/node@24.10.2)(lightningcss@1.30.2))
+        version: 3.9.1(@types/node@24.10.2)(rollup@4.53.3)(typescript@5.9.3)(vite@7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-glsl:
         specifier: ^1.3.0
-        version: 1.5.5(@rollup/pluginutils@5.3.0(rollup@4.53.3))(esbuild@0.27.0)(vite@5.4.21(@types/node@24.10.2)(lightningcss@1.30.2))
+        version: 1.5.5(@rollup/pluginutils@5.3.0(rollup@4.53.3))(esbuild@0.27.0)(vite@7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2))
       vite-plugin-no-bundle:
         specifier: ^4.0.0
         version: 4.0.0
@@ -19290,9 +19287,26 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-glsl@1.5.5(@rollup/pluginutils@5.3.0(rollup@4.53.3))(esbuild@0.27.0)(vite@5.4.21(@types/node@24.10.2)(lightningcss@1.30.2)):
+  vite-plugin-dts@3.9.1(@types/node@24.10.2)(rollup@4.53.3)(typescript@5.9.3)(vite@7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
-      vite: 5.4.21(@types/node@24.10.2)(lightningcss@1.30.2)
+      '@microsoft/api-extractor': 7.43.0(@types/node@24.10.2)
+      '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
+      '@vue/language-core': 1.8.27(typescript@5.9.3)
+      debug: 4.4.3
+      kolorist: 1.8.0
+      magic-string: 0.30.21
+      typescript: 5.9.3
+      vue-tsc: 1.8.27(typescript@5.9.3)
+    optionalDependencies:
+      vite: 7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
+    transitivePeerDependencies:
+      - '@types/node'
+      - rollup
+      - supports-color
+
+  vite-plugin-glsl@1.5.5(@rollup/pluginutils@5.3.0(rollup@4.53.3))(esbuild@0.27.0)(vite@7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)):
+    dependencies:
+      vite: 7.2.7(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
     optionalDependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       esbuild: 0.27.0
