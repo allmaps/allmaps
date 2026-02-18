@@ -4,31 +4,45 @@ Uses the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) algorithm to generate IDs 
 
 Allmaps uses this module to create IDs from IIIF URIs. For example:
 
-* Given the following manifest URL: https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/,
-* The output of the [`generateId`](#generateid) function will be: `6f5a7b547c8f6fbe`,
-* We can use this ID to lookup the [Georeference Annotation](https://iiif.io/api/extension/georef/) for the georeferenced maps in this manifest using Allmaps API:
+- Given the following manifest URL: https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/,
+- The output of the [`generateId`](#generateid) function will be: `6f5a7b547c8f6fbe`,
+- We can use this ID to lookup the [Georeference Annotation](https://iiif.io/api/extension/georef/) for the georeferenced maps in this manifest using Allmaps API:
   https://annotations.allmaps.org/manifests/6f5a7b547c8f6fbe.
 
 To see @allmaps/id in action, view this [Observable notebook](https://observablehq.com/@allmaps/the-allmaps-id-module).
 
 ## Usage
 
-This is an ESM-only module that works in browsers and Node.js.
+This is an ESM-only module that works in browsers, Node.js, and Cloudflare Workers.
 
-Node.js:
+There are two variants:
 
-The Node.js version of @allmaps/id uses[`crypto.createHash()`](https://nodejs.org/api/crypto.html#cryptocreatehashalgorithm-options) and [`crypto.randomUUID()`](https://nodejs.org/api/crypto.html#cryptorandomuuidoptions) from the [`crypto` module](https://nodejs.org/api/crypto.html). First, run `npm install @allmaps/id`.
+- **Async** (default) — uses [`SubtleCrypto.digest()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest) and [`Crypto.randomUUID()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID). Works everywhere.
+- **Sync** (`@allmaps/id/sync`) — pure-JS SHA-1 implementation with no external dependencies. Returns values synchronously. Useful when an async context is not available (e.g. inside Svelte `$derived`).
+
+Both variants produce identical output.
+
+### Async (default)
 
 ```js
 import { generateId } from '@allmaps/id'
+
 const url = 'https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/'
 const id = await generateId(url)
 // id = '6f5a7b547c8f6fbe'
 ```
 
-Browser:
+### Sync
 
-The browser version of @allmaps/id uses the [`SubtleCrypto.digest()`](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest) and [`Crypto.randomUUID()`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID) Web APIs.
+```js
+import { generateId, generateChecksum } from '@allmaps/id/sync'
+
+const url = 'https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/'
+const id = generateId(url)
+// id = '6f5a7b547c8f6fbe'
+```
+
+### Browser (via CDN)
 
 ```html
 <script type="module">
@@ -57,16 +71,18 @@ MIT
 
 ## API
 
+### Async API (`@allmaps/id`)
+
 ### `generateChecksum(obj, length)`
 
 Generates a checksum of a JSON object.
 
 ###### Parameters
 
-* `obj` (`unknown`)
-  * JSON object.
-* `length` (`number | undefined`)
-  * Length of returned hash. The maximum length of the hash is 40 characters.
+- `obj` (`unknown`)
+  - JSON object.
+- `length` (`number | undefined`)
+  - Length of returned hash. The maximum length of the hash is 40 characters.
 
 ###### Returns
 
@@ -78,10 +94,10 @@ Generates an ID from a string using the SHA-1 algorithm. Given the same input, t
 
 ###### Parameters
 
-* `str` (`string`)
-  * Input string
-* `length` (`number | undefined`)
-  * Length of returned hash. The maximum length of the hash is 40 characters. The default length is 16.
+- `str` (`string`)
+  - Input string
+- `length` (`number | undefined`)
+  - Length of returned hash. The maximum length of the hash is 40 characters. The default length is 16.
 
 ###### Returns
 
@@ -93,9 +109,58 @@ Generates a random ID.
 
 ###### Parameters
 
-* `length` (`number | undefined`)
-  * Length of returned hash. The maximum length of the hash is 40 characters.
+- `length` (`number | undefined`)
+  - Length of returned hash. The maximum length of the hash is 40 characters.
 
 ###### Returns
 
 First `length` characters of the SHA-1 hash of a random UUID (`Promise<string>`).
+
+---
+
+### Sync API (`@allmaps/id/sync`)
+
+Same functions as the async API, but synchronous. Uses a pure-JS SHA-1 implementation with no external dependencies.
+
+### `generateChecksum(obj, length)`
+
+Generates a checksum of a JSON object.
+
+###### Parameters
+
+- `obj` (`unknown`)
+  - JSON object.
+- `length` (`number | undefined`)
+  - Length of returned hash. The maximum length of the hash is 40 characters.
+
+###### Returns
+
+First `length` characters of the SHA-1 hash of sorted and serialized version of `obj` (`string`).
+
+### `generateId(str, length)`
+
+Generates an ID from a string using the SHA-1 algorithm. Given the same input, the ID will always be the same.
+
+###### Parameters
+
+- `str` (`string`)
+  - Input string
+- `length` (`number | undefined`)
+  - Length of returned hash. The maximum length of the hash is 40 characters. The default length is 16.
+
+###### Returns
+
+First `length` characters of the SHA-1 hash of `str` (`string`).
+
+### `generateRandomId(length)`
+
+Generates a random ID.
+
+###### Parameters
+
+- `length` (`number | undefined`)
+  - Length of returned hash. The maximum length of the hash is 40 characters.
+
+###### Returns
+
+First `length` characters of the SHA-1 hash of a random UUID (`string`).

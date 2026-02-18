@@ -57,8 +57,5 @@
   },
   "engines": {
     "node": ">=v19.0.0"
-  },
-  "dependencies": {
-    "js-sha1": "^0.7.0"
   }
 }
