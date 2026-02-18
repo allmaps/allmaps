@@ -1,7 +1,7 @@
 <script lang="ts">
   import examples from '$lib/components/examples.js'
 
-  import { PUBLIC_PREVIEW_URL } from '$env/static/public'
+  const PUBLIC_PREVIEW_URL = 'https://dev.preview.allmaps.org'
 </script>
 
 <p class="text-2xl font-bold text-black p-8 text-center">
