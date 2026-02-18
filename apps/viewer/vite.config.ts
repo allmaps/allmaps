@@ -13,5 +13,17 @@ export default defineConfig({
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },
+
+  // This define and rollupOptions are
+  // a last resort workaround to solve a Cloudflare deploy error.
+  define: {
+    'import.meta.url': JSON.stringify('http://localhost')
+  },
+  build: {
+    rollupOptions: {
+      external: ['node:module']
+    }
+  },
+
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
 }) satisfies UserConfig
