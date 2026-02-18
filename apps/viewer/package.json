@@ -17,6 +17,10 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev",
     "build": "vite build",
+    "lerna-build": "lerna run build --scope @allmaps/editor --include-dependencies",
+    "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env dev",
+    "tail": "wrangler tail",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
