@@ -870,9 +870,6 @@ importers:
       maplibre-gl:
         specifier: 'catalog:'
         version: 5.18.0
-      pmtiles:
-        specifier: ^4.3.2
-        version: 4.4.0
     devDependencies:
       '@allmaps/types':
         specifier: workspace:^
@@ -8048,9 +8045,6 @@ packages:
 
   pmtiles@4.3.0:
     resolution: {integrity: sha512-wnzQeSiYT/MyO63o7AVxwt7+uKqU0QUy2lHrivM7GvecNy0m1A4voVyGey7bujnEW5Hn+ZzLdvHPoFaqrOzbPA==}
-
-  pmtiles@4.4.0:
-    resolution: {integrity: sha512-tCLI1C5134MR54i8izUWhse0QUtO/EC33n9yWp1N5dYLLvyc197U0fkF5gAJhq1TdWO9Tvl+9hgvFvM0fR27Zg==}
 
   pngjs@6.0.0:
     resolution: {integrity: sha512-TRzzuFRRmEoSW/p1KVAmiOgPco2Irlah+bGFCeNfJXxxYGwSw7YwAOAcd7X28K/m5bjBWKsC29KyoMfHbypayg==}
@@ -17422,10 +17416,6 @@ snapshots:
       fflate: 0.8.2
 
   pmtiles@4.3.0:
-    dependencies:
-      fflate: 0.8.2
-
-  pmtiles@4.4.0:
     dependencies:
       fflate: 0.8.2
 
