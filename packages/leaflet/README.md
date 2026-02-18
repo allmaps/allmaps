@@ -2043,6 +2043,22 @@ HTMLDivElement
 }
 ```
 
+### `WarpedMapLayer#getBbox(projectionOptions)`
+
+Get the bounding box of all maps
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`ProjectionOptions | undefined`)
+
+###### Returns
+
+The bbox of all maps, in the chosen projection, or undefined if there were no maps (`Bbox | undefined`).
+
 ### `WarpedMapLayer#getBounds()`
 
 Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
@@ -2056,6 +2072,38 @@ There are no parameters.
 `Array<Array<number>> | undefined`.
 
 * L.LatLngBounds in array form of all visible maps
+
+### `WarpedMapLayer#getCenter(projectionOptions)`
+
+Get the center of the bounding box of all maps
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`ProjectionOptions | undefined`)
+
+###### Returns
+
+The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps (`Point | undefined`).
+
+### `WarpedMapLayer#getConvexHull(projectionOptions)`
+
+Get the convex hull of all maps
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`ProjectionOptions | undefined`)
+
+###### Returns
+
+The convex hull of all maps, in the chosen projection, or undefined if there were no maps (`Ring | undefined`).
 
 ### `WarpedMapLayer#getDefaultOptions()`
 
@@ -2528,6 +2576,21 @@ Set the layer options
 warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
 ```
 
+### `WarpedMapLayer#setLayerTransformationType(transformationType, animationOptions)`
+
+Set the transformation type of the layer
+
+###### Parameters
+
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
 ### `WarpedMapLayer#setMapGcps(mapId, gcps, animationOptions)`
 
 Set the GCPs of a map
@@ -2627,15 +2690,7 @@ and stays accessible in the warped map's `map` property.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
+* `transformationType?` (`TransformationType | undefined`)
   * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
@@ -2701,6 +2756,30 @@ This is equivalent to using the reset function for map-specific option.
     | Partial<LeafletWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapsTransformationType(mapIds, transformationType, animationOptions)`
+
+Set the transformation type of maps
+
+This only sets the map-specific `transformationType` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original transformation type inferred from the Georeference Annotation.
+
+The original transformation type can be reset by resetting the map-specific transformation type option,
+and stays accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs for which to set the options
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
 

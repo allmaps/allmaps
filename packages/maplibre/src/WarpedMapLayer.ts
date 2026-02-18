@@ -95,7 +95,7 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the bounding box of all maps  as a MapLibre LngLatBoundsLike object
+   * Get the bounding box of all maps as a MapLibre LngLatBoundsLike object
    *
    * This is the default MapLibre getBounds() function
    *
@@ -106,7 +106,7 @@ export class WarpedMapLayer
   getBounds(): LngLatBoundsLike | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const bbox = this.renderer.warpedMapList.getMapsBbox()
+    const bbox = this.getBbox()
     if (bbox) {
       return [
         [bbox[0], bbox[1]],

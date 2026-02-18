@@ -1791,7 +1791,7 @@ Creates a WarpedMapLayer instance
 
 ### `WarpedMapLayer#getBounds()`
 
-Get the bounding box of all maps  as a MapLibre LngLatBoundsLike object
+Get the bounding box of all maps as a MapLibre LngLatBoundsLike object
 
 This is the default MapLibre getBounds() function
 
