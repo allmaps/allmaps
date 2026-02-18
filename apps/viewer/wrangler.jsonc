@@ -8,11 +8,11 @@
       "enabled": false
     }
   },
-  "vars": {},
+  "vars": { "NODE_VERSION": "24" },
   "env": {
     "dev": {
       "name": "viewer-develop",
-      "vars": {}
+      "vars": { "NODE_VERSION": "24" }
     }
   }
 }

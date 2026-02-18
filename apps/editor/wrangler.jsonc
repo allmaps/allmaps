@@ -5,13 +5,11 @@
   "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
   "observability": {
     "logs": {
-      "enabled": false,
-      "head_sampling_rate": 1,
-      "invocation_logs": true,
-      "persist": true
+      "enabled": false
     }
   },
   "vars": {
+    "NODE_VERSION": "24",
     "PUBLIC_ALLMAPS_API_WS_URL": "wss://api.allmaps.org",
     "PUBLIC_ALLMAPS_API_URL": "https://api.allmaps.org",
     "PUBLIC_ALLMAPS_ANNOTATIONS_API_URL": "https://annotations.allmaps.org",
@@ -25,6 +23,7 @@
     "dev": {
       "name": "editor-develop",
       "vars": {
+        "NODE_VERSION": "24",
         "PUBLIC_ALLMAPS_API_WS_URL": "wss://dev.api.allmaps.org",
         "PUBLIC_ALLMAPS_API_URL": "https://dev.api.allmaps.org",
         "PUBLIC_ALLMAPS_ANNOTATIONS_API_URL": "https://dev.annotations.allmaps.org",
