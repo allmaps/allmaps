@@ -278,6 +278,22 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Get the center of the bounding box of all maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param projection - Projection in which to return the result
+   * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getCenter(projectionOptions?: ProjectionOptions): Point | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
+  }
+
+  /**
    * Get the center of the bounding box of the maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
@@ -300,6 +316,22 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Get the bounding box of all maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param projection - Projection in which to return the result
+   * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getBbox(projectionOptions?: ProjectionOptions): Bbox | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
+  }
+
+  /**
    * Get the bounding box of the maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
@@ -319,6 +351,23 @@ export abstract class BaseWarpedMapLayer<
     return this.renderer.warpedMapList.getMapsBbox(
       mergePartialOptions({ mapIds }, projectionOptions)
     )
+  }
+
+  /**
+   * Get the convex hull of all maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   * @param projection - Projection in which to return the result
+   * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getConvexHull(projectionOptions?: ProjectionOptions): Ring | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
   }
 
   /**
@@ -462,6 +511,22 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Set the transformation type of the layer
+   *
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setLayerTransformationType(
+    transformationType?: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setLayerOptions(
+      { transformationType: transformationType },
+      animationOptions
+    )
+  }
+
+  /**
    * Set the GCPs of a map
    *
    * This only sets the map-specific `gcps` option of the map
@@ -531,6 +596,33 @@ export abstract class BaseWarpedMapLayer<
   ) {
     return this.setMapOptions(
       mapId,
+      { transformationType: transformationType },
+      undefined,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the transformation type of maps
+   *
+   * This only sets the map-specific `transformationType` option of the map
+   * (or more specifically of the warped map used for rendering),
+   * overwriting the original transformation type inferred from the Georeference Annotation.
+   *
+   * The original transformation type can be reset by resetting the map-specific transformation type option,
+   * and stays accessible in the warped map's `map` property.
+   *
+   * @param mapIds - Map IDs for which to set the options
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setMapsTransformationType(
+    mapIds: string[],
+    transformationType?: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapsOptions(
+      mapIds,
       { transformationType: transformationType },
       undefined,
       animationOptions
