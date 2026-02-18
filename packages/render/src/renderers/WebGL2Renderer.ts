@@ -12,7 +12,6 @@ import {
 import { supportedDistortionMeasures } from '@allmaps/transform'
 
 import { BaseRenderer } from './BaseRenderer.js'
-import { WarpedMapList } from '../maps/WarpedMapList.js'
 import {
   WebGL2WarpedMap,
   createWebGL2WarpedMapFactory
@@ -49,6 +48,7 @@ import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
 
 import type {
+  AnimationOptions,
   Renderer,
   SpecificWebGL2RenderOptions,
   WebGL2RenderOptions
@@ -68,7 +68,11 @@ const THROTTLE_CHANGED_OPTIONS = {
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
-const ANIMATION_DURATION = 750
+
+const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
+  animate: true,
+  duration: 750
+}
 
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
@@ -967,7 +971,15 @@ export class WebGL2Renderer
     )
   }
 
-  private startAnimation(mapIds: string[]) {
+  private startAnimation(
+    mapIds: string[],
+    partialAnimationOptions?: Partial<AnimationOptions>
+  ) {
+    const options = mergeOptions(
+      DEFAULT_ANIMATION_OPTIONS,
+      partialAnimationOptions
+    )
+
     // This changed() is needed to prevent a blank canvas flash
     this.changed()
     this.updateVertexBuffers(mapIds)
@@ -980,26 +992,27 @@ export class WebGL2Renderer
     this.animationProgress = 0
     this.animationStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
-      ((now: number) => this.animationFrame(now, mapIds)).bind(this)
+      ((now: number) =>
+        this.animationFrame(now, mapIds, options.duration)).bind(this)
     )
   }
 
-  private animationFrame(now: number, mapIds: string[]) {
+  private animationFrame(now: number, mapIds: string[], duration: number) {
     if (!this.animationStart) {
       this.animationStart = now
     }
 
-    if (now - this.animationStart < ANIMATION_DURATION) {
+    if (now - this.animationStart < duration) {
       // Animation is ongoing
       // animationProgress goes from 0 to 1 throughout animation
-      this.animationProgress = (now - this.animationStart) / ANIMATION_DURATION
+      this.animationProgress = (now - this.animationStart) / duration
 
       // This changed() is needed to trigger the repaint of the canvas
       this.changed()
       this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
-        ((now: number) => this.animationFrame(now, mapIds)).bind(this)
+        ((now: number) => this.animationFrame(now, mapIds, duration)).bind(this)
       )
     } else {
       // Animation ended
@@ -1120,8 +1133,8 @@ export class WebGL2Renderer
       if (!event.data?.mapIds) {
         throw new Error('Event data missing')
       }
-      const { mapIds } = event.data
-      this.startAnimation(mapIds)
+      const { mapIds, animationOptions } = event.data
+      this.startAnimation(mapIds, animationOptions)
     }
   }
 

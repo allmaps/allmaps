@@ -959,7 +959,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, {
             mapIds: changedMapIds,
-            optionKeys: changedOptionKeys
+            optionKeys: changedOptionKeys,
+            animationOptions
           })
         )
       }

@@ -1753,6 +1753,7 @@ There are no parameters.
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  animationOptions?: Partial<AnimationOptions> | undefined
   spritesInfo?: SpritesInfo | undefined
 }
 ```

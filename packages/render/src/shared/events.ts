@@ -1,4 +1,4 @@
-import { SpritesInfo } from './types'
+import { AnimationOptions, SpritesInfo } from './types'
 
 export enum WarpedMapEventType {
   // WarpedMapList > ...
@@ -46,6 +46,7 @@ export type WarpedMapEventData = {
   mapIds: string[]
   tileUrl: string
   optionKeys: string[]
+  animationOptions: Partial<AnimationOptions>
   spritesInfo: SpritesInfo
 }
 

@@ -249,6 +249,7 @@ MIT
 ###### Fields
 
 * `animate` (`boolean`)
+* `duration` (`number`)
 
 ### `BaseRenderOptions`
 
@@ -2484,6 +2485,7 @@ There are no parameters.
   mapIds?: Array<string> | undefined
   tileUrl?: string | undefined
   optionKeys?: Array<string> | undefined
+  animationOptions?: Partial<AnimationOptions> | undefined
   spritesInfo?: SpritesInfo | undefined
 }
 ```
@@ -3991,12 +3993,13 @@ Creates an instance of WebGL2Renderer.
 false
 ```
 
-### `WebGL2Renderer#animationFrame(now, mapIds)`
+### `WebGL2Renderer#animationFrame(now, mapIds, duration)`
 
 ###### Parameters
 
 * `now` (`number`)
 * `mapIds` (`Array<string>`)
+* `duration` (`number`)
 
 ###### Returns
 
@@ -4412,11 +4415,12 @@ There are no parameters.
 
 `boolean`.
 
-### `WebGL2Renderer#startAnimation(mapIds)`
+### `WebGL2Renderer#startAnimation(mapIds, partialAnimationOptions)`
 
 ###### Parameters
 
 * `mapIds` (`Array<string>`)
+* `partialAnimationOptions?` (`Partial<AnimationOptions> | undefined`)
 
 ###### Returns
 
