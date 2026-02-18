@@ -68,6 +68,7 @@
     "typescript-eslint": "^8.48.1",
     "vite": "npm:rolldown-vite@latest",
     "vite-plugin-devtools-json": "^1.0.0",
-    "phosphor-svelte": "^3.0.1"
+    "phosphor-svelte": "^3.0.1",
+    "wrangler": "^4.3.0"
   }
 }
