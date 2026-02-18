@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev",
     "build": "vite build",
-    "lerna-build": "lerna run build --scope @allmaps/editor --include-dependencies",
+    "lerna-build": "lerna run build --scope @allmaps/viewer --include-dependencies",
     "deploy": "wrangler deploy",
     "deploy:dev": "wrangler deploy --env dev",
     "tail": "wrangler tail",
