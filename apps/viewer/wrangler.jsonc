@@ -1,0 +1,18 @@
+{
+  "name": "viewer",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "compatibility_date": "2025-01-01",
+  "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
+  "observability": {
+    "logs": {
+      "enabled": false
+    }
+  },
+  "vars": {},
+  "env": {
+    "dev": {
+      "name": "viewer-develop",
+      "vars": {}
+    }
+  }
+}
