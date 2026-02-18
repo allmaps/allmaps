@@ -18,7 +18,7 @@ export type TransformationOptions = {
 
 export type QueryOptions = TransformationOptions & {
   bounds: [number, number, number, number]
-  fit: 'contain' | 'cover' | 'inside'
+  fit: 'contain' | 'cover' | 'best'
   width: number
   height: number
   background: string

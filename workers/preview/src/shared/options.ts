@@ -26,7 +26,7 @@ export function optionsFromQuery(req: IRequest): Partial<QueryOptions> {
   let color: Color | undefined
   let from: [number, number] | undefined
   let bounds: [number, number, number, number] | undefined
-  let fit: 'contain' | 'cover' | 'inside' | undefined
+  let fit: 'contain' | 'cover' | 'best' | undefined
   let width: number | undefined
   let height: number | undefined
   let background: string | undefined
@@ -72,7 +72,7 @@ export function optionsFromQuery(req: IRequest): Partial<QueryOptions> {
   // Parse fit (only if bounds is not specified)
   if (
     !bounds &&
-    (query.fit === 'contain' || query.fit === 'cover' || query.fit === 'inside')
+    (query.fit === 'contain' || query.fit === 'cover' || query.fit === 'best')
   ) {
     fit = query.fit
   }

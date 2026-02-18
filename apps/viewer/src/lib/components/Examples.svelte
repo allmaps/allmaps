@@ -13,7 +13,7 @@
         <img
           alt={`Preview of ${example.title}`}
           class="border-2 bg-white/50 border-pink/20 rounded-lg aspect-3/2 overflow-clip"
-          src={`http://localhost:5514/${example.allmapsId}.webp?fit=best&background=fff&width=600&height=400`}
+          src={`http://localhost:5514/${example.allmapsId}.jpg?fit=best&background=fff&width=600&height=400`}
         />
 
         <span class="underline">{example.title}</span>

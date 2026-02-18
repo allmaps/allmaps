@@ -51,7 +51,7 @@ export async function generateWarpedMapImage(
     // Strategy 1: Use explicit bounds
     const geoPolygon = bboxToPolygon(options.bounds)
     viewport = Viewport.fromSizeAndGeoPolygon(size, geoPolygon)
-  } else if (options.fit === 'inside') {
+  } else if (options.fit === 'best') {
     // Strategy 2: Find best inside-fit frame
     const warpedMaps = renderer.warpedMapList.getWarpedMaps()
     const mapPolygons: Polygon[] = []
