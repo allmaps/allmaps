@@ -866,12 +866,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // We loop over all warped maps and set the maps options (if there are in mapOptionsByMapId)
     // and list options (if there are)
 
-    // Some options can be set with animation.
-    // When this function is called without specific animation options,
-    // it sets options in two go's:
+    // Animation options:
+    //
+    // When this function is called with animate: undefined, it sets options in two go's:
     // 1) first all options, exept those to be animated, and fire a direct change event
     // 2) then calls itself again with the 'animate' setting to now set all options
     // including those that will cause an animation, and fire an animated change event
+    //
+    // When this function is called with animate: true, all options are set
+    // and an animated change event is fired where the options that can be animated will
+    //
+    // When this function is called with animate: true, all options are set
+    // and a immedita change event is fired where all options are changed immediately
 
     let changedOptionKeys = []
     const changedMapIds = []
