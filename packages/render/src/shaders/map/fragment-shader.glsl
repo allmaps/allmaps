@@ -3,7 +3,10 @@
 precision highp float;
 precision highp isampler2D;
 
-#include ../helpers.frag;
+uniform float u_animationProgress;
+
+uniform float u_visibilityOpacity;
+uniform float u_previousVisibilityOpacity;
 
 uniform float u_opacity;
 uniform float u_saturation;

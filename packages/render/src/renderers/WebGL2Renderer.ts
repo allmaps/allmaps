@@ -629,6 +629,23 @@ export class WebGL2Renderer
       homogeneousTransformToMatrix4(renderHomogeneousTransform)
     )
 
+    // Visible
+    const visibilityOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_visibilityOpacity'
+    )
+    gl.uniform1f(visibilityOpacityLocation, webgl2WarpedMap.visibilityOpacity)
+    const previousVisibilityOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_previousVisibilityOpacity'
+    )
+    gl.uniform1f(
+      previousVisibilityOpacityLocation,
+      webgl2WarpedMap.previousVisibilityOpacity
+    )
+
     // Opacity
     const opacityLocation = this.getUniformLocation(gl, program, 'u_opacity')
     gl.uniform1f(opacityLocation, webgl2WarpedMap.options.opacity)
@@ -982,6 +999,9 @@ export class WebGL2Renderer
 
     // This changed() is needed to prevent a blank canvas flash
     this.changed()
+    // This requestFetchableTiles() is needed to update
+    // mapsWithFetchableTilesForViewport when visible is changed
+    this.requestFetchableTiles()
     this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {

@@ -2,8 +2,6 @@
 
 precision highp float;
 
-#include ../helpers.frag;
-
 uniform mat4 u_renderHomogeneousTransform;
 uniform float u_animationProgress;
 
@@ -21,8 +19,8 @@ out vec4 v_trianglePointBarycentric;
 
 void main() {
   // Mixing previous and new triangle points
-  vec2 clipTrianglePoint = mix(a_clipPreviousTrianglePoint, a_clipTrianglePoint, easing(u_animationProgress));
-  float trianglePointDistortion = mix(a_previousTrianglePointDistortion, a_trianglePointDistortion, easing(u_animationProgress));
+  vec2 clipTrianglePoint = mix(a_clipPreviousTrianglePoint, a_clipTrianglePoint, u_animationProgress);
+  float trianglePointDistortion = mix(a_previousTrianglePointDistortion, a_trianglePointDistortion, u_animationProgress);
 
   // Set triangle points coordinates
   // Variables that start with gl_ are special global variables

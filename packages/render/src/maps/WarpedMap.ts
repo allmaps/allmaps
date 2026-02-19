@@ -22,7 +22,8 @@ import {
   objectDifference,
   omit,
   mergePartialOptions,
-  mergeTwoOptionsUnlessUndefined
+  mergeTwoOptionsUnlessUndefined,
+  mixNumbers
 } from '@allmaps/stdlib'
 
 import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
@@ -109,14 +110,16 @@ export function createWarpedMapFactory<W extends WarpedMap>() {
  * @param fetchingImageInfo - Whether the image information is loading
  * @param image - Parsed IIIF image
  * @param tileSize - Size of the tiles
- * @param mixed - Wether the options were last set by mixing previous and new properties, i.e. when rerendering during an ongoing animation
+ * @param mixed - Whether the options were last set by mixing previous and new properties, i.e. when rerendering during an ongoing animation
+ * @param visible - Visibility of the map
+ * @param previousVisible - Visibility of the previous state of the map
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
  * @param resourcePoints - The resource coordinates of the ground control points
  * @param geoPoints - The geospatial coordinates of the ground control points
  * @param projectedGeoPoints - The projected geospatial coordinates of the projected ground control points
- * @param projectedGeoPreviousTransformedResourcePoints - The projectedGeoTransformedResourcePoints of the previous transformation type, used during transformation transitions
  * @param projectedGeoTransformedResourcePoints - The resource coordinates of the ground control points, transformed to projected geospatial coordinates using the projected transformer
+ * @param projectedGeoPreviousTransformedResourcePoints - The projectedGeoTransformedResourcePoints of the previous transformation type, used during transformation transitions
  * @param resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param resourceFullMaskBbox - Bbox of the resource full mask
  * @param resourceFullMaskRectangle - Rectangle of the resource full mask bbox
@@ -126,13 +129,13 @@ export function createWarpedMapFactory<W extends WarpedMap>() {
  * @param resourceMask - Resource mask
  * @param resourceMaskBbox - Bbox of the resourceMask
  * @param resourceMaskRectangle - Rectangle of the resourceMaskBbox
- * @param previousTransformationType - Previous transformation type
  * @param transformationType - Transformation type used in the transfomer. This is loaded from the georeference annotation.
- * @param previousInternalProjection - Previous internal projection
+ * @param previousTransformationType - Previous transformation type
  * @param internalProjection - Internal projection used in the projected transformer
+ * @param previousInternalProjection - Previous internal projection
  * @param projection - Projection of the projected geospatial coordinates space
- * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
+ * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param geoFullMask - resourceAppliableMask in geospatial coordinates
  * @param geoFullMaskBbox - Bbox of the geoFullMask
  * @param geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
@@ -152,8 +155,8 @@ export function createWarpedMapFactory<W extends WarpedMap>() {
  * @param projectedGeoMaskBbox - Bbox of the projectedGeoMask
  * @param projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
  * @param resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
- * @param previousDistortionMeasure - Previous distortion measure displayed for this map
  * @param distortionMeasure - Distortion measure displayed for this map
+ * @param previousDistortionMeasure - Previous distortion measure displayed for this map
  * @param tileZoomLevelForViewport - The tile zoom level, for the current viewport
  * @param overviewTileZoomLevelForViewport - The overview tile zoom level, for the current viewport
  * @param projectedGeoBufferedViewportRectangleForViewport - The (buffered) viewport in projected geospatial coordinates, for the current viewport
@@ -182,13 +185,18 @@ export class WarpedMap extends EventTarget {
 
   mixed = false
 
+  visible!: boolean
+  previousVisible!: boolean
+  visibilityOpacity = 1
+  previousVisibilityOpacity = 1
+
   gcps!: Gcp[]
   projectedGcps!: Gcp[]
   resourcePoints!: Point[]
   geoPoints!: Point[]
   projectedGeoPoints!: Point[]
-  projectedGeoPreviousTransformedResourcePoints!: Point[]
   projectedGeoTransformedResourcePoints!: Point[]
+  projectedGeoPreviousTransformedResourcePoints!: Point[]
 
   resourceFullMask!: Ring
   resourceFullMaskBbox!: Bbox
@@ -200,15 +208,15 @@ export class WarpedMap extends EventTarget {
   resourceMaskBbox!: Bbox
   resourceMaskRectangle!: Rectangle
 
-  previousTransformationType!: TransformationType
   transformationType!: TransformationType
+  previousTransformationType!: TransformationType
 
-  previousInternalProjection!: Projection
   internalProjection!: Projection
+  previousInternalProjection!: Projection
   projection!: Projection
 
-  projectedPreviousTransformer!: ProjectedGcpTransformer
   projectedTransformer!: ProjectedGcpTransformer
+  projectedPreviousTransformer!: ProjectedGcpTransformer
   protected projectedTransformerCache: Map<
     TransformationType,
     ProjectedGcpTransformer
@@ -240,8 +248,8 @@ export class WarpedMap extends EventTarget {
 
   resourceToProjectedGeoScale!: number
 
-  previousDistortionMeasure?: DistortionMeasure
   distortionMeasure?: DistortionMeasure
+  previousDistortionMeasure?: DistortionMeasure
 
   tileZoomLevelForViewport?: TileZoomLevel
   overviewTileZoomLevelForViewport?: TileZoomLevel
@@ -483,6 +491,9 @@ export class WarpedMap extends EventTarget {
       // On init we should set the properties in a specific order
       // and update the projected transformer properties only once at the end
 
+      this.visible = this.options.visible
+      this.previousVisible = this.visible
+
       this.gcps = this.options.gcps
 
       this.resourceFullMask = this.getResourceFullMask()
@@ -501,6 +512,11 @@ export class WarpedMap extends EventTarget {
 
       this.updateProjectedTransformerProperties()
     } else {
+      if ('visible' in changedOptions) {
+        this.visible = this.options.visible
+        this.visibilityOpacity = this.visible ? 1 : 0
+      }
+
       if ('gcps' in changedOptions) {
         this.setGcps(this.options.gcps)
       }
@@ -542,15 +558,16 @@ export class WarpedMap extends EventTarget {
   }
 
   shouldRenderMap(): boolean {
-    return this.options.visible !== false
+    // this.options.visible is equal to this.visible
+    return this.options.visible !== false || this.previousVisible !== false
   }
 
   shouldRenderLines(): boolean {
-    return this.options.visible !== false
+    return this.options.visible !== false || this.previousVisible !== false
   }
 
   shouldRenderPoints(): boolean {
-    return this.options.visible !== false
+    return this.options.visible !== false || this.previousVisible !== false
   }
 
   /**
@@ -738,6 +755,8 @@ export class WarpedMap extends EventTarget {
    */
   resetPrevious() {
     this.mixed = false
+    this.previousVisible = this.visible
+    this.previousVisibilityOpacity = this.visibilityOpacity
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
@@ -753,6 +772,12 @@ export class WarpedMap extends EventTarget {
    */
   mixPreviousAndNew(t: number) {
     this.mixed = true
+    this.previousVisible = true
+    this.previousVisibilityOpacity = mixNumbers(
+      this.visibilityOpacity,
+      this.previousVisibilityOpacity,
+      t
+    )
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection

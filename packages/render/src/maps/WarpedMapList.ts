@@ -75,6 +75,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         'projection'
       ],
       animatedOptions: [
+        'visible',
         'transformationType',
         'internalProjection',
         'distortionMeasure'

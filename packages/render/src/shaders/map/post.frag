@@ -18,4 +18,6 @@ if(u_colorize) {
 }
 
 // Opacity
-color = vec4(color.rgb * u_opacity, color.a * u_opacity);
+float opacityFromVisibility = mix(u_previousVisibilityOpacity, u_visibilityOpacity, u_animationProgress);
+float opacity = u_opacity * opacityFromVisibility;
+color = vec4(color * opacity);
