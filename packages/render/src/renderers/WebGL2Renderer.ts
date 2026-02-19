@@ -238,6 +238,8 @@ export class WebGL2Renderer
       THROTTLE_CHANGED_WAIT_MS,
       THROTTLE_CHANGED_OPTIONS
     )
+
+    this.warpedMapList.updateWarpedMapsUsingFactory(warpedMapFactory)
   }
 
   initializeWebGL(gl: WebGL2RenderingContext) {
@@ -391,12 +393,9 @@ export class WebGL2Renderer
   }
 
   protected getWarpedMapListFromOptions() {
-    if (!this.options.warpedMapList || !this.options.warpedMapFactory) {
-      throw new Error('No WarpedMapList or WarpedMapFactory')
-    }
-    return this.options.warpedMapList.setWarpedMapFactory(
-      this.options.warpedMapFactory
-    )
+    const warpedMapList = super.getWarpedMapListFromOptions()
+    warpedMapList.options.warpedMapFactory = this.options.warpedMapFactory
+    return warpedMapList
   }
 
   protected updateMapsForViewport(

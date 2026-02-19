@@ -206,9 +206,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the warpedMapFactory option
-   *
-   * This updates the maps in this list using a factory.
+   * Update the maps in the list using the warpedMapFactory
    *
    * This function is used when creating a WarpedMapList from scratch
    * and later including it in a specific renderer (e.g. a WebGL2Renderer)
@@ -216,12 +214,33 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * which could not be applied in the initial WarpedMapList.
    * This function recreates the WarpedMaps using the factory.
    *
-   * @param warpedMapFactory
-   * @returns this
+   * It is import to do this after the event listeners on the warpedmaplist
+   * are added to the renderer, so the WARPEDMAPADDED event is passed.
    */
-  setWarpedMapFactory(warpedMapFactory: WarpedMapFactory<W>) {
-    this.options.warpedMapFactory = warpedMapFactory
-    return this.updateWarpedMapsUsingFactoryInternal(warpedMapFactory)
+  updateWarpedMapsUsingFactory(warpedMapFactory: WarpedMapFactory<W>) {
+    for (const warpedMap of this.warpedMapsById.values()) {
+      const updatedWarpedMap = warpedMapFactory(
+        warpedMap.mapId,
+        warpedMap.georeferencedMap,
+        this.options,
+        warpedMap.mapOptions as Partial<GetWarpedMapOptions<W>>
+      )
+
+      this.warpedMapsById.set(warpedMap.mapId, updatedWarpedMap)
+
+      // Note: zIndices don't have to be updated since they only use mapId
+      // Note: RTree doesn't have to be updated since they only use mapId and geoMask
+
+      this.addEventListenersToWarpedMap(updatedWarpedMap)
+
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, {
+          mapIds: [warpedMap.mapId]
+        })
+      )
+    }
+
+    return this
   }
 
   /**
@@ -747,33 +766,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, { mapIds: [mapId] })
     )
     return mapId
-  }
-
-  private updateWarpedMapsUsingFactoryInternal(
-    warpedMapFactory: WarpedMapFactory<W>
-  ) {
-    for (const warpedMap of this.warpedMapsById.values()) {
-      const updatedWarpedMap = warpedMapFactory(
-        warpedMap.mapId,
-        warpedMap.georeferencedMap,
-        this.options,
-        warpedMap.mapOptions as Partial<GetWarpedMapOptions<W>>
-      )
-
-      this.warpedMapsById.set(warpedMap.mapId, updatedWarpedMap)
-
-      // Note: zIndices don't have to be updated since they only use mapId
-      // Note: RTree doesn't have to be updated since they only use mapId and geoMask
-
-      this.addEventListenersToWarpedMap(updatedWarpedMap)
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, {
-          mapIds: [warpedMap.mapId]
-        })
-      )
-    }
-
-    return this
   }
 
   private async removeGeoreferencedMapInternal(
