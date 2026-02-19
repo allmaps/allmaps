@@ -364,7 +364,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     if (!this.options.warpedMapList) {
       throw new Error('No WarpedMapList')
     }
-    return this.options.warpedMapList
+    const warpedMapList = this.options.warpedMapList
+    warpedMapList.setOptions(this.options)
+    return warpedMapList
   }
 
   protected loadMissingImagesInViewport(): Promise<void>[] {
