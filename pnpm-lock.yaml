@@ -2151,18 +2151,30 @@ importers:
       '@allmaps/components':
         specifier: workspace:^
         version: link:../../packages/components
+      '@allmaps/leaflet':
+        specifier: workspace:^
+        version: link:../../packages/leaflet
       '@allmaps/maplibre':
         specifier: workspace:^
         version: link:../../packages/maplibre
+      '@allmaps/openlayers':
+        specifier: workspace:^
+        version: link:../../packages/openlayers
       '@allmaps/project':
         specifier: workspace:^
         version: link:../../packages/project
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
       maplibre-gl:
         specifier: ^5.12.0
         version: 5.17.0
+      ol:
+        specifier: ^10.8.0
+        version: 10.8.0
       pmtiles:
         specifier: ^4.3.0
         version: 4.4.0
@@ -5018,6 +5030,9 @@ packages:
   '@vue/shared@3.5.27':
     resolution: {integrity: sha512-dXr/3CgqXsJkZ0n9F3I4elY8wM9jMJpP3pvRG52r6m0tu/MsAFIe6JpXVGeNMd/D9F4hQynWT8Rfuj0bdm9kFQ==}
 
+  '@zarrita/storage@0.1.4':
+    resolution: {integrity: sha512-qURfJAQcQGRfDQ4J9HaCjGaj3jlJKc66bnRk6G/IeLUsM7WKyG7Bzsuf1EZurSXyc0I4LVcu6HaeQQ4d3kZ16g==}
+
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
@@ -6086,6 +6101,10 @@ packages:
 
   geotiff@2.1.3:
     resolution: {integrity: sha512-PT6uoF5a1+kbC3tHmZSUsLHBp2QJlHasxxxxPW47QIY1VBKpFB+FcDvX+MxER6UzgLQZ0xDzJ9s48B9JbOCTqA==}
+    engines: {node: '>=10.19'}
+
+  geotiff@3.0.3:
+    resolution: {integrity: sha512-yRoDQDYxWYiB421p0cbxJvdy79OlQW+rxDI9GDbIUeWCAh6YAZ0vlTKF448EAiEuuUpBsNaegd2flavF0p+kvw==}
     engines: {node: '>=10.19'}
 
   get-caller-file@2.0.5:
@@ -7622,6 +7641,9 @@ packages:
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
+  numcodecs@0.3.2:
+    resolution: {integrity: sha512-6YSPnmZgg0P87jnNhi3s+FVLOcIn3y+1CTIgUulA3IdASzK9fJM87sUFkpyA+be9GibGRaST2wCgkD+6U+fWKw==}
+
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
@@ -7641,6 +7663,9 @@ packages:
 
   ol@10.7.0:
     resolution: {integrity: sha512-122U5gamPqNgLpLOkogFJhgpywvd/5en2kETIDW+Ubfi9lPnZ0G9HWRdG+CX0oP8od2d6u6ky3eewIYYlrVczw==}
+
+  ol@10.8.0:
+    resolution: {integrity: sha512-kLk7jIlJvKyhVMAjORTXKjzlM6YIByZ1H/d0DBx3oq8nSPCG6/gbLr5RxukzPgwbhnAqh+xHNCmrvmFKhVMvoQ==}
 
   ol@8.2.0:
     resolution: {integrity: sha512-/m1ddd7Jsp4Kbg+l7+ozR5aKHAZNQOBAoNZ5pM9Jvh4Etkf0WGkXr9qXd7PnhmwiC1Hnc2Toz9XjCzBBvexfXw==}
@@ -8288,6 +8313,9 @@ packages:
 
   reconnecting-websocket@4.4.0:
     resolution: {integrity: sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==}
+
+  reference-spec-reader@0.2.0:
+    resolution: {integrity: sha512-q0mfCi5yZSSHXpCyxjgQeaORq3tvDsxDyzaadA/5+AbAUwRyRuuTh0aRQuE/vAOt/qzzxidJ5iDeu1cLHaNBlQ==}
 
   regex-recursion@6.0.2:
     resolution: {integrity: sha512-0YCaSCq2VRIebiaUviZNs0cBz1kg5kVS2UKUfNIx8YVs1cN3AV7NTctO5FOKBA+UT2BPJIWZauYHPqJODG50cg==}
@@ -9329,6 +9357,10 @@ packages:
       uploadthing:
         optional: true
 
+  unzipit@1.4.3:
+    resolution: {integrity: sha512-gsq2PdJIWWGhx5kcdWStvNWit9FVdTewm4SEG7gFskWs+XCVaULt9+BwuoBtJiRE8eo3L1IPAOrbByNLtLtIlg==}
+    engines: {node: '>=12'}
+
   upath@2.0.1:
     resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
     engines: {node: '>=4'}
@@ -9360,6 +9392,9 @@ packages:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
     hasBin: true
+
+  uzip-module@1.0.3:
+    resolution: {integrity: sha512-AMqwWZaknLM77G+VPYNZLEruMGWGzyigPK3/Whg99B3S6vGHuqsyl5ZrOv1UUF3paGK1U6PM0cnayioaryg/fA==}
 
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
@@ -9937,6 +9972,9 @@ packages:
     engines: {node: '>=8.0.0'}
     hasBin: true
 
+  zarrita@0.6.1:
+    resolution: {integrity: sha512-YOMTW8FT55Rz+vadTIZeOFZ/F2h4svKizyldvPtMYSxPgSNcRkOzkxCsWpIWlWzB1I/LmISmi0bEekOhLlI+Zw==}
+
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
 
@@ -9965,6 +10003,9 @@ packages:
 
   zstddec@0.1.0:
     resolution: {integrity: sha512-w2NTI8+3l3eeltKAdK8QpiLo/flRAr2p8AGeakfMZOXBxOg9HIu4LVDxBi81sYgVhFhdJjv1OrB5ssI8uFPoLg==}
+
+  zstddec@0.2.0:
+    resolution: {integrity: sha512-oyPnDa1X5c13+Y7mA/FDMNJrn4S8UNBe0KCqtDmor40Re7ALrPN6npFwyYVRRh+PqozZQdeg23QtbcamZnG5rA==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -13114,6 +13155,11 @@ snapshots:
 
   '@vue/shared@3.5.27': {}
 
+  '@zarrita/storage@0.1.4':
+    dependencies:
+      reference-spec-reader: 0.2.0
+      unzipit: 1.4.3
+
   abbrev@2.0.0: {}
 
   abbrev@4.0.0: {}
@@ -14493,6 +14539,17 @@ snapshots:
       web-worker: 1.5.0
       xml-utils: 1.10.2
       zstddec: 0.1.0
+
+  geotiff@3.0.3:
+    dependencies:
+      '@petamoriken/float16': 3.9.3
+      lerc: 3.0.0
+      pako: 2.1.0
+      parse-headers: 2.0.6
+      quick-lru: 6.1.2
+      web-worker: 1.5.0
+      xml-utils: 1.10.2
+      zstddec: 0.2.0
 
   get-caller-file@2.0.5: {}
 
@@ -16665,6 +16722,10 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
+  numcodecs@0.3.2:
+    dependencies:
+      fflate: 0.8.2
+
   object-assign@4.1.1: {}
 
   object-hash@3.0.0: {}
@@ -16686,6 +16747,15 @@ snapshots:
       geotiff: 2.1.3
       pbf: 4.0.1
       rbush: 4.0.1
+
+  ol@10.8.0:
+    dependencies:
+      '@types/rbush': 4.0.0
+      earcut: 3.0.2
+      geotiff: 3.0.3
+      pbf: 4.0.1
+      rbush: 4.0.1
+      zarrita: 0.6.1
 
   ol@8.2.0:
     dependencies:
@@ -17325,6 +17395,8 @@ snapshots:
       vfile: 6.0.3
 
   reconnecting-websocket@4.4.0: {}
+
+  reference-spec-reader@0.2.0: {}
 
   regex-recursion@6.0.2:
     dependencies:
@@ -18622,6 +18694,10 @@ snapshots:
       ofetch: 1.5.1
       ufo: 1.6.3
 
+  unzipit@1.4.3:
+    dependencies:
+      uzip-module: 1.0.3
+
   upath@2.0.1: {}
 
   update-browserslist-db@1.2.3(browserslist@4.28.1):
@@ -18650,6 +18726,8 @@ snapshots:
       diff: 5.2.2
       kleur: 4.1.5
       sade: 1.8.1
+
+  uzip-module@1.0.3: {}
 
   validate-npm-package-license@3.0.4:
     dependencies:
@@ -19282,6 +19360,11 @@ snapshots:
     optionalDependencies:
       commander: 9.5.0
 
+  zarrita@0.6.1:
+    dependencies:
+      '@zarrita/storage': 0.1.4
+      numcodecs: 0.3.2
+
   zeptomatch@2.1.0:
     dependencies:
       grammex: 3.1.12
@@ -19305,5 +19388,7 @@ snapshots:
   zod@3.25.76: {}
 
   zstddec@0.1.0: {}
+
+  zstddec@0.2.0: {}
 
   zwitch@2.0.4: {}

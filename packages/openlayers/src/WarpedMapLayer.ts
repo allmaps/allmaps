@@ -5,7 +5,10 @@ import { WebGL2Renderer } from '@allmaps/render/webgl2'
 import { Viewport, WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
-import { projectionDefinitionToAntialiasedDefinition } from '@allmaps/project'
+import {
+  projectionDefinitionToAntialiasedDefinition,
+  proj4
+} from '@allmaps/project'
 
 import type { FrameState } from 'ol/Map.js'
 import type { Extent } from 'ol/extent'
@@ -176,14 +179,16 @@ export class WarpedMapLayer
 
     const rotation = frameState.viewState.rotation
     const devicePixelRatio = window.devicePixelRatio
-    const projection = {
-      definition: projectionDefinitionToAntialiasedDefinition(
-        frameState.viewState.projection.getCode()
-      )
+
+    const projectionCode = frameState.viewState.projection.getCode()
+    const projectionDefinition = proj4.defs(projectionCode).projStr
+    if (!projectionDefinition) {
+      throw new Error(`Unknown projection code: ${projectionCode}`)
     }
-    // TODO: add a way to understand other codes then the two default ones
-    // (e.g. by including a code-to-definition dictionnary)
-    // and assure wrapping (e.g. by adding `+over`)
+    const projection = {
+      definition:
+        projectionDefinitionToAntialiasedDefinition(projectionDefinition)
+    }
 
     const viewportSize = frameState.size as [number, number]
     const viewportCenter = frameState.viewState.center as [number, number]

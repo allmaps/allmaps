@@ -17,10 +17,14 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/basemap": "workspace:^",
     "@allmaps/components": "workspace:^",
+    "@allmaps/leaflet": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
+    "@allmaps/openlayers": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
+    "leaflet": "^1.9.4",
     "maplibre-gl": "^5.12.0",
+    "ol": "^10.8.0",
     "pmtiles": "^4.3.0"
   },
   "devDependencies": {
