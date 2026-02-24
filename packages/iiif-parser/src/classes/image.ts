@@ -86,6 +86,9 @@ export class EmbeddedImage {
   ) {
     const { parsedCanvas } = options || {}
 
+    let width
+    let height
+
     if (parsedCanvas && 'service' in parsedImage) {
       const parsedEmbeddedImage = parsedImage
 
@@ -173,6 +176,14 @@ export class EmbeddedImage {
       } else {
         this.supportsAnyRegionAndSize = false
       }
+
+      if (imageService.width) {
+        width = imageService.width
+      }
+
+      if (imageService.height) {
+        height = imageService.height
+      }
     } else {
       if ('@id' in parsedImage) {
         this.uri = parsedImage['@id']
@@ -213,21 +224,28 @@ export class EmbeddedImage {
       }
     }
 
-    if (parsedImage.width !== undefined) {
-      this.width = parsedImage.width
-    } else if (parsedCanvas) {
-      this.width = parsedCanvas.width
-    } else {
-      throw new Error('Width not present on either Canvas or Image Resource')
+    if (!width) {
+      if (parsedCanvas) {
+        width = parsedCanvas.width
+      } else if (parsedImage.width !== undefined) {
+        width = parsedImage.width
+      } else {
+        throw new Error('Width not present on either Canvas or Image Resource')
+      }
     }
 
-    if (parsedImage.height !== undefined) {
-      this.height = parsedImage.height
-    } else if (parsedCanvas) {
-      this.height = parsedCanvas.height
-    } else {
-      throw new Error('Height not present on either Canvas or Image Resource')
+    if (!height) {
+      if (parsedCanvas) {
+        height = parsedCanvas.height
+      } else if (parsedImage.height !== undefined) {
+        height = parsedImage.height
+      } else {
+        throw new Error('Height not present on either Canvas or Image Resource')
+      }
     }
+
+    this.width = width
+    this.height = height
   }
 
   /**

@@ -20,15 +20,15 @@
     {
       "uri": "https://d.lib.ncsu.edu/collections/canvas/unccmc00094-002-ff0001_1-002-004_0001",
       "type": "canvas",
-      "height": 3599,
       "width": 7096,
+      "height": 3599,
       "image": {
         "embedded": true,
         "uri": "https://iiif.lib.ncsu.edu/iiif/unccmc00094-002-ff0001_1-002-004_0001",
         "type": "image",
         "supportsAnyRegionAndSize": true,
-        "width": 1170,
-        "height": 593,
+        "width": 7096,
+        "height": 3599,
         "majorVersion": 2
       },
       "label": {
