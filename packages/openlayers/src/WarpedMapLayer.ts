@@ -1,3 +1,5 @@
+import proj4 from 'proj4'
+
 import Layer from 'ol/layer/Layer.js'
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
@@ -5,10 +7,7 @@ import { WebGL2Renderer } from '@allmaps/render/webgl2'
 import { Viewport, WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
-import {
-  projectionDefinitionToAntialiasedDefinition,
-  proj4
-} from '@allmaps/project'
+import { projectionDefinitionToAntialiasedDefinition } from '@allmaps/project'
 
 import type { FrameState } from 'ol/Map.js'
 import type { Extent } from 'ol/extent'
@@ -27,6 +26,7 @@ import type {
 } from '@allmaps/render/webgl2'
 import type { Bbox, Gcp, Point, Ring, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
+import type { Projection } from '@allmaps/project'
 
 export type SpecificOpenLayersWarpedMapLayerOptions = object
 
@@ -59,6 +59,8 @@ export class WarpedMapLayer
   renderer: WebGL2Renderer
 
   canvasSize: [number, number] = [0, 0]
+
+  registeredProjections: Map<string, Projection> = new Map()
 
   private resizeObserver: ResizeObserver
 
@@ -134,6 +136,31 @@ export class WarpedMapLayer
   }
 
   /**
+   * Keep a list of registered projections.
+   *
+   * Can optionally be used to complement OpenLayer's `register(proj4)` function.
+   *
+   * To use viewport projections in OpenLayers, add projections to proj4 and register proj4
+   * (Example: https://openlayers.org/en/latest/examples/scaleline-indiana-east.html).
+   * WarpedMapLayer reads the view's projections code, gets its definition from proj4.defs
+   * (thanks to the register() function) and constructs a new Projection type (defined in @allmap/project).
+   *
+   * Using this function on top of OpenLayer's `register()`,
+   * WarpedMapLayer will look up the code in the registered projections first for a matching `id`
+   * and, if found, use this projection. This ways relavant projection information (id, name, ...)
+   * can be passed and used to all Allmaps packages.
+   *
+   * Newly registered projection overwrite older ones with the same id.
+   */
+  registerProjections(projections: Projection[]): void {
+    for (const projection of projections) {
+      if (projection.id) {
+        this.registeredProjections.set(projection.id, projection)
+      }
+    }
+  }
+
+  /**
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
@@ -181,13 +208,18 @@ export class WarpedMapLayer
     const devicePixelRatio = window.devicePixelRatio
 
     const projectionCode = frameState.viewState.projection.getCode()
-    const projectionDefinition = proj4.defs(projectionCode).projStr
-    if (!projectionDefinition) {
+    const projectionDefinitionFromProj4 = proj4.defs(projectionCode).projStr
+    let projection: Projection
+    if (this.registeredProjections.has(projectionCode)) {
+      projection = this.registeredProjections.get(projectionCode)!
+    } else if (projectionDefinitionFromProj4) {
+      projection = {
+        definition: projectionDefinitionToAntialiasedDefinition(
+          projectionDefinitionFromProj4
+        )
+      }
+    } else {
       throw new Error(`Unknown projection code: ${projectionCode}`)
-    }
-    const projection = {
-      definition:
-        projectionDefinitionToAntialiasedDefinition(projectionDefinition)
     }
 
     const viewportSize = frameState.size as [number, number]

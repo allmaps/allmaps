@@ -47,6 +47,7 @@ Built for Leaflet 1.9, but should work with earlier versions as well.
 Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
+import L from 'leaflet'
 import { WarpedMapLayer } from '@allmaps/leaflet'
 
 const map = L.map('map', {

@@ -40,10 +40,10 @@ Built for MapLibre 4.0, but should work with earlier versions as well.
 Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
+import { Map as MapLibreMap } from 'maplibre-gl'
 import { WarpedMapLayer } from '@allmaps/maplibre'
 
-// MapLibre map with base layer
-const map = new maplibregl.Map({
+const map = new MapLibreMap({
   container: 'map',
   style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
   center: [-73.9337, 40.8011],

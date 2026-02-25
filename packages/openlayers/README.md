@@ -42,28 +42,32 @@ Built for OpenLayers 8, but should work with OpenLayers 6 and OpenLayers 7 as we
 Creating a `WarpedMapLayer` and adding a Georeference Annotation to an OpenLayers map looks like this:
 
 ```js
+import Map from 'ol/Map'
+import Tile from 'ol/layer/Tile'
+import OSM from 'ol/source/OSM'
+
 import { WarpedMapLayer } from '@allmaps/openlayers'
 
-const map = new ol.Map({
+const map = new Map({
   target: 'map',
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new Tile({
+      source: new OSM()
     })
-  ],
-  view: new ol.View({
-    center: ol.proj.fromLonLat([-71.00661, 42.37124]),
-    zoom: 14
-  })
+  ]
 })
 
-// Create WarpedMapLayer
+const annotationUrl = 'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
 const warpedMapLayer = new WarpedMapLayer()
 
-// Add the WarpedMapLayer to the map and load a Georeference Annotation
-const annotationUrl = 'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
 map.addLayer(warpedMapLayer)
-warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl).then(() => {
+  const extent = warpedMapLayer
+    .getBbox({ projection: { definition: 'EPSG:3857' } })
+  if (extent) {
+    map.getView().fit(extent)
+  }
+})
 ```
 
 A Georeference Annotation can be added using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
@@ -97,6 +101,51 @@ You can listen to **events** in the typical way:
 map.on('warpedmapadded', (event) => {
   console.log(event.mapIds)
 })
+```
+
+### Viewport projections
+
+Allmaps supports two types of map projections as documented in [@allmaps/project](../project/README.md): *internal projections* and *viewport projections*. OpenLayers [supports](https://openlayers.org/en/latest/examples/scaleline-indiana-east.html) custom view projections, too. The Allmaps OpenLayers plugin can read the projection of the view of an OpenLayers map and apply it.
+
+To set a custom projection to an OpenLayers map and have Allmaps pick it up, use [the `register` function](https://openlayers.org/en/latest/apidoc/module-ol_proj_proj4.html#.register) as foreseen in OpenLayers. (This works because the plugin loads Proj4 as a peer dependency.)
+
+Optionally, also register your custom projections with the warpedMapLayer. This allows using the projection objects (including properties like `id` and `name`) through-out Allmaps. If omitted, the plugin will create new projection object containing only the definition.
+
+```js
+import proj4 from 'proj4'
+
+//... other imports
+
+// const map = ...
+// const warpedMapLayer = ...
+
+const myProjection = {
+  id: 'EPSG:28992',
+  name: 'RD new',
+  definition:
+    '+proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.4171,50.3319,465.5524,1.9342,-1.6677,9.1019,4.0725 +units=m +no_defs +type=crs'
+}
+
+proj4.defs(myProjection.id, projection.definition)
+register(proj4)
+
+// Optional
+warpedMapLayer.registerProjections([ myProjection ])
+```
+
+Then, create a new view with that projection and set the extent, computed using the current projection:
+
+```js
+const extent = warpedMapLayer
+  .getBbox({ projection: myProjection })
+if (extent) {
+  map.setView(
+    new View({
+      projection: myProjection.id
+    })
+  )
+  map.getView().fit(extent)
+}
 ```
 
 ## License

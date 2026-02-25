@@ -48,6 +48,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "proj4": "^2.20.0",
     "stream-json": "^1.9.1"
   },
   "devDependencies": {

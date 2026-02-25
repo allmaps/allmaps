@@ -52,8 +52,11 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/warpedmaplayer": "workspace:^",
-    "lodash-es": "^4.17.21",
-    "ol": "^8.2.0"
+    "lodash-es": "^4.17.21"
+  },
+  "peerDependencies": {
+    "ol": "*",
+    "proj4": "*"
   },
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
@@ -63,7 +66,9 @@
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
+    "ol": "^8.2.0",
     "prettier": "^3.6.2",
+    "proj4": "^2.20.0",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "^5.7.0",
