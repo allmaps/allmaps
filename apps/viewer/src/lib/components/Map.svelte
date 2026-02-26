@@ -293,10 +293,9 @@
             visible: true,
             applyMask: false,
             renderMask: false,
-            renderAppliableMask: true
+            renderAppliableMask: true,
+            transformationType: 'helmert'
           })
-
-          warpedMapLayer?.setMapTransformationType(selectedMapId, 'helmert')
 
           if (map && selectedWarpedMap) {
             map.fitBounds(selectedWarpedMap.geoAppliableMaskBbox, {
@@ -342,10 +341,17 @@
           const otherMapIds = warpedMapLayer
             ? warpedMapLayer.getMapIds().filter((id) => id !== selectedMapId)
             : []
-          warpedMapLayer?.setMapsOptions(otherMapIds, {
-            visible: true,
-            transformationType: undefined
-          })
+
+          warpedMapLayer?.setMapsOptions(
+            otherMapIds,
+            {
+              visible: true,
+              transformationType: undefined
+            },
+            undefined,
+            { animate: false }
+          )
+
           warpedMapLayer?.setMapOptions(selectedMapId, {
             applyMask: true,
             renderMask: true,
@@ -353,9 +359,25 @@
             transformationType: undefined
           })
 
-          // warpedMapLayer?.setMapOptions(selectedMapId, {
+          // TODO: later, when visibility should be animated for otherMapIds,
+          // animate it together with transformationType for selectedMapIdForImageView
+          // using setMapsOptionsByMapId() as below
+          // (after setting only transformationType but not visibilty with { animate: false } ) as above
+          // and same when view == image
+          //
+          // const mapsOptionsByMapId = new Map()
+          // mapsOptionsByMapId.set(selectedMapIdForImageView, {
+          //   applyMask: true,
+          //   renderMask: true,
+          //   renderAppliableMask: false,
           //   transformationType: undefined
           // })
+          // for (const mapId of otherMapIds) {
+          //   mapsOptionsByMapId.set(mapId, {
+          //     visible: true,
+          //   })
+          // }
+          // warpedMapLayer?.setMapsOptionsByMapId(mapsOptionsByMapId)
 
           if (previousMapBounds) {
             map.fitBounds(previousMapBounds, {
@@ -388,10 +410,15 @@
                 .getMapIds()
                 .filter((id) => id !== selectedMapIdForImageView)
             : []
-          warpedMapLayer?.setMapsOptions(otherMapIds, {
-            visible: false,
-            transformationType: 'helmert'
-          })
+          warpedMapLayer?.setMapsOptions(
+            otherMapIds,
+            {
+              visible: false,
+              transformationType: 'helmert'
+            },
+            undefined,
+            { animate: false }
+          )
 
           warpedMapLayer?.setMapOptions(selectedMapIdForImageView, {
             applyMask: false,
@@ -400,10 +427,7 @@
             transformationType: 'helmert'
           })
 
-          // warpedMapLayer?.setMapTransformationType(
-          //   selectedMapIdForImageView,
-          //   'helmert'
-          // )
+          // TODO: same remark as for view == map
 
           previousMapBounds = map.getBounds()
 
