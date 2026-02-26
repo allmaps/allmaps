@@ -150,11 +150,12 @@ export type AnimationOptions = {
   animate: boolean
   duration: number
 }
-export type AnimationOptionsInternal = {
-  optionKeysPossiblyChanged: string[]
-  optionKeysToOmit: string[]
-  init: boolean
+export type AnimationInternalOptions = {
+  stage: AnimationStage
+  optionKeysPossiblyChanged?: string[]
+  optionKeysToOmit?: string[]
 }
+export type AnimationStage = 'init' | 'pre' | 'animate'
 
 export type Renderer = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -48,7 +48,7 @@ import type {
   SpecificWebGL2WarpedMapOptions,
   WebGL2WarpedMapOptions,
   WarpedMapListOptions,
-  AnimationOptionsInternal
+  AnimationInternalOptions
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
@@ -267,7 +267,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   setMapOptions(
     mapOptions?: Partial<WebGL2WarpedMapOptions>,
     listOptions?: Partial<WebGL2WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
     return super.setMapOptions(mapOptions, listOptions, animationOptions)
   }

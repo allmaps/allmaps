@@ -46,7 +46,7 @@ import type {
 
 import type {
   AnimationOptions,
-  AnimationOptionsInternal,
+  AnimationInternalOptions,
   GetWarpedMapOptions,
   WarpedMapFactory,
   WarpedMapListOptions,
@@ -302,7 +302,7 @@ export class WarpedMap extends EventTarget {
       resourceMask: georeferencedMap.resourceMask
     }
     this.setDefaultOptions()
-    this.applyOptions({ init: true })
+    this.applyOptions({ stage: 'init' })
   }
 
   /**
@@ -425,7 +425,7 @@ export class WarpedMap extends EventTarget {
   setMapOptions(
     mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
     const optionKeysPossiblyChanged: string[] = []
     if (mapOptions !== undefined && Object.keys(mapOptions).length > 0) {
@@ -462,7 +462,7 @@ export class WarpedMap extends EventTarget {
   }
 
   protected applyOptions(
-    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
     const options = mergeOptionsUnlessUndefined(
       this.defaultOptions,
@@ -487,7 +487,7 @@ export class WarpedMap extends EventTarget {
     )
     this.options = mergeTwoOptionsUnlessUndefined(this.options, changedOptions)
 
-    if (animationOptions?.init) {
+    if (animationOptions?.stage == 'init') {
       // On init we should set the properties in a specific order
       // and update the projected transformer properties only once at the end
 

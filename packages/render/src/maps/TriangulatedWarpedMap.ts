@@ -13,7 +13,7 @@ import { WarpedMap } from './WarpedMap.js'
 
 import type {
   AnimationOptions,
-  AnimationOptionsInternal,
+  AnimationInternalOptions,
   SpecificTriangulatedWarpedMapOptions,
   TriangulatedWarpedMapOptions,
   WarpedMapListOptions,
@@ -155,7 +155,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   setMapOptions(
     mapOptions?: Partial<TriangulatedWarpedMapOptions>,
     listOptions?: Partial<TriangulatedWarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
     return super.setMapOptions(mapOptions, listOptions, animationOptions)
   }

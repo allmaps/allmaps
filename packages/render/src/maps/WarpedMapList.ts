@@ -30,10 +30,19 @@ import type {
   SelectionOptions,
   AnimationOptions,
   WarpedMapListOptions,
-  WarpedMapFactory
+  WarpedMapFactory,
+  AnimationInternalOptions,
+  AnimationStage
 } from '../shared/types.js'
 
-const defaultSelectionOptions: SelectionOptions = {}
+const DEFAULT_SELECTION_OPTIONS: SelectionOptions = {}
+export const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
+  animate: true,
+  duration: 750
+}
+export const DEFAULT_ANIMATION_INTERNAL_OPTIONS: AnimationInternalOptions = {
+  stage: 'pre'
+}
 
 /**
  * An ordered list of WarpedMaps. This class contains an optional RTree
@@ -297,7 +306,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     partialSelectionOptions?: Partial<SelectionOptions>
   ): Iterable<W> {
     const selectionOptions = mergeOptions(
-      defaultSelectionOptions,
+      DEFAULT_SELECTION_OPTIONS,
       partialSelectionOptions
     )
 
@@ -845,17 +854,30 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       Partial<WarpedMapListOptions<W>> | undefined
     >,
     listOptions?: Partial<WarpedMapListOptions<W>>,
-    animationOptions?: Partial<AnimationOptions>
+    partialAnimationOptions?: Partial<AnimationOptions> &
+      Partial<AnimationInternalOptions>
   ): void {
     // If there are no maps yet, return
     if (this.warpedMapsById.size === 0 || mapOptionsByMapId?.size === 0) {
       return
     }
 
-    // If the option setting should be animated,
+    const animationOptions = mergeOptions(
+      mergeOptions(
+        DEFAULT_ANIMATION_OPTIONS,
+        DEFAULT_ANIMATION_INTERNAL_OPTIONS
+      ),
+      partialAnimationOptions
+    )
+
+    // If this function is called in the 'animate' stage.
     // prepare an upcoming change
     // (i.e. mix previous and current warped map properties if the animation is ongoing)
-    if (animationOptions?.animate !== undefined) {
+    // TODO: can we omit also executing this when animationOptions.animate is false?
+    if (
+      (animationOptions.animate && animationOptions.stage == 'animate') ||
+      !animationOptions.animate
+    ) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.PREPARECHANGE, {
           mapIds: this.getMapIds()
@@ -868,24 +890,27 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     // Animation options:
     //
-    // When this function is called with animate: undefined, it sets options in two go's:
-    // 1) first all options, exept those to be animated, and fire a direct change event
-    // 2) then calls itself again with the 'animate' setting to now set all options
-    // including those that will cause an animation, and fire an animated change event
+    // When this function is called with { animate: true }, it sets options in two go's:
     //
-    // When this function is called with animate: true, all options are set
-    // and an animated change event is fired where the options that can be animated will
+    // 1) first the 'pre' stage is run:
+    // this function sets all options, exept those to be animated,
+    // and fires an immediate change event
     //
-    // When this function is called with animate: true, all options are set
-    // and a immedita change event is fired where all options are changed immediately
+    // Then this function calls itself again with the 'animate' stage
+    //
+    // 2) When the 'animate' stage is run:
+    // this function now sets all options, including those that will cause an animation,
+    // and fires an animated change event
+    //
+    // When this function is called with { animate: false }, all options are set
+    // and a immedite change event is fired where all options are changed immediately
 
     let changedOptionKeys = []
     const changedMapIds = []
     for (const warpedMap of this.getWarpedMaps()) {
-      let warpedMapChangedOptions
-      if (animationOptions?.animate === undefined) {
-        // If no animation information is specified,
-        // set all options exect those for animation
+      let warpedMapChangedOptions = {}
+      if (animationOptions.animate && animationOptions.stage == 'pre') {
+        // If animating and in the 'pre' stage: set all options except those to be animated
         const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
         warpedMapChangedOptions = warpedMap.setMapOptions(
           mapOptions,
@@ -894,10 +919,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
             optionKeysToOmit: this.options.animatedOptions
           })
         )
-      } else {
-        // If the option setting should be animated,
-        // or if the option setting should not be animated
-        // set all options
+      }
+      if (
+        (animationOptions.animate && animationOptions.stage == 'animate') ||
+        !animationOptions.animate
+      ) {
+        // If animating and in the 'animate' stage, or if not animating: set all options
         const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
         warpedMapChangedOptions = warpedMap.setMapOptions(
           mapOptions,
@@ -926,12 +953,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     changedOptionKeys = Array.from(new Set(changedOptionKeys))
 
     if (
-      animationOptions?.animate === undefined ||
-      animationOptions?.animate === false
+      (animationOptions.animate && animationOptions.stage == 'pre') ||
+      !animationOptions.animate
     ) {
-      // If no animation information is specified,
-      // or if the option setting should not be animated
-      // finish by firing a direct change
+      // If animating and in the 'pre' stage, or if not animating: finish by firing a direct change
       if (changedOptionKeys.length > 0) {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.IMMEDIATECHANGE, {
@@ -941,26 +966,27 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         )
       }
 
-      if (animationOptions?.animate === undefined) {
-        // If no animation information is specified
-        // set the options again but now all options and with animation
+      if (animationOptions.animate && animationOptions.stage == 'pre') {
+        // If animating and in the 'pre' stage:
+        // call this function again but now all options and with animation
         this.setMapsOptionsByMapIdInternal(
           mapOptionsByMapId,
           listOptions,
           mergePartialOptions(animationOptions, {
-            animate: true
-          })
+            stage: 'animate'
+          } as { stage: AnimationStage })
         )
       }
-    } else {
-      // If the option setting should be animated,
+    }
+    if (animationOptions.animate && animationOptions.stage == 'animate') {
+      // If animating and in the 'animate' stage:
       // finish by firing the animation
       if (changedOptionKeys.length > 0) {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.ANIMATEDCHANGE, {
             mapIds: changedMapIds,
             optionKeys: changedOptionKeys,
-            animationOptions
+            animationOptions: animationOptions
           })
         )
       }

@@ -16,6 +16,7 @@ import {
   WebGL2WarpedMap,
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
+import { DEFAULT_ANIMATION_OPTIONS } from '../maps/WarpedMapList.js'
 import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
@@ -68,11 +69,6 @@ const THROTTLE_CHANGED_OPTIONS = {
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
-
-const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
-  animate: true,
-  duration: 750
-}
 
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
