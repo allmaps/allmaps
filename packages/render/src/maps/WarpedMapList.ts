@@ -491,7 +491,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.options = mergeOptions(this.options, options)
-    this.internalSetMapsOptionsByMapId(undefined, options, animationOptions)
+    this.setMapsOptionsByMapIdInternal(undefined, options, animationOptions)
   }
 
   /**
@@ -515,7 +515,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     for (const mapId of mapIds) {
       optionsByMapId.set(mapId, mapOptions)
     }
-    this.internalSetMapsOptionsByMapId(
+    this.setMapsOptionsByMapIdInternal(
       optionsByMapId,
       listOptions,
       animationOptions
@@ -538,7 +538,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     listOptions?: Partial<WarpedMapListOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
-    this.internalSetMapsOptionsByMapId(
+    this.setMapsOptionsByMapIdInternal(
       mapOptionsByMapId,
       listOptions,
       animationOptions
@@ -839,7 +839,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Internal set map options
    */
-  private internalSetMapsOptionsByMapId(
+  private setMapsOptionsByMapIdInternal(
     mapOptionsByMapId?: Map<
       string,
       Partial<WarpedMapListOptions<W>> | undefined
@@ -890,9 +890,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         warpedMapChangedOptions = warpedMap.setMapOptions(
           mapOptions,
           listOptions,
-          {
+          mergePartialOptions(animationOptions, {
             optionKeysToOmit: this.options.animatedOptions
-          }
+          })
         )
       } else {
         // If the option setting should be animated,
@@ -901,7 +901,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
         warpedMapChangedOptions = warpedMap.setMapOptions(
           mapOptions,
-          listOptions
+          listOptions,
+          animationOptions
         )
       }
 
@@ -943,7 +944,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       if (animationOptions?.animate === undefined) {
         // If no animation information is specified
         // set the options again but now all options and with animation
-        this.internalSetMapsOptionsByMapId(
+        this.setMapsOptionsByMapIdInternal(
           mapOptionsByMapId,
           listOptions,
           mergePartialOptions(animationOptions, {

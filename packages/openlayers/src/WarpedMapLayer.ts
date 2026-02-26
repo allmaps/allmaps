@@ -121,15 +121,6 @@ export class WarpedMapLayer
   }
 
   /**
-   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
-   *
-   * @returns - Bounding box of all warped maps
-   */
-  getExtent(): Extent | undefined {
-    return this.getBbox()
-  }
-
-  /**
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
@@ -510,10 +501,11 @@ export class WarpedMapLayer
    * Get the bounding box of all maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
-   * @param projection - Projection in which to return the result
+   * @param projectionOptions - ProjectionOptions
    * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
   getBbox(projectionOptions?: ProjectionOptions): Bbox | undefined {
@@ -526,11 +518,12 @@ export class WarpedMapLayer
    * Get the bounding box of the maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param projectionOptions - Projection options
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
@@ -548,11 +541,12 @@ export class WarpedMapLayer
    * Get the convex hull of all maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param projectionOptions - Projection options
    * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
    */
   getConvexHull(projectionOptions?: ProjectionOptions): Ring | undefined {
@@ -565,11 +559,12 @@ export class WarpedMapLayer
    * Get the convex hull of the maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param projectionOptions - Projection options
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
