@@ -35,7 +35,7 @@ pnpm run build
 
 ## Usage
 
-Built for OpenLayers 8, but should work with OpenLayers 6 and OpenLayers 7 as well.
+Built for OpenLayers 10, but should work with OpenLayers 9, 8, 7 and 6 as well.
 
 ### Loading a Georeference Annotation
 

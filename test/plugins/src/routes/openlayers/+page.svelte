@@ -1,15 +1,16 @@
 <script lang="ts">
+  import proj4 from 'proj4'
+
   import { onMount } from 'svelte'
 
   import Map from 'ol/Map'
   import View from 'ol/View'
   import OSM from 'ol/source/OSM'
   import Tile from 'ol/layer/Tile'
-  import Layer from 'ol/layer/Layer'
   import { register } from 'ol/proj/proj4'
 
   import { WarpedMapLayer } from '@allmaps/openLayers'
-  import { proj4 } from '@allmaps/project'
+
   import type { Projection } from '@allmaps/project'
 
   let container: HTMLElement
@@ -20,7 +21,7 @@
   const annotationUrl =
     'https://sammeltassen.nl/iiif-manifests/allmaps/rotterdam-1897.json'
 
-  let selectedProjection: string | undefined = $state()
+  let selectedProjectionId: string | undefined = $state()
   let defaultProjections: Projection[] = [
     {
       id: 'EPSG:3857',
@@ -62,7 +63,11 @@
     })
 
     warpedMapLayer = new WarpedMapLayer()
-    map.addLayer(warpedMapLayer as unknown as Layer)
+
+    // Optional: register projections with warpedmaplayer to use existing projections instead of creating new ones from their definition
+    warpedMapLayer.registerProjections(extraProjections)
+
+    map.addLayer(warpedMapLayer)
     warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl).then(() => {
       const extent = warpedMapLayer
         .getWarpedMapList()
@@ -74,16 +79,14 @@
   })
 
   $effect(() => {
-    if (selectedProjection) {
-      console.log('selectedProjection', selectedProjection)
+    if (selectedProjectionId) {
       const extent = warpedMapLayer
         .getWarpedMapList()
-        .getMapsBbox({ projection: { definition: selectedProjection } })
-      console.log(extent)
+        .getMapsBbox({ projection: { definition: selectedProjectionId } })
       if (extent) {
         map.setView(
           new View({
-            projection: selectedProjection
+            projection: selectedProjectionId
           })
         )
         map.getView().fit(extent, { padding: [25, 25, 25, 25] })
@@ -100,7 +103,7 @@
       name="projection"
       id="projection-select"
       class="bg-white p-2 rounded"
-      bind:value={selectedProjection}
+      bind:value={selectedProjectionId}
     >
       {#each projections as projection}
         <option value={projection.id}>{projection.name}</option>
