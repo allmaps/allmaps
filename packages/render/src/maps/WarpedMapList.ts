@@ -64,6 +64,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   options: WarpedMapListOptions<W>
 
+  private boundImageLoadedByMapId: Map<string, EventListener> = new Map()
+
   /**
    * Creates an instance of a WarpedMapList
    *
@@ -1029,16 +1031,17 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   private addEventListenersToWarpedMap(warpedMap: W) {
-    warpedMap.addEventListener(
-      WarpedMapEventType.IMAGELOADED,
-      this.imageLoaded.bind(this, warpedMap.mapId)
-    )
+    const bound = this.imageLoaded.bind(this, warpedMap.mapId)
+    this.boundImageLoadedByMapId.set(warpedMap.mapId, bound)
+
+    warpedMap.addEventListener(WarpedMapEventType.IMAGELOADED, bound)
   }
 
   private removeEventListenersFromWarpedMap(warpedMap: W) {
-    warpedMap.removeEventListener(
-      WarpedMapEventType.IMAGELOADED,
-      this.imageLoaded.bind(this, warpedMap.mapId)
-    )
+    const bound = this.boundImageLoadedByMapId.get(warpedMap.mapId)
+    if (bound) {
+      warpedMap.removeEventListener(WarpedMapEventType.IMAGELOADED, bound)
+      this.boundImageLoadedByMapId.delete(warpedMap.mapId)
+    }
   }
 }

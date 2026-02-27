@@ -110,6 +110,8 @@ export class WebGL2Renderer
 
   private throttledChanged: DebouncedFunc<typeof this.changed>
 
+  private boundThrottledChangedByMapId: Map<string, EventListener> = new Map()
+
   /**
    * Creates an instance of WebGL2Renderer.
    *
@@ -1164,19 +1166,22 @@ export class WebGL2Renderer
   }
 
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    webgl2WarpedMap.addEventListener(
-      WarpedMapEventType.TEXTURESUPDATED,
-      this.throttledChanged.bind(this)
-    )
+    const bound = this.throttledChanged.bind(this)
+    this.boundThrottledChangedByMapId.set(webgl2WarpedMap.mapId, bound)
+    webgl2WarpedMap.addEventListener(WarpedMapEventType.TEXTURESUPDATED, bound)
   }
 
   private removeEventListenersFromWebGL2WarpedMap(
     webgl2WarpedMap: WebGL2WarpedMap
   ) {
-    webgl2WarpedMap.removeEventListener(
-      WarpedMapEventType.TEXTURESUPDATED,
-      this.throttledChanged.bind(this)
-    )
+    const bound = this.boundThrottledChangedByMapId.get(webgl2WarpedMap.mapId)
+    if (bound) {
+      webgl2WarpedMap.removeEventListener(
+        WarpedMapEventType.TEXTURESUPDATED,
+        bound
+      )
+      this.boundThrottledChangedByMapId.delete(webgl2WarpedMap.mapId)
+    }
   }
 
   contextLost() {
