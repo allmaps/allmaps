@@ -111,7 +111,9 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     debugTriangulation: false
   }
 
-const DEFAULT_SHOULD_RENDER_OPTIONS = { checkOpacity: true }
+const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
+  checkOpacity: true
+}
 
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
@@ -310,11 +312,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   shouldRenderMap(partialOptions?: Partial<ShouldRenderOptions>): boolean {
     const options = mergeOptions(DEFAULT_SHOULD_RENDER_OPTIONS, partialOptions)
-    return super.shouldRenderMap(partialOptions) &&
+    return (
+      super.shouldRenderMap(partialOptions) &&
       this.options.renderMaps !== false &&
-      options.checkOpacity
-      ? this.options.opacity !== 0
-      : true
+      (options.checkOpacity ? this.options.opacity !== 0 : true)
+    )
   }
 
   shouldRenderLines(): boolean {

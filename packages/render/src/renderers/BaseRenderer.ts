@@ -740,7 +740,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.shouldRenderMap({ checkOpacity: false })) {
+    if (!warpedMap.shouldRenderMap()) {
       return []
     }
 
@@ -780,10 +780,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       .at(-1)
     warpedMap.setOverviewTileZoomLevelForViewport(overviewTileZoomLevel)
 
-    // If this map it ourside of the viewport with overview buffer, stop here:
+    // If this map it outside of the viewport with overview buffer, or if the map is invisible, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
-    if (!mapsInViewportForOverviewRequest.has(mapId)) {
+    if (
+      !mapsInViewportForOverviewRequest.has(mapId) ||
+      !warpedMap.shouldRenderMap()
+    ) {
       return []
     }
 
