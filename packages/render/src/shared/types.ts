@@ -152,6 +152,7 @@ export type TileCacheOptions<D> = {
 // The options when setting options
 export type AnimationOptions = {
   animate: boolean
+  animatedOptions?: string[]
   duration: number
 }
 export type AnimationInternalOptions = {

@@ -918,7 +918,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
           mapOptions,
           listOptions,
           mergePartialOptions(animationOptions, {
-            optionKeysToOmit: this.options.animatedOptions
+            optionKeysToOmit:
+              animationOptions.animatedOptions ?? this.options.animatedOptions
           })
         )
       }
