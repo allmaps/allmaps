@@ -731,7 +731,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.shouldRenderMap()) {
+    if (!warpedMap.shouldRenderMap({ checkOpacity: false })) {
       return []
     }
 

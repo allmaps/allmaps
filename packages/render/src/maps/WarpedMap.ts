@@ -50,7 +50,8 @@ import type {
   GetWarpedMapOptions,
   WarpedMapFactory,
   WarpedMapListOptions,
-  WarpedMapOptions
+  WarpedMapOptions,
+  ShouldRenderOptions
 } from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
@@ -557,7 +558,7 @@ export class WarpedMap extends EventTarget {
     return changedOptions
   }
 
-  shouldRenderMap(): boolean {
+  shouldRenderMap(_partialOptions?: Partial<ShouldRenderOptions>): boolean {
     // this.options.visible is equal to this.visible
     return this.options.visible !== false || this.previousVisible !== false
   }

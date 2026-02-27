@@ -21,6 +21,10 @@ import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type { WebGL2WarpedMap } from '../webgl2.js'
 import type { TriangulatedWarpedMap } from '../maps/TriangulatedWarpedMap.js'
 
+export type ShouldRenderOptions = {
+  checkOpacity: boolean
+}
+
 export type SelectionOptions = {
   onlyVisible?: boolean
   mapIds?: Iterable<string>
