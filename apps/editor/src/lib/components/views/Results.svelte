@@ -60,6 +60,7 @@
       projection: lonLatProjection
     })
     const geoMask = transformer.transformToGeo([map.resourceMask])
+
     return computeBbox(geoMask)
   }
 
@@ -75,8 +76,12 @@
     if (scopeState.maps) {
       const bboxes: Bbox[] = []
       for (const map of scopeState.maps) {
-        const bbox = computeGeoreferencedMapBbox(map)
-        bboxes.push(bbox)
+        try {
+          const bbox = computeGeoreferencedMapBbox(map)
+          bboxes.push(bbox)
+        } catch {
+          // If we can't compute a bbox for a map, we just skip it.
+        }
       }
       if (bboxes.length > 0) {
         const combinedBbox = combineBboxes(...bboxes)
