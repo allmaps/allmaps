@@ -232,10 +232,7 @@ export class MapsState extends MapsEventTarget {
     }
   }
 
-  #handleOperation(op: unknown) {
-    // Function also passes 2nd parameter localOperation: boolean
-    // I think we don't need to use it.
-
+  #handleOperation(op: unknown, localOperation: boolean) {
     if (op && this.#doc) {
       this.#maps = this.#doc.data
 
@@ -250,7 +247,8 @@ export class MapsState extends MapsEventTarget {
 
             const detail = {
               mapId,
-              map
+              map,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -258,7 +256,8 @@ export class MapsState extends MapsEventTarget {
             )
           } else if (isRemoveInstruction(instruction)) {
             const detail = {
-              mapId
+              mapId,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -277,7 +276,8 @@ export class MapsState extends MapsEventTarget {
 
               const detail = {
                 mapId,
-                resourceMask
+                resourceMask,
+                localOperation
               }
 
               this.dispatchEvent(
@@ -300,7 +300,8 @@ export class MapsState extends MapsEventTarget {
             const detail = {
               mapId,
               index,
-              point
+              point,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -318,7 +319,8 @@ export class MapsState extends MapsEventTarget {
             const detail = {
               mapId,
               index,
-              point
+              point,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -332,7 +334,8 @@ export class MapsState extends MapsEventTarget {
           } else if (isRemoveInstruction(instruction)) {
             const detail = {
               mapId,
-              index
+              index,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -359,7 +362,8 @@ export class MapsState extends MapsEventTarget {
 
               const detail = {
                 mapId,
-                gcps: gcpList
+                gcps: gcpList,
+                localOperation
               }
 
               this.dispatchEvent(
@@ -381,7 +385,8 @@ export class MapsState extends MapsEventTarget {
             const detail = {
               mapId,
               gcpId,
-              gcp
+              gcp,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -394,7 +399,8 @@ export class MapsState extends MapsEventTarget {
             const detail = {
               mapId,
               gcpId,
-              gcp
+              gcp,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -403,7 +409,8 @@ export class MapsState extends MapsEventTarget {
           } else if (isRemoveInstruction(instruction)) {
             const detail = {
               mapId,
-              gcpId
+              gcpId,
+              localOperation
             }
 
             this.dispatchEvent(
@@ -420,7 +427,8 @@ export class MapsState extends MapsEventTarget {
 
           const detail = {
             mapId,
-            transformation
+            transformation,
+            localOperation
           }
 
           this.dispatchEvent(
@@ -438,7 +446,8 @@ export class MapsState extends MapsEventTarget {
 
           const detail = {
             mapId,
-            resourceCrs
+            resourceCrs,
+            localOperation
           }
 
           this.dispatchEvent(
