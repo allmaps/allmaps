@@ -137,11 +137,11 @@
   }
 
   function removeGcp(gcpId: string) {
-    if (resourceDraw && resourceDraw.getSnapshotFeature(gcpId)) {
+    if (resourceDraw && resourceDraw.hasFeature(gcpId)) {
       resourceDraw.removeFeatures([gcpId])
     }
 
-    if (geoDraw && geoDraw.getSnapshotFeature(gcpId)) {
+    if (geoDraw && geoDraw.hasFeature(gcpId)) {
       geoDraw.removeFeatures([gcpId])
     }
 
@@ -169,7 +169,8 @@
 
   function handleReplaceGcp(event: ReplaceGcpEvent) {
     const mapId = event.detail.mapId
-    if (mapId === currentDisplayMapId) {
+
+    if (mapId === currentDisplayMapId && !event.detail.localOperation) {
       const gcpId = event.detail.gcp.id
       replaceGcpFromState(gcpId)
     }
@@ -361,10 +362,70 @@
 
     const gcp = mapsState.activeMap?.gcps[gcpId]
     if (gcp) {
-      removeGcp(gcp.id)
-      addGcp(gcp)
+      if (gcp.resource && gcp.geo) {
+        addOrUpdateResourceGcpFeature(gcpId, gcp.resource)
+        addOrUpdateGeoGcpFeature(gcpId, gcp.geo)
+      } else if (gcp.resource && !gcp.geo) {
+        addOrUpdateResourceGcpFeature(gcpId, gcp.resource)
+        removeGeoGcpFeature(gcpId)
+      } else if (!gcp.resource && gcp.geo) {
+        removeResourceGcpFeature(gcpId)
+        addOrUpdateGeoGcpFeature(gcpId, gcp.geo)
+      }
     } else {
       console.error(`Error setting new geometries for GCP ${gcpId}`)
+    }
+  }
+
+  function addOrUpdateResourceGcpFeature(gcpId: string, resourcePoint: Point) {
+    if (resourceDraw && resourceTransformer) {
+      if (resourceDraw.hasFeature(gcpId)) {
+        resourceDraw.updateFeatureGeometry(gcpId, {
+          type: 'Point',
+          coordinates: resourceTransformer.transformToGeo(resourcePoint)
+        })
+      } else {
+        addGeoGcpFeature(
+          {
+            id: gcpId,
+            index: gcpIndexFromGcpId(gcpId),
+            resource: resourcePoint
+          },
+          displayIndexFromGcpId(gcpId)
+        )
+      }
+    }
+  }
+
+  function addOrUpdateGeoGcpFeature(gcpId: string, geoPoint: Point) {
+    if (geoDraw) {
+      if (geoDraw.hasFeature(gcpId)) {
+        geoDraw.updateFeatureGeometry(gcpId, {
+          type: 'Point',
+          coordinates: geoPoint
+        })
+      } else {
+        addGeoGcpFeature(
+          {
+            id: gcpId,
+            index: gcpIndexFromGcpId(gcpId),
+            geo: geoPoint
+          },
+          displayIndexFromGcpId(gcpId)
+        )
+      }
+    }
+  }
+
+  function removeResourceGcpFeature(gcpId: string) {
+    if (resourceDraw && resourceDraw.hasFeature(gcpId)) {
+      resourceDraw.removeFeatures([gcpId])
+    }
+  }
+
+  function removeGeoGcpFeature(gcpId: string) {
+    if (geoDraw && geoDraw.hasFeature(gcpId)) {
+      geoDraw.removeFeatures([gcpId])
     }
   }
 
@@ -381,6 +442,11 @@
     if (type === 'update' && ids.length === 1) {
       const gcpId = ensureStringId(ids[0])
       makeGcpFeatureActive(gcpId)
+    } else if (type === 'delete') {
+      ids.forEach((id) => {
+        const gcpId = ensureStringId(id)
+        handleGcpDeleted('resource', gcpId)
+      })
     }
   }
 
@@ -400,6 +466,48 @@
     if (type === 'update' && ids.length === 1) {
       const gcpId = ensureStringId(ids[0])
       makeGcpFeatureActive(gcpId)
+    } else if (type === 'delete') {
+      ids.forEach((id) => {
+        const gcpId = ensureStringId(id)
+        handleGcpDeleted('geo', gcpId)
+      })
+    }
+  }
+
+  function handleGcpDeleted(pane: 'resource' | 'geo', gcpId: string) {
+    const mapId = mapsState.activeMapId
+    const gcp = mapsState.activeMap?.gcps[gcpId]
+
+    if (mapId && gcp) {
+      const gcps = mapsState.activeMap?.gcps
+
+      if (pane === 'geo') {
+        if (!gcp.resource) {
+          mapsState.removeGcp({ mapId, gcpId })
+        } else if (gcp.geo) {
+          mapsState.replaceGcp({
+            mapId,
+            gcp: {
+              id: gcpId,
+              index: gcp.index,
+              resource: gcp.resource
+            }
+          })
+        }
+      } else if (pane === 'resource') {
+        if (!gcp.geo) {
+          mapsState.removeGcp({ mapId, gcpId })
+        } else if (gcp.resource) {
+          mapsState.replaceGcp({
+            mapId,
+            gcp: {
+              id: gcpId,
+              index: gcp.index,
+              geo: gcp.geo
+            }
+          })
+        }
+      }
     }
   }
 
@@ -416,28 +524,42 @@
     }
   }
 
-  function addGcp(gcp: DbGcp3) {
-    if (!resourceDraw || !geoDraw) {
+  function addResourceGcpFeature(gcp: DbGcp3, displayIndex: number) {
+    if (!resourceDraw) {
       console.error('Cannot set GCPs, maps not ready')
       return
     }
 
-    const displayIndex = displayIndexFromGcpId(gcp.id)
-
     const resourceFeature = createResourceGcpFeature(gcp, displayIndex)
-    const geoFeature = createGeoGcpFeature(gcp, displayIndex)
-
     if (resourceFeature) {
       resourceDraw.addFeatures([resourceFeature])
     }
 
+    return resourceFeature
+  }
+
+  function addGeoGcpFeature(gcp: DbGcp3, displayIndex: number) {
+    if (!geoDraw) {
+      console.error('Cannot set GCPs, maps not ready')
+      return
+    }
+
+    const geoFeature = createGeoGcpFeature(gcp, displayIndex)
     if (geoFeature) {
       geoDraw.addFeatures([geoFeature])
     }
 
+    return geoFeature
+  }
+
+  function addGcp(gcp: DbGcp3) {
+    const displayIndex = displayIndexFromGcpId(gcp.id)
+    const resourceGcpFeature = addResourceGcpFeature(gcp, displayIndex)
+    const geoGcpFeature = addGeoGcpFeature(gcp, displayIndex)
+
     return {
-      resource: resourceFeature,
-      geo: geoFeature
+      resource: resourceGcpFeature,
+      geo: geoGcpFeature
     }
   }
 
@@ -624,6 +746,7 @@
     if (linkWithExistingGcp && existingGcpId) {
       const newGcp = gcpFromGcpId(newGcpId)
       const existingGcp = gcpFromGcpId(existingGcpId)
+
       draw.removeFeatures([newGcpId])
 
       addGcp({
@@ -864,6 +987,7 @@
     if (
       mapsReady &&
       mapsState.connected &&
+      resourceTransformer &&
       mapsState.activeMapId !== currentDisplayMapId &&
       mapsState.connectedImageId &&
       mapsState.connectedImageId !== currentDisplayImageId
