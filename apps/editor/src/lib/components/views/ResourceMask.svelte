@@ -31,6 +31,7 @@
   import YesNo from '$lib/components/YesNo.svelte'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
+
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
   import type { GcpTransformer } from '@allmaps/transform'
@@ -54,6 +55,14 @@
   } from '$lib/shared/constants.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
+
+  type TerraDrawOnChangeContext =
+    | { origin: 'api'; target?: 'geometry' | 'properties' }
+    | { target?: 'geometry' | 'properties' }
+
+  type PolygonModeOptions = NonNullable<
+    ConstructorParameters<typeof TerraDrawPolygonMode>[0]
+  >
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -206,7 +215,17 @@
     activeMapId = mapId
 
     if (resourceDraw && redraw) {
-      resourceDraw.updateModeOptions('polygon', getModeOptions())
+      // TODO: passing the full getModeOptions() here causes "Unsupported geometry type
+      // for coordinate points" in terra-draw >= 1.21. When updateModeOptions is called
+      // with showCoordinatePoints: true, terra-draw iterates all features with
+      // mode === 'polygon', which includes the Point guidance features (coordinate
+      // points), and then tries to call setFeatureCoordinatePoints on them — which
+      // only supports Polygon and LineString geometries. Passing only styles avoids
+      // the showCoordinatePoints code path entirely. Remove the `.styles` unwrapping
+      // and pass getModeOptions() directly once terra-draw fixes this bug.
+      resourceDraw.updateModeOptions('polygon', {
+        styles: getModeOptions().styles
+      })
     }
   }
 
@@ -283,10 +302,11 @@
   function handleDrawChange(
     ids: (string | number)[],
     type: string,
-    context?: { origin: 'api' }
+    context?: TerraDrawOnChangeContext
   ) {
     if (ids.length === 1) {
-      const hasApiOrigin = context && context.origin === 'api'
+      const hasApiOrigin =
+        context && 'origin' in context && context.origin === 'api'
 
       if (type === 'update') {
         const id = ensureStringId(ids[0])
@@ -405,8 +425,8 @@
   }
 
   function handleDrawFinish(
-    id: string | number,
-    context: { action: string; mode: string }
+    id: string | number
+    // context: { action: string; mode: string }
   ) {
     if (!transformer) {
       throw new Error('Transformer not initialized')
@@ -421,11 +441,25 @@
     if (feature) {
       isDrawing = false
 
-      if (context.action === 'edit') {
+      // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
+      // context.action is incorrectly set to 'draw' instead of 'edit' (the
+      // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
+      // we cannot rely on context.action to distinguish edits from new draws.
+      // Instead we check whether the map already exists in state.
+      const mapId = ensureStringId(feature.id)
+      const isExistingMap = mapId != null && mapsState.getMapById(mapId) != null
+
+      if (isExistingMap) {
         handleFeatureEdited(transformer, feature)
-      } else if (context.action === 'draw') {
+      } else {
         handleFeatureDrawn(transformer, feature)
       }
+
+      // if (context.action === 'edit') {
+      //   handleFeatureEdited(transformer, feature)
+      // } else if (context.action === 'draw') {
+      //   handleFeatureDrawn(transformer, feature)
+      // }
     }
   }
 
@@ -488,7 +522,7 @@
     }
   }
 
-  function getModeOptions() {
+  function getModeOptions(): PolygonModeOptions {
     return {
       editable: true,
       showCoordinatePoints: true,
