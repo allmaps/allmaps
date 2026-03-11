@@ -447,7 +447,7 @@
       // we cannot rely on context.action to distinguish edits from new draws.
       // Instead we check whether the map already exists in state.
       const mapId = ensureStringId(feature.id)
-      const isExistingMap = mapId != null && mapsState.getMapById(mapId) != null
+      const isExistingMap = mapId && mapsState.getMapById(mapId)
 
       if (isExistingMap) {
         handleFeatureEdited(transformer, feature)

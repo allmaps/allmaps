@@ -65,6 +65,10 @@
   } from '$lib/types/events.js'
   import type { Env } from '$lib/types/env.js'
 
+  type TerraDrawOnChangeContext =
+    | { origin: 'api'; target?: 'geometry' | 'properties' }
+    | { target?: 'geometry' | 'properties' }
+
   const sourceState = getSourceState()
   const mapsState = getMapsState()
   const uiState = getUiState()
@@ -438,11 +442,18 @@
     }
   }
 
-  function handleResourceDrawChange(ids: (string | number)[], type: string) {
-    if (type === 'update' && ids.length === 1) {
+  function handleResourceDrawChange(
+    ids: (string | number)[],
+    type: string,
+    context?: TerraDrawOnChangeContext
+  ) {
+    const hasApiOrigin =
+      context && 'origin' in context && context.origin === 'api'
+
+    if (type === 'update' && ids.length === 1 && !hasApiOrigin) {
       const gcpId = ensureStringId(ids[0])
       makeGcpFeatureActive(gcpId)
-    } else if (type === 'delete') {
+    } else if (type === 'delete' && !hasApiOrigin) {
       ids.forEach((id) => {
         const gcpId = ensureStringId(id)
         handleGcpDeleted('resource', gcpId)
@@ -451,22 +462,43 @@
   }
 
   function handleResourceDrawFinish(
-    id: string | number,
-    context: { action: string; mode: string }
+    id: string | number
+    // context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
-    if (context.action === 'edit') {
+
+    // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
+    // context.action is incorrectly set to 'draw' instead of 'edit' (the
+    // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
+    // we cannot rely on context.action to distinguish edits from new draws.
+    // Instead we check whether the map already exists in state.
+    const isExistingGcp = gcpId && mapsState.activeMap?.gcps[gcpId]
+
+    if (isExistingGcp) {
       handleDrawFinishEdited(gcpId)
-    } else if (resourceDraw && context.action === 'draw') {
+    } else if (resourceDraw) {
       handleDrawFinishDrawn(resourceDraw, gcpId)
     }
+
+    // if (context.action === 'edit') {
+    //   handleDrawFinishEdited(gcpId)
+    // } else if (resourceDraw && context.action === 'draw') {
+    //   handleDrawFinishDrawn(resourceDraw, gcpId)
+    // }
   }
 
-  function handleGeoDrawChange(ids: (string | number)[], type: string) {
-    if (type === 'update' && ids.length === 1) {
+  function handleGeoDrawChange(
+    ids: (string | number)[],
+    type: string,
+    context?: TerraDrawOnChangeContext
+  ) {
+    const hasApiOrigin =
+      context && 'origin' in context && context.origin === 'api'
+
+    if (type === 'update' && ids.length === 1 && !hasApiOrigin) {
       const gcpId = ensureStringId(ids[0])
       makeGcpFeatureActive(gcpId)
-    } else if (type === 'delete') {
+    } else if (type === 'delete' && !hasApiOrigin) {
       ids.forEach((id) => {
         const gcpId = ensureStringId(id)
         handleGcpDeleted('geo', gcpId)
@@ -512,16 +544,29 @@
   }
 
   function handleGeoDrawFinish(
-    id: string | number,
-    context: { action: string; mode: string }
+    id: string | number
+    // context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
 
-    if (context.action === 'edit') {
+    // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
+    // context.action is incorrectly set to 'draw' instead of 'edit' (the
+    // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
+    // we cannot rely on context.action to distinguish edits from new draws.
+    // Instead we check whether the map already exists in state.
+    const isExistingGcp = gcpId && mapsState.activeMap?.gcps[gcpId]
+
+    if (isExistingGcp) {
       handleDrawFinishEdited(gcpId)
-    } else if (geoDraw && context.action === 'draw') {
+    } else if (geoDraw) {
       handleDrawFinishDrawn(geoDraw, gcpId)
     }
+
+    // if (context.action === 'edit') {
+    //   handleDrawFinishEdited(gcpId)
+    // } else if (geoDraw && context.action === 'draw') {
+    //   handleDrawFinishDrawn(geoDraw, gcpId)
+    // }
   }
 
   function addResourceGcpFeature(gcp: DbGcp3, displayIndex: number) {
@@ -901,6 +946,11 @@
         duration,
         padding: MAPLIBRE_PADDING
       })
+    } else if (resourceWarpedMapLayerBounds) {
+      resourceMap?.fitBounds(resourceWarpedMapLayerBounds, {
+        duration,
+        padding: MAPLIBRE_PADDING
+      })
     }
 
     if (geoViewport) {
@@ -988,9 +1038,9 @@
       mapsReady &&
       mapsState.connected &&
       resourceTransformer &&
-      mapsState.activeMapId !== currentDisplayMapId &&
       mapsState.connectedImageId &&
-      mapsState.connectedImageId !== currentDisplayImageId
+      (mapsState.activeMapId !== currentDisplayMapId ||
+        mapsState.connectedImageId !== currentDisplayImageId)
     ) {
       if (mapsState.activeMap) {
         initializeGcps(mapsState.connectedImageId, mapsState.activeMap)
@@ -1121,6 +1171,7 @@
     bind:transformer={resourceTransformer}
     bind:warpedMapLayerBounds={resourceWarpedMapLayerBounds}
     initialViewport={resourceViewport}
+    mapId={mapsState.activeMapId}
     resourceMask={mapsState.activeMap?.resourceMask}
     renderMasks={uiState.georeferenceOptions.renderMasks}
   />

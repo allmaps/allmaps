@@ -423,6 +423,7 @@
       const maps = mapsMergedState.getMapsById(mapIds)
       setGeoreferencedMaps(maps).finally(() => {
         if (warpedMapLayer && currentMapIds.size) {
+          // @ts-expect-error incorrect MapLibre types
           warpedMapLayerBounds = warpedMapLayer.getBounds()
         }
       })
