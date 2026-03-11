@@ -16,11 +16,11 @@ export function isCallbackValid(callback: string) {
 }
 
 export const organizationsWithCollectionsOnHomepage: OrganizationWithId[] = [
-  {
-    title: 'Leiden University Libraries',
-    id: 'leiden',
-    baseUrls: ['https://iiif.universiteitleiden.nl']
-  },
+  // {
+  //   title: 'Leiden University Libraries',
+  //   id: 'leiden',
+  //   baseUrls: ['https://iiif.universiteitleiden.nl']
+  // },
   {
     id: 'lmec',
     title: 'Leventhal Map & Education Center',
@@ -40,12 +40,12 @@ export const organizationsWithCollectionsOnHomepage: OrganizationWithId[] = [
     label: (title: string) => `the ${title}`,
     baseUrls: ['https://map-view.nls.uk']
   },
-  {
-    id: 'loc',
-    title: 'Library of Congress',
-    label: (title: string) => `the ${title}`,
-    baseUrls: ['https://tile.loc.gov']
-  },
+  // {
+  //   id: 'loc',
+  //   title: 'Library of Congress',
+  //   label: (title: string) => `the ${title}`,
+  //   baseUrls: ['https://tile.loc.gov']
+  // },
   {
     id: 'agsl',
     title: 'American Geographical Society Library',
