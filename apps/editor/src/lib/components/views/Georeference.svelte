@@ -705,8 +705,6 @@
 
       if (displayIndex !== -1) {
         return displayIndex
-      } else {
-        return sortedGcps.length - 1
       }
     }
 
@@ -887,6 +885,10 @@
   }
 
   function initializeGcps(imageId: string, map: DbMap3, animate = false) {
+    if (mapsState.activeMapId !== map.id) {
+      mapsState.activeMapId = map.id
+    }
+
     resetGcps()
 
     const gcpFeatures = Object.values(map.gcps).map(addGcp)
