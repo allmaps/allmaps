@@ -40,6 +40,8 @@
   const imageInfoState = getImageInfoState()
 
   let currentImageId = $state<string>()
+  let currentMapId = $state<string>()
+  let currentImageSize = $state<{ width: number; height: number }>()
 
   let resourceMapContainer: HTMLDivElement
   let warpedMapLayer: WarpedMapLayer | undefined
@@ -56,6 +58,7 @@
   type Props = {
     initialViewport?: Viewport
     resourceMap?: MapLibreMap
+    mapId?: string
     resourceMask?: ResourceMask
     renderMasks?: boolean
     transformer?: GcpTransformer
@@ -65,6 +68,7 @@
   let {
     initialViewport,
     resourceMap = $bindable<MapLibreMap | undefined>(),
+    mapId,
     resourceMask,
     renderMasks,
     transformer = $bindable<GcpTransformer | undefined>(),
@@ -91,6 +95,7 @@
   ) {
     straightAnnotation = await generateStraightAnnotation(imageId, resourceMask)
     currentImageId = imageId
+    currentMapId = mapId
   }
 
   async function generateStraightAnnotation(
@@ -102,8 +107,24 @@
 
     const width = parsedImage.width
     const height = parsedImage.height
+    currentImageSize = { width, height }
 
     return generateFakeStraightAnnotation(imageId, width, height, resourceMask)
+  }
+
+  function getFullImageResourceMask(): ResourceMask {
+    if (!currentImageSize) {
+      return []
+    }
+
+    const { width, height } = currentImageSize
+
+    return [
+      [0, 0],
+      [0, height],
+      [width, height],
+      [width, 0]
+    ]
   }
 
   async function updateMap(annotation: Annotation | AnnotationPage) {
@@ -120,15 +141,40 @@
     const map = maps[0]
     transformer = new GcpTransformer(map.gcps, map.transformation?.type)
 
+    // @ts-expect-error incorrect MapLibre types
     warpedMapLayerBounds = warpedMapLayer.getBounds()
   }
 
+  function updateResourceMask(resourceMask?: ResourceMask) {
+    if (!warpedMapLayer || !currentImageId) {
+      return
+    }
+
+    warpedMapLayer.setMapResourceMask(
+      currentImageId,
+      resourceMask ?? getFullImageResourceMask()
+    )
+
+    // @ts-expect-error incorrect MapLibre types
+    warpedMapLayerBounds = warpedMapLayer.getBounds()
+    currentMapId = mapId
+  }
+
+  $effect(() => {
+    if (sourceState.activeImageId && currentImageId !== sourceState.activeImageId) {
+      updateStraightAnnotation(sourceState.activeImageId, resourceMask)
+    }
+  })
+
   $effect(() => {
     if (
+      mapLoaded &&
+      warpedMapLayer &&
       sourceState.activeImageId &&
-      currentImageId !== sourceState.activeImageId
+      currentImageId === sourceState.activeImageId &&
+      currentMapId !== mapId
     ) {
-      updateStraightAnnotation(sourceState.activeImageId, resourceMask)
+      updateResourceMask(resourceMask)
     }
   })
 
