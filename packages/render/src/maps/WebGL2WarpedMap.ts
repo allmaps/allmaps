@@ -67,7 +67,7 @@ const DEFAULT_RENDER_LINE_GROUP_OPTIONS = {
 }
 
 const DEFAULT_RENDER_POINT_GROUP_OPTION = {
-  viewportSize: 16,
+  viewportSize: 10,
   color: black,
   viewportBorderSize: 1,
   borderColor: white
@@ -80,16 +80,16 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     renderTransformedGcps: false,
     renderTransformedGcpsColor: pink,
     renderVectors: false,
-    renderVectorsSize: 6,
+    renderVectorsSize: 4,
     renderVectorsColor: black,
     renderFullMask: false,
-    renderFullMaskSize: 8,
+    renderFullMaskSize: 4,
     renderFullMaskColor: green,
     renderAppliableMask: false,
-    renderAppliableMaskSize: 8,
+    renderAppliableMaskSize: 4,
     renderAppliableMaskColor: pink,
     renderMask: false,
-    renderMaskSize: 8,
+    renderMaskSize: 4,
     renderMaskColor: pink,
     opacity: 1,
     saturation: 1,
@@ -427,23 +427,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineGroups() {
     this.lineGroups = []
 
-    if (this.options.renderVectors) {
-      this.lineGroups.push({
-        projectedGeoLines: pointsAndPointsToLines(
-          this.projectedGeoPoints,
-          this.projectedGeoTransformedResourcePoints
-        ),
-        projectedGeoPreviousLines: pointsAndPointsToLines(
-          this.projectedGeoPoints,
-          this.projectedGeoPreviousTransformedResourcePoints
-        ),
-        viewportSize: this.options.renderVectorsSize,
-        color: this.options.renderVectorsColor,
-        viewportBorderSize: this.options.renderVectorsBorderSize,
-        borderColor: this.options.renderVectorsBorderColor
-      })
-    }
-
     if (this.options.renderFullMask) {
       this.lineGroups.push({
         projectedGeoLines: lineStringToLines(
@@ -486,6 +469,23 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         color: this.options.renderMaskColor,
         viewportBorderSize: this.options.renderMaskBorderSize,
         borderColor: this.options.renderMaskBorderColor
+      })
+    }
+
+    if (this.options.renderVectors) {
+      this.lineGroups.push({
+        projectedGeoLines: pointsAndPointsToLines(
+          this.projectedGeoPoints,
+          this.projectedGeoTransformedResourcePoints
+        ),
+        projectedGeoPreviousLines: pointsAndPointsToLines(
+          this.projectedGeoPoints,
+          this.projectedGeoPreviousTransformedResourcePoints
+        ),
+        viewportSize: this.options.renderVectorsSize,
+        color: this.options.renderVectorsColor,
+        viewportBorderSize: this.options.renderVectorsBorderSize,
+        borderColor: this.options.renderVectorsBorderColor
       })
     }
   }
