@@ -1035,7 +1035,6 @@ export class WebGL2Renderer
 
       // This changed() is needed to trigger the repaint of the canvas
       this.changed()
-      this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
         ((now: number) => this.animationFrame(now, mapIds, duration)).bind(this)
