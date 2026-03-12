@@ -36,6 +36,7 @@ export class SourceState {
   #errorState: ErrorState
 
   #source = $state<Source>()
+  #requestedUrl: string | undefined
 
   #abortController: AbortController | undefined
 
@@ -209,8 +210,7 @@ export class SourceState {
       const newUrl = urlState.params.url
 
       if (newUrl) {
-        const currentSourceUrl = this.#source?.url
-        if (!currentSourceUrl || currentSourceUrl !== newUrl) {
+        if (!this.#requestedUrl || this.#requestedUrl !== newUrl) {
           this.#fetch(newUrl)
         }
       } else {
@@ -340,6 +340,8 @@ export class SourceState {
   }
 
   async #fetch(url: string) {
+    this.#requestedUrl = url
+
     if (this.#abortController) {
       this.#abortController.abort()
     }
@@ -395,6 +397,7 @@ export class SourceState {
     this.#fetching = false
     this.#fetchingInsideCollection = false
     this.#source = undefined
+    this.#requestedUrl = undefined
   }
 
   get imagesByImageId() {
