@@ -37,7 +37,7 @@ import type {
 const DEFAULT_SELECTION_OPTIONS: SelectionOptions = {}
 export const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
   animate: true,
-  duration: 750
+  duration: 300
 }
 export const DEFAULT_ANIMATION_INTERNAL_OPTIONS: AnimationInternalOptions = {
   stage: 'pre'
