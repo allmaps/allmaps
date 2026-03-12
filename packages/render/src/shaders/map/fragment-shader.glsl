@@ -66,7 +66,8 @@ void main() {
   vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
 
   // Set the initial values
-  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  vec4 initialColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  color = initialColor;
 
   // Loop through all cached tiles
   for(int index = 0; index < cachedTilesCount; index += 1) {

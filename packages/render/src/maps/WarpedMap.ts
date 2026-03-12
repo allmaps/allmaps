@@ -22,7 +22,6 @@ import {
   objectDifference,
   omit,
   mergePartialOptions,
-  mergeTwoOptionsUnlessUndefined,
   mixNumbers
 } from '@allmaps/stdlib'
 
@@ -508,7 +507,7 @@ export class WarpedMap extends EventTarget {
       this.options,
       optionKeysToConsider
     )
-    this.options = mergeTwoOptionsUnlessUndefined(this.options, changedOptions)
+    this.options = mergeOptions(this.options, changedOptions)
 
     if (animationOptions?.stage == 'init') {
       // On init we should set the properties in a specific order

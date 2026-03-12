@@ -35,7 +35,7 @@ import type { Projection } from '@allmaps/project'
 
 export const DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS: SpecificTriangulatedWarpedMapOptions =
   {
-    distortionMeasures: ['log2sigma', 'twoOmega']
+    distortionMeasures: ['log2sigma']
   }
 
 export function createTriangulatedWarpedMapFactory() {
@@ -430,6 +430,8 @@ export class TriangulatedWarpedMap extends WarpedMap {
                   // such that triangulated polygon (full mask + appliable mask)
                   // and steiner polygons (appliable mask)
                   // dont have touching edges, which hinders constraining triangulation
+                  // This could make trianguation way too big if appliable mask >> full mask
+                  // In that case, consider clipping applyable mask.
                 )!
               ),
               this.resourceResolution,
