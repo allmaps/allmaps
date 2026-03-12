@@ -197,6 +197,7 @@ export {
   mergeOptionsUnlessUndefined,
   mergeTwoOptionsUnlessUndefined,
   mergePartialOptions,
+  removeUndefinedOptions,
   optionKeysToUndefinedOptions,
   optionKeysByMapIdToUndefinedOptionsByMapId
 } from './options.js'

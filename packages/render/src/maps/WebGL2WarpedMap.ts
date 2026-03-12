@@ -263,6 +263,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
+   * Get default options without the options overwritten by the georeferenced map
+   */
+  static getDefaultWithoutGeoreferencedMapOptions(): Partial<WebGL2WarpedMapOptions> {
+    return mergeOptions(
+      DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS,
+      super.getDefaultWithoutGeoreferencedMapOptions()
+    )
+  }
+
+  /**
    * Set the map-specific options (and the list options)
    *
    * @param mapOptions - Map-specific options
@@ -436,7 +446,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     if (this.options.renderFullMask) {
       this.lineGroups.push({
-        projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
+        projectedGeoLines: lineStringToLines(
+          this.projectedGeoTriangulationFullMask
+        ),
+        projectedGeoPreviousLines: lineStringToLines(
+          this.projectedGeoPreviousTriangulationFullMask
+        ),
         viewportSize: this.options.renderFullMaskSize,
         color: this.options.renderFullMaskColor,
         viewportBorderSize: this.options.renderFullMaskBorderSize,
@@ -523,7 +538,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.mapProgram
     gl.bindVertexArray(this.mapVao)
 
-    // Resource triangle points
     createBuffer(
       gl,
       program,
@@ -531,8 +545,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       2,
       'a_resourceTrianglePoint'
     )
-
-    // Clip previous and new triangle points
 
     const clipPreviousTrianglePoints =
       this.projectedGeoPreviousTrianglePoints.map((point) =>
@@ -560,7 +572,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Previous and new distortion
     // Note: we must update the distortion data even when we don't render distortions
     // to ensure this array buffer is of the correct length, for example when triangulation changes
-
     createBuffer(
       gl,
       program,
@@ -577,8 +588,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_trianglePointDistortion'
     )
 
-    // Triangle Point index
-
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
     ).map((_v, i) => {
@@ -590,6 +599,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       trianglePointsTriangleIndex,
       1,
       'a_trianglePointIndex'
+    )
+
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(
+        this.trianglePointsInside.map((inside) => (inside ? 1 : 0))
+      ),
+      1,
+      'a_trianglePointInside'
     )
   }
 

@@ -197,15 +197,15 @@ export function objectDifference(
 // Basic omit function as replacement for lodash omit, since it will be removed in v5
 // See: https://github.com/lodash/lodash/issues/2930#issuecomment-272298477
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function omit<T extends Record<string, any>>(
+export function omit<T extends Record<string, any>, K extends string>(
   object: T,
-  keys: string[]
-): Partial<T> {
+  keys: K[]
+): Omit<T, K> {
   const result = cloneDeep(object) as T
   for (const key of keys) {
     delete result[key]
   }
-  return result
+  return result as Omit<T, K>
 }
 
 export function isValidHttpUrl(string: string) {

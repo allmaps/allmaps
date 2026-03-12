@@ -11,11 +11,13 @@ in vec2 a_clipTrianglePoint;
 in float a_previousTrianglePointDistortion;
 in float a_trianglePointDistortion;
 in float a_trianglePointIndex;
+in float a_trianglePointInside;
 
 out vec2 v_resourceTrianglePoint;
 out float v_trianglePointDistortion;
 out float v_trianglePointIndex;
 out vec4 v_trianglePointBarycentric;
+out float v_trianglePointInside;
 
 void main() {
   // Mixing previous and new triangle points
@@ -32,6 +34,7 @@ void main() {
   v_resourceTrianglePoint = a_resourceTrianglePoint;
   v_trianglePointDistortion = trianglePointDistortion;
   v_trianglePointIndex = a_trianglePointIndex;
+  v_trianglePointInside = a_trianglePointInside;
 
   float trianglePointLocalIndex = mod(a_trianglePointIndex, 3.0f);
   if(trianglePointLocalIndex == 0.0f)

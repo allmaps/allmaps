@@ -237,7 +237,7 @@ export class WebGL2Renderer
       THROTTLE_CHANGED_OPTIONS
     )
 
-    this.warpedMapList.updateWarpedMapsUsingFactory(warpedMapFactory)
+    this.warpedMapList.updateWarpedMapsUsingFactory()
   }
 
   initializeWebGL(gl: WebGL2RenderingContext) {
@@ -388,12 +388,6 @@ export class WebGL2Renderer
     }
 
     return programCache.get(name)!
-  }
-
-  protected getWarpedMapListFromOptions() {
-    const warpedMapList = super.getWarpedMapListFromOptions()
-    warpedMapList.options.warpedMapFactory = this.options.warpedMapFactory
-    return warpedMapList
   }
 
   protected updateMapsForViewport(
@@ -641,6 +635,21 @@ export class WebGL2Renderer
     gl.uniform1f(
       previousVisibilityOpacityLocation,
       webgl2WarpedMap.previousVisibilityOpacity
+    )
+    const applymaskOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_applyMaskOpacity'
+    )
+    gl.uniform1f(applymaskOpacityLocation, webgl2WarpedMap.applyMaskOpacity)
+    const previousApplyMaskOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_previousApplyMaskOpacity'
+    )
+    gl.uniform1f(
+      previousApplyMaskOpacityLocation,
+      webgl2WarpedMap.previousApplyMaskOpacity
     )
 
     // Opacity

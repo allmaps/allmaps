@@ -7,6 +7,8 @@ uniform float u_animationProgress;
 
 uniform float u_visibilityOpacity;
 uniform float u_previousVisibilityOpacity;
+uniform float u_applyMaskOpacity;
+uniform float u_previousApplyMaskOpacity;
 
 uniform float u_opacity;
 uniform float u_saturation;
@@ -43,6 +45,7 @@ in vec2 v_resourceTrianglePoint;
 in float v_trianglePointDistortion;
 in float v_trianglePointIndex;
 in vec4 v_trianglePointBarycentric;
+in float v_trianglePointInside;
 
 out vec4 color;
 

@@ -113,7 +113,13 @@ export function createWarpedMapFactory<W extends WarpedMap>() {
  * @param tileSize - Size of the tiles
  * @param mixed - Whether the options were last set by mixing previous and new properties, i.e. when rerendering during an ongoing animation
  * @param visible - Visibility of the map
- * @param previousVisible - Visibility of the previous state of the map
+ * @param previousVisible - Previous visible
+ * @param visibilityOpacity - Opacity linked to visibility of the map
+ * @param previousVisibilityOpacity - Opacity linked to previous visibility of the map
+ * @param applyMask - Apply the mask
+ * @param previousApplyMask - Previous applyMask
+ * @param applyMaskOpacity - Opacity for the triangles outside the mask, linked to appling of the mask
+ * @param previousApplyMaskOpacity - Opacity for the triangles outside the mask, linked to previous appling of the mask
  * @param gcps - Ground control points used for warping this map, from resource coordinates to geospatial coordinates
  * @param projectedGcps - Projected ground control points, from resource coordinates to projected geospatial coordinates
  * @param resourcePoints - The resource coordinates of the ground control points
@@ -190,6 +196,10 @@ export class WarpedMap extends EventTarget {
   previousVisible!: boolean
   visibilityOpacity = 1
   previousVisibilityOpacity = 1
+  applyMask!: boolean
+  previousApplyMask!: boolean
+  applyMaskOpacity = 0
+  previousApplyMaskOpacity = 0
 
   gcps!: Gcp[]
   projectedGcps!: Gcp[]
@@ -311,6 +321,18 @@ export class WarpedMap extends EventTarget {
    */
   static getDefaultOptions(): WarpedMapOptions {
     return DEFAULT_WARPED_MAP_OPTIONS
+  }
+
+  /**
+   * Get default options without the options overwritten by the georeferenced map
+   */
+  static getDefaultWithoutGeoreferencedMapOptions(): Partial<WarpedMapOptions> {
+    return omit(DEFAULT_WARPED_MAP_OPTIONS, [
+      'transformationType',
+      'internalProjection',
+      'resourceMask',
+      'gcps'
+    ])
   }
 
   /**
@@ -494,12 +516,14 @@ export class WarpedMap extends EventTarget {
 
       this.visible = this.options.visible
       this.previousVisible = this.visible
+      this.applyMask = this.options.applyMask
+      this.previousApplyMask = this.applyMask
 
       this.gcps = this.options.gcps
 
       this.resourceFullMask = this.getResourceFullMask()
       this.resourceAppliableMask = this.georeferencedMap.resourceMask
-      this.resourceMask = this.options.applyMask
+      this.resourceMask = this.applyMask
         ? this.resourceAppliableMask
         : this.resourceFullMask
       this.updateResourceMaskProperties()
@@ -523,9 +547,11 @@ export class WarpedMap extends EventTarget {
       }
 
       if ('resourceMask' in changedOptions || 'applyMask' in changedOptions) {
+        this.applyMask = this.options.applyMask
+        this.applyMaskOpacity = this.applyMask ? 0 : 1
         const resourceFullMask = this.getResourceFullMask()
         const resourceAppliableMask = this.options.resourceMask
-        const resourceMask = this.options.applyMask
+        const resourceMask = this.applyMask
           ? resourceAppliableMask
           : resourceFullMask
         this.setResourceMask(
@@ -758,6 +784,8 @@ export class WarpedMap extends EventTarget {
     this.mixed = false
     this.previousVisible = this.visible
     this.previousVisibilityOpacity = this.visibilityOpacity
+    this.previousApplyMask = this.applyMask
+    this.previousApplyMaskOpacity = this.applyMaskOpacity
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
@@ -777,6 +805,12 @@ export class WarpedMap extends EventTarget {
     this.previousVisibilityOpacity = mixNumbers(
       this.visibilityOpacity,
       this.previousVisibilityOpacity,
+      t
+    )
+    this.previousApplyMask = true
+    this.previousApplyMaskOpacity = mixNumbers(
+      this.applyMaskOpacity,
+      this.previousApplyMaskOpacity,
       t
     )
     this.previousTransformationType = this.transformationType

@@ -30,7 +30,6 @@ import type {
   SelectionOptions,
   AnimationOptions,
   WarpedMapListOptions,
-  WarpedMapFactory,
   AnimationInternalOptions,
   AnimationStage
 } from '../shared/types.js'
@@ -87,6 +86,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       ],
       animatedOptions: [
         'visible',
+        'applyMask',
         'transformationType',
         'internalProjection',
         'distortionMeasure'
@@ -228,9 +228,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * It is import to do this after the event listeners on the warpedmaplist
    * are added to the renderer, so the WARPEDMAPADDED event is passed.
    */
-  updateWarpedMapsUsingFactory(warpedMapFactory: WarpedMapFactory<W>) {
+  updateWarpedMapsUsingFactory() {
     for (const warpedMap of this.warpedMapsById.values()) {
-      const updatedWarpedMap = warpedMapFactory(
+      const updatedWarpedMap = this.options.warpedMapFactory(
         warpedMap.mapId,
         warpedMap.georeferencedMap,
         this.options,

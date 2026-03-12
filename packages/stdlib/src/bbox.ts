@@ -151,7 +151,7 @@ export function pointInBbox(point: Point, bbox: Bbox): boolean {
   return doBboxesIntersect([point[0], point[1], point[0], point[1]], bbox)
 }
 
-export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
+export function bufferBbox(bbox: Bbox, dist0: number, dist1?: number): Bbox {
   if (dist1 === undefined) {
     dist1 = dist0
   }

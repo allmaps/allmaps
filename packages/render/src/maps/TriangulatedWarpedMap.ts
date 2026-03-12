@@ -1,12 +1,16 @@
 import { GeoreferencedMap } from '@allmaps/annotation'
-import { interpolatePolygon, triangulateToUnique } from '@allmaps/triangulate'
+import { triangulateToUnique } from '@allmaps/triangulate'
 import {
   mixNumbers,
   mixPoints,
   getPropertyFromDoubleCacheOrComputation,
   getPropertyFromQuintupleCacheOrComputation,
   mergeOptions,
-  mixLineStrings
+  mixLineStrings,
+  computeBbox,
+  bboxToPolygon,
+  combineBboxes,
+  bufferBbox
 } from '@allmaps/stdlib'
 
 import { WarpedMap } from './WarpedMap.js'
@@ -49,6 +53,8 @@ type GcpTriangulation = {
   gcpUniquePoints: GcpAndDistortions[]
   uniquePointIndices: number[]
   uniquePointIndexInterpolatedPolygon: TypedPolygon<number>
+  uniquePointIndexInterpolatedSteinerPolygons: TypedPolygon<number>[]
+  insideSteinerPolygonsTriangles: boolean[]
 }
 
 /**
@@ -64,6 +70,7 @@ type GcpTriangulation = {
  * @param projectedGeoTrianglePoints - The resourceTrianglePoints in projected geospatial coordinates
  * @param previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
  * @param trianglePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
+ * @param projectedGeoPreviousTriangulationFullMask - The resource full mask refined by the previous triangulation, in projected geospatial coordinates
  * @param projectedGeoPreviousTriangulationAppliableMask - The resource appliable mask refined by the previous triangulation, in projected geospatial coordinates
  * @param projectedGeoTriangulationAppliableMask - The resource appliable mask refined by the triangulation, in projected geospatial coordinates
  * @param projectedGeoPreviousTriangulationMask - The resource mask refined by the previous triangulation, in projected geospatial coordinates
@@ -102,6 +109,12 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
   previousTrianglePointsDistortion: number[] = []
   trianglePointsDistortion: number[] = []
+
+  previousTrianglePointsInside: boolean[] = []
+  trianglePointsInside: boolean[] = []
+
+  projectedGeoPreviousTriangulationFullMask: Ring = []
+  projectedGeoTriangulationFullMask: Ring = []
 
   projectedGeoPreviousTriangulationAppliableMask: Ring = []
   projectedGeoTriangulationAppliableMask: Ring = []
@@ -142,6 +155,16 @@ export class TriangulatedWarpedMap extends WarpedMap {
     return mergeOptions(
       DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS,
       super.getDefaultOptions()
+    )
+  }
+
+  /**
+   * Get default options without the options overwritten by the georeferenced map
+   */
+  static getDefaultWithoutGeoreferencedMapOptions(): Partial<TriangulatedWarpedMapOptions> {
+    return mergeOptions(
+      DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS,
+      super.getDefaultWithoutGeoreferencedMapOptions()
     )
   }
 
@@ -245,7 +268,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.projectedGcpPreviousTriangulation = this.projectedGcpTriangulation
     this.projectedGeoPreviousTrianglePoints = this.projectedGeoTrianglePoints
     this.previousTrianglePointsDistortion = this.trianglePointsDistortion
+    this.previousTrianglePointsInside = this.trianglePointsInside
 
+    this.projectedGeoPreviousTriangulationFullMask =
+      this.projectedGeoTriangulationFullMask
     this.projectedGeoPreviousTriangulationAppliableMask =
       this.projectedGeoTriangulationAppliableMask
     this.projectedGeoPreviousTriangulationMask =
@@ -296,7 +322,11 @@ export class TriangulatedWarpedMap extends WarpedMap {
         uniquePointIndices:
           projectedGcpPreviousTriangulation.uniquePointIndices,
         uniquePointIndexInterpolatedPolygon:
-          projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedPolygon
+          projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedPolygon,
+        uniquePointIndexInterpolatedSteinerPolygons:
+          projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedSteinerPolygons,
+        insideSteinerPolygonsTriangles:
+          projectedGcpPreviousTriangulation.insideSteinerPolygonsTriangles
       }
 
       this.projectedGeoPreviousTrianglePoints =
@@ -312,6 +342,11 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
 
     // Also mix mask
+    this.projectedGeoPreviousTriangulationFullMask = mixLineStrings(
+      this.projectedGeoTriangulationFullMask,
+      this.projectedGeoPreviousTriangulationFullMask,
+      t
+    )
     this.projectedGeoPreviousTriangulationAppliableMask = mixLineStrings(
       this.projectedGeoTriangulationAppliableMask,
       this.projectedGeoPreviousTriangulationAppliableMask,
@@ -370,7 +405,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.projectedGcpTriangulation = getPropertyFromQuintupleCacheOrComputation(
       this.projectedGcpTriangulationCache,
       this.resourceResolution,
-      String(this.resourceMask),
+      String(this.resourceAppliableMask),
       this.transformationType,
       this.internalProjection.definition,
       String(this.options.distortionMeasures),
@@ -378,15 +413,32 @@ export class TriangulatedWarpedMap extends WarpedMap {
         const {
           uniquePoints,
           uniquePointIndexTriangles,
-          uniquePointIndexInterpolatedPolygon
+          uniquePointIndexInterpolatedPolygon,
+          uniquePointIndexInterpolatedSteinerPolygons,
+          insideSteinerPolygonsTriangles
         } = getPropertyFromDoubleCacheOrComputation(
           this.resourceTriangulationCache,
           this.resourceResolution,
-          String(this.resourceMask),
+          String(this.resourceAppliableMask),
           () =>
-            triangulateToUnique([this.resourceMask], this.resourceResolution, {
-              steinerPoints: this.gcps.map((gcp) => gcp.resource)
-            })
+            triangulateToUnique(
+              bboxToPolygon(
+                combineBboxes(
+                  computeBbox(this.resourceFullMask),
+                  bufferBbox(computeBbox(this.resourceAppliableMask), 1)
+                  // Buffer appliable mask before combining bboxes
+                  // such that triangulated polygon (full mask + appliable mask)
+                  // and steiner polygons (appliable mask)
+                  // dont have touching edges, which hinders constraining triangulation
+                )!
+              ),
+              this.resourceResolution,
+              {
+                steinerPoints: this.gcps.map((gcp) => gcp.resource),
+                steinerPolygons: [[this.resourceAppliableMask]],
+                computeInsideSteinerPolygons: true
+              }
+            )
         )
 
         // Extend Triangulation to ProjectedGcpTriangulation
@@ -409,7 +461,9 @@ export class TriangulatedWarpedMap extends WarpedMap {
           resourceResolution,
           gcpUniquePoints,
           uniquePointIndices,
-          uniquePointIndexInterpolatedPolygon
+          uniquePointIndexInterpolatedPolygon,
+          uniquePointIndexInterpolatedSteinerPolygons,
+          insideSteinerPolygonsTriangles
         }
       }
     )
@@ -425,7 +479,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
         getPropertyFromQuintupleCacheOrComputation(
           this.projectedGcpTriangulationCache,
           this.previousResourceResolution,
-          String(this.resourceMask),
+          String(this.resourceAppliableMask),
           this.previousTransformationType,
           this.previousInternalProjection.definition,
           String(this.options.distortionMeasures),
@@ -454,7 +508,11 @@ export class TriangulatedWarpedMap extends WarpedMap {
               uniquePointIndices:
                 this.projectedGcpTriangulation.uniquePointIndices,
               uniquePointIndexInterpolatedPolygon:
-                projectedGcpTriangulation.uniquePointIndexInterpolatedPolygon
+                projectedGcpTriangulation.uniquePointIndexInterpolatedPolygon,
+              uniquePointIndexInterpolatedSteinerPolygons:
+                projectedGcpTriangulation.uniquePointIndexInterpolatedSteinerPolygons,
+              insideSteinerPolygonsTriangles:
+                projectedGcpTriangulation.insideSteinerPolygonsTriangles
             }
           },
           () => !this.mixed,
@@ -477,9 +535,15 @@ export class TriangulatedWarpedMap extends WarpedMap {
     ) {
       return
     }
+
     const projectedGcpPreviousTriangulation =
       this.projectedGcpPreviousTriangulation
     const projectedGcpTriangulation = this.projectedGcpTriangulation
+
+    this.trianglePointsInside =
+      projectedGcpTriangulation.insideSteinerPolygonsTriangles
+        .map((inside) => [inside, inside, inside])
+        .flat()
 
     this.resourceTrianglePoints =
       this.projectedGcpTriangulation.uniquePointIndices.map(
@@ -496,16 +560,17 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
     // Also update the mask
 
-    // The triangulation produces triangles based on the resource mask,
-    // and refines that mask in it's process (using the resource resolution),
+    // The triangulation produces triangles based on the full resource mask,
+    // and refines that full mask in it's process (using the resource resolution),
     // giving a slighly different result then if we would simply transform
-    // the resource mask to projected geo space (because the transformation refinement
+    // the full resource mask to projected geo space (because the transformation refinement
     // is different then the triangulation refinement).
     // To prevent noticable slivers between both,
-    // we compute a triangulation-refined mask in projected geo space
-    // from the resource mask as refined by/during the triangulation.
+    // we compute a triangulation-refined full mask in projected geo space
+    // from the full resource mask as refined by/during the triangulation.
+    // We do the same for the appliable resource mask (and resource mask).
     // This way we obtain a mask that exactly matches the triangulation.
-    this.projectedGeoPreviousTriangulationMask =
+    this.projectedGeoPreviousTriangulationFullMask =
       this.projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedPolygon
         .map((typedRing) =>
           typedRing.map(
@@ -513,33 +578,33 @@ export class TriangulatedWarpedMap extends WarpedMap {
           )
         )
         .flat()
-    this.projectedGeoTriangulationMask =
+    this.projectedGeoTriangulationFullMask =
       this.projectedGcpTriangulation.uniquePointIndexInterpolatedPolygon
         .map((typedRing) =>
           typedRing.map((i) => projectedGcpTriangulation.gcpUniquePoints[i].geo)
         )
         .flat()
-    // To do the same for the appliable mask
-    // we compute it by transforming the 'appliable mask' to projecte geo space
-    // but to make sure that the number of points is the same
-    // before and after the transform (to prevent webgl buffer errors)
-    // and that the transform is fine enough and (!) follows the mask,
-    // we first refine the mask in the same way as during a triangulation
-    // and then transform point-by-point instead of as a ring or polygon that should be defined
+    this.projectedGeoPreviousTriangulationAppliableMask =
+      this.projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedSteinerPolygons[0]
+        .map((typedRing) =>
+          typedRing.map(
+            (i) => projectedGcpPreviousTriangulation.gcpUniquePoints[i].geo
+          )
+        )
+        .flat()
     this.projectedGeoTriangulationAppliableMask =
-      this.projectedTransformer.transformToProjectedGeo(
-        interpolatePolygon(
-          [this.resourceAppliableMask],
-          this.resourceResolution!
-        )[0],
-        {
-          isMultiGeometry: true
-        }
-      )
-    if (this.projectedGeoPreviousTriangulationAppliableMask.length == 0) {
-      this.projectedGeoPreviousTriangulationAppliableMask =
-        this.projectedGeoTriangulationAppliableMask
-    }
+      this.projectedGcpTriangulation.uniquePointIndexInterpolatedSteinerPolygons[0]
+        .map((typedRing) =>
+          typedRing.map((i) => projectedGcpTriangulation.gcpUniquePoints[i].geo)
+        )
+        .flat()
+    // For the resource mask, this can be derived
+    this.projectedGeoPreviousTriangulationMask = this.applyMask
+      ? this.projectedGeoPreviousTriangulationAppliableMask
+      : this.projectedGeoPreviousTriangulationFullMask
+    this.projectedGeoTriangulationMask = this.applyMask
+      ? this.projectedGeoTriangulationAppliableMask
+      : this.projectedGeoTriangulationFullMask
 
     this.updateTrianglePointsDistortion()
   }
