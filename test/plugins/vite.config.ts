@@ -1,6 +1,7 @@
 import devtoolsJson from 'vite-plugin-devtools-json'
 import tailwindcss from '@tailwindcss/vite'
 import { sveltekit } from '@sveltejs/kit/vite'
+import ViteYaml from '@modyfi/vite-plugin-yaml'
 
 import { defineConfig, searchForWorkspaceRoot, type UserConfig } from 'vite'
 
@@ -14,7 +15,7 @@ export default defineConfig({
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },
-  plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+  plugins: [tailwindcss(), sveltekit(), devtoolsJson(), ViteYaml()],
   ssr: {
     noExternal: ['maplibre-gl']
   }

@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "types": ["@modyfi/vite-plugin-yaml/modules"],
   },
   "references": [
     { "path": "../../packages/annotation" },
