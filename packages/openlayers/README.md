@@ -17,6 +17,8 @@ This plugin exports the class `WarpedMapLayer`. You can add one or multiple Geor
 
 To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
 
+This plugin implements a lot of methods from [@allmaps/warpedmaplayer](../warpedmaplayer/README.md), the core package gathering the functionality connecting the Allmaps plugins to the [@allmaps/render](../render/README.md) package.
+
 ## Installation
 
 This package works in browsers and in Node.js as an ESM or an UMD module.
@@ -118,9 +120,9 @@ map.addLayer(warpedMapLayer)
 
 Note that the `...ByUrl()` functions are not available on a WarpedMapList.
 
-### WarpedMapLayer API: Options and Events
+### WarpedMapLayer API, Options and Events
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins). It includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods coming from the WarpedMapLayer class (shared by all Allmaps plugins). It describes the methods like `addGeoreferenceAnnotation()` and includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
 You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
 
