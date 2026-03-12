@@ -129,16 +129,6 @@ interface WasmModule {
 export type OutputFormat = 'png' | 'webp' | 'jpeg'
 
 /**
- * Extract transformation weights in flat format for WASM
- */
-function extractTransformWeights(transformation: BaseTransformation): {
-  weights: Float64Array
-  sourcePoints: Float64Array
-} {
-  return transformation.getWeights()
-}
-
-/**
  * Class that renders WarpedMaps using WASM with raw JPEG tiles
  * Caches raw JPEG bytes and decodes them in WASM for maximum performance
  */
@@ -297,7 +287,8 @@ export class WasmRenderer
     // Extract transformation
     const transformer = warpedMap.projectedTransformer
     const transformation = transformer.getToResourceTransformation()
-    const { weights, sourcePoints } = extractTransformWeights(transformation)
+    const { weights, sourcePoints } =
+      transformation.getTransformationDataAsFloat64Array()
     const transformType = transformation.type
 
     // Get resource mask
