@@ -34,8 +34,8 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write src",
+    "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "types": "tsc --noEmit"
   },
   "files": [

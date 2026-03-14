@@ -53,9 +53,9 @@
     "watch": "tsc --watch",
     "build": "tsc",
     "test": "NODE_ENV=test vitest run",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src test",
+    "format": "prettier --ignore-path ../../.gitignore --write src test",
     "documentation": "remark . --output --use remark-api",
     "bench": "node bench/index.js"
   },

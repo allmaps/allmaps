@@ -34,8 +34,8 @@
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",
