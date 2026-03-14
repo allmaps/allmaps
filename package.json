@@ -27,6 +27,7 @@
     "@lerna-lite/cli": "^4.4.1",
     "@lerna-lite/publish": "^4.4.1",
     "@lerna-lite/run": "^4.4.1",
+    "@types/node": "catalog:",
     "turbo": "^2.5.5",
     "husky": "^8",
     "prettier": "^3.6.2"

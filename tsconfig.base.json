@@ -23,6 +23,8 @@
       "@allmaps/bearing/*": ["./packages/bearing/src/*"],
       "@allmaps/components": ["./packages/components/src"],
       "@allmaps/components/*": ["./packages/components/src/*"],
+      "@allmaps/env": ["./packages/env/src"],
+      "@allmaps/env/*": ["./packages/env/src/*"],
       "@allmaps/id": ["./packages/id/src"],
       "@allmaps/id/*": ["./packages/id/src/*"],
       "@allmaps/iiif-parser": ["./packages/iiif-parser/src"],
