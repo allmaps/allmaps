@@ -37,8 +37,8 @@
     "build": "tsc && pnpm run documentation",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src"
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src"
   },
   "license": "MIT",
   "dependencies": {

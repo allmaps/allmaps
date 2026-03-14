@@ -2,6 +2,7 @@
 node_modules
 .svelte-kit
 .wrangler
+.astro
 
 dist
 build
@@ -10,13 +11,12 @@ build
 .pnpm-debug.log
 lerna-debug.log
 
-.svelte-kit
-
 .env
 .env.*
-!.env.example
 !.env.test
-!.env.development
+!.env.localhost
+!.env.dev
+!.env.production
 
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
