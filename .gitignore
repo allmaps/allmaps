@@ -6,6 +6,7 @@ node_modules
 
 dist
 build
+target
 
 *.tsbuildinfo
 .pnpm-debug.log
