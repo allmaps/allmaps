@@ -4,6 +4,8 @@
 
   import { Stats } from '@allmaps/ui'
 
+  import Error from '$lib/components/Error.svelte'
+
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
   import { setSensorsState } from '$lib/state/sensors.svelte.js'
@@ -11,30 +13,28 @@
   import { setUiState } from '$lib/state/ui.svelte.js'
   import { setGeocodeState } from '$lib/state/geocode.svelte.js'
 
-  import type { Snippet } from 'svelte'
-
   import type { LayoutProps } from './$types.js'
-
-  import Error from '$lib/components/Error.svelte'
-
-  import { env } from '$env/dynamic/public'
 
   import '../app.css'
   import '@allmaps/ui/css/fonts.css'
 
-  type Props = {
-    children?: Snippet
-  }
-
-  let { data, children }: LayoutProps & Props = $props()
+  let { data, children }: LayoutProps = $props()
 
   const errorState = setErrorState()
   const imageInfoState = setImageInfoState()
   const sensorsState = setSensorsState(errorState)
   const uiState = setUiState()
 
-  setMapsState(sensorsState, imageInfoState, errorState, uiState)
-  setGeocodeState(data.geocodeEarthKey)
+  // svelte-ignore state_referenced_locally
+  setMapsState(
+    sensorsState,
+    imageInfoState,
+    errorState,
+    uiState,
+    data.env.PUBLIC_ANNOTATIONS_BASE_URL
+  )
+  // svelte-ignore state_referenced_locally
+  setGeocodeState(data.env.PUBLIC_GEOCODE_EARTH_KEY)
 
   $effect.pre(() => {
     sensorsState.position = data.position
@@ -56,7 +56,7 @@
   })
 </script>
 
-<Stats statsWebsiteId={env.PUBLIC_STATS_WEBSITE_ID} />
+<Stats statsWebsiteId={data.env.PUBLIC_STATS_WEBSITE_ID} />
 <main class="absolute w-full h-dvh flex flex-col">
   {#if errorState.error}
     <Error />
