@@ -1,4 +1,5 @@
 import { png, webp, jpeg } from 'itty-router'
+import tinycolor from 'tinycolor2'
 
 import { Viewport } from '@allmaps/render'
 import { WasmRenderer } from '@allmaps/render/wasm'
@@ -8,19 +9,20 @@ import { findBestFrame } from '@allmaps/frame'
 import { cachedFetch } from './fetch.js'
 import { getAnnotationUrl } from './urls.js'
 
-import type { QueryOptions, ResourceWithId } from './types.js'
+import type { Env, QueryOptions, ResourceWithId } from './types.js'
 import type { Size, FetchFn, Polygon } from '@allmaps/types'
 
 // Import WASM module (initialization happens at worker startup)
 import * as wasmModule from '@allmaps/render-wasm'
 
 export async function generateWarpedMapImage(
+  env: Env,
   resourceWithId: ResourceWithId,
   size: Size,
   options: Partial<QueryOptions>
 ) {
   // Use unified URL getter (supports maps, images, manifests)
-  const annotationUrl = getAnnotationUrl(resourceWithId)
+  const annotationUrl = getAnnotationUrl(env, resourceWithId)
 
   const annotation = await cachedFetch(annotationUrl).then((response) =>
     response.json()
@@ -35,11 +37,23 @@ export async function generateWarpedMapImage(
   // Get format from options (extracted from URL path), default to WebP
   const format = options.format || 'webp'
 
+  // Parse background color - for JPEG and other opaque formats, transparent
+  // pixels render as black without a background fill
+  let backgroundColor: [number, number, number] | undefined
+  if (options.background && options.background !== 'none') {
+    const parsed = tinycolor(options.background)
+    if (parsed.isValid()) {
+      const { r, g, b } = parsed.toRgb()
+      backgroundColor = [r, g, b]
+    }
+  }
+
   const renderer = new WasmRenderer(wasmModule, {
     fetchFn: cachedFetch as FetchFn,
     createRTree: false,
     transformationType,
-    outputFormat: format
+    outputFormat: format,
+    backgroundColor
   })
 
   await renderer.addGeoreferenceAnnotation(annotation)
