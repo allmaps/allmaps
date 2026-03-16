@@ -17,9 +17,9 @@
   },
   "scripts": {
     "lerna-build": "lerna run build --scope @allmaps/tileserver --include-dependencies",
-    "deploy": "wrangler deploy",
-    "deploy:dev": "wrangler deploy --env dev",
-    "dev": "wrangler dev --port $(../../port.js tileserver) --env dev",
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
+    "dev": "wrangler dev --port $(../../port.js tileserver) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
     "lint": "prettier --ignore-path ../../.gitignore --check src test scripts && eslint src test scripts --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --ignore-path ../../.gitignore --write src test scripts",
@@ -31,6 +31,7 @@
   "license": "MIT",
   "devDependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/env": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/project": "workspace:^",

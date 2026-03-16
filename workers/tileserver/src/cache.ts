@@ -1,23 +1,27 @@
-const cache = caches.default
+import type { WorkerEnv } from '@allmaps/env'
 
-type Env = {
-  BROWSER_CACHE_HOURS: number
-  CLOUDFLARE_CACHE_HOURS: number
-}
+const cache = caches.default
 
 export async function match(url: string) {
   return await cache.match(url)
 }
 
-export async function headers(response: Response, request: Request, env: Env) {
+export async function headers(
+  response: Response,
+  request: Request,
+  env: WorkerEnv
+) {
   // Convert hours to seconds
   const browserCacheSeconds = env.BROWSER_CACHE_HOURS * 60 * 60
   const cloudflareCacheSeconds = env.CLOUDFLARE_CACHE_HOURS * 60 * 60
 
-  // Set cache headers for both browser and CDN
+  // Cache images:
+  // - Browsers: configured via BROWSER_CACHE_HOURS
+  // - Cloudflare Edge: configured via CLOUDFLARE_CACHE_HOURS
+  // This allows browsers to cache longer while CDN refreshes more frequently
   response.headers.set(
     'Cache-Control',
-    `public, max-age=${browserCacheSeconds}, s-maxage=${cloudflareCacheSeconds}`
+    `public, immutable, no-transform, max-age=${browserCacheSeconds}, s-maxage=${cloudflareCacheSeconds}`
   )
 
   // Cloudflare-specific cache header for longer CDN caching

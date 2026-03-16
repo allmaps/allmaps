@@ -2,15 +2,17 @@ import { validateGeoreferencedMap, parseAnnotation } from '@allmaps/annotation'
 
 import { cachedFetch } from './fetch.js'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { IRequest } from 'itty-router'
+
+import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { WorkerEnv } from '@allmaps/env/worker'
 
 function parseQueryString(query: string | string[] | undefined) {
   return query ? (Array.isArray(query) ? query[0] : query) : undefined
 }
 
 export async function mapsFromParams(
-  env: unknown,
+  env: WorkerEnv,
   req: IRequest
 ): Promise<GeoreferencedMap[]> {
   const params = req.params
@@ -19,25 +21,13 @@ export async function mapsFromParams(
   const imageId = params?.imageId
   const manifestId = params?.manifestId
 
-  if (!env || typeof env !== 'object') {
-    throw new Error('No env object supplied')
-  }
-
-  if (
-    !('API_BASE_URL' in env) ||
-    env.API_BASE_URL === undefined ||
-    typeof env.API_BASE_URL !== 'string'
-  ) {
-    throw new Error('No API_BASE_URL supplied')
-  }
-
   let url
   if (mapId) {
-    url = `${env.API_BASE_URL}/maps/${mapId}`
+    url = `${env.PUBLIC_REST_BASE_URL}/maps/${mapId}`
   } else if (imageId) {
-    url = `${env.API_BASE_URL}/images/${imageId}/maps`
+    url = `${env.PUBLIC_REST_BASE_URL}/images/${imageId}/maps`
   } else if (manifestId) {
-    url = `${env.API_BASE_URL}/manifests/${manifestId}/maps`
+    url = `${env.PUBLIC_REST_BASE_URL}/manifests/${manifestId}/maps`
   } else {
     return []
   }
