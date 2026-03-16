@@ -1,15 +1,6 @@
 import type { TransformationType } from '@allmaps/transform'
 import type { OutputFormat } from '@allmaps/render/wasm'
-
-export type Env = {
-  USE_CACHE: boolean
-  API_BASE_URL: string
-  ASSETS: Fetcher
-  BROWSER_CACHE_HOURS: number
-  CLOUDFLARE_CACHE_HOURS: number
-}
-
-export type CFArgs = [Env, ExecutionContext]
+import type { PreviewEnv } from '@allmaps/env/preview'
 
 // TODO: align this with TransformationOptions from @allmaps/render
 export type TransformationOptions = {
@@ -51,4 +42,12 @@ export type Crop = {
 export type ResourceWithId = {
   type: 'map' | 'image' | 'manifest'
   id: string
+}
+
+type AssetsBinding = {
+  fetch: (request: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+}
+
+export type Env = PreviewEnv & {
+  ASSETS: AssetsBinding
 }

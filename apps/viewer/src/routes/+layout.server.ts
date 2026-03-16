@@ -1,13 +1,13 @@
 import { env as publicEnv } from '$env/dynamic/public'
 
-import { parseEditorPublicEnv } from '@allmaps/env/editor'
+import { parseViewerPublicEnv } from '@allmaps/env/viewer'
 
 import type { LayoutServerLoad } from './$types'
 
-const editorPublicEnv = parseEditorPublicEnv(publicEnv)
+const viewerPublicEnv = parseViewerPublicEnv(publicEnv)
 
 export const load: LayoutServerLoad = () => {
   return {
-    env: editorPublicEnv
+    env: viewerPublicEnv
   }
 }

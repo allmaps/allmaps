@@ -16,7 +16,8 @@
     { "path": "../../packages/render-wasm" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/types" },
+    { "path": "../../packages/env" }
   ],
   "include": ["./src/**/*", "./test/**/*", "./scripts/**/*"]
 }

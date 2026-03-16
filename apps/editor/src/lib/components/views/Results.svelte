@@ -35,7 +35,7 @@
 
   import type { ClickedItemEvent } from '$lib/types/events.js'
   import type { Viewport } from '$lib/types/shared.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorEnv } from '@allmaps/env/editor'
 
   let geoMap = $state.raw<MapLibreMap>()
   let warpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
@@ -45,11 +45,9 @@
   const scopeState = getScopeState()
   const sourceState = getSourceState()
   const urlState = getUrlState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorEnv>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   const geoViewport = $derived(getGeoViewport())
 

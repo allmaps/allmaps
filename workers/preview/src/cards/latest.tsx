@@ -60,7 +60,7 @@ export async function generateLatestCard(
   size: Size
 ): Promise<ImageResponse> {
   try {
-    const url = `https://api.allmaps.org/maps?limit=${mapCount}`
+    const url = `${env.PUBLIC_REST_BASE_URL}/maps?limit=${mapCount}`
     const apiMaps = await cachedFetch(url).then((response) => response.json())
 
     const shuffledColors = shuffleArray(colors)

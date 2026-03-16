@@ -21,6 +21,10 @@
 
   import { UiEvents } from '$lib/shared/ui-events.js'
 
+  import type { PageProps } from './$types'
+
+  let { data }: PageProps = $props()
+
   const sourceState = getSourceState()
   const uiState = getUiState()
   const urlState = getUrlState()
@@ -98,7 +102,7 @@
       </p>
     </div>
     <div class="w-full max-w-xl">
-      <AnnotationInput />
+      <AnnotationInput autoFocus />
     </div>
     <div></div>
   </PageSection>
@@ -107,7 +111,7 @@
     <DotsPattern color={pink} opacity={0.3}>
       <div class="pb-16">
         <PageSection>
-          <Examples />
+          <Examples previewUrl={data.env.PUBLIC_PREVIEW_BASE_URL} />
         </PageSection>
       </div>
     </DotsPattern>

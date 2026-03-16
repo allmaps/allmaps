@@ -1,8 +1,10 @@
 {
+  "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "tileserver",
   "main": "src/index.ts",
   "compatibility_date": "2024-05-24",
   "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "public", "binding": "ASSETS" },
   "rules": [
     {
       "type": "CompiledWasm",
@@ -12,33 +14,12 @@
   ],
   "observability": {
     "logs": {
-      "enabled": false,
-      "head_sampling_rate": 1,
-      "invocation_logs": true,
-      "persist": true
+      "enabled": false
     }
-  },
-  "vars": {
-    "NODE_VERSION": "24",
-    "USE_CACHE": true,
-    "API_BASE_URL": "https://api.allmaps.org",
-    "TILE_SERVER_BASE_URL": "https://allmaps.xyz",
-    "TILE_VIEWER_BASE_URL": "https://tiles.allmaps.org",
-    "BROWSER_CACHE_HOURS": 720,
-    "CLOUDFLARE_CACHE_HOURS": 24
   },
   "env": {
     "dev": {
-      "name": "tileserver-develop",
-      "vars": {
-        "NODE_VERSION": "24",
-        "USE_CACHE": true,
-        "API_BASE_URL": "https://api.allmaps.org",
-        "TILE_SERVER_BASE_URL": "https://dev.allmaps.xyz",
-        "TILE_VIEWER_BASE_URL": "https://tiles.allmaps.org",
-        "BROWSER_CACHE_HOURS": 1,
-        "CLOUDFLARE_CACHE_HOURS": 1
-      }
+      "name": "tileserver-develop"
     }
   }
 }

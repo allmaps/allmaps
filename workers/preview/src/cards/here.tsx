@@ -146,7 +146,7 @@ export async function generateHereCard(
   const pinShadowWidth = 200
   const pinShadowHeight = (pinShadowSize[1] / pinShadowSize[0]) * pinShadowWidth
 
-  const mapUrl = `https://api.allmaps.org/maps/${mapId}`
+  const mapUrl = `${env.PUBLIC_REST_BASE_URL}/maps/${mapId}`
 
   const map = await cachedFetch(mapUrl).then((response) => response.json())
   const parsedMap = validateGeoreferencedMap(map)

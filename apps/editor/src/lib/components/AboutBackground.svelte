@@ -16,15 +16,13 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { GeojsonPolygon } from '@allmaps/types'
 
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const uiState = getUiState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const viewerBaseUrl = varsState.PUBLIC_VIEWER_BASE_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   const count = 40
   const polygonWidth = 80

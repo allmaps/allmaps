@@ -1,5 +1,7 @@
 import { AutoRouter, error, cors, json, IRequestStrict } from 'itty-router'
 
+import { parsePreviewEnv } from '@allmaps/env/preview'
+
 import { optionsFromQuery } from './shared/options.js'
 import { match, put, headers } from './shared/cache.js'
 import {
@@ -7,7 +9,7 @@ import {
   toWebPImageResponse
 } from './shared/image-converter.js'
 
-import type { CFArgs, Env, QueryOptions } from './shared/types.js'
+import type { Env, QueryOptions } from './shared/types.js'
 
 import type { Size } from '@allmaps/types'
 
@@ -29,6 +31,8 @@ import { generateEditorCard } from './cards/editor.js'
 import { generateHereCard } from './cards/here.js'
 import { generateLatestCard } from './cards/latest.js'
 import { generateViewerCard } from './cards/viewer.js'
+
+type CFArgs = [Env, ExecutionContext]
 
 const { preflight, corsify } = cors()
 
@@ -411,10 +415,21 @@ router.get('/manifests/:manifestId.webp', (req, env) => {
 router.get('/', () => json({ name: 'Allmaps Preview' }))
 
 export default {
-  fetch: async (request: Request, env: Env) => {
+  fetch: async (request: Request, env, ctx) => {
+    const parsedEnv = parsePreviewEnv(env)
+
+    if (!env.ASSETS) {
+      throw new Error('ASSETS binding is not configured')
+    }
+
+    const previewEnv: Env = {
+      ...parsedEnv,
+      ASSETS: env.ASSETS
+    }
+
     return (
-      (env.USE_CACHE && (await match(request.url))) ||
-      router.fetch(request, env).catch(error)
+      (previewEnv.USE_CACHE && (await match(request.url))) ||
+      router.fetch(request, previewEnv, ctx).catch(error)
     )
   }
-} // satisfies ExportedHandler<Env>
+} satisfies ExportedHandler<Env>

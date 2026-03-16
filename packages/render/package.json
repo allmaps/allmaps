@@ -34,7 +34,7 @@
     "directory": "packages/render"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev --mode localhost",
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",

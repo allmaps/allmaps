@@ -14,6 +14,7 @@ export async function generateWarpedMapCard(
   options: Partial<QueryOptions>
 ) {
   const imageResponse = await generateWarpedMapImage(
+    env,
     resourceWithId,
     size,
     options

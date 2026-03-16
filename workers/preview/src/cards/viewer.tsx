@@ -25,6 +25,7 @@ export async function generateViewerCard(
     'https://raw.githubusercontent.com/allmaps/style/master/images/allmaps-logo-inverted.svg'
 
   const imageResponse = await generateWarpedMapImage(
+    env,
     resourceWithId,
     size,
     options

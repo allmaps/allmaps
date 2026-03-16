@@ -49,7 +49,7 @@
   } from '$lib/types/events.js'
 
   import type { Viewport, BasemapPreset } from '$lib/types/shared.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorEnv } from '@allmaps/env/editor'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -107,12 +107,10 @@
   const mapsMergedState = getMapsMergedState()
   const uiState = getUiState()
   const urlState = getUrlState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorEnv>()
 
-  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const apiBaseUrl = varsState.PUBLIC_REST_BASE_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let basemapPreset = $derived.by<BasemapPreset>(() => {
     if (urlState.params.basemapXyzUrl) {
