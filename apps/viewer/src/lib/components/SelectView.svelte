@@ -30,7 +30,6 @@
     onclick={() => (uiState.view = 'map')}
     class={[
       'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-all cursor-pointer',
-      ,
       isMapView && 'font-bold bg-pink/5 text-pink'
     ]}>Map</button
   >

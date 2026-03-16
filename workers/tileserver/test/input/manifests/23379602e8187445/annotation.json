@@ -25,18 +25,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/9593xq795",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 6"
-                ]
+                "none": ["image 6"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -46,9 +42,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -75,145 +69,91 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9222,
-                2190
-              ]
+              "resourceCoords": [9222, 2190]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9398648,
-                42.4618799
-              ]
+              "coordinates": [-70.9398648, 42.4618799]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1083,
-                1474
-              ]
+              "resourceCoords": [1083, 1474]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9501458,
-                42.4701332
-              ]
+              "coordinates": [-70.9501458, 42.4701332]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2949,
-                494
-              ]
+              "resourceCoords": [2949, 494]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9464044,
-                42.4694226
-              ]
+              "coordinates": [-70.9464044, 42.4694226]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8852,
-                3485
-              ]
+              "resourceCoords": [8852, 3485]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9419483,
-                42.4609444
-              ]
+              "coordinates": [-70.9419483, 42.4609444]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4404,
-                6299
-              ]
+              "resourceCoords": [4404, 6299]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9514841,
-                42.4620082
-              ]
+              "coordinates": [-70.9514841, 42.4620082]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1133,
-                6085
-              ]
+              "resourceCoords": [1133, 6085]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9559565,
-                42.4652807
-              ]
+              "coordinates": [-70.9559565, 42.4652807]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1870,
-                1779
-              ]
+              "resourceCoords": [1870, 1779]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9494902,
-                42.4689916
-              ]
+              "coordinates": [-70.9494902, 42.4689916]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7581,
-                1198
-              ]
+              "resourceCoords": [7581, 1198]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9408703,
-                42.46444
-              ]
+              "coordinates": [-70.9408703, 42.46444]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5468,
-                1120
-              ]
+              "resourceCoords": [5468, 1120]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9437131,
-                42.4663697
-              ]
+              "coordinates": [-70.9437131, 42.4663697]
             }
           }
         ],
@@ -261,18 +201,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/4x51mf216",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 8"
-                ]
+                "none": ["image 8"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -282,9 +218,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -311,65 +245,41 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6082,
-                6308
-              ]
+              "resourceCoords": [6082, 6308]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9278653,
-                42.4608585
-              ]
+              "coordinates": [-70.9278653, 42.4608585]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6488,
-                6334
-              ]
+              "resourceCoords": [6488, 6334]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9272118,
-                42.4610944
-              ]
+              "coordinates": [-70.9272118, 42.4610944]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5932,
-                5879
-              ]
+              "resourceCoords": [5932, 5879]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9283995,
-                42.4611054
-              ]
+              "coordinates": [-70.9283995, 42.4611054]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6580,
-                5881
-              ]
+              "resourceCoords": [6580, 5881]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9274101,
-                42.4615659
-              ]
+              "coordinates": [-70.9274101, 42.4615659]
             }
           }
         ],
@@ -417,18 +327,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/4x51mf216",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 8"
-                ]
+                "none": ["image 8"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -438,9 +344,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -467,177 +371,111 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5355,
-                1324
-              ]
+              "resourceCoords": [5355, 1324]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9312251,
-                42.4683142
-              ]
+              "coordinates": [-70.9312251, 42.4683142]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4872,
-                1002
-              ]
+              "resourceCoords": [4872, 1002]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9322034,
-                42.4682556
-              ]
+              "coordinates": [-70.9322034, 42.4682556]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4340,
-                1049
-              ]
+              "resourceCoords": [4340, 1049]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9329592,
-                42.4679292
-              ]
+              "coordinates": [-70.9329592, 42.4679292]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7499,
-                3957
-              ]
+              "resourceCoords": [7499, 3957]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.925165,
-                42.4670169
-              ]
+              "coordinates": [-70.925165, 42.4670169]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2271,
-                4837
-              ]
+              "resourceCoords": [2271, 4837]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9325045,
-                42.4620585
-              ]
+              "coordinates": [-70.9325045, 42.4620585]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7976,
-                4860
-              ]
+              "resourceCoords": [7976, 4860]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9236666,
-                42.465976
-              ]
+              "coordinates": [-70.9236666, 42.465976]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5331,
-                845
-              ]
+              "resourceCoords": [5331, 845]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.931787,
-                42.4689106
-              ]
+              "coordinates": [-70.931787, 42.4689106]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4110,
-                5990
-              ]
+              "resourceCoords": [4110, 5990]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9284774,
-                42.4620592
-              ]
+              "coordinates": [-70.9284774, 42.4620592]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8117,
-                2097
-              ]
+              "resourceCoords": [8117, 2097]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9261422,
-                42.4694806
-              ]
+              "coordinates": [-70.9261422, 42.4694806]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2147,
-                3715
-              ]
+              "resourceCoords": [2147, 3715]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.933762,
-                42.4633556
-              ]
+              "coordinates": [-70.933762, 42.4633556]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1386,
-                3657
-              ]
+              "resourceCoords": [1386, 3657]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9350635,
-                42.4627419
-              ]
+              "coordinates": [-70.9350635, 42.4627419]
             }
           }
         ],
@@ -685,18 +523,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/c534jj450",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 22"
-                ]
+                "none": ["image 22"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -706,9 +540,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -735,337 +567,211 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5654,
-                6178
-              ]
+              "resourceCoords": [5654, 6178]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9373346,
-                42.4819529
-              ]
+              "coordinates": [-70.9373346, 42.4819529]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2747,
-                3457
-              ]
+              "resourceCoords": [2747, 3457]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9623091,
-                42.483942
-              ]
+              "coordinates": [-70.9623091, 42.483942]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5747,
-                6567
-              ]
+              "resourceCoords": [5747, 6567]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9353207,
-                42.4805764
-              ]
+              "coordinates": [-70.9353207, 42.4805764]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2446,
-                1576
-              ]
+              "resourceCoords": [2446, 1576]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9712438,
-                42.491277
-              ]
+              "coordinates": [-70.9712438, 42.491277]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3136,
-                3860
-              ]
+              "resourceCoords": [3136, 3860]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9583946,
-                42.4836813
-              ]
+              "coordinates": [-70.9583946, 42.4836813]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4664,
-                1908
-              ]
+              "resourceCoords": [4664, 1908]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9575065,
-                42.4950461
-              ]
+              "coordinates": [-70.9575065, 42.4950461]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4862,
-                1552
-              ]
+              "resourceCoords": [4862, 1552]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9578274,
-                42.4975717
-              ]
+              "coordinates": [-70.9578274, 42.4975717]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2787,
-                2581
-              ]
+              "resourceCoords": [2787, 2581]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.965038,
-                42.487765
-              ]
+              "coordinates": [-70.965038, 42.487765]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2358,
-                1177
-              ]
+              "resourceCoords": [2358, 1177]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9720149,
-                42.4919271
-              ]
+              "coordinates": [-70.9720149, 42.4919271]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3186,
-                3236
-              ]
+              "resourceCoords": [3186, 3236]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9604314,
-                42.486076
-              ]
+              "coordinates": [-70.9604314, 42.486076]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5606,
-                5202
-              ]
+              "resourceCoords": [5606, 5202]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9411779,
-                42.4853396
-              ]
+              "coordinates": [-70.9411779, 42.4853396]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5879,
-                5137
-              ]
+              "resourceCoords": [5879, 5137]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9396225,
-                42.4866544
-              ]
+              "coordinates": [-70.9396225, 42.4866544]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3135,
-                4737
-              ]
+              "resourceCoords": [3135, 4737]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9552634,
-                42.4804017
-              ]
+              "coordinates": [-70.9552634, 42.4804017]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4055,
-                5223
-              ]
+              "resourceCoords": [4055, 5223]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9489034,
-                42.4808531
-              ]
+              "coordinates": [-70.9489034, 42.4808531]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4727,
-                1555
-              ]
+              "resourceCoords": [4727, 1555]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.958528,
-                42.4965737
-              ]
+              "coordinates": [-70.958528, 42.4965737]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3380,
-                5386
-              ]
+              "resourceCoords": [3380, 5386]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.951495,
-                42.4782239
-              ]
+              "coordinates": [-70.951495, 42.4782239]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4770,
-                5078
-              ]
+              "resourceCoords": [4770, 5078]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.945891,
-                42.4834715
-              ]
+              "coordinates": [-70.945891, 42.4834715]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2779,
-                4916
-              ]
+              "resourceCoords": [2779, 4916]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9564522,
-                42.4786157
-              ]
+              "coordinates": [-70.9564522, 42.4786157]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7044,
-                4711
-              ]
+              "resourceCoords": [7044, 4711]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9354968,
-                42.4911999
-              ]
+              "coordinates": [-70.9354968, 42.4911999]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1565,
-                5921
-              ]
+              "resourceCoords": [1565, 5921]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9589987,
-                42.471402
-              ]
+              "coordinates": [-70.9589987, 42.471402]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3336,
-                3138
-              ]
+              "resourceCoords": [3336, 3138]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9602101,
-                42.4867836
-              ]
+              "coordinates": [-70.9602101, 42.4867836]
             }
           }
         ],
@@ -1113,18 +819,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/05744m16x",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 10"
-                ]
+                "none": ["image 10"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -1134,9 +836,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -1163,145 +863,91 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7590,
-                4696
-              ]
+              "resourceCoords": [7590, 4696]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9404502,
-                42.4829147
-              ]
+              "coordinates": [-70.9404502, 42.4829147]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8257,
-                3350
-              ]
+              "resourceCoords": [8257, 3350]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9415756,
-                42.4847371
-              ]
+              "coordinates": [-70.9415756, 42.4847371]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1323,
-                1507
-              ]
+              "resourceCoords": [1323, 1507]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9524029,
-                42.4786227
-              ]
+              "coordinates": [-70.9524029, 42.4786227]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3729,
-                1933
-              ]
+              "resourceCoords": [3729, 1933]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9489797,
-                42.480877
-              ]
+              "coordinates": [-70.9489797, 42.480877]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1697,
-                5296
-              ]
+              "resourceCoords": [1697, 5296]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9463991,
-                42.4757734
-              ]
+              "coordinates": [-70.9463991, 42.4757734]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5168,
-                4590
-              ]
+              "resourceCoords": [5168, 4590]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9435165,
-                42.4802115
-              ]
+              "coordinates": [-70.9435165, 42.4802115]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4567,
-                5402
-              ]
+              "resourceCoords": [4567, 5402]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9430197,
-                42.478827
-              ]
+              "coordinates": [-70.9430197, 42.478827]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7609,
-                6620
-              ]
+              "resourceCoords": [7609, 6620]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9376339,
-                42.4811872
-              ]
+              "coordinates": [-70.9376339, 42.4811872]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1693,
-                3662
-              ]
+              "resourceCoords": [1693, 3662]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9488168,
-                42.477225
-              ]
+              "coordinates": [-70.9488168, 42.477225]
             }
           }
         ],
@@ -1349,18 +995,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/jd475s53d",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 14"
-                ]
+                "none": ["image 14"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -1370,9 +1012,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -1399,369 +1039,231 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4652,
-                1944
-              ]
+              "resourceCoords": [4652, 1944]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9675111,
-                42.4611337
-              ]
+              "coordinates": [-70.9675111, 42.4611337]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2008,
-                1681
-              ]
+              "resourceCoords": [2008, 1681]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9700459,
-                42.4643496
-              ]
+              "coordinates": [-70.9700459, 42.4643496]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6211,
-                5258
-              ]
+              "resourceCoords": [6211, 5258]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9707683,
-                42.456812
-              ]
+              "coordinates": [-70.9707683, 42.456812]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2995,
-                5962
-              ]
+              "resourceCoords": [2995, 5962]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9752108,
-                42.4598924
-              ]
+              "coordinates": [-70.9752108, 42.4598924]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8027,
-                675
-              ]
+              "resourceCoords": [8027, 675]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9619007,
-                42.4584994
-              ]
+              "coordinates": [-70.9619007, 42.4584994]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6427,
-                3381
-              ]
+              "resourceCoords": [6427, 3381]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9677767,
-                42.4581349
-              ]
+              "coordinates": [-70.9677767, 42.4581349]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                704,
-                4327
-              ]
+              "resourceCoords": [704, 4327]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9753131,
-                42.4636873
-              ]
+              "coordinates": [-70.9753131, 42.4636873]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1664,
-                4183
-              ]
+              "resourceCoords": [1664, 4183]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9741398,
-                42.4627058
-              ]
+              "coordinates": [-70.9741398, 42.4627058]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6987,
-                2947
-              ]
+              "resourceCoords": [6987, 2947]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9665189,
-                42.4577936
-              ]
+              "coordinates": [-70.9665189, 42.4577936]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5131,
-                5639
-              ]
+              "resourceCoords": [5131, 5639]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9725395,
-                42.4577942
-              ]
+              "coordinates": [-70.9725395, 42.4577942]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4600,
-                5669
-              ]
+              "resourceCoords": [4600, 5669]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9731355,
-                42.4583105
-              ]
+              "coordinates": [-70.9731355, 42.4583105]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5191,
-                5301
-              ]
+              "resourceCoords": [5191, 5301]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9719859,
-                42.4579797
-              ]
+              "coordinates": [-70.9719859, 42.4579797]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5446,
-                4036
-              ]
+              "resourceCoords": [5446, 4036]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9697923,
-                42.458667
-              ]
+              "coordinates": [-70.9697923, 42.458667]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1410,
-                1779
-              ]
+              "resourceCoords": [1410, 1779]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9708437,
-                42.4649289
-              ]
+              "coordinates": [-70.9708437, 42.4649289]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5862,
-                2676
-              ]
+              "resourceCoords": [5862, 2676]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9672603,
-                42.4592519
-              ]
+              "coordinates": [-70.9672603, 42.4592519]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5817,
-                2464
-              ]
+              "resourceCoords": [5817, 2464]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9669574,
-                42.4594766
-              ]
+              "coordinates": [-70.9669574, 42.4594766]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7915,
-                1211
-              ]
+              "resourceCoords": [7915, 1211]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9628092,
-                42.4581655
-              ]
+              "coordinates": [-70.9628092, 42.4581655]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5681,
-                6739
-              ]
+              "resourceCoords": [5681, 6739]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9736071,
-                42.4562739
-              ]
+              "coordinates": [-70.9736071, 42.4562739]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5653,
-                5277
-              ]
+              "resourceCoords": [5653, 5277]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9713929,
-                42.4574447
-              ]
+              "coordinates": [-70.9713929, 42.4574447]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                978,
-                3542
-              ]
+              "resourceCoords": [978, 3542]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9739111,
-                42.4640131
-              ]
+              "coordinates": [-70.9739111, 42.4640131]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6601,
-                2978
-              ]
+              "resourceCoords": [6601, 2978]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.966937,
-                42.4582138
-              ]
+              "coordinates": [-70.966937, 42.4582138]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6609,
-                644
-              ]
+              "resourceCoords": [6609, 644]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9634483,
-                42.4600497
-              ]
+              "coordinates": [-70.9634483, 42.4600497]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6634,
-                813
-              ]
+              "resourceCoords": [6634, 813]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9636657,
-                42.4598764
-              ]
+              "coordinates": [-70.9636657, 42.4598764]
             }
           }
         ],
@@ -1809,18 +1311,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/4168bc70m",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 12"
-                ]
+                "none": ["image 12"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -1830,9 +1328,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -1859,257 +1355,161 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4910,
-                3018
-              ]
+              "resourceCoords": [4910, 3018]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9602585,
-                42.4636956
-              ]
+              "coordinates": [-70.9602585, 42.4636956]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8355,
-                719
-              ]
+              "resourceCoords": [8355, 719]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9527822,
-                42.4628234
-              ]
+              "coordinates": [-70.9527822, 42.4628234]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1385,
-                3595
-              ]
+              "resourceCoords": [1385, 3595]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9656733,
-                42.4663009
-              ]
+              "coordinates": [-70.9656733, 42.4663009]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3350,
-                1114
-              ]
+              "resourceCoords": [3350, 1114]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9601263,
-                42.467033
-              ]
+              "coordinates": [-70.9601263, 42.467033]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2035,
-                1009
-              ]
+              "resourceCoords": [2035, 1009]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9617472,
-                42.4683488
-              ]
+              "coordinates": [-70.9617472, 42.4683488]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5702,
-                5735
-              ]
+              "resourceCoords": [5702, 5735]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9627789,
-                42.4603883
-              ]
+              "coordinates": [-70.9627789, 42.4603883]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6854,
-                1508
-              ]
+              "resourceCoords": [6854, 1508]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9557289,
-                42.4633807
-              ]
+              "coordinates": [-70.9557289, 42.4633807]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5818,
-                610
-              ]
+              "resourceCoords": [5818, 610]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9559658,
-                42.4652817
-              ]
+              "coordinates": [-70.9559658, 42.4652817]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8497,
-                5934
-              ]
+              "resourceCoords": [8497, 5934]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9590547,
-                42.4573102
-              ]
+              "coordinates": [-70.9590547, 42.4573102]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9798,
-                6424
-              ]
+              "resourceCoords": [9798, 6424]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9580358,
-                42.4556559
-              ]
+              "coordinates": [-70.9580358, 42.4556559]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                709,
-                6057
-              ]
+              "resourceCoords": [709, 6057]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9698761,
-                42.4644213
-              ]
+              "coordinates": [-70.9698761, 42.4644213]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5013,
-                479
-              ]
+              "resourceCoords": [5013, 479]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9570836,
-                42.4661899
-              ]
+              "coordinates": [-70.9570836, 42.4661899]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6571,
-                1201
-              ]
+              "resourceCoords": [6571, 1201]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9557495,
-                42.4638654
-              ]
+              "coordinates": [-70.9557495, 42.4638654]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6613,
-                6779
-              ]
+              "resourceCoords": [6613, 6779]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9626613,
-                42.4581889
-              ]
+              "coordinates": [-70.9626613, 42.4581889]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4795,
-                6650
-              ]
+              "resourceCoords": [4795, 6650]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.965002,
-                42.4601199
-              ]
+              "coordinates": [-70.965002, 42.4601199]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3322,
-                4894
-              ]
+              "resourceCoords": [3322, 4894]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9647015,
-                42.4632425
-              ]
+              "coordinates": [-70.9647015, 42.4632425]
             }
           }
         ],
@@ -2157,18 +1557,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/g445g9179",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 11"
-                ]
+                "none": ["image 11"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -2178,9 +1574,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -2207,129 +1601,81 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9770,
-                4737
-              ]
+              "resourceCoords": [9770, 4737]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.949138,
-                42.4771995
-              ]
+              "coordinates": [-70.949138, 42.4771995]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3681,
-                3854
-              ]
+              "resourceCoords": [3681, 3854]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.955366,
-                42.4699695
-              ]
+              "coordinates": [-70.955366, 42.4699695]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8013,
-                1689
-              ]
+              "resourceCoords": [8013, 1689]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9557122,
-                42.4767329
-              ]
+              "coordinates": [-70.9557122, 42.4767329]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1701,
-                4382
-              ]
+              "resourceCoords": [1701, 4382]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9560863,
-                42.4672191
-              ]
+              "coordinates": [-70.9560863, 42.4672191]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1286,
-                1252
-              ]
+              "resourceCoords": [1286, 1252]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9616473,
-                42.468396
-              ]
+              "coordinates": [-70.9616473, 42.468396]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5686,
-                1243
-              ]
+              "resourceCoords": [5686, 1243]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9582157,
-                42.4741228
-              ]
+              "coordinates": [-70.9582157, 42.4741228]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8890,
-                798
-              ]
+              "resourceCoords": [8890, 798]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9565585,
-                42.4783666
-              ]
+              "coordinates": [-70.9565585, 42.4783666]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4411,
-                4150
-              ]
+              "resourceCoords": [4411, 4150]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9543141,
-                42.4707131
-              ]
+              "coordinates": [-70.9543141, 42.4707131]
             }
           }
         ],
@@ -2377,18 +1723,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/g445g9179",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 11"
-                ]
+                "none": ["image 11"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -2398,9 +1740,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -2427,49 +1767,31 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3781,
-                982
-              ]
+              "resourceCoords": [3781, 982]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9577639,
-                42.4776317
-              ]
+              "coordinates": [-70.9577639, 42.4776317]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2935,
-                1339
-              ]
+              "resourceCoords": [2935, 1339]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9577324,
-                42.476356
-              ]
+              "coordinates": [-70.9577324, 42.476356]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4534,
-                1360
-              ]
+              "resourceCoords": [4534, 1360]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9564555,
-                42.4783798
-              ]
+              "coordinates": [-70.9564555, 42.4783798]
             }
           }
         ],
@@ -2517,18 +1839,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/gb19j239w",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 23"
-                ]
+                "none": ["image 23"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -2538,9 +1856,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -2567,209 +1883,131 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8893,
-                3169
-              ]
+              "resourceCoords": [8893, 3169]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9721145,
-                42.4779976
-              ]
+              "coordinates": [-70.9721145, 42.4779976]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9547,
-                4320
-              ]
+              "resourceCoords": [9547, 4320]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.976708,
-                42.4733938
-              ]
+              "coordinates": [-70.976708, 42.4733938]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9379,
-                4812
-              ]
+              "resourceCoords": [9379, 4812]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9803003,
-                42.4728725
-              ]
+              "coordinates": [-70.9803003, 42.4728725]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5205,
-                1520
-              ]
+              "resourceCoords": [5205, 1520]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9716464,
-                42.4974644
-              ]
+              "coordinates": [-70.9716464, 42.4974644]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8813,
-                2793
-              ]
+              "resourceCoords": [8813, 2793]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.969957,
-                42.479047
-              ]
+              "coordinates": [-70.969957, 42.479047]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9071,
-                4861
-              ]
+              "resourceCoords": [9071, 4861]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9814038,
-                42.4739874
-              ]
+              "coordinates": [-70.9814038, 42.4739874]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6135,
-                2095
-              ]
+              "resourceCoords": [6135, 2095]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9721828,
-                42.4920928
-              ]
+              "coordinates": [-70.9721828, 42.4920928]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5987,
-                1940
-              ]
+              "resourceCoords": [5987, 1940]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9718837,
-                42.4931591
-              ]
+              "coordinates": [-70.9718837, 42.4931591]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8959,
-                5684
-              ]
+              "resourceCoords": [8959, 5684]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9855178,
-                42.4732173
-              ]
+              "coordinates": [-70.9855178, 42.4732173]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9459,
-                5150
-              ]
+              "resourceCoords": [9459, 5150]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9815788,
-                42.4718545
-              ]
+              "coordinates": [-70.9815788, 42.4718545]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6056,
-                2009
-              ]
+              "resourceCoords": [6056, 2009]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9720093,
-                42.4926819
-              ]
+              "coordinates": [-70.9720093, 42.4926819]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8450,
-                5357
-              ]
+              "resourceCoords": [8450, 5357]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9858804,
-                42.4756664
-              ]
+              "coordinates": [-70.9858804, 42.4756664]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9951,
-                4617
-              ]
+              "resourceCoords": [9951, 4617]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9781551,
-                42.4710962
-              ]
+              "coordinates": [-70.9781551, 42.4710962]
             }
           }
         ],
@@ -2817,18 +2055,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/gx41qd29z",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 16"
-                ]
+                "none": ["image 16"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -2838,9 +2072,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -2867,225 +2099,141 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8373,
-                2904
-              ]
+              "resourceCoords": [8373, 2904]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.977758,
-                42.4683408
-              ]
+              "coordinates": [-70.977758, 42.4683408]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9064,
-                2323
-              ]
+              "resourceCoords": [9064, 2323]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9767858,
-                42.4694007
-              ]
+              "coordinates": [-70.9767858, 42.4694007]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3052,
-                5257
-              ]
+              "resourceCoords": [3052, 5257]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9864384,
-                42.4633925
-              ]
+              "coordinates": [-70.9864384, 42.4633925]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1141,
-                1887
-              ]
+              "resourceCoords": [1141, 1887]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9917271,
-                42.4679966
-              ]
+              "coordinates": [-70.9917271, 42.4679966]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1876,
-                5988
-              ]
+              "resourceCoords": [1876, 5988]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9882306,
-                42.4620193
-              ]
+              "coordinates": [-70.9882306, 42.4620193]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2285,
-                3148
-              ]
+              "resourceCoords": [2285, 3148]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.988789,
-                42.4659625
-              ]
+              "coordinates": [-70.988789, 42.4659625]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1490,
-                6721
-              ]
+              "resourceCoords": [1490, 6721]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9885468,
-                42.4609934
-              ]
+              "coordinates": [-70.9885468, 42.4609934]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8712,
-                5233
-              ]
+              "resourceCoords": [8712, 5233]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9760685,
-                42.4654707
-              ]
+              "coordinates": [-70.9760685, 42.4654707]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9579,
-                5290
-              ]
+              "resourceCoords": [9579, 5290]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9745154,
-                42.4656798
-              ]
+              "coordinates": [-70.9745154, 42.4656798]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2800,
-                6226
-              ]
+              "resourceCoords": [2800, 6226]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9864142,
-                42.4620101
-              ]
+              "coordinates": [-70.9864142, 42.4620101]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4836,
-                6594
-              ]
+              "resourceCoords": [4836, 6594]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9825719,
-                42.4622464
-              ]
+              "coordinates": [-70.9825719, 42.4622464]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9023,
-                2775
-              ]
+              "resourceCoords": [9023, 2775]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9766145,
-                42.4687621
-              ]
+              "coordinates": [-70.9766145, 42.4687621]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8742,
-                1282
-              ]
+              "resourceCoords": [8742, 1282]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.977634,
-                42.4707023
-              ]
+              "coordinates": [-70.977634, 42.4707023]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8516,
-                6472
-              ]
+              "resourceCoords": [8516, 6472]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9758635,
-                42.4637992
-              ]
+              "coordinates": [-70.9758635, 42.4637992]
             }
           }
         ],
@@ -3133,18 +2281,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/bc389b85f",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 15"
-                ]
+                "none": ["image 15"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -3154,9 +2298,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -3183,129 +2325,81 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5198,
-                5888
-              ]
+              "resourceCoords": [5198, 5888]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9884651,
-                42.4609134
-              ]
+              "coordinates": [-70.9884651, 42.4609134]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4960,
-                4543
-              ]
+              "resourceCoords": [4960, 4543]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9864786,
-                42.4619478
-              ]
+              "coordinates": [-70.9864786, 42.4619478]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5408,
-                6068
-              ]
+              "resourceCoords": [5408, 6068]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9887418,
-                42.4604253
-              ]
+              "coordinates": [-70.9887418, 42.4604253]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4504,
-                6346
-              ]
+              "resourceCoords": [4504, 6346]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9896171,
-                42.4614671
-              ]
+              "coordinates": [-70.9896171, 42.4614671]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5260,
-                6374
-              ]
+              "resourceCoords": [5260, 6374]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9892347,
-                42.4605103
-              ]
+              "coordinates": [-70.9892347, 42.4605103]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5999,
-                6406
-              ]
+              "resourceCoords": [5999, 6406]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9889242,
-                42.459748
-              ]
+              "coordinates": [-70.9889242, 42.459748]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5885,
-                6406
-              ]
+              "resourceCoords": [5885, 6406]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9889415,
-                42.4598116
-              ]
+              "coordinates": [-70.9889415, 42.4598116]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6115,
-                5133
-              ]
+              "resourceCoords": [6115, 5133]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9867788,
-                42.4599687
-              ]
+              "coordinates": [-70.9867788, 42.4599687]
             }
           }
         ],
@@ -3353,18 +2447,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/bc389b85f",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 15"
-                ]
+                "none": ["image 15"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -3374,9 +2464,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -3403,225 +2491,141 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6565,
-                940
-              ]
+              "resourceCoords": [6565, 940]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9735681,
-                42.4563161
-              ]
+              "coordinates": [-70.9735681, 42.4563161]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6300,
-                2021
-              ]
+              "resourceCoords": [6300, 2021]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9755927,
-                42.4563288
-              ]
+              "coordinates": [-70.9755927, 42.4563288]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4432,
-                2145
-              ]
+              "resourceCoords": [4432, 2145]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9768857,
-                42.4587656
-              ]
+              "coordinates": [-70.9768857, 42.4587656]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1063,
-                6650
-              ]
+              "resourceCoords": [1063, 6650]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9862502,
-                42.4618958
-              ]
+              "coordinates": [-70.9862502, 42.4618958]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3172,
-                2556
-              ]
+              "resourceCoords": [3172, 2556]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.977979,
-                42.4602171
-              ]
+              "coordinates": [-70.977979, 42.4602171]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2757,
-                3650
-              ]
+              "resourceCoords": [2757, 3650]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9801673,
-                42.4605532
-              ]
+              "coordinates": [-70.9801673, 42.4605532]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3811,
-                4502
-              ]
+              "resourceCoords": [3811, 4502]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9812083,
-                42.4588324
-              ]
+              "coordinates": [-70.9812083, 42.4588324]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6795,
-                888
-              ]
+              "resourceCoords": [6795, 888]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9732845,
-                42.455926
-              ]
+              "coordinates": [-70.9732845, 42.455926]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2856,
-                2934
-              ]
+              "resourceCoords": [2856, 2934]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9788455,
-                42.4606226
-              ]
+              "coordinates": [-70.9788455, 42.4606226]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1084,
-                895
-              ]
+              "resourceCoords": [1084, 895]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9759054,
-                42.4636697
-              ]
+              "coordinates": [-70.9759054, 42.4636697]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3160,
-                3324
-              ]
+              "resourceCoords": [3160, 3324]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9794079,
-                42.4601338
-              ]
+              "coordinates": [-70.9794079, 42.4601338]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1213,
-                5683
-              ]
+              "resourceCoords": [1213, 5683]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9844987,
-                42.4619692
-              ]
+              "coordinates": [-70.9844987, 42.4619692]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3520,
-                2636
-              ]
+              "resourceCoords": [3520, 2636]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9780857,
-                42.4597621
-              ]
+              "coordinates": [-70.9780857, 42.4597621]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4166,
-                3501
-              ]
+              "resourceCoords": [4166, 3501]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9793648,
-                42.4586633
-              ]
+              "coordinates": [-70.9793648, 42.4586633]
             }
           }
         ],
@@ -3669,18 +2673,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/bc389b85f",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 15"
-                ]
+                "none": ["image 15"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -3690,9 +2690,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -3719,161 +2717,101 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7051,
-                5013
-              ]
+              "resourceCoords": [7051, 5013]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9703465,
-                42.4563531
-              ]
+              "coordinates": [-70.9703465, 42.4563531]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7724,
-                4683
-              ]
+              "resourceCoords": [7724, 4683]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9656236,
-                42.4553049
-              ]
+              "coordinates": [-70.9656236, 42.4553049]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7284,
-                4623
-              ]
+              "resourceCoords": [7284, 4623]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9671155,
-                42.4570795
-              ]
+              "coordinates": [-70.9671155, 42.4570795]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7187,
-                5076
-              ]
+              "resourceCoords": [7187, 5076]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9699424,
-                42.4557188
-              ]
+              "coordinates": [-70.9699424, 42.4557188]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9318,
-                6124
-              ]
+              "resourceCoords": [9318, 6124]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9658543,
-                42.4441413
-              ]
+              "coordinates": [-70.9658543, 42.4441413]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7442,
-                4976
-              ]
+              "resourceCoords": [7442, 4976]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9682897,
-                42.455347
-              ]
+              "coordinates": [-70.9682897, 42.455347]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6782,
-                5035
-              ]
+              "resourceCoords": [6782, 5035]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9715311,
-                42.4573956
-              ]
+              "coordinates": [-70.9715311, 42.4573956]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7178,
-                4835
-              ]
+              "resourceCoords": [7178, 4835]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9689105,
-                42.4566408
-              ]
+              "coordinates": [-70.9689105, 42.4566408]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7326,
-                4873
-              ]
+              "resourceCoords": [7326, 4873]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9685372,
-                42.4560126
-              ]
+              "coordinates": [-70.9685372, 42.4560126]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7764,
-                4555
-              ]
+              "resourceCoords": [7764, 4555]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9649458,
-                42.4555875
-              ]
+              "coordinates": [-70.9649458, 42.4555875]
             }
           }
         ],
@@ -3921,18 +2859,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/3n206t688",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 29"
-                ]
+                "none": ["image 29"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -3942,9 +2876,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -3971,177 +2903,111 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6418,
-                1387
-              ]
+              "resourceCoords": [6418, 1387]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9896682,
-                42.4527028
-              ]
+              "coordinates": [-70.9896682, 42.4527028]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5706,
-                1030
-              ]
+              "resourceCoords": [5706, 1030]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9888107,
-                42.4545216
-              ]
+              "coordinates": [-70.9888107, 42.4545216]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3261,
-                680
-              ]
+              "resourceCoords": [3261, 680]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9888469,
-                42.4604802
-              ]
+              "coordinates": [-70.9888469, 42.4604802]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2826,
-                6535
-              ]
+              "resourceCoords": [2826, 6535]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0078286,
-                42.4602316
-              ]
+              "coordinates": [-71.0078286, 42.4602316]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7305,
-                5409
-              ]
+              "resourceCoords": [7305, 5409]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0021229,
-                42.4498819
-              ]
+              "coordinates": [-71.0021229, 42.4498819]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8245,
-                4416
-              ]
+              "resourceCoords": [8245, 4416]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9984077,
-                42.4478455
-              ]
+              "coordinates": [-70.9984077, 42.4478455]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3073,
-                615
-              ]
+              "resourceCoords": [3073, 615]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.988466,
-                42.4610188
-              ]
+              "coordinates": [-70.988466, 42.4610188]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3105,
-                1140
-              ]
+              "resourceCoords": [3105, 1140]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9903109,
-                42.4607934
-              ]
+              "coordinates": [-70.9903109, 42.4607934]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                854,
-                6280
-              ]
+              "resourceCoords": [854, 6280]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0076881,
-                42.4651184
-              ]
+              "coordinates": [-71.0076881, 42.4651184]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7367,
-                3071
-              ]
+              "resourceCoords": [7367, 3071]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9942415,
-                42.4501531
-              ]
+              "coordinates": [-70.9942415, 42.4501531]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9128,
-                2583
-              ]
+              "resourceCoords": [9128, 2583]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9922354,
-                42.4458394
-              ]
+              "coordinates": [-70.9922354, 42.4458394]
             }
           }
         ],
@@ -4189,18 +3055,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/6d572r771",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 18"
-                ]
+                "none": ["image 18"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -4210,9 +3072,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -4239,177 +3099,111 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                10192,
-                6215
-              ]
+              "resourceCoords": [10192, 6215]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9650977,
-                42.4757787
-              ]
+              "coordinates": [-70.9650977, 42.4757787]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4535,
-                6498
-              ]
+              "resourceCoords": [4535, 6498]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9717192,
-                42.4699603
-              ]
+              "coordinates": [-70.9717192, 42.4699603]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8362,
-                6098
-              ]
+              "resourceCoords": [8362, 6098]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9672578,
-                42.4745054
-              ]
+              "coordinates": [-70.9672578, 42.4745054]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9877,
-                1510
-              ]
+              "resourceCoords": [9877, 1510]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.970974,
-                42.4802667
-              ]
+              "coordinates": [-70.970974, 42.4802667]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2100,
-                5469
-              ]
+              "resourceCoords": [2100, 5469]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9764877,
-                42.4690566
-              ]
+              "coordinates": [-70.9764877, 42.4690566]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9339,
-                2448
-              ]
+              "resourceCoords": [9339, 2448]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9704292,
-                42.4787893
-              ]
+              "coordinates": [-70.9704292, 42.4787893]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4260,
-                4826
-              ]
+              "resourceCoords": [4260, 4826]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9742367,
-                42.4714938
-              ]
+              "coordinates": [-70.9742367, 42.4714938]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2260,
-                997
-              ]
+              "resourceCoords": [2260, 997]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9818406,
-                42.4737334
-              ]
+              "coordinates": [-70.9818406, 42.4737334]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2185,
-                5080
-              ]
+              "resourceCoords": [2185, 5080]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9768155,
-                42.4695338
-              ]
+              "coordinates": [-70.9768155, 42.4695338]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5926,
-                5589
-              ]
+              "resourceCoords": [5926, 5589]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9707368,
-                42.4721863
-              ]
+              "coordinates": [-70.9707368, 42.4721863]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1429,
-                2072
-              ]
+              "resourceCoords": [1429, 2072]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9816656,
-                42.4718371
-              ]
+              "coordinates": [-70.9816656, 42.4718371]
             }
           }
         ],
@@ -4457,18 +3251,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/6d572r771",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 18"
-                ]
+                "none": ["image 18"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -4478,9 +3268,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -4507,97 +3295,61 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6930,
-                2035
-              ]
+              "resourceCoords": [6930, 2035]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9309931,
-                42.4809835
-              ]
+              "coordinates": [-70.9309931, 42.4809835]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6627,
-                2071
-              ]
+              "resourceCoords": [6627, 2071]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9313107,
-                42.4812551
-              ]
+              "coordinates": [-70.9313107, 42.4812551]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7099,
-                2078
-              ]
+              "resourceCoords": [7099, 2078]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9308004,
-                42.4807201
-              ]
+              "coordinates": [-70.9308004, 42.4807201]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6604,
-                2341
-              ]
+              "resourceCoords": [6604, 2341]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9317743,
-                42.4810742
-              ]
+              "coordinates": [-70.9317743, 42.4810742]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5979,
-                915
-              ]
+              "resourceCoords": [5979, 915]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9302588,
-                42.4828209
-              ]
+              "coordinates": [-70.9302588, 42.4828209]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5962,
-                2341
-              ]
+              "resourceCoords": [5962, 2341]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9324155,
-                42.4818152
-              ]
+              "coordinates": [-70.9324155, 42.4818152]
             }
           }
         ],
@@ -4645,18 +3397,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/9019vw302",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 17"
-                ]
+                "none": ["image 17"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -4666,9 +3414,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -4695,209 +3441,131 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1187,
-                1082
-              ]
+              "resourceCoords": [1187, 1082]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9984591,
-                42.4743374
-              ]
+              "coordinates": [-70.9984591, 42.4743374]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4958,
-                3765
-              ]
+              "resourceCoords": [4958, 3765]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9904706,
-                42.4721899
-              ]
+              "coordinates": [-70.9904706, 42.4721899]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2937,
-                4072
-              ]
+              "resourceCoords": [2937, 4072]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9939175,
-                42.471038
-              ]
+              "coordinates": [-70.9939175, 42.471038]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4078,
-                2046
-              ]
+              "resourceCoords": [4078, 2046]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9929493,
-                42.4741297
-              ]
+              "coordinates": [-70.9929493, 42.4741297]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7784,
-                4029
-              ]
+              "resourceCoords": [7784, 4029]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9852039,
-                42.47307
-              ]
+              "coordinates": [-70.9852039, 42.47307]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9156,
-                5471
-              ]
+              "resourceCoords": [9156, 5471]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9819483,
-                42.4718835
-              ]
+              "coordinates": [-70.9819483, 42.4718835]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5931,
-                2905
-              ]
+              "resourceCoords": [5931, 2905]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9890507,
-                42.4737816
-              ]
+              "coordinates": [-70.9890507, 42.4737816]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1728,
-                1882
-              ]
+              "resourceCoords": [1728, 1882]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9971164,
-                42.4735167
-              ]
+              "coordinates": [-70.9971164, 42.4735167]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3604,
-                4904
-              ]
+              "resourceCoords": [3604, 4904]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9923139,
-                42.4701979
-              ]
+              "coordinates": [-70.9923139, 42.4701979]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7158,
-                2810
-              ]
+              "resourceCoords": [7158, 2810]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9869946,
-                42.4743739
-              ]
+              "coordinates": [-70.9869946, 42.4743739]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2544,
-                4384
-              ]
+              "resourceCoords": [2544, 4384]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9943864,
-                42.4704896
-              ]
+              "coordinates": [-70.9943864, 42.4704896]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2788,
-                1138
-              ]
+              "resourceCoords": [2788, 1138]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9956807,
-                42.474823
-              ]
+              "coordinates": [-70.9956807, 42.474823]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3135,
-                6434
-              ]
+              "resourceCoords": [3135, 6434]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9919044,
-                42.4680292
-              ]
+              "coordinates": [-70.9919044, 42.4680292]
             }
           }
         ],
@@ -4945,18 +3613,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/0c486g23h",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 19"
-                ]
+                "none": ["image 19"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -4966,9 +3630,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -4995,273 +3657,171 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2646,
-                3875
-              ]
+              "resourceCoords": [2646, 3875]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9714125,
-                42.4665364
-              ]
+              "coordinates": [-70.9714125, 42.4665364]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8354,
-                2585
-              ]
+              "resourceCoords": [8354, 2585]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9643255,
-                42.4728534
-              ]
+              "coordinates": [-70.9643255, 42.4728534]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1910,
-                3221
-              ]
+              "resourceCoords": [1910, 3221]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.973237,
-                42.4666152
-              ]
+              "coordinates": [-70.973237, 42.4666152]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7871,
-                1517
-              ]
+              "resourceCoords": [7871, 1517]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9663551,
-                42.4737194
-              ]
+              "coordinates": [-70.9663551, 42.4737194]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6627,
-                6211
-              ]
+              "resourceCoords": [6627, 6211]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9628319,
-                42.4676181
-              ]
+              "coordinates": [-70.9628319, 42.4676181]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8923,
-                5622
-              ]
+              "resourceCoords": [8923, 5622]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.960113,
-                42.4701514
-              ]
+              "coordinates": [-70.960113, 42.4701514]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2053,
-                5520
-              ]
+              "resourceCoords": [2053, 5520]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9703048,
-                42.4643425
-              ]
+              "coordinates": [-70.9703048, 42.4643425]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1697,
-                874
-              ]
+              "resourceCoords": [1697, 874]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9764464,
-                42.4688436
-              ]
+              "coordinates": [-70.9764464, 42.4688436]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2561,
-                991
-              ]
+              "resourceCoords": [2561, 991]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9750589,
-                42.4695306
-              ]
+              "coordinates": [-70.9750589, 42.4695306]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6623,
-                1007
-              ]
+              "resourceCoords": [6623, 1007]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9686744,
-                42.4732279
-              ]
+              "coordinates": [-70.9686744, 42.4732279]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                984,
-                4583
-              ]
+              "resourceCoords": [984, 4583]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9729827,
-                42.4643413
-              ]
+              "coordinates": [-70.9729827, 42.4643413]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4849,
-                4188
-              ]
+              "resourceCoords": [4849, 4188]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9678829,
-                42.4681736
-              ]
+              "coordinates": [-70.9678829, 42.4681736]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3100,
-                5036
-              ]
+              "resourceCoords": [3100, 5036]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9694338,
-                42.4657413
-              ]
+              "coordinates": [-70.9694338, 42.4657413]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1417,
-                4715
-              ]
+              "resourceCoords": [1417, 4715]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9721468,
-                42.4645916
-              ]
+              "coordinates": [-70.9721468, 42.4645916]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6370,
-                4220
-              ]
+              "resourceCoords": [6370, 4220]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9655159,
-                42.4694741
-              ]
+              "coordinates": [-70.9655159, 42.4694741]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2638,
-                2267
-              ]
+              "resourceCoords": [2638, 2267]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9733541,
-                42.4682556
-              ]
+              "coordinates": [-70.9733541, 42.4682556]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8218,
-                5829
-              ]
+              "resourceCoords": [8218, 5829]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9609187,
-                42.4693111
-              ]
+              "coordinates": [-70.9609187, 42.4693111]
             }
           }
         ],
@@ -5309,18 +3869,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/8623mq39z",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 20"
-                ]
+                "none": ["image 20"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -5330,9 +3886,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -5359,209 +3913,131 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3523,
-                1546
-              ]
+              "resourceCoords": [3523, 1546]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9603261,
-                42.4848922
-              ]
+              "coordinates": [-70.9603261, 42.4848922]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6053,
-                2543
-              ]
+              "resourceCoords": [6053, 2543]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9555802,
-                42.4866023
-              ]
+              "coordinates": [-70.9555802, 42.4866023]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2432,
-                4868
-              ]
+              "resourceCoords": [2432, 4868]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9573184,
-                42.4807047
-              ]
+              "coordinates": [-70.9573184, 42.4807047]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3458,
-                3935
-              ]
+              "resourceCoords": [3458, 3935]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9572292,
-                42.4826357
-              ]
+              "coordinates": [-70.9572292, 42.4826357]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2944,
-                5917
-              ]
+              "resourceCoords": [2944, 5917]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9552205,
-                42.4801654
-              ]
+              "coordinates": [-70.9552205, 42.4801654]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7129,
-                5060
-              ]
+              "resourceCoords": [7129, 5060]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9517948,
-                42.485033
-              ]
+              "coordinates": [-70.9517948, 42.485033]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8074,
-                6284
-              ]
+              "resourceCoords": [8074, 6284]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9480272,
-                42.4852099
-              ]
+              "coordinates": [-70.9480272, 42.4852099]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5646,
-                5024
-              ]
+              "resourceCoords": [5646, 5024]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.952759,
-                42.4839493
-              ]
+              "coordinates": [-70.952759, 42.4839493]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7291,
-                2621
-              ]
+              "resourceCoords": [7291, 2621]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9538886,
-                42.4877087
-              ]
+              "coordinates": [-70.9538886, 42.4877087]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7012,
-                2190
-              ]
+              "resourceCoords": [7012, 2190]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9548774,
-                42.487839
-              ]
+              "coordinates": [-70.9548774, 42.487839]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7932,
-                4357
-              ]
+              "resourceCoords": [7932, 4357]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9507816,
-                42.4868511
-              ]
+              "coordinates": [-70.9507816, 42.4868511]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6318,
-                3522
-              ]
+              "resourceCoords": [6318, 3522]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9539341,
-                42.485907
-              ]
+              "coordinates": [-70.9539341, 42.485907]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2845,
-                6822
-              ]
+              "resourceCoords": [2845, 6822]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9540859,
-                42.4792032
-              ]
+              "coordinates": [-70.9540859, 42.4792032]
             }
           }
         ],
@@ -5609,18 +4085,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/ks65m696n",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 21"
-                ]
+                "none": ["image 21"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -5630,9 +4102,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -5659,145 +4129,91 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7827,
-                3481
-              ]
+              "resourceCoords": [7827, 3481]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9599161,
-                42.4875811
-              ]
+              "coordinates": [-70.9599161, 42.4875811]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6273,
-                5591
-              ]
+              "resourceCoords": [6273, 5591]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9641235,
-                42.4858776
-              ]
+              "coordinates": [-70.9641235, 42.4858776]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7953,
-                3726
-              ]
+              "resourceCoords": [7953, 3726]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9600342,
-                42.4872462
-              ]
+              "coordinates": [-70.9600342, 42.4872462]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4481,
-                2643
-              ]
+              "resourceCoords": [4481, 2643]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9650967,
-                42.4908393
-              ]
+              "coordinates": [-70.9650967, 42.4908393]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7045,
-                4689
-              ]
+              "resourceCoords": [7045, 4689]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9621535,
-                42.4866411
-              ]
+              "coordinates": [-70.9621535, 42.4866411]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5529,
-                4704
-              ]
+              "resourceCoords": [5529, 4704]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9650154,
-                42.487723
-              ]
+              "coordinates": [-70.9650154, 42.487723]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1128,
-                3631
-              ]
+              "resourceCoords": [1128, 3631]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9716707,
-                42.491254
-              ]
+              "coordinates": [-70.9716707, 42.491254]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7840,
-                2774
-              ]
+              "resourceCoords": [7840, 2774]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9592635,
-                42.488546
-              ]
+              "coordinates": [-70.9592635, 42.488546]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7048,
-                5811
-              ]
+              "resourceCoords": [7048, 5811]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9630084,
-                42.4851897
-              ]
+              "coordinates": [-70.9630084, 42.4851897]
             }
           }
         ],
@@ -5845,18 +4261,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/ks65m696n",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 21"
-                ]
+                "none": ["image 21"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -5866,9 +4278,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -5895,145 +4305,91 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1286,
-                1700
-              ]
+              "resourceCoords": [1286, 1700]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9721792,
-                42.4921064
-              ]
+              "coordinates": [-70.9721792, 42.4921064]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2930,
-                1291
-              ]
+              "resourceCoords": [2930, 1291]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9701713,
-                42.4963503
-              ]
+              "coordinates": [-70.9701713, 42.4963503]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2297,
-                2274
-              ]
+              "resourceCoords": [2297, 2274]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9683907,
-                42.493612
-              ]
+              "coordinates": [-70.9683907, 42.493612]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1643,
-                826
-              ]
+              "resourceCoords": [1643, 826]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9743028,
-                42.4944303
-              ]
+              "coordinates": [-70.9743028, 42.4944303]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2228,
-                1518
-              ]
+              "resourceCoords": [2228, 1518]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9708783,
-                42.4944825
-              ]
+              "coordinates": [-70.9708783, 42.4944825]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1506,
-                1603
-              ]
+              "resourceCoords": [1506, 1603]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9720035,
-                42.4927177
-              ]
+              "coordinates": [-70.9720035, 42.4927177]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1447,
-                749
-              ]
+              "resourceCoords": [1447, 749]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9749812,
-                42.494077
-              ]
+              "coordinates": [-70.9749812, 42.494077]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1436,
-                1407
-              ]
+              "resourceCoords": [1436, 1407]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9727827,
-                42.4928828
-              ]
+              "coordinates": [-70.9727827, 42.4928828]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1672,
-                1544
-              ]
+              "resourceCoords": [1672, 1544]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9718564,
-                42.4931707
-              ]
+              "coordinates": [-70.9718564, 42.4931707]
             }
           }
         ],
@@ -6081,18 +4437,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/4x51mf22g",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 28"
-                ]
+                "none": ["image 28"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -6102,9 +4454,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -6131,113 +4481,71 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7388,
-                4628
-              ]
+              "resourceCoords": [7388, 4628]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0081179,
-                42.4707912
-              ]
+              "coordinates": [-71.0081179, 42.4707912]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9711,
-                4559
-              ]
+              "resourceCoords": [9711, 4559]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.007614,
-                42.4651327
-              ]
+              "coordinates": [-71.007614, 42.4651327]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7348,
-                6163
-              ]
+              "resourceCoords": [7348, 6163]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0133639,
-                42.4705836
-              ]
+              "coordinates": [-71.0133639, 42.4705836]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                10236,
-                4841
-              ]
+              "resourceCoords": [10236, 4841]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0083518,
-                42.4637155
-              ]
+              "coordinates": [-71.0083518, 42.4637155]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8883,
-                4946
-              ]
+              "resourceCoords": [8883, 4946]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0088967,
-                42.4670005
-              ]
+              "coordinates": [-71.0088967, 42.4670005]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9739,
-                6618
-              ]
+              "resourceCoords": [9739, 6618]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0143425,
-                42.4646913
-              ]
+              "coordinates": [-71.0143425, 42.4646913]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8486,
-                4777
-              ]
+              "resourceCoords": [8486, 4777]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0090444,
-                42.468044
-              ]
+              "coordinates": [-71.0090444, 42.468044]
             }
           }
         ],
@@ -6285,18 +4593,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/4x51mf22g",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 28"
-                ]
+                "none": ["image 28"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -6306,9 +4610,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -6335,225 +4637,141 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9383,
-                2841
-              ]
+              "resourceCoords": [9383, 2841]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.012818,
-                42.4442243
-              ]
+              "coordinates": [-71.012818, 42.4442243]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                872,
-                1611
-              ]
+              "resourceCoords": [872, 1611]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0125845,
-                42.4654389
-              ]
+              "coordinates": [-71.0125845, 42.4654389]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5394,
-                2010
-              ]
+              "resourceCoords": [5394, 2010]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0117074,
-                42.4542272
-              ]
+              "coordinates": [-71.0117074, 42.4542272]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9147,
-                2754
-              ]
+              "resourceCoords": [9147, 2754]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0124731,
-                42.4448153
-              ]
+              "coordinates": [-71.0124731, 42.4448153]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1468,
-                3227
-              ]
+              "resourceCoords": [1468, 3227]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0174322,
-                42.463376
-              ]
+              "coordinates": [-71.0174322, 42.463376]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1203,
-                1313
-              ]
+              "resourceCoords": [1203, 1313]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0114193,
-                42.4647439
-              ]
+              "coordinates": [-71.0114193, 42.4647439]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                944,
-                704
-              ]
+              "resourceCoords": [944, 704]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0095704,
-                42.4655192
-              ]
+              "coordinates": [-71.0095704, 42.4655192]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2685,
-                870
-              ]
+              "resourceCoords": [2685, 870]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.009418,
-                42.4613128
-              ]
+              "coordinates": [-71.009418, 42.4613128]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3954,
-                1205
-              ]
+              "resourceCoords": [3954, 1205]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0096945,
-                42.4579269
-              ]
+              "coordinates": [-71.0096945, 42.4579269]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8346,
-                2153
-              ]
+              "resourceCoords": [8346, 2153]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0102687,
-                42.4477534
-              ]
+              "coordinates": [-71.0102687, 42.4477534]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4181,
-                1418
-              ]
+              "resourceCoords": [4181, 1418]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.01055,
-                42.4573836
-              ]
+              "coordinates": [-71.01055, 42.4573836]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1066,
-                3530
-              ]
+              "resourceCoords": [1066, 3530]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0187056,
-                42.4643559
-              ]
+              "coordinates": [-71.0187056, 42.4643559]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5075,
-                1016
-              ]
+              "resourceCoords": [5075, 1016]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0086456,
-                42.4554036
-              ]
+              "coordinates": [-71.0086456, 42.4554036]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6638,
-                507
-              ]
+              "resourceCoords": [6638, 507]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -71.0063796,
-                42.4516053
-              ]
+              "coordinates": [-71.0063796, 42.4516053]
             }
           }
         ],
@@ -6601,18 +4819,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/6q185h13w",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 9"
-                ]
+                "none": ["image 9"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -6622,9 +4836,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -6651,113 +4863,71 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3466,
-                990
-              ]
+              "resourceCoords": [3466, 990]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9307988,
-                42.4807228
-              ]
+              "coordinates": [-70.9307988, 42.4807228]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9188,
-                5860
-              ]
+              "resourceCoords": [9188, 5860]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9313937,
-                42.4703998
-              ]
+              "coordinates": [-70.9313937, 42.4703998]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6065,
-                914
-              ]
+              "resourceCoords": [6065, 914]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9277729,
-                42.4779589
-              ]
+              "coordinates": [-70.9277729, 42.4779589]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1096,
-                6257
-              ]
+              "resourceCoords": [1096, 6257]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9413495,
-                42.4788016
-              ]
+              "coordinates": [-70.9413495, 42.4788016]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2245,
-                4735
-              ]
+              "resourceCoords": [2245, 4735]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9377686,
-                42.4787885
-              ]
+              "coordinates": [-70.9377686, 42.4787885]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5575,
-                2034
-              ]
+              "resourceCoords": [5575, 2034]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9300396,
-                42.4775838
-              ]
+              "coordinates": [-70.9300396, 42.4775838]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1964,
-                2202
-              ]
+              "resourceCoords": [1964, 2202]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9343035,
-                42.4813873
-              ]
+              "coordinates": [-70.9343035, 42.4813873]
             }
           }
         ],
@@ -6805,18 +4975,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/9306wt896",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 25"
-                ]
+                "none": ["image 25"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -6826,9 +4992,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -6855,97 +5019,61 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2813,
-                5335
-              ]
+              "resourceCoords": [2813, 5335]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.905416,
-                42.4648863
-              ]
+              "coordinates": [-70.905416, 42.4648863]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2634,
-                5654
-              ]
+              "resourceCoords": [2634, 5654]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9061148,
-                42.4644789
-              ]
+              "coordinates": [-70.9061148, 42.4644789]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7630,
-                2485
-              ]
+              "resourceCoords": [7630, 2485]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8915218,
-                42.4666948
-              ]
+              "coordinates": [-70.8915218, 42.4666948]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1468,
-                4356
-              ]
+              "resourceCoords": [1468, 4356]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9077434,
-                42.4673588
-              ]
+              "coordinates": [-70.9077434, 42.4673588]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5711,
-                1043
-              ]
+              "resourceCoords": [5711, 1043]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8949068,
-                42.4703301
-              ]
+              "coordinates": [-70.8949068, 42.4703301]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2586,
-                896
-              ]
+              "resourceCoords": [2586, 896]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9023504,
-                42.4727511
-              ]
+              "coordinates": [-70.9023504, 42.4727511]
             }
           }
         ],
@@ -6993,18 +5121,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/j3863304n",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 7"
-                ]
+                "none": ["image 7"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -7014,9 +5138,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -7043,177 +5165,111 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2133,
-                5919
-              ]
+              "resourceCoords": [2133, 5919]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9489156,
-                42.4728655
-              ]
+              "coordinates": [-70.9489156, 42.4728655]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5627,
-                607
-              ]
+              "resourceCoords": [5627, 607]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9369599,
-                42.4739834
-              ]
+              "coordinates": [-70.9369599, 42.4739834]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4414,
-                6113
-              ]
+              "resourceCoords": [4414, 6113]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9462526,
-                42.47033
-              ]
+              "coordinates": [-70.9462526, 42.47033]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1475,
-                3116
-              ]
+              "resourceCoords": [1475, 3116]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9458152,
-                42.4761277
-              ]
+              "coordinates": [-70.9458152, 42.4761277]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8939,
-                2161
-              ]
+              "resourceCoords": [8939, 2161]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9354377,
-                42.4691475
-              ]
+              "coordinates": [-70.9354377, 42.4691475]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1841,
-                3603
-              ]
+              "resourceCoords": [1841, 3603]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9460039,
-                42.4754263
-              ]
+              "coordinates": [-70.9460039, 42.4754263]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4825,
-                6582
-              ]
+              "resourceCoords": [4825, 6582]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9464124,
-                42.4694897
-              ]
+              "coordinates": [-70.9464124, 42.4694897]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1071,
-                726
-              ]
+              "resourceCoords": [1071, 726]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9428884,
-                42.4787763
-              ]
+              "coordinates": [-70.9428884, 42.4787763]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6677,
-                6612
-              ]
+              "resourceCoords": [6677, 6612]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9441037,
-                42.4674886
-              ]
+              "coordinates": [-70.9441037, 42.4674886]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                4067,
-                4383
-              ]
+              "resourceCoords": [4067, 4383]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9442843,
-                42.4722094
-              ]
+              "coordinates": [-70.9442843, 42.4722094]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5961,
-                3263
-              ]
+              "resourceCoords": [5961, 3263]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9404755,
-                42.4712756
-              ]
+              "coordinates": [-70.9404755, 42.4712756]
             }
           }
         ],
@@ -7261,18 +5317,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/xk81nf89f",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 13"
-                ]
+                "none": ["image 13"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -7282,9 +5334,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -7311,97 +5361,61 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1670,
-                2833
-              ]
+              "resourceCoords": [1670, 2833]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9522813,
-                42.4589715
-              ]
+              "coordinates": [-70.9522813, 42.4589715]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2238,
-                4041
-              ]
+              "resourceCoords": [2238, 4041]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9536545,
-                42.4574037
-              ]
+              "coordinates": [-70.9536545, 42.4574037]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2109,
-                2936
-              ]
+              "resourceCoords": [2109, 2936]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9518705,
-                42.4584133
-              ]
+              "coordinates": [-70.9518705, 42.4584133]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1578,
-                4126
-              ]
+              "resourceCoords": [1578, 4126]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9543179,
-                42.458139
-              ]
+              "coordinates": [-70.9543179, 42.458139]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                852,
-                1151
-              ]
+              "resourceCoords": [852, 1151]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9502653,
-                42.4611802
-              ]
+              "coordinates": [-70.9502653, 42.4611802]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1384,
-                6515
-              ]
+              "resourceCoords": [1384, 6515]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9583423,
-                42.4564758
-              ]
+              "coordinates": [-70.9583423, 42.4564758]
             }
           }
         ],
@@ -7449,18 +5463,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/xk81nf89f",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 13"
-                ]
+                "none": ["image 13"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -7470,9 +5480,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -7499,97 +5507,61 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6135,
-                2323
-              ]
+              "resourceCoords": [6135, 2323]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9401205,
-                42.4633093
-              ]
+              "coordinates": [-70.9401205, 42.4633093]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8847,
-                4706
-              ]
+              "resourceCoords": [8847, 4706]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9364352,
-                42.4589774
-              ]
+              "coordinates": [-70.9364352, 42.4589774]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8111,
-                1179
-              ]
+              "resourceCoords": [8111, 1179]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9358664,
-                42.464004
-              ]
+              "coordinates": [-70.9358664, 42.464004]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7172,
-                4266
-              ]
+              "resourceCoords": [7172, 4266]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9392556,
-                42.4602462
-              ]
+              "coordinates": [-70.9392556, 42.4602462]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5552,
-                1656
-              ]
+              "resourceCoords": [5552, 1656]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9408161,
-                42.4643309
-              ]
+              "coordinates": [-70.9408161, 42.4643309]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7889,
-                2950
-              ]
+              "resourceCoords": [7889, 2950]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9372437,
-                42.4615881
-              ]
+              "coordinates": [-70.9372437, 42.4615881]
             }
           }
         ],
@@ -7637,18 +5609,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/hq37zf852",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 26"
-                ]
+                "none": ["image 26"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -7658,9 +5626,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -7687,145 +5653,91 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6273,
-                4335
-              ]
+              "resourceCoords": [6273, 4335]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8920065,
-                42.4747665
-              ]
+              "coordinates": [-70.8920065, 42.4747665]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6017,
-                6761
-              ]
+              "resourceCoords": [6017, 6761]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8945764,
-                42.4707574
-              ]
+              "coordinates": [-70.8945764, 42.4707574]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5139,
-                3051
-              ]
+              "resourceCoords": [5139, 3051]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8937928,
-                42.4777448
-              ]
+              "coordinates": [-70.8937928, 42.4777448]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6630,
-                5671
-              ]
+              "resourceCoords": [6630, 5671]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8925112,
-                42.4723546
-              ]
+              "coordinates": [-70.8925112, 42.4723546]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6927,
-                4822
-              ]
+              "resourceCoords": [6927, 4822]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8911019,
-                42.473625
-              ]
+              "coordinates": [-70.8911019, 42.473625]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                8610,
-                4605
-              ]
+              "resourceCoords": [8610, 4605]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8868933,
-                42.4728736
-              ]
+              "coordinates": [-70.8868933, 42.4728736]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7726,
-                1729
-              ]
+              "resourceCoords": [7726, 1729]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8865476,
-                42.478444
-              ]
+              "coordinates": [-70.8865476, 42.478444]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6163,
-                1783
-              ]
+              "resourceCoords": [6163, 1783]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8902513,
-                42.4793178
-              ]
+              "coordinates": [-70.8902513, 42.4793178]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                9843,
-                1110
-              ]
+              "resourceCoords": [9843, 1110]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.8807884,
-                42.4783397
-              ]
+              "coordinates": [-70.8807884, 42.4783397]
             }
           }
         ],
@@ -7873,18 +5785,14 @@
               "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/canvas/hh63wp20p",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "image 24"
-                ]
+                "none": ["image 24"]
               },
               "partOf": [
                 {
                   "id": "https://ark.digitalcommonwealth.org/ark:/50959/dj530101x/manifest",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "Atlas of the city of Lynn, Massachusetts"
-                    ]
+                    "none": ["Atlas of the city of Lynn, Massachusetts"]
                   }
                 }
               ]
@@ -7894,9 +5802,7 @@
             {
               "type": "Organization",
               "label": {
-                "none": [
-                  "Digital Commonwealth"
-                ]
+                "none": ["Digital Commonwealth"]
               },
               "homepage": [
                 {
@@ -7923,161 +5829,101 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                3858,
-                2999
-              ]
+              "resourceCoords": [3858, 2999]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9176714,
-                42.476741
-              ]
+              "coordinates": [-70.9176714, 42.476741]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6075,
-                4908
-              ]
+              "resourceCoords": [6075, 4908]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9200082,
-                42.4716805
-              ]
+              "coordinates": [-70.9200082, 42.4716805]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2941,
-                6590
-              ]
+              "resourceCoords": [2941, 6590]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9269012,
-                42.4756908
-              ]
+              "coordinates": [-70.9269012, 42.4756908]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6063,
-                1990
-              ]
+              "resourceCoords": [6063, 1990]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9131006,
-                42.4735314
-              ]
+              "coordinates": [-70.9131006, 42.4735314]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7675,
-                4386
-              ]
+              "resourceCoords": [7675, 4386]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9172416,
-                42.4694108
-              ]
+              "coordinates": [-70.9172416, 42.4694108]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                5968,
-                5708
-              ]
+              "resourceCoords": [5968, 5708]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9216588,
-                42.4712702
-              ]
+              "coordinates": [-70.9216588, 42.4712702]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                7516,
-                3112
-              ]
+              "resourceCoords": [7516, 3112]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.914311,
-                42.470389
-              ]
+              "coordinates": [-70.914311, 42.470389]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2118,
-                5391
-              ]
+              "resourceCoords": [2118, 5391]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9246537,
-                42.4779386
-              ]
+              "coordinates": [-70.9246537, 42.4779386]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                6937,
-                3259
-              ]
+              "resourceCoords": [6937, 3259]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9150068,
-                42.4712291
-              ]
+              "coordinates": [-70.9150068, 42.4712291]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                2461,
-                1356
-              ]
+              "resourceCoords": [2461, 1356]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -70.9150489,
-                42.4803198
-              ]
+              "coordinates": [-70.9150489, 42.4803198]
             }
           }
         ],
