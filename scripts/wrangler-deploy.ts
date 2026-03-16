@@ -49,7 +49,9 @@ if (!cwd) {
 }
 
 const wranglerEnv = takeFlag(args, '--wrangler-env')
-const envFiles = takeAllFlags(args, '--env-file')
+const envFiles = takeAllFlags(args, '--dotenv-file')
+
+// console.log('daslkdjasoidjaso', envFiles)
 
 if (envFiles.length === 0) {
   throw new Error('Provide at least one --env-file')
