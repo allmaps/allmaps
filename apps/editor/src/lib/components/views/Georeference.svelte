@@ -496,8 +496,6 @@
     const gcp = mapsState.activeMap?.gcps[gcpId]
 
     if (mapId && gcp) {
-      const gcps = mapsState.activeMap?.gcps
-
       if (pane === 'geo') {
         if (!gcp.resource) {
           mapsState.removeGcp({ mapId, gcpId })
@@ -907,7 +905,24 @@
       }
     })
 
-    const duration = animate ? 300 : 0
+    if (
+      !resourceBbox &&
+      resourceTransformer &&
+      map.resourceMask &&
+      map.resourceMask.length >= 3
+    ) {
+      const resourceMaskCoordinates = resourceTransformer.transformToGeo([
+        ...map.resourceMask,
+        map.resourceMask[0]
+      ])
+
+      resourceBbox = computeBbox({
+        type: 'Polygon',
+        coordinates: [resourceMaskCoordinates]
+      })
+    }
+
+    const duration = animate ? MAPLIBRE_FIT_BOUNDS_DURATION : 0
 
     if (resourceViewport) {
       resourceMap?.flyTo({
@@ -917,11 +932,6 @@
       })
     } else if (resourceBbox) {
       resourceMap?.fitBounds(resourceBbox, {
-        duration,
-        padding: MAPLIBRE_PADDING
-      })
-    } else if (resourceWarpedMapLayerBounds) {
-      resourceMap?.fitBounds(resourceWarpedMapLayerBounds, {
         duration,
         padding: MAPLIBRE_PADDING
       })
