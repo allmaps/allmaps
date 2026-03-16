@@ -331,21 +331,21 @@ export class Viewport {
     )
 
     const projectedGeoRing = projectedGeoPolygon[0]
-    const rotatedProjectedGeoRing = rotatePoints(
+    const projectedGeoRotatedRing = rotatePoints(
       projectedGeoRing,
       -extendedViewportOptions.rotation
     )
-    const rotatedProjectedGeoBbox = computeBbox(rotatedProjectedGeoRing)
-    const rotatedProjectedGeoSize = bboxToSize(rotatedProjectedGeoBbox)
-    const rotatedProjectedGeoCenter = bboxToCenter(rotatedProjectedGeoBbox)
+    const projectedGeoRotatedBbox = computeBbox(projectedGeoRotatedRing)
+    const projectedGeoRotatedSize = bboxToSize(projectedGeoRotatedBbox)
+    const projectedGeoRotatedCenter = bboxToCenter(projectedGeoRotatedBbox)
     const projectedGeoPerViewportScale = sizesToScale(
-      rotatedProjectedGeoSize,
+      projectedGeoRotatedSize,
       viewportSize,
       extendedViewportOptions.fit
     )
 
     const projectedGeoCenter = rotatePoint(
-      rotatedProjectedGeoCenter,
+      projectedGeoRotatedCenter,
       extendedViewportOptions.rotation
     )
 
