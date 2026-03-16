@@ -133,7 +133,9 @@
 
   function handlePaste(event: ClipboardEvent) {
     const pastedText = event.clipboardData?.getData('text')
-    if (!pastedText) return
+    if (!pastedText) {
+      return
+    }
 
     // Check if pasted content is JSON or multi-line
     const isJson = (() => {

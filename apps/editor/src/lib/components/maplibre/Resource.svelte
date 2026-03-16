@@ -161,7 +161,10 @@
   }
 
   $effect(() => {
-    if (sourceState.activeImageId && currentImageId !== sourceState.activeImageId) {
+    if (
+      sourceState.activeImageId &&
+      currentImageId !== sourceState.activeImageId
+    ) {
       updateStraightAnnotation(sourceState.activeImageId, resourceMask)
     }
   })

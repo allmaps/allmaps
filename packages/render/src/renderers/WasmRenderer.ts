@@ -12,11 +12,11 @@ import { invertHomogeneousTransform } from '../shared/homogeneous-transform.js'
 import type { BaseTransformation } from '@allmaps/transform'
 
 import type { Renderer, IntArrayRenderOptions } from '../shared/types.js'
-
+import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
 
 // Type for the WASM module
-interface WasmModule {
+type WasmModule = {
   decode_jpeg_test(jpegBytes: Uint8Array): { width: number; height: number }
   encode_rgba_to_png(
     pixels: Uint8Array,
@@ -149,10 +149,14 @@ export class WasmRenderer
 {
   wasmModule: WasmModule
   outputFormat: OutputFormat
+  backgroundColor?: [number, number, number]
 
   constructor(
     wasmModule: WasmModule,
-    options?: Partial<IntArrayRenderOptions> & { outputFormat?: OutputFormat }
+    options?: Partial<IntArrayRenderOptions> & {
+      outputFormat?: OutputFormat
+      backgroundColor?: [number, number, number]
+    }
   ) {
     // Create factory function for raw JPEG tiles
     const decodeJpegForDimensions = (jpegBytes: Uint8ClampedArray) => {
@@ -166,6 +170,7 @@ export class WasmRenderer
     )
     this.wasmModule = wasmModule
     this.outputFormat = options?.outputFormat || 'png'
+    this.backgroundColor = options?.backgroundColor
 
     // Note: WASM module should be initialized by the caller before passing to constructor
   }
@@ -190,6 +195,17 @@ export class WasmRenderer
     const outputHeight = viewport.canvasSize[1]
     const outputPixels = new Uint8ClampedArray(outputWidth * outputHeight * 4)
 
+    // Fill background color if specified (important for opaque formats like JPEG)
+    if (this.backgroundColor) {
+      const [r, g, b] = this.backgroundColor
+      for (let i = 0; i < outputPixels.length; i += 4) {
+        outputPixels[i] = r
+        outputPixels[i + 1] = g
+        outputPixels[i + 2] = b
+        outputPixels[i + 3] = 255
+      }
+    }
+
     // Get canvas-to-geo transform (same for all maps)
     const geoToCanvas = viewport.projectedGeoToCanvasHomogeneousTransform
     const canvasToGeo = new Float64Array(
@@ -197,7 +213,6 @@ export class WasmRenderer
     )
 
     // Iterate over all warped maps and render each that intersects the viewport
-    let renderedMapCount = 0
     for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
       // Check if this map intersects the viewport
       if (
@@ -234,8 +249,6 @@ export class WasmRenderer
           outputPixels[i + 3] = mapPixels[i + 3]
         }
       }
-
-      renderedMapCount++
     }
 
     // Encode output based on format
@@ -254,7 +267,7 @@ export class WasmRenderer
    */
   private async renderMap(
     warpedMap: WarpedMap,
-    cachedTiles: any[],
+    cachedTiles: CachedTile<RawJpegData>[],
     canvasToGeo: Float64Array,
     outputWidth: number,
     outputHeight: number

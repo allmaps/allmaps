@@ -9,7 +9,7 @@ import type { FetchFn } from '@allmaps/types'
 /**
  * Raw JPEG tile data - stores compressed JPEG bytes for WASM decoding
  */
-export interface RawJpegData {
+export type RawJpegData = {
   jpegBytes: Uint8ClampedArray
   width: number
   height: number
@@ -20,11 +20,17 @@ export interface RawJpegData {
  * This avoids JavaScript JPEG decoding and lets WASM handle it
  */
 export class CacheableRawJpegTile extends CacheableTile<RawJpegData> {
-  decodeJpegForDimensions: (jpegBytes: Uint8ClampedArray) => { width: number; height: number }
+  decodeJpegForDimensions: (jpegBytes: Uint8ClampedArray) => {
+    width: number
+    height: number
+  }
 
   constructor(
     fetchableTile: FetchableTile,
-    decodeJpegForDimensions: (jpegBytes: Uint8ClampedArray) => { width: number; height: number },
+    decodeJpegForDimensions: (jpegBytes: Uint8ClampedArray) => {
+      width: number
+      height: number
+    },
     fetchFn?: FetchFn
   ) {
     super(fetchableTile, fetchFn)
@@ -90,7 +96,10 @@ export class CacheableRawJpegTile extends CacheableTile<RawJpegData> {
   }
 
   static createFactory(
-    decodeJpegForDimensions: (jpegBytes: Uint8ClampedArray) => { width: number; height: number }
+    decodeJpegForDimensions: (jpegBytes: Uint8ClampedArray) => {
+      width: number
+      height: number
+    }
   ) {
     return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
       new CacheableRawJpegTile(fetchableTile, decodeJpegForDimensions, fetchFn)

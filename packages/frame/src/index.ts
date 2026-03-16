@@ -121,7 +121,9 @@ function refineCenter(
     }
   }
 
-  if (totalArea === 0) return viewportBbox
+  if (totalArea === 0) {
+    return viewportBbox
+  }
 
   const contentLon = weightedLon / totalArea
   const contentLat = weightedLat / totalArea
@@ -149,7 +151,10 @@ function clusterPolygons(
   polygonAreas: number[]
 ): Cluster[] {
   const n = polygonBboxes.length
-  if (n === 0) return []
+  if (n === 0) {
+    return []
+  }
+
   if (n === 1) {
     return [
       { indices: [0], bbox: polygonBboxes[0], totalArea: polygonAreas[0] }
@@ -170,17 +175,24 @@ function clusterPolygons(
   const rank = new Array(n).fill(0)
 
   function find(x: number): number {
-    if (parent[x] !== x) parent[x] = find(parent[x])
+    if (parent[x] !== x) {
+      parent[x] = find(parent[x])
+    }
     return parent[x]
   }
 
   function unite(a: number, b: number) {
     const ra = find(a)
     const rb = find(b)
-    if (ra === rb) return
-    if (rank[ra] < rank[rb]) parent[ra] = rb
-    else if (rank[ra] > rank[rb]) parent[rb] = ra
-    else {
+    if (ra === rb) {
+      return
+    }
+
+    if (rank[ra] < rank[rb]) {
+      parent[ra] = rb
+    } else if (rank[ra] > rank[rb]) {
+      parent[rb] = ra
+    } else {
       parent[rb] = ra
       rank[ra]++
     }
