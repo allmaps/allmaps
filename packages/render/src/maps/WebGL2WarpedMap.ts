@@ -1021,9 +1021,18 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
       const imageData = this.cachedTilesForTexture[i].data
+
+      // The texture size is the largest available size in the image's tileZoomLevels
+      // (since the image could be served in multiple sizes).
+      // The size of the imageData is determined when fetching tiles
+      // and getting the optimal tileZoomLevel based on the scale derived from the viewport.
+      // Hence, the image data could be smaller then the texture.
+      // This is not a problem in se, but sub-optimal if the difference is large.
+      // (Also note that if the resource is only on part of the image,
+      // the image data is still its the full size).
       if (
-        imageData.width !== requiredTextureWidth ||
-        imageData.width !== requiredTextureWidth
+        imageData.width > requiredTextureWidth ||
+        imageData.height > requiredTextureHeigt
       ) {
         throw new Error("Cached tile doesn't fit in texture")
       }
