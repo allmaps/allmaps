@@ -15,7 +15,6 @@
   import { setScopeState } from '$lib/state/scope.svelte.js'
   import { setSourceState } from '$lib/state/source.svelte.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
-  import { getVarsState } from '$lib/state/vars.svelte.js'
 
   import { setViewportsState } from '$lib/state/viewports.svelte.js'
   // import { setWarpedMapLayerState } from '$lib/state/warpedmaplayer.svelte'
@@ -34,36 +33,33 @@
 
   import Error from '$lib/components/Error.svelte'
 
-  import type { Snippet } from 'svelte'
+  const { children, data } = $props()
 
-  import type { Env } from '$lib/types/env.js'
-
-  const { children }: { children: Snippet } = $props()
-
-  const varsState = getVarsState<Env>()
-
-  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
-  const previewUrl = varsState.get('PUBLIC_ALLMAPS_PREVIEW_URL')
-  const apiWsUrl = varsState.get('PUBLIC_ALLMAPS_API_WS_URL')
+  const apiBaseUrl = $derived(data.env.PUBLIC_REST_BASE_URL)
+  const annotationsApiBaseUrl = $derived(data.env.PUBLIC_ANNOTATIONS_BASE_URL)
+  const previewUrl = $derived(data.env.PUBLIC_PREVIEW_BASE_URL)
+  const apiWsUrl = $derived(data.env.PUBLIC_LIVE_BASE_URL)
 
   const errorState = getErrorState()
   const urlState = getUrlState()
+  // svelte-ignore state_referenced_locally
   const sourceState = setSourceState(
-    varsState.get('PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'),
+    data.env.PUBLIC_ANNOTATIONS_BASE_URL,
     urlState,
     errorState
   )
   const uiState = setUiState(urlState, sourceState)
+  // svelte-ignore state_referenced_locally
   const apiState = setApiState(apiBaseUrl, sourceState)
 
   setViewportsState(sourceState)
 
+  // svelte-ignore state_referenced_locally
   const projectionsState = setProjectionsState(`${apiBaseUrl}/projections`)
 
   const mapsHistoryState = setMapsHistoryState(sourceState)
+
+  // svelte-ignore state_referenced_locally
   const mapsState = setMapsState(
     apiWsUrl,
     sourceState,
@@ -71,6 +67,7 @@
     mapsHistoryState
   )
 
+  // svelte-ignore state_referenced_locally
   const mapsMergedState = setMapsMergedState(
     apiBaseUrl,
     annotationsApiBaseUrl,
@@ -80,6 +77,7 @@
     projectionsState
   )
 
+  // svelte-ignore state_referenced_locally
   setScopeState(
     apiBaseUrl,
     annotationsApiBaseUrl,
@@ -88,6 +86,8 @@
     mapsMergedState,
     projectionsState
   )
+
+  // svelte-ignore state_referenced_locally
   setHeadState(previewUrl, sourceState)
 
   // setWarpedMapLayerState(
@@ -97,8 +97,8 @@
   //   projectionsState
   // )
 
-  const bannerEnabled = varsState.get('VITE_BANNER_ENABLED')
-  const bannerText = varsState.get('VITE_BANNER_TEXT')
+  const bannerEnabled = $derived(data.env.PUBLIC_BANNER_ENABLED)
+  const bannerText = $derived(data.env.PUBLIC_BANNER_TEXT)
 
   function shouldHandleKeyboardEvent(event: KeyboardEvent) {
     if (event.target instanceof Element) {

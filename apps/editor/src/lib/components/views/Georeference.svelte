@@ -63,7 +63,7 @@
     RemoveGcpEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   type TerraDrawOnChangeContext =
     | { origin: 'api'; target?: 'geometry' | 'properties' }
@@ -75,7 +75,7 @@
   const urlState = getUrlState()
   const viewportsState = getViewportsState()
   const projectionsState = getProjectionsState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
   let resourceMap = $state.raw<MapLibreMap>()
   let geoMap = $state.raw<MapLibreMap>()
@@ -83,9 +83,7 @@
   let resourceTransformer = $state.raw<GcpTransformer>()
   let resourceWarpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let mapIds = $derived(
     mapsState.activeMapId

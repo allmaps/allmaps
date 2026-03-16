@@ -15,11 +15,11 @@
     "directory": "apps/editor"
   },
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --mode localhost",
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/editor --include-dependencies",
-    "deploy": "wrangler deploy",
-    "deploy:dev": "wrangler deploy --env dev",
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
     "tail": "wrangler tail",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -40,6 +40,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
+    "@allmaps/env": "workspace:^",
     "@turf/rewind": "^7.2.0",
     "bits-ui": "^2.14",
     "d3-geo": "^3.1.1",
