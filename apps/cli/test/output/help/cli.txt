@@ -9,6 +9,8 @@ Commands:
   annotation                   parse and generate Georeference Annotations
   attach [options] [files...]  attach maps
   fetch                        fetch IIIF images
+  frame [options] [files...]   compute best viewport frame for georeferenced
+                               maps
   iiif                         parse and generate IIIF resources
   id [urls...]                 generate Allmaps IDs from input URLs
   open                         open maps in Allmaps Viewer

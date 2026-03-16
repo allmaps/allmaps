@@ -7,6 +7,7 @@ import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
 import { fetch } from './commands/fetch.js'
+import { frame } from './commands/frame.js'
 import { open } from './commands/open.js'
 import { id } from './commands/id.js'
 import { iiif } from './commands/iiif.js'
@@ -22,6 +23,7 @@ const program = new Command()
   .addCommand(annotation())
   .addCommand(attach())
   .addCommand(fetch())
+  .addCommand(frame())
   .addCommand(iiif())
   .addCommand(id())
   .addCommand(open())
