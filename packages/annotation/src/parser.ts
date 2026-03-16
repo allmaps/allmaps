@@ -165,6 +165,11 @@ function getGeoreferencedMap(
     resourceCrs = annotation.body.resourceCrs
   }
 
+  let _allmaps: unknown
+  if ('_allmaps' in annotation) {
+    _allmaps = annotation._allmaps
+  }
+
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
@@ -174,7 +179,8 @@ function getGeoreferencedMap(
     gcps: parseGcps(annotation),
     resourceMask: parseResourceMask(annotation),
     transformation: annotation.body.transformation,
-    resourceCrs
+    resourceCrs,
+    _allmaps
   }
 }
 

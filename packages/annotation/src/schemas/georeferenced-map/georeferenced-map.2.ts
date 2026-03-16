@@ -36,7 +36,10 @@ export const GeoreferencedMapSchema = z.object({
   gcps: GCPSchema.array(),
   resourceMask: ResourceMaskSchema,
   transformation: TransformationSchema.optional(),
-  resourceCrs: ProjectionSchema.optional()
+  resourceCrs: ProjectionSchema.optional(),
+  // TODO: accept all keys that start with underscore and pass them?
+  // TODO: define proper schema for _allmaps
+  _allmaps: z.unknown().optional()
 })
 
 export const GeoreferencedMapsSchema = z.array(GeoreferencedMapSchema)

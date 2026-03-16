@@ -166,6 +166,11 @@ function generateGeoreferenceAnnotation(
     features: georeferencedMap.gcps.map((gcp) => generateFeature(gcp))
   }
 
+  let _allmaps: unknown
+  if ('_allmaps' in georeferencedMap) {
+    _allmaps = georeferencedMap._allmaps
+  }
+
   return {
     id: georeferencedMap.id,
     type: 'Annotation',
@@ -173,7 +178,8 @@ function generateGeoreferenceAnnotation(
     ...generateDates(georeferencedMap),
     motivation: 'georeferencing' as const,
     target,
-    body
+    body,
+    _allmaps
   }
 }
 
