@@ -462,29 +462,16 @@
   }
 
   function handleResourceDrawFinish(
-    id: string | number
-    // context: { action: string; mode: string }
+    id: string | number,
+    context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
 
-    // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
-    // context.action is incorrectly set to 'draw' instead of 'edit' (the
-    // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
-    // we cannot rely on context.action to distinguish edits from new draws.
-    // Instead we check whether the map already exists in state.
-    const isExistingGcp = gcpId && mapsState.activeMap?.gcps[gcpId]
-
-    if (isExistingGcp) {
+    if (context.action === 'edit') {
       handleDrawFinishEdited(gcpId)
-    } else if (resourceDraw) {
+    } else if (resourceDraw && context.action === 'draw') {
       handleDrawFinishDrawn(resourceDraw, gcpId)
     }
-
-    // if (context.action === 'edit') {
-    //   handleDrawFinishEdited(gcpId)
-    // } else if (resourceDraw && context.action === 'draw') {
-    //   handleDrawFinishDrawn(resourceDraw, gcpId)
-    // }
   }
 
   function handleGeoDrawChange(
@@ -544,29 +531,16 @@
   }
 
   function handleGeoDrawFinish(
-    id: string | number
-    // context: { action: string; mode: string }
+    id: string | number,
+    context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
 
-    // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
-    // context.action is incorrectly set to 'draw' instead of 'edit' (the
-    // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
-    // we cannot rely on context.action to distinguish edits from new draws.
-    // Instead we check whether the map already exists in state.
-    const isExistingGcp = gcpId && mapsState.activeMap?.gcps[gcpId]
-
-    if (isExistingGcp) {
+    if (context.action === 'edit') {
       handleDrawFinishEdited(gcpId)
-    } else if (geoDraw) {
+    } else if (geoDraw && context.action === 'draw') {
       handleDrawFinishDrawn(geoDraw, gcpId)
     }
-
-    // if (context.action === 'edit') {
-    //   handleDrawFinishEdited(gcpId)
-    // } else if (geoDraw && context.action === 'draw') {
-    //   handleDrawFinishDrawn(geoDraw, gcpId)
-    // }
   }
 
   function addResourceGcpFeature(gcp: DbGcp3, displayIndex: number) {
