@@ -569,7 +569,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     animationOptions?: Partial<AnimationOptions>
   ) {
     if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(this.getDefaultOptions())
+      listOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
     }
     this.setOptions(
       optionKeysToUndefinedOptions(listOptionKeys) as Partial<
@@ -596,12 +596,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     animationOptions?: Partial<AnimationOptions>
   ) {
     if (mapOptionKeys && mapOptionKeys.length == 0) {
-      mapOptionKeys = Object.keys(this.getDefaultOptions())
+      mapOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
     }
     // Note: undefined resets no options,
     // otherwise leaving out listOptionKeys would reset all list options
     if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(this.getDefaultOptions())
+      listOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
     }
     this.setMapsOptions(
       mapIds,
@@ -631,7 +631,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ) {
     if (mapOptionkeysByMapId && mapOptionkeysByMapId.size == 0) {
       const mapIds = this.getMapIds()
-      const defaultMapOptionsKeys = Object.keys(this.getDefaultOptions())
+      const defaultMapOptionsKeys = Object.keys(
+        WebGL2WarpedMap.getDefaultOptions()
+      )
       for (const mapId of mapIds) {
         mapOptionkeysByMapId.set(mapId, defaultMapOptionsKeys)
       }
@@ -639,7 +641,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // Note: undefined resets no options,
     // otherwise leaving out listOptionKeys would reset all list options
     if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(this.getDefaultOptions())
+      listOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
     }
 
     this.setMapsOptionsByMapId(
@@ -824,8 +826,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): Point[] {
     const warpedMaps = this.getWarpedMaps(partialSelectionAndProjectionOptions)
 
-    // Project geoMask using projection, if specified in options
-    // otherwise use available projectedGeoMask
+    // If a projection is specified in options, project the geoMask using projection
+    // otherwise (by default) use available geoMask, i.e. use lonLatProjection
     const projection = partialSelectionAndProjectionOptions?.projection
     if (projection) {
       const geoMaskPoints: Point[] = []

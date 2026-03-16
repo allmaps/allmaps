@@ -402,7 +402,7 @@ export class WarpedMap extends EventTarget {
    * @returns A projected transformer
    */
   getProjectedTransformer(
-    transformationType: TransformationType,
+    transformationType?: TransformationType,
     partialProjectedGcpTransformerOptions?: Partial<ProjectedGcpTransformerOptions>
   ): ProjectedGcpTransformer {
     const options = mergeOptionsUnlessUndefined(
@@ -413,6 +413,7 @@ export class WarpedMap extends EventTarget {
       },
       partialProjectedGcpTransformerOptions
     )
+    transformationType = transformationType ?? this.transformationType
 
     return getPropertyFromDoubleCacheOrComputation(
       this.projectedTransformerDoubleCache,
