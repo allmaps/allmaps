@@ -1,4 +1,5 @@
 {
+  "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "viewer",
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2026-02-18",
@@ -9,17 +10,9 @@
       "enabled": false
     }
   },
-  "vars": {
-    "NODE_VERSION": "24",
-    "PUBLIC_PREVIEW_URL": "https://preview.allmaps.org"
-  },
   "env": {
     "dev": {
-      "name": "viewer-develop",
-      "vars": {
-        "NODE_VERSION": "24",
-        "PUBLIC_PREVIEW_URL": "https://dev.preview.allmaps.org"
-      }
+      "name": "viewer-develop"
     }
   }
 }

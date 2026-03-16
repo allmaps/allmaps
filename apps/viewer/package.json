@@ -15,11 +15,11 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev",
+    "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev --mode localhost",
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/viewer --include-dependencies",
-    "deploy": "wrangler deploy",
-    "deploy:dev": "wrangler deploy --env dev",
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
     "tail": "wrangler tail",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -41,6 +41,7 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/components": "workspace:^",
+    "@allmaps/env": "workspace:^",
     "bits-ui": "catalog:",
     "maplibre-gl": "catalog:"
   },
