@@ -1,0 +1,72 @@
+{
+  "name": "@allmaps/api-shared",
+  "version": "1.0.0-beta.0",
+  "private": true,
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    }
+  ],
+  "description": "",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./db": "./dist/db.js",
+    "./elysia": "./dist/elysia.js",
+    "./shared": "./dist/shared.js",
+    "./types": "./dist/types.js",
+    "./projections": "./dist/projections.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/api-shared"
+  },
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc --noCheck",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "types": "tsc --noEmit",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
+    "documentation": "remark . --output --use remark-api"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "georeference",
+    "map"
+  ],
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/db": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "comlink": "^4.4.1",
+    "drizzle-orm": "catalog:",
+    "elysia": "catalog:",
+    "lodash-es": "^4.17.21",
+    "point-in-polygon-hao": "^1.2.4",
+    "rbush": "^4.0.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@allmaps/types": "workspace:^",
+    "@types/geojson": "^7946.0.16",
+    "@types/sharedb": "^3.3.12",
+    "typescript": "catalog:",
+    "@cloudflare/workers-types": "^4.20240320.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2"
+  }
+}
