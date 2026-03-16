@@ -15,7 +15,7 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --mode localhost",
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/explore --include-dependencies",
     "preview": "vite preview",

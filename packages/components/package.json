@@ -23,7 +23,7 @@
     "directory": "packages/components"
   },
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --mode localhost",
     "watch": "svelte-package --watch",
     "build": "vite build && pnpm run prepack",
     "preview": "vite preview",
@@ -52,6 +52,11 @@
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./auth": {
+      "types": "./dist/auth.d.ts",
+      "svelte": "./dist/auth.js",
+      "default": "./dist/auth.js"
+    },
     "./icons": {
       "types": "./dist/icons.d.ts",
       "svelte": "./dist/icons.js",
@@ -67,12 +72,14 @@
     "./css/*": "./dist/css/*"
   },
   "peerDependencies": {
-    "svelte": "^5.0.0"
+    "svelte": "catalog:",
+    "@sveltejs/kit": "catalog:"
   },
   "keywords": [
     "svelte"
   ],
   "dependencies": {
+    "better-auth": "catalog:",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
