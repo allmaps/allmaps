@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import { apiEnvSchema } from './fragments.js'
+import { authApiEnvSchema } from './fragments.js'
 
-export const annotationsEnvSchema = apiEnvSchema
+export const annotationsEnvSchema = authApiEnvSchema
 
 export type AnnotationsEnv = z.infer<typeof annotationsEnvSchema>
 

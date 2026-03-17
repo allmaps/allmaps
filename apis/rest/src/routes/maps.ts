@@ -3,9 +3,9 @@ import { t } from 'elysia'
 import { queryMaps, queryChecksums } from '@allmaps/api-shared/db'
 
 import { createElysia, RegExpRoute } from '../elysia.js'
-import { betterAuthPlugin } from './auth.js'
 
 import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
+import type { createBetterAuthRoutes } from './auth.js'
 
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
@@ -53,7 +53,10 @@ async function callLive(liveBaseUrl: string, path: string, body: unknown) {
   return response.json()
 }
 
-export const maps = createElysia({ name: 'maps' })
+export function createMaps(
+  betterAuthPlugin: ReturnType<typeof createBetterAuthRoutes>
+) {
+  return createElysia({ name: 'maps' })
   .use(betterAuthPlugin)
   // ── List all maps ────────────────────────────────────────────────────────────
   .get(
@@ -150,3 +153,4 @@ export const maps = createElysia({ name: 'maps' })
       detail: { summary: 'Update a map', tags: ['Maps'] }
     }
   )
+}

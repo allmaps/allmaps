@@ -6,7 +6,8 @@ import {
   queryList,
   queryListGeoreferenceAnnotations
 } from '@allmaps/api-shared/db'
-import { auth } from '@allmaps/db/auth'
+import { createAuth, type BetterAuthContext } from '@allmaps/db'
+import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia } from '../elysia.js'
 
@@ -15,7 +16,12 @@ type SessionUser = {
   slug?: string | null
 }
 
-async function assertCanAccessUserLists(headers: Headers, username: string) {
+async function assertCanAccessUserLists(
+  betterAuth: BetterAuthContext,
+  headers: Headers,
+  username: string
+) {
+  const { auth } = betterAuth
   const session = await auth.api.getSession({ headers })
 
   if (!session) {
@@ -33,13 +39,17 @@ async function assertCanAccessUserLists(headers: Headers, username: string) {
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
-export const lists = createElysia({
-  name: 'lists'
-})
+export function createLists(
+  env: AnnotationsEnv,
+  betterAuth: BetterAuthContext = createAuth(env)
+) {
+  return createElysia({
+    name: 'lists'
+  })
   .get(
     '/@:username/lists',
     async ({ db, env, params, request }) => {
-      await assertCanAccessUserLists(request.headers, params.username)
+      await assertCanAccessUserLists(betterAuth, request.headers, params.username)
       const lists = await queryLists(db, params.username)
 
       return lists.map((list: UserList) => ({
@@ -60,7 +70,7 @@ export const lists = createElysia({
   .get(
     '/@:username/lists/:listId',
     async ({ db, env, params, request }) => {
-      await assertCanAccessUserLists(request.headers, params.username)
+      await assertCanAccessUserLists(betterAuth, request.headers, params.username)
       return queryList(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
@@ -83,7 +93,7 @@ export const lists = createElysia({
   .get(
     '/@:username/lists/:listId/georeference-annotations',
     async ({ db, env, params, request }) => {
-      await assertCanAccessUserLists(request.headers, params.username)
+      await assertCanAccessUserLists(betterAuth, request.headers, params.username)
       return queryListGeoreferenceAnnotations(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
@@ -103,3 +113,4 @@ export const lists = createElysia({
       }
     }
   )
+}

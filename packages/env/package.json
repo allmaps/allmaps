@@ -17,7 +17,8 @@
     "./tileserver": "./dist/tileserver.js",
     "./preview": "./dist/preview.js",
     "./worker": "./dist/worker.js",
-    "./app": "./dist/app.js"
+    "./app": "./dist/app.js",
+    "./better-auth": "./dist/better-auth.js"
   },
   "files": [
     "dist"
