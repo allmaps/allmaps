@@ -6,11 +6,9 @@
     "module": "esnext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["@cloudflare/workers-types"],
+    "types": ["./worker-configuration.d.ts"],
     "composite": false,
     "declaration": false
   },
@@ -22,5 +20,5 @@
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/env" }
   ],
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*", "./worker-configuration.d.ts"]
 }
