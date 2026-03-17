@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2024",
+    "lib": ["es2024"],
+    "module": "esnext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["@cloudflare/workers-types"],
+    "composite": false,
+    "declaration": false
+  },
+  "references": [
+    { "path": "../../packages/api-shared" },
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/db" },
+    { "path": "../../packages/env" }
+  ],
+  "include": [
+    "./src/**/*",
+    "../../packages/api-shared/src/projections/projections.ts"
+  ]
+}
