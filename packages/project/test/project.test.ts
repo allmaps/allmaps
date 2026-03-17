@@ -6,9 +6,11 @@ import {
   expectToBeCloseToArrayArray
 } from '../../stdlib/test/helper-functions.js'
 
+import proj4 from 'proj4'
+
 import { GcpTransformer } from '@allmaps/transform'
 
-import { ProjectedGcpTransformer, proj4 } from '../src/index.js'
+import { ProjectedGcpTransformer } from '../src/index.js'
 
 import { gcps6 } from './input/gcps.js'
 import {
