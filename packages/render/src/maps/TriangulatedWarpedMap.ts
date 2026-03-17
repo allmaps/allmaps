@@ -21,7 +21,8 @@ import type {
   SpecificTriangulatedWarpedMapOptions,
   TriangulatedWarpedMapOptions,
   WarpedMapListOptions,
-  WarpedMapOptions
+  WarpedMapOptions,
+  TriangulatedWarpedMapWithoutGeoreferencedMapOptions
 } from '../shared/types.js'
 
 import type {
@@ -161,7 +162,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   /**
    * Get default options without the options overwritten by the georeferenced map
    */
-  static getDefaultWithoutGeoreferencedMapOptions(): Partial<TriangulatedWarpedMapOptions> {
+  static getDefaultWithoutGeoreferencedMapOptions(): TriangulatedWarpedMapWithoutGeoreferencedMapOptions {
     return mergeOptions(
       DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS,
       super.getDefaultWithoutGeoreferencedMapOptions()

@@ -1,3 +1,5 @@
+import proj4 from 'proj4'
+
 import {
   computeBbox,
   bboxToCenter,
@@ -19,11 +21,7 @@ import {
   mergeOptions,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import {
-  lonLatProjection,
-  webMercatorProjection,
-  proj4
-} from '@allmaps/project'
+import { lonLatProjection, webMercatorProjection } from '@allmaps/project'
 
 import {
   composeHomogeneousTransform,

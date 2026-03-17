@@ -43,9 +43,7 @@ Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
 import { Map as MapLibreMap } from 'maplibre-gl'
-import {
-  WarpedMapLayer
-} from '@allmaps/maplibre'
+import { WarpedMapLayer } from '@allmaps/maplibre'
 
 const map = new MapLibreMap({
   container: 'map',

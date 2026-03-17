@@ -62,6 +62,7 @@
     "comlink": "^4.4.1",
     "lodash-es": "^4.17.21",
     "point-in-polygon-hao": "^1.2.4",
+    "proj4": "^2.20.0",
     "rbush": "^4.0.0"
   },
   "license": "MIT",

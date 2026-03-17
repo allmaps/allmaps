@@ -110,6 +110,7 @@ export function getWebMercatorDefinition(
  * Note that `+over` was added to support wrapping around the antimeridian
  */
 export const lonLatProjection: Projection<string> = {
+  id: 'EPSG:4326',
   name: 'EPSG:4326 - WGS 84',
   definition: lonLatEquivalentDefinitions[0]
 }
@@ -121,6 +122,7 @@ export const lonLatProjection: Projection<string> = {
  * Note that `+over` was added to support wrapping around the antimeridian
  */
 export const webMercatorProjection: Projection<string> = {
+  id: 'EPSG:3857',
   name: 'EPSG:3857 - WGS 84 / Pseudo-Mercator',
   definition: webMercatorEquivalentDefinitions[0]
 }

@@ -50,7 +50,8 @@ import type {
   WarpedMapFactory,
   WarpedMapListOptions,
   WarpedMapOptions,
-  ShouldRenderOptions
+  ShouldRenderOptions,
+  WarpedMapWithoutGeoreferencedMapOptions
 } from '../shared/types.js'
 import type { Viewport } from '../viewport/Viewport.js'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
@@ -325,7 +326,7 @@ export class WarpedMap extends EventTarget {
   /**
    * Get default options without the options overwritten by the georeferenced map
    */
-  static getDefaultWithoutGeoreferencedMapOptions(): Partial<WarpedMapOptions> {
+  static getDefaultWithoutGeoreferencedMapOptions(): WarpedMapWithoutGeoreferencedMapOptions {
     return omit(DEFAULT_WARPED_MAP_OPTIONS, [
       'transformationType',
       'internalProjection',

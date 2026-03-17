@@ -287,7 +287,7 @@ export abstract class BaseWarpedMapLayer<
    * @param projection - Projection in which to return the result
    * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getCenter(projectionOptions?: ProjectionOptions): Point | undefined {
+  getCenter(projectionOptions?: Partial<ProjectionOptions>): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
@@ -306,7 +306,7 @@ export abstract class BaseWarpedMapLayer<
    */
   getMapsCenter(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -325,7 +325,7 @@ export abstract class BaseWarpedMapLayer<
    * @param projection - Projection in which to return the result
    * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getBbox(projectionOptions?: ProjectionOptions): Bbox | undefined {
+  getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
@@ -344,7 +344,7 @@ export abstract class BaseWarpedMapLayer<
    */
   getMapsBbox(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -364,7 +364,9 @@ export abstract class BaseWarpedMapLayer<
    * @param projection - Projection in which to return the result
    * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getConvexHull(projectionOptions?: ProjectionOptions): Ring | undefined {
+  getConvexHull(
+    projectionOptions?: Partial<ProjectionOptions>
+  ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
@@ -383,7 +385,7 @@ export abstract class BaseWarpedMapLayer<
    */
   getMapsConvexHull(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 

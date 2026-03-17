@@ -8,8 +8,10 @@ export { WarpedMapEvent, WarpedMapEventType } from './shared/events.js'
 
 export type {
   WarpedMapOptions,
+  WarpedMapWithoutGeoreferencedMapOptions,
   SpecificTriangulatedWarpedMapOptions,
   TriangulatedWarpedMapOptions,
+  TriangulatedWarpedMapWithoutGeoreferencedMapOptions,
   GetWarpedMapOptions,
   SpecificWarpedMapListOptions,
   WarpedMapListOptions,

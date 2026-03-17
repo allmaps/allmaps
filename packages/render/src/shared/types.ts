@@ -41,6 +41,12 @@ export type TransformationOptions = {
   options?: unknown
 }
 
+export type GeoreferencedMapOptions = {
+  gcps: Gcp[]
+  resourceMask: Ring
+  transformationType: TransformationType
+  internalProjection: Projection
+}
 export type WarpedMapOptions = {
   fetchFn?: FetchFn
   gcps: Gcp[]
@@ -52,12 +58,20 @@ export type WarpedMapOptions = {
   applyMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }
+export type WarpedMapWithoutGeoreferencedMapOptions = Omit<
+  WarpedMapOptions,
+  keyof GeoreferencedMapOptions
+>
 export type SpecificTriangulatedWarpedMapOptions = {
   resourceResolution?: number
   distortionMeasures: DistortionMeasure[]
 }
 export type TriangulatedWarpedMapOptions =
   SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
+export type TriangulatedWarpedMapWithoutGeoreferencedMapOptions = Omit<
+  TriangulatedWarpedMapOptions,
+  keyof GeoreferencedMapOptions
+>
 export type SpecificWebGL2WarpedMapOptions = {
   renderMaps?: boolean
   renderLines?: boolean
@@ -113,6 +127,10 @@ export type SpecificWebGL2WarpedMapOptions = {
 }
 export type WebGL2WarpedMapOptions = SpecificWebGL2WarpedMapOptions &
   TriangulatedWarpedMapOptions
+export type WebGL2WarpedMapWithoutGeoreferencedMapOptions = Omit<
+  WebGL2WarpedMapOptions,
+  keyof GeoreferencedMapOptions
+>
 
 export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
   ? WebGL2WarpedMapOptions

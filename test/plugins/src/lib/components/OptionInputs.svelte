@@ -5,63 +5,34 @@
     DistortionMeasure,
     TransformationType
   } from '@allmaps/transform'
+  import type { Projection } from '@allmaps/project'
 
-  let { options = $bindable() }: { options: Partial<WebGL2WarpedMapOptions> } =
-    $props()
-
-  const transformationTypes: TransformationType[] = [
-    'straight',
-    'helmert',
-    'polynomial',
-    'polynomial2',
-    'polynomial3',
-    'thinPlateSpline',
-    'projective',
-    'linear'
-  ]
-
-  const distortionMeasures: DistortionMeasure[] = [
-    'log2sigma',
-    'twoOmega',
-    'airyKavr',
-    'signDetJ',
-    'thetaa'
-  ]
-
-  const projections = [
-    lonLatProjection,
-    webMercatorProjection,
-    {
-      name: 'EPSG:28992 - Amersfoort / RD New -- Netherlands - Holland - Dutch',
-      definition:
-        '+proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=593.16,26.15,478.54,-6.3239,-0.5008,-5.5487,4.0775 +units=m +no_defs +type=crs'
-    },
-    {
-      name: 'EPSG:5637 - TUREF / LCC Europe',
-      definition:
-        '+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
-    },
-    {
-      name: 'EPSG:3995 - WGS 84 / Arctic Polar Stereographic',
-      definition:
-        '+proj=stere +lat_0=90 +lat_ts=71 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
-    },
-    {
-      name: 'EPSG:3031 - WGS 84 / Antarctic Polar Stereographic',
-      definition:
-        '+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
-    },
-    {
-      name: 'ESRI:102016 - WGS 1984 Azimuthal Equidistant North Pole',
-      definition:
-        '+proj=aeqd +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
-    },
-    {
-      name: 'ESRI:102019 - WGS 1984 Azimuthal Equidistant South Pole',
-      definition:
-        '+proj=aeqd +lat_0=-90 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs'
-    }
-  ]
+  let {
+    options = $bindable(),
+    transformationTypes = [
+      'straight',
+      'helmert',
+      'polynomial',
+      'polynomial2',
+      'polynomial3',
+      'thinPlateSpline',
+      'projective',
+      'linear'
+    ],
+    distortionMeasures = [
+      'log2sigma',
+      'twoOmega',
+      'airyKavr',
+      'signDetJ',
+      'thetaa'
+    ],
+    projections = [lonLatProjection, webMercatorProjection]
+  }: {
+    options: Partial<WebGL2WarpedMapOptions>
+    transformationTypes?: TransformationType[]
+    distortionMeasures?: DistortionMeasure[]
+    projections?: Projection[]
+  } = $props()
 </script>
 
 <div class="panel">
@@ -238,7 +209,7 @@
             (p) => p?.name === e.currentTarget.value
           ))}
       >
-        {#each [undefined, ...projections] as p}
+        {#each projections as p}
           <option value={p?.name}>{p?.name}</option>
         {/each}
       </select>

@@ -1,10 +1,12 @@
+import proj4 from 'proj4'
+
 import { generateChecksum } from '@allmaps/id'
 import {
   parseAnnotation,
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { proj4, webMercatorProjection } from '@allmaps/project'
+import { webMercatorProjection } from '@allmaps/project'
 import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'

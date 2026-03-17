@@ -49,7 +49,8 @@ import type {
   WebGL2WarpedMapOptions,
   WarpedMapListOptions,
   AnimationInternalOptions,
-  ShouldRenderOptions
+  ShouldRenderOptions,
+  WebGL2WarpedMapWithoutGeoreferencedMapOptions
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
@@ -265,7 +266,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   /**
    * Get default options without the options overwritten by the georeferenced map
    */
-  static getDefaultWithoutGeoreferencedMapOptions(): Partial<WebGL2WarpedMapOptions> {
+  static getDefaultWithoutGeoreferencedMapOptions(): WebGL2WarpedMapWithoutGeoreferencedMapOptions {
     return mergeOptions(
       DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS,
       super.getDefaultWithoutGeoreferencedMapOptions()

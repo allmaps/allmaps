@@ -1,3 +1,5 @@
+import proj4 from 'proj4'
+
 import Layer from 'ol/layer/Layer.js'
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
@@ -24,6 +26,7 @@ import type {
 } from '@allmaps/render/webgl2'
 import type { Bbox, Gcp, Point, Ring, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
+import type { Projection } from '@allmaps/project'
 
 export type SpecificOpenLayersWarpedMapLayerOptions = object
 
@@ -56,6 +59,8 @@ export class WarpedMapLayer
   renderer: WebGL2Renderer
 
   canvasSize: [number, number] = [0, 0]
+
+  registeredProjections: Map<string, Projection> = new Map()
 
   private resizeObserver: ResizeObserver
 
@@ -121,6 +126,41 @@ export class WarpedMapLayer
   }
 
   /**
+   * Return the bounding box of all visible maps in the layer (inside or outside of the Viewport), in longitude/latitude coordinates.
+   * @returns - Bounding box of all warped maps
+   */
+  getLonLatExtent(): Extent | undefined {
+    return this.renderer.warpedMapList.getMapsBbox({
+      projection: { definition: 'EPSG:4326' }
+    })
+  }
+
+  /**
+   * Keep a list of registered projections.
+   *
+   * Can optionally be used to complement OpenLayer's `register(proj4)` function.
+   *
+   * To use viewport projections in OpenLayers, add projections to proj4 and register proj4
+   * (Example: https://openlayers.org/en/latest/examples/scaleline-indiana-east.html).
+   * WarpedMapLayer reads the view's projections code, gets its definition from proj4.defs
+   * (thanks to the register() function) and constructs a new Projection type (defined in @allmap/project).
+   *
+   * Using this function on top of OpenLayer's `register()`,
+   * WarpedMapLayer will look up the code in the registered projections first for a matching `id`
+   * and, if found, use this projection. This ways relavant projection information (id, name, ...)
+   * can be passed and used to all Allmaps packages.
+   *
+   * Newly registered projection overwrite older ones with the same id.
+   */
+  registerProjections(projections: Projection[]): void {
+    for (const projection of projections) {
+      if (projection.id) {
+        this.registeredProjections.set(projection.id, projection)
+      }
+    }
+  }
+
+  /**
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
@@ -166,14 +206,21 @@ export class WarpedMapLayer
 
     const rotation = frameState.viewState.rotation
     const devicePixelRatio = window.devicePixelRatio
-    const projection = {
-      definition: projectionDefinitionToAntialiasedDefinition(
-        frameState.viewState.projection.getCode()
-      )
+
+    const projectionCode = frameState.viewState.projection.getCode()
+    const projectionDefinitionFromProj4 = proj4.defs(projectionCode).projStr
+    let projection: Projection
+    if (this.registeredProjections.has(projectionCode)) {
+      projection = this.registeredProjections.get(projectionCode)!
+    } else if (projectionDefinitionFromProj4) {
+      projection = {
+        definition: projectionDefinitionToAntialiasedDefinition(
+          projectionDefinitionFromProj4
+        )
+      }
+    } else {
+      throw new Error(`Unknown projection code: ${projectionCode}`)
     }
-    // TODO: add a way to understand other codes then the two default ones
-    // (e.g. by including a code-to-definition dictionnary)
-    // and assure wrapping (e.g. by adding `+over`)
 
     const viewportSize = frameState.size as [number, number]
     const viewportCenter = frameState.viewState.center as [number, number]
@@ -469,7 +516,7 @@ export class WarpedMapLayer
    * @param projection - Projection in which to return the result
    * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getCenter(projectionOptions?: ProjectionOptions): Point | undefined {
+  getCenter(projectionOptions?: Partial<ProjectionOptions>): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
@@ -488,7 +535,7 @@ export class WarpedMapLayer
    */
   getMapsCenter(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -508,7 +555,7 @@ export class WarpedMapLayer
    * @param projectionOptions - ProjectionOptions
    * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getBbox(projectionOptions?: ProjectionOptions): Bbox | undefined {
+  getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
@@ -528,7 +575,7 @@ export class WarpedMapLayer
    */
   getMapsBbox(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -549,7 +596,9 @@ export class WarpedMapLayer
    * @param projectionOptions - Projection options
    * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getConvexHull(projectionOptions?: ProjectionOptions): Ring | undefined {
+  getConvexHull(
+    projectionOptions?: Partial<ProjectionOptions>
+  ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
@@ -569,7 +618,7 @@ export class WarpedMapLayer
    */
   getMapsConvexHull(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
