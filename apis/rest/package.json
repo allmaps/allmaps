@@ -8,7 +8,11 @@
     "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
     "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
     "dev": "wrangler dev --port $(../../port.js rest) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "build": "tsc",
+    "lerna-build": "lerna run build --scope @allmaps/api-rest --include-dependencies",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "types": "tsc --noEmit"
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
