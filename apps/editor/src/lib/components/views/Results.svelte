@@ -35,7 +35,7 @@
 
   import type { ClickedItemEvent } from '$lib/types/events.js'
   import type { Viewport } from '$lib/types/shared.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorEnv } from '@allmaps/env/editor'
 
   let geoMap = $state.raw<MapLibreMap>()
   let warpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
@@ -45,11 +45,9 @@
   const scopeState = getScopeState()
   const sourceState = getSourceState()
   const urlState = getUrlState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorEnv>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   const geoViewport = $derived(getGeoViewport())
 
@@ -59,6 +57,7 @@
     const projectedTransformer =
       ProjectedGcpTransformer.fromGeoreferencedMap(map)
     const geoMask = projectedTransformer.transformToGeo([map.resourceMask])
+
     return computeBbox(geoMask)
   }
 
@@ -74,8 +73,12 @@
     if (scopeState.maps) {
       const bboxes: Bbox[] = []
       for (const map of scopeState.maps) {
-        const bbox = computeGeoreferencedMapBbox(map)
-        bboxes.push(bbox)
+        try {
+          const bbox = computeGeoreferencedMapBbox(map)
+          bboxes.push(bbox)
+        } catch {
+          // If we can't compute a bbox for a map, we just skip it.
+        }
       }
       if (bboxes.length > 0) {
         const combinedBbox = combineBboxes(...bboxes)

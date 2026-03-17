@@ -9,12 +9,14 @@
 
   let { children, color, opacity = 0.8 }: Props = $props()
 
-  const svg = `
+  const svg = $derived(`
     <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="10" fill="${color}" fill-opacity="${opacity * 100}%" />
-    </svg>`
+    </svg>`)
 
-  const backgroundImage = `url(data:image/svg+xml;base64,${btoa(svg)})`
+  const backgroundImage = $derived(
+    `url(data:image/svg+xml;base64,${btoa(svg)})`
+  )
 </script>
 
 <div

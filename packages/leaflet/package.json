@@ -28,14 +28,14 @@
     "directory": "packages/leaflet"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev --mode localhost",
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",
@@ -65,7 +65,7 @@
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "catalog:",
-    "vite": "^5.0.3",
+    "vite": "catalog:",
     "vite-plugin-dts": "^3.8.3",
     "vite-plugin-no-bundle": "^4.0.0"
   }

@@ -73,7 +73,10 @@
 
   // Format navigation date helper
   function formatNavDate(navDate?: Date): string {
-    if (!navDate) return ''
+    if (!navDate) {
+      return ''
+    }
+
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'long',
@@ -363,7 +366,7 @@
               <CopyButton
                 text={map.id || ''}
                 class="disabled:cursor-not-allowed disabled:text-gray
-              active:translate-[1px] hover:translate-[0.5px]
+              active:translate-px hover:translate-[0.5px]
               hover:bg-gray/20 select-none
               text-sm
               cursor-pointer transition-all px-4 py-2 rounded-lg

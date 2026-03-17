@@ -15,18 +15,18 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev",
+    "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite dev --mode localhost",
     "build": "vite build",
     "lerna-build": "lerna run build --scope @allmaps/viewer --include-dependencies",
-    "deploy": "wrangler deploy",
-    "deploy:dev": "wrangler deploy --env dev",
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
     "tail": "wrangler tail",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "types": "tsc --noEmit",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
+    "format": "prettier --ignore-path ../../.gitignore --write ."
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
@@ -41,6 +41,7 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/components": "workspace:^",
+    "@allmaps/env": "workspace:^",
     "bits-ui": "catalog:",
     "maplibre-gl": "catalog:"
   },
@@ -50,7 +51,7 @@
     "@eslint/js": "^9.39.1",
     "@sveltejs/adapter-cloudflare": "^7.2.4",
     "@sveltejs/kit": "^2.49.1",
-    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tailwindcss/vite": "^4.1.17",
     "@types/node": "^22",
     "eslint": "^9.39.1",
@@ -65,7 +66,7 @@
     "tailwindcss": "^4.1.17",
     "typescript": "catalog:",
     "typescript-eslint": "^8.48.1",
-    "vite": "npm:rolldown-vite@latest",
+    "vite": "catalog:",
     "vite-plugin-devtools-json": "^1.0.0",
     "phosphor-svelte": "^3.0.1",
     "wrangler": "^4.3.0"

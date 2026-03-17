@@ -1,0 +1,41 @@
+{
+  "name": "@allmaps/api-rest",
+  "version": "3.0.0",
+  "private": "true",
+  "module": "src/index.js",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
+    "dev": "wrangler dev --port $(../../port.js rest) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
+    "cf-typegen": "wrangler types",
+    "build": "tsc",
+    "lerna-build": "lerna run build --scope @allmaps/api-rest --include-dependencies",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/api-shared": "workspace:^",
+    "@allmaps/db": "workspace:^",
+    "@allmaps/env": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/stdlib": "workspace:^",
+    "@elysiajs/cors": "catalog:",
+    "@elysiajs/openapi": "catalog:",
+    "@neondatabase/serverless": "catalog:",
+    "better-auth": "catalog:",
+    "elysia": "catalog:",
+    "postgres": "catalog:",
+    "wrangler": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240320.1",
+    "@types/geojson": "^7946.0.14",
+    "@types/node": "catalog:",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:"
+  }
+}

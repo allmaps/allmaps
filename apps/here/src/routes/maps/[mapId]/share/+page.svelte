@@ -18,8 +18,6 @@
   import { getAllmapsId } from '$lib/shared/ids.js'
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
-  import { env } from '$env/dynamic/public'
-
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
   import type { PageProps } from './$types.js'
@@ -131,7 +129,7 @@
               onerror={handleImageError}
               alt="Preview"
               class="rounded-md overflow-hidden"
-              src="{env.PUBLIC_PREVIEW_URL}/{getAllmapsId(
+              src="{data.env.PUBLIC_PREVIEW_BASE_URL}/{getAllmapsId(
                 data.mapId
               )}.jpg?from={data.from?.join(',')}"
             />

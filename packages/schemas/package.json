@@ -27,8 +27,8 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "types": "tsc --noEmit"
   },
   "license": "MIT",

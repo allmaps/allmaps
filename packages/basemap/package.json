@@ -29,8 +29,8 @@
     "watch": "tsc --watch",
     "build": "tsc",
     "types": "tsc --noEmit",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",

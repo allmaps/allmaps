@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2024",
+    "lib": ["es2024"],
+    "module": "esnext",
+    "moduleResolution": "Bundler",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["@cloudflare/workers-types"],
+    "resolveJsonModule": true
+  },
+  "references": [
+    { "path": "../annotation" },
+    { "path": "../db" },
+    { "path": "../id" },
+    { "path": "../iiif-parser" },
+    { "path": "../stdlib" },
+    { "path": "../types" }
+  ],
+  "include": ["./src/**/*", "./src/**/*.json"]
+}

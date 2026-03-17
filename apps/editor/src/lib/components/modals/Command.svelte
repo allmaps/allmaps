@@ -23,18 +23,16 @@
   import { getAnnotationUrl, getViewerUrl } from '$lib/shared/urls.js'
 
   import type { Example } from '$lib/types/shared.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const scopeState = getScopeState()
   const uiState = getUiState()
   const urlState = getUrlState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const examplesApiUrl = varsState.get('PUBLIC_EXAMPLES_API_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
-  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
+  const examplesApiUrl = varsState.PUBLIC_EXAMPLES_API_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
+  const viewerBaseUrl = varsState.PUBLIC_VIEWER_BASE_URL
 
   let value = $state('')
 
@@ -138,7 +136,7 @@
             {#if mightBeUrl}
               <Command.Item
                 {value}
-                class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
+                class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
                 onSelect={handleOpenUrl}
               >
                 <CopyIcon class="size-4 shrink-0" />
@@ -150,7 +148,7 @@
             {/if}
 
             <Command.Item
-              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
               keywords={['iiif resource', 'open']}
               onSelect={handleNewIiifResource}
             >
@@ -159,7 +157,7 @@
             </Command.Item>
 
             <Command.Item
-              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
               keywords={['iiif', 'resource', 'open', 'random', 'example']}
               onSelect={handleRandomIiifResource}
             >
@@ -176,7 +174,7 @@
           </Command.GroupHeading>
           <Command.GroupItems>
             <Command.Item
-              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
               keywords={[
                 'copy',
                 'georeference',
@@ -194,7 +192,7 @@
             </Command.Item>
 
             <Command.Item
-              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
               keywords={['copy', 'georeference', 'viewer', 'clipboard']}
               onSelect={handleCopyViewerUrlToClipboard}
             >
@@ -203,7 +201,7 @@
             </Command.Item>
 
             <Command.Item
-              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-[selected]:bg-gray-100"
+              class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
               keywords={['copy', 'georeference', 'annotation', 'clipboard']}
               onSelect={handleCopyGeoreferenceAnnotationToClipboard}
             >

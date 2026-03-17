@@ -17,7 +17,7 @@
   import type { PickerProjection } from '@allmaps/components/projections'
 
   import type { DbMap3 } from '$lib/types/maps.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   type Props = {
     map: DbMap3
@@ -28,9 +28,9 @@
   const mapsState = getMapsState()
   const projectionsState = getProjectionsState()
   const uiState = getUiState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
+  const apiBaseUrl = varsState.PUBLIC_REST_BASE_URL
 
   let projectionId = $derived(
     map.resourceCrs?.id

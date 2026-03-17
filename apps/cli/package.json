@@ -29,8 +29,8 @@
     "build": "tsc && chmod +x dist/index.js",
     "test": "NODE_ENV=test vitest run",
     "types": "tsc --noEmit",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test"
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src test"
   },
   "keywords": [
     "allmaps",
@@ -43,6 +43,7 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/attach": "workspace:^",
+    "@allmaps/frame": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/io": "workspace:^",

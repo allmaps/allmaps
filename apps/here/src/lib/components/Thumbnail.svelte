@@ -59,7 +59,10 @@
   let fetchedImageInfo = $derived(imageInfoState.get(map.resource.id))
   let allmapsId = $derived(getAllmapsId(mapId))
 
-  const transformer = new GcpTransformer(map.gcps, map.transformation?.type)
+  const transformer = $derived(
+    new GcpTransformer(map.gcps, map.transformation?.type)
+  )
+
   let resourcePositionCoordinates = $derived(
     sensorsState.position
       ? toResourceCoordinates(transformer, sensorsState.position)
@@ -128,7 +131,7 @@
 
 <svelte:body bind:clientWidth={bodyClientWidth} />
 
-{#if fetchedImageInfo && fetchedImageInfo.state === 'success' && !thumbnailError}
+{#if allmapsId && fetchedImageInfo && fetchedImageInfo.state === 'success' && !thumbnailError}
   <svelte:boundary onerror={handleError}>
     <li class="flex flex-col gap-3 bg-white/50 p-2 rounded-lg">
       <a

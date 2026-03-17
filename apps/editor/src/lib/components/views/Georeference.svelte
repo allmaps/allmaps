@@ -63,7 +63,11 @@
     RemoveGcpEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
+
+  type TerraDrawOnChangeContext =
+    | { origin: 'api'; target?: 'geometry' | 'properties' }
+    | { target?: 'geometry' | 'properties' }
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -71,7 +75,7 @@
   const urlState = getUrlState()
   const viewportsState = getViewportsState()
   const projectionsState = getProjectionsState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
   let resourceMap = $state.raw<MapLibreMap>()
   let geoMap = $state.raw<MapLibreMap>()
@@ -79,9 +83,7 @@
   let resourceTransformer = $state.raw<GcpTransformer>()
   let resourceWarpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let mapIds = $derived(
     mapsState.activeMapId
@@ -137,11 +139,11 @@
   }
 
   function removeGcp(gcpId: string) {
-    if (resourceDraw && resourceDraw.getSnapshotFeature(gcpId)) {
+    if (resourceDraw && resourceDraw.hasFeature(gcpId)) {
       resourceDraw.removeFeatures([gcpId])
     }
 
-    if (geoDraw && geoDraw.getSnapshotFeature(gcpId)) {
+    if (geoDraw && geoDraw.hasFeature(gcpId)) {
       geoDraw.removeFeatures([gcpId])
     }
 
@@ -169,7 +171,8 @@
 
   function handleReplaceGcp(event: ReplaceGcpEvent) {
     const mapId = event.detail.mapId
-    if (mapId === currentDisplayMapId) {
+
+    if (mapId === currentDisplayMapId && !event.detail.localOperation) {
       const gcpId = event.detail.gcp.id
       replaceGcpFromState(gcpId)
     }
@@ -361,10 +364,70 @@
 
     const gcp = mapsState.activeMap?.gcps[gcpId]
     if (gcp) {
-      removeGcp(gcp.id)
-      addGcp(gcp)
+      if (gcp.resource && gcp.geo) {
+        addOrUpdateResourceGcpFeature(gcpId, gcp.resource)
+        addOrUpdateGeoGcpFeature(gcpId, gcp.geo)
+      } else if (gcp.resource && !gcp.geo) {
+        addOrUpdateResourceGcpFeature(gcpId, gcp.resource)
+        removeGeoGcpFeature(gcpId)
+      } else if (!gcp.resource && gcp.geo) {
+        removeResourceGcpFeature(gcpId)
+        addOrUpdateGeoGcpFeature(gcpId, gcp.geo)
+      }
     } else {
       console.error(`Error setting new geometries for GCP ${gcpId}`)
+    }
+  }
+
+  function addOrUpdateResourceGcpFeature(gcpId: string, resourcePoint: Point) {
+    if (resourceDraw && resourceTransformer) {
+      if (resourceDraw.hasFeature(gcpId)) {
+        resourceDraw.updateFeatureGeometry(gcpId, {
+          type: 'Point',
+          coordinates: resourceTransformer.transformToGeo(resourcePoint)
+        })
+      } else {
+        addGeoGcpFeature(
+          {
+            id: gcpId,
+            index: gcpIndexFromGcpId(gcpId),
+            resource: resourcePoint
+          },
+          displayIndexFromGcpId(gcpId)
+        )
+      }
+    }
+  }
+
+  function addOrUpdateGeoGcpFeature(gcpId: string, geoPoint: Point) {
+    if (geoDraw) {
+      if (geoDraw.hasFeature(gcpId)) {
+        geoDraw.updateFeatureGeometry(gcpId, {
+          type: 'Point',
+          coordinates: geoPoint
+        })
+      } else {
+        addGeoGcpFeature(
+          {
+            id: gcpId,
+            index: gcpIndexFromGcpId(gcpId),
+            geo: geoPoint
+          },
+          displayIndexFromGcpId(gcpId)
+        )
+      }
+    }
+  }
+
+  function removeResourceGcpFeature(gcpId: string) {
+    if (resourceDraw && resourceDraw.hasFeature(gcpId)) {
+      resourceDraw.removeFeatures([gcpId])
+    }
+  }
+
+  function removeGeoGcpFeature(gcpId: string) {
+    if (geoDraw && geoDraw.hasFeature(gcpId)) {
+      geoDraw.removeFeatures([gcpId])
     }
   }
 
@@ -377,10 +440,22 @@
     }
   }
 
-  function handleResourceDrawChange(ids: (string | number)[], type: string) {
-    if (type === 'update' && ids.length === 1) {
+  function handleResourceDrawChange(
+    ids: (string | number)[],
+    type: string,
+    context?: TerraDrawOnChangeContext
+  ) {
+    const hasApiOrigin =
+      context && 'origin' in context && context.origin === 'api'
+
+    if (type === 'update' && ids.length === 1 && !hasApiOrigin) {
       const gcpId = ensureStringId(ids[0])
       makeGcpFeatureActive(gcpId)
+    } else if (type === 'delete' && !hasApiOrigin) {
+      ids.forEach((id) => {
+        const gcpId = ensureStringId(id)
+        handleGcpDeleted('resource', gcpId)
+      })
     }
   }
 
@@ -389,6 +464,7 @@
     context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
+
     if (context.action === 'edit') {
       handleDrawFinishEdited(gcpId)
     } else if (resourceDraw && context.action === 'draw') {
@@ -396,10 +472,57 @@
     }
   }
 
-  function handleGeoDrawChange(ids: (string | number)[], type: string) {
-    if (type === 'update' && ids.length === 1) {
+  function handleGeoDrawChange(
+    ids: (string | number)[],
+    type: string,
+    context?: TerraDrawOnChangeContext
+  ) {
+    const hasApiOrigin =
+      context && 'origin' in context && context.origin === 'api'
+
+    if (type === 'update' && ids.length === 1 && !hasApiOrigin) {
       const gcpId = ensureStringId(ids[0])
       makeGcpFeatureActive(gcpId)
+    } else if (type === 'delete' && !hasApiOrigin) {
+      ids.forEach((id) => {
+        const gcpId = ensureStringId(id)
+        handleGcpDeleted('geo', gcpId)
+      })
+    }
+  }
+
+  function handleGcpDeleted(pane: 'resource' | 'geo', gcpId: string) {
+    const mapId = mapsState.activeMapId
+    const gcp = mapsState.activeMap?.gcps[gcpId]
+
+    if (mapId && gcp) {
+      if (pane === 'geo') {
+        if (!gcp.resource) {
+          mapsState.removeGcp({ mapId, gcpId })
+        } else if (gcp.geo) {
+          mapsState.replaceGcp({
+            mapId,
+            gcp: {
+              id: gcpId,
+              index: gcp.index,
+              resource: gcp.resource
+            }
+          })
+        }
+      } else if (pane === 'resource') {
+        if (!gcp.geo) {
+          mapsState.removeGcp({ mapId, gcpId })
+        } else if (gcp.resource) {
+          mapsState.replaceGcp({
+            mapId,
+            gcp: {
+              id: gcpId,
+              index: gcp.index,
+              geo: gcp.geo
+            }
+          })
+        }
+      }
     }
   }
 
@@ -416,28 +539,42 @@
     }
   }
 
-  function addGcp(gcp: DbGcp3) {
-    if (!resourceDraw || !geoDraw) {
+  function addResourceGcpFeature(gcp: DbGcp3, displayIndex: number) {
+    if (!resourceDraw) {
       console.error('Cannot set GCPs, maps not ready')
       return
     }
 
-    const displayIndex = displayIndexFromGcpId(gcp.id)
-
     const resourceFeature = createResourceGcpFeature(gcp, displayIndex)
-    const geoFeature = createGeoGcpFeature(gcp, displayIndex)
-
     if (resourceFeature) {
       resourceDraw.addFeatures([resourceFeature])
     }
 
+    return resourceFeature
+  }
+
+  function addGeoGcpFeature(gcp: DbGcp3, displayIndex: number) {
+    if (!geoDraw) {
+      console.error('Cannot set GCPs, maps not ready')
+      return
+    }
+
+    const geoFeature = createGeoGcpFeature(gcp, displayIndex)
     if (geoFeature) {
       geoDraw.addFeatures([geoFeature])
     }
 
+    return geoFeature
+  }
+
+  function addGcp(gcp: DbGcp3) {
+    const displayIndex = displayIndexFromGcpId(gcp.id)
+    const resourceGcpFeature = addResourceGcpFeature(gcp, displayIndex)
+    const geoGcpFeature = addGeoGcpFeature(gcp, displayIndex)
+
     return {
-      resource: resourceFeature,
-      geo: geoFeature
+      resource: resourceGcpFeature,
+      geo: geoGcpFeature
     }
   }
 
@@ -538,8 +675,6 @@
 
       if (displayIndex !== -1) {
         return displayIndex
-      } else {
-        return sortedGcps.length - 1
       }
     }
 
@@ -624,6 +759,7 @@
     if (linkWithExistingGcp && existingGcpId) {
       const newGcp = gcpFromGcpId(newGcpId)
       const existingGcp = gcpFromGcpId(existingGcpId)
+
       draw.removeFeatures([newGcpId])
 
       addGcp({
@@ -719,6 +855,10 @@
   }
 
   function initializeGcps(imageId: string, map: DbMap3, animate = false) {
+    if (mapsState.activeMapId !== map.id) {
+      mapsState.activeMapId = map.id
+    }
+
     resetGcps()
 
     const gcpFeatures = Object.values(map.gcps).map(addGcp)
@@ -765,7 +905,24 @@
       }
     })
 
-    const duration = animate ? 300 : 0
+    if (
+      !resourceBbox &&
+      resourceTransformer &&
+      map.resourceMask &&
+      map.resourceMask.length >= 3
+    ) {
+      const resourceMaskCoordinates = resourceTransformer.transformToGeo([
+        ...map.resourceMask,
+        map.resourceMask[0]
+      ])
+
+      resourceBbox = computeBbox({
+        type: 'Polygon',
+        coordinates: [resourceMaskCoordinates]
+      })
+    }
+
+    const duration = animate ? MAPLIBRE_FIT_BOUNDS_DURATION : 0
 
     if (resourceViewport) {
       resourceMap?.flyTo({
@@ -864,9 +1021,10 @@
     if (
       mapsReady &&
       mapsState.connected &&
-      mapsState.activeMapId !== currentDisplayMapId &&
+      resourceTransformer &&
       mapsState.connectedImageId &&
-      mapsState.connectedImageId !== currentDisplayImageId
+      (mapsState.activeMapId !== currentDisplayMapId ||
+        mapsState.connectedImageId !== currentDisplayImageId)
     ) {
       if (mapsState.activeMap) {
         initializeGcps(mapsState.connectedImageId, mapsState.activeMap)
@@ -997,6 +1155,7 @@
     bind:transformer={resourceTransformer}
     bind:warpedMapLayerBounds={resourceWarpedMapLayerBounds}
     initialViewport={resourceViewport}
+    mapId={mapsState.activeMapId}
     resourceMask={mapsState.activeMap?.resourceMask}
     renderMasks={uiState.georeferenceOptions.renderMasks}
   />

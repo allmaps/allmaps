@@ -25,7 +25,9 @@
   setUiState()
 
   onNavigate((navigation) => {
-    if (!document.startViewTransition) return
+    if (!document.startViewTransition) {
+      return
+    }
 
     return new Promise((resolve) => {
       document.startViewTransition(async () => {

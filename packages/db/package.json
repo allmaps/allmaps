@@ -1,0 +1,46 @@
+{
+  "name": "@allmaps/db",
+  "version": "1.0.0-beta.0",
+  "private": true,
+  "description": "Drizzle ORM schema, database connections, and migrations for Allmaps",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./schema": "./dist/schema.js",
+    "./schema/*": "./dist/schema/*.js",
+    "./maps": "./dist/maps.js",
+    "./auth": "./dist/auth.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc --noCheck",
+    "types": "tsc --noEmit",
+    "db:up": "drizzle-kit up",
+    "db:generate": "drizzle-kit generate",
+    "auth:generate": "pnpx auth generate --config ./src/auth-for-cli.ts --output ./src/schema/auth.ts",
+    "auth:info": " pnpx auth info --config ./src/auth-for-cli.ts",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@neondatabase/serverless": "catalog:",
+    "postgres": "catalog:",
+    "zod": "catalog:",
+    "better-auth": "catalog:"
+  },
+  "peerDependencies": {
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@types/sharedb": "^3.3.12",
+    "drizzle-orm": "catalog:",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:"
+  }
+}

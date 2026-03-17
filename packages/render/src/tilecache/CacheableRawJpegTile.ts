@@ -9,7 +9,7 @@ import type { FetchFn } from '@allmaps/types'
 /**
  * Raw JPEG tile data - stores compressed JPEG bytes for WASM decoding
  */
-export interface RawJpegData {
+export type RawJpegData = {
   jpegBytes: Uint8ClampedArray
   width: number
   height: number

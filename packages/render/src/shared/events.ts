@@ -1,46 +1,49 @@
-import { AnimationOptions, SpritesInfo } from './types'
+import { AnimationOptions, SpritesInfo } from './types.js'
 
-export enum WarpedMapEventType {
+export const WarpedMapEventType = {
   // WarpedMapList > ...
-  IMAGEINFOSADDED = 'imageinfosadded',
-  GEOREFERENCEANNOTATIONADDED = 'georeferenceannotationadded',
-  GEOREFERENCEANNOTATIONREMOVED = 'georeferenceannotationremoved',
-  WARPEDMAPADDED = 'warpedmapadded',
-  WARPEDMAPREMOVED = 'warpedmapremoved',
+  IMAGEINFOSADDED: 'imageinfosadded',
+  GEOREFERENCEANNOTATIONADDED: 'georeferenceannotationadded',
+  GEOREFERENCEANNOTATIONREMOVED: 'georeferenceannotationremoved',
+  WARPEDMAPADDED: 'warpedmapadded',
+  WARPEDMAPREMOVED: 'warpedmapremoved',
 
   // Renderer > ...
-  WARPEDMAPENTERED = 'warpedmapentered',
-  WARPEDMAPLEFT = 'warpedmapleft',
+  WARPEDMAPENTERED: 'warpedmapentered',
+  WARPEDMAPLEFT: 'warpedmapleft',
 
   // WarpedMap > WarpedMapList > Renderer > ...
-  IMAGELOADED = 'imageloaded',
+  IMAGELOADED: 'imageloaded',
 
   // Tile > TileCache
-  TILEFETCHED = 'tilefetched',
-  TILEFETCHERROR = 'tilefetcherror',
+  TILEFETCHED: 'tilefetched',
+  TILEFETCHERROR: 'tilefetcherror',
 
   // Tile > TileCache > Renderer
-  TILESFROMSPRITETILE = 'tilesfromspritetile',
+  TILESFROMSPRITETILE: 'tilesfromspritetile',
 
   // TileCache > Renderer > ...
-  MAPTILELOADED = 'maptileloaded',
-  MAPTILESLOADEDFROMSPRITES = 'maptilesloadedfromsprites',
-  MAPTILEDELETED = 'maptiledeleted',
-  FIRSTMAPTILELOADED = 'firstmaptileloaded',
-  ALLREQUESTEDTILESLOADED = 'allrequestedtilesloaded',
+  MAPTILELOADED: 'maptileloaded',
+  MAPTILESLOADEDFROMSPRITES: 'maptilesloadedfromsprites',
+  MAPTILEDELETED: 'maptiledeleted',
+  FIRSTMAPTILELOADED: 'firstmaptileloaded',
+  ALLREQUESTEDTILESLOADED: 'allrequestedtilesloaded',
 
   // WebGL2WarpedMap > WebGL2Renderer
-  TEXTURESUPDATED = 'texturesupdated',
+  TEXTURESUPDATED: 'texturesupdated',
 
   // WarpedMapList > ...
-  CLEARED = 'cleared',
-  PREPARECHANGE = 'preparechange',
-  IMMEDIATECHANGE = 'immediatechange',
-  ANIMATEDCHANGE = 'animatedchange',
+  CLEARED: 'cleared',
+  PREPARECHANGE: 'preparechange',
+  IMMEDIATECHANGE: 'immediatechange',
+  ANIMATEDCHANGE: 'animatedchange',
 
   // Renderer
-  CHANGED = 'changed'
-}
+  CHANGED: 'changed'
+} as const
+
+export type WarpedMapEventType =
+  (typeof WarpedMapEventType)[keyof typeof WarpedMapEventType]
 
 export type WarpedMapEventData = {
   mapIds: string[]

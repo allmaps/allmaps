@@ -11,14 +11,15 @@
     "types": ["@cloudflare/workers-types"]
   },
   "references": [
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/env" },
     { "path": "../../packages/frame" },
+    { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/render" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/types" },
-    { "path": "../../packages/annotation" },
-    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/tailwind" },
     { "path": "../../packages/transform" },
-    { "path": "../../packages/tailwind" }
+    { "path": "../../packages/types" }
   ],
   "include": ["./src/**/*"],
   "exclude": ["test"]

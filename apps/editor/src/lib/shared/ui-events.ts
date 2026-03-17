@@ -11,8 +11,9 @@ export const UiEvents = {
   TOGGLE_RENDER_MASKS: 'TOGGLE_RENDER_MASKS' as const
 }
 
-interface UiEventMap {
+type UiEventMap = {
   CLICKED_ITEM: ClickedItem
+  ZOOM_TO_EXTENT: void
   FIT_BBOX: Bbox
   SET_CENTER: Point
   TOGGLE_VISIBLE: boolean

@@ -8,19 +8,20 @@
   type Props = {
     title?: string
     source?: Source
+    previewUrl: string
   }
 
-  let { title, source }: Props = $props()
+  let { title, source, previewUrl }: Props = $props()
 
-  const OG_IMAGE_SIZE = [1200, 630]
+  const OG_IMAGE_SIZE = [640, 400]
+  // const OG_IMAGE_SIZE = [1200, 630]
 
   let description =
-    'View warped maps and their metadata with Allmaps Viewer. Explore georeferenced maps, compare them with modern maps, and discover the history behind each map. Allmaps Viewer provides an interactive platform for visualizing and analyzing historical maps in a geospatial context.'
+    'View warped maps and their metadata with Allmaps Viewer. Explore georeferenced maps, compare them with modern maps, and discover the history behind each map.'
 
   let ogImageUrl = $derived.by(() => {
     if (source?.allmapsId) {
-      // return `https://preview.allmaps.org/${source?.allmapsId}.jpg`
-      return `http://localhost:5514/${source?.allmapsId}.jpg`
+      return `${previewUrl}/${source?.allmapsId}.jpg?fit=best&background=fff`
     }
   })
 </script>
@@ -38,7 +39,7 @@
 
   {#if ogImageUrl}
     <meta property="og:image" content={ogImageUrl} />
-    <meta name="og:image:secure_url" content={ogImageUrl} />
+    <meta property="og:image:secure_url" content={ogImageUrl} />
     <meta property="og:image:width" content={String(OG_IMAGE_SIZE[0])} />
     <meta property="og:image:height" content={String(OG_IMAGE_SIZE[1])} />
   {/if}

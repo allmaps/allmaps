@@ -34,13 +34,13 @@
     "directory": "packages/render"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev --mode localhost",
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",

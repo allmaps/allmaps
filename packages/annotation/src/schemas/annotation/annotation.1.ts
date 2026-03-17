@@ -109,7 +109,10 @@ export const AnnotationSchema = z.object({
   created: z.string().datetime().optional(),
   modified: z.string().datetime().optional(),
   target: TargetSchema,
-  body: BodySchema
+  body: BodySchema,
+  // TODO: accept all keys that start with underscore and pass them?
+  // TODO: define proper schema for _allmaps
+  _allmaps: z.unknown().optional()
 })
 
 export const AnnotationPageSchema = z.object({

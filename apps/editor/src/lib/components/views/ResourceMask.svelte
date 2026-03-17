@@ -31,6 +31,7 @@
   import YesNo from '$lib/components/YesNo.svelte'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
+
   import type { LngLatBoundsLike } from 'maplibre-gl'
 
   import type { GcpTransformer } from '@allmaps/transform'
@@ -54,6 +55,14 @@
   } from '$lib/shared/constants.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
+
+  type TerraDrawOnChangeContext =
+    | { origin: 'api'; target?: 'geometry' | 'properties' }
+    | { target?: 'geometry' | 'properties' }
+
+  type PolygonModeOptions = NonNullable<
+    ConstructorParameters<typeof TerraDrawPolygonMode>[0]
+  >
 
   const sourceState = getSourceState()
   const mapsState = getMapsState()
@@ -283,10 +292,11 @@
   function handleDrawChange(
     ids: (string | number)[],
     type: string,
-    context?: { origin: 'api' }
+    context?: TerraDrawOnChangeContext
   ) {
     if (ids.length === 1) {
-      const hasApiOrigin = context && context.origin === 'api'
+      const hasApiOrigin =
+        context && 'origin' in context && context.origin === 'api'
 
       if (type === 'update') {
         const id = ensureStringId(ids[0])
@@ -488,7 +498,7 @@
     }
   }
 
-  function getModeOptions() {
+  function getModeOptions(): PolygonModeOptions {
     return {
       editable: true,
       showCoordinatePoints: true,
