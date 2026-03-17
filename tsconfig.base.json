@@ -6,6 +6,7 @@
     "target": "es2022",
     "module": "es2022",
     "allowSyntheticDefaultImports": true,
+    "erasableSyntaxOnly": true,
     "composite": true,
     "declaration": true,
     "moduleResolution": "bundler",
