@@ -94,11 +94,10 @@ It's also possible to create a WarpedMapList first and pass it to the layer on c
 import OpenLayersMap from 'ol/Map'
 import Tile from 'ol/layer/Tile'
 import OSM from 'ol/source/OSM'
-import {
-  WarpedMapLayer,
-  WarpedMapList,
-  WebGL2WarpedMap
-} from '@allmaps/openlayers'
+
+import { WarpedMapLayer } from '@allmaps/openlayers'
+import { WarpedMapList } from '@allmaps/render'
+import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
 
 const annotationUrl =
   'https://annotations.allmaps.org/manifests/8f9faeba73d67031'

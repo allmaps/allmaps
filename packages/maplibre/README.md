@@ -98,11 +98,10 @@ It's also possible to create a WarpedMapList first and pass it to the layer on c
 
 ```js
 import { Map as MapLibreMap } from 'maplibre-gl'
-import {
-  WarpedMapLayer,
-  WarpedMapList,
-  WebGL2WarpedMap
-} from '@allmaps/maplibre'
+
+import { WarpedMapLayer } from '@allmaps/maplibre'
+import { WarpedMapList } from '@allmaps/render'
+import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
 
 const annotationUrl = 'https://annotations.allmaps.org/images/d180902cb93d5bf2'
 const annotation = await fetch(annotationUrl).then((response) =>

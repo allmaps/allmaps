@@ -50,6 +50,7 @@ Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
 import L from 'leaflet'
+
 import { WarpedMapLayer } from '@allmaps/leaflet'
 
 const map = L.map('map', {
@@ -91,11 +92,10 @@ It's also possible to create a WarpedMapList first and pass it to the layer on c
 
 ```js
 import L from 'leaflet'
-import {
-  WarpedMapLayer,
-  WarpedMapList,
-  WebGL2WarpedMap
-} from '@allmaps/leaflet'
+
+import { WarpedMapLayer } from '@allmaps/leaflet'
+import { WarpedMapList } from '@allmaps/render'
+import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
 
 const annotationUrl =
   'https://annotations.allmaps.org/manifests/8f9faeba73d67031'

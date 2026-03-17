@@ -3,11 +3,9 @@
   import { Map as MapLibreMap, addProtocol } from 'maplibre-gl'
   import { Protocol } from 'pmtiles'
 
-  import {
-    WarpedMapLayer,
-    WarpedMapList,
-    WebGL2WarpedMap
-  } from '@allmaps/maplibre'
+  import { WarpedMapLayer } from '@allmaps/maplibre'
+  import { WarpedMapList } from '@allmaps/render'
+  import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
   import { basemapStyle } from '@allmaps/basemap'
   import { mergeOptions } from '@allmaps/stdlib'
 

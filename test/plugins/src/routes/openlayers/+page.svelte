@@ -12,7 +12,8 @@
   import OptionInputs from '$lib/components/OptionInputs.svelte'
   import AnnotationSelector from '$lib/components/AnnotationSelector.svelte'
 
-  import { WarpedMapLayer, WarpedMapList } from '@allmaps/openLayers'
+  import { WarpedMapLayer } from '@allmaps/openLayers'
+  import { WarpedMapList } from '@allmaps/render'
   import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
   import { mergeOptions } from '@allmaps/stdlib'
   import { lonLatProjection, webMercatorProjection } from '@allmaps/project'
