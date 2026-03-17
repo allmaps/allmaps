@@ -26,7 +26,7 @@ catalog:
   'bits-ui': ^2.15
   'maplibre-gl': ^5.16
 
-  'wrangler': ^4.54
+  'wrangler': ^4.74.0
 
   'drizzle-kit': ^1.0.0-beta.17
   'drizzle-orm': ^1.0.0-beta.17
