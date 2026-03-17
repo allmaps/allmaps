@@ -12,7 +12,7 @@ import {
 } from '@allmaps/api-shared/db'
 
 import { createElysia } from '../elysia.js'
-import { betterAuthPlugin } from './auth.js'
+import type { createBetterAuthRoutes } from './auth.js'
 
 function getUserId(user: unknown): string {
   if (
@@ -27,7 +27,10 @@ function getUserId(user: unknown): string {
   return user.id
 }
 
-export const lists = createElysia({ name: 'lists' })
+export function createLists(
+  betterAuthPlugin: ReturnType<typeof createBetterAuthRoutes>
+) {
+  return createElysia({ name: 'lists' })
   .use(betterAuthPlugin)
   .get('/lists', ({ db, user }) => queryUserLists(db, getUserId(user)), {
     auth: true,
@@ -220,3 +223,4 @@ export const lists = createElysia({ name: 'lists' })
       }
     }
   )
+}

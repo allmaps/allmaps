@@ -1,8 +1,7 @@
 import { t } from 'elysia'
 
+import { createAuth, type BetterAuthContext } from '@allmaps/db'
 import { createBetterAuthPlugin, error } from '../elysia.js'
-
-import { auth } from '@allmaps/db/auth'
 import {
   queryAdminOrganizations,
   queryUserOrganizationsWithRoles,
@@ -13,10 +12,17 @@ import {
   queryUsers,
   queryUserBySlug
 } from '@allmaps/api-shared/db'
+import type { RestEnv } from '@allmaps/env/rest'
 
 const Role = t.UnionEnum(['admin', 'member', 'owner'])
 
-export const betterAuthPlugin = createBetterAuthPlugin()
+export function createBetterAuthRoutes(
+  env: RestEnv,
+  betterAuth: BetterAuthContext = createAuth(env)
+) {
+  const { auth } = betterAuth
+
+  return createBetterAuthPlugin(betterAuth)
   .get('/users', ({ db }) => queryUsers(db), {
     admin: true,
     detail: {
@@ -194,3 +200,4 @@ export const betterAuthPlugin = createBetterAuthPlugin()
       })
     }
   )
+}

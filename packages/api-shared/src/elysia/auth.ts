@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
-import { auth, baseURL } from '@allmaps/db/auth'
+import type { BetterAuthContext } from '@allmaps/db'
 
 import { ResponseError } from '../shared/errors.js'
 import { createElysia } from './app.js'
@@ -16,7 +16,11 @@ function copySetCookieHeader(
   }
 }
 
-export function createBetterAuthPlugin<TEnv = Record<string, unknown>>() {
+export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
+  betterAuth: BetterAuthContext
+) {
+  const { auth, baseURL } = betterAuth
+
   return createElysia<TEnv>({ name: 'better-auth' })
     .mount(auth.handler)
     .macro({

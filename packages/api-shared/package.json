@@ -64,7 +64,6 @@
     "@types/geojson": "^7946.0.16",
     "@types/sharedb": "^3.3.12",
     "typescript": "catalog:",
-    "@cloudflare/workers-types": "^4.20240320.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.6.2"

@@ -2,15 +2,16 @@ import { Elysia } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 import { env as cfEnv } from 'cloudflare:workers'
 
-import { getNeonDb } from '@allmaps/db'
+import { createAuth, getNeonDb } from '@allmaps/db'
 import { parseRestEnv } from '@allmaps/env/rest'
 
-import { app } from './app.js'
+import { createApp } from './app.js'
 import { handleApiError } from './elysia.js'
 
 console.log('🗺️ Allmaps REST API starting...')
 
 const env = parseRestEnv(cfEnv)
+const betterAuth = createAuth(env)
 
 const elysia = new Elysia({
   adapter: CloudflareAdapter
@@ -18,7 +19,7 @@ const elysia = new Elysia({
   .decorate('env', env)
   .derive(() => ({ db: getNeonDb(env.DATABASE_URL, env.LOG_QUERIES) }))
   .onError(handleApiError)
-  .use(app)
+  .use(createApp(env, betterAuth))
   // This is required to make Elysia work on Cloudflare Worker
   .compile()
 
