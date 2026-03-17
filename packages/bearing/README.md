@@ -1,6 +1,8 @@
 # @allmaps/bearing
 
-Computes the bearing of a Georeferenced Map.
+Computes the bearing of a Georeferenced Map or Warped Map.
+
+## Usage
 
 ```js
 import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'

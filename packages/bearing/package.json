@@ -35,6 +35,7 @@
   "scripts": {
     "watch": "tsc --watch",
     "build": "tsc",
+    "test": "NODE_ENV=test vitest run",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
     "lint": "prettier --check src && eslint src --ext .js,.ts",
@@ -51,6 +52,7 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
+    "@types/node": "^24",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
@@ -58,6 +60,7 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^4.0.4"
   }
 }

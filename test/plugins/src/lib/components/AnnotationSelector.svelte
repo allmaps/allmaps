@@ -45,44 +45,6 @@
 <div class="group">
   <h3 class="group-label">Annotation</h3>
   <div class="field">
-    <label for="annotation-object-select">Load test map</label>
-    <div class="range-row">
-      <button
-        id="random"
-        onclick={() => {
-          annotationUrl = ''
-          annotationUrl = 'https://sammeltassen-rumsey_roulette.web.val.run'
-        }}
-      >
-        Random
-      </button>
-      or
-    </div>
-    <div class="range-row">
-      <select
-        value={annotationUrl}
-        name="annotation-select"
-        onchange={(e) => {
-          annotationUrl = e.currentTarget.value
-        }}
-      >
-        {#each annotationObjects as a}
-          <option value={a?.url}>{a?.name}</option>
-        {/each}
-      </select>
-      <button onclick={prev} disabled={currentIndex <= 0}>←</button>
-      <button
-        onclick={next}
-        disabled={currentIndex >= annotationObjects.length - 1}>→</button
-      >
-    </div>
-  </div>
-  {#if annotationObject?.reason}
-    <div class="info">
-      🧐 {annotationObject?.reason}
-    </div>
-  {/if}
-  <div class="field">
     <label for="annotation-input">Annotation</label>
     <div class="range-row">
       <input
@@ -114,6 +76,46 @@
         Copy JSON
       </button>
     </div>
+  </div>
+  <div class="ml-4">
+    <div class="field">
+      <label for="annotation-object-select">Load test map</label>
+      <div class="range-row">
+        <button
+          id="random"
+          onclick={() => {
+            annotationUrl = ''
+            annotationUrl = 'https://sammeltassen-rumsey_roulette.web.val.run'
+          }}
+        >
+          Random
+        </button>
+        or
+      </div>
+      <div class="range-row">
+        <select
+          value={annotationUrl}
+          name="annotation-select"
+          onchange={(e) => {
+            annotationUrl = e.currentTarget.value
+          }}
+        >
+          {#each annotationObjects as a}
+            <option value={a?.url}>{a?.name}</option>
+          {/each}
+        </select>
+        <button onclick={prev} disabled={currentIndex <= 0}>←</button>
+        <button
+          onclick={next}
+          disabled={currentIndex >= annotationObjects.length - 1}>→</button
+        >
+      </div>
+    </div>
+    {#if annotationObject?.reason}
+      <div class="info">
+        🧐 {annotationObject?.reason}
+      </div>
+    {/if}
   </div>
 </div>
 
