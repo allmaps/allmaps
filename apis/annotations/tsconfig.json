@@ -20,5 +20,5 @@
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/env" }
   ],
-  "include": ["./src/**/*", "./worker-configuration.d.ts"]
+  "include": ["./src/**/*"]
 }
