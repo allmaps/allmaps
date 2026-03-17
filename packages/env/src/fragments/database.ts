@@ -8,6 +8,6 @@ export const databaseEnvSchema = z.object({
   // PGUSER: z.string().min(1),
   // PGPASSWORD: z.string().min(1),
   DATABASE_URL: z.string().url(),
-  DIRECT_DATABASE_URL: z.string().url(),
-  LOG_QUERIES: envBoolean
+  DIRECT_DATABASE_URL: z.string().url().optional(),
+  LOG_QUERIES: envBoolean.optional()
 })
