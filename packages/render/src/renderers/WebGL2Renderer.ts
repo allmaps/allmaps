@@ -46,6 +46,8 @@ import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
 
+import type { HomogeneousTransform } from '@allmaps/types'
+
 import type {
   Renderer,
   SpecificWebGL2RenderOptions,
@@ -483,85 +485,111 @@ export class WebGL2Renderer
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-    this.renderMapsInternal()
-    this.renderLinesInternal()
-    this.renderPointsInternal()
+    const worldClipTransforms = this.getWorldClipTransforms()
+
+    this.renderMapsInternal(worldClipTransforms)
+    this.renderLinesInternal(worldClipTransforms)
+    this.renderPointsInternal(worldClipTransforms)
   }
 
-  private renderMapsInternal(): void {
+  private renderMapsInternal(worldClipTransforms: HomogeneousTransform[]): void {
     if (!this.viewport) {
       return
     }
 
     this.setMapProgramUniforms()
 
-    for (const mapId of this.mapsWithFetchableTilesForViewport) {
-      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+    for (const worldClipTransform of worldClipTransforms) {
+      for (const mapId of this.mapsWithFetchableTilesForViewport) {
+        const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderMap()) {
-        continue
+        if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderMap()) {
+          continue
+        }
+
+        this.setMapProgramMapUniforms(webgl2WarpedMap, worldClipTransform)
+
+        // Draw map
+        const count = webgl2WarpedMap.resourceTrianglePoints.length
+        const primitiveType = this.gl.TRIANGLES
+        const offset = 0
+        this.gl.bindVertexArray(webgl2WarpedMap.mapVao)
+        this.gl.drawArrays(primitiveType, offset, count)
       }
-
-      this.setMapProgramMapUniforms(webgl2WarpedMap)
-
-      // Draw map
-      const count = webgl2WarpedMap.resourceTrianglePoints.length
-      const primitiveType = this.gl.TRIANGLES
-      const offset = 0
-      this.gl.bindVertexArray(webgl2WarpedMap.mapVao)
-      this.gl.drawArrays(primitiveType, offset, count)
     }
   }
 
-  private renderLinesInternal(): void {
+  private renderLinesInternal(worldClipTransforms: HomogeneousTransform[]): void {
     this.setLinesProgramUniforms()
 
-    for (const mapId of this.mapsWithFetchableTilesForViewport) {
-      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+    for (const worldClipTransform of worldClipTransforms) {
+      for (const mapId of this.mapsWithFetchableTilesForViewport) {
+        const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderLines()) {
-        continue
+        if (!webgl2WarpedMap || !webgl2WarpedMap.shouldRenderLines()) {
+          continue
+        }
+
+        this.setLinesProgramMapUniforms(webgl2WarpedMap, worldClipTransform)
+
+        // Draw lines for each map
+        const count =
+          webgl2WarpedMap.lineGroups.reduce(
+            (accumulator: number, lineGroup) =>
+              accumulator + lineGroup.projectedGeoLines.length,
+            0
+          ) * 6
+        const primitiveType = this.gl.TRIANGLES
+        const offset = 0
+        this.gl.bindVertexArray(webgl2WarpedMap.linesVao)
+        this.gl.drawArrays(primitiveType, offset, count)
       }
-
-      this.setLinesProgramMapUniforms(webgl2WarpedMap)
-
-      // Draw lines for each map
-      const count =
-        webgl2WarpedMap.lineGroups.reduce(
-          (accumulator: number, lineGroup) =>
-            accumulator + lineGroup.projectedGeoLines.length,
-          0
-        ) * 6
-      const primitiveType = this.gl.TRIANGLES
-      const offset = 0
-      this.gl.bindVertexArray(webgl2WarpedMap.linesVao)
-      this.gl.drawArrays(primitiveType, offset, count)
     }
   }
 
-  private renderPointsInternal(): void {
+  private renderPointsInternal(worldClipTransforms: HomogeneousTransform[]): void {
     this.setPointsProgramUniforms()
 
-    for (const mapId of this.mapsWithFetchableTilesForViewport) {
-      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+    for (const worldClipTransform of worldClipTransforms) {
+      for (const mapId of this.mapsWithFetchableTilesForViewport) {
+        const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
 
-      if (!webgl2WarpedMap! || !webgl2WarpedMap.shouldRenderPoints()) {
-        continue
+        if (!webgl2WarpedMap! || !webgl2WarpedMap.shouldRenderPoints()) {
+          continue
+        }
+
+        this.setPointsProgramMapUniforms(webgl2WarpedMap, worldClipTransform)
+
+        // Draw points for each map
+        const count = webgl2WarpedMap.pointGroups.reduce(
+          (accumulator: number, pointGroup) =>
+            accumulator + pointGroup.projectedGeoPoints.length,
+          0
+        )
+        const primitiveType = this.gl.POINTS
+        const offset = 0
+        this.gl.bindVertexArray(webgl2WarpedMap.pointsVao)
+        this.gl.drawArrays(primitiveType, offset, count)
       }
-
-      this.setPointsProgramMapUniforms(webgl2WarpedMap)
-
-      // Draw points for each map
-      const count = webgl2WarpedMap.pointGroups.reduce(
-        (accumulator: number, pointGroup) =>
-          accumulator + pointGroup.projectedGeoPoints.length,
-        0
-      )
-      const primitiveType = this.gl.POINTS
-      const offset = 0
-      this.gl.bindVertexArray(webgl2WarpedMap.pointsVao)
-      this.gl.drawArrays(primitiveType, offset, count)
     }
+  }
+
+  private getWorldClipTransforms(): HomogeneousTransform[] {
+    if (!this.viewport) {
+      return [[1, 0, 0, 1, 0, 0]]
+    }
+
+    const transforms: HomogeneousTransform[] = []
+    for (let world = this.viewport.startWorld; world < this.viewport.endWorld; world++) {
+      const worldTranslation: HomogeneousTransform = [1, 0, 0, 1, world * this.viewport.worldWidth, 0]
+      transforms.push(
+        multiplyHomogeneousTransform(
+          this.viewport.projectedGeoToClipHomogeneousTransform,
+          worldTranslation
+        )
+      )
+    }
+    return transforms
   }
 
   private setMapProgramUniforms() {
@@ -578,7 +606,10 @@ export class WebGL2Renderer
     gl.uniform1f(animationProgressLocation, this.animationProgress)
   }
 
-  private setMapProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
+  private setMapProgramMapUniforms(
+    webgl2WarpedMap: WebGL2WarpedMap,
+    projectedGeoToClipTransform: HomogeneousTransform
+  ) {
     if (!this.viewport) {
       return
     }
@@ -589,7 +620,7 @@ export class WebGL2Renderer
 
     // Render Transform
     const renderHomogeneousTransform = multiplyHomogeneousTransform(
-      this.viewport.projectedGeoToClipHomogeneousTransform,
+      projectedGeoToClipTransform,
       webgl2WarpedMap.invertedRenderHomogeneousTransform
     )
     const renderHomogeneousTransformLocation = this.getUniformLocation(
@@ -867,7 +898,10 @@ export class WebGL2Renderer
     gl.uniform1f(animationProgressLocation, this.animationProgress)
   }
 
-  private setLinesProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
+  private setLinesProgramMapUniforms(
+    webgl2WarpedMap: WebGL2WarpedMap,
+    projectedGeoToClipTransform: HomogeneousTransform
+  ) {
     if (!this.viewport) {
       return
     }
@@ -878,7 +912,7 @@ export class WebGL2Renderer
 
     // Render Transform
     const renderHomogeneousTransform = multiplyHomogeneousTransform(
-      this.viewport.projectedGeoToClipHomogeneousTransform,
+      projectedGeoToClipTransform,
       webgl2WarpedMap.invertedRenderHomogeneousTransform
     )
     const renderHomogeneousTransformLocation = this.getUniformLocation(
@@ -919,7 +953,10 @@ export class WebGL2Renderer
     gl.uniform1f(devicePixelRatioLocation, this.viewport.devicePixelRatio)
   }
 
-  private setPointsProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
+  private setPointsProgramMapUniforms(
+    webgl2WarpedMap: WebGL2WarpedMap,
+    projectedGeoToClipTransform: HomogeneousTransform
+  ) {
     if (!this.viewport) {
       return
     }
@@ -930,7 +967,7 @@ export class WebGL2Renderer
 
     // Render Transform
     const renderHomogeneousTransform = multiplyHomogeneousTransform(
-      this.viewport.projectedGeoToClipHomogeneousTransform,
+      projectedGeoToClipTransform,
       webgl2WarpedMap.invertedRenderHomogeneousTransform
     )
     const renderHomogeneousTransformLocation = this.getUniformLocation(

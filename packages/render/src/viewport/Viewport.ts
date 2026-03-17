@@ -46,6 +46,8 @@ import type { Projection } from '@allmaps/project'
 import type { WarpedMap } from '../maps/WarpedMap.js'
 import type { ProjectionOptions, SelectionOptions } from '../shared/types.js'
 
+import { HALF_SIZE } from '../shared/web-mercator.js'
+
 export type ViewportOptions = {
   rotation: number
   devicePixelRatio: number
@@ -103,6 +105,10 @@ const defaultFitOptions = {
  * @property projectedGeoToCanvasHomogeneousTransform - Homogeneous Transform from projected geo coordinates to canvas pixels.
  * @property projectedGeoToClipHomogeneousTransform - Homogeneous Transform from projected geo coordinates to WebGL coordinates in the [-1, 1] range. Equivalent to OpenLayers projectionTransform.
  * @property viewportToClipHomogeneousTransform - Homogeneous Transform from viewport coordinates to WebGL coordinates in the [-1, 1] range.
+ * @property viewportToProjectedGeoHomogeneousTransform - Homogeneous Transform from viewport pixels to projected geospatial coordinates. Inverse of projectedGeoToViewportHomogeneousTransform.
+ * @property startWorld - Index of the first world copy to render, for anti-meridian wrapping (0 = primary world).
+ * @property endWorld - Index past the last world copy to render (exclusive), for anti-meridian wrapping.
+ * @property worldWidth - Width of one world in projected geospatial coordinates. 0 for non-wrapping projections.
  */
 export class Viewport {
   geoCenter: Point
@@ -145,7 +151,12 @@ export class Viewport {
   projectedGeoToClipHomogeneousTransform: HomogeneousTransform = [
     1, 0, 0, 1, 0, 0
   ]
+  viewportToProjectedGeoHomogeneousTransform: HomogeneousTransform = [1, 0, 0, 1, 0, 0]
   viewportToClipHomogeneousTransform: HomogeneousTransform = [1, 0, 0, 1, 0, 0]
+
+  startWorld: number
+  endWorld: number
+  worldWidth: number
 
   /**
    * Creates a new Viewport
@@ -193,14 +204,31 @@ export class Viewport {
     )
     this.projectedGeoResolution = sizeToResolution(this.projectedGeoSize)
 
-    // TODO: improve this with an interpolated back-projection, resulting in a ring
-    this.geoRectangle = this.projectedGeoRectangle.map((point) => {
-      return proj4(
-        this.projection.definition,
-        lonLatProjection.definition,
-        point
+    const canWrapX = typeof this.projection.definition === 'string' &&
+      this.projection.definition.includes('+proj=merc')
+
+    if (canWrapX) {
+      this.worldWidth = 2 * HALF_SIZE
+      this.startWorld = Math.floor(
+        (this.projectedGeoRectangleBbox[0] - (-HALF_SIZE)) / this.worldWidth
       )
-    }) as Rectangle
+      this.endWorld = Math.ceil(
+        (this.projectedGeoRectangleBbox[2] - HALF_SIZE) / this.worldWidth
+      ) + 1
+    } else {
+      this.worldWidth = 0
+      this.startWorld = 0
+      this.endWorld = 1
+    }
+
+    // TODO: improve this with an interpolated back-projection, resulting in a ring
+    const [a, b, c, d] = this.projectedGeoRectangle
+    this.geoRectangle = [
+      this.projectedGeoPointToGeoPoint(a),
+      this.projectedGeoPointToGeoPoint(b),
+      this.projectedGeoPointToGeoPoint(c),
+      this.projectedGeoPointToGeoPoint(d)
+    ]
     this.geoRectangleBbox = computeBbox(this.geoRectangle)
     this.geoCenter = bboxToCenter(this.geoRectangleBbox)
     this.geoSize = bboxToSize(this.geoRectangleBbox)
@@ -222,12 +250,15 @@ export class Viewport {
 
     this.projectedGeoToViewportHomogeneousTransform =
       this.composeProjectedGeoToViewportHomogeneousTransform()
+    this.viewportToProjectedGeoHomogeneousTransform =
+      invertHomogeneousTransform(this.projectedGeoToViewportHomogeneousTransform)
     this.projectedGeoToCanvasHomogeneousTransform =
       this.composeProjectedGeoToCanvasHomogeneousTransform()
     this.projectedGeoToClipHomogeneousTransform =
       this.composeProjectedGeoToClipHomogeneousTransform()
     this.viewportToClipHomogeneousTransform =
       this.composeViewportToClipHomogeneousTransform()
+
   }
 
   /**
@@ -468,25 +499,27 @@ export class Viewport {
   }
 
   getProjectedGeoBufferedRectangle(bufferFraction?: number): Rectangle {
-    const viewportBufferedBbox = bufferBboxByRatio(
-      this.viewportBbox,
-      bufferFraction
-    )
-    const viewportBufferedRectangle = bboxToRectangle(viewportBufferedBbox)
-    return viewportBufferedRectangle.map((point) =>
-      applyHomogeneousTransform(
-        invertHomogeneousTransform(
-          this.projectedGeoToViewportHomogeneousTransform
-        ),
-        point
-      )
-    ) as Rectangle
+    const bufferedBbox = bufferBboxByRatio(this.viewportBbox, bufferFraction ?? 0);
+    const [bl, br, tr, tl] = bboxToRectangle(bufferedBbox);
+
+    const transform = this.viewportToProjectedGeoHomogeneousTransform;
+
+    return [
+      this.wrapProjectedGeoPoint(applyHomogeneousTransform(transform, bl)),
+      this.wrapProjectedGeoPoint(applyHomogeneousTransform(transform, br)),
+      this.wrapProjectedGeoPoint(applyHomogeneousTransform(transform, tr)),
+      this.wrapProjectedGeoPoint(applyHomogeneousTransform(transform, tl)),
+    ];
   }
 
   getGeoBufferedRectangle(bufferFraction?: number): Rectangle {
-    return this.getProjectedGeoBufferedRectangle(bufferFraction).map((point) =>
-      proj4(this.projection.definition, lonLatProjection.definition, point)
-    ) as Rectangle
+    const [a, b, c, d] = this.getProjectedGeoBufferedRectangle(bufferFraction)
+    return [
+      this.projectedGeoPointToGeoPoint(a),
+      this.projectedGeoPointToGeoPoint(b),
+      this.projectedGeoPointToGeoPoint(c),
+      this.projectedGeoPointToGeoPoint(d)
+    ]
   }
 
   private composeProjectedGeoToViewportHomogeneousTransform(): HomogeneousTransform {
@@ -534,6 +567,38 @@ export class Viewport {
       0,
       -this.viewportCenter[0],
       -this.viewportCenter[1]
+    )
+  }
+
+  /**
+   * Wraps a projected geo point's X coordinate into the primary world [-HALF_SIZE, HALF_SIZE].
+   * This ensures proj4 inverse projection produces valid longitude values.
+   *
+   * @param point - A point in projected geospatial coordinates
+   * @returns The point with X coordinate wrapped into [-HALF_SIZE, HALF_SIZE]
+   */
+  private wrapProjectedGeoPoint([x, y]: Point): Point {
+    if (this.worldWidth === 0) {
+      return [x, y]
+    }
+    const distanceFromLeftEdge = x - (-HALF_SIZE)
+    const worldsCrossed = Math.floor(distanceFromLeftEdge / this.worldWidth)
+
+    return [x - worldsCrossed * this.worldWidth, y]
+  }
+
+  /**
+   * Converts a point in projected geospatial coordinates to longitude/latitude coordinates.
+   * The point's X coordinate is first wrapped into the primary world before inverse projection.
+   *
+   * @param point - A point in projected geospatial coordinates.
+   * @returns The point in longitude/latitude coordinates.
+   */
+  private projectedGeoPointToGeoPoint(point: Point): Point {
+    return proj4(
+      this.projection.definition,
+      lonLatProjection.definition,
+      this.wrapProjectedGeoPoint(point)
     )
   }
 
