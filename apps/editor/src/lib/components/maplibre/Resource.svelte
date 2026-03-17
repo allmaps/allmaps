@@ -76,12 +76,12 @@
       ? {
           renderMaskColor: pink,
           renderMaskSize: 6,
-          renderAppliableMask: true,
+          renderMask: true,
           applyMask: false
         }
       : {
           applyMask: false,
-          renderAppliableMask: false
+          renderMask: false
         }
   )
 

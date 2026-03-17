@@ -119,22 +119,22 @@
     </div>
 
     <div class="field">
-      <label for="render-appliable-mask">Render Appliable Mask</label>
-      <input
-        name="render-appliable-mask"
-        id="render-appliable-mask"
-        type="checkbox"
-        bind:checked={options.renderAppliableMask}
-      />
-    </div>
-
-    <div class="field">
       <label for="render-full-mask">Render Full Mask</label>
       <input
         name="render-full-mask"
         id="render-full-mask"
         type="checkbox"
         bind:checked={options.renderFullMask}
+      />
+    </div>
+
+    <div class="field">
+      <label for="render-applied-mask">Render Applied Mask</label>
+      <input
+        name="render-applied-mask"
+        id="render-applied-mask"
+        type="checkbox"
+        bind:checked={options.renderAppliedMask}
       />
     </div>
   </section>

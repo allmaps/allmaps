@@ -82,16 +82,16 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderFullMaskSize?: number
   renderFullMaskBorderColor?: string
   renderFullMaskBorderSize?: number
-  renderAppliableMask: boolean
-  renderAppliableMaskColor?: string
-  renderAppliableMaskSize?: number
-  renderAppliableMaskBorderColor?: string
-  renderAppliableMaskBorderSize?: number
   renderMask: boolean
   renderMaskColor?: string
   renderMaskSize?: number
   renderMaskBorderColor?: string
   renderMaskBorderSize?: number
+  renderAppliedMask: boolean
+  renderAppliedMaskColor?: string
+  renderAppliedMaskSize?: number
+  renderAppliedMaskBorderColor?: string
+  renderAppliedMaskBorderSize?: number
   opacity: number
   saturation: number
   removeColor: boolean

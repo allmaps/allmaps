@@ -129,9 +129,9 @@ export function createWarpedMapFactory<W extends WarpedMap>() {
  * @param resourceFullMask - Resource full mask (describing the entire extent of the image)
  * @param resourceFullMaskBbox - Bbox of the resource full mask
  * @param resourceFullMaskRectangle - Rectangle of the resource full mask bbox
- * @param resourceAppliableMask - Resource appliable mask. In case 'applyMask' is true, the resourceMask and the resourceAppliableMask are the same. In case 'applyMask' is false, the resourceMask is set to the resourceFullMask, but first a copy of the resourceMask is kept as the resourceAppliableMask.
- * @param resourceAppliableMaskBbox - Bbox of the resourceAppliableMask
- * @param resourceAppliableMaskRectangle - Rectangle of the resourceAppliableMaskBbox
+ * @param resourceAppliedMask - Resource applied mask. In case 'applyMask' is true, this is the resourceMask. In case 'applyMask' is false, this is the resourceFullMask.
+ * @param resourceAppliedMaskBbox - Bbox of the resourceAppliedMask
+ * @param resourceAppliedMaskRectangle - Rectangle of the resourceAppliedMaskBbox
  * @param resourceMask - Resource mask
  * @param resourceMaskBbox - Bbox of the resourceMask
  * @param resourceMaskRectangle - Rectangle of the resourceMaskBbox
@@ -142,24 +142,24 @@ export function createWarpedMapFactory<W extends WarpedMap>() {
  * @param projection - Projection of the projected geospatial coordinates space
  * @param projectedTransformer - Transformer used for warping this map from resource coordinates to projected geospatial coordinates
  * @param projectedPreviousTransformer - Previous transformer used for warping this map from resource coordinates to projected geospatial coordinates
- * @param geoFullMask - resourceAppliableMask in geospatial coordinates
+ * @param geoFullMask - resourceMask in geospatial coordinates
  * @param geoFullMaskBbox - Bbox of the geoFullMask
  * @param geoFullMaskRectangle - resourceFullMaskRectangle in geospatial coordinates
- * @param geoAppliableMask - resourceAppliableMask in geospatial coordinates
- * @param geoAppliableMaskBbox - Bbox of the geoFullMask
- * @param geoAppliableMaskRectangle - resourceAppliableMaskRectangle in geospatial coordinates
  * @param geoMask - resourceMask in geospatial coordinates
  * @param geoMaskBbox - Bbox of the geoMask
  * @param geoMaskRectangle - resourceMaskRectangle in geospatial coordinates
+ * @param geoAppliedMask - resourceAppliedMask in geospatial coordinates
+ * @param geoAppliedMaskBbox - Bbox of the geoFullMask
+ * @param geoAppliedMaskRectangle - resourceAppliedMaskRectangle in geospatial coordinates
  * @param projectedGeoFullMask - resourceFullMask in projected geospatial coordinates
  * @param projectedGeoFullMaskBbox - Bbox of the projectedGeoFullMask
  * @param projectedGeoFullMaskRectangle - resourceFullMaskRectangle in projected geospatial coordinates
- * @param projectedGeoAppliableMask - resourceAppliableMask in projected geospatial coordinates
- * @param projectedGeoAppliableMaskBbox - Bbox of the projectedGeoAppliableMask
- * @param projectedGeoAppliableMaskRectangle - resourceAppliableMaskRectangle in projected geospatial coordinates
  * @param projectedGeoMask - resourceMask in projected geospatial coordinates
  * @param projectedGeoMaskBbox - Bbox of the projectedGeoMask
  * @param projectedGeoMaskRectangle - resourceMaskRectanglee in projected geospatial coordinates
+ * @param projectedGeoAppliedMask - resourceAppliedMask in projected geospatial coordinates
+ * @param projectedGeoAppliedMaskBbox - Bbox of the projectedGeoAppliedMask
+ * @param projectedGeoAppliedMaskRectangle - resourceAppliedMaskRectangle in projected geospatial coordinates
  * @param resourceToProjectedGeoScale - Scale of the warped map, in resource pixels per projected geospatial coordinates
  * @param distortionMeasure - Distortion measure displayed for this map
  * @param previousDistortionMeasure - Previous distortion measure displayed for this map
@@ -211,12 +211,12 @@ export class WarpedMap extends EventTarget {
   resourceFullMask!: Ring
   resourceFullMaskBbox!: Bbox
   resourceFullMaskRectangle!: Rectangle
-  resourceAppliableMask!: Ring
-  resourceAppliableMaskBbox!: Bbox
-  resourceAppliableMaskRectangle!: Rectangle
   resourceMask!: Ring
   resourceMaskBbox!: Bbox
   resourceMaskRectangle!: Rectangle
+  resourceAppliedMask!: Ring
+  resourceAppliedMaskBbox!: Bbox
+  resourceAppliedMaskRectangle!: Rectangle
 
   transformationType!: TransformationType
   previousTransformationType!: TransformationType
@@ -239,22 +239,22 @@ export class WarpedMap extends EventTarget {
   geoFullMask!: Ring
   geoFullMaskBbox!: Bbox
   geoFullMaskRectangle!: Rectangle
-  geoAppliableMask!: Ring
-  geoAppliableMaskBbox!: Bbox
-  geoAppliableMaskRectangle!: Rectangle
   geoMask!: Ring
   geoMaskBbox!: Bbox
   geoMaskRectangle!: Rectangle
+  geoAppliedMask!: Ring
+  geoAppliedMaskBbox!: Bbox
+  geoAppliedMaskRectangle!: Rectangle
 
   projectedGeoFullMask!: Ring
   projectedGeoFullMaskBbox!: Bbox
   projectedGeoFullMaskRectangle!: Rectangle
-  projectedGeoAppliableMask!: Ring
-  projectedGeoAppliableMaskBbox!: Bbox
-  projectedGeoAppliableMaskRectangle!: Rectangle
   projectedGeoMask!: Ring
   projectedGeoMaskBbox!: Bbox
   projectedGeoMaskRectangle!: Rectangle
+  projectedGeoAppliedMask!: Ring
+  projectedGeoAppliedMaskBbox!: Bbox
+  projectedGeoAppliedMaskRectangle!: Rectangle
 
   resourceToProjectedGeoScale!: number
 
@@ -522,9 +522,9 @@ export class WarpedMap extends EventTarget {
       this.gcps = this.options.gcps
 
       this.resourceFullMask = this.getResourceFullMask()
-      this.resourceAppliableMask = this.georeferencedMap.resourceMask
-      this.resourceMask = this.applyMask
-        ? this.resourceAppliableMask
+      this.resourceMask = this.georeferencedMap.resourceMask
+      this.resourceAppliedMask = this.applyMask
+        ? this.resourceMask
         : this.resourceFullMask
       this.updateResourceMaskProperties()
 
@@ -550,14 +550,14 @@ export class WarpedMap extends EventTarget {
         this.applyMask = this.options.applyMask
         this.applyMaskOpacity = this.applyMask ? 0 : 1
         const resourceFullMask = this.getResourceFullMask()
-        const resourceAppliableMask = this.options.resourceMask
-        const resourceMask = this.applyMask
-          ? resourceAppliableMask
+        const resourceMask = this.options.resourceMask
+        const resourceAppliedMask = this.applyMask
+          ? resourceMask
           : resourceFullMask
         this.setResourceMask(
           resourceFullMask,
-          resourceAppliableMask,
-          resourceMask
+          resourceMask,
+          resourceAppliedMask
         )
       }
 
@@ -615,12 +615,12 @@ export class WarpedMap extends EventTarget {
    */
   protected setResourceMask(
     resourceFullMask: Ring,
-    resourceAppliableMask: Ring,
-    resourceMask: Ring
+    resourceMask: Ring,
+    resourceAppliedMask: Ring
   ): void {
     this.resourceFullMask = resourceFullMask
-    this.resourceAppliableMask = resourceAppliableMask
     this.resourceMask = resourceMask
+    this.resourceAppliedMask = resourceAppliedMask
     this.updateResourceMaskProperties()
     this.updateGeoMaskProperties()
     this.updateProjectedGeoMaskProperties()
@@ -876,12 +876,12 @@ export class WarpedMap extends EventTarget {
   private updateResourceMaskProperties() {
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
-    this.resourceAppliableMaskBbox = computeBbox(this.resourceAppliableMask)
-    this.resourceAppliableMaskRectangle = bboxToRectangle(
-      this.resourceAppliableMaskBbox
-    )
     this.resourceMaskBbox = computeBbox(this.resourceMask)
     this.resourceMaskRectangle = bboxToRectangle(this.resourceMaskBbox)
+    this.resourceAppliedMaskBbox = computeBbox(this.resourceAppliedMask)
+    this.resourceAppliedMaskRectangle = bboxToRectangle(
+      this.resourceAppliedMaskBbox
+    )
   }
 
   private getResourceFullMask() {
@@ -899,14 +899,14 @@ export class WarpedMap extends EventTarget {
 
   private updateGeoMaskProperties() {
     this.updateFullGeoMask()
-    this.updateAppliableGeoMask()
     this.updateGeoMask()
+    this.updateAppliedGeoMask()
   }
 
   private updateProjectedGeoMaskProperties() {
     this.updateProjectedFullGeoMask()
-    this.updateProjectedAppliableGeoMask()
     this.updateProjectedGeoMask()
+    this.updateProjectedAppliedGeoMask()
     this.updateResourceToProjectedGeoScale()
   }
 
@@ -938,13 +938,13 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  private updateAppliableGeoMask(): void {
-    this.geoAppliableMask = this.projectedTransformer.transformToGeo([
-      this.resourceAppliableMask
+  private updateAppliedGeoMask(): void {
+    this.geoAppliedMask = this.projectedTransformer.transformToGeo([
+      this.resourceAppliedMask
     ])[0]
-    this.geoAppliableMaskBbox = computeBbox(this.geoAppliableMask)
-    this.geoAppliableMaskRectangle = this.projectedTransformer.transformToGeo(
-      [this.resourceAppliableMaskRectangle],
+    this.geoAppliedMaskBbox = computeBbox(this.geoAppliedMask)
+    this.geoAppliedMaskRectangle = this.projectedTransformer.transformToGeo(
+      [this.resourceAppliedMaskRectangle],
       { maxDepth: 0 }
     )[0] as Rectangle
   }
@@ -973,17 +973,15 @@ export class WarpedMap extends EventTarget {
       )[0] as Rectangle
   }
 
-  private updateProjectedAppliableGeoMask(): void {
-    this.projectedGeoAppliableMask =
+  private updateProjectedAppliedGeoMask(): void {
+    this.projectedGeoAppliedMask =
       this.projectedTransformer.transformToProjectedGeo([
-        this.resourceAppliableMask
+        this.resourceAppliedMask
       ])[0]
-    this.projectedGeoAppliableMaskBbox = computeBbox(
-      this.projectedGeoAppliableMask
-    )
-    this.projectedGeoAppliableMaskRectangle =
+    this.projectedGeoAppliedMaskBbox = computeBbox(this.projectedGeoAppliedMask)
+    this.projectedGeoAppliedMaskRectangle =
       this.projectedTransformer.transformToProjectedGeo(
-        [this.resourceAppliableMaskRectangle],
+        [this.resourceAppliedMaskRectangle],
         { maxDepth: 0 }
       )[0] as Rectangle
   }

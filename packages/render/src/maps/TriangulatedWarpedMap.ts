@@ -71,10 +71,10 @@ type GcpTriangulation = {
  * @param previousTrianglePointsDistortion - The trianglePointsDistortion of the previous transformation type, used during transformation transitions
  * @param trianglePointsDistortion - Distortion amount of the distortionMeasure at the projectedGeoTrianglePoints
  * @param projectedGeoPreviousTriangulationFullMask - The resource full mask refined by the previous triangulation, in projected geospatial coordinates
- * @param projectedGeoPreviousTriangulationAppliableMask - The resource appliable mask refined by the previous triangulation, in projected geospatial coordinates
- * @param projectedGeoTriangulationAppliableMask - The resource appliable mask refined by the triangulation, in projected geospatial coordinates
  * @param projectedGeoPreviousTriangulationMask - The resource mask refined by the previous triangulation, in projected geospatial coordinates
  * @param projectedGeoTriangulationMask - The resource mask refined by the triangulation, in projected geospatial coordinates
+ * @param projectedGeoPreviousTriangulationAppliedMask - The resource applied mask refined by the previous triangulation, in projected geospatial coordinates
+ * @param projectedGeoTriangulationAppliedMask - The resource applied mask refined by the triangulation, in projected geospatial coordinates
  */
 export class TriangulatedWarpedMap extends WarpedMap {
   declare mapOptions: Partial<TriangulatedWarpedMapOptions>
@@ -116,11 +116,11 @@ export class TriangulatedWarpedMap extends WarpedMap {
   projectedGeoPreviousTriangulationFullMask: Ring = []
   projectedGeoTriangulationFullMask: Ring = []
 
-  projectedGeoPreviousTriangulationAppliableMask: Ring = []
-  projectedGeoTriangulationAppliableMask: Ring = []
-
   projectedGeoPreviousTriangulationMask: Ring = []
   projectedGeoTriangulationMask: Ring = []
+
+  projectedGeoPreviousTriangulationAppliedMask: Ring = []
+  projectedGeoTriangulationAppliedMask: Ring = []
 
   /**
    * Creates an instance of a TriangulatedWarpedMap.
@@ -221,10 +221,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
    */
   protected setResourceMask(
     resourceFullMask: Ring,
-    resourceAppliableMask: Ring,
-    resourceMask: Ring
+    resourceMask: Ring,
+    resourceAppliedMask: Ring
   ): void {
-    super.setResourceMask(resourceFullMask, resourceAppliableMask, resourceMask)
+    super.setResourceMask(resourceFullMask, resourceMask, resourceAppliedMask)
     this.updateTriangulation()
   }
 
@@ -272,10 +272,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
     this.projectedGeoPreviousTriangulationFullMask =
       this.projectedGeoTriangulationFullMask
-    this.projectedGeoPreviousTriangulationAppliableMask =
-      this.projectedGeoTriangulationAppliableMask
     this.projectedGeoPreviousTriangulationMask =
       this.projectedGeoTriangulationMask
+    this.projectedGeoPreviousTriangulationAppliedMask =
+      this.projectedGeoTriangulationAppliedMask
   }
 
   /**
@@ -347,14 +347,14 @@ export class TriangulatedWarpedMap extends WarpedMap {
       this.projectedGeoPreviousTriangulationFullMask,
       t
     )
-    this.projectedGeoPreviousTriangulationAppliableMask = mixLineStrings(
-      this.projectedGeoTriangulationAppliableMask,
-      this.projectedGeoPreviousTriangulationAppliableMask,
-      t
-    )
     this.projectedGeoPreviousTriangulationMask = mixLineStrings(
       this.projectedGeoTriangulationMask,
       this.projectedGeoPreviousTriangulationMask,
+      t
+    )
+    this.projectedGeoPreviousTriangulationAppliedMask = mixLineStrings(
+      this.projectedGeoTriangulationAppliedMask,
+      this.projectedGeoPreviousTriangulationAppliedMask,
       t
     )
   }
@@ -405,7 +405,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.projectedGcpTriangulation = getPropertyFromQuintupleCacheOrComputation(
       this.projectedGcpTriangulationCache,
       this.resourceResolution,
-      String(this.resourceAppliableMask),
+      String(this.resourceMask),
       this.transformationType,
       this.internalProjection.definition,
       String(this.options.distortionMeasures),
@@ -419,25 +419,25 @@ export class TriangulatedWarpedMap extends WarpedMap {
         } = getPropertyFromDoubleCacheOrComputation(
           this.resourceTriangulationCache,
           this.resourceResolution,
-          String(this.resourceAppliableMask),
+          String(this.resourceMask),
           () =>
             triangulateToUnique(
               bboxToPolygon(
                 combineBboxes(
                   computeBbox(this.resourceFullMask),
-                  bufferBbox(computeBbox(this.resourceAppliableMask), 1)
-                  // Buffer appliable mask before combining bboxes
-                  // such that triangulated polygon (full mask + appliable mask)
-                  // and steiner polygons (appliable mask)
+                  bufferBbox(computeBbox(this.resourceMask), 1)
+                  // Buffer mask before combining bboxes
+                  // such that triangulated polygon (full mask + mask)
+                  // and steiner polygons (mask)
                   // dont have touching edges, which hinders constraining triangulation
-                  // This could make trianguation way too big if appliable mask >> full mask
+                  // This could make trianguation way too big if mask >> full mask
                   // In that case, consider clipping applyable mask.
                 )!
               ),
               this.resourceResolution,
               {
                 steinerPoints: this.gcps.map((gcp) => gcp.resource),
-                steinerPolygons: [[this.resourceAppliableMask]],
+                steinerPolygons: [[this.resourceMask]],
                 computeInsideSteinerPolygons: true
               }
             )
@@ -481,7 +481,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
         getPropertyFromQuintupleCacheOrComputation(
           this.projectedGcpTriangulationCache,
           this.previousResourceResolution,
-          String(this.resourceAppliableMask),
+          String(this.resourceMask),
           this.previousTransformationType,
           this.previousInternalProjection.definition,
           String(this.options.distortionMeasures),
@@ -570,7 +570,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     // To prevent noticable slivers between both,
     // we compute a triangulation-refined full mask in projected geo space
     // from the full resource mask as refined by/during the triangulation.
-    // We do the same for the appliable resource mask (and resource mask).
+    // We do the same for the resource mask (and resource mask).
     // This way we obtain a mask that exactly matches the triangulation.
     this.projectedGeoPreviousTriangulationFullMask =
       this.projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedPolygon
@@ -586,7 +586,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
           typedRing.map((i) => projectedGcpTriangulation.gcpUniquePoints[i].geo)
         )
         .flat()
-    this.projectedGeoPreviousTriangulationAppliableMask =
+    this.projectedGeoPreviousTriangulationMask =
       this.projectedGcpPreviousTriangulation.uniquePointIndexInterpolatedSteinerPolygons[0]
         .map((typedRing) =>
           typedRing.map(
@@ -594,18 +594,18 @@ export class TriangulatedWarpedMap extends WarpedMap {
           )
         )
         .flat()
-    this.projectedGeoTriangulationAppliableMask =
+    this.projectedGeoTriangulationMask =
       this.projectedGcpTriangulation.uniquePointIndexInterpolatedSteinerPolygons[0]
         .map((typedRing) =>
           typedRing.map((i) => projectedGcpTriangulation.gcpUniquePoints[i].geo)
         )
         .flat()
-    // For the resource mask, this can be derived
-    this.projectedGeoPreviousTriangulationMask = this.applyMask
-      ? this.projectedGeoPreviousTriangulationAppliableMask
+    // For the applied resource mask, this can be derived
+    this.projectedGeoPreviousTriangulationAppliedMask = this.applyMask
+      ? this.projectedGeoPreviousTriangulationMask
       : this.projectedGeoPreviousTriangulationFullMask
-    this.projectedGeoTriangulationMask = this.applyMask
-      ? this.projectedGeoTriangulationAppliableMask
+    this.projectedGeoTriangulationAppliedMask = this.applyMask
+      ? this.projectedGeoTriangulationMask
       : this.projectedGeoTriangulationFullMask
 
     this.updateTrianglePointsDistortion()
