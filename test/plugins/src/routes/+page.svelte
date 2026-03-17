@@ -4,6 +4,11 @@
 
     <ul class="list-disc pl-5">
       <li>
+        <a href="./leaflet" class="text-blue-600 underline hover:text-blue-800"
+          >Leaflet</a
+        >
+      </li>
+      <li>
         <a href="./maplibre" class="text-blue-600 underline hover:text-blue-800"
           >Maplibre</a
         >

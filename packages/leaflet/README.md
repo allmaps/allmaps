@@ -116,7 +116,9 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map)
 const warpedMapLayer = new WarpedMapLayer(undefined, { warpedMapList }).addTo(map)
-map.fitBounds([ [ bbox[0], bbox[1] ], [ bbox[2], bbox[3] ] ])
+if (bbox) {
+  map.fitBounds([ [ bbox[0], bbox[1] ], [ bbox[2], bbox[3] ] ])
+}
 ```
 
 Note that the `...ByUrl()` functions are not available on a WarpedMapList.

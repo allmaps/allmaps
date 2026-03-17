@@ -64,10 +64,10 @@ const warpedMapLayer = new WarpedMapLayer()
 
 map.addLayer(warpedMapLayer)
 warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl).then(() => {
-  const extent = warpedMapLayer
+  const bbox = warpedMapLayer
     .getBbox({ projection: { definition: 'EPSG:3857' } })
-  if (extent) {
-    map.getView().fit(extent)
+  if (bbox) {
+    map.getView().fit(bbox)
   }
 })
 ```
@@ -175,18 +175,18 @@ register(proj4)
 warpedMapLayer.registerProjections([ myProjection ])
 ```
 
-Then, create a new view with that projection and set the extent, computed using the current projection:
+Then, create a new view with that projection and set the bbox, computed using the current projection:
 
 ```js
-const extent = warpedMapLayer
+const bbox = warpedMapLayer
   .getBbox({ projection: myProjection })
-if (extent) {
+if (bbox) {
   map.setView(
     new View({
       projection: myProjection.id
     })
   )
-  map.getView().fit(extent)
+  map.getView().fit(bbox)
 }
 ```
 

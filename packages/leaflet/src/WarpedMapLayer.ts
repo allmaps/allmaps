@@ -160,7 +160,7 @@ export class WarpedMapLayer
    * Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
    * @returns - L.LatLngBounds in array form of all visible maps
    */
-  getBounds(): number[][] | undefined {
+  getBounds(): [Point, Point] | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const bbox = this.renderer.warpedMapList.getMapsBbox()
