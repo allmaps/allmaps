@@ -819,7 +819,7 @@ There are no parameters.
 
 `[Array<number>, Array<number>]`.
 
-### `BasePolynomialTransformation#getWeights()`
+### `BasePolynomialTransformation#getTransformationDataAsFloat64Array()`
 
 ###### Parameters
 
@@ -995,7 +995,7 @@ There are no parameters.
 
 `Partial<HelmertMeasures> | Partial<Polynomial1Measures>`.
 
-### `BaseTransformation#getWeights()`
+### `BaseTransformation#getTransformationDataAsFloat64Array()`
 
 Get transformation weights in a format suitable for WASM rendering.
 This provides a standardized way to extract internal transformation parameters
@@ -1686,7 +1686,7 @@ Get two 1x4 coefsArrays, populating the 2Nx4 coefsArrayMatrices
 
 `[Array<number>, Array<number>]`.
 
-### `Helmert#getWeights()`
+### `Helmert#getTransformationDataAsFloat64Array()`
 
 ###### Parameters
 
@@ -2051,7 +2051,7 @@ Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
 
 `[number, number]`.
 
-### `Projective#getWeights()`
+### `Projective#getTransformationDataAsFloat64Array()`
 
 ###### Parameters
 
@@ -2228,7 +2228,7 @@ The coefsArray has a 1xN kernel part and a 1x3 affine part.
 
 `Array<number>`.
 
-### `RBF#getWeights()`
+### `RBF#getTransformationDataAsFloat64Array()`
 
 ###### Parameters
 
@@ -2385,7 +2385,7 @@ SplitGcpLineInfo & {
 
 `[number, number]`.
 
-### `Straight#getWeights()`
+### `Straight#getTransformationDataAsFloat64Array()`
 
 ###### Parameters
 

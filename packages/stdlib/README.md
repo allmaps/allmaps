@@ -192,7 +192,7 @@ MIT
 
 * `bbox` (`[number, number, number, number]`)
 * `dist0` (`number`)
-* `dist1` (`number`)
+* `dist1?` (`number | undefined`)
 
 ###### Returns
 
@@ -1496,11 +1496,11 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 ###### Parameters
 
 * `object` (`T`)
-* `keys` (`Array<string>`)
+* `keys` (`Array<K>`)
 
 ###### Returns
 
-`{[P in keyof T]?: T[P] | undefined}`.
+`{[P in Exclude<keyof T, K>]: T[P]}`.
 
 ### `optionKeysByMapIdToUndefinedOptionsByMapId(optionKeysByMapId)`
 
@@ -1655,6 +1655,19 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 `number`.
 
+### `removeUndefinedOptions(optionsArray)`
+
+###### Parameters
+
+* `optionsArray` (`U[0]`)
+
+###### Returns
+
+`{   [P in keyof {[K in keyof U[number]]: Exclude<U[number][K], undefined>}]?:
+    | {[K in keyof U[number]]: Exclude<U[number][K], undefined>}[P]
+    | undefined
+}`.
+
 ### `rgbToHex(color)`
 
 Convert RBG to HEX
@@ -1772,11 +1785,12 @@ HEX string, e (`string`).g. '#0033ffff'
 
 `Array<Array<T>>`.
 
-### `sizeToBbox(size)`
+### `sizeToBbox(size, center)`
 
 ###### Parameters
 
 * `size` (`[number, number]`)
+* `center?` (`Point | undefined`)
 
 ###### Returns
 
@@ -1792,11 +1806,12 @@ HEX string, e (`string`).g. '#0033ffff'
 
 `[number, number]`.
 
-### `sizeToRectangle(size)`
+### `sizeToRectangle(size, center)`
 
 ###### Parameters
 
 * `size` (`[number, number]`)
+* `center?` (`Point | undefined`)
 
 ###### Returns
 

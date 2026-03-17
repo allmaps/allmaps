@@ -659,6 +659,7 @@ Note that `+over` was added to support wrapping around the antimeridian
 ###### Fields
 
 * `definition` (`string`)
+* `id` (`string`)
 * `name` (`string`)
 
 ### `projectionDefinitionToAntialiasedDefinition(stringProjectionDefinition, partialProjectionDefinitionOptions)`
@@ -694,4 +695,5 @@ Note that `+over` was added to support wrapping around the antimeridian
 ###### Fields
 
 * `definition` (`string`)
+* `id` (`string`)
 * `name` (`string`)

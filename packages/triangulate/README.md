@@ -71,67 +71,6 @@ MIT
 
 ## API
 
-### `TriangluationOptions`
-
-###### Fields
-
-* `minimumTriangleAngle` (`number`)
-* `steinerPoints` (`Array<Point>`)
-
-### `TriangulationToUnique`
-
-###### Fields
-
-* `gridPoints` (`Array<Point>`)
-* `gridPointsInPolygon` (`Array<Point>`)
-* `interpolatedPolygon` (`Array<Array<Point>>`)
-* `interpolatedPolygonPoints` (`Array<Point>`)
-* `triangles` (`Array<Triangle>`)
-* `uniquePointIndexEdges` (`Array<TypedLine<number>>`)
-* `uniquePointIndexInterpolatedPolygon` (`Array<Array<number>>`)
-* `uniquePointIndexTriangles` (`Array<TypedTriangle<number>>`)
-* `uniquePoints` (`Array<Point>`)
-
-### `triangulate(polygon, distance, triangulationOptions)`
-
-Triangulate a polygon to triangles smaller then a distance
-
-Grid points are placed inside the polygon to obtain small, well conditioned triangles.
-
-###### Parameters
-
-* `polygon` (`Array<Array<Point>>`)
-  * Polygon
-* `distance?` (`number | undefined`)
-  * Distance that conditions the triangles
-* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
-  * Triangulation Options.
-
-###### Returns
-
-Array of triangles partitioning the polygon (`Array<Triangle>`).
-
-### `triangulateToUnique(polygon, distance, triangulationOptions)`
-
-Triangulate a polygon to triangles smaller then a distance, and return them via unique points.
-
-Grid points are placed inside the polygon to obtain small, well conditioned triangles.
-
-This function returns the triangulation as an array of unique points, and triangles of indices refering to those unique points.
-
-###### Parameters
-
-* `polygon` (`Array<Array<Point>>`)
-  * Polygon
-* `distance?` (`number | undefined`)
-  * Distance that conditions the triangles
-* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
-  * Triangulation Options.
-
-###### Returns
-
-Triangulation Object with uniquePointIndexTriangles and uniquePoints (`{ interpolatedPolygon: Polygon; interpolatedPolygonPoints: Point[]; gridPoints: Point[]; gridPointsInPolygon: Point[]; uniquePoints: Point[]; triangles: Triangle[]; uniquePointIndexTriangles: TypedTriangle<number>[]; uniquePointIndexInterpolatedPolygon: TypedPolygon<number>; uniquePointIndexEdges: TypedLine<number>[...`).
-
 ## Notes
 
 ### Stability

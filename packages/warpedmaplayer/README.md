@@ -333,7 +333,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -349,7 +349,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -365,7 +365,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -483,7 +483,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -501,7 +501,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -519,7 +519,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
