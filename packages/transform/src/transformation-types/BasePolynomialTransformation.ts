@@ -83,7 +83,10 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
     )
   }
 
-  getWeights(): { weights: Float64Array; sourcePoints: Float64Array } {
+  getTransformationDataAsFloat64Array(): {
+    weights: Float64Array
+    sourcePoints: Float64Array
+  } {
     if (!this.weightsArrays) {
       this.solve()
     }

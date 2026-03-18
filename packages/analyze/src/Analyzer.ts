@@ -35,7 +35,7 @@ import type {
   WarningCode,
   ErrorCode
 } from './shared/types'
-import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import { ProjectedGcpTransformer } from '@allmaps/project'
 
 // Note: construction errors and failures to get info, warning or errors are always reported
 const DEFAULT_INFO_CODES: InfoCode[] = [
@@ -427,7 +427,7 @@ export class Analyzer {
           modelFunction: (projectedTransformer) => (geoPoint) =>
             (
               projectedTransformer as unknown as ProjectedGcpTransformer
-            ).transformToGeo(geoPoint, { projection: lonLatProjection }),
+            ).transformToGeo(geoPoint),
           seed: 0, // Note: setting the seed to make the algorithm deterministic
           stopProbabilty: options.ransacStopProbabilty,
           maxNbIterations: options.ransacMaxNbIterations

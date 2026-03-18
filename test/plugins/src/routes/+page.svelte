@@ -1,50 +1,24 @@
-<script lang="ts">
-  import { onMount } from 'svelte'
+<main class="container mx-auto p-4 space-y-8">
+  <section>
+    <h1 class="text-xl font-bold mb-4">Allmaps plugins</h1>
 
-  import { Map as MapLibreMap, addProtocol } from 'maplibre-gl'
-  import { Protocol } from 'pmtiles'
-
-  import { WarpedMapLayer } from '@allmaps/maplibre'
-
-  import { basemapStyle } from '@allmaps/basemap'
-
-  let container: HTMLElement
-
-  let map: MapLibreMap
-  let warpedMapLayer: WarpedMapLayer
-
-  const annotationUrl =
-    'https://pages.allmaps.org/sprite-test/a5912d5d11a3ef64/128/thumbnail-sprites-annotation.json'
-
-  onMount(() => {
-    const protocol = new Protocol()
-    addProtocol('pmtiles', protocol.tile)
-
-    map = new MapLibreMap({
-      container,
-      // @ts-expect-error MapLibre types are incompatible
-      style: basemapStyle('en'),
-      center: [14.2437, 40.8384],
-      zoom: 7,
-      maxPitch: 0,
-      hash: true,
-      attributionControl: false,
-      canvasContextAttributes: {
-        preserveDrawingBuffer: true
-      }
-    })
-
-    map.once('load', () => {
-      warpedMapLayer = new WarpedMapLayer()
-
-      // @ts-expect-error MapLibre types are incompatible
-      map.addLayer(warpedMapLayer)
-
-      warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
-    })
-  })
-</script>
-
-<main class="grid grid-cols-1 h-dvh">
-  <div bind:this={container}></div>
+    <ul class="list-disc pl-5">
+      <li>
+        <a href="./leaflet" class="text-blue-600 underline hover:text-blue-800"
+          >Leaflet</a
+        >
+      </li>
+      <li>
+        <a href="./maplibre" class="text-blue-600 underline hover:text-blue-800"
+          >Maplibre</a
+        >
+      </li>
+      <li>
+        <a
+          href="./openlayers"
+          class="text-blue-600 underline hover:text-blue-800">OpenLayers</a
+        >
+      </li>
+    </ul>
+  </section>
 </main>

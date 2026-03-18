@@ -1,5 +1,4 @@
 import {
-  lonLatProjection,
   ProjectedGcpTransformer,
   projectionToAntialiasedProjection
 } from '@allmaps/project'
@@ -124,7 +123,6 @@ export async function generateGeoreferencedMapGdalwarpScripts(
   const geoMask = mergedOptions.projectedTransformer.transformToGeo(
     map.resourceMask,
     {
-      projection: lonLatProjection,
       maxDepth: 6
     }
   )
@@ -137,7 +135,7 @@ export async function generateGeoreferencedMapGdalwarpScripts(
   const resourceMaskBbox = computeBbox(map.resourceMask)
   const resourceMaskRectangle = bboxToRectangle(resourceMaskBbox)
   const projectedGeoMaskRectangle =
-    mergedOptions.projectedTransformer.transformToGeo(
+    mergedOptions.projectedTransformer.transformToProjectedGeo(
       resourceMaskRectangle
     ) as Rectangle
   const resourceToProjectedGeoScale = rectanglesToScale(
@@ -145,9 +143,8 @@ export async function generateGeoreferencedMapGdalwarpScripts(
     projectedGeoMaskRectangle
   )
 
-  const projectedGeoMask = mergedOptions.projectedTransformer.transformToGeo(
-    map.resourceMask
-  )
+  const projectedGeoMask =
+    mergedOptions.projectedTransformer.transformToProjectedGeo(map.resourceMask)
 
   const projectedGeoMaskBboxSize: Size = bboxToSize(
     computeBbox(projectedGeoMask)

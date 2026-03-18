@@ -48,7 +48,9 @@ import type {
   SpecificWebGL2WarpedMapOptions,
   WebGL2WarpedMapOptions,
   WarpedMapListOptions,
-  AnimationOptionsInternal
+  AnimationInternalOptions,
+  ShouldRenderOptions,
+  WebGL2WarpedMapWithoutGeoreferencedMapOptions
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 
@@ -66,7 +68,7 @@ const DEFAULT_RENDER_LINE_GROUP_OPTIONS = {
 }
 
 const DEFAULT_RENDER_POINT_GROUP_OPTION = {
-  viewportSize: 16,
+  viewportSize: 10,
   color: black,
   viewportBorderSize: 1,
   borderColor: white
@@ -79,17 +81,17 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     renderTransformedGcps: false,
     renderTransformedGcpsColor: pink,
     renderVectors: false,
-    renderVectorsSize: 6,
+    renderVectorsSize: 4,
     renderVectorsColor: black,
     renderFullMask: false,
-    renderFullMaskSize: 8,
+    renderFullMaskSize: 4,
     renderFullMaskColor: green,
-    renderAppliableMask: false,
-    renderAppliableMaskSize: 8,
-    renderAppliableMaskColor: pink,
     renderMask: false,
-    renderMaskSize: 8,
+    renderMaskSize: 4,
     renderMaskColor: pink,
+    renderAppliedMask: false,
+    renderAppliedMaskSize: 4,
+    renderAppliedMaskColor: pink,
     opacity: 1,
     saturation: 1,
     removeColor: false,
@@ -110,6 +112,10 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     debugTriangulation: false
   }
 
+const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
+  checkOpacity: true
+}
+
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
@@ -122,7 +128,7 @@ export function createWebGL2WarpedMapFactory(
   return (
     mapId: string,
     georeferencedMap: GeoreferencedMap,
-    listOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
   ) =>
     new WebGL2WarpedMap(
@@ -203,10 +209,15 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     mapProgram: WebGLProgram,
     linesProgram: WebGLProgram,
     pointsProgram: WebGLProgram,
-    listOptions?: Partial<WarpedMapListOptions>,
+    listOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
   ) {
-    super(mapId, georeferencedMap, listOptions, mapOptions)
+    super(
+      mapId,
+      georeferencedMap,
+      listOptions as Partial<WarpedMapListOptions<TriangulatedWarpedMap>>,
+      mapOptions
+    )
 
     this.cachedTilesByTileKey = new Map()
     this.cachedTilesByTileUrl = new Map()
@@ -253,6 +264,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
+   * Get default options without the options overwritten by the georeferenced map
+   */
+  static getDefaultWithoutGeoreferencedMapOptions(): WebGL2WarpedMapWithoutGeoreferencedMapOptions {
+    return mergeOptions(
+      DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS,
+      super.getDefaultWithoutGeoreferencedMapOptions()
+    )
+  }
+
+  /**
    * Set the map-specific options (and the list options)
    *
    * @param mapOptions - Map-specific options
@@ -262,7 +283,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   setMapOptions(
     mapOptions?: Partial<WebGL2WarpedMapOptions>,
     listOptions?: Partial<WebGL2WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationOptionsInternal>
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
     return super.setMapOptions(mapOptions, listOptions, animationOptions)
   }
@@ -300,11 +321,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return changedOptions
   }
 
-  shouldRenderMap(): boolean {
+  shouldRenderMap(partialOptions?: Partial<ShouldRenderOptions>): boolean {
+    const options = mergeOptions(DEFAULT_SHOULD_RENDER_OPTIONS, partialOptions)
     return (
-      super.shouldRenderMap() &&
+      super.shouldRenderMap(partialOptions) &&
       this.options.renderMaps !== false &&
-      this.options.opacity !== 0
+      (options.checkOpacity ? this.options.opacity !== 0 : true)
     )
   }
 
@@ -313,8 +335,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       super.shouldRenderLines() &&
       this.options.renderLines !== false &&
       (this.options.renderFullMask ||
-        this.options.renderAppliableMask ||
         this.options.renderMask ||
+        this.options.renderAppliedMask ||
         this.options.renderVectors)
     )
   }
@@ -406,26 +428,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   private setLineGroups() {
     this.lineGroups = []
 
-    if (this.options.renderVectors) {
-      this.lineGroups.push({
-        projectedGeoLines: pointsAndPointsToLines(
-          this.projectedGeoPoints,
-          this.projectedGeoTransformedResourcePoints
-        ),
-        projectedGeoPreviousLines: pointsAndPointsToLines(
-          this.projectedGeoPoints,
-          this.projectedGeoPreviousTransformedResourcePoints
-        ),
-        viewportSize: this.options.renderVectorsSize,
-        color: this.options.renderVectorsColor,
-        viewportBorderSize: this.options.renderVectorsBorderSize,
-        borderColor: this.options.renderVectorsBorderColor
-      })
-    }
-
     if (this.options.renderFullMask) {
       this.lineGroups.push({
-        projectedGeoLines: lineStringToLines(this.projectedGeoFullMask),
+        projectedGeoLines: lineStringToLines(
+          this.projectedGeoTriangulationFullMask
+        ),
+        projectedGeoPreviousLines: lineStringToLines(
+          this.projectedGeoPreviousTriangulationFullMask
+        ),
         viewportSize: this.options.renderFullMaskSize,
         color: this.options.renderFullMaskColor,
         viewportBorderSize: this.options.renderFullMaskBorderSize,
@@ -433,18 +443,18 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       })
     }
 
-    if (this.options.renderAppliableMask) {
+    if (this.options.renderAppliedMask) {
       this.lineGroups.push({
         projectedGeoLines: lineStringToLines(
-          this.projectedGeoTriangulationAppliableMask
+          this.projectedGeoTriangulationAppliedMask
         ),
         projectedGeoPreviousLines: lineStringToLines(
-          this.projectedGeoPreviousTriangulationAppliableMask
+          this.projectedGeoPreviousTriangulationAppliedMask
         ),
-        viewportSize: this.options.renderAppliableMaskSize,
-        color: this.options.renderAppliableMaskColor,
-        viewportBorderSize: this.options.renderAppliableMaskBorderSize,
-        borderColor: this.options.renderAppliableMaskBorderColor
+        viewportSize: this.options.renderAppliedMaskSize,
+        color: this.options.renderAppliedMaskColor,
+        viewportBorderSize: this.options.renderAppliedMaskBorderSize,
+        borderColor: this.options.renderAppliedMaskBorderColor
       })
     }
 
@@ -460,6 +470,23 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         color: this.options.renderMaskColor,
         viewportBorderSize: this.options.renderMaskBorderSize,
         borderColor: this.options.renderMaskBorderColor
+      })
+    }
+
+    if (this.options.renderVectors) {
+      this.lineGroups.push({
+        projectedGeoLines: pointsAndPointsToLines(
+          this.projectedGeoPoints,
+          this.projectedGeoTransformedResourcePoints
+        ),
+        projectedGeoPreviousLines: pointsAndPointsToLines(
+          this.projectedGeoPoints,
+          this.projectedGeoPreviousTransformedResourcePoints
+        ),
+        viewportSize: this.options.renderVectorsSize,
+        color: this.options.renderVectorsColor,
+        viewportBorderSize: this.options.renderVectorsBorderSize,
+        borderColor: this.options.renderVectorsBorderColor
       })
     }
   }
@@ -512,7 +539,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.mapProgram
     gl.bindVertexArray(this.mapVao)
 
-    // Resource triangle points
     createBuffer(
       gl,
       program,
@@ -520,8 +546,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       2,
       'a_resourceTrianglePoint'
     )
-
-    // Clip previous and new triangle points
 
     const clipPreviousTrianglePoints =
       this.projectedGeoPreviousTrianglePoints.map((point) =>
@@ -549,7 +573,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Previous and new distortion
     // Note: we must update the distortion data even when we don't render distortions
     // to ensure this array buffer is of the correct length, for example when triangulation changes
-
     createBuffer(
       gl,
       program,
@@ -566,8 +589,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_trianglePointDistortion'
     )
 
-    // Triangle Point index
-
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
     ).map((_v, i) => {
@@ -579,6 +600,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       trianglePointsTriangleIndex,
       1,
       'a_trianglePointIndex'
+    )
+
+    createBuffer(
+      gl,
+      program,
+      new Float32Array(
+        this.trianglePointsInside.map((inside) => (inside ? 1 : 0))
+      ),
+      1,
+      'a_trianglePointInside'
     )
   }
 
@@ -991,9 +1022,18 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
       const imageData = this.cachedTilesForTexture[i].data
+
+      // The texture size is the largest available size in the image's tileZoomLevels
+      // (since the image could be served in multiple sizes).
+      // The size of the imageData is determined when fetching tiles
+      // and getting the optimal tileZoomLevel based on the scale derived from the viewport.
+      // Hence, the image data could be smaller then the texture.
+      // This is not a problem in se, but sub-optimal if the difference is large.
+      // (Also note that if the resource is only on part of the image,
+      // the image data is still its the full size).
       if (
-        imageData.width !== requiredTextureWidth ||
-        imageData.width !== requiredTextureWidth
+        imageData.width > requiredTextureWidth ||
+        imageData.height > requiredTextureHeigt
       ) {
         throw new Error("Cached tile doesn't fit in texture")
       }

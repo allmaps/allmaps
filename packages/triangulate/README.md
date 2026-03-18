@@ -1,21 +1,18 @@
 # @allmaps/triangulate
 
-This module triangulates a polygon: it returns a set of triangles that partition the polygon.
+This package provides methods to triangulate a polygon: i.e. return a set of triangles that partition the polygon.
 
-If a `distance` parameter is provided, the triangles are well-conditioned and not larger then `distance`: the triangles are made firstly using a grid of points inside the polygon, spaced `distance` apart, with each grid cell resulting in two triangles, and secondly using points along the polygon's edges, by interpolating each edge using `distance`.
+It does this in a constrained way, where the triangles meet certain conditions: if a `distance` parameter is provided, the triangles are not larger than `distance`, and in general don't contain very sharp angles or very blunt angles.
 
-The following options can be passed:
-
-* `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
-* `minimumTriangleAngle`: The minimum angle (in radians) of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. Default: `0.01`.
-
-This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the mask of a georeferenced map into a set of triangles that can be rendered with WebGL.
+This package is used internally in [@allmaps/render](../../packages/render/) to triangulate the full mask of a georeferenced map (using the GCPs as Steiner points and the appliable mask as Steiner polygons) into a set of triangles that can be rendered with WebGL.
 
 ## How it works
 
 It uses a modern **constrained Delaunay triangulation algorithm** for polygons, built using [Delaunator](https://github.com/mapbox/delaunator) and [Constrainautor](https://github.com/kninnug/Constrainautor).
 
 To learn more on how it works, check out this [Observable notebook](https://observablehq.com/d/efde1d04f1a9bc17).
+
+In short, triangles are made firstly using a grid of points within the bounding box of the polygon, spaced `distance` apart, and with points resulting from the polygons edges (interpolated using `distance`), provided Steiner points and points from the Steiner Polygons. From all these points, a Delaunay triangulation is performed. This results in most grid cell resulting in two well-conditioned triangles. Then the triangulation is constrained with the edges of the interpolated polygon and the edges of the interpolated Steiner polygons.
 
 ## Installation
 
@@ -28,6 +25,10 @@ npm install @allmaps/triangulate
 ```
 
 ## Usage
+
+This package exposes two functions: `triangulate()` simply triangulates a polygon and returns the triangles, and `triangulateToUnique()` returns a set of objects that describe the triangulation using an array of unique points and edges between them.
+
+In the simplest case, it can be used as follows:
 
 ```js
 import { triangulate } from '@allmaps/triangulate'
@@ -57,72 +58,18 @@ const triangles = triangulate(polygon, distance)
 // ]
 ```
 
+To both functions, the following options can be passed:
+
+* `steinerPoints`: Steiner points. These become a third group of points taken into account when building the triangles.
+* `steinerPolygons`: Steiner polygons. These are polygons whose points need to be added as Steiner points, and whose edges (interpolated using distance) also need to be constrained.
+* `minimumTriangleAngle`: The minimum angle (in radians) of the resulting triangles. Using this options, sliver polygons that are possibly produced by internal functions can be removed. Default: `0.01`.
+* `computeInsideSteinerPolygons`: Whether or not to compute, for each triangle, whether they are inside the Steiner polygons or not.
+
 ## License
 
 MIT
 
 ## API
-
-### `TriangluationOptions`
-
-###### Fields
-
-* `minimumTriangleAngle` (`number`)
-* `steinerPoints` (`Array<Point>`)
-
-### `TriangulationToUnique`
-
-###### Fields
-
-* `gridPoints` (`Array<Point>`)
-* `gridPointsInPolygon` (`Array<Point>`)
-* `interpolatedPolygon` (`Array<Array<Point>>`)
-* `interpolatedPolygonPoints` (`Array<Point>`)
-* `triangles` (`Array<Triangle>`)
-* `uniquePointIndexEdges` (`Array<TypedLine<number>>`)
-* `uniquePointIndexInterpolatedPolygon` (`Array<Array<number>>`)
-* `uniquePointIndexTriangles` (`Array<TypedTriangle<number>>`)
-* `uniquePoints` (`Array<Point>`)
-
-### `triangulate(polygon, distance, triangulationOptions)`
-
-Triangulate a polygon to triangles smaller then a distance
-
-Grid points are placed inside the polygon to obtain small, well conditioned triangles.
-
-###### Parameters
-
-* `polygon` (`Array<Array<Point>>`)
-  * Polygon
-* `distance?` (`number | undefined`)
-  * Distance that conditions the triangles
-* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
-  * Triangulation Options.
-
-###### Returns
-
-Array of triangles partitioning the polygon (`Array<Triangle>`).
-
-### `triangulateToUnique(polygon, distance, triangulationOptions)`
-
-Triangulate a polygon to triangles smaller then a distance, and return them via unique points.
-
-Grid points are placed inside the polygon to obtain small, well conditioned triangles.
-
-This function returns the triangulation as an array of unique points, and triangles of indices refering to those unique points.
-
-###### Parameters
-
-* `polygon` (`Array<Array<Point>>`)
-  * Polygon
-* `distance?` (`number | undefined`)
-  * Distance that conditions the triangles
-* `triangulationOptions?` (`Partial<TriangluationOptions> | undefined`)
-  * Triangulation Options.
-
-###### Returns
-
-Triangulation Object with uniquePointIndexTriangles and uniquePoints (`{ interpolatedPolygon: Polygon; interpolatedPolygonPoints: Point[]; gridPoints: Point[]; gridPointsInPolygon: Point[]; uniquePoints: Point[]; triangles: Triangle[]; uniquePointIndexTriangles: TypedTriangle<number>[]; uniquePointIndexInterpolatedPolygon: TypedPolygon<number>; uniquePointIndexEdges: TypedLine<number>[...`).
 
 ## Notes
 

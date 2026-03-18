@@ -151,7 +151,7 @@ export function pointInBbox(point: Point, bbox: Bbox): boolean {
   return doBboxesIntersect([point[0], point[1], point[0], point[1]], bbox)
 }
 
-export function bufferBbox(bbox: Bbox, dist0: number, dist1: number): Bbox {
+export function bufferBbox(bbox: Bbox, dist0: number, dist1?: number): Bbox {
   if (dist1 === undefined) {
     dist1 = dist0
   }
@@ -309,12 +309,22 @@ export function sizeToCenter(size: Size): Point {
   return [size[0] / 2, size[1] / 2]
 }
 
-export function sizeToBbox(size: Size): Bbox {
-  return [0, 0, ...size]
+export function sizeToBbox(size: Size, center?: Point): Bbox {
+  // Note: passing no center not the same as passing center [0, 0]
+  if (center) {
+    return [
+      center[0] - size[0] / 2,
+      center[1] - size[1] / 2,
+      center[0] + size[0] / 2,
+      center[1] + size[1] / 2
+    ]
+  } else {
+    return [0, 0, ...size]
+  }
 }
 
-export function sizeToRectangle(size: Size): Rectangle {
-  return bboxToRectangle(sizeToBbox(size))
+export function sizeToRectangle(size: Size, center?: Point): Rectangle {
+  return bboxToRectangle(sizeToBbox(size, center))
 }
 
 export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {

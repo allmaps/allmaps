@@ -1,8 +1,5 @@
 // Distortion
-if(u_distortion) {
-  // color = colorWhite; // TODO: Add option to not display image
-  // color = colorTransparant; // TODO: Add option to not display image
-
+if(u_distortion && color != initialColor) {
   float trianglePointDistortion = v_trianglePointDistortion;
 
   // Introduce septs

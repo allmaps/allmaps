@@ -1,6 +1,5 @@
 import { BaseRenderer } from './BaseRenderer.js'
 import { CacheableImageDataTile } from '../tilecache/CacheableImageDataTile.js'
-import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import { Viewport } from '../viewport/Viewport.js'
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 
@@ -23,11 +22,7 @@ export class CanvasRenderer
     canvas: HTMLCanvasElement | OffscreenCanvas,
     options?: Partial<CanvasRenderOptions>
   ) {
-    super(
-      createWarpedMapFactory(),
-      CacheableImageDataTile.createFactory(),
-      options
-    )
+    super(CacheableImageDataTile.createFactory(), options)
 
     this.canvas = canvas
     this.context = canvas.getContext('2d') as CanvasRenderingContext2D

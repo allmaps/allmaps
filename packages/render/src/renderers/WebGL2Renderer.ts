@@ -16,6 +16,7 @@ import {
   WebGL2WarpedMap,
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
+import { DEFAULT_ANIMATION_OPTIONS } from '../maps/WarpedMapList.js'
 import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
@@ -39,6 +40,7 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 // Using the inline query parameter solves this.
 import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
 import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
+import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -47,11 +49,11 @@ import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
 
 import type {
+  AnimationOptions,
   Renderer,
   SpecificWebGL2RenderOptions,
   WebGL2RenderOptions
 } from '../shared/types.js'
-import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
 const THROTTLE_PREPARE_RENDER_OPTIONS = {
@@ -67,10 +69,6 @@ const THROTTLE_CHANGED_OPTIONS = {
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
-const ANIMATION_DURATION = 750
-
-export const DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions =
-  {}
 
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
@@ -82,9 +80,11 @@ export class WebGL2Renderer
   #worker: Worker
   #spritesWorker: Worker
 
+  DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions
+
   gl: WebGL2RenderingContext
 
-  declare options: Partial<WebGL2RenderOptions>
+  declare options: WebGL2RenderOptions
 
   mapProgram: WebGLProgram
   linesProgram: WebGLProgram
@@ -109,6 +109,8 @@ export class WebGL2Renderer
   >
 
   private throttledChanged: DebouncedFunc<typeof this.changed>
+
+  private boundThrottledChangedByMapId: Map<string, EventListener> = new Map()
 
   /**
    * Creates an instance of WebGL2Renderer.
@@ -172,21 +174,34 @@ export class WebGL2Renderer
     const wrappedSpritesWorker =
       comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
+    const warpedMapFactory = createWebGL2WarpedMapFactory(
+      gl,
+      mapProgram,
+      linesProgram,
+      pointsProgram
+    )
+
     super(
-      createWebGL2WarpedMapFactory(gl, mapProgram, linesProgram, pointsProgram),
       CacheableWorkerImageDataTile.createFactory(
         wrappedWorker,
         wrappedSpritesWorker
       ),
-      options
+      mergeOptions(
+        {
+          warpedMapFactory
+        },
+        options
+      )
     )
+
+    this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS = { warpedMapFactory }
 
     this.#worker = worker
     this.#spritesWorker = spritesWorker
     this.gl = gl
 
     this.options = mergeOptions(
-      DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
+      this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
       this.options
     )
 
@@ -221,6 +236,8 @@ export class WebGL2Renderer
       THROTTLE_CHANGED_WAIT_MS,
       THROTTLE_CHANGED_OPTIONS
     )
+
+    this.warpedMapList.updateWarpedMapsUsingFactory()
   }
 
   initializeWebGL(gl: WebGL2RenderingContext) {
@@ -603,6 +620,38 @@ export class WebGL2Renderer
       homogeneousTransformToMatrix4(renderHomogeneousTransform)
     )
 
+    // Visible
+    const visibilityOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_visibilityOpacity'
+    )
+    gl.uniform1f(visibilityOpacityLocation, webgl2WarpedMap.visibilityOpacity)
+    const previousVisibilityOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_previousVisibilityOpacity'
+    )
+    gl.uniform1f(
+      previousVisibilityOpacityLocation,
+      webgl2WarpedMap.previousVisibilityOpacity
+    )
+    const applymaskOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_applyMaskOpacity'
+    )
+    gl.uniform1f(applymaskOpacityLocation, webgl2WarpedMap.applyMaskOpacity)
+    const previousApplyMaskOpacityLocation = this.getUniformLocation(
+      gl,
+      program,
+      'u_previousApplyMaskOpacity'
+    )
+    gl.uniform1f(
+      previousApplyMaskOpacityLocation,
+      webgl2WarpedMap.previousApplyMaskOpacity
+    )
+
     // Opacity
     const opacityLocation = this.getUniformLocation(gl, program, 'u_opacity')
     gl.uniform1f(opacityLocation, webgl2WarpedMap.options.opacity)
@@ -945,9 +994,20 @@ export class WebGL2Renderer
     )
   }
 
-  private startAnimation(mapIds: string[]) {
+  private startAnimation(
+    mapIds: string[],
+    partialAnimationOptions?: Partial<AnimationOptions>
+  ) {
+    const options = mergeOptions(
+      DEFAULT_ANIMATION_OPTIONS,
+      partialAnimationOptions
+    )
+
     // This changed() is needed to prevent a blank canvas flash
     this.changed()
+    // This requestFetchableTiles() is needed to update
+    // mapsWithFetchableTilesForViewport when visible is changed
+    this.requestFetchableTiles()
     this.updateVertexBuffers(mapIds)
 
     if (this.lastAnimationFrameRequestId !== undefined) {
@@ -958,26 +1018,26 @@ export class WebGL2Renderer
     this.animationProgress = 0
     this.animationStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
-      ((now: number) => this.animationFrame(now, mapIds)).bind(this)
+      ((now: number) =>
+        this.animationFrame(now, mapIds, options.duration)).bind(this)
     )
   }
 
-  private animationFrame(now: number, mapIds: string[]) {
+  private animationFrame(now: number, mapIds: string[], duration: number) {
     if (!this.animationStart) {
       this.animationStart = now
     }
 
-    if (now - this.animationStart < ANIMATION_DURATION) {
+    if (now - this.animationStart < duration) {
       // Animation is ongoing
       // animationProgress goes from 0 to 1 throughout animation
-      this.animationProgress = (now - this.animationStart) / ANIMATION_DURATION
+      this.animationProgress = (now - this.animationStart) / duration
 
       // This changed() is needed to trigger the repaint of the canvas
       this.changed()
-      this.renderInternal()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
-        ((now: number) => this.animationFrame(now, mapIds)).bind(this)
+        ((now: number) => this.animationFrame(now, mapIds, duration)).bind(this)
       )
     } else {
       // Animation ended
@@ -1098,8 +1158,8 @@ export class WebGL2Renderer
       if (!event.data?.mapIds) {
         throw new Error('Event data missing')
       }
-      const { mapIds } = event.data
-      this.startAnimation(mapIds)
+      const { mapIds, animationOptions } = event.data
+      this.startAnimation(mapIds, animationOptions)
     }
   }
 
@@ -1114,19 +1174,22 @@ export class WebGL2Renderer
   }
 
   private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    webgl2WarpedMap.addEventListener(
-      WarpedMapEventType.TEXTURESUPDATED,
-      this.throttledChanged.bind(this)
-    )
+    const bound = this.throttledChanged.bind(this)
+    this.boundThrottledChangedByMapId.set(webgl2WarpedMap.mapId, bound)
+    webgl2WarpedMap.addEventListener(WarpedMapEventType.TEXTURESUPDATED, bound)
   }
 
   private removeEventListenersFromWebGL2WarpedMap(
     webgl2WarpedMap: WebGL2WarpedMap
   ) {
-    webgl2WarpedMap.removeEventListener(
-      WarpedMapEventType.TEXTURESUPDATED,
-      this.throttledChanged.bind(this)
-    )
+    const bound = this.boundThrottledChangedByMapId.get(webgl2WarpedMap.mapId)
+    if (bound) {
+      webgl2WarpedMap.removeEventListener(
+        WarpedMapEventType.TEXTURESUPDATED,
+        bound
+      )
+      this.boundThrottledChangedByMapId.delete(webgl2WarpedMap.mapId)
+    }
   }
 
   contextLost() {

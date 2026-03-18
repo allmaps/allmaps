@@ -1,5 +1,5 @@
 import { json } from 'itty-router'
-import { WarpedMapList, createWarpedMapFactory } from '@allmaps/render'
+import { WarpedMapList } from '@allmaps/render'
 
 import { cachedFetch } from './fetch.js'
 
@@ -21,7 +21,7 @@ export async function generateTileJsonResponse(
     transformationType = options['transformation.type']
   }
 
-  const warpedMapList = new WarpedMapList(createWarpedMapFactory(), {
+  const warpedMapList = new WarpedMapList({
     fetchFn: cachedFetch as FetchFn,
     createRTree: false,
     transformationType
@@ -32,12 +32,8 @@ export async function generateTileJsonResponse(
   }
 
   // Get bounds and center in EPSG:4326 (lon/lat) as required by TileJSON spec
-  const bounds = warpedMapList.getMapsBbox({
-    projection: { definition: 'EPSG:4326' }
-  })
-  const center = warpedMapList.getMapsCenter({
-    projection: { definition: 'EPSG:4326' }
-  })
+  const bounds = warpedMapList.getMapsBbox()
+  const center = warpedMapList.getMapsCenter()
 
   if (!bounds || !center) {
     throw new Error('Could not compute bounding box and center of maps')

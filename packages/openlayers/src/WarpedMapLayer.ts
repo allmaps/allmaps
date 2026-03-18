@@ -1,3 +1,5 @@
+import proj4 from 'proj4'
+
 import Layer from 'ol/layer/Layer.js'
 import { OLWarpedMapEvent } from './OLWarpedMapEvent.js'
 
@@ -24,6 +26,7 @@ import type {
 } from '@allmaps/render/webgl2'
 import type { Bbox, Gcp, Point, Ring, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
+import type { Projection } from '@allmaps/project'
 
 export type SpecificOpenLayersWarpedMapLayerOptions = object
 
@@ -56,6 +59,8 @@ export class WarpedMapLayer
   renderer: WebGL2Renderer
 
   canvasSize: [number, number] = [0, 0]
+
+  registeredProjections: Map<string, Projection> = new Map()
 
   private resizeObserver: ResizeObserver
 
@@ -131,6 +136,31 @@ export class WarpedMapLayer
   }
 
   /**
+   * Keep a list of registered projections.
+   *
+   * Can optionally be used to complement OpenLayer's `register(proj4)` function.
+   *
+   * To use viewport projections in OpenLayers, add projections to proj4 and register proj4
+   * (Example: https://openlayers.org/en/latest/examples/scaleline-indiana-east.html).
+   * WarpedMapLayer reads the view's projections code, gets its definition from proj4.defs
+   * (thanks to the register() function) and constructs a new Projection type (defined in @allmap/project).
+   *
+   * Using this function on top of OpenLayer's `register()`,
+   * WarpedMapLayer will look up the code in the registered projections first for a matching `id`
+   * and, if found, use this projection. This ways relavant projection information (id, name, ...)
+   * can be passed and used to all Allmaps packages.
+   *
+   * Newly registered projection overwrite older ones with the same id.
+   */
+  registerProjections(projections: Projection[]): void {
+    for (const projection of projections) {
+      if (projection.id) {
+        this.registeredProjections.set(projection.id, projection)
+      }
+    }
+  }
+
+  /**
    * Disposes all WebGL resources and cached tiles
    */
   dispose() {
@@ -176,14 +206,21 @@ export class WarpedMapLayer
 
     const rotation = frameState.viewState.rotation
     const devicePixelRatio = window.devicePixelRatio
-    const projection = {
-      definition: projectionDefinitionToAntialiasedDefinition(
-        frameState.viewState.projection.getCode()
-      )
+
+    const projectionCode = frameState.viewState.projection.getCode()
+    const projectionDefinitionFromProj4 = proj4.defs(projectionCode).projStr
+    let projection: Projection
+    if (this.registeredProjections.has(projectionCode)) {
+      projection = this.registeredProjections.get(projectionCode)!
+    } else if (projectionDefinitionFromProj4) {
+      projection = {
+        definition: projectionDefinitionToAntialiasedDefinition(
+          projectionDefinitionFromProj4
+        )
+      }
+    } else {
+      throw new Error(`Unknown projection code: ${projectionCode}`)
     }
-    // TODO: add a way to understand other codes then the two default ones
-    // (e.g. by including a code-to-definition dictionnary)
-    // and assure wrapping (e.g. by adding `+over`)
 
     const viewportSize = frameState.size as [number, number]
     const viewportCenter = frameState.viewState.center as [number, number]
@@ -470,10 +507,25 @@ export class WarpedMapLayer
   }
 
   /**
+   * Get the center of the bounding box of all maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param projection - Projection in which to return the result
+   * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getCenter(projectionOptions?: Partial<ProjectionOptions>): Point | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
+  }
+
+  /**
    * Get the center of the bounding box of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -483,7 +535,7 @@ export class WarpedMapLayer
    */
   getMapsCenter(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -493,20 +545,37 @@ export class WarpedMapLayer
   }
 
   /**
+   * Get the bounding box of all maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param projectionOptions - ProjectionOptions
+   * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
+  }
+
+  /**
    * Get the bounding box of the maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param projectionOptions - Projection options
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -516,20 +585,40 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the convex hull of the maps
+   * Get the convex hull of all maps
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param projectionOptions - Projection options
+   * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getConvexHull(
+    projectionOptions?: Partial<ProjectionOptions>
+  ): Ring | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
+  }
+
+  /**
+   * Get the convex hull of the maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   * @param projectionOptions - Projection options
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -563,7 +652,7 @@ export class WarpedMapLayer
    * Get the default options the layer
    */
   getDefaultOptions(): SpecificWarpedMapLayerOptions &
-    BaseRenderOptions &
+    BaseRenderOptions<WebGL2WarpedMap> &
     WebGL2WarpedMapOptions {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -657,6 +746,22 @@ export class WarpedMapLayer
   }
 
   /**
+   * Set the transformation type of the layer
+   *
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setLayerTransformationType(
+    transformationType?: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setLayerOptions(
+      { transformationType: transformationType },
+      animationOptions
+    )
+  }
+
+  /**
    * Set the GCPs of a map
    *
    * This only sets the map-specific `gcps` option of the map
@@ -721,12 +826,39 @@ export class WarpedMapLayer
    */
   setMapTransformationType(
     mapId: string,
-    transformationType: TransformationType,
+    transformationType?: TransformationType,
     animationOptions?: Partial<AnimationOptions>
   ) {
     return this.setMapOptions(
       mapId,
-      { transformationType },
+      { transformationType: transformationType },
+      undefined,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the transformation type of maps
+   *
+   * This only sets the map-specific `transformationType` option of the map
+   * (or more specifically of the warped map used for rendering),
+   * overwriting the original transformation type inferred from the Georeference Annotation.
+   *
+   * The original transformation type can be reset by resetting the map-specific transformation type option,
+   * and stays accessible in the warped map's `map` property.
+   *
+   * @param mapIds - Map IDs for which to set the options
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setMapsTransformationType(
+    mapIds: string[],
+    transformationType?: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapsOptions(
+      mapIds,
+      { transformationType: transformationType },
       undefined,
       animationOptions
     )

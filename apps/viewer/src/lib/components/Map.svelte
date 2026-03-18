@@ -292,14 +292,13 @@
           warpedMapLayer?.setMapOptions(selectedMapId, {
             visible: true,
             applyMask: false,
-            renderMask: false,
-            renderAppliableMask: true
+            renderAppliedMask: false,
+            renderMask: true,
+            transformationType: 'helmert'
           })
 
-          warpedMapLayer?.setMapTransformationType(selectedMapId, 'helmert')
-
           if (map && selectedWarpedMap) {
-            map.fitBounds(selectedWarpedMap.geoAppliableMaskBbox, {
+            map.fitBounds(selectedWarpedMap.geoMaskBbox, {
               padding: PADDING,
               animate: false,
               // duration: DURATION,
@@ -314,8 +313,8 @@
               warpedMapLayer?.setMapOptions(previousSelectedMapId, {
                 visible: false,
                 applyMask: true,
-                renderMask: false,
-                renderAppliableMask: false
+                renderAppliedMask: false,
+                renderMask: false
               })
             }
 
@@ -342,20 +341,43 @@
           const otherMapIds = warpedMapLayer
             ? warpedMapLayer.getMapIds().filter((id) => id !== selectedMapId)
             : []
-          warpedMapLayer?.setMapsOptions(otherMapIds, {
-            visible: true,
-            transformationType: undefined
-          })
+
+          warpedMapLayer?.setMapsOptions(
+            otherMapIds,
+            {
+              visible: true,
+              transformationType: undefined
+            },
+            undefined,
+            { animate: false }
+          )
+
           warpedMapLayer?.setMapOptions(selectedMapId, {
             applyMask: true,
-            renderMask: true,
-            renderAppliableMask: false,
+            renderAppliedMask: true,
+            renderMask: false,
             transformationType: undefined
           })
 
-          // warpedMapLayer?.setMapOptions(selectedMapId, {
+          // TODO: later, when visibility should be animated for otherMapIds,
+          // animate it together with transformationType for selectedMapIdForImageView
+          // using setMapsOptionsByMapId() as below
+          // (after setting only transformationType but not visibilty with { animate: false } ) as above
+          // and same when view == image
+          //
+          // const mapsOptionsByMapId = new Map()
+          // mapsOptionsByMapId.set(selectedMapIdForImageView, {
+          //   applyMask: true,
+          //   renderAppliedMask: true,
+          //   renderMask: false,
           //   transformationType: undefined
           // })
+          // for (const mapId of otherMapIds) {
+          //   mapsOptionsByMapId.set(mapId, {
+          //     visible: true,
+          //   })
+          // }
+          // warpedMapLayer?.setMapsOptionsByMapId(mapsOptionsByMapId)
 
           if (previousMapBounds) {
             map.fitBounds(previousMapBounds, {
@@ -388,26 +410,28 @@
                 .getMapIds()
                 .filter((id) => id !== selectedMapIdForImageView)
             : []
-          warpedMapLayer?.setMapsOptions(otherMapIds, {
-            visible: false,
-            transformationType: 'helmert'
-          })
+          warpedMapLayer?.setMapsOptions(
+            otherMapIds,
+            {
+              visible: false,
+              transformationType: 'helmert'
+            },
+            undefined,
+            { animate: false }
+          )
 
           warpedMapLayer?.setMapOptions(selectedMapIdForImageView, {
             applyMask: false,
-            renderMask: false,
-            renderAppliableMask: true,
+            renderAppliedMask: false,
+            renderMask: true,
             transformationType: 'helmert'
           })
 
-          // warpedMapLayer?.setMapTransformationType(
-          //   selectedMapIdForImageView,
-          //   'helmert'
-          // )
+          // TODO: same remark as for view == map
 
           previousMapBounds = map.getBounds()
 
-          map.fitBounds(untrackedSelectedWarpedMap.geoAppliableMaskBbox, {
+          map.fitBounds(untrackedSelectedWarpedMap.geoMaskBbox, {
             padding: PADDING,
             duration: DURATION,
             bearing: -computeWarpedMapBearing(untrackedSelectedWarpedMap)
@@ -575,10 +599,10 @@
       await Promise.allSettled(
         georeferencedMaps.map((georeferencedMap) =>
           warpedMapLayer?.addGeoreferencedMap(georeferencedMap, {
+            renderAppliedMaskColor: pink,
+            renderAppliedMaskSize: 3,
             renderMaskColor: pink,
-            renderMaskSize: 3,
-            renderAppliableMaskColor: pink,
-            renderAppliableMaskSize: 3
+            renderMaskSize: 3
           })
         )
       )

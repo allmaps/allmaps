@@ -50,7 +50,7 @@
     "watch": {
       "inputs": ["src/**/*.*"],
       "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["^test", "^build"]
+      "dependsOn": ["^watch"]
     },
     "dev": {
       "persistent": true,

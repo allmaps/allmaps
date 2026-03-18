@@ -18,4 +18,12 @@ if(u_colorize) {
 }
 
 // Opacity
-color = vec4(color.rgb * u_opacity, color.a * u_opacity);
+float opacityFromVisibility = mix(u_previousVisibilityOpacity, u_visibilityOpacity, u_animationProgress);
+float opacityFromApplyMask;
+if (v_trianglePointInside == 1.0) {
+  opacityFromApplyMask = 1.0;
+} else {
+  opacityFromApplyMask = mix(u_previousApplyMaskOpacity, u_applyMaskOpacity, u_animationProgress);
+}
+float opacity = u_opacity * opacityFromVisibility * opacityFromApplyMask;
+color = vec4(color * opacity);

@@ -16,6 +16,8 @@ import type {
 const PRUNE_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 4
 const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
 
+const MAX_REMOVE_QUEUE_LENGTH = 100
+
 /**
  * Class that fetches and caches IIIF tiles.
  */
@@ -29,8 +31,16 @@ export class TileCache<D> extends EventTarget {
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
   protected tilesFetchingCount = 0
+  protected tileRemoveQueue: {
+    tileUrl: string
+    mapId: string
+  }[] = []
 
   protected fetchableTiles: FetchableTile[] = []
+
+  private boundTileFetched = this.tileFetched.bind(this)
+  private boundTileFetchError = this.tileFetchError.bind(this)
+  private boundTilesFromSpriteTile = this.tilesFromSpriteTile.bind(this)
 
   constructor(
     cacheableTileFactory: CacheableTileFactory<D>,
@@ -238,7 +248,7 @@ export class TileCache<D> extends EventTarget {
                 PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
             })
           ) {
-            this.removeCacheableTileForMapId(tileUrl, mapId)
+            this.delayedRemoveCacheableTileForMapId(tileUrl, mapId)
           }
         }
       }
@@ -287,6 +297,7 @@ export class TileCache<D> extends EventTarget {
 
     this.addTileUrlForMapId(tileUrl, mapId)
     this.addMapIdForTileUrl(mapId, tileUrl)
+    this.cancelDelayedRemoveCacheableTileForMapId(tileUrl, mapId)
   }
 
   protected addCacheableTile(cacheableTile: CacheableTile<D>) {
@@ -309,6 +320,7 @@ export class TileCache<D> extends EventTarget {
     this.tilesByTileUrl.set(tileUrl, cachedTile)
     this.addTileUrlForMapId(tileUrl, mapId)
     this.addMapIdForTileUrl(mapId, tileUrl)
+    this.cancelDelayedRemoveCacheableTileForMapId(tileUrl, mapId)
 
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
@@ -316,6 +328,37 @@ export class TileCache<D> extends EventTarget {
         tileUrl
       })
     )
+  }
+
+  protected delayedRemoveCacheableTileForMapId(tileUrl: string, mapId: string) {
+    if (
+      this.tileRemoveQueue.some(
+        (tile) => tile.tileUrl === tileUrl && tile.mapId === mapId
+      )
+    ) {
+      return
+    }
+
+    this.tileRemoveQueue.push({ tileUrl, mapId })
+
+    if (this.tileRemoveQueue.length > MAX_REMOVE_QUEUE_LENGTH) {
+      const oldest = this.tileRemoveQueue.shift()
+      if (oldest) {
+        this.removeCacheableTileForMapId(oldest.tileUrl, oldest.mapId)
+      }
+    }
+  }
+
+  protected cancelDelayedRemoveCacheableTileForMapId(
+    tileUrl: string,
+    mapId: string
+  ) {
+    const index = this.tileRemoveQueue.findIndex(
+      (tile) => tile.tileUrl === tileUrl && tile.mapId === mapId
+    )
+    if (index !== -1) {
+      this.tileRemoveQueue.splice(index, 1)
+    }
   }
 
   protected removeCacheableTileForMapId(tileUrl: string, mapId: string) {
@@ -525,15 +568,15 @@ export class TileCache<D> extends EventTarget {
   protected addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHED,
-      this.tileFetched.bind(this)
+      this.boundTileFetched
     )
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHERROR,
-      this.tileFetchError.bind(this)
+      this.boundTileFetchError
     )
     cacheableTile.addEventListener(
       WarpedMapEventType.TILESFROMSPRITETILE,
-      this.tilesFromSpriteTile.bind(this)
+      this.boundTilesFromSpriteTile
     )
   }
 
@@ -542,15 +585,15 @@ export class TileCache<D> extends EventTarget {
   ) {
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHED,
-      this.tileFetched.bind(this)
+      this.boundTileFetched
     )
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHERROR,
-      this.tileFetchError.bind(this)
+      this.boundTileFetchError
     )
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILESFROMSPRITETILE,
-      this.tilesFromSpriteTile.bind(this)
+      this.boundTilesFromSpriteTile
     )
   }
 }

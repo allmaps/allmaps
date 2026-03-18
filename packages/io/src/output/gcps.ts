@@ -1,4 +1,6 @@
-import { proj4, lonLatProjection, isEqualProjection } from '@allmaps/project'
+import proj4 from 'proj4'
+
+import { lonLatProjection, isEqualProjection } from '@allmaps/project'
 import { mergeOptionsUnlessUndefined } from '@allmaps/stdlib'
 
 import { supportedGcpFileFormatsWithResourceYAxisUp } from '../shared/constants.js'

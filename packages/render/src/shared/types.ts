@@ -16,9 +16,14 @@ import type { Projection } from '@allmaps/project'
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 import type { CacheableTile } from '../tilecache/CacheableTile.js'
 import type { TileCache } from '../tilecache/TileCache.js'
+import type { WarpedMapList } from '../maps/WarpedMapList.js'
 import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type { WebGL2WarpedMap } from '../webgl2.js'
 import type { TriangulatedWarpedMap } from '../maps/TriangulatedWarpedMap.js'
+
+export type ShouldRenderOptions = {
+  checkOpacity: boolean
+}
 
 export type SelectionOptions = {
   onlyVisible?: boolean
@@ -36,6 +41,12 @@ export type TransformationOptions = {
   options?: unknown
 }
 
+export type GeoreferencedMapOptions = {
+  gcps: Gcp[]
+  resourceMask: Ring
+  transformationType: TransformationType
+  internalProjection: Projection
+}
 export type WarpedMapOptions = {
   fetchFn?: FetchFn
   gcps: Gcp[]
@@ -47,12 +58,20 @@ export type WarpedMapOptions = {
   applyMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }
+export type WarpedMapWithoutGeoreferencedMapOptions = Omit<
+  WarpedMapOptions,
+  keyof GeoreferencedMapOptions
+>
 export type SpecificTriangulatedWarpedMapOptions = {
   resourceResolution?: number
   distortionMeasures: DistortionMeasure[]
 }
 export type TriangulatedWarpedMapOptions =
   SpecificTriangulatedWarpedMapOptions & WarpedMapOptions
+export type TriangulatedWarpedMapWithoutGeoreferencedMapOptions = Omit<
+  TriangulatedWarpedMapOptions,
+  keyof GeoreferencedMapOptions
+>
 export type SpecificWebGL2WarpedMapOptions = {
   renderMaps?: boolean
   renderLines?: boolean
@@ -77,16 +96,16 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderFullMaskSize?: number
   renderFullMaskBorderColor?: string
   renderFullMaskBorderSize?: number
-  renderAppliableMask: boolean
-  renderAppliableMaskColor?: string
-  renderAppliableMaskSize?: number
-  renderAppliableMaskBorderColor?: string
-  renderAppliableMaskBorderSize?: number
   renderMask: boolean
   renderMaskColor?: string
   renderMaskSize?: number
   renderMaskBorderColor?: string
   renderMaskBorderSize?: number
+  renderAppliedMask: boolean
+  renderAppliedMaskColor?: string
+  renderAppliedMaskSize?: number
+  renderAppliedMaskBorderColor?: string
+  renderAppliedMaskBorderSize?: number
   opacity: number
   saturation: number
   removeColor: boolean
@@ -108,6 +127,10 @@ export type SpecificWebGL2WarpedMapOptions = {
 }
 export type WebGL2WarpedMapOptions = SpecificWebGL2WarpedMapOptions &
   TriangulatedWarpedMapOptions
+export type WebGL2WarpedMapWithoutGeoreferencedMapOptions = Omit<
+  WebGL2WarpedMapOptions,
+  keyof GeoreferencedMapOptions
+>
 
 export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
   ? WebGL2WarpedMapOptions
@@ -117,21 +140,27 @@ export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
       ? WarpedMapOptions
       : never
 
-export type SpecificWarpedMapListOptions = {
+export type SpecificWarpedMapListOptions<W extends WarpedMap> = {
   createRTree: boolean
   rtreeUpdatedOptions: string[]
   animatedOptions: string[]
+  warpedMapFactory: WarpedMapFactory<W>
 }
-export type WarpedMapListOptions = SpecificWarpedMapListOptions &
-  Partial<WebGL2WarpedMapOptions>
+export type WarpedMapListOptions<W extends WarpedMap> =
+  SpecificWarpedMapListOptions<W> & Partial<WebGL2WarpedMapOptions>
 
-export type SpecificBaseRenderOptions = object
-export type BaseRenderOptions = SpecificBaseRenderOptions & WarpedMapListOptions
-export type SpecificWebGL2RenderOptions = object
+export type SpecificBaseRenderOptions<W extends WarpedMap> = {
+  warpedMapList?: WarpedMapList<W>
+}
+export type BaseRenderOptions<W extends WarpedMap> =
+  SpecificBaseRenderOptions<W> & Partial<WarpedMapListOptions<W>>
+export type SpecificWebGL2RenderOptions = {
+  warpedMapFactory: WarpedMapFactory<WebGL2WarpedMap>
+}
 export type WebGL2RenderOptions = SpecificWebGL2RenderOptions &
-  BaseRenderOptions
-export type CanvasRenderOptions = BaseRenderOptions
-export type IntArrayRenderOptions = BaseRenderOptions
+  BaseRenderOptions<WebGL2WarpedMap>
+export type CanvasRenderOptions = BaseRenderOptions<WarpedMap>
+export type IntArrayRenderOptions = BaseRenderOptions<WarpedMap>
 
 export type TileCacheOptions<D> = {
   fetchFn: FetchFn
@@ -141,12 +170,15 @@ export type TileCacheOptions<D> = {
 // The options when setting options
 export type AnimationOptions = {
   animate: boolean
+  animatedOptions?: string[]
+  duration: number
 }
-export type AnimationOptionsInternal = {
-  optionKeysPossiblyChanged: string[]
-  optionKeysToOmit: string[]
-  init: boolean
+export type AnimationInternalOptions = {
+  stage: AnimationStage
+  optionKeysPossiblyChanged?: string[]
+  optionKeysToOmit?: string[]
 }
+export type AnimationStage = 'init' | 'pre' | 'animate'
 
 export type Renderer = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,11 +191,11 @@ export type GetImageDataValue<D> = (data: D, index: number) => number
 
 export type GetImageDataSize<D> = (data: D) => Size
 
-export type WarpedMapFactory<W> = (
+export type WarpedMapFactory<W extends WarpedMap> = (
   mapId: string,
   georeferencedMap: GeoreferencedMap,
-  listOptions?: Partial<WarpedMapListOptions>,
-  mapOptions?: Partial<WarpedMapOptions>
+  listOptions?: Partial<WarpedMapListOptions<W>>,
+  mapOptions?: Partial<GetWarpedMapOptions<W>>
 ) => W
 
 export type CacheableTileFactory<D> = (

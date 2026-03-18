@@ -29,7 +29,6 @@ import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type {
   CacheableTileFactory,
-  WarpedMapFactory,
   BaseRenderOptions,
   MapPruneInfo,
   GetWarpedMapOptions,
@@ -38,9 +37,6 @@ import type {
   SpritesInfo,
   Sprite
 } from '../shared/types.js'
-
-// TODO: move defaults for tunable options here
-const DEFAULT_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions = {}
 
 // These buffers should be in growing order
 const REQUEST_VIEWPORT_BUFFER_RATIO = 0
@@ -68,6 +64,8 @@ const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
  * Abstract base class for renderers
  */
 export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
+  DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions<W>
+
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
   spritesTileCache: TileCache<D>
@@ -79,18 +77,34 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
-  options: Partial<BaseRenderOptions>
+  options: BaseRenderOptions<W>
+
+  private boundMapTileLoaded = this.mapTileLoaded.bind(this)
+  private boundMapTileDeleted = this.mapTileDeleted.bind(this)
+  private boundImageLoaded = this.imageLoaded.bind(this)
+  private boundWarpedMapAdded = this.warpedMapAdded.bind(this)
+  private boundWarpedMapRemoved = this.warpedMapRemoved.bind(this)
+  private boundPrepareChange = this.prepareChange.bind(this)
+  private boundAnimatedChange = this.animatedChange.bind(this)
+  private boundImmediateChange = this.immediateChange.bind(this)
 
   constructor(
-    warpedMapFactory: WarpedMapFactory<W>,
     cacheableTileFactory: CacheableTileFactory<D>,
-    options?: Partial<BaseRenderOptions>
+    options?: Partial<BaseRenderOptions<W>>
   ) {
     super()
 
-    this.options = mergeOptions(DEFAULT_BASE_RENDER_OPTIONS, options)
+    // TODO: move defaults for tunable options here
+    this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {}
 
-    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
+    this.options = mergeOptions(
+      this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
+      options
+    )
+
+    this.warpedMapList = this.options.warpedMapList
+      ? this.getWarpedMapListFromOptions()
+      : new WarpedMapList(options)
     this.tileCache = new TileCache(cacheableTileFactory, options)
     this.spritesTileCache = new TileCache(
       cacheableTileFactory,
@@ -182,9 +196,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the default options of the renderer and list
    */
-  getDefaultOptions(): BaseRenderOptions & GetWarpedMapOptions<W> {
+  getDefaultOptions(): BaseRenderOptions<W> & GetWarpedMapOptions<W> {
     return mergeOptions(
-      DEFAULT_BASE_RENDER_OPTIONS,
+      this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
       this.warpedMapList.getDefaultOptions()
     )
   }
@@ -203,7 +217,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the render and list options
    */
-  getOptions(): Partial<BaseRenderOptions> {
+  getOptions(): Partial<BaseRenderOptions<W>> {
     return mergePartialOptions(this.options, this.warpedMapList.getOptions())
   }
 
@@ -235,7 +249,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setOptions(
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.options = mergeOptions(this.options, renderAndListOptions)
@@ -253,12 +267,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    */
   setMapsOptions(
     mapIds: string[],
-    mapOptions?: Partial<BaseRenderOptions>,
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    mapOptions?: Partial<BaseRenderOptions<W>>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     if (renderAndListOptions) {
-      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.options = mergeOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptions(
@@ -277,12 +291,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setMapsOptionsByMapId(
-    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions>>,
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions<W>>>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     if (renderAndListOptions) {
-      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.options = mergeOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptionsByMapId(
@@ -353,6 +367,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       listOptionKeys,
       animationOptions
     )
+  }
+
+  protected getWarpedMapListFromOptions(): WarpedMapList<W> {
+    if (!this.options.warpedMapList) {
+      throw new Error('No WarpedMapList')
+    }
+    const warpedMapList = this.options.warpedMapList
+    warpedMapList.setOptions(this.options)
+    return warpedMapList
   }
 
   protected loadMissingImagesInViewport(): Promise<void>[] {
@@ -467,10 +490,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const spriteFetchableTiles = this.tileCache
       .getCachedTiles()
       .filter((cachedTile) => cachedTile.isTileFromSprites())
-      .filter(
-        (cachedTile) =>
-          this.warpedMapList.getWarpedMap(cachedTile.fetchableTile.mapId)
-            ?.options.visible != false
+      .filter((cachedTile) =>
+        this.warpedMapList
+          .getWarpedMap(cachedTile.fetchableTile.mapId)
+          ?.shouldRenderMap()
       )
       .map((cachedTile) => cachedTile.fetchableTile)
 
@@ -570,7 +593,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.options.visible) {
+    if (!warpedMap.shouldRenderMap()) {
       return []
     }
 
@@ -717,7 +740,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.options.visible) {
+    if (!warpedMap.shouldRenderMap()) {
       return []
     }
 
@@ -757,10 +780,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       .at(-1)
     warpedMap.setOverviewTileZoomLevelForViewport(overviewTileZoomLevel)
 
-    // If this map it ourside of the viewport with overview buffer, stop here:
+    // If this map it outside of the viewport with overview buffer, or if the map is invisible, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
-    if (!mapsInViewportForOverviewRequest.has(mapId)) {
+    if (
+      !mapsInViewportForOverviewRequest.has(mapId) ||
+      !warpedMap.shouldRenderMap()
+    ) {
       return []
     }
 
@@ -961,84 +987,70 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected addEventListeners() {
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
+      this.boundMapTileLoaded
     )
-
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILEDELETED,
-      this.mapTileDeleted.bind(this)
+      this.boundMapTileDeleted
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMAGELOADED,
-      this.imageLoaded.bind(this)
+      this.boundImageLoaded
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
+      this.boundWarpedMapAdded
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
-      this.warpedMapRemoved.bind(this)
+      this.boundWarpedMapRemoved
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.PREPARECHANGE,
-      this.prepareChange.bind(this)
+      this.boundPrepareChange
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.ANIMATEDCHANGE,
-      this.animatedChange.bind(this)
+      this.boundAnimatedChange
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMMEDIATECHANGE,
-      this.immediateChange.bind(this)
+      this.boundImmediateChange
     )
   }
 
   protected removeEventListeners() {
     this.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
+      this.boundMapTileLoaded
     )
-
     this.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILEDELETED,
-      this.mapTileDeleted.bind(this)
+      this.boundMapTileDeleted
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
-      this.imageLoaded.bind(this)
+      this.boundImageLoaded
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
+      this.boundWarpedMapAdded
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
-      this.warpedMapRemoved.bind(this)
+      this.boundWarpedMapRemoved
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.PREPARECHANGE,
-      this.prepareChange.bind(this)
+      this.boundPrepareChange
     )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.IMMEDIATECHANGE,
-      this.immediateChange.bind(this)
-    )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.ANIMATEDCHANGE,
-      this.animatedChange.bind(this)
+      this.boundAnimatedChange
+    )
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.boundImmediateChange
     )
   }
 }

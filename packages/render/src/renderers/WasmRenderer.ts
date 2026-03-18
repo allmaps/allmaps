@@ -2,7 +2,6 @@ import { doBboxesIntersect } from '@allmaps/stdlib'
 
 import { BaseRenderer } from './BaseRenderer.js'
 import { Viewport } from '../viewport/Viewport.js'
-import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import {
   CacheableRawJpegTile,
   type RawJpegData
@@ -130,16 +129,6 @@ type WasmModule = {
 export type OutputFormat = 'png' | 'webp' | 'jpeg'
 
 /**
- * Extract transformation weights in flat format for WASM
- */
-function extractTransformWeights(transformation: BaseTransformation): {
-  weights: Float64Array
-  sourcePoints: Float64Array
-} {
-  return transformation.getWeights()
-}
-
-/**
  * Class that renders WarpedMaps using WASM with raw JPEG tiles
  * Caches raw JPEG bytes and decodes them in WASM for maximum performance
  */
@@ -163,11 +152,7 @@ export class WasmRenderer
       return wasmModule.decode_jpeg_test(new Uint8Array(jpegBytes))
     }
 
-    super(
-      createWarpedMapFactory(),
-      CacheableRawJpegTile.createFactory(decodeJpegForDimensions),
-      options
-    )
+    super(CacheableRawJpegTile.createFactory(decodeJpegForDimensions), options)
     this.wasmModule = wasmModule
     this.outputFormat = options?.outputFormat || 'png'
     this.backgroundColor = options?.backgroundColor
@@ -315,7 +300,8 @@ export class WasmRenderer
     // Extract transformation
     const transformer = warpedMap.projectedTransformer
     const transformation = transformer.getToResourceTransformation()
-    const { weights, sourcePoints } = extractTransformWeights(transformation)
+    const { weights, sourcePoints } =
+      transformation.getTransformationDataAsFloat64Array()
     const transformType = transformation.type
 
     // Get resource mask

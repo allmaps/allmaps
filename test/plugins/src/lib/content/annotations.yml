@@ -1,0 +1,63 @@
+- name: New York
+  url: https://annotations.allmaps.org/manifests/02c7b8df6fac1378
+  reason: Single annotation, low distortion
+- name: Rozenburg
+  url: https://annotations.allmaps.org/maps/68f2d73e25442695
+  reason: Many small tiles
+- name: India
+  url: https://annotations.allmaps.org/images/6b99cd166aeed9f5
+  reason: Non-square tiles, many small tiles
+- name: Marseille
+  url: https://annotations.allmaps.org/maps/94c2e29ec0996def
+  reason: Very large tile size and hence no overview tiles
+- name: Vietnam
+  url: https://annotations.allmaps.org/images/466d0cf48dcba6d0
+  reason: Zoom issues occured earlier
+- name: Europe
+  url: https://annotations.allmaps.org/images/f6033bee94f7763e
+  reason: Internal projection makes map fit perfectly with only 3 GCPs
+- name: British Isles
+  url: https://annotations.allmaps.org/images/e861bd9af6573765
+  reason: Thin Plate Spline warping
+- name: Railway map
+  url: https://gist.githubusercontent.com/sammeltassen/fa3dbfaf4dfa800e00824478c4bd1928/raw/f182beac911e38b0a1d1eb420fbd54b4e6d2f2eb/nl-railway-map.json
+  reason: Triangulation failed previously when refining too much
+- name: Scheldekaart
+  url: https://annotations.allmaps.org/maps/37af8588be44c256
+  reason: Extremely high warping, even fold over
+- name: Liber Floribus
+  url: https://annotations.allmaps.org/images/9d77cf5c62742b6a
+  reason: Extremly high warping
+- name: Chesapeake and Ohio Canal
+  url: https://annotations.allmaps.org/images/7f2494dd1ad9ed7a
+  reason: Two maps from same image, overlapping, mask outside full mask
+- name: Caledonia
+  url: https://annotations.allmaps.org/maps/63ac1b4bd125ca05
+  reason: Left of antimeridian
+- name: Samoa
+  url: https://annotations.allmaps.org/maps/04f2b5f4e3c931f3
+  reason: Right of antimeridian
+- name: New Zealand
+  url: https://annotations.allmaps.org/images/bd97e004c2973bb3
+  reason: Overlapping antimeridian
+- name: Rotterdam
+  url: https://annotations.allmaps.org/manifests/631b96e4d6d3f421
+  reason: Composite annotation page, differentiated zoomlevels crossing
+- name: Loman atlas
+  url: https://annotations.allmaps.org/manifests/af012d4792961902
+  reason: Complex annotation page
+- name: City of Lynn
+  url: https://annotations.allmaps.org/manifests/23379602e8187445
+  reason: Many maps of different sizes
+- name: TOP25 NL
+  url: https://sammeltassen.nl/iiif-manifests/allmaps/top25-1.json
+  reason: High number of annotations
+- name: Bonnebladen
+  url: https://raw.githubusercontent.com/bmmeijers/iiif-annotations/main/series/bonnebladen/bonnebladen.json
+  reason: Very high number of annotations
+- name: Ortelius Atlas
+  url: https://annotations.allmaps.org/manifests/29c3e14995297431
+  reason: Images with multiple tile sizes, dateline
+- name: Pourbus
+  url: https://raw.githubusercontent.com/mclaeysb/claeissens/refs/heads/main/final-annotation-page.json
+  reason: Extremely high number of GCPs

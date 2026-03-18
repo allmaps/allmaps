@@ -1,3 +1,5 @@
+import proj4 from 'proj4'
+
 import {
   computeBbox,
   bboxToCenter,
@@ -16,13 +18,10 @@ import {
   midPoint,
   scalePoints,
   rotatePoint,
-  mergeOptions
+  mergeOptions,
+  mergePartialOptions
 } from '@allmaps/stdlib'
-import {
-  lonLatProjection,
-  webMercatorProjection,
-  proj4
-} from '@allmaps/project'
+import { lonLatProjection, webMercatorProjection } from '@allmaps/project'
 
 import {
   composeHomogeneousTransform,
@@ -248,7 +247,9 @@ export class Viewport {
     >
   ): Viewport {
     const projectedGeoConvexHull = warpedMapList.getMapsConvexHull(
-      partialExtendedViewportOptions
+      mergePartialOptions(partialExtendedViewportOptions, {
+        projection: webMercatorProjection
+      })
     )
 
     if (!projectedGeoConvexHull) {
@@ -328,21 +329,21 @@ export class Viewport {
     )
 
     const projectedGeoRing = projectedGeoPolygon[0]
-    const rotatedProjectedGeoRing = rotatePoints(
+    const projectedGeoRotatedRing = rotatePoints(
       projectedGeoRing,
       -extendedViewportOptions.rotation
     )
-    const rotatedProjectedGeoBbox = computeBbox(rotatedProjectedGeoRing)
-    const rotatedProjectedGeoSize = bboxToSize(rotatedProjectedGeoBbox)
-    const rotatedProjectedGeoCenter = bboxToCenter(rotatedProjectedGeoBbox)
+    const projectedGeoRotatedBbox = computeBbox(projectedGeoRotatedRing)
+    const projectedGeoRotatedSize = bboxToSize(projectedGeoRotatedBbox)
+    const projectedGeoRotatedCenter = bboxToCenter(projectedGeoRotatedBbox)
     const projectedGeoPerViewportScale = sizesToScale(
-      rotatedProjectedGeoSize,
+      projectedGeoRotatedSize,
       viewportSize,
       extendedViewportOptions.fit
     )
 
     const projectedGeoCenter = rotatePoint(
-      rotatedProjectedGeoCenter,
+      projectedGeoRotatedCenter,
       extendedViewportOptions.rotation
     )
 
@@ -372,7 +373,9 @@ export class Viewport {
     >
   ): Viewport {
     const projectedGeoConvexHull = warpedMapList.getMapsConvexHull(
-      partialExtendedViewportOptions
+      mergePartialOptions(partialExtendedViewportOptions, {
+        projection: webMercatorProjection
+      })
     )
 
     if (!projectedGeoConvexHull) {

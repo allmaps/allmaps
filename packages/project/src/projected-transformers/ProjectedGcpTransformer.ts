@@ -69,7 +69,7 @@ import type {
  * with origin in the top left and the y-axis pointing down.
  *
  * @param internalProjection - the internal projection to which the GCPs (supplied in lon-lat 'EPSG:4326') are projected before building the transformation functions.
- * @param projection - the projection of the 'projected geo' space, in which the 'toGeo()' methods results its results.
+ * @param projection - the projection of the 'projected geo' space, in which the 'toProjectedGeo()' methods results its results.
  * @param internalProjectionToProjection - the postToGeo used to go from the internal projection to the projection.
  * @param projectionToInternalProjection - the preToResource function used to go from the projection to the internal projection.
  */
@@ -173,6 +173,78 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     return this.gcps
   }
 
+  transformToProjectedGeo<P = Point>(
+    point: Point,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): P
+  transformToProjectedGeo<P = Point>(
+    lineString: LineString,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedLineString<P>
+  transformToProjectedGeo<P = Point>(
+    polygon: Polygon,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedPolygon<P>
+  transformToProjectedGeo<P = Point>(
+    multiPoint: MultiPoint,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiPoint<P>
+  transformToProjectedGeo<P = Point>(
+    multiLineString: MultiLineString,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiLineString<P>
+  transformToProjectedGeo<P = Point>(
+    multiPoint: MultiPolygon,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedMultiPolygon<P>
+  transformToProjectedGeo<P = Point>(
+    geometry: Geometry,
+    partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedGeometry<P>
+  /**
+   * Transform a geometry to projected geo space
+   *
+   * @param geometry - Geometry to transform
+   * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
+   * @param gcpToP - Return type function
+   * @returns Input geometry transformed to projected geo space
+   */
+  transformToProjectedGeo<P = Point>(
+    geometry: Geometry,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
+    gcpToP?: (gcp: GcpAndDistortions) => P
+  ): TypedGeometry<P> {
+    const projection = partialProjectedGcpTransformOptions?.projection
+
+    let partialGcpTransformOptions = partialProjectedGcpTransformOptions
+
+    if (projection) {
+      const internalProjectionToProjectionConverter = proj4(
+        this.internalProjection.definition,
+        projection.definition
+      )
+      const postToGeo = internalProjectionToProjectionConverter.forward
+      const preToResource = internalProjectionToProjectionConverter.inverse
+
+      partialGcpTransformOptions = mergePartialOptions(
+        partialGcpTransformOptions,
+        {
+          postToGeo,
+          preToResource
+        }
+      )
+    }
+
+    return super.transformToGeo(geometry, partialGcpTransformOptions, gcpToP)
+  }
+
   transformToGeo<P = Point>(
     point: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
@@ -209,7 +281,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to projected geo space
+   * Transform a geometry to geo space
    *
    * @param geometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
@@ -221,28 +293,13 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
-    const projection = partialProjectedGcpTransformOptions?.projection
-
-    let partialGcpTransformOptions = partialProjectedGcpTransformOptions
-
-    if (projection) {
-      const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection.definition,
-        projection.definition
-      )
-      const postToGeo = internalProjectionToProjectionConverter.forward
-      const preToResource = internalProjectionToProjectionConverter.inverse
-
-      partialGcpTransformOptions = mergePartialOptions(
-        partialGcpTransformOptions,
-        {
-          postToGeo,
-          preToResource
-        }
-      )
-    }
-
-    return super.transformToGeo(geometry, partialGcpTransformOptions, gcpToP)
+    return this.transformToProjectedGeo(
+      geometry,
+      mergePartialOptions(partialProjectedGcpTransformOptions, {
+        projection: lonLatProjection
+      }),
+      gcpToP
+    )
   }
 
   transformToResource<P = Point>(

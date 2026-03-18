@@ -54,10 +54,9 @@
   let warpedMapLayer = $state.raw<WarpedMapLayer>()
 
   function computeGeoreferencedMapBbox(map: GeoreferencedMap) {
-    const transformer = ProjectedGcpTransformer.fromGeoreferencedMap(map, {
-      projection: lonLatProjection
-    })
-    const geoMask = transformer.transformToGeo([map.resourceMask])
+    const projectedTransformer =
+      ProjectedGcpTransformer.fromGeoreferencedMap(map)
+    const geoMask = projectedTransformer.transformToGeo([map.resourceMask])
 
     return computeBbox(geoMask)
   }
@@ -128,9 +127,7 @@
     if (geoMap && warpedMapLayer && event.detail.type === 'map') {
       const mapId = getFullMapId(annotationsApiBaseUrl, event.detail.mapId)
       warpedMapLayer.bringMapsToFront([mapId])
-      const bbox = warpedMapLayer?.getMapsBbox([mapId], {
-        projection: lonLatProjection
-      })
+      const bbox = warpedMapLayer?.getMapsBbox([mapId])
       if (bbox) {
         const bounds = [
           [bbox[0], bbox[1]],
@@ -178,9 +175,7 @@
 
   $effect(() => {
     if (scopeState.activeMapId && geoMap) {
-      const bbox = warpedMapLayer?.getMapsBbox([scopeState.activeMapId], {
-        projection: lonLatProjection
-      })
+      const bbox = warpedMapLayer?.getMapsBbox([scopeState.activeMapId])
       if (bbox) {
         const bounds = [
           [bbox[0], bbox[1]],

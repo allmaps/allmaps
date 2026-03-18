@@ -22,6 +22,8 @@ This plugin exports the class `WarpedMapLayer` that extends [`L.Layer`](https://
 
 To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
 
+This plugin implements a lot of methods from [@allmaps/warpedmaplayer](../warpedmaplayer/README.md), the core package gathering the functionality connecting the Allmaps plugins to the [@allmaps/render](../render/README.md) package.
+
 ## Installation
 
 This package works in browsers and in Node.js as an ESM or an UMD module.
@@ -42,11 +44,13 @@ pnpm run build
 
 Built for Leaflet 1.9, but should work with earlier versions as well.
 
-### Loading a Georeference Annotation
+### Adding a WarpedMapLayer to a MapLibre Map
 
 Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
+import L from 'leaflet'
+
 import { WarpedMapLayer } from '@allmaps/leaflet'
 
 const map = L.map('map', {
@@ -68,7 +72,9 @@ const warpedMapLayer = new WarpedMapLayer(annotationUrl).addTo(map)
 
 When adding this WarpedMapLayer to the Leaflet map, the georeferenced map specified in the Georeference Annotation will be rendered on the Leaflet map.
 
-Specifying a the URL Georeference Annotation when creating a WarpedMapLayer (as is done above) is optional. A Georeference Annotation can also be added at a later stage using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
+### Ways to load Georeference Annotations
+
+Once the layer has been added to the map, a Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
 
 ```js
 fetch(annotationUrl)
@@ -82,9 +88,44 @@ Or:
 await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-### WarpedMapLayer API and Events
+It's also possible to create a WarpedMapList first and pass it to the layer on creation. This has the advantage of being able to compute properties of a WarpedMapList first, e.g. getting the bounds and passing it to the Leaflet Map.
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins). It includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
+```js
+import L from 'leaflet'
+
+import { WarpedMapLayer } from '@allmaps/leaflet'
+import { WarpedMapList } from '@allmaps/render'
+import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+const annotation = await fetch(annotationUrl).then((response) =>
+    response.json()
+  )
+const warpedMapList = new WarpedMapList<WebGL2WarpedMap>()
+await warpedMapList.addGeoreferenceAnnotation(annotation)
+const bbox = warpedMapList.getMapsBbox()
+
+const map = L.map('map', {
+  // Zoom animations for more than one zoom level are
+  // currently not supported by the Allmaps plugin for Leaflet
+  zoomAnimationThreshold: 1
+})
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map)
+const warpedMapLayer = new WarpedMapLayer(undefined, { warpedMapList }).addTo(map)
+if (bbox) {
+  map.fitBounds([ [ bbox[0], bbox[1] ], [ bbox[2], bbox[3] ] ])
+}
+```
+
+Note that the `...ByUrl()` functions are not available on a WarpedMapList.
+
+### WarpedMapLayer API, Options and Events
+
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods coming from the WarpedMapLayer class (shared by all Allmaps plugins). It describes the methods like `addGeoreferenceAnnotation()` and includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
 You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
 
@@ -113,34 +154,6 @@ MIT
 
 ```ts
 SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
-```
-
-### `new WarpedMapEvent(type, data)`
-
-###### Parameters
-
-* `type` (`WarpedMapEventType`)
-* `data?` (`Partial<WarpedMapEventData> | undefined`)
-
-###### Returns
-
-`WarpedMapEvent`.
-
-###### Extends
-
-* `Event`
-
-### `WarpedMapEvent#data?`
-
-###### Type
-
-```ts
-{
-  mapIds?: Array<string> | undefined
-  tileUrl?: string | undefined
-  optionKeys?: Array<string> | undefined
-  spritesInfo?: SpritesInfo | undefined
-}
 ```
 
 ### `new WarpedMapLayer(annotationOrAnnotationUrl, options)`
@@ -429,6 +442,22 @@ HTMLDivElement
 }
 ```
 
+### `WarpedMapLayer#getBbox(projectionOptions)`
+
+Get the bounding box of all maps
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The bbox of all maps, in the chosen projection, or undefined if there were no maps (`Bbox | undefined`).
+
 ### `WarpedMapLayer#getBounds()`
 
 Returns the bounds of all visible maps (inside or outside of the Viewport), in latitude/longitude coordinates.
@@ -439,9 +468,41 @@ There are no parameters.
 
 ###### Returns
 
-`Array<Array<number>> | undefined`.
+`[Point, Point] | undefined`.
 
 * L.LatLngBounds in array form of all visible maps
+
+### `WarpedMapLayer#getCenter(projectionOptions)`
+
+Get the center of the bounding box of all maps
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps (`Point | undefined`).
+
+### `WarpedMapLayer#getConvexHull(projectionOptions)`
+
+Get the convex hull of all maps
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The convex hull of all maps, in the chosen projection, or undefined if there were no maps (`Ring | undefined`).
 
 ### `WarpedMapLayer#getDefaultOptions()`
 
@@ -453,7 +514,7 @@ There are no parameters.
 
 ###### Returns
 
-`SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions> & object & SpecificWarpedMapListOptions & Partial<...> & SpecificWebGL2WarpedMapOptions & SpecificTriangulatedWarpedMapOptions & WarpedMapOptions`.
+`SpecificLeafletWarpedMapLayerOptions & Partial<WebGL2RenderOptions> & SpecificBaseRenderOptions<WebGL2WarpedMap> & Partial<...> & SpecificWebGL2WarpedMapOptions & SpecificTriangulatedWarpedMapOptions & WarpedMapOptions`.
 
 ### `WarpedMapLayer#getLayerOptions()`
 
@@ -465,7 +526,7 @@ There are no parameters.
 
 ###### Returns
 
-`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; ... 62 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; warpedMapFactory?: WarpedMapFactory<WebGL2WarpedMap> | undefined; ... 65 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapLayer#getMapDefaultOptions(mapId)`
 
@@ -542,8 +603,7 @@ The z-index of a map (`number | undefined`).
 
 Get the bounding box of the maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -551,7 +611,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -561,8 +621,7 @@ The bbox of all selected maps, in the chosen projection, or undefined if there w
 
 Get the center of the bounding box of the maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -570,7 +629,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -580,8 +639,7 @@ The center of the bbox of all selected maps, in the chosen projection, or undefi
 
 Get the convex hull of the maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -589,7 +647,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -917,6 +975,21 @@ Set the layer options
 warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
 ```
 
+### `WarpedMapLayer#setLayerTransformationType(transformationType, animationOptions)`
+
+Set the transformation type of the layer
+
+###### Parameters
+
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
 ### `WarpedMapLayer#setMapGcps(mapId, gcps, animationOptions)`
 
 Set the GCPs of a map
@@ -1016,15 +1089,7 @@ and stays accessible in the warped map's `map` property.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
+* `transformationType?` (`TransformationType | undefined`)
   * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
@@ -1090,6 +1155,30 @@ This is equivalent to using the reset function for map-specific option.
     | Partial<LeafletWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapsTransformationType(mapIds, transformationType, animationOptions)`
+
+Set the transformation type of maps
+
+This only sets the map-specific `transformationType` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original transformation type inferred from the Georeference Annotation.
+
+The original transformation type can be reset by resetting the map-specific transformation type option,
+and stays accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs for which to set the options
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
 

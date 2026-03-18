@@ -1,6 +1,5 @@
 import { BaseRenderer } from './BaseRenderer.js'
 import { Viewport } from '../viewport/Viewport.js'
-import { createWarpedMapFactory } from '../maps/WarpedMap.js'
 import { CacheableIntArrayTile } from '../tilecache/CacheableIntArrayTile.js'
 import { renderToIntArray } from '../shared/render-to-int-array.js'
 
@@ -32,11 +31,7 @@ export class IntArrayRenderer<D>
     getImageDataSize: GetImageDataSize<D>,
     options?: Partial<IntArrayRenderOptions>
   ) {
-    super(
-      createWarpedMapFactory(),
-      CacheableIntArrayTile.createFactory(getImageData),
-      options
-    )
+    super(CacheableIntArrayTile.createFactory(getImageData), options)
     this.getImageDataValue = getImageDataValue
     this.getImageDataSize = getImageDataSize
   }

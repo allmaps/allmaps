@@ -1,6 +1,8 @@
 # @allmaps/bearing
 
-Computes the bearing of a Georeferenced Map.
+Computes the bearing of a Georeferenced Map or Warped Map.
+
+## Usage
 
 ```js
 import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
@@ -23,13 +25,13 @@ MIT
 
 ### `computeGeoreferencedMapBearing(georeferencedMap, options)`
 
-Computes the bearing of a Georeferenced Map.
+Compute the bearing of a Georeferenced Map.
 
 ###### Parameters
 
 * `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
   * Georeferenced Map
-* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; ... 6 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 
@@ -37,13 +39,13 @@ The bearing of the map in degrees, measured from the north line (`number`).
 
 ### `computeWarpedMapBearing(warpedMap, options)`
 
-Computes the bearing of a Warped Map.
+Compute the bearing of a Warped Map.
 
 ###### Parameters
 
 * `warpedMap` (`WarpedMap`)
   * Warped Map
-* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; ... 6 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 

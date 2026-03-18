@@ -1,45 +1,25 @@
 import {
-  lonLatProjection,
   ProjectedGcpTransformer,
   ProjectedGcpTransformerOptions
 } from '@allmaps/project'
 import {
   bearing,
   computeBbox,
-  mergePartialOptions,
   midPoint,
   radiansToDegrees
 } from '@allmaps/stdlib'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type {
-  TransformationType,
-  TransformationTypeInputs
-} from '@allmaps/transform'
-import type { Projection } from '@allmaps/project'
+import type { TransformationTypeInputs } from '@allmaps/transform'
 import type { Point, Ring } from '@allmaps/types'
 import type { WarpedMap } from '@allmaps/render'
 
 // Using helmert transformation by default, not map transformation type,
 // since possible for any amount of points, consistent,
 // faster when many gcps and accurate when showing original image
-const DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS: {
-  transformationType: TransformationType
-  projection: Projection
-} = {
-  transformationType: 'helmert',
-  projection: lonLatProjection
-}
-const DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS: {
-  transformationType: TransformationType
-  projection: Projection
-} = {
-  transformationType: 'helmert',
-  projection: lonLatProjection
-}
 
 /**
- * Computes the bearing of a Georeferenced Map.
+ * Compute the bearing of a Georeferenced Map.
  *
  * @param georeferencedMap - Georeferenced Map
  * @returns The bearing of the map in degrees, measured from the north line
@@ -48,11 +28,6 @@ export function computeGeoreferencedMapBearing(
   georeferencedMap: GeoreferencedMap,
   options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
 ) {
-  options = mergePartialOptions(
-    DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS,
-    options
-  )
-
   if (georeferencedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
   }
@@ -69,7 +44,7 @@ export function computeGeoreferencedMapBearing(
 }
 
 /**
- * Computes the bearing of a Warped Map.
+ * Compute the bearing of a Warped Map.
  *
  * @param warpedMap - Warped Map
  * @returns The bearing of the map in degrees, measured from the north line
@@ -78,18 +53,12 @@ export function computeWarpedMapBearing(
   warpedMap: WarpedMap,
   options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
 ) {
-  options = mergePartialOptions(
-    DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS,
-    options
-  )
-
   if (warpedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
   }
 
   const projectedTransformer = warpedMap.getProjectedTransformer(
-    options?.transformationType ??
-      DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS.transformationType,
+    options?.transformationType,
     options
   )
 
@@ -112,9 +81,9 @@ function computeBearingInternal(
   const resourceTopCenter = midPoint(resourceTopLeft, resourceTopRight)
   const resourceBottomCenter = midPoint(resourceBottomLeft, resourceBottomRight)
   const projectedGeoTopCenter =
-    projectedTransformer.transformToGeo(resourceTopCenter)
+    projectedTransformer.transformToProjectedGeo(resourceTopCenter)
   const projectedGeoBottomCenter =
-    projectedTransformer.transformToGeo(resourceBottomCenter)
+    projectedTransformer.transformToProjectedGeo(resourceBottomCenter)
 
   return radiansToDegrees(
     bearing([projectedGeoBottomCenter, projectedGeoTopCenter])

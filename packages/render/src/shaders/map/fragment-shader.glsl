@@ -3,7 +3,12 @@
 precision highp float;
 precision highp isampler2D;
 
-#include ../helpers.frag;
+uniform float u_animationProgress;
+
+uniform float u_visibilityOpacity;
+uniform float u_previousVisibilityOpacity;
+uniform float u_applyMaskOpacity;
+uniform float u_previousApplyMaskOpacity;
 
 uniform float u_opacity;
 uniform float u_saturation;
@@ -40,6 +45,7 @@ in vec2 v_resourceTrianglePoint;
 in float v_trianglePointDistortion;
 in float v_trianglePointIndex;
 in vec4 v_trianglePointBarycentric;
+in float v_trianglePointInside;
 
 out vec4 color;
 
@@ -60,7 +66,8 @@ void main() {
   vec3 cachedTilesTexturePoint = vec3(0.0f, 0.0f, 0.0f);
 
   // Set the initial values
-  color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  vec4 initialColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+  color = initialColor;
 
   // Loop through all cached tiles
   for(int index = 0; index < cachedTilesCount; index += 1) {

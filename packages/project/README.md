@@ -10,11 +10,11 @@ Within the Allmaps project, this module is used a.o. in [@allmaps/render](../../
 
 This package exports the `ProjectedGcpTransformer` class, which extends the `GcpTransformer` class from [@allmaps/transform](../../packages/transform/).
 
-Like instances of the `GcpTransformer` class, instances of the `ProjectedGcpTransformer` class are constructed from **a set of Control Points**, who's coordinates are known in both spaces (and who's geo coordinates are given in lon-lat `EPSG:4326` projection), and a specific **type of transformation** algorithm. Additionally, an internal projection and projection can be defined, in order to transform not from 'resource' to 'geo' space, but from 'resource' to 'projected geo' space of the viewport, optionally passing through an 'internal projected geo' space of the map. This is achieved using the same `toGeo()` and `toResource()` methods.
+Like instances of the `GcpTransformer` class, instances of the `ProjectedGcpTransformer` class are constructed from **a set of Control Points**, who's coordinates are known in both spaces (and who's geo coordinates are given in lon-lat `EPSG:4326` projection), and a specific **type of transformation** algorithm. Additionally, an internal projection and projection can be defined, in order to transform not from 'resource' to 'geo' space, but from 'resource' to 'projected geo' space of the viewport, optionally passing through an 'internal projected geo' space of the map. This is achieved using the `toProjectedGeo()` and `toResource()` methods (or `toGeo()` to obtain points in `EPSG:4326` projection).
 
 The **projection** defines the 'projected geo' space of the viewport. Since we will render our geometries in the projected space of our viewport, it is logical to make the transformer aware of this space by supplying its projection, so it can bring the results to this space. It defaults to WebMercator `EPSG:3857`, the projection used by default in most webmaps.
 
-The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account *only* for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different than the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to its 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
+The **internal projection** defines the 'internal projected geo' space. This is the space of the known or supposed projection in which the map was made. When we know this projection, it is important, e.g. when transforming `toGeo`, to build a `toGeoTransfromation` between the 'resource' space of the image and the 'internal projected geo' space of this known or supposed projection. This way we make the transformation account *only* for the warping of the image onto its intended projection space, and not for any other warping due to the choice of viewport projection (which could be different than the map projection). To bring the results from the 'internal projected geo' space of the map to the 'projected geo' space of the viewport, a projection function from 'internal projected geo' to 'projected geo' space is set as the `postToGeo` option (that is part of the GCP Transform options), and executed at the end of the transformer's `toProjectedGeo()` method. Similarly when calling the `toResource()` method a `preToResource()` is executed to go from 'projected geo' space to 'internal projected geo' space, before evaluating the `toResourceTransformation` and arriving in 'resource' space. The 'internal projected geo' space also defaults to WebMercator `EPSG:3857` (due to its 'conformal' properties that make it a good general guess for a map's projection at large scales). When the internal projection and projection are identical (as is the default) the `postToGeo()` function is an identity projection with no effect.
 
 The GCPs must be provided in lon-lat `EPSG:4326` projection (since this is the default projection used by GeoJSON and Georeference Annotations) and are projected to the 'projected geo' space before building the GCP Transformer (who will project them to the 'internal projected geo' space).
 
@@ -50,7 +50,7 @@ const projectedTransformer =
   ProjectedGcpTransformer.fromGeoreferencedMap(georeferencedMap)
 
 // Use it to transform geometries, as below. E.g.:
-const projectedGeoPoint = projectedTransformer.transformToGeo(resourcePoint)
+const projectedGeoPoint = projectedTransformer.transformToProjectedGeo(resourcePoint)
 ```
 
 This is equivalent to constructing a projected transformer from the Annotation's or Georeferenced Map's GCPs, transformation type and projection, as in the examples below.
@@ -130,7 +130,7 @@ const resourceLineString = [
 ]
 
 const projectedGeoLineString =
-  projectedTransformer.transformToGeo(resourceLineString)
+  projectedTransformer.transformToProjectedGeo(resourceLineString)
 // projectedGeoLineString = [
 //   [498246.8195647142, 6789061.316027705],
 //   [496595.9732655353, 6787546.801212325],
@@ -177,7 +177,7 @@ const resourceLineString = [
   [622, 941]
 ]
 
-const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineString)
+const projectedGeoLineString = projectedTransformer.transformToProjectedGeo(resourceLineString)
 // const projectedGeoLineString = [
 //   [498247.196090505, 6789061.7676701555],
 //   [496596.0857961293, 6787546.818863111],
@@ -227,7 +227,7 @@ const resourceLineString = [
   [622, 941]
 ]
 
-const projectedGeoLineString = projectedTransformer.transformToGeo(resourceLineString)
+const projectedGeoLineString = projectedTransformer.transformToProjectedGeo(resourceLineString)
 // const projectedGeoLineString = [
 //   [92171.96319801327, 439250.7392195241],
 //   [91140.1318550074, 438330.2059945731],
@@ -256,7 +256,7 @@ We can request the result of a 'toGeo' transform using the projected transformer
 // internalProjection: epsg31370,
 // projection: epsg28992
 
-const projectedGeoLineString = projectedTransformer.transformToGeo(
+const projectedGeoLineString = projectedTransformer.transformToProjectedGeo(
   resourceLineString,
   { projection: { definition: 'EPSG:3857' } }
 )
@@ -295,7 +295,8 @@ When creating an instance from the Projected GCP Transformer class:
 
 When using its main methods:
 
-* The method `transformToGeo()` transforms input geometries from 'resource' space to 'projected geo' space, as the method `transformToResource()` transforms input geometries from 'projected geo' space to 'resource' space.
+* The method `transformToProjectedGeo()` transforms input geometries from 'resource' space to 'projected geo' space, as the method `transformToResource()` transforms input geometries from 'projected geo' space to 'resource' space.
+* An additional method `transformToGeo()` transforms input geometries from 'resource' space to 'geo' in lon-lat 'EPSG:4326'.
 * Inputs are following the Allmaps Geometries types. To handle GeoJSON Geometries or SVG Geometries, convert to and from these geometry types using the functions available in [@allmaps/stdlib](../../packages/stdlib/).
 * **GCP Transform options** can be specified and manage a.o. how geometries are refined and which distortions are computed. The projection functions are now considered when refining geometries and recursively adding midpoints.
 * A **'return type function'** can be used to extract distortion information or modify the results.
@@ -497,6 +498,18 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 
 `P`.
 
+### `ProjectedGcpTransformer#transformToProjectedGeo(point, partialGcpTransformOptions, gcpToP)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
+* `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
+
+###### Returns
+
+`P`.
+
 ### `ProjectedGcpTransformer#transformToResource(point, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
@@ -646,6 +659,7 @@ Note that `+over` was added to support wrapping around the antimeridian
 ###### Fields
 
 * `definition` (`string`)
+* `id` (`string`)
 * `name` (`string`)
 
 ### `projectionDefinitionToAntialiasedDefinition(stringProjectionDefinition, partialProjectionDefinitionOptions)`
@@ -681,4 +695,5 @@ Note that `+over` was added to support wrapping around the antimeridian
 ###### Fields
 
 * `definition` (`string`)
+* `id` (`string`)
 * `name` (`string`)

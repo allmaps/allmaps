@@ -117,7 +117,7 @@ export abstract class BaseTransformation {
    *   - weights: Transformation-specific weight parameters as Float64Array
    *   - sourcePoints: Flattened source control points as Float64Array (for TPS only, empty otherwise)
    */
-  abstract getWeights(): {
+  abstract getTransformationDataAsFloat64Array(): {
     weights: Float64Array
     sourcePoints: Float64Array
   }

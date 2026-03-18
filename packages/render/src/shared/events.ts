@@ -1,4 +1,4 @@
-import { SpritesInfo } from './types.js'
+import { AnimationOptions, SpritesInfo } from './types.js'
 
 export const WarpedMapEventType = {
   // WarpedMapList > ...
@@ -49,6 +49,7 @@ export type WarpedMapEventData = {
   mapIds: string[]
   tileUrl: string
   optionKeys: string[]
+  animationOptions: Partial<AnimationOptions>
   spritesInfo: SpritesInfo
 }
 
