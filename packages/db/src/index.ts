@@ -1,4 +1,5 @@
 export { schema, relations } from './schema.js'
+export { createAuth } from './auth.js'
 export {
   getDb,
   getNeonSql,
@@ -9,6 +10,7 @@ export {
   getPostgresContext
 } from './db.js'
 
+export type { BetterAuthContext } from './auth.js'
 export type {
   Db,
   DbOrTx,

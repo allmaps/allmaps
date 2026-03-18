@@ -6,11 +6,9 @@
     "module": "esnext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["@cloudflare/workers-types"],
+    "types": ["./worker-configuration.d.ts"],
     "composite": false,
     "declaration": false
   },
@@ -23,8 +21,5 @@
     { "path": "../../packages/db" },
     { "path": "../../packages/env" }
   ],
-  "include": [
-    "./src/**/*",
-    "../../packages/api-shared/src/projections/projections.ts"
-  ]
+  "include": ["./src/**/*"]
 }

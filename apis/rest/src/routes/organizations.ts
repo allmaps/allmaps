@@ -10,7 +10,7 @@ import {
 } from '@allmaps/api-shared/db'
 
 import { createElysia } from '../elysia.js'
-import { betterAuthPlugin } from './auth.js'
+import type { createBetterAuthRoutes } from './auth.js'
 
 const OrgBody = t.Object({
   name: t.String(),
@@ -21,7 +21,10 @@ const OrgBody = t.Object({
   domains: t.Optional(t.Array(t.String()))
 })
 
-export const organizations = createElysia({ name: 'organizations' })
+export function createOrganizations(
+  betterAuthPlugin: ReturnType<typeof createBetterAuthRoutes>
+) {
+  return createElysia({ name: 'organizations' })
   .use(betterAuthPlugin)
   .get('/organizations', async ({ db }) => listOrganizations(db), {
     detail: { summary: 'List all organizations', tags: ['Organizations'] }
@@ -121,3 +124,4 @@ export const organizations = createElysia({ name: 'organizations' })
       detail: { summary: 'Delete an organization', tags: ['Organizations'] }
     }
   )
+}

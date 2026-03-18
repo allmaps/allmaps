@@ -9,10 +9,10 @@
     "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
     "dev": "wrangler dev --port $(../../port.js annotations) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
     "cf-typegen": "wrangler types",
-    "build": "tsc",
+    "build": "tsc --noCheck",
     "lerna-build": "lerna run build --scope @allmaps/api-annotations --include-dependencies",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
-    "types": "tsc --noEmit"
+    "types": "pnpm run cf-typegen && tsc --noEmit"
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
@@ -31,7 +31,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240320.1",
     "@types/geojson": "^7946.0.14",
     "@types/node": "catalog:",
     "drizzle-kit": "catalog:",
