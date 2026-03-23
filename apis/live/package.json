@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "PORT=$(../../port.js live) bun --no-env-file --env-file=../../.env.localhost --env-file=../../.env.localhost.local --watch src/index.ts",
     "types": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc --noCheck",
     "lerna-build": "lerna run build --scope @allmaps/api-live --include-dependencies",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "start": "PORT=$(../../port.js live) bun --no-env-file --env-file=../../.env.production --env-file=../../.env.production.local dist/src/index.js"
