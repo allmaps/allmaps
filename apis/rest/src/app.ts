@@ -8,7 +8,7 @@ import {
   handleApiError
 } from './elysia.js'
 
-import type { BetterAuthContext } from '@allmaps/db'
+import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createBetterAuthRoutes } from './routes/auth.js'
