@@ -5,6 +5,8 @@ import { generateRandomId } from '@allmaps/id/sync'
 import * as authSchema from '@allmaps/db/schema/auth'
 import * as organizationsSchema from '@allmaps/db/schema/organizations'
 
+import { clampLimit } from '../shared/limits.js'
+
 import type { Db, DbOrTx } from '@allmaps/db'
 
 export function normalizeDomain(value: string): string | undefined {
@@ -122,11 +124,12 @@ export async function replaceOrganizationUrls(
   })
 }
 
-export async function listOrganizations(db: Db) {
+export async function listOrganizations(db: Db, limit?: number) {
   const orgs = await db
     .select()
     .from(authSchema.organizations)
     .orderBy(authSchema.organizations.name)
+    .limit(clampLimit(limit))
 
   const urls = await db.select().from(organizationsSchema.organizationUrls)
 

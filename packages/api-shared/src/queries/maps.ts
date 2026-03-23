@@ -3,7 +3,7 @@ import { sql } from 'drizzle-orm'
 import { generateAnnotation } from '@allmaps/annotation'
 
 import { schema } from '@allmaps/db/schema'
-import { ResponseError } from '@allmaps/api-shared'
+import { ResponseError, clampLimit } from '@allmaps/api-shared'
 
 import {
   generateFeature,
@@ -235,7 +235,7 @@ export async function queryMaps(
         return desc(maps.updatedAt)
       }
     },
-    limit: responseOptions.singular ? 1 : params.limit
+    limit: responseOptions.singular ? 1 : clampLimit(params.limit)
   })
 
   if (responseOptions.expectRows && rows.length === 0) {

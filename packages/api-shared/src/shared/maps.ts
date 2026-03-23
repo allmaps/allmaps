@@ -12,7 +12,8 @@ import {
   getProjectionsByDbId,
   getProjectionDbId,
   getProjectionByDbId,
-  getProjectionByDefinitionAndName
+  getProjectionByDefinitionAndName,
+  getProjectionWithFullId
 } from '@allmaps/api-shared/projections'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -287,7 +288,6 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
   }
 
   // TODO: add other tranformation types
-
   return {
     type: 'polynomial' as const,
     options: {
@@ -296,9 +296,15 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
   }
 }
 
-export function toGeoreferencedMapProjection(projection?: DbProjection) {
-  if (projection?.id) {
-    return getProjectionByDbId(projectionsByDbId, projection.id)
+export function toGeoreferencedMapProjection(
+  dbProjection?: DbProjection,
+  baseUrl?: string
+) {
+  if (dbProjection?.id) {
+    const projection = getProjectionByDbId(projectionsByDbId, dbProjection.id)
+    if (projection && baseUrl) {
+      return getProjectionWithFullId(projection, baseUrl)
+    }
   }
 }
 
@@ -346,7 +352,10 @@ export function fromDbRow(dbRow: DbRow, annotationsBaseUrl: string): ApiMap {
     geoMask: dbRow.geoMask ? dbRow.geoMask : undefined,
     // TODO: read from dbRow
     transformation: toGeoreferencedMapTransformation(map.transformation),
-    resourceCrs: toGeoreferencedMapProjection(map.resourceCrs),
+    resourceCrs: toGeoreferencedMapProjection(
+      map.resourceCrs,
+      annotationsBaseUrl
+    ),
     _allmaps: getAllmaps(dbRow, urls)
   }
 }

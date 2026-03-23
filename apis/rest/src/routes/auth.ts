@@ -23,8 +23,9 @@ export function createBetterAuthRoutes(
   const { auth } = betterAuth
 
   return createBetterAuthPlugin(betterAuth)
-  .get('/users', ({ db }) => queryUsers(db), {
+  .get('/users', ({ db, query }) => queryUsers(db, query.limit), {
     admin: true,
+    query: t.Object({ limit: t.Optional(t.Number()) }),
     detail: {
       summary: 'List all users',
       description: 'Returns all users (Admin only)',
@@ -51,8 +52,9 @@ export function createBetterAuthRoutes(
       }
     }
   )
-  .get('/admin/organizations', ({ db }) => queryAdminOrganizations(db), {
+  .get('/admin/organizations', ({ db, query }) => queryAdminOrganizations(db, query.limit), {
     admin: true,
+    query: t.Object({ limit: t.Optional(t.Number()) }),
     detail: {
       summary: 'List all organizations',
       description: 'Returns all organizations (Admin only)',

@@ -2,13 +2,16 @@ import { eq } from 'drizzle-orm'
 
 import * as authSchema from '@allmaps/db/schema/auth'
 
+import { clampLimit } from '../shared/limits.js'
+
 import type { Db } from '@allmaps/db'
 
-export async function queryAdminOrganizations(db: Db) {
+export async function queryAdminOrganizations(db: Db, limit?: number) {
   return db
     .select()
     .from(authSchema.organizations)
     .orderBy(authSchema.organizations.createdAt)
+    .limit(clampLimit(limit))
 }
 
 // Returns all org memberships for a single user — used on the user detail page
@@ -131,8 +134,13 @@ export async function queryUserByEmail(db: Db, email: string) {
   return user ?? null
 }
 
-export async function queryUsers(db: Db) {
-  return db.select().from(authSchema.users).orderBy(authSchema.users.createdAt)
+export async function queryUsers(db: Db, limit?: number) {
+  return db
+    .select()
+    .from(authSchema.users)
+    .where(eq(authSchema.users.isAnonymous, false))
+    .orderBy(authSchema.users.createdAt)
+    .limit(clampLimit(limit))
 }
 
 export async function queryUserBySlug(db: Db, slug: string) {
