@@ -21,6 +21,7 @@
     "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
     "dev": "wrangler dev --port $(../../port.js tileserver) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
     "lint": "prettier --ignore-path ../../.gitignore --check src test scripts && eslint src test scripts --ext .js,.ts",
+    "cf-typegen": "wrangler types",
     "types": "tsc --noEmit",
     "format": "prettier --ignore-path ../../.gitignore --write src test scripts",
     "test": "vitest run",
@@ -41,7 +42,6 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
-    "@cloudflare/workers-types": "^4.20240320.1",
     "@types/eslint": "^8.56.0",
     "@types/node": "catalog:",
     "@types/pixelmatch": "^5.2.6",
@@ -58,6 +58,6 @@
     "typescript": "catalog:",
     "upng-js": "^2.1.0",
     "vitest": "catalog:",
-    "wrangler": "^4.0.0"
+    "wrangler": "catalog:"
   }
 }
