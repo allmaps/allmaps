@@ -5,6 +5,7 @@
   "scripts": {
     "watch": "turbo watch watch --filter \"./packages/**\"",
     "build:packages": "turbo run build --filter \"./packages/**\"",
+    "build:packages:force": "turbo run build --force --filter \"./packages/**\"",
     "build:apps": "turbo run build --filter \"./apps/**\"",
     "init": "pnpm install --recursive && pnpm run build:packages && pnpm run check && pnpm run build:apps",
     "types": "turbo run types",
