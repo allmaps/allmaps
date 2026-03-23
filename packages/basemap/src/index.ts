@@ -44,9 +44,7 @@ export function basemapStyle(
 
 export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
   const demSource = new mlcontour.DemSource({
-    url:
-      tiles ||
-      'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+    url: tiles || 'https://tiles.mapterhorn.com/{z}/{x}/{y}.webp',
     maxzoom: 13
   })
 
@@ -59,7 +57,7 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
       maxzoom: 13,
       encoding: 'terrarium',
       attribution:
-        "<a href='https://github.com/tilezen/joerd/tree/master'>Joerd</a>"
+        "<a href='https://mapterhorn.com/attribution/'>© Mapterhorn</a>"
     })
 
     map.addSource('contour-source', {
