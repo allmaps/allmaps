@@ -12,8 +12,12 @@ import { lists as listsSchema } from './schema/lists.js'
 
 export function createAuth(env: BetterAuthEnv) {
   const baseURL = env.BETTER_AUTH_URL
-  const isProduction = baseURL.startsWith('https://')
-  const db = getNeonHttpDb(env.DATABASE_URL, !isProduction)
+
+  const hostname = new URL(baseURL).hostname
+  const isLocalhost = hostname === 'localhost'
+  const useAllmapsCookieDomain = hostname.endsWith('.allmaps.org')
+
+  const db = getNeonHttpDb(env.DATABASE_URL, isLocalhost)
 
   const auth = betterAuth({
     baseURL,
@@ -34,9 +38,10 @@ export function createAuth(env: BetterAuthEnv) {
       }
     },
     advanced: {
-      crossSubDomainCookies: isProduction
-        ? { enabled: true, domain: '.allmaps.org' }
+      crossSubDomainCookies: useAllmapsCookieDomain
+        ? { enabled: true, domain: 'allmaps.org' }
         : { enabled: false },
+      trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
       database: {
         generateId: (options) => {
           if (
