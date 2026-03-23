@@ -60,7 +60,7 @@ export class WarpedMapLayer
 
   canvasSize: [number, number] = [0, 0]
 
-  registeredProjections: Map<string, Projection> = new Map()
+  registeredProjections: Map<string, Projection>
 
   #resizeObserver: ResizeObserver
 
@@ -77,6 +77,8 @@ export class WarpedMapLayer
       this.defaultSpecificWarpedMapLayerOptions,
       options
     )
+
+    this.registeredProjections = new Map()
 
     const container = document.createElement('div')
     this.container = container
