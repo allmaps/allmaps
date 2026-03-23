@@ -35,6 +35,10 @@
     "@types/geojson": "^7946.0.14",
     "@types/node": "catalog:",
     "drizzle-kit": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0"
   }
 }
