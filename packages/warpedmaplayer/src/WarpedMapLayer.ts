@@ -32,7 +32,7 @@ export abstract class BaseWarpedMapLayer<
 
   container?: HTMLDivElement
   canvas?: HTMLCanvasElement
-  gl: WebGL2RenderingContext | null | undefined
+  gl?: WebGL2RenderingContext
 
   renderer?: WebGL2Renderer
 
@@ -72,13 +72,13 @@ export abstract class BaseWarpedMapLayer<
    * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
-  async addGeoreferenceAnnotation(
+  addGeoreferenceAnnotation(
     annotation: unknown,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): Promise<(string | Error)[]> {
+  ): (string | Error)[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const results = await this.renderer.addGeoreferenceAnnotation(
+    const results = this.renderer.addGeoreferenceAnnotation(
       annotation,
       mapOptions
     )
@@ -93,13 +93,11 @@ export abstract class BaseWarpedMapLayer<
    * @param annotation - Georeference Annotation
    * @returns Map IDs of the maps that were removed, or an error per map
    */
-  async removeGeoreferenceAnnotation(
-    annotation: unknown
-  ): Promise<(string | Error)[]> {
+  removeGeoreferenceAnnotation(annotation: unknown): (string | Error)[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const results =
-      await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+      this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
     this.nativeUpdate()
 
     return results
@@ -143,12 +141,12 @@ export abstract class BaseWarpedMapLayer<
    *
    * @param georeferencedMap - Georeferenced Map
    * @param mapOptions - Map options
-   * @returns Map ID of the map that was added, or an error
+   * @returns Map ID of the map that was added
    */
-  async addGeoreferencedMap(
+  addGeoreferencedMap(
     georeferencedMap: unknown,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): Promise<string | Error> {
+  ): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result = this.renderer.addGeoreferencedMap(
@@ -164,11 +162,9 @@ export abstract class BaseWarpedMapLayer<
    * Removes a Georeferenced Map
    *
    * @param georeferencedMap - Georeferenced Map
-   * @returns Map ID of the map that was removed, or an error
+   * @returns Map ID of the map that was removed
    */
-  async removeGeoreferencedMap(
-    georeferencedMap: unknown
-  ): Promise<string | Error> {
+  removeGeoreferencedMap(georeferencedMap: unknown): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result =
@@ -182,11 +178,9 @@ export abstract class BaseWarpedMapLayer<
    * Removes a Georeferenced Map by its ID
    *
    * @param mapId - Map ID of the georeferenced map to remove
-   * @returns Map ID of the map that was removed, or an error
+   * @returns Map ID of the map that was removed
    */
-  async removeGeoreferencedMapById(
-    mapId: string
-  ): Promise<string | Error | undefined> {
+  removeGeoreferencedMapById(mapId: string): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result = this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
@@ -889,16 +883,6 @@ export abstract class BaseWarpedMapLayer<
     )
 
     this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -981,16 +965,6 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.warpedMapList.removeEventListener(
       WarpedMapEventType.IMAGEINFOSADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED,
       this.nativePassWarpedMapEvent.bind(this)
     )
 

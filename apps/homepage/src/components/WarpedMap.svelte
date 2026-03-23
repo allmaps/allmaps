@@ -87,14 +87,14 @@
     map.dragRotate.disable()
     map.touchZoomRotate.disableRotation()
 
-    map.on('load', async () => {
+    map.on('load', () => {
       if (map) {
         warpedMapLayer = new WarpedMapLayer()
 
         // @ts-expect-error Incompatible with MapLibre types
         map.addLayer(warpedMapLayer)
 
-        await warpedMapLayer.addGeoreferencedMap(georeferencedMap)
+        warpedMapLayer.addGeoreferencedMap(georeferencedMap)
 
         map.on('allrequestedtilesloaded', () => dispatch('ready'))
       }

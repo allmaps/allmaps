@@ -118,7 +118,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param annotation - Annotation
    * @param mapOptions - Map options
    */
-  async addGeoreferenceAnnotation(
+  addGeoreferenceAnnotation(
     annotation: unknown,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
@@ -131,7 +131,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param georeferencedMap - Georeferenced Map
    * @param mapOptions - Map options
    */
-  async addGeoreferencedMap(
+  addGeoreferencedMap(
     georeferencedMap: unknown,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
@@ -163,9 +163,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       if (!warpedMap.hasImage()) {
         await warpedMap.loadImage(this.warpedMapList.imagesById)
       }
+
       if (!warpedMap.hasImage()) {
         break // Make TS happy
       }
+
       const resourceId = warpedMap.georeferencedMap.resource.id
       if (!warpedMapsByResourceId.has(resourceId)) {
         warpedMapsByResourceId.set(resourceId, [])

@@ -3,8 +3,6 @@ import { AnimationOptions, SpritesInfo } from './types.js'
 export const WarpedMapEventType = {
   // WarpedMapList > ...
   IMAGEINFOSADDED: 'imageinfosadded',
-  GEOREFERENCEANNOTATIONADDED: 'georeferenceannotationadded',
-  GEOREFERENCEANNOTATIONREMOVED: 'georeferenceannotationremoved',
   WARPEDMAPADDED: 'warpedmapadded',
   WARPEDMAPREMOVED: 'warpedmapremoved',
 

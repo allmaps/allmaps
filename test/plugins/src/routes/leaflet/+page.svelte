@@ -85,12 +85,11 @@
     }
 
     warpedMapLayer.clear()
-    warpedMapLayer.addGeoreferenceAnnotation(annotation).then(() => {
-      const bounds = warpedMapLayer?.getBounds()
-      if (bounds) {
-        map.fitBounds(bounds)
-      }
-    })
+    warpedMapLayer.addGeoreferenceAnnotation(annotation)
+    const bounds = warpedMapLayer.getBounds()
+    if (bounds) {
+      map.fitBounds(bounds)
+    }
   })
 </script>
 

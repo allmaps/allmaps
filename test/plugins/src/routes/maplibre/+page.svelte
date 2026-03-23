@@ -87,10 +87,11 @@
     }
 
     warpedMapLayer.clear()
-    warpedMapLayer.addGeoreferenceAnnotation(annotation).then(() => {
-      const bbox = warpedMapLayer?.getBbox()
-      if (bbox) map.fitBounds(bbox, { padding: 20, duration: 0 })
-    })
+    warpedMapLayer.addGeoreferenceAnnotation(annotation)
+    const bbox = warpedMapLayer.getBbox()
+    if (bbox) {
+      map.fitBounds(bbox, { padding: 20, duration: 0 })
+    }
   })
 </script>
 

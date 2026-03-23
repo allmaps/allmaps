@@ -8,8 +8,8 @@ Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows dis
 
 Examples:
 
-* [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
-* [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
+- [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
+- [Observable notebook](https://observablehq.com/@allmaps/openlayers-plugin)
 
 ## How it works
 
@@ -64,8 +64,9 @@ const warpedMapLayer = new WarpedMapLayer()
 
 map.addLayer(warpedMapLayer)
 warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl).then(() => {
-  const bbox = warpedMapLayer
-    .getBbox({ projection: { definition: 'EPSG:3857' } })
+  const bbox = warpedMapLayer.getBbox({
+    projection: { definition: 'EPSG:3857' }
+  })
   if (bbox) {
     map.getView().fit(bbox)
   }
@@ -147,7 +148,7 @@ map.on('warpedmapadded', (event) => {
 
 ### Viewport projections
 
-Allmaps supports two types of map projections as documented in [@allmaps/project](../project/README.md): *internal projections* and *viewport projections*. OpenLayers [supports](https://openlayers.org/en/latest/examples/scaleline-indiana-east.html) custom view projections, too. The Allmaps OpenLayers plugin can read the projection of the view of an OpenLayers map and apply it.
+Allmaps supports two types of map projections as documented in [@allmaps/project](../project/README.md): _internal projections_ and _viewport projections_. OpenLayers [supports](https://openlayers.org/en/latest/examples/scaleline-indiana-east.html) custom view projections, too. The Allmaps OpenLayers plugin can read the projection of the view of an OpenLayers map and apply it.
 
 To set a custom projection to an OpenLayers map and have Allmaps pick it up, use [the `register` function](https://openlayers.org/en/latest/apidoc/module-ol_proj_proj4.html#.register) as foreseen in OpenLayers. (This works because the plugin loads Proj4 as a peer dependency.)
 
@@ -172,14 +173,13 @@ proj4.defs(myProjection.id, projection.definition)
 register(proj4)
 
 // Optional
-warpedMapLayer.registerProjections([ myProjection ])
+warpedMapLayer.registerProjections([myProjection])
 ```
 
 Then, create a new view with that projection and set the bbox, computed using the current projection:
 
 ```js
-const bbox = warpedMapLayer
-  .getBbox({ projection: myProjection })
+const bbox = warpedMapLayer.getBbox({ projection: myProjection })
 if (bbox) {
   map.setView(
     new View({
@@ -200,8 +200,8 @@ MIT
 
 ###### Parameters
 
-* `type` (`string`)
-* `data` (`unknown`)
+- `type` (`string`)
+- `data` (`unknown`)
 
 ###### Returns
 
@@ -209,7 +209,7 @@ MIT
 
 ###### Extends
 
-* `Event`
+- `Event`
 
 ### `OLWarpedMapEvent#data`
 
@@ -233,12 +233,12 @@ Creates an instance of a TriangulatedWarpedMap.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
-  * Georeferenced map used to construct the WarpedMap
-* `listOptions?` (`Partial<WarpedMapListOptions<TriangulatedWarpedMap>> | undefined`)
-* `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
+- `mapId` (`string`)
+  - ID of the map
+- `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+  - Georeferenced map used to construct the WarpedMap
+- `listOptions?` (`Partial<WarpedMapListOptions<TriangulatedWarpedMap>> | undefined`)
+- `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
 
 ###### Returns
 
@@ -246,7 +246,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 ###### Extends
 
-* `WarpedMap`
+- `WarpedMap`
 
 ### `TriangulatedWarpedMap#clearProjectedTransformerCaches()`
 
@@ -316,8 +316,8 @@ Mix previous transform properties with new ones (when changing an ongoing animat
 
 ###### Parameters
 
-* `t` (`number`)
-  * animation progress
+- `t` (`number`)
+  - animation progress
 
 ###### Returns
 
@@ -489,8 +489,8 @@ Set the distortionMeasure
 
 ###### Parameters
 
-* `distortionMeasure?` (`DistortionMeasure | undefined`)
-  * the disortion measure
+- `distortionMeasure?` (`DistortionMeasure | undefined`)
+  - the disortion measure
 
 ###### Returns
 
@@ -502,8 +502,8 @@ Update the ground control points loaded from a georeferenced map to new ground c
 
 ###### Parameters
 
-* `gcps` (`Array<Gcp>`)
-  * the new ground control points
+- `gcps` (`Array<Gcp>`)
+  - the new ground control points
 
 ###### Returns
 
@@ -515,8 +515,8 @@ Set the internal projection
 
 ###### Parameters
 
-* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
-  * the internal projection
+- `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
+  - the internal projection
 
 ###### Returns
 
@@ -528,10 +528,10 @@ Set the list options
 
 ###### Parameters
 
-* `listOptions?` (`Partial<TriangulatedWarpedMapOptions> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `listOptions?` (`Partial<TriangulatedWarpedMapOptions> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -543,12 +543,12 @@ Set the map-specific options (and the list options)
 
 ###### Parameters
 
-* `mapOptions?` (`Partial<TriangulatedWarpedMapOptions> | undefined`)
-  * Map-specific options
-* `listOptions?` (`Partial<TriangulatedWarpedMapOptions> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
-  * Animation options
+- `mapOptions?` (`Partial<TriangulatedWarpedMapOptions> | undefined`)
+  - Map-specific options
+- `listOptions?` (`Partial<TriangulatedWarpedMapOptions> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -560,8 +560,8 @@ Set the projection
 
 ###### Parameters
 
-* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
-  * the projection
+- `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
+  - the projection
 
 ###### Returns
 
@@ -573,10 +573,10 @@ Update the resource mask loaded from a georeferenced map to a new mask.
 
 ###### Parameters
 
-* `resourceFullMask` (`Array<Point>`)
-* `resourceAppliableMask` (`Array<Point>`)
-* `resourceMask` (`Array<Point>`)
-  * the new mask
+- `resourceFullMask` (`Array<Point>`)
+- `resourceAppliableMask` (`Array<Point>`)
+- `resourceMask` (`Array<Point>`)
+  - the new mask
 
 ###### Returns
 
@@ -640,12 +640,12 @@ Creates an instance of WarpedMap.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
-  * Georeferenced map used to construct the WarpedMap
-* `listOptions?` (`Partial<WarpedMapListOptions<WarpedMap>> | undefined`)
-* `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
+- `mapId` (`string`)
+  - ID of the map
+- `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+  - Georeferenced map used to construct the WarpedMap
+- `listOptions?` (`Partial<WarpedMapListOptions<WarpedMap>> | undefined`)
+- `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
 
 ###### Returns
 
@@ -653,7 +653,7 @@ Creates an instance of WarpedMap.
 
 ###### Extends
 
-* `EventTarget`
+- `EventTarget`
 
 ### `WarpedMap#abortController?`
 
@@ -667,7 +667,7 @@ AbortController
 
 ###### Parameters
 
-* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
+- `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
 
 ###### Returns
 
@@ -716,7 +716,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
+;'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
 ```
 
 ### `WarpedMap#fetchableTilesForViewport`
@@ -756,7 +756,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#geoAppliableMaskRectangle`
@@ -764,7 +764,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#geoFullMask`
@@ -780,7 +780,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#geoFullMaskRectangle`
@@ -788,7 +788,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#geoMask`
@@ -804,7 +804,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#geoMaskRectangle`
@@ -812,7 +812,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#geoPoints`
@@ -875,16 +875,16 @@ Default settings apply for the options.
 
 ###### Parameters
 
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
-* `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
+- `transformationType` (`  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+  | 'linear'`)
+- `partialProjectedGcpTransformerOptions?` (`Partial<ProjectedGcpTransformerOptions> | undefined`)
 
 ###### Returns
 
@@ -916,8 +916,8 @@ Get scale of the warped map, in resource pixels per canvas pixels.
 
 ###### Parameters
 
-* `viewport` (`Viewport`)
-  * the current viewport
+- `viewport` (`Viewport`)
+  - the current viewport
 
 ###### Returns
 
@@ -929,8 +929,8 @@ Get scale of the warped map, in resource pixels per viewport pixels.
 
 ###### Parameters
 
-* `viewport` (`Viewport`)
-  * the current viewport
+- `viewport` (`Viewport`)
+  - the current viewport
 
 ###### Returns
 
@@ -978,7 +978,7 @@ Load the parsed image from cache, or fetch and parse the image info to create it
 
 ###### Parameters
 
-* `imagesById?` (`Map<string, Image> | undefined`)
+- `imagesById?` (`Map<string, Image> | undefined`)
 
 ###### Returns
 
@@ -1006,8 +1006,8 @@ Mix previous transform properties with new ones (when changing an ongoing animat
 
 ###### Parameters
 
-* `t` (`number`)
-  * animation progress
+- `t` (`number`)
+  - animation progress
 
 ###### Returns
 
@@ -1068,7 +1068,7 @@ Array<FetchableTile>
 ###### Type
 
 ```ts
-'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
+;'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
 ```
 
 ### `WarpedMap#previousInternalProjection`
@@ -1116,7 +1116,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#projectedGeoAppliableMaskRectangle`
@@ -1124,7 +1124,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#projectedGeoBufferedViewportRectangleBboxForViewport?`
@@ -1132,7 +1132,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#projectedGeoBufferedViewportRectangleForViewport?`
@@ -1140,7 +1140,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#projectedGeoFullMask`
@@ -1156,7 +1156,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#projectedGeoFullMaskRectangle`
@@ -1164,7 +1164,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#projectedGeoMask`
@@ -1180,7 +1180,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#projectedGeoMaskRectangle`
@@ -1188,7 +1188,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#projectedGeoPoints`
@@ -1292,7 +1292,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#resourceAppliableMaskRectangle`
@@ -1300,7 +1300,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#resourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport?`
@@ -1308,7 +1308,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#resourceBufferedViewportRingBboxForViewport?`
@@ -1316,7 +1316,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#resourceBufferedViewportRingForViewport?`
@@ -1340,7 +1340,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#resourceFullMaskRectangle`
@@ -1348,7 +1348,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#resourceMask`
@@ -1364,7 +1364,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[number, number, number, number]
+;[number, number, number, number]
 ```
 
 ### `WarpedMap#resourceMaskRectangle`
@@ -1372,7 +1372,7 @@ Array<Point>
 ###### Type
 
 ```ts
-[Point, Point, Point, Point]
+;[Point, Point, Point, Point]
 ```
 
 ### `WarpedMap#resourcePoints`
@@ -1409,8 +1409,8 @@ Set the distortionMeasure
 
 ###### Parameters
 
-* `distortionMeasure?` (`DistortionMeasure | undefined`)
-  * the disortion measure
+- `distortionMeasure?` (`DistortionMeasure | undefined`)
+  - the disortion measure
 
 ###### Returns
 
@@ -1422,7 +1422,7 @@ Set tiles for the current viewport
 
 ###### Parameters
 
-* `fetchableTiles` (`Array<FetchableTile>`)
+- `fetchableTiles` (`Array<FetchableTile>`)
 
 ###### Returns
 
@@ -1434,7 +1434,7 @@ Update the ground control points loaded from a georeferenced map to new ground c
 
 ###### Parameters
 
-* `gcps` (`Array<Gcp>`)
+- `gcps` (`Array<Gcp>`)
 
 ###### Returns
 
@@ -1446,8 +1446,8 @@ Set the internal projection
 
 ###### Parameters
 
-* `projection?` (`Projection | undefined`)
-  * the internal projection
+- `projection?` (`Projection | undefined`)
+  - the internal projection
 
 ###### Returns
 
@@ -1459,10 +1459,10 @@ Set the list options
 
 ###### Parameters
 
-* `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -1474,12 +1474,12 @@ Set the map-specific options (and the list options)
 
 ###### Parameters
 
-* `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
-  * Map-specific options
-* `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
-  * Animation options
+- `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
+  - Map-specific options
+- `listOptions?` (`Partial<WarpedMapOptions> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -1491,7 +1491,7 @@ Set overview tiles for the current viewport
 
 ###### Parameters
 
-* `overviewFetchableTiles` (`Array<FetchableTile>`)
+- `overviewFetchableTiles` (`Array<FetchableTile>`)
 
 ###### Returns
 
@@ -1503,8 +1503,8 @@ Set the overview tile zoom level for the current viewport
 
 ###### Parameters
 
-* `tileZoomLevel?` (`TileZoomLevel | undefined`)
-  * tile zoom level for the current viewport
+- `tileZoomLevel?` (`TileZoomLevel | undefined`)
+  - tile zoom level for the current viewport
 
 ###### Returns
 
@@ -1516,7 +1516,7 @@ Set projectedGeoBufferedViewportRectangle for the current viewport
 
 ###### Parameters
 
-* `projectedGeoBufferedViewportRectangle?` (`Rectangle | undefined`)
+- `projectedGeoBufferedViewportRectangle?` (`Rectangle | undefined`)
 
 ###### Returns
 
@@ -1528,8 +1528,8 @@ Set the projection
 
 ###### Parameters
 
-* `projection?` (`Projection | undefined`)
-  * the projection
+- `projection?` (`Projection | undefined`)
+  - the projection
 
 ###### Returns
 
@@ -1541,7 +1541,7 @@ Set resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection for the curr
 
 ###### Parameters
 
-* `resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection?` (`Bbox | undefined`)
+- `resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection?` (`Bbox | undefined`)
 
 ###### Returns
 
@@ -1553,7 +1553,7 @@ Set resourceBufferedViewportRing for the current viewport
 
 ###### Parameters
 
-* `resourceBufferedViewportRing?` (`Ring | undefined`)
+- `resourceBufferedViewportRing?` (`Ring | undefined`)
 
 ###### Returns
 
@@ -1565,9 +1565,9 @@ Update the resource mask loaded from a georeferenced map to a new mask.
 
 ###### Parameters
 
-* `resourceFullMask` (`Array<Point>`)
-* `resourceAppliableMask` (`Array<Point>`)
-* `resourceMask` (`Array<Point>`)
+- `resourceFullMask` (`Array<Point>`)
+- `resourceAppliableMask` (`Array<Point>`)
+- `resourceMask` (`Array<Point>`)
 
 ###### Returns
 
@@ -1579,8 +1579,8 @@ Set the tile zoom level for the current viewport
 
 ###### Parameters
 
-* `tileZoomLevel?` (`TileZoomLevel | undefined`)
-  * tile zoom level for the current viewport
+- `tileZoomLevel?` (`TileZoomLevel | undefined`)
+  - tile zoom level for the current viewport
 
 ###### Returns
 
@@ -1592,15 +1592,15 @@ Set the transformationType
 
 ###### Parameters
 
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
+- `transformationType` (`  | 'straight'
+  | 'helmert'
+  | 'polynomial'
+  | 'polynomial1'
+  | 'polynomial2'
+  | 'polynomial3'
+  | 'thinPlateSpline'
+  | 'projective'
+  | 'linear'`)
 
 ###### Returns
 
@@ -1641,7 +1641,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-[number, number]
+;[number, number]
 ```
 
 ### `WarpedMap#tileZoomLevelForViewport?`
@@ -1808,8 +1808,8 @@ There are no parameters.
 
 ###### Parameters
 
-* `type` (`WarpedMapEventType`)
-* `data?` (`Partial<WarpedMapEventData> | undefined`)
+- `type` (`WarpedMapEventType`)
+- `data?` (`Partial<WarpedMapEventData> | undefined`)
 
 ###### Returns
 
@@ -1817,7 +1817,7 @@ There are no parameters.
 
 ###### Extends
 
-* `Event`
+- `Event`
 
 ### `WarpedMapEvent#data?`
 
@@ -1839,8 +1839,8 @@ Creates a WarpedMapLayer instance
 
 ###### Parameters
 
-* `options?` (`Partial<OpenLayersWarpedMapLayerOptions> | undefined`)
-  * the WebGL2 renderer options
+- `options?` (`Partial<OpenLayersWarpedMapLayerOptions> | undefined`)
+  - the WebGL2 renderer options
 
 ###### Returns
 
@@ -1848,8 +1848,8 @@ Creates a WarpedMapLayer instance
 
 ###### Extends
 
-* `Layer`
-* `BaseWarpedMapLayer`
+- `Layer`
+- `BaseWarpedMapLayer`
 
 ### `WarpedMapLayer#addEventListeners()`
 
@@ -1867,10 +1867,10 @@ Adds a Georeference Annotation
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Georeference Annotation
-* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * Map options
+- `annotation` (`unknown`)
+  - Georeference Annotation
+- `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  - Map options
 
 ###### Returns
 
@@ -1882,10 +1882,10 @@ Adds a Georeference Annotation by URL
 
 ###### Parameters
 
-* `annotationUrl` (`string`)
-  * URL of a Georeference Annotation
-* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * Map options
+- `annotationUrl` (`string`)
+  - URL of a Georeference Annotation
+- `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  - Map options
 
 ###### Returns
 
@@ -1897,10 +1897,10 @@ Adds a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced Map
-* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * Map options
+- `georeferencedMap` (`unknown`)
+  - Georeferenced Map
+- `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  - Map options
 
 ###### Returns
 
@@ -1912,8 +1912,8 @@ Adds image information to the WarpedMapList's image information cache
 
 ###### Parameters
 
-* `imageInfos` (`Array<unknown>`)
-  * Image informations
+- `imageInfos` (`Array<unknown>`)
+  - Image informations
 
 ###### Returns
 
@@ -1928,12 +1928,12 @@ This uses the image info of related maps. When using addImageInfos(), call it be
 
 ###### Parameters
 
-* `sprites` (`Array<Sprite>`)
-  * Sprites
-* `imageUrl` (`string`)
-  * Image url
-* `imageSize` (`[number, number]`)
-  * Image size
+- `sprites` (`Array<Sprite>`)
+  - Sprites
+- `imageUrl` (`string`)
+  - Image url
+- `imageSize` (`[number, number]`)
+  - Image size
 
 ###### Returns
 
@@ -1945,8 +1945,8 @@ Bring maps forward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -1958,8 +1958,8 @@ Bring maps to front
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -1978,7 +1978,7 @@ HTMLCanvasElement
 ###### Type
 
 ```ts
-[number, number]
+;[number, number]
 ```
 
 ### `WarpedMapLayer#clear()`
@@ -2005,7 +2005,7 @@ HTMLDivElement
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -2015,7 +2015,7 @@ HTMLDivElement
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -2051,7 +2051,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -2067,7 +2067,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -2083,7 +2083,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -2118,7 +2118,7 @@ There are no parameters.
 
 `Extent | undefined`.
 
-* Bounding box of all warped maps
+- Bounding box of all warped maps
 
 ### `WarpedMapLayer#getLayerOptions()`
 
@@ -2140,8 +2140,8 @@ These come from the default option settings for WebGL2WarpedMaps and the map's g
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -2167,8 +2167,8 @@ Get the map-specific options of a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -2183,8 +2183,8 @@ layer and map-specific options of that map.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -2196,8 +2196,8 @@ Get the z-index of a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to get the z-index
+- `mapId` (`string`)
+  - Map ID for which to get the z-index
 
 ###### Returns
 
@@ -2213,9 +2213,9 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `mapIds` (`Array<string>`)
+  - Map IDs
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -2231,9 +2231,9 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `mapIds` (`Array<string>`)
+  - Map IDs
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -2249,9 +2249,9 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+- `mapIds` (`Array<string>`)
+  - Map IDs
+- `projectionOptions?` (`ProjectionOptions | undefined`)
 
 ###### Returns
 
@@ -2277,8 +2277,8 @@ Get the WarpedMap instance for a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID of the requested WarpedMap instance
+- `mapId` (`string`)
+  - Map ID of the requested WarpedMap instance
 
 ###### Returns
 
@@ -2304,8 +2304,8 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
-* `mapIds?` (`Array<string> | undefined`)
-  * Map IDs
+- `mapIds?` (`Array<string> | undefined`)
+  - Map IDs
 
 ###### Returns
 
@@ -2316,14 +2316,14 @@ Note: more selection options are available on this function of WarpedMapList
 ###### Type
 
 ```ts
-WebGL2RenderingContext | null | undefined
+;WebGL2RenderingContext | null | undefined
 ```
 
 ### `WarpedMapLayer#nativePassWarpedMapEvent(event)`
 
 ###### Parameters
 
-* `event` (`Event`)
+- `event` (`Event`)
 
 ###### Returns
 
@@ -2363,8 +2363,8 @@ Removes a Georeference Annotation
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Georeference Annotation
+- `annotation` (`unknown`)
+  - Georeference Annotation
 
 ###### Returns
 
@@ -2376,8 +2376,8 @@ Removes a Georeference Annotation by URL
 
 ###### Parameters
 
-* `annotationUrl` (`string`)
-  * URL of a Georeference Annotation
+- `annotationUrl` (`string`)
+  - URL of a Georeference Annotation
 
 ###### Returns
 
@@ -2389,8 +2389,8 @@ Removes a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced Map
+- `georeferencedMap` (`unknown`)
+  - Georeferenced Map
 
 ###### Returns
 
@@ -2402,8 +2402,8 @@ Removes a Georeferenced Map by its ID
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID of the georeferenced map to remove
+- `mapId` (`string`)
+  - Map ID of the georeferenced map to remove
 
 ###### Returns
 
@@ -2415,8 +2415,8 @@ Render the layer.
 
 ###### Parameters
 
-* `frameState` (`{ pixelRatio: number; time: number; viewState: State; animate: boolean; coordinateToPixelTransform: Transform; ... 14 more ...; renderTargets: { [x: string]: boolean; }; }`)
-  * OpenLayers frame state
+- `frameState` (`{ pixelRatio: number; time: number; viewState: State; animate: boolean; coordinateToPixelTransform: Transform; ... 14 more ...; renderTargets: { [x: string]: boolean; }; }`)
+  - OpenLayers frame state
 
 ###### Returns
 
@@ -2439,10 +2439,10 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `layerOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `layerOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2457,14 +2457,14 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which to reset the options
-* `mapOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the map-specific options to reset
-* `layerOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the layer options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which to reset the options
+- `mapOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the map-specific options to reset
+- `layerOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the layer options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2479,12 +2479,12 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `mapOptionkeysByMapId` (`Map<string, Array<string>>`)
-  * Keys of map-specific options to reset by map ID
-* `layerOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the layer options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapOptionkeysByMapId` (`Map<string, Array<string>>`)
+  - Keys of map-specific options to reset by map ID
+- `layerOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the layer options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2494,8 +2494,8 @@ Doesn't reset render options or specific warped map layer options
 
 ###### Parameters
 
-* `canvas` (`HTMLCanvasElement`)
-* `undefined` (`[number, number]`)
+- `canvas` (`HTMLCanvasElement`)
+- `undefined` (`[number, number]`)
 
 ###### Returns
 
@@ -2513,7 +2513,7 @@ ResizeObserver
 
 ###### Parameters
 
-* `entries` (`Array<ResizeObserverEntry>`)
+- `entries` (`Array<ResizeObserverEntry>`)
 
 ###### Returns
 
@@ -2525,8 +2525,8 @@ Send maps backward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * IDs of the maps
+- `mapIds` (`Iterable<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -2538,8 +2538,8 @@ Send maps to back
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * IDs of the maps
+- `mapIds` (`Array<string>`)
+  - IDs of the maps
 
 ###### Returns
 
@@ -2551,10 +2551,10 @@ Set the layer options
 
 ###### Parameters
 
-* `layerOptions` (`object | Partial<WebGL2RenderOptions>`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `layerOptions` (`object | Partial<WebGL2RenderOptions>`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2572,10 +2572,10 @@ Set the transformation type of the layer
 
 ###### Parameters
 
-* `transformationType?` (`TransformationType | undefined`)
-  * Transformation type to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `transformationType?` (`TransformationType | undefined`)
+  - Transformation type to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2594,12 +2594,12 @@ and stay accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `gcps` (`Array<Gcp>`)
-  * GCPs to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `gcps` (`Array<Gcp>`)
+  - GCPs to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2620,14 +2620,14 @@ This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
-  * Map-specific options to set
-* `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  - Map-specific options to set
+- `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2652,12 +2652,12 @@ and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `resourceMask` (`Array<Point>`)
-  * Resource mask to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `resourceMask` (`Array<Point>`)
+  - Resource mask to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2676,12 +2676,12 @@ and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to set the options
-* `transformationType?` (`TransformationType | undefined`)
-  * Transformation type to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapId` (`string`)
+  - Map ID for which to set the options
+- `transformationType?` (`TransformationType | undefined`)
+  - Transformation type to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2702,14 +2702,14 @@ This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
-  * Map-specific options to set
-* `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which to set the options
+- `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+  - Map-specific options to set
+- `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2718,7 +2718,9 @@ This is equivalent to using the reset function for map-specific option.
 ###### Examples
 
 ```ts
-warpedMapLayer.setMapsOptions([myMapId], { transformationType: 'thinPlateSpline' })
+warpedMapLayer.setMapsOptions([myMapId], {
+  transformationType: 'thinPlateSpline'
+})
 ```
 
 ### `WarpedMapLayer#setMapsOptionsByMapId(mapOptionsByMapId, layerOptions, animationOptions)`
@@ -2736,12 +2738,12 @@ This is equivalent to using the reset function for map-specific option.
 
 ###### Parameters
 
-* `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
-  * Map-specific options to set by map ID
-* `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
-  * Layer options to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapOptionsByMapId` (`Map<string, Partial<WebGL2WarpedMapOptions>>`)
+  - Map-specific options to set by map ID
+- `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
+  - Layer options to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2760,12 +2762,12 @@ and stays accessible in the warped map's `map` property.
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which to set the options
-* `transformationType?` (`TransformationType | undefined`)
-  * Transformation type to set
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which to set the options
+- `transformationType?` (`TransformationType | undefined`)
+  - Transformation type to set
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -2777,8 +2779,8 @@ Set the layer opacity
 
 ###### Parameters
 
-* `opacity` (`number`)
-  * Layer opacity to set
+- `opacity` (`number`)
+  - Layer opacity to set
 
 ###### Returns
 
@@ -2790,8 +2792,8 @@ Creates an instance of a WarpedMapList
 
 ###### Parameters
 
-* `options?` (`Partial<WarpedMapListOptions<W>> | undefined`)
-  * Options of this list, which will be set on newly added maps as their list options
+- `options?` (`Partial<WarpedMapListOptions<W>> | undefined`)
+  - Options of this list, which will be set on newly added maps as their list options
 
 ###### Returns
 
@@ -2799,7 +2801,7 @@ Creates an instance of a WarpedMapList
 
 ###### Extends
 
-* `EventTarget`
+- `EventTarget`
 
 ### `WarpedMapList#DEFAULT_WARPED_MAP_LIST_OPTIONS`
 
@@ -2825,10 +2827,10 @@ Parses an annotation and adds its georeferenced map to this list
 
 ###### Parameters
 
-* `annotation` (`unknown`)
-  * Annotation
-* `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
-  * Map options
+- `annotation` (`unknown`)
+  - Annotation
+- `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
+  - Map options
 
 ###### Returns
 
@@ -2840,10 +2842,10 @@ Adds a georeferenced map to this list
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
-  * Georeferenced Map
-* `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
-  * Map options
+- `georeferencedMap` (`unknown`)
+  - Georeferenced Map
+- `mapOptions?` (`Partial<GetWarpedMapOptions<W>> | undefined`)
+  - Map options
 
 ###### Returns
 
@@ -2863,8 +2865,8 @@ Adds image informations, parses them to images and adds them to the image cache
 
 ###### Parameters
 
-* `imageInfos` (`Array<unknown>`)
-  * Image informations
+- `imageInfos` (`Array<unknown>`)
+  - Image informations
 
 ###### Returns
 
@@ -2884,8 +2886,8 @@ Changes the z-index of the specified maps to bring them forward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * Map IDs
+- `mapIds` (`Iterable<string>`)
+  - Map IDs
 
 ###### Returns
 
@@ -2897,8 +2899,8 @@ Changes the z-index of the specified maps to bring them to front
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * Map IDs
+- `mapIds` (`Iterable<string>`)
+  - Map IDs
 
 ###### Returns
 
@@ -2946,8 +2948,8 @@ These come from the default option settings for WebGL2WarpedMaps and the map's g
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -2959,15 +2961,15 @@ Get mapIds for selected maps
 
 The selectionOptions allow a.o. to:
 
-* filter for visible maps
-* filter for specific mapIds
-* filter for maps whose geoBbox overlap with the specified geoBbox
-* filter for maps that overlap with a given geoPoint
+- filter for visible maps
+- filter for specific mapIds
+- filter for maps whose geoBbox overlap with the specified geoBbox
+- filter for maps that overlap with a given geoPoint
 
 ###### Parameters
 
-* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
-  * Selection options (e.g. mapIds), defaults to all visible maps
+- `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  - Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
@@ -2979,8 +2981,8 @@ Get the map-specific options of a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -2995,8 +2997,8 @@ layer and map-specific options of that map.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which the options apply
+- `mapId` (`string`)
+  - Map ID for which the options apply
 
 ###### Returns
 
@@ -3008,8 +3010,8 @@ Get the z-index of a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID for which to get the z-index
+- `mapId` (`string`)
+  - Map ID for which to get the z-index
 
 ###### Returns
 
@@ -3023,8 +3025,8 @@ The result is returned in lon-lat `EPSG:4326` by default.
 
 ###### Parameters
 
-* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
-  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+- `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
 
 ###### Returns
 
@@ -3038,8 +3040,8 @@ The result is returned in lon-lat `EPSG:4326` by default.
 
 ###### Parameters
 
-* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
-  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+- `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
 
 ###### Returns
 
@@ -3053,8 +3055,8 @@ The result is returned in lon-lat `EPSG:4326` by default.
 
 ###### Parameters
 
-* `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
-  * Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+- `partialSelectionAndProjectionOptions?` (`Partial<SelectionOptions & ProjectionOptions> | undefined`)
+  - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
 
 ###### Returns
 
@@ -3094,8 +3096,8 @@ Get the WarpedMap instance for a map
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID of the requested WarpedMap instance
+- `mapId` (`string`)
+  - Map ID of the requested WarpedMap instance
 
 ###### Returns
 
@@ -3107,15 +3109,15 @@ Get the WarpedMap instances for selected maps
 
 The selectionOptions allow a.o. to:
 
-* filter for visible maps
-* filter for specific mapIds
-* filter for maps whose geoBbox overlap with the specified geoBbox
-* filter for maps that overlap with a given geoPoint
+- filter for visible maps
+- filter for specific mapIds
+- filter for maps whose geoBbox overlap with the specified geoBbox
+- filter for maps that overlap with a given geoPoint
 
 ###### Parameters
 
-* `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
-  * Selection options (e.g. mapIds), defaults to all visible maps
+- `partialSelectionOptions?` (`Partial<SelectionOptions> | undefined`)
+  - Selection options (e.g. mapIds), defaults to all visible maps
 
 ###### Returns
 
@@ -3157,8 +3159,8 @@ Use this as anonymous sort function in Array.prototype.sort()
 
 ###### Parameters
 
-* `mapId0` (`string`)
-* `mapId1` (`string`)
+- `mapId0` (`string`)
+- `mapId1` (`string`)
 
 ###### Returns
 
@@ -3186,7 +3188,7 @@ Parses an annotation and removes its georeferenced map from this list
 
 ###### Parameters
 
-* `annotation` (`unknown`)
+- `annotation` (`unknown`)
 
 ###### Returns
 
@@ -3198,7 +3200,7 @@ Removes a georeferenced map from this list
 
 ###### Parameters
 
-* `georeferencedMap` (`unknown`)
+- `georeferencedMap` (`unknown`)
 
 ###### Returns
 
@@ -3210,8 +3212,8 @@ Removes a georeferenced map from the list by its ID
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * Map ID
+- `mapId` (`string`)
+  - Map ID
 
 ###### Returns
 
@@ -3249,14 +3251,14 @@ An empty array resets all options, undefined resets no options.
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which to reset the options
-* `mapOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the map-specific options to reset
-* `listOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the list options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which to reset the options
+- `mapOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the map-specific options to reset
+- `listOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the list options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3270,12 +3272,12 @@ An empty array or map resets all options (for all maps), undefined resets no opt
 
 ###### Parameters
 
-* `mapOptionkeysByMapId?` (`Map<string, Array<string>> | undefined`)
-  * Keys of map-specific options to reset by map ID
-* `listOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the list options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapOptionkeysByMapId?` (`Map<string, Array<string>> | undefined`)
+  - Keys of map-specific options to reset by map ID
+- `listOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the list options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3289,10 +3291,10 @@ An empty array resets all options, undefined resets no options.
 
 ###### Parameters
 
-* `listOptionKeys?` (`Array<string> | undefined`)
-  * Keys of the list options to reset
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `listOptionKeys?` (`Array<string> | undefined`)
+  - Keys of the list options to reset
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3312,8 +3314,8 @@ Changes the zIndex of the specified maps to send them backward
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * Map IDs
+- `mapIds` (`Iterable<string>`)
+  - Map IDs
 
 ###### Returns
 
@@ -3325,8 +3327,8 @@ Changes the z-index of the specified maps to send them to back
 
 ###### Parameters
 
-* `mapIds` (`Iterable<string>`)
-  * Map IDs
+- `mapIds` (`Iterable<string>`)
+  - Map IDs
 
 ###### Returns
 
@@ -3338,14 +3340,14 @@ Set the map-specific options of maps (and the list options)
 
 ###### Parameters
 
-* `mapIds` (`Array<string>`)
-  * Map IDs for which the options apply
-* `mapOptions?` (`Partial<WarpedMapListOptions<W>> | undefined`)
-  * Map-specific options
-* `listOptions?` (`Partial<WarpedMapListOptions<W>> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapIds` (`Array<string>`)
+  - Map IDs for which the options apply
+- `mapOptions?` (`Partial<WarpedMapListOptions<W>> | undefined`)
+  - Map-specific options
+- `listOptions?` (`Partial<WarpedMapListOptions<W>> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3361,12 +3363,12 @@ but only one animation should be fired
 
 ###### Parameters
 
-* `mapOptionsByMapId?` (`Map<string, Partial<WarpedMapListOptions<W>>> | undefined`)
-  * Map-specific options by map ID
-* `listOptions?` (`Partial<WarpedMapListOptions<W>> | undefined`)
-  * List options
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `mapOptionsByMapId?` (`Map<string, Partial<WarpedMapListOptions<W>>> | undefined`)
+  - Map-specific options by map ID
+- `listOptions?` (`Partial<WarpedMapListOptions<W>> | undefined`)
+  - List options
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3380,10 +3382,10 @@ Note: Map-specific options set here will be passed to newly added maps.
 
 ###### Parameters
 
-* `options?` (`Partial<WarpedMapListOptions<W>> | undefined`)
-  * List Options
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `options?` (`Partial<WarpedMapListOptions<W>> | undefined`)
+  - List Options
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3403,7 +3405,7 @@ This function recreates the WarpedMaps using the factory.
 
 ###### Parameters
 
-* `warpedMapFactory` (`(mapId: string, georeferencedMap: GeoreferencedMap2, listOptions?: Partial<WarpedMapListOptions<W>> | undefined, mapOptions?: Partial<...> | undefined) => W`)
+- `warpedMapFactory` (`(mapId: string, georeferencedMap: GeoreferencedMap2, listOptions?: Partial<WarpedMapListOptions<W>> | undefined, mapOptions?: Partial<...> | undefined) => W`)
 
 ###### Returns
 
@@ -3439,18 +3441,18 @@ Creates an instance of WebGL2WarpedMap.
 
 ###### Parameters
 
-* `mapId` (`string`)
-  * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
-  * Georeferenced map used to construct the WarpedMap
-* `gl` (`WebGL2RenderingContext`)
-  * WebGL rendering context
-* `mapProgram` (`WebGLProgram`)
-  * WebGL program for map
-* `linesProgram` (`WebGLProgram`)
-* `pointsProgram` (`WebGLProgram`)
-* `listOptions?` (`Partial<WarpedMapListOptions<WebGL2WarpedMap>> | undefined`)
-* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+- `mapId` (`string`)
+  - ID of the map
+- `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+  - Georeferenced map used to construct the WarpedMap
+- `gl` (`WebGL2RenderingContext`)
+  - WebGL rendering context
+- `mapProgram` (`WebGLProgram`)
+  - WebGL program for map
+- `linesProgram` (`WebGLProgram`)
+- `pointsProgram` (`WebGLProgram`)
+- `listOptions?` (`Partial<WarpedMapListOptions<WebGL2WarpedMap>> | undefined`)
+- `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
 
 ###### Returns
 
@@ -3458,7 +3460,7 @@ Creates an instance of WebGL2WarpedMap.
 
 ###### Extends
 
-* `TriangulatedWarpedMap`
+- `TriangulatedWarpedMap`
 
 ### `WebGL2WarpedMap#addCachedTileAndUpdateTextures(cachedTile)`
 
@@ -3466,7 +3468,7 @@ Add cached tile to the textures of this map and update textures
 
 ###### Parameters
 
-* `cachedTile` (`CachedTile<ImageData>`)
+- `cachedTile` (`CachedTile<ImageData>`)
 
 ###### Returns
 
@@ -3476,7 +3478,7 @@ Add cached tile to the textures of this map and update textures
 
 ###### Parameters
 
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
 
 ###### Returns
 
@@ -3557,7 +3559,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-SpecificWebGL2WarpedMapOptions &
+;SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions
 ```
@@ -3616,9 +3618,9 @@ string
 
 ###### Parameters
 
-* `mapProgram` (`WebGLProgram`)
-* `linesProgram` (`WebGLProgram`)
-* `pointsProgram` (`WebGLProgram`)
+- `mapProgram` (`WebGLProgram`)
+- `linesProgram` (`WebGLProgram`)
+- `pointsProgram` (`WebGLProgram`)
 
 ###### Returns
 
@@ -3629,7 +3631,7 @@ string
 ###### Type
 
 ```ts
-[number, number, number, number, number, number]
+;[number, number, number, number, number, number]
 ```
 
 ### `WebGL2WarpedMap#lineGroups`
@@ -3693,7 +3695,7 @@ WebGLVertexArrayObject | null
 ###### Type
 
 ```ts
-SpecificWebGL2WarpedMapOptions &
+;SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions
 ```
@@ -3736,7 +3738,7 @@ Remove cached tile from the textures of this map and update textures
 
 ###### Parameters
 
-* `tileUrl` (`string`)
+- `tileUrl` (`string`)
 
 ###### Returns
 
@@ -3768,10 +3770,10 @@ Set the list options
 
 ###### Parameters
 
-* `listOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
-  * Animation options
+- `listOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3783,12 +3785,12 @@ Set the map-specific options (and the list options)
 
 ###### Parameters
 
-* `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * Map-specific options
-* `listOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
-  * list options
-* `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
-  * Animation options
+- `mapOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  - Map-specific options
+- `listOptions?` (`Partial<WebGL2WarpedMapOptions> | undefined`)
+  - list options
+- `animationOptions?` (`Partial<AnimationOptions & AnimationOptionsInternal> | undefined`)
+  - Animation options
 
 ###### Returns
 
@@ -3853,7 +3855,7 @@ any
 ###### Type
 
 ```ts
-[number, number]
+;[number, number]
 ```
 
 ### `WebGL2WarpedMap#tileToCachedTile`
@@ -3886,8 +3888,8 @@ Update the vertex buffers of this warped map
 
 ###### Parameters
 
-* `projectedGeoToClipHomogeneousTransform` (`[number, number, number, number, number, number]`)
-  * Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
+- `projectedGeoToClipHomogeneousTransform` (`[number, number, number, number, number, number]`)
+  - Transform from projected geo coordinates to webgl2 coordinates in the \[-1, 1] range. Equivalent to OpenLayers' projectionTransform.
 
 ###### Returns
 
