@@ -11,18 +11,18 @@ export function basemapStyle(
   tileJson?: string
 ): StyleSpecification {
   const layers = basemapLayers('protomaps', ALLMAPS_FLAVOR, { lang: lang })
+
   // modify the buildings layer
   layers.forEach((layer) => {
     if (layer.id === 'buildings') {
-      if (layer.paint && 'fill-outline-color' in layer.paint) {
-        layer.paint['fill-outline-color'] = 'rgba(139, 134, 123, 1)'
-      }
-
-      if (layer.paint && 'fill-opacity' in layer.paint) {
-        layer.paint['fill-opacity'] = 0.5
+      layer.paint = {
+        ...layer.paint,
+        'fill-outline-color': 'rgba(139, 134, 123, 0.6)',
+        'fill-opacity': 0.6
       }
     }
   })
+
   return {
     version: 8,
     glyphs:
