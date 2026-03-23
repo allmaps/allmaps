@@ -46,11 +46,7 @@ export const DEFAULT_ANIMATION_INTERNAL_OPTIONS: AnimationInternalOptions = {
 }
 
 function ensureError(error: unknown): Error {
-  if (error instanceof Error) {
-    return error
-  } else {
-    return new Error(String(error))
-  }
+  return error instanceof Error ? error : new Error(String(error))
 }
 
 /**
@@ -190,7 +186,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
 
     const validatedGeoreferencedMap = validatedGeoreferencedMapOrMaps
-
     const results = this.#removeGeoreferencedMapInternal(
       validatedGeoreferencedMap
     )
@@ -211,6 +206,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const results = this.#removeGeoreferencedMapsInternal(
       validatedGeoreferencedMaps
     )
+
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return results
   }
@@ -221,10 +217,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapId - Map ID
    * @returns Map ID of the removed map, or an error
    */
-  async removeGeoreferencedMapById(
-    mapId: string
-  ): Promise<string | Error | undefined> {
-    const result = await this.#removeGeoreferencedMapByIdInternal(mapId)
+  removeGeoreferencedMapById(mapId: string): string {
+    const result = this.#removeGeoreferencedMapByIdInternal(mapId)
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return result
   }
@@ -252,9 +246,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param annotation
    * @returns Map IDs of the maps that were removed, or an error per map
    */
-  async removeGeoreferenceAnnotation(
-    annotation: unknown
-  ): Promise<(string | Error)[]> {
+  removeGeoreferenceAnnotation(annotation: unknown): (string | Error)[] {
     const maps = parseAnnotation(annotation)
     const results = this.#removeGeoreferencedMapsInternal(maps)
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
