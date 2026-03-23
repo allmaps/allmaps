@@ -46,71 +46,83 @@ export function createLists(
   return createElysia({
     name: 'lists'
   })
-  .get(
-    '/@:username/lists',
-    async ({ db, env, params, request }) => {
-      await assertCanAccessUserLists(betterAuth, request.headers, params.username)
-      const lists = await queryLists(db, params.username)
+    .get(
+      '/@:username/lists',
+      async ({ db, env, params, request }) => {
+        await assertCanAccessUserLists(
+          betterAuth,
+          request.headers,
+          params.username
+        )
+        const lists = await queryLists(db, params.username)
 
-      return lists.map((list: UserList) => ({
-        ...list,
-        url: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/@${params.username}/lists/${list.id}`
-      }))
-    },
-    {
-      params: t.Object({
-        username: t.String()
-      }),
-      detail: {
-        summary: 'List a users lists',
-        tags: ['Lists']
+        return lists.map((list: UserList) => ({
+          ...list,
+          url: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/@${params.username}/lists/${list.id}`
+        }))
+      },
+      {
+        params: t.Object({
+          username: t.String()
+        }),
+        detail: {
+          summary: 'List a users lists',
+          tags: ['Lists']
+        }
       }
-    }
-  )
-  .get(
-    '/@:username/lists/:listId',
-    async ({ db, env, params, request }) => {
-      await assertCanAccessUserLists(betterAuth, request.headers, params.username)
-      return queryList(
-        env.PUBLIC_ANNOTATIONS_BASE_URL,
-        db,
-        params.username,
-        params.listId,
-        request.url
-      )
-    },
-    {
-      params: t.Object({
-        username: t.String(),
-        listId: t.String()
-      }),
-      detail: {
-        summary: 'Get annotations for a list',
-        tags: ['Lists']
+    )
+    .get(
+      '/@:username/lists/:listId',
+      async ({ db, env, params, request }) => {
+        await assertCanAccessUserLists(
+          betterAuth,
+          request.headers,
+          params.username
+        )
+        return queryList(
+          env.PUBLIC_ANNOTATIONS_BASE_URL,
+          db,
+          params.username,
+          params.listId,
+          request.url
+        )
+      },
+      {
+        params: t.Object({
+          username: t.String(),
+          listId: t.String()
+        }),
+        detail: {
+          summary: 'Get annotations for a list',
+          tags: ['Lists']
+        }
       }
-    }
-  )
-  .get(
-    '/@:username/lists/:listId/georeference-annotations',
-    async ({ db, env, params, request }) => {
-      await assertCanAccessUserLists(betterAuth, request.headers, params.username)
-      return queryListGeoreferenceAnnotations(
-        env.PUBLIC_ANNOTATIONS_BASE_URL,
-        db,
-        params.username,
-        params.listId,
-        request.url
-      )
-    },
-    {
-      params: t.Object({
-        username: t.String(),
-        listId: t.String()
-      }),
-      detail: {
-        summary: 'Get canonical georeference annotations for a list',
-        tags: ['Lists']
+    )
+    .get(
+      '/@:username/lists/:listId/georeference-annotations',
+      async ({ db, env, params, request }) => {
+        await assertCanAccessUserLists(
+          betterAuth,
+          request.headers,
+          params.username
+        )
+        return queryListGeoreferenceAnnotations(
+          env.PUBLIC_ANNOTATIONS_BASE_URL,
+          db,
+          params.username,
+          params.listId,
+          request.url
+        )
+      },
+      {
+        params: t.Object({
+          username: t.String(),
+          listId: t.String()
+        }),
+        detail: {
+          summary: 'Get canonical georeference annotations for a list',
+          tags: ['Lists']
+        }
       }
-    }
-  )
+    )
 }

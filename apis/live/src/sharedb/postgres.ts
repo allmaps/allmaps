@@ -35,7 +35,7 @@ export default class PostgresDB extends DB {
   commit(
     collection: string,
     id: string,
-    op: any,
+    op: unknown,
     snapshot: ShareDB.Snapshot,
     options: unknown,
     callback: Callback<boolean>

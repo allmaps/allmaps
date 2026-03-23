@@ -56,101 +56,107 @@ async function callLive(liveBaseUrl: string, path: string, body: unknown) {
 export function createMaps(
   betterAuthPlugin: ReturnType<typeof createBetterAuthRoutes>
 ) {
-  return createElysia({ name: 'maps' })
-  .use(betterAuthPlugin)
-  // ── List all maps ────────────────────────────────────────────────────────────
-  .get(
-    '/maps',
-    ({ env, db, query }) =>
-      queryMaps(env.PUBLIC_ANNOTATIONS_BASE_URL, db, {
-        intersectsWith: parseIntersects(query.intersects),
-        containedBy: parseContainedBy(query.containedBy),
-        limit: query.limit,
-        imageServiceDomain: query.imageServiceDomain,
-        manifestDomain: query.manifestDomain,
-        minScale: query.minScale,
-        maxScale: query.maxScale,
-        minArea: query.minArea,
-        maxArea: query.maxArea
-      }),
-    {
-      query: mapsQuerySchema,
-      detail: { summary: 'List maps', tags: ['Maps'] }
-    }
-  )
-  .get(
-    '/maps.geojson',
-    ({ env, db, query }) =>
-      queryMaps(
-        env.PUBLIC_ANNOTATIONS_BASE_URL,
-        db,
+  return (
+    createElysia({ name: 'maps' })
+      .use(betterAuthPlugin)
+      // ── List all maps ────────────────────────────────────────────────────────────
+      .get(
+        '/maps',
+        ({ env, db, query }) =>
+          queryMaps(env.PUBLIC_ANNOTATIONS_BASE_URL, db, {
+            intersectsWith: parseIntersects(query.intersects),
+            containedBy: parseContainedBy(query.containedBy),
+            limit: query.limit,
+            imageServiceDomain: query.imageServiceDomain,
+            manifestDomain: query.manifestDomain,
+            minScale: query.minScale,
+            maxScale: query.maxScale,
+            minArea: query.minArea,
+            maxArea: query.maxArea
+          }),
         {
-          intersectsWith: parseIntersects(query.intersects),
-          containedBy: parseContainedBy(query.containedBy),
-          limit: query.limit,
-          imageServiceDomain: query.imageServiceDomain,
-          manifestDomain: query.manifestDomain,
-          minScale: query.minScale,
-          maxScale: query.maxScale,
-          minArea: query.minArea,
-          maxArea: query.maxArea
-        },
-        { format: 'geojson', expectRows: false, singular: false }
-      ),
-    {
-      query: mapsQuerySchema,
-      detail: { summary: 'List maps as GeoJSON', tags: ['Maps'] }
-    }
-  )
-  // ── Create maps (POST body is a Georeference Annotation) ──────────────────
-  .post(
-    '/maps',
-    async ({ env, body }) => {
-      return callLive(env.PUBLIC_LIVE_BASE_URL, '/maps', body)
-    },
-    {
-      admin: true,
-      detail: { summary: 'Create maps from annotation', tags: ['Maps'] }
-    }
-  )
-  // ── Versions (must be before :mapId wildcard) ─────────────────────────────
-  .get(
-    '/maps/:mapId/versions',
-    ({ env, db, params }) =>
-      queryChecksums(env.PUBLIC_ANNOTATIONS_BASE_URL, db, params.mapId),
-    {
-      params: t.Object({ mapId: t.String() }),
-      detail: { summary: 'List all versions of a map', tags: ['Maps'] }
-    }
-  )
-  // ── Single map ────────────────────────────────────────────────────────────
-  .get(
-    `/maps/${mapRoute.path}`,
-    ({ env, db, params }) => {
-      const { mapId, ext } = mapRoute.parse(params)
-      const format = ext === 'geojson' ? 'geojson' : 'map'
-      return queryMaps(
-        env.PUBLIC_ANNOTATIONS_BASE_URL,
-        db,
-        { mapId },
-        { format, expectRows: true, singular: true }
+          query: mapsQuerySchema,
+          detail: { summary: 'List maps', tags: ['Maps'] }
+        }
       )
-    },
-    {
-      params: mapRoute.params,
-      detail: { summary: 'Get a single map', tags: ['Maps'] }
-    }
-  )
-  // ── Update map ────────────────────────────────────────────────────────────
-  .patch(
-    '/maps/:mapId',
-    async ({ env, params, body }) => {
-      return callLive(env.PUBLIC_LIVE_BASE_URL, `/maps/${params.mapId}`, body)
-    },
-    {
-      admin: true,
-      params: t.Object({ mapId: t.String() }),
-      detail: { summary: 'Update a map', tags: ['Maps'] }
-    }
+      .get(
+        '/maps.geojson',
+        ({ env, db, query }) =>
+          queryMaps(
+            env.PUBLIC_ANNOTATIONS_BASE_URL,
+            db,
+            {
+              intersectsWith: parseIntersects(query.intersects),
+              containedBy: parseContainedBy(query.containedBy),
+              limit: query.limit,
+              imageServiceDomain: query.imageServiceDomain,
+              manifestDomain: query.manifestDomain,
+              minScale: query.minScale,
+              maxScale: query.maxScale,
+              minArea: query.minArea,
+              maxArea: query.maxArea
+            },
+            { format: 'geojson', expectRows: false, singular: false }
+          ),
+        {
+          query: mapsQuerySchema,
+          detail: { summary: 'List maps as GeoJSON', tags: ['Maps'] }
+        }
+      )
+      // ── Create maps (POST body is a Georeference Annotation) ──────────────────
+      .post(
+        '/maps',
+        async ({ env, body }) => {
+          return callLive(env.PUBLIC_LIVE_BASE_URL, '/maps', body)
+        },
+        {
+          admin: true,
+          detail: { summary: 'Create maps from annotation', tags: ['Maps'] }
+        }
+      )
+      // ── Versions (must be before :mapId wildcard) ─────────────────────────────
+      .get(
+        '/maps/:mapId/versions',
+        ({ env, db, params }) =>
+          queryChecksums(env.PUBLIC_ANNOTATIONS_BASE_URL, db, params.mapId),
+        {
+          params: t.Object({ mapId: t.String() }),
+          detail: { summary: 'List all versions of a map', tags: ['Maps'] }
+        }
+      )
+      // ── Single map ────────────────────────────────────────────────────────────
+      .get(
+        `/maps/${mapRoute.path}`,
+        ({ env, db, params }) => {
+          const { mapId, ext } = mapRoute.parse(params)
+          const format = ext === 'geojson' ? 'geojson' : 'map'
+          return queryMaps(
+            env.PUBLIC_ANNOTATIONS_BASE_URL,
+            db,
+            { mapId },
+            { format, expectRows: true, singular: true }
+          )
+        },
+        {
+          params: mapRoute.params,
+          detail: { summary: 'Get a single map', tags: ['Maps'] }
+        }
+      )
+      // ── Update map ────────────────────────────────────────────────────────────
+      .patch(
+        '/maps/:mapId',
+        async ({ env, params, body }) => {
+          return callLive(
+            env.PUBLIC_LIVE_BASE_URL,
+            `/maps/${params.mapId}`,
+            body
+          )
+        },
+        {
+          admin: true,
+          params: t.Object({ mapId: t.String() }),
+          detail: { summary: 'Update a map', tags: ['Maps'] }
+        }
+      )
   )
 }
