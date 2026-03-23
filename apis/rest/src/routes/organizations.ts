@@ -26,7 +26,8 @@ export function createOrganizations(
 ) {
   return createElysia({ name: 'organizations' })
   .use(betterAuthPlugin)
-  .get('/organizations', async ({ db }) => listOrganizations(db), {
+  .get('/organizations', async ({ db, query }) => listOrganizations(db, query.limit), {
+    query: t.Object({ limit: t.Optional(t.Number()) }),
     detail: { summary: 'List all organizations', tags: ['Organizations'] }
   })
   .get(
