@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { fromError } from 'zod-validation-error'
+  import { prettifyError, ZodError } from 'zod'
 
   import { MapMonster } from '@allmaps/components'
   import { shades } from '@allmaps/tailwind'
 
   import { FetchError, type FetchErrorDetails } from '$lib/shared/errors.js'
-
-  import type { ValidationError } from 'zod-validation-error'
 
   type Props = {
     error: unknown
@@ -22,7 +20,7 @@
 
   type ParsedParseError = {
     type: 'parse'
-    details: ValidationError
+    details: string
   }
 
   type ParsedOtherError = {
@@ -55,11 +53,10 @@
     let message: string
 
     if (error instanceof Error) {
-      if (error.name === 'ZodError') {
-        const validationError = fromError(error)
+      if (error instanceof ZodError) {
         return {
           type: 'parse' as const,
-          details: validationError
+          details: prettifyError(error)
         }
       } else if (error instanceof FetchError) {
         return {
@@ -163,7 +160,7 @@
   <p
     class="max-h-96 overflow-y-auto rounded-md bg-[#2e3440ff] p-2 font-mono text-sm break-all text-[#eceff4]"
   >
-    {details.message}
+    {details}
   </p>
 {/snippet}
 

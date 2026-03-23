@@ -1,11 +1,9 @@
 import { Command } from '@commander-js/extra-typings'
-import { fromZodError } from 'zod-validation-error'
+import { prettifyError, ZodError } from 'zod'
 
 import { parseJsonInput, printJson } from '../../lib/io.js'
 import { parseIiif } from '../../lib/iiif.js'
 import { addParseIiifOptions } from '../../lib/options.js'
-
-import type { ZodError } from 'zod'
 
 export function parse() {
   const command = addParseIiifOptions(
@@ -34,10 +32,8 @@ export function parse() {
         const parsedIiif = await parseIiif(jsonValue, parseIiifOptions)
         parsedIiifs.push(parsedIiif)
       } catch (err) {
-        if (err instanceof Error && err.name === 'ZodError') {
-          const zodError = err as ZodError
-          const validationError = fromZodError(zodError)
-          console.error(validationError.toString())
+        if (err instanceof ZodError) {
+          console.error(prettifyError(err))
         } else if (err instanceof Error) {
           console.error(err.message)
         }

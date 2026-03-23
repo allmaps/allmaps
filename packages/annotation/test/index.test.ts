@@ -2,10 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { z } from 'zod'
-import { fromZodError } from 'zod-validation-error'
 
 import { describe, expect, test } from 'vitest'
 
+import { formatZodError } from './format-zod-error.js'
 import { inputDir, outputDir, readJSONFile } from './shared.js'
 
 import { parseAnnotation, generateAnnotation } from '../src/index.js'
@@ -65,8 +65,7 @@ fs.readdirSync(inputDir)
       error = err
 
       if (err instanceof z.ZodError) {
-        const validationError = fromZodError(err)
-        errorMessage = validationError.message
+        errorMessage = formatZodError(err, input)
       } else if (err instanceof Error) {
         errorMessage = err.message
       } else {
