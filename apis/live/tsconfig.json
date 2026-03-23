@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+
+    "types": ["node"],
+    "paths": {
+      "json0-ot-diff": ["./src/json0-ot-diff.d.ts"],
+      "@teamwork/websocket-json-stream": ["./src/websocket-json-stream.d.ts"]
+    }
+  },
+  "references": [
+    { "path": "../../packages/api-shared" },
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/stdlib" },
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/project" },
+    { "path": "../../packages/db" },
+    { "path": "../../packages/env" }
+  ],
+  "include": ["./src/**/*"]
+}
