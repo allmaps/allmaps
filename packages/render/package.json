@@ -69,7 +69,7 @@
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^24",
+    "@types/node": "catalog:",
     "@types/rbush": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
