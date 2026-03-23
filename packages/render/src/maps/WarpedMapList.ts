@@ -65,7 +65,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   options: WarpedMapListOptions<W>
 
-  private boundImageLoadedByMapId: Map<string, EventListener> = new Map()
+  #boundImageLoadedByMapId: Map<string, EventListener>
 
   /**
    * Creates an instance of a WarpedMapList
@@ -100,6 +100,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
     this.imagesById = new Map()
+    this.#boundImageLoadedByMapId = new Map()
 
     this.options = mergeOptions(
       this.DEFAULT_WARPED_MAP_LIST_OPTIONS,
@@ -124,13 +125,39 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): Promise<string> {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMap)
-    const validatedGeoreferencedMap = Array.isArray(
+
+    if (Array.isArray(validatedGeoreferencedMapOrMaps)) {
+      throw new Error(
+        'Expected a single georeferenced map, but got an array of georeferenced maps. Please use addGeoreferencedMaps to add multiple maps at once.'
+      )
+    }
+
+    const validatedGeoreferencedMap = validatedGeoreferencedMapOrMaps
+
+    const results = this.#addGeoreferencedMapInternal(
+      validatedGeoreferencedMap,
+      mapOptions
+    )
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    return results
+  }
+
+  addGeoreferencedMaps(
+    georeferencedMaps: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) {
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMaps)
+
+    const validatedGeoreferencedMaps = Array.isArray(
       validatedGeoreferencedMapOrMaps
     )
-      ? validatedGeoreferencedMapOrMaps[0]
-      : validatedGeoreferencedMapOrMaps
-    return this.addGeoreferencedMapInternal(
-      validatedGeoreferencedMap,
+      ? validatedGeoreferencedMapOrMaps
+      : [validatedGeoreferencedMapOrMaps]
+
+    const results = this.#addGeoreferencedMapsInternal(
+      validatedGeoreferencedMaps,
       mapOptions
     )
   }
@@ -146,8 +173,34 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): Promise<string | Error> {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMap)
-    const validatedGeoreferencedMap = Array.isArray(
+
+    if (Array.isArray(validatedGeoreferencedMapOrMaps)) {
+      throw new Error(
+        'Expected a single georeferenced map, but got an array of georeferenced maps. Please use addGeoreferencedMaps to add multiple maps at once.'
+      )
+    }
+
+    const validatedGeoreferencedMap = validatedGeoreferencedMapOrMaps
+
+    const results = this.#removeGeoreferencedMapInternal(
+      validatedGeoreferencedMap
+    )
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    return results
+  }
+
+  removeGeoreferencedMaps(georeferencedMaps: unknown): (string | Error)[] {
+    const validatedGeoreferencedMapOrMaps =
+      validateGeoreferencedMap(georeferencedMaps)
+
+    const validatedGeoreferencedMaps = Array.isArray(
       validatedGeoreferencedMapOrMaps
+    )
+      ? validatedGeoreferencedMapOrMaps
+      : [validatedGeoreferencedMapOrMaps]
+
+    const results = this.#removeGeoreferencedMapsInternal(
+      validatedGeoreferencedMaps
     )
       ? validatedGeoreferencedMapOrMaps[0]
       : validatedGeoreferencedMapOrMaps
@@ -179,20 +232,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ) {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
-    const settledResults = await Promise.allSettled(
-      maps.map((map) => this.addGeoreferencedMapInternal(map, mapOptions))
-    )
-    // TODO: make sure reason contains Error
-    for (const settledResult of settledResults) {
-      if (settledResult.status === 'fulfilled') {
-        results.push(settledResult.value)
-      } else {
-        results.push(settledResult.reason)
-      }
-    }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONADDED)
-    )
+    const results = this.#addGeoreferencedMapsInternal(maps, mapOptions)
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return results
   }
@@ -208,13 +248,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): Promise<(string | Error)[]> {
     const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
-    for (const map of maps) {
-      const mapIdOrError = await this.removeGeoreferencedMapInternal(map)
-      results.push(mapIdOrError)
-    }
-    this.dispatchEvent(
-      new WarpedMapEvent(WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED)
-    )
+    const results = this.#removeGeoreferencedMapsInternal(maps)
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return results
   }
 
@@ -753,18 +788,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   destroy() {
     for (const warpedMap of this.getWarpedMaps()) {
-      this.removeEventListenersFromWarpedMap(warpedMap)
+      this.#removeEventListenersFromWarpedMap(warpedMap)
       warpedMap.destroy()
     }
 
     this.clear()
   }
 
-  private async addGeoreferencedMapInternal(
+  #addGeoreferencedMapInternal(
     georeferencedMap: GeoreferencedMap,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
-  ): Promise<string> {
-    const mapId = await this.getOrComputeMapId(georeferencedMap)
+  ): string {
+    const mapId = this.#getOrComputeMapId(georeferencedMap)
 
     const warpedMap = this.options.warpedMapFactory(
       mapId,
@@ -775,35 +810,51 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     this.warpedMapsById.set(mapId, warpedMap)
     this.zIndices.set(mapId, this.warpedMapsById.size - 1)
-    this.addToOrUpdateRtree(warpedMap)
-    this.addEventListenersToWarpedMap(warpedMap)
+    this.#addToOrUpdateRtree(warpedMap)
+    this.#addEventListenersToWarpedMap(warpedMap)
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, { mapIds: [mapId] })
     )
     return mapId
   }
 
-  private async removeGeoreferencedMapInternal(
-    georeferencedMap: GeoreferencedMap
-  ): Promise<string> {
-    const mapId = await this.getOrComputeMapId(georeferencedMap)
-    return this.removeGeoreferencedMapByIdInternal(mapId)
+  #addGeoreferencedMapsInternal(
+    georeferencedMaps: GeoreferencedMap[],
+    mapOptions?: Partial<GetWarpedMapOptions<W>>
+  ) {
+    const results: (string | Error)[] = []
+    for (const georeferencedMap of georeferencedMaps) {
+      try {
+        const mapId = this.#addGeoreferencedMapInternal(
+          georeferencedMap,
+          mapOptions
+        )
+        results.push(mapId)
+      } catch (error) {
+        results.push(ensureError(error))
+      }
+    }
+
+    return results
   }
 
-  private async removeGeoreferencedMapByIdInternal(
-    mapId: string
-  ): Promise<string> {
+  #removeGeoreferencedMapInternal(georeferencedMap: GeoreferencedMap): string {
+    const mapId = this.#getOrComputeMapId(georeferencedMap)
+    return this.#removeGeoreferencedMapByIdInternal(mapId)
+  }
+
+  #removeGeoreferencedMapByIdInternal(mapId: string): string {
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       this.warpedMapsById.delete(mapId)
       this.zIndices.delete(mapId)
-      this.removeFromRtree(warpedMap)
+      this.#removeFromRtree(warpedMap)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPREMOVED, {
           mapIds: [mapId]
         })
       )
-      this.removeZIndexHoles()
+      this.#removeZIndexHoles()
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
 
       warpedMap.destroy()
@@ -813,15 +864,29 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     return mapId
   }
 
-  private async getOrComputeMapId(
-    georeferencedMap: GeoreferencedMap
-  ): Promise<string> {
-    const mapId =
-      georeferencedMap.id || (await generateChecksum(georeferencedMap))
+  #removeGeoreferencedMapsInternal(
+    georeferencedMaps: GeoreferencedMap[]
+  ): (string | Error)[] {
+    const results: (string | Error)[] = []
+
+    for (const georeferencedMap of georeferencedMaps) {
+      try {
+        const mapId = this.#removeGeoreferencedMapInternal(georeferencedMap)
+        results.push(mapId)
+      } catch (error) {
+        results.push(ensureError(error))
+      }
+    }
+
+    return results
+  }
+
+  #getOrComputeMapId(georeferencedMap: GeoreferencedMap): string {
+    const mapId = georeferencedMap.id || generateChecksum(georeferencedMap)
     return mapId
   }
 
-  private getProjectedGeoMaskPoints(
+  #getProjectedGeoMaskPoints(
     partialSelectionAndProjectionOptions?: Partial<
       SelectionOptions & ProjectionOptions
     >

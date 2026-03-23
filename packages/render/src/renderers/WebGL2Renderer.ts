@@ -101,13 +101,10 @@ export class WebGL2Renderer
 
   disableRender = false
 
-  private throttledPrepareRenderInternal: DebouncedFunc<
-    typeof this.prepareRenderInternal
-  >
+  #throttledPrepareRenderInternal: DebouncedFunc<() => void>
+  #throttledChanged: DebouncedFunc<() => void>
 
-  private throttledChanged: DebouncedFunc<typeof this.changed>
-
-  private boundThrottledChangedByMapId: Map<string, EventListener> = new Map()
+  #boundThrottledChangedByMapId: Map<string, EventListener>
 
   /**
    * Creates an instance of WebGL2Renderer.
@@ -196,6 +193,7 @@ export class WebGL2Renderer
     this.#worker = worker
     this.#spritesWorker = spritesWorker
     this.gl = gl
+    this.#boundThrottledChangedByMapId = new Map()
 
     this.options = mergeOptions(
       this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
