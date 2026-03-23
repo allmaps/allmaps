@@ -179,7 +179,7 @@ export class Viewport {
 
     this.projection = viewportOptions.projection
 
-    this.projectedGeoRectangle = this.computeProjectedGeoRectangle(
+    this.projectedGeoRectangle = this.#computeProjectedGeoRectangle(
       this.viewportSize,
       this.projectedGeoPerViewportScale,
       this.rotation,
@@ -220,13 +220,13 @@ export class Viewport {
       this.projectedGeoPerViewportScale / this.devicePixelRatio
 
     this.projectedGeoToViewportHomogeneousTransform =
-      this.composeProjectedGeoToViewportHomogeneousTransform()
+      this.#composeProjectedGeoToViewportHomogeneousTransform()
     this.projectedGeoToCanvasHomogeneousTransform =
-      this.composeProjectedGeoToCanvasHomogeneousTransform()
+      this.#composeProjectedGeoToCanvasHomogeneousTransform()
     this.projectedGeoToClipHomogeneousTransform =
-      this.composeProjectedGeoToClipHomogeneousTransform()
+      this.#composeProjectedGeoToClipHomogeneousTransform()
     this.viewportToClipHomogeneousTransform =
-      this.composeViewportToClipHomogeneousTransform()
+      this.#composeViewportToClipHomogeneousTransform()
   }
 
   /**
@@ -492,7 +492,7 @@ export class Viewport {
     ) as Rectangle
   }
 
-  private composeProjectedGeoToViewportHomogeneousTransform(): HomogeneousTransform {
+  #composeProjectedGeoToViewportHomogeneousTransform(): HomogeneousTransform {
     return composeHomogeneousTransform(
       this.viewportCenter[0],
       this.viewportCenter[1],
@@ -504,7 +504,7 @@ export class Viewport {
     )
   }
 
-  private composeProjectedGeoToCanvasHomogeneousTransform(): HomogeneousTransform {
+  #composeProjectedGeoToCanvasHomogeneousTransform(): HomogeneousTransform {
     return composeHomogeneousTransform(
       this.canvasCenter[0],
       this.canvasCenter[1],
@@ -516,7 +516,7 @@ export class Viewport {
     )
   }
 
-  private composeProjectedGeoToClipHomogeneousTransform(): HomogeneousTransform {
+  #composeProjectedGeoToClipHomogeneousTransform(): HomogeneousTransform {
     return composeHomogeneousTransform(
       0,
       0,
@@ -528,7 +528,7 @@ export class Viewport {
     )
   }
 
-  private composeViewportToClipHomogeneousTransform(): HomogeneousTransform {
+  #composeViewportToClipHomogeneousTransform(): HomogeneousTransform {
     return composeHomogeneousTransform(
       0,
       0,
@@ -553,7 +553,7 @@ export class Viewport {
    * @param rotation
    * @param projectedGeoCenter
    */
-  private computeProjectedGeoRectangle(
+  #computeProjectedGeoRectangle(
     viewportSize: Size,
     projectedGeoPerViewportScale: number,
     rotation: number,

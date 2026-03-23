@@ -59,19 +59,19 @@ export class CanvasRenderer
       this.warpedMapList,
       this.tileCache,
       this.viewport,
-      this.getTileImageData,
-      this.getTileSize,
+      this.#getTileImageData,
+      this.#getTileSize,
       imageData.data
     )
 
     this.context.putImageData(imageData, 0, 0)
   }
 
-  private getTileImageData(data: ImageData, index: number): number {
+  #getTileImageData(data: ImageData, index: number): number {
     return data.data[index]
   }
 
-  private getTileSize(data: ImageData): Size {
+  #getTileSize(data: ImageData): Size {
     return [data.width, data.height]
   }
 }

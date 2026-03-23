@@ -8,8 +8,6 @@ import {
 } from '../tilecache/CacheableRawJpegTile.js'
 import { invertHomogeneousTransform } from '../shared/homogeneous-transform.js'
 
-import type { BaseTransformation } from '@allmaps/transform'
-
 import type { Renderer, IntArrayRenderOptions } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
 import type { WarpedMap } from '../maps/WarpedMap.js'
@@ -216,7 +214,7 @@ export class WasmRenderer
       }
 
       // Render this map using WASM
-      const mapPixels = await this.renderMap(
+      const mapPixels = await this.#renderMap(
         warpedMap,
         cachedTiles,
         canvasToGeo,
@@ -238,11 +236,11 @@ export class WasmRenderer
 
     // Encode output based on format
     if (this.outputFormat === 'webp') {
-      return this.encodeWebP(outputPixels, outputWidth, outputHeight)
+      return this.#encodeWebP(outputPixels, outputWidth, outputHeight)
     } else if (this.outputFormat === 'jpeg') {
-      return this.encodeJPEG(outputPixels, outputWidth, outputHeight)
+      return this.#encodeJPEG(outputPixels, outputWidth, outputHeight)
     } else {
-      return this.encodePNG(outputPixels, outputWidth, outputHeight)
+      return this.#encodePNG(outputPixels, outputWidth, outputHeight)
     }
   }
 
@@ -250,7 +248,7 @@ export class WasmRenderer
    * Render a single map using WASM with raw JPEG tiles
    * WASM decodes JPEG natively - no JavaScript decoding needed!
    */
-  private async renderMap(
+  async #renderMap(
     warpedMap: WarpedMap,
     cachedTiles: CachedTile<RawJpegData>[],
     canvasToGeo: Float64Array,
@@ -336,7 +334,7 @@ export class WasmRenderer
   /**
    * Encode RGBA pixels to PNG using WASM
    */
-  private encodePNG(
+  #encodePNG(
     pixels: Uint8ClampedArray,
     width: number,
     height: number
@@ -351,7 +349,7 @@ export class WasmRenderer
   /**
    * Encode RGBA pixels to WebP using WASM
    */
-  private encodeWebP(
+  #encodeWebP(
     pixels: Uint8ClampedArray,
     width: number,
     height: number
@@ -366,7 +364,7 @@ export class WasmRenderer
   /**
    * Encode RGBA pixels to JPEG using WASM
    */
-  private encodeJPEG(
+  #encodeJPEG(
     pixels: Uint8ClampedArray,
     width: number,
     height: number,

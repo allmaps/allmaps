@@ -90,10 +90,7 @@ export class WebGL2Renderer
   linesProgram: WebGLProgram
   pointsProgram: WebGLProgram
 
-  private uniformCache: Map<
-    WebGLProgram,
-    Map<string, WebGLUniformLocation | null>
-  >
+  #uniformCache: Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>
 
   previousSignificantViewport: Viewport | undefined
 
@@ -209,7 +206,7 @@ export class WebGL2Renderer
     this.linesProgram = linesProgram
     this.pointsProgram = pointsProgram
 
-    this.uniformCache = new Map()
+    this.#uniformCache = new Map()
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
@@ -225,14 +222,14 @@ export class WebGL2Renderer
 
     this.addEventListeners()
 
-    this.throttledPrepareRenderInternal = throttle(
-      this.prepareRenderInternal.bind(this),
+    this.#throttledPrepareRenderInternal = throttle(
+      this.#prepareRenderInternal.bind(this),
       THROTTLE_PREPARE_RENDER_WAIT_MS,
       THROTTLE_PREPARE_RENDER_OPTIONS
     )
 
-    this.throttledChanged = throttle(
-      this.changed.bind(this),
+    this.#throttledChanged = throttle(
+      this.#changed.bind(this),
       THROTTLE_CHANGED_WAIT_MS,
       THROTTLE_CHANGED_OPTIONS
     )
@@ -293,7 +290,7 @@ export class WebGL2Renderer
     this.linesProgram = linesProgram
     this.pointsProgram = pointsProgram
 
-    this.uniformCache = new Map()
+    this.#uniformCache = new Map()
 
     gl.disable(gl.DEPTH_TEST)
 
@@ -310,7 +307,7 @@ export class WebGL2Renderer
    *
    * @param viewport - the current viewport
    */
-  render(viewport?: Viewport): void {
+  render(viewport?: Viewport) {
     if (this.disableRender) {
       return
     }
@@ -329,10 +326,10 @@ export class WebGL2Renderer
     // Don't fire throttled function unless it could result in something
     // Otherwise we have to wait for that cycle to finish before useful cycle can be started
     if (this.someImagesInViewport()) {
-      this.throttledPrepareRenderInternal()
+      this.#throttledPrepareRenderInternal()
     }
 
-    this.renderInternal()
+    this.#renderInternal()
   }
 
   clear() {
@@ -344,15 +341,15 @@ export class WebGL2Renderer
   }
 
   cancelThrottledFunctions() {
-    this.throttledPrepareRenderInternal.cancel()
-    this.throttledChanged.cancel()
+    this.#throttledPrepareRenderInternal.cancel()
+    this.#throttledChanged.cancel()
   }
 
   destroy() {
     this.cancelThrottledFunctions()
 
     for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
-      this.removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)
+      this.#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)
     }
 
     this.removeEventListeners()
@@ -369,16 +366,16 @@ export class WebGL2Renderer
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
 
-  private getUniformLocation(
+  #getUniformLocation(
     gl: WebGLRenderingContext,
     program: WebGLProgram,
     name: string
   ): WebGLUniformLocation | null {
     // Get or create program cache
-    let programCache = this.uniformCache.get(program)
+    let programCache = this.#uniformCache.get(program)
     if (!programCache) {
       programCache = new Map()
-      this.uniformCache.set(program, programCache)
+      this.#uniformCache.set(program, programCache)
     }
 
     // Get or fetch uniform location
@@ -435,7 +432,7 @@ export class WebGL2Renderer
     }
   }
 
-  private prepareRenderInternal(): void {
+  #prepareRenderInternal() {
     this.assureProjection()
     this.requestFetchableTiles()
   }
@@ -490,7 +487,7 @@ export class WebGL2Renderer
     return true
   }
 
-  private renderInternal(): void {
+  #renderInternal() {
     if (!this.viewport) {
       return
     }
@@ -500,17 +497,17 @@ export class WebGL2Renderer
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
 
-    this.renderMapsInternal()
-    this.renderLinesInternal()
-    this.renderPointsInternal()
+    this.#renderMapsInternal()
+    this.#renderLinesInternal()
+    this.#renderPointsInternal()
   }
 
-  private renderMapsInternal(): void {
+  #renderMapsInternal() {
     if (!this.viewport) {
       return
     }
 
-    this.setMapProgramUniforms()
+    this.#setMapProgramUniforms()
 
     for (const mapId of this.mapsWithFetchableTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -519,7 +516,7 @@ export class WebGL2Renderer
         continue
       }
 
-      this.setMapProgramMapUniforms(webgl2WarpedMap)
+      this.#setMapProgramMapUniforms(webgl2WarpedMap)
 
       // Draw map
       const count = webgl2WarpedMap.resourceTrianglePoints.length
@@ -530,8 +527,8 @@ export class WebGL2Renderer
     }
   }
 
-  private renderLinesInternal(): void {
-    this.setLinesProgramUniforms()
+  #renderLinesInternal() {
+    this.#setLinesProgramUniforms()
 
     for (const mapId of this.mapsWithFetchableTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -540,7 +537,7 @@ export class WebGL2Renderer
         continue
       }
 
-      this.setLinesProgramMapUniforms(webgl2WarpedMap)
+      this.#setLinesProgramMapUniforms(webgl2WarpedMap)
 
       // Draw lines for each map
       const count =
@@ -556,8 +553,8 @@ export class WebGL2Renderer
     }
   }
 
-  private renderPointsInternal(): void {
-    this.setPointsProgramUniforms()
+  #renderPointsInternal() {
+    this.#setPointsProgramUniforms()
 
     for (const mapId of this.mapsWithFetchableTilesForViewport) {
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -566,7 +563,7 @@ export class WebGL2Renderer
         continue
       }
 
-      this.setPointsProgramMapUniforms(webgl2WarpedMap)
+      this.#setPointsProgramMapUniforms(webgl2WarpedMap)
 
       // Draw points for each map
       const count = webgl2WarpedMap.pointGroups.reduce(
@@ -581,13 +578,13 @@ export class WebGL2Renderer
     }
   }
 
-  private setMapProgramUniforms() {
+  #setMapProgramUniforms() {
     const program = this.mapProgram
     const gl = this.gl
     gl.useProgram(program)
 
     // Animation progress
-    const animationProgressLocation = this.getUniformLocation(
+    const animationProgressLocation = this.#getUniformLocation(
       gl,
       program,
       'u_animationProgress'
@@ -595,7 +592,7 @@ export class WebGL2Renderer
     gl.uniform1f(animationProgressLocation, this.animationProgress)
   }
 
-  private setMapProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
+  #setMapProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
     if (!this.viewport) {
       return
     }
@@ -609,7 +606,7 @@ export class WebGL2Renderer
       this.viewport.projectedGeoToClipHomogeneousTransform,
       webgl2WarpedMap.invertedRenderHomogeneousTransform
     )
-    const renderHomogeneousTransformLocation = this.getUniformLocation(
+    const renderHomogeneousTransformLocation = this.#getUniformLocation(
       gl,
       program,
       'u_renderHomogeneousTransform'
@@ -621,13 +618,13 @@ export class WebGL2Renderer
     )
 
     // Visible
-    const visibilityOpacityLocation = this.getUniformLocation(
+    const visibilityOpacityLocation = this.#getUniformLocation(
       gl,
       program,
       'u_visibilityOpacity'
     )
     gl.uniform1f(visibilityOpacityLocation, webgl2WarpedMap.visibilityOpacity)
-    const previousVisibilityOpacityLocation = this.getUniformLocation(
+    const previousVisibilityOpacityLocation = this.#getUniformLocation(
       gl,
       program,
       'u_previousVisibilityOpacity'
@@ -636,13 +633,13 @@ export class WebGL2Renderer
       previousVisibilityOpacityLocation,
       webgl2WarpedMap.previousVisibilityOpacity
     )
-    const applymaskOpacityLocation = this.getUniformLocation(
+    const applymaskOpacityLocation = this.#getUniformLocation(
       gl,
       program,
       'u_applyMaskOpacity'
     )
     gl.uniform1f(applymaskOpacityLocation, webgl2WarpedMap.applyMaskOpacity)
-    const previousApplyMaskOpacityLocation = this.getUniformLocation(
+    const previousApplyMaskOpacityLocation = this.#getUniformLocation(
       gl,
       program,
       'u_previousApplyMaskOpacity'
@@ -653,11 +650,11 @@ export class WebGL2Renderer
     )
 
     // Opacity
-    const opacityLocation = this.getUniformLocation(gl, program, 'u_opacity')
+    const opacityLocation = this.#getUniformLocation(gl, program, 'u_opacity')
     gl.uniform1f(opacityLocation, webgl2WarpedMap.options.opacity)
 
     // Saturation
-    const saturationLocation = this.getUniformLocation(
+    const saturationLocation = this.#getUniformLocation(
       gl,
       program,
       'u_saturation'
@@ -665,7 +662,7 @@ export class WebGL2Renderer
     gl.uniform1f(saturationLocation, webgl2WarpedMap.options.saturation)
 
     // Remove color
-    const removeColorLocation = this.getUniformLocation(
+    const removeColorLocation = this.#getUniformLocation(
       gl,
       program,
       'u_removeColor'
@@ -675,7 +672,7 @@ export class WebGL2Renderer
       webgl2WarpedMap.options.removeColor ? 1 : 0
     )
 
-    const removeColorColorLocation = this.getUniformLocation(
+    const removeColorColorLocation = this.#getUniformLocation(
       gl,
       program,
       'u_removeColorColor'
@@ -685,7 +682,7 @@ export class WebGL2Renderer
       hexToFractionalRgb(webgl2WarpedMap.options.removeColorColor)
     )
 
-    const removeColorThresholdLocation = this.getUniformLocation(
+    const removeColorThresholdLocation = this.#getUniformLocation(
       gl,
       program,
       'u_removeColorThreshold'
@@ -695,7 +692,7 @@ export class WebGL2Renderer
       webgl2WarpedMap.options.removeColorThreshold
     )
 
-    const removeColorHardnessLocation = this.getUniformLocation(
+    const removeColorHardnessLocation = this.#getUniformLocation(
       gl,
       program,
       'u_removeColorHardness'
@@ -706,10 +703,10 @@ export class WebGL2Renderer
     )
 
     // Colorize
-    const colorizeLocation = this.getUniformLocation(gl, program, 'u_colorize')
+    const colorizeLocation = this.#getUniformLocation(gl, program, 'u_colorize')
     gl.uniform1f(colorizeLocation, webgl2WarpedMap.options.colorize ? 1 : 0)
 
-    const colorizeColorLocation = this.getUniformLocation(
+    const colorizeColorLocation = this.#getUniformLocation(
       gl,
       program,
       'u_colorizeColor'
@@ -720,24 +717,24 @@ export class WebGL2Renderer
     )
 
     // Grid
-    const gridLocation = this.getUniformLocation(gl, program, 'u_renderGrid')
+    const gridLocation = this.#getUniformLocation(gl, program, 'u_renderGrid')
     gl.uniform1f(gridLocation, webgl2WarpedMap.options.renderGrid ? 1 : 0)
 
-    const colorGrid = this.getUniformLocation(gl, program, 'u_renderGridColor')
+    const colorGrid = this.#getUniformLocation(gl, program, 'u_renderGridColor')
     gl.uniform4fv(
       colorGrid,
       hexToFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
     )
 
     // Distortion
-    const distortionLocation = this.getUniformLocation(
+    const distortionLocation = this.#getUniformLocation(
       gl,
       program,
       'u_distortion'
     )
     gl.uniform1f(distortionLocation, webgl2WarpedMap.distortionMeasure ? 1 : 0)
 
-    const distortionMeasureLocation = this.getUniformLocation(
+    const distortionMeasureLocation = this.#getUniformLocation(
       gl,
       program,
       'u_distortionMeasure'
@@ -749,7 +746,7 @@ export class WebGL2Renderer
         : 0
     )
 
-    const distortionColor00Location = this.getUniformLocation(
+    const distortionColor00Location = this.#getUniformLocation(
       gl,
       program,
       'u_distortionColor00'
@@ -759,7 +756,7 @@ export class WebGL2Renderer
       hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
     )
 
-    const distortionColor01Location = this.getUniformLocation(
+    const distortionColor01Location = this.#getUniformLocation(
       gl,
       program,
       'u_distortionColor01'
@@ -769,7 +766,7 @@ export class WebGL2Renderer
       hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
     )
 
-    const distortionColor1Location = this.getUniformLocation(
+    const distortionColor1Location = this.#getUniformLocation(
       gl,
       program,
       'u_distortionColor1'
@@ -779,7 +776,7 @@ export class WebGL2Renderer
       hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
     )
 
-    const distortionColor2Location = this.getUniformLocation(
+    const distortionColor2Location = this.#getUniformLocation(
       gl,
       program,
       'u_distortionColor2'
@@ -789,7 +786,7 @@ export class WebGL2Renderer
       hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
     )
 
-    const distortionColorLocation3 = this.getUniformLocation(
+    const distortionColorLocation3 = this.#getUniformLocation(
       gl,
       program,
       'u_distortionColor3'
@@ -800,7 +797,7 @@ export class WebGL2Renderer
     )
 
     // Debug Triangles
-    const debugTrianglesLocation = this.getUniformLocation(
+    const debugTrianglesLocation = this.#getUniformLocation(
       gl,
       program,
       'u_debugTriangles'
@@ -811,7 +808,7 @@ export class WebGL2Renderer
     )
 
     // Debug Tiles
-    const debugTilesLocation = this.getUniformLocation(
+    const debugTilesLocation = this.#getUniformLocation(
       gl,
       program,
       'u_debugTiles'
@@ -819,7 +816,7 @@ export class WebGL2Renderer
     gl.uniform1f(debugTilesLocation, webgl2WarpedMap.options.debugTiles ? 1 : 0)
 
     // Best scale factor
-    const scaleFactorForViewportLocation = this.getUniformLocation(
+    const scaleFactorForViewportLocation = this.#getUniformLocation(
       gl,
       program,
       'u_scaleFactorForViewport'
@@ -830,7 +827,7 @@ export class WebGL2Renderer
     gl.uniform1i(scaleFactorForViewportLocation, scaleFactorForViewport)
 
     // Cached tiles texture array
-    const cachedTilesTextureArrayLocation = this.getUniformLocation(
+    const cachedTilesTextureArrayLocation = this.#getUniformLocation(
       gl,
       program,
       'u_cachedTilesTextureArray'
@@ -841,7 +838,7 @@ export class WebGL2Renderer
 
     // Cached tiles resource origin points and sizes texture
     const cachedTilesResourceOriginPointsAndSizesLocation =
-      this.getUniformLocation(
+      this.#getUniformLocation(
         gl,
         program,
         'u_cachedTilesResourceOriginPointsAndSizesTexture'
@@ -855,7 +852,7 @@ export class WebGL2Renderer
     )
 
     // Cached tiles scale factors texture
-    const cachedTileScaleFactorsTextureLocation = this.getUniformLocation(
+    const cachedTileScaleFactorsTextureLocation = this.#getUniformLocation(
       gl,
       program,
       'u_cachedTilesScaleFactorsTexture'
@@ -868,7 +865,7 @@ export class WebGL2Renderer
     )
   }
 
-  private setLinesProgramUniforms() {
+  #setLinesProgramUniforms() {
     if (!this.viewport) {
       return
     }
@@ -878,7 +875,7 @@ export class WebGL2Renderer
     gl.useProgram(program)
 
     // ViewportToClip Transform
-    const viewportToClipHomogeneousTransformLocation = this.getUniformLocation(
+    const viewportToClipHomogeneousTransformLocation = this.#getUniformLocation(
       gl,
       program,
       'u_viewportToClipHomogeneousTransform'
@@ -892,7 +889,7 @@ export class WebGL2Renderer
     )
 
     // clipToViewport Transform
-    const clipToViewportHomogeneousTransformLocation = this.getUniformLocation(
+    const clipToViewportHomogeneousTransformLocation = this.#getUniformLocation(
       gl,
       program,
       'u_clipToViewportHomogeneousTransform'
@@ -908,7 +905,7 @@ export class WebGL2Renderer
     )
 
     // Animation progress
-    const animationProgressLocation = this.getUniformLocation(
+    const animationProgressLocation = this.#getUniformLocation(
       gl,
       program,
       'u_animationProgress'
@@ -916,7 +913,7 @@ export class WebGL2Renderer
     gl.uniform1f(animationProgressLocation, this.animationProgress)
   }
 
-  private setLinesProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
+  #setLinesProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
     if (!this.viewport) {
       return
     }
@@ -930,7 +927,7 @@ export class WebGL2Renderer
       this.viewport.projectedGeoToClipHomogeneousTransform,
       webgl2WarpedMap.invertedRenderHomogeneousTransform
     )
-    const renderHomogeneousTransformLocation = this.getUniformLocation(
+    const renderHomogeneousTransformLocation = this.#getUniformLocation(
       gl,
       program,
       'u_renderHomogeneousTransform'
@@ -942,7 +939,7 @@ export class WebGL2Renderer
     )
   }
 
-  private setPointsProgramUniforms() {
+  #setPointsProgramUniforms() {
     if (!this.viewport) {
       return
     }
@@ -952,7 +949,7 @@ export class WebGL2Renderer
     gl.useProgram(program)
 
     // Animation progress
-    const animationProgressLocation = this.getUniformLocation(
+    const animationProgressLocation = this.#getUniformLocation(
       gl,
       program,
       'u_animationProgress'
@@ -960,7 +957,7 @@ export class WebGL2Renderer
     gl.uniform1f(animationProgressLocation, this.animationProgress)
 
     // Device pixel ratio
-    const devicePixelRatioLocation = this.getUniformLocation(
+    const devicePixelRatioLocation = this.#getUniformLocation(
       gl,
       program,
       'u_devicePixelRatio'
@@ -968,7 +965,7 @@ export class WebGL2Renderer
     gl.uniform1f(devicePixelRatioLocation, this.viewport.devicePixelRatio)
   }
 
-  private setPointsProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
+  #setPointsProgramMapUniforms(webgl2WarpedMap: WebGL2WarpedMap) {
     if (!this.viewport) {
       return
     }
@@ -982,7 +979,7 @@ export class WebGL2Renderer
       this.viewport.projectedGeoToClipHomogeneousTransform,
       webgl2WarpedMap.invertedRenderHomogeneousTransform
     )
-    const renderHomogeneousTransformLocation = this.getUniformLocation(
+    const renderHomogeneousTransformLocation = this.#getUniformLocation(
       gl,
       program,
       'u_renderHomogeneousTransform'
@@ -994,7 +991,7 @@ export class WebGL2Renderer
     )
   }
 
-  private startAnimation(
+  #startAnimation(
     mapIds: string[],
     partialAnimationOptions?: Partial<AnimationOptions>
   ) {
@@ -1004,7 +1001,7 @@ export class WebGL2Renderer
     )
 
     // This changed() is needed to prevent a blank canvas flash
-    this.changed()
+    this.#changed()
     // This requestFetchableTiles() is needed to update
     // mapsWithFetchableTilesForViewport when visible is changed
     this.requestFetchableTiles()
@@ -1019,11 +1016,11 @@ export class WebGL2Renderer
     this.animationStart = undefined
     this.lastAnimationFrameRequestId = requestAnimationFrame(
       ((now: number) =>
-        this.animationFrame(now, mapIds, options.duration)).bind(this)
+        this.#animationFrame(now, mapIds, options.duration)).bind(this)
     )
   }
 
-  private animationFrame(now: number, mapIds: string[], duration: number) {
+  #animationFrame(now: number, mapIds: string[], duration: number) {
     if (!this.animationStart) {
       this.animationStart = now
     }
@@ -1034,18 +1031,20 @@ export class WebGL2Renderer
       this.animationProgress = (now - this.animationStart) / duration
 
       // This changed() is needed to trigger the repaint of the canvas
-      this.changed()
+      this.#changed()
 
       this.lastAnimationFrameRequestId = requestAnimationFrame(
-        ((now: number) => this.animationFrame(now, mapIds, duration)).bind(this)
+        ((now: number) => this.#animationFrame(now, mapIds, duration)).bind(
+          this
+        )
       )
     } else {
       // Animation ended
-      this.finishAnimation(mapIds)
+      this.#finishAnimation(mapIds)
     }
   }
 
-  private finishAnimation(mapIds: string[]) {
+  #finishAnimation(mapIds: string[]) {
     this.resetPrevious(mapIds)
     this.updateVertexBuffers(mapIds)
 
@@ -1057,11 +1056,11 @@ export class WebGL2Renderer
 
     // Unthrottled prepareRenderInternal to avoid flickering when maps are made visible/invisible
     // and render is called before prepareRenderInternal throttled delay would have passed
-    this.prepareRenderInternal()
-    this.changed()
+    this.#prepareRenderInternal()
+    this.#changed()
   }
 
-  private changed() {
+  #changed() {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
@@ -1132,7 +1131,7 @@ export class WebGL2Renderer
       const mapId = mapIds[0]
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
       if (webgl2WarpedMap) {
-        this.addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
+        this.#addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
       }
     }
   }
@@ -1159,7 +1158,7 @@ export class WebGL2Renderer
         throw new Error('Event data missing')
       }
       const { mapIds, animationOptions } = event.data
-      this.startAnimation(mapIds, animationOptions)
+      this.#startAnimation(mapIds, animationOptions)
     }
   }
 
@@ -1169,26 +1168,24 @@ export class WebGL2Renderer
         throw new Error('Event data missing')
       }
       const { mapIds } = event.data
-      this.finishAnimation(mapIds)
+      this.#finishAnimation(mapIds)
     }
   }
 
-  private addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    const bound = this.throttledChanged.bind(this)
-    this.boundThrottledChangedByMapId.set(webgl2WarpedMap.mapId, bound)
+  #addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
+    const bound = this.#throttledChanged.bind(this)
+    this.#boundThrottledChangedByMapId.set(webgl2WarpedMap.mapId, bound)
     webgl2WarpedMap.addEventListener(WarpedMapEventType.TEXTURESUPDATED, bound)
   }
 
-  private removeEventListenersFromWebGL2WarpedMap(
-    webgl2WarpedMap: WebGL2WarpedMap
-  ) {
-    const bound = this.boundThrottledChangedByMapId.get(webgl2WarpedMap.mapId)
+  #removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
+    const bound = this.#boundThrottledChangedByMapId.get(webgl2WarpedMap.mapId)
     if (bound) {
       webgl2WarpedMap.removeEventListener(
         WarpedMapEventType.TEXTURESUPDATED,
         bound
       )
-      this.boundThrottledChangedByMapId.delete(webgl2WarpedMap.mapId)
+      this.#boundThrottledChangedByMapId.delete(webgl2WarpedMap.mapId)
     }
   }
 
