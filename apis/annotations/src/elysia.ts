@@ -8,7 +8,7 @@ import {
 } from '@allmaps/api-shared/elysia'
 
 import type { ElysiaConfig } from 'elysia'
-import type { BetterAuthContext } from '@allmaps/db'
+import type { BetterAuthContext } from '@allmaps/db/auth'
 
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 

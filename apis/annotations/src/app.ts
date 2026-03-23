@@ -8,7 +8,7 @@ import { fetchJson } from '@allmaps/stdlib'
 import { generateId } from '@allmaps/id'
 
 import { createElysia, createBetterAuthPlugin } from './elysia.js'
-import type { BetterAuthContext } from '@allmaps/db'
+import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { maps } from './routes/maps.js'

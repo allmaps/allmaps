@@ -2,7 +2,8 @@ import { Elysia } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 import { env as cfEnv } from 'cloudflare:workers'
 
-import { createAuth, getNeonDb } from '@allmaps/db'
+import { getNeonDb } from '@allmaps/db'
+import { createAuth } from '@allmaps/db/auth'
 import { parseRestEnv } from '@allmaps/env/rest'
 
 import { createApp } from './app.js'

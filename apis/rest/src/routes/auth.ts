@@ -1,6 +1,7 @@
 import { t } from 'elysia'
 
-import { createAuth, type BetterAuthContext } from '@allmaps/db'
+import type { BetterAuthContext } from '@allmaps/db/auth'
+import { createAuth } from '@allmaps/db/auth'
 import { createBetterAuthPlugin, error } from '../elysia.js'
 import {
   queryAdminOrganizations,

@@ -6,7 +6,8 @@ import {
   queryList,
   queryListGeoreferenceAnnotations
 } from '@allmaps/api-shared/db'
-import { createAuth, type BetterAuthContext } from '@allmaps/db'
+import type { BetterAuthContext } from '@allmaps/db/auth'
+import { createAuth } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia } from '../elysia.js'

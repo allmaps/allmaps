@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
-import type { BetterAuthContext } from '@allmaps/db'
+import type { BetterAuthContext } from '@allmaps/db/auth'
 
 import { ResponseError } from '../shared/errors.js'
 import { createElysia } from './app.js'
