@@ -48,11 +48,9 @@
   const projections: Projection[] = [
     lonLatProjection,
     webMercatorProjection,
-    // svelte-ignore state_referenced_locally
     ...data.extraProjections
   ]
 
-  // svelte-ignore state_referenced_locally
   for (const projection of data.extraProjections) {
     proj4.defs(projection.id as string, projection.definition)
   }

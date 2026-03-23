@@ -45,6 +45,10 @@
     "@types/ramda": "^0.29.3",
     "@types/sharedb": "^3.3.12",
     "@types/ws": "^8.5.5",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0"
   }
 }

@@ -150,7 +150,7 @@
     <div class="field">
       <label for="transformationType">Type</label>
       <select id="transformationType" bind:value={options.transformationType}>
-        {#each [undefined, ...transformationTypes] as t}
+        {#each [undefined, ...transformationTypes] as t (t)}
           <option value={t}>{t}</option>
         {/each}
       </select>
@@ -175,7 +175,7 @@
     <div class="field">
       <label for="distortionMeasure">Distortion Measure</label>
       <select id="distortionMeasure" bind:value={options.distortionMeasure}>
-        {#each [undefined, ...distortionMeasures] as d}
+        {#each [undefined, ...distortionMeasures] as d (d)}
           <option value={d}>{d}</option>
         {/each}
       </select>
@@ -194,7 +194,7 @@
             (p) => p?.name === e.currentTarget.value
           ))}
       >
-        {#each [undefined, ...projections] as p}
+        {#each [undefined, ...projections] as p (p?.id)}
           <option value={p?.name}>{p?.name}</option>
         {/each}
       </select>
@@ -209,7 +209,7 @@
             (p) => p?.name === e.currentTarget.value
           ))}
       >
-        {#each projections as p}
+        {#each projections as p (p?.id)}
           <option value={p?.name}>{p?.name}</option>
         {/each}
       </select>

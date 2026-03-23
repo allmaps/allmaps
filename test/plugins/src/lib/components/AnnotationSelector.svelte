@@ -100,7 +100,7 @@
             annotationUrl = e.currentTarget.value
           }}
         >
-          {#each annotationObjects as a}
+          {#each annotationObjects as a (a?.url)}
             <option value={a?.url}>{a?.name}</option>
           {/each}
         </select>
