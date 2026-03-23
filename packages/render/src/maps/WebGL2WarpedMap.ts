@@ -1001,7 +1001,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Cached tiles texture array
 
     const requiredTextureWidth = this.tileSize[0]
-    const requiredTextureHeigt = this.tileSize[1]
+    const requiredTextureHeight = this.tileSize[1]
     const requiredTextureDepth = this.cachedTilesForTexture.length
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
@@ -1012,7 +1012,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       0,
       gl.RGBA,
       requiredTextureWidth,
-      requiredTextureHeigt,
+      requiredTextureHeight,
       requiredTextureDepth,
       0,
       gl.RGBA,
@@ -1033,7 +1033,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       // the image data is still its the full size).
       if (
         imageData.width > requiredTextureWidth ||
-        imageData.height > requiredTextureHeigt
+        imageData.height > requiredTextureHeight
       ) {
         throw new Error("Cached tile doesn't fit in texture")
       }
