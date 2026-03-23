@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "watch": "tsc --watch --noCheck",
-    "build": "tsc",
+    "build": "tsc --noCheck",
     "test": "NODE_ENV=test vitest run",
     "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
     "format": "prettier --ignore-path ../../.gitignore --write src test",
