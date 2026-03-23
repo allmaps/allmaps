@@ -5,7 +5,7 @@
     "buildCommand": "pnpm turbo run build --filter=@allmaps/api-live..."
   },
   "deploy": {
-    "startCommand": "node apis/live/dist/src/index.js",
+    "startCommand": "node apis/live/dist/index.js",
     "healthcheckPath": "/",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
