@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "watch": "tsc --watch --noCheck",
-    "build": "tsc",
+    "build": "tsc --noCheck",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
