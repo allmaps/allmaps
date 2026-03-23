@@ -115,7 +115,7 @@ export const DbMap3Schema = z.object({
   gcps: DbGcps3Schema,
   resourceMask: ResourceMaskSchema,
   transformation: DbTransformationSchema.optional(),
-  resourceCrs: DbProjectionSchema.optional()
+  resourceCrs: DbProjectionSchema.optional().catch(undefined)
 })
 
 export const DbMaps3Schema = z.record(z.string(), DbMap3Schema)
