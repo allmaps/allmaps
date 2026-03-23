@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
+    "build": "tsc",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",

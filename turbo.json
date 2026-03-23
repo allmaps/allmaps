@@ -14,8 +14,8 @@
     },
     "types": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],
-      "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["build", "^types"]
+      "outputs": [],
+      "dependsOn": ["^types"]
     },
     "lint": {
       "inputs": [
@@ -27,7 +27,7 @@
         ".prettierignore"
       ],
       "outputs": [],
-      "dependsOn": ["build", "^lint"]
+      "dependsOn": ["^lint"]
     },
     "test": {
       "inputs": ["src/**", "test/**", "package.json"],
