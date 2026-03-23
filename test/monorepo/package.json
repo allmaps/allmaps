@@ -7,7 +7,7 @@
     "_test": "NODE_ENV=test vitest run"
   },
   "devDependencies": {
-    "@types/node": "^24",
+    "@types/node": "catalog:",
     "vitest": "^4.0.4"
   },
   "dependencies": {}
