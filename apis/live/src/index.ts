@@ -22,6 +22,13 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get('/', (_req, res) => {
+  res.send({
+    service: 'allmaps-live',
+    status: 'ok'
+  })
+})
+
 app.post('/maps', async (req, res) => {
   const mapOrMaps = validateGeoreferencedMap(req.body)
   const maps = Array.isArray(mapOrMaps) ? mapOrMaps : [mapOrMaps]
