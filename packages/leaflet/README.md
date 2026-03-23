@@ -266,7 +266,7 @@ Adds a Georeference Annotation
 
 ###### Returns
 
-Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
+Map IDs of the maps that were added, or an error per map (`Array<string | Error>`).
 
 ### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl, mapOptions)`
 
@@ -296,7 +296,7 @@ Adds a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was added, or an error (`Promise<string | Error>`).
+Map ID of the map that was added, or an error (`string`).
 
 ### `WarpedMapLayer#addImageInfos(imageInfos)`
 
@@ -719,12 +719,12 @@ There are no parameters.
 
 `number | undefined`.
 
-### `WarpedMapLayer#gl`
+### `WarpedMapLayer#gl?`
 
 ###### Type
 
 ```ts
-WebGL2RenderingContext | null | undefined
+WebGL2RenderingContext
 ```
 
 ### `WarpedMapLayer#initialize(annotationOrAnnotationUrl, options)`
@@ -811,7 +811,7 @@ Removes a Georeference Annotation
 
 ###### Returns
 
-Map IDs of the maps that were removed, or an error per map (`Promise<Array<string | Error>>`).
+Map IDs of the maps that were removed, or an error per map (`Array<string | Error>`).
 
 ### `WarpedMapLayer#removeGeoreferenceAnnotationByUrl(annotationUrl)`
 
@@ -837,7 +837,7 @@ Removes a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`Promise<string | Error>`).
+Map ID of the map that was removed, or an error (`string`).
 
 ### `WarpedMapLayer#removeGeoreferencedMapById(mapId)`
 
@@ -850,7 +850,7 @@ Removes a Georeferenced Map by its ID
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`Promise<string | Error | undefined>`).
+Map ID of the map that was removed, or an error (`string`).
 
 ### `WarpedMapLayer#renderer?`
 

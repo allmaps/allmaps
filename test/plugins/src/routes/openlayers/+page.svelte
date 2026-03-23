@@ -120,9 +120,11 @@
     }
 
     warpedMapLayer.clear()
-    warpedMapLayer.addGeoreferenceAnnotation(annotation).then(() => {
-      bbox = warpedMapLayer?.getBbox({ projection: options.projection })
-    })
+    warpedMapLayer.addGeoreferenceAnnotation(annotation)
+    const bbox = warpedMapLayer?.getBbox({ projection: options.projection })
+    if (bbox) {
+      map.getView().fit(bbox, { padding: [20, 20, 20, 20] })
+    }
   })
 </script>
 

@@ -127,14 +127,14 @@
     ]
   }
 
-  async function updateMap(annotation: Annotation | AnnotationPage) {
+  function updateMap(annotation: Annotation | AnnotationPage) {
     if (!warpedMapLayer) {
       return
     }
 
     warpedMapLayer.clear()
 
-    await warpedMapLayer.addGeoreferenceAnnotation(annotation)
+    warpedMapLayer.addGeoreferenceAnnotation(annotation)
 
     // TODO: get transformer from warpedMapLayer's WarpedMapList
     const maps = parseAnnotation(annotation)

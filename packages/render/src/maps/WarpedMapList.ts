@@ -1,6 +1,6 @@
 import proj4 from 'proj4'
 
-import { generateChecksum } from '@allmaps/id'
+import { generateChecksum } from '@allmaps/id/sync'
 import {
   parseAnnotation,
   validateGeoreferencedMap,
@@ -43,6 +43,14 @@ export const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
 }
 export const DEFAULT_ANIMATION_INTERNAL_OPTIONS: AnimationInternalOptions = {
   stage: 'pre'
+}
+
+function ensureError(error: unknown): Error {
+  if (error instanceof Error) {
+    return error
+  } else {
+    return new Error(String(error))
+  }
 }
 
 /**
@@ -119,10 +127,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapOptions - Map options
    * @returns Map ID of the map that was added
    */
-  async addGeoreferencedMap(
+  addGeoreferencedMap(
     georeferencedMap: unknown,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
-  ): Promise<string> {
+  ): string {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMap)
 
@@ -160,6 +168,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       validatedGeoreferencedMaps,
       mapOptions
     )
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    return results
   }
 
   /**
@@ -168,9 +179,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param georeferencedMap
    * @returns Map ID of the removed map, or an error
    */
-  async removeGeoreferencedMap(
-    georeferencedMap: unknown
-  ): Promise<string | Error> {
+  removeGeoreferencedMap(georeferencedMap: unknown): string {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMap)
 
@@ -202,9 +211,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const results = this.#removeGeoreferencedMapsInternal(
       validatedGeoreferencedMaps
     )
-      ? validatedGeoreferencedMapOrMaps[0]
-      : validatedGeoreferencedMapOrMaps
-    return this.removeGeoreferencedMapInternal(validatedGeoreferencedMap)
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    return results
   }
 
   /**
@@ -216,7 +224,9 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   async removeGeoreferencedMapById(
     mapId: string
   ): Promise<string | Error | undefined> {
-    return this.#removeGeoreferencedMapByIdInternal(mapId)
+    const result = await this.#removeGeoreferencedMapByIdInternal(mapId)
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
+    return result
   }
 
   /**
@@ -226,11 +236,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
-  async addGeoreferenceAnnotation(
+  addGeoreferenceAnnotation(
     annotation: unknown,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
-    const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     const results = this.#addGeoreferencedMapsInternal(maps, mapOptions)
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
@@ -246,7 +255,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   async removeGeoreferenceAnnotation(
     annotation: unknown
   ): Promise<(string | Error)[]> {
-    const results: (string | Error)[] = []
     const maps = parseAnnotation(annotation)
     const results = this.#removeGeoreferencedMapsInternal(maps)
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))

@@ -103,7 +103,6 @@ export class WebGL2Renderer
 
   #throttledPrepareRenderInternal: DebouncedFunc<() => void>
   #throttledChanged: DebouncedFunc<() => void>
-
   #boundThrottledChangedByMapId: Map<string, EventListener>
 
   /**
