@@ -27,7 +27,7 @@
     "map"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "test": "NODE_ENV=test vitest run",
     "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
