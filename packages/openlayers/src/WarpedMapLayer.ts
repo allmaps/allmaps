@@ -62,7 +62,7 @@ export class WarpedMapLayer
 
   registeredProjections: Map<string, Projection> = new Map()
 
-  private resizeObserver: ResizeObserver
+  #resizeObserver: ResizeObserver
 
   /**
    * Creates a WarpedMapLayer instance
@@ -104,8 +104,8 @@ export class WarpedMapLayer
       throw new Error('WebGL 2 not available')
     }
 
-    this.resizeObserver = new ResizeObserver(this.resized.bind(this))
-    this.resizeObserver.observe(canvas, { box: 'content-box' })
+    this.#resizeObserver = new ResizeObserver(this.resized.bind(this))
+    this.#resizeObserver.observe(canvas, { box: 'content-box' })
 
     this.canvas = canvas
     this.gl = gl
@@ -177,7 +177,7 @@ export class WarpedMapLayer
       canvas.height = 1
     }
 
-    this.resizeObserver.disconnect()
+    this.#resizeObserver.disconnect()
 
     this.removeEventListeners()
 

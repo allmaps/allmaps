@@ -21,9 +21,7 @@ export class WorldHistoricalGazetteerGeocoderProvider extends GeocoderProvider {
     super('whg', 'World Historical Gazetteer')
   }
 
-  private getLabel(
-    properties: GeoJsonFeatureWorldHistoricalGazetteerProperties
-  ) {
+  #getLabel(properties: GeoJsonFeatureWorldHistoricalGazetteerProperties) {
     if (properties.ccodes) {
       return properties.title + ', ' + properties.ccodes.join(', ')
     } else {
@@ -46,7 +44,7 @@ export class WorldHistoricalGazetteerGeocoderProvider extends GeocoderProvider {
           geometry: geometry as GeojsonPoint,
           properties: {
             id: properties.index_id,
-            label: this.getLabel(properties),
+            label: this.#getLabel(properties),
             alt: properties.variants?.join(', '),
             url: `https://whgazetteer.org/places/${properties.index_id}/portal`,
             ...properties

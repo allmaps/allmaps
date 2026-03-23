@@ -79,14 +79,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
   options: BaseRenderOptions<W>
 
-  private boundMapTileLoaded = this.mapTileLoaded.bind(this)
-  private boundMapTileDeleted = this.mapTileDeleted.bind(this)
-  private boundImageLoaded = this.imageLoaded.bind(this)
-  private boundWarpedMapAdded = this.warpedMapAdded.bind(this)
-  private boundWarpedMapRemoved = this.warpedMapRemoved.bind(this)
-  private boundPrepareChange = this.prepareChange.bind(this)
-  private boundAnimatedChange = this.animatedChange.bind(this)
-  private boundImmediateChange = this.immediateChange.bind(this)
+  #boundMapTileLoaded = this.mapTileLoaded.bind(this)
+  #boundMapTileDeleted = this.mapTileDeleted.bind(this)
+  #boundImageLoaded = this.imageLoaded.bind(this)
+  #boundWarpedMapAdded = this.warpedMapAdded.bind(this)
+  #boundWarpedMapRemoved = this.warpedMapRemoved.bind(this)
+  #boundPrepareChange = this.prepareChange.bind(this)
+  #boundAnimatedChange = this.animatedChange.bind(this)
+  #boundImmediateChange = this.immediateChange.bind(this)
 
   constructor(
     cacheableTileFactory: CacheableTileFactory<D>,
@@ -987,70 +987,70 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected addEventListeners() {
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
-      this.boundMapTileLoaded
+      this.#boundMapTileLoaded
     )
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILEDELETED,
-      this.boundMapTileDeleted
+      this.#boundMapTileDeleted
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMAGELOADED,
-      this.boundImageLoaded
+      this.#boundImageLoaded
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.boundWarpedMapAdded
+      this.#boundWarpedMapAdded
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
-      this.boundWarpedMapRemoved
+      this.#boundWarpedMapRemoved
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.PREPARECHANGE,
-      this.boundPrepareChange
+      this.#boundPrepareChange
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.ANIMATEDCHANGE,
-      this.boundAnimatedChange
+      this.#boundAnimatedChange
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMMEDIATECHANGE,
-      this.boundImmediateChange
+      this.#boundImmediateChange
     )
   }
 
   protected removeEventListeners() {
     this.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILELOADED,
-      this.boundMapTileLoaded
+      this.#boundMapTileLoaded
     )
     this.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILEDELETED,
-      this.boundMapTileDeleted
+      this.#boundMapTileDeleted
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
-      this.boundImageLoaded
+      this.#boundImageLoaded
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.boundWarpedMapAdded
+      this.#boundWarpedMapAdded
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
-      this.boundWarpedMapRemoved
+      this.#boundWarpedMapRemoved
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.PREPARECHANGE,
-      this.boundPrepareChange
+      this.#boundPrepareChange
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.ANIMATEDCHANGE,
-      this.boundAnimatedChange
+      this.#boundAnimatedChange
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.IMMEDIATECHANGE,
-      this.boundImmediateChange
+      this.#boundImmediateChange
     )
   }
 }

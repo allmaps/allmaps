@@ -38,9 +38,9 @@ export class TileCache<D> extends EventTarget {
 
   protected fetchableTiles: FetchableTile[] = []
 
-  private boundTileFetched = this.tileFetched.bind(this)
-  private boundTileFetchError = this.tileFetchError.bind(this)
-  private boundTilesFromSpriteTile = this.tilesFromSpriteTile.bind(this)
+  #boundTileFetched = this.tileFetched.bind(this)
+  #boundTileFetchError = this.tileFetchError.bind(this)
+  #boundTilesFromSpriteTile = this.tilesFromSpriteTile.bind(this)
 
   constructor(
     cacheableTileFactory: CacheableTileFactory<D>,
@@ -568,15 +568,15 @@ export class TileCache<D> extends EventTarget {
   protected addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHED,
-      this.boundTileFetched
+      this.#boundTileFetched
     )
     cacheableTile.addEventListener(
       WarpedMapEventType.TILEFETCHERROR,
-      this.boundTileFetchError
+      this.#boundTileFetchError
     )
     cacheableTile.addEventListener(
       WarpedMapEventType.TILESFROMSPRITETILE,
-      this.boundTilesFromSpriteTile
+      this.#boundTilesFromSpriteTile
     )
   }
 
@@ -585,15 +585,15 @@ export class TileCache<D> extends EventTarget {
   ) {
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHED,
-      this.boundTileFetched
+      this.#boundTileFetched
     )
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILEFETCHERROR,
-      this.boundTileFetchError
+      this.#boundTileFetchError
     )
     cacheableTile.removeEventListener(
       WarpedMapEventType.TILESFROMSPRITETILE,
-      this.boundTilesFromSpriteTile
+      this.#boundTilesFromSpriteTile
     )
   }
 }

@@ -163,7 +163,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   async removeGeoreferencedMapById(
     mapId: string
   ): Promise<string | Error | undefined> {
-    return this.removeGeoreferencedMapByIdInternal(mapId)
+    return this.#removeGeoreferencedMapByIdInternal(mapId)
   }
 
   /**
@@ -244,7 +244,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       // Note: zIndices don't have to be updated since they only use mapId
       // Note: RTree doesn't have to be updated since they only use mapId and geoMask
 
-      this.addEventListenersToWarpedMap(updatedWarpedMap)
+      this.#addEventListenersToWarpedMap(updatedWarpedMap)
 
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, {
@@ -395,7 +395,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     // Note: we can't use the geoMaskBboxes since creating a bbox
     // gives a different result in a different projection
 
-    const projectedGeoMaskPoints = this.getProjectedGeoMaskPoints(
+    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(
       partialSelectionAndProjectionOptions
     )
 
@@ -419,7 +419,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       SelectionOptions & ProjectionOptions
     >
   ): Ring | undefined {
-    const projectedGeoMaskPoints = this.getProjectedGeoMaskPoints(
+    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(
       partialSelectionAndProjectionOptions
     )
     return convexHull(projectedGeoMaskPoints)
@@ -504,7 +504,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.options = mergeOptions(this.options, options)
-    this.setMapsOptionsByMapIdInternal(undefined, options, animationOptions)
+    this.#setMapsOptionsByMapIdInternal(undefined, options, animationOptions)
   }
 
   /**
@@ -528,7 +528,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     for (const mapId of mapIds) {
       optionsByMapId.set(mapId, mapOptions)
     }
-    this.setMapsOptionsByMapIdInternal(
+    this.#setMapsOptionsByMapIdInternal(
       optionsByMapId,
       listOptions,
       animationOptions
@@ -551,7 +551,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     listOptions?: Partial<WarpedMapListOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
-    this.setMapsOptionsByMapIdInternal(
+    this.#setMapsOptionsByMapIdInternal(
       mapOptionsByMapId,
       listOptions,
       animationOptions
@@ -671,7 +671,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         newZIndex++
       }
     }
-    this.removeZIndexHoles()
+    this.#removeZIndexHoles()
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
@@ -688,7 +688,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         newZIndex++
       }
     }
-    this.removeZIndexHoles()
+    this.#removeZIndexHoles()
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
@@ -707,7 +707,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         this.zIndices.set(mapId, zIndex + 3)
       }
     }
-    this.removeZIndexHoles()
+    this.#removeZIndexHoles()
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
@@ -726,7 +726,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         this.zIndices.set(mapId, zIndex - 3)
       }
     }
-    this.removeZIndexHoles()
+    this.#removeZIndexHoles()
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
   }
 
@@ -854,7 +854,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Internal set map options
    */
-  private setMapsOptionsByMapIdInternal(
+  #setMapsOptionsByMapIdInternal(
     mapOptionsByMapId?: Map<
       string,
       Partial<WarpedMapListOptions<W>> | undefined
@@ -952,7 +952,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
           (option) => option in warpedMapChangedOptions
         )
       ) {
-        this.addToOrUpdateRtree(warpedMap)
+        this.#addToOrUpdateRtree(warpedMap)
       }
     }
 
@@ -976,7 +976,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       if (animationOptions.animate && animationOptions.stage == 'pre') {
         // If animating and in the 'pre' stage:
         // call this function again but now all options and with animation
-        this.setMapsOptionsByMapIdInternal(
+        this.#setMapsOptionsByMapIdInternal(
           mapOptionsByMapId,
           listOptions,
           mergePartialOptions(animationOptions, {
@@ -1000,20 +1000,20 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     }
   }
 
-  private addToOrUpdateRtree(warpedMap: W): void {
+  #addToOrUpdateRtree(warpedMap: W): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
       this.rtree.addItem(warpedMap.mapId, [warpedMap.geoMask])
     }
   }
 
-  private removeFromRtree(warpedMap: W): void {
+  #removeFromRtree(warpedMap: W): void {
     if (this.rtree) {
       this.rtree.removeItem(warpedMap.mapId)
     }
   }
 
-  private removeZIndexHoles(): void {
+  #removeZIndexHoles(): void {
     const sortedZIndices = [...this.zIndices.entries()].sort(
       (entryA, entryB) => entryA[1] - entryB[1]
     )
@@ -1027,7 +1027,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   // This function and the listeners below transform an IMAGELOADED event by a WarpedMap
   // to an IMAGELOADED of the WarpedMapList, which is listened to in the Renderer
-  private imageLoaded(mapId: string) {
+  #imageLoaded(mapId: string) {
     this.dispatchEvent(
       new WarpedMapEvent(WarpedMapEventType.IMAGELOADED, {
         mapIds: [mapId]
@@ -1035,18 +1035,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     )
   }
 
-  private addEventListenersToWarpedMap(warpedMap: W) {
-    const bound = this.imageLoaded.bind(this, warpedMap.mapId)
-    this.boundImageLoadedByMapId.set(warpedMap.mapId, bound)
+  #addEventListenersToWarpedMap(warpedMap: W) {
+    const bound = this.#imageLoaded.bind(this, warpedMap.mapId)
+    this.#boundImageLoadedByMapId.set(warpedMap.mapId, bound)
 
     warpedMap.addEventListener(WarpedMapEventType.IMAGELOADED, bound)
   }
 
-  private removeEventListenersFromWarpedMap(warpedMap: W) {
-    const bound = this.boundImageLoadedByMapId.get(warpedMap.mapId)
+  #removeEventListenersFromWarpedMap(warpedMap: W) {
+    const bound = this.#boundImageLoadedByMapId.get(warpedMap.mapId)
     if (bound) {
       warpedMap.removeEventListener(WarpedMapEventType.IMAGELOADED, bound)
-      this.boundImageLoadedByMapId.delete(warpedMap.mapId)
+      this.#boundImageLoadedByMapId.delete(warpedMap.mapId)
     }
   }
 }
