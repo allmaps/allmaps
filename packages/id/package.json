@@ -19,7 +19,7 @@
     "directory": "packages/id"
   },
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "test": "NODE_ENV=test vitest run",
     "types": "tsc --noEmit",

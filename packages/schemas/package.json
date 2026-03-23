@@ -25,7 +25,7 @@
     "allmaps"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "format": "prettier --ignore-path ../../.gitignore --write src",

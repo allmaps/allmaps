@@ -30,7 +30,7 @@
     "Constrainautor"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "bench": "node ./bench/index.ts",
     "build": "tsc",
     "test": "NODE_ENV=test vitest run",
