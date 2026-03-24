@@ -22,7 +22,8 @@ export async function queryImage(db: Db, imageId: string) {
       createdAt: true
     },
     extras: {
-      fetched: sql<boolean>`NOT images.data IS NULL`.as('fetched')
+      fetched: (images, { sql }) =>
+        sql<boolean>`${images.data} IS NOT NULL`.as('fetched')
     },
     where: { id: imageId },
     with: {
@@ -62,7 +63,8 @@ export async function queryManifest(db: Db, manifestId: string) {
       createdAt: true
     },
     extras: {
-      fetched: sql<boolean>`NOT data IS NULL`.as('fetched')
+      fetched: (manifests, { sql }) =>
+        sql<boolean>`${manifests.data} IS NOT NULL`.as('fetched')
     },
     where: { id: manifestId }
   })
