@@ -33,7 +33,7 @@ import {
 
 // SQL client types
 
-export type PostgresSql = postgres.Sql<{}>
+export type PostgresSql = postgres.Sql
 export type NeonSql = NeonQueryFunction<false, false>
 
 // ShareDB types
