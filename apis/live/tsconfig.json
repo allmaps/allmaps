@@ -4,7 +4,8 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "resolveJsonModule": true,
-
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "types": ["node"],
     "paths": {
       "json0-ot-diff": ["./src/json0-ot-diff.d.ts"],
