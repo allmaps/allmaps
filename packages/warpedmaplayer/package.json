@@ -36,7 +36,7 @@
     "allmaps"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",

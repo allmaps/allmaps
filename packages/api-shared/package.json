@@ -31,7 +31,7 @@
     "directory": "packages/api-shared"
   },
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc --noCheck",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",

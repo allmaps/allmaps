@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc --noCheck",
     "types": "tsc --noEmit",
     "db:up": "drizzle-kit up",

@@ -27,7 +27,7 @@
     "parser"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "types": "tsc --noEmit",
     "test": "NODE_ENV=test vitest run",

@@ -33,7 +33,7 @@
     "io"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",

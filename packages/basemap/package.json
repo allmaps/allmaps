@@ -26,7 +26,7 @@
     "protomaps"
   ],
   "scripts": {
-    "watch": "tsc --watch",
+    "watch": "tsc --watch --noCheck",
     "build": "tsc",
     "types": "tsc --noEmit",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
