@@ -522,12 +522,12 @@ export class WarpedMap extends EventTarget {
 
       this.gcps = this.options.gcps
 
-      this.resourceFullMask = this.#getResourceFullMask()
+      this.resourceFullMask = this.getResourceFullMask()
       this.resourceMask = this.georeferencedMap.resourceMask
       this.resourceAppliedMask = this.applyMask
         ? this.resourceMask
         : this.resourceFullMask
-      this.#updateResourceMaskProperties()
+      this.updateResourceMaskProperties()
 
       this.transformationType = this.options.transformationType
       this.previousTransformationType = this.transformationType
@@ -550,7 +550,7 @@ export class WarpedMap extends EventTarget {
       if ('resourceMask' in changedOptions || 'applyMask' in changedOptions) {
         this.applyMask = this.options.applyMask
         this.applyMaskOpacity = this.applyMask ? 0 : 1
-        const resourceFullMask = this.#getResourceFullMask()
+        const resourceFullMask = this.getResourceFullMask()
         const resourceMask = this.options.resourceMask
         const resourceAppliedMask = this.applyMask
           ? resourceMask
@@ -622,9 +622,9 @@ export class WarpedMap extends EventTarget {
     this.resourceFullMask = resourceFullMask
     this.resourceMask = resourceMask
     this.resourceAppliedMask = resourceAppliedMask
-    this.#updateResourceMaskProperties()
-    this.#updateGeoMaskProperties()
-    this.#updateProjectedGeoMaskProperties()
+    this.updateResourceMaskProperties()
+    this.updateGeoMaskProperties()
+    this.updateProjectedGeoMaskProperties()
   }
 
   /**
@@ -874,7 +874,7 @@ export class WarpedMap extends EventTarget {
     }
   }
 
-  #updateResourceMaskProperties() {
+  private updateResourceMaskProperties() {
     this.resourceFullMaskBbox = computeBbox(this.resourceFullMask)
     this.resourceFullMaskRectangle = bboxToRectangle(this.resourceFullMaskBbox)
     this.resourceMaskBbox = computeBbox(this.resourceMask)
@@ -885,7 +885,7 @@ export class WarpedMap extends EventTarget {
     )
   }
 
-  #getResourceFullMask() {
+  private getResourceFullMask() {
     const resourceWidth = this.georeferencedMap.resource.width
     const resourceHeight = this.georeferencedMap.resource.height
 
@@ -898,28 +898,28 @@ export class WarpedMap extends EventTarget {
     }
   }
 
-  #updateGeoMaskProperties() {
-    this.#updateFullGeoMask()
-    this.#updateGeoMask()
-    this.#updateAppliedGeoMask()
+  private updateGeoMaskProperties() {
+    this.updateFullGeoMask()
+    this.updateGeoMask()
+    this.updateAppliedGeoMask()
   }
 
-  #updateProjectedGeoMaskProperties() {
-    this.#updateProjectedFullGeoMask()
-    this.#updateProjectedGeoMask()
-    this.#updateProjectedAppliedGeoMask()
-    this.#updateResourceToProjectedGeoScale()
+  private updateProjectedGeoMaskProperties() {
+    this.updateProjectedFullGeoMask()
+    this.updateProjectedGeoMask()
+    this.updateProjectedAppliedGeoMask()
+    this.updateResourceToProjectedGeoScale()
   }
 
   protected updateProjectedTransformerProperties(): void {
-    this.#updateProjectedTransformer()
+    this.updateProjectedTransformer()
 
-    this.#updateGeoMaskProperties()
-    this.#updateProjectedGeoMaskProperties()
-    this.#updateGcpsProperties()
+    this.updateGeoMaskProperties()
+    this.updateProjectedGeoMaskProperties()
+    this.updateGcpsProperties()
   }
 
-  #updateProjectedTransformer(): void {
+  private updateProjectedTransformer(): void {
     this.projectedTransformer = this.getProjectedTransformer(
       this.transformationType
     )
@@ -928,7 +928,7 @@ export class WarpedMap extends EventTarget {
     }
   }
 
-  #updateFullGeoMask(): void {
+  private updateFullGeoMask(): void {
     this.geoFullMask = this.projectedTransformer.transformToGeo([
       this.resourceFullMask
     ])[0]
@@ -939,7 +939,7 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  #updateAppliedGeoMask(): void {
+  private updateAppliedGeoMask(): void {
     this.geoAppliedMask = this.projectedTransformer.transformToGeo([
       this.resourceAppliedMask
     ])[0]
@@ -950,7 +950,7 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  #updateGeoMask(): void {
+  private updateGeoMask(): void {
     this.geoMask = this.projectedTransformer.transformToGeo([
       this.resourceMask
     ])[0]
@@ -961,7 +961,7 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  #updateProjectedFullGeoMask(): void {
+  private updateProjectedFullGeoMask(): void {
     this.projectedGeoFullMask =
       this.projectedTransformer.transformToProjectedGeo([
         this.resourceFullMask
@@ -974,7 +974,7 @@ export class WarpedMap extends EventTarget {
       )[0] as Rectangle
   }
 
-  #updateProjectedAppliedGeoMask(): void {
+  private updateProjectedAppliedGeoMask(): void {
     this.projectedGeoAppliedMask =
       this.projectedTransformer.transformToProjectedGeo([
         this.resourceAppliedMask
@@ -987,7 +987,7 @@ export class WarpedMap extends EventTarget {
       )[0] as Rectangle
   }
 
-  #updateProjectedGeoMask(): void {
+  private updateProjectedGeoMask(): void {
     this.projectedGeoMask = this.projectedTransformer.transformToProjectedGeo([
       this.resourceMask
     ])[0]
@@ -999,14 +999,14 @@ export class WarpedMap extends EventTarget {
       )[0] as Rectangle
   }
 
-  #updateResourceToProjectedGeoScale(): void {
+  private updateResourceToProjectedGeoScale(): void {
     this.resourceToProjectedGeoScale = rectanglesToScale(
       this.resourceMaskRectangle,
       this.projectedGeoMaskRectangle
     )
   }
 
-  #updateGcpsProperties() {
+  private updateGcpsProperties() {
     this.projectedGcps = this.gcps.map(({ resource, geo }) => ({
       resource,
       geo: this.projectedTransformer.lonLatToProjection(geo)
