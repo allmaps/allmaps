@@ -9,6 +9,8 @@ import { getPostgresContext } from '@allmaps/db'
 import { validateGeoreferencedMap } from '@allmaps/annotation'
 import { parseLiveEnv } from '@allmaps/env/live'
 
+import packageJson from '../package.json' with { type: 'json' }
+
 const env = parseLiveEnv(process.env)
 
 if (!env.DATABASE_URL) {
@@ -24,8 +26,8 @@ app.use(express.json())
 
 app.get('/', (_req, res) => {
   res.send({
-    service: 'allmaps-live',
-    status: 'ok'
+    name: 'Allmaps Live API',
+    version: packageJson.version
   })
 })
 
