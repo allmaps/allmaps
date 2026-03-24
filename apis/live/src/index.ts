@@ -23,6 +23,7 @@ const shareDb = new AllmapsShareDB(postgresContext)
 const app = express()
 app.use(cors())
 app.use(express.json())
+app.set('json spaces', 2)
 
 app.get('/', (_req, res) => {
   res.send({
