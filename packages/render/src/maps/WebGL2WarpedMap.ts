@@ -190,7 +190,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   // this renderHomogeneousTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
   invertedRenderHomogeneousTransform: HomogeneousTransform
 
-  #throttledUpdateTextures: DebouncedFunc<() => Promise<void>>
+  private throttledUpdateTextures: DebouncedFunc<() => Promise<void>>
 
   /**
    * Creates an instance of WebGL2WarpedMap.
@@ -227,8 +227,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     this.invertedRenderHomogeneousTransform = createHomogeneousTransform()
 
-    this.#throttledUpdateTextures = throttle(
-      this.#updateTextures.bind(this),
+    this.throttledUpdateTextures = throttle(
+      this.updateTextures.bind(this),
       THROTTLE_UPDATE_TEXTURES_WAIT_MS,
       THROTTLE_UPDATE_TEXTURES_OPTIONS
     )
@@ -364,13 +364,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
 
     if (this.shouldRenderMap()) {
-      this.#updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)
+      this.updateVertexBuffersMap(projectedGeoToClipHomogeneousTransform)
     }
     if (this.shouldRenderLines()) {
-      this.#updateVertexBuffersLines(projectedGeoToClipHomogeneousTransform)
+      this.updateVertexBuffersLines(projectedGeoToClipHomogeneousTransform)
     }
     if (this.shouldRenderPoints()) {
-      this.#updateVertexBuffersPoints(projectedGeoToClipHomogeneousTransform)
+      this.updateVertexBuffersPoints(projectedGeoToClipHomogeneousTransform)
     }
   }
 
@@ -390,7 +390,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
     this.cachedTilesByTileKey.set(cachedTile.fetchableTile.tileKey, cachedTile)
     this.cachedTilesByTileUrl.set(cachedTile.fetchableTile.tileUrl, cachedTile)
-    this.#throttledUpdateTextures()
+    this.throttledUpdateTextures()
   }
 
   /**
@@ -405,11 +405,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
     this.cachedTilesByTileKey.delete(cachedTile.fetchableTile.tileKey)
     this.cachedTilesByTileUrl.delete(tileUrl)
-    this.#throttledUpdateTextures()
+    this.throttledUpdateTextures()
   }
 
   cancelThrottledFunctions() {
-    this.#throttledUpdateTextures.cancel()
+    this.throttledUpdateTextures.cancel()
   }
 
   destroy() {
@@ -425,7 +425,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     super.destroy()
   }
 
-  #setLineGroups() {
+  private setLineGroups() {
     this.lineGroups = []
 
     if (this.options.renderFullMask) {
@@ -491,7 +491,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
   }
 
-  #setPointGroups() {
+  private setPointGroups() {
     this.pointGroups = []
 
     if (this.options.renderGcps) {
@@ -528,7 +528,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
   }
 
-  #updateVertexBuffersMap(
+  private updateVertexBuffersMap(
     projectedGeoToClipHomogeneousTransform: HomogeneousTransform
   ) {
     if (!this.mapVao) {
@@ -613,7 +613,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  #updateVertexBuffersLines(
+  private updateVertexBuffersLines(
     projectedGeoToClipHomogeneousTransform: HomogeneousTransform
   ) {
     if (!this.linesVao) {
@@ -624,7 +624,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.linesProgram
     gl.bindVertexArray(this.linesVao)
 
-    this.#setLineGroups()
+    this.setLineGroups()
 
     const clipSixPoints = this.lineGroups
       .reduce(
@@ -845,7 +845,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  #updateVertexBuffersPoints(
+  private updateVertexBuffersPoints(
     projectedGeoToClipHomogeneousTransform: HomogeneousTransform
   ) {
     if (!this.pointsVao) {
@@ -856,7 +856,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.pointsProgram
     gl.bindVertexArray(this.pointsVao)
 
-    this.#setPointGroups()
+    this.setPointGroups()
 
     const clipPoints = this.pointGroups
       .reduce(
@@ -967,11 +967,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  async #updateTextures() {
+  private async updateTextures() {
     const gl = this.gl
 
     // Find out which tiles to include in texture
-    this.#updateCachedTilesForTextures()
+    this.updateCachedTilesForTextures()
 
     // Don't update if request without tiles, or if
     // same request is (non-null) subset of previous request
@@ -1137,7 +1137,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
   }
 
-  #updateCachedTilesForTextures() {
+  private updateCachedTilesForTextures() {
     // Select tiles form tileCache that should be included in the texture
     const cachedTiles = []
     const cachedTilesAtOtherScaleFactors = []
@@ -1152,7 +1152,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         cachedTiles.push(cachedTile)
       } else {
         // If they are not available, include their parents or children if they are available
-        for (const cachedTile of this.#getCachedTilesAtOtherScaleFactors(
+        for (const cachedTile of this.getCachedTilesAtOtherScaleFactors(
           fetchableTile.tile
         )) {
           cachedTilesAtOtherScaleFactors.push(cachedTile)
@@ -1213,7 +1213,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return
   }
 
-  #getCachedTilesAtOtherScaleFactors(tile: Tile): CachedTile<ImageData>[] {
+  private getCachedTilesAtOtherScaleFactors(
+    tile: Tile
+  ): CachedTile<ImageData>[] {
     if (this.cachedTilesByTileUrl.size === 0) {
       return []
     }
@@ -1228,9 +1230,9 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       this.tileZoomLevelForViewport.scaleFactor,
       TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF,
       TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF,
-      this.#tileInCachedTiles.bind(this) // Only consider tiles in cache,
+      this.tileInCachedTiles.bind(this) // Only consider tiles in cache,
     )) {
-      const cachedTile = this.#tileToCachedTile(tile)
+      const cachedTile = this.tileToCachedTile(tile)
       if (cachedTile) {
         cachedTiles.push(cachedTile)
       } else {
@@ -1243,11 +1245,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   // Lookup by tileKey (zoomlevel, row, column) instead of tileUrl
   // Because computing the tileUrl for every tile is expensive
-  #tileToCachedTile(tile: Tile): CachedTile<ImageData> | undefined {
+  private tileToCachedTile(tile: Tile): CachedTile<ImageData> | undefined {
     return this.cachedTilesByTileKey.get(tileKey(tile))
   }
 
-  #tileInCachedTiles(tile: Tile): boolean {
+  private tileInCachedTiles(tile: Tile): boolean {
     return this.cachedTilesByTileKey.has(tileKey(tile))
   }
 }

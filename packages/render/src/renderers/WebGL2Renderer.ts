@@ -517,6 +517,7 @@ export class WebGL2Renderer
 
       // Draw map
       const count = webgl2WarpedMap.resourceTrianglePoints.length
+
       const primitiveType = this.gl.TRIANGLES
       const offset = 0
       this.gl.bindVertexArray(webgl2WarpedMap.mapVao)

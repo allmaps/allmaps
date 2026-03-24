@@ -146,7 +146,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     this.resourceTriangulationCache = new Map()
     this.projectedGcpTriangulationCache = new Map()
 
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   /**
@@ -212,7 +212,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   protected setGcps(gcps: Gcp[]) {
     super.setGcps(gcps)
     this.clearResourceTriangulationCaches()
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   /**
@@ -226,7 +226,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     resourceAppliedMask: Ring
   ) {
     super.setResourceMask(resourceFullMask, resourceMask, resourceAppliedMask)
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   /**
@@ -236,7 +236,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    */
   protected setDistortionMeasure(distortionMeasure?: DistortionMeasure) {
     super.setDistortionMeasure(distortionMeasure)
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   /**
@@ -246,7 +246,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    */
   protected setInternalProjection(projection: Projection) {
     super.setInternalProjection(projection)
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   /**
@@ -257,7 +257,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   protected setProjection(projection: Projection) {
     super.setProjection(projection)
     this.clearProjectedTriangulationCaches()
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   /**
@@ -363,7 +363,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
   /**
    * Update the (previous and new) triangulation of the resourceMask. Use cache if available.
    */
-  #updateTriangulation() {
+  private updateTriangulation() {
     // The following ensures this function is only run after initialisation
     // This class' constructor calls this function twice
     // Once via super() and updateTransformerProperties()
@@ -523,7 +523,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
         )
     }
 
-    this.#updateTrianglePoints()
+    this.updateTrianglePoints()
   }
 
   /**
@@ -531,7 +531,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
    *
    * Also derive the (previous and new) triangulation-refined resource and projectedGeo mask
    */
-  #updateTrianglePoints() {
+  private updateTrianglePoints() {
     if (
       !this.projectedGcpPreviousTriangulation ||
       !this.projectedGcpTriangulation
@@ -609,13 +609,13 @@ export class TriangulatedWarpedMap extends WarpedMap {
       ? this.projectedGeoTriangulationMask
       : this.projectedGeoTriangulationFullMask
 
-    this.#updateTrianglePointsDistortion()
+    this.updateTrianglePointsDistortion()
   }
 
   /**
    * Derive the (previous and new) distortions from their corresponding triangulations.
    */
-  #updateTrianglePointsDistortion() {
+  private updateTrianglePointsDistortion() {
     if (
       !this.projectedGcpPreviousTriangulation ||
       !this.projectedGcpTriangulation
@@ -650,7 +650,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
   protected updateProjectedTransformerProperties() {
     super.updateProjectedTransformerProperties()
-    this.#updateTriangulation()
+    this.updateTriangulation()
   }
 
   protected clearProjectedTransformerCaches() {

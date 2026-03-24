@@ -863,12 +863,16 @@ export abstract class BaseWarpedMapLayer<
   }
 
   contextLost(event: Event) {
-    event.preventDefault()
+    if ('preventDefault' in event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
     this.renderer?.contextLost()
   }
 
   contextRestored(event: Event) {
-    event.preventDefault()
+    if ('preventDefault' in event && typeof event.preventDefault === 'function') {
+      event.preventDefault()
+    }
     this.renderer?.contextRestored()
   }
 

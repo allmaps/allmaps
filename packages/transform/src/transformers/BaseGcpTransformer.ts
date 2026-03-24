@@ -87,8 +87,8 @@ import type {
 export abstract class BaseGcpTransformer {
   protected generalGcpsInternal: GeneralGcp[]
 
-  #sourcePointsInternal: Point[]
-  #destinationPointsInternal: Point[]
+  private sourcePointsInternal: Point[]
+  private destinationPointsInternal: Point[]
 
   readonly type: TransformationType
   protected transformerOptions: GeneralGcpTransformerOptions
@@ -115,13 +115,13 @@ export abstract class BaseGcpTransformer {
       throw new Error('No control points')
     }
     this.generalGcpsInternal = generalGcps
-    this.#sourcePointsInternal = this.generalGcpsInternal.map((generalGcp) => {
+    this.sourcePointsInternal = this.generalGcpsInternal.map((generalGcp) => {
       const source = this.transformerOptions.differentHandedness
         ? flipY(generalGcp.source)
         : generalGcp.source
       return this.transformerOptions.preForward(source)
     })
-    this.#destinationPointsInternal = this.generalGcpsInternal.map(
+    this.destinationPointsInternal = this.generalGcpsInternal.map(
       (generalGcp) =>
         this.transformerOptions.preBackward(generalGcp.destination)
     )
@@ -133,9 +133,9 @@ export abstract class BaseGcpTransformer {
    */
   protected getForwardTransformationInternal(): BaseTransformation {
     if (!this.forwardTransformation) {
-      this.forwardTransformation = this.#createTransformation(
-        this.#sourcePointsInternal,
-        this.#destinationPointsInternal
+      this.forwardTransformation = this.createTransformation(
+        this.sourcePointsInternal,
+        this.destinationPointsInternal
       )
     }
     return this.forwardTransformation
@@ -146,9 +146,9 @@ export abstract class BaseGcpTransformer {
    */
   protected getBackwardTransformationInternal(): BaseTransformation {
     if (!this.backwardTransformation) {
-      this.backwardTransformation = this.#createTransformation(
-        this.#destinationPointsInternal,
-        this.#sourcePointsInternal
+      this.backwardTransformation = this.createTransformation(
+        this.destinationPointsInternal,
+        this.sourcePointsInternal
       )
     }
     return this.backwardTransformation
@@ -166,7 +166,7 @@ export abstract class BaseGcpTransformer {
    * @param destinationPoints - destination points
    * @returns Transformation
    */
-  #createTransformation(
+  private createTransformation(
     sourcePoints: Point[],
     destinationPoints: Point[]
   ): BaseTransformation {
@@ -325,19 +325,19 @@ export abstract class BaseGcpTransformer {
     )
     if (!transformOptions.isMultiGeometry) {
       if (isPoint(geometry)) {
-        return this.#transformPointForwardInternal(
+        return this.transformPointForwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isLineString(geometry)) {
-        return this.#transformLineStringForwardInternal(
+        return this.transformLineStringForwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isPolygon(geometry)) {
-        return this.#transformPolygonForwardInternal(
+        return this.transformPolygonForwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
@@ -437,19 +437,19 @@ export abstract class BaseGcpTransformer {
     )
     if (!transformOptions.isMultiGeometry) {
       if (isPoint(geometry)) {
-        return this.#transformPointBackwardInternal(
+        return this.transformPointBackwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isLineString(geometry)) {
-        return this.#transformLineStringBackwardInternal(
+        return this.transformLineStringBackwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isPolygon(geometry)) {
-        return this.#transformPolygonBackwardInternal(
+        return this.transformPolygonBackwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
@@ -493,7 +493,7 @@ export abstract class BaseGcpTransformer {
 
   // Handle specific geometries
 
-  #transformPointForwardInternal<P = Point>(
+  private transformPointForwardInternal<P = Point>(
     point: Point,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (
@@ -539,7 +539,7 @@ export abstract class BaseGcpTransformer {
     })
   }
 
-  #transformPointBackwardInternal<P = Point>(
+  private transformPointBackwardInternal<P = Point>(
     point: Point,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (
@@ -592,63 +592,61 @@ export abstract class BaseGcpTransformer {
     })
   }
 
-  #transformLineStringForwardInternal<P>(
+  private transformLineStringForwardInternal<P>(
     lineString: LineString,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P> {
     return refineLineString(
       lineString,
-      (p) => this.#transformPointForwardInternal(p, generalGcpTransformOptions),
+      (p) => this.transformPointForwardInternal(p, generalGcpTransformOptions),
       refinementOptionsFromForwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(generalGcp))
   }
 
-  #transformLineStringBackwardInternal<P>(
+  private transformLineStringBackwardInternal<P>(
     lineString: LineString,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P> {
     return refineLineString(
       lineString,
-      (p) =>
-        this.#transformPointBackwardInternal(p, generalGcpTransformOptions),
+      (p) => this.transformPointBackwardInternal(p, generalGcpTransformOptions),
       refinementOptionsFromBackwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
   }
 
-  #transformRingForwardInternal<P>(
+  private transformRingForwardInternal<P>(
     ring: Ring,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedRing<P> {
     return refineRing(
       ring,
-      (p) => this.#transformPointForwardInternal(p, generalGcpTransformOptions),
+      (p) => this.transformPointForwardInternal(p, generalGcpTransformOptions),
       refinementOptionsFromForwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(generalGcp))
   }
 
-  #transformRingBackwardInternal<P>(
+  private transformRingBackwardInternal<P>(
     ring: Ring,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedRing<P> {
     return refineRing(
       ring,
-      (p) =>
-        this.#transformPointBackwardInternal(p, generalGcpTransformOptions),
+      (p) => this.transformPointBackwardInternal(p, generalGcpTransformOptions),
       refinementOptionsFromBackwardTransformOptions(generalGcpTransformOptions)
     ).map((generalGcp) => generalGcpToP(invertGeneralGcp(generalGcp)))
   }
 
-  #transformPolygonForwardInternal<P>(
+  private transformPolygonForwardInternal<P>(
     polygon: Polygon,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P> {
     return polygon.map((ring) => {
-      return this.#transformRingForwardInternal(
+      return this.transformRingForwardInternal(
         ring,
         generalGcpTransformOptions,
         generalGcpToP
@@ -656,13 +654,13 @@ export abstract class BaseGcpTransformer {
     })
   }
 
-  #transformPolygonBackwardInternal<P>(
+  private transformPolygonBackwardInternal<P>(
     polygon: Polygon,
     generalGcpTransformOptions: GeneralGcpTransformOptions,
     generalGcpToP: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P> {
     return polygon.map((ring) => {
-      return this.#transformRingBackwardInternal(
+      return this.transformRingBackwardInternal(
         ring,
         generalGcpTransformOptions,
         generalGcpToP

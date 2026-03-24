@@ -115,13 +115,6 @@ export class WarpedMapLayer
     }
   }
 
-  // /**
-  //  * Prepare rendering the layer.
-  //  */
-  // preparerender(): void {
-  //   // Empty function to make TypeScript happy
-  // }
-
   /**
    * Render the layer.
    */
