@@ -27,13 +27,13 @@ export const ManifestSchema = z.union([Manifest2Schema, Manifest3Schema])
 export const CollectionSchema = z.union([Collection2Schema, Collection3Schema])
 
 export const IIIF1Schema = Image1Schema
-export const IIIF2Schema = z.union([
+export const IIIF2Schema = z.discriminatedUnion('@type', [
   Collection2Schema,
   Manifest2Schema,
   Canvas2Schema,
   Image2Schema
 ])
-export const IIIF3Schema = z.union([
+export const IIIF3Schema = z.discriminatedUnion('type', [
   Collection3Schema,
   Manifest3Schema,
   Canvas3Schema,

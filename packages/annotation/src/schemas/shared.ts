@@ -1,9 +1,19 @@
 import { z } from 'zod'
 
-export function ensureArray<T>(val: T | T[]): T[] | undefined {
-  if (val) {
-    return Array.isArray(val) ? val : [val]
-  }
+export function oneOrMany<T extends z.ZodTypeAny>(schema: T) {
+  return z
+    .union([z.array(schema), schema])
+    .transform((value) => (Array.isArray(value) ? value : [value]))
+}
+
+export function parseIfValid<T extends z.ZodTypeAny>(schema: T) {
+  return z.unknown().transform<z.infer<T> | undefined>((value) => {
+    const result = schema.safeParse(value)
+
+    if (result.success) {
+      return result.data
+    }
+  })
 }
 
 // Copied from presentation.3.ts in @allmaps/iiif-parser
@@ -33,26 +43,16 @@ const ResourceTypes = [...ImageServices, ...['Canvas' as const]] as const
 export const ImageServiceSchema = z.enum(ImageServices)
 export const ResourceTypeSchema = z.enum(ResourceTypes)
 
-// partOf can recursively contain nested partOfs
-// From: https://github.com/colinhacks/zod#recursive-types
-const basePartOfItemSchema = z.object({
+export const PartOfItemSchema = z.object({
   id: z.string().url(),
   type: z.string(),
-  label: LanguageValueSchema.optional()
+  label: LanguageValueSchema.optional(),
+  get partOf() {
+    return z.array(PartOfItemSchema).optional()
+  }
 })
 
-type PartOfItem = z.infer<typeof basePartOfItemSchema> & {
-  partOf?: PartOfItem[]
-}
-
-export const PartOfItemSchema: z.ZodType<PartOfItem> =
-  basePartOfItemSchema.extend({
-    partOf: z.lazy(() => PartOfItemSchema.array()).optional()
-  })
-
-export const PartOfSchema = z
-  .union([PartOfItemSchema.array(), PartOfItemSchema])
-  .transform(ensureArray)
+export const PartOfSchema = oneOrMany(PartOfItemSchema)
 
 export const HomepageItemSchema = z.object({
   id: z.string().url(),
@@ -62,9 +62,7 @@ export const HomepageItemSchema = z.object({
   language: z.union([z.string(), z.array(z.string())]).optional()
 })
 
-export const HomepageSchema = z
-  .union([HomepageItemSchema.array(), HomepageItemSchema])
-  .transform(ensureArray)
+export const HomepageSchema = oneOrMany(HomepageItemSchema)
 
 export const ProviderItemSchema = z.object({
   id: z.string().url().optional(),
@@ -72,9 +70,7 @@ export const ProviderItemSchema = z.object({
   homepage: HomepageSchema.optional()
 })
 
-export const ProviderSchema = z
-  .union([ProviderItemSchema.array(), ProviderItemSchema])
-  .transform(ensureArray)
+export const ProviderSchema = oneOrMany(ProviderItemSchema)
 
 const ValidTransformationSchema = z.object({
   type: z.enum([
@@ -85,7 +81,7 @@ const ValidTransformationSchema = z.object({
     'straight',
     'linear'
   ]),
-  options: z.object({}).passthrough().optional()
+  options: z.looseObject({}).optional()
 })
 
 type Transformation = z.infer<typeof ValidTransformationSchema>
@@ -118,20 +114,13 @@ function parseInvalidTransformation(val: string): Transformation | undefined {
   }
 }
 
-export const TransformationSchema = z
-  .union([
-    ValidTransformationSchema,
-
-    // Catchall for unknown transformation types
-    z.unknown()
-  ])
-  .transform((val) => {
-    const { success, data } = ValidTransformationSchema.safeParse(val)
-    if (success) {
-      return data
-    } else if (val === 'string') {
+export const TransformationSchema = parseIfValid(ValidTransformationSchema).or(
+  z.unknown().transform<Transformation | undefined>((val) => {
+    if (typeof val === 'string') {
       return parseInvalidTransformation(val)
-    } else if (
+    }
+
+    if (
       val &&
       typeof val === 'object' &&
       'type' in val &&
@@ -140,6 +129,7 @@ export const TransformationSchema = z
       return parseInvalidTransformation(val.type)
     }
   })
+)
 
 export const ProjectionSchema = z.object({
   id: z.string().url().optional(),

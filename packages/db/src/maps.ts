@@ -126,6 +126,10 @@ export const DbMaps3Schema = z.record(z.string(), DbMap3Schema)
 
 export const DbGcpSchema = z.union([DbGcp1Schema, DbGcp2Schema, DbGcp3Schema])
 
-export const DbMapSchema = z.union([DbMap1Schema, DbMap2Schema, DbMap3Schema])
+export const DbMapSchema = z.discriminatedUnion('version', [
+  DbMap1Schema,
+  DbMap2Schema,
+  DbMap3Schema
+])
 
 export const DbMapsSchema = z.record(z.string(), DbMapSchema)

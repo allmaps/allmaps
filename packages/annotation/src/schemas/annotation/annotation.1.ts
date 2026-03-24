@@ -73,8 +73,7 @@ export const Canvas3Schema = z.object({
 
 export const SourceSchema = z.union([
   Source1Schema,
-  Source2Schema,
-  Canvas3Schema
+  z.discriminatedUnion('type', [Source2Schema, Canvas3Schema])
 ])
 
 export const TargetSchema = z.object({

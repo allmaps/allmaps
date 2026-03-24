@@ -1,10 +1,10 @@
-import { zodToJsonSchema } from 'zod-to-json-schema'
+import { z } from 'zod'
 
 import { GeoreferencedMapSchema } from '@allmaps/annotation'
 
 const georeferencedMapJsonSchemaId =
   'https://schemas.allmaps.org.com/map/1/schema.json'
-const georeferencedMapJsonSchema = zodToJsonSchema(GeoreferencedMapSchema)
+const georeferencedMapJsonSchema = z.toJSONSchema(GeoreferencedMapSchema)
 
 console.log(
   JSON.stringify(

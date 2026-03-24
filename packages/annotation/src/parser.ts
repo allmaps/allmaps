@@ -55,13 +55,15 @@ function parseResourceType(annotation: AnnotationAllVersions): ResourceType {
   }
 }
 
-function parsePartOf(annotation: AnnotationAllVersions): PartOf {
+function parsePartOf(annotation: AnnotationAllVersions): PartOf | undefined {
   if (isAnnotation1(annotation)) {
     return annotation.target.source.partOf
   }
 }
 
-function parseProvider(annotation: AnnotationAllVersions) {
+function parseProvider(
+  annotation: AnnotationAllVersions
+): Resource['provider'] | undefined {
   if (isAnnotation1(annotation)) {
     return annotation.target.source.provider
   }
