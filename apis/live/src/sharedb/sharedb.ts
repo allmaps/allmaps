@@ -25,8 +25,6 @@ import { DbMapsSchema } from '@allmaps/db/maps'
 
 import type { Polygon } from 'geojson'
 import type { WebSocket } from 'ws'
-import type { Connection } from 'sharedb/lib/client'
-
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -45,7 +43,7 @@ type PersistEntry = {
 export default class AllmapsShareDB {
   db: PostgresContext['db']
   shareDb: ShareDB
-  connection: Connection
+  connection: ReturnType<ShareDB['connect']>
   latestSnapshotByImageId = new Map<string, ShareDB.Snapshot>()
   persistEntries = new Map<string, PersistEntry>()
   commitsReceived = 0
