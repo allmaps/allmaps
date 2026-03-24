@@ -18,6 +18,7 @@
     "watch": "tsc --watch --noCheck",
     "build": "tsc --noCheck",
     "types": "tsc --noEmit",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "db:up": "drizzle-kit up",
     "db:generate": "drizzle-kit generate",
     "auth:generate": "pnpx auth generate --config ./src/auth-for-cli.ts --output ./src/schema/auth.ts",
@@ -42,6 +43,11 @@
     "@types/sharedb": "^3.3.12",
     "drizzle-orm": "catalog:",
     "drizzle-kit": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@types/eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0"
   }
 }
