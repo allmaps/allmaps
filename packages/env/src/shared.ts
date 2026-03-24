@@ -20,3 +20,26 @@ export const envBoolean = z.preprocess((value) => {
 
   return value
 }, z.boolean())
+
+function formatEnvIssues(error: z.ZodError): string {
+  return error.issues
+    .map((issue) => {
+      const key = issue.path.join('.') || '(root)'
+      return `${key}: ${issue.message}`
+    })
+    .join('; ')
+}
+
+export function parseEnvSchema<T extends z.ZodType>(
+  schema: T,
+  value: unknown,
+  envName: string
+): z.infer<T> {
+  const result = schema.safeParse(value)
+
+  if (!result.success) {
+    throw new Error(`Invalid ${envName}: ${formatEnvIssues(result.error)}`)
+  }
+
+  return result.data
+}
