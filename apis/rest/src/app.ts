@@ -47,18 +47,16 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .use(cors())
     .get(
       '/',
-      () => {
-        return {
-          name: 'Allmaps API',
-          version: packageJson.version,
-          docs: '/docs',
-          login: '/login/github',
-          logout: '/logout'
-        }
-      },
+      () => ({
+        name: 'Allmaps REST API',
+        version: packageJson.version,
+        docs: '/docs',
+        login: '/login/github',
+        logout: '/logout'
+      }),
       {
         detail: {
-          summary: 'Allmaps API',
+          summary: 'Allmaps REST API',
           tags: ['API']
         }
       }
