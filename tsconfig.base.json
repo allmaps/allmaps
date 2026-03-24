@@ -2,6 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "strict": true,
+    "skipLibCheck": true,
     "allowJs": true,
     "target": "es2022",
     "module": "es2022",

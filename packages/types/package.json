@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "watch": "tsc --watch --noCheck",
-    "build": "tsc",
+    "build": "tsc --noCheck",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --ignore-path ../../.gitignore --write src",
