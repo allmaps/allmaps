@@ -676,6 +676,8 @@
       if (displayIndex !== -1) {
         return displayIndex
       }
+
+      return sortedGcps.length
     }
 
     return 0
@@ -769,7 +771,7 @@
         geo: newGcp.geo || existingGcp.geo
       })
     } else {
-      const displayIndex = displayIndexFromGcpId(gcpId) + 1
+      const displayIndex = displayIndexFromGcpId(gcpId)
       draw.updateFeatureProperties(gcpId, {
         displayIndex
       })
