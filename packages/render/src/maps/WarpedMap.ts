@@ -519,6 +519,8 @@ export class WarpedMap extends EventTarget {
       this.previousVisible = this.visible
       this.applyMask = this.options.applyMask
       this.previousApplyMask = this.applyMask
+      this.applyMaskOpacity = this.applyMask ? 0 : 1
+      this.previousApplyMaskOpacity = this.applyMaskOpacity
 
       this.gcps = this.options.gcps
 
