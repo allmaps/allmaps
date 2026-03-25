@@ -887,6 +887,9 @@
   }
 
   function initializeGcps(imageId: string, map: DbMap3, animate = false) {
+    const preserveCurrentView =
+      currentDisplayMapId !== undefined && currentDisplayMapId === map.id
+
     if (mapsState.activeMapId !== map.id) {
       mapsState.activeMapId = map.id
     }
@@ -945,6 +948,13 @@
         duration,
         padding: MAPLIBRE_PADDING
       })
+    } else if (preserveCurrentView && resourceMap) {
+      resourceMap.flyTo({
+        center: resourceMap.getCenter(),
+        zoom: resourceMap.getZoom(),
+        bearing: resourceMap.getBearing(),
+        duration
+      })
     } else if (resourceBbox) {
       resourceMap?.fitBounds(resourceBbox, {
         duration,
@@ -962,6 +972,13 @@
         ...geoViewport,
         duration,
         padding: MAPLIBRE_PADDING
+      })
+    } else if (preserveCurrentView && geoMap) {
+      geoMap.flyTo({
+        center: geoMap.getCenter(),
+        zoom: geoMap.getZoom(),
+        bearing: geoMap.getBearing(),
+        duration
       })
     } else if (geoBbox) {
       geoMap?.fitBounds(geoBbox, { padding: MAPLIBRE_PADDING, duration })
