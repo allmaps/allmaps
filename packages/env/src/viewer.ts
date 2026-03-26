@@ -14,9 +14,5 @@ export function parseViewerEnv(value: unknown): ViewerEnv {
 }
 
 export function parseViewerPublicEnv(value: unknown): ViewerPublicEnv {
-  return parseEnvSchema(
-    viewerPublicEnvSchema,
-    value,
-    'viewer public env vars'
-  )
+  return parseEnvSchema(viewerPublicEnvSchema, value, 'viewer public env vars')
 }
