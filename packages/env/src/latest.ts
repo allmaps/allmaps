@@ -13,9 +13,5 @@ export function parseLatestEnv(value: unknown): LatestEnv {
   return parseEnvSchema(latestEnvSchema, value, 'latest env vars')
 }
 export function parseLatestPublicEnv(value: unknown): LatestPublicEnv {
-  return parseEnvSchema(
-    latestPublicEnvSchema,
-    value,
-    'latest public env vars'
-  )
+  return parseEnvSchema(latestPublicEnvSchema, value, 'latest public env vars')
 }

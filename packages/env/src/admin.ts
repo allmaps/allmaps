@@ -14,9 +14,5 @@ export function parseAdminEnv(value: unknown): AdminEnv {
 }
 
 export function parseAdminPublicEnv(value: unknown): AdminPublicEnv {
-  return parseEnvSchema(
-    adminPublicEnvSchema,
-    value,
-    'admin public env vars'
-  )
+  return parseEnvSchema(adminPublicEnvSchema, value, 'admin public env vars')
 }

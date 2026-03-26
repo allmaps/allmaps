@@ -14,9 +14,5 @@ export function parseEditorEnv(value: unknown): EditorEnv {
 }
 
 export function parseEditorPublicEnv(value: unknown): EditorPublicEnv {
-  return parseEnvSchema(
-    editorPublicEnvSchema,
-    value,
-    'editor public env vars'
-  )
+  return parseEnvSchema(editorPublicEnvSchema, value, 'editor public env vars')
 }
