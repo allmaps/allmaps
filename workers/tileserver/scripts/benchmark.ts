@@ -153,16 +153,12 @@ async function main() {
   // Fetch maps
   console.log('Fetching maps from API...')
   const response = await fetch('https://annotations.allmaps.org/maps?limit=20')
-  const data = (await response.json()) as { items: any[] }
+  const annotation = await response.json()
+
+  const maps = parseAnnotation(annotation)
 
   // Parse and filter
-  const validMaps: GeoreferencedMap[] = []
-  for (const annotation of data.items) {
-    try {
-      const maps = parseAnnotation(annotation)
-      validMaps.push(...maps.filter((m) => m.gcps.length >= 3))
-    } catch {}
-  }
+  const validMaps = maps.filter((map) => map.gcps.length >= 3)
 
   console.log(`Found ${validMaps.length} valid maps\n`)
 

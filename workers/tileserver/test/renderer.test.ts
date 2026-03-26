@@ -27,7 +27,12 @@ import type {
   TileResolution
 } from '../src/types.js'
 
-// @ts-ignore - import.meta.url is available in ESM
+type TileTest = {
+  name: string
+  tile: string
+  annotation: string
+}
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -146,12 +151,6 @@ function parseTilePath(tilePath: string): XYZTile {
     x: parseInt(match[2], 10),
     y: parseInt(match[3], 10)
   }
-}
-
-interface TileTest {
-  name: string
-  tile: string
-  annotation: string
 }
 
 describe('Renderer Tests', () => {
