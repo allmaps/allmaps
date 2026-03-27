@@ -17,7 +17,7 @@ import { readFile } from 'fs/promises'
 import { join, dirname } from 'path'
 
 import { fileURLToPath } from 'url'
-import { xyzTileToProjectedGeoBbox } from '../src/geo.js'
+import { xyzTileToProjectedGeoBbox } from '../src/lib/geo.js'
 
 import type { Bbox, FetchFn } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -25,7 +25,7 @@ import type {
   XYZTile,
   TransformationOptions,
   TileResolution
-} from '../src/types.js'
+} from '../src/lib/types.js'
 
 type TileTest = {
   name: string

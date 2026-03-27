@@ -7,7 +7,7 @@ import { Viewport } from '@allmaps/render'
 import { WasmRenderer } from '@allmaps/render/wasm'
 import { IntArrayRenderer } from '@allmaps/render/intarray'
 
-import { xyzTileToProjectedGeoBbox } from '../src/geo.js'
+import { xyzTileToProjectedGeoBbox } from '../src/lib/geo.js'
 
 import * as wasmModule from '../../../packages/render-wasm/pkg-nodejs/allmaps_render_wasm.js'
 

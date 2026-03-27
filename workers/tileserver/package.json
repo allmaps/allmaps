@@ -17,9 +17,9 @@
   },
   "scripts": {
     "lerna-build": "lerna run build --scope @allmaps/tileserver --include-dependencies",
-    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
-    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
-    "dev": "wrangler dev --port $(../../port.js tileserver) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local --dotenv-file ./.env.override",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local --dotenv-file ./.env.override",
+    "dev": "wrangler dev --port $(../../port.js tileserver) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local --env-file ./.env.override",
     "lint": "prettier --ignore-path ../../.gitignore --check src test scripts && eslint src test scripts --ext .js,.ts",
     "cf-typegen": "wrangler types",
     "types": "tsc --noEmit",
