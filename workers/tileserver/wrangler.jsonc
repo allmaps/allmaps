@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "compatibility_date": "2024-05-24",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": { "directory": "public", "binding": "ASSETS" },
   "rules": [
     {
       "type": "CompiledWasm",
