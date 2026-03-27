@@ -2,16 +2,16 @@ import { AutoRouter, error, cors, json, IRequestStrict } from 'itty-router'
 
 import { parseTileServerEnv } from '@allmaps/env/tileserver'
 
-import { createWarpedTileResponseWasm } from './warped-tile-response-wasm.js'
-import { mapsFromParams, mapsFromQuery } from './maps-from-request.js'
-import { optionsFromQuery } from './options.js'
-import { generateTileJsonResponse as generateTileJsonResponse } from './tilejson.js'
-import { generateTilesHtml } from './html.js'
-import { match, put, headers } from './cache.js'
+import { createWarpedTileResponseWasm } from './lib/warped-tile-response-wasm.js'
+import { mapsFromParams, mapsFromQuery } from './lib/maps-from-request.js'
+import { optionsFromQuery } from './lib/options.js'
+import { generateTileJsonResponse as generateTileJsonResponse } from './lib/tilejson.js'
+import { generateTilesHtml } from './lib/html.js'
+import { match, put, headers } from './lib/cache.js'
 
 import type { TileServerEnv } from '@allmaps/env/tileserver'
 
-import type { XYZTile } from './types.js'
+import type { XYZTile } from './lib/types.js'
 
 type CFArgs = [TileServerEnv, ExecutionContext]
 
