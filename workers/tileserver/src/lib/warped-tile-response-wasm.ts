@@ -15,7 +15,7 @@ import { bboxToRectangle } from '@allmaps/stdlib'
 import wasmInit, * as wasmModule from '@allmaps/render-wasm'
 
 // THe worker wants the direct path to the WASM file, so we import it as a URL
-import wasmFile from '../../../packages/render-wasm/pkg/allmaps_render_wasm_bg.wasm'
+import wasmFile from '../../../../packages/render-wasm/pkg/allmaps_render_wasm_bg.wasm'
 
 // Initialize WASM module (Cloudflare Workers support top-level await)
 // Use new wasm-bindgen initialization API with module_or_path parameter
