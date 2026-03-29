@@ -1,4 +1,4 @@
-import { png, webp, jpeg } from 'itty-router'
+import { png, webp, jpeg, StatusError } from 'itty-router'
 import tinycolor from 'tinycolor2'
 
 import { Viewport } from '@allmaps/render'
@@ -24,6 +24,19 @@ export async function generateWarpedMapImage(
   // Use unified URL getter (supports maps, images, manifests)
   const annotationUrl = getAnnotationUrl(env, resourceWithId)
 
+  const annotationResponse = await cachedFetch(annotationUrl)
+
+  if (!annotationResponse.ok) {
+    if (annotationResponse.status === 404) {
+      throw new StatusError(404, `Map not found: ${annotationUrl}`)
+    }
+
+    throw new Error(
+      `Error fetching annotation from URL: ${annotationUrl} (${annotationResponse.status})`
+    )
+  }
+
+  const annotation = await annotationResponse.json()
   const annotation = await cachedFetch(annotationUrl).then((response) =>
     response.json()
   )
