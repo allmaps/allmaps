@@ -1,3 +1,4 @@
+import { StatusError } from 'itty-router'
 import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
 
 import tinycolor from 'tinycolor2'
@@ -148,7 +149,18 @@ export async function generateHereCard(
 
   const mapUrl = `${env.PUBLIC_REST_BASE_URL}/maps/${mapId}`
 
-  const map = await cachedFetch(mapUrl).then((response) => response.json())
+  const mapResponse = await cachedFetch(mapUrl)
+  if (!mapResponse.ok) {
+    if (mapResponse.status === 404) {
+      throw new StatusError(404, `Map not found: ${mapUrl}`)
+    }
+
+    throw new Error(
+      `Error fetching map from URL: ${mapUrl} (${mapResponse.status})`
+    )
+  }
+
+  const map = await mapResponse.json()
   const parsedMap = validateGeoreferencedMap(map)
 
   if (Array.isArray(parsedMap)) {

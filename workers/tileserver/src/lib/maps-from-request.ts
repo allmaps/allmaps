@@ -1,4 +1,5 @@
 import { validateGeoreferencedMap, parseAnnotation } from '@allmaps/annotation'
+import { StatusError } from 'itty-router'
 
 import { cachedFetch } from './fetch.js'
 
@@ -36,6 +37,16 @@ export async function mapsFromParams(
 
   if (!mapsResponse) {
     throw new Error(`Error fetching maps from URL: ${url}`)
+  }
+
+  if (!mapsResponse.ok) {
+    if (mapsResponse.status === 404) {
+      throw new StatusError(404, `Map not found: ${url}`)
+    }
+
+    throw new Error(
+      `Error fetching maps from URL: ${url} (${mapsResponse.status})`
+    )
   }
 
   const fetchedMaps = await mapsResponse.json()
