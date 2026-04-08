@@ -863,14 +863,20 @@ export abstract class BaseWarpedMapLayer<
   }
 
   contextLost(event: Event) {
-    if ('preventDefault' in event && typeof event.preventDefault === 'function') {
+    if (
+      'preventDefault' in event &&
+      typeof event.preventDefault === 'function'
+    ) {
       event.preventDefault()
     }
     this.renderer?.contextLost()
   }
 
   contextRestored(event: Event) {
-    if ('preventDefault' in event && typeof event.preventDefault === 'function') {
+    if (
+      'preventDefault' in event &&
+      typeof event.preventDefault === 'function'
+    ) {
       event.preventDefault()
     }
     this.renderer?.contextRestored()
@@ -909,6 +915,11 @@ export abstract class BaseWarpedMapLayer<
     this.renderer.addEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
@@ -995,6 +1006,11 @@ export abstract class BaseWarpedMapLayer<
     this.renderer.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.removeEventListener(

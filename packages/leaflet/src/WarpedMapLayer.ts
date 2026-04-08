@@ -1262,6 +1262,11 @@ export class WarpedMapLayer
       this.nativeUpdate.bind(this)
     )
 
+    this.renderer.addEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
       this.nativePassWarpedMapEvent.bind(this)
@@ -1346,6 +1351,11 @@ export class WarpedMapLayer
     this.renderer.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.removeEventListener(

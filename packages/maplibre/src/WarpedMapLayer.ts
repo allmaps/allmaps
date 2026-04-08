@@ -209,7 +209,11 @@ export class WarpedMapLayer
   nativePassWarpedMapEvent(event: Event) {
     if (event instanceof WarpedMapEvent) {
       if (this.map) {
-        this.map.fire(event.type, { ...event.data, layerId: this.id })
+        this.map.fire(event.type, {
+          ...event.data,
+          error: event.error,
+          layerId: this.id
+        })
       }
     }
   }

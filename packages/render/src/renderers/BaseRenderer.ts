@@ -13,7 +13,11 @@ import { TileCache } from '../tilecache/TileCache.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'
 import { FetchableTile } from '../tilecache/FetchableTile.js'
 
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 import {
   getTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel,
@@ -650,11 +654,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // there is an inherent imperfection in this computation
     // which could lead to inaccurate tile loading.
     // In general, this is made up for by the buffers.
-    const resourceBufferedViewportRing =
-      projectedTransformer.transformToResource(
+    // Note: this is the first time the backwards transformation is computed
+    // which can cause unexpected errors (this isn't computed and hence check when adding maps)
+    // so we catch such error and pass them to the user as events.
+    let resourceBufferedViewportRing
+    try {
+      resourceBufferedViewportRing = projectedTransformer.transformToResource(
         [projectedGeoBufferedViewportRectangle],
         transformerOptions
       )[0]
+    } catch (error) {
+      if (error instanceof Error) {
+        error.message = 'Error while transforming to resource: ' + error.message
+        const errorEvent = new WarpedMapErrorEvent(error, { mapIds: [mapId] })
+        this.dispatchEvent(errorEvent)
+      }
+      // Return no tiles, which will exclude this map from mapsInViewport etc.
+      // and hence all further rendering.
+      return []
+    }
     warpedMap.setProjectedGeoBufferedViewportRectangleForViewport(
       projectedGeoBufferedViewportRectangle
     )

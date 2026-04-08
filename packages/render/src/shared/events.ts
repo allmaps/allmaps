@@ -37,7 +37,8 @@ export const WarpedMapEventType = {
   ANIMATEDCHANGE: 'animatedchange',
 
   // Renderer
-  CHANGED: 'changed'
+  CHANGED: 'changed',
+  ERROR: 'error'
 } as const
 
 export type WarpedMapEventType =
@@ -53,10 +54,22 @@ export type WarpedMapEventData = {
 
 export class WarpedMapEvent extends Event {
   data?: Partial<WarpedMapEventData>
+  error?: Error
 
   constructor(type: WarpedMapEventType, data?: Partial<WarpedMapEventData>) {
     super(type)
 
     this.data = data
+  }
+}
+
+// Similar to https://maplibre.org/maplibre-gl-js/docs/API/interfaces/MapEventType/#error
+export class WarpedMapErrorEvent extends WarpedMapEvent {
+  error: Error
+
+  constructor(error: Error, data?: Partial<WarpedMapEventData>) {
+    super(WarpedMapEventType.ERROR, data)
+
+    this.error = error
   }
 }
