@@ -179,11 +179,11 @@ export function printAnalysisItem(
   alternativeMapId: string
 ) {
   printString(
-    item.type +
+    (item.mapId ?? alternativeMapId) +
+      '\t' +
+      item.type +
       '\t' +
       item.code +
-      '\t' +
-      (item.mapId ?? alternativeMapId) +
       '\t' +
       item.message +
       (item.originalMessage ? '\t' + item.originalMessage : '')

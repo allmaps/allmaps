@@ -16,6 +16,7 @@ Options:
 
 Commands:
   annotation                   parse and generate Georeference Annotations
+  analyze                      analyze maps
   attach [options] [files...]  attach maps
   fetch                        fetch IIIF images
   iiif                         parse and generate IIIF resources
@@ -67,8 +68,11 @@ node ./dist/index.js
 
 Most CLI commands accept one or more files as input. You can supply these files in two ways:
 
-- Supplied at the end of the command using their full or relative paths. In the CLI's help output, this is shown as `[files...]`: `allmaps annotation generate path/to/my-georeferenced-map.json`
-- Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI: `cat path/to/my-georeferenced-map.json | allmaps annotation generate`
+- Supplied at the end of the command using their full or relative paths. In the CLI's help output, this is shown as `[files...]`:
+  - `allmaps annotation generate path/to/my-georeferenced-map.json`
+- Using the standard input (stdin). You can pipe the contents of the input files to the Allmaps CLI:
+  - `cat path/to/my-georeferenced-map.json | allmaps annotation generate`
+  - `curl "https://annotations.allmaps.org/maps/096f57b5ff35b3eb" | allmaps annotation parse`
 
 Commands that require SVG input only accept one file, commands that require JSON or points input accept multiple files.
 
@@ -359,13 +363,53 @@ Additionally, the `coordinates` command has an option to specifically compute th
 |:----------------|:-------------------------------------------------------------------------------------------------------------------|:--------|
 | `-i, --inverse` | Use the Projected GCP Transformer's 'toResource' ("inverse") transformation instead of the 'toGeo' transformation. |         |
 
-### Attach maps
+### Analyze maps
 
-Show help:
+Analyze maps and returns information, warning and error items.
+
+This takes Georeference Annotations (or Georeferenced Maps) as input, and for this input performs the analysis described in [@allmaps/analyze](../../packages/analyze/):
+
+To get complete analysis (info, warnings, errors) use `allmaps analyze`:
 
 ```bash
-allmaps attach --help
+allmaps analyze path/to/my-annotation.json path/to/my-annotation2.json
 ```
+
+Or analyze a georeference annotation stored on a URL using curl:
+
+```bash
+curl "https://annotations.allmaps.org/maps/096f57b5ff35b3eb" | allmaps analyze
+
+# https://annotations.allmaps.org/maps/096f57b5ff35b3eb warning	maskpointoutsidefullmask	Mask point 1 with resource coordinates [-1,999] outside full mask.
+```
+
+To get e.g. only errors, use `allmaps analyze errors`:
+
+```bash
+allmaps analyze errors path/to/my-annotation.json path/to/my-annotation2.json
+```
+
+And analogously for info or warnings.
+
+Note: computing the warnings can throw an error (e.g. if there are not enough GCPs). This error is caught and added to the errors when a full analysis is performed, but not when only the warnings are computed.
+
+#### Options
+
+This commands accepts the same options for specifying the analysis as used in the package:
+
+| Option                            | Description                                                                                   | Default                                                 |
+| :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
+`-c, --codes <codes>` | Comma-separated list of codes to analyze.' | (see default codes in [@allmaps/analyze](../../packages/analyze/)) |
+`--max-rmse-diameter-fraction <number>` | Maximum allowed RMSE as a fraction of the map diameter' | `0.05` |
+`--max-shear <number>` | Maximum allowed shear for a polynomial transformation' | `0.1` |
+`--max-log2sigma <number>` | Maximum allowed area scaling distortion (log2sigma)' | `1` |
+`--min-log2sigma <number>` | Minimum allowed area scaling distortion (log2sigma)' | `-1` |
+`--max-two-omega <number>` | Maximum allowed angular distortion (twoOmega)' | `0.5` |
+`--ransac-threshold-factor <number>` | RANSAC scaling factor applied to the RANSAC inlier distance threshold when detecting outlier GCPs' | `0.1` |
+`--ransac-stop-probability <number>` | RANSAC stopping probability when detecting outlier GCPs' | `0.99` |
+`--ransac-max-nb-iterations <number>` | Maximum number of RANSAC iterations when detecting outlier GCPs' | `100` |
+
+### Attach maps
 
 Attach maps using Resource Control Points to infer new Ground Control Points that bring the maps together.
 
