@@ -49,6 +49,6 @@
   "dependencies": {
     "@protomaps/basemaps": "^5.0.1",
     "maplibre-contour": "^0.1.0",
-    "maplibre-gl": "^4.7.1"
+    "maplibre-gl": "catalog:"
   }
 }

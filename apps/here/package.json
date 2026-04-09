@@ -43,7 +43,7 @@
     "@turf/distance": "^7.2.0",
     "bits-ui": "^2.11.4",
     "lodash-es": "^4.17.21",
-    "ol": "^10.5.0",
+    "ol": "catalog:",
     "phosphor-svelte": "^3.0.1"
   },
   "devDependencies": {

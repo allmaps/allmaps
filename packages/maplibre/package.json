@@ -50,7 +50,7 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/warpedmaplayer": "workspace:^",
-    "maplibre-gl": "^4.5.0"
+    "maplibre-gl": "catalog:"
   },
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
