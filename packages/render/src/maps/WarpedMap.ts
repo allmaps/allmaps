@@ -552,16 +552,7 @@ export class WarpedMap extends EventTarget {
       if ('resourceMask' in changedOptions || 'applyMask' in changedOptions) {
         this.applyMask = this.options.applyMask
         this.applyMaskOpacity = this.applyMask ? 0 : 1
-        const resourceFullMask = this.getResourceFullMask()
-        const resourceMask = this.options.resourceMask
-        const resourceAppliedMask = this.applyMask
-          ? resourceMask
-          : resourceFullMask
-        this.setResourceMask(
-          resourceFullMask,
-          resourceMask,
-          resourceAppliedMask
-        )
+        this.setResourceMask()
       }
 
       if ('transformationType' in changedOptions) {
@@ -616,14 +607,12 @@ export class WarpedMap extends EventTarget {
    *
    * @param resourceMask
    */
-  protected setResourceMask(
-    resourceFullMask: Ring,
-    resourceMask: Ring,
-    resourceAppliedMask: Ring
-  ): void {
-    this.resourceFullMask = resourceFullMask
-    this.resourceMask = resourceMask
-    this.resourceAppliedMask = resourceAppliedMask
+  protected setResourceMask(): void {
+    this.resourceFullMask = this.getResourceFullMask()
+    this.resourceMask = this.options.resourceMask
+    this.resourceAppliedMask = this.applyMask
+      ? this.resourceMask
+      : this.resourceFullMask
     this.updateResourceMaskProperties()
     this.updateGeoMaskProperties()
     this.updateProjectedGeoMaskProperties()
@@ -891,12 +880,14 @@ export class WarpedMap extends EventTarget {
     const resourceWidth = this.georeferencedMap.resource.width
     const resourceHeight = this.georeferencedMap.resource.height
 
-    // If width and height are not set on georeferenced map
-    // get full mask from resource mask, which is sure to be set
+    // Per the georeference annotation spec,
+    // width and height SHOULD be set on georeferenced map but are not guaranteed,
+    // if not set, get (approximate) width and height from resource mask (which MUST be set).
+    // TODO: consider to get from image when fetched.
     if (resourceWidth && resourceHeight) {
       return sizeToRectangle([resourceWidth, resourceHeight])
     } else {
-      return bboxToRectangle(this.resourceMaskBbox)
+      return bboxToRectangle(computeBbox(this.georeferencedMap.resourceMask))
     }
   }
 
