@@ -143,7 +143,7 @@ export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
 export type SpecificWarpedMapListOptions<W extends WarpedMap> = {
   createRTree: boolean
   rtreeUpdatedOptions: string[]
-  animatedOptions: string[]
+  animatedOptions: Array<keyof WebGL2WarpedMapOptions>
   warpedMapFactory: WarpedMapFactory<W>
 }
 export type WarpedMapListOptions<W extends WarpedMap> =
@@ -170,7 +170,7 @@ export type TileCacheOptions<D> = {
 // The options when setting options
 export type AnimationOptions = {
   animate: boolean
-  animatedOptions?: string[]
+  animatedOptions?: Array<keyof WebGL2WarpedMapOptions>
   duration: number
 }
 export type AnimationInternalOptions = {
