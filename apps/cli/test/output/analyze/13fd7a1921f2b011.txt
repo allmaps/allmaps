@@ -1,0 +1,2 @@
+warning	gcpoutlier	59de70c7f0d6d563	GCP 5 with resource coordinates [1765,1737] and geo coordinates [-18.1014216,64.3331759] is possibly an outlier.
+warning	destinationpolynomial1rmsetoohigh	59de70c7f0d6d563	The RMSE is higher then 0.05 times the map diameter for a polynomial transformation.

@@ -7,6 +7,7 @@ Options:
 
 Commands:
   annotation                   parse and generate Georeference Annotations
+  analyze                      analyze maps
   attach [options] [files...]  attach maps
   fetch                        fetch IIIF images
   frame [options] [files...]   compute best viewport frame for georeferenced

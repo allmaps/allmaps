@@ -229,3 +229,52 @@ export function addAttachOptions<
 
   // Note: no 'clone' option, not applicable in CLI.
 }
+
+export function addAnalyzeInputs<
+  Args extends unknown[] = [],
+  Opts extends OptionValues = Record<string, unknown>,
+  GlobalOpts extends OptionValues = Record<string, unknown>
+>(command: Command<Args, Opts, GlobalOpts>) {
+  return command
+    .option('-c, --codes <codes>', 'Comma-separated list of codes to analyze.')
+    .option(
+      '--max-rmse-diameter-fraction <number>',
+      'Maximum allowed RMSE as a fraction of the map diameter.',
+      parseFloat
+    )
+    .option(
+      '--max-shear <number>',
+      'Maximum allowed shear for a polynomial transformation.',
+      parseFloat
+    )
+    .option(
+      '--max-log2sigma <number>',
+      'Maximum allowed area scaling distortion (log2sigma).',
+      parseFloat
+    )
+    .option(
+      '--min-log2sigma <number>',
+      'Minimum allowed area scaling distortion (log2sigma).',
+      parseFloat
+    )
+    .option(
+      '--max-two-omega <number>',
+      'Maximum allowed angular distortion (twoOmega).',
+      parseFloat
+    )
+    .option(
+      '--ransac-threshold-factor <number>',
+      'RANSAC scaling factor applied to the RANSAC inlier distance threshold when detecting outlier GCPs.',
+      parseFloat
+    )
+    .option(
+      '--ransac-stop-probability <number>',
+      'RANSAC stopping probability when detecting outlier GCPs.',
+      parseFloat
+    )
+    .option(
+      '--ransac-max-nb-iterations <number>',
+      'Maximum number of RANSAC iterations when detecting outlier GCPs.',
+      parseInt
+    )
+}
