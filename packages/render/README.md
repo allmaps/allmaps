@@ -63,6 +63,8 @@ pnpm run build
 
 The most straightforward way to use the render logic in this package is by rendering a Georeference Annotation on a webmaps using one of the Allmaps plugins (which use the WebGL2Renderer) or setting up the Allmaps TileServer (which uses the CanvasRenderer).
 
+This package can be tested using [@allmaps/test-plugins](../../test/plugins/).
+
 It's also possible to call a renderer directly:
 
 ### CanvasRenderer

@@ -15,9 +15,9 @@ Examples:
 
 This plugin exports the class `WarpedMapLayer`. You can add one or multiple Georeference Annotations (or AnnotationPages that contain multiple Georeference Annotations) to a WarpedMapLayer and add the WarpedMapLayer to your OpenLayers map. This will render all georeferenced maps defined by the Georeference Annotations.
 
-To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/) package.
 
-This plugin implements a lot of methods from [@allmaps/warpedmaplayer](../warpedmaplayer/README.md), the core package gathering the functionality connecting the Allmaps plugins to the [@allmaps/render](../render/README.md) package.
+This plugin implements a lot of methods from [@allmaps/warpedmaplayer](../warpedmaplayer/), the core package gathering the functionality connecting the Allmaps plugins to the [@allmaps/render](../render/) package.
 
 ## Installation
 
@@ -38,6 +38,8 @@ pnpm run build
 ## Usage
 
 Built for OpenLayers 10, but should work with OpenLayers 9, 8, 7 and 6 as well.
+
+This package can be tested using [@allmaps/test-plugins](../../test/plugins/).
 
 ### Adding a WarpedMapLayer to a MapLibre Map
 
@@ -129,7 +131,7 @@ Note that the `...ByUrl()` functions are not available on a WarpedMapList.
 
 ### WarpedMapLayer API, Options and Events
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods coming from the WarpedMapLayer class (shared by all Allmaps plugins). It describes the methods like `addGeoreferenceAnnotation()` and includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/) package for the API documentation of the methods coming from the WarpedMapLayer class (shared by all Allmaps plugins). It describes the methods like `addGeoreferenceAnnotation()` and includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
 You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
 
@@ -148,7 +150,7 @@ map.on('warpedmapadded', (event) => {
 
 ### Viewport projections
 
-Allmaps supports two types of map projections as documented in [@allmaps/project](../project/README.md): *internal projections* and *viewport projections*. OpenLayers [supports](https://openlayers.org/en/latest/examples/scaleline-indiana-east.html) custom view projections, too. The Allmaps OpenLayers plugin can read the projection of the view of an OpenLayers map and apply it.
+Allmaps supports two types of map projections as documented in [@allmaps/project](../project/): *internal projections* and *viewport projections*. OpenLayers [supports](https://openlayers.org/en/latest/examples/scaleline-indiana-east.html) custom view projections, too. The Allmaps OpenLayers plugin can read the projection of the view of an OpenLayers map and apply it.
 
 To set a custom projection to an OpenLayers map and have Allmaps pick it up, use [the `register` function](https://openlayers.org/en/latest/apidoc/module-ol_proj_proj4.html#.register) as foreseen in OpenLayers. (This works because the plugin loads Proj4 as a peer dependency.)
 

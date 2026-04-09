@@ -1,5 +1,9 @@
 # Monorepo tests
 
+This test package contains general tests to assure correct functioning of the Allmaps monorepo.
+
+## Usage
+
 Run them using:
 
 ```bash
