@@ -31,6 +31,12 @@
 - name: Chesapeake and Ohio Canal
   url: https://annotations.allmaps.org/images/7f2494dd1ad9ed7a
   reason: Two maps from same image, overlapping, mask outside full mask
+- name: Strait of Magellan
+  url: https://annotations.allmaps.org/maps/96a50503ef4261aa
+  reason: Best with projection
+- name: Antarctic Peninsula
+  url: https://sammeltassen.nl/iiif-manifests/allmaps/antarctic-allmaps.json
+  reason: Extreme latitudes, best with projection
 - name: Caledonia
   url: https://annotations.allmaps.org/maps/63ac1b4bd125ca05
   reason: Left of antimeridian
