@@ -37,7 +37,7 @@
     annotation = await fetch(annotationUrl).then((response) => response.json())
 
     warpedMapList = new WarpedMapList()
-    await warpedMapList.addGeoreferenceAnnotation(annotation)
+    warpedMapList.addGeoreferenceAnnotation(annotation)
     const bbox = warpedMapList.getMapsBbox()
 
     options = mergeOptions(
@@ -53,6 +53,10 @@
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map)
+
+    map.on('error', (e) => {
+      console.warn(e)
+    })
 
     warpedMapLayer = new WarpedMapLayer(undefined, {
       warpedMapList
@@ -108,3 +112,11 @@
     <OptionInputs bind:options></OptionInputs>
   </div>
 </main>
+
+<svelte:head>
+  <title>Allmaps Leaflet plugin test</title>
+  <meta
+    name="Allmaps Leaflet plugin test"
+    content="Test page for the Allmaps Leaflet plugin"
+  />
+</svelte:head>

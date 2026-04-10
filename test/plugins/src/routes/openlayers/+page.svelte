@@ -62,7 +62,7 @@
     annotation = await fetch(annotationUrl).then((response) => response.json())
 
     warpedMapList = new WarpedMapList()
-    await warpedMapList.addGeoreferenceAnnotation(annotation)
+    warpedMapList.addGeoreferenceAnnotation(annotation)
     bbox = warpedMapList.getMapsBbox({
       projection: { definition: 'EPSG:3857' }
     })
@@ -80,6 +80,10 @@
         })
       ],
       controls: []
+    })
+
+    map.on('error', (e) => {
+      console.warn(e)
     })
 
     warpedMapLayer = new WarpedMapLayer({ warpedMapList })
@@ -142,3 +146,11 @@
     {/if}
   </div>
 </main>
+
+<svelte:head>
+  <title>Allmaps Openlayers plugin test</title>
+  <meta
+    name="Allmaps Openlayers plugin test"
+    content="Test page for the Allmaps Openlayers plugin"
+  />
+</svelte:head>

@@ -37,7 +37,7 @@
     annotation = await fetch(annotationUrl).then((response) => response.json())
 
     warpedMapList = new WarpedMapList()
-    await warpedMapList.addGeoreferenceAnnotation(annotation)
+    warpedMapList.addGeoreferenceAnnotation(annotation)
     const bbox = warpedMapList.getMapsBbox()
 
     options = mergeOptions(
@@ -59,11 +59,14 @@
 
     map.on('load', () => {
       warpedMapLayer = new WarpedMapLayer({ warpedMapList })
-      // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
       if (bbox) {
         map.fitBounds(bbox, { padding: 20, duration: 0 })
       }
+    })
+
+    map.on('error', (e) => {
+      console.warn(e)
     })
   })
 
@@ -110,3 +113,11 @@
     <OptionInputs bind:options></OptionInputs>
   </div>
 </main>
+
+<svelte:head>
+  <title>Allmaps Maplibre plugin test</title>
+  <meta
+    name="Allmaps Maplibre plugin test"
+    content="Test page for the Allmaps Maplibre plugin"
+  />
+</svelte:head>
