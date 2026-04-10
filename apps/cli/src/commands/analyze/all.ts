@@ -24,18 +24,18 @@ export function all() {
     const georeferencedMaps = parseAnnotationsValidateMaps(jsonValues)
     const parsedAnalyzeInputs = parseAnalyzeInputs(options)
 
-    georeferencedMaps.forEach((georeferencedMap, index) => {
+    georeferencedMaps.forEach((georeferencedMap, mapIndex) => {
       const analyzer = new Analyzer(georeferencedMap, parsedAnalyzeInputs)
 
       const analysis = analyzer.analyze()
       analysis.info.forEach((item) => {
-        printAnalysisItem(item, 'Map ' + index)
+        printAnalysisItem(item, mapIndex)
       })
       analysis.warnings.forEach((item) => {
-        printAnalysisItem(item, 'Map ' + index)
+        printAnalysisItem(item, mapIndex)
       })
       analysis.errors.forEach((item) => {
-        printAnalysisItem(item, 'Map ' + index)
+        printAnalysisItem(item, mapIndex)
       })
     })
   })

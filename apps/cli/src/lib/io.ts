@@ -174,12 +174,9 @@ export function printString(str: string) {
   console.log(str)
 }
 
-export function printAnalysisItem(
-  item: AnalysisItem,
-  alternativeMapId: string
-) {
+export function printAnalysisItem(item: AnalysisItem, mapIndex: number) {
   printString(
-    (item.mapId ?? alternativeMapId) +
+    (item.mapId ?? `Map ${mapIndex + 1}`) +
       '\t' +
       item.type +
       '\t' +

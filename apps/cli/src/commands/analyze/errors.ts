@@ -22,11 +22,11 @@ export function errors() {
     const georeferencedMaps = parseAnnotationsValidateMaps(jsonValues)
     const parsedAnalyzeInputs = parseAnalyzeInputs(options)
 
-    georeferencedMaps.forEach((georeferencedMap, index) => {
+    georeferencedMaps.forEach((georeferencedMap, mapIndex) => {
       const analyzer = new Analyzer(georeferencedMap, parsedAnalyzeInputs)
 
       analyzer.getErrors().forEach((item) => {
-        printAnalysisItem(item, 'Map ' + index)
+        printAnalysisItem(item, mapIndex)
       })
     })
   })
