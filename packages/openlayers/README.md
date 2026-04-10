@@ -1,8 +1,8 @@
 # @allmaps/openlayers
 
-Allmaps plugin for OpenLayers. Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/).
+Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position.
 
-Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+See [allmaps.org](https://allmaps.org) for more information.
 
 [![Example of the Allmaps plugin for OpenLayers](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/openlayers/example.jpg)](https://observablehq.com/@allmaps/openlayers-plugin)
 
@@ -37,9 +37,10 @@ pnpm run build
 
 ## Usage
 
-Built for OpenLayers 10, but should work with OpenLayers 9, 8, 7 and 6 as well.
+> [!Note]
+> The easiest way to test this package is via [@allmaps/test-plugins](../../test/plugins/).
 
-This package can be tested using [@allmaps/test-plugins](../../test/plugins/).
+Built for OpenLayers 10, but should work with OpenLayers 9, 8, 7 and 6 as well.
 
 ### Adding a WarpedMapLayer to a MapLibre Map
 

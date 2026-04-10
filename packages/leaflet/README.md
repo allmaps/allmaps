@@ -1,6 +1,8 @@
 # @allmaps/leaflet
 
-Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [Leaflet](https://leafletjs.com/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a Leaflet map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position.
+
+See [allmaps.org](https://allmaps.org) for more information.
 
 *The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).*
 *The development of the Allmaps plugin for Leaflet was funded by [CLARIAH-VL](https://clariahvl.hypotheses.org/).*
@@ -42,9 +44,10 @@ pnpm run build
 
 ## Usage
 
-Built for Leaflet 1.9, but should work with earlier versions as well.
+> [!Note]
+> The easiest way to test this package is via [@allmaps/test-plugins](../../test/plugins/).
 
-This package can be tested using [@allmaps/test-plugins](../../test/plugins/).
+Built for Leaflet 1.9, but should work with earlier versions as well.
 
 ### Adding a WarpedMapLayer to a MapLibre Map
 

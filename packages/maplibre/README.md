@@ -1,6 +1,8 @@
 # @allmaps/maplibre
 
-Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position.
+
+See [allmaps.org](https://allmaps.org) for more information.
 
 [![Example of the Allmaps plugin for MapLibre](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/maplibre/example.jpg)](https://observablehq.com/@allmaps/maplibre-plugin)
 
@@ -35,9 +37,10 @@ pnpm run build
 
 ## Usage
 
-Built for MapLibre 5.0, but should work with earlier versions as well.
+> [!Note]
+> The easiest way to test this package is via [@allmaps/test-plugins](../../test/plugins/).
 
-This package can be tested using [@allmaps/test-plugins](../../test/plugins/).
+Built for MapLibre 5.0, but should work with earlier versions as well.
 
 ### Adding a WarpedMapLayer to a MapLibre Map
 

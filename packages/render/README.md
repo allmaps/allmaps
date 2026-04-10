@@ -14,7 +14,7 @@ This module is mainly used in the Allmaps pipeline by the following packages:
 * [Allmaps plugin for MapLibre](../maplibre/)
 * [Allmaps plugin for OpenLayers](../openlayers/)
 
-It is also used in the [Allmaps Preview](../../worker/preview/) worker.
+It is also used in the [Allmaps Preview](../../worker/preview/) worker and [Allmaps Tile Server](../../worker/tileserver/) proxy server, both of which use the `WasmRenderer`, a WASM implementation of the `CanvasRenderer`.
 
 ## How it works
 
@@ -61,11 +61,10 @@ pnpm run build
 
 ## Usage
 
-The most straightforward way to use the render logic in this package is by rendering a Georeference Annotation on a webmaps using one of the Allmaps plugins (which use the WebGL2Renderer) or setting up the Allmaps TileServer (which uses the CanvasRenderer).
+> [!Note]
+> The easiest way to test this package is via [@allmaps/test-plugins](../../test/plugins/), since all of the plugins use the WebGL2Renderer to render a Georeference Annotation on screen.
 
-This package can be tested using [@allmaps/test-plugins](../../test/plugins/).
-
-It's also possible to call a renderer directly:
+Here's how each of the renderers can be used directly:
 
 ### CanvasRenderer
 
