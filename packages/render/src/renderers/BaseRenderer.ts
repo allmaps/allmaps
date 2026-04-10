@@ -389,13 +389,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    const geoBufferedViewportRectangleBbox = computeBbox(
-      this.viewport.getGeoBufferedRectangle()
+    // Same comment on viewport and warpedMapList being in same projection as below
+    const projectedGeoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getProjectedGeoBufferedRectangle()
     )
 
     return Array.from(
       this.warpedMapList.getWarpedMaps({
-        geoBbox: geoBufferedViewportRectangleBbox
+        projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
+        applyMask: false
       })
     )
       .filter(
@@ -444,7 +446,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         this.viewport.projection
       )
     ) {
-      this.warpedMapList.options.projection = this.viewport.projection
       this.warpedMapList.setOptions({ projection: this.viewport.projection })
     }
   }
@@ -549,21 +550,27 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
     const viewport = this.viewport
 
-    const geoBufferedViewportRectangleBbox = computeBbox(
-      this.viewport.getGeoBufferedRectangle(viewportBufferRatio)
+    // Using the viewport's projectedGeoBufferedRectangle to look up
+    // in the warpedMapList's projectedGeo RTree
+    // assumes the viewport and warpedMapList are in the same projection.
+    // This is what assureProjection() takes care of, but is worth noting here.
+    // (It's also why we don't need to pass a projection in the lookup function)
+    const geoProjectedBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
     )
 
     const mapsInViewport = new Set(
       Array.from(
         this.warpedMapList.getWarpedMaps({
-          geoBbox: geoBufferedViewportRectangleBbox
+          projectedGeoBbox: geoProjectedBufferedViewportRectangleBbox,
+          applyMask: false
         })
       )
         .map((warpedMap) => {
           return {
             warpedMap,
             projectedGeoSquaredDistanceToViewportCenter: squaredDistance(
-              bboxToCenter(warpedMap.projectedGeoMaskBbox),
+              bboxToCenter(warpedMap.projectedGeoAppliedMaskBbox),
               viewport.projectedGeoCenter
             )
           }
@@ -689,14 +696,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       )
     }
 
-    // Compute intersection of bboxes of to-resource-back-transformed viewport and resource mask
-    const resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection =
+    // Compute intersection of bboxes of to-resource-back-transformed viewport and resource applied mask
+    const resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection =
       intersectBboxes(
         warpedMap.resourceBufferedViewportRingBboxForViewport,
-        warpedMap.resourceMaskBbox
+        warpedMap.resourceAppliedMaskBbox
       )
-    warpedMap.setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(
-      resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+    warpedMap.setResourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersectionForViewport(
+      resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
     )
 
     // If this map it outside of the viewport with request buffer, stop here:
@@ -708,7 +715,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // If the intersection of the bboxes is undefined, we don't need to compute any tiles.
     // This should in general only happen if the previous check also returned false.
-    if (!resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection) {
+    if (
+      !resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
+    ) {
       return []
     }
 
@@ -716,7 +725,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // by computing the tiles covering this bbox's rectangle at the tilezoomlevel
     let tiles = computeTilesCoveringRingAtTileZoomLevel(
       bboxToRectangle(
-        resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+        resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
       ),
       tileZoomLevel,
       [warpedMap.image.width, warpedMap.image.height]

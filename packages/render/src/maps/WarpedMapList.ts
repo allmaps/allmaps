@@ -6,7 +6,7 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { webMercatorProjection } from '@allmaps/project'
+import { isEqualProjection, webMercatorProjection } from '@allmaps/project'
 import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
@@ -15,6 +15,7 @@ import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 
 import {
   bboxToCenter,
+  bboxToLine,
   computeBbox,
   convexHull,
   mergeOptions,
@@ -25,6 +26,7 @@ import {
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { Ring, Bbox, Point } from '@allmaps/types'
+import type { Projection } from '@allmaps/project'
 
 import type {
   GetWarpedMapOptions,
@@ -36,7 +38,7 @@ import type {
   AnimationStage
 } from '../shared/types.js'
 
-const DEFAULT_SELECTION_OPTIONS: SelectionOptions = {}
+const DEFAULT_SELECTION_OPTIONS: SelectionOptions = { applyMask: true }
 export const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
   animate: true,
   duration: 300
@@ -65,7 +67,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   imagesById: Map<string, Image>
 
-  rtree?: RTree
+  geoMaskRTree?: RTree
+  geoFullMaskRTree?: RTree
+  projectedGeoMaskRTree?: RTree
+  projectedGeoFullMaskRTree?: RTree
 
   options: WarpedMapListOptions<W>
 
@@ -112,7 +117,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     ) as WarpedMapListOptions<W>
 
     if (this.options.createRTree) {
-      this.rtree = new RTree()
+      this.geoMaskRTree = new RTree()
+      this.geoFullMaskRTree = new RTree()
+      this.projectedGeoMaskRTree = new RTree()
+      this.projectedGeoFullMaskRTree = new RTree()
     }
   }
 
@@ -335,49 +343,108 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * The selectionOptions allow a.o. to:
    * - filter for visible maps
    * - filter for specific mapIds
-   * - filter for maps whose geoBbox overlap with the specified geoBbox
-   * - filter for maps that overlap with a given geoPoint
+   * - filter for maps that overlap with a given point. Use geoPoint or projectedGeoPoint. Optionally specify projection for projectedGeoPoint. Optionally specify whether mask should be applied when computing overlap using applyMask.
+   * - filter for maps whose bbox overlap with the specified bbox. Use geoBbox or projectedGeoBbox. Optionally specify projection for projectedGeoBbox. Optionally specify whether mask should be applied when computing overlap using applyMask.
    *
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
+   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
    * @returns WarpedMap instances
    */
   getWarpedMaps(
-    partialSelectionOptions?: Partial<SelectionOptions>
+    partialSelectionAndProjectionOptions?: Partial<
+      SelectionOptions & ProjectionOptions
+    >
   ): Iterable<W> {
-    const selectionOptions = mergeOptions(
-      DEFAULT_SELECTION_OPTIONS,
-      partialSelectionOptions
+    const selectionAndProjectionOptions = mergeOptions(
+      mergeOptions(DEFAULT_SELECTION_OPTIONS, {
+        projection: this.options.projection
+      }),
+      partialSelectionAndProjectionOptions
     )
 
     let mapIds
-    if (selectionOptions.mapIds === undefined) {
-      if (this.rtree && selectionOptions.geoBbox) {
-        mapIds = this.rtree.searchFromBbox(selectionOptions.geoBbox)
-      } else if (this.rtree && selectionOptions.geoPoint) {
-        mapIds = this.rtree.searchFromPoint(selectionOptions.geoPoint)
+    if (selectionAndProjectionOptions.mapIds === undefined) {
+      if (selectionAndProjectionOptions.geoPoint) {
+        // Select by geoPoint
+        if (selectionAndProjectionOptions.applyMask) {
+          mapIds = this.geoMaskRTree?.searchFromPoint(
+            selectionAndProjectionOptions.geoPoint
+          )
+        } else {
+          mapIds = this.geoFullMaskRTree?.searchFromPoint(
+            selectionAndProjectionOptions.geoPoint
+          )
+        }
+      } else if (selectionAndProjectionOptions.geoBbox) {
+        // Select by geoBbox
+        mapIds = this.geoMaskRTree?.searchFromBbox(
+          selectionAndProjectionOptions.geoBbox
+        )
+        if (selectionAndProjectionOptions.applyMask) {
+          mapIds = this.geoMaskRTree?.searchFromBbox(
+            selectionAndProjectionOptions.geoBbox
+          )
+        } else {
+          mapIds = this.geoFullMaskRTree?.searchFromBbox(
+            selectionAndProjectionOptions.geoBbox
+          )
+        }
+      } else if (selectionAndProjectionOptions.projectedGeoPoint) {
+        // Select by projectedGeoPoint
+        const projectedGeoPoint = WarpedMapList.projectPointIfNeeded(
+          this.options.projection,
+          selectionAndProjectionOptions.projection,
+          selectionAndProjectionOptions.projectedGeoPoint
+        )
+        if (selectionAndProjectionOptions.applyMask) {
+          mapIds =
+            this.projectedGeoMaskRTree?.searchFromPoint(projectedGeoPoint)
+        } else {
+          mapIds =
+            this.projectedGeoFullMaskRTree?.searchFromPoint(projectedGeoPoint)
+        }
+      } else if (selectionAndProjectionOptions.projectedGeoBbox) {
+        // Select by projectedGeoBbox
+        const projectedGeoBbox = WarpedMapList.projectBboxIfNeeded(
+          this.options.projection,
+          selectionAndProjectionOptions.projection,
+          selectionAndProjectionOptions.projectedGeoBbox
+        )
+        if (selectionAndProjectionOptions.applyMask) {
+          mapIds = this.projectedGeoMaskRTree?.searchFromBbox(projectedGeoBbox)
+        } else {
+          mapIds = mapIds =
+            this.projectedGeoFullMaskRTree?.searchFromBbox(projectedGeoBbox)
+        }
       } else {
+        // Select all
         mapIds = Array.from(this.warpedMapsById.keys())
       }
     } else {
-      mapIds = selectionOptions.mapIds
+      // Select specified
+      mapIds = selectionAndProjectionOptions.mapIds
     }
 
     const warpedMaps: W[] = []
 
+    // If failed to find maps, return empty
     if (mapIds === undefined) {
       return warpedMaps
     }
 
+    // Limit to visible
     for (const mapId of mapIds) {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (
         warpedMap &&
-        (selectionOptions.onlyVisible ? warpedMap.options.visible : true)
+        (selectionAndProjectionOptions.onlyVisible
+          ? warpedMap.options.visible
+          : true)
       ) {
         warpedMaps.push(warpedMap)
       }
     }
 
+    // Sort by Z-index
     warpedMaps.sort((map0, map1) =>
       this.orderMapIdsByZIndex(map0.mapId, map1.mapId)
     )
@@ -540,6 +607,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   ): void {
     this.options = mergeOptions(this.options, options)
     this.#setMapsOptionsByMapIdInternal(undefined, options, animationOptions)
+
+    // Also update RTree sunce projectedGeoMask and projectedGeoFullMask changed
+    if (options && 'projection' in options) {
+      for (const warpedMap of this.getWarpedMaps()) {
+        this.#addToOrUpdateRtree(warpedMap)
+      }
+    }
   }
 
   /**
@@ -782,7 +856,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   clear(): void {
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
-    this.rtree?.clear()
+    this.geoMaskRTree?.clear()
+    this.geoFullMaskRTree?.clear()
+    this.projectedGeoMaskRTree?.clear()
+    this.projectedGeoFullMaskRTree?.clear()
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CLEARED))
   }
 
@@ -1066,15 +1143,37 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   #addToOrUpdateRtree(warpedMap: W): void {
-    if (this.rtree) {
-      this.rtree.removeItem(warpedMap.mapId)
-      this.rtree.addItem(warpedMap.mapId, [warpedMap.geoMask])
+    this.#removeFromRtree(warpedMap)
+    if (this.geoMaskRTree) {
+      this.geoMaskRTree.addItem(warpedMap.mapId, [warpedMap.geoMask])
+    }
+    if (this.geoFullMaskRTree) {
+      this.geoFullMaskRTree.addItem(warpedMap.mapId, [warpedMap.geoFullMask])
+    }
+    if (this.projectedGeoMaskRTree) {
+      this.projectedGeoMaskRTree.addItem(warpedMap.mapId, [
+        warpedMap.projectedGeoMask
+      ])
+    }
+    if (this.projectedGeoFullMaskRTree) {
+      this.projectedGeoFullMaskRTree.addItem(warpedMap.mapId, [
+        warpedMap.projectedGeoFullMask
+      ])
     }
   }
 
   #removeFromRtree(warpedMap: W): void {
-    if (this.rtree) {
-      this.rtree.removeItem(warpedMap.mapId)
+    if (this.geoMaskRTree) {
+      this.geoMaskRTree.removeItem(warpedMap.mapId)
+    }
+    if (this.geoFullMaskRTree) {
+      this.geoFullMaskRTree.removeItem(warpedMap.mapId)
+    }
+    if (this.projectedGeoMaskRTree) {
+      this.projectedGeoMaskRTree.removeItem(warpedMap.mapId)
+    }
+    if (this.projectedGeoFullMaskRTree) {
+      this.projectedGeoFullMaskRTree.removeItem(warpedMap.mapId)
     }
   }
 
@@ -1113,5 +1212,39 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       warpedMap.removeEventListener(WarpedMapEventType.IMAGELOADED, bound)
       this.#boundImageLoadedByMapId.delete(warpedMap.mapId)
     }
+  }
+
+  // Helper function to only project if different projection
+  // TODO: Consider to move to @allmaps/project. But then would this replace the general usage of proj4() everywhere?
+  static projectPointIfNeeded(
+    projectionFrom: Projection,
+    projectionTo: Projection,
+    point: Point
+  ): Point {
+    return isEqualProjection(projectionFrom, projectionTo)
+      ? point
+      : proj4(projectionFrom?.definition, projectionTo?.definition, point)
+  }
+
+  static projectPointsIfNeeded(
+    projectionFrom: Projection,
+    projectionTo: Projection,
+    points: Point[]
+  ): Point[] {
+    return isEqualProjection(projectionFrom, projectionTo)
+      ? points
+      : points.map((point) =>
+          proj4(projectionFrom?.definition, projectionTo?.definition, point)
+        )
+  }
+
+  static projectBboxIfNeeded(
+    projectionFrom: Projection,
+    projectionTo: Projection,
+    bbox: Bbox
+  ): Bbox {
+    return computeBbox(
+      this.projectPointsIfNeeded(projectionFrom, projectionTo, bboxToLine(bbox))
+    )
   }
 }

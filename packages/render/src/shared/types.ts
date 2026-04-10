@@ -28,8 +28,11 @@ export type ShouldRenderOptions = {
 export type SelectionOptions = {
   onlyVisible?: boolean
   mapIds?: Iterable<string>
-  geoBbox?: Bbox
   geoPoint?: Point
+  geoBbox?: Bbox
+  projectedGeoPoint?: Point
+  projectedGeoBbox?: Bbox
+  applyMask?: boolean
 }
 
 export type ProjectionOptions = {
@@ -142,8 +145,9 @@ export type GetWarpedMapOptions<W extends WarpedMap> = W extends WebGL2WarpedMap
 
 export type SpecificWarpedMapListOptions<W extends WarpedMap> = {
   createRTree: boolean
-  rtreeUpdatedOptions: string[]
+  rtreeUpdatedOptions: Array<keyof WebGL2WarpedMapOptions>
   animatedOptions: Array<keyof WebGL2WarpedMapOptions>
+  projection: Projection
   warpedMapFactory: WarpedMapFactory<W>
 }
 export type WarpedMapListOptions<W extends WarpedMap> =

@@ -1,6 +1,7 @@
 import proj4 from 'proj4'
 
 import { defaultGcpTransformerOptions } from '@allmaps/transform'
+import { mergeOptions } from '@allmaps/stdlib'
 
 import type {
   ProjectedGcpTransformerOptions,
@@ -8,7 +9,6 @@ import type {
   Projection,
   ProjectionDefinitionOptions
 } from './types.js'
-import { mergeOptions } from '@allmaps/stdlib'
 
 const DEFAULT_PROJECTION_DEFINITION_OPTIONS: ProjectionDefinitionOptions = {
   type: 'proj4String',

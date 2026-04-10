@@ -726,15 +726,15 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection for the current viewport
+   * Set resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection for the current viewport
    *
-   * @param resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+   * @param resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
    */
-  setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(
-    resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection?: Bbox
+  setResourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersectionForViewport(
+    resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection?: Bbox
   ) {
     this.resourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport =
-      resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+      resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
   }
 
   /**
