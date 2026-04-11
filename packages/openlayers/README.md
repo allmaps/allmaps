@@ -35,10 +35,9 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
-## Usage
+The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/).
 
-> [!Note]
-> The easiest way to test this package is via [@allmaps/test-plugins](../../test/plugins/).
+## Usage
 
 Built for OpenLayers 10, but should work with OpenLayers 9, 8, 7 and 6 as well.
 

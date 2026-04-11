@@ -59,10 +59,9 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
-## Usage
+The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/), since all of the plugins use the WebGL2Renderer to render a Georeference Annotation on screen.
 
-> [!Note]
-> The easiest way to test this package is via [@allmaps/test-plugins](../../test/plugins/), since all of the plugins use the WebGL2Renderer to render a Georeference Annotation on screen.
+## Usage
 
 Here's how each of the renderers can be used directly:
 
