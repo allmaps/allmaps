@@ -36,7 +36,6 @@ export async function generateWarpedMapImage(
     )
   }
 
-  const annotation = await annotationResponse.json()
   const annotation = await cachedFetch(annotationUrl).then((response) =>
     response.json()
   )
