@@ -5,8 +5,6 @@ import { generateChecksum } from '@allmaps/id/sync'
 
 import { getAllmapsIdFromUrl } from '$lib/shared/api.js'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
-
 import type {
   ParsedSource,
   UrlSource,
@@ -15,6 +13,7 @@ import type {
 
 async function parseSource(
   json: unknown,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetch?: typeof globalThis.fetch
 ): Promise<ParsedSource> {
   if (
@@ -35,16 +34,14 @@ async function parseSource(
     const parsedIiif = IIIF.parse(json)
 
     // let embeddedMaps: GeoreferencedMap[] | undefined
-    let apiMaps: GeoreferencedMap[] | undefined
 
     // TODO: handle embedded annotations inside manifests
     // if (parsedIiif.type==='manifest' ) {
     //   parsedIiif.annotations
     // }
-    try {
-      const apiAnnotations = await fetchAnnotationsFromApi(parsedIiif, fetch)
-      apiMaps = parseAnnotation(apiAnnotations)
-    } catch {}
+
+    const apiAnnotations = await fetchAnnotationsFromApi(parsedIiif)
+    const apiMaps = parseAnnotation(apiAnnotations)
 
     return {
       type: 'iiif',

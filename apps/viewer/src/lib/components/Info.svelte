@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    Info as InfoIcon,
-    ArrowRight as ArrowRightIcon
-  } from 'phosphor-svelte'
-
-  import { Popover, LoadingSmall } from '@allmaps/components'
+  import { Popover } from '@allmaps/components'
 
   import AnnotationInput from '$lib/components/AnnotationInput.svelte'
 
@@ -70,9 +65,9 @@
   <span class="text-gray-500">/</span>
 {/snippet}
 
-{#snippet arrow()}
+<!-- {#snippet arrow()}
   <ArrowRightIcon class="inline-block size-4 text-gray-500" weight="bold" />
-{/snippet}
+{/snippet} -->
 
 {#snippet renderLabels(labels: string[])}
   {#each labels as label, index (index)}

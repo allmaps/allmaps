@@ -37,7 +37,7 @@
     opacity?: number
     removeColorThreshold?: number
     terrain?: boolean
-    overlay?: { streets: boolean; buildings: boolean }
+    // overlay?: { streets: boolean; buildings: boolean }
     bearing?: number
   }
 
@@ -48,7 +48,7 @@
     opacity = 1,
     removeColorThreshold = 1,
     terrain = false,
-    overlay = { streets: false, buildings: false },
+    // overlay = { streets: false, buildings: false },
     bearing = $bindable(0)
   }: Props = $props()
 

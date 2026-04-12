@@ -5,7 +5,6 @@
     x?: number
     y?: number
     squareSize?: number
-    color1?: string
     color2?: string
     solidColor?: string
   }
@@ -14,7 +13,6 @@
     x = $bindable(1),
     y = $bindable(1),
     squareSize = 28,
-    color1 = '#ffffff',
     color2 = '#cccccc',
     solidColor = pink
   }: Props = $props()

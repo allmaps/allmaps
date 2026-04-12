@@ -9,7 +9,7 @@
 </p>
 
 <ul class="grid grid-cols-1 sm:grid-cols-2 list-none gap-4 rounded-2xl">
-  {#each examples as example}
+  {#each examples as example (example.allmapsId)}
     <li class="flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2">
       <a class="contents" href={`?url=${encodeURIComponent(example.url)}`}>
         <img

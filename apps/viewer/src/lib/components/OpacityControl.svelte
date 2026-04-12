@@ -3,8 +3,6 @@
 
   import { Popover } from 'bits-ui'
 
-  import type { Snippet } from 'svelte'
-
   import { Drop as DropIcon } from 'phosphor-svelte'
 
   import OpacitySlider from '$lib/components/OpacitySlider.svelte'
@@ -26,7 +24,7 @@
     </Popover.Trigger>
     <Popover.Portal>
       <Popover.Content forceMount sideOffset={18}>
-        {#snippet child({ wrapperProps, props, open })}
+        {#snippet child({ wrapperProps, open })}
           {#if open}
             <div {...wrapperProps}>
               <div transition:scale={{ start: 0.95, duration: 75 }}>

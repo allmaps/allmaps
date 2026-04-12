@@ -5,8 +5,6 @@
     ArrowUp as ArrowUpIcon
   } from 'phosphor-svelte'
 
-  import { getUiState } from '$lib/state/ui.svelte.js'
-
   import ControlContainer from '$lib/components/ControlContainer.svelte'
 
   type Props = {
@@ -17,8 +15,6 @@
   }
 
   let { onZoomIn, onZoomOut, mapBearing, onResetBearing }: Props = $props()
-
-  const uiState = getUiState()
 </script>
 
 <div class="flex flex-col gap-2">

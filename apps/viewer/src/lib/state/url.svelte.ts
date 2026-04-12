@@ -87,13 +87,13 @@ export class UrlState<T extends SearchParams> {
 
           const stringValue = this.#stringifyParam(value, prop as keyof T)
 
-          let defaultStringValue: string | undefined = undefined
-          if (this.#searchParams[prop].default) {
-            defaultStringValue = this.#stringifyParam(
-              this.#searchParams[prop].default,
-              prop as keyof T
-            )
-          }
+          // let defaultStringValue: string | undefined = undefined
+          // if (this.#searchParams[prop].default) {
+          //   defaultStringValue = this.#stringifyParam(
+          //     this.#searchParams[prop].default,
+          //     prop as keyof T
+          //   )
+          // }
 
           // Get current value from URL
           let currentValue: string | null = null
