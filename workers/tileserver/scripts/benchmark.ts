@@ -9,7 +9,7 @@ import { IntArrayRenderer } from '@allmaps/render/intarray'
 
 import { xyzTileToProjectedGeoBbox } from '../src/lib/geo.js'
 
-import * as wasmModule from '../../../packages/render-wasm/pkg-nodejs/allmaps_render_wasm.js'
+import * as wasmModule from '@allmaps/render-wasm'
 
 import type { Bbox, FetchFn, Point } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
