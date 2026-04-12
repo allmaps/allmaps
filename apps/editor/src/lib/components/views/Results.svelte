@@ -3,7 +3,7 @@
 
   import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl'
 
-  import { ProjectedGcpTransformer, lonLatProjection } from '@allmaps/project'
+  import { ProjectedGcpTransformer } from '@allmaps/project'
   import { computeBbox, combineBboxes } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 

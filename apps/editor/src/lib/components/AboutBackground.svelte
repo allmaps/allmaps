@@ -9,7 +9,7 @@
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getVarsState } from '$lib/state/vars.svelte.js'
 
-  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+  import { ProjectedGcpTransformer } from '@allmaps/project'
   import { validateGeoreferencedMap } from '@allmaps/annotation'
   import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
