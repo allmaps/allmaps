@@ -73,8 +73,7 @@ export const Canvas3Schema = z.object({
 
 export const SourceSchema = z.union([
   Source1Schema,
-  Source2Schema,
-  Canvas3Schema
+  z.discriminatedUnion('type', [Source2Schema, Canvas3Schema])
 ])
 
 export const TargetSchema = z.object({
@@ -105,7 +104,7 @@ export const AnnotationSchema = z.object({
   id: z.string().optional(),
   type: z.literal('Annotation'),
   '@context': ContextSchema.optional(),
-  motivation: z.string().default('georeferencing').optional(),
+  motivation: z.string().optional(),
   created: z.string().datetime().optional(),
   modified: z.string().datetime().optional(),
   target: TargetSchema,

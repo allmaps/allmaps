@@ -3,6 +3,7 @@
 
 import { z } from 'zod'
 import { TilesetSchema, SizeSchema } from './shared.js'
+import { filterValidItems } from './shared.js'
 
 // The following compliance levels URIs are valid in the IIIF Image API 2.1:
 //  - "http://iiif.io/api/image/2/level0.json"
@@ -53,22 +54,7 @@ function isValidImage2ProfileArrayItem(
 export const Image2ProfileSchema = z
   .union([
     Image2ProfileUri,
-    z.array(
-      z
-        .union([
-          ValidImage2ProfileArrayItemSchema,
-
-          // Catchall for incorrect profiles
-          z.unknown()
-        ])
-        .transform((val) => {
-          const { success, data } =
-            ValidImage2ProfileArrayItemSchema.safeParse(val)
-          if (success) {
-            return data
-          }
-        })
-    )
+    filterValidItems(ValidImage2ProfileArrayItemSchema)
   ])
   .transform((val): string | ValidImage2ProfileArray => {
     if (val && Array.isArray(val)) {
@@ -97,9 +83,7 @@ export const Image2Context = z.union([
 
 export const Image2Schema = z.object({
   '@id': z.string().url(),
-  '@type': z
-    .union([z.literal('iiif:Image'), z.literal('ImageService2')])
-    .optional(),
+  '@type': z.enum(['iiif:Image', 'ImageService2']).optional(),
   '@context': Image2Context,
   protocol: z.literal('http://iiif.io/api/image'),
   width: z.number().int(),

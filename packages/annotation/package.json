@@ -47,10 +47,9 @@
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "catalog:",
-    "vitest": "^4.0.4",
-    "zod-validation-error": "^3.4.0"
+    "vitest": "^4.0.4"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "catalog:"
   }
 }

@@ -64,8 +64,8 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
   let width: number | undefined
   let height: number | undefined
 
-  let partOf: PartOf
-  let provider: Provider
+  let partOf: PartOf | undefined
+  let provider: Provider | undefined
 
   if (isGeoreferencedMap2(georeferencedMap)) {
     if (georeferencedMap.resource.type === 'Canvas') {

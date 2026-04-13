@@ -50,6 +50,6 @@
     "vitest": "^4.0.4"
   },
   "dependencies": {
-    "zod": "^3.24.1"
+    "zod": "catalog:"
   }
 }
