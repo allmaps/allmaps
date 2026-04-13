@@ -45,18 +45,21 @@
     warpedMapLayer?.getBbox({ projection: options.projection })
   )
 
+  // svelte-ignore state_referenced_locally
+  const extraProjections = data.extraProjections
+
   const projections: Projection[] = [
     lonLatProjection,
     webMercatorProjection,
-    ...data.extraProjections
+    ...extraProjections
   ]
 
-  for (const projection of data.extraProjections) {
+  for (const projection of extraProjections) {
     proj4.defs(projection.id as string, projection.definition)
   }
   register(proj4)
   // Optional: register projections with warpedmaplayer to use existing projections instead of creating new ones from their definition
-  // warpedMapLayer.registerProjections(data.extraProjections)
+  // warpedMapLayer.registerProjections(extraProjections)
 
   onMount(async () => {
     annotation = await fetch(annotationUrl).then((response) => response.json())
