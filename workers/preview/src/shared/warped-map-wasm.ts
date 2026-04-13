@@ -6,7 +6,7 @@ import { WasmRenderer } from '@allmaps/render/wasm'
 import { bboxToPolygon } from '@allmaps/stdlib'
 import { findBestFrame } from '@allmaps/frame'
 
-import { cachedFetch } from './fetch.js'
+import { createCachedFetch } from './fetch.js'
 import { getAnnotationUrl } from './urls.js'
 
 import type { Env, QueryOptions, ResourceWithId } from './types.js'
@@ -21,6 +21,7 @@ export async function generateWarpedMapImage(
   size: Size,
   options: Partial<QueryOptions>
 ) {
+  const cachedFetch = createCachedFetch(env)
   // Use unified URL getter (supports maps, images, manifests)
   const annotationUrl = getAnnotationUrl(env, resourceWithId)
 
@@ -68,7 +69,7 @@ export async function generateWarpedMapImage(
     backgroundColor
   })
 
-  await renderer.addGeoreferenceAnnotation(annotation)
+  renderer.addGeoreferenceAnnotation(annotation)
 
   // Create viewport with full feature parity
   let viewport: Viewport

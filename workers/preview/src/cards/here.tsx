@@ -9,7 +9,7 @@ import { Image } from '@allmaps/iiif-parser'
 import { computeBbox } from '@allmaps/stdlib'
 import { pink } from '@allmaps/tailwind'
 
-import { cachedFetch } from '../shared/fetch.js'
+import { createCachedFetch } from '../shared/fetch.js'
 import { getLocalFont } from '../shared/fonts.js'
 import { loadImage } from '../shared/image.js'
 import { computeCrop, computeMaxSize } from '../shared/crop.js'
@@ -32,7 +32,10 @@ const pinSize = [182.4, 315]
 const pinShadowSize = [825, 260]
 const stampSize = [300.8, 147.4]
 
-async function getImageSource(imageUrl: string): Promise<string> {
+async function getImageSource(
+  cachedFetch: ReturnType<typeof createCachedFetch>,
+  imageUrl: string
+): Promise<string> {
   const imageResponse = await cachedFetch(imageUrl)
   if (!imageResponse.ok) {
     throw new Error('Failed to load IIIF Image')
@@ -45,6 +48,7 @@ async function getImageSource(imageUrl: string): Promise<string> {
 }
 
 async function renderTiledImage(
+  cachedFetch: ReturnType<typeof createCachedFetch>,
   parsedImage: Image,
   crop: Crop,
   tiles: ImageRequest[][],
@@ -74,7 +78,7 @@ async function renderTiledImage(
     const imageRow: string[] = []
     for (const tile of row) {
       const imageUrl = parsedImage.getImageUrl(tile)
-      const imageSource = await getImageSource(imageUrl)
+      const imageSource = await getImageSource(cachedFetch, imageUrl)
       imageRow.push(imageSource)
     }
     imageSources.push(imageRow)
@@ -120,6 +124,7 @@ export async function generateHereCard(
   size: Size,
   options: Partial<QueryOptions>
 ): Promise<ImageResponse> {
+  const cachedFetch = createCachedFetch(env)
   const color = options.color || tinycolor(pink).toRgb()
 
   const font = await getLocalFont(req, env, {
@@ -215,7 +220,7 @@ export async function generateHereCard(
       region: crop.region,
       size: maxSize
     })
-    imageSource = await getImageSource(imageUrl)
+    imageSource = await getImageSource(cachedFetch, imageUrl)
   } else {
     const { tileZoomLevels } = parsedImage
     const bestScaleFactor = crop.region.width / crop.size.width
@@ -322,7 +327,14 @@ export async function generateHereCard(
             style={{ position: 'absolute', top: 0, borderRadius: '16px' }}
           />
         ) : (
-          await renderTiledImage(parsedImage, crop, tiles, scaleFactor, scale)
+          await renderTiledImage(
+            cachedFetch,
+            parsedImage,
+            crop,
+            tiles,
+            scaleFactor,
+            scale
+          )
         )}
 
         <img

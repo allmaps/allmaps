@@ -4,14 +4,15 @@ import { encode as encodePng } from 'upng-js'
 
 import { Viewport } from '@allmaps/render'
 import { IntArrayRenderer } from '@allmaps/render/intarray'
+import { bboxToRectangle } from '@allmaps/stdlib'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
-import { cachedFetch } from './fetch.js'
+import { createCachedFetch } from './fetch.js'
 
-import type { Size, Bbox, FetchFn } from '@allmaps/types'
+import type { Size, Bbox } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { WorkerEnv } from '@allmaps/env/worker'
 import type { XYZTile, TransformationOptions, TileResolution } from './types.js'
-import { bboxToRectangle } from '@allmaps/stdlib'
 
 const TILE_WIDTH = 256
 
@@ -28,6 +29,7 @@ function getImageDataSize(decodedJpeg: UintArrRet): Size {
 }
 
 export async function createWarpedTileResponse(
+  env: WorkerEnv,
   georeferencedMaps: GeoreferencedMap[],
   options: TransformationOptions,
   { x, y, z }: XYZTile,
@@ -43,12 +45,14 @@ export async function createWarpedTileResponse(
     transformationType = options['transformation.type']
   }
 
+  const cachedFetch = createCachedFetch(env)
+
   const renderer = new IntArrayRenderer<UintArrRet>(
     getImageData,
     getImageDataValue,
     getImageDataSize,
     {
-      fetchFn: cachedFetch as FetchFn,
+      fetchFn: cachedFetch,
       createRTree: false,
       transformationType
     }
