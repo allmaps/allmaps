@@ -7,7 +7,7 @@ import {
   mergeOptions,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { isEqualProjection } from '@allmaps/project'
+import { isEqualProjection, webMercatorProjection } from '@allmaps/project'
 
 import { TileCache } from '../tilecache/TileCache.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'
@@ -555,14 +555,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // assumes the viewport and warpedMapList are in the same projection.
     // This is what assureProjection() takes care of, but is worth noting here.
     // (It's also why we don't need to pass a projection in the lookup function)
-    const geoProjectedBufferedViewportRectangleBbox = computeBbox(
+    const projectedGeoBufferedViewportRectangleBbox = computeBbox(
       this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
     )
 
     const mapsInViewport = new Set(
       Array.from(
         this.warpedMapList.getWarpedMaps({
-          projectedGeoBbox: geoProjectedBufferedViewportRectangleBbox,
+          projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
           applyMask: false
         })
       )
@@ -631,14 +631,16 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Transforming the viewport back to resource
     const transformerOptions = {
-      maxDepth: 0,
-      // maxDepth: 2,
-      // minOffsetRatio: 0.00001,
-      sourceIsGeographic: false,
-      destinationIsGeographic: true
+      maxDepth: isEqualProjection(
+        warpedMap.internalProjection,
+        webMercatorProjection
+      )
+        ? 0
+        : 2,
+      minOffsetRatio: 0.00001
     }
     // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
-    // TODO: Consider recusive refinement via options like {minOffsetRatio: 0.00001, maxDepth: 2}
+    // If an internal projection is present, some refinement is needed.
     // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
     const projectedGeoBufferedViewportRectangle =
       viewport.getProjectedGeoBufferedRectangle(
