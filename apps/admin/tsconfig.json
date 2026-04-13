@@ -1,0 +1,19 @@
+{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "rewriteRelativeImportExtensions": true,
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "bundler"
+  },
+  "references": [
+    { "path": "../../packages/tailwind" },
+    { "path": "../../packages/env" }
+  ]
+}
