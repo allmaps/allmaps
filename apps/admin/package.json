@@ -1,0 +1,49 @@
+{
+  "name": "@allmaps/admin",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --mode localhost",
+    "build": "vite build",
+    "preview": "wrangler dev .svelte-kit/cloudflare/_worker.js --port 4173",
+    "prepare": "pnpm run types && svelte-kit sync || echo ''",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --ignore-path ../../.gitignore --write .",
+    "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
+    "types": "wrangler types"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.4.0",
+    "@eslint/js": "^9.39.1",
+    "@sveltejs/adapter-cloudflare": "^7.2.4",
+    "@sveltejs/kit": "^2.49.1",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/node": "catalog:",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.13.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-svelte": "^3.4.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "svelte": "^5.45.6",
+    "svelte-check": "^4.3.4",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1",
+    "vite": "catalog:",
+    "vite-plugin-devtools-json": "^1.0.0",
+    "wrangler": "catalog:"
+  },
+  "dependencies": {
+    "@allmaps/components": "workspace:^",
+    "@allmaps/ui": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/env": "workspace:^",
+    "better-auth": "catalog:",
+    "bits-ui": "^2.15.4"
+  }
+}
