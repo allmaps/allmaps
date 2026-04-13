@@ -90,7 +90,7 @@
   <div class="sticky top-0 z-50 bg-white">
     <Header appName="Admin">
       <div class="flex items-center justify-between w-full gap-3">
-        <div class="flex items-center gap-1 font-sans text-sm">
+        <div class="flex items-center gap-3 font-sans text-sm">
           {#each crumbs as crumb, i (crumb.href)}
             <span class="text-gray-300 select-none">/</span>
             {#if i < crumbs.length - 1}
