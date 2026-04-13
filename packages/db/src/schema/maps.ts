@@ -16,7 +16,8 @@ import { eq, sql, defineRelationsPart, type SQL } from 'drizzle-orm'
 
 import { createTimestamp } from '../shared.js'
 
-import { images } from './iiif.js'
+import { images, canvases, canvasesToImages } from './iiif.js'
+import { organizationUrls } from './organizations.js'
 
 import type { DbMap } from '../types.js'
 
@@ -90,7 +91,10 @@ export const maps = pgTable(
     }),
     // TODO: improve indexes
     index().on(table.checksum),
-    index().on(table.imageId),
+    index('maps_image_id_idx').on(table.imageId),
+    index('maps_latest_image_id_idx')
+      .on(table.imageId)
+      .where(sql`${table.latest} = true`),
     index().on(table.latest),
     index().on(table.updatedAt),
     index().using('GIST', table.geoMask)
@@ -103,11 +107,31 @@ export const mapsLatest = pgView('maps_latest').as((qb) =>
   qb.select().from(maps).where(eq(maps.latest, true))
 )
 
-export const mapsRelationsPart = defineRelationsPart({ maps, images }, (r) => ({
-  maps: {
-    image: r.one.images({
-      from: r.maps.imageId,
-      to: r.images.id
-    })
-  }
-}))
+export const mapsRelationsPart = defineRelationsPart(
+  { maps, images, canvases, canvasesToImages, organizationUrls },
+  (r) => ({
+    maps: {
+      image: r.one.images({
+        from: r.maps.imageId,
+        to: r.images.id
+      })
+    },
+    images: {
+      maps: r.many.maps({
+        from: r.images.id,
+        to: r.maps.imageId
+      }),
+      canvases: r.many.canvases({
+        from: r.images.id.through(r.canvasesToImages.imageId),
+        to: r.canvases.id.through(r.canvasesToImages.canvasId)
+      }),
+      organizationUrl: r.one.organizationUrls({
+        from: r.images.domain,
+        to: r.organizationUrls.url,
+        where: {
+          type: 'domain'
+        }
+      })
+    }
+  })
+)

@@ -48,8 +48,12 @@ export const schema = {
 
 export const relations = {
   ...authRelations,
-  ...organizationsRelationsPart,
+  organizations: {
+    ...authRelations.organizations,
+    ...organizationsRelationsPart.organizations
+  },
   ...iiifRelationsPart,
   ...listsRelationsPart,
-  ...mapsRelationsPart
+  ...mapsRelationsPart,
+  organizationUrls: organizationsRelationsPart.organizationUrls
 }
