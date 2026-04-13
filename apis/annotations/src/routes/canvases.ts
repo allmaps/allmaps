@@ -16,7 +16,7 @@ export const canvases = createElysia({ name: 'canvases' }).get(
   {
     params: t.Object({ canvasId: t.String() }),
     detail: {
-      summary: 'Get annotations for a canvas',
+      summary: 'Get Georeference Annotations for a single IIIF Canvas',
       tags: ['Canvases']
     }
   }

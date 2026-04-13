@@ -6,8 +6,9 @@ import {
   queryList,
   queryListGeoreferenceAnnotations
 } from '@allmaps/api-shared/db'
-import type { BetterAuthContext } from '@allmaps/db/auth'
 import { createAuth } from '@allmaps/db/auth'
+
+import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia } from '../elysia.js'
@@ -40,7 +41,7 @@ async function assertCanAccessUserLists(
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
-export function createLists(
+export function createListsRoutes(
   env: AnnotationsEnv,
   betterAuth: BetterAuthContext = createAuth(env)
 ) {
@@ -67,7 +68,7 @@ export function createLists(
           username: t.String()
         }),
         detail: {
-          summary: 'List a users lists',
+          summary: 'Get all lists for a single user',
           tags: ['Lists']
         }
       }
@@ -94,7 +95,7 @@ export function createLists(
           listId: t.String()
         }),
         detail: {
-          summary: 'Get annotations for a list',
+          summary: 'Get a single list',
           tags: ['Lists']
         }
       }
@@ -121,7 +122,7 @@ export function createLists(
           listId: t.String()
         }),
         detail: {
-          summary: 'Get canonical georeference annotations for a list',
+          summary: 'Get a single list as a Georeference Annotation',
           tags: ['Lists']
         }
       }

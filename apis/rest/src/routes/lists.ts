@@ -12,7 +12,7 @@ import {
 } from '@allmaps/api-shared/db'
 
 import { createElysia } from '../elysia.js'
-import type { createBetterAuthRoutes } from './auth.js'
+import type { createBetterAuthPlugin } from '../elysia.js'
 
 function getUserId(user: unknown): string {
   if (
@@ -27,8 +27,8 @@ function getUserId(user: unknown): string {
   return user.id
 }
 
-export function createLists(
-  betterAuthPlugin: ReturnType<typeof createBetterAuthRoutes>
+export function createListsRoutes(
+  betterAuthPlugin: ReturnType<typeof createBetterAuthPlugin>
 ) {
   return createElysia({ name: 'lists' })
     .use(betterAuthPlugin)

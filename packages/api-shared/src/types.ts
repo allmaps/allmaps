@@ -18,6 +18,8 @@ export type MapsQueryParams = {
   manifestDomain: string
   imageChecksum: string
   checksum: string
+  organizationSlug: string
+  organizationAssociation: 'any' | 'image' | 'canvas' | 'manifest'
   intersectsWith: IntersectsWith
   containedBy: ContainedBy
   limit: number

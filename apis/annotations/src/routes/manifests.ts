@@ -16,7 +16,7 @@ export const manifests = createElysia({ name: 'manifests' }).get(
   {
     params: t.Object({ manifestId: t.String() }),
     detail: {
-      summary: 'Get annotations for a manifest',
+      summary: 'Get Georeference Annotations for a single IIIF Manifest',
       tags: ['Manifests']
     }
   }

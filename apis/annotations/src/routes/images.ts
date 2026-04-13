@@ -30,7 +30,8 @@ export const images = createElysia({ name: 'images' }).get(
   {
     params: imageRoute.params,
     detail: {
-      summary: 'Get annotations for an image (with optional version)',
+      summary:
+        'Get Georeference Annotations for a single IIIF Image (with optional version)',
       tags: ['Images']
     }
   }

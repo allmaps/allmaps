@@ -310,46 +310,64 @@ export async function queryListWithItems(
   userId: string,
   listId: string
 ) {
-  const list = await queryUserList(db, userId, listId)
-
-  if (!list) {
-    return
-  }
-
-  const items = await db.query.listItems.findMany({
+  const list = await db.query.lists.findFirst({
     columns: {
-      listId: true,
-      mapId: true,
-      mapImageId: true,
-      mapChecksum: true,
-      mapVersion: true,
-      imageId: true,
-      canvasId: true,
-      manifestId: true,
-      createdAt: true
+      id: true,
+      userId: true,
+      name: true,
+      deletable: true,
+      createdAt: true,
+      updatedAt: true
     },
     where: {
-      listId: {
+      id: {
         eq: listId
+      },
+      userId: {
+        eq: userId
       }
     },
     with: {
-      canvas: {
+      listItems: {
         columns: {
-          label: true
-        }
-      },
-      manifest: {
-        columns: {
-          label: true
+          listId: true,
+          mapId: true,
+          mapImageId: true,
+          mapChecksum: true,
+          mapVersion: true,
+          imageId: true,
+          canvasId: true,
+          manifestId: true,
+          createdAt: true
+        },
+        with: {
+          canvas: {
+            columns: {
+              label: true
+            }
+          },
+          manifest: {
+            columns: {
+              label: true
+            }
+          }
         }
       }
     }
   })
 
+  if (!list) {
+    return
+  }
+
   return {
-    ...list,
-    items: items.map((item) => ({
+    id: list.id,
+    userId: list.userId,
+    name: list.name,
+    deletable: list.deletable,
+    createdAt: list.createdAt,
+    updatedAt: list.updatedAt,
+    items: list.listItems.map((item) => ({
       listId: item.listId,
       mapId: item.mapId,
       mapImageId: item.mapImageId,

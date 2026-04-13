@@ -1,25 +1,15 @@
 import {
   RegExpRoute,
-  createElysia as createBaseElysia,
-  createBetterAuthPlugin as createBaseBetterAuthPlugin,
+  createTypedElysiaHelpers,
   error,
   handleApiError,
   redirect
 } from '@allmaps/api-shared/elysia'
 
-import type { ElysiaConfig } from 'elysia'
-import type { BetterAuthContext } from '@allmaps/db/auth'
-
 import type { RestEnv } from '@allmaps/env/rest'
 
-export function createElysia<const BasePath extends string = ''>(
-  config?: ElysiaConfig<BasePath>
-) {
-  return createBaseElysia<RestEnv, BasePath>(config)
-}
+const { createElysia, createBetterAuthPlugin, createBetterAuthRoutes } =
+  createTypedElysiaHelpers<RestEnv>()
 
-export function createBetterAuthPlugin(betterAuth: BetterAuthContext) {
-  return createBaseBetterAuthPlugin<RestEnv>(betterAuth)
-}
-
+export { createElysia, createBetterAuthPlugin, createBetterAuthRoutes }
 export { RegExpRoute, error, handleApiError, redirect }

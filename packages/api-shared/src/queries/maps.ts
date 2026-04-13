@@ -205,6 +205,15 @@ export async function queryMaps(
         domain: {
           eq: params.imageServiceDomain
         },
+        organizationUrl: params.organizationSlug
+          ? {
+              organization: {
+                slug: {
+                  eq: params.organizationSlug
+                }
+              }
+            }
+          : undefined,
         canvases:
           params.canvasId || params.manifestId || params.manifestDomain
             ? {

@@ -1,6 +1,8 @@
 export {
   queryImage,
-  queryManifest,
+  queryImages,
+  queryCanvases,
+  queryManifests,
   createImage,
   createManifest
 } from './queries/iiif.js'
@@ -27,24 +29,31 @@ export {
 } from './queries/lists.js'
 
 export {
-  queryAdminOrganizations,
+  fromDbUser,
+  queryAdminOrganizationById,
   queryUserOrganizationsWithRoles,
-  queryAllUserOrganizations,
-  queryAllOrganizationMembers,
-  queryOrganizationBySlug,
+  queryUserWithOrganizationsById,
+  queryAllOrganizationUsers,
+  queryOrganizationMemberByUserId,
+  queryOrganizationMembersById,
+  queryUserById,
   queryUserByEmail,
-  queryUsers,
-  queryUserBySlug
+  queryUsers
 } from './queries/auth.js'
 
 export {
+  normalizeOrganizationSlug,
   normalizeDomain,
   normalizeDomains,
-  formatOrganization,
+  fromDbOrganization,
+  fromDbOrganizationWithUsers,
   queryOrganizationUrls,
   replaceOrganizationUrls,
   listOrganizations,
-  queryOrganizationByIdOrSlug,
+  listOrganizationsWithUsers,
+  queryOrganizationById,
+  queryOrganizationByIdWithUsers,
+  queryOrganizationBySlug,
   createOrganization,
   updateOrganization,
   deleteOrganization
