@@ -3,6 +3,7 @@
   import { page } from '$app/state'
 
   import { getOrganizationId } from '$lib/organizations.js'
+  import { usersListPageState } from '$lib/list-state.svelte.js'
 
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
@@ -39,15 +40,23 @@
 
   const PAGE_SIZE = 20
 
-  let searchValue = $state('')
-  let searchField = $state('email')
-  let offset = $state(0)
+  let searchValue = $state(usersListPageState.searchValue)
+  let searchField = $state(usersListPageState.searchField)
+  let offset = $state(usersListPageState.offset)
   let allUsers = $state<User[]>([])
   let loading = $state(false)
   let error = $state<string | null>(null)
 
-  let sortBy = $state<'name' | 'email' | 'createdAt'>('createdAt')
-  let sortDir = $state<'asc' | 'desc'>('desc')
+  let sortBy = $state<'name' | 'email' | 'createdAt'>(usersListPageState.sortBy)
+  let sortDir = $state<'asc' | 'desc'>(usersListPageState.sortDir)
+
+  $effect(() => {
+    usersListPageState.searchValue = searchValue
+    usersListPageState.searchField = searchField
+    usersListPageState.offset = offset
+    usersListPageState.sortBy = sortBy
+    usersListPageState.sortDir = sortDir
+  })
 
   let isFiltering = $derived(searchValue.length > 0)
 
@@ -125,7 +134,7 @@
 
   function search(value: string, field: string) {
     searchValue = value
-    searchField = field
+    searchField = field === 'name' ? 'name' : 'email'
     offset = 0
   }
 

@@ -3,19 +3,29 @@
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
   import { getOrganizationId } from '$lib/organizations.js'
+  import { organizationsListPageState } from '$lib/list-state.svelte.js'
 
   import type { Organization } from '$lib/types.js'
 
   import type { PageProps } from './$types'
   let { data }: PageProps = $props()
 
-  let searchValue = $state('')
-  let searchField = $state('name')
+  let searchValue = $state(organizationsListPageState.searchValue)
+  let searchField = $state(organizationsListPageState.searchField)
 
-  let sortBy = $state<'name' | 'slug' | 'plan' | 'createdAt'>('name')
-  let sortDir = $state<'asc' | 'desc'>('asc')
+  let sortBy = $state<'name' | 'slug' | 'plan' | 'createdAt'>(
+    organizationsListPageState.sortBy
+  )
+  let sortDir = $state<'asc' | 'desc'>(organizationsListPageState.sortDir)
 
   const planOrder: Record<string, number> = { supporter: 1, innovator: 2 }
+
+  $effect(() => {
+    organizationsListPageState.searchValue = searchValue
+    organizationsListPageState.searchField = searchField
+    organizationsListPageState.sortBy = sortBy
+    organizationsListPageState.sortDir = sortDir
+  })
 
   function sort(col: typeof sortBy) {
     if (sortBy === col) {
@@ -28,7 +38,7 @@
 
   function search(value: string, field: string) {
     searchValue = value
-    searchField = field
+    searchField = field === 'slug' ? 'slug' : 'name'
   }
 
   function matchesSearch(organization: Organization) {
@@ -125,10 +135,10 @@
         >{@render sortBtn('name', 'Name')}</th
       >
       <th class="px-3 py-2 @lg:px-4 text-left"
-        >{@render sortBtn('slug', 'Slug')}</th
+        >{@render sortBtn('plan', 'Plan')}</th
       >
       <th class="px-3 py-2 @lg:px-4 text-left"
-        >{@render sortBtn('plan', 'Plan')}</th
+        >{@render sortBtn('slug', 'Slug')}</th
       >
       <th class="px-3 py-2 @lg:px-4 text-left">
         <span
@@ -159,11 +169,6 @@
                 {organization.name}
               </a>
             </td>
-            <td
-              class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap font-sans text-sm text-gray-500"
-            >
-              {organization.slug}
-            </td>
             <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
               {#if organization.plan === 'supporter'}
                 <span
@@ -180,6 +185,11 @@
               {:else}
                 <span class="font-sans text-xs text-gray-300">—</span>
               {/if}
+            </td>
+            <td
+              class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap font-sans text-sm text-gray-500"
+            >
+              {organization.slug}
             </td>
             <td class="px-3 py-2 @lg:px-4 @lg:py-3">
               <div class="flex flex-wrap gap-1">
