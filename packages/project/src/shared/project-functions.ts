@@ -23,6 +23,8 @@ const DEFAULT_PROJECTION_DEFINITION_OPTIONS: ProjectionDefinitionOptions = {
 const lonLatEpsgDefinition = 'EPSG:4326'
 const lonLatProj4StringDefinition =
   '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'
+const webMercatorOpenLayersProj4StringDefinition =
+  '+title=WGS 84 / Pseudo-Mercator +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs'
 const lonLatWktDefinition =
   'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
 const lonLatWkt2Definition =
@@ -30,6 +32,7 @@ const lonLatWkt2Definition =
 const lonLatEquivalentDefinitions = [
   lonLatProj4StringDefinition + ' +over',
   lonLatProj4StringDefinition,
+  webMercatorOpenLayersProj4StringDefinition,
   lonLatEpsgDefinition,
   lonLatWktDefinition,
   lonLatWkt2Definition,
