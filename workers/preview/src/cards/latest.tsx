@@ -15,7 +15,7 @@ import {
 
 import { validateGeoreferencedMap } from '@allmaps/annotation'
 
-import { cachedFetch } from '../shared/fetch.js'
+import { createCachedFetch } from '../shared/fetch.js'
 import { getTransformedPolygon, geometryToPath } from '../shared/geometry.js'
 import { shuffleArray } from '../shared/arrays.js'
 
@@ -60,6 +60,7 @@ export async function generateLatestCard(
   size: Size
 ): Promise<ImageResponse> {
   try {
+    const cachedFetch = createCachedFetch(env)
     const url = `${env.PUBLIC_REST_BASE_URL}/maps?limit=${mapCount}`
     const apiMaps = await cachedFetch(url).then((response) => response.json())
 

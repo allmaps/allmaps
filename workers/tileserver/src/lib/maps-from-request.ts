@@ -1,7 +1,7 @@
 import { validateGeoreferencedMap, parseAnnotation } from '@allmaps/annotation'
 import { StatusError } from 'itty-router'
 
-import { cachedFetch } from './fetch.js'
+import { createCachedFetch } from './fetch.js'
 
 import type { IRequest } from 'itty-router'
 
@@ -16,6 +16,7 @@ export async function mapsFromParams(
   env: WorkerEnv,
   req: IRequest
 ): Promise<GeoreferencedMap[]> {
+  const cachedFetch = createCachedFetch(env)
   const params = req.params
 
   const mapId = params?.mapId
@@ -67,8 +68,10 @@ export async function mapsFromParams(
 }
 
 export async function mapsFromQuery(
+  env: WorkerEnv,
   req: IRequest
 ): Promise<GeoreferencedMap[]> {
+  const cachedFetch = createCachedFetch(env)
   const query = req.query
 
   const url = parseQueryString(query.url)

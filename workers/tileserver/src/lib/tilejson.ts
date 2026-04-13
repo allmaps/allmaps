@@ -1,16 +1,16 @@
 import { json } from 'itty-router'
 import { WarpedMapList } from '@allmaps/render'
 
-import { cachedFetch } from './fetch.js'
+import { createCachedFetch } from './fetch.js'
 
 import type { TransformationOptions } from './types.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-
-import type { FetchFn } from '@allmaps/types'
+import type { WorkerEnv } from '@allmaps/env/worker'
 
 // See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
 export async function generateTileJsonResponse(
+  env: WorkerEnv,
   georeferencedMaps: GeoreferencedMap[],
   options: TransformationOptions,
   urlTemplate: string
@@ -21,8 +21,10 @@ export async function generateTileJsonResponse(
     transformationType = options['transformation.type']
   }
 
+  const cachedFetch = createCachedFetch(env)
+
   const warpedMapList = new WarpedMapList({
-    fetchFn: cachedFetch as FetchFn,
+    fetchFn: cachedFetch,
     createRTree: false,
     transformationType
   })

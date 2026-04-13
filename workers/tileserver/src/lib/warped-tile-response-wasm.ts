@@ -2,14 +2,15 @@ import { png, webp } from 'itty-router'
 
 import { Viewport } from '@allmaps/render'
 import { WasmRenderer, type OutputFormat } from '@allmaps/render/wasm'
+import { bboxToRectangle } from '@allmaps/stdlib'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
-import { cachedFetch } from './fetch.js'
+import { createCachedFetch } from './fetch.js'
 
-import type { Bbox, FetchFn } from '@allmaps/types'
+import type { Bbox } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { WorkerEnv } from '@allmaps/env/worker'
 import type { XYZTile, TransformationOptions, TileResolution } from './types.js'
-import { bboxToRectangle } from '@allmaps/stdlib'
 
 // Import WASM initialization and module for Cloudflare Workers
 import wasmInit, * as wasmModule from '@allmaps/render-wasm'
@@ -24,6 +25,7 @@ await wasmInit({ module_or_path: wasmFile })
 const TILE_WIDTH = 256
 
 export async function createWarpedTileResponseWasm(
+  env: WorkerEnv,
   georeferencedMaps: GeoreferencedMap[],
   options: TransformationOptions,
   { x, y, z }: XYZTile,
@@ -40,8 +42,10 @@ export async function createWarpedTileResponseWasm(
     transformationType = options['transformation.type']
   }
 
+  const cachedFetch = createCachedFetch(env)
+
   const renderer = new WasmRenderer(wasmModule, {
-    fetchFn: cachedFetch as FetchFn,
+    fetchFn: cachedFetch,
     createRTree: false,
     transformationType,
     outputFormat: format
