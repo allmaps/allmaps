@@ -6,11 +6,165 @@ import { Manifest, Image } from '@allmaps/iiif-parser'
 
 import { schema } from '@allmaps/db/schema'
 
-import { ResponseError } from '@allmaps/api-shared'
+import { ResponseError, clampLimit } from '@allmaps/api-shared'
 
+import type { LanguageString } from '@allmaps/iiif-parser'
 import type { Db } from '@allmaps/db'
 
-export async function queryImage(db: Db, imageId: string) {
+type DbManifest = {
+  id: string
+  uri: string
+  createdAt: Date
+  updatedAt: Date
+  label: LanguageString | null
+  fetched: boolean
+  organizationUrl: {
+    organization: {
+      id: string
+    } | null
+  } | null
+  canvases: {
+    id: string
+    uri: string
+    images: {
+      id: string
+      uri: string
+      maps: {
+        id: string
+      }[]
+    }[]
+  }[]
+}
+
+type DbCanvas = {
+  id: string
+  uri: string
+  label: LanguageString | null
+  width: number
+  height: number
+  updatedAt: Date
+  createdAt: Date
+  organizationUrl: {
+    organization: {
+      id: string
+    } | null
+  } | null
+  images: {
+    id: string
+    uri: string
+    maps: {
+      id: string
+    }[]
+  }[]
+  manifests: {
+    id: string
+    uri: string
+    label: LanguageString | null
+  }[]
+}
+
+type DbImage = {
+  id: string
+  uri: string
+  width: number | null
+  height: number | null
+  embedded: boolean
+  updatedAt: Date
+  createdAt: Date
+  fetched: boolean
+  organizationUrl: {
+    organization: {
+      id: string
+    } | null
+  } | null
+  maps: {
+    id: string
+  }[]
+  canvases: {
+    id: string
+    uri: string
+    label: LanguageString | null
+    manifests: {
+      id: string
+      uri: string
+      label: LanguageString | null
+    }[]
+  }[]
+}
+
+function fromDbManifest(restBaseUrl: string, dbManifest: DbManifest) {
+  return {
+    ...dbManifest,
+    organization: dbManifest.organizationUrl?.organization
+      ? {
+          id: `${restBaseUrl}/organizations/${dbManifest.organizationUrl.organization.id}`
+        }
+      : undefined,
+    canvases: dbManifest.canvases.map((canvas) => ({
+      ...canvas,
+      id: `${restBaseUrl}/canvases/${canvas.id}`,
+      images: canvas.images.map((image) => ({
+        ...image,
+        id: `${restBaseUrl}/images/${image.id}`,
+        maps: image.maps.map((map) => ({
+          id: `${restBaseUrl}/maps/${map.id}`
+        }))
+      }))
+    })),
+    organizationUrl: undefined,
+    id: `${restBaseUrl}/manifests/${dbManifest.id}`
+  }
+}
+
+function fromDbImage(restBaseUrl: string, dbImage: DbImage) {
+  return {
+    ...dbImage,
+    organization: dbImage.organizationUrl?.organization
+      ? {
+          id: `${restBaseUrl}/organizations/${dbImage.organizationUrl.organization.id}`
+        }
+      : undefined,
+    id: `${restBaseUrl}/images/${dbImage.id}`,
+    maps: dbImage.maps.map((map) => ({
+      id: `${restBaseUrl}/maps/${map.id}`
+    })),
+    canvases: dbImage.canvases.map((canvas) => ({
+      ...canvas,
+      id: `${restBaseUrl}/canvases/${canvas.id}`,
+      manifests: canvas.manifests.map((manifest) => ({
+        ...manifest,
+        id: `${restBaseUrl}/manifests/${manifest.id}`
+      }))
+    })),
+    organizationUrl: undefined
+  }
+}
+
+function fromDbCanvas(restBaseUrl: string, dbCanvas: DbCanvas) {
+  return {
+    ...dbCanvas,
+    organization: dbCanvas.organizationUrl?.organization
+      ? {
+          id: `${restBaseUrl}/organizations/${dbCanvas.organizationUrl.organization.id}`
+        }
+      : undefined,
+    id: `${restBaseUrl}/canvases/${dbCanvas.id}`,
+    images: dbCanvas.images.map((image) => ({
+      ...image,
+      id: `${restBaseUrl}/images/${image.id}`,
+      maps: image.maps.map((map) => ({
+        id: `${restBaseUrl}/maps/${map.id}`
+      }))
+    })),
+    manifests: dbCanvas.manifests.map((manifest) => ({
+      ...manifest,
+      id: `${restBaseUrl}/manifests/${manifest.id}`
+    })),
+    organizationUrl: undefined
+  }
+}
+
+export async function queryImage(restBaseUrl: string, db: Db, imageId: string) {
   const image = await db.query.images.findFirst({
     columns: {
       id: true,
@@ -27,6 +181,24 @@ export async function queryImage(db: Db, imageId: string) {
     },
     where: { id: imageId },
     with: {
+      organizationUrl: {
+        columns: {},
+        with: {
+          organization: {
+            columns: {
+              id: true
+            }
+          }
+        }
+      },
+      maps: {
+        columns: {
+          id: true
+        },
+        where: {
+          latest: true
+        }
+      },
       canvases: {
         columns: {
           id: true,
@@ -47,18 +219,269 @@ export async function queryImage(db: Db, imageId: string) {
   })
 
   if (image) {
-    return image
+    return fromDbImage(restBaseUrl, image)
   } else {
     const message = `Image not found: ${imageId}`
     throw new ResponseError(message, 404)
   }
 }
 
-export async function queryManifest(db: Db, manifestId: string) {
-  const manifest = await db.query.manifests.findFirst({
+export async function queryImages(
+  restBaseUrl: string,
+  db: Db,
+  params: {
+    imageId?: string
+    organizationId?: string
+    georeferenced?: boolean
+    limit?: number
+    randomImageId?: string
+    randomImageIdOp?: 'gt' | 'lte'
+  },
+  responseOptions: {
+    expectRows: boolean
+    singular: boolean
+  } = { expectRows: false, singular: false }
+) {
+  const rows = await db.query.images.findMany({
     columns: {
       id: true,
       uri: true,
+      width: true,
+      height: true,
+      embedded: true,
+      updatedAt: true,
+      createdAt: true
+    },
+    extras: {
+      fetched: (images, { sql }) =>
+        sql<boolean>`${images.data} IS NOT NULL`.as('fetched')
+    },
+    where: {
+      id: {
+        eq: params.imageId,
+        ...(params.randomImageIdOp === 'gt'
+          ? { gt: params.randomImageId }
+          : params.randomImageIdOp === 'lte'
+            ? { lte: params.randomImageId }
+            : {})
+      },
+      ...(params.georeferenced !== undefined
+        ? params.georeferenced
+          ? {
+              maps: {
+                latest: true
+              }
+            }
+          : {
+              NOT: {
+                maps: {
+                  latest: true
+                }
+              }
+            }
+        : {}),
+      organizationUrl: params.organizationId
+        ? {
+            organizationId: {
+              eq: params.organizationId
+            }
+          }
+        : undefined
+    },
+    with: {
+      organizationUrl: {
+        columns: {},
+        with: {
+          organization: {
+            columns: {
+              id: true
+            }
+          }
+        }
+      },
+      maps: {
+        columns: {
+          id: true
+        },
+        where: {
+          latest: true
+        }
+      },
+      canvases: {
+        columns: {
+          id: true,
+          uri: true,
+          label: true
+        },
+        with: {
+          manifests: {
+            columns: {
+              id: true,
+              uri: true,
+              label: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: params.randomImageId
+      ? (images, { asc, desc }) =>
+          params.randomImageIdOp === 'gt' ? asc(images.id) : desc(images.id)
+      : undefined,
+    limit: responseOptions.singular ? 1 : clampLimit(params.limit ?? 100)
+  })
+
+  if (responseOptions.expectRows && rows.length === 0) {
+    const message = params.imageId
+      ? `Image not found: ${params.imageId}`
+      : 'Images not found'
+    throw new ResponseError(message, 404)
+  }
+
+  const apiImages = rows.map((image) => fromDbImage(restBaseUrl, image))
+  return responseOptions.singular ? apiImages[0] : apiImages
+}
+
+export async function queryCanvases(
+  restBaseUrl: string,
+  db: Db,
+  params: {
+    canvasId?: string
+    organizationId?: string
+    georeferenced?: boolean
+    limit?: number
+    randomCanvasId?: string
+    randomCanvasIdOp?: 'gt' | 'lte'
+  },
+  responseOptions: {
+    expectRows: boolean
+    singular: boolean
+  } = { expectRows: false, singular: false }
+) {
+  const rows = await db.query.canvases.findMany({
+    columns: {
+      id: true,
+      uri: true,
+      label: true,
+      width: true,
+      height: true,
+      updatedAt: true,
+      createdAt: true
+    },
+    where: {
+      id: {
+        eq: params.canvasId,
+        ...(params.randomCanvasIdOp === 'gt'
+          ? { gt: params.randomCanvasId }
+          : params.randomCanvasIdOp === 'lte'
+            ? { lte: params.randomCanvasId }
+            : {})
+      },
+      ...(params.georeferenced !== undefined
+        ? params.georeferenced
+          ? {
+              images: {
+                maps: {
+                  latest: true
+                }
+              }
+            }
+          : {
+              NOT: {
+                images: {
+                  maps: {
+                    latest: true
+                  }
+                }
+              }
+            }
+        : {}),
+      images: params.organizationId
+        ? {
+            organizationUrl: {
+              organizationId: {
+                eq: params.organizationId
+              }
+            }
+          }
+        : undefined
+    },
+    with: {
+      organizationUrl: {
+        columns: {},
+        with: {
+          organization: {
+            columns: {
+              id: true
+            }
+          }
+        }
+      },
+      images: {
+        columns: {
+          id: true,
+          uri: true
+        },
+        with: {
+          maps: {
+            columns: {
+              id: true
+            },
+            where: {
+              latest: true
+            }
+          }
+        }
+      },
+      manifests: {
+        columns: {
+          id: true,
+          uri: true,
+          label: true
+        }
+      }
+    },
+    orderBy: params.randomCanvasId
+      ? (canvases, { asc, desc }) =>
+          params.randomCanvasIdOp === 'gt'
+            ? asc(canvases.id)
+            : desc(canvases.id)
+      : undefined,
+    limit: responseOptions.singular ? 1 : clampLimit(params.limit ?? 100)
+  })
+
+  if (responseOptions.expectRows && rows.length === 0) {
+    const message = params.canvasId
+      ? `Canvas not found: ${params.canvasId}`
+      : 'Canvases not found'
+    throw new ResponseError(message, 404)
+  }
+
+  const apiCanvases = rows.map((c) => fromDbCanvas(restBaseUrl, c))
+  return responseOptions.singular ? apiCanvases[0] : apiCanvases
+}
+
+export async function queryManifests(
+  restBaseUrl: string,
+  db: Db,
+  params: {
+    manifestId?: string
+    organizationId?: string
+    georeferenced?: boolean
+    limit?: number
+    randomManifestId?: string
+    randomManifestIdOp?: 'gt' | 'lte'
+  },
+  responseOptions: {
+    expectRows: boolean
+    singular: boolean
+  } = { expectRows: false, singular: false }
+) {
+  const rows = await db.query.manifests.findMany({
+    columns: {
+      id: true,
+      uri: true,
+      label: true,
       updatedAt: true,
       createdAt: true
     },
@@ -66,15 +489,100 @@ export async function queryManifest(db: Db, manifestId: string) {
       fetched: (manifests, { sql }) =>
         sql<boolean>`${manifests.data} IS NOT NULL`.as('fetched')
     },
-    where: { id: manifestId }
+    where: {
+      id: {
+        eq: params.manifestId,
+        ...(params.randomManifestIdOp === 'gt'
+          ? { gt: params.randomManifestId }
+          : params.randomManifestIdOp === 'lte'
+            ? { lte: params.randomManifestId }
+            : {})
+      },
+      ...(params.georeferenced !== undefined
+        ? params.georeferenced
+          ? {
+              canvases: {
+                images: {
+                  maps: {
+                    latest: true
+                  }
+                }
+              }
+            }
+          : {
+              NOT: {
+                canvases: {
+                  images: {
+                    maps: {
+                      latest: true
+                    }
+                  }
+                }
+              }
+            }
+        : {}),
+      organizationUrl: params.organizationId
+        ? {
+            organizationId: {
+              eq: params.organizationId
+            }
+          }
+        : undefined
+    },
+    with: {
+      organizationUrl: {
+        columns: {},
+        with: {
+          organization: {
+            columns: {
+              id: true
+            }
+          }
+        }
+      },
+      canvases: {
+        columns: {
+          id: true,
+          uri: true
+        },
+        with: {
+          images: {
+            columns: {
+              id: true,
+              uri: true
+            },
+            with: {
+              maps: {
+                columns: {
+                  id: true
+                },
+                where: {
+                  latest: true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    orderBy: params.randomManifestId
+      ? (manifests, { asc, desc }) =>
+          params.randomManifestIdOp === 'gt'
+            ? asc(manifests.id)
+            : desc(manifests.id)
+      : undefined,
+    limit: responseOptions.singular ? 1 : clampLimit(params.limit ?? 100)
   })
 
-  if (manifest) {
-    return manifest
-  } else {
-    const message = `Manifest not found: ${manifestId}`
+  if (responseOptions.expectRows && rows.length === 0) {
+    const message = params.manifestId
+      ? `Manifest not found: ${params.manifestId}`
+      : 'Manifests not found'
     throw new ResponseError(message, 404)
   }
+
+  const apiManifests = rows.map((m) => fromDbManifest(restBaseUrl, m))
+  return responseOptions.singular ? apiManifests[0] : apiManifests
 }
 
 export async function createImage(

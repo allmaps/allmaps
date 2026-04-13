@@ -19,10 +19,9 @@ function copySetCookieHeader(
 export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
   betterAuth: BetterAuthContext
 ) {
-  const { auth, baseURL } = betterAuth
+  const { auth } = betterAuth
 
   return createElysia<TEnv>({ name: 'better-auth' })
-    .mount(auth.handler)
     .macro({
       auth: {
         async resolve({ status, request: { headers } }) {
@@ -49,6 +48,7 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
     })
     .derive(({ request: { headers } }) => {
       return {
+        getOptionalSession: async () => auth.api.getSession({ headers }),
         getSession: async () => {
           const session = await auth.api.getSession({ headers })
 
@@ -60,6 +60,15 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
         }
       }
     })
+}
+
+export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
+  betterAuth: BetterAuthContext
+) {
+  const { auth, baseURL } = betterAuth
+
+  return createElysia<TEnv>({ name: 'better-auth-routes' })
+    .mount(auth.handler)
     .get(
       '/login/github',
       async ({ set, query }) => {
@@ -90,7 +99,7 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
       {
         query: t.Object({ returnTo: t.Optional(t.String()) }),
         detail: {
-          summary: 'Login with GitHub (GET)',
+          summary: 'Login with GitHub',
           description:
             'Initiates GitHub OAuth flow and redirects to GitHub authorization page',
           tags: ['Authentication']
@@ -116,7 +125,8 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
         query: t.Object({ returnTo: t.Optional(t.String()) }),
         detail: {
           summary: 'Logout',
-          description: 'Signs out and redirects to returnTo or root',
+          description:
+            'Signs out and redirects to URL specified in returnTo query parameter',
           tags: ['Authentication']
         }
       }

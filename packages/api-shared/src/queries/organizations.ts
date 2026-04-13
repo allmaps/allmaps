@@ -4,10 +4,29 @@ import { generateRandomId } from '@allmaps/id/sync'
 
 import * as authSchema from '@allmaps/db/schema/auth'
 import * as organizationsSchema from '@allmaps/db/schema/organizations'
+import {
+  queryAllOrganizationUsers,
+  queryOrganizationMembersById
+} from './auth.js'
 
 import { clampLimit } from '../shared/limits.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
+
+type DbOrganization = {
+  id: string
+  name: string
+  slug: string
+  logo: string | null
+  homepage: string | null
+  plan: string | null
+  createdAt: Date
+  updatedAt?: Date
+  urls: {
+    url: string
+    type: 'domain'
+  }[]
+}
 
 export function normalizeDomain(value: string): string | undefined {
   const input = value.trim()
@@ -54,6 +73,16 @@ export function normalizeDomain(value: string): string | undefined {
   return domainRegex.test(domain) ? domain : undefined
 }
 
+export function normalizeOrganizationSlug(value: string): string | undefined {
+  const slug = value.trim()
+
+  if (!slug) {
+    return
+  }
+
+  return /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/.test(slug) ? slug : undefined
+}
+
 export function normalizeDomains(domains: string[] | undefined) {
   if (domains === undefined) {
     return {
@@ -77,13 +106,45 @@ export function normalizeDomains(domains: string[] | undefined) {
   return { validDomains: [...valid], invalidDomains: invalid }
 }
 
-export function formatOrganization(
-  org: typeof authSchema.organizations.$inferSelect,
-  urls: (typeof organizationsSchema.organizationUrls.$inferSelect)[]
+export function fromDbOrganization(
+  restBaseUrl: string,
+  dbOrganization: DbOrganization
+) {
+  const id = `${restBaseUrl}/organizations/${dbOrganization.id}`
+
+  return {
+    id,
+    name: dbOrganization.name,
+    slug: dbOrganization.slug,
+    logo: dbOrganization.logo,
+    homepage: dbOrganization.homepage,
+    plan: dbOrganization.plan,
+    createdAt: dbOrganization.createdAt,
+    domains: dbOrganization.urls
+      .filter(({ type }) => type === 'domain')
+      .map(({ url }) => url),
+    images: `${id}/images`,
+    canvases: `${id}/canvases`,
+    manifests: `${id}/manifests`
+  }
+}
+
+export function fromDbOrganizationWithUsers(
+  restBaseUrl: string,
+  dbOrganization: DbOrganization,
+  users: {
+    role: string
+    createdAt: Date
+    user: {
+      id: string
+      name: string
+      email: string
+    }
+  }[]
 ) {
   return {
-    ...org,
-    domains: urls.filter((u) => u.type === 'domain').map((u) => u.url)
+    ...fromDbOrganization(restBaseUrl, dbOrganization),
+    users
   }
 }
 
@@ -124,47 +185,118 @@ export async function replaceOrganizationUrls(
   })
 }
 
-export async function listOrganizations(db: Db, limit?: number) {
-  const orgs = await db
-    .select()
-    .from(authSchema.organizations)
-    .orderBy(authSchema.organizations.name)
-    .limit(clampLimit(limit))
+export async function listOrganizations(
+  db: Db,
+  restBaseUrl: string,
+  limit?: number
+) {
+  const dbOrganizations = await db.query.organizations.findMany({
+    with: {
+      urls: true
+    },
+    orderBy: (organizations, { asc }) => asc(organizations.name),
+    limit: clampLimit(limit)
+  })
 
-  const urls = await db.select().from(organizationsSchema.organizationUrls)
+  return dbOrganizations.map((dbOrganization) =>
+    fromDbOrganization(restBaseUrl, dbOrganization)
+  )
+}
 
-  return orgs.map((org) =>
-    formatOrganization(
-      org,
-      urls.filter((u) => u.organizationId === org.id)
+export async function listOrganizationsWithUsers(
+  db: Db,
+  restBaseUrl: string,
+  limit?: number
+) {
+  const [dbOrganizations, usersByOrganizationId] = await Promise.all([
+    db.query.organizations.findMany({
+      with: {
+        urls: true
+      },
+      orderBy: (organizations, { asc }) => asc(organizations.name),
+      limit: clampLimit(limit)
+    }),
+    queryAllOrganizationUsers(db, restBaseUrl)
+  ])
+
+  return dbOrganizations.map((dbOrganization) =>
+    fromDbOrganizationWithUsers(
+      restBaseUrl,
+      dbOrganization,
+      usersByOrganizationId[dbOrganization.id] ?? []
     )
   )
 }
 
-export async function queryOrganizationByIdOrSlug(
+export async function queryOrganizationById(
   db: Db,
+  restBaseUrl: string,
   organizationId: string
 ) {
-  const isId = /^[0-9a-f]+$/.test(organizationId)
-  const [organization] = await db
-    .select()
-    .from(authSchema.organizations)
-    .where(
-      isId
-        ? eq(authSchema.organizations.id, organizationId)
-        : eq(authSchema.organizations.slug, organizationId)
-    )
+  const organization = await db.query.organizations.findFirst({
+    with: {
+      urls: true
+    },
+    where: {
+      id: {
+        eq: organizationId
+      }
+    }
+  })
 
   if (!organization) {
     return
   }
 
-  const urls = await queryOrganizationUrls(db, organization.id)
-  return formatOrganization(organization, urls)
+  return fromDbOrganization(restBaseUrl, organization)
+}
+
+export async function queryOrganizationByIdWithUsers(
+  db: Db,
+  restBaseUrl: string,
+  organizationId: string
+) {
+  const [organization, users] = await Promise.all([
+    queryOrganizationById(db, restBaseUrl, organizationId),
+    queryOrganizationMembersById(db, restBaseUrl, organizationId)
+  ])
+
+  if (!organization) {
+    return
+  }
+
+  return {
+    ...organization,
+    users
+  }
+}
+
+export async function queryOrganizationBySlug(
+  db: Db,
+  restBaseUrl: string,
+  organizationSlug: string
+) {
+  const organization = await db.query.organizations.findFirst({
+    with: {
+      urls: true
+    },
+    where: {
+      slug: {
+        eq: organizationSlug
+      }
+    }
+  })
+
+  if (!organization) {
+    return
+  }
+
+  return fromDbOrganization(restBaseUrl, organization)
 }
 
 export async function createOrganization(
   db: Db,
+  restBaseUrl: string,
   data: {
     name: string
     slug: string
@@ -200,11 +332,12 @@ export async function createOrganization(
   await replaceOrganizationUrls(db, id, data.domains)
 
   const urls = await queryOrganizationUrls(db, id)
-  return formatOrganization(organization, urls)
+  return fromDbOrganization(restBaseUrl, { ...organization, urls })
 }
 
 export async function updateOrganization(
   db: Db,
+  restBaseUrl: string,
   organizationId: string,
   patch: Partial<{
     name: string
@@ -236,7 +369,7 @@ export async function updateOrganization(
     }
 
     const urls = await queryOrganizationUrls(tx, organizationId)
-    return formatOrganization(organization, urls)
+    return fromDbOrganization(restBaseUrl, { ...organization, urls })
   })
 }
 

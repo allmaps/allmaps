@@ -1,0 +1,1 @@
+CREATE INDEX "maps_latest_image_id_idx" ON "maps" ("image_id") WHERE "latest" = true;

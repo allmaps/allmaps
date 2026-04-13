@@ -55,7 +55,6 @@ async function callLive(liveBaseUrl: string, body: unknown) {
 }
 
 export const maps = createElysia({ name: 'maps' })
-  // ── List all maps ─────────────────────────────────────────────────────────
   .get(
     '/maps',
     ({ request, env, db, query }) =>
@@ -82,7 +81,10 @@ export const maps = createElysia({ name: 'maps' })
       ),
     {
       query: mapsQuerySchema,
-      detail: { summary: 'List maps as annotations', tags: ['Maps'] }
+      detail: {
+        summary: 'Get Georeference Annotations',
+        tags: ['Maps']
+      }
     }
   )
   .get(
@@ -111,17 +113,12 @@ export const maps = createElysia({ name: 'maps' })
       ),
     {
       query: mapsQuerySchema,
-      detail: { summary: 'List maps as GeoJSON', tags: ['Maps'] }
+      detail: {
+        summary: 'Get Georeference Annotations as GeoJSON',
+        tags: ['Maps']
+      }
     }
   )
-  // ── Create maps from annotation body ─────────────────────────────────────
-  .post('/maps', ({ env, body }) => callLive(env.PUBLIC_LIVE_BASE_URL, body), {
-    detail: {
-      summary: 'Create maps from a Georeference Annotation',
-      tags: ['Maps']
-    }
-  })
-  // ── Random map (must be before :mapId wildcard) ───────────────────────────
   .get(
     '/maps/random',
     ({ env, db, query }) => {
@@ -163,10 +160,12 @@ export const maps = createElysia({ name: 'maps' })
     },
     {
       query: mapsQuerySchema,
-      detail: { summary: 'Get a random map as annotation', tags: ['Maps'] }
+      detail: {
+        summary: 'Get random Georeference Annotations',
+        tags: ['Maps']
+      }
     }
   )
-  // ── Single map (with optional @checksum and .ext) ─────────────────────────
   .get(
     `/maps/${mapRoute.path}`,
     ({ env, db, params }) => {
@@ -185,7 +184,7 @@ export const maps = createElysia({ name: 'maps' })
     {
       params: mapRoute.params,
       detail: {
-        summary: 'Get a map as annotation (with optional version)',
+        summary: 'Get a single Georeference Annotation (with optional version)',
         tags: ['Maps']
       }
     }

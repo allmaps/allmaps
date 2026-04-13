@@ -7,7 +7,14 @@ import { IIIF } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
 import { generateId } from '@allmaps/id'
 
-import { createElysia, createBetterAuthPlugin } from './elysia.js'
+import {
+  createElysia,
+  error,
+  redirect,
+  handleApiError,
+  createBetterAuthRoutes
+} from './elysia.js'
+
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
@@ -15,13 +22,18 @@ import { maps } from './routes/maps.js'
 import { images } from './routes/images.js'
 import { canvases } from './routes/canvases.js'
 import { manifests } from './routes/manifests.js'
-import { createLists } from './routes/lists.js'
+import { organizations } from './routes/organizations.js'
+import { createListsRoutes } from './routes/lists.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
 export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
   return createElysia({ name: 'app' })
-    .use(createBetterAuthPlugin(betterAuth))
+    .use(createBetterAuthRoutes(betterAuth))
+    .decorate('error', error)
+    .decorate('redirect', redirect)
+    .onError(handleApiError)
+    .use(cors())
     .use(
       openapi({
         path: 'docs',
@@ -34,12 +46,12 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
         }
       })
     )
-    .use(cors())
     .use(maps)
     .use(images)
     .use(canvases)
     .use(manifests)
-    .use(createLists(env, betterAuth))
+    .use(organizations)
+    .use(createListsRoutes(env, betterAuth))
     .get(
       '/',
       async ({ env, query, set }) => {
@@ -66,9 +78,9 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
         return {
           name: 'Allmaps Annotations API',
           version: packageJson.version,
-          docs: '/docs',
-          login: '/login/github',
-          logout: '/logout'
+          docs: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/docs`,
+          login: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/login/github`,
+          logout: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/logout`
         }
       },
       {

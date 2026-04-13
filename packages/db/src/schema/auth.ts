@@ -1,10 +1,11 @@
-import { defineRelationsPart } from 'drizzle-orm'
+import { defineRelationsPart, sql } from 'drizzle-orm'
 import {
   pgTable,
   text,
   timestamp,
   boolean,
   index,
+  check,
   uniqueIndex
 } from 'drizzle-orm/pg-core'
 
@@ -25,7 +26,15 @@ export const users = pgTable('users', {
   banReason: text('ban_reason'),
   banExpires: timestamp('ban_expires'),
   slug: text('slug')
-})
+}, (table) => [
+  uniqueIndex('users_slug_uidx')
+    .on(table.slug)
+    .where(sql`${table.slug} IS NOT NULL`),
+  check(
+    'users_slug_format',
+    sql`${table.slug} IS NULL OR ${table.slug} ~ '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'`
+  )
+])
 
 export const sessions = pgTable(
   'sessions',
@@ -100,7 +109,13 @@ export const organizations = pgTable(
     homepage: text('homepage'),
     plan: text('plan')
   },
-  (table) => [uniqueIndex('organizations_slug_uidx').on(table.slug)]
+  (table) => [
+    uniqueIndex('organizations_slug_uidx').on(table.slug),
+    check(
+      'organizations_slug_format',
+      sql`${table.slug} ~ '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'`
+    )
+  ]
 )
 
 export const members = pgTable(

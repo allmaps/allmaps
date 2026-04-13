@@ -3,11 +3,18 @@ import { t } from 'elysia'
 import { createElysia } from '../elysia.js'
 import {
   queryImage,
+  queryImages,
   createImage,
   queryMaps,
   queryImageChecksums
 } from '@allmaps/api-shared/db'
+import { queryRandom } from '@allmaps/api-shared'
 import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
+
+const imagesQuerySchema = t.Object({
+  georeferenced: t.Optional(t.Boolean()),
+  limit: t.Optional(t.Number())
+})
 
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
@@ -34,22 +41,62 @@ function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
 }
 
 export const images = createElysia({ name: 'images' })
-  // ── Get image metadata ────────────────────────────────────────────────────
-  .get('/images/:imageId', ({ db, params }) => queryImage(db, params.imageId), {
-    params: t.Object({ imageId: t.String() }),
-    detail: { summary: 'Get image metadata', tags: ['Images'] }
-  })
-  // ── Get all versions for an image ─────────────────────────────────────────
+  .get(
+    '/images',
+    ({ env, db, query }) =>
+      queryImages(
+        env.PUBLIC_REST_BASE_URL,
+        db,
+        { georeferenced: query.georeferenced, limit: query.limit },
+        { expectRows: false, singular: false }
+      ),
+    {
+      query: imagesQuerySchema,
+      detail: { summary: 'Get IIIF Images', tags: ['Images'] }
+    }
+  )
+  .get(
+    '/images/random',
+    async ({ env, db, query }) =>
+      queryRandom((op, randomId) =>
+        queryImages(
+          env.PUBLIC_REST_BASE_URL,
+          db,
+          {
+            georeferenced: query.georeferenced,
+            limit: query.limit,
+            randomImageId: randomId,
+            randomImageIdOp: op
+          },
+          { expectRows: true, singular: false }
+        )
+      ),
+    {
+      query: imagesQuerySchema,
+      detail: { summary: 'Get a random IIIF Image', tags: ['Images'] }
+    }
+  )
+  .get(
+    '/images/:imageId',
+    ({ env, db, params }) =>
+      queryImage(env.PUBLIC_REST_BASE_URL, db, params.imageId),
+    {
+      params: t.Object({ imageId: t.String() }),
+      detail: { summary: 'Get a single IIIF Image', tags: ['Images'] }
+    }
+  )
   .get(
     '/images/:imageId/versions',
     ({ env, db, params }) =>
       queryImageChecksums(env.PUBLIC_ANNOTATIONS_BASE_URL, db, params.imageId),
     {
       params: t.Object({ imageId: t.String() }),
-      detail: { summary: 'List all versions for an image', tags: ['Images'] }
+      detail: {
+        summary: 'Get all versions for a single IIIF Image',
+        tags: ['Images']
+      }
     }
   )
-  // ── Get maps for an image ─────────────────────────────────────────────────
   .get(
     '/images/:imageId/maps',
     ({ env, db, params, query }) =>
@@ -73,7 +120,7 @@ export const images = createElysia({ name: 'images' })
     {
       params: t.Object({ imageId: t.String() }),
       query: mapsQuerySchema,
-      detail: { summary: 'Get maps for an image', tags: ['Images'] }
+      detail: { summary: 'Get maps for a single IIIF Image', tags: ['Images'] }
     }
   )
   .get(
@@ -99,10 +146,12 @@ export const images = createElysia({ name: 'images' })
     {
       params: t.Object({ imageId: t.String() }),
       query: mapsQuerySchema,
-      detail: { summary: 'Get maps for an image as GeoJSON', tags: ['Images'] }
+      detail: {
+        summary: 'Get maps for a single IIIF Image as GeoJSON',
+        tags: ['Images']
+      }
     }
   )
-  // ── Create/upsert image from IIIF URL ─────────────────────────────────────
   .put(
     '/images/:imageId',
     ({ db, params, body }) => createImage(db, params.imageId, body.url),
@@ -110,7 +159,7 @@ export const images = createElysia({ name: 'images' })
       params: t.Object({ imageId: t.String() }),
       body: t.Object({ url: t.String() }),
       detail: {
-        summary: 'Create or update an image from a IIIF URL',
+        summary: 'Create or update a single IIIF Image from a IIIF URL',
         tags: ['Images']
       }
     }

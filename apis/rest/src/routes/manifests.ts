@@ -2,10 +2,11 @@ import { t } from 'elysia'
 
 import { createElysia } from '../elysia.js'
 import {
-  queryManifest,
+  queryManifests,
   createManifest,
   queryMaps
 } from '@allmaps/api-shared/db'
+import { queryRandom } from '@allmaps/api-shared'
 import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
 
 const mapsQuerySchema = t.Object({
@@ -33,18 +34,62 @@ function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
 }
 
 export const manifests = createElysia({ name: 'manifests' })
-  // ── Get manifest metadata ─────────────────────────────────────────────────
   .get(
-    '/manifests/:manifestId',
-    async ({ db, params }) => {
-      return queryManifest(db, params.manifestId)
-    },
+    '/manifests',
+    async ({ db, env, query }) =>
+      queryManifests(
+        env.PUBLIC_REST_BASE_URL,
+        db,
+        { georeferenced: query.georeferenced, limit: query.limit },
+        { expectRows: false, singular: false }
+      ),
     {
-      params: t.Object({ manifestId: t.String() }),
-      detail: { summary: 'Get manifest metadata', tags: ['Manifests'] }
+      query: t.Object({
+        georeferenced: t.Optional(t.Boolean()),
+        limit: t.Optional(t.Number())
+      }),
+      detail: { summary: 'Get IIIF Manifests', tags: ['Manifests'] }
     }
   )
-  // ── Get maps for a manifest ───────────────────────────────────────────────
+  .get(
+    '/manifests/random',
+    async ({ db, env, query }) =>
+      queryRandom((op, randomId) =>
+        queryManifests(
+          env.PUBLIC_REST_BASE_URL,
+          db,
+          {
+            georeferenced: query.georeferenced,
+            limit: query.limit,
+            randomManifestId: randomId,
+            randomManifestIdOp: op
+          },
+          { expectRows: true, singular: false }
+        )
+      ),
+    {
+      query: t.Object({
+        georeferenced: t.Optional(t.Boolean()),
+        limit: t.Optional(t.Number())
+      }),
+      detail: { summary: 'Get a random IIIF Manifest', tags: ['Manifests'] }
+    }
+  )
+  .get(
+    '/manifests/:manifestId',
+    async ({ db, params, env, query }) =>
+      queryManifests(
+        env.PUBLIC_REST_BASE_URL,
+        db,
+        { manifestId: params.manifestId, georeferenced: query.georeferenced },
+        { expectRows: true, singular: true }
+      ),
+    {
+      params: t.Object({ manifestId: t.String() }),
+      query: t.Object({ georeferenced: t.Optional(t.Boolean()) }),
+      detail: { summary: 'Get a single IIIF Manifest', tags: ['Manifests'] }
+    }
+  )
   .get(
     '/manifests/:manifestId/maps',
     async ({ env, db, params, query }) => {
@@ -69,7 +114,10 @@ export const manifests = createElysia({ name: 'manifests' })
     {
       params: t.Object({ manifestId: t.String() }),
       query: mapsQuerySchema,
-      detail: { summary: 'Get maps for a manifest', tags: ['Manifests'] }
+      detail: {
+        summary: 'Get maps for a single IIIF Manifest',
+        tags: ['Manifests']
+      }
     }
   )
   .get(
@@ -97,22 +145,22 @@ export const manifests = createElysia({ name: 'manifests' })
       params: t.Object({ manifestId: t.String() }),
       query: mapsQuerySchema,
       detail: {
-        summary: 'Get maps for a manifest as GeoJSON',
+        summary: 'Get maps for a single IIIF Manifest as GeoJSON',
         tags: ['Manifests']
       }
     }
   )
-  // ── Create/upsert manifest from IIIF URL ──────────────────────────────────
   .put(
     '/manifests/:manifestId',
     async ({ db, params, body }) => {
+      // TODO: add checkseum and check checksum matches manifest at URL before creating/updating
       return createManifest(db, params.manifestId, body.url)
     },
     {
       params: t.Object({ manifestId: t.String() }),
-      body: t.Object({ url: t.String() }),
+      body: t.Object({ url: t.String(), checksum: t.String() }),
       detail: {
-        summary: 'Create or update a manifest from a IIIF URL',
+        summary: 'Create or update a IIIF Manifest from a IIIF URL',
         tags: ['Manifests']
       }
     }
