@@ -1,0 +1,242 @@
+[
+  {
+    "title": "Allmaps",
+    "homepage": "https://allmaps.org",
+    "domains": ["allmaps.org"]
+  },
+  {
+    "title": "Zentral- und Landesbibliothek Berlin",
+    "homepage": "https://digital.zlb.de",
+    "domains": ["digital.zlb.de"]
+  },
+  {
+    "title": "Polona",
+    "homepage": "https://polona.pl",
+    "domains": ["zas.bn.org.pl"]
+  },
+  {
+    "title": "University of Groningen",
+    "homepage": "https://researchworks.oclc.org/iiif-explorer/search?q=collection.id%3Ahttps%3A%2F%2Fresearchworks.oclc.org%2Fdigital%2Fdataset%2F21053_Kaarten",
+    "domains": ["cdm21053.contentdm.oclc.org"]
+  },
+  {
+    "title": "IIIF Hosting",
+    "homepage": "https://iiifhosting.com",
+    "domains": ["images.iiifhosting.com"]
+  },
+  {
+    "title": "Det Kgl. Bibliotek",
+    "homepage": "https://www5.kb.dk/maps/kortsa/2012/jul/kortatlas/subject206/da/",
+    "domains": ["kb-images.kb.dk"]
+  },
+  {
+    "title": "Nasjonalbiblioteket",
+    "homepage": "https://www.nb.no/search?mediatype=kart",
+    "domains": ["www.nb.no"]
+  },
+  {
+    "title": "Riksarkivet",
+    "homepage": "https://sok.riksarkivet.se",
+    "domains": ["lbiiif.riksarkivet.se"]
+  },
+  {
+    "title": "Micrio",
+    "homepage": "https://micr.io",
+    "domains": ["iiif.micr.io"]
+  },
+  {
+    "title": "Rotterdams Publiek",
+    "homepage": "https://rotterdamspubliek.nl",
+    "domains": ["rotterdamspubliek.nl"]
+  },
+  {
+    "title": "Penn State University Libraries",
+    "homepage": "https://libraries.psu.edu",
+    "domains": ["cdm17287.contentdm.oclc.org"]
+  },
+  {
+    "title": "Old Maps Online",
+    "homepage": "https://www.oldmapsonline.org",
+    "domains": ["iiif.oldmapsonline.org"]
+  },
+  {
+    "title": "Yale University Library",
+    "homepage": "https://collections.library.yale.edu/catalog?f%5Bgenre_ssim%5D%5B%5D=Maps",
+    "domains": ["collections.library.yale.edu"]
+  },
+  {
+    "title": "Princeton University Library",
+    "homepage": "https://maps.princeton.edu",
+    "domains": ["iiif-cloud.princeton.edu"]
+  },
+  {
+    "title": "University of Manchester Library",
+    "homepage": "https://www.library.manchester.ac.uk/search-resources/digital-collections/",
+    "domains": ["image.digitalcollections.manchester.ac.uk"]
+  },
+  {
+    "title": "Universiteitsbibliotheek Gent",
+    "homepage": "https://lib.ugent.be/en/catalog?access=zoomable&type=map",
+    "domains": ["adore.ugent.be"]
+  },
+  {
+    "title": "IIIF Hosting",
+    "homepage": "https://iiifhosting.com",
+    "domains": ["free.iiifhosting.com"]
+  },
+  {
+    "title": "Minnesota Digital Library",
+    "homepage": "https://mndigital.org",
+    "domains": ["cdm16022.contentdm.oclc.org"]
+  },
+  {
+    "title": "University of Michigan Library",
+    "homepage": "https://quod.lib.umich.edu/c/clark1ic?view=reslist;q1=clark1ic",
+    "domains": ["quod.lib.umich.edu"]
+  },
+  {
+    "title": "Austrian Academy of Sciences",
+    "homepage": "https://www.oeaw.ac.at/en/",
+    "domains": ["in-rome.ait.ac.at"]
+  },
+  {
+    "title": "Gouda Tijdmachine",
+    "homepage": "https://www.goudatijdmachine.nl/data/collection/ark:/60537/bb25wx",
+    "domains": ["www.goudatijdmachine.nl"]
+  },
+  {
+    "title": "Kent State University Libraries",
+    "homepage": "https://www.library.kent.edu/special-collections-and-archives",
+    "domains": ["oaks.kent.edu"]
+  },
+  {
+    "title": "Institut Cartogràfic i Geològic de Catalunya",
+    "homepage": "https://cartotecadigital.icgc.cat",
+    "domains": ["cdm21055.contentdm.oclc.org"]
+  },
+  {
+    "title": "Harvard Library Digital Collections",
+    "homepage": "https://digitalcollections.library.harvard.edu/catalog?f%5BresourceType%5D%5B%5D=cartographic",
+    "domains": ["ids.lib.harvard.edu"]
+  },
+  {
+    "title": "Stadsarchief Amsterdam",
+    "homepage": "https://archief.amsterdam/beeldbank",
+    "domains": ["stadsarchiefamsterdam.memorix.io"]
+  },
+  {
+    "title": "Stanford Libraries",
+    "homepage": "https://earthworks.stanford.edu/catalog?featured=scanned_maps",
+    "domains": ["stacks.stanford.edu"]
+  },
+  {
+    "title": "Bayerische Staatsbibliothek",
+    "homepage": "https://www.digitale-sammlungen.de/en/search?query=&sortField=scanDate&filter=type_content%3A%22map%22&filter=features%3A%22iiif%22",
+    "domains": ["api.digitale-sammlungen.de"]
+  },
+  {
+    "title": "University of Wisconsin-Milwaukee Libraries",
+    "homepage": "https://collections.lib.uwm.edu/digital/collection/agdm/",
+    "domains": ["cdm17272.contentdm.oclc.org"]
+  },
+  {
+    "title": "Musea Brugge",
+    "homepage": "https://www.museabrugge.be/collecties/doorzoek?subject=cartografie",
+    "domains": ["dam.museabrugge.be"]
+  },
+  {
+    "title": "University of Colorado Boulder",
+    "homepage": "https://scholar.colorado.edu",
+    "domains": ["archives.mountainscholar.org"]
+  },
+  {
+    "title": "Universiteit van Amsterdam",
+    "homepage": "https://www.uvaerfgoed.nl/beeldbank/nl/xsearch?metadata=kaarten",
+    "domains": ["images.uba.uva.nl"]
+  },
+  {
+    "title": "Bibliothèque nationale de France",
+    "homepage": "https://gallica.bnf.fr",
+    "domains": ["gallica.bnf.fr", "openapi.bnf.fr"]
+  },
+  {
+    "title": "Nationaal Archief",
+    "homepage": "https://www.nationaalarchief.nl/onderzoeken/zoeken?activeTab=maps",
+    "domains": ["service.archief.nl"]
+  },
+  {
+    "title": "Ghent Centre for Digital Humanities",
+    "homepage": "https://ghentcdh.ugent.be",
+    "domains": ["iiif.ghentcdh.ugent.be"]
+  },
+  {
+    "title": "4TU.ResearchData",
+    "homepage": "https://data.4tu.nl",
+    "domains": ["data.4tu.nl"]
+  },
+  {
+    "title": "Internet Archive",
+    "homepage": "https://archive.org",
+    "domains": ["iiif.archive.org"]
+  },
+  {
+    "title": "Rijksdienst voor het Cultureel Erfgoed",
+    "homepage": "https://beeldbank.cultureelerfgoed.nl",
+    "domains": ["images.memorix.nl"]
+  },
+  {
+    "title": "Leiden University",
+    "homepage": "https://digitalcollections.universiteitleiden.nl/islandora/search?type=dismax&islandora_solr_search_navigation=0&f[0]=RELS_EXT_isMemberOfCollection_uri_ms:%22info:fedora/collection:ubl_maps%22",
+    "domains": ["iiif.universiteitleiden.nl"]
+  },
+  {
+    "title": "Library of Congress",
+    "homepage": "https://www.loc.gov/maps/",
+    "domains": ["tile.loc.gov"]
+  },
+  {
+    "title": "Utrecht University Library",
+    "homepage": "https://www.uu.nl/en/utrecht-university-library-special-collections/collections/maps-and-atlases",
+    "domains": ["objects.library.uu.nl"]
+  },
+  {
+    "title": "State Library Victoria",
+    "homepage": "https://www.slv.vic.gov.au/search-discover",
+    "domains": ["rosetta.slv.vic.gov.au"]
+  },
+  {
+    "title": "National Library of Scotland",
+    "homepage": "https://maps.nls.uk",
+    "domains": ["map-view.nls.uk"]
+  },
+  {
+    "title": "Digirati DLC Services",
+    "homepage": "https://dlc.services",
+    "domains": ["dlc.services"]
+  },
+  {
+    "title": "Digital Commonwealth",
+    "homepage": "https://www.digitalcommonwealth.org/search?f%5Bgenre_basic_ssim%5D%5B%5D=Maps",
+    "domains": ["iiif.digitalcommonwealth.org"]
+  },
+  {
+    "title": "University of Chicago Library",
+    "homepage": "https://www.lib.uchicago.edu/collex/collections/",
+    "domains": ["iiif-server.lib.uchicago.edu"]
+  },
+  {
+    "title": "Vrije Universiteit Amsterdam",
+    "homepage": "https://researchworks.oclc.org/iiif-explorer/search?q=collection.id%3Ahttps%3A%2F%2Fresearchworks.oclc.org%2Fdigital%2Fdataset%2F21033_krt",
+    "domains": ["cdm21033.contentdm.oclc.org"]
+  },
+  {
+    "title": "David Rumsey Map Collection",
+    "homepage": "https://www.davidrumsey.com/luna/servlet/view/all",
+    "domains": ["www.davidrumsey.com"]
+  },
+  {
+    "title": "New York Public Library",
+    "homepage": "https://digitalcollections.nypl.org/search/index?filters%5Btype%5D=cartographic",
+    "domains": ["iiif.nypl.org"]
+  }
+]
