@@ -30,7 +30,7 @@
   reason: Extremly high warping
 - name: Chesapeake and Ohio Canal
   url: https://annotations.allmaps.org/images/7f2494dd1ad9ed7a
-  reason: Two maps from same image, overlapping, mask outside full mask
+  reason: Two maps from same image, overlapping, mask outside full mask, sideways map
 - name: Strait of Magellan
   url: https://annotations.allmaps.org/maps/96a50503ef4261aa
   reason: Best with projection
@@ -49,6 +49,9 @@
 - name: Rotterdam
   url: https://annotations.allmaps.org/manifests/631b96e4d6d3f421
   reason: Composite annotation page, differentiated zoomlevels crossing
+- name: Diemer meer
+  url: https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a
+  reason: Composite annotation page, upside down maps
 - name: Loman atlas
   url: https://annotations.allmaps.org/manifests/af012d4792961902
   reason: Complex annotation page
