@@ -58,6 +58,7 @@ export type WarpedMapOptions = {
   internalProjection: Projection
   projection: Projection
   visible: boolean
+  anticipate: boolean
   applyMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }

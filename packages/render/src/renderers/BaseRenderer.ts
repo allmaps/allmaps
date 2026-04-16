@@ -394,12 +394,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       this.viewport.getProjectedGeoBufferedRectangle()
     )
 
-    return Array.from(
-      this.warpedMapList.getWarpedMaps({
+    return this.warpedMapList
+      .getWarpedMaps({
         projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
         applyMask: false
       })
-    )
       .filter(
         (warpedMap) => !warpedMap.hasImage() && !warpedMap.fetchingImageInfo
       )
@@ -461,11 +460,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const mapsInViewportForRequest = this.findMapsInViewport(
       this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
     )
-    const mapsInViewportForOverviewRequest = this.findMapsInViewport(
-      this.shouldAnticipateInteraction()
-        ? OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO
-        : 1
-    )
+    const mapsInViewportForOverviewRequest = new Set([
+      ...this.findMapsInViewport(
+        this.shouldAnticipateInteraction()
+          ? OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO
+          : 1
+      ),
+      ...this.findMapsToAnticipate()
+    ])
     const mapsInViewportForPrune = this.findMapsInViewport(
       this.shouldAnticipateInteraction() ? PRUNE_VIEWPORT_BUFFER_RATIO : 1
     )
@@ -560,12 +562,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     const mapsInViewport = new Set(
-      Array.from(
-        this.warpedMapList.getWarpedMaps({
+      this.warpedMapList
+        .getWarpedMaps({
           projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
           applyMask: false
         })
-      )
         .map((warpedMap) => {
           return {
             warpedMap,
@@ -589,6 +590,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     return mapsInViewport
+  }
+
+  protected findMapsToAnticipate(): Set<string> {
+    return new Set(
+      this.warpedMapList
+        .getWarpedMaps()
+        .filter((warpedMap) => warpedMap.options.anticipate)
+        .map((warpedmap) => warpedmap.mapId)
+    )
   }
 
   protected getMapFetchableTilesForViewport(

@@ -68,6 +68,7 @@ export const DEFAULT_WARPED_MAP_OPTIONS = {
   internalProjection: webMercatorProjection,
   projection: webMercatorProjection,
   visible: true,
+  anticipate: false,
   applyMask: true,
   distortionMeasure: undefined
 }
