@@ -8,10 +8,10 @@ For parsing and generating full Georeference Annotations, see [@allmaps/annotati
 
 This is an ESM-only module that works in browsers and in Node.js.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/io
+pnpm install @allmaps/io
 ```
 
 ## Usage

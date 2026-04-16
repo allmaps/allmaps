@@ -35,10 +35,10 @@ This package can analyze ProtoGeoreferencedMaps, GeoreferencedMaps or WarpedMaps
 
 This is an ESM-only module that works in browsers and Node.js.
 
-Install using npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/analyze
+pnpm install @allmaps/analyze
 ```
 
 ## Usage

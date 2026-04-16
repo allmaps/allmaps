@@ -32,10 +32,10 @@ This is an ESM-only module that works in browsers and in Node.js.
 
 Node.js:
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/annotation
+pnpm install @allmaps/annotation
 ```
 
 Browser:

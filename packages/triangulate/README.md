@@ -18,10 +18,10 @@ In short, triangles are made firstly using a grid of points within the bounding 
 
 This is an ESM-only module that works in browsers and Node.js.
 
-Install using npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/triangulate
+pnpm install @allmaps/triangulate
 ```
 
 ## Usage

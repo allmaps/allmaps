@@ -16,7 +16,7 @@ This is an ESM-only module that works in browsers and Node.js.
 
 Node.js:
 
-First, run `npm install @allmaps/iiif-parser` to add this module to your project.
+First, run `pnpm install @allmaps/iiif-parser` to add this module to your project.
 
 ```js
 import { IIIF } from '@allmaps/iiif-parser'

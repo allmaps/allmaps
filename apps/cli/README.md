@@ -32,10 +32,10 @@ For more details about Allmaps, see https://allmaps.org
 
 ## Installation
 
-Use npm to install Allmaps CLI globally:
+Use npm or pnpm to install Allmaps CLI globally:
 
 ```bash
-npm install -g @allmaps/cli
+pnpm install -g @allmaps/cli
 ```
 
 ## Usage

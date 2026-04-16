@@ -23,10 +23,10 @@ Some details:
 
 This is an ESM-only module that works in browsers and in Node.js.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/attach
+pnpm install @allmaps/attach
 ```
 
 ## Usage

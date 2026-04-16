@@ -21,10 +21,10 @@ As an **example** for the georeferenced map *L'Angleterre Novissima Descriptio A
 
 This is an ESM-only module that works in browsers and in Node.js.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/transform
+pnpm install @allmaps/transform
 ```
 
 ## Usage

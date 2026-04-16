@@ -16,18 +16,29 @@ From the description above it follows that the bearing computed in this package 
 
 For rendering purposes it is desirable to consider how both **horizontal and vertical** resource space lines are transformed and define the bearing as the (angular) mean between both angles. In some contexts, e.g. for skewed maps with polynomial transformation where vertical resource axis pointed north, one might be interested in only considering the vertical resource line. This can be specified in the options.
 
+## Installation
+
+This package works in browsers and in Node.js as an ESM module.
+
+Install with pnpm:
+
+```sh
+pnpm install @allmaps/bearing
+```
+
 ## Usage
 
 ```js
-import { parseAnnotation, generateAnnotation } from '@allmaps/annotation'
+import { parseAnnotation } from '@allmaps/annotation'
 import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
 
 const annotation = await fetch(
   'https://annotations.allmaps.org/maps/95eeba91177d2a1d'
 ).then((response) => response.json())
 
-const maps = parseAnnotation(annotation)
-const bearing = computeGeoreferencedMapBearing(maps[0])
+const georeferencedMaps = parseAnnotation(annotation)
+const georeferencedMap = georeferencedMaps[0]
+const bearing = computeGeoreferencedMapBearing(georeferencedMap)
 // bearing = 30.48243288240172
 ```
 

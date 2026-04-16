@@ -22,10 +22,10 @@ The GCPs must be provided in lon-lat `EPSG:4326` projection (since this is the d
 
 This is an ESM-only module that works in browsers and in Node.js.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/project
+pnpm install @allmaps/project
 ```
 
 ## Usage
