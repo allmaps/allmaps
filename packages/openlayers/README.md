@@ -300,7 +300,7 @@ Adds a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was added, or an error (`string`).
+Map ID of the map that was added (`string`).
 
 ### `WarpedMapLayer#addImageInfos(imageInfos)`
 
@@ -439,17 +439,15 @@ There are no parameters.
 
 ### `WarpedMapLayer#getBbox(projectionOptions)`
 
-Get the bounding box of all maps
+Get the bounding box of all maps in the layer
 
 The result is returned in lon-lat `EPSG:4326` by default.
-Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
 
 Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
 * `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
-  * ProjectionOptions
 
 ###### Returns
 
@@ -457,7 +455,7 @@ The bbox of all maps, in the chosen projection, or undefined if there were no ma
 
 ### `WarpedMapLayer#getCenter(projectionOptions)`
 
-Get the center of the bounding box of all maps
+Get the center of the bounding box of all maps in the layer
 
 The result is returned in lon-lat `EPSG:4326` by default.
 
@@ -473,17 +471,15 @@ The center of the bbox of all maps, in the chosen projection, or undefined if th
 
 ### `WarpedMapLayer#getConvexHull(projectionOptions)`
 
-Get the convex hull of all maps
+Get the convex hull of all maps in the layer
 
 The result is returned in lon-lat `EPSG:4326` by default.
-Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
 
 Note: more selection options are available on this function of WarpedMapList
 
 ###### Parameters
 
 * `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
-  * Projection options
 
 ###### Returns
 
@@ -516,7 +512,7 @@ There are no parameters.
 
 ###### Returns
 
-`{ warpedMapFactory?: WarpedMapFactory<WebGL2WarpedMap> | undefined; warpedMapList?: WarpedMapList<WebGL2WarpedMap> | undefined; ... 64 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+`{ warpedMapFactory?: WarpedMapFactory<WebGL2WarpedMap> | undefined; warpedMapList?: WarpedMapList<WebGL2WarpedMap> | undefined; ... 65 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapLayer#getLonLatExtent()`
 
@@ -549,7 +545,7 @@ These come from the default option settings for WebGL2WarpedMaps and the map's g
 
 ### `WarpedMapLayer#getMapIds()`
 
-Get mapIds for selected maps
+Get mapIds for all maps in the layer
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -559,7 +555,7 @@ There are no parameters.
 
 ###### Returns
 
-`Array<string>`.
+The mapIds of all maps (`Array<string>`).
 
 ### `WarpedMapLayer#getMapMapOptions(mapId)`
 
@@ -605,10 +601,9 @@ The z-index of a map (`number | undefined`).
 
 ### `WarpedMapLayer#getMapsBbox(mapIds, projectionOptions)`
 
-Get the bounding box of the maps
+Get the bounding box of all selected maps
 
 The result is returned in lon-lat `EPSG:4326` by default.
-Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -617,7 +612,6 @@ Note: more selection options are available on this function of WarpedMapList
 * `mapIds` (`Array<string>`)
   * Map IDs
 * `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
-  * Projection options
 
 ###### Returns
 
@@ -625,7 +619,7 @@ The bbox of all selected maps, in the chosen projection, or undefined if there w
 
 ### `WarpedMapLayer#getMapsCenter(mapIds, projectionOptions)`
 
-Get the center of the bounding box of the maps
+Get the center of the bounding box of all selected maps
 
 The result is returned in lon-lat `EPSG:4326` by default.
 
@@ -643,10 +637,9 @@ The center of the bbox of all selected maps, in the chosen projection, or undefi
 
 ### `WarpedMapLayer#getMapsConvexHull(mapIds, projectionOptions)`
 
-Get the convex hull of the maps
+Get the convex hull of all selected maps maps
 
 The result is returned in lon-lat `EPSG:4326` by default.
-Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -655,7 +648,6 @@ Note: more selection options are available on this function of WarpedMapList
 * `mapIds` (`Array<string>`)
   * Map IDs
 * `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
-  * Projection options
 
 ###### Returns
 
@@ -702,7 +694,9 @@ There are no parameters.
 
 ### `WarpedMapLayer#getWarpedMaps(mapIds)`
 
-Get the WarpedMap instances for selected maps
+Get the WarpedMap instances for all maps, or all selected maps
+
+If no argument is passed, the WarpedMap instance of all maps in the layer is passed
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -713,7 +707,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Returns
 
-`Iterable<WebGL2WarpedMap>`.
+The WarpedMap instance of all (selected) map (`Array<WebGL2WarpedMap>`).
 
 ### `WarpedMapLayer#gl?`
 
@@ -825,7 +819,7 @@ Removes a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`string`).
+Map ID of the map that was removed (`string`).
 
 ### `WarpedMapLayer#removeGeoreferencedMapById(mapId)`
 
@@ -838,7 +832,7 @@ Removes a Georeferenced Map by its ID
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`string`).
+Map ID of the map that was removed (`string`).
 
 ### `WarpedMapLayer#render(frameState)`
 
@@ -931,14 +925,6 @@ Doesn't reset render options or specific warped map layer options
 ###### Returns
 
 `boolean`.
-
-### `WarpedMapLayer#resizeObserver`
-
-###### Type
-
-```ts
-ResizeObserver
-```
 
 ### `WarpedMapLayer#resized(entries)`
 
@@ -1053,7 +1039,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
   * Layer options to set
@@ -1135,7 +1121,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
   * Layer options to set

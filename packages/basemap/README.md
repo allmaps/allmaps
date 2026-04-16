@@ -10,9 +10,9 @@ Preview:
 
 The style follows the [MapLibre Style Spec](https://maplibre.org/maplibre-style-spec/) and has the following properties:
 
-- **Map data** (city labels, roads, water features and other essential location context) is loaded via the [Protomaps](https://protomaps.com/) [OSM Basemap](https://docs.protomaps.com/basemaps/downloads). This is a 120GB basemap vector cartographic tileset created from OpenStreetMap and other open data sources and served using the [PMTiles format](https://docs.protomaps.com/pmtiles/).
-- **Terrain data** is loaded using [Mapterhorn](https://mapterhorn.com), which provides a basemap raster tileset created from public terrain data and is also served using the PMTiles format.
-- **Styling** similar to [@allmaps/ui](../../packages/ui/) is applied, with custom Allmaps colors and fonts. Sprites are reused from the Protomaps style.
+* **Map data** (city labels, roads, water features and other essential location context) is loaded via the [Protomaps](https://protomaps.com/) [OSM Basemap](https://docs.protomaps.com/basemaps/downloads). This is a 120GB basemap vector cartographic tileset created from OpenStreetMap and other open data sources and served using the [PMTiles format](https://docs.protomaps.com/pmtiles/).
+* **Terrain data** is loaded using [Mapterhorn](https://mapterhorn.com), which provides a basemap raster tileset created from public terrain data and is also served using the PMTiles format.
+* **Styling** similar to [@allmaps/ui](../../packages/ui/) is applied, with custom Allmaps colors and fonts. Sprites are reused from the Protomaps style.
 
 ## Installation
 

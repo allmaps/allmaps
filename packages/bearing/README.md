@@ -48,19 +48,31 @@ MIT
 
 ## API
 
+### `BearingOptions`
+
+###### Fields
+
+* `orientation` (`'horizontal' | 'vertical' | 'mean'`)
+
+### `DEFAULT_BEARING_OPTIONS`
+
+###### Fields
+
+* `orientation` (`'mean'`)
+
 ### `computeGeoreferencedMapBearing(georeferencedMap, options)`
 
 Compute the bearing of a Georeferenced Map.
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
   * Georeferenced Map
-* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; ... 6 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<BearingOptions & { internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { ...; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 
-The bearing of the map in degrees, measured from the north line (`number`).
+The bearing of the map in degrees, measured in degrees from the north line in the clockwise (negative) direction (`number`).
 
 ### `computeWarpedMapBearing(warpedMap, options)`
 
@@ -70,8 +82,8 @@ Compute the bearing of a Warped Map.
 
 * `warpedMap` (`WarpedMap`)
   * Warped Map
-* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; ... 6 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<BearingOptions & { internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { ...; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 
-The bearing of the map in degrees, measured from the north line (`number`).
+The bearing of the map in degrees, measured in degrees from the north line in the clockwise (negative) direction (`number`).

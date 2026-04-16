@@ -201,7 +201,83 @@ There are no parameters.
 
 ###### Returns
 
-bounding box of all warped maps (`LngLatBoundsLike | undefined`).
+bounding box of all maps (`LngLatBoundsLike | undefined`).
+
+### `WarpedMapLayer#getCenterZoomBearing(options)`
+
+Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all maps in the layer.
+
+This can be used as input for
+
+* Map.jumpTo() for immediate change
+* Map.easeTo() for smooth panning
+* Map.flyTo() for a flying animation which zooms out and in
+
+###### Parameters
+
+* `options?` (`  | Partial<
+        CenterZoomBearingOptions &
+          CenterZoomBearing & {
+            pitch?: number
+            roll?: number
+            elevation?: number
+          } & {
+            padding?: number | PaddingOptions
+            offset?: PointLike
+            maxZoom?: number
+          }     >
+    | undefined`)
+
+###### Returns
+
+center, zoom and bearing (`{center?: LngLatLike; zoom?: number; bearing?: number}`).
+
+### `WarpedMapLayer#getMapsBounds(mapIds)`
+
+Get the bounding box of all selected maps as a MapLibre LngLatBoundsLike object
+
+This is the default MapLibre getBounds() function
+
+The result is returned in lon-lat `EPSG:4326`.
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs
+
+###### Returns
+
+bounding box of all selected maps (`LngLatBoundsLike | undefined`).
+
+### `WarpedMapLayer#getMapsCenterZoomBearing(mapIds, options)`
+
+Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all selected maps.
+
+This can be used as input for
+
+* Map.jumpTo() for immediate change
+* Map.easeTo() for smooth panning
+* Map.flyTo() for a flying animation which zooms out and back in
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+* `options?` (`  | Partial<
+        CenterZoomBearingOptions &
+          CenterZoomBearing & {
+            pitch?: number
+            roll?: number
+            elevation?: number
+          } & {
+            padding?: number | PaddingOptions
+            offset?: PointLike
+            maxZoom?: number
+          }     >
+    | undefined`)
+
+###### Returns
+
+center, zoom and bearing (`{center?: LngLatLike; zoom?: number; bearing?: number}`).
 
 ### `WarpedMapLayer#id`
 

@@ -554,7 +554,10 @@ false
 ###### Parameters
 
 * `id` (`string`)
-* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+* `fetchFn` (`  | {
+        (input: RequestInfo | URL, init?: RequestInit): Promise<Response>
+        (input: string | URL | Request, init?: RequestInit): Promise<Response>
+      }
     | undefined`)
 
 ###### Returns
@@ -566,7 +569,10 @@ false
 ###### Parameters
 
 * `index` (`number`)
-* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+* `fetchFn` (`  | {
+        (input: RequestInfo | URL, init?: RequestInit): Promise<Response>
+        (input: string | URL | Request, init?: RequestInit): Promise<Response>
+      }
     | undefined`)
 
 ###### Returns
@@ -1208,7 +1214,10 @@ false
 
 ###### Parameters
 
-* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+* `fetchFn` (`  | {
+        (input: RequestInfo | URL, init?: RequestInit): Promise<Response>
+        (input: string | URL | Request, init?: RequestInit): Promise<Response>
+      }
     | undefined`)
 
 ###### Returns
@@ -1220,7 +1229,10 @@ false
 ###### Parameters
 
 * `imageUri` (`string`)
-* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+* `fetchFn` (`  | {
+        (input: RequestInfo | URL, init?: RequestInit): Promise<Response>
+        (input: string | URL | Request, init?: RequestInit): Promise<Response>
+      }
     | undefined`)
 
 ###### Returns
@@ -1231,7 +1243,10 @@ false
 
 ###### Parameters
 
-* `fetchFn` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+* `fetchFn` (`  | {
+        (input: RequestInfo | URL, init?: RequestInit): Promise<Response>
+        (input: string | URL | Request, init?: RequestInit): Promise<Response>
+      }
     | undefined`)
 * `depth` (`number | undefined`)
 
