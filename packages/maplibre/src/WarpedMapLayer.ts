@@ -2,13 +2,31 @@ import { Map as MaplibreMap, CustomLayerInterface } from 'maplibre-gl'
 
 import { WebGL2Renderer } from '@allmaps/render/webgl2'
 import { Viewport, WarpedMapEvent } from '@allmaps/render'
-import { rectangleToSize, sizesToScale } from '@allmaps/stdlib'
-import { lonLatToWebMercator } from '@allmaps/project'
+import {
+  angularMean,
+  bboxToLine,
+  computeBbox,
+  computeRotatedBboxProperties,
+  degreesToRadians,
+  mergeOptions,
+  radiansToDegrees,
+  rectangleToSize,
+  sizesToScale,
+  bboxToRectangle,
+  scaleBbox,
+  bboxToSize
+} from '@allmaps/stdlib'
+import { lonLatToWebMercator, webMercatorToLonLat } from '@allmaps/project'
 import { BaseWarpedMapLayer } from '@allmaps/warpedmaplayer'
+import { computeWarpedMapBearing } from '@allmaps/bearing'
 
-import type { LngLatBoundsLike } from 'maplibre-gl'
+import type {
+  CameraForBoundsOptions,
+  CenterZoomBearing,
+  LngLatBoundsLike
+} from 'maplibre-gl'
 
-import type { Rectangle, Point } from '@allmaps/types'
+import type { Rectangle, Point, Fit, Size } from '@allmaps/types'
 
 import type { WebGL2RenderOptions } from '@allmaps/render/webgl2'
 
@@ -21,6 +39,12 @@ export type SpecificMapLibreWarpedMapLayerOptions = {
   layerRenderingMode: '2d'
 }
 
+export type CenterZoomBearingOptions = {
+  applyMask: boolean
+  bearingSelection: 'first' | 'angularMean'
+  fit: Fit
+}
+
 export type MapLibreWarpedMapLayerOptions =
   SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 
@@ -30,6 +54,11 @@ const DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpe
     layerType: 'custom',
     layerRenderingMode: '2d'
   }
+const DEFAULT_BEARING_OPTIONS: CenterZoomBearingOptions = {
+  applyMask: true,
+  bearingSelection: 'first',
+  fit: 'contain'
+}
 
 /**
  * WarpedMapLayer class.
@@ -101,18 +130,153 @@ export class WarpedMapLayer
    *
    * The result is returned in lon-lat `EPSG:4326`.
    *
-   * @returns bounding box of all warped maps
+   * @returns bounding box of all maps
    */
   getBounds(): LngLatBoundsLike | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const bbox = this.getBbox()
     if (bbox) {
-      return [
-        [bbox[0], bbox[1]],
-        [bbox[2], bbox[3]]
-      ]
+      return bboxToLine(bbox)
     }
+  }
+
+  /**
+   * Get the bounding box of all selected maps as a MapLibre LngLatBoundsLike object
+   *
+   * This is the default MapLibre getBounds() function
+   *
+   * The result is returned in lon-lat `EPSG:4326`.
+   *
+   * @param mapIds - Map IDs
+   * @returns bounding box of all selected maps
+   */
+  getMapsBounds(mapIds: string[]): LngLatBoundsLike | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    const bbox = this.getMapsBbox(mapIds)
+    if (bbox) {
+      return bboxToLine(bbox)
+    }
+  }
+
+  /**
+   * Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all maps in the layer.
+   *
+   * This can be used as input for
+   * - Map.jumpTo() for immediate change
+   * - Map.easeTo() for smooth panning
+   * - Map.flyTo() for a flying animation which zooms out and in
+   *
+   * @returns center, zoom and bearing
+   */
+  getCenterZoomBearing(
+    options?: Partial<CenterZoomBearingOptions & CameraForBoundsOptions>
+  ): CenterZoomBearing {
+    return this.getMapsCenterZoomBearing(this.getMapIds(), options)
+  }
+
+  /**
+   * Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all selected maps.
+   *
+   * This can be used as input for
+   * - Map.jumpTo() for immediate change
+   * - Map.easeTo() for smooth panning
+   * - Map.flyTo() for a flying animation which zooms out and back in
+   *
+   * @returns center, zoom and bearing
+   */
+  getMapsCenterZoomBearing(
+    mapIds: string[],
+    options?: Partial<CenterZoomBearingOptions & CameraForBoundsOptions>
+  ): CenterZoomBearing {
+    // When MapLibre is asked to fit to a bbox while the map is rotated,
+    // it will compute a CenterZoomBearing, that fits the entire bbox
+    // (which appears rotated when the map is rotated) in the viewport.
+    //
+    // This function computes the CenterZoomBearing needed to display maps
+    // while the map is rotated towards their bearing.
+    //
+    // First a bearing is computed using @allmaps/bearing from the first map or as an average of all maps
+    //
+    // Then the projectedGeoMasks are rotated in the opposite direction
+    // to find their center and ask MapLibre which zoom it would need to center on those.
+
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    options = mergeOptions(DEFAULT_BEARING_OPTIONS, options)
+
+    // Get warped maps
+    const warpedMaps = this.getWarpedMaps(mapIds)
+    if (!(warpedMaps.length > 0)) {
+      throw new Error('No warped maps')
+    }
+
+    // Compute bearing
+    let bearing
+    if (options.bearingSelection == 'first') {
+      bearing = computeWarpedMapBearing(warpedMaps[0])
+    } else if (options.bearingSelection == 'angularMean') {
+      bearing = radiansToDegrees(
+        angularMean(
+          ...warpedMaps.map((warpedMap) =>
+            degreesToRadians(computeWarpedMapBearing(warpedMap))
+          )
+        )
+      )
+    } else {
+      throw new Error('Unknown bearing selection method')
+    }
+
+    // Rotate projectedGeoMasks in the opposite direction and get center and bbox
+    //
+    // Note: bearing is in clockwise direction and rotation functions
+    // go in counter-clockwise direction so no minus sign needed.
+    const projectedGeoMasks = options.applyMask
+      ? warpedMaps.map((warpedMap) => warpedMap.projectedGeoAppliedMask)
+      : warpedMaps.map((warpedMap) => warpedMap.projectedGeoMask)
+    const rotatedBboxProperties = computeRotatedBboxProperties(
+      projectedGeoMasks,
+      degreesToRadians(bearing)
+    )
+    let projectedGeoBbox = rotatedBboxProperties.bbox
+    const projectedGeoCenter = rotatedBboxProperties.center
+
+    const map = this.map
+    if (!map) {
+      throw new Error('Map not defined')
+    }
+
+    // Scale bbox based on fit with viewport bbox
+    if (options.fit) {
+      const canvas = map.getCanvas()
+      const viewportSize = [
+        canvas.width / window.devicePixelRatio,
+        canvas.height / window.devicePixelRatio
+      ] as Size
+
+      const adjustmentScale =
+        sizesToScale(bboxToSize(projectedGeoBbox), viewportSize, options.fit) /
+        sizesToScale(bboxToSize(projectedGeoBbox), viewportSize, 'contain')
+      projectedGeoBbox = scaleBbox(projectedGeoBbox, adjustmentScale)
+    }
+
+    // Project to lonlat
+    const projectedGeoRectangle = bboxToRectangle(projectedGeoBbox)
+    const geoRectangle = projectedGeoRectangle.map((point) =>
+      webMercatorToLonLat(point)
+    ) as Rectangle
+    const geoBbox = computeBbox(geoRectangle)
+    const geoCenter = webMercatorToLonLat(projectedGeoCenter)
+
+    // Get zoom via camera for bbox bounds
+    const camera = map.cameraForBounds(bboxToLine(geoBbox), options)
+
+    if (!camera) {
+      throw new Error('Unable to compute camera')
+    }
+
+    return { center: geoCenter, zoom: camera.zoom, bearing }
   }
 
   /**
@@ -132,7 +296,7 @@ export class WarpedMapLayer
     const viewportSize = [
       canvas.width / window.devicePixelRatio,
       canvas.height / window.devicePixelRatio
-    ] as [number, number]
+    ] as Size
 
     const geoCenterAsLngLat = this.map.getCenter()
     const projectedGeoCenter = lonLatToWebMercator([
@@ -209,7 +373,11 @@ export class WarpedMapLayer
   nativePassWarpedMapEvent(event: Event) {
     if (event instanceof WarpedMapEvent) {
       if (this.map) {
-        this.map.fire(event.type, { ...event.data, layerId: this.id })
+        this.map.fire(event.type, {
+          ...event.data,
+          error: event.error,
+          layerId: this.id
+        })
       }
     }
   }

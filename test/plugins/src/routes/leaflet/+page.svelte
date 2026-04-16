@@ -32,12 +32,13 @@
     WebGL2WarpedMap.getDefaultWithoutGeoreferencedMapOptions()
   )
   let testDefaultOptions = $state<Partial<WebGL2WarpedMapOptions>>({})
+  let showComponents = $state(true)
 
   onMount(async () => {
     annotation = await fetch(annotationUrl).then((response) => response.json())
 
     warpedMapList = new WarpedMapList()
-    await warpedMapList.addGeoreferenceAnnotation(annotation)
+    warpedMapList.addGeoreferenceAnnotation(annotation)
     const bbox = warpedMapList.getMapsBbox()
 
     options = mergeOptions(
@@ -53,6 +54,10 @@
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map)
+
+    map.on('error', (e) => {
+      console.warn(e)
+    })
 
     warpedMapLayer = new WarpedMapLayer(undefined, {
       warpedMapList
@@ -93,10 +98,10 @@
   })
 </script>
 
-<main class="grid grid-cols-1 h-dvh">
+<main class="grid grid-cols-1 grid-rows-1 h-dvh">
   <div bind:this={container}></div>
 
-  <div class="absolute top-0 right-0 m-2 z-500">
+  <div class="absolute top-0 right-0 m-2 z-500" class:hidden={!showComponents}>
     <AnnotationSelector
       annotationObjects={[undefined, ...data.annotationObjects]}
       {annotationUrl}
@@ -104,7 +109,36 @@
     ></AnnotationSelector>
   </div>
 
-  <div class="absolute top-0 m-2 z-500">
+  <div class="absolute top-0 m-2 z-500" class:hidden={!showComponents}>
     <OptionInputs bind:options></OptionInputs>
   </div>
+
+  <div class="absolute bottom-0 right-0 mr-2 mb-6 z-500">
+    <button
+      onclick={() => {
+        showComponents = !showComponents
+      }}>⛶</button
+    >
+  </div>
 </main>
+
+<svelte:head>
+  <title>Allmaps Leaflet plugin test</title>
+  <meta
+    name="Allmaps Leaflet plugin test"
+    content="Test page for the Allmaps Leaflet plugin"
+  />
+</svelte:head>
+
+<style>
+  button {
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 3px;
+    background: white;
+    font-size: 0.7rem;
+    font-family: ui-monospace, monospace;
+    padding: 0.1rem 0.35rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+</style>

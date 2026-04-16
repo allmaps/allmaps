@@ -46,7 +46,6 @@ export type {
   Gcp,
   MultiGeometryOptions,
   Bbox,
-  BboxOptions,
   Size,
   Fit,
   HomogeneousTransform,

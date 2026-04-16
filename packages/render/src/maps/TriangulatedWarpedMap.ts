@@ -220,12 +220,8 @@ export class TriangulatedWarpedMap extends WarpedMap {
    *
    * @param resourceMask - the new mask
    */
-  protected setResourceMask(
-    resourceFullMask: Ring,
-    resourceMask: Ring,
-    resourceAppliedMask: Ring
-  ) {
-    super.setResourceMask(resourceFullMask, resourceMask, resourceAppliedMask)
+  protected setResourceMask() {
+    super.setResourceMask()
     this.updateTriangulation()
   }
 

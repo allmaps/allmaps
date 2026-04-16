@@ -18,6 +18,16 @@ MIT
 
 `number`.
 
+### `angularMean(angles)`
+
+###### Parameters
+
+* `angles` (`number`)
+
+###### Returns
+
+`number`.
+
 ### `arrayContains(array, object, isEqualObject)`
 
 ###### Parameters
@@ -121,66 +131,13 @@ MIT
 
 `[number, number]`.
 
-### `bboxesToScale(bbox0, bbox1)`
+### `bboxesToScale(bbox0, bbox1, fit)`
 
 ###### Parameters
 
 * `bbox0` (`[number, number, number, number]`)
 * `bbox1` (`[number, number, number, number]`)
-
-###### Returns
-
-`number`.
-
-### `bearing(line)`
-
-###### Parameters
-
-* `line` (`[Point, Point]`)
-
-###### Returns
-
-`number`.
-
-### `bindPoint(point, min, max)`
-
-###### Parameters
-
-* `point` (`[number, number]`)
-* `min` (`[number, number]`)
-* `max` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `bindPointLngLatProjection(point)`
-
-###### Parameters
-
-* `point` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `bindPointWebMercatorProjection(point)`
-
-###### Parameters
-
-* `point` (`[number, number]`)
-
-###### Returns
-
-`[number, number]`.
-
-### `bindValue(value, min, max)`
-
-###### Parameters
-
-* `value` (`number`)
-* `min` (`number`)
-* `max` (`number`)
+* `fit?` (`Fit | undefined`)
 
 ###### Returns
 
@@ -218,6 +175,50 @@ MIT
 ###### Returns
 
 `string`.
+
+### `clipPoint(point, min, max)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+* `min` (`[number, number]`)
+* `max` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `clipPointLngLatProjection(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `clipPointWebMercatorProjection(point)`
+
+###### Parameters
+
+* `point` (`[number, number]`)
+
+###### Returns
+
+`[number, number]`.
+
+### `clipValue(value, min, max)`
+
+###### Parameters
+
+* `value` (`number`)
+* `min` (`number`)
+* `max` (`number`)
+
+###### Returns
+
+`number`.
 
 ### `closeMultiPolygon(multiPolygon)`
 
@@ -259,12 +260,11 @@ MIT
 
 `Bbox | undefined`.
 
-### `computeBbox(points, options)`
+### `computeBbox(geometry)`
 
 ###### Parameters
 
-* `points` (`Geometry | GeojsonGeometry`)
-* `options?` (`Partial<BboxOptions> | undefined`)
+* `geometry` (`Geometry | GeojsonGeometry`)
 
 ###### Returns
 
@@ -279,6 +279,23 @@ MIT
 ###### Returns
 
 `[number, number]`.
+
+### `computeRotatedBboxProperties(geometry, angle)`
+
+###### Parameters
+
+* `geometry` (`Geometry | GeojsonGeometry`)
+* `angle` (`number`)
+
+###### Returns
+
+`{
+  center: Point
+  size: Size
+  bbox: Bbox
+  rectangle: Rectangle
+  rotatedRectangle: Rectangle
+}`.
 
 ### `conformLineString(lineString)`
 
@@ -1307,7 +1324,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
 
 ###### Returns
 
@@ -1644,12 +1661,13 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 `[number, number]`.
 
-### `rectanglesToScale(rectangle0, rectangle1)`
+### `rectanglesToScale(rectangle0, rectangle1, fit)`
 
 ###### Parameters
 
 * `rectangle0` (`[Point, Point, Point, Point]`)
 * `rectangle1` (`[Point, Point, Point, Point]`)
+* `fit?` (`Fit | undefined`)
 
 ###### Returns
 
@@ -1714,13 +1732,13 @@ HEX string, e (`string`).g. '#0033ffff'
 
 `number`.
 
-### `rotatePoint(point, angle, anchor, cosAngle, sinAngle)`
+### `rotatePoint(point, angle, pivot, cosAngle, sinAngle)`
 
 ###### Parameters
 
 * `point` (`[number, number]`)
 * `angle` (`number | undefined`)
-* `anchor` (`Point | undefined`)
+* `pivot` (`Point | undefined`)
 * `cosAngle?` (`number | undefined`)
 * `sinAngle?` (`number | undefined`)
 
@@ -1728,19 +1746,28 @@ HEX string, e (`string`).g. '#0033ffff'
 
 `[number, number]`.
 
-### `rotatePoints(points, angle, anchor, cosAngle, sinAngle)`
+### `rotatePoints(points, angle, pivot)`
 
 ###### Parameters
 
 * `points` (`Array<Point>`)
 * `angle` (`number | undefined`)
-* `anchor` (`Point | undefined`)
-* `cosAngle?` (`number | undefined`)
-* `sinAngle?` (`number | undefined`)
+* `pivot` (`Point | undefined`)
 
 ###### Returns
 
 `Array<Point>`.
+
+### `scaleBbox(bbox, scale)`
+
+###### Parameters
+
+* `bbox` (`[number, number, number, number]`)
+* `scale` (`number`)
+
+###### Returns
+
+`[number, number, number, number]`.
 
 ### `scalePoint(point, scale)`
 
@@ -1829,16 +1856,16 @@ HEX string, e (`string`).g. '#0033ffff'
 
 ### `sizesToScale(size0, size1, fit)`
 
-Compute a size from two scales
+Compute a scale from two sizes
 
 For unspecified 'fit', the scale is computed based on the surface area derived from the sizes.
 
 For specified 'fit':
 
-Example for square rectangles '\*' and '+':
+Example for square rectangles bbox0 '\*' and bbox1 '.':
 
 'contain' where '\*' contains '.'
-(in the first image size0 is relatively wider)
+(in the first size0 is relatively wider)
 
 ```
            ****
@@ -1853,7 +1880,7 @@ Example for square rectangles '\*' and '+':
   \*\*\*\*
 
 'cover' where '\*' is covered by '.'
-(in the first image size0 is relatively wider)
+(in the first size0 is relatively wider)
 
 ```
            ....
@@ -1865,6 +1892,18 @@ Example for square rectangles '\*' and '+':
 ..****..     \*\*\*\*
 .  .
 ....
+
+'equal' where '\*' is of equal area as '.'
+(in the first size0 is relatively wider)
+
+```
+****       ....
+```
+
+.*..*.     *.\*\*.*
+.\*  *.     *.  .*
+.*..\*.     *.\*\*.*
+\*\*\*\*       ....
 
 ###### Parameters
 

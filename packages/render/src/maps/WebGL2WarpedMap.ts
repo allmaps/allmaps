@@ -113,7 +113,7 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
   }
 
 const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
-  checkOpacity: true
+  checkOpacity: false
 }
 
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5

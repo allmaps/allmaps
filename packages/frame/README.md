@@ -15,7 +15,7 @@ _This package and its algorithm was created with help from Claude Code / Sonnet 
 ## Installation
 
 ```bash
-npm install @allmaps/frame
+pnpm install @allmaps/frame
 ```
 
 ## Usage

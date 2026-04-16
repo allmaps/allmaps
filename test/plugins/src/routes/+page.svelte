@@ -1,6 +1,8 @@
 <main class="container mx-auto p-4 space-y-8">
   <section>
-    <h1 class="text-xl font-bold mb-4">Allmaps plugins</h1>
+    <h1 class="text-xl font-bold mb-4">Allmaps plugins tests</h1>
+
+    <p class="mb-2">These are test pages for the Allmaps webmap plugins.</p>
 
     <ul class="list-disc pl-5">
       <li>

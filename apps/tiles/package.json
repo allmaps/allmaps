@@ -30,7 +30,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
-    "ol": "^8.2.0"
+    "ol": "catalog:"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",

@@ -85,7 +85,7 @@
           id="random"
           onclick={() => {
             annotationUrl = ''
-            annotationUrl = 'https://sammeltassen-rumsey_roulette.web.val.run'
+            annotationUrl = 'https://annotations.allmaps.org/maps/random'
           }}
         >
           Random

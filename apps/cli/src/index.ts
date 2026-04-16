@@ -3,6 +3,7 @@
 import { Command, CommanderError } from '@commander-js/extra-typings'
 import { prettifyError, ZodError } from 'zod'
 
+import { analyze } from './commands/analyze.js'
 import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
@@ -19,6 +20,7 @@ const program = new Command()
   .name('allmaps')
   .exitOverride()
   .addCommand(annotation())
+  .addCommand(analyze())
   .addCommand(attach())
   .addCommand(fetch())
   .addCommand(frame())

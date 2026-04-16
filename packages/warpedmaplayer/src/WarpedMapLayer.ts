@@ -237,9 +237,11 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get mapIds for selected maps
+   * Get mapIds for all maps in the layer
    *
    * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @returns The mapIds of all maps
    */
   getMapIds(): string[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -248,13 +250,16 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the WarpedMap instances for selected maps
+   * Get the WarpedMap instances for all maps, or all selected maps
+   *
+   * If no argument is passed, the WarpedMap instance of all maps in the layer is passed
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
+   * @returns The WarpedMap instance of all (selected) map
    */
-  getWarpedMaps(mapIds?: string[]): Iterable<WebGL2WarpedMap> {
+  getWarpedMaps(mapIds?: string[]): Array<WebGL2WarpedMap> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMaps({ mapIds })
@@ -272,7 +277,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the center of the bounding box of all maps
+   * Get the center of the bounding box of all maps in the layer
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -288,7 +293,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the center of the bounding box of the maps
+   * Get the center of the bounding box of all selected maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -310,7 +315,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the bounding box of all maps
+   * Get the bounding box of all maps in the layer
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -326,7 +331,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the bounding box of the maps
+   * Get the bounding box of all selected maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -348,7 +353,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the convex hull of all maps
+   * Get the convex hull of all maps in the layer
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -367,7 +372,7 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the convex hull of the maps
+   * Get the convex hull of all selected maps maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -917,6 +922,11 @@ export abstract class BaseWarpedMapLayer<
       this.nativeUpdate.bind(this)
     )
 
+    this.renderer.addEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
       this.nativePassWarpedMapEvent.bind(this)
@@ -1001,6 +1011,11 @@ export abstract class BaseWarpedMapLayer<
     this.renderer.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.removeEventListener(
