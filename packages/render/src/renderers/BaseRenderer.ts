@@ -42,28 +42,6 @@ import type {
   Sprite
 } from '../shared/types.js'
 
-// These buffers should be in growing order
-const REQUEST_VIEWPORT_BUFFER_RATIO = 0
-const OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO = 8
-const PRUNE_VIEWPORT_BUFFER_RATIO = 8
-const OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO = 16
-
-/**
- * 0 = no correction, -1 = shaper, +1 = less sharp
- * Normal has more effect on smaller scale factors
- * Log2 (i.e. per zoomlevel) has equal effect on all scale factors
- */
-const SCALE_FACTOR_CORRECTION = 0
-const LOG2_SCALE_FACTOR_CORRECTION = -0.5
-
-const SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = Infinity
-const SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
-
-const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
-const MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO = 50
-
-const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
-
 /**
  * Abstract base class for renderers
  */
@@ -99,7 +77,28 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     super()
 
     // TODO: move defaults for tunable options here
-    this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {}
+    this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {
+      // These buffers should be in growing order
+      requestViewportBufferRatio: 0,
+      overviewRequestViewportBufferRatio: 8,
+      pruneViewportBufferRatio: 8,
+      overviewPruneViewportBufferRatio: 16,
+
+      // 0 = no correction, -1 = shaper, +1 = less sharp
+      // Normal has more effect on smaller scale factors
+      // Log2 (i.e. per zoomlevel) has equal effect on all scale factors
+      scaleFactorCorrection: 0,
+      log2ScaleFactorCorrection: -0.5,
+
+      spritesMaxHigherLog2ScaleFactorDiff: Infinity,
+      spritesMaxLowerLog2ScaleFactorDiff: 1,
+
+      // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
+      maxMapOverviewResolution: 1024 * 1024,
+      maxTotalOverviewResolutionRatio: 50,
+
+      maxGcpsExactTpsToResource: 100
+    }
 
     this.options = mergeOptions(
       this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
@@ -415,7 +414,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return Array.from(
       this.findMapsInViewport(
         this.shouldAnticipateInteraction()
-          ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
+          ? this.options.overviewPruneViewportBufferRatio
           : 1
       )
     )
@@ -458,22 +457,26 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const overviewFetchableTilesForViewport: FetchableTile[] = []
 
     const mapsInViewportForRequest = this.findMapsInViewport(
-      this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
+      this.shouldAnticipateInteraction()
+        ? this.options.requestViewportBufferRatio
+        : 1
     )
     const mapsInViewportForOverviewRequest = new Set([
       ...this.findMapsInViewport(
         this.shouldAnticipateInteraction()
-          ? OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO
+          ? this.options.overviewRequestViewportBufferRatio
           : 1
       ),
       ...this.findMapsToAnticipate()
     ])
     const mapsInViewportForPrune = this.findMapsInViewport(
-      this.shouldAnticipateInteraction() ? PRUNE_VIEWPORT_BUFFER_RATIO : 1
+      this.shouldAnticipateInteraction()
+        ? this.options.pruneViewportBufferRatio
+        : 1
     )
     const mapsInViewportForOverviewPrune = this.findMapsInViewport(
       this.shouldAnticipateInteraction()
-        ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
+        ? this.options.overviewPruneViewportBufferRatio
         : 1
     )
 
@@ -534,8 +537,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       ...overviewFetchableTilesForViewport
     ]
     const allRequestedTilesForViewport = allFetchableTilesForViewport.filter(
-      (fetchableTile) =>
-        this.warpedMapList.getWarpedMap(fetchableTile.mapId)?.shouldRenderMap()
+      (fetchableTile) => {
+        const warpedMap = this.warpedMapList.getWarpedMap(fetchableTile.mapId)
+        return warpedMap?.shouldRenderMap() || warpedMap?.options.anticipate
+      }
     )
 
     // Request all fetchable tiles to render, and prune tile cache
@@ -634,8 +639,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const tileZoomLevel = getTileZoomLevelForScale(
       warpedMap.image.tileZoomLevels,
       warpedMap.getResourceToViewportScale(viewport),
-      SCALE_FACTOR_CORRECTION,
-      LOG2_SCALE_FACTOR_CORRECTION
+      this.options.scaleFactorCorrection,
+      this.options.log2ScaleFactorCorrection
     )
     warpedMap.setTileZoomLevelForViewport(tileZoomLevel)
 
@@ -654,7 +659,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
     const projectedGeoBufferedViewportRectangle =
       viewport.getProjectedGeoBufferedRectangle(
-        this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
+        this.shouldAnticipateInteraction()
+          ? this.options.requestViewportBufferRatio
+          : 1
       )
     // Optimise computation time of backwards transformation:
     // Since this is the only place transformToResource is called
@@ -665,7 +672,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // this could lead to inaccurate tile loading (in addition to the reason explained below).
     const projectedTransformer =
       warpedMap.transformationType === 'thinPlateSpline' &&
-      warpedMap.gcps.length > MAX_GCPS_EXACT_TPS_TO_RESOURCE
+      warpedMap.gcps.length > this.options.maxGcpsExactTpsToResource
         ? warpedMap.getProjectedTransformer('polynomial')
         : warpedMap.projectedTransformer
     // Compute viewport in resource
@@ -781,7 +788,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.shouldRenderMap()) {
+    if (!warpedMap.shouldRenderMap() && !warpedMap.options.anticipate) {
       return []
     }
 
@@ -796,7 +803,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // or if many maps to render
     // or if tiles from sprites
     const maxTotalFetchableTilesResolution =
-      this.viewport.viewportResolution * MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO
+      this.viewport.viewportResolution *
+      this.options.maxTotalOverviewResolutionRatio
     if (
       totalFetchableTilesForViewportResolution >
         maxTotalFetchableTilesResolution ||
@@ -809,8 +817,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const overviewTileZoomLevel = warpedMap.image.tileZoomLevels
       .filter(
         (tileZoomLevel) =>
-          getTileZoomLevelResolution(tileZoomLevel) <=
-          MAX_MAP_OVERVIEW_RESOLUTION
+          warpedMap.options.anticipateTileZoomLevel == 'top'
+            ? true
+            : getTileZoomLevelResolution(tileZoomLevel) <=
+              this.options.maxMapOverviewResolution
         // Neglect zoomlevels that contain too many pixels
       )
       .sort(
@@ -825,8 +835,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
     if (
-      !mapsInViewportForOverviewRequest.has(mapId) ||
-      !warpedMap.shouldRenderMap()
+      !warpedMap.options.anticipate &&
+      (!mapsInViewportForOverviewRequest.has(mapId) ||
+        !warpedMap.shouldRenderMap())
     ) {
       return []
     }
@@ -979,9 +990,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           Math.log2(tile.tileZoomLevel.scaleFactor) -
           Math.log2(spriteCachedTilesScaleFactor)
         const scaleFactorDiffWithinHigherTolerance =
-          log2ScaleFactorDiff <= SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+          log2ScaleFactorDiff <=
+          this.options.spritesMaxHigherLog2ScaleFactorDiff
         const scaleFactorDiffWithinLowerTolerance =
-          -log2ScaleFactorDiff <= SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+          -log2ScaleFactorDiff <=
+          this.options.spritesMaxLowerLog2ScaleFactorDiff
         if (
           scaleFactorDiffWithinHigherTolerance &&
           scaleFactorDiffWithinLowerTolerance

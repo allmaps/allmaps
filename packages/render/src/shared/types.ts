@@ -59,6 +59,7 @@ export type WarpedMapOptions = {
   projection: Projection
   visible: boolean
   anticipate: boolean
+  anticipateTileZoomLevel: 'overview' | 'top'
   applyMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }
@@ -156,6 +157,17 @@ export type WarpedMapListOptions<W extends WarpedMap> =
 
 export type SpecificBaseRenderOptions<W extends WarpedMap> = {
   warpedMapList?: WarpedMapList<W>
+  requestViewportBufferRatio: number
+  overviewRequestViewportBufferRatio: number
+  pruneViewportBufferRatio: number
+  overviewPruneViewportBufferRatio: number
+  scaleFactorCorrection: number
+  log2ScaleFactorCorrection: number
+  spritesMaxHigherLog2ScaleFactorDiff: number
+  spritesMaxLowerLog2ScaleFactorDiff: number
+  maxMapOverviewResolution: number
+  maxTotalOverviewResolutionRatio: number
+  maxGcpsExactTpsToResource: number
 }
 export type BaseRenderOptions<W extends WarpedMap> =
   SpecificBaseRenderOptions<W> & Partial<WarpedMapListOptions<W>>

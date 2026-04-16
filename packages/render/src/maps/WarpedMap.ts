@@ -61,7 +61,7 @@ export const UNDEFINED_GEOREFERENCED_MAP_OPTIONS = {
   internalProjection: undefined
 }
 
-export const DEFAULT_WARPED_MAP_OPTIONS = {
+export const DEFAULT_WARPED_MAP_OPTIONS: WarpedMapOptions = {
   gcps: [],
   resourceMask: [],
   transformationType: 'polynomial' as TransformationType,
@@ -69,6 +69,7 @@ export const DEFAULT_WARPED_MAP_OPTIONS = {
   projection: webMercatorProjection,
   visible: true,
   anticipate: false,
+  anticipateTileZoomLevel: 'overview',
   applyMask: true,
   distortionMeasure: undefined
 }
