@@ -332,7 +332,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    */
   getMapIds(partialSelectionOptions?: Partial<SelectionOptions>): string[] {
     // Enable the same selection options when getting mapIds
-    return Array.from(this.getWarpedMaps(partialSelectionOptions)).map(
+    return this.getWarpedMaps(partialSelectionOptions).map(
       (warpedMap) => warpedMap.mapId
     )
   }
@@ -353,7 +353,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     partialSelectionAndProjectionOptions?: Partial<
       SelectionOptions & ProjectionOptions
     >
-  ): Iterable<W> {
+  ): Array<W> {
     const selectionAndProjectionOptions = mergeOptions(
       mergeOptions(DEFAULT_SELECTION_OPTIONS, {
         projection: this.options.projection
@@ -575,7 +575,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    */
   getMapMapOptions(mapId: string): Partial<GetWarpedMapOptions<W>> | undefined {
     const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
-    const warpedMap = Array.from(warpedMaps)[0]
+    const warpedMap = warpedMaps[0]
     return warpedMap?.mapOptions as GetWarpedMapOptions<W>
   }
 
@@ -589,7 +589,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    */
   getMapOptions(mapId: string): GetWarpedMapOptions<W> | undefined {
     const warpedMaps = this.getWarpedMaps({ mapIds: [mapId] })
-    const warpedMap = Array.from(warpedMaps)[0]
+    const warpedMap = warpedMaps[0]
     return warpedMap?.options as GetWarpedMapOptions<W>
   }
 

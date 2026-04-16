@@ -1,11 +1,17 @@
 import monotoneChainConvexHull from 'monotone-chain-convex-hull'
 
-import { isGeojsonGeometry, geojsonGeometryToGeometry } from './geojson.js'
-import { isPoint, isPolygon, isMultiPolygon, distance } from './geometry.js'
+import { isGeojsonGeometry, geojsonGeometryToPoints } from './geojson.js'
+import {
+  distance,
+  isGeometry,
+  geometryToPoints,
+  rotatePoints,
+  rotatePoint,
+  midPoint
+} from './geometry.js'
 
 import type {
   Point,
-  LineString,
   Polygon,
   Geometry,
   Line,
@@ -14,8 +20,7 @@ import type {
   Size,
   Fit,
   GeojsonGeometry,
-  Ring,
-  BboxOptions
+  Ring
 } from '@allmaps/types'
 
 export const MIN_POINT_LNG_LAT_PROJECTION = [-180, -90] as Point
@@ -45,27 +50,27 @@ export function computeMinMax(values: number[]): [number, number] {
   return [min, max]
 }
 
-export function bindValue(value: number, min: number, max: number): number {
+export function clipValue(value: number, min: number, max: number): number {
   return Math.max(Math.min(value, max), min)
 }
 
-export function bindPoint(point: Point, min: Point, max: Point): Point {
+export function clipPoint(point: Point, min: Point, max: Point): Point {
   return [
-    bindValue(point[0], min[0], max[0]),
-    bindValue(point[1], min[1], max[1])
+    clipValue(point[0], min[0], max[0]),
+    clipValue(point[1], min[1], max[1])
   ]
 }
 
-export function bindPointLngLatProjection(point: Point): Point {
-  return bindPoint(
+export function clipPointLngLatProjection(point: Point): Point {
+  return clipPoint(
     point,
     MIN_POINT_LNG_LAT_PROJECTION,
     MAX_POINT_LNG_LAT_PROJECTION
   )
 }
 
-export function bindPointWebMercatorProjection(point: Point): Point {
-  return bindPoint(
+export function clipPointWebMercatorProjection(point: Point): Point {
+  return clipPoint(
     point,
     MIN_POINT_WEBMERCATOR_PROJECTION,
     MAX_POINT_WEBMERCATOR_PROJECTION
@@ -73,45 +78,65 @@ export function bindPointWebMercatorProjection(point: Point): Point {
 }
 
 // Note: bbox order is minX, minY, maxX, maxY
-export function computeBbox(
-  points: Geometry | GeojsonGeometry,
-  options?: Partial<BboxOptions>
-): Bbox {
-  if (isPoint(points)) {
-    points = [points]
-  }
-  if (isPolygon(points)) {
-    points = points.flat()
-  }
-  if (isMultiPolygon(points)) {
-    points = points.flat()
-  }
-  if (isGeojsonGeometry(points)) {
-    return computeBbox(geojsonGeometryToGeometry(points), options)
+export function computeBbox(geometry: Geometry | GeojsonGeometry): Bbox {
+  let points: Point[]
+  if (isGeometry(geometry)) {
+    points = geometryToPoints(geometry)
+  } else if (isGeojsonGeometry(geometry)) {
+    points = geojsonGeometryToPoints(geometry)
+  } else {
+    throw new Error(`Unsupported Geometry`)
   }
 
-  points = points as LineString
-
-  if (options?.clipLngLat) {
-    points = points.map((point) => bindPointLngLatProjection(point))
-  }
-  if (options?.clipWebMercator) {
-    points = points.map((point) => bindPointWebMercatorProjection(point))
-  }
-
-  // TODO: do this without making two new arrays
-  const xs = []
-  const ys = []
-
-  for (const point of points) {
-    xs.push(point[0])
-    ys.push(point[1])
-  }
+  const xs = points.map((point) => point[0])
+  const ys = points.map((point) => point[1])
 
   const [minX, maxX] = computeMinMax(xs)
   const [minY, maxY] = computeMinMax(ys)
 
   return [minX, minY, maxX, maxY]
+}
+
+// Takes angle in radians
+export function computeRotatedBboxProperties(
+  geometry: Geometry | GeojsonGeometry,
+  angle: number
+): {
+  center: Point
+  size: Size
+  bbox: Bbox
+  rectangle: Rectangle
+  rotatedRectangle: Rectangle
+} {
+  let points: Point[]
+  if (isGeometry(geometry)) {
+    points = geometryToPoints(geometry)
+  } else if (isGeojsonGeometry(geometry)) {
+    points = geojsonGeometryToPoints(geometry)
+  } else {
+    throw new Error(`Unsupported Geometry`)
+  }
+
+  // Note: approach similar to Viewport.fromSizeAndProjectedGeoPolygon()
+
+  // Initially pivot around midpoint
+  const pivot: Point = midPoint(...points)
+
+  // Rotate points around the pivot and compute bbox and it's center
+  const rotatedPoints = rotatePoints(points, angle, pivot)
+  const rotatedPointsBbox = computeBbox(rotatedPoints)
+  const rotatedPointsBboxCenter = bboxToCenter(rotatedPointsBbox)
+  const size = bboxToSize(rotatedPointsBbox)
+
+  // Rotate center back around pivot and construct final 'bbox'
+  // (but actually rectangle, since bbox must be horizontal)
+  // around center, using same width and height as rotated bbox
+  const center = rotatePoint(rotatedPointsBboxCenter, -angle, pivot)
+  const bbox = sizeToBbox(size, center)
+  const rectangle = bboxToRectangle(bbox) as Rectangle
+  const rotatedRectangle = rotatePoints(rectangle, -angle, center) as Rectangle
+
+  return { center, size, bbox, rectangle, rotatedRectangle }
 }
 
 export function combineBboxes(...bboxes: Bbox[]): Bbox | undefined {
@@ -246,16 +271,16 @@ export function convexHull(points: Point[]): Ring | undefined {
 // Sizes and Scales
 
 /**
- * Compute a size from two scales
+ * Compute a scale from two sizes
  *
  * For unspecified 'fit', the scale is computed based on the surface area derived from the sizes.
  *
  * For specified 'fit':
  *
- * Example for square rectangles '*' and '+':
+ * Example for square rectangles bbox0 '*' and bbox1 '.':
  *
  * 'contain' where '*' contains '.'
- * (in the first image size0 is relatively wider)
+ * (in the first size0 is relatively wider)
  *
  *                ****
  *                *  *
@@ -267,7 +292,7 @@ export function convexHull(points: Point[]): Ring | undefined {
  *
  *
  * 'cover' where '*' is covered by '.'
- * (in the first image size0 is relatively wider)
+ * (in the first size0 is relatively wider)
  *
  *                ....
  *                .  .
@@ -277,24 +302,41 @@ export function convexHull(points: Point[]): Ring | undefined {
  *                .  .
  *                ....
  *
+ * 'equal' where '*' is of equal area as '.'
+ * (in the first size0 is relatively wider)
+ *
+ *     ****       ....
+ *    .*..*.     *.**.*
+ *    .*  *.     *.  .*
+ *    .*..*.     *.**.*
+ *     ****       ....
+ *
  * @export
  * @param size0 - first size
  * @param size1 - second size
  * @param fit - fit
  */
 export function sizesToScale(size0: Size, size1: Size, fit?: Fit): number {
-  if (!fit) {
-    return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
-  } else if (fit === 'contain') {
+  if (fit === 'contain') {
     return size0[0] / size0[1] >= size1[0] / size1[1] // size0 is relatively wider
       ? size0[0] / size1[0]
       : size0[1] / size1[1]
-  } else {
-    // fit = 'cover'
+  } else if (fit === 'cover') {
     return size0[0] / size0[1] >= size1[0] / size1[1] // size0 is relatively wider
       ? size0[1] / size1[1]
       : size0[0] / size1[0]
+  } else if (!fit || fit == 'equal') {
+    return Math.sqrt((size0[0] * size0[1]) / (size1[0] * size1[1]))
+  } else {
+    throw new Error('Unknown fit')
   }
+}
+
+export function scaleBbox(bbox: Bbox, scale: number): Bbox {
+  const center = bboxToCenter(bbox)
+  let size = bboxToSize(bbox)
+  size = scaleSize(size, scale)
+  return sizeToBbox(size, center)
 }
 
 export function scaleSize(size: Size, scale: number): Size {
@@ -327,13 +369,18 @@ export function sizeToRectangle(size: Size, center?: Point): Rectangle {
   return bboxToRectangle(sizeToBbox(size, center))
 }
 
-export function bboxesToScale(bbox0: Bbox, bbox1: Bbox): number {
-  return sizesToScale(bboxToSize(bbox0), bboxToSize(bbox1))
+export function bboxesToScale(bbox0: Bbox, bbox1: Bbox, fit?: Fit): number {
+  return sizesToScale(bboxToSize(bbox0), bboxToSize(bbox1), fit)
 }
 
 export function rectanglesToScale(
   rectangle0: Rectangle,
-  rectangle1: Rectangle
+  rectangle1: Rectangle,
+  fit?: Fit
 ): number {
-  return sizesToScale(rectangleToSize(rectangle0), rectangleToSize(rectangle1))
+  return sizesToScale(
+    rectangleToSize(rectangle0),
+    rectangleToSize(rectangle1),
+    fit
+  )
 }

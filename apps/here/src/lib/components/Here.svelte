@@ -319,7 +319,7 @@
         if (dragging) {
           compassState.compassMode = 'custom'
           compassState.customRotation =
-            view.getRotation() * (180 / Math.PI) +
+            view.getRotation() * (180 / Math.PI) -
             (compassState.selectedMapBearing || 0)
         }
       })
@@ -524,21 +524,21 @@
       compassState.compassMode === 'north' &&
       compassState.selectedMapBearing !== undefined
     ) {
-      setResourceRotation(-compassState.selectedMapBearing * (Math.PI / 180))
+      setResourceRotation(compassState.selectedMapBearing * (Math.PI / 180))
     } else if (
       compassState.compassMode === 'follow-orientation' &&
       sensorsState.orientationAlpha &&
       compassState.selectedMapBearing !== undefined
     ) {
       setResourceRotation(
-        (sensorsState.orientationAlpha + compassState.selectedMapBearing + 45) *
+        (sensorsState.orientationAlpha - compassState.selectedMapBearing + 45) *
           (Math.PI / 180)
       )
 
       setPinRotation(
         sensorsState.orientationAlpha * (Math.PI / 180)
         // (360 -
-        //   (sensorsState.orientationAlpha +
+        //   (sensorsState.orientationAlpha -
         //     compassState.selectedMapBearing +
         //     45)) *
         //   (Math.PI / 180)
@@ -567,12 +567,12 @@
       compassState.selectedMapBearing !== undefined
     ) {
       setPinRotation(
-        (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
+        (-sensorsState.orientationAlpha - compassState.selectedMapBearing) *
           (Math.PI / 180)
       )
     } else if (compassState.compassMode === 'follow-orientation') {
       // setPinRotation(
-      //   (-sensorsState.orientationAlpha + compassState.selectedMapBearing) *
+      //   (-sensorsState.orientationAlpha - compassState.selectedMapBearing) *
       //     (Math.PI / 180)
       // )
     }

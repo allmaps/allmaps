@@ -46,6 +46,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@allmaps/bearing": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",

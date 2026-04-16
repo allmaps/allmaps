@@ -372,7 +372,7 @@ export class WarpedMapLayer
    *
    * @param georeferencedMap - Georeferenced Map
    * @param mapOptions - Map options
-   * @returns Map ID of the map that was added, or an error
+   * @returns Map ID of the map that was added
    */
   addGeoreferencedMap(
     georeferencedMap: unknown,
@@ -393,7 +393,7 @@ export class WarpedMapLayer
    * Removes a Georeferenced Map
    *
    * @param georeferencedMap - Georeferenced Map
-   * @returns Map ID of the map that was removed, or an error
+   * @returns Map ID of the map that was removed
    */
   removeGeoreferencedMap(georeferencedMap: unknown): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -409,7 +409,7 @@ export class WarpedMapLayer
    * Removes a Georeferenced Map by its ID
    *
    * @param mapId - Map ID of the georeferenced map to remove
-   * @returns Map ID of the map that was removed, or an error
+   * @returns Map ID of the map that was removed
    */
   removeGeoreferencedMapById(mapId: string): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -468,9 +468,11 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get mapIds for selected maps
+   * Get mapIds for all maps in the layer
    *
    * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @returns The mapIds of all maps
    */
   getMapIds(): string[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -479,13 +481,16 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the WarpedMap instances for selected maps
+   * Get the WarpedMap instances for all maps, or all selected maps
+   *
+   * If no argument is passed, the WarpedMap instance of all maps in the layer is passed
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
+   * @returns The WarpedMap instance of all (selected) map
    */
-  getWarpedMaps(mapIds?: string[]): Iterable<WebGL2WarpedMap> {
+  getWarpedMaps(mapIds?: string[]): Array<WebGL2WarpedMap> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMaps({ mapIds })
@@ -503,7 +508,7 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the center of the bounding box of all maps
+   * Get the center of the bounding box of all maps in the layer
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -519,7 +524,7 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the center of the bounding box of the maps
+   * Get the center of the bounding box of all selected maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
@@ -541,14 +546,13 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the bounding box of all maps
+   * Get the bounding box of all maps in the layer
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
-   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
-   * @param projectionOptions - ProjectionOptions
+   * @param projection - Projection in which to return the result
    * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
   getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
@@ -558,15 +562,14 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the bounding box of the maps
+   * Get the bounding box of all selected maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
-   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projectionOptions - Projection options
+   * @param projection - Projection in which to return the result
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
@@ -581,15 +584,14 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the convex hull of all maps
+   * Get the convex hull of all maps in the layer
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
-   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projectionOptions - Projection options
+   * @param projection - Projection in which to return the result
    * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
    */
   getConvexHull(
@@ -601,15 +603,14 @@ export class WarpedMapLayer
   }
 
   /**
-   * Get the convex hull of the maps
+   * Get the convex hull of all selected maps maps
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
-   * Set projectionOptions to { projection: { definition: 'EPSG:3857' } } to get result in WebMercator.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projectionOptions - Projection options
+   * @param projection - Projection in which to return the result
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
@@ -1098,12 +1099,22 @@ export class WarpedMapLayer
   }
 
   contextLost(event: Event) {
-    event.preventDefault()
+    if (
+      'preventDefault' in event &&
+      typeof event.preventDefault === 'function'
+    ) {
+      event.preventDefault()
+    }
     this.renderer?.contextLost()
   }
 
   contextRestored(event: Event) {
-    event.preventDefault()
+    if (
+      'preventDefault' in event &&
+      typeof event.preventDefault === 'function'
+    ) {
+      event.preventDefault()
+    }
     this.renderer?.contextRestored()
   }
 
