@@ -20,21 +20,11 @@ With [@allmaps/render](../../packages/render/) relying of most other Allmaps pac
 
 ## Installation
 
-Install with pnpm:
-
-```sh
-pnpm install @allmaps/render
-```
-
-Build locally:
-
-```sh
-pnpm run build
-```
+Follow the [installation guidelines for the monorepo](../../) to install and build this and all packages it requires.
 
 ## Usage
 
-Get a local server running the plugins:
+Get a local server running the plugins by running the following command in this directory:
 
 ```bash
 pnpm run dev

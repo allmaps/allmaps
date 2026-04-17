@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/maplibre</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5.0.0/dist/maplibre-gl.css"
+      type="text/css"
+    />
+    <script src="https://unpkg.com/maplibre-gl@5.0.0/dist/maplibre-gl.js"></script>
+    <style>
+      body {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        font-family: monospace;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="module">
+      import { WarpedMapLayer } from './src/index.ts'
+
+      const map = new maplibregl.Map({
+        container: 'map',
+        // @ts-expect-error MapLibre types are incompatible
+        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+        center: [-73.9337, 40.8011],
+        zoom: 11.5,
+        // Pitch is currently not supported by the Allmaps plugin for MapLibre
+        maxPitch: 0
+      })
+
+      const annotationUrl =
+        'https://annotations.allmaps.org/images/d180902cb93d5bf2'
+      const warpedMapLayer = new WarpedMapLayer()
+
+      map.on('load', () => {
+        // @ts-expect-error MapLibre types are incompatible
+        map.addLayer(warpedMapLayer)
+        warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+      })
+    </script>
+  </body>
+</html>

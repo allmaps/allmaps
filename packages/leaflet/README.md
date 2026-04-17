@@ -42,7 +42,7 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
-The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/).
+The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/). A minimal example is also included in `./index.html` and can be served via `pnpm run dev`.
 
 ## Usage
 
@@ -70,7 +70,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map)
 
 const annotationUrl =
-  'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+  'https://annotations.allmaps.org/maps/2d49b3ecd1ba6346'
 const warpedMapLayer = new WarpedMapLayer(annotationUrl).addTo(map)
 ```
 

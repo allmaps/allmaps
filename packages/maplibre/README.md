@@ -35,7 +35,7 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
-The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/).
+The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/). A minimal example is also included in `./index.html` and can be served via `pnpm run dev`.
 
 ## Usage
 

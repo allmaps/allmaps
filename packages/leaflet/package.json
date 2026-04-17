@@ -29,6 +29,7 @@
   },
   "scripts": {
     "watch": "tsc --watch --noCheck",
+    "dev": "vite dev --mode localhost",
     "build": "tsc --noCheck",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
@@ -62,6 +63,7 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:"
   }
 }
