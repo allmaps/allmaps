@@ -1223,22 +1223,12 @@ export class WarpedMapLayer
   }
 
   contextLost(event: Event) {
-    if (
-      'preventDefault' in event &&
-      typeof event.preventDefault === 'function'
-    ) {
-      event.preventDefault()
-    }
+    event.preventDefault()
     this.renderer?.contextLost()
   }
 
   contextRestored(event: Event) {
-    if (
-      'preventDefault' in event &&
-      typeof event.preventDefault === 'function'
-    ) {
-      event.preventDefault()
-    }
+    event.preventDefault()
     this.renderer?.contextRestored()
   }
 
