@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@allmaps/openlayers</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/ol@8.2.0/ol.css"
+      type="text/css"
+    />
+    <script src="https://unpkg.com/ol@v8.2.0/dist/ol.js"></script>
+    <style>
+      body {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        font-family: monospace;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="module">
+      import { WarpedMapLayer } from './src/index.ts'
+
+      const map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([-71.00661, 42.37124]),
+          zoom: 14
+        })
+      })
+
+      const annotationUrl =
+        'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
+      const warpedMapLayer = new WarpedMapLayer()
+
+      map.addLayer(warpedMapLayer)
+      warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+    </script>
+  </body>
+</html>
