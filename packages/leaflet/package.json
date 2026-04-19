@@ -28,9 +28,10 @@
     "directory": "packages/leaflet"
   },
   "scripts": {
-    "watch": "tsc --watch --noCheck",
     "dev": "vite dev --mode localhost",
-    "build": "tsc --noCheck",
+    "watch": "vite build --watch",
+    "build": "vite build",
+    "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
@@ -64,6 +65,8 @@
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vite-plugin-dts": "^3.8.3",
+    "vite-plugin-no-bundle": "^4.0.0"
   }
 }
