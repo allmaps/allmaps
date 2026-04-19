@@ -74,9 +74,6 @@ WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://ma
 * `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
 * `WarpedMapLayer` currently does not support pitch, so disable it on your map.
 * Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
-* `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
-* `WarpedMapLayer` currently does not support pitch, so disable it on your map.
-* Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
 
 ```js
 const warpedMapLayerWithUniqueId = new WarpedMapLayer({layerId: 'my-unique-id'})
