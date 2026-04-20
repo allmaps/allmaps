@@ -6,6 +6,7 @@
     "paths": {}
   },
   "references": [
+    { "path": "../bearing" },
     { "path": "../project" },
     { "path": "../render" },
     { "path": "../transform" },

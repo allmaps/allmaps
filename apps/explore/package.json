@@ -33,8 +33,8 @@
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "lodash-es": "^4.17.21",
-    "maplibre-gl": "^5.7.0",
-    "pmtiles": "^3.0.6"
+    "maplibre-gl": "catalog:",
+    "pmtiles": "catalog:"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",

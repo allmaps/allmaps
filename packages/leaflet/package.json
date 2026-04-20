@@ -49,14 +49,14 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/warpedmaplayer": "workspace:^",
-    "leaflet": "^1.9.4"
+    "leaflet": "catalog:"
   },
   "license": "MIT",
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
-    "@types/leaflet": "^1.9.3",
+    "@types/leaflet": "catalog:",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",

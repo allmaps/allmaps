@@ -12,13 +12,13 @@ export function readJSONFile(filename: string) {
 }
 
 describe('Bearing', () => {
-  test('GeoreferencedMap: no info, warnings or errors', () => {
+  test('computeGeoreferencedMapBearing', () => {
     const georeferencedMap = readJSONFile(
       path.join(inputDir, 'georeferenced-map.json')
     )
 
     const bearing = computeGeoreferencedMapBearing(georeferencedMap)
 
-    expect(bearing).to.equal(-45.56119258566859)
+    expect(bearing).to.equal(30.48243288240172)
   })
 })

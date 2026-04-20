@@ -1,3 +1,4 @@
+import { AnalysisItem } from '@allmaps/analyze'
 import { createReadStream, readFileSync, ReadStream } from 'fs'
 import { Readable } from 'stream'
 import StreamValues from 'stream-json/streamers/StreamValues.js'
@@ -171,4 +172,17 @@ export function printJson(json: unknown) {
 
 export function printString(str: string) {
   console.log(str)
+}
+
+export function printAnalysisItem(item: AnalysisItem, mapIndex: number) {
+  printString(
+    (item.mapId ?? `Map ${mapIndex + 1}`) +
+      '\t' +
+      item.type +
+      '\t' +
+      item.code +
+      '\t' +
+      item.message +
+      (item.originalMessage ? '\t' + item.originalMessage : '')
+  )
 }

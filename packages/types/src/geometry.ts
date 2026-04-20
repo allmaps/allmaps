@@ -75,11 +75,6 @@ export type Gcp = { resource: Point; geo: Point }
  */
 export type Bbox = [number, number, number, number]
 
-export type BboxOptions = {
-  clipLngLat: boolean
-  clipWebMercator: boolean
-}
-
 /**
  * Two numbers indicating the size of a Bbox as [width, height] or [xSize, ySize].
  * Alternatively, two numbers indicating the minimum and maximum of, for example, an array of numbers
@@ -88,11 +83,12 @@ export type BboxOptions = {
 export type Size = [number, number]
 
 /**
- * Two ways two rectangles (or shapes in general) can overlap:
+ * Ways two rectangles (or shapes in general) can overlap:
  * - 'contain': The first contains the second
  * - 'cover': The first is covered by the second
+ * - 'equal': The first and second have equal size
  */
-export type Fit = 'cover' | 'contain'
+export type Fit = 'cover' | 'contain' | 'equal'
 
 /**
  * Weights array of a 2D Homogeneous Transform Matrix

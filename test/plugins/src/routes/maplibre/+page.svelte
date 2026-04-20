@@ -32,12 +32,13 @@
     WebGL2WarpedMap.getDefaultWithoutGeoreferencedMapOptions()
   )
   let testDefaultOptions = $state<Partial<WebGL2WarpedMapOptions>>({})
+  let showComponents = $state(true)
 
   onMount(async () => {
     annotation = await fetch(annotationUrl).then((response) => response.json())
 
     warpedMapList = new WarpedMapList()
-    await warpedMapList.addGeoreferenceAnnotation(annotation)
+    warpedMapList.addGeoreferenceAnnotation(annotation)
     const bbox = warpedMapList.getMapsBbox()
 
     options = mergeOptions(
@@ -59,11 +60,14 @@
 
     map.on('load', () => {
       warpedMapLayer = new WarpedMapLayer({ warpedMapList })
-      // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
       if (bbox) {
         map.fitBounds(bbox, { padding: 20, duration: 0 })
       }
+    })
+
+    map.on('error', (e) => {
+      console.warn(e)
     })
   })
 
@@ -95,10 +99,10 @@
   })
 </script>
 
-<main class="grid grid-cols-1 h-dvh">
+<main class="grid grid-cols-1 grid-rows-1 h-dvh">
   <div bind:this={container}></div>
 
-  <div class="absolute top-0 right-0 m-2">
+  <div class="absolute top-0 right-0 m-2" class:hidden={!showComponents}>
     <AnnotationSelector
       annotationObjects={[undefined, ...data.annotationObjects]}
       {annotationUrl}
@@ -106,7 +110,36 @@
     ></AnnotationSelector>
   </div>
 
-  <div class="absolute top-0 m-2">
+  <div class="absolute top-0 m-2" class:hidden={!showComponents}>
     <OptionInputs bind:options></OptionInputs>
   </div>
+
+  <div class="absolute bottom-0 right-0 m-2">
+    <button
+      onclick={() => {
+        showComponents = !showComponents
+      }}>⛶</button
+    >
+  </div>
 </main>
+
+<svelte:head>
+  <title>Allmaps Maplibre plugin test</title>
+  <meta
+    name="Allmaps Maplibre plugin test"
+    content="Test page for the Allmaps Maplibre plugin"
+  />
+</svelte:head>
+
+<style>
+  button {
+    border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-radius: 3px;
+    background: white;
+    font-size: 0.7rem;
+    font-family: ui-monospace, monospace;
+    padding: 0.1rem 0.35rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+</style>

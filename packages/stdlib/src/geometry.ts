@@ -319,6 +319,31 @@ export function geometryToSvgGeometry(geometry: Geometry): SvgGeometry {
   }
 }
 
+// Convert to points
+
+export function geometryToPoints(geometry: Geometry): Point[] {
+  if (isPoint(geometry)) {
+    return [geometry]
+  }
+  if (isLineString(geometry)) {
+    return geometry
+  }
+  if (isPolygon(geometry)) {
+    return geometry.flat()
+  }
+  if (isMultiPoint(geometry)) {
+    return geometry
+  }
+  if (isMultiLineString(geometry)) {
+    return geometry.flat()
+  }
+  if (isMultiPolygon(geometry)) {
+    return geometry.flat(2)
+  } else {
+    throw new Error(`Unsupported Geometry`)
+  }
+}
+
 // Check
 
 export function isClosed(input: Point[]): boolean {
@@ -551,10 +576,12 @@ export function translatePoints(
   return points.map((p) => translatePoint(p, point, addOrSubstract))
 }
 
+// Rotate point in positive (counterclockwise) direction
+// (in a cartesian grid where the y-axis points up)
 export function rotatePoint(
   point: Point,
   angle = 0,
-  anchor: Point | undefined = undefined,
+  pivot: Point | undefined = undefined,
   cosAngle?: number,
   sinAngle?: number
 ): Point {
@@ -562,16 +589,16 @@ export function rotatePoint(
     return point
   }
 
-  if (anchor) {
+  if (pivot) {
     return translatePoint(
       rotatePoint(
-        translatePoint(point, anchor, 'substract'),
+        translatePoint(point, pivot, 'substract'),
         angle,
         undefined,
         cosAngle,
         sinAngle
       ),
-      anchor
+      pivot
     )
   } else {
     cosAngle = cosAngle || Math.cos(angle)
@@ -587,19 +614,17 @@ export function rotatePoint(
 export function rotatePoints(
   points: Point[],
   angle = 0,
-  anchor: Point | undefined = undefined,
-  cosAngle?: number,
-  sinAngle?: number
+  pivot: Point | undefined = undefined
 ): Point[] {
   if (angle === 0 || angle === undefined) {
     return points
   }
 
-  cosAngle = cosAngle || Math.cos(angle)
-  sinAngle = sinAngle || Math.sin(angle)
+  const cosAngle = Math.cos(angle)
+  const sinAngle = Math.sin(angle)
 
   return points.map((point) =>
-    rotatePoint(point, angle, anchor, cosAngle, sinAngle)
+    rotatePoint(point, angle, pivot, cosAngle, sinAngle)
   )
 }
 

@@ -4,7 +4,8 @@ import {
   conformPolygon,
   conformMultiLineString,
   conformMultiPolygon,
-  geometryToSvgGeometry
+  geometryToSvgGeometry,
+  geometryToPoints
 } from './geometry.js'
 
 import type {
@@ -307,6 +308,14 @@ export function geojsonGeometryToSvgGeometry(
   geojsonGeometry: GeojsonGeometry
 ): SvgGeometry {
   return geometryToSvgGeometry(geojsonGeometryToGeometry(geojsonGeometry))
+}
+
+// Convert to points
+
+export function geojsonGeometryToPoints(
+  geoJsonGeometry: GeojsonGeometry
+): Point[] {
+  return geometryToPoints(geojsonGeometryToGeometry(geoJsonGeometry))
 }
 
 // Wrap Geometry in Feature

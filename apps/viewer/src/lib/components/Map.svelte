@@ -302,7 +302,7 @@
               padding: PADDING,
               animate: false,
               // duration: DURATION,
-              bearing: -computeWarpedMapBearing(selectedWarpedMap)
+              bearing: computeWarpedMapBearing(selectedWarpedMap)
             })
 
             if (previousSelectedMapId) {
@@ -434,7 +434,7 @@
           map.fitBounds(untrackedSelectedWarpedMap.geoMaskBbox, {
             padding: PADDING,
             duration: DURATION,
-            bearing: -computeWarpedMapBearing(untrackedSelectedWarpedMap)
+            bearing: computeWarpedMapBearing(untrackedSelectedWarpedMap)
           })
 
           map.once('idle', () => {
@@ -608,9 +608,7 @@
       )
 
       const warpedMapList = warpedMapLayer?.renderer?.warpedMapList
-      warpedMaps = warpedMapList
-        ? Array.from(warpedMapList.getWarpedMaps())
-        : []
+      warpedMaps = warpedMapList ? warpedMapList.getWarpedMaps() : []
 
       geoBbox = warpedMapList?.getMapsBbox({
         projection: { definition: 'EPSG:4326' }
