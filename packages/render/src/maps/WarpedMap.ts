@@ -934,17 +934,6 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  private updateAppliedGeoMask(): void {
-    this.geoAppliedMask = this.projectedTransformer.transformToGeo([
-      this.resourceAppliedMask
-    ])[0]
-    this.geoAppliedMaskBbox = computeBbox(this.geoAppliedMask)
-    this.geoAppliedMaskRectangle = this.projectedTransformer.transformToGeo(
-      [this.resourceAppliedMaskRectangle],
-      { maxDepth: 0 }
-    )[0] as Rectangle
-  }
-
   private updateGeoMask(): void {
     this.geoMask = this.projectedTransformer.transformToGeo([
       this.resourceMask
@@ -954,6 +943,16 @@ export class WarpedMap extends EventTarget {
       [this.resourceMaskRectangle],
       { maxDepth: 0 }
     )[0] as Rectangle
+  }
+
+  private updateAppliedGeoMask(): void {
+    this.geoAppliedMask = this.applyMask ? this.geoMask : this.geoFullMask
+    this.geoAppliedMaskBbox = this.applyMask
+      ? this.geoMaskBbox
+      : this.geoFullMaskBbox
+    this.geoAppliedMaskRectangle = this.applyMask
+      ? this.geoMaskRectangle
+      : this.geoFullMaskRectangle
   }
 
   private updateProjectedFullGeoMask(): void {
@@ -969,19 +968,6 @@ export class WarpedMap extends EventTarget {
       )[0] as Rectangle
   }
 
-  private updateProjectedAppliedGeoMask(): void {
-    this.projectedGeoAppliedMask =
-      this.projectedTransformer.transformToProjectedGeo([
-        this.resourceAppliedMask
-      ])[0]
-    this.projectedGeoAppliedMaskBbox = computeBbox(this.projectedGeoAppliedMask)
-    this.projectedGeoAppliedMaskRectangle =
-      this.projectedTransformer.transformToProjectedGeo(
-        [this.resourceAppliedMaskRectangle],
-        { maxDepth: 0 }
-      )[0] as Rectangle
-  }
-
   private updateProjectedGeoMask(): void {
     this.projectedGeoMask = this.projectedTransformer.transformToProjectedGeo([
       this.resourceMask
@@ -992,6 +978,18 @@ export class WarpedMap extends EventTarget {
         [this.resourceMaskRectangle],
         { maxDepth: 0 }
       )[0] as Rectangle
+  }
+
+  private updateProjectedAppliedGeoMask(): void {
+    this.projectedGeoAppliedMask = this.applyMask
+      ? this.projectedGeoMask
+      : this.projectedGeoFullMask
+    this.projectedGeoAppliedMaskBbox = this.applyMask
+      ? this.projectedGeoMaskBbox
+      : this.projectedGeoFullMaskBbox
+    this.projectedGeoAppliedMaskRectangle = this.applyMask
+      ? this.projectedGeoMaskRectangle
+      : this.projectedGeoFullMaskRectangle
   }
 
   private updateResourceToProjectedGeoScale(): void {
