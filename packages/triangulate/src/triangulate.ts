@@ -2,6 +2,7 @@ import Delaunator from 'delaunator'
 import Constrainautor from '@kninnug/constrainautor'
 
 import {
+  closePolygon,
   computeBbox,
   conformPolygon,
   mergeOptions,
@@ -21,7 +22,8 @@ import {
   getGridPointsInBbox,
   interpolateRing,
   interpolatePolygon,
-  pointInPolygon
+  pointInPolygon,
+  pointInClosedPolygon
 } from './shared.js'
 
 import type { TriangluationOptions, TriangulationToUnique } from './types.js'
@@ -202,11 +204,12 @@ export function triangulateToUnique(
   }
 
   // Only keep triangles inside polygon
+  const closedPolygon = closePolygon(polygon)
   const shouldKeep = triangles.map((triangle, index) => {
     // Only keep if inside
     if (shouldClassifyTriangles[index]) {
       return (
-        pointInPolygon(midPoint(...triangle), polygon) &&
+        pointInClosedPolygon(midPoint(...triangle), closedPolygon) &&
         triangleAngles(triangle).every(
           (angle) => angle >= options.minimumTriangleAngle
         )
@@ -222,10 +225,13 @@ export function triangulateToUnique(
 
   // If requested, compute if triangles are inside steiner polygons
   let insideSteinerPolygonsTriangles: boolean[] = []
+  const steinerClosedPolygons = steinerPolygons.map((steinerPolygon) =>
+    closePolygon(steinerPolygon)
+  )
   if (options.computeInsideSteinerPolygons) {
     insideSteinerPolygonsTriangles = triangles.map((triangle) =>
-      steinerPolygons.some((steinerPolygon) =>
-        pointInPolygon(midPoint(...triangle), steinerPolygon)
+      steinerClosedPolygons.some((steinerClosedPolygon) =>
+        pointInClosedPolygon(midPoint(...triangle), steinerClosedPolygon)
       )
     )
   }
