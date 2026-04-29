@@ -417,27 +417,38 @@ export class TriangulatedWarpedMap extends WarpedMap {
           this.resourceTriangulationCache,
           this.resourceResolution,
           String(this.resourceMask),
-          () =>
-            triangulateToUnique(
-              bboxToPolygon(
-                combineBboxes(
-                  computeBbox(this.resourceFullMask),
-                  bufferBbox(computeBbox(this.resourceMask), 1)
-                  // Buffer mask before combining bboxes
-                  // such that triangulated polygon (full mask + mask)
-                  // and steiner polygons (mask)
-                  // dont have touching edges, which hinders constraining triangulation
-                  // This could make trianguation way too big if mask >> full mask
-                  // In that case, consider clipping applyable mask.
-                )!
-              ),
-              this.resourceResolution,
-              {
-                steinerPoints: this.gcps.map((gcp) => gcp.resource),
-                steinerPolygons: [[this.resourceMask]],
-                computeInsideSteinerPolygons: true
+          () => {
+            try {
+              return triangulateToUnique(
+                bboxToPolygon(
+                  combineBboxes(
+                    computeBbox(this.resourceFullMask),
+                    bufferBbox(computeBbox(this.resourceMask), 1)
+                    // Buffer mask before combining bboxes
+                    // such that triangulated polygon (full mask + mask)
+                    // and steiner polygons (mask)
+                    // dont have touching edges, which hinders constraining triangulation
+                    // This could make trianguation way too big if mask >> full mask
+                    // In that case, consider clipping applyable mask.
+                  )!
+                ),
+                this.resourceResolution,
+                {
+                  steinerPoints: this.gcps.map((gcp) => gcp.resource),
+                  steinerPolygons: [[this.resourceMask]],
+                  computeInsideSteinerPolygons: true
+                }
+              )
+            } catch (error) {
+              if (error instanceof Error) {
+                error.message =
+                  `Failed to triangulate map ${this.mapId}: ` + error.message
+                throw error
+              } else {
+                throw new Error(`Failed to triangulate map ${this.mapId}`)
               }
-            )
+            }
+          }
         )
 
         // Extend Triangulation to ProjectedGcpTriangulation
