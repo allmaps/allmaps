@@ -73,3 +73,14 @@ export function pointInPolygon(point: Point, polygon: Polygon): boolean {
     return false
   }
 }
+export function pointInClosedPolygon(
+  point: Point,
+  closedPolygon: Polygon
+): boolean {
+  try {
+    return inside(point, closedPolygon) === true
+  } catch (error) {
+    console.error('Error determining if point is inside polygon:', error)
+    return false
+  }
+}
