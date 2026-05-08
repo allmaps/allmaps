@@ -405,7 +405,6 @@ export class GcpTransformer extends BaseGcpTransformer {
    * Transform an SVG geometry to geo space as a GeoJSON Geometry
    *
    * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-   * Note: since this converts to GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
    * Note: Multi-geometries are not supported
    *
    * @param transformer - A GCP Transformer defining the transformation
@@ -418,10 +417,6 @@ export class GcpTransformer extends BaseGcpTransformer {
     svgGeometry: SvgGeometry,
     partialGcpTransformOptions?: Partial<GcpTransformOptions>
   ): GeojsonGeometry {
-    partialGcpTransformOptions = mergePartialOptions(
-      { geoIsGeographic: true },
-      partialGcpTransformOptions
-    )
     // This middle step is needed to make typescript happy
     const transformedGeometry = transformer.transformToGeo(
       svgGeometryToGeometry(svgGeometry),
@@ -434,7 +429,6 @@ export class GcpTransformer extends BaseGcpTransformer {
    * Transform an SVG string to geo space to a GeoJSON FeatureCollection
    *
    * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-   * Note: since this converts to GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
    * Note: Multi-geometries are not supported
    *
    * @param transformer - A GCP Transformer defining the transformation
@@ -463,7 +457,6 @@ export class GcpTransformer extends BaseGcpTransformer {
    * Transform a GeoJSON Geometry to resource space to a SVG geometry
    *
    * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-   * Note: since this converts from GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
    * Note: Multi-geometries are not supported
    *
    * @param transformer - A GCP Transformer defining the transformation
@@ -476,10 +469,6 @@ export class GcpTransformer extends BaseGcpTransformer {
     geojsonGeometry: GeojsonGeometry,
     partialGcpTransformOptions?: Partial<GcpTransformOptions>
   ): SvgGeometry {
-    partialGcpTransformOptions = mergePartialOptions(
-      { geoIsGeographic: true },
-      partialGcpTransformOptions
-    )
     // This middle step is needed to make typescript happy
     const transformedGeometry = transformer.transformToResource(
       geojsonGeometryToGeometry(geojsonGeometry),
@@ -492,7 +481,6 @@ export class GcpTransformer extends BaseGcpTransformer {
    * Transform a GeoJSON FeatureCollection to resource space to a SVG string
    *
    * This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-   * Note: since this converts from GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
    * Note: Multi-geometries are not supported
    *
    * @param transformer - A GCP Transformer defining the transformation

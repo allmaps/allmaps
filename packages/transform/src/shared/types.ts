@@ -82,10 +82,8 @@ export type RefinementOptions = {
   minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
   sourceMidPointFunction: (p0: Point, p1: Point) => Point
   destinationMidPointFunction: (p0: Point, p1: Point) => Point
-  destinationDistanceFunction: (p0: Point, p1: Point) => number
 }
 
 export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
@@ -107,9 +105,6 @@ export type GeneralGcpTransformOptions = {
   setMinDestinationDistanceFromResolution: boolean
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
-  sourceIsGeographic: boolean
-  destinationIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
   preForward: ProjectionFunction
@@ -126,8 +121,6 @@ export type GcpTransformOptions = {
   setMinDestinationDistanceFromResolution: boolean
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
-  geoIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
   postToGeo: ProjectionFunction

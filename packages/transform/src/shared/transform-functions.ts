@@ -26,9 +26,6 @@ export const defaultGeneralGcpTransformOptions: GeneralGcpTransformOptions = {
   setMinDestinationDistanceFromResolution: true,
   minOffsetRatio: 0,
   minOffsetDistance: Infinity,
-  minLineDistance: Infinity,
-  sourceIsGeographic: false,
-  destinationIsGeographic: false,
   isMultiGeometry: false,
   distortionMeasures: [],
   referenceScale: 1,
@@ -53,11 +50,6 @@ export function gcpTransformOptionsToGeneralGcpTransformOptions(
 
   const partialGeneralGcpTransformOptions =
     partialGcpTransformOptions as Partial<GeneralGcpTransformOptions>
-
-  if (partialGcpTransformOptions.geoIsGeographic) {
-    partialGeneralGcpTransformOptions.destinationIsGeographic =
-      partialGcpTransformOptions.geoIsGeographic
-  }
 
   if (partialGcpTransformOptions.postToGeo) {
     partialGeneralGcpTransformOptions.postForward =
@@ -98,11 +90,6 @@ export function generalGcpTransformOptionsToGcpTransformOptions(
 
   const partialGcpTransformOptions =
     partialGeneralGcpTransformOptions as Partial<GcpTransformOptions>
-
-  if (partialGeneralGcpTransformOptions.destinationIsGeographic) {
-    partialGcpTransformOptions.geoIsGeographic =
-      partialGeneralGcpTransformOptions.destinationIsGeographic
-  }
 
   if (partialGeneralGcpTransformOptions.postForward) {
     partialGcpTransformOptions.postToGeo =
@@ -147,21 +134,9 @@ export function refinementOptionsFromForwardTransformOptions(
     minSourceDistance: generalGcpTransformOptions.minSourceDistance,
     minDestinationDistance: generalGcpTransformOptions.minDestinationDistance,
     minOffsetRatio: generalGcpTransformOptions.minOffsetRatio,
-    minOffsetDistance: generalGcpTransformOptions.minOffsetDistance,
-    minLineDistance: generalGcpTransformOptions.minLineDistance
+    minOffsetDistance: generalGcpTransformOptions.minOffsetDistance
   })
 
-  if (generalGcpTransformOptions.sourceIsGeographic) {
-    refinementOptions.sourceMidPointFunction = (point0: Point, point1: Point) =>
-      getWorldMidpoint(point0, point1).geometry.coordinates as Point
-  }
-  if (generalGcpTransformOptions.destinationIsGeographic) {
-    refinementOptions.destinationMidPointFunction = (
-      point0: Point,
-      point1: Point
-    ) => getWorldMidpoint(point0, point1).geometry.coordinates as Point
-    refinementOptions.destinationDistanceFunction = getWorldDistance
-  }
   return refinementOptions
 }
 
@@ -173,20 +148,8 @@ export function refinementOptionsFromBackwardTransformOptions(
     minSourceDistance: generalGcpTransformOptions.minSourceDistance,
     minDestinationDistance: generalGcpTransformOptions.minDestinationDistance,
     minOffsetRatio: generalGcpTransformOptions.minOffsetRatio,
-    minOffsetDistance: generalGcpTransformOptions.minOffsetDistance,
-    minLineDistance: generalGcpTransformOptions.minLineDistance
+    minOffsetDistance: generalGcpTransformOptions.minOffsetDistance
   })
 
-  if (generalGcpTransformOptions.destinationIsGeographic) {
-    refinementOptions.sourceMidPointFunction = (point0: Point, point1: Point) =>
-      getWorldMidpoint(point0, point1).geometry.coordinates as Point
-  }
-  if (generalGcpTransformOptions.sourceIsGeographic) {
-    refinementOptions.destinationMidPointFunction = (
-      point0: Point,
-      point1: Point
-    ) => getWorldMidpoint(point0, point1).geometry.coordinates as Point
-    refinementOptions.destinationDistanceFunction = getWorldDistance
-  }
   return refinementOptions
 }

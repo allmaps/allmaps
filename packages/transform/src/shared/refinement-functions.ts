@@ -47,10 +47,8 @@ export const defaultRefinementOptions: RefinementOptions = {
   minDestinationDistance: 0,
   minOffsetRatio: 0,
   minOffsetDistance: Infinity,
-  minLineDistance: Infinity,
   sourceMidPointFunction: midPoint,
-  destinationMidPointFunction: midPoint,
-  destinationDistanceFunction: distance
+  destinationMidPointFunction: midPoint
 }
 
 // Refine Geometries
@@ -191,21 +189,19 @@ function splitGcpLinePointInfo(
   )
   const destinationMidPointFromRefinementFunction =
     refinementFunction(sourceMidPoint)
-  const destinationMidPointsDistance =
-    refinementOptions.destinationDistanceFunction(
-      destinationMidPoint,
-      destinationMidPointFromRefinementFunction
-    )
+  const destinationMidPointsDistance = distance(
+    destinationMidPoint,
+    destinationMidPointFromRefinementFunction
+  )
 
-  const destinationLineDistance = refinementOptions.destinationDistanceFunction(
+  const destinationLineDistance = distance(
     gcpLine[0].destination,
     gcpLine[1].destination
   )
-  const destinationRefinedLineDistance =
-    refinementOptions.destinationDistanceFunction(
-      refinementFunction(gcpLine[0].source),
-      refinementFunction(gcpLine[1].source)
-    )
+  const destinationRefinedLineDistance = distance(
+    refinementFunction(gcpLine[0].source),
+    refinementFunction(gcpLine[1].source)
+  )
 
   return {
     sourceMidPoint,
@@ -227,8 +223,7 @@ function shouldSplitGcpLine(
   return (
     destinationMidPointsDistance / destinationLineDistance >
       refinementOptions.minOffsetRatio ||
-    destinationMidPointsDistance > refinementOptions.minOffsetDistance ||
-    destinationRefinedLineDistance > refinementOptions.minLineDistance
+    destinationMidPointsDistance > refinementOptions.minOffsetDistance
   )
 }
 

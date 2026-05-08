@@ -445,8 +445,6 @@ export function parseProjectedGcpTransformOptions(options: {
   setMinDestinationDistanceFromResolution?: boolean
   minOffsetRatio?: number
   minOffsetDistance?: number
-  minLineDistance?: number
-  geoIsGeographic?: boolean
 }): Partial<ProjectedGcpTransformOptions> {
   const partialProjectedGcpTransformOptions: Partial<ProjectedGcpTransformOptions> =
     {}
@@ -496,17 +494,6 @@ export function parseProjectedGcpTransformOptions(options: {
       partialProjectedGcpTransformOptions.minOffsetDistance = Number(
         options.minOffsetDistance
       )
-    }
-
-    if ('minLineDistance' in options && options.minLineDistance) {
-      partialProjectedGcpTransformOptions.minLineDistance = Number(
-        options.minLineDistance
-      )
-    }
-
-    if ('geoIsGeographic' in options && options.geoIsGeographic) {
-      partialProjectedGcpTransformOptions.geoIsGeographic =
-        options.geoIsGeographic
     }
   }
 
