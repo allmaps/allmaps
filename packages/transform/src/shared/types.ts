@@ -78,6 +78,8 @@ export type InverseOptions = {
 
 export type RefinementOptions = {
   maxDepth: number
+  minSourceDistance: number
+  minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
@@ -99,6 +101,10 @@ export type SplitGcpLineInfo = {
 
 export type GeneralGcpTransformOptions = {
   maxDepth: number
+  minSourceDistance: number
+  setMinSourceDistanceFromResolution: boolean
+  minDestinationDistance: number
+  setMinDestinationDistanceFromResolution: boolean
   minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number
@@ -114,6 +120,10 @@ export type GeneralGcpTransformOptions = {
 
 export type GcpTransformOptions = {
   maxDepth: number
+  minSourceDistance: number
+  setMinSourceDistanceFromResolution: boolean
+  minDestinationDistance: number
+  setMinDestinationDistanceFromResolution: boolean
   minOffsetRatio: number
   minOffsetDistance: number
   minLineDistance: number

@@ -19,6 +19,32 @@ import type {
   Polygon
 } from '@allmaps/types'
 
+describe('Transform LineString Forward To LineString, with maxDepth = 0', async () => {
+  const transformOptions = {
+    maxDepth: 0
+  }
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
+  const resourceLineString: LineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const geoLineString = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.420666790347598, 51.959985351835975]
+  ]
+
+  test(`should transform the lineString (without closing) and add no midpoints`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformToGeo(resourceLineString, transformOptions),
+      geoLineString
+    )
+  })
+})
+
 describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetRatio', async () => {
   const transformOptions = {
     minOffsetRatio: 0.01,
@@ -77,7 +103,35 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
   })
 })
 
-describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetDistance', async () => {
+describe('Transform LineString Forward To LineString, with maxDepth = 1, minSourceDistance = 4000 and minOffsetDistance = 0.0001', async () => {
+  const transformOptions = {
+    minOffsetDistance: 0.0001,
+    maxDepth: 1,
+    minSourceDistance: 4000
+  }
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
+  const resourceLineString: LineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const geoLineString: LineString = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.420666790347598, 51.959985351835975]
+  ]
+
+  test(`should transform the lineString (without closing) and add no midpoints`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformToGeo(resourceLineString, transformOptions),
+      geoLineString
+    )
+  })
+})
+
+describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetDistance = 0.0001', async () => {
   const transformOptions = {
     minOffsetRatio: Infinity,
     minOffsetDistance: 0.0001,
@@ -529,5 +583,27 @@ describe('Transform LineString Forward To LineString, with reading out the sourc
       ),
       geoLineString
     )
+  })
+
+  describe('Get resolutions', async () => {
+    const transformerOptions = {
+      minOffsetDistance: 0.0001,
+      maxDepth: 5
+    }
+    const transformer = new GcpTransformer(
+      gcps6,
+      'thinPlateSpline',
+      transformerOptions
+    )
+
+    test(`should correctly compute the resolution of the to geo transformation`, () => {
+      expect(transformer.getToGeoTransformationResolution()).to.equal(71.03125)
+    })
+
+    test(`should correctly compute the resolution of the to resource transformation`, () => {
+      expect(transformer.getToResourceTransformationResolution()).to.equal(
+        0.0013075593749931613
+      )
+    })
   })
 })

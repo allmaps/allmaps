@@ -1,6 +1,7 @@
 import proj4 from 'proj4'
 
 import {
+  computeBbox,
   mergeOptions,
   mergeOptionsUnlessUndefined,
   mergePartialOptions
@@ -22,7 +23,8 @@ import {
 import {
   defaultProjectedGcpTransformerOptions,
   isEqualProjection,
-  lonLatProjection
+  lonLatProjection,
+  projectedGcpTransformOptionsToGcpTransformOptions
 } from '../shared/project-functions.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -40,7 +42,8 @@ import type {
   TypedMultiPoint,
   TypedMultiLineString,
   TypedMultiPolygon,
-  TypedGeometry
+  TypedGeometry,
+  Bbox
 } from '@allmaps/types'
 
 /**
@@ -221,26 +224,11 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
-    const projection = partialProjectedGcpTransformOptions?.projection
-
-    let partialGcpTransformOptions = partialProjectedGcpTransformOptions
-
-    if (projection) {
-      const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection.definition,
-        projection.definition
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
       )
-      const postToGeo = internalProjectionToProjectionConverter.forward
-      const preToResource = internalProjectionToProjectionConverter.inverse
-
-      partialGcpTransformOptions = mergePartialOptions(
-        partialGcpTransformOptions,
-        {
-          postToGeo,
-          preToResource
-        }
-      )
-    }
 
     return super.transformToGeo(geometry, partialGcpTransformOptions, gcpToP)
   }
@@ -350,31 +338,139 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
-    const projection = partialProjectedGcpTransformOptions?.projection
-
-    let partialGcpTransformOptions = partialProjectedGcpTransformOptions
-
-    if (projection) {
-      const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection.definition,
-        projection.definition
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
       )
-      const postToGeo = internalProjectionToProjectionConverter.forward
-      const preToResource = internalProjectionToProjectionConverter.inverse
-
-      partialGcpTransformOptions = mergePartialOptions(
-        partialGcpTransformOptions,
-        {
-          postToGeo,
-          preToResource
-        }
-      )
-    }
 
     return super.transformToResource(
       geometry,
       partialGcpTransformOptions,
       gcpToP
+    )
+  }
+
+  protected getMinSourceDistanceFromResolution(): number {
+    if (this.minSourceDistanceFromResolution === undefined) {
+      this.minSourceDistanceFromResolution =
+        this.getToProjectedGeoTransformationResolution() ?? Infinity
+    }
+    return this.minSourceDistanceFromResolution
+  }
+
+  protected getMinDestinationDistanceFromResolution(): number {
+    if (this.minDestinationDistanceFromResolution === undefined) {
+      this.minDestinationDistanceFromResolution =
+        this.getToResourceTransformationResolution() ?? Infinity
+    }
+    return this.minDestinationDistanceFromResolution
+  }
+
+  /**
+   * Get the resolution of the toProjectedGeo transformation in resource space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in resource space.
+   * It can be useful e.g. to create a triangulation in resource space
+   * that is fine enough for this warping or set the minSourceDistance options.
+   *
+   * It is obtained by transforming toProjectedGeo two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toProjectedGeo transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in resource coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param resourceBbox - BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toProjectedGeo transformation in resource space
+   */
+  getToProjectedGeoTransformationResolution(
+    resourceBbox?: Bbox,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+  ): number | undefined {
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
+      )
+    resourceBbox =
+      resourceBbox ??
+      computeBbox(
+        this.projectedGcps.map((projectedGcp) => projectedGcp.resource)
+      )
+    return super.getToGeoTransformationResolution(
+      resourceBbox,
+      partialGcpTransformOptions
+    )
+  }
+
+  /**
+   * Get the resolution of the toGeo transformation in resource space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in resource space.
+   * It can be useful e.g. to create a triangulation in resource space
+   * that is fine enough for this warping or set the minSourceDistance options.
+   *
+   * It is obtained by transforming toGeo two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toGeo transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in resource coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param resourceBbox - BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toGeo transformation in resource space
+   */
+  getToGeoTransformationResolution(
+    resourceBbox?: Bbox,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+  ): number | undefined {
+    return this.getToProjectedGeoTransformationResolution(
+      resourceBbox,
+      mergePartialOptions(partialProjectedGcpTransformOptions, {
+        projection: lonLatProjection
+      })
+    )
+  }
+
+  /**
+   * Get the resolution of the toResource transformation in projected geo space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in projected geo space.
+   * It can be useful e.g. to create a triangulation in projected geo space
+   * that is fine enough for this warping or set the minDestionationDistance options.
+   *
+   * It is obtained by transforming toResource two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toResource transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in projeted geo coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param projectedGeoBbox - BBox in projected geo space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toResource transformation in projected geo space
+   */
+  getToResourceTransformationResolution(
+    projectedGeoBbox?: Bbox,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+  ): number | undefined {
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
+      )
+    projectedGeoBbox =
+      projectedGeoBbox ??
+      computeBbox(this.projectedGcps.map((projectedGcp) => projectedGcp.geo))
+    return super.getToResourceTransformationResolution(
+      projectedGeoBbox,
+      partialGcpTransformOptions
     )
   }
 
@@ -451,9 +547,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     // They have already been converted to the internal projection
     // in the GCP Transformer constructor
 
-    projectedTransformer.setTransformerOptionsInternal(
-      partialGcpTransformerOptions
-    )
+    projectedTransformer.setTransformerOptions(partialGcpTransformerOptions)
 
     projectedTransformer.projection = projection
 

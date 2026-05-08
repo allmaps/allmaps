@@ -8,7 +8,8 @@ import {
   svgGeometriesToSvgString,
   svgGeometryToGeometry,
   mergePartialOptions,
-  mergeOptions
+  mergeOptions,
+  computeBbox
 } from '@allmaps/stdlib'
 
 import { BaseGcpTransformer } from './BaseGcpTransformer.js'
@@ -119,82 +120,6 @@ export class GcpTransformer extends BaseGcpTransformer {
   }
 
   /**
-   * Get the forward transformation. Create if it doesn't exist yet.
-   */
-  getToGeoTransformation(): BaseTransformation {
-    return super.getForwardTransformationInternal()
-  }
-
-  /**
-   * Get the backward transformation. Create if it doesn't exist yet.
-   */
-  getToResourceTransformation(): BaseTransformation {
-    return super.getBackwardTransformationInternal()
-  }
-
-  /**
-   * Get the resolution of the toGeo transformation in resource space, within a given bbox.
-   *
-   * This informs you in how fine the warping is, in resource space.
-   * It can be useful e.g. to create a triangulation in resource space
-   * that is fine enough for this warping.
-   *
-   * It is obtained by transforming toGeo two linestring,
-   * namely the horizontal and vertical midlines of the given bbox.
-   * The toGeo transformation will refine these lines:
-   * it will break them in small enough pieces to obtain a near continuous result.
-   * Returned in the length of the shortest piece, measured in resource coordinates.
-   *
-   * @param resourceBbox - BBox in resource space where the resolution is requested
-   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
-   * @returns Resolution of the toGeo transformation in resource space
-   */
-  getToGeoTransformationResolution(
-    resourceBbox: Bbox,
-    partialGcpTransformOptions?: Partial<GcpTransformOptions>
-  ): number | undefined {
-    const partialGeneralGcpTransformOptions =
-      gcpTransformOptionsToGeneralGcpTransformOptions(
-        partialGcpTransformOptions
-      )
-    return super.getForwardTransformationResolutionInternal(
-      resourceBbox,
-      partialGeneralGcpTransformOptions
-    )
-  }
-
-  /**
-   * Get the resolution of the toResource transformation in geo space, within a given bbox.
-   *
-   * This informs you in how fine the warping is, in geo space.
-   * It can be useful e.g. to create a triangulation in geo space
-   * that is fine enough for this warping.
-   *
-   * It is obtained by transforming toResource two linestring,
-   * namely the horizontal and vertical midlines of the given bbox.
-   * The toResource transformation will refine these lines:
-   * it will break them in small enough pieces to obtain a near continuous result.
-   * Returned in the length of the shortest piece, measured in geo coordinates.
-   *
-   * @param geoBbox - BBox in geo space where the resolution is requested
-   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
-   * @returns Resolution of the toResource transformation in geo space
-   */
-  getToResourceTransformationResolution(
-    geoBbox: Bbox,
-    partialGcpTransformOptions: Partial<GcpTransformOptions>
-  ): number | undefined {
-    const generalGcpTransformOptions =
-      gcpTransformOptionsToGeneralGcpTransformOptions(
-        partialGcpTransformOptions
-      )
-    return super.getBackwardTransformationResolutionInternal(
-      geoBbox,
-      generalGcpTransformOptions
-    )
-  }
-
-  /**
    * Get the transformer options.
    */
   getTransformerOptions() {
@@ -206,7 +131,7 @@ export class GcpTransformer extends BaseGcpTransformer {
    *
    * Use with caution, especially for options that have effects in the constructor.
    */
-  protected setTransformerOptionsInternal(
+  setTransformerOptions(
     partialGcpTransformerOptions: Partial<GcpTransformerOptions>
   ) {
     this.transformerOptions = mergeOptions(
@@ -215,6 +140,20 @@ export class GcpTransformer extends BaseGcpTransformer {
         partialGcpTransformerOptions
       )
     )
+  }
+
+  /**
+   * Get the forward transformation. Create if it doesn't exist yet.
+   */
+  getToGeoTransformation(): BaseTransformation {
+    return super.getForwardTransformationInternal()
+  }
+
+  /**
+   * Get the backward transformation. Create if it doesn't exist yet.
+   */
+  getToResourceTransformation(): BaseTransformation {
+    return super.getBackwardTransformationInternal()
   }
 
   transformToGeo<P = Point>(
@@ -342,6 +281,91 @@ export class GcpTransformer extends BaseGcpTransformer {
       geometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP
+    )
+  }
+
+  protected getMinSourceDistanceFromResolution(): number {
+    if (this.minSourceDistanceFromResolution === undefined) {
+      this.minSourceDistanceFromResolution =
+        this.getToGeoTransformationResolution() ?? Infinity
+    }
+    return this.minSourceDistanceFromResolution
+  }
+
+  protected getMinDestinationDistanceFromResolution(): number {
+    if (this.minDestinationDistanceFromResolution === undefined) {
+      this.minDestinationDistanceFromResolution =
+        this.getToResourceTransformationResolution() ?? Infinity
+    }
+    return this.minDestinationDistanceFromResolution
+  }
+
+  /**
+   * Get the resolution of the toGeo transformation in resource space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in resource space.
+   * It can be useful e.g. to create a triangulation in resource space
+   * that is fine enough for this warping or set the minSourceDistance options.
+   *
+   * It is obtained by transforming toGeo two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toGeo transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in resource coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param resourceBbox - BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toGeo transformation in resource space
+   */
+  getToGeoTransformationResolution(
+    resourceBbox?: Bbox,
+    partialGcpTransformOptions?: Partial<GcpTransformOptions>
+  ): number | undefined {
+    const partialGeneralGcpTransformOptions =
+      gcpTransformOptionsToGeneralGcpTransformOptions(
+        partialGcpTransformOptions
+      )
+    resourceBbox =
+      resourceBbox ?? computeBbox(this.gcps.map((gcp) => gcp.resource))
+    return super.getForwardTransformationResolutionInternal(
+      resourceBbox,
+      partialGeneralGcpTransformOptions
+    )
+  }
+
+  /**
+   * Get the resolution of the toResource transformation in geo space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in geo space.
+   * It can be useful e.g. to create a triangulation in geo space
+   * that is fine enough for this warping or set the minDestionationDistance options.
+   *
+   * It is obtained by transforming toResource two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toResource transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in geo coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param geoBbox - BBox in geo space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toResource transformation in geo space
+   */
+  getToResourceTransformationResolution(
+    geoBbox?: Bbox,
+    partialGcpTransformOptions?: Partial<GcpTransformOptions>
+  ): number | undefined {
+    const generalGcpTransformOptions =
+      gcpTransformOptionsToGeneralGcpTransformOptions(
+        partialGcpTransformOptions
+      )
+    geoBbox = geoBbox ?? computeBbox(this.gcps.map((gcp) => gcp.geo))
+    return super.getBackwardTransformationResolutionInternal(
+      geoBbox,
+      generalGcpTransformOptions
     )
   }
 

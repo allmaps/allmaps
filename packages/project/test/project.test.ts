@@ -1,4 +1,4 @@
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
 // TODO: move to test helper file in /test/
 import {
@@ -410,5 +410,35 @@ describe('Support PROJJSON projections', () => {
       projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedTransformerProjjson.transformToProjectedGeo(resourceLineString)
     )
+  })
+
+  describe('Get resolutions', async () => {
+    const transformerOptions = {
+      minOffsetDistance: 0.0001,
+      maxDepth: 5
+    }
+    const projectedTransformer = new ProjectedGcpTransformer(
+      gcps6,
+      'thinPlateSpline',
+      transformerOptions
+    )
+
+    test(`should correctly compute the resolution of the to projected geo transformation`, () => {
+      expect(
+        projectedTransformer.getToProjectedGeoTransformationResolution()
+      ).to.equal(71.03125)
+    })
+
+    test(`should correctly compute the resolution of the to geo transformation`, () => {
+      expect(projectedTransformer.getToGeoTransformationResolution()).to.equal(
+        71.03125
+      )
+    })
+
+    test(`should correctly compute the resolution of the to resource transformation`, () => {
+      expect(
+        projectedTransformer.getToResourceTransformationResolution()
+      ).to.equal(235.99268526304513)
+    })
   })
 })

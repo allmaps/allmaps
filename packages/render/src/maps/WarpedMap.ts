@@ -401,7 +401,6 @@ export class WarpedMap extends EventTarget {
    *
    * @params transformationType - the transformation type
    * @params partialProjectedGcpTransformerOptions - options
-   * @params useCache - whether to use the cached projected transformers previously computed
    * @returns A projected transformer
    */
   getProjectedTransformer(
