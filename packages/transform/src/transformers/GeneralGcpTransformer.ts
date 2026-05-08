@@ -1,3 +1,5 @@
+import { computeBbox } from '@allmaps/stdlib'
+
 import { BaseGcpTransformer } from './BaseGcpTransformer.js'
 
 import { BaseTransformation } from '../transformation-types/BaseTransformation.js'
@@ -80,60 +82,6 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
    */
   getBackwardTransformation(): BaseTransformation {
     return super.getBackwardTransformationInternal()
-  }
-
-  /**
-   * Get the resolution of the forward transformation in source space, within a given bbox.
-   *
-   * This informs you in how fine the warping is, in source space.
-   * It can be useful e.g. to create a triangulation in source space
-   * that is fine enough for this warping.
-   *
-   * It is obtained by transforming forward two linestring,
-   * namely the horizontal and vertical midlines of the given bbox.
-   * The forward transformation will refine these lines:
-   * it will break them in small enough pieces to obtain a near continuous result.
-   * Returned in the length of the shortest piece, measured in source coordinates.
-   *
-   * @param sourceBbox - BBox in source space where the resolution is requested
-   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
-   * @returns Resolution of the forward transformation in source space
-   */
-  getForwardTransformationResolution(
-    sourceBbox: Bbox,
-    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
-  ): number | undefined {
-    return super.getForwardTransformationResolutionInternal(
-      sourceBbox,
-      partialGeneralGcpTransformOptions
-    )
-  }
-
-  /**
-   * Get the resolution of the backward transformation in destination space, within a given bbox.
-   *
-   * This informs you in how fine the warping is, in destination space.
-   * It can be useful e.g. to create a triangulation in destination space
-   * that is fine enough for this warping.
-   *
-   * It is obtained by transforming backward two linestring,
-   * namely the horizontal and vertical midlines of the given bbox.
-   * The backward transformation will refine these lines:
-   * it will break them in small enough pieces to obtain a near continuous result.
-   * Returned in the length of the shortest piece, measured in destination coordinates.
-   *
-   * @param destinationBbox - BBox in destination space where the resolution is requested
-   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
-   * @returns Resolution of the backward transformation in destination space
-   */
-  getBackwardTransformationResolution(
-    destinationBbox: Bbox,
-    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
-  ): number | undefined {
-    return super.getBackwardTransformationResolutionInternal(
-      destinationBbox,
-      partialGeneralGcpTransformOptions
-    )
   }
 
   transformForward<P = Point>(
@@ -251,6 +199,86 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
       geometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP
+    )
+  }
+
+  protected getMinSourceDistanceFromResolution(): number {
+    if (this.minSourceDistanceFromResolution === undefined) {
+      this.minSourceDistanceFromResolution =
+        this.getForwardTransformationResolution() ?? Infinity
+    }
+    return this.minSourceDistanceFromResolution
+  }
+
+  protected getMinDestinationDistanceFromResolution(): number {
+    if (this.minDestinationDistanceFromResolution === undefined) {
+      this.minDestinationDistanceFromResolution =
+        this.getBackwardTransformationResolution() ?? Infinity
+    }
+    return this.minDestinationDistanceFromResolution
+  }
+
+  /**
+   * Get the resolution of the forward transformation in source space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in source space.
+   * It can be useful e.g. to create a triangulation in source space
+   * that is fine enough for this warping.
+   *
+   * It is obtained by transforming forward two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The forward transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in source coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param sourceBbox - BBox in source space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
+   * @returns Resolution of the forward transformation in source space
+   */
+  getForwardTransformationResolution(
+    sourceBbox?: Bbox,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
+  ): number | undefined {
+    sourceBbox =
+      sourceBbox ??
+      computeBbox(this.generalGcps.map((generalGcp) => generalGcp.source))
+    return super.getForwardTransformationResolutionInternal(
+      sourceBbox,
+      partialGeneralGcpTransformOptions
+    )
+  }
+
+  /**
+   * Get the resolution of the backward transformation in destination space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in destination space.
+   * It can be useful e.g. to create a triangulation in destination space
+   * that is fine enough for this warping.
+   *
+   * It is obtained by transforming backward two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The backward transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in destination coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param destinationBbox - BBox in destination space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
+   * @returns Resolution of the backward transformation in destination space
+   */
+  getBackwardTransformationResolution(
+    destinationBbox?: Bbox,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
+  ): number | undefined {
+    destinationBbox =
+      destinationBbox ??
+      computeBbox(this.generalGcps.map((generalGcp) => generalGcp.destination))
+    return super.getBackwardTransformationResolutionInternal(
+      destinationBbox,
+      partialGeneralGcpTransformOptions
     )
   }
 }

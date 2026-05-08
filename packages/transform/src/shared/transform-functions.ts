@@ -20,6 +20,10 @@ import type { Point } from '@allmaps/types'
 
 export const defaultGeneralGcpTransformOptions: GeneralGcpTransformOptions = {
   maxDepth: 0,
+  minSourceDistance: 0,
+  setMinSourceDistanceFromResolution: true,
+  minDestinationDistance: 0,
+  setMinDestinationDistanceFromResolution: true,
   minOffsetRatio: 0,
   minOffsetDistance: Infinity,
   minLineDistance: Infinity,
@@ -41,84 +45,88 @@ export const defaultGeneralGcpTransformerOptions: GeneralGcpTransformerOptions =
   }
 
 export function gcpTransformOptionsToGeneralGcpTransformOptions(
-  gcpTransformOptions?: Partial<GcpTransformOptions>
+  partialGcpTransformOptions?: Partial<GcpTransformOptions>
 ): Partial<GeneralGcpTransformOptions> {
-  if (gcpTransformOptions === undefined) {
+  if (partialGcpTransformOptions === undefined) {
     return {}
   }
 
-  const generalGcpTransformOptions =
-    gcpTransformOptions as Partial<GeneralGcpTransformOptions>
+  const partialGeneralGcpTransformOptions =
+    partialGcpTransformOptions as Partial<GeneralGcpTransformOptions>
 
-  if (gcpTransformOptions.geoIsGeographic) {
-    generalGcpTransformOptions.destinationIsGeographic =
-      gcpTransformOptions.geoIsGeographic
+  if (partialGcpTransformOptions.geoIsGeographic) {
+    partialGeneralGcpTransformOptions.destinationIsGeographic =
+      partialGcpTransformOptions.geoIsGeographic
   }
 
-  if (gcpTransformOptions.postToGeo) {
-    generalGcpTransformOptions.postForward = gcpTransformOptions.postToGeo
+  if (partialGcpTransformOptions.postToGeo) {
+    partialGeneralGcpTransformOptions.postForward =
+      partialGcpTransformOptions.postToGeo
   }
-  if (gcpTransformOptions.preToResource) {
-    generalGcpTransformOptions.preBackward = gcpTransformOptions.preToResource
+  if (partialGcpTransformOptions.preToResource) {
+    partialGeneralGcpTransformOptions.preBackward =
+      partialGcpTransformOptions.preToResource
   }
 
-  return generalGcpTransformOptions
+  return partialGeneralGcpTransformOptions
 }
 
 export function gcpTransformerOptionsToGeneralGcpTransformerOptions(
-  gcpTransformerOptions?: Partial<GcpTransformerOptions>
+  partialGcpTransformerOptions?: Partial<GcpTransformerOptions>
 ): Partial<GeneralGcpTransformerOptions> {
-  if (gcpTransformerOptions === undefined) {
+  if (partialGcpTransformerOptions === undefined) {
     return {}
   }
 
   // Note: None of the transformer options need to be adapted
   // only the transform options that could be included in them
 
-  const generalGcpTransformerOptions =
+  const partialGeneralGcpTransformerOptions =
     gcpTransformOptionsToGeneralGcpTransformOptions(
-      gcpTransformerOptions
+      partialGcpTransformerOptions
     ) as Partial<GeneralGcpTransformerOptions>
 
-  return generalGcpTransformerOptions
+  return partialGeneralGcpTransformerOptions
 }
 
 export function generalGcpTransformOptionsToGcpTransformOptions(
-  generalGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
+  partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
 ): Partial<GcpTransformOptions> {
-  if (generalGcpTransformOptions === undefined) {
+  if (partialGeneralGcpTransformOptions === undefined) {
     return {}
   }
 
-  const gcpTransformOptions =
-    generalGcpTransformOptions as Partial<GcpTransformOptions>
+  const partialGcpTransformOptions =
+    partialGeneralGcpTransformOptions as Partial<GcpTransformOptions>
 
-  if (generalGcpTransformOptions.destinationIsGeographic) {
-    gcpTransformOptions.geoIsGeographic =
-      generalGcpTransformOptions.destinationIsGeographic
+  if (partialGeneralGcpTransformOptions.destinationIsGeographic) {
+    partialGcpTransformOptions.geoIsGeographic =
+      partialGeneralGcpTransformOptions.destinationIsGeographic
   }
 
-  if (generalGcpTransformOptions.postForward) {
-    gcpTransformOptions.postToGeo = generalGcpTransformOptions.postForward
+  if (partialGeneralGcpTransformOptions.postForward) {
+    partialGcpTransformOptions.postToGeo =
+      partialGeneralGcpTransformOptions.postForward
   }
-  if (generalGcpTransformOptions.preBackward) {
-    gcpTransformOptions.preToResource = generalGcpTransformOptions.preBackward
+  if (partialGeneralGcpTransformOptions.preBackward) {
+    partialGcpTransformOptions.preToResource =
+      partialGeneralGcpTransformOptions.preBackward
   }
 
-  return gcpTransformOptions
+  return partialGcpTransformOptions
 }
 
 export function generalGcpTransformerOptionsToGcpTransformerOptions(
-  generalGcpTransformerOptions?: Partial<GeneralGcpTransformerOptions>
+  partialGeneralGcpTransformerOptions?: Partial<GeneralGcpTransformerOptions>
 ): Partial<GcpTransformerOptions> {
-  if (generalGcpTransformerOptions == undefined) {
+  if (partialGeneralGcpTransformerOptions == undefined) {
     return {}
   }
 
-  const gcpTransformerOptions =
-    generalGcpTransformerOptions as Partial<GcpTransformerOptions>
+  const partialGcpTransformerOptions =
+    partialGeneralGcpTransformerOptions as Partial<GcpTransformerOptions>
 
-  return gcpTransformerOptions
+  return partialGcpTransformerOptions
 }
 
 export const defaultGcpTransformOptions: GcpTransformOptions =
@@ -135,10 +143,12 @@ export function refinementOptionsFromForwardTransformOptions(
   generalGcpTransformOptions: GeneralGcpTransformOptions
 ): RefinementOptions {
   const refinementOptions = mergeOptions(defaultRefinementOptions, {
+    maxDepth: generalGcpTransformOptions.maxDepth,
+    minSourceDistance: generalGcpTransformOptions.minSourceDistance,
+    minDestinationDistance: generalGcpTransformOptions.minDestinationDistance,
     minOffsetRatio: generalGcpTransformOptions.minOffsetRatio,
     minOffsetDistance: generalGcpTransformOptions.minOffsetDistance,
-    minLineDistance: generalGcpTransformOptions.minLineDistance,
-    maxDepth: generalGcpTransformOptions.maxDepth
+    minLineDistance: generalGcpTransformOptions.minLineDistance
   })
 
   if (generalGcpTransformOptions.sourceIsGeographic) {
@@ -159,10 +169,12 @@ export function refinementOptionsFromBackwardTransformOptions(
   generalGcpTransformOptions: GeneralGcpTransformOptions
 ): RefinementOptions {
   const refinementOptions = mergeOptions(defaultRefinementOptions, {
+    maxDepth: generalGcpTransformOptions.maxDepth,
+    minSourceDistance: generalGcpTransformOptions.minSourceDistance,
+    minDestinationDistance: generalGcpTransformOptions.minDestinationDistance,
     minOffsetRatio: generalGcpTransformOptions.minOffsetRatio,
     minOffsetDistance: generalGcpTransformOptions.minOffsetDistance,
-    minLineDistance: generalGcpTransformOptions.minLineDistance,
-    maxDepth: generalGcpTransformOptions.maxDepth
+    minLineDistance: generalGcpTransformOptions.minLineDistance
   })
 
   if (generalGcpTransformOptions.destinationIsGeographic) {

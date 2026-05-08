@@ -92,6 +92,8 @@ export abstract class BaseGcpTransformer {
 
   readonly type: TransformationType
   protected transformerOptions: GeneralGcpTransformerOptions
+  protected minSourceDistanceFromResolution?: number
+  protected minDestinationDistanceFromResolution?: number
 
   protected forwardTransformation?: BaseTransformation
   protected backwardTransformation?: BaseTransformation
@@ -203,70 +205,6 @@ export abstract class BaseGcpTransformer {
     }
   }
 
-  /**
-   * Get the resolution of the forward transformation in source space, within a given bbox.
-   *
-   * This informs you in how fine the warping is, in source space.
-   * It can be useful e.g. to create a triangulation in source space
-   * that is fine enough for this warping.
-   *
-   * It is obtained by transforming forward two linestring,
-   * namely the horizontal and vertical midlines of the given bbox.
-   * The forward transformation will refine these lines:
-   * it will break them in small enough pieces to obtain a near continuous result.
-   * Returned in the length of the shortest piece, measured in source coordinates.
-   *
-   * @param sourceBbox - BBox in source space where the resolution is requested
-   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
-   * @returns Resolution of the forward transformation in source space
-   */
-  protected getForwardTransformationResolutionInternal(
-    sourceBbox: Bbox,
-    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
-  ): number | undefined {
-    const transformOptions = mergeOptions(
-      this.transformerOptions,
-      partialGeneralGcpTransformOptions
-    )
-    return getSourceRefinementResolution(
-      sourceBbox,
-      (p) => this.transformForwardInternal(p, transformOptions),
-      refinementOptionsFromForwardTransformOptions(transformOptions)
-    )
-  }
-
-  /**
-   * Get the resolution of the backward transformation in destination space, within a given bbox.
-   *
-   * This informs you in how fine the warping is, in destination space.
-   * It can be useful e.g. to create a triangulation in destination space
-   * that is fine enough for this warping.
-   *
-   * It is obtained by transforming backward two linestring,
-   * namely the horizontal and vertical midlines of the given bbox.
-   * The backward transformation will refine these lines:
-   * it will break them in small enough pieces to obtain a near continuous result.
-   * Returned in the length of the shortest piece, measured in destination coordinates.
-   *
-   * @param destinationBbox - BBox in destination space where the resolution is requested
-   * @param partialGeneralGcpTransformOptions - General GCP Transform options to consider during the transformation
-   * @returns Resolution of the backward transformation in destination space
-   */
-  protected getBackwardTransformationResolutionInternal(
-    destinationBbox: Bbox,
-    partialGeneralGcpTransformOptions: Partial<GeneralGcpTransformOptions>
-  ): number | undefined {
-    const transformOptions = mergeOptions(
-      this.transformerOptions,
-      partialGeneralGcpTransformOptions
-    )
-    return getSourceRefinementResolution(
-      destinationBbox,
-      (p) => this.transformBackwardInternal(p, transformOptions),
-      refinementOptionsFromBackwardTransformOptions(transformOptions)
-    )
-  }
-
   protected transformForwardInternal<P = Point>(
     point: Point,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
@@ -331,12 +269,14 @@ export abstract class BaseGcpTransformer {
           generalGcpToP
         )
       } else if (isLineString(geometry)) {
+        this.assureMinSourceDistanceFromResolution()
         return this.transformLineStringForwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isPolygon(geometry)) {
+        this.assureMinSourceDistanceFromResolution()
         return this.transformPolygonForwardInternal(
           geometry,
           transformOptions,
@@ -443,12 +383,14 @@ export abstract class BaseGcpTransformer {
           generalGcpToP
         )
       } else if (isLineString(geometry)) {
+        this.assureMinDestinationDistanceFromResolution()
         return this.transformLineStringBackwardInternal(
           geometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isPolygon(geometry)) {
+        this.assureMinDestinationDistanceFromResolution()
         return this.transformPolygonBackwardInternal(
           geometry,
           transformOptions,
@@ -666,5 +608,58 @@ export abstract class BaseGcpTransformer {
         generalGcpToP
       )
     })
+  }
+
+  // The idea here is to compute the resolution once,
+  // and use this information when transforming lineString or polygons
+  // and avoid the (possibly expensive) refinement check
+  // when there are many segments smaller then this distance
+  // e.g. when transforming (many) very finely mapped masks.
+  protected assureMinSourceDistanceFromResolution(): void {
+    if (this.transformerOptions.setMinSourceDistanceFromResolution) {
+      this.transformerOptions.minSourceDistance =
+        this.getMinSourceDistanceFromResolution()
+    }
+  }
+
+  protected assureMinDestinationDistanceFromResolution(): void {
+    if (this.transformerOptions.setMinDestinationDistanceFromResolution) {
+      this.transformerOptions.minDestinationDistance =
+        this.getMinDestinationDistanceFromResolution()
+    }
+  }
+
+  protected abstract getMinSourceDistanceFromResolution(): number
+
+  protected abstract getMinDestinationDistanceFromResolution(): number
+
+  protected getForwardTransformationResolutionInternal(
+    sourceBbox: Bbox,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
+  ): number | undefined {
+    const transformOptions = mergeOptions(
+      this.transformerOptions,
+      partialGeneralGcpTransformOptions
+    )
+    return getSourceRefinementResolution(
+      sourceBbox,
+      (p) => this.transformForwardInternal(p, transformOptions),
+      refinementOptionsFromForwardTransformOptions(transformOptions)
+    )
+  }
+
+  protected getBackwardTransformationResolutionInternal(
+    destinationBbox: Bbox,
+    partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
+  ): number | undefined {
+    const transformOptions = mergeOptions(
+      this.transformerOptions,
+      partialGeneralGcpTransformOptions
+    )
+    return getSourceRefinementResolution(
+      destinationBbox,
+      (p) => this.transformBackwardInternal(p, transformOptions),
+      refinementOptionsFromBackwardTransformOptions(transformOptions)
+    )
   }
 }

@@ -438,10 +438,14 @@ export function parseGcpProjectionInputOptions(
 }
 
 export function parseProjectedGcpTransformOptions(options: {
+  maxDepth?: number
+  minSourceDistance?: number
+  setMinSourceDistanceFromResolution?: boolean
+  minDestinationDistance?: number
+  setMinDestinationDistanceFromResolution?: boolean
   minOffsetRatio?: number
   minOffsetDistance?: number
   minLineDistance?: number
-  maxDepth?: number
   geoIsGeographic?: boolean
 }): Partial<ProjectedGcpTransformOptions> {
   const partialProjectedGcpTransformOptions: Partial<ProjectedGcpTransformOptions> =
@@ -452,6 +456,34 @@ export function parseProjectedGcpTransformOptions(options: {
       partialProjectedGcpTransformOptions.maxDepth = Math.round(
         Number(options.maxDepth)
       )
+    }
+
+    if ('minSourceDistance' in options && options.minSourceDistance) {
+      partialProjectedGcpTransformOptions.minSourceDistance = Math.round(
+        Number(options.minSourceDistance)
+      )
+    }
+
+    if (
+      'setMinSourceDistanceFromResolution' in options &&
+      options.setMinSourceDistanceFromResolution
+    ) {
+      partialProjectedGcpTransformOptions.setMinSourceDistanceFromResolution =
+        options.setMinSourceDistanceFromResolution
+    }
+
+    if ('minDestinationDistance' in options && options.minDestinationDistance) {
+      partialProjectedGcpTransformOptions.minDestinationDistance = Math.round(
+        Number(options.minDestinationDistance)
+      )
+    }
+
+    if (
+      'setMinDestinationDistanceFromResolution' in options &&
+      options.setMinDestinationDistanceFromResolution
+    ) {
+      partialProjectedGcpTransformOptions.setMinDestinationDistanceFromResolution =
+        options.setMinDestinationDistanceFromResolution
     }
 
     if ('minOffsetRatio' in options && options.minOffsetRatio) {
