@@ -177,50 +177,50 @@ export class ProjectedGcpTransformer extends GcpTransformer {
   }
 
   transformToProjectedGeo<P = Point>(
-    point: Point,
+    resourcePoint: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToProjectedGeo<P = Point>(
-    lineString: LineString,
+    resourceLineString: LineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToProjectedGeo<P = Point>(
-    polygon: Polygon,
+    resourcePolygon: Polygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToProjectedGeo<P = Point>(
-    multiPoint: MultiPoint,
+    resourceMultiPoint: MultiPoint,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToProjectedGeo<P = Point>(
-    multiLineString: MultiLineString,
+    resourceMultiLineString: MultiLineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToProjectedGeo<P = Point>(
-    multiPoint: MultiPolygon,
+    resourceMultiPoint: MultiPolygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToProjectedGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to projected geo space
+   * Transform a geometry from resource space to projected geo space
    *
-   * @param geometry - Geometry to transform
+   * @param resourceGeometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
    * @param gcpToP - Return type function
    * @returns Input geometry transformed to projected geo space
    */
   transformToProjectedGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
@@ -230,59 +230,63 @@ export class ProjectedGcpTransformer extends GcpTransformer {
         partialProjectedGcpTransformOptions
       )
 
-    return super.transformToGeo(geometry, partialGcpTransformOptions, gcpToP)
+    return super.transformToGeo(
+      resourceGeometry,
+      partialGcpTransformOptions,
+      gcpToP
+    )
   }
 
   transformToGeo<P = Point>(
-    point: Point,
+    resourcePoint: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToGeo<P = Point>(
-    lineString: LineString,
+    resourceLineString: LineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToGeo<P = Point>(
-    polygon: Polygon,
+    resourcePolygon: Polygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToGeo<P = Point>(
-    multiPoint: MultiPoint,
+    resourceMultiPoint: MultiPoint,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToGeo<P = Point>(
-    multiLineString: MultiLineString,
+    resourceMultiLineString: MultiLineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToGeo<P = Point>(
-    multiPoint: MultiPolygon,
+    resourceMultiPoint: MultiPolygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to geo space
+   * Transform a geometry from resource space to geo space
    *
-   * @param geometry - Geometry to transform
+   * @param resourceGeometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
    * @param gcpToP - Return type function
    * @returns Input geometry transformed to projected geo space
    */
   transformToGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
     return this.transformToProjectedGeo(
-      geometry,
+      resourceGeometry,
       mergePartialOptions(partialProjectedGcpTransformOptions, {
         projection: lonLatProjection
       }),
@@ -291,50 +295,50 @@ export class ProjectedGcpTransformer extends GcpTransformer {
   }
 
   transformToResource<P = Point>(
-    point: Point,
+    projectedGeoPoint: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToResource<P = Point>(
-    lineString: LineString,
+    projectedGeoLineString: LineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToResource<P = Point>(
-    polygon: Polygon,
+    projectedGeoPolygon: Polygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToResource<P = Point>(
-    multiPoint: MultiPoint,
+    projectedGeoMultiPoint: MultiPoint,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToResource<P = Point>(
-    multiLineString: MultiLineString,
+    projectedGeoMultiLineString: MultiLineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToResource<P = Point>(
-    multiPolygon: MultiPolygon,
+    projectedGeoMultiPolygon: MultiPolygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToResource<P = Point>(
-    geometry: Geometry,
+    projectedGeoGeometry: Geometry,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to resource space
+   * Transform a geometry from projected geo space to resource space
    *
-   * @param geometry - Geometry to transform
+   * @param projectedGeoGeometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
    * @param gcpToP - Return type function
    * @returns Input geometry transformed to resource space
    */
   transformToResource<P>(
-    geometry: Geometry,
+    projectedGeoGeometry: Geometry,
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
@@ -345,7 +349,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       )
 
     return super.transformToResource(
-      geometry,
+      projectedGeoGeometry,
       partialGcpTransformOptions,
       gcpToP
     )
