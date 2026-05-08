@@ -449,12 +449,12 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * The toResource transformation will refine these lines:
    * it will break them in small enough pieces to obtain a near continuous result.
    *
-   * Resolution returned in the length of the shortest piece, measured in projeted geo coordinates,
+   * Resolution returned in the length of the shortest piece, measured in internal projected geo coordinates,
    * or undefined if no refinements were needed.
    *
    * @param projectedGeoBbox - BBox in projected geo space where the resolution is requested, or undefined to get this from the GCPs
    * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
-   * @returns Resolution of the toResource transformation in projected geo space
+   * @returns Resolution of the toResource transformation in internal projected geo space
    */
   getToResourceTransformationResolution(
     projectedGeoBbox?: Bbox,
