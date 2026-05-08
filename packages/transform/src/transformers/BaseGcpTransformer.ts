@@ -206,50 +206,50 @@ export abstract class BaseGcpTransformer {
   }
 
   protected transformForwardInternal<P = Point>(
-    point: Point,
+    sourcePoint: Point,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): P
   protected transformForwardInternal<P = Point>(
-    lineString: LineString,
+    sourceLineString: LineString,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P>
   protected transformForwardInternal<P = Point>(
-    polygon: Polygon,
+    sourcePolygon: Polygon,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P>
   protected transformForwardInternal<P = Point>(
-    multiPoint: MultiPoint,
+    sourceMultiPoint: MultiPoint,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPoint<P>
   protected transformForwardInternal<P = Point>(
-    multiLineString: MultiLineString,
+    sourceMultiLineString: MultiLineString,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiLineString<P>
   protected transformForwardInternal<P = Point>(
-    multiPolygon: MultiPolygon,
+    sourceMultiPolygon: MultiPolygon,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   protected transformForwardInternal<P = Point>(
-    geometry: Geometry,
+    sourceGeometry: Geometry,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry forward
+   * Transform a geometry forward from source space to destination space
    *
-   * @param geometry - Geometry to transform
+   * @param sourceGeometry - Geometry to transform
    * @param partialGeneralGcpTransformOptions - General GCP Transform options
    * @param generalGcpToP - Return type function
    * @returns Forward transform of input geometry
    */
   protected transformForwardInternal<P = Point>(
-    geometry: Geometry,
+    sourceGeometry: Geometry,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP: (
       generalGcp: GeneralGcpAndDistortions
@@ -262,23 +262,23 @@ export abstract class BaseGcpTransformer {
       partialGeneralGcpTransformOptions
     )
     if (!transformOptions.isMultiGeometry) {
-      if (isPoint(geometry)) {
+      if (isPoint(sourceGeometry)) {
         return this.transformPointForwardInternal(
-          geometry,
+          sourceGeometry,
           transformOptions,
           generalGcpToP
         )
-      } else if (isLineString(geometry)) {
+      } else if (isLineString(sourceGeometry)) {
         this.assureMinSourceDistanceFromResolution()
         return this.transformLineStringForwardInternal(
-          geometry,
+          sourceGeometry,
           transformOptions,
           generalGcpToP
         )
-      } else if (isPolygon(geometry)) {
+      } else if (isPolygon(sourceGeometry)) {
         this.assureMinSourceDistanceFromResolution()
         return this.transformPolygonForwardInternal(
-          geometry,
+          sourceGeometry,
           transformOptions,
           generalGcpToP
         )
@@ -289,24 +289,24 @@ export abstract class BaseGcpTransformer {
       if (partialGeneralGcpTransformOptions) {
         partialGeneralGcpTransformOptions.isMultiGeometry = false // false for piecewise single geometries
       }
-      if (isMultiPoint(geometry)) {
-        return geometry.map((element) =>
+      if (isMultiPoint(sourceGeometry)) {
+        return sourceGeometry.map((element) =>
           this.transformForwardInternal(
             element,
             partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
-      } else if (isMultiLineString(geometry)) {
-        return geometry.map((element) =>
+      } else if (isMultiLineString(sourceGeometry)) {
+        return sourceGeometry.map((element) =>
           this.transformForwardInternal(
             element,
             partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
-      } else if (isMultiPolygon(geometry)) {
-        return geometry.map((element) =>
+      } else if (isMultiPolygon(sourceGeometry)) {
+        return sourceGeometry.map((element) =>
           this.transformForwardInternal(
             element,
             partialGeneralGcpTransformOptions,
@@ -320,50 +320,50 @@ export abstract class BaseGcpTransformer {
   }
 
   protected transformBackwardInternal<P = Point>(
-    point: Point,
+    destinationPoint: Point,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): P
   protected transformBackwardInternal<P = Point>(
-    lineString: LineString,
+    destinationLineString: LineString,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedLineString<P>
   protected transformBackwardInternal<P = Point>(
-    polygon: Polygon,
+    destinationPolygon: Polygon,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedPolygon<P>
   protected transformBackwardInternal<P = Point>(
-    multiPoint: MultiPoint,
+    destinationMultiPoint: MultiPoint,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPoint<P>
   protected transformBackwardInternal<P = Point>(
-    multiLineString: MultiLineString,
+    destinationMultiLineString: MultiLineString,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiLineString<P>
   protected transformBackwardInternal<P = Point>(
-    multiPolygon: MultiPolygon,
+    destinationMultiPolygon: MultiPolygon,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   protected transformBackwardInternal<P = Point>(
-    geometry: Geometry,
+    destinationGeometry: Geometry,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP?: (generalGcp: GeneralGcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry backward
+   * Transform a geometry backward from destination space to source space
    *
-   * @param geometry - Geometry to transform
+   * @param destinationGeometry - Geometry to transform
    * @param partialGeneralGcpTransformOptions - General GCP Transform options
    * @param generalGcpToP - Return type function
    * @returns Backward transform of input geometry
    */
   protected transformBackwardInternal<P = Point>(
-    geometry: Geometry,
+    destinationGeometry: Geometry,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>,
     generalGcpToP: (
       generalGcp: GeneralGcpAndDistortions
@@ -376,23 +376,23 @@ export abstract class BaseGcpTransformer {
       partialGeneralGcpTransformOptions
     )
     if (!transformOptions.isMultiGeometry) {
-      if (isPoint(geometry)) {
+      if (isPoint(destinationGeometry)) {
         return this.transformPointBackwardInternal(
-          geometry,
+          destinationGeometry,
           transformOptions,
           generalGcpToP
         )
-      } else if (isLineString(geometry)) {
+      } else if (isLineString(destinationGeometry)) {
         this.assureMinDestinationDistanceFromResolution()
         return this.transformLineStringBackwardInternal(
-          geometry,
+          destinationGeometry,
           transformOptions,
           generalGcpToP
         )
-      } else if (isPolygon(geometry)) {
+      } else if (isPolygon(destinationGeometry)) {
         this.assureMinDestinationDistanceFromResolution()
         return this.transformPolygonBackwardInternal(
-          geometry,
+          destinationGeometry,
           transformOptions,
           generalGcpToP
         )
@@ -403,24 +403,24 @@ export abstract class BaseGcpTransformer {
       if (partialGeneralGcpTransformOptions) {
         partialGeneralGcpTransformOptions.isMultiGeometry = false // false for piecewise single geometries
       }
-      if (isMultiPoint(geometry)) {
-        return geometry.map((element) =>
+      if (isMultiPoint(destinationGeometry)) {
+        return destinationGeometry.map((element) =>
           this.transformBackwardInternal(
             element,
             partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
-      } else if (isMultiLineString(geometry)) {
-        return geometry.map((element) =>
+      } else if (isMultiLineString(destinationGeometry)) {
+        return destinationGeometry.map((element) =>
           this.transformBackwardInternal(
             element,
             partialGeneralGcpTransformOptions,
             generalGcpToP
           )
         )
-      } else if (isMultiPolygon(geometry)) {
-        return geometry.map((element) =>
+      } else if (isMultiPolygon(destinationGeometry)) {
+        return destinationGeometry.map((element) =>
           this.transformBackwardInternal(
             element,
             partialGeneralGcpTransformOptions,
