@@ -2,7 +2,6 @@ import { rewind } from '@turf/rewind'
 
 import { isEqualArray } from './main.js'
 
-
 import type {
   Point,
   Line,

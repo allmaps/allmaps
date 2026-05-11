@@ -255,11 +255,12 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4326 in
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection', () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and not setting sourceDistanceFromResolution', () => {
   const transformerOptions = {
     minOffsetRatio: 0.01,
     maxDepth: 1,
-    internalProjection: epsg4326
+    internalProjection: epsg4326,
+    setMinSourceDistanceFromResolution: false
   }
   const transformer = new GcpTransformer(
     gcps6,
