@@ -38,16 +38,6 @@ export type TransformationType =
   | 'projective'
   | 'linear'
 
-// export const SupportedTransformationTypes: TransformationType[] = [
-//   'straight',
-//   'helmert',
-//   'polynomial', // Note: no 'polynomial1' here
-//   'polynomial2',
-//   'polynomial3',
-//   'thinPlateSpline',
-//   'projective'
-// ]
-
 // Stored here as object to facilitate parsing in CLI and elsewhere
 export type GcpsInputs = {
   gcps: Gcp[]
@@ -94,15 +84,12 @@ export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
 export type SplitGcpLineInfo = {
   destinationMidPointsDistance: number
   destinationLineDistance: number
-  destinationRefinedLineDistance: number
 }
 
 export type GeneralGcpTransformOptions = {
   maxDepth: number
   minSourceDistance: number
-  setMinSourceDistanceFromResolution: boolean
   minDestinationDistance: number
-  setMinDestinationDistanceFromResolution: boolean
   minOffsetRatio: number
   minOffsetDistance: number
   distortionMeasures: DistortionMeasure[]
@@ -116,9 +103,7 @@ export type GeneralGcpTransformOptions = {
 export type GcpTransformOptions = {
   maxDepth: number
   minSourceDistance: number
-  setMinSourceDistanceFromResolution: boolean
   minDestinationDistance: number
-  setMinDestinationDistanceFromResolution: boolean
   minOffsetRatio: number
   minOffsetDistance: number
   distortionMeasures: DistortionMeasure[]

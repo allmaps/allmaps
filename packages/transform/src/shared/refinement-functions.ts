@@ -153,15 +153,13 @@ export function newMidGcpIfShouldSplitGcpLine(
     sourceMidPoint,
     destinationMidPointFromRefinementFunction,
     destinationMidPointsDistance,
-    destinationLineDistance,
-    destinationRefinedLineDistance
+    destinationLineDistance
   } = splitGcpLinePointInfo(gcpLine, refinementFunction, refinementOptions)
 
   const shouldSplit = shouldSplitGcpLine(
     {
       destinationMidPointsDistance,
-      destinationLineDistance,
-      destinationRefinedLineDistance
+      destinationLineDistance
     },
     refinementOptions
   )
@@ -198,26 +196,17 @@ function splitGcpLinePointInfo(
     gcpLine[0].destination,
     gcpLine[1].destination
   )
-  const destinationRefinedLineDistance = distance(
-    refinementFunction(gcpLine[0].source),
-    refinementFunction(gcpLine[1].source)
-  )
 
   return {
     sourceMidPoint,
     destinationMidPointFromRefinementFunction,
     destinationMidPointsDistance,
-    destinationLineDistance,
-    destinationRefinedLineDistance
+    destinationLineDistance
   }
 }
 
 function shouldSplitGcpLine(
-  {
-    destinationMidPointsDistance,
-    destinationLineDistance,
-    destinationRefinedLineDistance
-  }: SplitGcpLineInfo,
+  { destinationMidPointsDistance, destinationLineDistance }: SplitGcpLineInfo,
   refinementOptions: RefinementOptions
 ): boolean {
   return (

@@ -1,5 +1,3 @@
-import { computeBbox } from '@allmaps/stdlib'
-
 import { BaseGcpTransformer } from './BaseGcpTransformer.js'
 
 import { BaseTransformation } from '../transformation-types/BaseTransformation.js'
@@ -202,22 +200,6 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
     )
   }
 
-  protected getMinSourceDistanceFromResolution(): number {
-    if (this.minSourceDistanceFromResolution === undefined) {
-      this.minSourceDistanceFromResolution =
-        this.getForwardTransformationResolution() ?? Infinity
-    }
-    return this.minSourceDistanceFromResolution
-  }
-
-  protected getMinDestinationDistanceFromResolution(): number {
-    if (this.minDestinationDistanceFromResolution === undefined) {
-      this.minDestinationDistanceFromResolution =
-        this.getBackwardTransformationResolution() ?? Infinity
-    }
-    return this.minDestinationDistanceFromResolution
-  }
-
   /**
    * Get the resolution of the forward transformation in source space, within a given bbox.
    *
@@ -241,9 +223,6 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
     sourceBbox?: Bbox,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
-    sourceBbox =
-      sourceBbox ??
-      computeBbox(this.generalGcps.map((generalGcp) => generalGcp.source))
     return super.getForwardTransformationResolutionInternal(
       sourceBbox,
       partialGeneralGcpTransformOptions
@@ -273,9 +252,6 @@ export class GeneralGcpTransformer extends BaseGcpTransformer {
     destinationBbox?: Bbox,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
-    destinationBbox =
-      destinationBbox ??
-      computeBbox(this.generalGcps.map((generalGcp) => generalGcp.destination))
     return super.getBackwardTransformationResolutionInternal(
       destinationBbox,
       partialGeneralGcpTransformOptions

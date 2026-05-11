@@ -18,12 +18,16 @@ import type { Point } from '@allmaps/types'
 
 // Options
 
+export const nonWarpingTransformationTypes = [
+  'helmert',
+  'polynomial',
+  'polynomial1'
+]
+
 export const defaultGeneralGcpTransformOptions: GeneralGcpTransformOptions = {
   maxDepth: 0,
   minSourceDistance: 0,
-  setMinSourceDistanceFromResolution: true,
   minDestinationDistance: 0,
-  setMinDestinationDistanceFromResolution: true,
   minOffsetRatio: 0,
   minOffsetDistance: Infinity,
   isMultiGeometry: false,
@@ -44,7 +48,10 @@ export const defaultGeneralGcpTransformerOptions: GeneralGcpTransformerOptions =
 export function gcpTransformOptionsToGeneralGcpTransformOptions(
   partialGcpTransformOptions?: Partial<GcpTransformOptions>
 ): Partial<GeneralGcpTransformOptions> {
-  if (partialGcpTransformOptions === undefined) {
+  if (
+    partialGcpTransformOptions === undefined ||
+    Object.keys(partialGcpTransformOptions).length === 0
+  ) {
     return {}
   }
 
@@ -129,13 +136,10 @@ export const defaultGcpTransformerOptions: GcpTransformerOptions =
 export function refinementOptionsFromForwardTransformOptions(
   generalGcpTransformOptions: GeneralGcpTransformOptions
 ): RefinementOptions {
-  const refinementOptions = mergeOptions(defaultRefinementOptions, {
-    maxDepth: generalGcpTransformOptions.maxDepth,
-    minSourceDistance: generalGcpTransformOptions.minSourceDistance,
-    minDestinationDistance: generalGcpTransformOptions.minDestinationDistance,
-    minOffsetRatio: generalGcpTransformOptions.minOffsetRatio,
-    minOffsetDistance: generalGcpTransformOptions.minOffsetDistance
-  })
+  const refinementOptions = mergeOptions(
+    defaultRefinementOptions,
+    generalGcpTransformOptions
+  )
 
   return refinementOptions
 }
@@ -143,13 +147,10 @@ export function refinementOptionsFromForwardTransformOptions(
 export function refinementOptionsFromBackwardTransformOptions(
   generalGcpTransformOptions: GeneralGcpTransformOptions
 ): RefinementOptions {
-  const refinementOptions = mergeOptions(defaultRefinementOptions, {
-    maxDepth: generalGcpTransformOptions.maxDepth,
-    minSourceDistance: generalGcpTransformOptions.minSourceDistance,
-    minDestinationDistance: generalGcpTransformOptions.minDestinationDistance,
-    minOffsetRatio: generalGcpTransformOptions.minOffsetRatio,
-    minOffsetDistance: generalGcpTransformOptions.minOffsetDistance
-  })
+  const refinementOptions = mergeOptions(
+    defaultRefinementOptions,
+    generalGcpTransformOptions
+  )
 
   return refinementOptions
 }

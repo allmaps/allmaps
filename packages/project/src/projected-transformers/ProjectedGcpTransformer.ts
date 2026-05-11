@@ -1,7 +1,6 @@
 import proj4 from 'proj4'
 
 import {
-  computeBbox,
   mergeOptions,
   mergeOptionsUnlessUndefined,
   mergePartialOptions
@@ -10,6 +9,7 @@ import {
   GcpAndDistortions,
   GcpTransformer,
   GcpTransformerOptions,
+  nonWarpingTransformationTypes,
   ProjectionFunction,
   TransformationType,
   TransformationTypeInputs
@@ -355,20 +355,11 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     )
   }
 
-  protected getMinSourceDistanceFromResolution(): number {
-    if (this.minSourceDistanceFromResolution === undefined) {
-      this.minSourceDistanceFromResolution =
-        this.getToProjectedGeoTransformationResolution() ?? Infinity
-    }
-    return this.minSourceDistanceFromResolution
-  }
-
-  protected getMinDestinationDistanceFromResolution(): number {
-    if (this.minDestinationDistanceFromResolution === undefined) {
-      this.minDestinationDistanceFromResolution =
-        this.getToResourceTransformationResolution() ?? Infinity
-    }
-    return this.minDestinationDistanceFromResolution
+  protected isWarping(): boolean {
+    return (
+      isEqualProjection(this.projection, this.internalProjection) === true &&
+      nonWarpingTransformationTypes.includes(this.type)
+    )
   }
 
   /**
@@ -398,11 +389,6 @@ export class ProjectedGcpTransformer extends GcpTransformer {
       projectedGcpTransformOptionsToGcpTransformOptions(
         this.internalProjection,
         partialProjectedGcpTransformOptions
-      )
-    resourceBbox =
-      resourceBbox ??
-      computeBbox(
-        this.projectedGcps.map((projectedGcp) => projectedGcp.resource)
       )
     return super.getToGeoTransformationResolution(
       resourceBbox,
@@ -469,9 +455,6 @@ export class ProjectedGcpTransformer extends GcpTransformer {
         this.internalProjection,
         partialProjectedGcpTransformOptions
       )
-    projectedGeoBbox =
-      projectedGeoBbox ??
-      computeBbox(this.projectedGcps.map((projectedGcp) => projectedGcp.geo))
     return super.getToResourceTransformationResolution(
       projectedGeoBbox,
       partialGcpTransformOptions

@@ -164,17 +164,17 @@ describe('Transform LineString Backward To LineString of horizontal line, with m
   const transformOptions = {
     maxDepth: 2
   }
-  const transformer = new GcpTransformer(gcps7, 'polynomial')
+  const transformer = new GcpTransformer(gcps7, 'thinPlateSpline')
   const geoLineString: LineString = [
     [10, 50],
     [50, 50]
   ]
   const resourceLineString: LineString = [
-    [31.06060606060611, 155.30303030303048],
-    [82.57575757575762, 162.8787878787881],
-    [134.09090909090912, 170.45454545454567],
-    [185.60606060606065, 178.0303030303033],
-    [237.12121212121218, 185.60606060606085]
+    [44.27384434127721, 221.36922170638508],
+    [95.55738564741294, 227.78692823706382],
+    [145.95772421640729, 229.78862108203538],
+    [195.16931671863088, 225.84658359315318],
+    [242.8859015221895, 214.42950761094625]
   ]
 
   test(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
