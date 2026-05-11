@@ -287,7 +287,10 @@ export abstract class BaseGcpTransformer {
       }
     } else {
       if (partialGeneralGcpTransformOptions) {
-        partialGeneralGcpTransformOptions.isMultiGeometry = false // false for piecewise single geometries
+        partialGeneralGcpTransformOptions = mergeOptions(
+          partialGeneralGcpTransformOptions,
+          { isMultiGeometry: false }
+        ) // false for piecewise single geometries
       }
       if (isMultiPoint(sourceGeometry)) {
         return sourceGeometry.map((element) =>
@@ -401,7 +404,10 @@ export abstract class BaseGcpTransformer {
       }
     } else {
       if (partialGeneralGcpTransformOptions) {
-        partialGeneralGcpTransformOptions.isMultiGeometry = false // false for piecewise single geometries
+        partialGeneralGcpTransformOptions = mergeOptions(
+          partialGeneralGcpTransformOptions,
+          { isMultiGeometry: false }
+        ) // false for piecewise single geometries
       }
       if (isMultiPoint(destinationGeometry)) {
         return destinationGeometry.map((element) =>
@@ -617,6 +623,7 @@ export abstract class BaseGcpTransformer {
   // e.g. when transforming (many) very finely mapped masks.
   protected assureMinSourceDistanceFromResolution(): void {
     if (this.transformerOptions.setMinSourceDistanceFromResolution) {
+      console.log('Setting minSourceDistance')
       this.transformerOptions.minSourceDistance =
         this.getMinSourceDistanceFromResolution()
     }
