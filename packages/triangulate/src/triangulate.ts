@@ -7,6 +7,7 @@ import {
   conformPolygon,
   mergeOptions,
   midPoint,
+  polygonIsBboxRectangle,
   triangleAngles
 } from '@allmaps/stdlib'
 import type {
@@ -85,12 +86,16 @@ export function triangulateToUnique(
 
   // Conform polygons (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
+  const closedPolygon = closePolygon(polygon)
+  const polygonIsBbox = polygonIsBboxRectangle(polygon)
   const steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
     conformPolygon(steinerPolygon)
   )
 
   // Gather Steinerpoints (don't require them to be in polygon)
-  const steinerPointsInPolygon = options.steinerPoints
+  const steinerPointsInPolygon = options.steinerPoints.filter((point) =>
+    pointInClosedPolygon(point, closedPolygon)
+  )
 
   // Interpolate polygons and create grid based on distance
   let interpolatedPolygon: Polygon = []
@@ -148,6 +153,9 @@ export function triangulateToUnique(
   // Lookup point indices for the edges of the interpolated polygon
   const uniquePointIndexInterpolatedPolygon: TypedPolygon<number> =
     interpolatedPolygon.map((ring) => ring.map(getPointIndex))
+  const uniquePointIndexSetInterpolatedPolygon = new Set(
+    uniquePointIndexInterpolatedPolygon.flat()
+  )
   // Lookup point indices for the edges of the interpolated steiner polygons
   const uniquePointIndexInterpolatedSteinerPolygons: TypedPolygon<number>[] =
     interpolatedSteinerPolygons.map((polygon) =>
@@ -182,7 +190,7 @@ export function triangulateToUnique(
 
   let uniquePointIndexTriangles: TypedTriangle<number>[] = []
   let triangles: Triangle[] = []
-  const shouldClassifyTriangles: boolean[] = []
+  const triangleIsAlongInterpolatedPolygon: boolean[] = []
   for (let i = 0; i < constrainautor.del.triangles.length; i += 3) {
     uniquePointIndexTriangles.push([
       constrainautor.del.triangles[i],
@@ -195,21 +203,28 @@ export function triangulateToUnique(
       uniquePoints[constrainautor.del.triangles[i + 2]]
     ])
     // Only classify triangles if they are along the border
-    shouldClassifyTriangles.push(
-      constrainautor.del.triangles[i] < interpolatedPolygonPoints.length ||
-        constrainautor.del.triangles[i + 1] <
-          interpolatedPolygonPoints.length ||
-        constrainautor.del.triangles[i + 2] < interpolatedPolygonPoints.length
+    triangleIsAlongInterpolatedPolygon.push(
+      uniquePointIndexSetInterpolatedPolygon.has(
+        constrainautor.del.triangles[i]
+      ) ||
+        uniquePointIndexSetInterpolatedPolygon.has(
+          constrainautor.del.triangles[i + 1]
+        ) ||
+        uniquePointIndexSetInterpolatedPolygon.has(
+          constrainautor.del.triangles[i + 2]
+        )
     )
   }
 
   // Only keep triangles inside polygon
-  const closedPolygon = closePolygon(polygon)
-  const shouldKeep = triangles.map((triangle, index) => {
-    // Only keep if inside
-    if (shouldClassifyTriangles[index]) {
+  const triangleShouldKeep = triangles.map((triangle, index) => {
+    // Only keep if inside (and can't be outside if polygon is bbox)
+    // This check for every triangle is expensive!
+    if (triangleIsAlongInterpolatedPolygon[index]) {
       return (
-        pointInClosedPolygon(midPoint(...triangle), closedPolygon) &&
+        (polygonIsBbox
+          ? true
+          : pointInClosedPolygon(midPoint(...triangle), closedPolygon)) &&
         triangleAngles(triangle).every(
           (angle) => angle >= options.minimumTriangleAngle
         )
@@ -219,11 +234,12 @@ export function triangulateToUnique(
     }
   })
   uniquePointIndexTriangles = uniquePointIndexTriangles.filter(
-    (_triangle, index) => shouldKeep[index]
+    (_triangle, index) => triangleShouldKeep[index]
   )
-  triangles = triangles.filter((_triangle, index) => shouldKeep[index])
+  triangles = triangles.filter((_triangle, index) => triangleShouldKeep[index])
 
   // If requested, compute if triangles are inside steiner polygons
+  // This check for every triangle is expensive!
   let insideSteinerPolygonsTriangles: boolean[] = []
   const steinerClosedPolygons = steinerPolygons.map((steinerPolygon) =>
     closePolygon(steinerPolygon)

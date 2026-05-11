@@ -1,5 +1,6 @@
 import monotoneChainConvexHull from 'monotone-chain-convex-hull'
 
+import { rotateArray } from './main.js'
 import { isGeojsonGeometry, geojsonGeometryToPoints } from './geojson.js'
 import {
   distance,
@@ -7,7 +8,8 @@ import {
   geometryToPoints,
   rotatePoints,
   rotatePoint,
-  midPoint
+  midPoint,
+  isEqualPointArray
 } from './geometry.js'
 
 import type {
@@ -174,6 +176,20 @@ export function intersectBboxes(bbox0: Bbox, bbox1: Bbox): Bbox | undefined {
 
 export function pointInBbox(point: Point, bbox: Bbox): boolean {
   return doBboxesIntersect([point[0], point[1], point[0], point[1]], bbox)
+}
+
+export function ringIsBboxRectangle(ring: Ring): boolean {
+  const rectangle = bboxToRectangle(computeBbox(ring))
+  return (
+    isEqualPointArray(rectangle, ring) ||
+    isEqualPointArray(rectangle, rotateArray(ring, 1)) ||
+    isEqualPointArray(rectangle, rotateArray(ring, 2)) ||
+    isEqualPointArray(rectangle, rotateArray(ring, 3))
+  )
+}
+
+export function polygonIsBboxRectangle(polygon: Polygon): boolean {
+  return polygon.length == 1 && ringIsBboxRectangle(polygon[0])
 }
 
 export function bufferBbox(bbox: Bbox, dist0: number, dist1?: number): Bbox {
