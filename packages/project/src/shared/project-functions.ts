@@ -202,7 +202,10 @@ export function projectedGcpTransformOptionsToGcpTransformOptions(
   internalProjection: Projection,
   partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
 ): Partial<GcpTransformOptions> {
-  if (partialProjectedGcpTransformOptions === undefined) {
+  if (
+    partialProjectedGcpTransformOptions === undefined ||
+    Object.keys(partialProjectedGcpTransformOptions).length === 0
+  ) {
     return {}
   }
 

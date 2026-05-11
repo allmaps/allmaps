@@ -6,7 +6,8 @@ import {
   isMultiLineString,
   isMultiPolygon,
   flipY,
-  mergeOptions
+  mergeOptions,
+  computeBbox
 } from '@allmaps/stdlib'
 
 import { computeDistortionsFromPartialDerivatives } from '../shared/distortion.js'
@@ -26,6 +27,7 @@ import { euclideanNorm } from '../shared/norm-functions.js'
 
 import {
   defaultGeneralGcpTransformerOptions,
+  nonWarpingTransformationTypes,
   refinementOptionsFromBackwardTransformOptions,
   refinementOptionsFromForwardTransformOptions
 } from '../shared/transform-functions.js'
@@ -92,8 +94,6 @@ export abstract class BaseGcpTransformer {
 
   readonly type: TransformationType
   protected transformerOptions: GeneralGcpTransformerOptions
-  protected minSourceDistanceFromResolution?: number
-  protected minDestinationDistanceFromResolution?: number
 
   protected forwardTransformation?: BaseTransformation
   protected backwardTransformation?: BaseTransformation
@@ -257,10 +257,13 @@ export abstract class BaseGcpTransformer {
       generalGcp: GeneralGcpAndDistortions
     ) => P
   ): TypedGeometry<P> {
-    const transformOptions = mergeOptions(
+    let transformOptions = mergeOptions(
       this.transformerOptions,
       partialGeneralGcpTransformOptions
     )
+    if (this.isWarping()) {
+      transformOptions = mergeOptions(transformOptions, { maxDepth: 0 })
+    }
     if (!transformOptions.isMultiGeometry) {
       if (isPoint(sourceGeometry)) {
         return this.transformPointForwardInternal(
@@ -269,14 +272,12 @@ export abstract class BaseGcpTransformer {
           generalGcpToP
         )
       } else if (isLineString(sourceGeometry)) {
-        this.assureMinSourceDistanceFromResolution()
         return this.transformLineStringForwardInternal(
           sourceGeometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isPolygon(sourceGeometry)) {
-        this.assureMinSourceDistanceFromResolution()
         return this.transformPolygonForwardInternal(
           sourceGeometry,
           transformOptions,
@@ -374,10 +375,13 @@ export abstract class BaseGcpTransformer {
       generalGcp: GeneralGcpAndDistortions
     ) => P
   ): TypedGeometry<P> {
-    const transformOptions = mergeOptions(
+    let transformOptions = mergeOptions(
       this.transformerOptions,
       partialGeneralGcpTransformOptions
     )
+    if (this.isWarping()) {
+      transformOptions = mergeOptions(transformOptions, { maxDepth: 0 })
+    }
     if (!transformOptions.isMultiGeometry) {
       if (isPoint(destinationGeometry)) {
         return this.transformPointBackwardInternal(
@@ -386,14 +390,12 @@ export abstract class BaseGcpTransformer {
           generalGcpToP
         )
       } else if (isLineString(destinationGeometry)) {
-        this.assureMinDestinationDistanceFromResolution()
         return this.transformLineStringBackwardInternal(
           destinationGeometry,
           transformOptions,
           generalGcpToP
         )
       } else if (isPolygon(destinationGeometry)) {
-        this.assureMinDestinationDistanceFromResolution()
         return this.transformPolygonBackwardInternal(
           destinationGeometry,
           transformOptions,
@@ -616,56 +618,39 @@ export abstract class BaseGcpTransformer {
     })
   }
 
-  // The idea here is to compute the resolution once,
-  // and use this information when transforming lineString or polygons
-  // and avoid the (possibly expensive) refinement check
-  // when there are many segments smaller then this distance
-  // e.g. when transforming (many) very finely mapped masks.
-  protected assureMinSourceDistanceFromResolution(): void {
-    if (this.transformerOptions.setMinSourceDistanceFromResolution) {
-      console.log('Setting minSourceDistance')
-      this.transformerOptions.minSourceDistance =
-        this.getMinSourceDistanceFromResolution()
-    }
+  protected isWarping(): boolean {
+    return nonWarpingTransformationTypes.includes(this.type)
   }
-
-  protected assureMinDestinationDistanceFromResolution(): void {
-    if (this.transformerOptions.setMinDestinationDistanceFromResolution) {
-      this.transformerOptions.minDestinationDistance =
-        this.getMinDestinationDistanceFromResolution()
-    }
-  }
-
-  protected abstract getMinSourceDistanceFromResolution(): number
-
-  protected abstract getMinDestinationDistanceFromResolution(): number
 
   protected getForwardTransformationResolutionInternal(
-    sourceBbox: Bbox,
+    sourceBbox?: Bbox,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
     const transformOptions = mergeOptions(
       this.transformerOptions,
       partialGeneralGcpTransformOptions
     )
+    sourceBbox = sourceBbox ?? computeBbox(this.sourcePointsInternal)
     return getSourceRefinementResolution(
       sourceBbox,
-      (p) => this.transformForwardInternal(p, transformOptions),
+      (p) => this.transformPointForwardInternal(p, transformOptions),
       refinementOptionsFromForwardTransformOptions(transformOptions)
     )
   }
 
   protected getBackwardTransformationResolutionInternal(
-    destinationBbox: Bbox,
+    destinationBbox?: Bbox,
     partialGeneralGcpTransformOptions?: Partial<GeneralGcpTransformOptions>
   ): number | undefined {
     const transformOptions = mergeOptions(
       this.transformerOptions,
       partialGeneralGcpTransformOptions
     )
+    destinationBbox =
+      destinationBbox ?? computeBbox(this.destinationPointsInternal)
     return getSourceRefinementResolution(
       destinationBbox,
-      (p) => this.transformBackwardInternal(p, transformOptions),
+      (p) => this.transformPointBackwardInternal(p, transformOptions),
       refinementOptionsFromBackwardTransformOptions(transformOptions)
     )
   }

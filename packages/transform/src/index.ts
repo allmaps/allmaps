@@ -24,6 +24,7 @@ export {
 } from './shared/distortion.js'
 
 export {
+  nonWarpingTransformationTypes,
   defaultGeneralGcpTransformerOptions,
   defaultGcpTransformerOptions,
   defaultGeneralGcpTransformOptions,

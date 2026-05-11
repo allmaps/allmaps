@@ -122,17 +122,9 @@ export function addProjectedGcpTransformOptions<
       parseInt
     )
     .option(
-      '--set-min-source-distance-from-resolution',
-      `Set 'minSourceDistance' using the resolution of the forward transformation. This is useful to prevent refinement checks on short segments. Default ${defaultProjectedGcpTransformOptions.setMinSourceDistanceFromResolution}.`
-    )
-    .option(
       '--min-destination-distance <number>',
       `Minimum distance of a destination segment when recursively refining (lower means more midpoints). Default ${defaultProjectedGcpTransformOptions.minDestinationDistance}.`,
       parseInt
-    )
-    .option(
-      '--set-min-destination-distance-from-resolution',
-      `Set 'minDestinationDistance' using the resolution of the backward transformation. This is useful to prevent refinement checks on short segments. Default ${defaultProjectedGcpTransformOptions.setMinDestinationDistanceFromResolution}.`
     )
     .option(
       '--min-offset-ratio <number>',

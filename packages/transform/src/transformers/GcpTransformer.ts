@@ -8,8 +8,7 @@ import {
   svgGeometriesToSvgString,
   svgGeometryToGeometry,
   mergePartialOptions,
-  mergeOptions,
-  computeBbox
+  mergeOptions
 } from '@allmaps/stdlib'
 
 import { BaseGcpTransformer } from './BaseGcpTransformer.js'
@@ -208,11 +207,10 @@ export class GcpTransformer extends BaseGcpTransformer {
   ): TypedGeometry<P> {
     const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
       gcpToP(generalGcpToGcp(generalGcp))
-    const partialGeneralGcpTransformOptions = partialGcpTransformOptions
-      ? gcpTransformOptionsToGeneralGcpTransformOptions(
-          partialGcpTransformOptions
-        )
-      : undefined
+    const partialGeneralGcpTransformOptions =
+      gcpTransformOptionsToGeneralGcpTransformOptions(
+        partialGcpTransformOptions
+      )
     return super.transformForwardInternal(
       resourceGeometry,
       partialGeneralGcpTransformOptions,
@@ -272,32 +270,15 @@ export class GcpTransformer extends BaseGcpTransformer {
   ): TypedGeometry<P> {
     const generalGcpToP = (generalGcp: GeneralGcpAndDistortions) =>
       gcpToP(generalGcpToGcp(generalGcp))
-    const partialGeneralGcpTransformOptions = partialGcpTransformOptions
-      ? gcpTransformOptionsToGeneralGcpTransformOptions(
-          partialGcpTransformOptions
-        )
-      : undefined
+    const partialGeneralGcpTransformOptions =
+      gcpTransformOptionsToGeneralGcpTransformOptions(
+        partialGcpTransformOptions
+      )
     return super.transformBackwardInternal(
       geoGeometry,
       partialGeneralGcpTransformOptions,
       generalGcpToP
     )
-  }
-
-  protected getMinSourceDistanceFromResolution(): number {
-    if (this.minSourceDistanceFromResolution === undefined) {
-      this.minSourceDistanceFromResolution =
-        this.getToGeoTransformationResolution() ?? Infinity
-    }
-    return this.minSourceDistanceFromResolution
-  }
-
-  protected getMinDestinationDistanceFromResolution(): number {
-    if (this.minDestinationDistanceFromResolution === undefined) {
-      this.minDestinationDistanceFromResolution =
-        this.getToResourceTransformationResolution() ?? Infinity
-    }
-    return this.minDestinationDistanceFromResolution
   }
 
   /**
@@ -327,8 +308,6 @@ export class GcpTransformer extends BaseGcpTransformer {
       gcpTransformOptionsToGeneralGcpTransformOptions(
         partialGcpTransformOptions
       )
-    resourceBbox =
-      resourceBbox ?? computeBbox(this.gcps.map((gcp) => gcp.resource))
     return super.getForwardTransformationResolutionInternal(
       resourceBbox,
       partialGeneralGcpTransformOptions
@@ -362,7 +341,6 @@ export class GcpTransformer extends BaseGcpTransformer {
       gcpTransformOptionsToGeneralGcpTransformOptions(
         partialGcpTransformOptions
       )
-    geoBbox = geoBbox ?? computeBbox(this.gcps.map((gcp) => gcp.geo))
     return super.getBackwardTransformationResolutionInternal(
       geoBbox,
       generalGcpTransformOptions
