@@ -11,7 +11,29 @@ export function mergeOptions<
   // where this was a 50% speed increase when transforming a lot of points
   // - Allow additionalOptions to be undefined, which simplifies handing over a simple spread
 
-  const hasAdditional = additionalPartialOptions.some((o) => o != null)
+  const len = additionalPartialOptions.length
+
+  // Fast path: no additional options
+  if (len === 0) {
+    return baseOptions as T & U[number]
+  }
+
+  // Fast path: single additional option (most common case)
+  // Avoids the mergePartialOptions call and its internal spread
+  if (len === 1) {
+    const only = additionalPartialOptions[0]
+    if (only == null) return baseOptions as T & U[number]
+    return { ...baseOptions, ...only }
+  }
+
+  let hasAdditional = false
+  for (let i = 0; i < len; i++) {
+    if (additionalPartialOptions[i] != null) {
+      hasAdditional = true
+      break
+    }
+  }
+
   if (!hasAdditional) return baseOptions as T & U[number]
   return {
     ...baseOptions,
