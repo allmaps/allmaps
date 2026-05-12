@@ -455,16 +455,16 @@ export class TriangulatedWarpedMap extends WarpedMap {
         // By including projectedGeo and distortions
         const resourceResolution = this.resourceResolution
         const resourceUniquePoints = uniquePoints as Point[]
-        const gcpUniquePoints = resourceUniquePoints.map((resourcePoint) =>
+        const gcpUniquePoints =
           this.projectedTransformer.transformToProjectedGeo(
-            resourcePoint,
+            resourceUniquePoints,
             {
               distortionMeasures: this.options.distortionMeasures,
-              referenceScale: this.getReferenceScale()
+              referenceScale: this.getReferenceScale(),
+              isMultiGeometry: true
             },
             (gcpPartialDistortion) => gcpPartialDistortion
           )
-        )
         const uniquePointIndices = uniquePointIndexTriangles.flat() as number[]
 
         return {
@@ -504,16 +504,16 @@ export class TriangulatedWarpedMap extends WarpedMap {
               resourceResolution:
                 this.projectedGcpTriangulation.resourceResolution,
               gcpUniquePoints:
-                this.projectedGcpTriangulation.gcpUniquePoints.map(
-                  (projectedGcp) =>
-                    this.projectedPreviousTransformer.transformToProjectedGeo(
-                      projectedGcp.resource,
-                      {
-                        distortionMeasures: this.options.distortionMeasures,
-                        referenceScale: this.getReferenceScale()
-                      },
-                      (gcpPartialDistortion) => gcpPartialDistortion
-                    )
+                this.projectedPreviousTransformer.transformToProjectedGeo(
+                  this.projectedGcpTriangulation.gcpUniquePoints.map(
+                    (projectedGcp) => projectedGcp.resource
+                  ),
+                  {
+                    distortionMeasures: this.options.distortionMeasures,
+                    referenceScale: this.getReferenceScale(),
+                    isMultiGeometry: true
+                  },
+                  (gcpPartialDistortion) => gcpPartialDistortion
                 ),
               uniquePointIndices:
                 this.projectedGcpTriangulation.uniquePointIndices,
