@@ -157,22 +157,6 @@
     </div>
 
     <div class="field">
-      <label for="distortion-measures"
-        >Pre-compute all distortion measures</label
-      >
-      <input
-        name="distortion-measures"
-        id="distortion-measures"
-        type="checkbox"
-        checked={options.distortionMeasures === distortionMeasures}
-        onchange={(e) =>
-          (options.distortionMeasures = e.currentTarget.checked
-            ? distortionMeasures
-            : ['log2sigma'])}
-      />
-    </div>
-
-    <div class="field">
       <label for="distortionMeasure">Distortion Measure</label>
       <select id="distortionMeasure" bind:value={options.distortionMeasure}>
         {#each [undefined, ...distortionMeasures] as d (d)}

@@ -111,9 +111,9 @@
       return
     }
 
-    // Spread options to ensure all properties are read, registering them as reactive dependencies
-    const copiedOptions = { ...options }
-    warpedMapLayer.setLayerOptions(copiedOptions)
+    warpedMapLayer.setLayerOptions(
+      $state.snapshot(options) as WebGL2WarpedMapOptions
+    )
   })
 
   $effect(() => {
