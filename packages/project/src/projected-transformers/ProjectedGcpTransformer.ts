@@ -355,7 +355,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     )
   }
 
-  protected isWarping(): boolean {
+  protected isNonWarping(): boolean {
     return (
       isEqualProjection(this.projection, this.internalProjection) === true &&
       nonWarpingTransformationTypes.includes(this.type)
