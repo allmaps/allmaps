@@ -1,4 +1,5 @@
 import type {
+  Bbox,
   Point,
   Polygon,
   Triangle,
@@ -28,4 +29,9 @@ export type TriangluationOptions = {
   steinerPolygons: Polygon[]
   minimumTriangleAngle: number
   computeInsideSteinerPolygons: boolean
+}
+
+export type PolygonForInsidenessCheck = {
+  closedRings: { coords: Float64Array; length: number }[]
+  bbox: Bbox
 }

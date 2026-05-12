@@ -23,8 +23,9 @@ import {
   getGridPointsInBbox,
   interpolateRing,
   interpolatePolygon,
-  pointInPolygon,
-  pointInClosedPolygon
+  coordsInPolygonForInsidenessCheck,
+  preprocessPolygonForInsideCheck,
+  coordsInPolygonsForInsidenessCheck
 } from './shared.js'
 
 import type { TriangluationOptions, TriangulationToUnique } from './types.js'
@@ -86,7 +87,7 @@ export function triangulateToUnique(
 
   // Conform polygons (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
-  const closedPolygon = closePolygon(polygon)
+  const polygonForInsidenessCheck = preprocessPolygonForInsideCheck(polygon)
   const polygonIsBbox = polygonIsBboxRectangle(polygon)
   const steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
     conformPolygon(steinerPolygon)
@@ -94,7 +95,11 @@ export function triangulateToUnique(
 
   // Gather Steinerpoints (don't require them to be in polygon)
   const steinerPointsInPolygon = options.steinerPoints.filter((point) =>
-    pointInClosedPolygon(point, closedPolygon)
+    coordsInPolygonForInsidenessCheck(
+      point[0],
+      point[1],
+      polygonForInsidenessCheck
+    )
   )
 
   // Interpolate polygons and create grid based on distance
@@ -116,7 +121,11 @@ export function triangulateToUnique(
     // Add grid points inside the polygon
     gridPoints = getGridPointsInBbox(computeBbox(polygon), distance)
     gridPointsInPolygon = gridPoints.filter((point) =>
-      pointInPolygon(point, polygon)
+      coordsInPolygonForInsidenessCheck(
+        point[0],
+        point[1],
+        polygonForInsidenessCheck
+      )
     )
   } else {
     interpolatedPolygon = polygon
@@ -216,6 +225,8 @@ export function triangulateToUnique(
     )
   }
 
+  // Triangle midPoints
+  let triangleMidPoints = triangles.map((triangle) => midPoint(...triangle))
   // Only keep triangles inside polygon
   const triangleShouldKeep = triangles.map((triangle, index) => {
     // Only keep if inside (and can't be outside if polygon is bbox)
@@ -224,7 +235,11 @@ export function triangulateToUnique(
       return (
         (polygonIsBbox
           ? true
-          : pointInClosedPolygon(midPoint(...triangle), closedPolygon)) &&
+          : coordsInPolygonForInsidenessCheck(
+              triangleMidPoints[index][0],
+              triangleMidPoints[index][1],
+              polygonForInsidenessCheck
+            )) &&
         triangleAngles(triangle).every(
           (angle) => angle >= options.minimumTriangleAngle
         )
@@ -237,6 +252,9 @@ export function triangulateToUnique(
     (_triangle, index) => triangleShouldKeep[index]
   )
   triangles = triangles.filter((_triangle, index) => triangleShouldKeep[index])
+  triangleMidPoints = triangleMidPoints.filter(
+    (_triangle, index) => triangleShouldKeep[index]
+  )
 
   // If requested, compute if triangles are inside steiner polygons
   // This check for every triangle is expensive!
@@ -245,10 +263,16 @@ export function triangulateToUnique(
     closePolygon(steinerPolygon)
   )
   if (options.computeInsideSteinerPolygons) {
-    insideSteinerPolygonsTriangles = triangles.map((triangle) =>
-      steinerClosedPolygons.some((steinerClosedPolygon) =>
-        pointInClosedPolygon(midPoint(...triangle), steinerClosedPolygon)
-      )
+    const steinerClosedPolygonsForInsidenessCheck = steinerClosedPolygons.map(
+      (steinerPolygon) => preprocessPolygonForInsideCheck(steinerPolygon)
+    )
+    insideSteinerPolygonsTriangles = triangles.map(
+      (_triangle, index) =>
+        coordsInPolygonsForInsidenessCheck(
+          triangleMidPoints[index][0],
+          triangleMidPoints[index][1],
+          steinerClosedPolygonsForInsidenessCheck
+        ) === true
     )
   }
 
