@@ -36,7 +36,7 @@ import type { Projection } from '@allmaps/project'
 
 export const DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS: SpecificTriangulatedWarpedMapOptions =
   {
-    distortionMeasures: ['log2sigma']
+    distortionMeasures: [] // List of distortion measures to compute starts empty, and is filled as individual distortion measures are requested. To precompute multiple distortion measures, pass a list here.
   }
 
 export function createTriangulatedWarpedMapFactory() {
@@ -232,6 +232,12 @@ export class TriangulatedWarpedMap extends WarpedMap {
    */
   protected setDistortionMeasure(distortionMeasure?: DistortionMeasure) {
     super.setDistortionMeasure(distortionMeasure)
+    if (
+      distortionMeasure &&
+      !this.options.distortionMeasures.includes(distortionMeasure)
+    ) {
+      this.options.distortionMeasures.push(distortionMeasure)
+    }
     this.updateTriangulation()
   }
 
