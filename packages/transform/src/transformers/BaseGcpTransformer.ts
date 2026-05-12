@@ -261,7 +261,7 @@ export abstract class BaseGcpTransformer {
       this.transformerOptions,
       partialGeneralGcpTransformOptions
     )
-    if (this.isWarping()) {
+    if (this.isNonWarping()) {
       transformOptions = mergeOptions(transformOptions, { maxDepth: 0 })
     }
     if (!transformOptions.isMultiGeometry) {
@@ -379,7 +379,7 @@ export abstract class BaseGcpTransformer {
       this.transformerOptions,
       partialGeneralGcpTransformOptions
     )
-    if (this.isWarping()) {
+    if (this.isNonWarping()) {
       transformOptions = mergeOptions(transformOptions, { maxDepth: 0 })
     }
     if (!transformOptions.isMultiGeometry) {
@@ -618,8 +618,14 @@ export abstract class BaseGcpTransformer {
     })
   }
 
-  protected isWarping(): boolean {
-    return nonWarpingTransformationTypes.includes(this.type)
+  protected isNonWarping(): boolean {
+    return (
+      this.transformerOptions.postForward ===
+        this.transformerOptions.preBackward &&
+      this.transformerOptions.postBackward ===
+        this.transformerOptions.preForward &&
+      nonWarpingTransformationTypes.includes(this.type)
+    )
   }
 
   protected getForwardTransformationResolutionInternal(
