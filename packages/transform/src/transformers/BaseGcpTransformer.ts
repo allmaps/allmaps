@@ -287,33 +287,32 @@ export abstract class BaseGcpTransformer {
         throw new Error('Geometry type not supported')
       }
     } else {
-      if (partialGeneralGcpTransformOptions) {
-        partialGeneralGcpTransformOptions = mergeOptions(
-          partialGeneralGcpTransformOptions,
-          { isMultiGeometry: false }
-        ) // false for piecewise single geometries
+      if (transformOptions) {
+        transformOptions = mergeOptions(transformOptions, {
+          isMultiGeometry: false
+        }) // false for piecewise single geometries
       }
       if (isMultiPoint(sourceGeometry)) {
-        return sourceGeometry.map((element) =>
-          this.transformForwardInternal(
-            element,
-            partialGeneralGcpTransformOptions,
+        return sourceGeometry.map((sourcePoint) =>
+          this.transformPointForwardInternal(
+            sourcePoint,
+            transformOptions,
             generalGcpToP
           )
         )
       } else if (isMultiLineString(sourceGeometry)) {
-        return sourceGeometry.map((element) =>
-          this.transformForwardInternal(
-            element,
-            partialGeneralGcpTransformOptions,
+        return sourceGeometry.map((sourceLineString) =>
+          this.transformLineStringForwardInternal(
+            sourceLineString,
+            transformOptions,
             generalGcpToP
           )
         )
       } else if (isMultiPolygon(sourceGeometry)) {
-        return sourceGeometry.map((element) =>
-          this.transformForwardInternal(
-            element,
-            partialGeneralGcpTransformOptions,
+        return sourceGeometry.map((sourcePolygon) =>
+          this.transformPolygonForwardInternal(
+            sourcePolygon,
+            transformOptions,
             generalGcpToP
           )
         )
@@ -405,33 +404,32 @@ export abstract class BaseGcpTransformer {
         throw new Error('Geometry type not supported')
       }
     } else {
-      if (partialGeneralGcpTransformOptions) {
-        partialGeneralGcpTransformOptions = mergeOptions(
-          partialGeneralGcpTransformOptions,
-          { isMultiGeometry: false }
-        ) // false for piecewise single geometries
+      if (transformOptions) {
+        transformOptions = mergeOptions(transformOptions, {
+          isMultiGeometry: false
+        }) // false for piecewise single geometries
       }
       if (isMultiPoint(destinationGeometry)) {
-        return destinationGeometry.map((element) =>
-          this.transformBackwardInternal(
-            element,
-            partialGeneralGcpTransformOptions,
+        return destinationGeometry.map((destinationPoint) =>
+          this.transformPointBackwardInternal(
+            destinationPoint,
+            transformOptions,
             generalGcpToP
           )
         )
       } else if (isMultiLineString(destinationGeometry)) {
-        return destinationGeometry.map((element) =>
-          this.transformBackwardInternal(
-            element,
-            partialGeneralGcpTransformOptions,
+        return destinationGeometry.map((destinationLineString) =>
+          this.transformLineStringBackwardInternal(
+            destinationLineString,
+            transformOptions,
             generalGcpToP
           )
         )
       } else if (isMultiPolygon(destinationGeometry)) {
-        return destinationGeometry.map((element) =>
-          this.transformBackwardInternal(
-            element,
-            partialGeneralGcpTransformOptions,
+        return destinationGeometry.map((destinationPolygon) =>
+          this.transformPolygonBackwardInternal(
+            destinationPolygon,
+            transformOptions,
             generalGcpToP
           )
         )
