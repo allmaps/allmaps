@@ -108,8 +108,7 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     distortionColor2: yellow,
     distortionColor3: red,
     debugTiles: false,
-    debugTriangles: false,
-    debugTriangulation: false
+    debugTriangles: false
   }
 
 const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
@@ -345,9 +344,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return (
       super.shouldRenderPoints() &&
       this.options.renderPoints !== false &&
-      (this.options.renderGcps ||
-        this.options.renderTransformedGcps ||
-        this.options.debugTriangulation)
+      (this.options.renderGcps || this.options.renderTransformedGcps)
     )
   }
 
@@ -513,17 +510,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         color: this.options.renderTransformedGcpsColor,
         viewportBorderSize: this.options.renderTransformedGcpsBorderSize,
         borderColor: this.options.renderTransformedGcpsBorderColor
-      })
-    }
-
-    if (this.options.debugTriangulation) {
-      this.pointGroups.push({
-        projectedGeoPoints: this.projectedGeoPreviousTrianglePoints,
-        color: gray
-      })
-      this.pointGroups.push({
-        projectedGeoPoints: this.projectedGeoTrianglePoints,
-        color: yellow
       })
     }
   }

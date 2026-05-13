@@ -3389,7 +3389,6 @@ If no viewport is specified, a viewport is deduced based on the WarpedMapList an
 * `colorizeColor` (`string`)
 * `debugTiles` (`boolean`)
 * `debugTriangles` (`boolean`)
-* `debugTriangulation` (`boolean`)
 * `distortionColor00` (`string`)
 * `distortionColor01` (`string`)
 * `distortionColor1` (`string`)

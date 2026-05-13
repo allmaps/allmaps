@@ -127,7 +127,6 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderGrid: boolean
   renderGridColor: string
   debugTriangles: boolean
-  debugTriangulation: boolean
   debugTiles: boolean
 }
 export type WebGL2WarpedMapOptions = SpecificWebGL2WarpedMapOptions &
