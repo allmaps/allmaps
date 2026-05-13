@@ -20,7 +20,6 @@ import {
   convexHull,
   mergeOptions,
   mergePartialOptions,
-  optionKeysByMapIdToUndefinedOptionsByMapId,
   optionKeysToUndefinedOptions
 } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
@@ -1010,7 +1009,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     if (projection) {
       const geoMaskPoints: Point[] = []
       for (const warpedMap of warpedMaps) {
-        geoMaskPoints.push(...warpedMap.geoMask)
+        geoMaskPoints.push(...warpedMap.geoAppliedMask)
       }
 
       const projectedGeoMaskPoints = geoMaskPoints.map((point) =>
@@ -1020,7 +1019,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     } else {
       const projectedGeoMaskPoints: Point[] = []
       for (const warpedMap of warpedMaps) {
-        projectedGeoMaskPoints.push(...warpedMap.geoMask)
+        projectedGeoMaskPoints.push(...warpedMap.geoAppliedMask)
       }
 
       return projectedGeoMaskPoints
