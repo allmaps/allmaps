@@ -23,7 +23,6 @@ import {
   doBboxesIntersect,
   mergeOptions,
   mergePartialOptions,
-  optionKeysByMapIdToUndefinedOptionsByMapId,
   optionKeysToUndefinedOptions,
   pointInBbox
 } from '@allmaps/stdlib'
@@ -1054,7 +1053,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     if (projection) {
       const geoMaskPoints: Point[] = []
       for (const warpedMap of warpedMaps) {
-        geoMaskPoints.push(...warpedMap.geoMask)
+        geoMaskPoints.push(...warpedMap.geoAppliedMask)
       }
 
       const projectedGeoMaskPoints = geoMaskPoints.map((point) =>
@@ -1064,7 +1063,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     } else {
       const projectedGeoMaskPoints: Point[] = []
       for (const warpedMap of warpedMaps) {
-        projectedGeoMaskPoints.push(...warpedMap.geoMask)
+        projectedGeoMaskPoints.push(...warpedMap.geoAppliedMask)
       }
 
       return projectedGeoMaskPoints
