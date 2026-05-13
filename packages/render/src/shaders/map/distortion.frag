@@ -1,5 +1,5 @@
 // Distortion
-if(u_distortion && color != initialColor) {
+if(u_distortion && opacityFromApplyMask != 0.0) {
   float trianglePointDistortion = v_trianglePointDistortion;
 
   // Introduce septs
