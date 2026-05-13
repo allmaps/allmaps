@@ -96,7 +96,7 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     saturation: 1,
     removeColor: false,
     removeColorColor: black,
-    removeColorThreshold: 0,
+    removeColorThreshold: 0.3,
     removeColorHardness: 0.7,
     colorize: false,
     colorizeColor: pink,
