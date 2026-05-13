@@ -27,7 +27,9 @@ export const Presentation3ImageService3Schema = z.object({
   type: ImageServiceTypesSchema,
   width: z.number().int().optional(),
   height: z.number().int().optional(),
-  profile: z.enum(complianceLevels).catch('level0')
+  profile: z.enum(complianceLevels).catch('level0'),
+  extraFormats: z.string().array().optional(),
+  preferredFormats: z.string().array().optional()
 })
 
 export const ImageService3Schema = z.union([

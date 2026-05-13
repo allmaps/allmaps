@@ -14,6 +14,10 @@ export type ProfileProperties = {
   maxArea?: number
 }
 
+export type ImageUrlOptions = {
+  preferredFormats?: string[]
+}
+
 export type LanguageString = {
   [language: string]: (string | number | boolean)[]
 }
