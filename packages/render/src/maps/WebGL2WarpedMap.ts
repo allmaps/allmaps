@@ -273,18 +273,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * Set the map-specific options (and the list options)
-   *
-   * @param mapOptions - Map-specific options
-   * @param listOptions - list options
-   * @param animationOptions - Animation options
+   * Set the defaultOptions
    */
-  setMapOptions(
-    mapOptions?: Partial<WebGL2WarpedMapOptions>,
-    listOptions?: Partial<WebGL2WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
-  ): object {
-    return super.setMapOptions(mapOptions, listOptions, animationOptions)
+  setDefaultOptions() {
+    this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }
 
   /**
@@ -301,10 +293,35 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * Set the defaultOptions
+   * Set the map-specific options
+   *
+   * @param mapOptions - Map-specific options
+   * @param animationOptions - Animation options
    */
-  setDefaultOptions() {
-    this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
+  setMapOptions(
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return super.setMapOptions(mapOptions, animationOptions)
+  }
+
+  /**
+   * Set the map-specific options, and the list options
+   *
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setMapOptionsAndListOptions(
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    listOptions?: Partial<WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return super.setMapOptionsAndListOptions(
+      mapOptions,
+      listOptions,
+      animationOptions
+    )
   }
 
   protected applyOptions(animationOptions?: Partial<AnimationOptions>) {
