@@ -41,6 +41,41 @@ const tests = [
   }
 ]
 
+const preferredFormatTests = [
+  {
+    filename: 'image.2.toolforge-e8f0e820e00680e69939a97ffccf64e8.json',
+    region: { x: 0, y: 0, width: 256, height: 256 },
+    size: { width: 256, height: 256 },
+    preferredFormats: ['webp', 'png', 'jpg'],
+    expectedUrl:
+      'http://zoomviewer.toolforge.org/iipsrv.fcgi/?iiif=cache/e8f0e820e00680e69939a97ffccf64e8.tif/0,0,256,256/256,/0/default.png'
+  },
+  {
+    filename: 'image.3.918ecd18c2592080851777620de9bcb5-gottingen.json',
+    region: { x: 0, y: 0, width: 512, height: 512 },
+    size: { width: 256, height: 256 },
+    preferredFormats: ['png', 'webp', 'jpg'],
+    expectedUrl:
+      'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/0,0,512,512/256,256/0/default.png'
+  },
+  {
+    filename: 'image.3.918ecd18c2592080851777620de9bcb5-gottingen.json',
+    region: { x: 0, y: 0, width: 512, height: 512 },
+    size: { width: 256, height: 256 },
+    preferredFormats: ['webp', 'jpg'],
+    expectedUrl:
+      'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/0,0,512,512/256,256/0/default.webp'
+  },
+  {
+    filename: 'image.3.918ecd18c2592080851777620de9bcb5-gottingen.json',
+    region: { x: 0, y: 0, width: 512, height: 512 },
+    size: { width: 256, height: 256 },
+    preferredFormats: ['avif'],
+    expectedUrl:
+      'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/0,0,512,512/256,256/0/default.jpg'
+  }
+]
+
 for (const { filename, region, size, expectedUrl } of tests) {
   let regionStr = 'full'
   if (region) {
@@ -58,6 +93,26 @@ for (const { filename, region, size, expectedUrl } of tests) {
       const parsedImage = Image.parse(image)
       const imageRequest = { region, size }
       const imageUrl = parsedImage.getImageUrl(imageRequest)
+      expect(imageUrl).to.equal(expectedUrl)
+    })
+  })
+}
+
+for (const {
+  filename,
+  region,
+  size,
+  preferredFormats,
+  expectedUrl
+} of preferredFormatTests) {
+  describe(`preferred formats for ${filename}`, () => {
+    test(`should use ${expectedUrl.split('.').at(-1)}`, () => {
+      const image = readJson(filename)
+      const parsedImage = Image.parse(image)
+      const imageRequest = { region, size }
+      const imageUrl = parsedImage.getImageUrl(imageRequest, {
+        preferredFormats
+      })
       expect(imageUrl).to.equal(expectedUrl)
     })
   })

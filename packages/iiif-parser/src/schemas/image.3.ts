@@ -20,6 +20,10 @@ export const Image3Schema = z.object({
   maxArea: z.number().int().optional(),
   sizes: SizeSchema.array().optional(),
   tiles: TilesetSchema.array().optional(),
-  extraFeatures: z.string().array().optional()
+  extraFeatures: z.string().array().optional(),
+  extraFormats: z.string().array().optional(),
+  preferredFormats: z.string().array().optional()
+
+  // rights
   // TODO: add partOf, seeAlso, and service
 })

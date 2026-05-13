@@ -1,0 +1,38 @@
+{
+  "embedded": false,
+  "height": 3024,
+  "majorVersion": 3,
+  "supportsAnyRegionAndSize": true,
+  "tileZoomLevels": [
+    {
+      "columns": 8,
+      "height": 512,
+      "originalHeight": 512,
+      "originalWidth": 512,
+      "rows": 6,
+      "scaleFactor": 1,
+      "width": 512
+    },
+    {
+      "columns": 4,
+      "height": 512,
+      "originalHeight": 1024,
+      "originalWidth": 1024,
+      "rows": 3,
+      "scaleFactor": 2,
+      "width": 512
+    },
+    {
+      "columns": 2,
+      "height": 512,
+      "originalHeight": 2048,
+      "originalWidth": 2048,
+      "rows": 2,
+      "scaleFactor": 4,
+      "width": 512
+    }
+  ],
+  "type": "image",
+  "uri": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen",
+  "width": 4032
+}
