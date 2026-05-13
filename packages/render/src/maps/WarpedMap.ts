@@ -441,13 +441,54 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set the map-specific options (and the list options)
+   * Set the defaultOptions
+   */
+  setDefaultOptions() {
+    this.defaultOptions = WarpedMap.getDefaultOptions()
+  }
+
+  /**
+   * Set the list options
+   *
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setListOptions(
+    listOptions?: Partial<WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ): object {
+    return this.setMapOptionsAndListOptions(
+      undefined,
+      listOptions,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the map-specific options
+   *
+   * @param mapOptions - Map-specific options
+   * @param animationOptions - Animation options
+   */
+  setMapOptions(
+    mapOptions?: Partial<WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return this.setMapOptionsAndListOptions(
+      mapOptions,
+      undefined,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the map-specific options, and the list options
    *
    * @param mapOptions - Map-specific options
    * @param listOptions - list options
    * @param animationOptions - Animation options
    */
-  setMapOptions(
+  setMapOptionsAndListOptions(
     mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
@@ -464,26 +505,6 @@ export class WarpedMap extends EventTarget {
     return this.applyOptions(
       mergePartialOptions(animationOptions, { optionKeysPossiblyChanged })
     )
-  }
-
-  /**
-   * Set the list options
-   *
-   * @param listOptions - list options
-   * @param animationOptions - Animation options
-   */
-  setListOptions(
-    listOptions?: Partial<WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions>
-  ): object {
-    return this.setMapOptions(undefined, listOptions, animationOptions)
-  }
-
-  /**
-   * Set the defaultOptions
-   */
-  setDefaultOptions() {
-    this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
   protected applyOptions(
