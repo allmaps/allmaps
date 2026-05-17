@@ -11,8 +11,9 @@ import {
   deleteUserList
 } from '@allmaps/api-shared/db'
 
-import { createElysia } from '../elysia.js'
-import type { createBetterAuthPlugin } from '../elysia.js'
+import { createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { authenticatedDetail } from '../openapi.js'
+import type { BetterAuthContext } from '@allmaps/db/auth'
 
 function getUserId(user: unknown): string {
   if (
@@ -27,16 +28,17 @@ function getUserId(user: unknown): string {
   return user.id
 }
 
-export function createListsRoutes(
-  betterAuthPlugin: ReturnType<typeof createBetterAuthPlugin>
-) {
-  return createElysia({ name: 'lists' })
-    .use(betterAuthPlugin)
+export function createListsRoutes(betterAuth: BetterAuthContext) {
+  return createElysia({
+    name: 'lists-routes'
+  })
+    .use(createBetterAuthPlugin(betterAuth))
     .get('/lists', ({ db, user }) => queryUserLists(db, getUserId(user)), {
       auth: true,
       detail: {
         summary: 'Get current user lists',
-        tags: ['Lists']
+        tags: ['Lists'],
+        ...authenticatedDetail
       }
     })
     .post(
@@ -49,7 +51,8 @@ export function createListsRoutes(
         }),
         detail: {
           summary: 'Create a list',
-          tags: ['Lists']
+          tags: ['Lists'],
+          ...authenticatedDetail
         }
       }
     )
@@ -73,7 +76,8 @@ export function createListsRoutes(
         params: t.Object({ listId: t.String() }),
         detail: {
           summary: 'Get a list with its items',
-          tags: ['Lists']
+          tags: ['Lists'],
+          ...authenticatedDetail
         }
       }
     )
@@ -103,7 +107,8 @@ export function createListsRoutes(
         body: t.Object({ name: t.String() }),
         detail: {
           summary: 'Update a list name',
-          tags: ['Lists']
+          tags: ['Lists'],
+          ...authenticatedDetail
         }
       }
     )
@@ -135,7 +140,8 @@ export function createListsRoutes(
         ]),
         detail: {
           summary: 'Add an item to a list',
-          tags: ['Lists']
+          tags: ['Lists'],
+          ...authenticatedDetail
         }
       }
     )
@@ -164,8 +170,10 @@ export function createListsRoutes(
         detail: {
           summary: 'Add an item to a list by URL',
           description:
-            'Accepts annotations.allmaps.org URLs for maps, images, canvases, and manifests',
-          tags: ['Lists']
+            'Authenticated users only. Accepts annotations.allmaps.org URLs for maps, images, canvases, and manifests.',
+          tags: ['Lists'],
+          security: authenticatedDetail.security,
+          'x-badges': authenticatedDetail['x-badges']
         }
       }
     )
@@ -200,7 +208,8 @@ export function createListsRoutes(
         ),
         detail: {
           summary: 'Remove an item from a list',
-          tags: ['Lists']
+          tags: ['Lists'],
+          ...authenticatedDetail
         }
       }
     )
@@ -219,7 +228,8 @@ export function createListsRoutes(
         params: t.Object({ listId: t.String() }),
         detail: {
           summary: 'Delete a list',
-          tags: ['Lists']
+          tags: ['Lists'],
+          ...authenticatedDetail
         }
       }
     )

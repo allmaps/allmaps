@@ -160,6 +160,7 @@ export const manifests = createElysia({ name: 'manifests' })
       params: t.Object({ manifestId: t.String() }),
       body: t.Object({ url: t.String(), checksum: t.String() }),
       detail: {
+        hide: true,
         summary: 'Create or update a IIIF Manifest from a IIIF URL',
         tags: ['Manifests']
       }

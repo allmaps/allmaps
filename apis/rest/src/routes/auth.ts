@@ -2,12 +2,8 @@ import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import { createAuth } from '@allmaps/db/auth'
-import {
-  createElysia,
-  createBetterAuthPlugin,
-  createBetterAuthRoutes as createBaseBetterAuthRoutes,
-  error
-} from '../elysia.js'
+import { createElysia, createBetterAuthPlugin, error } from '../elysia.js'
+import { adminDetail } from '../openapi.js'
 import {
   queryAdminOrganizationById,
   queryUserWithOrganizationsById,
@@ -21,16 +17,16 @@ import type { RestEnv } from '@allmaps/env/rest'
 
 const Role = t.UnionEnum(['admin', 'member', 'owner'])
 
-export function createBetterAuthRoutes(
+export function createAuthRoutes(
   env: RestEnv,
-  betterAuthPlugin: ReturnType<typeof createBetterAuthPlugin>,
   betterAuth: BetterAuthContext = createAuth(env)
 ) {
   const { auth } = betterAuth
 
-  return createElysia({ name: 'rest-auth-routes' })
-    .use(betterAuthPlugin)
-    .use(createBaseBetterAuthRoutes(betterAuth))
+  return createElysia({
+    name: 'auth-routes'
+  })
+    .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/users',
       ({ db, env, query }) =>
@@ -40,7 +36,8 @@ export function createBetterAuthRoutes(
         query: t.Object({ limit: t.Optional(t.Number()) }),
         detail: {
           summary: 'Get all users',
-          tags: ['Authentication']
+          tags: ['Authentication'],
+          ...adminDetail
         }
       }
     )
@@ -64,7 +61,8 @@ export function createBetterAuthRoutes(
         params: t.Object({ userId: t.String() }),
         detail: {
           summary: 'Get a single user',
-          tags: ['Authentication']
+          tags: ['Authentication'],
+          ...adminDetail
         }
       }
     )
@@ -81,7 +79,8 @@ export function createBetterAuthRoutes(
         params: t.Object({ organizationId: t.String() }),
         detail: {
           summary: 'Get users for a single organization',
-          tags: ['Authentication']
+          tags: ['Authentication'],
+          ...adminDetail
         }
       }
     )
@@ -117,7 +116,12 @@ export function createBetterAuthRoutes(
         body: t.Object({
           email: t.String(),
           role: t.Optional(t.Union([Role, t.Array(Role)]))
-        })
+        }),
+        detail: {
+          summary: 'Add a user to a single organization',
+          tags: ['Authentication'],
+          ...adminDetail
+        }
       }
     )
     .delete(
@@ -148,7 +152,12 @@ export function createBetterAuthRoutes(
       },
       {
         admin: true,
-        params: t.Object({ organizationId: t.String(), userId: t.String() })
+        params: t.Object({ organizationId: t.String(), userId: t.String() }),
+        detail: {
+          summary: 'Remove a user from a single organization',
+          tags: ['Authentication'],
+          ...adminDetail
+        }
       }
     )
     .patch(
@@ -189,7 +198,12 @@ export function createBetterAuthRoutes(
         params: t.Object({ organizationId: t.String(), userId: t.String() }),
         body: t.Object({
           role: Role
-        })
+        }),
+        detail: {
+          summary: 'Update a user role in a single organization',
+          tags: ['Authentication'],
+          ...adminDetail
+        }
       }
     )
 }

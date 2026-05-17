@@ -159,6 +159,7 @@ export const images = createElysia({ name: 'images' })
       params: t.Object({ imageId: t.String() }),
       body: t.Object({ url: t.String() }),
       detail: {
+        hide: true,
         summary: 'Create or update a single IIIF Image from a IIIF URL',
         tags: ['Images']
       }
