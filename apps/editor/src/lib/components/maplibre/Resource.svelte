@@ -141,7 +141,6 @@
     const map = maps[0]
     transformer = new GcpTransformer(map.gcps, map.transformation?.type)
 
-    // @ts-expect-error incorrect MapLibre types
     warpedMapLayerBounds = warpedMapLayer.getBounds()
   }
 
@@ -155,7 +154,6 @@
       resourceMask ?? getFullImageResourceMask()
     )
 
-    // @ts-expect-error incorrect MapLibre types
     warpedMapLayerBounds = warpedMapLayer.getBounds()
     currentMapId = mapId
   }
@@ -166,6 +164,18 @@
       currentImageId !== sourceState.activeImageId
     ) {
       updateStraightAnnotation(sourceState.activeImageId, resourceMask)
+    }
+  })
+
+  $effect(() => {
+    if (
+      mapLoaded &&
+      warpedMapLayer &&
+      sourceState.activeImageId &&
+      currentImageId === sourceState.activeImageId &&
+      currentMapId !== mapId
+    ) {
+      updateResourceMask(resourceMask)
     }
   })
 

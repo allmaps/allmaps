@@ -201,6 +201,11 @@
 
     if (geoMap) {
       navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
+      console.log(
+        'navPlaceGeoViewport',
+        sourceState.navPlace,
+        navPlaceGeoViewport
+      )
       urlGeoViewport = getBboxViewport(urlState.params.bbox)
 
       if (mapsState.activeMap?.gcps) {
