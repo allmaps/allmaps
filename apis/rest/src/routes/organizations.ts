@@ -18,8 +18,8 @@ import {
   queryManifests
 } from '@allmaps/api-shared/db'
 
-import { createElysia } from '../elysia.js'
-import type { createBetterAuthPlugin } from '../elysia.js'
+import { createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { adminDetail } from '../openapi.js'
 
 const OrganizationBody = t.Object({
   name: t.String(),
@@ -37,13 +37,14 @@ const querySchema = t.Object({
 
 export function createOrganizationsRoutes(
   env: RestEnv,
-  betterAuthPlugin: ReturnType<typeof createBetterAuthPlugin>,
   betterAuth: BetterAuthContext = createAuth(env)
 ) {
   const { auth } = betterAuth
 
-  return createElysia({ name: 'organizations' })
-    .use(betterAuthPlugin)
+  return createElysia({
+    name: 'organizations-routes'
+  })
+    .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/organizations',
       async ({ db, env, query, request }) => {
@@ -195,7 +196,11 @@ export function createOrganizationsRoutes(
       {
         admin: true,
         body: OrganizationBody,
-        detail: { summary: 'Create an organization', tags: ['Organizations'] }
+        detail: {
+          summary: 'Create an organization',
+          tags: ['Organizations'],
+          ...adminDetail
+        }
       }
     )
     .patch(
@@ -242,7 +247,11 @@ export function createOrganizationsRoutes(
         admin: true,
         params: t.Object({ organizationId: t.String() }),
         body: t.Partial(OrganizationBody),
-        detail: { summary: 'Update an organization', tags: ['Organizations'] }
+        detail: {
+          summary: 'Update an organization',
+          tags: ['Organizations'],
+          ...adminDetail
+        }
       }
     )
     .delete(
@@ -259,7 +268,11 @@ export function createOrganizationsRoutes(
       {
         admin: true,
         params: t.Object({ organizationId: t.String() }),
-        detail: { summary: 'Delete an organization', tags: ['Organizations'] }
+        detail: {
+          summary: 'Delete an organization',
+          tags: ['Organizations'],
+          ...adminDetail
+        }
       }
     )
 }

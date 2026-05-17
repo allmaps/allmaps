@@ -2,10 +2,11 @@ import { t } from 'elysia'
 
 import { queryMaps, queryChecksums } from '@allmaps/api-shared/db'
 
-import { createElysia, RegExpRoute } from '../elysia.js'
+import { RegExpRoute, createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { adminDetail } from '../openapi.js'
+import type { BetterAuthContext } from '@allmaps/db/auth'
 
 import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
-import type { createBetterAuthPlugin } from '../elysia.js'
 
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
@@ -31,10 +32,13 @@ function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
   }
 }
 
-// Matches: mapId  OR  mapId.geojson
-const mapRoute = new RegExpRoute<{ mapId: string; ext?: string }>(
+const mapRoute = new RegExpRoute<{
+  mapId: string
+  version?: string
+  ext?: string
+}>(
   'mapId',
-  /^(?<mapId>[0-9a-f]+)(\.(?<ext>geojson))?$/
+  /^(?<mapId>[0-9a-f]{16})(\@(?<version>[0-9a-f]{16}))?(\.(?<ext>geojson))?$/
 )
 
 async function callLive(liveBaseUrl: string, path: string, body: unknown) {
@@ -53,25 +57,30 @@ async function callLive(liveBaseUrl: string, path: string, body: unknown) {
   return response.json()
 }
 
-export function createMapsRoutes(
-  betterAuthPlugin: ReturnType<typeof createBetterAuthPlugin>
-) {
-  return createElysia({ name: 'maps' })
-    .use(betterAuthPlugin)
+export function createMapsRoutes(betterAuth: BetterAuthContext) {
+  return createElysia({
+    name: 'maps-routes'
+  })
+    .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/maps',
       ({ env, db, query }) =>
-        queryMaps(env.PUBLIC_ANNOTATIONS_BASE_URL, db, {
-          intersectsWith: parseIntersects(query.intersects),
-          containedBy: parseContainedBy(query.containedBy),
-          limit: query.limit,
-          imageServiceDomain: query.imageServiceDomain,
-          manifestDomain: query.manifestDomain,
-          minScale: query.minScale,
-          maxScale: query.maxScale,
-          minArea: query.minArea,
-          maxArea: query.maxArea
-        }),
+        queryMaps(
+          env.PUBLIC_ANNOTATIONS_BASE_URL,
+          db,
+          {
+            intersectsWith: parseIntersects(query.intersects),
+            containedBy: parseContainedBy(query.containedBy),
+            limit: query.limit,
+            imageServiceDomain: query.imageServiceDomain,
+            manifestDomain: query.manifestDomain,
+            minScale: query.minScale,
+            maxScale: query.maxScale,
+            minArea: query.minArea,
+            maxArea: query.maxArea
+          },
+          { format: 'map', expectRows: false, singular: false }
+        ),
       {
         query: mapsQuerySchema,
         detail: { summary: 'Get maps', tags: ['Maps'] }
@@ -110,7 +119,8 @@ export function createMapsRoutes(
         admin: true,
         detail: {
           summary: 'Create maps from a Georeference Annotation',
-          tags: ['Maps']
+          tags: ['Maps'],
+          ...adminDetail
         }
       }
     )
@@ -126,6 +136,7 @@ export function createMapsRoutes(
         }
       }
     )
+
     .get(
       `/maps/${mapRoute.path}`,
       ({ env, db, params }) => {
@@ -140,7 +151,11 @@ export function createMapsRoutes(
       },
       {
         params: mapRoute.params,
-        detail: { summary: 'Get a single map', tags: ['Maps'] }
+        detail: {
+          summary: 'Get a single map',
+          description: `Get a single map. Optionally specify .geojson extension to get the map in GeoJSON format.`,
+          tags: ['Maps']
+        }
       }
     )
     .patch(
@@ -151,7 +166,7 @@ export function createMapsRoutes(
       {
         admin: true,
         params: t.Object({ mapId: t.String() }),
-        detail: { summary: 'Update a map', tags: ['Maps'] }
+        detail: { summary: 'Update a map', tags: ['Maps'], ...adminDetail }
       }
     )
 }

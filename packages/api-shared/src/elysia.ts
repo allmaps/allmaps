@@ -18,6 +18,26 @@ export { RegExpRoute } from './elysia/routes.js'
 
 export type { DecoratedElysia } from './elysia/app.js'
 
+export function createTagsSorter(
+  tags: Array<{ name: string }>,
+  lastTagName = 'Authentication'
+) {
+  return function tagsSorter(tagA: { name: string }, tagB: { name: string }) {
+    if (tagA.name === lastTagName) {
+      return 1
+    }
+
+    if (tagB.name === lastTagName) {
+      return -1
+    }
+
+    return (
+      tags.findIndex((tag) => tag.name === tagA.name) -
+      tags.findIndex((tag) => tag.name === tagB.name)
+    )
+  }
+}
+
 export function createTypedElysiaHelpers<TEnv>() {
   return {
     createElysia<const BasePath extends string = ''>(

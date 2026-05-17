@@ -1,6 +1,7 @@
 import {
   RegExpRoute,
   createTypedElysiaHelpers,
+  createTagsSorter,
   error,
   handleApiError,
   redirect
@@ -12,4 +13,4 @@ const { createElysia, createBetterAuthPlugin, createBetterAuthRoutes } =
   createTypedElysiaHelpers<AnnotationsEnv>()
 
 export { createElysia, createBetterAuthPlugin, createBetterAuthRoutes }
-export { RegExpRoute, error, handleApiError, redirect }
+export { RegExpRoute, createTagsSorter, error, handleApiError, redirect }

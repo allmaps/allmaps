@@ -12,7 +12,8 @@ import {
   error,
   redirect,
   handleApiError,
-  createBetterAuthRoutes
+  createBetterAuthRoutes,
+  createTagsSorter
 } from './elysia.js'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
@@ -27,6 +28,18 @@ import { createListsRoutes } from './routes/lists.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
+const openApiTags = [
+  { name: 'API' },
+  { name: 'Maps' },
+  { name: 'Images' },
+  { name: 'Canvases' },
+  { name: 'Manifests' },
+  { name: 'Organizations' },
+  { name: 'Lists' },
+  { name: 'Authentication' }
+]
+const tagsSorter = createTagsSorter(openApiTags)
+
 export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
   return createElysia({ name: 'app' })
     .use(createBetterAuthRoutes(betterAuth))
@@ -36,12 +49,20 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
     .use(cors())
     .use(
       openapi({
-        path: 'docs',
+        provider: null,
+        specPath: 'openapi.json',
         documentation: {
           info: {
             title: 'Allmaps Annotations API Documentation',
             description: 'API documentation for the Allmaps Annotations API',
             version: packageJson.version
+          },
+          tags: openApiTags
+        },
+        scalar: {
+          tagsSorter,
+          agent: {
+            disabled: true
           }
         }
       })

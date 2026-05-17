@@ -270,8 +270,6 @@ export async function queryMaps(
 
   const apiMaps = rows.map((row) => fromDbRow(row, annotationsBaseUrl))
 
-  console.log('queryMaps', { apiMaps })
-
   if (responseOptions.singular && apiMaps.length > 1) {
     console.error(
       'Single map requested, but multiple maps found:',
