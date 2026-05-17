@@ -16,6 +16,7 @@
       "width": 7408,
       "image": {
         "embedded": true,
+        "supportedFormats": ["jpg"],
         "uri": "https://images.uba.uva.nl/iiif/2/default!1!3!1!990037778300205131!HB-KZL-1809-A-3.jpg",
         "type": "image",
         "supportsAnyRegionAndSize": true,
@@ -136,6 +137,7 @@
       "width": 10393,
       "image": {
         "embedded": true,
+        "supportedFormats": ["jpg"],
         "uri": "https://images.uba.uva.nl/iiif/2/erfgoed!kaarten!9!4!6!990009296490205131!100-12-02.jpg",
         "type": "image",
         "supportsAnyRegionAndSize": true,
@@ -256,7 +258,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7475,
         "height": 6314,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": [
@@ -355,7 +358,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 13648,
         "height": 11460,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A4 - Amsterdam"]
@@ -453,7 +457,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8811,
         "height": 6261,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A5 - Amsterdam"]
@@ -612,7 +617,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 10702,
         "height": 7240,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": [
@@ -735,7 +741,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6526,
         "height": 5247,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": [
@@ -823,7 +830,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9004,
         "height": 7201,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A8 - Plan tot uitbreiding van Amsterdam."]
@@ -907,7 +915,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8272,
         "height": 6327,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A9 - Amsterdam in 1882"]
@@ -1031,7 +1040,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7373,
         "height": 8724,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A10 - Kaart van Amsterdam en omstreken"]
@@ -1115,7 +1125,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6000,
         "height": 5368,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A11 - Plattegrond der stad Amsterdam"]
@@ -1207,7 +1218,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 12448,
         "height": 12224,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["A12 - Kaart van Amsterdam 1:10.000"]
@@ -1291,7 +1303,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7864,
         "height": 6722,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC1 - Asiae in tabula geographica delineatio"]
@@ -1375,7 +1388,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7868,
         "height": 7687,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC2 - Carte des Indes et de la Chine"]
@@ -1463,7 +1477,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7795,
         "height": 6554,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": [
@@ -1551,7 +1566,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7792,
         "height": 6584,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC4 - Insulae Iavae pars orientalis"]
@@ -1635,7 +1651,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8112,
         "height": 6704,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC5 - Insulae Iavae Pars Occidentalis"]
@@ -1740,7 +1757,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7816,
         "height": 6589,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": [
@@ -1832,7 +1850,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6668,
         "height": 5272,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC7 - Asia"]
@@ -1916,7 +1935,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4558,
         "height": 3612,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC8 - India"]
@@ -2002,7 +2022,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4421,
         "height": 3508,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC9 - Eiland Ceilon"]
@@ -2086,7 +2107,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3931,
         "height": 3499,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC10 - Japan"]
@@ -2176,7 +2198,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8879,
         "height": 6409,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC11 - Indiae"]
@@ -2260,7 +2283,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8868,
         "height": 6432,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC12 - Asiae"]
@@ -2344,7 +2368,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8078,
         "height": 6126,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "nl": ["VOC13 - Oost-Indien"]

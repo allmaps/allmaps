@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 843,
         "height": 565,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [
@@ -39,7 +40,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 843,
         "height": 599,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [

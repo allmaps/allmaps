@@ -27,7 +27,8 @@
         "majorVersion": 2,
         "supportsAnyRegionAndSize": true,
         "width": 6590,
-        "height": 4800
+        "height": 4800,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

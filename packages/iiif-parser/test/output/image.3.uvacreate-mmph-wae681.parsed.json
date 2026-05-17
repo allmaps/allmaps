@@ -87,5 +87,6 @@
   ],
   "type": "image",
   "uri": "https://uvacreate.gitlab.io/freedom-of-the-streets/iiif-level0-maps/iiif/mmph_wae681",
-  "width": 1999
+  "width": 1999,
+  "supportedFormats": ["jpg"]
 }

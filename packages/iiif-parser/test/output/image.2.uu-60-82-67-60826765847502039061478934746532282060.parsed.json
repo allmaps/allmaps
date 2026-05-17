@@ -63,10 +63,26 @@
     }
   ],
   "sizes": [
-    { "width": 146, "height": 93 },
-    { "width": 293, "height": 187 },
-    { "width": 586, "height": 374 },
-    { "width": 1173, "height": 749 },
-    { "width": 2347, "height": 1498 }
-  ]
+    {
+      "width": 146,
+      "height": 93
+    },
+    {
+      "width": 293,
+      "height": 187
+    },
+    {
+      "width": 586,
+      "height": 374
+    },
+    {
+      "width": 1173,
+      "height": 749
+    },
+    {
+      "width": 2347,
+      "height": 1498
+    }
+  ],
+  "supportedFormats": ["jpg"]
 }

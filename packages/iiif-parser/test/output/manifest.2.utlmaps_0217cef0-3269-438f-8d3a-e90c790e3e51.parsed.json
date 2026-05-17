@@ -9,7 +9,8 @@
         "supportsAnyRegionAndSize": true,
         "type": "image",
         "uri": "https://iiif.lib.utexas.edu/iiif/2/utldams_utlmaps_0217cef0-3269-438f-8d3a-e90c790e3e51.jp2",
-        "width": 8504
+        "width": 8504,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [

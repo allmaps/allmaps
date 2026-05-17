@@ -2,6 +2,7 @@
   "embedded": false,
   "height": 3024,
   "majorVersion": 3,
+  "preferredFormats": ["webp", "jpg"],
   "supportsAnyRegionAndSize": true,
   "tileZoomLevels": [
     {
@@ -34,5 +35,6 @@
   ],
   "type": "image",
   "uri": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen",
-  "width": 4032
+  "width": 4032,
+  "supportedFormats": ["jpg", "png", "webp"]
 }

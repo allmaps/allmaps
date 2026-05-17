@@ -188,7 +188,8 @@
         "width": 11091,
         "height": 9607,
         "uri": "https://stacks.stanford.edu/image/iiif/vg994wz9415%2Fvg994wz9415_0001",
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

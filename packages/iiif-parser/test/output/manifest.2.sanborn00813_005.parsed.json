@@ -21,7 +21,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1363,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 1"]
@@ -64,7 +65,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 2"]
@@ -107,7 +109,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1406,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 3"]
@@ -150,7 +153,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 4"]
@@ -193,7 +197,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1406,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 5"]
@@ -236,7 +241,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 6"]
@@ -279,7 +285,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1406,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 7"]
@@ -322,7 +329,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 8"]
@@ -365,7 +373,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1406,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 9"]
@@ -408,7 +417,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 10"]
@@ -451,7 +461,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1406,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 11"]
@@ -494,7 +505,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 12"]
@@ -537,7 +549,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1424,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 13"]
@@ -580,7 +593,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1413,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 14"]
@@ -623,7 +637,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1424,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 15"]
@@ -666,7 +681,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1412,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 16"]
@@ -709,7 +725,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1424,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 17"]
@@ -752,7 +769,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1412,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 18"]
@@ -795,7 +813,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1424,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 19"]
@@ -838,7 +857,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1412,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 20"]
@@ -881,7 +901,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1425,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 21"]
@@ -924,7 +945,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1418,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 22"]
@@ -967,7 +989,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1427,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 23"]
@@ -1010,7 +1033,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1418,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 24"]
@@ -1053,7 +1077,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1427,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 25"]
@@ -1096,7 +1121,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1418,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 26"]
@@ -1139,7 +1165,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1427,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 27"]
@@ -1182,7 +1209,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1418,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 28"]
@@ -1225,7 +1253,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1427,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 29"]
@@ -1268,7 +1297,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1417,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 30"]
@@ -1311,7 +1341,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1427,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 31"]
@@ -1354,7 +1385,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1417,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 32"]
@@ -1397,7 +1429,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 33"]
@@ -1440,7 +1473,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1405,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 34"]
@@ -1483,7 +1517,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 35"]
@@ -1526,7 +1561,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 36"]
@@ -1569,7 +1605,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 37"]
@@ -1612,7 +1649,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 38"]
@@ -1655,7 +1693,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 39"]
@@ -1698,7 +1737,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 40"]
@@ -1741,7 +1781,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 41"]
@@ -1784,7 +1825,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 42"]
@@ -1827,7 +1869,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 43"]
@@ -1870,7 +1913,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 44"]
@@ -1913,7 +1957,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 45"]
@@ -1956,7 +2001,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 46"]
@@ -1999,7 +2045,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 47"]
@@ -2042,7 +2089,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 48"]
@@ -2085,7 +2133,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 49"]
@@ -2128,7 +2177,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 50"]
@@ -2171,7 +2221,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 51"]
@@ -2214,7 +2265,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1414,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 52"]
@@ -2257,7 +2309,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 53"]
@@ -2300,7 +2353,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1412,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 54"]
@@ -2343,7 +2397,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 55"]
@@ -2386,7 +2441,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1420,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 56"]
@@ -2429,7 +2485,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1421,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 57"]
@@ -2472,7 +2529,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1420,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 58"]
@@ -2515,7 +2573,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1408,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 59"]
@@ -2558,7 +2617,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1420,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 60"]
@@ -2601,7 +2661,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1408,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 61"]
@@ -2644,7 +2705,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1405,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 62"]
@@ -2687,7 +2749,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1408,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 63"]
@@ -2730,7 +2793,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1405,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 64"]
@@ -2773,7 +2837,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1408,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 65"]
@@ -2816,7 +2881,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1405,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 66"]
@@ -2859,7 +2925,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1408,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 67"]
@@ -2902,7 +2969,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1405,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 68"]
@@ -2945,7 +3013,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1404,
         "height": 2037,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Page 69"]

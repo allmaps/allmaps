@@ -29,8 +29,18 @@
     }
   ],
   "sizes": [
-    { "width": 600, "height": 475 },
-    { "width": 900, "height": 712 },
-    { "width": 1800, "height": 1425 }
-  ]
+    {
+      "width": 600,
+      "height": 475
+    },
+    {
+      "width": 900,
+      "height": 712
+    },
+    {
+      "width": 1800,
+      "height": 1425
+    }
+  ],
+  "supportedFormats": ["jpg", "tif", "png"]
 }
