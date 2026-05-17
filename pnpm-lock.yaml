@@ -348,7 +348,89 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  apps/admin:
+  apps/cli:
+    dependencies:
+      '@allmaps/analyze':
+        specifier: workspace:^
+        version: link:../../packages/analyze
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../../packages/annotation
+      '@allmaps/attach':
+        specifier: workspace:^
+        version: link:../../packages/attach
+      '@allmaps/frame':
+        specifier: workspace:^
+        version: link:../../packages/frame
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../../packages/id
+      '@allmaps/iiif-parser':
+        specifier: workspace:^
+        version: link:../../packages/iiif-parser
+      '@allmaps/io':
+        specifier: workspace:^
+        version: link:../../packages/io
+      '@allmaps/project':
+        specifier: workspace:^
+        version: link:../../packages/project
+      '@allmaps/stdlib':
+        specifier: workspace:^
+        version: link:../../packages/stdlib
+      '@allmaps/transform':
+        specifier: workspace:^
+        version: link:../../packages/transform
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../../packages/types
+      '@commander-js/extra-typings':
+        specifier: ^13.0.0
+        version: 13.1.0(commander@13.1.0)
+      commander:
+        specifier: ^13.0.0
+        version: 13.1.0
+      open:
+        specifier: ^10.1.2
+        version: 10.2.0
+      stream-json:
+        specifier: ^1.9.1
+        version: 1.9.1
+    devDependencies:
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.10.2
+      '@types/stream-json':
+        specifier: ^1.7.2
+        version: 1.7.8
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.2(eslint@8.57.1)
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.4
+        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
+
+  apps/console:
     dependencies:
       '@allmaps/components':
         specifier: workspace:^
@@ -435,88 +517,6 @@ importers:
       wrangler:
         specifier: 'catalog:'
         version: 4.75.0
-
-  apps/cli:
-    dependencies:
-      '@allmaps/analyze':
-        specifier: workspace:^
-        version: link:../../packages/analyze
-      '@allmaps/annotation':
-        specifier: workspace:^
-        version: link:../../packages/annotation
-      '@allmaps/attach':
-        specifier: workspace:^
-        version: link:../../packages/attach
-      '@allmaps/frame':
-        specifier: workspace:^
-        version: link:../../packages/frame
-      '@allmaps/id':
-        specifier: workspace:^
-        version: link:../../packages/id
-      '@allmaps/iiif-parser':
-        specifier: workspace:^
-        version: link:../../packages/iiif-parser
-      '@allmaps/io':
-        specifier: workspace:^
-        version: link:../../packages/io
-      '@allmaps/project':
-        specifier: workspace:^
-        version: link:../../packages/project
-      '@allmaps/stdlib':
-        specifier: workspace:^
-        version: link:../../packages/stdlib
-      '@allmaps/transform':
-        specifier: workspace:^
-        version: link:../../packages/transform
-      '@allmaps/types':
-        specifier: workspace:^
-        version: link:../../packages/types
-      '@commander-js/extra-typings':
-        specifier: ^13.0.0
-        version: 13.1.0(commander@13.1.0)
-      commander:
-        specifier: ^13.0.0
-        version: 13.1.0
-      open:
-        specifier: ^10.1.2
-        version: 10.2.0
-      stream-json:
-        specifier: ^1.9.1
-        version: 1.9.1
-    devDependencies:
-      '@types/eslint':
-        specifier: ^8.56.0
-        version: 8.56.12
-      '@types/node':
-        specifier: 'catalog:'
-        version: 24.10.2
-      '@types/stream-json':
-        specifier: ^1.7.2
-        version: 1.7.8
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^7.0.0
-        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: ^7.0.0
-        version: 7.18.0(eslint@8.57.1)(typescript@5.9.3)
-      eslint:
-        specifier: ^8.56.0
-        version: 8.57.1
-      eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.2(eslint@8.57.1)
-      prettier:
-        specifier: ^3.6.2
-        version: 3.8.1
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
-      vitest:
-        specifier: ^4.0.4
-        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.6
 
   apps/editor:
     dependencies:
@@ -911,7 +911,7 @@ importers:
         specifier: ^0.2.4
         version: 0.2.4(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
       wrangler:
-        specifier: 'catalog:'
+        specifier: ^4.3.0
         version: 4.75.0
 
   apps/homepage:
