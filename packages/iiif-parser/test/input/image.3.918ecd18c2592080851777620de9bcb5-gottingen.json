@@ -1,7 +1,7 @@
 {
   "@context": "http://iiif.io/api/image/3/context.json",
   "extraFormats": ["jpg", "png", "webp"],
-  "prefferedFormats": ["webp", "jpg"],
+  "preferredFormats": ["webp", "jpg"],
   "extraQualities": ["default", "color", "gray"],
   "rights": "http://creativecommons.org/publicdomain/mark/1.0/",
   "height": 3024,
