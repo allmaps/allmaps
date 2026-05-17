@@ -2,4 +2,43 @@ packages:
   - 'packages/*'
   - 'apps/*'
   - 'workers/*'
+  - 'apis/*'
   - 'test/*'
+
+catalog:
+  '@types/node': ^24
+
+  'vite': ^8.0
+  'vitest': ^4.0.5
+  'typescript': ^5.9.3
+
+  'eslint': ^9.36.0
+  'eslint-config-prettier': ^9.1.0
+  'prettier': ^3.6.2
+  'typescript-eslint': ^8.44.1
+
+  'zod': ^4.3.6
+  'tailwindcss': ^4.1.13
+  'svelte': ^5.43.2
+  'svelte-check': ^4.3.2
+  '@sveltejs/kit': ^2.47.1
+  '@sveltejs/vite-plugin-svelte': ^7.0.0
+  'bits-ui': ^2.15
+
+  'wrangler': ^4.74.0
+
+  'drizzle-kit': ^1.0.0-beta.17
+  'drizzle-orm': ^1.0.0-beta.17
+  'better-auth': ^1.5.0
+  '@neondatabase/serverless': ^1.0
+  'elysia': ^1.4
+  '@elysiajs/cors': ^1.4
+  '@elysiajs/openapi': ^1.4
+  'postgres': ^3.4
+
+  'proj4': ^2.20.0
+  'leaflet': ^1.9.4
+  '@types/leaflet': ^1.9.4
+  'ol': ^10.8.0
+  'maplibre-gl': ^5.16
+  'pmtiles': ^4.3.0

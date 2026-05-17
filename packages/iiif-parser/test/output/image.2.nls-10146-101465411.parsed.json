@@ -70,5 +70,6 @@
       "columns": 1,
       "rows": 1
     }
-  ]
+  ],
+  "supportedFormats": ["jpg"]
 }

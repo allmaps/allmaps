@@ -52,5 +52,6 @@
       "columns": 2,
       "rows": 1
     }
-  ]
+  ],
+  "supportedFormats": ["jpg"]
 }

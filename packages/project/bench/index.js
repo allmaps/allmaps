@@ -37,7 +37,7 @@ function logBenchmarkUseGcpTransformer(input, type) {
   const projectedTransformer = new ProjectedGcpTransformer(input, type)
   projectedTransformer.getToGeoTransformation()
   while (Date.now() - start < 1000) {
-    projectedTransformer.transformToGeo([100, 100])
+    projectedTransformer.transformToProjectedGeo([100, 100])
     ops++
   }
   console.log(

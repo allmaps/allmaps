@@ -9,7 +9,8 @@
         "supportsAnyRegionAndSize": true,
         "type": "image",
         "uri": "https://iiif.universiteitleiden.nl/iiif/2/hdl%3A1887.1%2Fitem%3A130206",
-        "width": 11901
+        "width": 11901,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [

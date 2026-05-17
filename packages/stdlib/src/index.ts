@@ -9,11 +9,12 @@ export {
 
 export {
   computeMinMax,
-  bindValue,
-  bindPoint,
-  bindPointLngLatProjection,
-  bindPointWebMercatorProjection,
+  clipValue,
+  clipPoint,
+  clipPointLngLatProjection,
+  clipPointWebMercatorProjection,
   computeBbox,
+  computeRotatedBboxProperties,
   combineBboxes,
   doBboxesIntersect,
   intersectBboxes,
@@ -31,6 +32,7 @@ export {
   rectangleToSize,
   convexHull,
   sizesToScale,
+  scaleBbox,
   scaleSize,
   sizeToResolution,
   sizeToCenter,
@@ -165,7 +167,7 @@ export {
   degreesToRadians,
   radiansToDegrees,
   angle,
-  bearing,
+  angularMean,
   groupBy,
   isEqualArray,
   arrayRepeated,
@@ -197,6 +199,7 @@ export {
   mergeOptionsUnlessUndefined,
   mergeTwoOptionsUnlessUndefined,
   mergePartialOptions,
+  removeUndefinedOptions,
   optionKeysToUndefinedOptions,
   optionKeysByMapIdToUndefinedOptionsByMapId
 } from './options.js'

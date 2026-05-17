@@ -53,8 +53,8 @@
       "id": "https://d.lib.ncsu.edu/collections/canvas/unccmc00094-002-ff0001_1-002-004_0001",
       "type": "Canvas",
       "label": { "en": ["1"] },
-      "height": 3599,
       "width": 7096,
+      "height": 3599,
       "items": [
         {
           "type": "AnnotationPage",

@@ -67,12 +67,7 @@ export class RTree {
     this.rbush.clear()
   }
 
-  private search(
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number
-  ): RTreeItem[] {
+  #search(minX: number, minY: number, maxX: number, maxY: number): RTreeItem[] {
     return this.rbush.search({
       minX,
       minY,
@@ -91,7 +86,7 @@ export class RTree {
 
   searchFromBbox(bbox: Bbox): string[] {
     const [minX, minY, maxX, maxY] = bbox
-    return this.search(minX, minY, maxX, maxY).map((item) => item.id)
+    return this.#search(minX, minY, maxX, maxY).map((item) => item.id)
   }
 
   searchFromPoint(
@@ -100,7 +95,7 @@ export class RTree {
   ): string[] {
     const [minX, minY, maxX, maxY] = [point[0], point[1], point[0], point[1]]
 
-    const rtreeResults = this.search(minX, minY, maxX, maxY)
+    const rtreeResults = this.#search(minX, minY, maxX, maxY)
 
     if (filterInsidePolygon) {
       return rtreeResults

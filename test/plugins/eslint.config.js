@@ -8,7 +8,9 @@ import globals from 'globals'
 import ts from 'typescript-eslint'
 import svelteConfig from './svelte.config.js'
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url))
+const gitignorePath = fileURLToPath(
+  new URL('./../../.gitignore', import.meta.url)
+)
 
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
@@ -36,6 +38,10 @@ export default defineConfig(
         parser: ts.parser,
         svelteConfig
       }
+    },
+    rules: {
+      'svelte/prefer-svelte-reactivity': 'warn',
+      'svelte/no-navigation-without-resolve': 'warn'
     }
   }
 )

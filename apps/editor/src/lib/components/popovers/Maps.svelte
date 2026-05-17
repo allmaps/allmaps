@@ -27,17 +27,15 @@
   import EditResourceMask from '$lib/components/modals/EditResourceMask.svelte'
 
   import type { DbMap, ResourceMask, GCPs } from '$lib/types/maps.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const mapsState = getMapsState()
   const uiState = getUiState()
   const projectionsState = getProjectionsState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const apiBaseUrl = varsState.PUBLIC_REST_BASE_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let mapCount = $derived(
     mapsState.maps ? Object.values(mapsState.maps).length : 0
@@ -115,7 +113,7 @@
   <StartGeoreferencing />
 {:else}
   <ol
-    class="grid auto-rows-auto grid-cols-[repeat(2,_max-content)_1fr] gap-1 sm:grid-cols-[repeat(8,_max-content)_1fr] sm:gap-2"
+    class="grid auto-rows-auto grid-cols-[repeat(2,max-content)_1fr] gap-1 sm:grid-cols-[repeat(8,max-content)_1fr] sm:gap-2"
   >
     {#each mapsState.maps as map, index (map.id)}
       {@const gcpCount = Object.values(map.gcps).length}

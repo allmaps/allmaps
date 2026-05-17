@@ -1,18 +1,10 @@
 <script lang="ts">
   import { Banner } from '@allmaps/components'
 
-  import { getVarsState } from '$lib/state/vars.svelte.js'
+  const { children, data } = $props()
 
-  import type { Snippet } from 'svelte'
-
-  import type { Env } from '$lib/types/env.js'
-
-  const { children }: { children: Snippet } = $props()
-
-  const varsState = getVarsState<Env>()
-
-  const bannerEnabled = varsState.get('VITE_BANNER_ENABLED')
-  const bannerText = varsState.get('VITE_BANNER_TEXT')
+  const bannerEnabled = $derived(data.env.PUBLIC_BANNER_ENABLED)
+  const bannerText = $derived(data.env.PUBLIC_BANNER_TEXT)
 </script>
 
 <!-- TODO: add head tags -->

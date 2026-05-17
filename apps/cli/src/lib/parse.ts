@@ -47,6 +47,7 @@ import type {
   ProjectedGcpTransformOptions,
   Projection
 } from '@allmaps/project'
+import type { AnalysisOptions } from '@allmaps/analyze'
 
 export const mustContainOneMapMessage =
   'Annotation must contain exactly 1 georeferenced map'
@@ -573,14 +574,20 @@ export function parseAttachInputs(
       partialAttachedTransformationOptions.evaluateAttachmentScps =
         !options.noEvaluateAttachmentScps
     }
-    if ('evaluateSingleScps' in options && options.evaluateSingleScps) {
+    if (
+      'evaluateSingleScps' in options &&
+      options.evaluateSingleScps !== undefined
+    ) {
       partialAttachedTransformationOptions.evaluateSingleScps =
         options.evaluateSingleScps
     }
-    if ('evaluateGcps' in options && options.evaluateGcps) {
+    if ('evaluateGcps' in options && options.evaluateGcps !== undefined) {
       partialAttachedTransformationOptions.evaluateGcps = options.evaluateGcps
     }
-    if ('removeExistingGcps' in options && options.removeExistingGcps) {
+    if (
+      'removeExistingGcps' in options &&
+      options.removeExistingGcps !== undefined
+    ) {
       partialAttachedTransformationOptions.removeExistingGcps =
         options.removeExistingGcps
     }
@@ -635,4 +642,71 @@ export function parseCommanderGcpResourceYAxis(
       `Unsupported GCP resource y axis. Supported formats are ${supportedGcpResourceYAxis.join(', ')}`
     )
   }
+}
+
+export function parseAnalyzeInputs(
+  options: Partial<{
+    codes: string
+    maxRmseDiameterFraction: number
+    maxShear: number
+    maxLog2sigma: number
+    minLog2sigma: number
+    maxTwoOmega: number
+    ransacThresholdFactor: number
+    ransacStopProbability: number
+    ransacMaxNbIterations: number
+  }>
+): Partial<AnalysisOptions> {
+  const partialAnalysisOptions: Partial<AnalysisOptions> = {}
+
+  if (options && typeof options === 'object') {
+    if ('codes' in options && options.codes) {
+      partialAnalysisOptions.codes = options.codes
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean)
+    }
+    if (
+      'maxRmseDiameterFraction' in options &&
+      options.maxRmseDiameterFraction !== undefined
+    ) {
+      partialAnalysisOptions.maxRmseDiameterFraction =
+        options.maxRmseDiameterFraction
+    }
+    if ('maxShear' in options && options.maxShear !== undefined) {
+      partialAnalysisOptions.maxShear = options.maxShear
+    }
+    if ('maxLog2sigma' in options && options.maxLog2sigma !== undefined) {
+      partialAnalysisOptions.maxLog2sigma = options.maxLog2sigma
+    }
+    if ('minLog2sigma' in options && options.minLog2sigma !== undefined) {
+      partialAnalysisOptions.minLog2sigma = options.minLog2sigma
+    }
+    if ('maxTwoOmega' in options && options.maxTwoOmega !== undefined) {
+      partialAnalysisOptions.maxTwoOmega = options.maxTwoOmega
+    }
+    if (
+      'ransacThresholdFactor' in options &&
+      options.ransacThresholdFactor !== undefined
+    ) {
+      partialAnalysisOptions.ransacThresholdFactor =
+        options.ransacThresholdFactor
+    }
+    if (
+      'ransacStopProbability' in options &&
+      options.ransacStopProbability !== undefined
+    ) {
+      partialAnalysisOptions.ransacStopProbability =
+        options.ransacStopProbability
+    }
+    if (
+      'ransacMaxNbIterations' in options &&
+      options.ransacMaxNbIterations !== undefined
+    ) {
+      partialAnalysisOptions.ransacMaxNbIterations =
+        options.ransacMaxNbIterations
+    }
+  }
+
+  return partialAnalysisOptions
 }

@@ -35,7 +35,7 @@ import type {
   WarningCode,
   ErrorCode
 } from './shared/types'
-import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+import { ProjectedGcpTransformer } from '@allmaps/project'
 
 // Note: construction errors and failures to get info, warning or errors are always reported
 const DEFAULT_INFO_CODES: InfoCode[] = [
@@ -84,7 +84,7 @@ const DEFAULT_OPTIONS: AnalysisOptions = {
   minLog2sigma: -1,
   maxTwoOmega: 0.5,
   ransacThresholdFactor: 0.1,
-  ransacStopProbabilty: 0.99,
+  ransacStopProbability: 0.99,
   ransacMaxNbIterations: 100
 }
 
@@ -117,10 +117,13 @@ export class Analyzer {
    */
   constructor(
     protoGeoreferencedMap: ProtoGeoreferencedMap,
-    options?: AnalysisOptions
+    options?: Partial<AnalysisOptions>
   )
-  constructor(georeferenceddMap: GeoreferencedMap, options?: AnalysisOptions)
-  constructor(warpedMap: WarpedMap, options?: AnalysisOptions)
+  constructor(
+    georeferenceddMap: GeoreferencedMap,
+    options?: Partial<AnalysisOptions>
+  )
+  constructor(warpedMap: WarpedMap, options?: Partial<AnalysisOptions>)
   constructor(
     map: ProtoGeoreferencedMap | GeoreferencedMap | WarpedMap,
     options?: Partial<AnalysisOptions>
@@ -155,6 +158,7 @@ export class Analyzer {
       } catch (error) {
         this.constructionErrors.push({
           mapId: this.mapId,
+          type: 'error',
           code: 'constructinggeoreferencedmapfailed',
           message: 'Constructing a GeoreferencedMap failed.',
           originalMessage: String(error)
@@ -177,6 +181,7 @@ export class Analyzer {
       } catch (error) {
         this.constructionErrors.push({
           mapId: this.mapId,
+          type: 'error',
           code: 'constructingtriangulatedwarpedmapfailed',
           message:
             'Constructing a TriangulatedWarpedMap failed (possibly because triangulating the resourceMask failed).',
@@ -193,6 +198,7 @@ export class Analyzer {
       } catch (error) {
         this.constructionErrors.push({
           mapId: this.mapId,
+          type: 'error',
           code: 'constructingwarpedmapfailed',
           message: 'Constructing a WarpedMap failed.',
           originalMessage: String(error)
@@ -219,6 +225,7 @@ export class Analyzer {
     } catch (error) {
       this.errors.push({
         mapId: this.mapId,
+        type: 'error',
         code: 'errorsfailed',
         message: 'Failed to get errors.',
         originalMessage: String(error)
@@ -229,6 +236,7 @@ export class Analyzer {
     } catch (error) {
       this.errors.push({
         mapId: this.mapId,
+        type: 'error',
         code: 'infofailed',
         message: 'Failed to get info.',
         originalMessage: String(error)
@@ -239,6 +247,7 @@ export class Analyzer {
     } catch (error) {
       this.errors.push({
         mapId: this.mapId,
+        type: 'error',
         code: 'warningsfailed',
         message: 'Failed to get warnings.',
         originalMessage: String(error)
@@ -276,6 +285,7 @@ export class Analyzer {
     ) {
       this.info.push({
         mapId: this.mapId,
+        type: 'info',
         code,
         message: 'The mask contains the full image.'
       })
@@ -312,6 +322,7 @@ export class Analyzer {
         ({ gcpIndex, maskPointIndex, resourcePoint }) => {
           this.info.push({
             mapId: this.mapId,
+            type: 'info',
             code,
             resourcePoint,
             gcpIndex,
@@ -349,6 +360,7 @@ export class Analyzer {
       if (!this.protoGeoreferencedMap.resourceMask) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           message: `A mask is missing.`
         })
@@ -375,6 +387,7 @@ export class Analyzer {
       gcpsOutside.forEach(({ gcp, gcpIndex }) => {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           resourcePoint: gcp.resource,
           gcpIndex: gcpIndex,
@@ -427,9 +440,9 @@ export class Analyzer {
           modelFunction: (projectedTransformer) => (geoPoint) =>
             (
               projectedTransformer as unknown as ProjectedGcpTransformer
-            ).transformToGeo(geoPoint, { projection: lonLatProjection }),
+            ).transformToGeo(geoPoint),
           seed: 0, // Note: setting the seed to make the algorithm deterministic
-          stopProbabilty: options.ransacStopProbabilty,
+          stopProbabilty: options.ransacStopProbability,
           maxNbIterations: options.ransacMaxNbIterations
         }
       )
@@ -440,6 +453,7 @@ export class Analyzer {
       gcpsOutlier.forEach(({ gcp, gcpIndex }) => {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           resourcePoint: gcp.resource,
           geoPoint: gcp.geo,
@@ -474,6 +488,7 @@ export class Analyzer {
         ({ resourceMaskPoint, maskPointIndex }) => {
           this.warnings.push({
             mapId: this.mapId,
+            type: 'warning',
             code,
             resourcePoint: resourceMaskPoint,
             maskPointIndex,
@@ -495,6 +510,7 @@ export class Analyzer {
       ) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           message: `The RMSE is higher then ${options.maxRmseDiameterFraction} times the map diameter.`
         })
@@ -512,6 +528,7 @@ export class Analyzer {
       ) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           message: `The RMSE is higher then ${options.maxRmseDiameterFraction} times the map diameter for a Helmert transformation.`
         })
@@ -529,6 +546,7 @@ export class Analyzer {
       ) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           message: `The shear is higher then ${options.maxShear} for a polynomial transformation.`
         })
@@ -546,6 +564,7 @@ export class Analyzer {
       ) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           message: `The RMSE is higher then ${options.maxRmseDiameterFraction} times the map diameter for a polynomial transformation.`
         })
@@ -576,6 +595,7 @@ export class Analyzer {
       if (gcpUniquePointsFiltered && gcpUniquePointsFiltered.length > 0) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           resourcePoint: gcpUniquePointsFiltered[0].resource,
           geoPoint: this.warpedMap.projectedTransformer.projectionToLonLat(
@@ -606,6 +626,7 @@ export class Analyzer {
       if (gcpUniquePointsFiltered && gcpUniquePointsFiltered.length > 0) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           resourcePoint: gcpUniquePointsFiltered[0].resource,
           geoPoint: this.warpedMap.projectedTransformer.projectionToLonLat(
@@ -636,6 +657,7 @@ export class Analyzer {
       if (gcpUniquePointsFiltered && gcpUniquePointsFiltered.length > 0) {
         this.warnings.push({
           mapId: this.mapId,
+          type: 'warning',
           code,
           resourcePoint: gcpUniquePointsFiltered[0].resource,
           geoPoint: this.warpedMap.projectedTransformer.projectionToLonLat(
@@ -666,6 +688,7 @@ export class Analyzer {
     if (codes.includes(code) && !this.protoGeoreferencedMap.gcps) {
       this.errors.push({
         mapId: this.mapId,
+        type: 'error',
         code,
         message: `GCPs are missing.`
       })
@@ -682,6 +705,7 @@ export class Analyzer {
       gcpsIncompleteResource.forEach(({ gcp, gcpIndex }) => {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           geoPoint: gcp.geo,
           gcpIndex,
@@ -701,6 +725,7 @@ export class Analyzer {
       gcpsIncompleteGeo.forEach(({ gcp, gcpIndex }) => {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           resourcePoint: gcp.resource,
           gcpIndex,
@@ -725,6 +750,7 @@ export class Analyzer {
     ) {
       this.errors.push({
         mapId: this.mapId,
+        type: 'error',
         code,
         message: `There are ${this.protoGeoreferencedMap.gcps.length} GCPs, but a minimum of 2 are required (for a Helmert transform).`
       })
@@ -733,11 +759,13 @@ export class Analyzer {
     code = 'gcpsamountlessthen3'
     if (
       codes.includes(code) &&
+      !codes.includes('gcpsamountlessthen2') &&
       this.protoGeoreferencedMap.gcps &&
       this.protoGeoreferencedMap.gcps.length < 3
     ) {
       this.errors.push({
         mapId: this.mapId,
+        type: 'error',
         code,
         message: `There are ${this.protoGeoreferencedMap.gcps.length} GCPs, but a minimum of 3 are required.`
       })
@@ -754,6 +782,7 @@ export class Analyzer {
       resourceRepeatedPoints.forEach((resourceRepeatedPoint) => {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           resourcePoint: resourceRepeatedPoint.item,
           gcpIndex: resourceRepeatedPoint.index,
@@ -777,6 +806,7 @@ export class Analyzer {
       geoRepeatedPoints.forEach((geoRepeatedPoint) => {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           geoPoint: geoRepeatedPoint.item,
           gcpIndex: geoRepeatedPoint.index,
@@ -798,6 +828,7 @@ export class Analyzer {
       ) {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           message: `GCP resource coordinates are not linearly independent.`
         })
@@ -814,6 +845,7 @@ export class Analyzer {
       ) {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           message: `GCP geo coordinates are not linearly independent.`
         })
@@ -826,6 +858,7 @@ export class Analyzer {
       if (!maskIsRing) {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           message: 'The mask is not a valid ring (an array of points).'
         })
@@ -845,6 +878,7 @@ export class Analyzer {
       resourceMaskRepeatedPoints.forEach((resourceMaskRepeatedPoint) => {
         this.errors.push({
           mapId: this.mapId,
+          type: 'error',
           code,
           resourcePoint: resourceMaskRepeatedPoint.item,
           maskPointIndex: resourceMaskRepeatedPoint.index,
@@ -866,6 +900,7 @@ export class Analyzer {
         (resourceMaskSelfIntersectionPoint) => {
           this.errors.push({
             mapId: this.mapId,
+            type: 'error',
             code,
             resourcePoint: resourceMaskSelfIntersectionPoint,
             message: `The mask self-intersects at resource coordinates [${resourceMaskSelfIntersectionPoint}].`

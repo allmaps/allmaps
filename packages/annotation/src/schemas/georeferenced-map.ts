@@ -24,7 +24,7 @@ const DefaultGeoreferencedMapsSchema = GeoreferencedMaps2Schema
 const DefaultGCPSchema = GeoreferencedMap2GCPSchema
 const DefaultResourceSchema = GeoreferencedMap2ResourceSchema
 
-const GeoreferencedMapAllVersionsSchema = z.union([
+const GeoreferencedMapAllVersionsSchema = z.discriminatedUnion('version', [
   GeoreferencedMap1Schema,
   GeoreferencedMap2Schema
 ])

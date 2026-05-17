@@ -10,5 +10,6 @@ export type {
   MajorVersion,
   Metadata,
   ProfileProperties,
-  LanguageString
+  LanguageString,
+  ImageUrlOptions
 } from './lib/types.js'

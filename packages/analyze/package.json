@@ -34,11 +34,11 @@
     "map"
   ],
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
     "test": "NODE_ENV=test vitest run",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test",
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src test",
     "types": "tsc --noEmit",
     "documentation": "documentation readme dist/index.js --section=API"
   },
@@ -56,14 +56,14 @@
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
-    "@types/node": "^24",
+    "@types/node": "catalog:",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "documentation": "^14.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^2.8.0",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "vitest": "^4.0.4"
   }
 }

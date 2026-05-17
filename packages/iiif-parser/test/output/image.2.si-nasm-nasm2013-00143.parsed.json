@@ -43,5 +43,6 @@
   ],
   "type": "image",
   "uri": "https://ids.si.edu/ids/iiif/NASM-NASM2013-00143",
-  "width": 2071
+  "width": 2071,
+  "supportedFormats": ["jpg"]
 }

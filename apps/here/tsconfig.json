@@ -19,6 +19,7 @@
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/types" },
-    { "path": "../../packages/bearing" }
+    { "path": "../../packages/bearing" },
+    { "path": "../../packages/env" }
   ]
 }

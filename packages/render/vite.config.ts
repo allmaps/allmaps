@@ -19,7 +19,8 @@ export default defineConfig({
         './src/index.ts',
         './src/canvas.ts',
         './src/intarray.ts',
-        './src/webgl2.ts'
+        './src/webgl2.ts',
+        './src/wasm.ts'
       ],
       formats: ['es']
     }

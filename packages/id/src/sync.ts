@@ -1,4 +1,4 @@
-import { sha1 } from 'js-sha1'
+import { sha1Hex } from './sha1.js'
 
 import { serialize } from './checksum.js'
 
@@ -11,7 +11,7 @@ const DEFAULT_LENGTH = 16
  * @returns SHA-1 hash of `str`.
  */
 function generateHash(str: string): string {
-  return sha1.hex(str)
+  return sha1Hex(str)
 }
 
 /**

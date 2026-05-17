@@ -7,13 +7,17 @@ import {
   mergeOptions,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { isEqualProjection } from '@allmaps/project'
+import { isEqualProjection, webMercatorProjection } from '@allmaps/project'
 
 import { TileCache } from '../tilecache/TileCache.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'
 import { FetchableTile } from '../tilecache/FetchableTile.js'
 
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 import {
   getTileZoomLevelForScale,
   computeTilesCoveringRingAtTileZoomLevel,
@@ -29,7 +33,6 @@ import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
 import type {
   CacheableTileFactory,
-  WarpedMapFactory,
   BaseRenderOptions,
   MapPruneInfo,
   GetWarpedMapOptions,
@@ -39,35 +42,12 @@ import type {
   Sprite
 } from '../shared/types.js'
 
-// TODO: move defaults for tunable options here
-const DEFAULT_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions = {}
-
-// These buffers should be in growing order
-const REQUEST_VIEWPORT_BUFFER_RATIO = 0
-const OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO = 8
-const PRUNE_VIEWPORT_BUFFER_RATIO = 8
-const OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO = 16
-
-/**
- * 0 = no correction, -1 = shaper, +1 = less sharp
- * Normal has more effect on smaller scale factors
- * Log2 (i.e. per zoomlevel) has equal effect on all scale factors
- */
-const SCALE_FACTOR_CORRECTION = 0
-const LOG2_SCALE_FACTOR_CORRECTION = -0.5
-
-const SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = Infinity
-const SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
-
-const MAX_MAP_OVERVIEW_RESOLUTION = 1024 * 1024 // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
-const MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO = 50
-
-const MAX_GCPS_EXACT_TPS_TO_RESOURCE = 100
-
 /**
  * Abstract base class for renderers
  */
 export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
+  DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS: SpecificBaseRenderOptions<W>
+
   warpedMapList: WarpedMapList<W>
   tileCache: TileCache<D>
   spritesTileCache: TileCache<D>
@@ -79,18 +59,55 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   mapsWithRequestedTilesForViewport: Set<string> = new Set()
   protected viewport: Viewport | undefined
 
-  options: Partial<BaseRenderOptions>
+  options: BaseRenderOptions<W>
+
+  #boundMapTileLoaded = this.mapTileLoaded.bind(this)
+  #boundMapTileDeleted = this.mapTileDeleted.bind(this)
+  #boundImageLoaded = this.imageLoaded.bind(this)
+  #boundWarpedMapAdded = this.warpedMapAdded.bind(this)
+  #boundWarpedMapRemoved = this.warpedMapRemoved.bind(this)
+  #boundPrepareChange = this.prepareChange.bind(this)
+  #boundAnimatedChange = this.animatedChange.bind(this)
+  #boundImmediateChange = this.immediateChange.bind(this)
 
   constructor(
-    warpedMapFactory: WarpedMapFactory<W>,
     cacheableTileFactory: CacheableTileFactory<D>,
-    options?: Partial<BaseRenderOptions>
+    options?: Partial<BaseRenderOptions<W>>
   ) {
     super()
 
-    this.options = mergeOptions(DEFAULT_BASE_RENDER_OPTIONS, options)
+    // TODO: move defaults for tunable options here
+    this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {
+      // These buffers should be in growing order
+      requestViewportBufferRatio: 0,
+      overviewRequestViewportBufferRatio: 8,
+      pruneViewportBufferRatio: 8,
+      overviewPruneViewportBufferRatio: 16,
 
-    this.warpedMapList = new WarpedMapList(warpedMapFactory, options)
+      // 0 = no correction, -1 = shaper, +1 = less sharp
+      // Normal has more effect on smaller scale factors
+      // Log2 (i.e. per zoomlevel) has equal effect on all scale factors
+      scaleFactorCorrection: 0,
+      log2ScaleFactorCorrection: -0.5,
+
+      spritesMaxHigherLog2ScaleFactorDiff: Infinity,
+      spritesMaxLowerLog2ScaleFactorDiff: 1,
+
+      // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
+      maxMapOverviewResolution: 1024 * 1024,
+      maxTotalOverviewResolutionRatio: 50,
+
+      maxGcpsExactTpsToResource: 100
+    }
+
+    this.options = mergeOptions(
+      this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
+      options
+    )
+
+    this.warpedMapList = this.options.warpedMapList
+      ? this.getWarpedMapListFromOptions()
+      : new WarpedMapList(options)
     this.tileCache = new TileCache(cacheableTileFactory, options)
     this.spritesTileCache = new TileCache(
       cacheableTileFactory,
@@ -104,7 +121,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param annotation - Annotation
    * @param mapOptions - Map options
    */
-  async addGeoreferenceAnnotation(
+  addGeoreferenceAnnotation(
     annotation: unknown,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
@@ -117,7 +134,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param georeferencedMap - Georeferenced Map
    * @param mapOptions - Map options
    */
-  async addGeoreferencedMap(
+  addGeoreferencedMap(
     georeferencedMap: unknown,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
@@ -149,9 +166,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       if (!warpedMap.hasImage()) {
         await warpedMap.loadImage(this.warpedMapList.imagesById)
       }
+
       if (!warpedMap.hasImage()) {
         break // Make TS happy
       }
+
       const resourceId = warpedMap.georeferencedMap.resource.id
       if (!warpedMapsByResourceId.has(resourceId)) {
         warpedMapsByResourceId.set(resourceId, [])
@@ -182,9 +201,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the default options of the renderer and list
    */
-  getDefaultOptions(): BaseRenderOptions & GetWarpedMapOptions<W> {
+  getDefaultOptions(): BaseRenderOptions<W> & GetWarpedMapOptions<W> {
     return mergeOptions(
-      DEFAULT_BASE_RENDER_OPTIONS,
+      this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS,
       this.warpedMapList.getDefaultOptions()
     )
   }
@@ -203,7 +222,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   /**
    * Get the render and list options
    */
-  getOptions(): Partial<BaseRenderOptions> {
+  getOptions(): Partial<BaseRenderOptions<W>> {
     return mergePartialOptions(this.options, this.warpedMapList.getOptions())
   }
 
@@ -235,7 +254,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setOptions(
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     this.options = mergeOptions(this.options, renderAndListOptions)
@@ -253,12 +272,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    */
   setMapsOptions(
     mapIds: string[],
-    mapOptions?: Partial<BaseRenderOptions>,
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    mapOptions?: Partial<BaseRenderOptions<W>>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     if (renderAndListOptions) {
-      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.options = mergeOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptions(
@@ -277,12 +296,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    * @param animationOptions - Animation options
    */
   setMapsOptionsByMapId(
-    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions>>,
-    renderAndListOptions?: Partial<BaseRenderOptions>,
+    mapOptionsByMapId?: Map<string, Partial<BaseRenderOptions<W>>>,
+    renderAndListOptions?: Partial<BaseRenderOptions<W>>,
     animationOptions?: Partial<AnimationOptions>
   ): void {
     if (renderAndListOptions) {
-      this.options = mergePartialOptions(this.options, renderAndListOptions)
+      this.options = mergeOptions(this.options, renderAndListOptions)
       this.tileCache.setOptions(renderAndListOptions)
     }
     this.warpedMapList.setMapsOptionsByMapId(
@@ -355,20 +374,30 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
   }
 
+  protected getWarpedMapListFromOptions(): WarpedMapList<W> {
+    if (!this.options.warpedMapList) {
+      throw new Error('No WarpedMapList')
+    }
+    const warpedMapList = this.options.warpedMapList
+    warpedMapList.setOptions(this.options)
+    return warpedMapList
+  }
+
   protected loadMissingImagesInViewport(): Promise<void>[] {
     if (!this.viewport) {
       return []
     }
 
-    const geoBufferedViewportRectangleBbox = computeBbox(
-      this.viewport.getGeoBufferedRectangle()
+    // Same comment on viewport and warpedMapList being in same projection as below
+    const projectedGeoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getProjectedGeoBufferedRectangle()
     )
 
-    return Array.from(
-      this.warpedMapList.getWarpedMaps({
-        geoBbox: geoBufferedViewportRectangleBbox
+    return this.warpedMapList
+      .getWarpedMaps({
+        projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
+        applyMask: false
       })
-    )
       .filter(
         (warpedMap) => !warpedMap.hasImage() && !warpedMap.fetchingImageInfo
       )
@@ -385,7 +414,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return Array.from(
       this.findMapsInViewport(
         this.shouldAnticipateInteraction()
-          ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
+          ? this.options.overviewPruneViewportBufferRatio
           : 1
       )
     )
@@ -415,7 +444,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         this.viewport.projection
       )
     ) {
-      this.warpedMapList.options.projection = this.viewport.projection
       this.warpedMapList.setOptions({ projection: this.viewport.projection })
     }
   }
@@ -429,19 +457,26 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const overviewFetchableTilesForViewport: FetchableTile[] = []
 
     const mapsInViewportForRequest = this.findMapsInViewport(
-      this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
-    )
-    const mapsInViewportForOverviewRequest = this.findMapsInViewport(
       this.shouldAnticipateInteraction()
-        ? OVERVIEW_REQUEST_VIEWPORT_BUFFER_RATIO
+        ? this.options.requestViewportBufferRatio
         : 1
     )
+    const mapsInViewportForOverviewRequest = new Set([
+      ...this.findMapsInViewport(
+        this.shouldAnticipateInteraction()
+          ? this.options.overviewRequestViewportBufferRatio
+          : 1
+      ),
+      ...this.findMapsToAnticipate()
+    ])
     const mapsInViewportForPrune = this.findMapsInViewport(
-      this.shouldAnticipateInteraction() ? PRUNE_VIEWPORT_BUFFER_RATIO : 1
+      this.shouldAnticipateInteraction()
+        ? this.options.pruneViewportBufferRatio
+        : 1
     )
     const mapsInViewportForOverviewPrune = this.findMapsInViewport(
       this.shouldAnticipateInteraction()
-        ? OVERVIEW_PRUNE_VIEWPORT_BUFFER_RATIO
+        ? this.options.overviewPruneViewportBufferRatio
         : 1
     )
 
@@ -467,10 +502,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const spriteFetchableTiles = this.tileCache
       .getCachedTiles()
       .filter((cachedTile) => cachedTile.isTileFromSprites())
-      .filter(
-        (cachedTile) =>
-          this.warpedMapList.getWarpedMap(cachedTile.fetchableTile.mapId)
-            ?.options.visible != false
+      .filter((cachedTile) =>
+        this.warpedMapList
+          .getWarpedMap(cachedTile.fetchableTile.mapId)
+          ?.shouldRenderMap()
       )
       .map((cachedTile) => cachedTile.fetchableTile)
 
@@ -502,8 +537,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       ...overviewFetchableTilesForViewport
     ]
     const allRequestedTilesForViewport = allFetchableTilesForViewport.filter(
-      (fetchableTile) =>
-        this.warpedMapList.getWarpedMap(fetchableTile.mapId)?.shouldRenderMap()
+      (fetchableTile) => {
+        const warpedMap = this.warpedMapList.getWarpedMap(fetchableTile.mapId)
+        return warpedMap?.shouldRenderMap() || warpedMap?.options.anticipate
+      }
     )
 
     // Request all fetchable tiles to render, and prune tile cache
@@ -520,21 +557,26 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
     const viewport = this.viewport
 
-    const geoBufferedViewportRectangleBbox = computeBbox(
-      this.viewport.getGeoBufferedRectangle(viewportBufferRatio)
+    // Using the viewport's projectedGeoBufferedRectangle to look up
+    // in the warpedMapList's projectedGeo RTree
+    // assumes the viewport and warpedMapList are in the same projection.
+    // This is what assureProjection() takes care of, but is worth noting here.
+    // (It's also why we don't need to pass a projection in the lookup function)
+    const projectedGeoBufferedViewportRectangleBbox = computeBbox(
+      this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
     )
 
     const mapsInViewport = new Set(
-      Array.from(
-        this.warpedMapList.getWarpedMaps({
-          geoBbox: geoBufferedViewportRectangleBbox
+      this.warpedMapList
+        .getWarpedMaps({
+          projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
+          applyMask: false
         })
-      )
         .map((warpedMap) => {
           return {
             warpedMap,
             projectedGeoSquaredDistanceToViewportCenter: squaredDistance(
-              bboxToCenter(warpedMap.projectedGeoMaskBbox),
+              bboxToCenter(warpedMap.projectedGeoAppliedMaskBbox),
               viewport.projectedGeoCenter
             )
           }
@@ -555,6 +597,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return mapsInViewport
   }
 
+  protected findMapsToAnticipate(): Set<string> {
+    return new Set(
+      this.warpedMapList
+        .getWarpedMaps()
+        .filter((warpedMap) => warpedMap.options.anticipate)
+        .map((warpedmap) => warpedmap.mapId)
+    )
+  }
+
   protected getMapFetchableTilesForViewport(
     mapId: string,
     mapsInViewportForRequest: Set<string>
@@ -570,7 +621,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.options.visible) {
+    if (!warpedMap.shouldRenderMap()) {
       return []
     }
 
@@ -588,25 +639,29 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const tileZoomLevel = getTileZoomLevelForScale(
       warpedMap.image.tileZoomLevels,
       warpedMap.getResourceToViewportScale(viewport),
-      SCALE_FACTOR_CORRECTION,
-      LOG2_SCALE_FACTOR_CORRECTION
+      this.options.scaleFactorCorrection,
+      this.options.log2ScaleFactorCorrection
     )
     warpedMap.setTileZoomLevelForViewport(tileZoomLevel)
 
     // Transforming the viewport back to resource
     const transformerOptions = {
-      maxDepth: 0,
-      // maxDepth: 2,
-      // minOffsetRatio: 0.00001,
-      sourceIsGeographic: false,
-      destinationIsGeographic: true
+      maxDepth: isEqualProjection(
+        warpedMap.internalProjection,
+        webMercatorProjection
+      )
+        ? 0
+        : 2,
+      minOffsetRatio: 0.00001
     }
     // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
-    // TODO: Consider recusive refinement via options like {minOffsetRatio: 0.00001, maxDepth: 2}
+    // If an internal projection is present, some refinement is needed.
     // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
     const projectedGeoBufferedViewportRectangle =
       viewport.getProjectedGeoBufferedRectangle(
-        this.shouldAnticipateInteraction() ? REQUEST_VIEWPORT_BUFFER_RATIO : 1
+        this.shouldAnticipateInteraction()
+          ? this.options.requestViewportBufferRatio
+          : 1
       )
     // Optimise computation time of backwards transformation:
     // Since this is the only place transformToResource is called
@@ -617,7 +672,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // this could lead to inaccurate tile loading (in addition to the reason explained below).
     const projectedTransformer =
       warpedMap.transformationType === 'thinPlateSpline' &&
-      warpedMap.gcps.length > MAX_GCPS_EXACT_TPS_TO_RESOURCE
+      warpedMap.gcps.length > this.options.maxGcpsExactTpsToResource
         ? warpedMap.getProjectedTransformer('polynomial')
         : warpedMap.projectedTransformer
     // Compute viewport in resource
@@ -625,11 +680,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // there is an inherent imperfection in this computation
     // which could lead to inaccurate tile loading.
     // In general, this is made up for by the buffers.
-    const resourceBufferedViewportRing =
-      projectedTransformer.transformToResource(
+    // Note: this is the first time the backwards transformation is computed
+    // which can cause unexpected errors (this isn't computed and hence check when adding maps)
+    // so we catch such error and pass them to the user as events.
+    let resourceBufferedViewportRing
+    try {
+      resourceBufferedViewportRing = projectedTransformer.transformToResource(
         [projectedGeoBufferedViewportRectangle],
         transformerOptions
       )[0]
+    } catch (error) {
+      if (error instanceof Error) {
+        error.message = 'Error while transforming to resource: ' + error.message
+        const errorEvent = new WarpedMapErrorEvent(error, { mapIds: [mapId] })
+        this.dispatchEvent(errorEvent)
+      }
+      // Return no tiles, which will exclude this map from mapsInViewport etc.
+      // and hence all further rendering.
+      return []
+    }
     warpedMap.setProjectedGeoBufferedViewportRectangleForViewport(
       projectedGeoBufferedViewportRectangle
     )
@@ -646,14 +715,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       )
     }
 
-    // Compute intersection of bboxes of to-resource-back-transformed viewport and resource mask
-    const resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection =
+    // Compute intersection of bboxes of to-resource-back-transformed viewport and resource applied mask
+    const resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection =
       intersectBboxes(
         warpedMap.resourceBufferedViewportRingBboxForViewport,
-        warpedMap.resourceMaskBbox
+        warpedMap.resourceAppliedMaskBbox
       )
-    warpedMap.setResourceBufferedViewportRingBboxAndResourceMaskBboxIntersectionForViewport(
-      resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+    warpedMap.setResourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersectionForViewport(
+      resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
     )
 
     // If this map it outside of the viewport with request buffer, stop here:
@@ -665,7 +734,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // If the intersection of the bboxes is undefined, we don't need to compute any tiles.
     // This should in general only happen if the previous check also returned false.
-    if (!resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection) {
+    if (
+      !resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
+    ) {
       return []
     }
 
@@ -673,7 +744,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // by computing the tiles covering this bbox's rectangle at the tilezoomlevel
     let tiles = computeTilesCoveringRingAtTileZoomLevel(
       bboxToRectangle(
-        resourceBufferedViewportRingBboxAndResourceMaskBboxIntersection
+        resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
       ),
       tileZoomLevel,
       [warpedMap.image.width, warpedMap.image.height]
@@ -717,7 +788,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.options.visible) {
+    if (!warpedMap.shouldRenderMap() && !warpedMap.options.anticipate) {
       return []
     }
 
@@ -732,7 +803,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // or if many maps to render
     // or if tiles from sprites
     const maxTotalFetchableTilesResolution =
-      this.viewport.viewportResolution * MAX_TOTAL_OVERVIEW_RESOLUTION_RATIO
+      this.viewport.viewportResolution *
+      this.options.maxTotalOverviewResolutionRatio
     if (
       totalFetchableTilesForViewportResolution >
         maxTotalFetchableTilesResolution ||
@@ -745,8 +817,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const overviewTileZoomLevel = warpedMap.image.tileZoomLevels
       .filter(
         (tileZoomLevel) =>
-          getTileZoomLevelResolution(tileZoomLevel) <=
-          MAX_MAP_OVERVIEW_RESOLUTION
+          warpedMap.options.anticipateTileZoomLevel == 'top'
+            ? true
+            : getTileZoomLevelResolution(tileZoomLevel) <=
+              this.options.maxMapOverviewResolution
         // Neglect zoomlevels that contain too many pixels
       )
       .sort(
@@ -757,10 +831,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       .at(-1)
     warpedMap.setOverviewTileZoomLevelForViewport(overviewTileZoomLevel)
 
-    // If this map it ourside of the viewport with overview buffer, stop here:
+    // If this map it outside of the viewport with overview buffer, or if the map is invisible, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
-    if (!mapsInViewportForOverviewRequest.has(mapId)) {
+    if (
+      !warpedMap.options.anticipate &&
+      (!mapsInViewportForOverviewRequest.has(mapId) ||
+        !warpedMap.shouldRenderMap())
+    ) {
       return []
     }
 
@@ -912,9 +990,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           Math.log2(tile.tileZoomLevel.scaleFactor) -
           Math.log2(spriteCachedTilesScaleFactor)
         const scaleFactorDiffWithinHigherTolerance =
-          log2ScaleFactorDiff <= SPRITES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF
+          log2ScaleFactorDiff <=
+          this.options.spritesMaxHigherLog2ScaleFactorDiff
         const scaleFactorDiffWithinLowerTolerance =
-          -log2ScaleFactorDiff <= SPRITES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF
+          -log2ScaleFactorDiff <=
+          this.options.spritesMaxLowerLog2ScaleFactorDiff
         if (
           scaleFactorDiffWithinHigherTolerance &&
           scaleFactorDiffWithinLowerTolerance
@@ -961,84 +1041,70 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected addEventListeners() {
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
+      this.#boundMapTileLoaded
     )
-
     this.tileCache.addEventListener(
       WarpedMapEventType.MAPTILEDELETED,
-      this.mapTileDeleted.bind(this)
+      this.#boundMapTileDeleted
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMAGELOADED,
-      this.imageLoaded.bind(this)
+      this.#boundImageLoaded
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
+      this.#boundWarpedMapAdded
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
-      this.warpedMapRemoved.bind(this)
+      this.#boundWarpedMapRemoved
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.PREPARECHANGE,
-      this.prepareChange.bind(this)
+      this.#boundPrepareChange
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.ANIMATEDCHANGE,
-      this.animatedChange.bind(this)
+      this.#boundAnimatedChange
     )
-
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMMEDIATECHANGE,
-      this.immediateChange.bind(this)
+      this.#boundImmediateChange
     )
   }
 
   protected removeEventListeners() {
     this.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILELOADED,
-      this.mapTileLoaded.bind(this)
+      this.#boundMapTileLoaded
     )
-
     this.tileCache.removeEventListener(
       WarpedMapEventType.MAPTILEDELETED,
-      this.mapTileDeleted.bind(this)
+      this.#boundMapTileDeleted
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
-      this.imageLoaded.bind(this)
+      this.#boundImageLoaded
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
-      this.warpedMapAdded.bind(this)
+      this.#boundWarpedMapAdded
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPREMOVED,
-      this.warpedMapRemoved.bind(this)
+      this.#boundWarpedMapRemoved
     )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.PREPARECHANGE,
-      this.prepareChange.bind(this)
+      this.#boundPrepareChange
     )
-
-    this.warpedMapList.removeEventListener(
-      WarpedMapEventType.IMMEDIATECHANGE,
-      this.immediateChange.bind(this)
-    )
-
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.ANIMATEDCHANGE,
-      this.animatedChange.bind(this)
+      this.#boundAnimatedChange
+    )
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMMEDIATECHANGE,
+      this.#boundImmediateChange
     )
   }
 }

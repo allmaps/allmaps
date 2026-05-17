@@ -63,7 +63,7 @@
     RemoveGcpEvent,
     ClickedItemEvent
   } from '$lib/types/events.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   type TerraDrawOnChangeContext =
     | { origin: 'api'; target?: 'geometry' | 'properties' }
@@ -75,7 +75,7 @@
   const urlState = getUrlState()
   const viewportsState = getViewportsState()
   const projectionsState = getProjectionsState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
   let resourceMap = $state.raw<MapLibreMap>()
   let geoMap = $state.raw<MapLibreMap>()
@@ -83,9 +83,7 @@
   let resourceTransformer = $state.raw<GcpTransformer>()
   let resourceWarpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let mapIds = $derived(
     mapsState.activeMapId
@@ -203,6 +201,11 @@
 
     if (geoMap) {
       navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
+      console.log(
+        'navPlaceGeoViewport',
+        sourceState.navPlace,
+        navPlaceGeoViewport
+      )
       urlGeoViewport = getBboxViewport(urlState.params.bbox)
 
       if (mapsState.activeMap?.gcps) {
@@ -462,29 +465,16 @@
   }
 
   function handleResourceDrawFinish(
-    id: string | number
-    // context: { action: string; mode: string }
+    id: string | number,
+    context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
 
-    // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
-    // context.action is incorrectly set to 'draw' instead of 'edit' (the
-    // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
-    // we cannot rely on context.action to distinguish edits from new draws.
-    // Instead we check whether the map already exists in state.
-    const isExistingGcp = gcpId && mapsState.activeMap?.gcps[gcpId]
-
-    if (isExistingGcp) {
+    if (context.action === 'edit') {
       handleDrawFinishEdited(gcpId)
-    } else if (resourceDraw) {
+    } else if (resourceDraw && context.action === 'draw') {
       handleDrawFinishDrawn(resourceDraw, gcpId)
     }
-
-    // if (context.action === 'edit') {
-    //   handleDrawFinishEdited(gcpId)
-    // } else if (resourceDraw && context.action === 'draw') {
-    //   handleDrawFinishDrawn(resourceDraw, gcpId)
-    // }
   }
 
   function handleGeoDrawChange(
@@ -511,8 +501,6 @@
     const gcp = mapsState.activeMap?.gcps[gcpId]
 
     if (mapId && gcp) {
-      const gcps = mapsState.activeMap?.gcps
-
       if (pane === 'geo') {
         if (!gcp.resource) {
           mapsState.removeGcp({ mapId, gcpId })
@@ -544,29 +532,16 @@
   }
 
   function handleGeoDrawFinish(
-    id: string | number
-    // context: { action: string; mode: string }
+    id: string | number,
+    context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
 
-    // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
-    // context.action is incorrectly set to 'draw' instead of 'edit' (the
-    // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
-    // we cannot rely on context.action to distinguish edits from new draws.
-    // Instead we check whether the map already exists in state.
-    const isExistingGcp = gcpId && mapsState.activeMap?.gcps[gcpId]
-
-    if (isExistingGcp) {
+    if (context.action === 'edit') {
       handleDrawFinishEdited(gcpId)
-    } else if (geoDraw) {
+    } else if (geoDraw && context.action === 'draw') {
       handleDrawFinishDrawn(geoDraw, gcpId)
     }
-
-    // if (context.action === 'edit') {
-    //   handleDrawFinishEdited(gcpId)
-    // } else if (geoDraw && context.action === 'draw') {
-    //   handleDrawFinishDrawn(geoDraw, gcpId)
-    // }
   }
 
   function addResourceGcpFeature(gcp: DbGcp3, displayIndex: number) {
@@ -940,7 +915,24 @@
       }
     })
 
-    const duration = animate ? 300 : 0
+    if (
+      !resourceBbox &&
+      resourceTransformer &&
+      map.resourceMask &&
+      map.resourceMask.length >= 3
+    ) {
+      const resourceMaskCoordinates = resourceTransformer.transformToGeo([
+        ...map.resourceMask,
+        map.resourceMask[0]
+      ])
+
+      resourceBbox = computeBbox({
+        type: 'Polygon',
+        coordinates: [resourceMaskCoordinates]
+      })
+    }
+
+    const duration = animate ? MAPLIBRE_FIT_BOUNDS_DURATION : 0
 
     if (resourceViewport) {
       resourceMap?.flyTo({
@@ -957,11 +949,6 @@
       })
     } else if (resourceBbox) {
       resourceMap?.fitBounds(resourceBbox, {
-        duration,
-        padding: MAPLIBRE_PADDING
-      })
-    } else if (resourceWarpedMapLayerBounds) {
-      resourceMap?.fitBounds(resourceWarpedMapLayerBounds, {
         duration,
         padding: MAPLIBRE_PADDING
       })

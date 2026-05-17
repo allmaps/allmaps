@@ -25,16 +25,16 @@
     "allmaps"
   ],
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src",
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "types": "tsc --noEmit"
   },
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
-    "zod": "^3.22.4",
+    "zod": "catalog:",
     "zod-to-json-schema": "^3.22.4"
   },
   "devDependencies": {
@@ -44,6 +44,6 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.6.2",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:"
   }
 }

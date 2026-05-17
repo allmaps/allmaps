@@ -6,7 +6,8 @@ import {
   PartOfSchema,
   ResourceMaskSchema,
   TransformationSchema,
-  ProjectionSchema
+  ProjectionSchema,
+  ProviderSchema
 } from '../shared.js'
 
 export const GCPSchema = z.object({
@@ -19,7 +20,8 @@ export const ResourceSchema = z.object({
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
   type: ResourceTypeSchema,
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const GeoreferencedMapSchema = z.object({
@@ -34,7 +36,10 @@ export const GeoreferencedMapSchema = z.object({
   gcps: GCPSchema.array(),
   resourceMask: ResourceMaskSchema,
   transformation: TransformationSchema.optional(),
-  resourceCrs: ProjectionSchema.optional()
+  resourceCrs: ProjectionSchema.optional(),
+  // TODO: accept all keys that start with underscore and pass them?
+  // TODO: define proper schema for _allmaps
+  _allmaps: z.unknown().optional()
 })
 
 export const GeoreferencedMapsSchema = z.array(GeoreferencedMapSchema)

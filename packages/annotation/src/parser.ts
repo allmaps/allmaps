@@ -29,7 +29,8 @@ function parseResource(annotation: AnnotationAllVersions): Resource {
     id: parseImageId(annotation),
     ...parseImageDimensions(annotation),
     type: parseResourceType(annotation),
-    partOf: parsePartOf(annotation)
+    partOf: parsePartOf(annotation),
+    provider: parseProvider(annotation)
   }
 }
 
@@ -54,9 +55,17 @@ function parseResourceType(annotation: AnnotationAllVersions): ResourceType {
   }
 }
 
-function parsePartOf(annotation: AnnotationAllVersions): PartOf {
+function parsePartOf(annotation: AnnotationAllVersions): PartOf | undefined {
   if (isAnnotation1(annotation)) {
     return annotation.target.source.partOf
+  }
+}
+
+function parseProvider(
+  annotation: AnnotationAllVersions
+): Resource['provider'] | undefined {
+  if (isAnnotation1(annotation)) {
+    return annotation.target.source.provider
   }
 }
 
@@ -158,6 +167,11 @@ function getGeoreferencedMap(
     resourceCrs = annotation.body.resourceCrs
   }
 
+  let _allmaps: unknown
+  if ('_allmaps' in annotation) {
+    _allmaps = annotation._allmaps
+  }
+
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
     type: 'GeoreferencedMap',
@@ -167,7 +181,8 @@ function getGeoreferencedMap(
     gcps: parseGcps(annotation),
     resourceMask: parseResourceMask(annotation),
     transformation: annotation.body.transformation,
-    resourceCrs
+    resourceCrs,
+    _allmaps
   }
 }
 

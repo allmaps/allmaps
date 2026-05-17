@@ -16,31 +16,36 @@
     "directory": "workers/preview"
   },
   "scripts": {
-    "deploy": "wrangler deploy",
-    "deploy:dev": "wrangler deploy --env dev",
-    "dev": "wrangler dev --port $(../../port.js preview) --env dev",
+    "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
+    "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
+    "dev": "wrangler dev --port $(../../port.js preview) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
+    "build": "tsc",
     "lerna-build": "lerna run build --scope @allmaps/preview --include-dependencies",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "cf-typegen": "wrangler types",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src"
+    "format": "prettier --ignore-path ../../.gitignore --write src"
   },
   "license": "MIT",
   "devDependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/env": "workspace:^",
+    "@allmaps/frame": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/render": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@cloudflare/kv-asset-handler": "^0.3.1",
     "@cloudflare/pages-plugin-vercel-og": "^0.1.2",
-    "@cloudflare/workers-types": "^4.20240320.1",
     "@turf/rewind": "^7.2.0",
     "@types/d3-geo": "^3.1.0",
     "@types/eslint": "^8.56.0",
     "@types/geojson": "^7946.0.14",
-    "@types/node": "^24",
+    "@types/node": "catalog:",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/tinycolor2": "^1.4.3",
@@ -57,8 +62,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tinycolor2": "^1.6.0",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "upng-js": "^2.1.0",
-    "wrangler": "^4.3.0"
+    "wrangler": "catalog:"
   }
 }

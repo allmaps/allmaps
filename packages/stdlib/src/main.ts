@@ -9,12 +9,20 @@ export function radiansToDegrees(radians: number) {
   return radians * (180 / Math.PI)
 }
 
+// Returns angle in radians
 export function angle(line: Line) {
   return Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0])
 }
 
-export function bearing(line: Line) {
-  return angle(line) - Math.PI / 2
+// Takes and returns angle in radians
+export function angularMean(...angles: number[]) {
+  if (angles.length == 0) {
+    throw new Error("Can't compute mean of empty array")
+  }
+  return Math.atan2(
+    angles.reduce((sum, angle) => sum + Math.sin(angle), 0) / angles.length,
+    angles.reduce((sum, angle) => sum + Math.cos(angle), 0) / angles.length
+  )
 }
 
 // Define vanilla groupBy function, since official one is only baseline 2024
@@ -197,15 +205,15 @@ export function objectDifference(
 // Basic omit function as replacement for lodash omit, since it will be removed in v5
 // See: https://github.com/lodash/lodash/issues/2930#issuecomment-272298477
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function omit<T extends Record<string, any>>(
+export function omit<T extends Record<string, any>, K extends string>(
   object: T,
-  keys: string[]
-): Partial<T> {
+  keys: K[]
+): Omit<T, K> {
   const result = cloneDeep(object) as T
   for (const key of keys) {
     delete result[key]
   }
-  return result
+  return result as Omit<T, K>
 }
 
 export function isValidHttpUrl(string: string) {

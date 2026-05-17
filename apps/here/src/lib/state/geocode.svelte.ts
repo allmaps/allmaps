@@ -8,13 +8,13 @@ import type { Point } from '@allmaps/types'
 const GEOCODE_KEY = Symbol('geocode')
 
 export class GeocodeState {
-  #geocodeEarthKey: string
+  #geocodeEarthKey: string | undefined
 
   #localityByLatLon = $state<SvelteMap<string, string | undefined>>(
     new SvelteMap()
   )
 
-  constructor(geocodeEarthKey: string) {
+  constructor(geocodeEarthKey?: string) {
     this.#geocodeEarthKey = geocodeEarthKey
   }
 
@@ -23,6 +23,10 @@ export class GeocodeState {
   }
 
   async fetchReverseGeocode(point: Point) {
+    if (!this.#geocodeEarthKey) {
+      return
+    }
+
     const key = this.#getKeyFromPoint(point)
 
     if (this.#localityByLatLon.has(key)) {
@@ -42,7 +46,7 @@ export class GeocodeState {
   }
 }
 
-export function setGeocodeState(geocodeEarthKey: string) {
+export function setGeocodeState(geocodeEarthKey?: string) {
   return setContext(GEOCODE_KEY, new GeocodeState(geocodeEarthKey))
 }
 

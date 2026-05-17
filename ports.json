@@ -1,5 +1,7 @@
 {
-  "api": 5499,
+  "live": 5497,
+  "annotations": 5498,
+  "rest": 5499,
   "viewer": 5500,
   "info": 5501,
   "explore": 5502,

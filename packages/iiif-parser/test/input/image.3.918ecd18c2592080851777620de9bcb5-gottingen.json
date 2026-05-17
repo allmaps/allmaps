@@ -1,0 +1,20 @@
+{
+  "@context": "http://iiif.io/api/image/3/context.json",
+  "extraFormats": ["jpg", "png", "webp"],
+  "preferredFormats": ["webp", "jpg"],
+  "extraQualities": ["default", "color", "gray"],
+  "rights": "http://creativecommons.org/publicdomain/mark/1.0/",
+  "height": 3024,
+  "id": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen",
+  "profile": "level1",
+  "protocol": "http://iiif.io/api/image",
+  "tiles": [
+    {
+      "height": 512,
+      "scaleFactors": [1, 2, 4],
+      "width": 512
+    }
+  ],
+  "type": "ImageService3",
+  "width": 4032
+}

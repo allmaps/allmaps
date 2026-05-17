@@ -19,7 +19,8 @@
     ".": "./dist/index.js",
     "./intarray": "./dist/intarray.js",
     "./canvas": "./dist/canvas.js",
-    "./webgl2": "./dist/webgl2.js"
+    "./webgl2": "./dist/webgl2.js",
+    "./wasm": "./dist/wasm.js"
   },
   "files": [
     "dist"
@@ -33,13 +34,13 @@
     "directory": "packages/render"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev --mode localhost",
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",
@@ -61,13 +62,14 @@
     "comlink": "^4.4.1",
     "lodash-es": "^4.17.21",
     "point-in-polygon-hao": "^1.2.4",
+    "proj4": "catalog:",
     "rbush": "^4.0.0"
   },
   "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^8.56.0",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^24",
+    "@types/node": "catalog:",
     "@types/rbush": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
@@ -76,8 +78,8 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
-    "vite": "^5.0.3",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-plugin-dts": "^3.8.3",
     "vite-plugin-glsl": "^1.3.0",
     "vite-plugin-no-bundle": "^4.0.0"

@@ -27,13 +27,13 @@
     "parser"
   ],
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
     "types": "tsc --noEmit",
     "test": "NODE_ENV=test vitest run",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
     "documentation": "remark . --output --use remark-api",
-    "format": "prettier --write src test"
+    "format": "prettier --ignore-path ../../.gitignore --write src test"
   },
   "license": "MIT",
   "devDependencies": {
@@ -46,10 +46,10 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "vitest": "^4.0.4"
   },
   "dependencies": {
-    "zod": "^3.24.1"
+    "zod": "catalog:"
   }
 }

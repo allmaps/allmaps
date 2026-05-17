@@ -32,7 +32,7 @@ export abstract class BaseWarpedMapLayer<
 
   container?: HTMLDivElement
   canvas?: HTMLCanvasElement
-  gl: WebGL2RenderingContext | null | undefined
+  gl?: WebGL2RenderingContext
 
   renderer?: WebGL2Renderer
 
@@ -72,13 +72,13 @@ export abstract class BaseWarpedMapLayer<
    * @param mapOptions - Map options
    * @returns Map IDs of the maps that were added, or an error per map
    */
-  async addGeoreferenceAnnotation(
+  addGeoreferenceAnnotation(
     annotation: unknown,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): Promise<(string | Error)[]> {
+  ): (string | Error)[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const results = await this.renderer.addGeoreferenceAnnotation(
+    const results = this.renderer.addGeoreferenceAnnotation(
       annotation,
       mapOptions
     )
@@ -93,13 +93,11 @@ export abstract class BaseWarpedMapLayer<
    * @param annotation - Georeference Annotation
    * @returns Map IDs of the maps that were removed, or an error per map
    */
-  async removeGeoreferenceAnnotation(
-    annotation: unknown
-  ): Promise<(string | Error)[]> {
+  removeGeoreferenceAnnotation(annotation: unknown): (string | Error)[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const results =
-      await this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+      this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
     this.nativeUpdate()
 
     return results
@@ -143,12 +141,12 @@ export abstract class BaseWarpedMapLayer<
    *
    * @param georeferencedMap - Georeferenced Map
    * @param mapOptions - Map options
-   * @returns Map ID of the map that was added, or an error
+   * @returns Map ID of the map that was added
    */
-  async addGeoreferencedMap(
+  addGeoreferencedMap(
     georeferencedMap: unknown,
     mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): Promise<string | Error> {
+  ): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result = this.renderer.addGeoreferencedMap(
@@ -164,11 +162,9 @@ export abstract class BaseWarpedMapLayer<
    * Removes a Georeferenced Map
    *
    * @param georeferencedMap - Georeferenced Map
-   * @returns Map ID of the map that was removed, or an error
+   * @returns Map ID of the map that was removed
    */
-  async removeGeoreferencedMap(
-    georeferencedMap: unknown
-  ): Promise<string | Error> {
+  removeGeoreferencedMap(georeferencedMap: unknown): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result =
@@ -182,11 +178,9 @@ export abstract class BaseWarpedMapLayer<
    * Removes a Georeferenced Map by its ID
    *
    * @param mapId - Map ID of the georeferenced map to remove
-   * @returns Map ID of the map that was removed, or an error
+   * @returns Map ID of the map that was removed
    */
-  async removeGeoreferencedMapById(
-    mapId: string
-  ): Promise<string | Error | undefined> {
+  removeGeoreferencedMapById(mapId: string): string {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const result = this.renderer.warpedMapList.removeGeoreferencedMapById(mapId)
@@ -243,9 +237,11 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get mapIds for selected maps
+   * Get mapIds for all maps in the layer
    *
    * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @returns The mapIds of all maps
    */
   getMapIds(): string[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -254,13 +250,16 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the WarpedMap instances for selected maps
+   * Get the WarpedMap instances for all maps, or all selected maps
+   *
+   * If no argument is passed, the WarpedMap instance of all maps in the layer is passed
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
+   * @returns The WarpedMap instance of all (selected) map
    */
-  getWarpedMaps(mapIds?: string[]): Iterable<WebGL2WarpedMap> {
+  getWarpedMaps(mapIds?: string[]): Array<WebGL2WarpedMap> {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getWarpedMaps({ mapIds })
@@ -278,10 +277,25 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the center of the bounding box of the maps
+   * Get the center of the bounding box of all maps in the layer
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param projection - Projection in which to return the result
+   * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getCenter(projectionOptions?: Partial<ProjectionOptions>): Point | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
+  }
+
+  /**
+   * Get the center of the bounding box of all selected maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -291,7 +305,7 @@ export abstract class BaseWarpedMapLayer<
    */
   getMapsCenter(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -301,10 +315,25 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the bounding box of the maps
+   * Get the bounding box of all maps in the layer
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param projection - Projection in which to return the result
+   * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
+  }
+
+  /**
+   * Get the bounding box of all selected maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -314,7 +343,7 @@ export abstract class BaseWarpedMapLayer<
    */
   getMapsBbox(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -324,10 +353,28 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
-   * Get the convex hull of the maps
+   * Get the convex hull of all maps in the layer
    *
-   * By default the result is returned in the list's projection, which is `EPSG:3857` by default
-   * Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+   * The result is returned in lon-lat `EPSG:4326` by default.
+   *
+   * Note: more selection options are available on this function of WarpedMapList
+   *
+   * @param mapIds - Map IDs
+   * @param projection - Projection in which to return the result
+   * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
+   */
+  getConvexHull(
+    projectionOptions?: Partial<ProjectionOptions>
+  ): Ring | undefined {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
+  }
+
+  /**
+   * Get the convex hull of all selected maps maps
+   *
+   * The result is returned in lon-lat `EPSG:4326` by default.
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
@@ -337,7 +384,7 @@ export abstract class BaseWarpedMapLayer<
    */
   getMapsConvexHull(
     mapIds: string[],
-    projectionOptions?: ProjectionOptions
+    projectionOptions?: Partial<ProjectionOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -371,7 +418,7 @@ export abstract class BaseWarpedMapLayer<
    * Get the default options the layer
    */
   getDefaultOptions(): SpecificWarpedMapLayerOptions &
-    BaseRenderOptions &
+    BaseRenderOptions<WebGL2WarpedMap> &
     WebGL2WarpedMapOptions {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
@@ -465,6 +512,22 @@ export abstract class BaseWarpedMapLayer<
   }
 
   /**
+   * Set the transformation type of the layer
+   *
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setLayerTransformationType(
+    transformationType?: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setLayerOptions(
+      { transformationType: transformationType },
+      animationOptions
+    )
+  }
+
+  /**
    * Set the GCPs of a map
    *
    * This only sets the map-specific `gcps` option of the map
@@ -529,12 +592,39 @@ export abstract class BaseWarpedMapLayer<
    */
   setMapTransformationType(
     mapId: string,
-    transformationType: TransformationType,
+    transformationType?: TransformationType,
     animationOptions?: Partial<AnimationOptions>
   ) {
     return this.setMapOptions(
       mapId,
-      { transformationType },
+      { transformationType: transformationType },
+      undefined,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the transformation type of maps
+   *
+   * This only sets the map-specific `transformationType` option of the map
+   * (or more specifically of the warped map used for rendering),
+   * overwriting the original transformation type inferred from the Georeference Annotation.
+   *
+   * The original transformation type can be reset by resetting the map-specific transformation type option,
+   * and stays accessible in the warped map's `map` property.
+   *
+   * @param mapIds - Map IDs for which to set the options
+   * @param transformationType - Transformation type to set
+   * @param animationOptions - Animation options
+   */
+  setMapsTransformationType(
+    mapIds: string[],
+    transformationType?: TransformationType,
+    animationOptions?: Partial<AnimationOptions>
+  ) {
+    return this.setMapsOptions(
+      mapIds,
+      { transformationType: transformationType },
       undefined,
       animationOptions
     )
@@ -798,16 +888,6 @@ export abstract class BaseWarpedMapLayer<
     )
 
     this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -830,6 +910,11 @@ export abstract class BaseWarpedMapLayer<
     this.renderer.addEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.addEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.addEventListener(
@@ -894,16 +979,6 @@ export abstract class BaseWarpedMapLayer<
     )
 
     this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONADDED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
-      WarpedMapEventType.GEOREFERENCEANNOTATIONREMOVED,
-      this.nativePassWarpedMapEvent.bind(this)
-    )
-
-    this.renderer.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -926,6 +1001,11 @@ export abstract class BaseWarpedMapLayer<
     this.renderer.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.ERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.tileCache.removeEventListener(

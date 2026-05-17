@@ -19,12 +19,12 @@
     "directory": "packages/id"
   },
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
     "test": "NODE_ENV=test vitest run",
     "types": "tsc --noEmit",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test",
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src test",
     "documentation": "remark . --output --use remark-api"
   },
   "keywords": [
@@ -52,13 +52,10 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "vitest": "^4.0.4"
   },
   "engines": {
     "node": ">=v19.0.0"
-  },
-  "dependencies": {
-    "js-sha1": "^0.7.0"
   }
 }

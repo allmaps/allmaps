@@ -9,22 +9,20 @@
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getVarsState } from '$lib/state/vars.svelte.js'
 
-  import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
+  import { ProjectedGcpTransformer } from '@allmaps/project'
   import { validateGeoreferencedMap } from '@allmaps/annotation'
   import { geometryToGeojsonGeometry } from '@allmaps/stdlib'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { GeojsonPolygon } from '@allmaps/types'
 
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const uiState = getUiState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const viewerBaseUrl = varsState.PUBLIC_VIEWER_BASE_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   const count = 40
   const polygonWidth = 80
@@ -210,8 +208,7 @@
     const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
       map,
       {
-        transformationType: 'polynomial',
-        projection: lonLatProjection
+        transformationType: 'polynomial'
       }
     )
 

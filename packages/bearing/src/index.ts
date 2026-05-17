@@ -1,58 +1,41 @@
 import {
-  lonLatProjection,
   ProjectedGcpTransformer,
   ProjectedGcpTransformerOptions
 } from '@allmaps/project'
 import {
-  bearing,
+  angle,
+  angularMean,
   computeBbox,
-  mergePartialOptions,
+  mergeOptions,
   midPoint,
   radiansToDegrees
 } from '@allmaps/stdlib'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type {
-  TransformationType,
-  TransformationTypeInputs
-} from '@allmaps/transform'
-import type { Projection } from '@allmaps/project'
+import type { TransformationTypeInputs } from '@allmaps/transform'
 import type { Point, Ring } from '@allmaps/types'
 import type { WarpedMap } from '@allmaps/render'
 
-// Using helmert transformation by default, not map transformation type,
-// since possible for any amount of points, consistent,
-// faster when many gcps and accurate when showing original image
-const DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS: {
-  transformationType: TransformationType
-  projection: Projection
-} = {
-  transformationType: 'helmert',
-  projection: lonLatProjection
+export type BearingOptions = {
+  orientation: 'horizontal' | 'vertical' | 'mean'
 }
-const DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS: {
-  transformationType: TransformationType
-  projection: Projection
-} = {
-  transformationType: 'helmert',
-  projection: lonLatProjection
+
+export const DEFAULT_BEARING_OPTIONS: BearingOptions = {
+  orientation: 'mean'
 }
 
 /**
- * Computes the bearing of a Georeferenced Map.
+ * Compute the bearing of a Georeferenced Map.
  *
  * @param georeferencedMap - Georeferenced Map
- * @returns The bearing of the map in degrees, measured from the north line
+ * @returns The bearing of the map in degrees, measured in degrees from the north line in the clockwise (negative) direction
  */
 export function computeGeoreferencedMapBearing(
   georeferencedMap: GeoreferencedMap,
-  options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
+  options?: Partial<
+    BearingOptions & ProjectedGcpTransformerOptions & TransformationTypeInputs
+  >
 ) {
-  options = mergePartialOptions(
-    DEFAULT_COMPUTE_GEOREFERENCED_MAP_BEARING_OPTIONS,
-    options
-  )
-
   if (georeferencedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
   }
@@ -64,42 +47,53 @@ export function computeGeoreferencedMapBearing(
 
   return computeBearingInternal(
     georeferencedMap.resourceMask,
-    projectedTransformer
+    projectedTransformer,
+    options
   )
 }
 
 /**
- * Computes the bearing of a Warped Map.
+ * Compute the bearing of a Warped Map.
  *
  * @param warpedMap - Warped Map
- * @returns The bearing of the map in degrees, measured from the north line
+ * @returns The bearing of the map in degrees, measured in degrees from the north line in the clockwise (negative) direction
  */
 export function computeWarpedMapBearing(
   warpedMap: WarpedMap,
-  options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
+  options?: Partial<
+    BearingOptions & ProjectedGcpTransformerOptions & TransformationTypeInputs
+  >
 ) {
-  options = mergePartialOptions(
-    DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS,
-    options
-  )
-
   if (warpedMap.gcps.length < 2) {
     throw new Error('Not enough GCPs to compute bearing')
   }
 
   const projectedTransformer = warpedMap.getProjectedTransformer(
-    options?.transformationType ??
-      DEFAULT_COMPUTE_WARPED_MAP_BEARING_OPTIONS.transformationType,
+    options?.transformationType,
     options
   )
 
-  return computeBearingInternal(warpedMap.resourceMask, projectedTransformer)
+  return computeBearingInternal(
+    warpedMap.resourceMask,
+    projectedTransformer,
+    options
+  )
 }
 
+/**
+ * Description placeholder
+ *
+ * @param resourceMask
+ * @param projectedTransformer
+ * @returns The bearing, in degrees from the north line in the clockwise (negative) direction
+ */
 function computeBearingInternal(
   resourceMask: Ring,
-  projectedTransformer: ProjectedGcpTransformer
+  projectedTransformer: ProjectedGcpTransformer,
+  partialOptions?: Partial<BearingOptions>
 ): number {
+  const options = mergeOptions(DEFAULT_BEARING_OPTIONS, partialOptions)
+
   const resourceMaskBbox = computeBbox(resourceMask)
 
   const resourceTopLeft = [resourceMaskBbox[0], resourceMaskBbox[1]] as Point
@@ -109,14 +103,35 @@ function computeBearingInternal(
     resourceMaskBbox[2],
     resourceMaskBbox[3]
   ] as Point
+
   const resourceTopCenter = midPoint(resourceTopLeft, resourceTopRight)
   const resourceBottomCenter = midPoint(resourceBottomLeft, resourceBottomRight)
   const projectedGeoTopCenter =
-    projectedTransformer.transformToGeo(resourceTopCenter)
+    projectedTransformer.transformToProjectedGeo(resourceTopCenter)
   const projectedGeoBottomCenter =
-    projectedTransformer.transformToGeo(resourceBottomCenter)
+    projectedTransformer.transformToProjectedGeo(resourceBottomCenter)
 
-  return radiansToDegrees(
-    bearing([projectedGeoBottomCenter, projectedGeoTopCenter])
-  )
+  const resourceCenterRight = midPoint(resourceTopRight, resourceBottomRight)
+  const resourceCenterLeft = midPoint(resourceTopLeft, resourceBottomLeft)
+  const projectedGeoCenterLeft =
+    projectedTransformer.transformToProjectedGeo(resourceCenterLeft)
+  const projectedGeoCenterRight =
+    projectedTransformer.transformToProjectedGeo(resourceCenterRight)
+
+  const verticalAngle = angle([projectedGeoBottomCenter, projectedGeoTopCenter])
+
+  const horizontalAngle = angle([
+    projectedGeoCenterLeft,
+    projectedGeoCenterRight
+  ])
+
+  if (options.orientation == 'horizontal') {
+    return -radiansToDegrees(horizontalAngle)
+  } else if (options.orientation == 'vertical') {
+    return -radiansToDegrees(verticalAngle - Math.PI / 2)
+  } else {
+    return -radiansToDegrees(
+      angularMean(verticalAngle - Math.PI / 2, horizontalAngle)
+    )
+  }
 }

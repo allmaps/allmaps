@@ -11,18 +11,18 @@ export function basemapStyle(
   tileJson?: string
 ): StyleSpecification {
   const layers = basemapLayers('protomaps', ALLMAPS_FLAVOR, { lang: lang })
+
   // modify the buildings layer
   layers.forEach((layer) => {
     if (layer.id === 'buildings') {
-      if (layer.paint && 'fill-outline-color' in layer.paint) {
-        layer.paint['fill-outline-color'] = 'rgba(139, 134, 123, 1)'
-      }
-
-      if (layer.paint && 'fill-opacity' in layer.paint) {
-        layer.paint['fill-opacity'] = 0.5
+      layer.paint = {
+        ...layer.paint,
+        'fill-outline-color': 'rgba(139, 134, 123, 0.6)',
+        'fill-opacity': 0.6
       }
     }
   })
+
   return {
     version: 8,
     glyphs:
@@ -44,9 +44,7 @@ export function basemapStyle(
 
 export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
   const demSource = new mlcontour.DemSource({
-    url:
-      tiles ||
-      'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+    url: tiles || 'https://tiles.mapterhorn.com/{z}/{x}/{y}.webp',
     maxzoom: 13
   })
 
@@ -59,7 +57,7 @@ export function addTerrain(map: Map, maplibregl: unknown, tiles?: string) {
       maxzoom: 13,
       encoding: 'terrarium',
       attribution:
-        "<a href='https://github.com/tilezen/joerd/tree/master'>Joerd</a>"
+        "<a href='https://mapterhorn.com/attribution/'>© Mapterhorn</a>"
     })
 
     map.addSource('contour-source', {

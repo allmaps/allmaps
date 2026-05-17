@@ -1,0 +1,107 @@
+{
+  "@context": "https://schemas.allmaps.org/map/2/context.json",
+  "type": "GeoreferencedMap",
+  "id": "https://annotations.allmaps.org/maps/95eeba91177d2a1d",
+  "created": "2025-02-22T10:26:47.893Z",
+  "modified": "2025-02-22T10:26:47.893Z",
+  "resource": {
+    "id": "https://ids.lib.harvard.edu/ids/iiif/5860250",
+    "width": 6921,
+    "height": 9105,
+    "type": "ImageService2",
+    "partOf": [
+      {
+        "id": "https://iiif.lib.harvard.edu/manifests/ids:5860250/canvas/canvas-5860250.json",
+        "type": "Canvas",
+        "label": {
+          "none": [
+            "Harvard University, Harvard Map Collection, G3804_N4_2M3A5_1939_C4"
+          ]
+        },
+        "partOf": [
+          {
+            "id": "https://iiif.lib.harvard.edu/manifests/ids:5860250",
+            "type": "Manifest",
+            "label": {
+              "none": [
+                "Harvard University, Harvard Map Collection, G3804_N4_2M3A5_1939_C4"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "gcps": [
+    {
+      "resource": [3426, 7170],
+      "geo": [-73.977544, 40.7258587]
+    },
+    {
+      "resource": [2548, 6570],
+      "geo": [-73.9934638, 40.7521864]
+    },
+    {
+      "resource": [2222, 5611],
+      "geo": [-73.9844755, 40.7798053]
+    },
+    {
+      "resource": [3170, 4775],
+      "geo": [-73.9414808, 40.7876843]
+    },
+    {
+      "resource": [2967, 8225],
+      "geo": [-74.0117023, 40.7077622]
+    }
+  ],
+  "resourceMask": [
+    [1688, 735],
+    [1879, 1890],
+    [1889, 2854],
+    [2013, 3207],
+    [2099, 5861],
+    [2176, 6847],
+    [2909, 8402],
+    [3134, 8461],
+    [3188, 8319],
+    [3340, 8006],
+    [3618, 7777],
+    [3799, 7684],
+    [3535, 6970],
+    [3398, 6985],
+    [3256, 6857],
+    [3256, 6095],
+    [3398, 6194],
+    [3480, 6103],
+    [3548, 6030],
+    [3584, 5439],
+    [3690, 5188],
+    [3628, 5157],
+    [3499, 5157],
+    [3495, 4971],
+    [3575, 4931],
+    [3677, 4953],
+    [3724, 4875],
+    [3894, 4258],
+    [4001, 4195],
+    [4240, 4141],
+    [4256, 3567],
+    [4370, 3597],
+    [4391, 3529],
+    [4593, 3458],
+    [4616, 3493],
+    [4692, 3472],
+    [4687, 3432],
+    [4730, 3421],
+    [4739, 3265],
+    [5283, 3033],
+    [5202, 2875],
+    [5001, 814]
+  ],
+  "transformation": {
+    "type": "polynomial",
+    "options": {
+      "order": 1
+    }
+  }
+}

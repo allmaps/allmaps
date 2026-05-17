@@ -231,7 +231,8 @@
         "width": 11560,
         "height": 9128,
         "uri": "https://collections.library.yale.edu/iiif/2/15828036",
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

@@ -80,12 +80,12 @@
       ? {
           renderMaskColor: pink,
           renderMaskSize: 6,
-          renderAppliableMask: true,
+          renderMask: true,
           applyMask: false
         }
       : {
           applyMask: false,
-          renderAppliableMask: false
+          renderMask: false
         }
   )
 
@@ -127,21 +127,20 @@
     ]
   }
 
-  async function updateMap(annotation: Annotation | AnnotationPage) {
+  function updateMap(annotation: Annotation | AnnotationPage) {
     if (!warpedMapLayer) {
       return
     }
 
     warpedMapLayer.clear()
 
-    await warpedMapLayer.addGeoreferenceAnnotation(annotation)
+    warpedMapLayer.addGeoreferenceAnnotation(annotation)
 
     // TODO: get transformer from warpedMapLayer's WarpedMapList
     const maps = parseAnnotation(annotation)
     const map = maps[0]
     transformer = new GcpTransformer(map.gcps, map.transformation?.type)
 
-    // @ts-expect-error incorrect MapLibre types
     warpedMapLayerBounds = warpedMapLayer.getBounds()
   }
 
@@ -155,14 +154,28 @@
       resourceMask ?? getFullImageResourceMask()
     )
 
-    // @ts-expect-error incorrect MapLibre types
     warpedMapLayerBounds = warpedMapLayer.getBounds()
     currentMapId = mapId
   }
 
   $effect(() => {
-    if (sourceState.activeImageId && currentImageId !== sourceState.activeImageId) {
+    if (
+      sourceState.activeImageId &&
+      currentImageId !== sourceState.activeImageId
+    ) {
       updateStraightAnnotation(sourceState.activeImageId, resourceMask)
+    }
+  })
+
+  $effect(() => {
+    if (
+      mapLoaded &&
+      warpedMapLayer &&
+      sourceState.activeImageId &&
+      currentImageId === sourceState.activeImageId &&
+      currentMapId !== mapId
+    ) {
+      updateResourceMask(resourceMask)
     }
   })
 

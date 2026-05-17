@@ -30,6 +30,7 @@ import {
   ImageServiceSchema,
   ResourceMaskSchema,
   PartOfSchema,
+  ProviderSchema,
   ProjectionSchema,
   PartOfItemSchema
 } from './schemas/shared.js'
@@ -38,6 +39,7 @@ export type ImageService = z.infer<typeof ImageServiceSchema>
 export type ResourceMask = z.infer<typeof ResourceMaskSchema>
 export type PartOf = z.infer<typeof PartOfSchema>
 export type PartOfItem = z.infer<typeof PartOfItemSchema>
+export type Provider = z.infer<typeof ProviderSchema>
 export type ResourceType = z.infer<typeof ResourceTypeSchema>
 export type Target = z.infer<typeof TargetSchema>
 export type Source = z.infer<typeof SourceSchema>

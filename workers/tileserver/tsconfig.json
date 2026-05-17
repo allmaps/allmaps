@@ -5,19 +5,19 @@
     "skipLibCheck": true,
     "target": "ES2022",
     "lib": ["ES2022"],
-    "rootDir": "./src",
     "outDir": "./dist",
-    "types": ["@cloudflare/workers-types"]
+    "types": ["vitest/globals", "node", "./worker-configuration.d.ts"]
   },
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/project" },
     { "path": "../../packages/render" },
+    { "path": "../../packages/render-wasm" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/types" },
+    { "path": "../../packages/env" }
   ],
-  "include": ["./src/**/*"],
-  "exclude": ["test"]
+  "include": ["./src/**/*", "./test/**/*", "./scripts/**/*"]
 }

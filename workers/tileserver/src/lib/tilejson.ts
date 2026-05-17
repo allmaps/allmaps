@@ -1,0 +1,53 @@
+import { json } from 'itty-router'
+import { WarpedMapList } from '@allmaps/render'
+
+import { createCachedFetch } from './fetch.js'
+
+import type { TransformationOptions } from './types.js'
+
+import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { WorkerEnv } from '@allmaps/env/worker'
+
+// See https://github.com/mapbox/tilejson-spec/blob/master/3.0.0/example/osm.json
+export async function generateTileJsonResponse(
+  env: WorkerEnv,
+  georeferencedMaps: GeoreferencedMap[],
+  options: TransformationOptions,
+  urlTemplate: string
+): Promise<Response> {
+  // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
+  let transformationType
+  if (options['transformation.type']) {
+    transformationType = options['transformation.type']
+  }
+
+  const cachedFetch = createCachedFetch(env)
+
+  const warpedMapList = new WarpedMapList({
+    fetchFn: cachedFetch,
+    createRTree: false,
+    transformationType
+  })
+
+  for (const georeferencedMap of georeferencedMaps) {
+    await warpedMapList.addGeoreferencedMap(georeferencedMap)
+  }
+
+  // Get bounds and center in EPSG:4326 (lon/lat) as required by TileJSON spec
+  const bounds = warpedMapList.getMapsBbox()
+  const center = warpedMapList.getMapsCenter()
+
+  if (!bounds || !center) {
+    throw new Error('Could not compute bounding box and center of maps')
+  }
+
+  return json({
+    tilejson: '3.0.0',
+    id: urlTemplate,
+    tiles: [urlTemplate],
+    fields: {},
+    bounds,
+    center
+    // TODO: add minzoom and maxzoom
+  })
+}

@@ -3,7 +3,7 @@
 
   import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl'
 
-  import { ProjectedGcpTransformer, lonLatProjection } from '@allmaps/project'
+  import { ProjectedGcpTransformer } from '@allmaps/project'
   import { computeBbox, combineBboxes } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
@@ -35,7 +35,7 @@
 
   import type { ClickedItemEvent } from '$lib/types/events.js'
   import type { Viewport } from '$lib/types/shared.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorEnv } from '@allmaps/env/editor'
 
   let geoMap = $state.raw<MapLibreMap>()
   let warpedMapLayerBounds = $state.raw<LngLatBoundsLike>()
@@ -45,21 +45,18 @@
   const scopeState = getScopeState()
   const sourceState = getSourceState()
   const urlState = getUrlState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorEnv>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   const geoViewport = $derived(getGeoViewport())
 
   let warpedMapLayer = $state.raw<WarpedMapLayer>()
 
   function computeGeoreferencedMapBbox(map: GeoreferencedMap) {
-    const transformer = ProjectedGcpTransformer.fromGeoreferencedMap(map, {
-      projection: lonLatProjection
-    })
-    const geoMask = transformer.transformToGeo([map.resourceMask])
+    const projectedTransformer =
+      ProjectedGcpTransformer.fromGeoreferencedMap(map)
+    const geoMask = projectedTransformer.transformToGeo([map.resourceMask])
 
     return computeBbox(geoMask)
   }
@@ -130,9 +127,7 @@
     if (geoMap && warpedMapLayer && event.detail.type === 'map') {
       const mapId = getFullMapId(annotationsApiBaseUrl, event.detail.mapId)
       warpedMapLayer.bringMapsToFront([mapId])
-      const bbox = warpedMapLayer?.getMapsBbox([mapId], {
-        projection: lonLatProjection
-      })
+      const bbox = warpedMapLayer?.getMapsBbox([mapId])
       if (bbox) {
         const bounds = [
           [bbox[0], bbox[1]],
@@ -180,9 +175,7 @@
 
   $effect(() => {
     if (scopeState.activeMapId && geoMap) {
-      const bbox = warpedMapLayer?.getMapsBbox([scopeState.activeMapId], {
-        projection: lonLatProjection
-      })
+      const bbox = warpedMapLayer?.getMapsBbox([scopeState.activeMapId])
       if (bbox) {
         const bounds = [
           [bbox[0], bbox[1]],

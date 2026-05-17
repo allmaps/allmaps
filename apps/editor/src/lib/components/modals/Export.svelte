@@ -19,15 +19,13 @@
     generateMapLibreExample
   } from '@allmaps/io'
 
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorEnv } from '@allmaps/env/editor'
 
   const uiState = getUiState()
   const scopeState = getScopeState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorEnv>()
 
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let geotiffScript = $derived(
     scopeState.allmapsId

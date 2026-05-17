@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -10,54 +10,48 @@
       type="text/css"
     />
     <script src="https://unpkg.com/maplibre-gl@5.0.0/dist/maplibre-gl.js"></script>
-    <link rel="stylesheet" href="examples/style.css" type="text/css" />
-    <script src="examples/controls.js"></script>
+    <style>
+      body {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        font-family: monospace;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <div id="map"></div>
-    <div id="controls"></div>
     <script type="module">
       import { WarpedMapLayer } from './src/index.ts'
 
       const map = new maplibregl.Map({
         container: 'map',
+        // @ts-expect-error MapLibre types are incompatible
         style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
         center: [-73.9337, 40.8011],
         zoom: 11.5,
+        // Pitch is currently not supported by the Allmaps plugin for MapLibre
         maxPitch: 0
       })
 
-      let mapLoaded = false
-      let nav = new maplibregl.NavigationControl()
-      map.addControl(nav, 'top-left')
-
-      const warpedMapLayer = new WarpedMapLayer()
       const annotationUrl =
         'https://annotations.allmaps.org/images/d180902cb93d5bf2'
+      const warpedMapLayer = new WarpedMapLayer()
 
-      map.on('load', async () => {
-        mapLoaded = true
+      map.on('load', () => {
+        // @ts-expect-error MapLibre types are incompatible
         map.addLayer(warpedMapLayer)
-        await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+        warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
       })
-
-      async function handleAddMapClicked() {
-        if (mapLoaded) {
-          await warpedMapLayer.addGeoreferenceAnnotationByUrl(
-            'https://annotations.allmaps.org/maps/3c72848762664ecd'
-          )
-
-          map.fitBounds(warpedMapLayer.getBounds())
-        }
-      }
-
-      if (window.initializeControls) {
-        initializeControls(
-          'examples/controls.html',
-          warpedMapLayer,
-          handleAddMapClicked
-        )
-      }
     </script>
   </body>
 </html>

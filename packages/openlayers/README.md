@@ -1,8 +1,8 @@
 # @allmaps/openlayers
 
-Allmaps plugin for OpenLayers. Plugin that uses WebGL to show warped IIIF images on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/).
+Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position.
 
-Allmaps plugin for [OpenLayers](https://openlayers.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on an OpenLayers map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+See [allmaps.org](https://allmaps.org) for more information.
 
 [![Example of the Allmaps plugin for OpenLayers](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/openlayers/example.jpg)](https://observablehq.com/@allmaps/openlayers-plugin)
 
@@ -15,7 +15,9 @@ Examples:
 
 This plugin exports the class `WarpedMapLayer`. You can add one or multiple Georeference Annotations (or AnnotationPages that contain multiple Georeference Annotations) to a WarpedMapLayer and add the WarpedMapLayer to your OpenLayers map. This will render all georeferenced maps defined by the Georeference Annotations.
 
-To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/) package.
+
+This plugin implements a lot of methods from [@allmaps/warpedmaplayer](../warpedmaplayer/), the core package gathering the functionality connecting the Allmaps plugins to the [@allmaps/render](../render/) package.
 
 ## Installation
 
@@ -33,40 +35,49 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
+The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/). A minimal example is also included in `./index.html` and can be served via `pnpm run dev`.
+
 ## Usage
 
-Built for OpenLayers 8, but should work with OpenLayers 6 and OpenLayers 7 as well.
+Built for OpenLayers 10, but should work with OpenLayers 9, 8, 7 and 6 as well.
 
-### Loading a Georeference Annotation
+### Adding a WarpedMapLayer to a MapLibre Map
 
 Creating a `WarpedMapLayer` and adding a Georeference Annotation to an OpenLayers map looks like this:
 
 ```js
+import OpenLayersMap from 'ol/Map'
+import Tile from 'ol/layer/Tile'
+import OSM from 'ol/source/OSM'
+
 import { WarpedMapLayer } from '@allmaps/openlayers'
 
-const map = new ol.Map({
+const map = new OpenLayersMap({
   target: 'map',
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM()
+    new Tile({
+      source: new OSM()
     })
-  ],
-  view: new ol.View({
-    center: ol.proj.fromLonLat([-71.00661, 42.37124]),
-    zoom: 14
-  })
+  ]
 })
 
-// Create WarpedMapLayer
+const annotationUrl = 'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
 const warpedMapLayer = new WarpedMapLayer()
 
-// Add the WarpedMapLayer to the map and load a Georeference Annotation
-const annotationUrl = 'https://annotations.allmaps.org/maps/a9458d2f895dcdfb'
 map.addLayer(warpedMapLayer)
-warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
+warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl).then(() => {
+  const bbox = warpedMapLayer.getBbox({
+    projection: { definition: 'EPSG:3857' }
+  })
+  if (bbox) {
+    map.getView().fit(bbox)
+  }
+})
 ```
 
-A Georeference Annotation can be added using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
+### Ways to load Georeference Annotations
+
+Once the layer has been added to the map, a Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
 
 ```js
 fetch(annotationUrl)
@@ -80,9 +91,47 @@ Or:
 await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-### WarpedMapLayer API: Options and Events
+It's also possible to create a WarpedMapList first and pass it to the layer on creation. This has the advantage of being able to compute properties of a WarpedMapList first, e.g. getting the bounds and passing it to the OpenLayers Map.
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins). It includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
+```js
+import OpenLayersMap from 'ol/Map'
+import Tile from 'ol/layer/Tile'
+import OSM from 'ol/source/OSM'
+
+import { WarpedMapLayer } from '@allmaps/openlayers'
+import { WarpedMapList } from '@allmaps/render'
+import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/manifests/8f9faeba73d67031'
+const annotation = await fetch(annotationUrl).then((response) =>
+    response.json()
+  )
+const warpedMapList = new WarpedMapList<WebGL2WarpedMap>()
+await warpedMapList.addGeoreferenceAnnotation(annotation)
+const bbox = warpedMapList.getMapsBbox({ projection: { definition: 'EPSG:3857' } })
+
+const map = new OpenLayersMap({
+  target: 'map',
+  layers: [
+    new Tile({
+      source: new OSM()
+    })
+  ],
+  view: new View().fit(bbox, {
+  padding: [20, 20, 20, 20]
+  })
+})
+
+const warpedMapLayer = new WarpedMapLayer({ warpedMapList })
+map.addLayer(warpedMapLayer)
+```
+
+Note that the `...ByUrl()` functions are not available on a WarpedMapList.
+
+### WarpedMapLayer API, Options and Events
+
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/) package for the API documentation of the methods coming from the WarpedMapLayer class (shared by all Allmaps plugins). It describes the methods like `addGeoreferenceAnnotation()` and includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
 You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
 
@@ -97,6 +146,50 @@ You can listen to **events** in the typical way:
 map.on('warpedmapadded', (event) => {
   console.log(event.mapIds)
 })
+```
+
+### Viewport projections
+
+Allmaps supports two types of map projections as documented in [@allmaps/project](../project/): *internal projections* and *viewport projections*. OpenLayers [supports](https://openlayers.org/en/latest/examples/scaleline-indiana-east.html) custom view projections, too. The Allmaps OpenLayers plugin can read the projection of the view of an OpenLayers map and apply it.
+
+To set a custom projection to an OpenLayers map and have Allmaps pick it up, use [the `register` function](https://openlayers.org/en/latest/apidoc/module-ol_proj_proj4.html#.register) as foreseen in OpenLayers. (This works because the plugin loads Proj4 as a peer dependency.)
+
+Optionally, also register your custom projections with the warpedMapLayer. This allows using the projection objects (including properties like `id` and `name`) through-out Allmaps. If omitted, the plugin will create new projection object containing only the definition.
+
+```js
+import proj4 from 'proj4'
+
+//... other imports
+
+// const map = ...
+// const warpedMapLayer = ...
+
+const myProjection = {
+  id: 'EPSG:28992',
+  name: 'RD new',
+  definition:
+    '+proj=sterea +lat_0=52.1561605555556 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.4171,50.3319,465.5524,1.9342,-1.6677,9.1019,4.0725 +units=m +no_defs +type=crs'
+}
+
+proj4.defs(myProjection.id, projection.definition)
+register(proj4)
+
+// Optional
+warpedMapLayer.registerProjections([myProjection])
+```
+
+Then, create a new view with that projection and set the bbox, computed using the current projection:
+
+```js
+const bbox = warpedMapLayer.getBbox({ projection: myProjection })
+if (bbox) {
+  map.setView(
+    new View({
+      projection: myProjection.id
+    })
+  )
+  map.getView().fit(bbox)
+}
 ```
 
 ## License
@@ -134,34 +227,6 @@ unknown
 
 ```ts
 object & Partial<WebGL2RenderOptions>
-```
-
-### `new WarpedMapEvent(type, data)`
-
-###### Parameters
-
-* `type` (`WarpedMapEventType`)
-* `data?` (`Partial<WarpedMapEventData> | undefined`)
-
-###### Returns
-
-`WarpedMapEvent`.
-
-###### Extends
-
-* `Event`
-
-### `WarpedMapEvent#data?`
-
-###### Type
-
-```ts
-{
-  mapIds?: Array<string> | undefined
-  tileUrl?: string | undefined
-  optionKeys?: Array<string> | undefined
-  spritesInfo?: SpritesInfo | undefined
-}
 ```
 
 ### `new WarpedMapLayer(options)`
@@ -205,7 +270,7 @@ Adds a Georeference Annotation
 
 ###### Returns
 
-Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
+Map IDs of the maps that were added, or an error per map (`Array<string | Error>`).
 
 ### `WarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl, mapOptions)`
 
@@ -235,7 +300,7 @@ Adds a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was added, or an error (`Promise<string | Error>`).
+Map ID of the map that was added (`string`).
 
 ### `WarpedMapLayer#addImageInfos(imageInfos)`
 
@@ -372,6 +437,54 @@ There are no parameters.
 
 `void`.
 
+### `WarpedMapLayer#getBbox(projectionOptions)`
+
+Get the bounding box of all maps in the layer
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The bbox of all maps, in the chosen projection, or undefined if there were no maps (`Bbox | undefined`).
+
+### `WarpedMapLayer#getCenter(projectionOptions)`
+
+Get the center of the bounding box of all maps in the layer
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps (`Point | undefined`).
+
+### `WarpedMapLayer#getConvexHull(projectionOptions)`
+
+Get the convex hull of all maps in the layer
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The convex hull of all maps, in the chosen projection, or undefined if there were no maps (`Ring | undefined`).
+
 ### `WarpedMapLayer#getDefaultOptions()`
 
 Get the default options the layer
@@ -383,8 +496,8 @@ There are no parameters.
 ###### Returns
 
 `object &
-  SpecificWarpedMapListOptions &
-  Partial<WebGL2WarpedMapOptions> &
+  SpecificBaseRenderOptions<WebGL2WarpedMap> &
+  Partial<WarpedMapListOptions<WebGL2WarpedMap>> &
   SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions`.
@@ -399,7 +512,7 @@ There are no parameters.
 
 ###### Returns
 
-`{ createRTree?: boolean | undefined; rtreeUpdatedOptions?: Array<string> | undefined; animatedOptions?: Array<string> | undefined; renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; ... 58 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+`{ warpedMapFactory?: WarpedMapFactory<WebGL2WarpedMap> | undefined; warpedMapList?: WarpedMapList<WebGL2WarpedMap> | undefined; ... 65 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapLayer#getLonLatExtent()`
 
@@ -432,7 +545,7 @@ These come from the default option settings for WebGL2WarpedMaps and the map's g
 
 ### `WarpedMapLayer#getMapIds()`
 
-Get mapIds for selected maps
+Get mapIds for all maps in the layer
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -442,7 +555,7 @@ There are no parameters.
 
 ###### Returns
 
-`Array<string>`.
+The mapIds of all maps (`Array<string>`).
 
 ### `WarpedMapLayer#getMapMapOptions(mapId)`
 
@@ -488,10 +601,9 @@ The z-index of a map (`number | undefined`).
 
 ### `WarpedMapLayer#getMapsBbox(mapIds, projectionOptions)`
 
-Get the bounding box of the maps
+Get the bounding box of all selected maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -499,7 +611,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -507,10 +619,9 @@ The bbox of all selected maps, in the chosen projection, or undefined if there w
 
 ### `WarpedMapLayer#getMapsCenter(mapIds, projectionOptions)`
 
-Get the center of the bounding box of the maps
+Get the center of the bounding box of all selected maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -518,7 +629,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -526,10 +637,9 @@ The center of the bbox of all selected maps, in the chosen projection, or undefi
 
 ### `WarpedMapLayer#getMapsConvexHull(mapIds, projectionOptions)`
 
-Get the convex hull of the maps
+Get the convex hull of all selected maps maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use {definition: 'EPSG:4326'} to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -537,7 +647,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -584,7 +694,9 @@ There are no parameters.
 
 ### `WarpedMapLayer#getWarpedMaps(mapIds)`
 
-Get the WarpedMap instances for selected maps
+Get the WarpedMap instances for all maps, or all selected maps
+
+If no argument is passed, the WarpedMap instance of all maps in the layer is passed
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -595,14 +707,14 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Returns
 
-`Iterable<WebGL2WarpedMap>`.
+The WarpedMap instance of all (selected) map (`Array<WebGL2WarpedMap>`).
 
-### `WarpedMapLayer#gl`
+### `WarpedMapLayer#gl?`
 
 ###### Type
 
 ```ts
-WebGL2RenderingContext | null | undefined
+WebGL2RenderingContext
 ```
 
 ### `WarpedMapLayer#nativePassWarpedMapEvent(event)`
@@ -633,6 +745,33 @@ There are no parameters.
 object & Partial<WebGL2RenderOptions>
 ```
 
+### `WarpedMapLayer#registerProjections(projections)`
+
+Keep a list of registered projections.
+
+Can optionally be used to complement OpenLayer's `register(proj4)` function.
+
+To use viewport projections in OpenLayers, add projections to proj4 and register proj4
+(Example: <https://openlayers.org/en/latest/examples/scaleline-indiana-east.html>).
+WarpedMapLayer reads the view's projections code, gets its definition from proj4.defs
+(thanks to the register() function) and constructs a new Projection type (defined in
+
+###### Parameters
+
+* `projections` (`Array<Projection>`)
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#registeredProjections`
+
+###### Type
+
+```ts
+Map<string, Projection>
+```
+
 ### `WarpedMapLayer#removeEventListeners()`
 
 ###### Parameters
@@ -654,7 +793,7 @@ Removes a Georeference Annotation
 
 ###### Returns
 
-Map IDs of the maps that were removed, or an error per map (`Promise<Array<string | Error>>`).
+Map IDs of the maps that were removed, or an error per map (`Array<string | Error>`).
 
 ### `WarpedMapLayer#removeGeoreferenceAnnotationByUrl(annotationUrl)`
 
@@ -680,7 +819,7 @@ Removes a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`Promise<string | Error>`).
+Map ID of the map that was removed (`string`).
 
 ### `WarpedMapLayer#removeGeoreferencedMapById(mapId)`
 
@@ -693,7 +832,7 @@ Removes a Georeferenced Map by its ID
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`Promise<string | Error | undefined>`).
+Map ID of the map that was removed (`string`).
 
 ### `WarpedMapLayer#render(frameState)`
 
@@ -787,14 +926,6 @@ Doesn't reset render options or specific warped map layer options
 
 `boolean`.
 
-### `WarpedMapLayer#resizeObserver`
-
-###### Type
-
-```ts
-ResizeObserver
-```
-
 ### `WarpedMapLayer#resized(entries)`
 
 ###### Parameters
@@ -852,6 +983,21 @@ Set the layer options
 warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
 ```
 
+### `WarpedMapLayer#setLayerTransformationType(transformationType, animationOptions)`
+
+Set the transformation type of the layer
+
+###### Parameters
+
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
 ### `WarpedMapLayer#setMapGcps(mapId, gcps, animationOptions)`
 
 Set the GCPs of a map
@@ -893,7 +1039,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
   * Layer options to set
@@ -949,15 +1095,7 @@ and stays accessible in the warped map's `map` property.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
+* `transformationType?` (`TransformationType | undefined`)
   * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
@@ -983,7 +1121,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
   * Layer options to set
@@ -1019,6 +1157,30 @@ This is equivalent to using the reset function for map-specific option.
   * Map-specific options to set by map ID
 * `layerOptions?` (`object | Partial<WebGL2RenderOptions> | undefined`)
   * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `WarpedMapLayer#setMapsTransformationType(mapIds, transformationType, animationOptions)`
+
+Set the transformation type of maps
+
+This only sets the map-specific `transformationType` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original transformation type inferred from the Georeference Annotation.
+
+The original transformation type can be reset by resetting the map-specific transformation type option,
+and stays accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs for which to set the options
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
 

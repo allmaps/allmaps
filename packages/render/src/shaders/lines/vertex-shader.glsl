@@ -2,8 +2,6 @@
 
 precision highp float;
 
-#include ../helpers.frag;
-
 uniform mat4 u_renderHomogeneousTransform;
 uniform mat4 u_viewportToClipHomogeneousTransform;
 uniform mat4 u_clipToViewportHomogeneousTransform;
@@ -30,8 +28,8 @@ out float v_viewportFeatherSize;
 out float v_viewportTotalSize;
 
 void main() {
-  vec2 clipPoint = mix(a_clipPreviousPoint, a_clipPoint, easing(u_animationProgress));
-  vec2 clipOtherPoint = mix(a_clipPreviousOtherPoint, a_clipOtherPoint, easing(u_animationProgress));
+  vec2 clipPoint = mix(a_clipPreviousPoint, a_clipPoint, u_animationProgress);
+  vec2 clipOtherPoint = mix(a_clipPreviousOtherPoint, a_clipOtherPoint, u_animationProgress);
 
   vec2 viewportPoint = (u_clipToViewportHomogeneousTransform * u_renderHomogeneousTransform * vec4(clipPoint, 0.0f, 1.0f)).xy;
   vec2 viewportOtherPoint = (u_clipToViewportHomogeneousTransform * u_renderHomogeneousTransform * vec4(clipOtherPoint, 0.0f, 1.0f)).xy;

@@ -47,8 +47,8 @@ fs.readdirSync(inputDir)
       output = JSON.parse(JSON.stringify({ ...parsedIiif }))
       errors = []
     } catch (err) {
-      if (err instanceof z.ZodError && err.errors) {
-        errors = err.errors.map((error) => error.message)
+      if (err instanceof z.ZodError) {
+        errors = err.issues.map((error) => error.message)
         zodError = err
       } else if (err instanceof Error) {
         errors = [err.message]

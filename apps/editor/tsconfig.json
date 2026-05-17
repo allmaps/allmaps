@@ -23,6 +23,7 @@
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },
     { "path": "../../packages/transform" },
+    { "path": "../../packages/env" },
     { "path": "../../packages/types" }
   ]
 }

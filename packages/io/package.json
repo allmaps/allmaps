@@ -33,12 +33,12 @@
     "io"
   ],
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc && pnpm run documentation",
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
     "types": "tsc --noEmit",
     "documentation": "remark . --output --use remark-api",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src"
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src"
   },
   "license": "MIT",
   "dependencies": {
@@ -48,6 +48,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "proj4": "catalog:",
     "stream-json": "^1.9.1"
   },
   "devDependencies": {
@@ -60,6 +61,6 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:"
   }
 }

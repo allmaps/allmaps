@@ -24,7 +24,8 @@ import { getTileZoomLevels, getTileImageRequest } from '../lib/tiles.js'
 import { getImageRequest } from '../lib/image-requests.js'
 import {
   getProfileProperties,
-  getMajorIiifVersionFromImageService
+  getMajorIiifVersionFromImageService,
+  getSupportedFormats
 } from '../lib/profile.js'
 
 import type { SizeObject, ImageRequest, TileZoomLevel } from '@allmaps/types'
@@ -33,7 +34,8 @@ import type {
   MajorVersion,
   Tileset,
   ConstructorOptions,
-  ParseOptions
+  ParseOptions,
+  ImageUrlOptions
 } from '../lib/types.js'
 
 type ImageServiceType = z.infer<typeof ImageServiceSchema>
@@ -49,6 +51,24 @@ type ImageConstructorOptions = {
   parsedCanvas?: CanvasType
 }
 
+function getImageUrlFormat(
+  supportedFormats: string[],
+  options?: ImageUrlOptions
+): string {
+  if (options?.preferredFormats) {
+    const supportedFormatSet = new Set(supportedFormats)
+    const preferredFormat = options.preferredFormats.find((format) =>
+      supportedFormatSet.has(format.toLowerCase())
+    )
+
+    if (preferredFormat) {
+      return preferredFormat.toLowerCase()
+    }
+  }
+
+  return 'jpg'
+}
+
 /**
  * Parsed IIIF Image, embedded in a Canvas
  *
@@ -57,6 +77,7 @@ type ImageConstructorOptions = {
  * @property uri - URI of Image
  * @property majorVersion - IIIF API version of Image
  * @property supportsAnyRegionAndSize - Whether the associated Image Service supports any region and size
+ * @property supportedFormats - Array of supported image formats of the associated Image Service
  * @property maxWidth - Maximum width of the associated Image Service
  * @property maxHeight - Maximum height of the associated Image Service
  * @property maxArea - Maximum area of the associated Image Service
@@ -74,6 +95,8 @@ export class EmbeddedImage {
   maxArea: number | undefined
 
   supportsAnyRegionAndSize: boolean
+  supportedFormats: string[]
+  preferredFormats?: string[]
 
   width: number
   height: number
@@ -85,6 +108,9 @@ export class EmbeddedImage {
     options?: Partial<ImageConstructorOptions>
   ) {
     const { parsedCanvas } = options || {}
+
+    let width
+    let height
 
     if (parsedCanvas && 'service' in parsedImage) {
       const parsedEmbeddedImage = parsedImage
@@ -170,8 +196,18 @@ export class EmbeddedImage {
         this.maxWidth = profileProperties.maxWidth
         this.maxHeight = profileProperties.maxHeight
         this.maxArea = profileProperties.maxArea
+        this.supportedFormats = getSupportedFormats(imageService)
       } else {
         this.supportsAnyRegionAndSize = false
+        this.supportedFormats = ['jpg']
+      }
+
+      if (imageService.width) {
+        width = imageService.width
+      }
+
+      if (imageService.height) {
+        height = imageService.height
       }
     } else {
       if ('@id' in parsedImage) {
@@ -208,34 +244,48 @@ export class EmbeddedImage {
         this.maxWidth = profileProperties.maxWidth
         this.maxHeight = profileProperties.maxHeight
         this.maxArea = profileProperties.maxArea
+        this.supportedFormats = getSupportedFormats(parsedImage)
       } else {
         this.supportsAnyRegionAndSize = false
+        this.supportedFormats = ['jpg']
+      }
+
+      if ('preferredFormats' in parsedImage) {
+        this.preferredFormats = parsedImage.preferredFormats
       }
     }
 
-    if (parsedImage.width !== undefined) {
-      this.width = parsedImage.width
-    } else if (parsedCanvas) {
-      this.width = parsedCanvas.width
-    } else {
-      throw new Error('Width not present on either Canvas or Image Resource')
+    if (!width) {
+      if (parsedCanvas) {
+        width = parsedCanvas.width
+      } else if (parsedImage.width !== undefined) {
+        width = parsedImage.width
+      } else {
+        throw new Error('Width not present on either Canvas or Image Resource')
+      }
     }
 
-    if (parsedImage.height !== undefined) {
-      this.height = parsedImage.height
-    } else if (parsedCanvas) {
-      this.height = parsedCanvas.height
-    } else {
-      throw new Error('Height not present on either Canvas or Image Resource')
+    if (!height) {
+      if (parsedCanvas) {
+        height = parsedCanvas.height
+      } else if (parsedImage.height !== undefined) {
+        height = parsedImage.height
+      } else {
+        throw new Error('Height not present on either Canvas or Image Resource')
+      }
     }
+
+    this.width = width
+    this.height = height
   }
 
   /**
    * Generates a IIIF Image API URL for the requested region and size
    * @param imageRequest - Image request object containing the desired region and size of the requested image
+   * @param options - Options for generating the requested image URL
    * @returns Image API URL that can be used to fetch the requested image
    */
-  getImageUrl(imageRequest: ImageRequest): string {
+  getImageUrl(imageRequest: ImageRequest, options?: ImageUrlOptions): string {
     const { region, size } = imageRequest
 
     let width
@@ -320,8 +370,9 @@ export class EmbeddedImage {
     }
 
     const quality = this.majorVersion === 1 ? 'native' : 'default'
+    const format = getImageUrlFormat(this.supportedFormats, options)
 
-    return `${this.uri}/${urlRegion}/${urlSize}/0/${quality}.jpg`
+    return `${this.uri}/${urlRegion}/${urlSize}/0/${quality}.${format}`
   }
 
   getImageRequest(

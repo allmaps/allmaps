@@ -24,7 +24,7 @@ export type AnalysisOptions = {
   minLog2sigma: number
   maxTwoOmega: number
   ransacThresholdFactor: number
-  ransacStopProbabilty: number
+  ransacStopProbability: number
   ransacMaxNbIterations: number
 }
 
@@ -34,13 +34,13 @@ export type AnalysisOptions = {
 export type AnalysisItem = {
   mapId?: string
   code: string
+  type: AnalysisItemType
   resourcePoint?: Point
   geoPoint?: Point
   gcpIndex?: number
   maskPointIndex?: number
   message: string
   originalMessage?: unknown
-  text?: string
 }
 
 /**
@@ -51,6 +51,8 @@ export type Analysis = {
   warnings: AnalysisItem[]
   errors: AnalysisItem[]
 }
+
+export type AnalysisItemType = 'info' | 'warning' | 'error'
 
 export type InfoCode = 'maskequalsfullmask' | 'gcpresourcepointismaskpoint'
 export type WarningCode =

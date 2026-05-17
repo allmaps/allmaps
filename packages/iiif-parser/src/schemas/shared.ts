@@ -19,23 +19,38 @@ const imageServiceTypes = [
 
 export const ImageServiceTypesSchema = z.enum(imageServiceTypes)
 
+export function oneOrMany<T extends z.ZodTypeAny>(schema: T) {
+  return z
+    .union([z.array(schema), schema])
+    .transform((value) => (Array.isArray(value) ? value : [value]))
+}
+
+export function parseIfValid<T extends z.ZodTypeAny>(schema: T) {
+  return z.unknown().transform<z.infer<T> | undefined>((value) => {
+    const result = schema.safeParse(value)
+
+    if (result.success) {
+      return result.data
+    }
+  })
+}
+
+export function filterValidItems<T extends z.ZodTypeAny>(schema: T) {
+  return z.array(z.unknown()).transform<z.infer<T>[]>((values) =>
+    values.flatMap((value) => {
+      const result = schema.safeParse(value)
+
+      return result.success ? [result.data] : []
+    })
+  )
+}
+
 // https://iiif.io/api/presentation/3.0/#navdate
 const ValidNavDateSchema = z.coerce.date()
 
-export const NavDateSchema = z
-  .union([
-    ValidNavDateSchema,
-
-    // Catchall for incorrect values
-    z.any()
-  ])
-  .transform((val) => {
-    const { success, data } = ValidNavDateSchema.safeParse(val)
-    if (success) {
-      return data
-    }
-  })
+// Invalid navDate values are intentionally treated as absent.
+export const NavDateSchema = parseIfValid(ValidNavDateSchema)
 
 // For now, Allmaps does not parse GeoJSON values
 // This is left to clients consuming this data
-export const NavPlaceSchema = z.object({}).passthrough()
+export const NavPlaceSchema = z.looseObject({})

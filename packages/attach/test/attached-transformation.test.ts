@@ -15,6 +15,8 @@ import { rcps0, rcps0Extra, rcps1, rcps2, rcps11, rcps } from './input/rcps.js'
 
 import { AttachedTransformation } from '../src/AttachedTransformation.js'
 
+import { lonLatProjection } from '@allmaps/project'
+
 // import { generateAnnotation } from '@allmaps/annotation'
 
 export const inputDir = './test/input'
@@ -466,12 +468,8 @@ describe('Compare to observable', () => {
       {
         transformationType: 'thinPlateSpline',
         differentHandedness: false,
-        internalProjection: {
-          definition: 'EPSG:4326'
-        },
-        projection: {
-          definition: 'EPSG:4326'
-        }
+        internalProjection: lonLatProjection,
+        projection: lonLatProjection
       }
     )
     const resultingGeoreferencedMaps =

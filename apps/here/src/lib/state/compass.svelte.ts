@@ -32,7 +32,7 @@ export class CompassState {
       this.#compassMode === 'image' &&
       this.selectedMapBearing !== undefined
     ) {
-      return this.#selectedMapBearing
+      return this.#selectedMapBearing ? -this.#selectedMapBearing : undefined
     } else if (this.#compassMode === 'north') {
       return 0
     } else if (

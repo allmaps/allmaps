@@ -90,7 +90,10 @@ export function getTimeAgo(map: GeoreferencedMap) {
 }
 
 export function formatNavDate(navDate?: Date): string {
-  if (!navDate) return ''
+  if (!navDate) {
+    return ''
+  }
+
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',

@@ -37,15 +37,18 @@
   let previousMapId = $derived(mapsState.getPreviousMapId(mapId))
   let nextMapId = $derived(mapsState.getNextMapId(mapId))
 
+  let previousAllmapsId = $derived(previousMapId && getAllmapsId(previousMapId))
+  let nextAllmapsId = $derived(nextMapId && getAllmapsId(nextMapId))
+
   function handleNorthArrowClick() {
     compassState.nextCompassMode()
   }
 
   function handleKeyup(event: KeyboardEvent) {
-    if (event.code === 'BracketLeft' && previousMapId) {
-      goto(createRouteUrl(page, getAllmapsId(previousMapId)))
-    } else if (event.code === 'BracketRight' && nextMapId) {
-      goto(createRouteUrl(page, getAllmapsId(nextMapId)))
+    if (event.code === 'BracketLeft' && previousAllmapsId) {
+      goto(createRouteUrl(page, previousAllmapsId))
+    } else if (event.code === 'BracketRight' && nextAllmapsId) {
+      goto(createRouteUrl(page, nextAllmapsId))
     }
   }
 
@@ -59,7 +62,7 @@
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-  {#if hasMaps && previousMapId && nextMapId}
+  {#if hasMaps && previousAllmapsId && nextAllmapsId}
     <div
       bind:clientWidth={uiState.elementSizes.bottom.left[0]}
       bind:clientHeight={uiState.elementSizes.bottom.left[1]}
@@ -76,13 +79,13 @@
         <span>Maps</span></a
       >
       <a
-        href={createRouteUrl(page, getAllmapsId(previousMapId))}
+        href={createRouteUrl(page, previousAllmapsId)}
         role="button"
         class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 focus:z-10 focus:ring-2 focus:ring-pink-500"
         ><ArrowLeftIcon size="16" weight="bold" /></a
       >
       <a
-        href={createRouteUrl(page, getAllmapsId(nextMapId))}
+        href={createRouteUrl(page, nextAllmapsId)}
         role="button"
         class="px-2 py-2 text-sm font-medium bg-white border border-gray-200 rounded-r-lg focus:z-10 focus:ring-2 focus:ring-pink-500"
         ><ArrowRightIcon size="16" weight="bold" /></a

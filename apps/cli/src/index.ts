@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 import { Command, CommanderError } from '@commander-js/extra-typings'
-import { fromZodError } from 'zod-validation-error'
+import { prettifyError, ZodError } from 'zod'
 
+import { analyze } from './commands/analyze.js'
 import { attach } from './commands/attach.js'
 import { annotation } from './commands/annotation.js'
 import { script } from './commands/script.js'
 import { fetch } from './commands/fetch.js'
+import { frame } from './commands/frame.js'
 import { open } from './commands/open.js'
 import { id } from './commands/id.js'
 import { iiif } from './commands/iiif.js'
 import { transform } from './commands/transform.js'
-
-import type { ZodError } from 'zod'
 
 const fixedWidth = process.env.NODE_ENV === 'test'
 
@@ -20,8 +20,10 @@ const program = new Command()
   .name('allmaps')
   .exitOverride()
   .addCommand(annotation())
+  .addCommand(analyze())
   .addCommand(attach())
   .addCommand(fetch())
+  .addCommand(frame())
   .addCommand(iiif())
   .addCommand(id())
   .addCommand(open())
@@ -46,9 +48,8 @@ async function parse() {
     } else if (err instanceof Error) {
       if ('code' in err && err.code === 'ENOENT' && 'path' in err) {
         console.error(`File not found "${err.path}"`)
-      } else if (err.name === 'ZodError') {
-        const validationError = fromZodError(err as ZodError)
-        console.error(validationError.message)
+      } else if (err instanceof ZodError) {
+        console.error(prettifyError(err))
       } else {
         console.error('Error:', err.message)
       }

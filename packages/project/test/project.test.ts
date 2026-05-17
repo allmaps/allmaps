@@ -6,9 +6,11 @@ import {
   expectToBeCloseToArrayArray
 } from '../../stdlib/test/helper-functions.js'
 
+import proj4 from 'proj4'
+
 import { GcpTransformer } from '@allmaps/transform'
 
-import { ProjectedGcpTransformer, proj4 } from '../src/index.js'
+import { ProjectedGcpTransformer } from '../src/index.js'
 
 import { gcps6 } from './input/gcps.js'
 import {
@@ -49,7 +51,7 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
 
   test(`should transform the lineString to webmercator and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedGeoLineString
     )
   })
@@ -89,7 +91,7 @@ describe('Projected Transform LineString Forward To LineString with default EPSG
 
   test(`should transform the lineString to webmercator and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedGeoLineString
     )
   })
@@ -131,7 +133,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:31370 i
 
   test(`should transform the lineString to webmercator, via an internal EPSG:31370 projection which results in other points`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedGeoLineString
     )
   })
@@ -173,7 +175,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:31370 i
 
   test(`should transform the lineString to EPSG:31370 projection, and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedGeoLineString
     )
   })
@@ -215,7 +217,7 @@ describe('Projected Transform LineString Forward To LineString with EPSG:31370 i
 
   test(`should transform the lineString to EPSG:31370 projection, and add some midpoints`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedGeoLineString
     )
   })
@@ -245,7 +247,38 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4326 in
     [2000, 1000]
   ]
 
-  test(`should give the same result as an unprojected transformer`, () => {
+  test(`should give the same result as an unprojected transformer when using transformToProjectedGeo`, () => {
+    expectToBeCloseToArrayArray(
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
+      transformer.transformToGeo(resourceLineString)
+    )
+  })
+})
+
+describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection', () => {
+  const transformerOptions = {
+    minOffsetRatio: 0.01,
+    maxDepth: 1,
+    internalProjection: epsg4326
+  }
+  const transformer = new GcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptions
+  )
+  const projectedTransformer = new ProjectedGcpTransformer(
+    gcps6,
+    'thinPlateSpline',
+    transformerOptions
+  )
+  const resourceLineString: LineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+
+  test(`should give the same result as an unprojected transformer when using transformToGeo`, () => {
     expectToBeCloseToArrayArray(
       projectedTransformer.transformToGeo(resourceLineString),
       transformer.transformToGeo(resourceLineString)
@@ -286,8 +319,10 @@ describe('Allow to change a projection of a transformer', () => {
 
   test(`should give the same result as a transformer that was given that projection on construction`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer4326.transformToGeo(resourceLineString),
-      projectedTransformer31370setTo4326.transformToGeo(resourceLineString)
+      projectedTransformer4326.transformToProjectedGeo(resourceLineString),
+      projectedTransformer31370setTo4326.transformToProjectedGeo(
+        resourceLineString
+      )
     )
   })
 })
@@ -323,8 +358,8 @@ describe('Allow to modify the requested projection in a transform function', () 
 
   test(`should give the same result as a transformer that was given that projection on construction`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer4326.transformToGeo(resourceLineString),
-      projectedTransformer31370.transformToGeo(resourceLineString, {
+      projectedTransformer4326.transformToProjectedGeo(resourceLineString),
+      projectedTransformer31370.transformToProjectedGeo(resourceLineString, {
         projection: epsg4326
       })
     )
@@ -372,8 +407,8 @@ describe('Support PROJJSON projections', () => {
 
   test(`should transform the lineString to EPSG:31370 projection in the same way with a proj4-string and a PROJJSON object`, () => {
     expectToBeCloseToArrayArray(
-      projectedTransformer.transformToGeo(resourceLineString),
-      projectedTransformerProjjson.transformToGeo(resourceLineString)
+      projectedTransformer.transformToProjectedGeo(resourceLineString),
+      projectedTransformerProjjson.transformToProjectedGeo(resourceLineString)
     )
   })
 })

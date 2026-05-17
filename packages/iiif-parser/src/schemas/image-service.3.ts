@@ -9,11 +9,15 @@ export const Presentation3ImageService2Schema = z.union([
   z.object({
     id: z.string().url(),
     type: z.literal('ImageService2'),
+    width: z.number().int().optional(),
+    height: z.number().int().optional(),
     profile: Image2ProfileSchema
   }),
   z.object({
     '@id': z.string().url(),
     '@type': z.literal('ImageService2'),
+    width: z.number().int().optional(),
+    height: z.number().int().optional(),
     profile: Image2ProfileSchema
   })
 ])
@@ -21,7 +25,11 @@ export const Presentation3ImageService2Schema = z.union([
 export const Presentation3ImageService3Schema = z.object({
   id: z.string().url(),
   type: ImageServiceTypesSchema,
-  profile: z.enum(complianceLevels).catch('level0')
+  width: z.number().int().optional(),
+  height: z.number().int().optional(),
+  profile: z.enum(complianceLevels).catch('level0'),
+  extraFormats: z.string().array().optional(),
+  preferredFormats: z.string().array().optional()
 })
 
 export const ImageService3Schema = z.union([

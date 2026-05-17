@@ -4,8 +4,6 @@ import { SvelteMap } from 'svelte/reactivity'
 import { fetchJson } from '@allmaps/stdlib'
 import { parseAnnotation } from '@allmaps/annotation'
 
-import { env } from '$env/dynamic/public'
-
 import { computePositionDistance } from '$lib/shared/position.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -30,6 +28,7 @@ export class MapsState {
   #sensorsState: SensorsState
   #imageInfoState: ImageInfoState
   #uiState: UiState
+  #annotationsBaseUrl: string
 
   #fetchCount = $state(0)
   #loading = $state(false)
@@ -69,11 +68,13 @@ export class MapsState {
     sensorsState: SensorsState,
     imageInfoState: ImageInfoState,
     errorState: ErrorState,
-    uiState: UiState
+    uiState: UiState,
+    annotationsBaseUrl: string
   ) {
     this.#sensorsState = sensorsState
     this.#imageInfoState = imageInfoState
     this.#uiState = uiState
+    this.#annotationsBaseUrl = annotationsBaseUrl
 
     $effect(() => {
       const newPosition = this.#sensorsState.position
@@ -121,7 +122,7 @@ export class MapsState {
       coords: { latitude, longitude }
     } = position
 
-    const url = `${env.PUBLIC_ANNOTATIONS_URL}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
+    const url = `${this.#annotationsBaseUrl}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
       latitude,
       longitude
     ].join(',')}&maxarea=${MAX_AREA}`
@@ -198,11 +199,18 @@ export function setMapsState(
   sensorsState: SensorsState,
   imageInfoState: ImageInfoState,
   errorState: ErrorState,
-  uiState: UiState
+  uiState: UiState,
+  annotationsBaseUrl: string
 ) {
   return setContext(
     MAPS_KEY,
-    new MapsState(sensorsState, imageInfoState, errorState, uiState)
+    new MapsState(
+      sensorsState,
+      imageInfoState,
+      errorState,
+      uiState,
+      annotationsBaseUrl
+    )
   )
 }
 

@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import { generateId, generateRandomId, generateChecksum } from '../src/index.js'
+import {
+  generateId as generateIdSync,
+  generateRandomId as generateRandomIdSync,
+  generateChecksum as generateChecksumSync
+} from '../src/sync.js'
 
 const DEFAULT_LENGTH = 16
 
@@ -77,5 +82,85 @@ describe('Object checksum', () => {
 
   test('Semantically equal objects produce equal checksums', () => {
     expect(checksum1).to.equal(checksum2)
+  })
+})
+
+// Sync tests
+
+describe('sync: generate ID for string "1234"', () => {
+  const syncId = generateIdSync(String(1234))
+
+  test(`ID should be ${DEFAULT_LENGTH} characters long`, () => {
+    expect(syncId.length).to.equal(DEFAULT_LENGTH)
+  })
+
+  const expectedId = '7110eda4d09e062a'
+  test(`ID should equal "${expectedId}"`, () => {
+    expect(syncId).to.equal(expectedId)
+  })
+})
+
+describe(`sync: generate ID for URL "${iiifUrl}"`, () => {
+  const expectedId = '8520a34527aba090'
+  test(`ID should equal "${expectedId}"`, () => {
+    const id = generateIdSync(iiifUrl)
+    expect(id).to.equal(expectedId)
+  })
+})
+
+describe('sync: generate random IDs', () => {
+  const id1 = generateRandomIdSync()
+  const id2 = generateRandomIdSync()
+
+  test(`IDs should be ${DEFAULT_LENGTH} characters long`, () => {
+    expect(id1.length).to.equal(DEFAULT_LENGTH)
+    expect(id2.length).to.equal(DEFAULT_LENGTH)
+  })
+
+  test('IDs should be different', () => {
+    expect(id1).to.not.equal(id2)
+  })
+})
+
+describe(`sync: ID of length ${length}`, () => {
+  const id = generateIdSync('qwertyuiopasdfghjklzxcvbnm', length)
+  test(`ID should have length ${maxLength}`, () => {
+    expect(id.length).to.equal(maxLength)
+  })
+})
+
+describe('sync: Object checksum', () => {
+  const checksum1 = generateChecksumSync(obj1)
+  const checksum2 = generateChecksumSync(obj2)
+
+  test(`Checksums should have length ${DEFAULT_LENGTH}`, () => {
+    expect(checksum1.length).to.equal(DEFAULT_LENGTH)
+    expect(checksum2.length).to.equal(DEFAULT_LENGTH)
+  })
+
+  test('Checksum should be correct', () => {
+    expect(checksum1).to.equal('9d50f0d6814d9f21')
+  })
+
+  test('Semantically equal objects produce equal checksums', () => {
+    expect(checksum1).to.equal(checksum2)
+  })
+})
+
+// Async vs sync parity tests
+
+describe('async and sync produce identical output', () => {
+  test('generateId output matches', async () => {
+    for (const input of [String(1234), iiifUrl, 'qwertyuiopasdfghjklzxcvbnm']) {
+      expect(await generateId(input)).to.equal(generateIdSync(input))
+    }
+  })
+
+  test('generateChecksum output matches for obj1', async () => {
+    expect(await generateChecksum(obj1)).to.equal(generateChecksumSync(obj1))
+  })
+
+  test('generateChecksum output matches for obj2', async () => {
+    expect(await generateChecksum(obj2)).to.equal(generateChecksumSync(obj2))
   })
 })

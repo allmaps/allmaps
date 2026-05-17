@@ -18,17 +18,15 @@
   import ExportUrl from '$lib/components/ExportUrl.svelte'
   import Cloud from '$lib/components/Cloud.svelte'
 
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const scopeState = getScopeState()
   const uiState = getUiState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const viewerBaseUrl = varsState.get('PUBLIC_ALLMAPS_VIEWER_URL')
-  const tileServerBaseUrl = varsState.get('PUBLIC_ALLMAPS_TILE_SERVER_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const viewerBaseUrl = varsState.PUBLIC_VIEWER_BASE_URL
+  const tileServerBaseUrl = varsState.PUBLIC_TILE_SERVER_BASE_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 </script>
 
 <div class="flex flex-col gap-4">
@@ -60,8 +58,8 @@
           <button
             onclick={() => (uiState.modalOpen.annotation = true)}
             class="flex cursor-pointer flex-row items-center gap-1.5 rounded-full bg-darkblue/90
-        px-3 py-1 text-sm font-medium
-      text-white shadow-none transition-all hover:bg-darkblue/100 hover:shadow-md"
+              px-3 py-1 text-sm font-medium
+            text-white shadow-none transition-all hover:bg-darkblue hover:shadow-md"
           >
             <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
               class="hidden sm:inline-block"

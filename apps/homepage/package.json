@@ -57,16 +57,16 @@
     "d3-geo": "^3.1.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "maplibre-gl": "^5.6.1",
+    "maplibre-gl": "catalog:",
     "phosphor-svelte": "^3.0.1",
-    "pmtiles": "^3.0.5",
+    "pmtiles": "catalog:",
     "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
     "protomaps-themes-base": "2.0.0-alpha.5",
     "sharp": "^0.34.2",
     "svelte": "^5.43.2",
     "tailwindcss": "^4.1.16",
-    "typescript": "^5.9.3"
+    "typescript": "catalog:"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",

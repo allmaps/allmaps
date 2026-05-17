@@ -6,7 +6,7 @@ Base class for Allmaps plugins. This class contains the main logic for the Warpe
 
 This plugin creates a new class `WarpedMapLayer` which extends or is implemented by the `Layer` classes of the webmap libraries Leaflet, OpenLayers and MapLibre. Where it extends (MapLibre), the methods defined in this package are inherited automatically. Where it is implemented (Leaflet and OpenLayers) any changes to these methods should be copy-pasted to the implementing classes (see comments in the code).
 
-To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/) package.
 
 ## Installation
 
@@ -86,9 +86,9 @@ The following options are available:
 | `distortionColor3`           | Color in the `'signDetJ'` distortion                                                                                                                                                                        | `"#fe5e60"`                                                                                              |
 | `distortionMeasures`         | Distortion measures to be computed                                                                                                                                                                          | `['log2sigma', 'twoOmega']`                                                                              |
 | `gcps`                       | Ground control points                                                                                                                                                                                       | `[]` (overwritten by the GCPs in the georeference annotation)                                            |
-| `internalProjection`         | Internal projection (see [@allmaps/project](../project/README.md))                                                                                                                                          | `WebMercatorProjection` (possibly overwritten by the internal projection in the georeference annotation) |
+| `internalProjection`         | Internal projection (see [@allmaps/project](../project/))                                                                                                                                          | `WebMercatorProjection` (possibly overwritten by the internal projection in the georeference annotation) |
 | `opacity`                    | Opacity                                                                                                                                                                                                     | `1`                                                                                                      |
-| `projection`                 | Projection (see [@allmaps/project](../project/README.md))                                                                                                                                                   | `WebMercatorProjection`                                                                                  |
+| `projection`                 | Projection (see [@allmaps/project](../project/))                                                                                                                                                   | `WebMercatorProjection`                                                                                  |
 | `removeColor`                | Remove color                                                                                                                                                                                                | `false`                                                                                                  |
 | `removeColorColor`           | Color to remove                                                                                                                                                                                             | `"#222222"`                                                                                              |
 | `removeColorHardness`        | Hardness when removing color                                                                                                                                                                                | `0.7`                                                                                                    |
@@ -176,7 +176,7 @@ Adds a Georeference Annotation
 
 ###### Returns
 
-Map IDs of the maps that were added, or an error per map (`Promise<Array<string | Error>>`).
+Map IDs of the maps that were added, or an error per map (`Array<string | Error>`).
 
 ### `BaseWarpedMapLayer#addGeoreferenceAnnotationByUrl(annotationUrl, mapOptions)`
 
@@ -206,7 +206,7 @@ Adds a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was added, or an error (`Promise<string | Error>`).
+Map ID of the map that was added (`string`).
 
 ### `BaseWarpedMapLayer#addImageInfos(imageInfos)`
 
@@ -323,6 +323,54 @@ HTMLDivElement
 SpecificWarpedMapLayerOptions
 ```
 
+### `BaseWarpedMapLayer#getBbox(projectionOptions)`
+
+Get the bounding box of all maps in the layer
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The bbox of all maps, in the chosen projection, or undefined if there were no maps (`Bbox | undefined`).
+
+### `BaseWarpedMapLayer#getCenter(projectionOptions)`
+
+Get the center of the bounding box of all maps in the layer
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps (`Point | undefined`).
+
+### `BaseWarpedMapLayer#getConvexHull(projectionOptions)`
+
+Get the convex hull of all maps in the layer
+
+The result is returned in lon-lat `EPSG:4326` by default.
+
+Note: more selection options are available on this function of WarpedMapList
+
+###### Parameters
+
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
+
+###### Returns
+
+The convex hull of all maps, in the chosen projection, or undefined if there were no maps (`Ring | undefined`).
+
 ### `BaseWarpedMapLayer#getDefaultOptions()`
 
 Get the default options the layer
@@ -334,9 +382,8 @@ There are no parameters.
 ###### Returns
 
 `SpecificWarpedMapLayerOptions &
-  object &
-  SpecificWarpedMapListOptions &
-  Partial<WebGL2WarpedMapOptions> &
+  SpecificBaseRenderOptions<WebGL2WarpedMap> &
+  Partial<WarpedMapListOptions<WebGL2WarpedMap>> &
   SpecificWebGL2WarpedMapOptions &
   SpecificTriangulatedWarpedMapOptions &
   WarpedMapOptions`.
@@ -370,7 +417,7 @@ These come from the default option settings for WebGL2WarpedMaps and the map's g
 
 ### `BaseWarpedMapLayer#getMapIds()`
 
-Get mapIds for selected maps
+Get mapIds for all maps in the layer
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -380,7 +427,7 @@ There are no parameters.
 
 ###### Returns
 
-`Array<string>`.
+The mapIds of all maps (`Array<string>`).
 
 ### `BaseWarpedMapLayer#getMapMapOptions(mapId)`
 
@@ -426,10 +473,9 @@ The z-index of a map (`number | undefined`).
 
 ### `BaseWarpedMapLayer#getMapsBbox(mapIds, projectionOptions)`
 
-Get the bounding box of the maps
+Get the bounding box of all selected maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -437,7 +483,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -445,10 +491,9 @@ The bbox of all selected maps, in the chosen projection, or undefined if there w
 
 ### `BaseWarpedMapLayer#getMapsCenter(mapIds, projectionOptions)`
 
-Get the center of the bounding box of the maps
+Get the center of the bounding box of all selected maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -456,7 +501,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -464,10 +509,9 @@ The center of the bbox of all selected maps, in the chosen projection, or undefi
 
 ### `BaseWarpedMapLayer#getMapsConvexHull(mapIds, projectionOptions)`
 
-Get the convex hull of the maps
+Get the convex hull of all selected maps maps
 
-By default the result is returned in the list's projection, which is `EPSG:3857` by default
-Use projectionOptions `{ projection: { definition: 'EPSG:4326' } }` to request the result in lon-lat `EPSG:4326`
+The result is returned in lon-lat `EPSG:4326` by default.
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -475,7 +519,7 @@ Note: more selection options are available on this function of WarpedMapList
 
 * `mapIds` (`Array<string>`)
   * Map IDs
-* `projectionOptions?` (`ProjectionOptions | undefined`)
+* `projectionOptions?` (`Partial<ProjectionOptions> | undefined`)
 
 ###### Returns
 
@@ -522,7 +566,9 @@ There are no parameters.
 
 ### `BaseWarpedMapLayer#getWarpedMaps(mapIds)`
 
-Get the WarpedMap instances for selected maps
+Get the WarpedMap instances for all maps, or all selected maps
+
+If no argument is passed, the WarpedMap instance of all maps in the layer is passed
 
 Note: more selection options are available on this function of WarpedMapList
 
@@ -533,14 +579,14 @@ Note: more selection options are available on this function of WarpedMapList
 
 ###### Returns
 
-`Iterable<WebGL2WarpedMap>`.
+The WarpedMap instance of all (selected) map (`Array<WebGL2WarpedMap>`).
 
-### `BaseWarpedMapLayer#gl`
+### `BaseWarpedMapLayer#gl?`
 
 ###### Type
 
 ```ts
-WebGL2RenderingContext | null | undefined
+WebGL2RenderingContext
 ```
 
 ### `BaseWarpedMapLayer#nativePassWarpedMapEvent(event)`
@@ -592,7 +638,7 @@ Removes a Georeference Annotation
 
 ###### Returns
 
-Map IDs of the maps that were removed, or an error per map (`Promise<Array<string | Error>>`).
+Map IDs of the maps that were removed, or an error per map (`Array<string | Error>`).
 
 ### `BaseWarpedMapLayer#removeGeoreferenceAnnotationByUrl(annotationUrl)`
 
@@ -618,7 +664,7 @@ Removes a Georeferenced Map
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`Promise<string | Error>`).
+Map ID of the map that was removed (`string`).
 
 ### `BaseWarpedMapLayer#removeGeoreferencedMapById(mapId)`
 
@@ -631,7 +677,7 @@ Removes a Georeferenced Map by its ID
 
 ###### Returns
 
-Map ID of the map that was removed, or an error (`Promise<string | Error | undefined>`).
+Map ID of the map that was removed (`string`).
 
 ### `BaseWarpedMapLayer#renderer?`
 
@@ -748,6 +794,21 @@ Set the layer options
 warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
 ```
 
+### `BaseWarpedMapLayer#setLayerTransformationType(transformationType, animationOptions)`
+
+Set the transformation type of the layer
+
+###### Parameters
+
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
 ### `BaseWarpedMapLayer#setMapGcps(mapId, gcps, animationOptions)`
 
 Set the GCPs of a map
@@ -789,7 +850,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`  | Partial<WebGL2RenderOptions>
     | Partial<SpecificWarpedMapLayerOptions>
@@ -847,15 +908,7 @@ and stays accessible in the warped map's `map` property.
 
 * `mapId` (`string`)
   * Map ID for which to set the options
-* `transformationType` (`  | 'straight'
-    | 'helmert'
-    | 'polynomial'
-    | 'polynomial1'
-    | 'polynomial2'
-    | 'polynomial3'
-    | 'thinPlateSpline'
-    | 'projective'
-    | 'linear'`)
+* `transformationType?` (`TransformationType | undefined`)
   * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
@@ -881,7 +934,7 @@ This is equivalent to using the reset function for map-specific option.
 
 * `mapIds` (`Array<string>`)
   * Map IDs for which to set the options
-* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 54 more ...; distortionMeasure?: DistortionMeasure | ...`)
+* `mapOptions` (`{ renderMaps?: boolean | undefined; renderLines?: boolean | undefined; renderPoints?: boolean | undefined; renderGcps?: boolean | undefined; renderGcpsColor?: string | undefined; renderGcpsSize?: number | undefined; renderGcpsBorderColor?: string | undefined; ... 55 more ...; distortionMeasure?: DistortionMeasure | ...`)
   * Map-specific options to set
 * `layerOptions?` (`  | Partial<WebGL2RenderOptions>
     | Partial<SpecificWarpedMapLayerOptions>
@@ -921,6 +974,30 @@ This is equivalent to using the reset function for map-specific option.
     | Partial<SpecificWarpedMapLayerOptions>
     | undefined`)
   * Layer options to set
+* `animationOptions?` (`Partial<AnimationOptions> | undefined`)
+  * Animation options
+
+###### Returns
+
+`void`.
+
+### `BaseWarpedMapLayer#setMapsTransformationType(mapIds, transformationType, animationOptions)`
+
+Set the transformation type of maps
+
+This only sets the map-specific `transformationType` option of the map
+(or more specifically of the warped map used for rendering),
+overwriting the original transformation type inferred from the Georeference Annotation.
+
+The original transformation type can be reset by resetting the map-specific transformation type option,
+and stays accessible in the warped map's `map` property.
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs for which to set the options
+* `transformationType?` (`TransformationType | undefined`)
+  * Transformation type to set
 * `animationOptions?` (`Partial<AnimationOptions> | undefined`)
   * Animation options
 

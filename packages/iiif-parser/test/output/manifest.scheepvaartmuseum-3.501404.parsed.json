@@ -9,7 +9,8 @@
         "supportsAnyRegionAndSize": false,
         "type": "image",
         "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/923902",
-        "width": 2000
+        "width": 2000,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Image (1)"]
@@ -27,7 +28,8 @@
         "supportsAnyRegionAndSize": false,
         "type": "image",
         "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/960291",
-        "width": 2000
+        "width": 2000,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Image (2)"]
@@ -45,7 +47,8 @@
         "supportsAnyRegionAndSize": false,
         "type": "image",
         "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/979681",
-        "width": 2000
+        "width": 2000,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Image (3)"]
@@ -58,6 +61,7 @@
       "height": 1004,
       "image": {
         "embedded": true,
+        "supportedFormats": ["jpg"],
         "height": 1004,
         "majorVersion": 3,
         "supportsAnyRegionAndSize": false,
@@ -81,7 +85,8 @@
         "supportsAnyRegionAndSize": false,
         "type": "image",
         "uri": "https://collectie.hetscheepvaartmuseum.nl/IIIF/980351",
-        "width": 2000
+        "width": 2000,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Image (5)"]

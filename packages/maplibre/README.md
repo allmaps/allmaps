@@ -1,6 +1,8 @@
 # @allmaps/maplibre
 
-Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position. See [allmaps.org](https://allmaps.org) for more information.
+Allmaps plugin for [MapLibre GL](https://maplibre.org/). This plugin allows displaying georeferenced [IIIF images](https://iiif.io/) on a MapLibre map. The plugin works by loading [Georeference Annotations](https://iiif.io/api/georef/extension/georef/) and uses WebGL to transform images from a IIIF image server to overlay them on their correct geographical position.
+
+See [allmaps.org](https://allmaps.org) for more information.
 
 [![Example of the Allmaps plugin for MapLibre](https://raw.githubusercontent.com/allmaps/allmaps/main/packages/maplibre/example.jpg)](https://observablehq.com/@allmaps/maplibre-plugin)
 
@@ -13,7 +15,9 @@ Examples:
 
 This plugin creates a new class `WarpedMapLayer` which extends MapLibre's [`CustomLayerInterface`](https://maplibre.org/maplibre-gl-js/docs/API/interfaces/CustomLayerInterface/). You can add one or multiple Georeference Annotations (or AnnotationPages with multiple Georeference Annotations) to a WarpedMapLayer, and add the WarpedMapLayer to your MapLibre map. This will render all georeferenced maps contained in the Georeference Annotation on your MapLibre map.
 
-To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/README.md) package.
+To understand what happens under the hood for each georeferenced map, see the [@allmaps/render](../render/) package.
+
+This plugin inherits a lot of methods from [@allmaps/warpedmaplayer](../warpedmaplayer/), the core package gathering the functionality connecting the Allmaps plugins to the [@allmaps/render](../render/) package.
 
 ## Installation
 
@@ -31,20 +35,23 @@ You can optionally build this package locally by running:
 pnpm run build
 ```
 
+The easiest way to test this package during local development is via [@allmaps/test-plugins](../../test/plugins/). A minimal example is also included in `./index.html` and can be served via `pnpm run dev`.
+
 ## Usage
 
-Built for MapLibre 4.0, but should work with earlier versions as well.
+Built for MapLibre 5.0, but should work with earlier versions as well.
 
-### Loading a Georeference Annotation
+### Adding a WarpedMapLayer to a MapLibre Map
 
 Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
 ```js
+import { Map as MapLibreMap } from 'maplibre-gl'
 import { WarpedMapLayer } from '@allmaps/maplibre'
 
-// MapLibre map with base layer
-const map = new maplibregl.Map({
+const map = new MapLibreMap({
   container: 'map',
+  // @ts-expect-error MapLibre types are incompatible
   style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
   center: [-73.9337, 40.8011],
   zoom: 11.5,
@@ -56,6 +63,7 @@ const annotationUrl = 'https://annotations.allmaps.org/images/d180902cb93d5bf2'
 const warpedMapLayer = new WarpedMapLayer()
 
 map.on('load', () => {
+  // @ts-expect-error MapLibre types are incompatible
   map.addLayer(warpedMapLayer)
   warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 })
@@ -66,15 +74,14 @@ WarpedMapLayer is implemented using MapLibre's [CustomLayerInterface](https://ma
 * `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
 * `WarpedMapLayer` currently does not support pitch, so disable it on your map.
 * Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
-* `WarpedMapLayer` does not make use of a [Source](https://maplibre.org/maplibre-style-spec/sources/) (although that could be implemented in the future, similar to [@allmaps/openlayers](../openlayers)).
-* `WarpedMapLayer` currently does not support pitch, so disable it on your map.
-* Just like other MapLibre layers, a WarpedMapLayer must have a unique `id`. By default, the `id` has the value `warped-map-layer`. When adding multiple WarpedMapLayers to your map, pass a unique `id` to their constructor:
 
 ```js
 const warpedMapLayerWithUniqueId = new WarpedMapLayer({layerId: 'my-unique-id'})
 ```
 
-A Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
+### Ways to load Georeference Annotations
+
+Once the layer has been added to the map, a Georeference Annotation can be added to a `WarpedMapLayer` using the `addGeoreferenceAnnotation` and `addGeoreferenceAnnotationByUrl` functions:
 
 ```js
 fetch(annotationUrl)
@@ -88,9 +95,47 @@ Or:
 await warpedMapLayer.addGeoreferenceAnnotationByUrl(annotationUrl)
 ```
 
-### WarpedMapLayer API: Options and Events
+It's also possible to create a WarpedMapList first and pass it to the layer on creation. This has the advantage of being able to compute properties of a WarpedMapList first, e.g. getting the bounds and passing it to the MapLibre Map.
 
-See the [@allmaps/warpedmaplayer](../warpedmaplayer/README.md) package for the API documentation of the methods inherited from the WarpedMapLayer class (shared by all Allmaps plugins). It includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
+```js
+import { Map as MapLibreMap } from 'maplibre-gl'
+
+import { WarpedMapLayer } from '@allmaps/maplibre'
+import { WarpedMapList } from '@allmaps/render'
+import { WebGL2WarpedMap } from '@allmaps/render/webgl2'
+
+const annotationUrl = 'https://annotations.allmaps.org/images/d180902cb93d5bf2'
+const annotation = await fetch(annotationUrl).then((response) =>
+    response.json()
+  )
+
+const warpedMapList = new WarpedMapList<WebGL2WarpedMap>()
+await warpedMapList.addGeoreferenceAnnotation(annotation)
+const bbox = warpedMapList.getMapsBbox()
+
+map = new MapLibreMap({
+  container: 'map',
+  // @ts-expect-error MapLibre types are incompatible
+  style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+  // Pitch is currently not supported by the Allmaps plugin for MapLibre
+  maxPitch: 0
+})
+
+map.on('load', () => {
+  const warpedMapLayer = new WarpedMapLayer({ warpedMapList })
+  // @ts-expect-error MapLibre types are incompatible
+  map.addLayer(warpedMapLayer)
+  if (bbox) {
+    map.fitBounds(bbox, { padding: 20 })
+  }
+})
+```
+
+Note that the `...ByUrl()` functions are not available on a WarpedMapList.
+
+### WarpedMapLayer API, Options and Events
+
+See the [@allmaps/warpedmaplayer](../warpedmaplayer/) package for the API documentation of the methods coming from the WarpedMapLayer class (shared by all Allmaps plugins). It describes the methods like `addGeoreferenceAnnotation()` and includes a list of all options that can be set on instances of the class and all events which are passed to the native map instance hosting the layer instance.
 
 You can set **options** on the entire layer, or on a specific map on the layer (overwriting layer options):
 
@@ -121,34 +166,6 @@ MIT
 SpecificMapLibreWarpedMapLayerOptions & Partial<WebGL2RenderOptions>
 ```
 
-### `new WarpedMapEvent(type, data)`
-
-###### Parameters
-
-* `type` (`WarpedMapEventType`)
-* `data?` (`Partial<WarpedMapEventData> | undefined`)
-
-###### Returns
-
-`WarpedMapEvent`.
-
-###### Extends
-
-* `Event`
-
-### `WarpedMapEvent#data?`
-
-###### Type
-
-```ts
-{
-  mapIds?: Array<string> | undefined
-  tileUrl?: string | undefined
-  optionKeys?: Array<string> | undefined
-  spritesInfo?: SpritesInfo | undefined
-}
-```
-
 ### `new WarpedMapLayer(options)`
 
 Creates a WarpedMapLayer instance
@@ -169,11 +186,11 @@ Creates a WarpedMapLayer instance
 
 ### `WarpedMapLayer#getBounds()`
 
-Get the bounding box of all maps  as a MapLibre LngLatBoundsLike object
+Get the bounding box of all maps as a MapLibre LngLatBoundsLike object
 
 This is the default MapLibre getBounds() function
 
-Result is in longitude/latitude `EPSG:4326` coordinates.
+The result is returned in lon-lat `EPSG:4326`.
 
 ###### Parameters
 
@@ -181,7 +198,83 @@ There are no parameters.
 
 ###### Returns
 
-bounding box of all warped maps (`LngLatBoundsLike | undefined`).
+bounding box of all maps (`LngLatBoundsLike | undefined`).
+
+### `WarpedMapLayer#getCenterZoomBearing(options)`
+
+Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all maps in the layer.
+
+This can be used as input for
+
+* Map.jumpTo() for immediate change
+* Map.easeTo() for smooth panning
+* Map.flyTo() for a flying animation which zooms out and in
+
+###### Parameters
+
+* `options?` (`  | Partial<
+        CenterZoomBearingOptions &
+          CenterZoomBearing & {
+            pitch?: number
+            roll?: number
+            elevation?: number
+          } & {
+            padding?: number | PaddingOptions
+            offset?: PointLike
+            maxZoom?: number
+          }     >
+    | undefined`)
+
+###### Returns
+
+center, zoom and bearing (`{center?: LngLatLike; zoom?: number; bearing?: number}`).
+
+### `WarpedMapLayer#getMapsBounds(mapIds)`
+
+Get the bounding box of all selected maps as a MapLibre LngLatBoundsLike object
+
+This is the default MapLibre getBounds() function
+
+The result is returned in lon-lat `EPSG:4326`.
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+  * Map IDs
+
+###### Returns
+
+bounding box of all selected maps (`LngLatBoundsLike | undefined`).
+
+### `WarpedMapLayer#getMapsCenterZoomBearing(mapIds, options)`
+
+Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all selected maps.
+
+This can be used as input for
+
+* Map.jumpTo() for immediate change
+* Map.easeTo() for smooth panning
+* Map.flyTo() for a flying animation which zooms out and back in
+
+###### Parameters
+
+* `mapIds` (`Array<string>`)
+* `options?` (`  | Partial<
+        CenterZoomBearingOptions &
+          CenterZoomBearing & {
+            pitch?: number
+            roll?: number
+            elevation?: number
+          } & {
+            padding?: number | PaddingOptions
+            offset?: PointLike
+            maxZoom?: number
+          }     >
+    | undefined`)
+
+###### Returns
+
+center, zoom and bearing (`{center?: LngLatLike; zoom?: number; bearing?: number}`).
 
 ### `WarpedMapLayer#id`
 

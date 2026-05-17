@@ -28,14 +28,14 @@
     "directory": "packages/leaflet"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev --mode localhost",
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
-    "format": "prettier --write src",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "homepage": "https://allmaps.org",
@@ -49,14 +49,14 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/warpedmaplayer": "workspace:^",
-    "leaflet": "^1.9.4"
+    "leaflet": "catalog:"
   },
   "license": "MIT",
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@types/eslint": "^8.56.0",
-    "@types/leaflet": "^1.9.3",
+    "@types/leaflet": "catalog:",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
@@ -64,8 +64,8 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0",
-    "vite": "^5.0.3",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-plugin-dts": "^3.8.3",
     "vite-plugin-no-bundle": "^4.0.0"
   }

@@ -7,7 +7,8 @@ import {
   PointGeometrySchema,
   TransformationSchema,
   ProjectionSchema,
-  ContextSchema
+  ContextSchema,
+  ProviderSchema
 } from '../shared.js'
 
 const polygonRegex =
@@ -48,7 +49,8 @@ export const Source1Schema = z.object({
   type: ImageServiceSchema,
   height: z.number().positive(),
   width: z.number().positive(),
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const Source2Schema = z.object({
@@ -56,7 +58,8 @@ export const Source2Schema = z.object({
   type: ImageServiceSchema,
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const Canvas3Schema = z.object({
@@ -64,13 +67,13 @@ export const Canvas3Schema = z.object({
   type: z.literal('Canvas'),
   height: z.number().positive().optional(),
   width: z.number().positive().optional(),
-  partOf: PartOfSchema.optional()
+  partOf: PartOfSchema.optional(),
+  provider: ProviderSchema.optional()
 })
 
 export const SourceSchema = z.union([
   Source1Schema,
-  Source2Schema,
-  Canvas3Schema
+  z.discriminatedUnion('type', [Source2Schema, Canvas3Schema])
 ])
 
 export const TargetSchema = z.object({
@@ -101,11 +104,14 @@ export const AnnotationSchema = z.object({
   id: z.string().optional(),
   type: z.literal('Annotation'),
   '@context': ContextSchema.optional(),
-  motivation: z.string().default('georeferencing').optional(),
+  motivation: z.string().optional(),
   created: z.string().datetime().optional(),
   modified: z.string().datetime().optional(),
   target: TargetSchema,
-  body: BodySchema
+  body: BodySchema,
+  // TODO: accept all keys that start with underscore and pass them?
+  // TODO: define proper schema for _allmaps
+  _allmaps: z.unknown().optional()
 })
 
 export const AnnotationPageSchema = z.object({

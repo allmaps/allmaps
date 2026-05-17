@@ -34,11 +34,11 @@
     "types"
   ],
   "scripts": {
-    "watch": "tsc --watch",
-    "build": "tsc",
-    "lint": "prettier --check src && eslint src --ext .js,.ts",
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
-    "format": "prettier --write src",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
     "documentation": "remark . --output --use remark-api"
   },
   "license": "MIT",
@@ -51,6 +51,6 @@
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "typescript": "^5.7.0"
+    "typescript": "catalog:"
   }
 }

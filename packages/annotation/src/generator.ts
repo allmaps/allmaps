@@ -23,7 +23,8 @@ import type {
   Source,
   PartOf,
   ResourceType,
-  Projection
+  Projection,
+  Provider
 } from './types.js'
 
 function generateSvgSelector(
@@ -63,7 +64,8 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
   let width: number | undefined
   let height: number | undefined
 
-  let partOf: PartOf
+  let partOf: PartOf | undefined
+  let provider: Provider | undefined
 
   if (isGeoreferencedMap2(georeferencedMap)) {
     if (georeferencedMap.resource.type === 'Canvas') {
@@ -73,7 +75,8 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
         type: georeferencedMap.resource.type,
         height: georeferencedMap.resource.height,
         width: georeferencedMap.resource.width,
-        partOf: georeferencedMap.resource.partOf
+        partOf: georeferencedMap.resource.partOf,
+        provider: georeferencedMap.resource.provider
       }
 
       return source
@@ -83,6 +86,7 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
       width = georeferencedMap.resource.width
       height = georeferencedMap.resource.height
       partOf = georeferencedMap.resource.partOf
+      provider = georeferencedMap.resource.provider
     }
   } else {
     id = georeferencedMap.image.uri
@@ -96,7 +100,8 @@ function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
     type,
     height,
     width,
-    partOf
+    partOf,
+    provider
   }
 }
 
@@ -161,6 +166,11 @@ function generateGeoreferenceAnnotation(
     features: georeferencedMap.gcps.map((gcp) => generateFeature(gcp))
   }
 
+  let _allmaps: unknown
+  if ('_allmaps' in georeferencedMap) {
+    _allmaps = georeferencedMap._allmaps
+  }
+
   return {
     id: georeferencedMap.id,
     type: 'Annotation',
@@ -168,7 +178,8 @@ function generateGeoreferenceAnnotation(
     ...generateDates(georeferencedMap),
     motivation: 'georeferencing' as const,
     target,
-    body
+    body,
+    _allmaps
   }
 }
 

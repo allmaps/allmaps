@@ -224,7 +224,8 @@
         "width": 4467,
         "height": 5609,
         "uri": "https://iiif-cloud.princeton.edu/iiif/2/f7%2Fd6%2F70%2Ff7d670bee780421db09afe918b920978%2Fintermediate_file",
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

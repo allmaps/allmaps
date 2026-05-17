@@ -73,7 +73,9 @@ export function resourceMask() {
         )
       )
 
-      const polygon = projectedTransformer.transformToGeo([map.resourceMask])
+      const polygon = projectedTransformer.transformToProjectedGeo([
+        map.resourceMask
+      ])
       const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
       features.push(

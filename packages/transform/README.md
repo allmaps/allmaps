@@ -21,10 +21,10 @@ As an **example** for the georeferenced map *L'Angleterre Novissima Descriptio A
 
 This is an ESM-only module that works in browsers and in Node.js.
 
-Install with npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/transform
+pnpm install @allmaps/transform
 ```
 
 ## Usage
@@ -819,6 +819,16 @@ There are no parameters.
 
 `[Array<number>, Array<number>]`.
 
+### `BasePolynomialTransformation#getTransformationDataAsFloat64Array()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `BasePolynomialTransformation#order`
 
 ###### Type
@@ -984,6 +994,23 @@ There are no parameters.
 ###### Returns
 
 `Partial<HelmertMeasures> | Partial<Polynomial1Measures>`.
+
+### `BaseTransformation#getTransformationDataAsFloat64Array()`
+
+Get transformation weights in a format suitable for WASM rendering.
+This provides a standardized way to extract internal transformation parameters
+for use in WebAssembly-based rendering pipelines.
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+An object containing: (`{weights: Float64Array; sourcePoints: Float64Array}`).
+
+* weights: Transformation-specific weight parameters as Float64Array
+* sourcePoints: Flattened source control points as Float64Array (for TPS only, empty otherwise)
 
 ### `BaseTransformation#pointCount`
 
@@ -1271,7 +1298,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; partOf?: ({ type: string; id: string; label?: Record<string, (string | number | boolean)[]> | undefined; } & { partOf?: ({ type: st...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
   * A Georeferenced Map
 * `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; geoIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...`)
   * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
@@ -1659,6 +1686,16 @@ Get two 1x4 coefsArrays, populating the 2Nx4 coefsArrayMatrices
 
 `[Array<number>, Array<number>]`.
 
+### `Helmert#getTransformationDataAsFloat64Array()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `Helmert#solve()`
 
 ###### Parameters
@@ -2014,6 +2051,16 @@ Get 1x3 coefsArray, populating the Nx3 coefsArrayMatrix
 
 `[number, number]`.
 
+### `Projective#getTransformationDataAsFloat64Array()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `Projective#solve()`
 
 ###### Parameters
@@ -2181,6 +2228,16 @@ The coefsArray has a 1xN kernel part and a 1x3 affine part.
 
 `Array<number>`.
 
+### `RBF#getTransformationDataAsFloat64Array()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
+
 ### `RBF#kernelFunction`
 
 ###### Type
@@ -2327,6 +2384,16 @@ SplitGcpLineInfo & {
 ###### Returns
 
 `[number, number]`.
+
+### `Straight#getTransformationDataAsFloat64Array()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{weights: Float64Array; sourcePoints: Float64Array}`.
 
 ### `Straight#solve()`
 

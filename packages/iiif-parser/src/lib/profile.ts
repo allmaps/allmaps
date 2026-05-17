@@ -56,6 +56,34 @@ function parseImage2ProfileDescription(
   }
 }
 
+function addFormats(formats: Set<string>, values?: string[]) {
+  values?.forEach((format) => formats.add(format.toLowerCase()))
+}
+
+export function getSupportedFormats(
+  parsedImage: ImageType | ImageServiceType
+): string[] {
+  const formats = new Set(['jpg'])
+
+  if ('profile' in parsedImage && Array.isArray(parsedImage.profile)) {
+    parsedImage.profile.forEach((profile) => {
+      if (typeof profile !== 'string') {
+        addFormats(formats, profile.formats)
+      }
+    })
+  }
+
+  if ('extraFormats' in parsedImage) {
+    addFormats(formats, parsedImage.extraFormats)
+  }
+
+  if ('preferredFormats' in parsedImage) {
+    addFormats(formats, parsedImage.preferredFormats)
+  }
+
+  return Array.from(formats)
+}
+
 export function getMajorIiifVersionFromImageService(
   imageService: ImageServiceType
 ): MajorVersion {

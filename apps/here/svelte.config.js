@@ -11,6 +11,9 @@ const config = {
     alias: {
       $lib: './src/lib',
       '$lib/*': './src/lib/*'
+    },
+    env: {
+      dir: '../..'
     }
   }
 }

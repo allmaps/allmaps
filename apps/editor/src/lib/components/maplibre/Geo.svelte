@@ -49,7 +49,7 @@
   } from '$lib/types/events.js'
 
   import type { Viewport, BasemapPreset } from '$lib/types/shared.js'
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorEnv } from '@allmaps/env/editor'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -107,12 +107,10 @@
   const mapsMergedState = getMapsMergedState()
   const uiState = getUiState()
   const urlState = getUrlState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorEnv>()
 
-  const apiBaseUrl = varsState.get('PUBLIC_ALLMAPS_API_URL')
-  const annotationsApiBaseUrl = varsState.get(
-    'PUBLIC_ALLMAPS_ANNOTATIONS_API_URL'
-  )
+  const apiBaseUrl = varsState.PUBLIC_REST_BASE_URL
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 
   let basemapPreset = $derived.by<BasemapPreset>(() => {
     if (urlState.params.basemapXyzUrl) {
@@ -136,14 +134,14 @@
 
   const viewport = initialViewport || defaultViewport
 
-  async function addGeoreferencedMap(map: GeoreferencedMap) {
+  function addGeoreferencedMap(map: GeoreferencedMap) {
     if (!map.id) {
       throw new Error('Map is missing ID')
     }
 
     if (warpedMapLayer) {
       try {
-        await warpedMapLayer.addGeoreferencedMap(map)
+        warpedMapLayer.addGeoreferencedMap(map)
         currentMapIds.add(map.id)
       } catch {
         // Couldn't add Georeferenced Map. This probably means that
@@ -152,14 +150,14 @@
     }
   }
 
-  async function removeGeoreferencedMap(mapId: string) {
+  function removeGeoreferencedMap(mapId: string) {
     if (warpedMapLayer && currentMapIds.has(mapId)) {
       warpedMapLayer.removeGeoreferencedMapById(mapId)
       currentMapIds.delete(mapId)
     }
   }
 
-  async function setGeoreferencedMaps(maps: GeoreferencedMap[]) {
+  function setGeoreferencedMaps(maps: GeoreferencedMap[]) {
     let currentMapIdsChanged = false
     const newMapIds = new Set<string>()
 
@@ -169,7 +167,7 @@
       }
 
       if (!currentMapIds.has(map.id)) {
-        await addGeoreferencedMap(map)
+        addGeoreferencedMap(map)
         currentMapIdsChanged = true
       }
 
@@ -178,7 +176,7 @@
 
     for (const currentMapId of currentMapIds) {
       if (!newMapIds.has(currentMapId)) {
-        await removeGeoreferencedMap(currentMapId)
+        removeGeoreferencedMap(currentMapId)
         currentMapIdsChanged = true
       }
     }
@@ -421,12 +419,14 @@
       mapIds
     ) {
       const maps = mapsMergedState.getMapsById(mapIds)
-      setGeoreferencedMaps(maps).finally(() => {
+      try {
+        setGeoreferencedMaps(maps)
+      } finally {
         if (warpedMapLayer && currentMapIds.size) {
           // @ts-expect-error incorrect MapLibre types
           warpedMapLayerBounds = warpedMapLayer.getBounds()
         }
-      })
+      }
     }
   })
 

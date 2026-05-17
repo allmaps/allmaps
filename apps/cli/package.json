@@ -29,8 +29,8 @@
     "build": "tsc && chmod +x dist/index.js",
     "test": "NODE_ENV=test vitest run",
     "types": "tsc --noEmit",
-    "lint": "prettier --check src test && eslint src test --ext .js,.ts",
-    "format": "prettier --write src test"
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src test"
   },
   "keywords": [
     "allmaps",
@@ -42,7 +42,9 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/analyze": "workspace:^",
     "@allmaps/attach": "workspace:^",
+    "@allmaps/frame": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/io": "workspace:^",
@@ -53,20 +55,19 @@
     "@commander-js/extra-typings": "^13.0.0",
     "commander": "^13.0.0",
     "open": "^10.1.2",
-    "stream-json": "^1.9.1",
-    "zod-validation-error": "^3.4.0"
+    "stream-json": "^1.9.1"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.0",
-    "@types/node": "^24",
+    "@types/node": "catalog:",
     "@types/stream-json": "^1.7.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.6.2",
-    "typescript": "^5.7.0",
+    "typescript": "catalog:",
     "vitest": "^4.0.4",
-    "zod": "^3.22.4"
+    "zod": "catalog:"
   }
 }

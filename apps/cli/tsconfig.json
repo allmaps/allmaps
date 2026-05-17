@@ -10,6 +10,8 @@
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/attach" },
+    { "path": "../../packages/analyze" },
+    { "path": "../../packages/frame" },
     { "path": "../../packages/id" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/io" },

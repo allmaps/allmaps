@@ -13,7 +13,7 @@
   import MapSettings from '$lib/components/popovers/MapSettings.svelte'
   import Geocoder from '$lib/components/popovers/Geocoder.svelte'
 
-  import type { Env } from '$lib/types/env.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   type Props = {
     zoomToExtentEnabled: boolean
@@ -25,9 +25,9 @@
     $props()
 
   const uiState = getUiState()
-  const varsState = getVarsState<Env>()
+  const varsState = getVarsState<EditorPublicEnv>()
 
-  const geocodeEarthKey = varsState.get('PUBLIC_GEOCODE_EARTH_KEY')
+  const geocodeEarthKey = varsState.PUBLIC_GEOCODE_EARTH_KEY
 
   function handleZoomToExtentClick() {
     uiState.dispatchZoomToExtent()

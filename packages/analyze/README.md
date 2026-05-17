@@ -35,10 +35,10 @@ This package can analyze ProtoGeoreferencedMaps, GeoreferencedMaps or WarpedMaps
 
 This is an ESM-only module that works in browsers and Node.js.
 
-Install using npm:
+Install with pnpm:
 
 ```sh
-npm install @allmaps/analyze
+pnpm install @allmaps/analyze
 ```
 
 ## Usage
@@ -141,6 +141,24 @@ An analyzer can analyze the following info, warnings and errors:
 | Error   | `masknotring`                             | The mask is not a valid ring (an array of points).                                                                                                                 | Yes                 |
 | Error   | `maskrepeatedpoint`                       | Mask resource coordinates are repeated.                                                                                                                            | Yes                 |
 | Error   | `maskselfintersection`                    | The mask self-intersects.                                                                                                                                          | Yes                 |
+
+Note: computing the warnings can throw an error (e.g. if there are not enough GCPs). This error is caught and added to the errors when a full analysis is performed, but not when only the warnings are computed.
+
+#### Options
+
+An analysis accepts the following options:
+
+| Option                            | Description                                                                                   | Default                                                 |
+| :-------------------------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
+`codes` | Array of codes to analyze. | (see above) |
+`maxRmseDiameterFraction` | Maximum allowed RMSE as a fraction of the map diameter' | `0.05` |
+`maxShear` | Maximum allowed shear for a polynomial transformation' | `0.1` |
+`maxLog2sigma` | Maximum allowed area scaling distortion (log2sigma)' | `1` |
+`minLog2sigma` | Minimum allowed area scaling distortion (log2sigma)' | `-1` |
+`maxTwoOmega` | Maximum allowed angular distortion (twoOmega)' | `0.5` |
+`ransacThresholdFactor` | RANSAC scaling factor applied to the RANSAC inlier distance threshold when detecting outlier GCPs' | `0.1` |
+`ransacStopProbability` | RANSAC stopping probability when detecting outlier GCPs' | `0.99` |
+`ransacMaxNbIterations` | Maximum number of RANSAC iterations when detecting outlier GCPs' | `100` |
 
 ## Measures
 

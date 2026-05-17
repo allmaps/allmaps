@@ -62,7 +62,9 @@ export class FetchableTile {
     return new FetchableTile(
       tile,
       warpedMap.mapId,
-      warpedMap.image.getImageUrl(tileImageRequest),
+      warpedMap.image.getImageUrl(tileImageRequest, {
+        preferredFormats: ['webp', 'jpg']
+      }),
       mergePartialOptions(options, { imageRequest: tileImageRequest })
     )
   }

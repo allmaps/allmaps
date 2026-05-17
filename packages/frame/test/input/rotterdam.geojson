@@ -1,0 +1,1115 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/108f667d99ea8981",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:57:02.230Z",
+        "modified": "2026-02-13T21:57:02.230Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-10",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-10",
+          "type": "ImageService2",
+          "width": 5206,
+          "height": 10534,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-10",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "69ef948808deb251",
+            "index": 0,
+            "resource": [1023, 3167],
+            "geo": [4.5503832, 51.9012726]
+          },
+          {
+            "id": "9d3e7e0dee010eee",
+            "index": 1,
+            "resource": [1533, 1257],
+            "geo": [4.5509162, 51.9091272]
+          },
+          {
+            "id": "c66152f6f206eb55",
+            "index": 2,
+            "resource": [4441, 5928],
+            "geo": [4.5739184, 51.8929206]
+          }
+        ],
+        "resourceMask": [
+          [145, 253],
+          [140, 10162],
+          [4967, 10149],
+          [4952, 234]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/108f667d99ea8981",
+          "version": "https://annotations.allmaps.org/maps/108f667d99ea8981@3e937ec314e58e66",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/ddf3053254beef6c",
+            "version": "https://annotations.allmaps.org/images/ddf3053254beef6c@228dd4c56ab8ccfa",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/ddf3053254beef6c",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.339246,
+          "area": 8725430.1
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.541509248, 51.912058508],
+            [4.554191552, 51.873207326],
+            [4.582410014, 51.876749987],
+            [4.569603025, 51.915607164],
+            [4.541509248, 51.912058508]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/2277504d5ec0dea2",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:56:55.531Z",
+        "modified": "2026-02-13T21:56:55.531Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-9",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-9",
+          "type": "ImageService2",
+          "width": 5530,
+          "height": 10534,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-9",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "3adc7c8e0292d2fa",
+            "index": 0,
+            "resource": [4012, 4951],
+            "geo": [4.5392297, 51.8926705]
+          },
+          {
+            "id": "916d243e6ebd817c",
+            "index": 1,
+            "resource": [3382, 8089],
+            "geo": [4.5392784, 51.8804263]
+          },
+          {
+            "id": "d8dff25ae5db2bb0",
+            "index": 2,
+            "resource": [2625, 2084],
+            "geo": [4.527001, 51.9023565]
+          }
+        ],
+        "resourceMask": [
+          [126, 192],
+          [129, 10083],
+          [5385, 10070],
+          [5367, 162]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/2277504d5ec0dea2",
+          "version": "https://annotations.allmaps.org/maps/2277504d5ec0dea2@c2e7e62f567c0cab",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/c862e6770c3e0f2c",
+            "version": "https://annotations.allmaps.org/images/c862e6770c3e0f2c@7390cf57a94c67f3",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/c862e6770c3e0f2c",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.321017,
+          "area": 9644809.61
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.509099124, 51.907538827],
+            [4.521599315, 51.870465441],
+            [4.554213309, 51.874528342],
+            [4.541598543, 51.911650622],
+            [4.509099124, 51.907538827]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/6de7bf724196f91c",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:56:35.702Z",
+        "modified": "2026-02-13T21:56:35.702Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-8",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-8",
+          "type": "ImageService2",
+          "width": 5506,
+          "height": 10581,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-8",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "2658c3382f114f2f",
+            "index": 3.3304251359685417,
+            "resource": [2988, 733],
+            "geo": [4.4963884, 51.9038708]
+          },
+          {
+            "id": "4ce7ea1ff81ae777",
+            "index": 4.739435932308486,
+            "resource": [3087, 473],
+            "geo": [4.4965882, 51.9047498]
+          },
+          {
+            "id": "62ce0385ef5604b0",
+            "index": 0,
+            "resource": [798, 9753],
+            "geo": [4.494536, 51.8681803]
+          },
+          {
+            "id": "8f582c41364f8084",
+            "index": 1,
+            "resource": [3469, 862],
+            "geo": [4.4994348, 51.9036572]
+          },
+          {
+            "id": "eb51409dbe92f344",
+            "index": 2,
+            "resource": [1299, 1009],
+            "geo": [4.4866225, 51.9014374]
+          }
+        ],
+        "resourceMask": [
+          [105, 198],
+          [5354, 172],
+          [5363, 10083],
+          [121, 10088]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/6de7bf724196f91c",
+          "version": "https://annotations.allmaps.org/maps/6de7bf724196f91c@db6f7cc735ada1f6",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/4b881d1def2a3177",
+            "version": "https://annotations.allmaps.org/images/4b881d1def2a3177@43e7e96a90a19a7f",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/4b881d1def2a3177",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.359787,
+          "area": 9326100.8
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.478462393, 51.903570134],
+            [4.490907942, 51.866401222],
+            [4.522248564, 51.870456368],
+            [4.509818651, 51.907706222],
+            [4.478462393, 51.903570134]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/8ce208d980a2fe21",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:55:59.846Z",
+        "modified": "2026-02-13T21:55:59.846Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-7",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-7",
+          "type": "ImageService2",
+          "width": 1547,
+          "height": 2953,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-7",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "21fe94af24fb3ac7",
+            "index": 0,
+            "resource": [793, 735],
+            "geo": [4.466123, 51.8925992]
+          },
+          {
+            "id": "696131824240a3d9",
+            "index": 1,
+            "resource": [139, 1861],
+            "geo": [4.4568342, 51.8756294]
+          },
+          {
+            "id": "c1fddb88ec4f34e2",
+            "index": 2,
+            "resource": [482, 2700],
+            "geo": [4.4678395, 51.8652809]
+          }
+        ],
+        "resourceMask": [
+          [44, 67],
+          [1508, 62],
+          [1500, 2823],
+          [34, 2818]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/8ce208d980a2fe21",
+          "version": "https://annotations.allmaps.org/maps/8ce208d980a2fe21@4db06d70ea9ffd9e",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/b9504079d11f4266",
+            "version": "https://annotations.allmaps.org/images/b9504079d11f4266@9f31c1b7c40bcf33",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/b9504079d11f4266",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 0.656823,
+          "area": 9358789.82
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.447085743, 51.899516406],
+            [4.458673348, 51.862450534],
+            [4.490346152, 51.8664443],
+            [4.47867246, 51.903635912],
+            [4.447085743, 51.899516406]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/2e9611ad8fb8a51c",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:55:27.712Z",
+        "modified": "2026-02-13T21:55:27.712Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-6",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-6",
+          "type": "ImageService2",
+          "width": 5530,
+          "height": 10833,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-6",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "797fc40f12ee8b3c",
+            "index": 0,
+            "resource": [1303, 8914],
+            "geo": [4.4327329, 51.8639787]
+          },
+          {
+            "id": "7e9bbe795059b74b",
+            "index": 1,
+            "resource": [1135, 2140],
+            "geo": [4.4238447, 51.889568]
+          },
+          {
+            "id": "8ec5ea79c56cba8b",
+            "index": 2,
+            "resource": [3036, 9759],
+            "geo": [4.4441896, 51.8620589]
+          }
+        ],
+        "resourceMask": [
+          [234, 223],
+          [228, 10067],
+          [5381, 10065],
+          [5386, 199]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/2e9611ad8fb8a51c",
+          "version": "https://annotations.allmaps.org/maps/2e9611ad8fb8a51c@7148117d9a6105fa",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/37ad34c40f9da9a8",
+            "version": "https://annotations.allmaps.org/images/37ad34c40f9da9a8@f876c5487d9e64e4",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/37ad34c40f9da9a8",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.341428,
+          "area": 9262161.03
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.41617091, 51.896172735],
+            [4.427575382, 51.858800903],
+            [4.458718936, 51.862640924],
+            [4.447282852, 51.900092292],
+            [4.41617091, 51.896172735]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/ed2a5e1f12ee4a8b",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:55:13.454Z",
+        "modified": "2026-02-13T21:55:13.454Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-5",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-5",
+          "type": "ImageService2",
+          "width": 5374,
+          "height": 10617,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-5",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "1725039c97779ce5",
+            "index": 0,
+            "resource": [3363, 7197],
+            "geo": [4.5565648, 51.9256178]
+          },
+          {
+            "id": "2cf5b06715604d90",
+            "index": 1,
+            "resource": [600, 7699],
+            "geo": [4.5403109, 51.9217815]
+          },
+          {
+            "id": "c5c4f0ce85c5eb7f",
+            "index": 2,
+            "resource": [1046, 6845],
+            "geo": [4.542055, 51.9251666]
+          },
+          {
+            "id": "e51f80640e298c16",
+            "index": 3,
+            "resource": [994, 5976],
+            "geo": [4.5406142, 51.9283947]
+          }
+        ],
+        "resourceMask": [
+          [215, 355],
+          [5030, 334],
+          [5049, 10331],
+          [229, 10355]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/ed2a5e1f12ee4a8b",
+          "version": "https://annotations.allmaps.org/maps/ed2a5e1f12ee4a8b@49488298048960ee",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/bf58a9c786ab2e84",
+            "version": "https://annotations.allmaps.org/images/bf58a9c786ab2e84@a4d2100b34a9e921",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/bf58a9c786ab2e84",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.369693,
+          "area": 8577794.63
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.529039728, 51.948431067],
+            [4.541302113, 51.911737231],
+            [4.570667214, 51.915334759],
+            [4.55837799, 51.952011011],
+            [4.529039728, 51.948431067]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/e033d98cc542d262",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:54:51.643Z",
+        "modified": "2026-02-13T21:54:51.643Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-4",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-4",
+          "type": "ImageService2",
+          "width": 5554,
+          "height": 10498,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-4",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "0878ab0c3179de7f",
+            "index": 4.677942447260889,
+            "resource": [4194, 6190],
+            "geo": [4.5290403, 51.9260412]
+          },
+          {
+            "id": "19b30fe5a5d25814",
+            "index": 0,
+            "resource": [1404, 7266],
+            "geo": [4.5135722, 51.9201209]
+          },
+          {
+            "id": "4254347727e37ec3",
+            "index": 1,
+            "resource": [1898, 7101],
+            "geo": [4.5163773, 51.9210961]
+          },
+          {
+            "id": "4c342db0db27095f",
+            "index": 2,
+            "resource": [2208, 9314],
+            "geo": [4.5206861, 51.9129754]
+          },
+          {
+            "id": "80f15e0623627b85",
+            "index": 5.360338128792117,
+            "resource": [5087, 5983],
+            "geo": [4.5343654, 51.9274159]
+          },
+          {
+            "id": "c2ccaf2df3f9e3db",
+            "index": 3,
+            "resource": [1997, 6295],
+            "geo": [4.5160193, 51.9241235]
+          },
+          {
+            "id": "d5ce65e96b289fa2",
+            "index": 6.344197331103746,
+            "resource": [243, 4378],
+            "geo": [4.5031334, 51.9301967]
+          }
+        ],
+        "resourceMask": [
+          [140, 326],
+          [5383, 294],
+          [5421, 10307],
+          [164, 10345]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/e033d98cc542d262",
+          "version": "https://annotations.allmaps.org/maps/e033d98cc542d262@f0c4cb441b611e8f",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/095f9c71917946f0",
+            "version": "https://annotations.allmaps.org/images/095f9c71917946f0@a0def1632f7aa8ab",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/095f9c71917946f0",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.359928,
+          "area": 9442023.11
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.497883991, 51.945323327],
+            [4.509578527, 51.907727923],
+            [4.541304751, 51.911402123],
+            [4.529532524, 51.948962542],
+            [4.497883991, 51.945323327]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/991e9e51bca3600b",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:54:37.975Z",
+        "modified": "2026-02-13T21:54:37.975Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-3",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-3",
+          "type": "ImageService2",
+          "width": 4121,
+          "height": 7900,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-3",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "43173a353bb3ce50",
+            "index": 5.350681420766711,
+            "resource": [1583, 4494],
+            "geo": [4.4849672, 51.9212747]
+          },
+          {
+            "id": "60bf0de9cc7c155c",
+            "index": 1.2638566643536033,
+            "resource": [3743, 7725],
+            "geo": [4.5072797, 51.9073561]
+          },
+          {
+            "id": "62860e2a8b1b235f",
+            "index": 10.016177524493699,
+            "resource": [1108, 6363],
+            "geo": [4.4842282, 51.9114728]
+          },
+          {
+            "id": "76db4ad9ed2b2c03",
+            "index": 9.275287809106157,
+            "resource": [2687, 3004],
+            "geo": [4.491359, 51.929827]
+          },
+          {
+            "id": "87dbf79578ccda92",
+            "index": 2.7195384994943166,
+            "resource": [2111, 7129],
+            "geo": [4.4941626, 51.9087536]
+          },
+          {
+            "id": "ae1d961058f25c68",
+            "index": 13.08786451667338,
+            "resource": [1594, 2896],
+            "geo": [4.4824233, 51.9292267]
+          },
+          {
+            "id": "c46e7e1ca5cb1a21",
+            "index": 14.927750706314015,
+            "resource": [3360, 3360],
+            "geo": [4.4972812, 51.9287453]
+          },
+          {
+            "id": "ccda4d009d6db280",
+            "index": 0.20980068300716614,
+            "resource": [1135, 4858],
+            "geo": [4.4820266, 51.9190322]
+          },
+          {
+            "id": "dff7f8772581683d",
+            "index": 12.084559404344287,
+            "resource": [2118, 2874],
+            "geo": [4.4869643, 51.9298773]
+          },
+          {
+            "id": "f143ddf511cd37ce",
+            "index": 15.656057097539444,
+            "resource": [3606, 3709],
+            "geo": [4.4998167, 51.9272613]
+          },
+          {
+            "id": "f6fa741053488c19",
+            "index": 8.754841037508404,
+            "resource": [2503, 5072],
+            "geo": [4.493233, 51.9193397]
+          },
+          {
+            "id": "f8c1dc9140033175",
+            "index": 11.00833022707468,
+            "resource": [2785, 1893],
+            "geo": [4.4902012, 51.9354415]
+          },
+          {
+            "id": "fa4c5e752aded087",
+            "index": 6.320662319682578,
+            "resource": [1135, 2156],
+            "geo": [4.4775367, 51.9324222]
+          },
+          {
+            "id": "fb3d66c303dd9c38",
+            "index": 7.014785293533927,
+            "resource": [2541, 349],
+            "geo": [4.4856838, 51.9428206]
+          }
+        ],
+        "resourceMask": [
+          [85, 176],
+          [4052, 178],
+          [4049, 7730],
+          [78, 7753]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/991e9e51bca3600b",
+          "version": "https://annotations.allmaps.org/maps/991e9e51bca3600b@7da268b102c439f8",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/2268db201f4b3c4a",
+            "version": "https://annotations.allmaps.org/images/2268db201f4b3c4a@dea703a35a6485d9",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/2268db201f4b3c4a",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 1.783156,
+          "area": 9442387.99
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.465996456, 51.941214207],
+            [4.478571034, 51.903535006],
+            [4.509993919, 51.907697018],
+            [4.497429323, 51.94524442],
+            [4.465996456, 51.941214207]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/a27f86193c1eb9b5",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:54:11.070Z",
+        "modified": "2026-02-13T21:54:11.070Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-2",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-2",
+          "type": "ImageService2",
+          "width": 5410,
+          "height": 10476,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-2",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "2a0f4735264976fc",
+            "index": 0.09104233871114376,
+            "resource": [4772, 9966],
+            "geo": [4.4745659, 51.9043149]
+          },
+          {
+            "id": "4bd022ee06b3d2cf",
+            "index": 2.248323562722764,
+            "resource": [5322, 533],
+            "geo": [4.4670337, 51.9400327]
+          },
+          {
+            "id": "67fd8c9cf8ac718b",
+            "index": 4.342316223821803,
+            "resource": [734, 9085],
+            "geo": [4.4491263, 51.9046547]
+          },
+          {
+            "id": "8063713d7326fbd5",
+            "index": 5.455549008593967,
+            "resource": [920, 7842],
+            "geo": [4.4488327, 51.909516]
+          },
+          {
+            "id": "9f256f6ff40fe300",
+            "index": 6.483020080294498,
+            "resource": [4862, 3463],
+            "geo": [4.4670748, 51.9287481]
+          },
+          {
+            "id": "c80c410ad6f5280d",
+            "index": 3.0287857994199747,
+            "resource": [90, 1444],
+            "geo": [4.4358105, 51.9327759]
+          },
+          {
+            "id": "e4c19d874c5ea634",
+            "index": 7.949113614994493,
+            "resource": [5005, 4149],
+            "geo": [4.4686218, 51.92646]
+          },
+          {
+            "id": "eb5f843210552569",
+            "index": 1.9120118384083435,
+            "resource": [4666, 9112],
+            "geo": [4.4729223, 51.9075223]
+          }
+        ],
+        "resourceMask": [
+          [87, 254],
+          [5335, 235],
+          [5341, 10283],
+          [72, 10293]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/a27f86193c1eb9b5",
+          "version": "https://annotations.allmaps.org/maps/a27f86193c1eb9b5@4492889d1c721524",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/fd6d7b919a70a9f3",
+            "version": "https://annotations.allmaps.org/images/fd6d7b919a70a9f3@d5ddc59db102f1c6",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/fd6d7b919a70a9f3",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.355162,
+          "area": 9521491.03
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.434522337, 51.937240785],
+            [4.446489966, 51.89966637],
+            [4.478386295, 51.903620894],
+            [4.466280683, 51.941210061],
+            [4.434522337, 51.937240785]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@context": "https://schemas.allmaps.org/map/2/context.json",
+        "id": "https://annotations.allmaps.org/maps/8b639501c40f2178",
+        "type": "GeoreferencedMap",
+        "created": "2026-02-13T21:53:50.755Z",
+        "modified": "2026-02-13T21:53:50.755Z",
+        "resource": {
+          "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-1",
+          "uri": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-1",
+          "type": "ImageService2",
+          "width": 5434,
+          "height": 10536,
+          "partOf": [
+            {
+              "type": "Canvas",
+              "id": "https://sammeltassen.nl/iiif-images/stadsarchief-rotterdam/NL-RtSA_4201_I-118-1",
+              "partOf": [
+                {
+                  "type": "Manifest",
+                  "id": "https://sammeltassen.nl/iiif-manifests/stadsarchief-rotterdam/NL-RtSA_4201_I-118.json",
+                  "label": {
+                    "en": ["Plattegrond van Rotterdam in 10 bladen (1895-1897)"]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gcps": [
+          {
+            "id": "12fd09f12b27bea9",
+            "index": 5.807983456814321,
+            "resource": [921, 1030],
+            "geo": [4.408324, 51.9315843]
+          },
+          {
+            "id": "5c161d775d0e2b4b",
+            "index": 6.907653817697845,
+            "resource": [108, 3337],
+            "geo": [4.4070164, 51.9223011]
+          },
+          {
+            "id": "9510ac6eace1fc0a",
+            "index": 7.068649436854811,
+            "resource": [4160, 999],
+            "geo": [4.4289051, 51.9334165]
+          },
+          {
+            "id": "95ba4378e61377ef",
+            "index": 3.5256021365448165,
+            "resource": [5069, 4427],
+            "geo": [4.4372047, 51.9221399]
+          },
+          {
+            "id": "c6fa6d0dba2aae5c",
+            "index": 4.207175882081752,
+            "resource": [3566, 6382],
+            "geo": [4.4317778, 51.9130049]
+          }
+        ],
+        "resourceMask": [
+          [197, 10339],
+          [194, 312],
+          [5333, 293],
+          [5356, 10330]
+        ],
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/8b639501c40f2178",
+          "version": "https://annotations.allmaps.org/maps/8b639501c40f2178@63ec8f5111f63d0b",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/1d67b915234d1f61",
+            "version": "https://annotations.allmaps.org/images/1d67b915234d1f61@b640174509a042d3",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/1d67b915234d1f61",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.373363,
+          "area": 9170300.06
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [4.416099938, 51.896270514],
+            [4.447037146, 51.899872265],
+            [4.434383487, 51.937211247],
+            [4.403578726, 51.933589108],
+            [4.416099938, 51.896270514]
+          ]
+        ]
+      }
+    }
+  ]
+}

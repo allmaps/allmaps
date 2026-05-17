@@ -1,12 +1,6 @@
 import type { TransformationType } from '@allmaps/transform'
-
-export type Env = {
-  USE_CACHE: boolean
-  API_BASE_URL: string
-  ASSETS: Fetcher
-}
-
-export type CFArgs = [Env, ExecutionContext]
+import type { OutputFormat } from '@allmaps/render/wasm'
+import type { PreviewEnv } from '@allmaps/env/preview'
 
 // TODO: align this with TransformationOptions from @allmaps/render
 export type TransformationOptions = {
@@ -14,6 +8,13 @@ export type TransformationOptions = {
 }
 
 export type QueryOptions = TransformationOptions & {
+  bounds: [number, number, number, number]
+  fit: 'contain' | 'cover' | 'best'
+  width: number
+  height: number
+  background: string
+  format: OutputFormat
+  // TODO: these options are specific to Allmaps Here, move them to a separate type
   color: Color
   from: [number, number]
 }
@@ -36,4 +37,17 @@ export type Crop = {
     height: number
   }
   coordinates: number[]
+}
+
+export type ResourceWithId = {
+  type: 'map' | 'image' | 'manifest'
+  id: string
+}
+
+type AssetsBinding = {
+  fetch: (request: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+}
+
+export type Env = PreviewEnv & {
+  ASSETS: AssetsBinding
 }

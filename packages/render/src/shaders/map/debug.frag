@@ -24,6 +24,8 @@ if(bool(u_debugTiles)) {
   float resourceDistPixelSize = length(vec2(dFdx(resourceDist), dFdy(resourceDist)));
   float resourceDistThreshold = viewportWidth * resourceDistPixelSize;
 
+  float blueStrength = 0.8 / (1.0 + log2(float(smallestScaleFactor)));
+  color = mix(color, vec4(0.0, 0.2, 1.0, color.a), blueStrength);
   if(resourceDist < resourceDistThreshold) {
     color = vec4(0.0, 0.0, 1.0, 1.0);
   }

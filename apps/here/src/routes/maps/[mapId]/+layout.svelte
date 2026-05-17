@@ -25,8 +25,6 @@
 
   import type { LayoutProps } from './$types.js'
 
-  import { env } from '$env/dynamic/public'
-
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
 
   let timeout = $state(false)
@@ -38,6 +36,7 @@
   let { data, children }: LayoutProps & Props = $props()
 
   const sensorsState = getSensorsState()
+  // svelte-ignore state_referenced_locally
   const mapState = setMapState(data.selectedMapWithImageInfo.map)
 
   setIiifState(mapState)
@@ -59,7 +58,7 @@
   let ogImageUrl = $derived(
     data.from &&
       data.mapId &&
-      `${env.PUBLIC_PREVIEW_URL}/${getAllmapsId(
+      `${data.env.PUBLIC_PREVIEW_BASE_URL}/${getAllmapsId(
         data.mapId
       )}.jpg?from=${data.from.join(',')}`
   )

@@ -86,8 +86,10 @@ import type {
  * */
 export abstract class BaseGcpTransformer {
   protected generalGcpsInternal: GeneralGcp[]
+
   private sourcePointsInternal: Point[]
   private destinationPointsInternal: Point[]
+
   readonly type: TransformationType
   protected transformerOptions: GeneralGcpTransformerOptions
 

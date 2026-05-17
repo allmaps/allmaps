@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3694,
         "height": 5106,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.012v"]
@@ -37,7 +38,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2757,
         "height": 4979,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.011v"]
@@ -55,7 +57,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3669,
         "height": 5199,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.012r"]
@@ -73,7 +76,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3053,
         "height": 5082,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.011r"]
@@ -91,7 +95,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6076,
         "height": 5221,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.010v"]
@@ -109,7 +114,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6072,
         "height": 4981,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.010r"]
@@ -127,7 +133,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8141,
         "height": 7457,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.020r"]
@@ -145,7 +152,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8272,
         "height": 7561,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.030r"]
@@ -163,7 +171,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8399,
         "height": 7532,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.040"]
@@ -181,7 +190,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9139,
         "height": 7704,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.050"]
@@ -199,7 +209,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8976,
         "height": 7496,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.060"]
@@ -217,7 +228,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9656,
         "height": 7677,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.070"]
@@ -235,7 +247,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9119,
         "height": 7443,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.080"]
@@ -253,7 +266,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9299,
         "height": 7044,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.090"]
@@ -271,7 +285,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9678,
         "height": 7619,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.100r"]
@@ -289,7 +304,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 8462,
         "height": 7625,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.100v"]
@@ -307,7 +323,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3746,
         "height": 3239,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["X.013r"]

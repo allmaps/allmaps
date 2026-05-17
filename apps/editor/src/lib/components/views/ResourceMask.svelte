@@ -215,17 +215,7 @@
     activeMapId = mapId
 
     if (resourceDraw && redraw) {
-      // TODO: passing the full getModeOptions() here causes "Unsupported geometry type
-      // for coordinate points" in terra-draw >= 1.21. When updateModeOptions is called
-      // with showCoordinatePoints: true, terra-draw iterates all features with
-      // mode === 'polygon', which includes the Point guidance features (coordinate
-      // points), and then tries to call setFeatureCoordinatePoints on them — which
-      // only supports Polygon and LineString geometries. Passing only styles avoids
-      // the showCoordinatePoints code path entirely. Remove the `.styles` unwrapping
-      // and pass getModeOptions() directly once terra-draw fixes this bug.
-      resourceDraw.updateModeOptions('polygon', {
-        styles: getModeOptions().styles
-      })
+      resourceDraw.updateModeOptions('polygon', getModeOptions())
     }
   }
 
@@ -425,8 +415,8 @@
   }
 
   function handleDrawFinish(
-    id: string | number
-    // context: { action: string; mode: string }
+    id: string | number,
+    context: { action: string; mode: string }
   ) {
     if (!transformer) {
       throw new Error('Transformer not initialized')
@@ -441,25 +431,11 @@
     if (feature) {
       isDrawing = false
 
-      // TODO: terra-draw 1.25.0 has a bug in polygon mode's onDragEnd where
-      // context.action is incorrectly set to 'draw' instead of 'edit' (the
-      // linestring mode correctly uses FinishActions.Edit). Until it is fixed,
-      // we cannot rely on context.action to distinguish edits from new draws.
-      // Instead we check whether the map already exists in state.
-      const mapId = ensureStringId(feature.id)
-      const isExistingMap = mapId && mapsState.getMapById(mapId)
-
-      if (isExistingMap) {
+      if (context.action === 'edit') {
         handleFeatureEdited(transformer, feature)
-      } else {
+      } else if (context.action === 'draw') {
         handleFeatureDrawn(transformer, feature)
       }
-
-      // if (context.action === 'edit') {
-      //   handleFeatureEdited(transformer, feature)
-      // } else if (context.action === 'draw') {
-      //   handleFeatureDrawn(transformer, feature)
-      // }
     }
   }
 

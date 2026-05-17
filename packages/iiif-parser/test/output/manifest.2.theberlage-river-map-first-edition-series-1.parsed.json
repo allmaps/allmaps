@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7280,
         "height": 5064,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [
@@ -45,7 +46,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7936,
         "height": 4992,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [
@@ -71,7 +73,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7768,
         "height": 4572,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [
@@ -97,7 +100,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7248,
         "height": 4512,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [
@@ -123,7 +127,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7480,
         "height": 4920,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["01. Schenkenschans (1830)"]
@@ -147,7 +152,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7008,
         "height": 5040,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["02. Kekerdom (1830)"]
@@ -171,7 +177,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4260,
         "height": 3088,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": [
@@ -197,7 +204,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7280,
         "height": 4980,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["03. Nijmegen (1830)"]
@@ -221,7 +229,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7328,
         "height": 5604,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["04. Herveld (1830)"]
@@ -245,7 +254,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7264,
         "height": 5052,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["05. Dodewaard (1831)"]
@@ -269,7 +279,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7344,
         "height": 5100,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["06. Leeuwen (1831)"]
@@ -293,7 +304,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5316,
         "height": 6592,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["07. Tiel (1831)"]
@@ -317,7 +329,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7320,
         "height": 5088,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["08. Varik (1831)"]
@@ -341,7 +354,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7328,
         "height": 5004,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["09. Zalt-Boemel (1832)"]
@@ -365,7 +379,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7272,
         "height": 6336,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["10. Zuilichem (1832)"]
@@ -389,7 +404,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7312,
         "height": 5856,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["11. Brakel (1832)"]
@@ -413,7 +429,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7320,
         "height": 5376,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["12. Gorinchem (1833)"]
@@ -437,7 +454,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7256,
         "height": 5088,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["13. Giesendam (1833)"]
@@ -461,7 +479,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6856,
         "height": 4980,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["14. Dordrecht (1833)"]
@@ -485,7 +504,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6680,
         "height": 4944,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["15. Puttershoek (1833)"]
@@ -509,7 +529,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 6696,
         "height": 4956,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["16. Heinenoord (1834)"]
@@ -533,7 +554,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7280,
         "height": 5040,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["17. Poortugaal (1834)"]
