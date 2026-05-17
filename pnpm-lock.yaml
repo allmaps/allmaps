@@ -911,7 +911,7 @@ importers:
         specifier: ^0.2.4
         version: 0.2.4(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
       wrangler:
-        specifier: ^4.3.0
+        specifier: 'catalog:'
         version: 4.75.0
 
   apps/homepage:

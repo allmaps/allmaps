@@ -1,13 +1,13 @@
 import { env as publicEnv } from '$env/dynamic/public'
 
-import { parseAdminPublicEnv } from '@allmaps/env/admin'
+import { parseConsolePublicEnv } from '@allmaps/env/console'
 
 import type { LayoutServerLoad } from './$types'
 
-const adminEnv = parseAdminPublicEnv(publicEnv)
+const consoleEnv = parseConsolePublicEnv(publicEnv)
 
 export const load: LayoutServerLoad = () => {
   return {
-    env: adminEnv
+    env: consoleEnv
   }
 }

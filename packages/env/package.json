@@ -13,7 +13,7 @@
     "./latest": "./dist/latest.js",
     "./here": "./dist/here.js",
     "./editor": "./dist/editor.js",
-    "./admin": "./dist/admin.js",
+    "./console": "./dist/console.js",
     "./tileserver": "./dist/tileserver.js",
     "./preview": "./dist/preview.js",
     "./worker": "./dist/worker.js",
