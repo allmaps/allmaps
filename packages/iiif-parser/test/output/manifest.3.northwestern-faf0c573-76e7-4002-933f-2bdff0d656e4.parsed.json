@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 9731,
         "height": 11333,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["P0234-gmap-G3764_B6G4_1922.tif"]

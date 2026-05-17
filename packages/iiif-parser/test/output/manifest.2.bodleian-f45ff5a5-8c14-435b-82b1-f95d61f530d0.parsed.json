@@ -17,7 +17,8 @@
         "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/c042e80d-9542-45b6-afd5-4a8dfdfe8037",
         "majorVersion": 2,
         "width": 4478,
-        "height": 6482
+        "height": 6482,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -35,7 +36,8 @@
         "uri": "https://iiif.bodleian.ox.ac.uk/iiif/image/ba18d903-4645-43fa-bc4c-8c396d24a86c",
         "majorVersion": 2,
         "width": 4535,
-        "height": 6443
+        "height": 6443,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

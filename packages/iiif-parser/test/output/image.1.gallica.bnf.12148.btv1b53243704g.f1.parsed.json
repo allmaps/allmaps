@@ -43,5 +43,6 @@
       "scaleFactor": 8,
       "width": 768
     }
-  ]
+  ],
+  "supportedFormats": ["jpg"]
 }

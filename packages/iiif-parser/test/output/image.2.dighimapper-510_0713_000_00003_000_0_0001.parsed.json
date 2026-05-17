@@ -85,5 +85,6 @@
   ],
   "type": "image",
   "uri": "https://images.dighimapper.eu/iiif/2/510_0713_000_00496_000_0_0001.tif",
-  "width": 4864
+  "width": 4864,
+  "supportedFormats": ["jpg", "tif", "gif", "png"]
 }

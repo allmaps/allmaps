@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 10802,
         "height": 8318,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["Map of the County of Cornwall"]

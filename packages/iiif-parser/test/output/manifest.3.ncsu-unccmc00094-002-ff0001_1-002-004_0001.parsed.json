@@ -29,7 +29,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7096,
         "height": 3599,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["1"]

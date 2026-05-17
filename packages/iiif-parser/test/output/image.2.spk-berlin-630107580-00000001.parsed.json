@@ -28,5 +28,11 @@
       "rows": 2
     }
   ],
-  "sizes": [{ "width": 11458, "height": 17014 }]
+  "sizes": [
+    {
+      "width": 11458,
+      "height": 17014
+    }
+  ],
+  "supportedFormats": ["jpg", "tif", "png"]
 }

@@ -21,7 +21,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3228,
         "height": 2520,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["1"]
@@ -39,7 +40,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3406,
         "height": 2705,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["2"]
@@ -57,7 +59,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2555,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["3"]
@@ -75,7 +78,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["4"]
@@ -93,7 +97,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["5"]
@@ -111,7 +116,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["6"]
@@ -129,7 +135,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2638,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["7"]
@@ -147,7 +154,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["8"]
@@ -165,7 +173,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["9"]
@@ -183,7 +192,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["10"]
@@ -201,7 +211,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["11"]
@@ -219,7 +230,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["12"]
@@ -237,7 +249,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2625,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["13"]
@@ -255,7 +268,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["14"]
@@ -273,7 +287,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3458,
         "height": 2732,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["15"]
@@ -291,7 +306,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2644,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["16"]
@@ -309,7 +325,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2637,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["17"]
@@ -327,7 +344,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["18"]
@@ -345,7 +363,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2639,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["19"]
@@ -363,7 +382,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2568,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["20"]
@@ -381,7 +401,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2568,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["21"]
@@ -399,7 +420,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["22"]
@@ -417,7 +439,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2637,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["23"]
@@ -435,7 +458,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["24"]
@@ -453,7 +477,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["25"]
@@ -471,7 +496,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["26"]
@@ -489,7 +515,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["27"]
@@ -507,7 +534,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["28"]
@@ -525,7 +553,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["29"]
@@ -543,7 +572,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["30"]
@@ -561,7 +591,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["31"]
@@ -579,7 +610,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["32"]
@@ -597,7 +629,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2643,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["33"]
@@ -615,7 +648,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["34"]
@@ -633,7 +667,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["35"]
@@ -651,7 +686,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["36"]
@@ -669,7 +705,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["37"]
@@ -687,7 +724,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["38"]
@@ -705,7 +743,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["39"]
@@ -723,7 +762,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["40"]
@@ -741,7 +781,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["41"]
@@ -759,7 +800,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["42"]
@@ -777,7 +819,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["43"]
@@ -795,7 +838,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["44"]
@@ -813,7 +857,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2640,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["45"]
@@ -831,7 +876,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["46"]
@@ -849,7 +895,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2635,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["47"]
@@ -867,7 +914,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["48"]
@@ -885,7 +933,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["49"]
@@ -903,7 +952,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["50"]
@@ -921,7 +971,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2644,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["51"]
@@ -939,7 +990,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2643,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["52"]
@@ -957,7 +1009,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2618,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["53"]
@@ -975,7 +1028,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["54"]
@@ -993,7 +1047,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["55"]
@@ -1011,7 +1066,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["56"]
@@ -1029,7 +1085,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["57"]
@@ -1047,7 +1104,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["58"]
@@ -1065,7 +1123,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["59"]
@@ -1083,7 +1142,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["60"]
@@ -1101,7 +1161,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["61"]
@@ -1119,7 +1180,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["62"]
@@ -1137,7 +1199,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2638,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["63"]
@@ -1155,7 +1218,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["64"]
@@ -1173,7 +1237,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["65"]
@@ -1191,7 +1256,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["66"]
@@ -1209,7 +1275,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["67"]
@@ -1227,7 +1294,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["68"]
@@ -1245,7 +1313,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["69"]
@@ -1263,7 +1332,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["70"]
@@ -1281,7 +1351,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["71"]
@@ -1299,7 +1370,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["72"]
@@ -1317,7 +1389,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["73"]
@@ -1335,7 +1408,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["74"]
@@ -1353,7 +1427,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["75"]
@@ -1371,7 +1446,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["76"]
@@ -1389,7 +1465,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["77"]
@@ -1407,7 +1484,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["78"]
@@ -1425,7 +1503,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["79"]
@@ -1443,7 +1522,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["80"]
@@ -1461,7 +1541,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["81"]
@@ -1479,7 +1560,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["82"]
@@ -1497,7 +1579,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2623,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["83"]
@@ -1515,7 +1598,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["84"]
@@ -1533,7 +1617,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["85"]
@@ -1551,7 +1636,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["86"]
@@ -1569,7 +1655,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2644,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["87"]
@@ -1587,7 +1674,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["88"]
@@ -1605,7 +1693,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["89"]
@@ -1623,7 +1712,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["90"]
@@ -1641,7 +1731,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2643,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["91"]
@@ -1659,7 +1750,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["92"]
@@ -1677,7 +1769,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["93"]
@@ -1695,7 +1788,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["94"]
@@ -1713,7 +1807,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["95"]
@@ -1731,7 +1826,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["96"]
@@ -1749,7 +1845,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2640,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["97"]
@@ -1767,7 +1864,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["98"]
@@ -1785,7 +1883,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["99"]
@@ -1803,7 +1902,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["100"]
@@ -1821,7 +1921,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["101"]
@@ -1839,7 +1940,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["102"]
@@ -1857,7 +1959,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["103"]
@@ -1875,7 +1978,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2638,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["104"]
@@ -1893,7 +1997,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2644,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["105"]
@@ -1911,7 +2016,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2645,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["106"]
@@ -1929,7 +2035,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["107"]
@@ -1947,7 +2054,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["108"]
@@ -1965,7 +2073,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["109"]
@@ -1983,7 +2092,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["110"]
@@ -2001,7 +2111,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2644,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["111"]
@@ -2019,7 +2130,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["112"]
@@ -2037,7 +2149,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["113"]
@@ -2055,7 +2168,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3381,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["114"]
@@ -2073,7 +2187,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["115"]
@@ -2091,7 +2206,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["116"]
@@ -2109,7 +2225,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["117"]
@@ -2127,7 +2244,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["118"]
@@ -2145,7 +2263,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2637,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["119"]
@@ -2163,7 +2282,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["120"]
@@ -2181,7 +2301,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["121"]
@@ -2199,7 +2320,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["122"]
@@ -2217,7 +2339,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2691,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["123"]
@@ -2235,7 +2358,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["124"]
@@ -2253,7 +2377,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2633,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["125"]
@@ -2271,7 +2396,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["126"]
@@ -2289,7 +2415,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2634,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["127"]
@@ -2307,7 +2434,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3325,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["128"]
@@ -2325,7 +2453,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2626,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["129"]
@@ -2343,7 +2472,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["130"]
@@ -2361,7 +2491,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["131"]
@@ -2379,7 +2510,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3261,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["132"]
@@ -2397,7 +2529,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2641,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["133"]
@@ -2415,7 +2548,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["134"]
@@ -2433,7 +2567,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2618,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["135"]
@@ -2451,7 +2586,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["136"]
@@ -2469,7 +2605,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["137"]
@@ -2487,7 +2624,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["138"]
@@ -2505,7 +2643,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["139"]
@@ -2523,7 +2662,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["140"]
@@ -2541,7 +2681,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5130,
         "height": 1565,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["141"]
@@ -2559,7 +2700,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2942,
         "height": 2704,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["142"]
@@ -2577,7 +2719,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5277,
         "height": 1730,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["143"]
@@ -2595,7 +2738,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2956,
         "height": 2694,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["144"]
@@ -2613,7 +2757,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5195,
         "height": 1573,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["145"]
@@ -2631,7 +2776,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["146"]
@@ -2649,7 +2795,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5342,
         "height": 1472,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["147"]
@@ -2667,7 +2814,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2694,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["148"]
@@ -2685,7 +2833,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5545,
         "height": 2081,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["149"]
@@ -2703,7 +2852,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2692,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["150"]
@@ -2721,7 +2871,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5408,
         "height": 2081,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["151"]
@@ -2739,7 +2890,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["152"]
@@ -2757,7 +2909,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["153"]
@@ -2775,7 +2928,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2691,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["154"]
@@ -2793,7 +2947,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2642,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["155"]
@@ -2811,7 +2966,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["156"]
@@ -2829,7 +2985,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5057,
         "height": 1546,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["157"]
@@ -2847,7 +3004,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["158"]
@@ -2865,7 +3023,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5268,
         "height": 1610,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["159"]
@@ -2883,7 +3042,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["160"]
@@ -2901,7 +3061,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5167,
         "height": 1998,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["161"]
@@ -2919,7 +3080,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["162"]
@@ -2937,7 +3099,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5323,
         "height": 1841,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["163"]
@@ -2955,7 +3118,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["164"]
@@ -2973,7 +3137,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5323,
         "height": 1823,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["165"]
@@ -2991,7 +3156,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2703,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["166"]
@@ -3009,7 +3175,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5268,
         "height": 2191,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["167"]
@@ -3027,7 +3194,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["168"]
@@ -3045,7 +3213,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5259,
         "height": 1481,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["169"]
@@ -3063,7 +3232,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["170"]
@@ -3081,7 +3251,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5167,
         "height": 2155,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["171"]
@@ -3099,7 +3270,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["172"]
@@ -3117,7 +3289,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5185,
         "height": 2182,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["173"]
@@ -3135,7 +3308,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["174"]
@@ -3153,7 +3327,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5213,
         "height": 2136,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["175"]
@@ -3171,7 +3346,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["176"]
@@ -3189,7 +3365,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5121,
         "height": 1453,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["177"]
@@ -3207,7 +3384,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["178"]
@@ -3225,7 +3403,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5351,
         "height": 2734,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["179"]
@@ -3243,7 +3422,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["180"]
@@ -3261,7 +3441,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5102,
         "height": 2127,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["181"]
@@ -3279,7 +3460,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2646,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["182"]
@@ -3297,7 +3479,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5075,
         "height": 2108,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["183"]
@@ -3315,7 +3498,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3369,
         "height": 2246,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["184"]
@@ -3333,7 +3517,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5102,
         "height": 2136,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["185"]
@@ -3351,7 +3536,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3369,
         "height": 2246,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["186"]
@@ -3369,7 +3555,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5269,
         "height": 1666,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["187"]
@@ -3387,7 +3574,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3369,
         "height": 2246,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["188"]
@@ -3405,7 +3593,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4143,
         "height": 3472,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["189"]
@@ -3423,7 +3612,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4918,
         "height": 3232,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["190"]
@@ -3441,7 +3631,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4826,
         "height": 3186,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["191"]
@@ -3459,7 +3650,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4808,
         "height": 3186,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["192"]
@@ -3477,7 +3669,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4844,
         "height": 3186,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["193"]
@@ -3495,7 +3688,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4807,
         "height": 3214,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["194"]
@@ -3513,7 +3707,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3065,
         "height": 3472,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["195"]
@@ -3531,7 +3726,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3775,
         "height": 3121,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["196"]
@@ -3549,7 +3745,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3775,
         "height": 3121,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["197"]
@@ -3567,7 +3764,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3857,
         "height": 3149,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["198"]
@@ -3585,7 +3783,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3857,
         "height": 3131,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["199"]
@@ -3603,7 +3802,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3848,
         "height": 2615,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["200"]
@@ -3621,7 +3821,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3848,
         "height": 2615,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["201"]
@@ -3639,7 +3840,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3234,
         "height": 2577,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["202"]
@@ -3657,7 +3859,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3346,
         "height": 2683,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["203"]
@@ -3675,7 +3878,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3228,
         "height": 2520,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["204"]

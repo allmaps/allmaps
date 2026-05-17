@@ -13,7 +13,8 @@
         "uri": "https://dlc.services/iiif-img/7/4/00e3862e-f98e-4e7e-a701-fa74dcc93cb9",
         "majorVersion": 2,
         "width": 4524,
-        "height": 3940
+        "height": 3940,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

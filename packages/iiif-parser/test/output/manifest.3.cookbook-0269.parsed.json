@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4032,
         "height": 3024,
-        "majorVersion": 3
+        "majorVersion": 3,
+        "supportedFormats": ["jpg"]
       },
       "annotations": [
         {

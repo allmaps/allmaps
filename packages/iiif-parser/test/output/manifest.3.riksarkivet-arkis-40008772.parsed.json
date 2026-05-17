@@ -9,7 +9,8 @@
         "supportsAnyRegionAndSize": true,
         "type": "image",
         "uri": "https://lbiiif.riksarkivet.se/v3/arkis!40008772_00001",
-        "width": 15162
+        "width": 15162,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["Image 1"],
