@@ -83,12 +83,12 @@
 
 <svelte:head>
   <link rel="icon" href={favicon} />
-  <title>Allmaps Admin</title>
+  <title>Allmaps Console</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-100 flex flex-col h-screen">
   <div class="sticky top-0 z-50 bg-white">
-    <Header appName="Admin">
+    <Header appName="Console">
       <div class="flex items-center justify-between w-full gap-3">
         <div class="flex items-center gap-3 font-sans text-sm">
           {#each crumbs as crumb, i (crumb.href)}

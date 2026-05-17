@@ -35,7 +35,8 @@
         },
         body: JSON.stringify({
           name: newOrganizationName,
-          slug: newOrganizationSlug
+          slug: newOrganizationSlug,
+          plan: null
         })
       })
 
