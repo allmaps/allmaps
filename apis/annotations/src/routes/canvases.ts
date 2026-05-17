@@ -6,12 +6,17 @@ import { createElysia } from '../elysia.js'
 
 export const canvases = createElysia({ name: 'canvases' }).get(
   '/canvases/:canvasId',
-  ({ env, db, params }) =>
+  ({ request, env, db, params }) =>
     queryMaps(
       env.PUBLIC_ANNOTATIONS_BASE_URL,
       db,
       { canvasId: params.canvasId },
-      { format: 'annotation', expectRows: true, singular: false }
+      {
+        id: request.url,
+        format: 'annotation',
+        expectRows: true,
+        singular: false
+      }
     ),
   {
     params: t.Object({ canvasId: t.String() }),

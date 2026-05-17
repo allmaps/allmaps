@@ -6,12 +6,17 @@ import { createElysia } from '../elysia.js'
 
 export const manifests = createElysia({ name: 'manifests' }).get(
   '/manifests/:manifestId',
-  ({ env, db, params }) =>
+  ({ request, env, db, params }) =>
     queryMaps(
       env.PUBLIC_ANNOTATIONS_BASE_URL,
       db,
       { manifestId: params.manifestId },
-      { format: 'annotation', expectRows: true, singular: false }
+      {
+        id: request.url,
+        format: 'annotation',
+        expectRows: true,
+        singular: false
+      }
     ),
   {
     params: t.Object({ manifestId: t.String() }),

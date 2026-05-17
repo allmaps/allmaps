@@ -14,7 +14,7 @@ const imageRoute = new RegExpRoute<{
 
 export const images = createElysia({ name: 'images' }).get(
   `/images/${imageRoute.path}`,
-  ({ env, db, params }) => {
+  ({ request, env, db, params }) => {
     const { imageId, imageChecksum, ext } = imageRoute.parse(params)
     const format = ext === 'geojson' ? 'geojson' : 'annotation'
     return queryMaps(
@@ -24,7 +24,7 @@ export const images = createElysia({ name: 'images' }).get(
         imageId,
         ...(imageChecksum ? { imageChecksum } : {})
       },
-      { format, expectRows: true, singular: false }
+      { id: request.url, format, expectRows: true, singular: false }
     )
   },
   {

@@ -13,7 +13,7 @@ const organizationRoute = new RegExpRoute<{
 
 export const organizations = createElysia({ name: 'organizations' }).get(
   `/organizations/${organizationRoute.path}`,
-  async ({ env, db, params }) => {
+  async ({ request, env, db, params }) => {
     const { organizationSlug, ext } = organizationRoute.parse(params)
     const organization = await queryOrganizationBySlug(
       db,
@@ -32,7 +32,7 @@ export const organizations = createElysia({ name: 'organizations' }).get(
       {
         organizationSlug
       },
-      { format, expectRows: true, singular: false }
+      { id: request.url, format, expectRows: true, singular: false }
     )
   },
   {

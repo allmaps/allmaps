@@ -30,29 +30,11 @@ function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
   }
 }
 
-// Matches: mapId  OR  mapId@checksum  OR  mapId.geojson  OR  mapId@checksum.annotation etc.
 const mapRoute = new RegExpRoute<{
   mapId: string
   checksum?: string
   ext?: string
 }>('mapId', /^(?<mapId>[0-9a-f]+)(@(?<checksum>[0-9a-f]+))?(\.(?<ext>\w+))?$/)
-
-async function callLive(liveBaseUrl: string, body: unknown) {
-  const response = await fetch(`${liveBaseUrl}/maps`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  })
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}))
-
-    throw new Error(
-      (data as { error?: string }).error ?? `Live API error ${response.status}`
-    )
-  }
-
-  return response.json()
-}
 
 export const maps = createElysia({ name: 'maps' })
   .get(

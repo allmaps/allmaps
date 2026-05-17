@@ -6,13 +6,15 @@ import {
   error,
   redirect,
   handleApiError,
-  createBetterAuthPlugin
+  createBetterAuthPlugin,
+  createBetterAuthRoutes as createSharedBetterAuthRoutes,
+  createTagsSorter
 } from './elysia.js'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
-import { createBetterAuthRoutes } from './routes/auth.js'
+import { createAuthRoutes } from './routes/auth.js'
 import { manifests } from './routes/manifests.js'
 import { canvases } from './routes/canvases.js'
 import { images } from './routes/images.js'
@@ -23,12 +25,29 @@ import { projections } from './routes/projections.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
+const openApiTags = [
+  { name: 'API' },
+  { name: 'Maps' },
+  { name: 'Images' },
+  { name: 'Canvases' },
+  { name: 'Manifests' },
+  { name: 'Organizations' },
+  { name: 'Lists' },
+  { name: 'Projections' },
+  { name: 'Authentication' }
+]
+const tagsSorter = createTagsSorter(openApiTags)
+
 export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
   const betterAuthPlugin = createBetterAuthPlugin(betterAuth)
-
   return createElysia({
     name: 'app'
   })
+    .use(betterAuthPlugin)
+    .derive(({ request }) => ({
+      getOptionalSession: () =>
+        betterAuth.auth.api.getSession({ headers: request.headers })
+    }))
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)
@@ -41,27 +60,66 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
             title: 'Allmaps API Documentation',
             description: 'API documentation for the Allmaps REST API',
             version: packageJson.version
+          },
+          components: {
+            securitySchemes: {
+              sessionCookie: {
+                type: 'apiKey',
+                in: 'cookie',
+                name: 'better-auth.session_token',
+                description:
+                  'Better Auth session cookie. Some routes additionally require the authenticated user to be an admin.'
+              }
+            }
+          },
+          tags: openApiTags
+        },
+        exclude: {
+          staticFile: false
+        },
+        scalar: {
+          tagsSorter,
+          agent: {
+            disabled: true
           }
         }
       })
     )
-    .use(createBetterAuthRoutes(env, betterAuthPlugin, betterAuth))
-    .use(createMapsRoutes(betterAuthPlugin))
+    .use(createSharedBetterAuthRoutes(betterAuth))
+    .use(createAuthRoutes(env, betterAuth))
+    .use(createMapsRoutes(betterAuth))
+    .use(createListsRoutes(betterAuth))
+    .use(createOrganizationsRoutes(env, betterAuth))
     .use(manifests)
     .use(canvases)
     .use(images)
-    .use(createListsRoutes(betterAuthPlugin))
-    .use(createOrganizationsRoutes(env, betterAuthPlugin, betterAuth))
     .use(projections)
     .get(
       '/',
-      () => ({
-        name: 'Allmaps REST API',
-        version: packageJson.version,
-        docs: '/docs',
-        login: '/login/github',
-        logout: '/logout'
-      }),
+      async ({ env, getOptionalSession }) => {
+        const session = await getOptionalSession()
+
+        let user
+
+        if (session && session.user) {
+          user = {
+            id: `${env.PUBLIC_REST_BASE_URL}/users/${session.user.id}`,
+            name: session.user.name,
+            slug: session.user.slug
+          }
+        }
+
+        return {
+          name: 'Allmaps REST API',
+          version: packageJson.version,
+          docs: `${env.PUBLIC_REST_BASE_URL}/docs`,
+          login: session
+            ? undefined
+            : `${env.PUBLIC_REST_BASE_URL}/login/github`,
+          logout: session ? `${env.PUBLIC_REST_BASE_URL}/logout` : undefined,
+          user
+        }
+      },
       {
         detail: {
           summary: 'Allmaps REST API',
