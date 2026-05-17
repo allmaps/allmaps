@@ -387,7 +387,7 @@
           coordinates: resourceTransformer.transformToGeo(resourcePoint)
         })
       } else {
-        addGeoGcpFeature(
+        addResourceGcpFeature(
           {
             id: gcpId,
             index: gcpIndexFromGcpId(gcpId),
