@@ -464,8 +464,9 @@
     context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
+    const isExistingGcp = gcpId in (mapsState.activeMap?.gcps ?? {})
 
-    if (context.action === 'edit') {
+    if (context.action === 'edit' || isExistingGcp) {
       handleDrawFinishEdited(gcpId)
     } else if (resourceDraw && context.action === 'draw') {
       handleDrawFinishDrawn(resourceDraw, gcpId)
@@ -531,8 +532,9 @@
     context: { action: string; mode: string }
   ) {
     const gcpId = ensureStringId(id)
+    const isExistingGcp = gcpId in (mapsState.activeMap?.gcps ?? {})
 
-    if (context.action === 'edit') {
+    if (context.action === 'edit' || isExistingGcp) {
       handleDrawFinishEdited(gcpId)
     } else if (geoDraw && context.action === 'draw') {
       handleDrawFinishDrawn(geoDraw, gcpId)
