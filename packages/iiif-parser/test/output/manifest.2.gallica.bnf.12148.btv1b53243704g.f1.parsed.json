@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 11072,
         "height": 8034,
-        "majorVersion": 1
+        "majorVersion": 1,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["NP"]
@@ -42,7 +43,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 11102,
         "height": 8008,
-        "majorVersion": 1
+        "majorVersion": 1,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["NP"]
@@ -65,7 +67,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 11082,
         "height": 8050,
-        "majorVersion": 1
+        "majorVersion": 1,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["NP"]
@@ -88,7 +91,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 11068,
         "height": 7982,
-        "majorVersion": 1
+        "majorVersion": 1,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["NP"]
@@ -111,7 +115,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 11088,
         "height": 8036,
-        "majorVersion": 1
+        "majorVersion": 1,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "none": ["NP"]

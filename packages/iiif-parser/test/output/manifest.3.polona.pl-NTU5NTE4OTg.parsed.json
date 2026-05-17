@@ -21,7 +21,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1496,
         "height": 2274,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["-"]
@@ -48,7 +49,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2915,
         "height": 2263,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["1"]
@@ -75,7 +77,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2922,
         "height": 2267,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["2,3"]
@@ -102,7 +105,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2938,
         "height": 2265,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["4,5"]
@@ -129,7 +133,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2924,
         "height": 2280,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["6,7"]
@@ -156,7 +161,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 2918,
         "height": 2271,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["8"]
@@ -183,7 +189,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 15083,
         "height": 14957,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["[1r]"]
@@ -210,7 +217,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 7462,
         "height": 7491,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["[1v]"]
@@ -237,7 +245,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 1496,
         "height": 2295,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "pl": ["-"]

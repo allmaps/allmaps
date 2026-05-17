@@ -43,5 +43,6 @@
   ],
   "type": "image",
   "uri": "https://rotterdamspubliek.nl/iiif/A136B927DA744CD2BEA9F1A3FF2271BA",
-  "width": 6426
+  "width": 6426,
+  "supportedFormats": ["jpg"]
 }

@@ -17,7 +17,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2164",
         "majorVersion": 2,
         "width": 2867,
-        "height": 2832
+        "height": 2832,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -35,7 +36,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2165",
         "majorVersion": 2,
         "width": 4979,
-        "height": 3012
+        "height": 3012,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -53,7 +55,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2166",
         "majorVersion": 2,
         "width": 4141,
-        "height": 3622
+        "height": 3622,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -71,7 +74,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2167",
         "majorVersion": 2,
         "width": 4131,
-        "height": 3630
+        "height": 3630,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -89,7 +93,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2168",
         "majorVersion": 2,
         "width": 4142,
-        "height": 3621
+        "height": 3621,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -107,7 +112,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2169",
         "majorVersion": 2,
         "width": 4137,
-        "height": 3625
+        "height": 3625,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -125,7 +131,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2170",
         "majorVersion": 2,
         "width": 4141,
-        "height": 3622
+        "height": 3622,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -143,7 +150,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2171",
         "majorVersion": 2,
         "width": 4138,
-        "height": 3624
+        "height": 3624,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -161,7 +169,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2172",
         "majorVersion": 2,
         "width": 4134,
-        "height": 3627
+        "height": 3627,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -179,7 +188,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2173",
         "majorVersion": 2,
         "width": 4119,
-        "height": 3641
+        "height": 3641,
+        "supportedFormats": ["jpg"]
       }
     },
     {
@@ -197,7 +207,8 @@
         "uri": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:2174",
         "majorVersion": 2,
         "width": 4129,
-        "height": 3632
+        "height": 3632,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

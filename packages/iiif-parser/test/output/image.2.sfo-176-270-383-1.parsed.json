@@ -43,5 +43,6 @@
   ],
   "type": "image",
   "uri": "https://static.sfomuseum.org/media/176/270/383/1/tiles",
-  "width": 1698
+  "width": 1698,
+  "supportedFormats": ["jpg"]
 }

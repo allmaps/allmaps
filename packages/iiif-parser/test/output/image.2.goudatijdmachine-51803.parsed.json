@@ -57,5 +57,6 @@
   ],
   "type": "image",
   "uri": "https://www.goudatijdmachine.nl/data/iiif/2/51803",
-  "width": 10290
+  "width": 10290,
+  "supportedFormats": ["jpg"]
 }

@@ -19,7 +19,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5920,
         "height": 1703,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -40,7 +41,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5712,
         "height": 4105,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -61,7 +63,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5044,
         "height": 3708,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -82,7 +85,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4993,
         "height": 3609,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -103,7 +107,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5358,
         "height": 3960,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -124,7 +129,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5397,
         "height": 3838,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -145,7 +151,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5439,
         "height": 3977,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -166,7 +173,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4642,
         "height": 3957,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -187,7 +195,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5646,
         "height": 3714,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -208,7 +217,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3601,
         "height": 5509,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -229,7 +239,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5148,
         "height": 3592,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -250,7 +261,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4048,
         "height": 3828,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -271,7 +283,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5391,
         "height": 3725,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -292,7 +305,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5752,
         "height": 2334,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -313,7 +327,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4985,
         "height": 3834,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -334,7 +349,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5418,
         "height": 2027,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -355,7 +371,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5263,
         "height": 3967,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -376,7 +393,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5494,
         "height": 4011,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -397,7 +415,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 3690,
         "height": 3900,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -418,7 +437,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5376,
         "height": 4048,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -439,7 +459,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4233,
         "height": 3894,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -460,7 +481,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5745,
         "height": 3701,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -481,7 +503,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5805,
         "height": 2514,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -502,7 +525,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4346,
         "height": 3520,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -523,7 +547,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5275,
         "height": 3863,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -544,7 +569,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5490,
         "height": 3936,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -565,7 +591,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5310,
         "height": 3823,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -586,7 +613,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 4372,
         "height": 3801,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {
@@ -607,7 +635,8 @@
         "supportsAnyRegionAndSize": true,
         "width": 5022,
         "height": 4021,
-        "majorVersion": 2
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"]
       },
       "thumbnail": [
         {

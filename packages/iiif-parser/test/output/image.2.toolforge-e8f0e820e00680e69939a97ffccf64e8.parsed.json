@@ -85,5 +85,6 @@
   ],
   "type": "image",
   "uri": "http://zoomviewer.toolforge.org/iipsrv.fcgi/?iiif=cache/e8f0e820e00680e69939a97ffccf64e8.tif",
-  "width": 6510
+  "width": 6510,
+  "supportedFormats": ["jpg", "png"]
 }

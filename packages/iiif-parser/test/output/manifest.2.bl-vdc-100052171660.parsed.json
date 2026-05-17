@@ -50,7 +50,8 @@
         "majorVersion": 2,
         "supportsAnyRegionAndSize": true,
         "width": 8586,
-        "height": 6543
+        "height": 6543,
+        "supportedFormats": ["jpg"]
       }
     }
   ],

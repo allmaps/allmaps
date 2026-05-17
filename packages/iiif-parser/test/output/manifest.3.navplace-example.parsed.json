@@ -9,7 +9,8 @@
         "supportsAnyRegionAndSize": true,
         "type": "image",
         "uri": "https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen",
-        "width": 4032
+        "width": 4032,
+        "supportedFormats": ["jpg"]
       },
       "label": {
         "en": ["Picture of Göttingen taken during the 2019 IIIF Conference"]

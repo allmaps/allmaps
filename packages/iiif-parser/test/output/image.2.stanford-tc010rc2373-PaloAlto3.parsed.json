@@ -104,5 +104,6 @@
   ],
   "type": "image",
   "uri": "https://stacks.stanford.edu/image/iiif/tc010rc2373/PaloAlto3",
-  "width": 6710
+  "width": 6710,
+  "supportedFormats": ["jpg"]
 }
