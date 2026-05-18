@@ -8,8 +8,7 @@ import {
   queryMaps,
   queryImageChecksums
 } from '@allmaps/api-shared/db'
-import { queryRandom } from '@allmaps/api-shared'
-import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
+import { normalizeMapsQueryParams, queryRandom } from '@allmaps/api-shared'
 
 const imagesQuerySchema = t.Object({
   georeferenced: t.Optional(t.Boolean()),
@@ -27,18 +26,6 @@ const mapsQuerySchema = t.Object({
   minArea: t.Optional(t.Number()),
   maxArea: t.Optional(t.Number())
 })
-
-function parseIntersects(intersects?: number[]): IntersectsWith | undefined {
-  if (intersects && (intersects.length === 2 || intersects.length === 4)) {
-    return intersects as IntersectsWith
-  }
-}
-
-function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
-  if (containedBy && containedBy.length === 4) {
-    return containedBy as ContainedBy
-  }
-}
 
 export const images = createElysia({ name: 'images' })
   .get(
@@ -99,21 +86,13 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/:imageId/maps',
-    ({ env, db, params, query }) =>
+    ({ request, env, db, params }) =>
       queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         {
-          imageId: params.imageId,
-          intersectsWith: parseIntersects(query.intersects),
-          containedBy: parseContainedBy(query.containedBy),
-          limit: query.limit,
-          imageServiceDomain: query.imageServiceDomain,
-          manifestDomain: query.manifestDomain,
-          minScale: query.minScale,
-          maxScale: query.maxScale,
-          minArea: query.minArea,
-          maxArea: query.maxArea
+          ...normalizeMapsQueryParams(request),
+          imageId: params.imageId
         },
         { format: 'map', expectRows: true, singular: false }
       ),
@@ -125,21 +104,13 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/:imageId/maps.geojson',
-    ({ env, db, params, query }) =>
+    ({ request, env, db, params }) =>
       queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         {
-          imageId: params.imageId,
-          intersectsWith: parseIntersects(query.intersects),
-          containedBy: parseContainedBy(query.containedBy),
-          limit: query.limit,
-          imageServiceDomain: query.imageServiceDomain,
-          manifestDomain: query.manifestDomain,
-          minScale: query.minScale,
-          maxScale: query.maxScale,
-          minArea: query.minArea,
-          maxArea: query.maxArea
+          ...normalizeMapsQueryParams(request),
+          imageId: params.imageId
         },
         { format: 'geojson', expectRows: true, singular: false }
       ),

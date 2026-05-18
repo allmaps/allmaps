@@ -9,4 +9,5 @@ export {
 
 export { ResponseError } from './shared/errors.js'
 export { DEFAULT_LIMIT, MAX_LIMIT, clampLimit } from './shared/limits.js'
+export { normalizeMapsQueryParams } from './shared/query-params.js'
 export { queryRandom } from './shared/random.js'

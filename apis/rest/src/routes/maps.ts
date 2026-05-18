@@ -1,12 +1,11 @@
 import { t } from 'elysia'
 
 import { queryMaps, queryChecksums } from '@allmaps/api-shared/db'
+import { normalizeMapsQueryParams } from '@allmaps/api-shared'
 
 import { RegExpRoute, createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 import type { BetterAuthContext } from '@allmaps/db/auth'
-
-import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
 
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
@@ -20,25 +19,13 @@ const mapsQuerySchema = t.Object({
   maxArea: t.Optional(t.Number())
 })
 
-function parseIntersects(intersects?: number[]): IntersectsWith | undefined {
-  if (intersects && (intersects.length === 2 || intersects.length === 4)) {
-    return intersects as IntersectsWith
-  }
-}
-
-function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
-  if (containedBy && containedBy.length === 4) {
-    return containedBy as ContainedBy
-  }
-}
-
 const mapRoute = new RegExpRoute<{
   mapId: string
   version?: string
   ext?: string
 }>(
   'mapId',
-  /^(?<mapId>[0-9a-f]{16})(\@(?<version>[0-9a-f]{16}))?(\.(?<ext>geojson))?$/
+  /^(?<mapId>[0-9a-f]{16})(@(?<version>[0-9a-f]{16}))?(\.(?<ext>geojson))?$/
 )
 
 async function callLive(liveBaseUrl: string, path: string, body: unknown) {
@@ -64,21 +51,11 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/maps',
-      ({ env, db, query }) =>
+      ({ request, env, db }) =>
         queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          {
-            intersectsWith: parseIntersects(query.intersects),
-            containedBy: parseContainedBy(query.containedBy),
-            limit: query.limit,
-            imageServiceDomain: query.imageServiceDomain,
-            manifestDomain: query.manifestDomain,
-            minScale: query.minScale,
-            maxScale: query.maxScale,
-            minArea: query.minArea,
-            maxArea: query.maxArea
-          },
+          normalizeMapsQueryParams(request),
           { format: 'map', expectRows: false, singular: false }
         ),
       {
@@ -88,21 +65,11 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .get(
       '/maps.geojson',
-      ({ env, db, query }) =>
+      ({ request, env, db }) =>
         queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          {
-            intersectsWith: parseIntersects(query.intersects),
-            containedBy: parseContainedBy(query.containedBy),
-            limit: query.limit,
-            imageServiceDomain: query.imageServiceDomain,
-            manifestDomain: query.manifestDomain,
-            minScale: query.minScale,
-            maxScale: query.maxScale,
-            minArea: query.minArea,
-            maxArea: query.maxArea
-          },
+          normalizeMapsQueryParams(request),
           { format: 'geojson', expectRows: false, singular: false }
         ),
       {

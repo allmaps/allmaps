@@ -168,8 +168,8 @@ function getGeoreferencedMap(
   }
 
   let _allmaps: unknown
-  if ('_allmaps' in annotation) {
-    _allmaps = annotation._allmaps
+  if ('_allmaps' in annotation.body) {
+    _allmaps = annotation.body._allmaps
   }
 
   return {
