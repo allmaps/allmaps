@@ -2,7 +2,7 @@ import { t } from 'elysia'
 
 import { generateRandomId } from '@allmaps/id/sync'
 import { queryMaps } from '@allmaps/api-shared/db'
-import type { ContainedBy, IntersectsWith } from '@allmaps/api-shared/types'
+import { normalizeMapsQueryParams } from '@allmaps/api-shared'
 
 import { createElysia, RegExpRoute } from '../elysia.js'
 
@@ -18,18 +18,6 @@ const mapsQuerySchema = t.Object({
   maxArea: t.Optional(t.Number())
 })
 
-function parseIntersects(intersects?: number[]): IntersectsWith | undefined {
-  if (intersects && (intersects.length === 2 || intersects.length === 4)) {
-    return intersects as IntersectsWith
-  }
-}
-
-function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
-  if (containedBy && containedBy.length === 4) {
-    return containedBy as ContainedBy
-  }
-}
-
 const mapRoute = new RegExpRoute<{
   mapId: string
   checksum?: string
@@ -39,21 +27,11 @@ const mapRoute = new RegExpRoute<{
 export const maps = createElysia({ name: 'maps' })
   .get(
     '/maps',
-    ({ request, env, db, query }) =>
+    ({ request, env, db }) =>
       queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
-        {
-          intersectsWith: parseIntersects(query.intersects),
-          containedBy: parseContainedBy(query.containedBy),
-          limit: query.limit,
-          imageServiceDomain: query.imageServiceDomain,
-          manifestDomain: query.manifestDomain,
-          minScale: query.minScale,
-          maxScale: query.maxScale,
-          minArea: query.minArea,
-          maxArea: query.maxArea
-        },
+        normalizeMapsQueryParams(request),
         {
           id: request.url,
           format: 'annotation',
@@ -71,21 +49,11 @@ export const maps = createElysia({ name: 'maps' })
   )
   .get(
     '/maps.geojson',
-    ({ request, env, db, query }) =>
+    ({ request, env, db }) =>
       queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
-        {
-          intersectsWith: parseIntersects(query.intersects),
-          containedBy: parseContainedBy(query.containedBy),
-          limit: query.limit,
-          imageServiceDomain: query.imageServiceDomain,
-          manifestDomain: query.manifestDomain,
-          minScale: query.minScale,
-          maxScale: query.maxScale,
-          minArea: query.minArea,
-          maxArea: query.maxArea
-        },
+        normalizeMapsQueryParams(request),
         {
           id: request.url,
           format: 'geojson',
@@ -103,19 +71,12 @@ export const maps = createElysia({ name: 'maps' })
   )
   .get(
     '/maps/random',
-    ({ env, db, query }) => {
+    ({ request, env, db }) => {
       const randomMapId = generateRandomId()
 
       // Try maps with id > randomMapId first, fall back to id <= randomMapId
       const baseQuery = {
-        intersectsWith: parseIntersects(query.intersects),
-        containedBy: parseContainedBy(query.containedBy),
-        imageServiceDomain: query.imageServiceDomain,
-        manifestDomain: query.manifestDomain,
-        minScale: query.minScale,
-        maxScale: query.maxScale,
-        minArea: query.minArea,
-        maxArea: query.maxArea,
+        ...normalizeMapsQueryParams(request),
         limit: 1
       }
       const responseOptions = {
