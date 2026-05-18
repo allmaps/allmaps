@@ -409,8 +409,8 @@ export class WebGL2Renderer
     }
   }
 
-  protected resetPrevious(mapIds?: string[]) {
-    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps({ mapIds })
+  protected resetPrevious() {
+    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps()
     for (const webgl2WarpedMap of webgl2WarpedMaps) {
       webgl2WarpedMap.resetPrevious()
     }
@@ -1043,7 +1043,7 @@ export class WebGL2Renderer
   }
 
   #finishAnimation(mapIds: string[]) {
-    this.resetPrevious(mapIds)
+    this.resetPrevious()
     this.updateVertexBuffers(mapIds)
 
     this.animating = false
@@ -1140,10 +1140,10 @@ export class WebGL2Renderer
         throw new Error('Event data missing')
       }
       const { mapIds } = event.data
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
-        mapIds
-      })) {
-        if (this.animating) {
+      if (this.animating) {
+        for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+          mapIds
+        })) {
           webgl2WarpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }
       }
