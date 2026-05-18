@@ -22,7 +22,9 @@ const mapsQuerySchema = t.Object({
   minScale: t.Optional(t.Number()),
   maxScale: t.Optional(t.Number()),
   minArea: t.Optional(t.Number()),
-  maxArea: t.Optional(t.Number())
+  maxArea: t.Optional(t.Number()),
+  modifiedAfter: t.Optional(t.String()),
+  modifiedBefore: t.Optional(t.String())
 })
 
 export const canvases = createElysia({ name: 'canvases' })

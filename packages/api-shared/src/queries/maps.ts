@@ -199,6 +199,12 @@ export async function queryMaps(
           checksum: {
             eq: params.checksum
           }
+        },
+        {
+          updatedAt: {
+            gte: params.modifiedAfter,
+            lte: params.modifiedBefore
+          }
         }
       ],
       image: {
