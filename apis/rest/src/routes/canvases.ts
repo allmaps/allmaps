@@ -105,3 +105,26 @@ export const canvases = createElysia({ name: 'canvases' })
       }
     }
   )
+  .get(
+    '/canvases/:canvasId/maps.geojson',
+    ({ request, env, db, params, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryMaps(
+        env.PUBLIC_ANNOTATIONS_BASE_URL,
+        db,
+        {
+          ...normalizeMapsQueryParams(request),
+          canvasId: params.canvasId
+        },
+        { format: 'geojson', expectRows: true, singular: false }
+      )
+    },
+    {
+      params: t.Object({ canvasId: t.String() }),
+      query: mapsQuerySchema,
+      detail: {
+        summary: 'Get maps for a single IIIF Canvas as GeoJSON',
+        tags: ['Canvases']
+      }
+    }
+  )

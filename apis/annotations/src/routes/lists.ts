@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
-import { ResponseError } from '@allmaps/api-shared'
+import { ResponseError, setCacheControl } from '@allmaps/api-shared'
 import {
   queryLists,
   queryList,

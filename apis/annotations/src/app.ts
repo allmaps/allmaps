@@ -6,6 +6,7 @@ import { openapi } from '@elysiajs/openapi'
 import { IIIF } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
 import { generateId } from '@allmaps/id'
+import { setCacheControl } from '@allmaps/api-shared'
 
 import {
   createElysia,

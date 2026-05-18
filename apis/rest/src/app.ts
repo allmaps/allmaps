@@ -1,6 +1,8 @@
 import { cors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 
+import { setCacheControl } from '@allmaps/api-shared'
+
 import {
   createElysia,
   error,
