@@ -1,4 +1,4 @@
-import { ResponseError } from '@allmaps/api-shared'
+import { ResponseError, setCacheControl } from '@allmaps/api-shared'
 import { queryMaps, queryOrganizationBySlug } from '@allmaps/api-shared/db'
 
 import { createElysia, RegExpRoute } from '../elysia.js'
@@ -13,7 +13,8 @@ const organizationRoute = new RegExpRoute<{
 
 export const organizations = createElysia({ name: 'organizations' }).get(
   `/organizations/${organizationRoute.path}`,
-  async ({ request, env, db, params }) => {
+  async ({ request, env, db, params, set }) => {
+    setCacheControl(set, 'public-medium')
     const { organizationSlug, ext } = organizationRoute.parse(params)
     const organization = await queryOrganizationBySlug(
       db,

@@ -2,7 +2,11 @@ import { t } from 'elysia'
 
 import { createElysia } from '../elysia.js'
 import { queryCanvases, queryMaps } from '@allmaps/api-shared/db'
-import { normalizeMapsQueryParams, queryRandom } from '@allmaps/api-shared'
+import {
+  normalizeMapsQueryParams,
+  queryRandom,
+  setCacheControl
+} from '@allmaps/api-shared'
 
 const canvasesQuerySchema = t.Object({
   georeferenced: t.Optional(t.Boolean()),
@@ -24,13 +28,15 @@ const mapsQuerySchema = t.Object({
 export const canvases = createElysia({ name: 'canvases' })
   .get(
     '/canvases',
-    async ({ db, env, query }) =>
-      queryCanvases(
+    async ({ db, env, query, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryCanvases(
         env.PUBLIC_REST_BASE_URL,
         db,
         { georeferenced: query.georeferenced, limit: query.limit },
         { expectRows: false, singular: false }
-      ),
+      )
+    },
     {
       query: canvasesQuerySchema,
       detail: { summary: 'Get IIIF Canvases', tags: ['Canvases'] }
@@ -38,8 +44,9 @@ export const canvases = createElysia({ name: 'canvases' })
   )
   .get(
     '/canvases/random',
-    async ({ db, env, query }) =>
-      queryRandom((op, randomId) =>
+    async ({ db, env, query, set }) => {
+      setCacheControl(set, 'private-no-store')
+      return queryRandom((op, randomId) =>
         queryCanvases(
           env.PUBLIC_REST_BASE_URL,
           db,
@@ -51,7 +58,8 @@ export const canvases = createElysia({ name: 'canvases' })
           },
           { expectRows: true, singular: false }
         )
-      ),
+      )
+    },
     {
       query: canvasesQuerySchema,
       detail: { summary: 'Get a random IIIF Canvas', tags: ['Canvases'] }
@@ -59,13 +67,15 @@ export const canvases = createElysia({ name: 'canvases' })
   )
   .get(
     '/canvases/:canvasId',
-    async ({ db, env, params, query }) =>
-      queryCanvases(
+    async ({ db, env, params, query, set }) => {
+      setCacheControl(set, 'public-medium')
+      return queryCanvases(
         env.PUBLIC_REST_BASE_URL,
         db,
         { canvasId: params.canvasId, georeferenced: query.georeferenced },
         { expectRows: true, singular: true }
-      ),
+      )
+    },
     {
       params: t.Object({ canvasId: t.String() }),
       query: t.Object({ georeferenced: t.Optional(t.Boolean()) }),
@@ -74,8 +84,9 @@ export const canvases = createElysia({ name: 'canvases' })
   )
   .get(
     '/canvases/:canvasId/maps',
-    ({ request, env, db, params }) =>
-      queryMaps(
+    ({ request, env, db, params, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         {
@@ -83,7 +94,8 @@ export const canvases = createElysia({ name: 'canvases' })
           canvasId: params.canvasId
         },
         { format: 'map', expectRows: true, singular: false }
-      ),
+      )
+    },
     {
       params: t.Object({ canvasId: t.String() }),
       query: mapsQuerySchema,

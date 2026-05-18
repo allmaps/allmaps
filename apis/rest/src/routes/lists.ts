@@ -10,6 +10,7 @@ import {
   deleteListItem,
   deleteUserList
 } from '@allmaps/api-shared/db'
+import { setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { authenticatedDetail } from '../openapi.js'
@@ -33,17 +34,27 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     name: 'lists-routes'
   })
     .use(createBetterAuthPlugin(betterAuth))
-    .get('/lists', ({ db, user }) => queryUserLists(db, getUserId(user)), {
-      auth: true,
-      detail: {
-        summary: 'Get current user lists',
-        tags: ['Lists'],
-        ...authenticatedDetail
+    .get(
+      '/lists',
+      ({ db, user, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return queryUserLists(db, getUserId(user))
+      },
+      {
+        auth: true,
+        detail: {
+          summary: 'Get current user lists',
+          tags: ['Lists'],
+          ...authenticatedDetail
+        }
       }
-    })
+    )
     .post(
       '/lists',
-      ({ db, user, body }) => createUserList(db, getUserId(user), body.name),
+      ({ db, user, body, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return createUserList(db, getUserId(user), body.name)
+      },
       {
         auth: true,
         body: t.Object({
@@ -58,7 +69,8 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .get(
       '/lists/:listId',
-      async ({ db, user, params, status }) => {
+      async ({ db, user, params, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const result = await queryListWithItems(
           db,
           getUserId(user),
@@ -83,7 +95,8 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .patch(
       '/lists/:listId',
-      async ({ db, user, params, body, status }) => {
+      async ({ db, user, params, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const name = body.name.trim()
         if (!name) {
           return status(400, { error: 'Name is required' })
@@ -114,7 +127,8 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .post(
       '/lists/:listId/items',
-      async ({ db, user, params, body, status }) => {
+      async ({ db, user, params, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const userId = getUserId(user)
         const list = await queryListWithItems(db, userId, params.listId)
 
@@ -147,7 +161,8 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .post(
       '/lists/:listId/items/url',
-      async ({ db, user, params, body, status }) => {
+      async ({ db, user, params, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const userId = getUserId(user)
         const list = await queryListWithItems(db, userId, params.listId)
 
@@ -179,7 +194,8 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .delete(
       '/lists/:listId/items',
-      async ({ db, user, params, query, status }) => {
+      async ({ db, user, params, query, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const userId = getUserId(user)
         const list = await queryListWithItems(db, userId, params.listId)
 
@@ -215,7 +231,8 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .delete(
       '/lists/:listId',
-      async ({ db, user, params, status }) => {
+      async ({ db, user, params, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const result = await deleteUserList(db, getUserId(user), params.listId)
         if (!result.success) {
           return status(result.status, { error: result.error })

@@ -4,6 +4,7 @@ import type { BetterAuthContext } from '@allmaps/db/auth'
 
 import { ResponseError } from '../shared/errors.js'
 import { createElysia } from './app.js'
+import { setCacheControl } from './cache.js'
 import { redirect } from './response.js'
 
 function copySetCookieHeader(
@@ -72,6 +73,7 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
     .get(
       '/login/github',
       async ({ set, query }) => {
+        setCacheControl(set, 'private-no-store')
         const callbackURL = query.returnTo ?? '/'
 
         const result = await auth.handler(
@@ -109,6 +111,7 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
     .get(
       '/logout',
       async ({ request, set, query }) => {
+        setCacheControl(set, 'private-no-store')
         const callbackURL = query.returnTo ?? '/'
 
         const signOutResult = await auth.handler(

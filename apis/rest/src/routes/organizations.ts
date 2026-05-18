@@ -18,6 +18,7 @@ import {
   queryCanvases,
   queryManifests
 } from '@allmaps/api-shared/db'
+import { setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
@@ -48,9 +49,10 @@ export function createOrganizationsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/organizations',
-      async ({ db, env, query, request }) => {
+      async ({ db, env, query, request, set }) => {
         const session = await auth.api.getSession({ headers: request.headers })
         if (session?.user.role === 'admin') {
+          setCacheControl(set, 'private-no-store')
           return listOrganizationsWithUsers(
             db,
             env.PUBLIC_REST_BASE_URL,
@@ -58,6 +60,7 @@ export function createOrganizationsRoutes(
           )
         }
 
+        setCacheControl(set, 'public-medium')
         return listOrganizations(db, env.PUBLIC_REST_BASE_URL, query.limit)
       },
       {
@@ -67,17 +70,19 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId',
-      async ({ db, env, params, status, request }) => {
+      async ({ db, env, params, status, request, set }) => {
         const session = await auth.api.getSession({ headers: request.headers })
         let organization
 
         if (session?.user.role === 'admin') {
+          setCacheControl(set, 'private-no-store')
           organization = await queryOrganizationByIdWithUsers(
             db,
             env.PUBLIC_REST_BASE_URL,
             params.organizationId
           )
         } else {
+          setCacheControl(set, 'public-medium')
           organization = await queryOrganizationById(
             db,
             env.PUBLIC_REST_BASE_URL,
@@ -98,8 +103,9 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/manifests',
-      ({ env, db, params, query }) =>
-        queryManifests(
+      ({ env, db, params, query, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryManifests(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
@@ -108,7 +114,8 @@ export function createOrganizationsRoutes(
             limit: query.limit
           },
           { expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: querySchema,
         detail: {
@@ -119,8 +126,9 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/canvases',
-      ({ env, db, params, query }) =>
-        queryCanvases(
+      ({ env, db, params, query, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryCanvases(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
@@ -129,7 +137,8 @@ export function createOrganizationsRoutes(
             limit: query.limit
           },
           { expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: querySchema,
         detail: {
@@ -140,8 +149,9 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/images',
-      ({ env, db, params, query }) =>
-        queryImages(
+      ({ env, db, params, query, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryImages(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
@@ -150,7 +160,8 @@ export function createOrganizationsRoutes(
             limit: query.limit
           },
           { expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: querySchema,
         detail: {
@@ -161,7 +172,8 @@ export function createOrganizationsRoutes(
     )
     .post(
       '/organizations',
-      async ({ db, env, body, status }) => {
+      async ({ db, env, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const validSlug = normalizeOrganizationSlug(body.slug)
         if (!validSlug) {
           return status(400, {
@@ -222,7 +234,8 @@ export function createOrganizationsRoutes(
     )
     .patch(
       '/organizations/:organizationId',
-      async ({ db, env, params, body, status }) => {
+      async ({ db, env, params, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const validSlug =
           body.slug === undefined
             ? undefined
@@ -289,7 +302,8 @@ export function createOrganizationsRoutes(
     )
     .delete(
       '/organizations/:organizationId',
-      async ({ db, params, status }) => {
+      async ({ db, params, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const deleted = await deleteOrganization(db, params.organizationId)
 
         if (!deleted) {

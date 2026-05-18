@@ -45,10 +45,7 @@ function fromDbOrganizationMembership(
   }
 }
 
-export function fromDbUser(
-  restBaseUrl: string,
-  user: DbUser
-) {
+export function fromDbUser(restBaseUrl: string, user: DbUser) {
   return {
     id: `${restBaseUrl}/users/${user.id}`,
     name: user.fullName,
@@ -151,7 +148,11 @@ export async function queryAllOrganizationUsers(db: Db, restBaseUrl: string) {
 
   const usersByOrganizationId: Record<
     string,
-    { role: string; createdAt: Date; user: { id: string; name: string; email: string } }[]
+    {
+      role: string
+      createdAt: Date
+      user: { id: string; name: string; email: string }
+    }[]
   > = {}
 
   for (const row of rows) {

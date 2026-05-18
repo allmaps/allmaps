@@ -6,7 +6,11 @@ import {
   createManifest,
   queryMaps
 } from '@allmaps/api-shared/db'
-import { normalizeMapsQueryParams, queryRandom } from '@allmaps/api-shared'
+import {
+  normalizeMapsQueryParams,
+  queryRandom,
+  setCacheControl
+} from '@allmaps/api-shared'
 
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
@@ -23,13 +27,15 @@ const mapsQuerySchema = t.Object({
 export const manifests = createElysia({ name: 'manifests' })
   .get(
     '/manifests',
-    async ({ db, env, query }) =>
-      queryManifests(
+    async ({ db, env, query, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryManifests(
         env.PUBLIC_REST_BASE_URL,
         db,
         { georeferenced: query.georeferenced, limit: query.limit },
         { expectRows: false, singular: false }
-      ),
+      )
+    },
     {
       query: t.Object({
         georeferenced: t.Optional(t.Boolean()),
@@ -40,8 +46,9 @@ export const manifests = createElysia({ name: 'manifests' })
   )
   .get(
     '/manifests/random',
-    async ({ db, env, query }) =>
-      queryRandom((op, randomId) =>
+    async ({ db, env, query, set }) => {
+      setCacheControl(set, 'private-no-store')
+      return queryRandom((op, randomId) =>
         queryManifests(
           env.PUBLIC_REST_BASE_URL,
           db,
@@ -53,7 +60,8 @@ export const manifests = createElysia({ name: 'manifests' })
           },
           { expectRows: true, singular: false }
         )
-      ),
+      )
+    },
     {
       query: t.Object({
         georeferenced: t.Optional(t.Boolean()),
@@ -64,13 +72,15 @@ export const manifests = createElysia({ name: 'manifests' })
   )
   .get(
     '/manifests/:manifestId',
-    async ({ db, params, env, query }) =>
-      queryManifests(
+    async ({ db, params, env, query, set }) => {
+      setCacheControl(set, 'public-medium')
+      return queryManifests(
         env.PUBLIC_REST_BASE_URL,
         db,
         { manifestId: params.manifestId, georeferenced: query.georeferenced },
         { expectRows: true, singular: true }
-      ),
+      )
+    },
     {
       params: t.Object({ manifestId: t.String() }),
       query: t.Object({ georeferenced: t.Optional(t.Boolean()) }),
@@ -79,7 +89,8 @@ export const manifests = createElysia({ name: 'manifests' })
   )
   .get(
     '/manifests/:manifestId/maps',
-    async ({ request, env, db, params }) => {
+    async ({ request, env, db, params, set }) => {
+      setCacheControl(set, 'public-short')
       return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
@@ -101,7 +112,8 @@ export const manifests = createElysia({ name: 'manifests' })
   )
   .get(
     '/manifests/:manifestId/maps.geojson',
-    async ({ request, env, db, params }) => {
+    async ({ request, env, db, params, set }) => {
+      setCacheControl(set, 'public-short')
       return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
@@ -123,7 +135,8 @@ export const manifests = createElysia({ name: 'manifests' })
   )
   .put(
     '/manifests/:manifestId',
-    async ({ db, params, body }) => {
+    async ({ db, params, body, set }) => {
+      setCacheControl(set, 'private-no-store')
       // TODO: add checkseum and check checksum matches manifest at URL before creating/updating
       return createManifest(db, params.manifestId, body.url)
     },

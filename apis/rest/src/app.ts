@@ -96,8 +96,9 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .use(projections)
     .get(
       '/',
-      async ({ env, getOptionalSession }) => {
+      async ({ env, getOptionalSession, set }) => {
         const session = await getOptionalSession()
+        setCacheControl(set, session ? 'private-no-store' : 'public-short')
 
         let user
 

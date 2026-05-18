@@ -30,13 +30,15 @@ const mapsQuerySchema = t.Object({
 export const images = createElysia({ name: 'images' })
   .get(
     '/images',
-    ({ env, db, query }) =>
-      queryImages(
+    ({ env, db, query, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryImages(
         env.PUBLIC_REST_BASE_URL,
         db,
         { georeferenced: query.georeferenced, limit: query.limit },
         { expectRows: false, singular: false }
-      ),
+      )
+    },
     {
       query: imagesQuerySchema,
       detail: { summary: 'Get IIIF Images', tags: ['Images'] }
@@ -44,8 +46,9 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/random',
-    async ({ env, db, query }) =>
-      queryRandom((op, randomId) =>
+    async ({ env, db, query, set }) => {
+      setCacheControl(set, 'private-no-store')
+      return queryRandom((op, randomId) =>
         queryImages(
           env.PUBLIC_REST_BASE_URL,
           db,
@@ -57,7 +60,8 @@ export const images = createElysia({ name: 'images' })
           },
           { expectRows: true, singular: false }
         )
-      ),
+      )
+    },
     {
       query: imagesQuerySchema,
       detail: { summary: 'Get a random IIIF Image', tags: ['Images'] }
@@ -65,8 +69,10 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/:imageId',
-    ({ env, db, params }) =>
-      queryImage(env.PUBLIC_REST_BASE_URL, db, params.imageId),
+    ({ env, db, params, set }) => {
+      setCacheControl(set, 'public-medium')
+      return queryImage(env.PUBLIC_REST_BASE_URL, db, params.imageId)
+    },
     {
       params: t.Object({ imageId: t.String() }),
       detail: { summary: 'Get a single IIIF Image', tags: ['Images'] }
@@ -74,8 +80,14 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/:imageId/versions',
-    ({ env, db, params }) =>
-      queryImageChecksums(env.PUBLIC_ANNOTATIONS_BASE_URL, db, params.imageId),
+    ({ env, db, params, set }) => {
+      setCacheControl(set, 'public-medium')
+      return queryImageChecksums(
+        env.PUBLIC_ANNOTATIONS_BASE_URL,
+        db,
+        params.imageId
+      )
+    },
     {
       params: t.Object({ imageId: t.String() }),
       detail: {
@@ -86,8 +98,9 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/:imageId/maps',
-    ({ request, env, db, params }) =>
-      queryMaps(
+    ({ request, env, db, params, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         {
@@ -95,7 +108,8 @@ export const images = createElysia({ name: 'images' })
           imageId: params.imageId
         },
         { format: 'map', expectRows: true, singular: false }
-      ),
+      )
+    },
     {
       params: t.Object({ imageId: t.String() }),
       query: mapsQuerySchema,
@@ -104,8 +118,9 @@ export const images = createElysia({ name: 'images' })
   )
   .get(
     '/images/:imageId/maps.geojson',
-    ({ request, env, db, params }) =>
-      queryMaps(
+    ({ request, env, db, params, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         {
@@ -113,7 +128,8 @@ export const images = createElysia({ name: 'images' })
           imageId: params.imageId
         },
         { format: 'geojson', expectRows: true, singular: false }
-      ),
+      )
+    },
     {
       params: t.Object({ imageId: t.String() }),
       query: mapsQuerySchema,
@@ -125,7 +141,10 @@ export const images = createElysia({ name: 'images' })
   )
   .put(
     '/images/:imageId',
-    ({ db, params, body }) => createImage(db, params.imageId, body.url),
+    ({ db, params, body, set }) => {
+      setCacheControl(set, 'private-no-store')
+      return createImage(db, params.imageId, body.url)
+    },
     {
       params: t.Object({ imageId: t.String() }),
       body: t.Object({ url: t.String() }),
