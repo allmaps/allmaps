@@ -8,7 +8,11 @@ import {
   queryMaps,
   queryImageChecksums
 } from '@allmaps/api-shared/db'
-import { normalizeMapsQueryParams, queryRandom } from '@allmaps/api-shared'
+import {
+  normalizeMapsQueryParams,
+  queryRandom,
+  setCacheControl
+} from '@allmaps/api-shared'
 
 const imagesQuerySchema = t.Object({
   georeferenced: t.Optional(t.Boolean()),
