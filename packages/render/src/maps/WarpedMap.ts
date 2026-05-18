@@ -856,13 +856,13 @@ export class WarpedMap extends EventTarget {
    */
   mixPreviousAndNew(t: number) {
     this.mixed = true
-    this.previousVisible = true
+    this.previousVisible = this.visible
     this.previousVisibilityOpacity = mixNumbers(
       this.visibilityOpacity,
       this.previousVisibilityOpacity,
       t
     )
-    this.previousApplyMask = true
+    this.previousApplyMask = this.applyMask
     this.previousApplyMaskOpacity = mixNumbers(
       this.applyMaskOpacity,
       this.previousApplyMaskOpacity,
