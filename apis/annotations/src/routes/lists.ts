@@ -50,7 +50,8 @@ export function createListsRoutes(
   })
     .get(
       '/@:username/lists',
-      async ({ db, env, params, request }) => {
+      async ({ db, env, params, request, set }) => {
+        setCacheControl(set, 'private-no-store')
         await assertCanAccessUserLists(
           betterAuth,
           request.headers,
@@ -75,7 +76,8 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId',
-      async ({ db, env, params, request }) => {
+      async ({ db, env, params, request, set }) => {
+        setCacheControl(set, 'private-no-store')
         await assertCanAccessUserLists(
           betterAuth,
           request.headers,
@@ -102,7 +104,8 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId/georeference-annotations',
-      async ({ db, env, params, request }) => {
+      async ({ db, env, params, request, set }) => {
+        setCacheControl(set, 'private-no-store')
         await assertCanAccessUserLists(
           betterAuth,
           request.headers,

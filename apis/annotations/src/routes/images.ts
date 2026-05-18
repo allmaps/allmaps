@@ -1,4 +1,5 @@
 import { queryMaps } from '@allmaps/api-shared/db'
+import { setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, RegExpRoute } from '../elysia.js'
 
@@ -14,8 +15,9 @@ const imageRoute = new RegExpRoute<{
 
 export const images = createElysia({ name: 'images' }).get(
   `/images/${imageRoute.path}`,
-  ({ request, env, db, params }) => {
+  ({ request, env, db, params, set }) => {
     const { imageId, imageChecksum, ext } = imageRoute.parse(params)
+    setCacheControl(set, imageChecksum ? 'public-immutable' : 'public-medium')
     const format = ext === 'geojson' ? 'geojson' : 'annotation'
     return queryMaps(
       env.PUBLIC_ANNOTATIONS_BASE_URL,

@@ -1,7 +1,7 @@
 import { t } from 'elysia'
 
 import { queryMaps, queryChecksums } from '@allmaps/api-shared/db'
-import { normalizeMapsQueryParams } from '@allmaps/api-shared'
+import { normalizeMapsQueryParams, setCacheControl } from '@allmaps/api-shared'
 
 import { RegExpRoute, createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
@@ -51,13 +51,15 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/maps',
-      ({ request, env, db }) =>
-        queryMaps(
+      ({ request, env, db, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           normalizeMapsQueryParams(request),
           { format: 'map', expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: mapsQuerySchema,
         detail: { summary: 'Get maps', tags: ['Maps'] }
@@ -65,13 +67,15 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .get(
       '/maps.geojson',
-      ({ request, env, db }) =>
-        queryMaps(
+      ({ request, env, db, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           normalizeMapsQueryParams(request),
           { format: 'geojson', expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: mapsQuerySchema,
         detail: { summary: 'Get maps as GeoJSON', tags: ['Maps'] }
@@ -79,7 +83,8 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .post(
       '/maps',
-      async ({ env, body }) => {
+      async ({ env, body, set }) => {
+        setCacheControl(set, 'private-no-store')
         return callLive(env.PUBLIC_LIVE_BASE_URL, '/maps', body)
       },
       {
@@ -93,8 +98,10 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .get(
       '/maps/:mapId/versions',
-      ({ env, db, params }) =>
-        queryChecksums(env.PUBLIC_ANNOTATIONS_BASE_URL, db, params.mapId),
+      ({ env, db, params, set }) => {
+        setCacheControl(set, 'public-medium')
+        return queryChecksums(env.PUBLIC_ANNOTATIONS_BASE_URL, db, params.mapId)
+      },
       {
         params: t.Object({ mapId: t.String() }),
         detail: {
@@ -106,13 +113,14 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
 
     .get(
       `/maps/${mapRoute.path}`,
-      ({ env, db, params }) => {
-        const { mapId, ext } = mapRoute.parse(params)
+      ({ env, db, params, set }) => {
+        const { mapId, version, ext } = mapRoute.parse(params)
+        setCacheControl(set, version ? 'public-immutable' : 'public-medium')
         const format = ext === 'geojson' ? 'geojson' : 'map'
         return queryMaps(
           env.PUBLIC_REST_BASE_URL,
           db,
-          { mapId },
+          { mapId, ...(version ? { checksum: version } : {}) },
           { format, expectRows: true, singular: true }
         )
       },
@@ -127,7 +135,8 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .patch(
       '/maps/:mapId',
-      async ({ env, params, body }) => {
+      async ({ env, params, body, set }) => {
+        setCacheControl(set, 'private-no-store')
         return callLive(env.PUBLIC_LIVE_BASE_URL, `/maps/${params.mapId}`, body)
       },
       {

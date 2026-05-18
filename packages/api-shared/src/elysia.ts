@@ -15,8 +15,10 @@ export {
 export { error, redirect } from './elysia/response.js'
 export { handleApiError } from './elysia/errors.js'
 export { RegExpRoute } from './elysia/routes.js'
+export { setCacheControl } from './elysia/cache.js'
 
 export type { DecoratedElysia } from './elysia/app.js'
+export type { CacheControlPreset } from './elysia/cache.js'
 
 export function createTagsSorter(
   tags: Array<{ name: string }>,

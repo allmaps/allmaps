@@ -2,7 +2,7 @@ import { t } from 'elysia'
 
 import { generateRandomId } from '@allmaps/id/sync'
 import { queryMaps } from '@allmaps/api-shared/db'
-import { normalizeMapsQueryParams } from '@allmaps/api-shared'
+import { normalizeMapsQueryParams, setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, RegExpRoute } from '../elysia.js'
 
@@ -27,8 +27,9 @@ const mapRoute = new RegExpRoute<{
 export const maps = createElysia({ name: 'maps' })
   .get(
     '/maps',
-    ({ request, env, db }) =>
-      queryMaps(
+    ({ request, env, db, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         normalizeMapsQueryParams(request),
@@ -38,7 +39,8 @@ export const maps = createElysia({ name: 'maps' })
           expectRows: false,
           singular: false
         }
-      ),
+      )
+    },
     {
       query: mapsQuerySchema,
       detail: {
@@ -49,8 +51,9 @@ export const maps = createElysia({ name: 'maps' })
   )
   .get(
     '/maps.geojson',
-    ({ request, env, db }) =>
-      queryMaps(
+    ({ request, env, db, set }) => {
+      setCacheControl(set, 'public-short')
+      return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
         db,
         normalizeMapsQueryParams(request),
@@ -60,7 +63,8 @@ export const maps = createElysia({ name: 'maps' })
           expectRows: false,
           singular: false
         }
-      ),
+      )
+    },
     {
       query: mapsQuerySchema,
       detail: {
@@ -71,7 +75,8 @@ export const maps = createElysia({ name: 'maps' })
   )
   .get(
     '/maps/random',
-    ({ request, env, db }) => {
+    ({ request, env, db, set }) => {
+      setCacheControl(set, 'private-no-store')
       const randomMapId = generateRandomId()
 
       // Try maps with id > randomMapId first, fall back to id <= randomMapId
@@ -111,8 +116,9 @@ export const maps = createElysia({ name: 'maps' })
   )
   .get(
     `/maps/${mapRoute.path}`,
-    ({ env, db, params }) => {
+    ({ env, db, params, set }) => {
       const { mapId, checksum, ext } = mapRoute.parse(params)
+      setCacheControl(set, checksum ? 'public-immutable' : 'public-medium')
       const format = ext === 'geojson' ? 'geojson' : 'annotation'
       return queryMaps(
         env.PUBLIC_ANNOTATIONS_BASE_URL,
