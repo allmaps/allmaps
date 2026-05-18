@@ -173,6 +173,8 @@ export {
   groupBy,
   rotateArray,
   isEqualArray,
+  arrayDifference,
+  arrayUnique,
   arrayRepeated,
   arrayContains,
   subSetArray,
