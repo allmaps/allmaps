@@ -32,10 +32,10 @@ if(u_distortion && opacityFromApplyMask != 0.0) {
 }
 
 // Grid
-if(u_renderGrid) {
+if(u_renderGrid && opacityFromApplyMask != 0.0) {
   float gridSize = 20.0f * float(u_scaleFactorForViewport);
   float gridWidth = 2.0f * float(u_scaleFactorForViewport);
   if(mod(float(resourceTrianglePointX) + gridWidth / 2.0f, gridSize) < gridWidth || mod(float(resourceTrianglePointY) + gridWidth / 2.0f, gridSize) < gridWidth) {
-    color = u_renderGridColor;
+    color = vec4(u_renderGridColor * opacity);
   }
 }
