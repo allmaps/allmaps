@@ -43,6 +43,7 @@ export {
 
 export {
   normalizeOrganizationSlug,
+  normalizeHomepageUrl,
   normalizeDomain,
   normalizeDomains,
   fromDbOrganization,

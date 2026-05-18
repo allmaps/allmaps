@@ -5,6 +5,7 @@ import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 import {
   normalizeOrganizationSlug,
+  normalizeHomepageUrl,
   normalizeDomains,
   listOrganizations,
   listOrganizationsWithUsers,
@@ -177,11 +178,27 @@ export function createOrganizationsRoutes(
           })
         }
 
+        const validHomepage =
+          body.homepage === undefined || body.homepage === null
+            ? body.homepage
+            : normalizeHomepageUrl(body.homepage)
+
+        if (
+          body.homepage !== undefined &&
+          body.homepage !== null &&
+          !validHomepage
+        ) {
+          return status(400, {
+            error: 'Invalid homepage. Use an absolute http(s) URL.'
+          })
+        }
+
         const organization = await createOrganization(
           db,
           env.PUBLIC_REST_BASE_URL,
           {
             ...body,
+            homepage: validHomepage,
             slug: validSlug,
             domains: validDomains
           }
@@ -226,6 +243,21 @@ export function createOrganizationsRoutes(
           })
         }
 
+        const validHomepage =
+          body.homepage === undefined || body.homepage === null
+            ? body.homepage
+            : normalizeHomepageUrl(body.homepage)
+
+        if (
+          body.homepage !== undefined &&
+          body.homepage !== null &&
+          !validHomepage
+        ) {
+          return status(400, {
+            error: 'Invalid homepage. Use an absolute http(s) URL.'
+          })
+        }
+
         const { domains, ...patch } = body
         const organization = await updateOrganization(
           db,
@@ -233,6 +265,7 @@ export function createOrganizationsRoutes(
           params.organizationId,
           {
             ...patch,
+            ...(body.homepage !== undefined ? { homepage: validHomepage } : {}),
             ...(validSlug !== undefined ? { slug: validSlug } : {})
           },
           domains !== undefined ? validDomains : undefined
