@@ -29,6 +29,8 @@ export type MapsQueryParams = {
   maxScale: number
   minArea: number
   maxArea: number
+  modifiedAfter: Date
+  modifiedBefore: Date
 }
 
 export type MapsQueryUrlParams = {
@@ -42,6 +44,8 @@ export type MapsQueryUrlParams = {
   maxscale: string
   minarea: string
   maxarea: string
+  modifiedafter: string
+  modifiedbefore: string
 }
 
 export type ExtParams = {
