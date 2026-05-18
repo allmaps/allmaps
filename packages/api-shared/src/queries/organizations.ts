@@ -83,6 +83,24 @@ export function normalizeOrganizationSlug(value: string): string | undefined {
   return /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/.test(slug) ? slug : undefined
 }
 
+export function normalizeHomepageUrl(value: string): string | undefined {
+  const homepage = value.trim()
+
+  if (!homepage) {
+    return
+  }
+
+  try {
+    const url = new URL(homepage)
+
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url.toString()
+    }
+  } catch {
+    return
+  }
+}
+
 export function normalizeDomains(domains: string[] | undefined) {
   if (domains === undefined) {
     return {
