@@ -196,12 +196,12 @@ export class WarpedMap extends EventTarget {
 
   visible!: boolean
   previousVisible!: boolean
-  visibilityOpacity = 1
-  previousVisibilityOpacity = 1
+  visibilityOpacity!: number
+  previousVisibilityOpacity!: number
   applyMask!: boolean
   previousApplyMask!: boolean
-  applyMaskOpacity = 0
-  previousApplyMaskOpacity = 0
+  applyMaskOpacity!: number
+  previousApplyMaskOpacity!: number
 
   gcps!: Gcp[]
   projectedGcps!: Gcp[]
@@ -578,6 +578,8 @@ export class WarpedMap extends EventTarget {
 
       this.visible = this.options.visible
       this.previousVisible = this.visible
+      this.visibilityOpacity = this.visible ? 1 : 0
+      this.previousVisibilityOpacity = this.visibilityOpacity
       this.applyMask = this.options.applyMask
       this.previousApplyMask = this.applyMask
       this.applyMaskOpacity = this.applyMask ? 0 : 1
