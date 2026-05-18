@@ -21,7 +21,7 @@ function formatPath(path: readonly PropertyKey[]) {
     return ''
   }
 
-  return path.reduce((result, segment, index) => {
+  return path.reduce((result: string, segment, index) => {
     if (typeof segment === 'number') {
       return `${result}[${segment}]`
     }
@@ -60,7 +60,7 @@ function getValueAtPath(input: unknown, path: readonly PropertyKey[]) {
       return undefined
     }
 
-    current = (current as Record<string, unknown>)[segment]
+    current = (current as Record<PropertyKey, unknown>)[segment]
   }
 
   return current
