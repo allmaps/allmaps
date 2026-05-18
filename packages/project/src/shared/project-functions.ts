@@ -187,9 +187,9 @@ export function projectionToAntialiasedProjection(
 }
 
 export function isEqualProjection(
-  projection0: Projection | undefined,
-  projection1: Projection | undefined
-): boolean | undefined {
+  projection0: Projection,
+  projection1: Projection
+): boolean {
   return (
     projectionDefinitionToAntialiasedDefinition(
       String(projection0?.definition)

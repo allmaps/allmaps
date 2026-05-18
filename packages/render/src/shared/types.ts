@@ -25,14 +25,17 @@ export type ShouldRenderOptions = {
   checkOpacity: boolean
 }
 
-export type SelectionOptions = {
+export type SelectionOptions = MaskOptions & {
   onlyVisible?: boolean
   mapIds?: Iterable<string>
   geoPoint?: Point
   geoBbox?: Bbox
   projectedGeoPoint?: Point
   projectedGeoBbox?: Bbox
-  applyMask?: boolean
+}
+
+export type MaskOptions = {
+  applyMask: boolean
 }
 
 export type ProjectionOptions = {

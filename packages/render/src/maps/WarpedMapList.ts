@@ -6,7 +6,11 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { isEqualProjection, webMercatorProjection } from '@allmaps/project'
+import {
+  isEqualProjection,
+  lonLatProjection,
+  webMercatorProjection
+} from '@allmaps/project'
 import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
@@ -320,18 +324,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get mapIds for selected maps
    *
-   * The selectionOptions allow a.o. to:
+   * The options allow a.o. to:
    * - filter for visible maps
    * - filter for specific mapIds
-   * - filter for maps whose geoBbox overlap with the specified geoBbox
-   * - filter for maps that overlap with a given geoPoint
+   * - filter for maps that overlap with a given point. Use geoPoint or projectedGeoPoint. Optionally specify projection for projectedGeoPoint. Optionally specify whether mask should be applied when computing overlap using applyMask.
+   * - filter for maps whose bbox overlap with the specified bbox. Use geoBbox or projectedGeoBbox. Optionally specify projection for projectedGeoBbox. Optionally specify whether mask should be applied when computing overlap using applyMask.
    *
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
+   * @param partialOptions - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns mapIds
    */
-  getMapIds(partialSelectionOptions?: Partial<SelectionOptions>): string[] {
+  getMapIds(partialOptions?: Partial<SelectionOptions>): string[] {
     // Enable the same selection options when getting mapIds
-    return this.getWarpedMaps(partialSelectionOptions).map(
+    return this.getWarpedMaps(partialOptions).map(
       (warpedMap) => warpedMap.mapId
     )
   }
@@ -339,76 +343,64 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the WarpedMap instances for selected maps
    *
-   * The selectionOptions allow a.o. to:
+   * The options allow a.o. to:
    * - filter for visible maps
    * - filter for specific mapIds
    * - filter for maps that overlap with a given point. Use geoPoint or projectedGeoPoint. Optionally specify projection for projectedGeoPoint. Optionally specify whether mask should be applied when computing overlap using applyMask.
    * - filter for maps whose bbox overlap with the specified bbox. Use geoBbox or projectedGeoBbox. Optionally specify projection for projectedGeoBbox. Optionally specify whether mask should be applied when computing overlap using applyMask.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param partialOptions - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns WarpedMap instances
    */
   getWarpedMaps(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    partialOptions?: Partial<SelectionOptions & ProjectionOptions>
   ): Array<W> {
-    const selectionAndProjectionOptions = mergeOptions(
+    const options = mergeOptions(
       mergeOptions(DEFAULT_SELECTION_OPTIONS, {
         projection: this.options.projection
       }),
-      partialSelectionAndProjectionOptions
+      partialOptions
     )
 
     let mapIds
-    if (selectionAndProjectionOptions.mapIds === undefined) {
-      if (selectionAndProjectionOptions.geoPoint) {
+    if (options.mapIds === undefined) {
+      if (options.geoPoint) {
         // Select by geoPoint
-        if (selectionAndProjectionOptions.applyMask) {
-          mapIds = this.geoMaskRTree?.searchFromPoint(
-            selectionAndProjectionOptions.geoPoint
-          )
+        if (options.applyMask) {
+          mapIds = this.geoMaskRTree?.searchFromPoint(options.geoPoint)
         } else {
-          mapIds = this.geoFullMaskRTree?.searchFromPoint(
-            selectionAndProjectionOptions.geoPoint
-          )
+          mapIds = this.geoFullMaskRTree?.searchFromPoint(options.geoPoint)
         }
-      } else if (selectionAndProjectionOptions.geoBbox) {
+      } else if (options.geoBbox) {
         // Select by geoBbox
-        mapIds = this.geoMaskRTree?.searchFromBbox(
-          selectionAndProjectionOptions.geoBbox
-        )
-        if (selectionAndProjectionOptions.applyMask) {
-          mapIds = this.geoMaskRTree?.searchFromBbox(
-            selectionAndProjectionOptions.geoBbox
-          )
+        mapIds = this.geoMaskRTree?.searchFromBbox(options.geoBbox)
+        if (options.applyMask) {
+          mapIds = this.geoMaskRTree?.searchFromBbox(options.geoBbox)
         } else {
-          mapIds = this.geoFullMaskRTree?.searchFromBbox(
-            selectionAndProjectionOptions.geoBbox
-          )
+          mapIds = this.geoFullMaskRTree?.searchFromBbox(options.geoBbox)
         }
-      } else if (selectionAndProjectionOptions.projectedGeoPoint) {
+      } else if (options.projectedGeoPoint) {
         // Select by projectedGeoPoint
         const projectedGeoPoint = WarpedMapList.projectPointIfNeeded(
           this.options.projection,
-          selectionAndProjectionOptions.projection,
-          selectionAndProjectionOptions.projectedGeoPoint
+          options.projection,
+          options.projectedGeoPoint
         )
-        if (selectionAndProjectionOptions.applyMask) {
+        if (options.applyMask) {
           mapIds =
             this.projectedGeoMaskRTree?.searchFromPoint(projectedGeoPoint)
         } else {
           mapIds =
             this.projectedGeoFullMaskRTree?.searchFromPoint(projectedGeoPoint)
         }
-      } else if (selectionAndProjectionOptions.projectedGeoBbox) {
+      } else if (options.projectedGeoBbox) {
         // Select by projectedGeoBbox
         const projectedGeoBbox = WarpedMapList.projectBboxIfNeeded(
           this.options.projection,
-          selectionAndProjectionOptions.projection,
-          selectionAndProjectionOptions.projectedGeoBbox
+          options.projection,
+          options.projectedGeoBbox
         )
-        if (selectionAndProjectionOptions.applyMask) {
+        if (options.applyMask) {
           mapIds = this.projectedGeoMaskRTree?.searchFromBbox(projectedGeoBbox)
         } else {
           mapIds = mapIds =
@@ -420,7 +412,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     } else {
       // Select specified
-      mapIds = selectionAndProjectionOptions.mapIds
+      mapIds = options.mapIds
     }
 
     const warpedMaps: W[] = []
@@ -435,9 +427,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (
         warpedMap &&
-        (selectionAndProjectionOptions.onlyVisible
-          ? warpedMap.options.visible
-          : true)
+        (options.onlyVisible ? warpedMap.options.visible : true)
       ) {
         warpedMaps.push(warpedMap)
       }
@@ -466,15 +456,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param options - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsCenter(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Point | undefined {
-    const bbox = this.getMapsBbox(partialSelectionAndProjectionOptions)
+    const bbox = this.getMapsBbox(options)
     if (bbox) {
       return bboxToCenter(bbox)
     }
@@ -485,20 +473,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param options - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Bbox | undefined {
     // Note: we can't use the geoMaskBboxes since creating a bbox
     // gives a different result in a different projection
 
-    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(
-      partialSelectionAndProjectionOptions
-    )
+    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(options)
 
     if (projectedGeoMaskPoints.length === 0) {
       return
@@ -512,17 +496,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param options - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Ring | undefined {
-    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(
-      partialSelectionAndProjectionOptions
-    )
+    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(options)
     return convexHull(projectedGeoMaskPoints)
   }
 
@@ -997,33 +977,25 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   #getProjectedGeoMaskPoints(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Point[] {
-    const warpedMaps = this.getWarpedMaps(partialSelectionAndProjectionOptions)
+    const warpedMaps = this.getWarpedMaps(options)
 
-    // If a projection is specified in options, project the geoMask using projection
-    // otherwise (by default) use available geoMask, i.e. use lonLatProjection
-    const projection = partialSelectionAndProjectionOptions?.projection
-    if (projection) {
-      const geoMaskPoints: Point[] = []
-      for (const warpedMap of warpedMaps) {
-        geoMaskPoints.push(...warpedMap.geoAppliedMask)
-      }
-
-      const projectedGeoMaskPoints = geoMaskPoints.map((point) =>
-        proj4(projection.definition, point)
-      )
-      return projectedGeoMaskPoints
-    } else {
-      const projectedGeoMaskPoints: Point[] = []
-      for (const warpedMap of warpedMaps) {
-        projectedGeoMaskPoints.push(...warpedMap.geoAppliedMask)
-      }
-
-      return projectedGeoMaskPoints
+    const geoMaskPoints: Point[] = []
+    for (const warpedMap of warpedMaps) {
+      geoMaskPoints.push(...warpedMap.getGeoAppliedMask(options?.applyMask))
     }
+
+    // If a projection is specified in options, project the geoMaskPoints using projection
+    // otherwise (by default) use available geoMask, i.e. use lonLatProjection
+    const projection = options?.projection
+    return projection
+      ? WarpedMapList.projectPointsIfNeeded(
+          projection,
+          lonLatProjection,
+          geoMaskPoints
+        )
+      : geoMaskPoints
   }
 
   /**

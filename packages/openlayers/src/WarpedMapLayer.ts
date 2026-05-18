@@ -14,6 +14,7 @@ import type { Extent } from 'ol/extent'
 
 import type {
   BaseRenderOptions,
+  MaskOptions,
   ProjectionOptions,
   AnimationOptions,
   WarpedMapList,
@@ -514,13 +515,15 @@ export class WarpedMapLayer
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getCenter(projectionOptions?: Partial<ProjectionOptions>): Point | undefined {
+  getCenter(
+    options?: Partial<ProjectionOptions & MaskOptions>
+  ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
+    return this.renderer.warpedMapList.getMapsCenter(options)
   }
 
   /**
@@ -531,17 +534,17 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsCenter(
     mapIds: string[],
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsCenter(
-      mergePartialOptions({ mapIds }, projectionOptions)
+      mergePartialOptions({ mapIds }, options)
     )
   }
 
@@ -552,13 +555,15 @@ export class WarpedMapLayer
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
+  getBbox(
+    options?: Partial<ProjectionOptions & MaskOptions>
+  ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
+    return this.renderer.warpedMapList.getMapsBbox(options)
   }
 
   /**
@@ -569,17 +574,17 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
     mapIds: string[],
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsBbox(
-      mergePartialOptions({ mapIds }, projectionOptions)
+      mergePartialOptions({ mapIds }, options)
     )
   }
 
@@ -591,15 +596,15 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
    */
   getConvexHull(
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
+    return this.renderer.warpedMapList.getMapsConvexHull(options)
   }
 
   /**
@@ -610,17 +615,17 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
     mapIds: string[],
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsConvexHull(
-      mergePartialOptions({ mapIds }, projectionOptions)
+      mergePartialOptions({ mapIds }, options)
     )
   }
 
