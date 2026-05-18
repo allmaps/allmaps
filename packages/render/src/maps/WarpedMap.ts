@@ -338,6 +338,45 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
+   * Get the resource applied mask, mask or full mask, based on an input option.
+   */
+  getResourceAppliedMask(applyMask?: boolean): Ring {
+    if (applyMask === undefined) {
+      return this.resourceAppliedMask
+    } else if (applyMask) {
+      return this.resourceMask
+    } else {
+      return this.resourceFullMask
+    }
+  }
+
+  /**
+   * Get the geo applied mask, mask or full mask, based on an input option.
+   */
+  getGeoAppliedMask(applyMask?: boolean): Ring {
+    if (applyMask === undefined) {
+      return this.geoAppliedMask
+    } else if (applyMask) {
+      return this.geoMask
+    } else {
+      return this.geoFullMask
+    }
+  }
+
+  /**
+   * Get the projected geo applied mask, mask or full mask, based on an input option.
+   */
+  getProjectedGeoAppliedMask(applyMask?: boolean): Ring {
+    if (applyMask === undefined) {
+      return this.projectedGeoAppliedMask
+    } else if (applyMask) {
+      return this.projectedGeoMask
+    } else {
+      return this.projectedGeoFullMask
+    }
+  }
+
+  /**
    * Get default and georeferenced map options
    */
   getDefaultAndGeoreferencedMapOptions(): WarpedMapOptions {

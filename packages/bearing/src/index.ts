@@ -8,21 +8,20 @@ import {
   computeBbox,
   mergeOptions,
   midPoint,
-  radiansToDegrees
+  radiansToDegrees,
+  sizeToRectangle
 } from '@allmaps/stdlib'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { TransformationTypeInputs } from '@allmaps/transform'
 import type { Point, Ring } from '@allmaps/types'
-import type { WarpedMap } from '@allmaps/render'
+import type { MaskOptions, WarpedMap } from '@allmaps/render'
 
-export type BearingOptions = {
-  orientation: 'horizontal' | 'vertical' | 'mean'
+export type BearingOptions = Partial<MaskOptions> & {
+  orientation?: 'horizontal' | 'vertical'
 }
 
-export const DEFAULT_BEARING_OPTIONS: BearingOptions = {
-  orientation: 'mean'
-}
+export const DEFAULT_BEARING_OPTIONS: BearingOptions = {}
 
 /**
  * Compute the bearing of a Georeferenced Map.
@@ -40,16 +39,26 @@ export function computeGeoreferencedMapBearing(
     throw new Error('Not enough GCPs to compute bearing')
   }
 
+  let resourceMask
+  if (options?.applyMask === false) {
+    const width = georeferencedMap.resource.width
+    const height = georeferencedMap.resource.height
+    if (!width || !height) {
+      throw new Error(
+        'Width and height must be known to compute bearing without mask'
+      )
+    }
+    resourceMask = sizeToRectangle([width, height])
+  } else {
+    resourceMask = georeferencedMap.resourceMask
+  }
+
   const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
     georeferencedMap,
     options
   )
 
-  return computeBearingInternal(
-    georeferencedMap.resourceMask,
-    projectedTransformer,
-    options
-  )
+  return computeBearingInternal(resourceMask, projectedTransformer, options)
 }
 
 /**
@@ -74,19 +83,13 @@ export function computeWarpedMapBearing(
   )
 
   return computeBearingInternal(
-    warpedMap.resourceMask,
+    warpedMap.getResourceAppliedMask(options?.applyMask),
     projectedTransformer,
     options
   )
 }
 
-/**
- * Description placeholder
- *
- * @param resourceMask
- * @param projectedTransformer
- * @returns The bearing, in degrees from the north line in the clockwise (negative) direction
- */
+// Compute the bearing by checking the orientation of
 function computeBearingInternal(
   resourceMask: Ring,
   projectedTransformer: ProjectedGcpTransformer,

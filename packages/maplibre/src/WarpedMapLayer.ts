@@ -1,7 +1,7 @@
 import { Map as MaplibreMap, CustomLayerInterface } from 'maplibre-gl'
 
 import { WebGL2Renderer } from '@allmaps/render/webgl2'
-import { Viewport, WarpedMapEvent } from '@allmaps/render'
+import { MaskOptions, Viewport, WarpedMapEvent } from '@allmaps/render'
 import {
   angularMean,
   bboxToLine,
@@ -39,8 +39,7 @@ export type SpecificMapLibreWarpedMapLayerOptions = {
   layerRenderingMode: '2d'
 }
 
-export type CenterZoomBearingOptions = {
-  applyMask: boolean
+export type CenterZoomBearingOptions = Partial<MaskOptions> & {
   bearingSelection: 'first' | 'angularMean'
   fit: Fit
 }
@@ -55,7 +54,6 @@ const DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpe
     layerRenderingMode: '2d'
   }
 const DEFAULT_BEARING_OPTIONS: CenterZoomBearingOptions = {
-  applyMask: true,
   bearingSelection: 'first',
   fit: 'contain'
 }
@@ -177,6 +175,23 @@ export class WarpedMapLayer
   }
 
   /**
+   * Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit the selected map.
+   *
+   * This can be used as input for
+   * - Map.jumpTo() for immediate change
+   * - Map.easeTo() for smooth panning
+   * - Map.flyTo() for a flying animation which zooms out and back in
+   *
+   * @returns center, zoom and bearing
+   */
+  getMapCenterZoomBearing(
+    mapId: string,
+    options?: Partial<CenterZoomBearingOptions & CameraForBoundsOptions>
+  ): CenterZoomBearing {
+    return this.getMapsCenterZoomBearing([mapId], options)
+  }
+
+  /**
    * Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all selected maps.
    *
    * This can be used as input for
@@ -215,12 +230,12 @@ export class WarpedMapLayer
     // Compute bearing
     let bearing
     if (options.bearingSelection == 'first') {
-      bearing = computeWarpedMapBearing(warpedMaps[0])
+      bearing = computeWarpedMapBearing(warpedMaps[0], options)
     } else if (options.bearingSelection == 'angularMean') {
       bearing = radiansToDegrees(
         angularMean(
           ...warpedMaps.map((warpedMap) =>
-            degreesToRadians(computeWarpedMapBearing(warpedMap))
+            degreesToRadians(computeWarpedMapBearing(warpedMap, options))
           )
         )
       )
@@ -232,9 +247,9 @@ export class WarpedMapLayer
     //
     // Note: bearing is in clockwise direction and rotation functions
     // go in counter-clockwise direction so no minus sign needed.
-    const projectedGeoMasks = options.applyMask
-      ? warpedMaps.map((warpedMap) => warpedMap.projectedGeoAppliedMask)
-      : warpedMaps.map((warpedMap) => warpedMap.projectedGeoMask)
+    const projectedGeoMasks = warpedMaps.map((warpedMap) =>
+      warpedMap.getProjectedGeoAppliedMask(options.applyMask)
+    )
     const rotatedBboxProperties = computeRotatedBboxProperties(
       projectedGeoMasks,
       degreesToRadians(bearing)
