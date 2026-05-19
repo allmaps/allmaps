@@ -8,7 +8,16 @@ export {
 } from './shared/maps.js'
 
 export { ResponseError } from './shared/errors.js'
-export { DEFAULT_LIMIT, MAX_LIMIT, clampLimit } from './shared/limits.js'
+export {
+  DEFAULT_LIMIT,
+  PUBLIC_MAX_LIMIT,
+  USER_MAX_LIMIT,
+  MEMBER_MAX_LIMIT,
+  ADMIN_MAX_LIMIT,
+  clampLimit,
+  needsElevatedLimitRole
+} from './shared/limits.js'
+export type { UserRole } from './shared/limits.js'
 export { normalizeMapsQueryParams } from './shared/query-params.js'
 export { queryRandom } from './shared/random.js'
 export { setCacheControl } from './elysia/cache.js'

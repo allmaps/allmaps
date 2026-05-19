@@ -20,11 +20,11 @@ import {
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
-import { maps } from './routes/maps.js'
-import { images } from './routes/images.js'
-import { canvases } from './routes/canvases.js'
-import { manifests } from './routes/manifests.js'
-import { organizations } from './routes/organizations.js'
+import { createMapsRoutes } from './routes/maps.js'
+import { createImagesRoutes } from './routes/images.js'
+import { createCanvasesRoutes } from './routes/canvases.js'
+import { createManifestsRoutes } from './routes/manifests.js'
+import { createOrganizationsRoutes } from './routes/organizations.js'
 import { createListsRoutes } from './routes/lists.js'
 
 import packageJson from '../package.json' with { type: 'json' }
@@ -68,11 +68,11 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
         }
       })
     )
-    .use(maps)
-    .use(images)
-    .use(canvases)
-    .use(manifests)
-    .use(organizations)
+    .use(createMapsRoutes(env, betterAuth))
+    .use(createImagesRoutes(env, betterAuth))
+    .use(createCanvasesRoutes(env, betterAuth))
+    .use(createManifestsRoutes(env, betterAuth))
+    .use(createOrganizationsRoutes(env, betterAuth))
     .use(createListsRoutes(env, betterAuth))
     .get(
       '/',

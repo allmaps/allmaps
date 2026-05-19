@@ -10,6 +10,7 @@ import { ResponseError, clampLimit } from '@allmaps/api-shared'
 
 import type { LanguageString } from '@allmaps/iiif-parser'
 import type { Db } from '@allmaps/db'
+import type { UserRole } from '../shared/limits.js'
 
 type DbManifest = {
   id: string
@@ -236,6 +237,7 @@ export async function queryImages(
     limit?: number
     randomImageId?: string
     randomImageIdOp?: 'gt' | 'lte'
+    userRole?: UserRole
   },
   responseOptions: {
     expectRows: boolean
@@ -328,7 +330,9 @@ export async function queryImages(
       ? (images, { asc, desc }) =>
           params.randomImageIdOp === 'gt' ? asc(images.id) : desc(images.id)
       : undefined,
-    limit: responseOptions.singular ? 1 : clampLimit(params.limit ?? 100)
+    limit: responseOptions.singular
+      ? 1
+      : clampLimit(params.limit ?? 100, params.userRole)
   })
 
   if (responseOptions.expectRows && rows.length === 0) {
@@ -352,6 +356,7 @@ export async function queryCanvases(
     limit?: number
     randomCanvasId?: string
     randomCanvasIdOp?: 'gt' | 'lte'
+    userRole?: UserRole
   },
   responseOptions: {
     expectRows: boolean
@@ -447,7 +452,9 @@ export async function queryCanvases(
             ? asc(canvases.id)
             : desc(canvases.id)
       : undefined,
-    limit: responseOptions.singular ? 1 : clampLimit(params.limit ?? 100)
+    limit: responseOptions.singular
+      ? 1
+      : clampLimit(params.limit ?? 100, params.userRole)
   })
 
   if (responseOptions.expectRows && rows.length === 0) {
@@ -471,6 +478,7 @@ export async function queryManifests(
     limit?: number
     randomManifestId?: string
     randomManifestIdOp?: 'gt' | 'lte'
+    userRole?: UserRole
   },
   responseOptions: {
     expectRows: boolean
@@ -571,7 +579,9 @@ export async function queryManifests(
             ? asc(manifests.id)
             : desc(manifests.id)
       : undefined,
-    limit: responseOptions.singular ? 1 : clampLimit(params.limit ?? 100)
+    limit: responseOptions.singular
+      ? 1
+      : clampLimit(params.limit ?? 100, params.userRole)
   })
 
   if (responseOptions.expectRows && rows.length === 0) {

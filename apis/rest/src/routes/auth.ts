@@ -32,7 +32,13 @@ export function createAuthRoutes(
       '/users',
       ({ db, env, query, set }) => {
         setCacheControl(set, 'private-no-store')
-        return queryUsers(db, env.PUBLIC_REST_BASE_URL, query.limit, true)
+        return queryUsers(
+          db,
+          env.PUBLIC_REST_BASE_URL,
+          query.limit,
+          true,
+          'admin'
+        )
       },
       {
         admin: true,

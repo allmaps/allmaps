@@ -1,7 +1,11 @@
 import { t } from 'elysia'
 
 import { queryMaps, queryChecksums } from '@allmaps/api-shared/db'
-import { normalizeMapsQueryParams, setCacheControl } from '@allmaps/api-shared'
+import {
+  needsElevatedLimitRole,
+  normalizeMapsQueryParams,
+  setCacheControl
+} from '@allmaps/api-shared'
 
 import { RegExpRoute, createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
@@ -53,12 +57,19 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/maps',
-      ({ request, env, db, set }) => {
-        setCacheControl(set, 'public-short')
+      async ({ request, env, db, set, getLimitRole }) => {
+        const queryParams = normalizeMapsQueryParams(request)
+        const userRole = needsElevatedLimitRole(queryParams.limit)
+          ? await getLimitRole()
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          normalizeMapsQueryParams(request),
+          { ...queryParams, userRole },
           { format: 'map', expectRows: false, singular: false }
         )
       },
@@ -69,12 +80,19 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .get(
       '/maps.geojson',
-      ({ request, env, db, set }) => {
-        setCacheControl(set, 'public-short')
+      async ({ request, env, db, set, getLimitRole }) => {
+        const queryParams = normalizeMapsQueryParams(request)
+        const userRole = needsElevatedLimitRole(queryParams.limit)
+          ? await getLimitRole()
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          normalizeMapsQueryParams(request),
+          { ...queryParams, userRole },
           { format: 'geojson', expectRows: false, singular: false }
         )
       },

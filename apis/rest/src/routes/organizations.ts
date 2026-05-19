@@ -18,7 +18,7 @@ import {
   queryCanvases,
   queryManifests
 } from '@allmaps/api-shared/db'
-import { setCacheControl } from '@allmaps/api-shared'
+import { needsElevatedLimitRole, setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
@@ -56,7 +56,8 @@ export function createOrganizationsRoutes(
           return listOrganizationsWithUsers(
             db,
             env.PUBLIC_REST_BASE_URL,
-            query.limit
+            query.limit,
+            'admin'
           )
         }
 
@@ -103,15 +104,25 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/manifests',
-      ({ env, db, params, query, set }) => {
-        setCacheControl(set, 'public-short')
+      async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
+        const userRole = needsElevatedLimitRole(query.limit)
+          ? await getOrganizationLimitRole({
+              id: params.organizationId
+            })
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
+
         return queryManifests(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
             organizationId: params.organizationId,
             georeferenced: query.georeferenced,
-            limit: query.limit
+            limit: query.limit,
+            userRole
           },
           { expectRows: false, singular: false }
         )
@@ -126,15 +137,25 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/canvases',
-      ({ env, db, params, query, set }) => {
-        setCacheControl(set, 'public-short')
+      async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
+        const userRole = needsElevatedLimitRole(query.limit)
+          ? await getOrganizationLimitRole({
+              id: params.organizationId
+            })
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
+
         return queryCanvases(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
             organizationId: params.organizationId,
             georeferenced: query.georeferenced,
-            limit: query.limit
+            limit: query.limit,
+            userRole
           },
           { expectRows: false, singular: false }
         )
@@ -149,15 +170,25 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/images',
-      ({ env, db, params, query, set }) => {
-        setCacheControl(set, 'public-short')
+      async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
+        const userRole = needsElevatedLimitRole(query.limit)
+          ? await getOrganizationLimitRole({
+              id: params.organizationId
+            })
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
+
         return queryImages(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
             organizationId: params.organizationId,
             georeferenced: query.georeferenced,
-            limit: query.limit
+            limit: query.limit,
+            userRole
           },
           { expectRows: false, singular: false }
         )

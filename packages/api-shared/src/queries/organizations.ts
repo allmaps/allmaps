@@ -12,6 +12,7 @@ import {
 import { clampLimit } from '../shared/limits.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
+import type { UserRole } from '../shared/limits.js'
 
 type DbOrganization = {
   id: string
@@ -206,14 +207,15 @@ export async function replaceOrganizationUrls(
 export async function listOrganizations(
   db: Db,
   restBaseUrl: string,
-  limit?: number
+  limit?: number,
+  userRole?: UserRole
 ) {
   const dbOrganizations = await db.query.organizations.findMany({
     with: {
       urls: true
     },
     orderBy: (organizations, { asc }) => asc(organizations.name),
-    limit: clampLimit(limit)
+    limit: clampLimit(limit, userRole)
   })
 
   return dbOrganizations.map((dbOrganization) =>
@@ -224,7 +226,8 @@ export async function listOrganizations(
 export async function listOrganizationsWithUsers(
   db: Db,
   restBaseUrl: string,
-  limit?: number
+  limit?: number,
+  userRole?: UserRole
 ) {
   const [dbOrganizations, usersByOrganizationId] = await Promise.all([
     db.query.organizations.findMany({
@@ -232,7 +235,7 @@ export async function listOrganizationsWithUsers(
         urls: true
       },
       orderBy: (organizations, { asc }) => asc(organizations.name),
-      limit: clampLimit(limit)
+      limit: clampLimit(limit, userRole)
     }),
     queryAllOrganizationUsers(db, restBaseUrl)
   ])

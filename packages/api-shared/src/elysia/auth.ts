@@ -1,11 +1,17 @@
 import { t } from 'elysia'
+import { and, eq } from 'drizzle-orm'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
+import * as authSchema from '@allmaps/db/schema/auth'
 
 import { ResponseError } from '../shared/errors.js'
 import { createElysia } from './app.js'
 import { setCacheControl } from './cache.js'
 import { redirect } from './response.js'
+
+import type { UserRole } from '../shared/limits.js'
+
+const PAID_ORGANIZATION_PLANS = new Set(['supporter', 'innovator'])
 
 function copySetCookieHeader(
   response: Response,
@@ -47,20 +53,74 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
         }
       }
     })
-    .derive(({ request: { headers } }) => {
+    .derive(({ db, request: { headers } }) => {
+      const getOptionalSession = async () => auth.api.getSession({ headers })
+
       return {
-        getOptionalSession: async () => auth.api.getSession({ headers }),
+        getOptionalSession,
+        getLimitRole: async (): Promise<UserRole> => {
+          const session = await getOptionalSession()
+
+          return session?.user.role === 'admin'
+            ? 'admin'
+            : session?.user.id
+              ? 'user'
+              : 'public'
+        },
         getSession: async () => {
-          const session = await auth.api.getSession({ headers })
+          const session = await getOptionalSession()
 
           if (!session) {
             throw new ResponseError('Unauthorized', 401)
           }
 
           return session
+        },
+        getOrganizationLimitRole: async (organization: {
+          id?: string
+          slug?: string
+        }): Promise<UserRole> => {
+          const session = await getOptionalSession()
+
+          if (session?.user.role === 'admin') {
+            return 'admin'
+          }
+
+          if (!session?.user.id || (!organization.id && !organization.slug)) {
+            return 'public'
+          }
+
+          const [membership] = await db
+            .select({
+              plan: authSchema.organizations.plan
+            })
+            .from(authSchema.members)
+            .innerJoin(
+              authSchema.organizations,
+              eq(authSchema.members.organizationId, authSchema.organizations.id)
+            )
+            .where(
+              and(
+                eq(authSchema.members.userId, session.user.id),
+                organization.id
+                  ? eq(authSchema.organizations.id, organization.id)
+                  : eq(authSchema.organizations.slug, organization.slug!)
+              )
+            )
+            .limit(1)
+
+          if (
+            membership?.plan &&
+            PAID_ORGANIZATION_PLANS.has(membership.plan)
+          ) {
+            return 'member'
+          }
+
+          return 'user'
         }
       }
     })
+    .as('global')
 }
 
 export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
