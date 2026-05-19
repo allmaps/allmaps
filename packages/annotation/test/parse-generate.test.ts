@@ -37,6 +37,107 @@ describe('Parsing a generated annotation', () => {
   })
 })
 
+describe('Parsing provider homepages', () => {
+  test('Invalid homepage URLs should be omitted', () => {
+    const map = readJSONFile(path.join(inputDir, mapFilename)) as {
+      resource: {
+        provider?: unknown
+      }
+    }
+
+    map.resource.provider = [
+      {
+        label: { none: ['Example Organization'] },
+        homepage: [
+          { id: 'https://example.org/' },
+          { id: 'example.org' },
+          { id: 'not a url' }
+        ]
+      }
+    ]
+
+    const annotation = generateAnnotation(map)
+
+    expect(annotation).toMatchObject({
+      target: {
+        source: {
+          provider: [
+            {
+              homepage: [{ id: 'https://example.org/' }]
+            }
+          ]
+        }
+      }
+    })
+  })
+
+  test('Invalid annotation homepage URLs should be omitted', () => {
+    const map = readJSONFile(path.join(inputDir, mapFilename))
+    const annotation = generateAnnotation(map) as {
+      target: {
+        source: {
+          provider?: unknown
+        }
+      }
+    }
+
+    annotation.target.source.provider = [
+      {
+        label: { none: ['Example Organization'] },
+        homepage: [
+          { id: 'https://example.org/' },
+          { id: 'example.org' },
+          { id: 'not a url' }
+        ]
+      }
+    ]
+
+    const parsedMaps = parseAnnotation(annotation)
+
+    expect(parsedMaps[0]).toMatchObject({
+      resource: {
+        provider: [
+          {
+            homepage: [{ id: 'https://example.org/' }]
+          }
+        ]
+      }
+    })
+  })
+})
+
+describe('Generating annotations with invalid resource dimensions', () => {
+  test('Non-positive resource dimensions should be omitted', () => {
+    const map = readJSONFile(path.join(inputDir, mapFilename)) as {
+      resource: {
+        width: number
+        height: number
+      }
+    }
+
+    map.resource.width = 0
+    map.resource.height = 0
+
+    const annotation = generateAnnotation(map) as {
+      target: {
+        source: {
+          width?: number
+          height?: number
+        }
+        selector: {
+          value: string
+        }
+      }
+    }
+
+    expect(annotation.target.source).not.toHaveProperty('width')
+    expect(annotation.target.source).not.toHaveProperty('height')
+    expect(annotation.target.selector.value).toBe(
+      '<svg><polygon points="117,120 113,1776 4587,1772 4568,101" /></svg>'
+    )
+  })
+})
+
 describe('Parsing annotations without motivation', () => {
   test('Version 0 schema should preserve omission', () => {
     const annotation = readJSONFile(
