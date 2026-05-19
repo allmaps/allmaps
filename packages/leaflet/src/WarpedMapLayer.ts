@@ -417,9 +417,9 @@ export class WarpedMapLayer
   }
 
   // Normal functions
-  //
-  // These are copied from @allmaps/warpedmaplayermap
-  // since classes can only extend one class
+  // These function are copied automatically from @allmaps/warpedmaplayer's WarpedMapLayer.ts
+
+  // START_AUTOMATED_COPY
 
   /**
    * Adds a Georeference Annotation
@@ -1428,4 +1428,6 @@ export class WarpedMapLayer
       this.nativeUpdate.bind(this)
     )
   }
+
+  // END_AUTOMATED_COPY
 }
