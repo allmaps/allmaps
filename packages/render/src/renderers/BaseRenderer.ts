@@ -78,6 +78,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // TODO: move defaults for tunable options here
     this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {
+      overviewTiles: true,
+
       // These buffers should be in growing order
       requestViewportBufferRatio: 0,
       overviewRequestViewportBufferRatio: 8,
@@ -93,8 +95,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       spritesMaxHigherLog2ScaleFactorDiff: Infinity,
       spritesMaxLowerLog2ScaleFactorDiff: 1,
 
-      // Support one 1024 * 1024 overview tile, e.g. for Rotterdam map.
-      maxMapOverviewResolution: 1024 * 1024,
       maxTotalOverviewResolutionRatio: 50,
 
       maxGcpsExactTpsToResource: 100
@@ -519,7 +519,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Get overview fetchable tiles for all maps in viewport with overview buffer
     // (and set properties for the current viewport for all maps in viewport with prune buffer)
-    if (this.shouldAnticipateInteraction()) {
+    if (this.shouldAnticipateInteraction() && this.options.overviewTiles) {
       for (const mapId of mapsInViewportForOverviewPrune) {
         const mapOverviewFetchableTilesForViewport =
           this.getMapOverviewFetchableTilesForViewport(
@@ -547,7 +547,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const allRequestedTilesForViewport = allFetchableTilesForViewport.filter(
       (fetchableTile) => {
         const warpedMap = this.warpedMapList.getWarpedMap(fetchableTile.mapId)
-        return warpedMap?.shouldRenderMap() || warpedMap?.options.anticipate
+        return warpedMap?.shouldRenderMap() || warpedMap?.options.overviewTiles
       }
     )
 
@@ -609,7 +609,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return new Set(
       this.warpedMapList
         .getWarpedMaps()
-        .filter((warpedMap) => warpedMap.options.anticipate)
+        .filter((warpedMap) => warpedMap.options.overviewTiles)
         .map((warpedmap) => warpedmap.mapId)
     )
   }
@@ -789,6 +789,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     if (!this.viewport) {
       return []
     }
+    const viewport = this.viewport
 
     const warpedMap = this.warpedMapList.getWarpedMap(mapId)
 
@@ -796,7 +797,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.shouldRenderMap() && !warpedMap.options.anticipate) {
+    if (!warpedMap.shouldRenderMap() && !warpedMap.options.overviewTiles) {
       return []
     }
 
@@ -811,8 +812,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // or if many maps to render
     // or if tiles from sprites
     const maxTotalFetchableTilesResolution =
-      this.viewport.viewportResolution *
-      this.options.maxTotalOverviewResolutionRatio
+      viewport.viewportResolution * this.options.maxTotalOverviewResolutionRatio
     if (
       totalFetchableTilesForViewportResolution >
         maxTotalFetchableTilesResolution ||
@@ -822,13 +822,15 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     // Find the fitting overview zoomlevel, if any
+    const overviewTilesMaxResolution =
+      warpedMap.options.overviewTilesMaxResolution == 'viewport'
+        ? viewport.viewportResolution
+        : warpedMap.options.overviewTilesMaxResolution
     const overviewTileZoomLevel = warpedMap.image.tileZoomLevels
       .filter(
         (tileZoomLevel) =>
-          warpedMap.options.anticipateTileZoomLevel == 'top'
-            ? true
-            : getTileZoomLevelResolution(tileZoomLevel) <=
-              this.options.maxMapOverviewResolution
+          getTileZoomLevelResolution(tileZoomLevel) <=
+          overviewTilesMaxResolution
         // Neglect zoomlevels that contain too many pixels
       )
       .sort(
@@ -836,14 +838,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           tileZoomLevel0.scaleFactor - tileZoomLevel1.scaleFactor
         // Enforcing default ascending order, e.g. from 1 to 16
       )
-      .at(-1)
+      .at(warpedMap.options.overviewTilesSelection == 'lowest' ? 0 : -1)
     warpedMap.setOverviewTileZoomLevelForViewport(overviewTileZoomLevel)
 
     // If this map it outside of the viewport with overview buffer, or if the map is invisible, stop here:
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
     if (
-      !warpedMap.options.anticipate &&
+      !warpedMap.options.overviewTiles &&
       (!mapsInViewportForOverviewRequest.has(mapId) ||
         !warpedMap.shouldRenderMap())
     ) {
