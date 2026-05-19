@@ -63,8 +63,9 @@ export abstract class BaseWarpedMapLayer<
   abstract nativePassWarpedMapEvent(event: Event): void
 
   // Normal functions
-  //
-  // These are to be copied to manually to @allmaps/openlayers and @allmaps/leaflet's WarpedMapLayer.ts
+  // These function are copied automatically to @allmaps/openlayers and @allmaps/leaflet's WarpedMapLayer.ts
+
+  // START_AUTOMATED_COPY
 
   /**
    * Adds a Georeference Annotation
@@ -1074,9 +1075,9 @@ export abstract class BaseWarpedMapLayer<
     )
   }
 
+  // END_AUTOMATED_COPY
+
   // Static functions
-  //
-  // Not to be copied
 
   static assertRenderer(
     renderer?: WebGL2Renderer

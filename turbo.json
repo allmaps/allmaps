@@ -10,7 +10,7 @@
         "svelte.config.js"
       ],
       "outputs": ["dist/**", "build/**"],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "copy-between"]
     },
     "types": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],
@@ -43,6 +43,11 @@
       "inputs": ["src/**", "package.json", "README.md"],
       "outputs": ["README.md"],
       "dependsOn": ["^documentation"]
+    },
+    "copy-between": {
+      "inputs": ["src/WarpedMapLayer.ts", "../../scripts/copy-between.ts"],
+      "outputs": [],
+      "cache": false
     },
     "precommit": {
       "dependsOn": ["build", "test", "types", "lint", "documentation"]
