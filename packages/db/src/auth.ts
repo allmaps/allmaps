@@ -38,6 +38,7 @@ export function createAuth(env: BetterAuthEnv) {
       }
     },
     advanced: {
+      cookiePrefix: env.BETTER_AUTH_COOKIE_PREFIX,
       crossSubDomainCookies: useAllmapsCookieDomain
         ? { enabled: true, domain: 'allmaps.org' }
         : { enabled: false },
