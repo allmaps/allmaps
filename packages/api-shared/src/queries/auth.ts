@@ -5,6 +5,7 @@ import * as authSchema from '@allmaps/db/schema/auth'
 import { clampLimit } from '../shared/limits.js'
 
 import type { Db } from '@allmaps/db'
+import type { UserRole } from '../shared/limits.js'
 
 type DbUser = typeof authSchema.users.$inferSelect & {
   members?: {
@@ -296,7 +297,8 @@ export async function queryUsers(
   db: Db,
   restBaseUrl: string,
   limit?: number,
-  includeOrganizations = false
+  includeOrganizations = false,
+  userRole?: UserRole
 ) {
   if (includeOrganizations) {
     const users = await db.query.users.findMany({
@@ -325,7 +327,7 @@ export async function queryUsers(
         }
       },
       orderBy: (users, { asc }) => asc(users.createdAt),
-      limit: clampLimit(limit)
+      limit: clampLimit(limit, userRole)
     })
 
     return users.map((user) => fromDbUser(restBaseUrl, user))
@@ -336,7 +338,7 @@ export async function queryUsers(
     .from(authSchema.users)
     .where(eq(authSchema.users.isAnonymous, false))
     .orderBy(authSchema.users.createdAt)
-    .limit(clampLimit(limit))
+    .limit(clampLimit(limit, userRole))
 
   return users.map((user) => fromDbUser(restBaseUrl, user))
 }
