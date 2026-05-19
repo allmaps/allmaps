@@ -1174,16 +1174,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     for (const fetchableTile of this.overviewFetchableTilesForViewport) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
       if (cachedTile) {
-        // If they are available, consider to include them
-        const tileZoolLevelTilesCount = this.tileZoomLevelForViewport
+        // If they are available, consider to include them,
+        // if this map's cached tiles don't already cover the entire zoomlevel
+        const tileZoomLevelTilesCount = this.tileZoomLevelForViewport
           ? this.tileZoomLevelForViewport.rows *
             this.tileZoomLevelForViewport.columns
           : undefined
-        // If this map's cached tiles don't already cover the entire zoomlevel
         if (
           cachedTiles.length === 0 ||
-          (tileZoolLevelTilesCount &&
-            cachedTiles.length < tileZoolLevelTilesCount)
+          (tileZoomLevelTilesCount &&
+            cachedTiles.length < tileZoomLevelTilesCount)
         ) {
           overviewCachedTiles.push(cachedTile)
         }
