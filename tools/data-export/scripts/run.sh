@@ -2,31 +2,37 @@
 
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+TOOL_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
+REPO_DIR="$(cd -- "$TOOL_DIR/../.." && pwd)"
 
 echo "Starting Allmaps data export"
 date -u
+echo "Script directory: $SCRIPT_DIR"
+echo "Tool directory: $TOOL_DIR"
+echo "Repository directory: $REPO_DIR"
+echo "Working directory: $(pwd)"
 
 # =============================================================================
 # Georeference Annotations, GeoJSON, etc.
 # =============================================================================
 
 echo "Exporting maps and annotations"
-pnpm run export production
+pnpm --dir "$REPO_DIR" --filter @allmaps/data-export run export production
 
 # =============================================================================
 # PMTiles
 # =============================================================================
 
 echo "Creating PMTiles"
-pnpm run pmtiles
+pnpm --dir "$REPO_DIR" --filter @allmaps/data-export run pmtiles
 
 # =============================================================================
 # Upload to R2 using rclone
 # =============================================================================
 
 echo "Uploading export files"
-pnpm run upload
+pnpm --dir "$REPO_DIR" --filter @allmaps/data-export run upload
 
 echo "Finished Allmaps data export"
 date -u
