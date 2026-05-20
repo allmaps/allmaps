@@ -22,8 +22,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.json ts
 COPY packages ./packages
 COPY tools/data-export ./tools/data-export
 
-RUN corepack enable \
-  && corepack prepare pnpm@10.0.0 --activate \
+RUN npm install -g pnpm@10.0.0 \
   && pnpm install --frozen-lockfile \
   && pnpm --filter @allmaps/data-export... run build
 
