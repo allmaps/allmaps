@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 // import { parseAnnotation } from '@allmaps/annotation'
 // import { WasmRenderer, type OutputFormat } from '@allmaps/render/wasm'
 // import { IntArrayRenderer } from '@allmaps/render/intarray'

@@ -30,8 +30,7 @@ const mapsQueryParamNames: Record<string, MapsQueryParamName> = {
 }
 
 const dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/
-const utcDateTimePattern =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+const utcDateTimePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
 
 function parseNumberParam(name: string, value: string) {
   const number = Number(value)
