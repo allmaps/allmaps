@@ -13,7 +13,7 @@ export async function generateTileJsonResponse(
   env: WorkerEnv,
   georeferencedMaps: GeoreferencedMap[],
   options: TransformationOptions,
-  urlTemplate: string
+  urlTemplates: string[]
 ): Promise<Response> {
   // TODO: simplify this when this will be aligned with TransformationOptions from @allmaps/render
   let transformationType
@@ -43,8 +43,8 @@ export async function generateTileJsonResponse(
 
   return json({
     tilejson: '3.0.0',
-    id: urlTemplate,
-    tiles: [urlTemplate],
+    id: urlTemplates[0],
+    tiles: urlTemplates,
     fields: {},
     bounds,
     center

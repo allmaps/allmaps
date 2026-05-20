@@ -44,6 +44,8 @@ function xyzFromParams(params: unknown): XYZTile {
 // Direct template URL requests - redirect to tiles.allmaps.org
 // -------------------------------------------------------------------------------------------
 
+// First, PNG tiles:
+
 router.get('/%7Bz%7D/%7Bx%7D/%7By%7D@2x.png', (req, env) => {
   const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
   return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
@@ -87,6 +89,54 @@ router.get('/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
   return generateTilesHtml(req, tileViewerBaseUrl)
 })
 
+// And WebP tiles:
+
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D@2x.webp', (req, env) => {
+  const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+})
+
+router.get('/%7Bz%7D/%7Bx%7D/%7By%7D.webp', (req, env) => {
+  const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
+})
+
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.webp', (req, env) => {
+  const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+})
+
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+  const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
+})
+
+router.get('/images/:imageId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.webp', (req, env) => {
+  const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+})
+
+router.get('/images/:imageId/%7Bz%7D/%7Bx%7D/%7By%7D.webp', (req, env) => {
+  const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+  return generateTilesHtml(req, tileViewerBaseUrl)
+})
+
+router.get(
+  '/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.webp',
+  (req, env) => {
+    const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+    return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
+  }
+)
+
+router.get(
+  '/manifests/:manifestId/%7Bz%7D/%7Bx%7D/%7By%7D.webp',
+  (req, env) => {
+    const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
+    return generateTilesHtml(req, tileViewerBaseUrl)
+  }
+)
+
 // -------------------------------------------------------------------------------------------
 // TileJSON
 // -------------------------------------------------------------------------------------------
@@ -96,9 +146,12 @@ router.get('/tiles@2x.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}@2x.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}@2x.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}@2x.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/tiles.json', async (req, env) => {
@@ -106,9 +159,12 @@ router.get('/tiles.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/maps/:mapId/tiles@2x.json', async (req, env) => {
@@ -117,9 +173,12 @@ router.get('/maps/:mapId/tiles@2x.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}@2x.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}@2x.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}@2x.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/maps/:mapId/tiles.json', async (req, env) => {
@@ -128,9 +187,12 @@ router.get('/maps/:mapId/tiles.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/images/:imageId/tiles@2x.json', async (req, env) => {
@@ -139,9 +201,12 @@ router.get('/images/:imageId/tiles@2x.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}@2x.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}@2x.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}@2x.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/images/:imageId/tiles.json', async (req, env) => {
@@ -150,9 +215,12 @@ router.get('/images/:imageId/tiles.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/manifests/:manifestId/tiles@2x.json', async (req, env) => {
@@ -161,9 +229,12 @@ router.get('/manifests/:manifestId/tiles@2x.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}@2x.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}@2x.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}@2x.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
@@ -172,9 +243,12 @@ router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
   const options = optionsFromQuery(req)
 
   const url = new URL(req.url)
-  const urlTemplate = `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.webp${url.search}`
+  const urlTemplates = [
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`,
+    `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.webp${url.search}`
+  ]
 
-  return generateTileJsonResponse(env, maps, options, urlTemplate)
+  return generateTileJsonResponse(env, maps, options, urlTemplates)
 })
 
 // -------------------------------------------------------------------------------------------
