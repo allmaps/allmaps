@@ -1,0 +1,7 @@
+.git
+**/.DS_Store
+**/.turbo
+**/data
+**/dist
+**/node_modules
+**/*.tsbuildinfo

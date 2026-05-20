@@ -18,13 +18,16 @@ RUN git clone https://github.com/felt/tippecanoe.git /tmp/tippecanoe \
 
 WORKDIR /allmaps
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.json tsconfig.base.json ./
-COPY packages ./packages
-COPY tools/data-export ./tools/data-export
+RUN npm install -g pnpm@10.0.0
 
-RUN npm install -g pnpm@10.0.0 \
-  && pnpm install --frozen-lockfile \
-  && pnpm --filter @allmaps/data-export... run build
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+RUN pnpm fetch
+
+COPY . .
+
+RUN pnpm install --offline --frozen-lockfile \
+  && pnpm --filter @allmaps/data-export^... run build
 
 WORKDIR /allmaps/tools/data-export
 
