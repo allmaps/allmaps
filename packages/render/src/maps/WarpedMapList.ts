@@ -1,4 +1,5 @@
 import proj4 from 'proj4'
+import inside from 'point-in-polygon-hao'
 
 import { generateChecksum } from '@allmaps/id/sync'
 import {
@@ -16,12 +17,15 @@ import { WebGL2WarpedMap } from './WebGL2WarpedMap.js'
 import {
   bboxToCenter,
   bboxToLine,
+  closePolygon,
   computeBbox,
   convexHull,
+  doBboxesIntersect,
   mergeOptions,
   mergePartialOptions,
   optionKeysByMapIdToUndefinedOptionsByMapId,
-  optionKeysToUndefinedOptions
+  optionKeysToUndefinedOptions,
+  pointInBbox
 } from '@allmaps/stdlib'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
@@ -366,27 +370,46 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       if (selectionAndProjectionOptions.geoPoint) {
         // Select by geoPoint
         if (selectionAndProjectionOptions.applyMask) {
-          mapIds = this.geoMaskRTree?.searchFromPoint(
-            selectionAndProjectionOptions.geoPoint
-          )
+          mapIds =
+            this.geoMaskRTree?.searchFromPoint(
+              selectionAndProjectionOptions.geoPoint
+            ) ??
+            this.#getMapIdsFromPoint(
+              selectionAndProjectionOptions.geoPoint,
+              (warpedMap) => warpedMap.geoMaskBbox,
+              (warpedMap) => warpedMap.geoMask
+            )
         } else {
-          mapIds = this.geoFullMaskRTree?.searchFromPoint(
-            selectionAndProjectionOptions.geoPoint
-          )
+          mapIds =
+            this.geoFullMaskRTree?.searchFromPoint(
+              selectionAndProjectionOptions.geoPoint
+            ) ??
+            this.#getMapIdsFromPoint(
+              selectionAndProjectionOptions.geoPoint,
+              (warpedMap) => warpedMap.geoFullMaskBbox,
+              (warpedMap) => warpedMap.geoFullMask
+            )
         }
       } else if (selectionAndProjectionOptions.geoBbox) {
         // Select by geoBbox
-        mapIds = this.geoMaskRTree?.searchFromBbox(
-          selectionAndProjectionOptions.geoBbox
-        )
         if (selectionAndProjectionOptions.applyMask) {
-          mapIds = this.geoMaskRTree?.searchFromBbox(
-            selectionAndProjectionOptions.geoBbox
-          )
+          mapIds =
+            this.geoMaskRTree?.searchFromBbox(
+              selectionAndProjectionOptions.geoBbox
+            ) ??
+            this.#getMapIdsFromBbox(
+              selectionAndProjectionOptions.geoBbox,
+              (warpedMap) => warpedMap.geoMaskBbox
+            )
         } else {
-          mapIds = this.geoFullMaskRTree?.searchFromBbox(
-            selectionAndProjectionOptions.geoBbox
-          )
+          mapIds =
+            this.geoFullMaskRTree?.searchFromBbox(
+              selectionAndProjectionOptions.geoBbox
+            ) ??
+            this.#getMapIdsFromBbox(
+              selectionAndProjectionOptions.geoBbox,
+              (warpedMap) => warpedMap.geoFullMaskBbox
+            )
         }
       } else if (selectionAndProjectionOptions.projectedGeoPoint) {
         // Select by projectedGeoPoint
@@ -397,10 +420,22 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         )
         if (selectionAndProjectionOptions.applyMask) {
           mapIds =
-            this.projectedGeoMaskRTree?.searchFromPoint(projectedGeoPoint)
+            this.projectedGeoMaskRTree?.searchFromPoint(projectedGeoPoint) ??
+            this.#getMapIdsFromPoint(
+              projectedGeoPoint,
+              (warpedMap) => warpedMap.projectedGeoMaskBbox,
+              (warpedMap) => warpedMap.projectedGeoMask
+            )
         } else {
           mapIds =
-            this.projectedGeoFullMaskRTree?.searchFromPoint(projectedGeoPoint)
+            this.projectedGeoFullMaskRTree?.searchFromPoint(
+              projectedGeoPoint
+            ) ??
+            this.#getMapIdsFromPoint(
+              projectedGeoPoint,
+              (warpedMap) => warpedMap.projectedGeoFullMaskBbox,
+              (warpedMap) => warpedMap.projectedGeoFullMask
+            )
         }
       } else if (selectionAndProjectionOptions.projectedGeoBbox) {
         // Select by projectedGeoBbox
@@ -410,10 +445,19 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
           selectionAndProjectionOptions.projectedGeoBbox
         )
         if (selectionAndProjectionOptions.applyMask) {
-          mapIds = this.projectedGeoMaskRTree?.searchFromBbox(projectedGeoBbox)
+          mapIds =
+            this.projectedGeoMaskRTree?.searchFromBbox(projectedGeoBbox) ??
+            this.#getMapIdsFromBbox(
+              projectedGeoBbox,
+              (warpedMap) => warpedMap.projectedGeoMaskBbox
+            )
         } else {
-          mapIds = mapIds =
-            this.projectedGeoFullMaskRTree?.searchFromBbox(projectedGeoBbox)
+          mapIds =
+            this.projectedGeoFullMaskRTree?.searchFromBbox(projectedGeoBbox) ??
+            this.#getMapIdsFromBbox(
+              projectedGeoBbox,
+              (warpedMap) => warpedMap.projectedGeoFullMaskBbox
+            )
         }
       } else {
         // Select all
@@ -1160,6 +1204,26 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         warpedMap.projectedGeoFullMask
       ])
     }
+  }
+
+  #getMapIdsFromBbox(bbox: Bbox, getBbox: (warpedMap: W) => Bbox): string[] {
+    return Array.from(this.warpedMapsById.values())
+      .filter((warpedMap) => doBboxesIntersect(bbox, getBbox(warpedMap)))
+      .map((warpedMap) => warpedMap.mapId)
+  }
+
+  #getMapIdsFromPoint(
+    point: Point,
+    getBbox: (warpedMap: W) => Bbox,
+    getMask: (warpedMap: W) => Ring
+  ): string[] {
+    return Array.from(this.warpedMapsById.values())
+      .filter(
+        (warpedMap) =>
+          pointInBbox(point, getBbox(warpedMap)) &&
+          inside(point, closePolygon([getMask(warpedMap)]))
+      )
+      .map((warpedMap) => warpedMap.mapId)
   }
 
   #removeFromRtree(warpedMap: W): void {
