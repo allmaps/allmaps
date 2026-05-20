@@ -9,32 +9,36 @@ import {
   uniqueIndex
 } from 'drizzle-orm/pg-core'
 
-export const users = pgTable('users', {
-  id: text('id').primaryKey(),
-  fullName: text('full_name').notNull(),
-  email: text('email').notNull().unique(),
-  emailVerified: boolean('email_verified').default(false).notNull(),
-  image: text('image'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  isAnonymous: boolean('is_anonymous').default(false),
-  role: text('role'),
-  banned: boolean('banned').default(false),
-  banReason: text('ban_reason'),
-  banExpires: timestamp('ban_expires'),
-  slug: text('slug')
-}, (table) => [
-  uniqueIndex('users_slug_uidx')
-    .on(table.slug)
-    .where(sql`${table.slug} IS NOT NULL`),
-  check(
-    'users_slug_format',
-    sql`${table.slug} IS NULL OR ${table.slug} ~ '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'`
-  )
-])
+export const users = pgTable(
+  'users',
+  {
+    id: text('id').primaryKey(),
+    fullName: text('full_name').notNull(),
+    email: text('email').notNull().unique(),
+    emailVerified: boolean('email_verified').default(false).notNull(),
+    image: text('image'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+    isAnonymous: boolean('is_anonymous').default(false),
+    role: text('role'),
+    banned: boolean('banned').default(false),
+    banReason: text('ban_reason'),
+    banExpires: timestamp('ban_expires'),
+    slug: text('slug')
+  },
+  (table) => [
+    uniqueIndex('users_slug_uidx')
+      .on(table.slug)
+      .where(sql`${table.slug} IS NOT NULL`),
+    check(
+      'users_slug_format',
+      sql`${table.slug} IS NULL OR ${table.slug} ~ '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'`
+    )
+  ]
+)
 
 export const sessions = pgTable(
   'sessions',

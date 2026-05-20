@@ -34,6 +34,8 @@ export {
   queryUserOrganizationsWithRoles,
   queryUserWithOrganizationsById,
   queryAllOrganizationUsers,
+  queryOrganizationIdsByUserId,
+  queryOrganizationUsersByOrganizationIds,
   queryOrganizationMemberByUserId,
   queryOrganizationMembersById,
   queryUserById,
@@ -43,6 +45,7 @@ export {
 
 export {
   normalizeOrganizationSlug,
+  normalizeHomepageUrl,
   normalizeDomain,
   normalizeDomains,
   fromDbOrganization,
@@ -51,6 +54,7 @@ export {
   replaceOrganizationUrls,
   listOrganizations,
   listOrganizationsWithUsers,
+  listOrganizationsWithUsersByOrganizationIds,
   queryOrganizationById,
   queryOrganizationByIdWithUsers,
   queryOrganizationBySlug,

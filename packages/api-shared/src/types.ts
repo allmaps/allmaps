@@ -4,6 +4,7 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { LanguageString } from '@allmaps/iiif-parser'
 
 import type { DbMap } from '@allmaps/db'
+import type { UserRole } from './shared/limits.js'
 
 export type IntersectsWith = [number, number] | [number, number, number, number]
 export type ContainedBy = [number, number, number, number]
@@ -29,6 +30,9 @@ export type MapsQueryParams = {
   maxScale: number
   minArea: number
   maxArea: number
+  modifiedAfter: Date
+  modifiedBefore: Date
+  userRole: UserRole
 }
 
 export type MapsQueryUrlParams = {
@@ -42,6 +46,8 @@ export type MapsQueryUrlParams = {
   maxscale: string
   minarea: string
   maxarea: string
+  modifiedafter: string
+  modifiedbefore: string
 }
 
 export type ExtParams = {

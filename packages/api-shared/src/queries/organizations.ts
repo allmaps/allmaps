@@ -6,12 +6,14 @@ import * as authSchema from '@allmaps/db/schema/auth'
 import * as organizationsSchema from '@allmaps/db/schema/organizations'
 import {
   queryAllOrganizationUsers,
+  queryOrganizationUsersByOrganizationIds,
   queryOrganizationMembersById
 } from './auth.js'
 
 import { clampLimit } from '../shared/limits.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
+import type { UserRole } from '../shared/limits.js'
 
 type DbOrganization = {
   id: string
@@ -81,6 +83,24 @@ export function normalizeOrganizationSlug(value: string): string | undefined {
   }
 
   return /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/.test(slug) ? slug : undefined
+}
+
+export function normalizeHomepageUrl(value: string): string | undefined {
+  const homepage = value.trim()
+
+  if (!homepage) {
+    return
+  }
+
+  try {
+    const url = new URL(homepage)
+
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url.toString()
+    }
+  } catch {
+    return
+  }
 }
 
 export function normalizeDomains(domains: string[] | undefined) {
@@ -188,14 +208,15 @@ export async function replaceOrganizationUrls(
 export async function listOrganizations(
   db: Db,
   restBaseUrl: string,
-  limit?: number
+  limit?: number,
+  userRole?: UserRole
 ) {
   const dbOrganizations = await db.query.organizations.findMany({
     with: {
       urls: true
     },
     orderBy: (organizations, { asc }) => asc(organizations.name),
-    limit: clampLimit(limit)
+    limit: clampLimit(limit, userRole)
   })
 
   return dbOrganizations.map((dbOrganization) =>
@@ -206,7 +227,8 @@ export async function listOrganizations(
 export async function listOrganizationsWithUsers(
   db: Db,
   restBaseUrl: string,
-  limit?: number
+  limit?: number,
+  userRole?: UserRole
 ) {
   const [dbOrganizations, usersByOrganizationId] = await Promise.all([
     db.query.organizations.findMany({
@@ -214,7 +236,7 @@ export async function listOrganizationsWithUsers(
         urls: true
       },
       orderBy: (organizations, { asc }) => asc(organizations.name),
-      limit: clampLimit(limit)
+      limit: clampLimit(limit, userRole)
     }),
     queryAllOrganizationUsers(db, restBaseUrl)
   ])
@@ -226,6 +248,40 @@ export async function listOrganizationsWithUsers(
       usersByOrganizationId[dbOrganization.id] ?? []
     )
   )
+}
+
+export async function listOrganizationsWithUsersByOrganizationIds(
+  db: Db,
+  restBaseUrl: string,
+  organizationIds: string[],
+  limit?: number,
+  userRole?: UserRole
+) {
+  const [dbOrganizations, usersByOrganizationId] = await Promise.all([
+    db.query.organizations.findMany({
+      with: {
+        urls: true
+      },
+      orderBy: (organizations, { asc }) => asc(organizations.name),
+      limit: clampLimit(limit, userRole)
+    }),
+    queryOrganizationUsersByOrganizationIds(db, restBaseUrl, organizationIds)
+  ])
+
+  const organizationIdSet = new Set(organizationIds)
+
+  return dbOrganizations.map((dbOrganization) => {
+    const organization = fromDbOrganization(restBaseUrl, dbOrganization)
+
+    if (!organizationIdSet.has(dbOrganization.id)) {
+      return organization
+    }
+
+    return {
+      ...organization,
+      users: usersByOrganizationId[dbOrganization.id] ?? []
+    }
+  })
 }
 
 export async function queryOrganizationById(

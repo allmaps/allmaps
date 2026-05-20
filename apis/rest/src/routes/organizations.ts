@@ -5,11 +5,15 @@ import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 import {
   normalizeOrganizationSlug,
+  normalizeHomepageUrl,
   normalizeDomains,
   listOrganizations,
   listOrganizationsWithUsers,
+  listOrganizationsWithUsersByOrganizationIds,
   queryOrganizationById,
   queryOrganizationByIdWithUsers,
+  queryOrganizationIdsByUserId,
+  queryOrganizationMemberByUserId,
   createOrganization,
   updateOrganization,
   deleteOrganization,
@@ -17,6 +21,7 @@ import {
   queryCanvases,
   queryManifests
 } from '@allmaps/api-shared/db'
+import { needsElevatedLimitRole, setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
@@ -47,16 +52,37 @@ export function createOrganizationsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/organizations',
-      async ({ db, env, query, request }) => {
+      async ({ db, env, query, request, set }) => {
         const session = await auth.api.getSession({ headers: request.headers })
         if (session?.user.role === 'admin') {
+          setCacheControl(set, 'private-no-store')
           return listOrganizationsWithUsers(
             db,
             env.PUBLIC_REST_BASE_URL,
-            query.limit
+            query.limit,
+            'admin'
           )
         }
 
+        if (session?.user.id) {
+          const organizationIds = await queryOrganizationIdsByUserId(
+            db,
+            session.user.id
+          )
+
+          if (organizationIds.length > 0) {
+            setCacheControl(set, 'private-no-store')
+            return listOrganizationsWithUsersByOrganizationIds(
+              db,
+              env.PUBLIC_REST_BASE_URL,
+              organizationIds,
+              query.limit,
+              'user'
+            )
+          }
+        }
+
+        setCacheControl(set, 'public-medium')
         return listOrganizations(db, env.PUBLIC_REST_BASE_URL, query.limit)
       },
       {
@@ -66,17 +92,41 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId',
-      async ({ db, env, params, status, request }) => {
+      async ({ db, env, params, status, request, set }) => {
         const session = await auth.api.getSession({ headers: request.headers })
         let organization
 
         if (session?.user.role === 'admin') {
+          setCacheControl(set, 'private-no-store')
           organization = await queryOrganizationByIdWithUsers(
             db,
             env.PUBLIC_REST_BASE_URL,
             params.organizationId
           )
+        } else if (session?.user.id) {
+          const member = await queryOrganizationMemberByUserId(
+            db,
+            params.organizationId,
+            session.user.id
+          )
+
+          if (member) {
+            setCacheControl(set, 'private-no-store')
+            organization = await queryOrganizationByIdWithUsers(
+              db,
+              env.PUBLIC_REST_BASE_URL,
+              params.organizationId
+            )
+          } else {
+            setCacheControl(set, 'public-medium')
+            organization = await queryOrganizationById(
+              db,
+              env.PUBLIC_REST_BASE_URL,
+              params.organizationId
+            )
+          }
         } else {
+          setCacheControl(set, 'public-medium')
           organization = await queryOrganizationById(
             db,
             env.PUBLIC_REST_BASE_URL,
@@ -97,17 +147,29 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/manifests',
-      ({ env, db, params, query }) =>
-        queryManifests(
+      async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
+        const userRole = needsElevatedLimitRole(query.limit)
+          ? await getOrganizationLimitRole({
+              id: params.organizationId
+            })
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
+
+        return queryManifests(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
             organizationId: params.organizationId,
             georeferenced: query.georeferenced,
-            limit: query.limit
+            limit: query.limit,
+            userRole
           },
           { expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: querySchema,
         detail: {
@@ -118,17 +180,29 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/canvases',
-      ({ env, db, params, query }) =>
-        queryCanvases(
+      async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
+        const userRole = needsElevatedLimitRole(query.limit)
+          ? await getOrganizationLimitRole({
+              id: params.organizationId
+            })
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
+
+        return queryCanvases(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
             organizationId: params.organizationId,
             georeferenced: query.georeferenced,
-            limit: query.limit
+            limit: query.limit,
+            userRole
           },
           { expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: querySchema,
         detail: {
@@ -139,17 +213,29 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId/images',
-      ({ env, db, params, query }) =>
-        queryImages(
+      async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
+        const userRole = needsElevatedLimitRole(query.limit)
+          ? await getOrganizationLimitRole({
+              id: params.organizationId
+            })
+          : 'public'
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-short' : 'private-no-store'
+        )
+
+        return queryImages(
           env.PUBLIC_REST_BASE_URL,
           db,
           {
             organizationId: params.organizationId,
             georeferenced: query.georeferenced,
-            limit: query.limit
+            limit: query.limit,
+            userRole
           },
           { expectRows: false, singular: false }
-        ),
+        )
+      },
       {
         query: querySchema,
         detail: {
@@ -160,7 +246,8 @@ export function createOrganizationsRoutes(
     )
     .post(
       '/organizations',
-      async ({ db, env, body, status }) => {
+      async ({ db, env, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const validSlug = normalizeOrganizationSlug(body.slug)
         if (!validSlug) {
           return status(400, {
@@ -177,11 +264,27 @@ export function createOrganizationsRoutes(
           })
         }
 
+        const validHomepage =
+          body.homepage === undefined || body.homepage === null
+            ? body.homepage
+            : normalizeHomepageUrl(body.homepage)
+
+        if (
+          body.homepage !== undefined &&
+          body.homepage !== null &&
+          !validHomepage
+        ) {
+          return status(400, {
+            error: 'Invalid homepage. Use an absolute http(s) URL.'
+          })
+        }
+
         const organization = await createOrganization(
           db,
           env.PUBLIC_REST_BASE_URL,
           {
             ...body,
+            homepage: validHomepage,
             slug: validSlug,
             domains: validDomains
           }
@@ -205,7 +308,8 @@ export function createOrganizationsRoutes(
     )
     .patch(
       '/organizations/:organizationId',
-      async ({ db, env, params, body, status }) => {
+      async ({ db, env, params, body, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const validSlug =
           body.slug === undefined
             ? undefined
@@ -226,6 +330,21 @@ export function createOrganizationsRoutes(
           })
         }
 
+        const validHomepage =
+          body.homepage === undefined || body.homepage === null
+            ? body.homepage
+            : normalizeHomepageUrl(body.homepage)
+
+        if (
+          body.homepage !== undefined &&
+          body.homepage !== null &&
+          !validHomepage
+        ) {
+          return status(400, {
+            error: 'Invalid homepage. Use an absolute http(s) URL.'
+          })
+        }
+
         const { domains, ...patch } = body
         const organization = await updateOrganization(
           db,
@@ -233,6 +352,7 @@ export function createOrganizationsRoutes(
           params.organizationId,
           {
             ...patch,
+            ...(body.homepage !== undefined ? { homepage: validHomepage } : {}),
             ...(validSlug !== undefined ? { slug: validSlug } : {})
           },
           domains !== undefined ? validDomains : undefined
@@ -256,7 +376,8 @@ export function createOrganizationsRoutes(
     )
     .delete(
       '/organizations/:organizationId',
-      async ({ db, params, status }) => {
+      async ({ db, params, status, set }) => {
+        setCacheControl(set, 'private-no-store')
         const deleted = await deleteOrganization(db, params.organizationId)
 
         if (!deleted) {

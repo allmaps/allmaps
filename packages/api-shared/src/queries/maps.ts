@@ -199,6 +199,12 @@ export async function queryMaps(
           checksum: {
             eq: params.checksum
           }
+        },
+        {
+          updatedAt: {
+            gte: params.modifiedAfter,
+            lte: params.modifiedBefore
+          }
         }
       ],
       image: {
@@ -244,7 +250,9 @@ export async function queryMaps(
         return desc(maps.updatedAt)
       }
     },
-    limit: responseOptions.singular ? 1 : clampLimit(params.limit)
+    limit: responseOptions.singular
+      ? 1
+      : clampLimit(params.limit, params.userRole)
   })
 
   if (responseOptions.expectRows && rows.length === 0) {

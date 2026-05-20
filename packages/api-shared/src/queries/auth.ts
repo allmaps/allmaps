@@ -1,10 +1,11 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 
 import * as authSchema from '@allmaps/db/schema/auth'
 
 import { clampLimit } from '../shared/limits.js'
 
 import type { Db } from '@allmaps/db'
+import type { UserRole } from '../shared/limits.js'
 
 type DbUser = typeof authSchema.users.$inferSelect & {
   members?: {
@@ -45,10 +46,7 @@ function fromDbOrganizationMembership(
   }
 }
 
-export function fromDbUser(
-  restBaseUrl: string,
-  user: DbUser
-) {
+export function fromDbUser(restBaseUrl: string, user: DbUser) {
   return {
     id: `${restBaseUrl}/users/${user.id}`,
     name: user.fullName,
@@ -151,7 +149,11 @@ export async function queryAllOrganizationUsers(db: Db, restBaseUrl: string) {
 
   const usersByOrganizationId: Record<
     string,
-    { role: string; createdAt: Date; user: { id: string; name: string; email: string } }[]
+    {
+      role: string
+      createdAt: Date
+      user: { id: string; name: string; email: string }
+    }[]
   > = {}
 
   for (const row of rows) {
@@ -170,6 +172,68 @@ export async function queryAllOrganizationUsers(db: Db, restBaseUrl: string) {
         }
       })
     }
+  }
+
+  return usersByOrganizationId
+}
+
+export async function queryOrganizationIdsByUserId(db: Db, userId: string) {
+  const rows = await db.query.members.findMany({
+    columns: { organizationId: true },
+    where: { userId: { eq: userId } }
+  })
+
+  return rows.map((row) => row.organizationId)
+}
+
+export async function queryOrganizationUsersByOrganizationIds(
+  db: Db,
+  restBaseUrl: string,
+  organizationIds: string[]
+) {
+  if (organizationIds.length === 0) {
+    return {}
+  }
+
+  const rows = await db
+    .select({
+      organizationId: authSchema.members.organizationId,
+      role: authSchema.members.role,
+      createdAt: authSchema.members.createdAt,
+      userId: authSchema.users.id,
+      userName: authSchema.users.fullName,
+      userEmail: authSchema.users.email
+    })
+    .from(authSchema.members)
+    .innerJoin(
+      authSchema.users,
+      eq(authSchema.members.userId, authSchema.users.id)
+    )
+    .where(inArray(authSchema.members.organizationId, organizationIds))
+
+  const usersByOrganizationId: Record<
+    string,
+    {
+      role: string
+      createdAt: Date
+      user: { id: string; name: string; email: string }
+    }[]
+  > = {}
+
+  for (const row of rows) {
+    if (!usersByOrganizationId[row.organizationId]) {
+      usersByOrganizationId[row.organizationId] = []
+    }
+
+    usersByOrganizationId[row.organizationId].push({
+      role: row.role,
+      createdAt: row.createdAt,
+      user: {
+        id: `${restBaseUrl}/users/${row.userId}`,
+        name: row.userName,
+        email: row.userEmail
+      }
+    })
   }
 
   return usersByOrganizationId
@@ -295,7 +359,8 @@ export async function queryUsers(
   db: Db,
   restBaseUrl: string,
   limit?: number,
-  includeOrganizations = false
+  includeOrganizations = false,
+  userRole?: UserRole
 ) {
   if (includeOrganizations) {
     const users = await db.query.users.findMany({
@@ -324,7 +389,7 @@ export async function queryUsers(
         }
       },
       orderBy: (users, { asc }) => asc(users.createdAt),
-      limit: clampLimit(limit)
+      limit: clampLimit(limit, userRole)
     })
 
     return users.map((user) => fromDbUser(restBaseUrl, user))
@@ -335,7 +400,7 @@ export async function queryUsers(
     .from(authSchema.users)
     .where(eq(authSchema.users.isAnonymous, false))
     .orderBy(authSchema.users.createdAt)
-    .limit(clampLimit(limit))
+    .limit(clampLimit(limit, userRole))
 
   return users.map((user) => fromDbUser(restBaseUrl, user))
 }

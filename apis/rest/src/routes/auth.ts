@@ -1,5 +1,6 @@
 import { t } from 'elysia'
 
+import { setCacheControl } from '@allmaps/api-shared'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import { createAuth } from '@allmaps/db/auth'
 import { createElysia, createBetterAuthPlugin, error } from '../elysia.js'
@@ -29,8 +30,16 @@ export function createAuthRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/users',
-      ({ db, env, query }) =>
-        queryUsers(db, env.PUBLIC_REST_BASE_URL, query.limit, true),
+      ({ db, env, query, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return queryUsers(
+          db,
+          env.PUBLIC_REST_BASE_URL,
+          query.limit,
+          true,
+          'admin'
+        )
+      },
       {
         admin: true,
         query: t.Object({ limit: t.Optional(t.Number()) }),
@@ -43,7 +52,17 @@ export function createAuthRoutes(
     )
     .get(
       '/users/:userId',
-      async ({ db, env, params }) => {
+      async ({ db, env, params, request, set, status }) => {
+        const session = await auth.api.getSession({ headers: request.headers })
+
+        if (
+          !session ||
+          (session.user.role !== 'admin' && session.user.id !== params.userId)
+        ) {
+          return status(401, { error: 'Unauthorized' })
+        }
+
+        setCacheControl(set, 'private-no-store')
         const user = await queryUserWithOrganizationsById(
           db,
           env.PUBLIC_REST_BASE_URL,
@@ -57,23 +76,23 @@ export function createAuthRoutes(
         return user
       },
       {
-        admin: true,
         params: t.Object({ userId: t.String() }),
         detail: {
           summary: 'Get a single user',
-          tags: ['Authentication'],
-          ...adminDetail
+          tags: ['Authentication']
         }
       }
     )
     .get(
       '/organizations/:organizationId/users',
-      ({ db, env, params }) =>
-        queryOrganizationMembersById(
+      ({ db, env, params, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return queryOrganizationMembersById(
           db,
           env.PUBLIC_REST_BASE_URL,
           params.organizationId
-        ),
+        )
+      },
       {
         admin: true,
         params: t.Object({ organizationId: t.String() }),
@@ -86,7 +105,8 @@ export function createAuthRoutes(
     )
     .post(
       '/organizations/:organizationId/users',
-      async ({ db, body, params }) => {
+      async ({ db, body, params, set }) => {
+        setCacheControl(set, 'private-no-store')
         const { email, role } = body
 
         const organization = await queryAdminOrganizationById(
@@ -126,7 +146,8 @@ export function createAuthRoutes(
     )
     .delete(
       '/organizations/:organizationId/users/:userId',
-      async ({ db, env, params, request }) => {
+      async ({ db, env, params, request, set }) => {
+        setCacheControl(set, 'private-no-store')
         const { organizationId, userId } = params
 
         const organization = await queryAdminOrganizationById(
@@ -162,7 +183,8 @@ export function createAuthRoutes(
     )
     .patch(
       '/organizations/:organizationId/users/:userId',
-      async ({ db, body, params, request }) => {
+      async ({ db, body, params, request, set }) => {
+        setCacheControl(set, 'private-no-store')
         const { organizationId, userId } = params
         const { role } = body
 

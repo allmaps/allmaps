@@ -12,6 +12,8 @@ type MapsQueryParamName =
   | 'maxScale'
   | 'minArea'
   | 'maxArea'
+  | 'modifiedAfter'
+  | 'modifiedBefore'
 
 const mapsQueryParamNames: Record<string, MapsQueryParamName> = {
   limit: 'limit',
@@ -22,8 +24,13 @@ const mapsQueryParamNames: Record<string, MapsQueryParamName> = {
   minscale: 'minScale',
   maxscale: 'maxScale',
   minarea: 'minArea',
-  maxarea: 'maxArea'
+  maxarea: 'maxArea',
+  modifiedafter: 'modifiedAfter',
+  modifiedbefore: 'modifiedBefore'
 }
+
+const dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/
+const utcDateTimePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
 
 function parseNumberParam(name: string, value: string) {
   const number = Number(value)
@@ -40,6 +47,34 @@ function parseNumberArrayParam(name: string, values: string[]) {
     .flatMap((value) => value.split(','))
     .filter((value) => value !== '')
     .map((value) => parseNumberParam(name, value))
+}
+
+function parseDateParam(
+  name: 'modifiedAfter' | 'modifiedBefore',
+  value: string
+) {
+  const isDateOnly = dateOnlyPattern.test(value)
+  const isUtcDateTime = utcDateTimePattern.test(value)
+
+  if (!isDateOnly && !isUtcDateTime) {
+    throw new ResponseError(`Invalid query parameter ${name}: ${value}`, 400)
+  }
+
+  const normalizedValue = isDateOnly
+    ? `${value}T${name === 'modifiedAfter' ? '00:00:00.000' : '23:59:59.999'}Z`
+    : value
+
+  const date = new Date(normalizedValue)
+
+  if (
+    Number.isNaN(date.getTime()) ||
+    (isDateOnly && date.toISOString().slice(0, 10) !== value) ||
+    (isUtcDateTime && date.toISOString().slice(0, 19) !== value.slice(0, 19))
+  ) {
+    throw new ResponseError(`Invalid query parameter ${name}: ${value}`, 400)
+  }
+
+  return date
 }
 
 function parseIntersects(intersects?: number[]): IntersectsWith | undefined {
@@ -109,7 +144,24 @@ export function normalizeMapsQueryParams(
       case 'maxArea':
         params.maxArea = parseNumberParam(name, lastValue)
         break
+      case 'modifiedAfter':
+        params.modifiedAfter = parseDateParam(name, lastValue)
+        break
+      case 'modifiedBefore':
+        params.modifiedBefore = parseDateParam(name, lastValue)
+        break
     }
+  }
+
+  if (
+    params.modifiedAfter &&
+    params.modifiedBefore &&
+    params.modifiedAfter > params.modifiedBefore
+  ) {
+    throw new ResponseError(
+      'Invalid query parameters: modifiedAfter is later than modifiedBefore',
+      400
+    )
   }
 
   return params
