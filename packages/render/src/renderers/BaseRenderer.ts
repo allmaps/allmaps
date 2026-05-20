@@ -52,6 +52,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   tileCache: TileCache<D>
   spritesTileCache: TileCache<D>
 
+  mapsInList: Set<string> = new Set()
   mapsInPreviousViewport: Set<string> = new Set()
   mapsInViewport: Set<string> = new Set()
   mapsWithFetchableTilesForPreviousViewport: Set<string> = new Set()
@@ -78,7 +79,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // TODO: move defaults for tunable options here
     this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {
-      overviewTiles: true,
+      anticipateOverviewTiles: true,
 
       // These buffers should be in growing order
       requestViewportBufferRatio: 0,
@@ -519,7 +520,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Get overview fetchable tiles for all maps in viewport with overview buffer
     // (and set properties for the current viewport for all maps in viewport with prune buffer)
-    if (this.shouldAnticipateInteraction() && this.options.overviewTiles) {
+    if (
+      this.shouldAnticipateInteraction() &&
+      this.options.anticipateOverviewTiles
+    ) {
       for (const mapId of mapsInViewportForOverviewPrune) {
         const mapOverviewFetchableTilesForViewport =
           this.getMapOverviewFetchableTilesForViewport(
@@ -823,22 +827,34 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Find the fitting overview zoomlevel, if any
     const overviewTilesMaxResolution =
-      warpedMap.options.overviewTilesMaxResolution == 'viewport'
-        ? viewport.viewportResolution
+      warpedMap.options.overviewTilesMaxResolution == undefined
+        ? Math.min(
+            viewport.viewportResolution,
+            (viewport.viewportResolution *
+              this.options.maxTotalOverviewResolutionRatio) /
+              this.mapsInList.size
+          )
         : warpedMap.options.overviewTilesMaxResolution
     const overviewTileZoomLevel = warpedMap.image.tileZoomLevels
-      .filter(
-        (tileZoomLevel) =>
-          getTileZoomLevelResolution(tileZoomLevel) <=
-          overviewTilesMaxResolution
-        // Neglect zoomlevels that contain too many pixels
-      )
       .sort(
         (tileZoomLevel0, tileZoomLevel1) =>
-          tileZoomLevel0.scaleFactor - tileZoomLevel1.scaleFactor
-        // Enforcing default ascending order, e.g. from 1 to 16
+          tileZoomLevel1.scaleFactor - tileZoomLevel0.scaleFactor
+        // Enforcing default decending order, e.g. from 16 to 1
       )
-      .at(warpedMap.options.overviewTilesSelection == 'lowest' ? 0 : -1)
+      .filter(
+        (tileZoomLevel, index) =>
+          getTileZoomLevelResolution(tileZoomLevel) <=
+            overviewTilesMaxResolution ||
+          (warpedMap.options.overviewTilesMaxResolution == undefined
+            ? index == 0
+            : false)
+        // Only consider zoomlevels that don't contain too many pixels
+        // and if overviewTilesMaxResolution is undefined also consider the highest one.
+      )
+      .at(
+        warpedMap.options.overviewTilesSelection == 'highest' ? 0 : -1
+        // Select the highest or lowest remaining zoomlevel
+      )
     warpedMap.setOverviewTileZoomLevelForViewport(overviewTileZoomLevel)
 
     // If this map it outside of the viewport with overview buffer, or if the map is invisible, stop here:
@@ -892,6 +908,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     mapsInViewportEntering: string[]
     mapsInViewportLeaving: string[]
   } {
+    this.mapsInList = new Set(this.warpedMapList.getMapIds())
+
     this.mapsWithFetchableTilesForPreviousViewport =
       this.mapsWithFetchableTilesForViewport
     this.mapsWithFetchableTilesForViewport = new Set(

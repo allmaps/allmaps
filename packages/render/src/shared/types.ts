@@ -63,7 +63,7 @@ export type WarpedMapOptions = {
   visible: boolean
   overviewTiles: boolean
   overviewTilesSelection: 'highest' | 'lowest'
-  overviewTilesMaxResolution: number | 'viewport'
+  overviewTilesMaxResolution: number | undefined
   applyMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }
@@ -160,7 +160,7 @@ export type WarpedMapListOptions<W extends WarpedMap> =
 
 export type SpecificBaseRenderOptions<W extends WarpedMap> = {
   warpedMapList?: WarpedMapList<W>
-  overviewTiles: boolean
+  anticipateOverviewTiles: boolean
   requestViewportBufferRatio: number
   overviewRequestViewportBufferRatio: number
   pruneViewportBufferRatio: number
