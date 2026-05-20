@@ -22,7 +22,13 @@
   import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
 
   import { formatTimeAgo } from '$lib/shared/format.js'
-  import { getMaskFilter, maskBands, maskLayerIds } from '$lib/shared/mask-bands.js'
+  import {
+    getMaskFilter,
+    getMaskOpacity,
+    maskBands,
+    maskLayerIds,
+    masksSourceMaxzoom
+  } from '$lib/shared/mask-bands.js'
 
   import type { Bbox } from '@allmaps/types'
   import type { GeocoderGeoJsonFeature } from '@allmaps/components/geocoder'
@@ -41,11 +47,6 @@
   let features: MapGeoJSONFeature[] = $state([])
 
   let lastModifiedAgo: string | undefined = $state('')
-
-  const minMaxArea = 100_000
-  const maxMaxAea = 300_000_000_000_000
-
-  let maxAreaSqrt = $state(Math.sqrt(maxMaxAea))
 
   function updateFeatures() {
     const newFeatures = map.queryRenderedFeatures({
@@ -135,7 +136,8 @@
     map.on('load', () => {
       map.addSource('masks', {
         type: 'vector',
-        url: `pmtiles://${pmtilesUrl}`
+        tiles: [`pmtiles://${pmtilesUrl}/{z}/{x}/{y}`],
+        maxzoom: masksSourceMaxzoom
       })
 
       for (const maskBand of maskBands) {
@@ -153,9 +155,9 @@
           paint: {
             'line-color': '#ff56ba',
             'line-width': maskBand.lineWidth,
-            'line-opacity': maskBand.lineOpacity
+            'line-opacity': getMaskOpacity(maskBand)
           },
-          filter: getMaskFilter(maxAreaSqrt ** 2)
+          filter: getMaskFilter()
         })
       }
 
@@ -194,7 +196,7 @@
   $effect(() => {
     if (layersAdded) {
       for (const maskLayerId of maskLayerIds) {
-        map.setFilter(maskLayerId, getMaskFilter(maxAreaSqrt ** 2))
+        map.setFilter(maskLayerId, getMaskFilter())
       }
       updateFeatures()
     }
@@ -264,18 +266,6 @@
           </li>
         {/each}
       </ol>
-      <div>
-        <label
-          >Max. area: <input
-            class="w-full"
-            bind:value={maxAreaSqrt}
-            min={Math.sqrt(minMaxArea)}
-            max={Math.sqrt(maxMaxAea)}
-            step={(Math.sqrt(maxMaxAea) - Math.sqrt(minMaxArea)) / 100}
-            type="range"
-          /></label
-        >
-      </div>
     </aside>
   </div>
 </div>
