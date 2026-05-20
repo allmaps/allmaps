@@ -9,8 +9,11 @@ import {
   normalizeDomains,
   listOrganizations,
   listOrganizationsWithUsers,
+  listOrganizationsWithUsersByOrganizationIds,
   queryOrganizationById,
   queryOrganizationByIdWithUsers,
+  queryOrganizationIdsByUserId,
+  queryOrganizationMemberByUserId,
   createOrganization,
   updateOrganization,
   deleteOrganization,
@@ -61,6 +64,24 @@ export function createOrganizationsRoutes(
           )
         }
 
+        if (session?.user.id) {
+          const organizationIds = await queryOrganizationIdsByUserId(
+            db,
+            session.user.id
+          )
+
+          if (organizationIds.length > 0) {
+            setCacheControl(set, 'private-no-store')
+            return listOrganizationsWithUsersByOrganizationIds(
+              db,
+              env.PUBLIC_REST_BASE_URL,
+              organizationIds,
+              query.limit,
+              'user'
+            )
+          }
+        }
+
         setCacheControl(set, 'public-medium')
         return listOrganizations(db, env.PUBLIC_REST_BASE_URL, query.limit)
       },
@@ -82,6 +103,28 @@ export function createOrganizationsRoutes(
             env.PUBLIC_REST_BASE_URL,
             params.organizationId
           )
+        } else if (session?.user.id) {
+          const member = await queryOrganizationMemberByUserId(
+            db,
+            params.organizationId,
+            session.user.id
+          )
+
+          if (member) {
+            setCacheControl(set, 'private-no-store')
+            organization = await queryOrganizationByIdWithUsers(
+              db,
+              env.PUBLIC_REST_BASE_URL,
+              params.organizationId
+            )
+          } else {
+            setCacheControl(set, 'public-medium')
+            organization = await queryOrganizationById(
+              db,
+              env.PUBLIC_REST_BASE_URL,
+              params.organizationId
+            )
+          }
         } else {
           setCacheControl(set, 'public-medium')
           organization = await queryOrganizationById(

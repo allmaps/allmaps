@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 
 import * as authSchema from '@allmaps/db/schema/auth'
 
@@ -172,6 +172,68 @@ export async function queryAllOrganizationUsers(db: Db, restBaseUrl: string) {
         }
       })
     }
+  }
+
+  return usersByOrganizationId
+}
+
+export async function queryOrganizationIdsByUserId(db: Db, userId: string) {
+  const rows = await db.query.members.findMany({
+    columns: { organizationId: true },
+    where: { userId: { eq: userId } }
+  })
+
+  return rows.map((row) => row.organizationId)
+}
+
+export async function queryOrganizationUsersByOrganizationIds(
+  db: Db,
+  restBaseUrl: string,
+  organizationIds: string[]
+) {
+  if (organizationIds.length === 0) {
+    return {}
+  }
+
+  const rows = await db
+    .select({
+      organizationId: authSchema.members.organizationId,
+      role: authSchema.members.role,
+      createdAt: authSchema.members.createdAt,
+      userId: authSchema.users.id,
+      userName: authSchema.users.fullName,
+      userEmail: authSchema.users.email
+    })
+    .from(authSchema.members)
+    .innerJoin(
+      authSchema.users,
+      eq(authSchema.members.userId, authSchema.users.id)
+    )
+    .where(inArray(authSchema.members.organizationId, organizationIds))
+
+  const usersByOrganizationId: Record<
+    string,
+    {
+      role: string
+      createdAt: Date
+      user: { id: string; name: string; email: string }
+    }[]
+  > = {}
+
+  for (const row of rows) {
+    if (!usersByOrganizationId[row.organizationId]) {
+      usersByOrganizationId[row.organizationId] = []
+    }
+
+    usersByOrganizationId[row.organizationId].push({
+      role: row.role,
+      createdAt: row.createdAt,
+      user: {
+        id: `${restBaseUrl}/users/${row.userId}`,
+        name: row.userName,
+        email: row.userEmail
+      }
+    })
   }
 
   return usersByOrganizationId

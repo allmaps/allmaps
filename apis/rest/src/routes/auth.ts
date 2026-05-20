@@ -52,7 +52,16 @@ export function createAuthRoutes(
     )
     .get(
       '/users/:userId',
-      async ({ db, env, params, set }) => {
+      async ({ db, env, params, request, set, status }) => {
+        const session = await auth.api.getSession({ headers: request.headers })
+
+        if (
+          !session ||
+          (session.user.role !== 'admin' && session.user.id !== params.userId)
+        ) {
+          return status(401, { error: 'Unauthorized' })
+        }
+
         setCacheControl(set, 'private-no-store')
         const user = await queryUserWithOrganizationsById(
           db,
@@ -67,12 +76,10 @@ export function createAuthRoutes(
         return user
       },
       {
-        admin: true,
         params: t.Object({ userId: t.String() }),
         detail: {
           summary: 'Get a single user',
-          tags: ['Authentication'],
-          ...adminDetail
+          tags: ['Authentication']
         }
       }
     )
