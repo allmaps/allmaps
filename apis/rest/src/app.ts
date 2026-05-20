@@ -57,6 +57,7 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .use(
       openapi({
         path: 'docs',
+        specPath: 'openapi.json',
         documentation: {
           info: {
             title: 'Allmaps API Documentation',

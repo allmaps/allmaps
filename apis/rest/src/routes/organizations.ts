@@ -17,6 +17,8 @@ import {
   createOrganization,
   updateOrganization,
   deleteOrganization,
+  createImageFromUrl,
+  createManifestFromUrl,
   queryImages,
   queryCanvases,
   queryManifests
@@ -39,6 +41,29 @@ const querySchema = t.Object({
   georeferenced: t.Optional(t.Boolean()),
   limit: t.Optional(t.Number())
 })
+
+const createIiifBodySchema = t.Union([
+  t.Object({ url: t.String() }),
+  t.Array(t.Object({ url: t.String() }))
+])
+
+type CreateIiifBody = { url: string } | { url: string }[]
+
+const organizationMutationDetail = {
+  security: [{ sessionCookie: [] }],
+  'x-badges': [{ name: 'Admin or paid organization member', color: '#df0' }]
+}
+
+async function createIiifFromBody<T>(
+  body: CreateIiifBody,
+  create: (url: string) => Promise<T>
+) {
+  if (Array.isArray(body)) {
+    return Promise.all(body.map(({ url }) => create(url)))
+  }
+
+  return create(body.url)
+}
 
 export function createOrganizationsRoutes(
   env: RestEnv,
@@ -178,6 +203,54 @@ export function createOrganizationsRoutes(
         }
       }
     )
+    .post(
+      '/organizations/:organizationId/manifests',
+      async ({
+        db,
+        env,
+        params,
+        body,
+        status,
+        set,
+        getOrganizationLimitRole
+      }) => {
+        setCacheControl(set, 'private-no-store')
+
+        const organization = await queryOrganizationById(
+          db,
+          env.PUBLIC_REST_BASE_URL,
+          params.organizationId
+        )
+
+        if (!organization) {
+          return status(404, { error: 'Organization not found' })
+        }
+
+        const userRole = await getOrganizationLimitRole({
+          id: params.organizationId
+        })
+
+        if (userRole !== 'admin' && userRole !== 'paidOrganizationMember') {
+          return status(403, { error: 'Forbidden' })
+        }
+
+        return createIiifFromBody(body, (url) =>
+          createManifestFromUrl(db, url, {
+            allowedUrlDomains: organization.domains
+          })
+        )
+      },
+      {
+        auth: true,
+        params: t.Object({ organizationId: t.String() }),
+        body: createIiifBodySchema,
+        detail: {
+          summary: 'Create a IIIF Manifest for a single organization',
+          tags: ['Organizations'],
+          ...organizationMutationDetail
+        }
+      }
+    )
     .get(
       '/organizations/:organizationId/canvases',
       async ({ env, db, params, query, set, getOrganizationLimitRole }) => {
@@ -241,6 +314,55 @@ export function createOrganizationsRoutes(
         detail: {
           summary: 'Get IIIF Images for a single organization',
           tags: ['Organizations']
+        }
+      }
+    )
+    .post(
+      '/organizations/:organizationId/images',
+      async ({
+        db,
+        env,
+        params,
+        body,
+        status,
+        set,
+        getOrganizationLimitRole
+      }) => {
+        setCacheControl(set, 'private-no-store')
+
+        const organization = await queryOrganizationById(
+          db,
+          env.PUBLIC_REST_BASE_URL,
+          params.organizationId
+        )
+
+        if (!organization) {
+          return status(404, { error: 'Organization not found' })
+        }
+
+        const userRole = await getOrganizationLimitRole({
+          id: params.organizationId
+        })
+
+        if (userRole !== 'admin' && userRole !== 'paidOrganizationMember') {
+          return status(403, { error: 'Forbidden' })
+        }
+
+        return createIiifFromBody(body, (url) =>
+          createImageFromUrl(db, url, {
+            allowedUrlDomains: organization.domains,
+            allowedParsedUriDomains: organization.domains
+          })
+        )
+      },
+      {
+        auth: true,
+        params: t.Object({ organizationId: t.String() }),
+        body: createIiifBodySchema,
+        detail: {
+          summary: 'Create a IIIF Image for a single organization',
+          tags: ['Organizations'],
+          ...organizationMutationDetail
         }
       }
     )

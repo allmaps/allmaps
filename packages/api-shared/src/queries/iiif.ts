@@ -93,6 +93,37 @@ type DbImage = {
   }[]
 }
 
+type CreateIiifOptions = {
+  allowedUrlDomains?: string[]
+  allowedParsedUriDomains?: string[]
+}
+
+function getHttpUrlDomain(url: string) {
+  let parsedUrl: URL
+
+  try {
+    parsedUrl = new URL(url)
+  } catch {
+    throw new ResponseError('Invalid URL', 400)
+  }
+
+  // TODO: maybe only accept HTTPS URLs? Here and in other parts of the codebase?
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    throw new ResponseError('URL must use http or https', 400)
+  }
+
+  return parsedUrl.hostname.toLowerCase()
+}
+
+function assertAllowedDomain(
+  domain: string,
+  allowedDomains: string[] | undefined
+) {
+  if (allowedDomains && !allowedDomains.includes(domain)) {
+    throw new ResponseError(`Domain not allowed: ${domain}`, 403)
+  }
+}
+
 function fromDbManifest(restBaseUrl: string, dbManifest: DbManifest) {
   return {
     ...dbManifest,
@@ -595,50 +626,224 @@ export async function queryManifests(
   return responseOptions.singular ? apiManifests[0] : apiManifests
 }
 
+async function createParsedImage(
+  db: Db,
+  newImageData: unknown,
+  expectedImageId?: string,
+  options: CreateIiifOptions = {}
+) {
+  const newImageChecksum = await generateChecksum(newImageData)
+  const newParsedImage = Image.parse(newImageData)
+  const newImageId = await generateId(newParsedImage.uri)
+
+  assertAllowedDomain(
+    getHttpUrlDomain(newParsedImage.uri),
+    options.allowedParsedUriDomains
+  )
+
+  if (expectedImageId && newImageId !== expectedImageId) {
+    throw new ResponseError("Image downloaded, but IDs don't match", 409)
+  }
+
+  await db
+    .insert(schema.images)
+    .values({
+      id: newImageId,
+      uri: newParsedImage.uri,
+      width: newParsedImage.width,
+      height: newParsedImage.height,
+      data: newImageData,
+      checksum: newImageChecksum,
+      embedded: false
+    })
+    .onConflictDoUpdate({
+      target: schema.images.id,
+      set: {
+        width: newParsedImage.width,
+        height: newParsedImage.height,
+        data: newImageData,
+        checksum: newImageChecksum,
+        embedded: false
+      }
+    })
+
+  return {
+    id: newImageId,
+    uri: newParsedImage.uri
+  }
+}
+
+async function createParsedManifest(
+  db: Db,
+  newManifestData: unknown,
+  expectedManifestId?: string,
+  options: CreateIiifOptions = {}
+) {
+  const newManifestChecksum = await generateChecksum(newManifestData)
+  const newParsedManifest = Manifest.parse(newManifestData)
+  const newManifestId = await generateId(newParsedManifest.uri)
+
+  if (options.allowedParsedUriDomains) {
+    assertAllowedDomain(
+      getHttpUrlDomain(newParsedManifest.uri),
+      options.allowedParsedUriDomains
+    )
+  }
+
+  if (expectedManifestId && newManifestId !== expectedManifestId) {
+    throw new ResponseError(
+      "Manifest downloaded, but doesn't IDs don't match",
+      409
+    )
+  }
+
+  const manifestLabel = newParsedManifest.label
+
+  type ResultCanvas = {
+    id: string
+    uri: string
+    images: [
+      {
+        id: string
+        uri: string
+      }
+    ]
+  }
+
+  const resultCanvases: ResultCanvas[] = []
+
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(schema.manifests)
+      .values({
+        id: newManifestId,
+        uri: newParsedManifest.uri,
+        data: newManifestData,
+        checksum: newManifestChecksum,
+        label: manifestLabel
+      })
+      .onConflictDoUpdate({
+        target: schema.manifests.id,
+        set: {
+          data: newManifestData,
+          checksum: newManifestChecksum,
+          updatedAt: sql`NOW()`
+        }
+      })
+
+    for (const canvas of newParsedManifest.canvases) {
+      const canvasId = await generateId(canvas.uri)
+      const canvasLabel = canvas.label
+
+      await tx
+        .insert(schema.canvases)
+        .values({
+          id: canvasId,
+          uri: canvas.uri,
+          width: canvas.width,
+          height: canvas.height,
+          label: canvasLabel
+        })
+        .onConflictDoUpdate({
+          target: schema.canvases.id,
+          set: {
+            width: canvas.width,
+            height: canvas.height,
+            updatedAt: sql`NOW()`
+          }
+        })
+
+      const image = canvas.image
+      const imageId = await generateId(image.uri)
+
+      await tx
+        .insert(schema.images)
+        .values({
+          id: imageId,
+          uri: image.uri,
+          width: image.width,
+          height: image.height,
+          embedded: true
+        })
+        .onConflictDoUpdate({
+          target: schema.images.id,
+          set: {
+            width: image.width,
+            height: image.height,
+            updatedAt: sql`NOW()`
+          },
+          where: eq(schema.images.embedded, true)
+        })
+
+      await tx
+        .insert(schema.canvasesToImages)
+        .values({
+          canvasId,
+          imageId
+        })
+        .onConflictDoNothing()
+
+      await tx
+        .insert(schema.manifestsToCanvases)
+        .values({
+          manifestId: newManifestId,
+          canvasId
+        })
+        .onConflictDoNothing()
+
+      resultCanvases.push({
+        id: canvasId,
+        uri: canvas.uri,
+        images: [
+          {
+            id: imageId,
+            uri: image.uri
+          }
+        ]
+      })
+    }
+  })
+
+  return {
+    id: newManifestId,
+    uri: newParsedManifest.uri,
+    canvases: resultCanvases
+  }
+}
+
+export async function createImageFromUrl(
+  db: Db,
+  newImageUrl: string,
+  options: CreateIiifOptions = {}
+) {
+  assertAllowedDomain(getHttpUrlDomain(newImageUrl), options.allowedUrlDomains)
+  const newImageData = await fetchJson(newImageUrl)
+
+  return createParsedImage(db, newImageData, undefined, options)
+}
+
 export async function createImage(
   db: Db,
   newImageId: string,
   newImageUrl: string
 ) {
   const newImageData = await fetchJson(newImageUrl)
-  const newImageChecksum = await generateChecksum(newImageData)
 
-  const newParsedImage = Image.parse(newImageData)
-  const generatedImageId = await generateId(newParsedImage.uri)
+  return createParsedImage(db, newImageData, newImageId)
+}
 
-  const imagesMatch =
-    newParsedImage.type === 'image' && generatedImageId === newImageId
+export async function createManifestFromUrl(
+  db: Db,
+  newManifestUrl: string,
+  options: CreateIiifOptions = {}
+) {
+  assertAllowedDomain(
+    getHttpUrlDomain(newManifestUrl),
+    options.allowedUrlDomains
+  )
+  const newManifestData = await fetchJson(newManifestUrl)
 
-  if (imagesMatch) {
-    await db
-      .insert(schema.images)
-      .values({
-        id: newImageId,
-        uri: newParsedImage.uri,
-        width: newParsedImage.width,
-        height: newParsedImage.height,
-        data: newImageData,
-        checksum: newImageChecksum,
-        embedded: false
-      })
-      .onConflictDoUpdate({
-        target: schema.images.id,
-        set: {
-          width: newParsedImage.width,
-          height: newParsedImage.height,
-          data: newImageData,
-          checksum: newImageChecksum,
-          embedded: false
-        }
-      })
-
-    return {
-      id: newImageId,
-      uri: newParsedImage.uri
-    }
-  } else {
-    throw new ResponseError("Image downloaded, but IDs don't match", 409)
-  }
+  return createParsedManifest(db, newManifestData, undefined, options)
 }
 
 export async function createManifest(
@@ -647,132 +852,6 @@ export async function createManifest(
   newManifestUrl: string
 ) {
   const newManifestData = await fetchJson(newManifestUrl)
-  const newManifestChecksum = await generateChecksum(newManifestData)
 
-  const newParsedManifest = Manifest.parse(newManifestData)
-  const generatedManifestId = await generateId(newParsedManifest.uri)
-
-  const manifestsMatch =
-    newParsedManifest.type === 'manifest' &&
-    generatedManifestId === newManifestId
-
-  if (manifestsMatch) {
-    const manifestLabel = newParsedManifest.label
-
-    type ResultCanvas = {
-      id: string
-      uri: string
-      images: [
-        {
-          id: string
-          uri: string
-        }
-      ]
-    }
-
-    const resultCanvases: ResultCanvas[] = []
-
-    await db.transaction(async (tx) => {
-      await tx
-        .insert(schema.manifests)
-        .values({
-          id: newManifestId,
-          uri: newParsedManifest.uri,
-          data: newManifestData,
-          checksum: newManifestChecksum,
-          label: manifestLabel
-        })
-        .onConflictDoUpdate({
-          target: schema.manifests.id,
-          set: {
-            data: newManifestData,
-            checksum: newManifestChecksum,
-            updatedAt: sql`NOW()`
-          }
-        })
-
-      for (const canvas of newParsedManifest.canvases) {
-        const canvasId = await generateId(canvas.uri)
-        const canvasLabel = canvas.label
-
-        await tx
-          .insert(schema.canvases)
-          .values({
-            id: canvasId,
-            uri: canvas.uri,
-            width: canvas.width,
-            height: canvas.height,
-            label: canvasLabel
-          })
-          .onConflictDoUpdate({
-            target: schema.canvases.id,
-            set: {
-              width: canvas.width,
-              height: canvas.height,
-              updatedAt: sql`NOW()`
-            }
-          })
-
-        const image = canvas.image
-        const imageId = await generateId(image.uri)
-
-        await tx
-          .insert(schema.images)
-          .values({
-            id: imageId,
-            uri: image.uri,
-            width: image.width,
-            height: image.height,
-            embedded: true
-          })
-          .onConflictDoUpdate({
-            target: schema.images.id,
-            set: {
-              width: image.width,
-              height: image.height,
-              updatedAt: sql`NOW()`
-            },
-            where: eq(schema.images.embedded, true)
-          })
-
-        await tx
-          .insert(schema.canvasesToImages)
-          .values({
-            canvasId,
-            imageId
-          })
-          .onConflictDoNothing()
-
-        await tx
-          .insert(schema.manifestsToCanvases)
-          .values({
-            manifestId: newManifestId,
-            canvasId
-          })
-          .onConflictDoNothing()
-
-        resultCanvases.push({
-          id: canvasId,
-          uri: canvas.uri,
-          images: [
-            {
-              id: imageId,
-              uri: image.uri
-            }
-          ]
-        })
-      }
-    })
-
-    return {
-      id: newManifestId,
-      uri: newParsedManifest.uri,
-      canvases: resultCanvases
-    }
-  } else {
-    throw new ResponseError(
-      "Manifest downloaded, but doesn't IDs don't match",
-      409
-    )
-  }
+  return createParsedManifest(db, newManifestData, newManifestId)
 }

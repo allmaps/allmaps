@@ -1,14 +1,17 @@
 import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
+import type { Db } from '@allmaps/db'
 import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { adminDetail } from '../openapi.js'
 import {
   queryImage,
   queryImages,
   createImage,
+  createImageFromUrl,
   queryMaps,
   queryImageChecksums
 } from '@allmaps/api-shared/db'
@@ -24,6 +27,13 @@ const imagesQuerySchema = t.Object({
   limit: t.Optional(t.Number())
 })
 
+const createImageBodySchema = t.Union([
+  t.Object({ url: t.String() }),
+  t.Array(t.Object({ url: t.String() }))
+])
+
+type CreateImageBody = { url: string } | { url: string }[]
+
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
   imageServiceDomain: t.Optional(t.String()),
@@ -37,6 +47,14 @@ const mapsQuerySchema = t.Object({
   modifiedAfter: t.Optional(t.String()),
   modifiedBefore: t.Optional(t.String())
 })
+
+async function createImagesFromBody(db: Db, body: CreateImageBody) {
+  if (Array.isArray(body)) {
+    return Promise.all(body.map(({ url }) => createImageFromUrl(db, url)))
+  }
+
+  return createImageFromUrl(db, body.url)
+}
 
 export function createImagesRoutes(
   env: RestEnv,
@@ -181,6 +199,22 @@ export function createImagesRoutes(
         detail: {
           summary: 'Get maps for a single IIIF Image as GeoJSON',
           tags: ['Images']
+        }
+      }
+    )
+    .post(
+      '/images',
+      ({ db, body, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return createImagesFromBody(db, body)
+      },
+      {
+        admin: true,
+        body: createImageBodySchema,
+        detail: {
+          summary: 'Create a single IIIF Image from a IIIF URL',
+          tags: ['Images'],
+          ...adminDetail
         }
       }
     )

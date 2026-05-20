@@ -1,13 +1,16 @@
 import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
+import type { Db } from '@allmaps/db'
 import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { adminDetail } from '../openapi.js'
 import {
   queryManifests,
   createManifest,
+  createManifestFromUrl,
   queryMaps
 } from '@allmaps/api-shared/db'
 import {
@@ -30,6 +33,21 @@ const mapsQuerySchema = t.Object({
   modifiedAfter: t.Optional(t.String()),
   modifiedBefore: t.Optional(t.String())
 })
+
+const createManifestBodySchema = t.Union([
+  t.Object({ url: t.String() }),
+  t.Array(t.Object({ url: t.String() }))
+])
+
+type CreateManifestBody = { url: string } | { url: string }[]
+
+async function createManifestsFromBody(db: Db, body: CreateManifestBody) {
+  if (Array.isArray(body)) {
+    return Promise.all(body.map(({ url }) => createManifestFromUrl(db, url)))
+  }
+
+  return createManifestFromUrl(db, body.url)
+}
 
 export function createManifestsRoutes(
   env: RestEnv,
@@ -168,6 +186,22 @@ export function createManifestsRoutes(
         detail: {
           summary: 'Get maps for a single IIIF Manifest as GeoJSON',
           tags: ['Manifests']
+        }
+      }
+    )
+    .post(
+      '/manifests',
+      ({ db, body, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return createManifestsFromBody(db, body)
+      },
+      {
+        admin: true,
+        body: createManifestBodySchema,
+        detail: {
+          summary: 'Create a IIIF Manifest from a IIIF URL',
+          tags: ['Manifests'],
+          ...adminDetail
         }
       }
     )
