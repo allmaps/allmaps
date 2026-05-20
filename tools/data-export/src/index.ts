@@ -27,22 +27,33 @@ main().catch((error: unknown) => {
 
 function loadEnvProfile(profile?: string) {
   if (!profile) {
-    return process.env
+    return withoutEmptyValues(process.env)
   }
 
   if (!isValidProfile(profile)) {
     throw new Error(`Invalid env profile: ${profile}`)
   }
 
-  const env = { ...process.env }
+  const env = withoutEmptyValues(process.env)
 
   for (const envPath of getEnvPaths(profile)) {
     if (existsSync(envPath)) {
-      Object.assign(env, parseEnv(readFileSync(envPath, 'utf8')))
+      Object.assign(
+        env,
+        withoutEmptyValues(parseEnv(readFileSync(envPath, 'utf8')))
+      )
     }
   }
 
   return env
+}
+
+function withoutEmptyValues(env: NodeJS.ProcessEnv) {
+  return Object.fromEntries(
+    Object.entries(env).filter(
+      ([, value]) => value !== undefined && value !== ''
+    )
+  )
 }
 
 function isValidProfile(profile: string) {
