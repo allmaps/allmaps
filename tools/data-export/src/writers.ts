@@ -12,6 +12,7 @@ import {
   serializeDomainCounts,
   type DomainCounts
 } from './domains.ts'
+import { getTileBand } from './tile-bands.ts'
 
 import type { ApiMap } from '@allmaps/api-shared/types'
 import type { Writable } from 'node:stream'
@@ -112,11 +113,18 @@ function generateFlattenedFeature(map: ApiMap) {
   const feature = generateFeature(map)
   const mapUrl = getRequiredString(map._allmaps?.id ?? map.id, 'map id')
   const modified = getRequiredString(map.modified, 'map modified date')
+  const tileBand = getTileBand(map._allmaps?.area)
 
   return {
     type: 'Feature',
+    tippecanoe: {
+      layer: tileBand.layer,
+      minzoom: tileBand.minzoom,
+      maxzoom: tileBand.maxzoom
+    },
     properties: {
       mapId: getLastPathPart(mapUrl),
+      tileBand: tileBand.id,
       modified: Math.floor(Date.parse(modified) / 1000),
       id: mapUrl,
       scale: map._allmaps?.scale,

@@ -19,13 +19,14 @@ fi
 
 tippecanoe \
   -f \
-  -z8 \
+  -z14 \
   --simplify-only-low-zooms \
-  --full-detail=24 \
+  --full-detail=18 \
   --visvalingam \
   --drop-densest-as-needed \
   --projection=EPSG:4326 \
   -y id \
+  -y tileBand \
   -y scale \
   -y area \
   -y modified \
@@ -35,5 +36,4 @@ tippecanoe \
   -y resourceHeight \
   -y imageServiceDomain \
   -o "$OUTPUT_PATH" \
-  -l masks \
   "$INPUT_PATH"

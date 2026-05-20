@@ -17,11 +17,12 @@
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
-  import type { MapGeoJSONFeature, FilterSpecification } from 'maplibre-gl'
+  import type { MapGeoJSONFeature } from 'maplibre-gl'
 
   import { PUBLIC_GEOCODE_EARTH_API_KEY } from '$env/static/public'
 
   import { formatTimeAgo } from '$lib/shared/format.js'
+  import { getMaskFilter, maskBands, maskLayerIds } from '$lib/shared/mask-bands.js'
 
   import type { Bbox } from '@allmaps/types'
   import type { GeocoderGeoJsonFeature } from '@allmaps/components/geocoder'
@@ -42,22 +43,13 @@
   let lastModifiedAgo: string | undefined = $state('')
 
   const minMaxArea = 100_000
-  const maxMaxAea = 500_000_000_000
+  const maxMaxAea = 300_000_000_000_000
 
-  let maxAreaSqrt = $state(Math.sqrt(5_000_000_000))
-
-  function getFilters(maxAea: number): FilterSpecification {
-    return [
-      'all',
-      ['>=', 'area', 0],
-      ['<=', 'area', maxAea],
-      ['!=', 'imageServiceDomain', 'iiif.nypl.org']
-    ]
-  }
+  let maxAreaSqrt = $state(Math.sqrt(maxMaxAea))
 
   function updateFeatures() {
     const newFeatures = map.queryRenderedFeatures({
-      layers: ['masks']
+      layers: maskLayerIds
     })
 
     features = uniqWith(
@@ -138,7 +130,6 @@
       hash: true
     })
 
-    // @ts-expect-error incorrect MapLibre types
     addTerrain(map, maplibregl)
 
     map.on('load', () => {
@@ -147,24 +138,29 @@
         url: `pmtiles://${pmtilesUrl}`
       })
 
-      map.addLayer({
-        id: 'masks',
-        type: 'line',
-        source: 'masks',
-        'source-layer': 'masks',
-        layout: {
-          'line-join': 'round',
-          'line-cap': 'round'
-        },
-        paint: {
-          'line-color': '#ff56ba',
-          'line-width': 3
-        }
-      })
+      for (const maskBand of maskBands) {
+        map.addLayer({
+          id: maskBand.layerId,
+          type: 'line',
+          source: 'masks',
+          'source-layer': maskBand.sourceLayer,
+          minzoom: maskBand.minzoom,
+          maxzoom: maskBand.maxzoom,
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#ff56ba',
+            'line-width': maskBand.lineWidth,
+            'line-opacity': maskBand.lineOpacity
+          },
+          filter: getMaskFilter(maxAreaSqrt ** 2)
+        })
+      }
 
       warpedMapLayer = new WarpedMapLayer()
 
-      // @ts-expect-error incorrect MapLibre types
       map.addLayer(warpedMapLayer)
 
       layersAdded = true
@@ -197,7 +193,9 @@
 
   $effect(() => {
     if (layersAdded) {
-      map.setFilter('masks', getFilters(maxAreaSqrt ** 2))
+      for (const maskLayerId of maskLayerIds) {
+        map.setFilter(maskLayerId, getMaskFilter(maxAreaSqrt ** 2))
+      }
       updateFeatures()
     }
   })
@@ -244,7 +242,7 @@
                   mode="contain"
                 />
               </a>
-              <div class="flex-shrink-0 flex gap-2 flex-wrap">
+              <div class="shrink-0 flex gap-2 flex-wrap">
                 <button
                   onclick={() => showOnMap(feature.properties.id)}
                   class="py-2.5 px-5 text-sm focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"

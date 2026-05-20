@@ -65,6 +65,19 @@ The PMTiles command reads `maps-flattened.geojson` and writes:
 
 - `maps.pmtiles`
 
+`maps.pmtiles` contains one vector source layer per map area band. Area is in
+square meters and the bands overlap in zoom so Explore can render adjacent
+scales together:
+
+| Source layer      |                                   Area | Tile zooms |
+| ----------------- | -------------------------------------: | ---------: |
+| `masks_global`    |                `>= 10,000,000,000,000` |        0-5 |
+| `masks_continent` | `1,000,000,000,000-10,000,000,000,000` |        2-7 |
+| `masks_country`   |     `10,000,000,000-1,000,000,000,000` |        4-9 |
+| `masks_region`    |           `100,000,000-10,000,000,000` |       6-11 |
+| `masks_city`      |                `1,000,000-100,000,000` |       8-13 |
+| `masks_local`     |                          `< 1,000,000` |      10-14 |
+
 Next implementation steps:
 
 - upload completed files to R2
