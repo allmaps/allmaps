@@ -14,5 +14,9 @@ export function parseConsoleEnv(value: unknown): ConsoleEnv {
 }
 
 export function parseConsolePublicEnv(value: unknown): ConsolePublicEnv {
-  return parseEnvSchema(consolePublicEnvSchema, value, 'console public env vars')
+  return parseEnvSchema(
+    consolePublicEnvSchema,
+    value,
+    'console public env vars'
+  )
 }
