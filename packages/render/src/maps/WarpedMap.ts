@@ -70,7 +70,7 @@ export const DEFAULT_WARPED_MAP_OPTIONS: WarpedMapOptions = {
   visible: true,
   overviewTiles: false,
   overviewTilesSelection: 'lowest',
-  overviewTilesMaxResolution: 'viewport', // Used to be 1024 * 1024 to support one such tile, e.g. for Rotterdam map.
+  overviewTilesMaxResolution: undefined, // Used to be 1024 * 1024 to support one such tile, e.g. for Rotterdam map.
   applyMask: true,
   distortionMeasure: undefined
 }
