@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {},
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
+  },
+  "references": [
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/api-shared" },
+    { "path": "../../packages/env" },
+    { "path": "../../packages/iiif-parser" }
+  ],
+  "include": ["./src/**/*"]
+}
