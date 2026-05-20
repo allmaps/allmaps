@@ -50,7 +50,7 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
     .use(cors())
     .use(
       openapi({
-        provider: null,
+        path: 'docs',
         specPath: 'openapi.json',
         documentation: {
           info: {
@@ -58,7 +58,21 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
             description: 'API documentation for the Allmaps Annotations API',
             version: packageJson.version
           },
+          components: {
+            securitySchemes: {
+              sessionCookie: {
+                type: 'apiKey',
+                in: 'cookie',
+                name: 'better-auth.session_token',
+                description:
+                  'Better Auth session cookie. Some routes additionally require the authenticated user to be an admin.'
+              }
+            }
+          },
           tags: openApiTags
+        },
+        exclude: {
+          staticFile: false
         },
         scalar: {
           tagsSorter,
