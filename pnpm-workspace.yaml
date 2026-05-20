@@ -4,6 +4,7 @@ packages:
   - 'workers/*'
   - 'apis/*'
   - 'test/*'
+  - 'tools/*'
 
 catalog:
   '@types/node': ^24
