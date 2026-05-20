@@ -4,7 +4,9 @@ export {
   queryCanvases,
   queryManifests,
   createImage,
-  createManifest
+  createImageFromUrl,
+  createManifest,
+  createManifestFromUrl
 } from './queries/iiif.js'
 
 export { queryMaps } from './queries/maps.js'
