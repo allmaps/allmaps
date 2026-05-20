@@ -113,7 +113,7 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
             membership?.plan &&
             PAID_ORGANIZATION_PLANS.has(membership.plan)
           ) {
-            return 'member'
+            return 'paidOrganizationMember'
           }
 
           return 'user'
