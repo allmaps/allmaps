@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd "$(dirname "$0")/.."
+
 echo "Starting Allmaps data export"
 date -u
 
