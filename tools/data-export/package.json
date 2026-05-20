@@ -1,0 +1,41 @@
+{
+  "name": "@allmaps/data-export",
+  "version": "1.0.0-beta.0",
+  "private": true,
+  "description": "Export public Allmaps data dumps from the database",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "bin": {
+    "allmaps-data-export": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x ./dist/index.js",
+    "export": "node ./src/index.ts export",
+    "export:dev": "node ./src/index.ts export dev",
+    "export:localhost": "node ./src/index.ts export localhost",
+    "export:production": "node ./src/index.ts export production",
+    "pmtiles": "./scripts/pmtiles.sh",
+    "run": "./scripts/run.sh",
+    "upload": "./scripts/upload.sh",
+    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src",
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/api-shared": "workspace:^",
+    "@allmaps/env": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "postgres": "catalog:"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.0",
+    "@types/node": "catalog:",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2",
+    "typescript": "catalog:"
+  }
+}
