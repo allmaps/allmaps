@@ -108,6 +108,7 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
           user = {
             id: `${env.PUBLIC_REST_BASE_URL}/users/${session.user.id}`,
             name: session.user.name,
+            email: session.user.email,
             slug: session.user.slug
           }
         }

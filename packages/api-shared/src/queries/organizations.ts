@@ -6,6 +6,7 @@ import * as authSchema from '@allmaps/db/schema/auth'
 import * as organizationsSchema from '@allmaps/db/schema/organizations'
 import {
   queryAllOrganizationUsers,
+  queryOrganizationUsersByOrganizationIds,
   queryOrganizationMembersById
 } from './auth.js'
 
@@ -244,6 +245,40 @@ export async function listOrganizationsWithUsers(
       usersByOrganizationId[dbOrganization.id] ?? []
     )
   )
+}
+
+export async function listOrganizationsWithUsersByOrganizationIds(
+  db: Db,
+  restBaseUrl: string,
+  organizationIds: string[],
+  limit?: number,
+  userRole?: UserRole
+) {
+  const [dbOrganizations, usersByOrganizationId] = await Promise.all([
+    db.query.organizations.findMany({
+      with: {
+        urls: true
+      },
+      orderBy: (organizations, { asc }) => asc(organizations.name),
+      limit: clampLimit(limit, userRole)
+    }),
+    queryOrganizationUsersByOrganizationIds(db, restBaseUrl, organizationIds)
+  ])
+
+  const organizationIdSet = new Set(organizationIds)
+
+  return dbOrganizations.map((dbOrganization) => {
+    const organization = fromDbOrganization(restBaseUrl, dbOrganization)
+
+    if (!organizationIdSet.has(dbOrganization.id)) {
+      return organization
+    }
+
+    return {
+      ...organization,
+      users: usersByOrganizationId[dbOrganization.id] ?? []
+    }
+  })
 }
 
 export async function queryOrganizationById(
