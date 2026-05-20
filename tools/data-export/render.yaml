@@ -1,0 +1,27 @@
+services:
+  - type: cron
+    name: allmaps-data-export
+    runtime: docker
+    schedule: '0 3 * * *'
+    dockerfilePath: tools/data-export/Dockerfile
+    dockerContext: .
+    dockerCommand: ./scripts/run.sh
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_DATABASE_URL
+        sync: false
+      - key: RCLONE_CONFIG_R2_ACCESS_KEY_ID
+        sync: false
+      - key: RCLONE_CONFIG_R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: RCLONE_CONFIG_R2_ENDPOINT
+        sync: false
+      - key: ANNOTATIONS_BASE_URL
+        value: https://annotations.allmaps.org
+      - key: DATA_EXPORT_OUTPUT_DIR
+        value: ./data
+      - key: DATA_EXPORT_BATCH_SIZE
+        value: 500
+      - key: DATA_EXPORT_R2_DESTINATION
+        value: r2:allmaps-files

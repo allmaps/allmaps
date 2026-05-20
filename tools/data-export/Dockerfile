@@ -29,4 +29,4 @@ RUN corepack enable \
 
 WORKDIR /allmaps/tools/data-export
 
-ENTRYPOINT ["./scripts/run.sh"]
+CMD ["./scripts/run.sh"]
