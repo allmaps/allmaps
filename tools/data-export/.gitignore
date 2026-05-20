@@ -1,0 +1,6 @@
+data/
+*.geojson
+*.geojsonl
+*.json
+*.ndjson
+*.pmtiles

@@ -16,6 +16,7 @@
     "./console": "./dist/console.js",
     "./tileserver": "./dist/tileserver.js",
     "./preview": "./dist/preview.js",
+    "./data-export": "./dist/data-export.js",
     "./worker": "./dist/worker.js",
     "./app": "./dist/app.js",
     "./better-auth": "./dist/better-auth.js"
