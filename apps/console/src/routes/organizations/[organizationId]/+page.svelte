@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { Combobox } from 'bits-ui'
   import { getAbortSignal } from 'svelte'
 
   import AppSelect from '$lib/components/AppSelect.svelte'
@@ -15,6 +16,7 @@
     updateOrganizationForm,
     updateOrganizationMemberRole
   } from '../organizations.remote.js'
+  import { getUsers, type ConsoleUser } from '../../users/users.remote.js'
   import type { Organization } from '$lib/types.js'
   import type { PageProps } from './$types.js'
 
@@ -36,6 +38,10 @@
   let showAddMemberModal = $state(false)
   let newMemberEmail = $state('')
   let newMemberRole = $state<'admin' | 'member' | 'owner'>('member')
+  let memberSearchValue = $state('')
+  let users = $state<ConsoleUser[]>([])
+  let isLoadingUsers = $state(false)
+  let usersLoadError = $state<unknown>(null)
   let isAddingMember = $state(false)
 
   let removingMemberId = $state<string | null>(null)
@@ -75,6 +81,32 @@
       href: `${organizationApiUrl}/images?georeferenced=true`
     }
   ])
+  const memberEmailSet = $derived(
+    new Set((organization?.users ?? []).map((member) => member.user.email))
+  )
+  const userItems = $derived(
+    users
+      .filter((user) => user.email)
+      .map((user) => ({
+        value: user.email as string,
+        label: [user.name, user.email].filter(Boolean).join(' '),
+        name: user.name || 'Unnamed user',
+        email: user.email as string,
+        isMember: memberEmailSet.has(user.email as string)
+      }))
+      .sort((firstUser, secondUser) =>
+        firstUser.label.localeCompare(secondUser.label)
+      )
+  )
+  const filteredUserItems = $derived(
+    memberSearchValue.trim()
+      ? userItems.filter((user) =>
+          user.label
+            .toLowerCase()
+            .includes(memberSearchValue.trim().toLowerCase())
+        )
+      : userItems
+  )
 
   function initializeOrganizationForm(nextOrganization: Organization) {
     editOrgName = nextOrganization.name
@@ -145,6 +177,37 @@
     }
   }
 
+  async function loadUsers() {
+    if (users.length || isLoadingUsers) {
+      return
+    }
+
+    isLoadingUsers = true
+    usersLoadError = null
+
+    const result = await queryResult<ConsoleUser[]>(getUsers(10000))
+
+    if (result.error || !result.data) {
+      usersLoadError = result.error ?? new Error('Failed to load users')
+    } else {
+      users = result.data
+    }
+
+    isLoadingUsers = false
+  }
+
+  function openAddMemberModal() {
+    showAddMemberModal = true
+    loadUsers()
+  }
+
+  function resetAddMemberModal() {
+    showAddMemberModal = false
+    newMemberEmail = ''
+    newMemberRole = 'member'
+    memberSearchValue = ''
+  }
+
   async function addMember() {
     if (!newMemberEmail) {
       return
@@ -160,9 +223,7 @@
       })
 
       await loadOrganization()
-      newMemberEmail = ''
-      newMemberRole = 'member'
-      showAddMemberModal = false
+      resetAddMemberModal()
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to add member'
     } finally {
@@ -250,149 +311,137 @@
     </div>
   {:else}
     <form {...updateOrganizationForm} class="bg-white rounded-lg shadow p-6">
-    <input
-      type="hidden"
-      name="organizationId"
-      value={organizationId}
-    />
-    <input
-      type="hidden"
-      name="domains"
-      value={editDomains.join('\n')}
-    />
-    <div class="space-y-6">
-      <div>
-        <label
-          for="orgName"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Organization Name
-        </label>
-        <input
-          id="orgName"
-          type="text"
-          name="name"
-          bind:value={editOrgName}
-          required
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Organization name"
-        />
-      </div>
-
-      <div>
-        <label
-          for="orgSlug"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          URL-friendly identifier
-        </label>
-        <input
-          id="orgSlug"
-          type="text"
-          name="slug"
-          bind:value={editOrgSlug}
-          required
-          pattern={slugPattern}
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="organization-name"
-        />
-      </div>
-
-      <div>
-        <label
-          for="orgHomepage"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Homepage
-        </label>
-        <input
-          id="orgHomepage"
-          type="url"
-          name="homepage"
-          bind:value={editHomepage}
-          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="https://example.com"
-        />
-      </div>
-
-      <div>
-        <label
-          for="orgPlan"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Plan
-        </label>
-        <AppSelect bind:value={editPlan} items={planItems} />
-        <input
-          type="hidden"
-          name="plan"
-          value={editPlan}
-        />
-      </div>
-
-      <div>
-        <p class="block text-sm font-medium text-gray-700 mb-2">Domains</p>
-        <div class="space-y-2">
-          {#each editDomains as editDomain, i (editDomain)}
-            <div class="flex gap-2">
-              <input
-                type="text"
-                bind:value={editDomains[i]}
-                class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="example.com"
-              />
-              <button
-                type="button"
-                onclick={() =>
-                  (editDomains = editDomains.filter((_, j) => j !== i))}
-                class="px-3 py-2 text-red-600 hover:text-red-800 cursor-pointer"
-              >
-                Remove
-              </button>
-            </div>
-          {/each}
-          <button
-            type="button"
-            onclick={() => (editDomains = [...editDomains, ''])}
-            class="text-sm text-blue-600 hover:underline cursor-pointer"
+      <input type="hidden" name="organizationId" value={organizationId} />
+      <input type="hidden" name="domains" value={editDomains.join('\n')} />
+      <div class="space-y-6">
+        <div>
+          <label
+            for="orgName"
+            class="block text-sm font-medium text-gray-700 mb-2"
           >
-            + Add domain
-          </button>
+            Organization Name
+          </label>
+          <input
+            id="orgName"
+            type="text"
+            name="name"
+            bind:value={editOrgName}
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Organization name"
+          />
         </div>
-      </div>
 
-      <div class="flex gap-3 justify-between mt-8 pt-6 border-t">
-        <button
-          type="button"
-          onclick={() => (showDeleteModal = true)}
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition cursor-pointer"
-          disabled={!!updateOrganizationForm.pending}
-        >
-          Delete Organization
-        </button>
-        <div class="flex gap-3">
+        <div>
+          <label
+            for="orgSlug"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            URL-friendly identifier
+          </label>
+          <input
+            id="orgSlug"
+            type="text"
+            name="slug"
+            bind:value={editOrgSlug}
+            required
+            pattern={slugPattern}
+            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="organization-name"
+          />
+        </div>
+
+        <div>
+          <label
+            for="orgHomepage"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Homepage
+          </label>
+          <input
+            id="orgHomepage"
+            type="url"
+            name="homepage"
+            bind:value={editHomepage}
+            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="https://example.com"
+          />
+        </div>
+
+        <div>
+          <label
+            for="orgPlan"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Plan
+          </label>
+          <AppSelect bind:value={editPlan} items={planItems} />
+          <input type="hidden" name="plan" value={editPlan} />
+        </div>
+
+        <div>
+          <p class="block text-sm font-medium text-gray-700 mb-2">Domains</p>
+          <div class="space-y-2">
+            {#each editDomains as editDomain, i (editDomain)}
+              <div class="flex gap-2">
+                <input
+                  type="text"
+                  bind:value={editDomains[i]}
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="example.com"
+                />
+                <button
+                  type="button"
+                  onclick={() =>
+                    (editDomains = editDomains.filter((_, j) => j !== i))}
+                  class="px-3 py-2 text-red-600 hover:text-red-800 cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
+            {/each}
+            <button
+              type="button"
+              onclick={() => (editDomains = [...editDomains, ''])}
+              class="text-sm text-blue-600 hover:underline cursor-pointer"
+            >
+              + Add domain
+            </button>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-between mt-8 pt-6 border-t">
           <button
             type="button"
-            onclick={cancel}
-            class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
+            onclick={() => (showDeleteModal = true)}
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition cursor-pointer"
             disabled={!!updateOrganizationForm.pending}
           >
-            Cancel
+            Delete Organization
           </button>
-          <button
-            type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
-            disabled={!editOrgName ||
-              !editOrgSlug ||
-              !!updateOrganizationForm.pending}
-          >
-            {updateOrganizationForm.pending
-              ? 'Updating...'
-              : 'Update Organization'}
-          </button>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick={cancel}
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
+              disabled={!!updateOrganizationForm.pending}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+              disabled={!editOrgName ||
+                !editOrgSlug ||
+                !!updateOrganizationForm.pending}
+            >
+              {updateOrganizationForm.pending
+                ? 'Updating...'
+                : 'Update Organization'}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     </form>
   {/if}
 
@@ -405,8 +454,7 @@
             <tbody class="divide-y divide-gray-100">
               {#each organizationResourceLinks as resourceLink (resourceLink.href)}
                 <tr>
-                  <th
-                    class="w-48 py-2 pr-4 text-left font-medium text-gray-500"
+                  <th class="w-48 py-2 pr-4 text-left font-medium text-gray-500"
                     >{resourceLink.label}</th
                   >
                   <td class="py-2">
@@ -435,7 +483,7 @@
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-semibold">Members ({members.length})</h3>
           <button
-            onclick={() => (showAddMemberModal = true)}
+            onclick={openAddMemberModal}
             class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
           >
             Add Member
@@ -578,27 +626,95 @@
   <div
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
     onclick={(e) => {
-      if (e.target === e.currentTarget) showAddMemberModal = false
+      if (e.target === e.currentTarget) resetAddMemberModal()
     }}
   >
-    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+    <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
       <h3 class="text-xl font-bold mb-4">Add Member</h3>
 
       <div class="space-y-4">
         <div>
           <label
-            for="memberEmail"
+            for="memberUser"
             class="block text-sm font-medium text-gray-700 mb-2"
           >
-            Email Address
+            User
           </label>
-          <input
-            id="memberEmail"
-            type="email"
+          <Combobox.Root
+            type="single"
             bind:value={newMemberEmail}
-            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="user@example.com"
-          />
+            items={userItems}
+            onOpenChangeComplete={(open) => {
+              if (!open) memberSearchValue = ''
+            }}
+          >
+            <div class="relative">
+              <Combobox.Input
+                autocomplete="off"
+                id="memberUser"
+                oninput={(event) =>
+                  (memberSearchValue = event.currentTarget.value)}
+                class="w-full px-3 py-2 pr-9 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                placeholder={isLoadingUsers
+                  ? 'Loading users...'
+                  : 'Search users by name or email'}
+                disabled={isLoadingUsers}
+                aria-label="Search users"
+              />
+              <Combobox.Trigger
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs disabled:opacity-50 cursor-pointer"
+                disabled={isLoadingUsers}
+                aria-label="Show users"
+              >
+                ▾
+              </Combobox.Trigger>
+            </div>
+            <Combobox.Portal>
+              <Combobox.Content
+                class="z-50 w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)] rounded-xl border border-gray-200 bg-white shadow-lg py-1 outline-none"
+                sideOffset={4}
+              >
+                <Combobox.Viewport class="max-h-72 overflow-y-auto">
+                  {#if usersLoadError}
+                    <div class="px-3 py-2 text-sm text-red-600">
+                      Failed to load users.
+                    </div>
+                  {:else if filteredUserItems.length === 0}
+                    <div class="px-3 py-2 text-sm text-gray-500">
+                      No users found.
+                    </div>
+                  {:else}
+                    {#each filteredUserItems as user (user.value)}
+                      <Combobox.Item
+                        value={user.value}
+                        label={user.label}
+                        disabled={user.isMember}
+                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 cursor-pointer select-none outline-none hover:bg-gray-50 data-[highlighted]:bg-gray-50 data-[state=checked]:text-blue-600 data-[state=checked]:font-medium data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:bg-white"
+                      >
+                        {#snippet children({ selected })}
+                          <div class="min-w-0 flex-1">
+                            <div class="truncate font-medium">{user.name}</div>
+                            <div class="truncate text-xs text-gray-500">
+                              {user.email}
+                            </div>
+                          </div>
+                          {#if user.isMember}
+                            <span class="shrink-0 text-xs text-gray-400">
+                              Member
+                            </span>
+                          {:else if selected}
+                            <span class="shrink-0 text-xs text-blue-600">
+                              Selected
+                            </span>
+                          {/if}
+                        {/snippet}
+                      </Combobox.Item>
+                    {/each}
+                  {/if}
+                </Combobox.Viewport>
+              </Combobox.Content>
+            </Combobox.Portal>
+          </Combobox.Root>
         </div>
 
         <div>
@@ -614,11 +730,7 @@
 
       <div class="flex gap-3 justify-end mt-6">
         <button
-          onclick={() => {
-            showAddMemberModal = false
-            newMemberEmail = ''
-            newMemberRole = 'member'
-          }}
+          onclick={resetAddMemberModal}
           class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
           disabled={isAddingMember}
         >

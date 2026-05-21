@@ -30,6 +30,7 @@
   let user = $state<ConsoleUser | null>(null)
   let organizations = $state<Organization[]>([])
   let isLoadingUser = $state(true)
+  let isLoadingOrganizations = $state(false)
   let loadError = $state<unknown>(null)
 
   const userOrganizations = $derived(user?.organizations ?? [])
@@ -48,6 +49,18 @@
   let initializedUserId = $state<string | null>(null)
 
   const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
+  const organizationItems = $derived([
+    {
+      value: '',
+      label: isLoadingOrganizations
+        ? 'Loading organizations...'
+        : 'Select an organization'
+    },
+    ...organizations.map((organization) => ({
+      value: organization.id,
+      label: organization.name
+    }))
+  ])
 
   function initializeUserForm(nextUser: ConsoleUser) {
     editUserName = nextUser.name || ''
@@ -62,21 +75,16 @@
     isLoadingUser = true
     loadError = null
 
-    const [userLoadResult, organizationsLoadResult] = await Promise.all([
+    const userLoadResult =
       data.isAdmin || data.isCurrentUser
-        ? queryResult<ConsoleUser>(getUser(userId))
-        : Promise.resolve({ data: null, error: null }),
-      data.isAdmin
-        ? queryResult<Organization[]>(getOrganizations())
-        : Promise.resolve({ data: [], error: null })
-    ])
+        ? await queryResult<ConsoleUser>(getUser(userId))
+        : { data: null, error: null }
 
     if (signal?.aborted) {
       return
     }
 
     isLoadingUser = false
-    organizations = organizationsLoadResult.data ?? []
 
     if (userLoadResult.error || !userLoadResult.data) {
       user = data.isCurrentUser ? (sessionUser ?? null) : null
@@ -90,11 +98,30 @@
     }
   }
 
+  async function loadOrganizations(signal?: AbortSignal) {
+    if (!data.isAdmin) {
+      organizations = []
+      return
+    }
+
+    isLoadingOrganizations = true
+
+    const result = await queryResult<Organization[]>(getOrganizations())
+
+    if (signal?.aborted) {
+      return
+    }
+
+    organizations = result.data ?? []
+    isLoadingOrganizations = false
+  }
+
   $effect(() => {
     const signal = getAbortSignal()
 
     user = null
     organizations = []
+    isLoadingOrganizations = false
     editUserName = ''
     editUserSlug = ''
     editUserEmail = ''
@@ -102,7 +129,11 @@
     editUserRole = 'user'
     initializedUserId = null
 
-    loadUser(signal)
+    loadUser(signal).then(() => {
+      if (!signal.aborted) {
+        loadOrganizations(signal)
+      }
+    })
   })
 
   async function changeRole() {
@@ -431,16 +462,12 @@
                 >
                   Select Organization
                 </label>
-                <select
+                <AppSelect
                   id="orgSelect"
                   bind:value={selectedOrganizationId}
-                  class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">-- Select an organization --</option>
-                  {#each organizations as organization (organization.id)}
-                    <option value={organization.id}>{organization.name}</option>
-                  {/each}
-                </select>
+                  items={organizationItems}
+                  disabled={isLoadingOrganizations}
+                />
               </div>
               <div>
                 <label
