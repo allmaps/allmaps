@@ -102,6 +102,8 @@
 
     return organizations
   }
+
+  const organizationsResult = $derived(await queryResult(getOrganizations()))
 </script>
 
 {#snippet sortIcon(col: string)}
@@ -139,8 +141,10 @@
   <div class="mb-4">
     <SearchFilter
       fields={[
+        { value: 'all', label: 'All' },
         { value: 'name', label: 'Name' },
-        { value: 'slug', label: 'Slug' }
+        { value: 'slug', label: 'Slug' },
+        { value: 'domain', label: 'Domain' }
       ]}
       bind:value={searchValue}
       bind:field={searchField}
@@ -148,7 +152,8 @@
     />
   </div>
 
-  {#await getOrganizations() then organizations}
+  {#if organizationsResult.data}
+    {@const organizations = organizationsResult.data}
     {@const displayedOrganizations = getDisplayedOrganizations(organizations)}
     <DataTable>
       {#snippet thead()}
@@ -257,9 +262,9 @@
         {/if}
       {/snippet}
     </DataTable>
-  {:catch}
+  {:else}
     <p class="px-6 py-12 text-center text-gray-400 font-sans text-sm">
       Failed to load organizations
     </p>
-  {/await}
+  {/if}
 </div>

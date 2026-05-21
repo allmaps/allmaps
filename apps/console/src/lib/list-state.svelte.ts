@@ -1,6 +1,6 @@
 export const usersListPageState = $state({
   searchValue: '',
-  searchField: 'email' as 'email' | 'name',
+  searchField: 'all' as 'all' | 'email' | 'name',
   offset: 0,
   sortBy: 'createdAt' as 'name' | 'email' | 'createdAt',
   sortDir: 'desc' as 'asc' | 'desc'

@@ -49,7 +49,24 @@
         return (user.name ?? '').toLowerCase().includes(normalizedSearchValue)
       }
 
-      return (user.email ?? '').toLowerCase().includes(normalizedSearchValue)
+      if (searchField === 'email') {
+        return (user.email ?? '').toLowerCase().includes(normalizedSearchValue)
+      }
+
+      const organizations = (user.organizations ?? []).map(
+        (membership) => membership.organization.name
+      )
+      const searchableValues = [
+        user.name,
+        user.email,
+        user.role,
+        user.slug,
+        ...organizations
+      ]
+
+      return searchableValues.some((value) =>
+        (value ?? '').toLowerCase().includes(normalizedSearchValue)
+      )
     })
   }
 
@@ -88,7 +105,7 @@
 
   function search(value: string, field: string) {
     searchValue = value
-    searchField = field === 'name' ? 'name' : 'email'
+    searchField = field === 'name' || field === 'email' ? field : 'all'
     offset = 0
   }
 
@@ -109,6 +126,8 @@
   function nextPage() {
     offset = offset + PAGE_SIZE
   }
+
+  const usersResult = $derived(await queryResult(getUsers(10000)))
 </script>
 
 {#snippet sortIcon(col: string)}
@@ -136,6 +155,7 @@
   <div class="mb-4">
     <SearchFilter
       fields={[
+        { value: 'all', label: 'All' },
         { value: 'email', label: 'Email' },
         { value: 'name', label: 'Name' }
       ]}
@@ -145,43 +165,8 @@
     />
   </div>
 
-  {#await getUsers(10000)}
-    <DataTable>
-      {#snippet thead()}
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('name', 'Name')}</th
-        >
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('email', 'Email')}</th
-        >
-        <th class="px-3 py-2 @lg:px-4 text-left">
-          <span
-            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >Role</span
-          >
-        </th>
-        <th class="px-3 py-2 @lg:px-4 text-left">
-          <span
-            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >Organizations</span
-          >
-        </th>
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('createdAt', 'Created')}</th
-        >
-      {/snippet}
-
-      {#snippet tbody()}
-        <tr>
-          <td
-            colspan="5"
-            class="px-6 py-12 text-center text-gray-400 font-sans text-sm"
-            >Loading...</td
-          >
-        </tr>
-      {/snippet}
-    </DataTable>
-  {:then users}
+  {#if usersResult.data}
+    {@const users = usersResult.data}
     {@const displayedUsers = getDisplayedUsers(users)}
     {@const total = getFilteredUsers(users).length}
     <DataTable>
@@ -301,11 +286,11 @@
         </div>
       </div>
     {/if}
-  {:catch}
+  {:else}
     <div
       class="mb-4 px-4 py-3 bg-red-100 text-red-700 rounded-lg border border-red-200 font-sans text-sm"
     >
       Failed to load users
     </div>
-  {/await}
+  {/if}
 </div>
