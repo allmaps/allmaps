@@ -1,30 +1,17 @@
-import { command, query } from '$app/server'
+import { command, form, query } from '$app/server'
+import { redirect } from '@sveltejs/kit'
 
 import { restFetch } from '$lib/server/rest.js'
+import { routes } from '$lib/routes.js'
 import { z } from 'zod'
 
 import type { Organization } from '$lib/types.js'
 
 type OrganizationRole = 'admin' | 'member' | 'owner'
 
-type OrganizationPlan = 'supporter' | 'innovator'
-
-type OrganizationBody = {
-  name: string
-  slug: string
-  homepage: string | null
-  plan: OrganizationPlan | null
-  domains: string[]
-}
-
 type CreateOrganizationInput = {
   name: string
   slug: string
-}
-
-type UpdateOrganizationInput = {
-  organizationId: string
-  organization: OrganizationBody
 }
 
 type OrganizationMemberInput = {
@@ -43,25 +30,35 @@ type UpdateOrganizationMemberRoleInput = OrganizationMemberInput & {
 }
 
 const organizationIdSchema = z.string()
+const slugSchema = z
+  .string()
+  .trim()
+  .regex(/^[a-z](?:[a-z0-9-]*[a-z0-9])?$/, 'Invalid slug')
 const organizationRoleSchema = z.enum(['admin', 'member', 'owner'])
-const organizationPlanSchema = z.enum(['supporter', 'innovator']).nullable()
-const organizationBodySchema = z.object({
-  name: z.string().trim().min(1),
-  slug: z.string().trim().min(1),
-  homepage: z.string().nullable(),
-  plan: organizationPlanSchema,
-  domains: z.array(z.string())
-}) satisfies z.ZodType<OrganizationBody>
 
 const createOrganizationSchema = z.object({
   name: z.string().trim().min(1),
-  slug: z.string().trim().min(1)
+  slug: slugSchema
 }) satisfies z.ZodType<CreateOrganizationInput>
 
-const updateOrganizationSchema = z.object({
+const updateOrganizationFormSchema = z.object({
   organizationId: organizationIdSchema,
-  organization: organizationBodySchema
-}) satisfies z.ZodType<UpdateOrganizationInput>
+  name: z.string().trim().min(1),
+  slug: slugSchema,
+  homepage: z
+    .string()
+    .trim()
+    .transform((value) => value || null),
+  plan: z
+    .union([z.enum(['supporter', 'innovator']), z.literal('')])
+    .transform((value) => value || null),
+  domains: z.string().transform((value) =>
+    value
+      .split('\n')
+      .map((domain) => domain.trim())
+      .filter(Boolean)
+  )
+})
 
 const addOrganizationMemberSchema = z.object({
   organizationId: organizationIdSchema,
@@ -91,40 +88,39 @@ export const getOrganization = query(
   }
 )
 
-export const createOrganization = command<
-  typeof createOrganizationSchema,
-  Promise<Organization>
->(createOrganizationSchema, async (body) => {
-  const organization = await restFetch<Organization>('/organizations', {
-    method: 'POST',
-    json: {
-      ...body,
-      plan: null
-    }
-  })
+export const createOrganizationForm = form(
+  createOrganizationSchema,
+  async (body) => {
+    await restFetch<Organization>('/organizations', {
+      method: 'POST',
+      json: {
+        ...body,
+        plan: null
+      }
+    })
 
-  void getOrganizations().refresh()
+    await getOrganizations().refresh()
 
-  return organization
-})
+    redirect(303, routes.organizations())
+  }
+)
 
-export const updateOrganization = command<
-  typeof updateOrganizationSchema,
-  Promise<Organization>
->(updateOrganizationSchema, async ({ organizationId, organization: body }) => {
-  const organization = await restFetch<Organization>(
-    `/organizations/${organizationId}`,
-    {
+export const updateOrganizationForm = form(
+  updateOrganizationFormSchema,
+  async ({ organizationId, ...organization }) => {
+    await restFetch<Organization>(`/organizations/${organizationId}`, {
       method: 'PATCH',
-      json: body
-    }
-  )
+      json: organization
+    })
 
-  void getOrganizations().refresh()
-  void getOrganization(organizationId).refresh()
+    await Promise.all([
+      getOrganizations().refresh(),
+      getOrganization(organizationId).refresh()
+    ])
 
-  return organization
-})
+    redirect(303, routes.organizations())
+  }
+)
 
 export const deleteOrganization = command<
   typeof organizationIdSchema,
@@ -134,7 +130,7 @@ export const deleteOrganization = command<
     method: 'DELETE'
   })
 
-  void getOrganizations().refresh()
+  await getOrganizations().refresh()
 })
 
 export const addOrganizationMember = command<
@@ -146,8 +142,10 @@ export const addOrganizationMember = command<
     json: { email, role }
   })
 
-  void getOrganizations().refresh()
-  void getOrganization(organizationId).refresh()
+  await Promise.all([
+    getOrganizations().refresh(),
+    getOrganization(organizationId).refresh()
+  ])
 })
 
 export const removeOrganizationMember = command<
@@ -158,8 +156,10 @@ export const removeOrganizationMember = command<
     method: 'DELETE'
   })
 
-  void getOrganizations().refresh()
-  void getOrganization(organizationId).refresh()
+  await Promise.all([
+    getOrganizations().refresh(),
+    getOrganization(organizationId).refresh()
+  ])
 })
 
 export const updateOrganizationMemberRole = command<
@@ -173,7 +173,9 @@ export const updateOrganizationMemberRole = command<
       json: { role }
     })
 
-    void getOrganizations().refresh()
-    void getOrganization(organizationId).refresh()
+    await Promise.all([
+      getOrganizations().refresh(),
+      getOrganization(organizationId).refresh()
+    ])
   }
 )

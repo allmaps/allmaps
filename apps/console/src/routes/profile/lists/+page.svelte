@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getLists } from '$lib/lists.remote.js'
   import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
 
   import type { PageProps } from './$types'
   import type { ListSummary } from '$lib/lists.remote.js'
@@ -18,7 +19,7 @@
     <div class="flex items-center justify-between">
       <h1 class="text-3xl font-bold">My Lists</h1>
       <a
-        href="/profile/lists/new"
+        href={routes.newProfileList()}
         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
         New List
@@ -33,7 +34,7 @@
         {#if lists.length === 0}
           <p class="text-sm text-gray-500 italic">
             No lists yet. <a
-              href="/profile/lists/new"
+              href={routes.newProfileList()}
               class="text-blue-600 hover:underline">Create your first list.</a
             >
           </p>
@@ -41,7 +42,7 @@
           <div class="space-y-2">
             {#each lists as list (list.id)}
               <a
-                href="/profile/lists/{list.id}"
+                href={routes.profileList(list.id)}
                 class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
               >
                 <div>

@@ -1,5 +1,7 @@
-import { command, query } from '$app/server'
+import { command, form, query } from '$app/server'
+import { redirect } from '@sveltejs/kit'
 
+import { routes } from '$lib/routes.js'
 import { restFetch } from '$lib/server/rest.js'
 import { z } from 'zod'
 
@@ -91,21 +93,18 @@ export const getList = query(listIdSchema, async (listId) => {
   return restFetch<ListDetail>(`/lists/${listId}`)
 })
 
-export const createList = command<
-  typeof createListSchema,
-  Promise<ListSummary>
->(createListSchema, async ({ name }) => {
-  const list = await restFetch<ListSummary>('/lists', {
+export const createListForm = form(createListSchema, async ({ name }) => {
+  await restFetch<ListSummary>('/lists', {
     method: 'POST',
     json: { name }
   })
 
-  void getLists().refresh()
+  await getLists().refresh()
 
-  return list
+  redirect(303, routes.profileLists())
 })
 
-export const renameList = command<typeof renameListSchema, Promise<ListDetail>>(
+export const renameListForm = form(
   renameListSchema,
   async ({ listId, name }) => {
     const list = await restFetch<ListDetail>(`/lists/${listId}`, {
@@ -113,24 +112,29 @@ export const renameList = command<typeof renameListSchema, Promise<ListDetail>>(
       json: { name }
     })
 
-    void getLists().refresh()
-    void getList(listId).refresh()
+    await Promise.all([getLists().refresh(), getList(listId).refresh()])
 
-    return list
+    return {
+      list
+    }
   }
 )
 
-export const addListItemByUrl = command<
-  typeof addListItemByUrlSchema,
-  Promise<void>
->(addListItemByUrlSchema, async ({ listId, url }) => {
-  await restFetch(`/lists/${listId}/items/url`, {
-    method: 'POST',
-    json: { url }
-  })
+export const addListItemByUrlForm = form(
+  addListItemByUrlSchema,
+  async ({ listId, url }) => {
+    await restFetch(`/lists/${listId}/items/url`, {
+      method: 'POST',
+      json: { url }
+    })
 
-  void getList(listId).refresh()
-})
+    await getList(listId).refresh()
+
+    return {
+      success: true
+    }
+  }
+)
 
 export const removeListItem = command<
   typeof removeListItemSchema,
@@ -148,5 +152,5 @@ export const removeListItem = command<
     method: 'DELETE'
   })
 
-  void getList(listId).refresh()
+  await getList(listId).refresh()
 })

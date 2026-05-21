@@ -3,9 +3,9 @@
   import { getAuthContext } from '@allmaps/components/auth'
 
   import {
-    addListItemByUrl,
+    addListItemByUrlForm,
     getList,
-    renameList as renameListCommand,
+    renameListForm,
     removeListItem as removeListItemCommand
   } from '$lib/lists.remote.js'
   import { queryResult } from '$lib/query-result.js'
@@ -38,13 +38,6 @@
     return error instanceof Error ? error.message : 'Failed to load list'
   }
 
-  let urlInput = $state('')
-  let adding = $state(false)
-  let addError = $state<string | null>(null)
-  let addSuccess = $state<string | null>(null)
-  let renaming = $state(false)
-  let renameError = $state<string | null>(null)
-  let renameSuccess = $state<string | null>(null)
   let removingItem = $state<string | null>(null)
 
   let username = $derived(
@@ -140,67 +133,6 @@
     }
   }
 
-  async function addItem() {
-    const url = urlInput.trim()
-    if (!url) {
-      return
-    }
-
-    adding = true
-    addError = null
-    addSuccess = null
-
-    try {
-      await addListItemByUrl({ listId, url }).updates(getList(listId))
-
-      urlInput = ''
-      addSuccess = `Added successfully`
-    } catch (err) {
-      addError =
-        err instanceof Error ? err.message : 'Network error. Please try again.'
-    } finally {
-      adding = false
-    }
-  }
-
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter') addItem()
-  }
-
-  async function renameList(event: SubmitEvent) {
-    event.preventDefault()
-
-    const form = event.currentTarget
-    if (!(form instanceof HTMLFormElement)) {
-      return
-    }
-
-    const formData = new FormData(form)
-    const nameValue = formData.get('name')
-    const name = typeof nameValue === 'string' ? nameValue.trim() : ''
-
-    renameError = null
-    renameSuccess = null
-
-    if (!name) {
-      renameError = 'Name is required'
-      return
-    }
-
-    renaming = true
-
-    try {
-      await renameListCommand({ listId, name }).updates(getList(listId))
-
-      renameSuccess = 'List name updated'
-    } catch (err) {
-      renameError =
-        err instanceof Error ? err.message : 'Network error. Please try again.'
-    } finally {
-      renaming = false
-    }
-  }
-
   const listResult = $derived(await queryResult<ListDetail>(getList(listId)))
 </script>
 
@@ -244,10 +176,10 @@
     {@const list = listResult.data}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
       <h2 class="text-xl font-semibold mb-3">List Name</h2>
-      <form onsubmit={renameList} class="space-y-3">
+      <form {...renameListForm} class="space-y-3">
+        <input {...renameListForm.fields.listId.as('hidden', listId)} />
         <input
-          name="name"
-          type="text"
+          {...renameListForm.fields.name.as('text')}
           value={list.name}
           required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -255,16 +187,13 @@
         <div class="flex items-center gap-3">
           <button
             type="submit"
-            disabled={renaming}
+            disabled={!!renameListForm.pending}
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {renaming ? 'Saving...' : 'Save name'}
+            {renameListForm.pending ? 'Saving...' : 'Save name'}
           </button>
-          {#if renameError}
-            <p class="text-sm text-red-600">{renameError}</p>
-          {/if}
-          {#if renameSuccess}
-            <p class="text-sm text-green-600">{renameSuccess}</p>
+          {#if renameListForm.result}
+            <p class="text-sm text-green-600">List name updated</p>
           {/if}
         </div>
       </form>
@@ -283,27 +212,30 @@
         >annotations.allmaps.org</code
       > URL for a map, image, canvas, or manifest.
     </p>
-    <div class="flex gap-2">
+    <form
+      {...addListItemByUrlForm.enhance(async (form) => {
+        await form.submit()
+        form.form.reset()
+      })}
+      class="flex gap-2"
+    >
+      <input {...addListItemByUrlForm.fields.listId.as('hidden', listId)} />
       <input
-        type="url"
-        bind:value={urlInput}
-        onkeydown={handleKeydown}
+        {...addListItemByUrlForm.fields.url.as('url')}
+        required
         placeholder="https://annotations.allmaps.org/maps/d9474a8524a4309d"
         class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
       />
       <button
-        onclick={addItem}
-        disabled={adding || !urlInput.trim()}
+        type="submit"
+        disabled={!!addListItemByUrlForm.pending}
         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
       >
-        {adding ? 'Adding...' : 'Add'}
+        {addListItemByUrlForm.pending ? 'Adding...' : 'Add'}
       </button>
-    </div>
-    {#if addError}
-      <p class="mt-2 text-sm text-red-600">{addError}</p>
-    {/if}
-    {#if addSuccess}
-      <p class="mt-2 text-sm text-green-600">{addSuccess}</p>
+    </form>
+    {#if addListItemByUrlForm.result?.success}
+      <p class="mt-2 text-sm text-green-600">Added successfully</p>
     {/if}
   </div>
 

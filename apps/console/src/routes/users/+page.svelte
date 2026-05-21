@@ -1,7 +1,18 @@
 <script lang="ts">
-  import { getOrganizationId } from '$lib/organizations.js'
-  import { usersListPageState } from '$lib/list-state.svelte.js'
+  import { replaceState } from '$app/navigation'
+  import { page } from '$app/state'
+
+  import { getOrganizationId, getUserId } from '$lib/organizations.js'
   import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
+  import {
+    getOffset,
+    getSearchField,
+    getSortDirection,
+    getSortField,
+    matchesSearch,
+    tableStatePath
+  } from '$lib/table.js'
 
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
@@ -9,31 +20,30 @@
 
   import type { ConsoleUser } from './users.remote.js'
 
-  function getUserId(userIdOrUrl: string) {
-    try {
-      const url = new URL(userIdOrUrl)
-      return url.pathname.split('/').filter(Boolean).at(-1) ?? userIdOrUrl
-    } catch {
-      return userIdOrUrl
+  const PAGE_SIZE = 20
+  const userSearchFields = ['email', 'name'] as const
+  const userSortFields = ['name', 'email', 'createdAt'] as const
+
+  let searchValue = $state(page.url.searchParams.get('q') ?? '')
+  let searchField = $state(getSearchField(page.url, userSearchFields))
+  let offset = $state(getOffset(page.url))
+
+  let sortBy = $state(getSortField(page.url, userSortFields, 'createdAt'))
+  let sortDir = $state(getSortDirection(page.url, 'desc'))
+
+  function replaceTableState() {
+    const path = tableStatePath('/users', {
+      searchValue,
+      searchField,
+      sortBy: sortBy === 'createdAt' ? undefined : sortBy,
+      sortDir: sortDir === 'desc' ? undefined : sortDir,
+      offset
+    })
+
+    if (path !== `${page.url.pathname}${page.url.search}`) {
+      replaceState(path, page.state)
     }
   }
-
-  const PAGE_SIZE = 20
-
-  let searchValue = $state(usersListPageState.searchValue)
-  let searchField = $state(usersListPageState.searchField)
-  let offset = $state(usersListPageState.offset)
-
-  let sortBy = $state<'name' | 'email' | 'createdAt'>(usersListPageState.sortBy)
-  let sortDir = $state<'asc' | 'desc'>(usersListPageState.sortDir)
-
-  $effect(() => {
-    usersListPageState.searchValue = searchValue
-    usersListPageState.searchField = searchField
-    usersListPageState.offset = offset
-    usersListPageState.sortBy = sortBy
-    usersListPageState.sortDir = sortDir
-  })
 
   let isFiltering = $derived(searchValue.length > 0)
 
@@ -46,11 +56,11 @@
       const normalizedSearchValue = searchValue.toLowerCase()
 
       if (searchField === 'name') {
-        return (user.name ?? '').toLowerCase().includes(normalizedSearchValue)
+        return matchesSearch(normalizedSearchValue, [user.name])
       }
 
       if (searchField === 'email') {
-        return (user.email ?? '').toLowerCase().includes(normalizedSearchValue)
+        return matchesSearch(normalizedSearchValue, [user.email])
       }
 
       const organizations = (user.organizations ?? []).map(
@@ -64,9 +74,7 @@
         ...organizations
       ]
 
-      return searchableValues.some((value) =>
-        (value ?? '').toLowerCase().includes(normalizedSearchValue)
-      )
+      return matchesSearch(normalizedSearchValue, searchableValues)
     })
   }
 
@@ -107,6 +115,7 @@
     searchValue = value
     searchField = field === 'name' || field === 'email' ? field : 'all'
     offset = 0
+    replaceTableState()
   }
 
   function sort(col: typeof sortBy) {
@@ -117,14 +126,17 @@
       sortDir = 'asc'
     }
     offset = 0
+    replaceTableState()
   }
 
   function prevPage() {
     offset = Math.max(0, offset - PAGE_SIZE)
+    replaceTableState()
   }
 
   function nextPage() {
     offset = offset + PAGE_SIZE
+    replaceTableState()
   }
 
   const usersResult = $derived(await queryResult(getUsers(10000)))
@@ -200,7 +212,7 @@
             <tr class="hover:bg-gray-50 transition">
               <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
                 <a
-                  href="/users/{getUserId(user.id)}"
+                  href={routes.user(getUserId(user.id))}
                   class="font-sans text-sm font-medium hover:text-pink"
                 >
                   {user.name || 'N/A'}
@@ -230,9 +242,9 @@
                 <div class="flex flex-wrap gap-1">
                   {#each user.organizations ?? [] as membership (membership.organization.slug)}
                     <a
-                      href="/organizations/{getOrganizationId(
-                        membership.organization.id
-                      )}"
+                      href={routes.organization(
+                        getOrganizationId(membership.organization.id)
+                      )}
                       class="rounded px-2 py-0.5 font-sans text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
                     >
                       {membership.organization.name}

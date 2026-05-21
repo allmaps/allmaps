@@ -2,13 +2,15 @@
   import { goto } from '$app/navigation'
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { planItems, orgMemberRoleItems } from '$lib/select-items'
+  import { getUserId } from '$lib/organizations.js'
   import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
   import {
     addOrganizationMember,
     deleteOrganization as deleteOrganizationCommand,
     getOrganization,
     removeOrganizationMember,
-    updateOrganization as updateOrganizationCommand,
+    updateOrganizationForm,
     updateOrganizationMemberRole
   } from '../organizations.remote.js'
   import type { Organization } from '$lib/types.js'
@@ -22,7 +24,6 @@
   let editHomepage = $state('')
   let editPlan = $state<'supporter' | 'innovator' | ''>('')
   let editDomains = $state<string[]>([])
-  let isUpdating = $state(false)
   let error = $state<string | null>(null)
   let initializedOrganizationId = $state<string | null>(null)
 
@@ -38,18 +39,7 @@
   let deleteConfirmName = $state('')
   let isDeleting = $state(false)
 
-  function isValidSlug(value: string) {
-    return /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/.test(value.trim())
-  }
-
-  function getUserId(userIdOrUrl: string) {
-    try {
-      const url = new URL(userIdOrUrl)
-      return url.pathname.split('/').filter(Boolean).at(-1) ?? userIdOrUrl
-    } catch {
-      return userIdOrUrl
-    }
-  }
+  const slugPattern = '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'
 
   const organizationResult = $derived(
     await queryResult<Organization>(getOrganization(organizationId))
@@ -79,47 +69,13 @@
     try {
       await deleteOrganizationCommand(organizationId)
 
-      goto('/organizations')
+      goto(routes.organizations())
     } catch (err) {
       error =
         err instanceof Error ? err.message : 'Failed to delete organization'
     } finally {
       isDeleting = false
       showDeleteModal = false
-    }
-  }
-
-  async function updateOrganization() {
-    if (!organization) {
-      return
-    }
-    if (!isValidSlug(editOrgSlug)) {
-      error =
-        'Invalid slug. Use lowercase letters, numbers, and hyphens, starting with a letter.'
-      return
-    }
-
-    isUpdating = true
-    error = null
-    try {
-      await updateOrganizationCommand({
-        organizationId,
-        organization: {
-          name: editOrgName,
-          slug: editOrgSlug,
-          homepage: editHomepage || null,
-          plan: editPlan || null,
-          domains: editDomains.filter(Boolean)
-        }
-      })
-
-      goto('/organizations')
-    } catch (err) {
-      console.error('Failed to update organization:', err)
-      error =
-        err instanceof Error ? err.message : 'Failed to update organization'
-    } finally {
-      isUpdating = false
     }
   }
 
@@ -141,7 +97,6 @@
       newMemberRole = 'member'
       showAddMemberModal = false
     } catch (err) {
-      console.error('Failed to add member:', err)
       error = err instanceof Error ? err.message : 'Failed to add member'
     } finally {
       isAddingMember = false
@@ -162,7 +117,6 @@
     try {
       await removeOrganizationMember({ organizationId, userId })
     } catch (err) {
-      console.error('Failed to remove member:', err)
       error = err instanceof Error ? err.message : 'Failed to remove member'
     } finally {
       removingMemberId = null
@@ -178,7 +132,6 @@
     try {
       await updateOrganizationMemberRole({ organizationId, userId, role })
     } catch (err) {
-      console.error('Failed to update member role:', err)
       error =
         err instanceof Error ? err.message : 'Failed to update member role'
     } finally {
@@ -187,7 +140,7 @@
   }
 
   function cancel() {
-    goto('/organizations')
+    goto(routes.organizations())
   }
 </script>
 
@@ -204,7 +157,18 @@
     </div>
   {/if}
 
-  <div class="bg-white rounded-lg shadow p-6">
+  <form {...updateOrganizationForm} class="bg-white rounded-lg shadow p-6">
+    <input
+      {...updateOrganizationForm.fields.organizationId.as(
+        'hidden',
+        organizationId
+      )}
+    />
+    <input
+      type="hidden"
+      name="domains"
+      value={editDomains.join('\n')}
+    />
     <div class="space-y-6">
       <div>
         <label
@@ -215,8 +179,9 @@
         </label>
         <input
           id="orgName"
-          type="text"
+          {...updateOrganizationForm.fields.name.as('text')}
           bind:value={editOrgName}
+          required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Organization name"
         />
@@ -231,8 +196,10 @@
         </label>
         <input
           id="orgSlug"
-          type="text"
+          {...updateOrganizationForm.fields.slug.as('text')}
           bind:value={editOrgSlug}
+          required
+          pattern={slugPattern}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="organization-name"
         />
@@ -247,7 +214,7 @@
         </label>
         <input
           id="orgHomepage"
-          type="url"
+          {...updateOrganizationForm.fields.homepage.as('url')}
           bind:value={editHomepage}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="https://example.com"
@@ -262,6 +229,11 @@
           Plan
         </label>
         <AppSelect bind:value={editPlan} items={planItems} />
+        <input
+          type="hidden"
+          name="plan"
+          value={editPlan}
+        />
       </div>
 
       <div>
@@ -297,31 +269,37 @@
 
       <div class="flex gap-3 justify-between mt-8 pt-6 border-t">
         <button
+          type="button"
           onclick={() => (showDeleteModal = true)}
           class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition cursor-pointer"
-          disabled={isUpdating}
+          disabled={!!updateOrganizationForm.pending}
         >
           Delete Organization
         </button>
         <div class="flex gap-3">
           <button
+            type="button"
             onclick={cancel}
             class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
-            disabled={isUpdating}
+            disabled={!!updateOrganizationForm.pending}
           >
             Cancel
           </button>
           <button
-            onclick={updateOrganization}
+            type="submit"
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
-            disabled={!editOrgName || !editOrgSlug || isUpdating}
+            disabled={!editOrgName ||
+              !editOrgSlug ||
+              !!updateOrganizationForm.pending}
           >
-            {isUpdating ? 'Updating...' : 'Update Organization'}
+            {updateOrganizationForm.pending
+              ? 'Updating...'
+              : 'Update Organization'}
           </button>
         </div>
       </div>
     </div>
-  </div>
+  </form>
 
   {#if organization}
     {@const members = organization.users || []}
@@ -384,7 +362,7 @@
                   <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm">
                       <a
-                        href="/users/{getUserId(member.user.id)}"
+                        href={routes.user(getUserId(member.user.id))}
                         class="text-blue-600 hover:underline"
                         >{member.user.name || '—'}</a
                       >

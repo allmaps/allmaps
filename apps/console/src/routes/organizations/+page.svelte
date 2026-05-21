@@ -1,29 +1,46 @@
 <script lang="ts">
+  import { replaceState } from '$app/navigation'
+  import { page } from '$app/state'
+
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
-  import { getOrganizationId } from '$lib/organizations.js'
-  import { organizationsListPageState } from '$lib/list-state.svelte.js'
+  import { getOrganizationId, getUserId } from '$lib/organizations.js'
   import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
+  import {
+    getSearchField,
+    getSortDirection,
+    getSortField,
+    matchesSearch as matchesSearchValue,
+    tableStatePath
+  } from '$lib/table.js'
   import { getOrganizations } from './organizations.remote.js'
 
   import type { Organization } from '$lib/types.js'
 
-  let searchValue = $state(organizationsListPageState.searchValue)
-  let searchField = $state(organizationsListPageState.searchField)
+  const organizationSearchFields = ['name', 'slug', 'domain'] as const
+  const organizationSortFields = ['name', 'slug', 'plan', 'createdAt'] as const
 
-  let sortBy = $state<'name' | 'slug' | 'plan' | 'createdAt'>(
-    organizationsListPageState.sortBy
-  )
-  let sortDir = $state<'asc' | 'desc'>(organizationsListPageState.sortDir)
+  let searchValue = $state(page.url.searchParams.get('q') ?? '')
+  let searchField = $state(getSearchField(page.url, organizationSearchFields))
+
+  let sortBy = $state(getSortField(page.url, organizationSortFields, 'plan'))
+  let sortDir = $state(getSortDirection(page.url, 'desc'))
 
   const planOrder: Record<string, number> = { supporter: 1, innovator: 2 }
 
-  $effect(() => {
-    organizationsListPageState.searchValue = searchValue
-    organizationsListPageState.searchField = searchField
-    organizationsListPageState.sortBy = sortBy
-    organizationsListPageState.sortDir = sortDir
-  })
+  function replaceTableState() {
+    const path = tableStatePath('/organizations', {
+      searchValue,
+      searchField,
+      sortBy: sortBy === 'plan' ? undefined : sortBy,
+      sortDir: sortDir === 'desc' ? undefined : sortDir
+    })
+
+    if (path !== `${page.url.pathname}${page.url.search}`) {
+      replaceState(path, page.state)
+    }
+  }
 
   function sort(col: typeof sortBy) {
     if (sortBy === col) {
@@ -32,15 +49,17 @@
       sortBy = col
       sortDir = col === 'createdAt' ? 'desc' : 'asc'
     }
+    replaceTableState()
   }
 
   function search(value: string, field: string) {
     searchValue = value
     searchField =
       field === 'name' || field === 'slug' || field === 'domain' ? field : 'all'
+    replaceTableState()
   }
 
-  function matchesSearch(organization: Organization) {
+  function organizationMatchesSearch(organization: Organization) {
     const normalizedSearchValue = searchValue.trim().toLowerCase()
 
     if (!normalizedSearchValue) {
@@ -48,17 +67,18 @@
     }
 
     if (searchField === 'slug') {
-      return organization.slug.toLowerCase().includes(normalizedSearchValue)
+      return matchesSearchValue(normalizedSearchValue, [organization.slug])
     }
 
     if (searchField === 'domain') {
-      return (organization.domains ?? []).some((domain) =>
-        domain.toLowerCase().includes(normalizedSearchValue)
+      return matchesSearchValue(
+        normalizedSearchValue,
+        organization.domains ?? []
       )
     }
 
     if (searchField === 'name') {
-      return organization.name.toLowerCase().includes(normalizedSearchValue)
+      return matchesSearchValue(normalizedSearchValue, [organization.name])
     }
 
     const searchableValues = [
@@ -69,13 +89,11 @@
       ...(organization.domains ?? [])
     ]
 
-    return searchableValues.some((value) =>
-      (value ?? '').toLowerCase().includes(normalizedSearchValue)
-    )
+    return matchesSearchValue(normalizedSearchValue, searchableValues)
   }
 
   function getDisplayedOrganizations(allOrganizations: Organization[]) {
-    let organizations = allOrganizations.filter(matchesSearch)
+    let organizations = allOrganizations.filter(organizationMatchesSearch)
 
     organizations.sort((a: Organization, b: Organization) => {
       let av: number | string
@@ -131,7 +149,7 @@
       </h1>
     </div>
     <a
-      href="/organizations/new"
+      href={routes.newOrganization()}
       class="px-4 py-2 bg-blue-500 text-white rounded-lg font-sans text-sm hover:bg-blue-600 transition"
     >
       Create Organization
@@ -189,7 +207,7 @@
             <tr class="hover:bg-gray-50 transition">
               <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
                 <a
-                  href="/organizations/{getOrganizationId(organization.id)}"
+                  href={routes.organization(getOrganizationId(organization.id))}
                   class="font-sans text-sm font-medium hover:text-pink"
                 >
                   {organization.name}
@@ -232,10 +250,7 @@
                 <div class="flex flex-wrap gap-1">
                   {#each organization.users ?? [] as member (member.user.id)}
                     <a
-                      href="/users/{member.user.id
-                        .split('/')
-                        .filter(Boolean)
-                        .at(-1) ?? ''}"
+                      href={routes.user(getUserId(member.user.id))}
                       class="rounded px-2 py-0.5 font-sans text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
                     >
                       {member.user.name || member.user.id}

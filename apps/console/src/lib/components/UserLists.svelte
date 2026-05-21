@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getLists } from '$lib/lists.remote.js'
   import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
 
   import type { ListSummary } from '$lib/lists.remote.js'
 
@@ -13,7 +14,7 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-semibold">My Lists</h2>
       <a
-        href="/profile/lists/new"
+        href={routes.newProfileList()}
         class="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
         New List
@@ -25,7 +26,7 @@
       <div class="space-y-2">
         {#each lists as list (list.id)}
           <a
-            href="/profile/lists/{list.id}"
+            href={routes.profileList(list.id)}
             class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
           >
             <span class="text-sm font-medium">{list.label || list.name}</span>
@@ -36,7 +37,7 @@
         {/each}
         <div class="pt-1">
           <a
-            href="/profile/lists"
+            href={routes.profileLists()}
             class="text-sm text-blue-600 hover:underline"
           >
             View all lists &rarr;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getAuthContext } from '@allmaps/components/auth'
+  import { routes } from '$lib/routes.js'
   import type { AuthSession, AuthSessionState } from '@allmaps/components/auth'
   import type { Readable } from 'svelte/store'
 
@@ -68,7 +69,7 @@
       <div class="space-y-5">
         <!-- User card -->
         <a
-          href="/users/{user.id}"
+          href={routes.user(user.id)}
           class="group block rounded-xl border border-gray-200 bg-white p-5 transition hover:border-blue-400 hover:shadow-md"
         >
           <div class="flex items-center justify-between gap-4">
@@ -123,7 +124,7 @@
               class="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100"
             >
               <a
-                href="/users"
+                href={routes.users()}
                 class="group flex items-start justify-between gap-4 p-5 transition hover:bg-blue-50"
               >
                 <div>
@@ -139,7 +140,7 @@
               </a>
 
               <a
-                href="/organizations"
+                href={routes.organizations()}
                 class="group flex items-start justify-between gap-4 p-5 transition hover:bg-blue-50"
               >
                 <div>

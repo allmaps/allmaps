@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/state'
   import { goto } from '$app/navigation'
 
   import { getOrganizationId } from '$lib/organizations.js'
+  import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
 
   import UserLists from '$lib/components/UserLists.svelte'
   import AppSelect from '$lib/components/AppSelect.svelte'
@@ -11,45 +12,67 @@
     addOrganizationMember,
     removeOrganizationMember
   } from '../../organizations/organizations.remote.js'
-  import {
-    getUser,
-    setUserRole,
-    updateUser as updateUserCommand
-  } from '../users.remote.js'
+  import { getOrganizations } from '../../organizations/organizations.remote.js'
+  import { getUser, setUserRole, updateUserForm } from '../users.remote.js'
 
   import type { PageProps } from './$types'
-
-  const userId = $derived(page.params.userId ?? '')
+  import type { Organization } from '$lib/types.js'
+  import type { ConsoleUser } from '../users.remote.js'
 
   let { data }: PageProps = $props()
+
+  const userId = $derived(data.userId)
+  const sessionUser = $derived(
+    data.sessionData.data?.user as ConsoleUser | undefined
+  )
+  const userResult = $derived(
+    data.isAdmin ? await queryResult<ConsoleUser>(getUser(userId)) : null
+  )
+  const organizationsResult = $derived(
+    data.isAdmin
+      ? await queryResult<Organization[]>(getOrganizations())
+      : null
+  )
+  const user = $derived(
+    data.isAdmin
+      ? (userResult?.data ?? null)
+      : data.isCurrentUser
+        ? (sessionUser ?? null)
+        : null
+  )
+  const organizations = $derived(organizationsResult?.data ?? [])
+  const userOrganizations = $derived(user?.organizations ?? [])
 
   let editUserName = $state('')
   let editUserSlug = $state('')
   let editUserEmail = $state('')
   let editUserBanned = $state(false)
   let editUserRole = $state<'user' | 'admin'>('user')
-  let isUpdating = $state(false)
   let isChangingRole = $state(false)
   let selectedOrganizationId = $state('')
   let selectedOrganizationRole = $state<'admin' | 'member'>('member')
   let isAddingToOrganization = $state(false)
   let removingOrganizationId = $state<string | null>(null)
   let error = $state<string | null>(null)
+  let initializedUserId = $state<string | null>(null)
 
-  function isValidSlug(value: string) {
-    return /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/.test(value.trim())
-  }
+  const slugPattern = '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'
 
   $effect(() => {
-    editUserName = data.user?.name || ''
-    editUserSlug = data.user?.slug || ''
-    editUserEmail = data.user?.email || ''
-    editUserBanned = data.user?.banned || false
-    editUserRole = (data.user?.role as 'user' | 'admin') || 'user'
+    if (!user || initializedUserId === userId) {
+      return
+    }
+
+    editUserName = user.name || ''
+    editUserSlug = user.slug || ''
+    editUserEmail = user.email || ''
+    editUserBanned = user.banned || false
+    editUserRole = (user.role as 'user' | 'admin') || 'user'
+    initializedUserId = userId
   })
 
   async function changeRole() {
-    if (!data.user || !data.isAdmin) {
+    if (!user || !data.isAdmin) {
       return
     }
     if (!userId) {
@@ -80,7 +103,7 @@
     error = null
 
     try {
-      const organization = data.organizations.find(
+      const organization = organizations.find(
         (o) => o.id === selectedOrganizationId
       )
       if (!organization) {
@@ -90,14 +113,13 @@
 
       await addOrganizationMember({
         organizationId,
-        email: data.user?.email ?? '',
+        email: user?.email ?? '',
         role: selectedOrganizationRole
       }).updates(getUser(userId))
 
       selectedOrganizationId = ''
       selectedOrganizationRole = 'member'
     } catch (err) {
-      console.error('Failed to add user to organization:', err)
       error =
         err instanceof Error
           ? err.message
@@ -133,7 +155,6 @@
         getUser(userId)
       )
     } catch (err) {
-      console.error('Failed to remove user from organization:', err)
       error =
         err instanceof Error
           ? err.message
@@ -143,45 +164,8 @@
     }
   }
 
-  async function updateUser() {
-    if (!data.user || !data.isAdmin) {
-      return
-    }
-    if (!userId) {
-      return
-    }
-
-    if (editUserSlug && !isValidSlug(editUserSlug)) {
-      error =
-        'Invalid slug. Use lowercase letters, numbers, and hyphens, starting with a letter.'
-      return
-    }
-
-    isUpdating = true
-    error = null
-
-    try {
-      await updateUserCommand({
-        userId,
-        data: {
-          name: editUserName,
-          slug: editUserSlug || null,
-          email: editUserEmail,
-          banned: editUserBanned
-        }
-      }).updates(getUser(userId))
-
-      goto('/users')
-    } catch (err) {
-      console.error('Failed to update user:', err)
-      error = err instanceof Error ? err.message : 'Failed to update user'
-    } finally {
-      isUpdating = false
-    }
-  }
-
   function cancel() {
-    goto(data.isCurrentUser ? '/' : '/users')
+    goto(data.isCurrentUser ? routes.home() : routes.users())
   }
 </script>
 
@@ -192,7 +176,7 @@
     </h1>
   </div>
 
-  {#if !data.user}
+  {#if !user}
     <div class="bg-white rounded-lg shadow p-6">
       <p class="text-gray-500">User not found.</p>
     </div>
@@ -205,7 +189,8 @@
       </div>
     {/if}
 
-    <div class="bg-white rounded-lg shadow p-6">
+    <form {...updateUserForm} class="bg-white rounded-lg shadow p-6">
+      <input {...updateUserForm.fields.userId.as('hidden', userId)} />
       <div class="space-y-6">
         <div>
           <label
@@ -216,7 +201,7 @@
           </label>
           <input
             id="userName"
-            type="text"
+            {...updateUserForm.fields.name.as('text')}
             bind:value={editUserName}
             class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="John Doe"
@@ -232,8 +217,9 @@
           </label>
           <input
             id="userEmail"
-            type="email"
+            {...updateUserForm.fields.email.as('email')}
             bind:value={editUserEmail}
+            required
             class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="john@example.com"
           />
@@ -248,9 +234,10 @@
           </label>
           <input
             id="userSlug"
-            type="text"
+            {...updateUserForm.fields.slug.as('text')}
             bind:value={editUserSlug}
             disabled={!data.isAdmin}
+            pattern={slugPattern}
             class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="username"
           />
@@ -271,9 +258,10 @@
             />
             {#if data.isAdmin}
               <button
+                type="button"
                 onclick={changeRole}
                 disabled={isChangingRole ||
-                  editUserRole === (data.user.role || 'user')}
+                  editUserRole === (user.role || 'user')}
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
               >
                 {isChangingRole ? 'Saving…' : 'Save'}
@@ -285,8 +273,8 @@
         <div class="flex items-center">
           <input
             id="userBanned"
-            type="checkbox"
-            bind:checked={editUserBanned}
+            {...updateUserForm.fields.banned.as('checkbox')}
+            checked={editUserBanned}
             disabled={!data.isAdmin}
             class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
           />
@@ -301,30 +289,30 @@
         <div class="text-sm text-gray-500">
           <p>
             <strong>Created:</strong>
-            {data.user.createdAt
-              ? new Date(data.user.createdAt).toLocaleString()
+            {user.createdAt
+              ? new Date(user.createdAt).toLocaleString()
               : 'Unknown'}
           </p>
           <p>
             <strong>Last Updated:</strong>
-            {data.user.updatedAt
-              ? new Date(data.user.updatedAt).toLocaleString()
+            {user.updatedAt
+              ? new Date(user.updatedAt).toLocaleString()
               : 'Unknown'}
           </p>
-          {#if data.user.emailVerified}
+          {#if user.emailVerified}
             <p><strong>Email Verified:</strong> Yes</p>
           {/if}
         </div>
 
         <div class="border-t pt-6">
           <h3 class="text-lg font-semibold mb-4">Organizations</h3>
-          {#if data.userOrganizations.length === 0}
+          {#if userOrganizations.length === 0}
             <p class="text-sm text-gray-500 italic">
               Not a member of any organizations
             </p>
           {:else}
             <div class="space-y-2">
-              {#each data.userOrganizations as membership (membership.organization.slug)}
+              {#each userOrganizations as membership (membership.organization.slug)}
                 {@const membershipOrganizationId = getOrganizationId(
                   membership.organization.id
                 )}
@@ -332,7 +320,7 @@
                   class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
                 >
                   <a
-                    href="/organizations/{membershipOrganizationId}"
+                    href={routes.organization(membershipOrganizationId)}
                     class="min-w-0"
                   >
                     <span class="block text-sm font-medium">
@@ -392,7 +380,7 @@
                   class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">-- Select an organization --</option>
-                  {#each data.organizations as organization (organization.id)}
+                  {#each organizations as organization (organization.id)}
                     <option value={organization.id}>{organization.name}</option>
                   {/each}
                 </select>
@@ -410,6 +398,7 @@
                 />
               </div>
               <button
+                type="button"
                 onclick={addToOrganization}
                 class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50 cursor-pointer"
                 disabled={!selectedOrganizationId || isAddingToOrganization}
@@ -424,22 +413,23 @@
       {#if data.isAdmin}
         <div class="flex gap-3 justify-end mt-8 pt-6 border-t">
           <button
+            type="button"
             onclick={cancel}
             class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
-            disabled={isUpdating}
+            disabled={!!updateUserForm.pending}
           >
             Cancel
           </button>
           <button
-            onclick={updateUser}
+            type="submit"
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
-            disabled={!editUserEmail || isUpdating}
+            disabled={!editUserEmail || !!updateUserForm.pending}
           >
-            {isUpdating ? 'Updating...' : 'Update User'}
+            {updateUserForm.pending ? 'Updating...' : 'Update User'}
           </button>
         </div>
       {/if}
-    </div>
+    </form>
 
     {#if data.isCurrentUser}
       <UserLists />

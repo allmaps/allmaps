@@ -1,5 +1,7 @@
-import { command, query } from '$app/server'
+import { command, form, query } from '$app/server'
+import { redirect } from '@sveltejs/kit'
 
+import { routes } from '$lib/routes.js'
 import { restFetch } from '$lib/server/rest.js'
 import { z } from 'zod'
 
@@ -43,15 +45,22 @@ export const getUsers = query(userLimitSchema, async (limit) => {
 })
 
 const userRoleSchema = z.enum(['user', 'admin'])
+const userSlugSchema = z
+  .string()
+  .trim()
+  .regex(/^[a-z](?:[a-z0-9-]*[a-z0-9])?$/, 'Invalid slug')
+  .or(z.literal(''))
+  .transform((value) => value || null)
 
-const updateUserSchema = z.object({
+const updateUserFormSchema = z.object({
   userId: userIdSchema,
-  data: z.object({
-    name: z.string(),
-    slug: z.string().nullable(),
-    email: z.string().email(),
-    banned: z.boolean()
-  })
+  name: z.string(),
+  slug: userSlugSchema,
+  email: z.string().email(),
+  banned: z
+    .union([z.literal('true'), z.literal('on'), z.literal(true)])
+    .optional()
+    .transform(Boolean)
 })
 
 const setUserRoleSchema = z.object({
@@ -63,23 +72,27 @@ export const getUser = query(userIdSchema, async (userId) => {
   return restFetch<ConsoleUser>(`/users/${userId}`)
 })
 
-export const updateUser = command<
-  typeof updateUserSchema,
-  Promise<ConsoleUser>
->(updateUserSchema, async (body) => {
-  const result = await restFetch<{ user: ConsoleUser }>(
-    '/auth/admin/update-user',
-    {
+export const updateUserForm = form(
+  updateUserFormSchema,
+  async ({ userId, name, slug, email, banned }) => {
+    await restFetch<{ user: ConsoleUser }>('/auth/admin/update-user', {
       method: 'POST',
-      json: body
-    }
-  )
+      json: {
+        userId,
+        data: {
+          name,
+          slug,
+          email,
+          banned
+        }
+      }
+    })
 
-  void getUsers(10000).refresh()
-  void getUser(body.userId).refresh()
+    await Promise.all([getUsers(10000).refresh(), getUser(userId).refresh()])
 
-  return result.user
-})
+    redirect(303, routes.users())
+  }
+)
 
 export const setUserRole = command<
   typeof setUserRoleSchema,
@@ -93,8 +106,7 @@ export const setUserRole = command<
     }
   )
 
-  void getUsers(10000).refresh()
-  void getUser(body.userId).refresh()
+  await Promise.all([getUsers(10000).refresh(), getUser(body.userId).refresh()])
 
   return result.user
 })
