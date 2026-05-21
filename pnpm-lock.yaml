@@ -448,7 +448,7 @@ importers:
         specifier: 'catalog:'
         version: 1.5.1(1b2fb570a3a89310748ed18dea69dc49)
       bits-ui:
-        specifier: ^2.15.4
+        specifier: 'catalog:'
         version: 2.15.6(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.2(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.51.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.51.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.51.2)
       zod:
         specifier: 'catalog:'
@@ -914,7 +914,7 @@ importers:
         specifier: ^0.2.4
         version: 0.2.4(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
       wrangler:
-        specifier: ^4.3.0
+        specifier: 'catalog:'
         version: 4.75.0
 
   apps/homepage:
