@@ -14,6 +14,7 @@ import { clampLimit } from '../shared/limits.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
 import type { UserRole } from '../shared/limits.js'
+import type { OrganizationPlan } from '../types.js'
 
 type DbOrganization = {
   id: string
@@ -28,6 +29,12 @@ type DbOrganization = {
     url: string
     type: 'domain'
   }[]
+}
+
+type ListOrganizationsOptions = {
+  limit?: number
+  plans?: OrganizationPlan[]
+  userRole?: UserRole
 }
 
 export function normalizeDomain(value: string): string | undefined {
@@ -168,6 +175,16 @@ export function fromDbOrganizationWithUsers(
   }
 }
 
+function getOrganizationPlanWhere(plans?: OrganizationPlan[]) {
+  if (plans && plans.length > 0) {
+    return {
+      plan: {
+        in: plans
+      }
+    }
+  }
+}
+
 export async function queryOrganizationUrls(
   db: DbOrTx,
   organizationId: string
@@ -208,15 +225,15 @@ export async function replaceOrganizationUrls(
 export async function listOrganizations(
   db: Db,
   restBaseUrl: string,
-  limit?: number,
-  userRole?: UserRole
+  options: ListOrganizationsOptions = {}
 ) {
   const dbOrganizations = await db.query.organizations.findMany({
     with: {
       urls: true
     },
+    where: getOrganizationPlanWhere(options.plans),
     orderBy: (organizations, { asc }) => asc(organizations.name),
-    limit: clampLimit(limit, userRole)
+    limit: clampLimit(options.limit, options.userRole)
   })
 
   return dbOrganizations.map((dbOrganization) =>
@@ -227,16 +244,16 @@ export async function listOrganizations(
 export async function listOrganizationsWithUsers(
   db: Db,
   restBaseUrl: string,
-  limit?: number,
-  userRole?: UserRole
+  options: ListOrganizationsOptions = {}
 ) {
   const [dbOrganizations, usersByOrganizationId] = await Promise.all([
     db.query.organizations.findMany({
       with: {
         urls: true
       },
+      where: getOrganizationPlanWhere(options.plans),
       orderBy: (organizations, { asc }) => asc(organizations.name),
-      limit: clampLimit(limit, userRole)
+      limit: clampLimit(options.limit, options.userRole)
     }),
     queryAllOrganizationUsers(db, restBaseUrl)
   ])
@@ -254,16 +271,16 @@ export async function listOrganizationsWithUsersByOrganizationIds(
   db: Db,
   restBaseUrl: string,
   organizationIds: string[],
-  limit?: number,
-  userRole?: UserRole
+  options: ListOrganizationsOptions = {}
 ) {
   const [dbOrganizations, usersByOrganizationId] = await Promise.all([
     db.query.organizations.findMany({
       with: {
         urls: true
       },
+      where: getOrganizationPlanWhere(options.plans),
       orderBy: (organizations, { asc }) => asc(organizations.name),
-      limit: clampLimit(limit, userRole)
+      limit: clampLimit(options.limit, options.userRole)
     }),
     queryOrganizationUsersByOrganizationIds(db, restBaseUrl, organizationIds)
   ])

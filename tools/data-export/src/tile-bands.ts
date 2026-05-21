@@ -14,7 +14,7 @@ export const tileBands = [
     minArea: 10_000_000_000_000,
     maxArea: Infinity,
     minzoom: 0,
-    maxzoom: 5
+    maxzoom: 6
   },
   {
     id: 'continent',
@@ -22,7 +22,7 @@ export const tileBands = [
     minArea: 1_000_000_000_000,
     maxArea: 10_000_000_000_000,
     minzoom: 2,
-    maxzoom: 7
+    maxzoom: 8
   },
   {
     id: 'country',
@@ -30,7 +30,7 @@ export const tileBands = [
     minArea: 10_000_000_000,
     maxArea: 1_000_000_000_000,
     minzoom: 4,
-    maxzoom: 9
+    maxzoom: 10
   },
   {
     id: 'region',
@@ -38,7 +38,7 @@ export const tileBands = [
     minArea: 100_000_000,
     maxArea: 10_000_000_000,
     minzoom: 6,
-    maxzoom: 11
+    maxzoom: 12
   },
   {
     id: 'city',
@@ -46,7 +46,7 @@ export const tileBands = [
     minArea: 1_000_000,
     maxArea: 100_000_000,
     minzoom: 8,
-    maxzoom: 13
+    maxzoom: 14
   },
   {
     id: 'local',

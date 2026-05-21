@@ -11,10 +11,10 @@ export type Tilejson = {
   id: string | undefined
   tiles: string[]
   fields: object
-  bounds: number[]
-  center: number[]
-  // maxzoom
-  // minzoom
+  bounds: [number, number, number, number]
+  center: [number, number, number]
+  minzoom: number
+  maxzoom: number
 }
 
 // TODO: align this with TransformationOptions from @allmaps/render

@@ -1,34 +1,20 @@
 <script lang="ts">
-  import { page } from '$app/state'
+  import { getLists } from '$lib/lists.remote.js'
+  import { queryResult } from '$lib/query-result.js'
+  import { routes } from '$lib/routes.js'
 
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
+  import type { ListSummary } from '$lib/lists.remote.js'
 
-  type List = {
-    id: string
-    name: string
-    label: string | null
-    createdAt: string
-  }
-
-  async function fetchLists(): Promise<List[]> {
-    const response = await fetch(`${apiBaseUrl}/lists`, {
-      credentials: 'include'
-    })
-    return response.ok ? response.json() : []
-  }
+  const listsResult = $derived(await queryResult<ListSummary[]>(getLists()))
 </script>
 
-{#await fetchLists()}
-  <div class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-semibold mb-4">My Lists</h2>
-    <p class="text-sm text-gray-500">Loading...</p>
-  </div>
-{:then lists}
+{#if listsResult.data}
+  {@const lists = listsResult.data}
   <div class="bg-white rounded-lg shadow p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-semibold">My Lists</h2>
       <a
-        href="/profile/lists/new"
+        href={routes.newProfileList()}
         class="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
         New List
@@ -40,7 +26,7 @@
       <div class="space-y-2">
         {#each lists as list (list.id)}
           <a
-            href="/profile/lists/{list.id}"
+            href={routes.profileList(list.id)}
             class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
           >
             <span class="text-sm font-medium">{list.label || list.name}</span>
@@ -51,7 +37,7 @@
         {/each}
         <div class="pt-1">
           <a
-            href="/profile/lists"
+            href={routes.profileLists()}
             class="text-sm text-blue-600 hover:underline"
           >
             View all lists &rarr;
@@ -60,4 +46,9 @@
       </div>
     {/if}
   </div>
-{/await}
+{:else}
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">My Lists</h2>
+    <p class="text-sm text-red-600">Failed to load lists.</p>
+  </div>
+{/if}

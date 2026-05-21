@@ -23,7 +23,11 @@ import {
   queryCanvases,
   queryManifests
 } from '@allmaps/api-shared/db'
-import { needsElevatedLimitRole, setCacheControl } from '@allmaps/api-shared'
+import {
+  needsElevatedLimitRole,
+  normalizeOrganizationsQueryParams,
+  setCacheControl
+} from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
@@ -77,16 +81,15 @@ export function createOrganizationsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/organizations',
-      async ({ db, env, query, request, set }) => {
+      async ({ db, env, request, set }) => {
+        const queryParams = normalizeOrganizationsQueryParams(request)
         const session = await auth.api.getSession({ headers: request.headers })
         if (session?.user.role === 'admin') {
           setCacheControl(set, 'private-no-store')
-          return listOrganizationsWithUsers(
-            db,
-            env.PUBLIC_REST_BASE_URL,
-            query.limit,
-            'admin'
-          )
+          return listOrganizationsWithUsers(db, env.PUBLIC_REST_BASE_URL, {
+            ...queryParams,
+            userRole: 'admin'
+          })
         }
 
         if (session?.user.id) {
@@ -101,17 +104,19 @@ export function createOrganizationsRoutes(
               db,
               env.PUBLIC_REST_BASE_URL,
               organizationIds,
-              query.limit,
-              'user'
+              { ...queryParams, userRole: 'user' }
             )
           }
         }
 
         setCacheControl(set, 'public-medium')
-        return listOrganizations(db, env.PUBLIC_REST_BASE_URL, query.limit)
+        return listOrganizations(db, env.PUBLIC_REST_BASE_URL, queryParams)
       },
       {
-        query: t.Object({ limit: t.Optional(t.Number()) }),
+        query: t.Object({
+          limit: t.Optional(t.Number()),
+          plan: t.Optional(t.Array(t.UnionEnum(['supporter', 'innovator'])))
+        }),
         detail: { summary: 'Get all organizations', tags: ['Organizations'] }
       }
     )
