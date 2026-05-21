@@ -3,6 +3,7 @@
   import DataTable from '$lib/components/DataTable.svelte'
   import { getOrganizationId } from '$lib/organizations.js'
   import { organizationsListPageState } from '$lib/list-state.svelte.js'
+  import { queryResult } from '$lib/query-result.js'
   import { getOrganizations } from './organizations.remote.js'
 
   import type { Organization } from '$lib/types.js'
@@ -35,7 +36,8 @@
 
   function search(value: string, field: string) {
     searchValue = value
-    searchField = field === 'slug' ? 'slug' : 'name'
+    searchField =
+      field === 'name' || field === 'slug' || field === 'domain' ? field : 'all'
   }
 
   function matchesSearch(organization: Organization) {
@@ -49,7 +51,27 @@
       return organization.slug.toLowerCase().includes(normalizedSearchValue)
     }
 
-    return organization.name.toLowerCase().includes(normalizedSearchValue)
+    if (searchField === 'domain') {
+      return (organization.domains ?? []).some((domain) =>
+        domain.toLowerCase().includes(normalizedSearchValue)
+      )
+    }
+
+    if (searchField === 'name') {
+      return organization.name.toLowerCase().includes(normalizedSearchValue)
+    }
+
+    const searchableValues = [
+      organization.name,
+      organization.slug,
+      organization.plan,
+      organization.homepage,
+      ...(organization.domains ?? [])
+    ]
+
+    return searchableValues.some((value) =>
+      (value ?? '').toLowerCase().includes(normalizedSearchValue)
+    )
   }
 
   function getDisplayedOrganizations(allOrganizations: Organization[]) {

@@ -47,6 +47,7 @@
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/env": "workspace:^",
     "better-auth": "catalog:",
-    "bits-ui": "^2.15.4"
+    "bits-ui": "^2.15.4",
+    "zod": "catalog:"
   }
 }

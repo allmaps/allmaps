@@ -1,13 +1,7 @@
 import { command, query } from '$app/server'
 
-import {
-  assertNonEmptyString,
-  assertObject,
-  assertString,
-  schema,
-  stringSchema
-} from '$lib/remote-schema.js'
 import { restFetch } from '$lib/server/rest.js'
+import { z } from 'zod'
 
 import type { Organization } from '$lib/types.js'
 
@@ -48,116 +42,50 @@ type UpdateOrganizationMemberRoleInput = OrganizationMemberInput & {
   role: OrganizationRole
 }
 
-function assertOrganizationRole(
-  value: unknown
-): asserts value is OrganizationRole {
-  if (value !== 'admin' && value !== 'member' && value !== 'owner') {
-    throw new Error('Invalid member role')
-  }
-}
+const organizationIdSchema = z.string()
+const organizationRoleSchema = z.enum(['admin', 'member', 'owner'])
+const organizationPlanSchema = z.enum(['supporter', 'innovator']).nullable()
+const organizationBodySchema = z.object({
+  name: z.string().trim().min(1),
+  slug: z.string().trim().min(1),
+  homepage: z.string().nullable(),
+  plan: organizationPlanSchema,
+  domains: z.array(z.string())
+}) satisfies z.ZodType<OrganizationBody>
 
-function assertOrganizationPlan(
-  value: unknown
-): asserts value is OrganizationPlan | null {
-  if (value !== null && value !== 'supporter' && value !== 'innovator') {
-    throw new Error('Invalid organization plan')
-  }
-}
+const createOrganizationSchema = z.object({
+  name: z.string().trim().min(1),
+  slug: z.string().trim().min(1)
+}) satisfies z.ZodType<CreateOrganizationInput>
 
-function assertOrganizationBody(
-  value: unknown
-): asserts value is OrganizationBody {
-  assertObject(value, 'organization')
+const updateOrganizationSchema = z.object({
+  organizationId: organizationIdSchema,
+  organization: organizationBodySchema
+}) satisfies z.ZodType<UpdateOrganizationInput>
 
-  const organization = value
+const addOrganizationMemberSchema = z.object({
+  organizationId: organizationIdSchema,
+  email: z.string().trim().min(1),
+  role: organizationRoleSchema
+}) satisfies z.ZodType<AddOrganizationMemberInput>
 
-  assertNonEmptyString(organization.name, 'organization name')
-  assertNonEmptyString(organization.slug, 'organization slug')
-  assertOrganizationPlan(organization.plan)
+const organizationMemberSchema = z.object({
+  organizationId: organizationIdSchema,
+  userId: z.string()
+}) satisfies z.ZodType<OrganizationMemberInput>
 
-  if (
-    organization.homepage !== null &&
-    typeof organization.homepage !== 'string'
-  ) {
-    throw new Error('Invalid organization homepage')
-  }
-
-  if (
-    !Array.isArray(organization.domains) ||
-    !organization.domains.every((domain) => typeof domain === 'string')
-  ) {
-    throw new Error('Invalid organization domains')
-  }
-}
-
-const createOrganizationSchema = schema<CreateOrganizationInput>((value) => {
-  assertObject(value, 'organization')
-  assertNonEmptyString(value.name, 'organization name')
-  assertNonEmptyString(value.slug, 'organization slug')
-
-  return {
-    name: value.name,
-    slug: value.slug
-  }
-})
-
-const updateOrganizationSchema = schema<UpdateOrganizationInput>((value) => {
-  assertObject(value, 'organization update')
-  assertString(value.organizationId, 'organization id')
-  assertOrganizationBody(value.organization)
-
-  return {
-    organizationId: value.organizationId,
-    organization: value.organization
-  }
-})
-
-const addOrganizationMemberSchema = schema<AddOrganizationMemberInput>(
-  (value) => {
-    assertObject(value, 'organization member')
-    assertString(value.organizationId, 'organization id')
-    assertNonEmptyString(value.email, 'member email')
-    assertOrganizationRole(value.role)
-
-    return {
-      organizationId: value.organizationId,
-      email: value.email,
-      role: value.role
-    }
-  }
-)
-
-const organizationMemberSchema = schema<OrganizationMemberInput>((value) => {
-  assertObject(value, 'organization member')
-  assertString(value.organizationId, 'organization id')
-  assertString(value.userId, 'user id')
-
-  return {
-    organizationId: value.organizationId,
-    userId: value.userId
-  }
-})
-
-const updateOrganizationMemberRoleSchema =
-  schema<UpdateOrganizationMemberRoleInput>((value) => {
-    assertObject(value, 'organization member role')
-    assertString(value.organizationId, 'organization id')
-    assertString(value.userId, 'user id')
-    assertOrganizationRole(value.role)
-
-    return {
-      organizationId: value.organizationId,
-      userId: value.userId,
-      role: value.role
-    }
-  })
+const updateOrganizationMemberRoleSchema = z.object({
+  organizationId: organizationIdSchema,
+  userId: z.string(),
+  role: organizationRoleSchema
+}) satisfies z.ZodType<UpdateOrganizationMemberRoleInput>
 
 export const getOrganizations = query(async () => {
   return restFetch<Organization[]>('/organizations')
 })
 
 export const getOrganization = query(
-  stringSchema('organization id'),
+  organizationIdSchema,
   async (organizationId) => {
     return restFetch<Organization>(`/organizations/${organizationId}`)
   }
@@ -199,9 +127,9 @@ export const updateOrganization = command<
 })
 
 export const deleteOrganization = command<
-  ReturnType<typeof stringSchema>,
+  typeof organizationIdSchema,
   Promise<void>
->(stringSchema('organization id'), async (organizationId) => {
+>(organizationIdSchema, async (organizationId) => {
   await restFetch<{ success: true }>(`/organizations/${organizationId}`, {
     method: 'DELETE'
   })

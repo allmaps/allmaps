@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({
   parent,
   request
 }) => {
-  const { env } = await parent()
+  const { env, sessionData } = await parent()
   const { userId } = params
   const headers = new Headers()
   const cookie = request.headers.get('cookie')
@@ -52,14 +52,8 @@ export const load: PageServerLoad = async ({
     signal: AbortSignal.timeout(10_000)
   }
 
-  const sessionResponse = await fetch(
-    `${env.PUBLIC_REST_BASE_URL}/auth/get-session`,
-    requestOptions
-  )
-  const sessionData: SessionData = sessionResponse.ok
-    ? { data: await sessionResponse.json() }
-    : { data: null }
-  const sessionUser = sessionData.data?.user
+  const session = sessionData as SessionData
+  const sessionUser = session.data?.user
   const isAdmin = sessionUser?.role === 'admin'
   const isCurrentUser = sessionUser?.id === userId
 
@@ -88,6 +82,6 @@ export const load: PageServerLoad = async ({
     userOrganizations,
     isAdmin,
     isCurrentUser,
-    sessionData
+    sessionData: session
   }
 }

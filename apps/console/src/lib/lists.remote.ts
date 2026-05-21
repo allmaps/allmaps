@@ -1,13 +1,7 @@
 import { command, query } from '$app/server'
 
-import {
-  assertNonEmptyString,
-  assertObject,
-  assertString,
-  schema,
-  stringSchema
-} from '$lib/remote-schema.js'
 import { restFetch } from '$lib/server/rest.js'
+import { z } from 'zod'
 
 export type LanguageString = {
   [language: string]: (string | number | boolean)[]
@@ -60,64 +54,40 @@ type RemoveListItemInput = {
   manifestId?: string
 }
 
-const createListSchema = schema<CreateListInput>((value) => {
-  assertObject(value, 'list')
-  assertNonEmptyString(value.name, 'list name')
+const listIdSchema = z.string()
 
-  return { name: value.name.trim() }
-})
+const createListSchema = z.object({
+  name: z.string().trim().min(1)
+}) satisfies z.ZodType<CreateListInput>
 
-const renameListSchema = schema<RenameListInput>((value) => {
-  assertObject(value, 'list')
-  assertString(value.listId, 'list id')
-  assertNonEmptyString(value.name, 'list name')
+const renameListSchema = z.object({
+  listId: listIdSchema,
+  name: z.string().trim().min(1)
+}) satisfies z.ZodType<RenameListInput>
 
-  return {
-    listId: value.listId,
-    name: value.name.trim()
-  }
-})
+const addListItemByUrlSchema = z.object({
+  listId: listIdSchema,
+  url: z.string().trim().min(1)
+}) satisfies z.ZodType<AddListItemByUrlInput>
 
-const addListItemByUrlSchema = schema<AddListItemByUrlInput>((value) => {
-  assertObject(value, 'list item')
-  assertString(value.listId, 'list id')
-  assertNonEmptyString(value.url, 'item URL')
-
-  return {
-    listId: value.listId,
-    url: value.url.trim()
-  }
-})
-
-const removeListItemSchema = schema<RemoveListItemInput>((value) => {
-  assertObject(value, 'list item')
-  assertString(value.listId, 'list id')
-
-  const input: RemoveListItemInput = {
-    listId: value.listId
-  }
-
-  for (const key of ['mapId', 'imageId', 'canvasId', 'manifestId'] as const) {
-    const id = value[key]
-
-    if (id !== undefined) {
-      assertString(id, key)
-      input[key] = id
-    }
-  }
-
-  if (!input.mapId && !input.imageId && !input.canvasId && !input.manifestId) {
-    throw new Error('Invalid list item')
-  }
-
-  return input
-})
+const removeListItemSchema = z
+  .object({
+    listId: listIdSchema,
+    mapId: z.string().optional(),
+    imageId: z.string().optional(),
+    canvasId: z.string().optional(),
+    manifestId: z.string().optional()
+  })
+  .refine(
+    (item) => item.mapId || item.imageId || item.canvasId || item.manifestId,
+    'Invalid list item'
+  ) satisfies z.ZodType<RemoveListItemInput>
 
 export const getLists = query(async () => {
   return restFetch<ListSummary[]>('/lists')
 })
 
-export const getList = query(stringSchema('list id'), async (listId) => {
+export const getList = query(listIdSchema, async (listId) => {
   return restFetch<ListDetail>(`/lists/${listId}`)
 })
 

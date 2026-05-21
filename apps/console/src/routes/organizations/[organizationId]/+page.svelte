@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/state'
-  import { untrack } from 'svelte'
   import { goto } from '$app/navigation'
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { planItems, orgMemberRoleItems } from '$lib/select-items'
+  import { queryResult } from '$lib/query-result.js'
   import {
     addOrganizationMember,
     deleteOrganization as deleteOrganizationCommand,
@@ -12,22 +11,20 @@
     updateOrganization as updateOrganizationCommand,
     updateOrganizationMemberRole
   } from '../organizations.remote.js'
+  import type { Organization } from '$lib/types.js'
   import type { PageProps } from './$types.js'
 
   let { data }: PageProps = $props()
-  const organizationId = $derived(page.params.organizationId ?? '')
+  const organizationId = $derived(data.organizationId)
 
-  let editOrgName = $state(untrack(() => data.organization?.name ?? ''))
-  let editOrgSlug = $state(untrack(() => data.organization?.slug ?? ''))
-  let editHomepage = $state(untrack(() => data.organization?.homepage ?? ''))
-  let editPlan = $state<'supporter' | 'innovator' | ''>(
-    untrack(() => data.organization?.plan ?? '')
-  )
-  let editDomains = $state<string[]>(
-    untrack(() => data.organization?.domains ?? [])
-  )
+  let editOrgName = $state('')
+  let editOrgSlug = $state('')
+  let editHomepage = $state('')
+  let editPlan = $state<'supporter' | 'innovator' | ''>('')
+  let editDomains = $state<string[]>([])
   let isUpdating = $state(false)
   let error = $state<string | null>(null)
+  let initializedOrganizationId = $state<string | null>(null)
 
   let showAddMemberModal = $state(false)
   let newMemberEmail = $state('')
@@ -54,8 +51,25 @@
     }
   }
 
+  const organizationResult = $derived(
+    await queryResult<Organization>(getOrganization(organizationId))
+  )
+  const organization = $derived(organizationResult.data)
+
+  $effect(() => {
+    if (!organization || initializedOrganizationId === organizationId) {
+      return
+    }
+
+    editOrgName = organization.name
+    editOrgSlug = organization.slug
+    editHomepage = organization.homepage ?? ''
+    editPlan = organization.plan ?? ''
+    editDomains = organization.domains ?? []
+    initializedOrganizationId = organizationId
+  })
+
   async function deleteOrganization() {
-    const organization = data.organization
     if (!organization) {
       return
     }
@@ -76,7 +90,6 @@
   }
 
   async function updateOrganization() {
-    const organization = data.organization
     if (!organization) {
       return
     }
@@ -310,7 +323,7 @@
     </div>
   </div>
 
-  {#await getOrganization(organizationId) then organization}
+  {#if organization}
     {@const members = organization.users || []}
     <div class="bg-white rounded-lg shadow p-6 mt-6">
       <div class="space-y-4 mb-8">
@@ -416,11 +429,11 @@
         {/if}
       </div>
     </div>
-  {:catch}
+  {:else}
     <div class="bg-white rounded-lg shadow p-6 mt-6">
-      <p class="text-gray-500">Failed to load organization members</p>
+      <p class="text-sm text-red-600">Failed to load organization.</p>
     </div>
-  {/await}
+  {/if}
 </div>
 
 {#if showDeleteModal}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getOrganizationId } from '$lib/organizations.js'
   import { usersListPageState } from '$lib/list-state.svelte.js'
+  import { queryResult } from '$lib/query-result.js'
 
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'

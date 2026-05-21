@@ -8,7 +8,7 @@ export const usersListPageState = $state({
 
 export const organizationsListPageState = $state({
   searchValue: '',
-  searchField: 'name' as 'name' | 'slug',
+  searchField: 'all' as 'all' | 'name' | 'slug' | 'domain',
   sortBy: 'plan' as 'name' | 'slug' | 'plan' | 'createdAt',
   sortDir: 'desc' as 'asc' | 'desc'
 })

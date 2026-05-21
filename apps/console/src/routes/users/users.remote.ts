@@ -1,7 +1,7 @@
-import { query } from '$app/server'
+import { command, query } from '$app/server'
 
-import { optionalNumberSchema, stringSchema } from '$lib/remote-schema.js'
 import { restFetch } from '$lib/server/rest.js'
+import { z } from 'zod'
 
 export type ConsoleUser = {
   id: string
@@ -26,22 +26,75 @@ export type ConsoleUser = {
   }[]
 }
 
-export const getUsers = query(
-  optionalNumberSchema('user limit'),
-  async (limit) => {
-    const params = new URLSearchParams()
+const userIdSchema = z.string()
+const userLimitSchema = z.number().finite().optional()
 
-    if (limit !== undefined) {
-      params.set('limit', String(limit))
-    }
+export const getUsers = query(userLimitSchema, async (limit) => {
+  const params = new URLSearchParams()
 
-    const queryString = params.toString()
-    return restFetch<ConsoleUser[]>(
-      `/users${queryString ? `?${queryString}` : ''}`
-    )
+  if (limit !== undefined) {
+    params.set('limit', String(limit))
   }
-)
 
-export const getUser = query(stringSchema('user id'), async (userId) => {
+  const queryString = params.toString()
+  return restFetch<ConsoleUser[]>(
+    `/users${queryString ? `?${queryString}` : ''}`
+  )
+})
+
+const userRoleSchema = z.enum(['user', 'admin'])
+
+const updateUserSchema = z.object({
+  userId: userIdSchema,
+  data: z.object({
+    name: z.string(),
+    slug: z.string().nullable(),
+    email: z.string().email(),
+    banned: z.boolean()
+  })
+})
+
+const setUserRoleSchema = z.object({
+  userId: userIdSchema,
+  role: userRoleSchema
+})
+
+export const getUser = query(userIdSchema, async (userId) => {
   return restFetch<ConsoleUser>(`/users/${userId}`)
+})
+
+export const updateUser = command<
+  typeof updateUserSchema,
+  Promise<ConsoleUser>
+>(updateUserSchema, async (body) => {
+  const result = await restFetch<{ user: ConsoleUser }>(
+    '/auth/admin/update-user',
+    {
+      method: 'POST',
+      json: body
+    }
+  )
+
+  void getUsers(10000).refresh()
+  void getUser(body.userId).refresh()
+
+  return result.user
+})
+
+export const setUserRole = command<
+  typeof setUserRoleSchema,
+  Promise<ConsoleUser>
+>(setUserRoleSchema, async (body) => {
+  const result = await restFetch<{ user: ConsoleUser }>(
+    '/auth/admin/set-role',
+    {
+      method: 'POST',
+      json: body
+    }
+  )
+
+  void getUsers(10000).refresh()
+  void getUser(body.userId).refresh()
+
+  return result.user
 })

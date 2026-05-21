@@ -8,11 +8,16 @@
     renameList as renameListCommand,
     removeListItem as removeListItemCommand
   } from '$lib/lists.remote.js'
+  import { queryResult } from '$lib/query-result.js'
 
   import type { AuthSessionState } from '@allmaps/components/auth'
   import type { Readable } from 'svelte/store'
   import type { PageProps } from './$types'
-  import type { LanguageString, ListItem } from '$lib/lists.remote.js'
+  import type {
+    LanguageString,
+    ListDetail,
+    ListItem
+  } from '$lib/lists.remote.js'
 
   let { data }: PageProps = $props()
 
@@ -27,6 +32,10 @@
 
   type SessionUser = {
     slug?: string | null
+  }
+
+  function errorMessage(error: unknown) {
+    return error instanceof Error ? error.message : 'Failed to load list'
   }
 
   let urlInput = $state('')
@@ -191,20 +200,21 @@
       renaming = false
     }
   }
+
+  const listResult = $derived(await queryResult<ListDetail>(getList(listId)))
 </script>
 
 <div class="max-w-4xl mx-auto px-4 py-8">
   <div class="mb-8">
-    {#await getList(listId)}
-      <h1 class="text-3xl font-bold text-gray-400">Loading...</h1>
-    {:then list}
+    {#if listResult.data}
+      {@const list = listResult.data}
       <h1 class="text-3xl font-bold">{list.label || list.name}</h1>
       {#if list.label}
         <p class="text-sm text-gray-400 font-mono mt-1">{list.name}</p>
       {/if}
-    {:catch}
+    {:else}
       <h1 class="text-3xl font-bold text-red-600">List not found</h1>
-    {/await}
+    {/if}
   </div>
 
   {#if listUrl && listViewerUrl}
@@ -230,11 +240,8 @@
   {/if}
 
   <!-- Rename list -->
-  {#await getList(listId)}
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-      <p class="text-sm text-gray-500">Loading list details...</p>
-    </div>
-  {:then list}
+  {#if listResult.data}
+    {@const list = listResult.data}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
       <h2 class="text-xl font-semibold mb-3">List Name</h2>
       <form onsubmit={renameList} class="space-y-3">
@@ -262,11 +269,11 @@
         </div>
       </form>
     </div>
-  {:catch err}
+  {:else}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
-      <p class="text-sm text-red-600">{err.message}</p>
+      <p class="text-sm text-red-600">{errorMessage(listResult.error)}</p>
     </div>
-  {/await}
+  {/if}
 
   <!-- Add item by URL -->
   <div class="bg-white rounded-lg shadow p-6 mb-6">
@@ -301,11 +308,8 @@
   </div>
 
   <!-- Items list -->
-  {#await getList(listId)}
-    <div class="bg-white rounded-lg shadow p-6">
-      <p class="text-sm text-gray-500">Loading items...</p>
-    </div>
-  {:then list}
+  {#if listResult.data}
+    {@const list = listResult.data}
     <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-xl font-semibold mb-4">
         Items <span class="text-gray-400 font-normal text-base"
@@ -368,9 +372,9 @@
         </div>
       {/if}
     </div>
-  {:catch err}
+  {:else}
     <div class="bg-white rounded-lg shadow p-6">
-      <p class="text-sm text-red-600">{err.message}</p>
+      <p class="text-sm text-red-600">{errorMessage(listResult.error)}</p>
     </div>
-  {/await}
+  {/if}
 </div>

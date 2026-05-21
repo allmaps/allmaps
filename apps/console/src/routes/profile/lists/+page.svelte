@@ -1,9 +1,16 @@
 <script lang="ts">
   import { getLists } from '$lib/lists.remote.js'
+  import { queryResult } from '$lib/query-result.js'
 
   import type { PageProps } from './$types'
+  import type { ListSummary } from '$lib/lists.remote.js'
 
   let { data }: PageProps = $props()
+
+  const user = $derived(data.sessionData.data?.user)
+  const listsResult = $derived(
+    user?.id ? await queryResult<ListSummary[]>(getLists()) : null
+  )
 </script>
 
 <div class="max-w-4xl mx-auto px-4 py-8">
@@ -19,53 +26,48 @@
     </div>
   </div>
 
-  {#await data.sessionData}
-    <p class="text-gray-500">Loading...</p>
-  {:then sessionData}
-    {@const user = sessionData.data?.user}
-
-    {#if user?.id}
-      {#await getLists()}
-        <div class="bg-white rounded-lg shadow p-6">
-          <p class="text-sm text-gray-500">Loading lists...</p>
-        </div>
-      {:then lists}
-        <div class="bg-white rounded-lg shadow p-6">
-          {#if lists.length === 0}
-            <p class="text-sm text-gray-500 italic">
-              No lists yet. <a
-                href="/profile/lists/new"
-                class="text-blue-600 hover:underline">Create your first list.</a
+  {#if user?.id}
+    {#if listsResult?.data}
+      {@const lists = listsResult.data}
+      <div class="bg-white rounded-lg shadow p-6">
+        {#if lists.length === 0}
+          <p class="text-sm text-gray-500 italic">
+            No lists yet. <a
+              href="/profile/lists/new"
+              class="text-blue-600 hover:underline">Create your first list.</a
+            >
+          </p>
+        {:else}
+          <div class="space-y-2">
+            {#each lists as list (list.id)}
+              <a
+                href="/profile/lists/{list.id}"
+                class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
               >
-            </p>
-          {:else}
-            <div class="space-y-2">
-              {#each lists as list (list.id)}
-                <a
-                  href="/profile/lists/{list.id}"
-                  class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
-                >
-                  <div>
-                    <span class="text-sm font-medium"
-                      >{list.label || list.name}</span
+                <div>
+                  <span class="text-sm font-medium"
+                    >{list.label || list.name}</span
+                  >
+                  {#if list.label}
+                    <span class="ml-2 text-xs text-gray-400 font-mono"
+                      >{list.name}</span
                     >
-                    {#if list.label}
-                      <span class="ml-2 text-xs text-gray-400 font-mono"
-                        >{list.name}</span
-                      >
-                    {/if}
-                  </div>
-                  <span class="text-xs text-gray-400">
-                    {new Date(list.createdAt).toLocaleDateString()}
-                  </span>
-                </a>
-              {/each}
-            </div>
-          {/if}
-        </div>
-      {/await}
+                  {/if}
+                </div>
+                <span class="text-xs text-gray-400">
+                  {new Date(list.createdAt).toLocaleDateString()}
+                </span>
+              </a>
+            {/each}
+          </div>
+        {/if}
+      </div>
     {:else}
-      <p class="text-gray-500">Not signed in.</p>
+      <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-sm text-red-600">Failed to load lists.</p>
+      </div>
     {/if}
-  {/await}
+  {:else}
+    <p class="text-gray-500">Not signed in.</p>
+  {/if}
 </div>

@@ -8,24 +8,10 @@ type SessionData = {
   }
 }
 
-export const load: PageServerLoad = async ({ fetch, parent, request }) => {
-  const { env } = await parent()
-  const headers = new Headers()
-  const cookie = request.headers.get('cookie')
-
-  if (cookie) {
-    headers.set('cookie', cookie)
-  }
-
-  const response = await fetch(`${env.PUBLIC_REST_BASE_URL}/auth/get-session`, {
-    credentials: 'include',
-    headers,
-    signal: AbortSignal.timeout(10_000)
-  })
-  const sessionData: SessionData | null = response.ok
-    ? await response.json()
-    : null
-  const userId = sessionData?.user?.id
+export const load: PageServerLoad = async ({ parent }) => {
+  const { sessionData } = await parent()
+  const session = sessionData.data as SessionData | null
+  const userId = session?.user?.id
 
   if (!userId) {
     throw redirect(302, '/')

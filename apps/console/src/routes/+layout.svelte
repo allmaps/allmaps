@@ -12,8 +12,10 @@
 
   import { authClient } from '$lib/auth-client.js'
   import { getList } from '$lib/lists.remote.js'
+  import { getOrganization } from './organizations/organizations.remote.js'
 
   import type { Snippet } from 'svelte'
+  import type { Organization } from '$lib/types.js'
   import type { ListDetail } from '$lib/lists.remote.js'
 
   import './layout.css'
@@ -35,6 +37,18 @@
       const list: ListDetail = await listQuery
 
       return list.label || list.name
+    } catch {
+      return null
+    }
+  }
+
+  async function getOrganizationBreadcrumbLabel(
+    organizationQuery: ReturnType<typeof getOrganization>
+  ): Promise<string | null> {
+    try {
+      const organization: Organization = await organizationQuery
+
+      return organization.name
     } catch {
       return null
     }
@@ -69,7 +83,22 @@
     listBreadcrumbId ? getList(listBreadcrumbId) : null
   )
   const listBreadcrumbLabel = $derived(
-    listBreadcrumbQuery ? await getListBreadcrumbLabel(listBreadcrumbQuery) : null
+    listBreadcrumbQuery
+      ? await getListBreadcrumbLabel(listBreadcrumbQuery)
+      : null
+  )
+  const organizationBreadcrumbId = $derived(
+    page.route.id === '/organizations/[organizationId]'
+      ? page.params.organizationId
+      : null
+  )
+  const organizationBreadcrumbQuery = $derived(
+    organizationBreadcrumbId ? getOrganization(organizationBreadcrumbId) : null
+  )
+  const organizationBreadcrumbLabel = $derived(
+    organizationBreadcrumbQuery
+      ? await getOrganizationBreadcrumbLabel(organizationBreadcrumbQuery)
+      : null
   )
 
   let crumbs = $derived.by((): Crumb[] => {
@@ -94,7 +123,8 @@
       else if (seg === 'new') label = 'New'
       else if (prev === 'users')
         label = d.isCurrentUser ? 'My Profile' : (d.user?.name ?? seg)
-      else if (prev === 'organizations') label = d.organization?.name ?? seg
+      else if (prev === 'organizations')
+        label = organizationBreadcrumbLabel ?? seg
       else if (prev === 'lists') label = listBreadcrumbLabel ?? seg
       else label = seg
 

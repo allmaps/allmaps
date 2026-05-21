@@ -2,7 +2,6 @@
   import { page } from '$app/state'
   import { goto } from '$app/navigation'
 
-  import { authClient } from '$lib/auth-client.js'
   import { getOrganizationId } from '$lib/organizations.js'
 
   import UserLists from '$lib/components/UserLists.svelte'
@@ -12,6 +11,11 @@
     addOrganizationMember,
     removeOrganizationMember
   } from '../../organizations/organizations.remote.js'
+  import {
+    getUser,
+    setUserRole,
+    updateUser as updateUserCommand
+  } from '../users.remote.js'
 
   import type { PageProps } from './$types'
 
@@ -56,13 +60,10 @@
     error = null
 
     try {
-      const result = await authClient.admin.setRole({
+      await setUserRole({
         userId,
         role: editUserRole
-      })
-      if (result.error) {
-        error = result.error.message ?? 'Failed to change role'
-      }
+      }).updates(getUser(userId))
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to change role'
     } finally {
@@ -91,11 +92,10 @@
         organizationId,
         email: data.user?.email ?? '',
         role: selectedOrganizationRole
-      })
+      }).updates(getUser(userId))
 
       selectedOrganizationId = ''
       selectedOrganizationRole = 'member'
-      goto(`/users/${userId}`, { invalidateAll: true })
     } catch (err) {
       console.error('Failed to add user to organization:', err)
       error =
@@ -129,8 +129,9 @@
     error = null
 
     try {
-      await removeOrganizationMember({ organizationId, userId })
-      goto(`/users/${userId}`, { invalidateAll: true })
+      await removeOrganizationMember({ organizationId, userId }).updates(
+        getUser(userId)
+      )
     } catch (err) {
       console.error('Failed to remove user from organization:', err)
       error =
@@ -160,7 +161,7 @@
     error = null
 
     try {
-      const result = await authClient.admin.updateUser({
+      await updateUserCommand({
         userId,
         data: {
           name: editUserName,
@@ -168,11 +169,8 @@
           email: editUserEmail,
           banned: editUserBanned
         }
-      })
-      if (result.error) {
-        error = result.error.message ?? 'Failed to update user'
-        return
-      }
+      }).updates(getUser(userId))
+
       goto('/users')
     } catch (err) {
       console.error('Failed to update user:', err)

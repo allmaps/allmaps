@@ -1,13 +1,14 @@
 <script lang="ts">
   import { getLists } from '$lib/lists.remote.js'
+  import { queryResult } from '$lib/query-result.js'
+
+  import type { ListSummary } from '$lib/lists.remote.js'
+
+  const listsResult = $derived(await queryResult<ListSummary[]>(getLists()))
 </script>
 
-{#await getLists()}
-  <div class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-semibold mb-4">My Lists</h2>
-    <p class="text-sm text-gray-500">Loading...</p>
-  </div>
-{:then lists}
+{#if listsResult.data}
+  {@const lists = listsResult.data}
   <div class="bg-white rounded-lg shadow p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-semibold">My Lists</h2>
@@ -44,4 +45,9 @@
       </div>
     {/if}
   </div>
-{/await}
+{:else}
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">My Lists</h2>
+    <p class="text-sm text-red-600">Failed to load lists.</p>
+  </div>
+{/if}
