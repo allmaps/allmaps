@@ -1,8 +1,11 @@
-export function getOrganizationId(organizationIdOrUrl: string) {
+export function getResourceId(resourceIdOrUrl: string) {
   try {
-    const url = new URL(organizationIdOrUrl)
-    return url.pathname.split('/').filter(Boolean).at(-1) ?? organizationIdOrUrl
+    const url = new URL(resourceIdOrUrl)
+    return url.pathname.split('/').filter(Boolean).at(-1) ?? resourceIdOrUrl
   } catch {
-    return organizationIdOrUrl
+    return resourceIdOrUrl
   }
 }
+
+export const getOrganizationId = getResourceId
+export const getUserId = getResourceId
