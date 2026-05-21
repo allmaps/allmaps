@@ -5,7 +5,7 @@
   import { Loading } from '@allmaps/ui'
   import { pink } from '@allmaps/tailwind'
 
-  import { getAllmapsId } from '$lib/shared/ids.js'
+  import { getHerePreviewUrl } from '$lib/shared/ids.js'
   import { getTitle, getDescription } from '$lib/shared/head.js'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
@@ -58,9 +58,11 @@
   let ogImageUrl = $derived(
     data.from &&
       data.mapId &&
-      `${data.env.PUBLIC_PREVIEW_BASE_URL}/${getAllmapsId(
-        data.mapId
-      )}.jpg?from=${data.from.join(',')}`
+      getHerePreviewUrl(
+        data.env.PUBLIC_PREVIEW_BASE_URL,
+        data.mapId,
+        data.from
+      )
   )
 
   onMount(() => {
