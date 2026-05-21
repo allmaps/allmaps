@@ -1,6 +1,12 @@
 import { ResponseError } from './errors.js'
 
-import type { ContainedBy, IntersectsWith, MapsQueryParams } from '../types.js'
+import type {
+  ContainedBy,
+  IntersectsWith,
+  MapsQueryParams,
+  OrganizationPlan,
+  OrganizationsQueryParams
+} from '../types.js'
 
 type MapsQueryParamName =
   | 'limit'
@@ -28,6 +34,8 @@ const mapsQueryParamNames: Record<string, MapsQueryParamName> = {
   modifiedafter: 'modifiedAfter',
   modifiedbefore: 'modifiedBefore'
 }
+
+const organizationPlans = new Set<OrganizationPlan>(['supporter', 'innovator'])
 
 const dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/
 const utcDateTimePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
@@ -87,6 +95,39 @@ function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
   if (containedBy && containedBy.length === 4) {
     return containedBy as ContainedBy
   }
+}
+
+function parseOrganizationPlanParam(value: string) {
+  if (organizationPlans.has(value as OrganizationPlan)) {
+    return value as OrganizationPlan
+  }
+
+  throw new ResponseError(`Invalid query parameter plan: ${value}`, 400)
+}
+
+export function normalizeOrganizationsQueryParams(
+  request: Request
+): Partial<OrganizationsQueryParams> {
+  const searchParams = new URL(request.url).searchParams
+  const plans = new Set<OrganizationPlan>()
+  const params: Partial<OrganizationsQueryParams> = {}
+
+  for (const [key, value] of searchParams) {
+    switch (key.toLowerCase()) {
+      case 'limit':
+        params.limit = parseNumberParam('limit', value)
+        break
+      case 'plan':
+        plans.add(parseOrganizationPlanParam(value))
+        break
+    }
+  }
+
+  if (plans.size > 0) {
+    params.plans = [...plans]
+  }
+
+  return params
 }
 
 export function normalizeMapsQueryParams(
