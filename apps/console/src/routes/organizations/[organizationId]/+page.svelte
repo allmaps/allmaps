@@ -46,6 +46,35 @@
   let isDeleting = $state(false)
 
   const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
+  const organizationApiUrl = $derived(
+    `${data.env.PUBLIC_REST_BASE_URL}/organizations/${organizationId}`
+  )
+  const organizationResourceLinks = $derived([
+    {
+      label: 'ID',
+      href: organizationApiUrl
+    },
+    {
+      label: 'Images',
+      href: `${organizationApiUrl}/images`
+    },
+    {
+      label: 'Canvases',
+      href: `${organizationApiUrl}/canvases`
+    },
+    {
+      label: 'Manifests',
+      href: `${organizationApiUrl}/manifests`
+    },
+    {
+      label: 'Images without georeference',
+      href: `${organizationApiUrl}/images?georeferenced=false`
+    },
+    {
+      label: 'Georeferenced images',
+      href: `${organizationApiUrl}/images?georeferenced=true`
+    }
+  ])
 
   function initializeOrganizationForm(nextOrganization: Organization) {
     editOrgName = nextOrganization.name
@@ -371,9 +400,28 @@
     {@const members = organization.users || []}
     <div class="bg-white rounded-lg shadow p-6 mt-6">
       <div class="space-y-4 mb-8">
-        <div>
-          <span class="text-sm font-medium text-gray-500">ID:</span>
-          <p class="text-gray-900">{organization.id}</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-gray-100">
+              {#each organizationResourceLinks as resourceLink (resourceLink.href)}
+                <tr>
+                  <th
+                    class="w-48 py-2 pr-4 text-left font-medium text-gray-500"
+                    >{resourceLink.label}</th
+                  >
+                  <td class="py-2">
+                    <a
+                      href={resourceLink.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="font-mono text-blue-600 hover:underline break-all"
+                      >{resourceLink.href}</a
+                    >
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
         </div>
         <div>
           <span class="text-sm font-medium text-gray-500">Created:</span>
