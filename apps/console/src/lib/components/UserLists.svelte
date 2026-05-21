@@ -1,24 +1,8 @@
 <script lang="ts">
-  import { page } from '$app/state'
-
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
-
-  type List = {
-    id: string
-    name: string
-    label: string | null
-    createdAt: string
-  }
-
-  async function fetchLists(): Promise<List[]> {
-    const response = await fetch(`${apiBaseUrl}/lists`, {
-      credentials: 'include'
-    })
-    return response.ok ? response.json() : []
-  }
+  import { getLists } from '$lib/lists.remote.js'
 </script>
 
-{#await fetchLists()}
+{#await getLists()}
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">My Lists</h2>
     <p class="text-sm text-gray-500">Loading...</p>

@@ -1,13 +1,11 @@
 <script lang="ts">
-  import { page } from '$app/state'
   import { goto } from '$app/navigation'
-
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
+  import { createOrganization as createOrganizationCommand } from '../organizations.remote.js'
 
   let newOrganizationName = $state('')
   let newOrganizationSlug = $state('')
   let isCreating = $state(false)
-  let error = $state<string | null>(null)
+  let error = $state<string>()
 
   function isValidSlug(value: string) {
     return /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/.test(value.trim())
@@ -25,26 +23,12 @@
     }
 
     isCreating = true
-    error = null
+    error = undefined
     try {
-      const response = await fetch(`${apiBaseUrl}/organizations`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: newOrganizationName,
-          slug: newOrganizationSlug,
-          plan: null
-        })
+      await createOrganizationCommand({
+        name: newOrganizationName,
+        slug: newOrganizationSlug
       })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        error = errorText || 'Failed to create organization'
-        return
-      }
 
       goto('/organizations')
     } catch (err) {

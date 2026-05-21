@@ -1,24 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/state'
+  import { getLists } from '$lib/lists.remote.js'
+
   import type { PageProps } from './$types'
 
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
-
   let { data }: PageProps = $props()
-
-  type List = {
-    id: string
-    name: string
-    label: string | null
-    createdAt: string
-  }
-
-  async function fetchLists(): Promise<List[]> {
-    const r = await fetch(`${apiBaseUrl}/lists`, {
-      credentials: 'include'
-    })
-    return r.ok ? r.json() : []
-  }
 </script>
 
 <div class="max-w-4xl mx-auto px-4 py-8">
@@ -40,7 +25,7 @@
     {@const user = sessionData.data?.user}
 
     {#if user?.id}
-      {#await fetchLists()}
+      {#await getLists()}
         <div class="bg-white rounded-lg shadow p-6">
           <p class="text-sm text-gray-500">Loading lists...</p>
         </div>

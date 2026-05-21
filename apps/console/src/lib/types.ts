@@ -2,9 +2,11 @@ export type Organization = {
   id: string
   name: string
   slug: string
+  logo?: string | null
+  homepage?: string | null
   createdAt: string
   domains: string[]
-  plan: string | null
+  plan: 'supporter' | 'innovator' | null
   users?: {
     role: string
     createdAt: string

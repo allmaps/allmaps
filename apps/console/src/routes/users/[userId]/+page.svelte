@@ -1,15 +1,20 @@
 <script lang="ts">
   import { page } from '$app/state'
-  import { authClient } from '$lib/auth-client'
-  import { getOrganizationId } from '$lib/organizations.js'
   import { goto } from '$app/navigation'
+
+  import { authClient } from '$lib/auth-client.js'
+  import { getOrganizationId } from '$lib/organizations.js'
+
   import UserLists from '$lib/components/UserLists.svelte'
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { userRoleItems, orgMemberRoleItems } from '$lib/select-items'
+  import {
+    addOrganizationMember,
+    removeOrganizationMember
+  } from '../../organizations/organizations.remote.js'
 
   import type { PageProps } from './$types'
 
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
   const userId = $derived(page.params.userId ?? '')
 
   let { data }: PageProps = $props()
@@ -24,6 +29,7 @@
   let selectedOrganizationId = $state('')
   let selectedOrganizationRole = $state<'admin' | 'member'>('member')
   let isAddingToOrganization = $state(false)
+  let removingOrganizationId = $state<string | null>(null)
   let error = $state<string | null>(null)
 
   function isValidSlug(value: string) {
@@ -81,25 +87,11 @@
       }
       const organizationId = getOrganizationId(organization.id)
 
-      const response = await fetch(
-        `${apiBaseUrl}/organizations/${organizationId}/users`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: data.user?.email,
-            role: selectedOrganizationRole
-          })
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Failed to add to organization: ${errorText}`)
-      }
+      await addOrganizationMember({
+        organizationId,
+        email: data.user?.email ?? '',
+        role: selectedOrganizationRole
+      })
 
       selectedOrganizationId = ''
       selectedOrganizationRole = 'member'
@@ -112,6 +104,41 @@
           : 'Failed to add user to organization'
     } finally {
       isAddingToOrganization = false
+    }
+  }
+
+  async function removeFromOrganization(
+    organizationIdOrUrl: string,
+    organizationName: string
+  ) {
+    if (!data.isAdmin || !userId) {
+      return
+    }
+
+    if (
+      !confirm(
+        `Are you sure you want to remove this user from ${organizationName}?`
+      )
+    ) {
+      return
+    }
+
+    const organizationId = getOrganizationId(organizationIdOrUrl)
+
+    removingOrganizationId = organizationId
+    error = null
+
+    try {
+      await removeOrganizationMember({ organizationId, userId })
+      goto(`/users/${userId}`, { invalidateAll: true })
+    } catch (err) {
+      console.error('Failed to remove user from organization:', err)
+      error =
+        err instanceof Error
+          ? err.message
+          : 'Failed to remove user from organization'
+    } finally {
+      removingOrganizationId = null
     }
   }
 
@@ -300,25 +327,51 @@
           {:else}
             <div class="space-y-2">
               {#each data.userOrganizations as membership (membership.organization.slug)}
-                <a
-                  href="/organizations/{getOrganizationId(membership.organization.id)}"
+                {@const membershipOrganizationId = getOrganizationId(
+                  membership.organization.id
+                )}
+                <div
                   class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
                 >
-                  <span>
+                  <a
+                    href="/organizations/{membershipOrganizationId}"
+                    class="min-w-0"
+                  >
                     <span class="block text-sm font-medium">
                       {membership.organization.name}
                     </span>
                     {#if membership.createdAt}
                       <span class="block text-xs text-gray-500">
-                        Added {new Date(membership.createdAt).toLocaleDateString()}
+                        Added {new Date(
+                          membership.createdAt
+                        ).toLocaleDateString()}
                       </span>
                     {/if}
-                  </span>
-                  <span
-                    class="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600"
-                    >{membership.userRole}</span
-                  >
-                </a>
+                  </a>
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600"
+                      >{membership.userRole}</span
+                    >
+                    {#if data.isAdmin}
+                      <button
+                        type="button"
+                        onclick={() =>
+                          removeFromOrganization(
+                            membership.organization.id,
+                            membership.organization.name
+                          )}
+                        class="text-xs text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
+                        disabled={removingOrganizationId ===
+                          membershipOrganizationId}
+                      >
+                        {removingOrganizationId === membershipOrganizationId
+                          ? 'Removing...'
+                          : 'Remove'}
+                      </button>
+                    {/if}
+                  </div>
+                </div>
               {/each}
             </div>
           {/if}

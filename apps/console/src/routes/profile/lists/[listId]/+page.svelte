@@ -2,13 +2,20 @@
   import { page } from '$app/state'
   import { getAuthContext } from '@allmaps/components/auth'
 
+  import {
+    addListItemByUrl,
+    getList,
+    renameList as renameListCommand,
+    removeListItem as removeListItemCommand
+  } from '$lib/lists.remote.js'
+
   import type { AuthSessionState } from '@allmaps/components/auth'
   import type { Readable } from 'svelte/store'
   import type { PageProps } from './$types'
+  import type { LanguageString, ListItem } from '$lib/lists.remote.js'
 
   let { data }: PageProps = $props()
 
-  const restBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
   const annotationsBaseUrl = $derived(page.data.env.PUBLIC_ANNOTATIONS_BASE_URL)
   const viewerBaseUrl = $derived(
     page.data.env.PUBLIC_VIEWER_BASE_URL.replace(/\/+$/, '')
@@ -22,32 +29,6 @@
     slug?: string | null
   }
 
-  type LanguageString = {
-    [language: string]: (string | number | boolean)[]
-  }
-
-  type ListItem = {
-    listId: string
-    mapId: string | null
-    mapImageId: string | null
-    mapChecksum: string | null
-    mapVersion: number | null
-    imageId: string | null
-    canvasId: string | null
-    manifestId: string | null
-    createdAt: string | null
-    canvasLabel: LanguageString | null
-    manifestLabel: LanguageString | null
-  }
-
-  type ListDetail = {
-    id: string
-    name: string
-    label: string | null
-    createdAt: string
-    items: ListItem[]
-  }
-
   let urlInput = $state('')
   let adding = $state(false)
   let addError = $state<string | null>(null)
@@ -57,7 +38,6 @@
   let renameSuccess = $state<string | null>(null)
   let removingItem = $state<string | null>(null)
 
-  let listPromise = $state(fetchList())
   let username = $derived(
     ($session.data?.user as SessionUser | undefined)?.slug ?? null
   )
@@ -67,14 +47,6 @@
   let listViewerUrl = $derived(
     listUrl ? `${viewerBaseUrl}/?url=${encodeURIComponent(listUrl)}` : null
   )
-
-  async function fetchList(): Promise<ListDetail> {
-    const r = await fetch(`${restBaseUrl}/lists/${listId}`, {
-      credentials: 'include'
-    })
-    if (!r.ok) throw new Error(`Failed to load list: ${r.status}`)
-    return r.json()
-  }
 
   function itemType(item: ListItem): string {
     if (item.mapId) {
@@ -139,11 +111,13 @@
     else if (item.manifestId) params.set('manifestId', item.manifestId)
 
     try {
-      const r = await fetch(`${restBaseUrl}/lists/${listId}/items?${params}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      })
-      if (r.ok) listPromise = fetchList()
+      await removeListItemCommand({
+        listId,
+        mapId: params.get('mapId') ?? undefined,
+        imageId: params.get('imageId') ?? undefined,
+        canvasId: params.get('canvasId') ?? undefined,
+        manifestId: params.get('manifestId') ?? undefined
+      }).updates(getList(listId))
     } finally {
       removingItem = null
     }
@@ -168,38 +142,26 @@
     addSuccess = null
 
     try {
-      const r = await fetch(`${restBaseUrl}/lists/${listId}/items/url`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
-      })
-
-      const data = await r.json().catch(() => ({}))
-
-      if (!r.ok) {
-        addError = (data as { error?: string }).error ?? `Error ${r.status}`
-        return
-      }
+      await addListItemByUrl({ listId, url }).updates(getList(listId))
 
       urlInput = ''
       addSuccess = `Added successfully`
-      listPromise = fetchList()
-    } catch {
-      addError = 'Network error. Please try again.'
+    } catch (err) {
+      addError =
+        err instanceof Error ? err.message : 'Network error. Please try again.'
     } finally {
       adding = false
     }
   }
 
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter') addItem()
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') addItem()
   }
 
-  async function renameList(e: SubmitEvent) {
-    e.preventDefault()
+  async function renameList(event: SubmitEvent) {
+    event.preventDefault()
 
-    const form = e.currentTarget
+    const form = event.currentTarget
     if (!(form instanceof HTMLFormElement)) {
       return
     }
@@ -219,24 +181,12 @@
     renaming = true
 
     try {
-      const r = await fetch(`${restBaseUrl}/lists/${listId}`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      })
-
-      const data = await r.json().catch(() => ({}))
-
-      if (!r.ok) {
-        renameError = (data as { error?: string }).error ?? `Error ${r.status}`
-        return
-      }
+      await renameListCommand({ listId, name }).updates(getList(listId))
 
       renameSuccess = 'List name updated'
-      listPromise = fetchList()
-    } catch {
-      renameError = 'Network error. Please try again.'
+    } catch (err) {
+      renameError =
+        err instanceof Error ? err.message : 'Network error. Please try again.'
     } finally {
       renaming = false
     }
@@ -245,7 +195,7 @@
 
 <div class="max-w-4xl mx-auto px-4 py-8">
   <div class="mb-8">
-    {#await listPromise}
+    {#await getList(listId)}
       <h1 class="text-3xl font-bold text-gray-400">Loading...</h1>
     {:then list}
       <h1 class="text-3xl font-bold">{list.label || list.name}</h1>
@@ -280,7 +230,7 @@
   {/if}
 
   <!-- Rename list -->
-  {#await listPromise}
+  {#await getList(listId)}
     <div class="bg-white rounded-lg shadow p-6 mb-6">
       <p class="text-sm text-gray-500">Loading list details...</p>
     </div>
@@ -351,7 +301,7 @@
   </div>
 
   <!-- Items list -->
-  {#await listPromise}
+  {#await getList(listId)}
     <div class="bg-white rounded-lg shadow p-6">
       <p class="text-sm text-gray-500">Loading items...</p>
     </div>
@@ -366,7 +316,7 @@
         <p class="text-sm text-gray-500 italic">No items yet. Add one above.</p>
       {:else}
         <div class="space-y-2">
-          {#each list.items as item (item.listId)}
+          {#each list.items as item (`${itemType(item)}:${itemId(item)}`)}
             {@const title = itemTitle(item)}
             {@const key = itemId(item)}
             <div

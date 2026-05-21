@@ -2,15 +2,20 @@
   import { page } from '$app/state'
   import { untrack } from 'svelte'
   import { goto } from '$app/navigation'
-  import { authClient } from '$lib/auth-client.js'
-  import { getOrganizationId } from '$lib/organizations.js'
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { planItems, orgMemberRoleItems } from '$lib/select-items'
-  import type { PageProps } from './$types'
-
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
+  import {
+    addOrganizationMember,
+    deleteOrganization as deleteOrganizationCommand,
+    getOrganization,
+    removeOrganizationMember,
+    updateOrganization as updateOrganizationCommand,
+    updateOrganizationMemberRole
+  } from '../organizations.remote.js'
+  import type { PageProps } from './$types.js'
 
   let { data }: PageProps = $props()
+  const organizationId = $derived(page.params.organizationId ?? '')
 
   let editOrgName = $state(untrack(() => data.organization?.name ?? ''))
   let editOrgSlug = $state(untrack(() => data.organization?.slug ?? ''))
@@ -54,22 +59,11 @@
     if (!organization) {
       return
     }
-    const organizationId = getOrganizationId(organization.id)
-
     isDeleting = true
     error = null
 
     try {
-      const response = await fetch(`${apiBaseUrl}/organizations/${organizationId}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        error = errorText || 'Failed to delete organization'
-        return
-      }
+      await deleteOrganizationCommand(organizationId)
 
       goto('/organizations')
     } catch (err) {
@@ -86,8 +80,6 @@
     if (!organization) {
       return
     }
-    const organizationId = getOrganizationId(organization.id)
-
     if (!isValidSlug(editOrgSlug)) {
       error =
         'Invalid slug. Use lowercase letters, numbers, and hyphens, starting with a letter.'
@@ -97,26 +89,16 @@
     isUpdating = true
     error = null
     try {
-      const response = await fetch(
-        `${apiBaseUrl}/organizations/${organizationId}`,
-        {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: editOrgName,
-            slug: editOrgSlug,
-            homepage: editHomepage || null,
-            plan: editPlan || null,
-            domains: editDomains.filter(Boolean)
-          })
+      await updateOrganizationCommand({
+        organizationId,
+        organization: {
+          name: editOrgName,
+          slug: editOrgSlug,
+          homepage: editHomepage || null,
+          plan: editPlan || null,
+          domains: editDomains.filter(Boolean)
         }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(errorText || 'Failed to update organization')
-      }
+      })
 
       goto('/organizations')
     } catch (err) {
@@ -133,40 +115,18 @@
       return
     }
 
-    const organization = data.organization
-
-    if (!organization) {
-      return
-    }
-    const organizationId = getOrganizationId(organization.id)
-
     isAddingMember = true
     error = null
     try {
-      const response = await fetch(
-        `${apiBaseUrl}/organizations/${organizationId}/users`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: newMemberEmail,
-            role: newMemberRole
-          })
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(errorText || 'Failed to add member')
-      }
+      await addOrganizationMember({
+        organizationId,
+        email: newMemberEmail,
+        role: newMemberRole
+      })
 
       newMemberEmail = ''
       newMemberRole = 'member'
       showAddMemberModal = false
-      window.location.reload()
     } catch (err) {
       console.error('Failed to add member:', err)
       error = err instanceof Error ? err.message : 'Failed to add member'
@@ -184,29 +144,10 @@
       return
     }
 
-    const organization = data.organization
-    if (!organization) {
-      return
-    }
-    const organizationId = getOrganizationId(organization.id)
-
     removingMemberId = email
     error = null
     try {
-      const response = await fetch(
-        `${apiBaseUrl}/organizations/${organizationId}/users/${userId}`,
-        {
-          method: 'DELETE',
-          credentials: 'include'
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(errorText || 'Failed to remove member')
-      }
-
-      window.location.reload()
+      await removeOrganizationMember({ organizationId, userId })
     } catch (err) {
       console.error('Failed to remove member:', err)
       error = err instanceof Error ? err.message : 'Failed to remove member'
@@ -219,34 +160,10 @@
     userId: string,
     role: 'admin' | 'member' | 'owner'
   ) {
-    const organization = data.organization
-
-    if (!organization) {
-      return
-    }
-    const organizationId = getOrganizationId(organization.id)
-
     updatingRoleId = userId
     error = null
     try {
-      const response = await fetch(
-        `${apiBaseUrl}/organizations/${organizationId}/users/${userId}`,
-        {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ role })
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(errorText || 'Failed to update role')
-      }
-
-      window.location.reload()
+      await updateOrganizationMemberRole({ organizationId, userId, role })
     } catch (err) {
       console.error('Failed to update member role:', err)
       error =
@@ -393,117 +310,117 @@
     </div>
   </div>
 
-  {#if data.organization}
+  {#await getOrganization(organizationId) then organization}
+    {@const members = organization.users || []}
     <div class="bg-white rounded-lg shadow p-6 mt-6">
       <div class="space-y-4 mb-8">
         <div>
           <span class="text-sm font-medium text-gray-500">ID:</span>
-          <p class="text-gray-900">{data.organization.id}</p>
+          <p class="text-gray-900">{organization.id}</p>
         </div>
         <div>
           <span class="text-sm font-medium text-gray-500">Created:</span>
           <p class="text-gray-900">
-            {new Date(data.organization.createdAt).toLocaleDateString()}
+            {new Date(organization.createdAt).toLocaleDateString()}
           </p>
         </div>
       </div>
 
       <div class="border-t pt-6">
-        {#await data.membersData}
-          <p class="text-gray-500">Loading members...</p>
-        {:then membersData}
-          {@const members = membersData.data?.members || []}
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold">Members ({members.length})</h3>
-            <button
-              onclick={() => (showAddMemberModal = true)}
-              class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
-            >
-              Add Member
-            </button>
-          </div>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold">Members ({members.length})</h3>
+          <button
+            onclick={() => (showAddMemberModal = true)}
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
+          >
+            Add Member
+          </button>
+        </div>
 
-          {#if members.length === 0}
-            <p class="text-gray-500 italic">No members yet</p>
-          {:else}
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead class="bg-gray-50 border-b">
-                  <tr>
-                    <th
-                      class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                      >Name</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                      >Email</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                      >Role</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                      >Joined</th
-                    >
-                    <th
-                      class="px-4 py-3 text-right text-sm font-medium text-gray-700"
-                      >Actions</th
-                    >
+        {#if members.length === 0}
+          <p class="text-gray-500 italic">No members yet</p>
+        {:else}
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th
+                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                    >Name</th
+                  >
+                  <th
+                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                    >Email</th
+                  >
+                  <th
+                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                    >Role</th
+                  >
+                  <th
+                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                    >Joined</th
+                  >
+                  <th
+                    class="px-4 py-3 text-right text-sm font-medium text-gray-700"
+                    >Actions</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                {#each members as member (member.user.id)}
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm">
+                      <a
+                        href="/users/{getUserId(member.user.id)}"
+                        class="text-blue-600 hover:underline"
+                        >{member.user.name || '—'}</a
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm">{member.user.email}</td>
+                    <td class="px-4 py-3 text-sm">
+                      <AppSelect
+                        value={member.role}
+                        items={orgMemberRoleItems}
+                        disabled={updatingRoleId === getUserId(member.user.id)}
+                        onchange={(role) =>
+                          updateMemberRole(
+                            getUserId(member.user.id),
+                            role as 'admin' | 'member' | 'owner'
+                          )}
+                        class="min-w-36"
+                      />
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                      {new Date(member.createdAt).toLocaleDateString()}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-right">
+                      <button
+                        onclick={() =>
+                          removeMember(
+                            getUserId(member.user.id),
+                            member.user.email
+                          )}
+                        class="text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
+                        disabled={removingMemberId === member.user.email}
+                      >
+                        {removingMemberId === member.user.email
+                          ? 'Removing...'
+                          : 'Remove'}
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody class="divide-y">
-                  {#each members as member (member.user.id)}
-                    <tr class="hover:bg-gray-50">
-                      <td class="px-4 py-3 text-sm">
-                        <a
-                          href="/users/{getUserId(member.user.id)}"
-                          class="text-blue-600 hover:underline"
-                          >{member.user.name || '—'}</a
-                        >
-                      </td>
-                      <td class="px-4 py-3 text-sm">{member.user.email}</td>
-                      <td class="px-4 py-3 text-sm">
-                        <AppSelect
-                          value={member.role}
-                          items={orgMemberRoleItems}
-                          disabled={updatingRoleId === getUserId(member.user.id)}
-                          onchange={(role) =>
-                            updateMemberRole(
-                              getUserId(member.user.id),
-                              role as 'admin' | 'member' | 'owner'
-                            )}
-                          class="min-w-36"
-                        />
-                      </td>
-                      <td class="px-4 py-3 text-sm text-gray-600">
-                        {new Date(member.createdAt).toLocaleDateString()}
-                      </td>
-                      <td class="px-4 py-3 text-sm text-right">
-                        <button
-                          onclick={() =>
-                            removeMember(
-                              getUserId(member.user.id),
-                              member.user.email
-                            )}
-                          class="text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
-                          disabled={removingMemberId === member.user.email}
-                        >
-                          {removingMemberId === member.user.email
-                            ? 'Removing...'
-                            : 'Remove'}
-                        </button>
-                      </td>
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
-            </div>
-          {/if}
-        {/await}
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        {/if}
       </div>
     </div>
-  {/if}
+  {:catch}
+    <div class="bg-white rounded-lg shadow p-6 mt-6">
+      <p class="text-gray-500">Failed to load organization members</p>
+    </div>
+  {/await}
 </div>
 
 {#if showDeleteModal}

@@ -19,6 +19,15 @@
 
   const { client } = getAuthContext()
   const session = client.useSession() as Readable<AuthSessionState>
+  let sessionTimedOut = $state(false)
+
+  $effect(() => {
+    const timeout = setTimeout(() => {
+      sessionTimedOut = true
+    }, 10_000)
+
+    return () => clearTimeout(timeout)
+  })
 
   const getDisplayName = (user?: BasicUser) =>
     user?.name || user?.email || 'User'
@@ -34,7 +43,7 @@
 </script>
 
 <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-  {#if $session.isPending}
+  {#if $session.isPending && !sessionTimedOut}
     <div class="flex items-center justify-center min-h-[60vh]">
       <p class="text-gray-500 font-sans">Loading...</p>
     </div>

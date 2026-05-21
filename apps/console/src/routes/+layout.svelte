@@ -11,8 +11,10 @@
   import DotsPattern from '$lib/components/DotsPattern.svelte'
 
   import { authClient } from '$lib/auth-client.js'
+  import { getList } from '$lib/lists.remote.js'
 
   import type { Snippet } from 'svelte'
+  import type { ListDetail } from '$lib/lists.remote.js'
 
   import './layout.css'
   import '@allmaps/components/css/fonts.css'
@@ -24,6 +26,18 @@
   type Crumb = {
     label: string
     href: string
+  }
+
+  async function getListBreadcrumbLabel(
+    listQuery: ReturnType<typeof getList>
+  ): Promise<string | null> {
+    try {
+      const list: ListDetail = await listQuery
+
+      return list.label || list.name
+    } catch {
+      return null
+    }
   }
 
   let { children: pageChildren }: Props = $props()
@@ -48,6 +62,16 @@
     })
   })
 
+  const listBreadcrumbId = $derived(
+    page.route.id === '/profile/lists/[listId]' ? page.params.listId : null
+  )
+  const listBreadcrumbQuery = $derived(
+    listBreadcrumbId ? getList(listBreadcrumbId) : null
+  )
+  const listBreadcrumbLabel = $derived(
+    listBreadcrumbQuery ? await getListBreadcrumbLabel(listBreadcrumbQuery) : null
+  )
+
   let crumbs = $derived.by((): Crumb[] => {
     const segments = page.url.pathname.split('/').filter(Boolean)
     if (segments.length === 0) {
@@ -71,7 +95,7 @@
       else if (prev === 'users')
         label = d.isCurrentUser ? 'My Profile' : (d.user?.name ?? seg)
       else if (prev === 'organizations') label = d.organization?.name ?? seg
-      else if (prev === 'lists') label = d.listName ?? seg
+      else if (prev === 'lists') label = listBreadcrumbLabel ?? seg
       else label = seg
 
       result.push({ label, href })

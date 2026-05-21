@@ -1,37 +1,24 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { page } from '$app/state'
 
-  const apiBaseUrl = $derived(page.data.env.PUBLIC_REST_BASE_URL)
+  import { createList } from '$lib/lists.remote.js'
 
   let name = $state('')
   let error = $state<string | null>(null)
   let submitting = $state(false)
 
-  async function handleSubmit(e: SubmitEvent) {
-    e.preventDefault()
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault()
     error = null
     submitting = true
 
     try {
-      const r = await fetch(`${apiBaseUrl}/lists`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim()
-        })
-      })
-
-      if (!r.ok) {
-        const data = await r.json().catch(() => ({}))
-        error = (data as { error?: string }).error ?? `Error ${r.status}`
-        return
-      }
+      await createList({ name })
 
       goto('/profile/lists')
-    } catch {
-      error = 'Network error. Please try again.'
+    } catch (err) {
+      error =
+        err instanceof Error ? err.message : 'Network error. Please try again.'
     } finally {
       submitting = false
     }
