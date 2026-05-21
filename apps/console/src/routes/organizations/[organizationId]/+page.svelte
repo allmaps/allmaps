@@ -1,5 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { getAbortSignal } from 'svelte'
+
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { planItems, orgMemberRoleItems } from '$lib/select-items'
   import { getUserId } from '$lib/organizations.js'
@@ -18,6 +20,10 @@
 
   let { data }: PageProps = $props()
   const organizationId = $derived(data.organizationId)
+
+  let organization = $state<Organization | null>(null)
+  let isLoadingOrganization = $state(true)
+  let loadError = $state<unknown>(null)
 
   let editOrgName = $state('')
   let editOrgSlug = $state('')
@@ -39,24 +45,55 @@
   let deleteConfirmName = $state('')
   let isDeleting = $state(false)
 
-  const slugPattern = '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'
+  const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
 
-  const organizationResult = $derived(
-    await queryResult<Organization>(getOrganization(organizationId))
-  )
-  const organization = $derived(organizationResult.data)
+  function initializeOrganizationForm(nextOrganization: Organization) {
+    editOrgName = nextOrganization.name
+    editOrgSlug = nextOrganization.slug
+    editHomepage = nextOrganization.homepage ?? ''
+    editPlan = nextOrganization.plan ?? ''
+    editDomains = nextOrganization.domains ?? []
+    initializedOrganizationId = organizationId
+  }
 
-  $effect(() => {
-    if (!organization || initializedOrganizationId === organizationId) {
+  async function loadOrganization(signal?: AbortSignal) {
+    isLoadingOrganization = true
+    loadError = null
+
+    const result = await queryResult<Organization>(
+      getOrganization(organizationId)
+    )
+
+    if (signal?.aborted) {
       return
     }
 
-    editOrgName = organization.name
-    editOrgSlug = organization.slug
-    editHomepage = organization.homepage ?? ''
-    editPlan = organization.plan ?? ''
-    editDomains = organization.domains ?? []
-    initializedOrganizationId = organizationId
+    isLoadingOrganization = false
+
+    if (result.error || !result.data) {
+      organization = null
+      loadError = result.error ?? new Error('Organization not found')
+      return
+    }
+
+    organization = result.data
+    if (initializedOrganizationId !== organizationId) {
+      initializeOrganizationForm(result.data)
+    }
+  }
+
+  $effect(() => {
+    const signal = getAbortSignal()
+
+    organization = null
+    editOrgName = ''
+    editOrgSlug = ''
+    editHomepage = ''
+    editPlan = ''
+    editDomains = []
+    initializedOrganizationId = null
+
+    loadOrganization(signal)
   })
 
   async function deleteOrganization() {
@@ -93,6 +130,7 @@
         role: newMemberRole
       })
 
+      await loadOrganization()
       newMemberEmail = ''
       newMemberRole = 'member'
       showAddMemberModal = false
@@ -116,6 +154,7 @@
     error = null
     try {
       await removeOrganizationMember({ organizationId, userId })
+      await loadOrganization()
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to remove member'
     } finally {
@@ -131,6 +170,7 @@
     error = null
     try {
       await updateOrganizationMemberRole({ organizationId, userId, role })
+      await loadOrganization()
     } catch (err) {
       error =
         err instanceof Error ? err.message : 'Failed to update member role'
@@ -157,12 +197,34 @@
     </div>
   {/if}
 
-  <form {...updateOrganizationForm} class="bg-white rounded-lg shadow p-6">
+  {#if isLoadingOrganization}
+    <div class="bg-white rounded-lg shadow p-6" aria-busy="true">
+      <div class="space-y-6">
+        <div>
+          <div class="mb-2 h-4 w-36 rounded bg-gray-200"></div>
+          <div class="h-10 w-full rounded bg-gray-100"></div>
+        </div>
+        <div>
+          <div class="mb-2 h-4 w-40 rounded bg-gray-200"></div>
+          <div class="h-10 w-full rounded bg-gray-100"></div>
+        </div>
+        <div>
+          <div class="mb-2 h-4 w-24 rounded bg-gray-200"></div>
+          <div class="h-10 w-full rounded bg-gray-100"></div>
+        </div>
+        <p class="text-sm text-gray-500">Loading organization details...</p>
+      </div>
+    </div>
+  {:else if loadError || !organization}
+    <div class="bg-white rounded-lg shadow p-6">
+      <p class="text-sm text-red-600">Failed to load organization.</p>
+    </div>
+  {:else}
+    <form {...updateOrganizationForm} class="bg-white rounded-lg shadow p-6">
     <input
-      {...updateOrganizationForm.fields.organizationId.as(
-        'hidden',
-        organizationId
-      )}
+      type="hidden"
+      name="organizationId"
+      value={organizationId}
     />
     <input
       type="hidden"
@@ -179,7 +241,8 @@
         </label>
         <input
           id="orgName"
-          {...updateOrganizationForm.fields.name.as('text')}
+          type="text"
+          name="name"
           bind:value={editOrgName}
           required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -196,7 +259,8 @@
         </label>
         <input
           id="orgSlug"
-          {...updateOrganizationForm.fields.slug.as('text')}
+          type="text"
+          name="slug"
           bind:value={editOrgSlug}
           required
           pattern={slugPattern}
@@ -214,7 +278,8 @@
         </label>
         <input
           id="orgHomepage"
-          {...updateOrganizationForm.fields.homepage.as('url')}
+          type="url"
+          name="homepage"
           bind:value={editHomepage}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="https://example.com"
@@ -299,7 +364,8 @@
         </div>
       </div>
     </div>
-  </form>
+    </form>
+  {/if}
 
   {#if organization}
     {@const members = organization.users || []}
@@ -406,10 +472,6 @@
           </div>
         {/if}
       </div>
-    </div>
-  {:else}
-    <div class="bg-white rounded-lg shadow p-6 mt-6">
-      <p class="text-sm text-red-600">Failed to load organization.</p>
     </div>
   {/if}
 </div>

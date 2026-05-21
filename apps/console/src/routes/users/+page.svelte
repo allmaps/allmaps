@@ -3,7 +3,6 @@
   import { page } from '$app/state'
 
   import { getOrganizationId, getUserId } from '$lib/organizations.js'
-  import { queryResult } from '$lib/query-result.js'
   import { routes } from '$lib/routes.js'
   import {
     getOffset,
@@ -16,9 +15,11 @@
 
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
-  import { getUsers } from './users.remote.js'
 
+  import type { PageProps } from './$types.js'
   import type { ConsoleUser } from './users.remote.js'
+
+  let { data }: PageProps = $props()
 
   const PAGE_SIZE = 20
   const userSearchFields = ['email', 'name'] as const
@@ -138,8 +139,7 @@
     offset = offset + PAGE_SIZE
     replaceTableState()
   }
-
-  const usersResult = $derived(await queryResult(getUsers(10000)))
+  const users = $derived(data.users)
 </script>
 
 {#snippet sortIcon(col: string)}
@@ -177,8 +177,7 @@
     />
   </div>
 
-  {#if usersResult.data}
-    {@const users = usersResult.data}
+  {#if users}
     {@const displayedUsers = getDisplayedUsers(users)}
     {@const total = getFilteredUsers(users).length}
     <DataTable>

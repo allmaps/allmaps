@@ -5,18 +5,21 @@
   import favicon from '$lib/assets/favicon.png'
 
   import { Header } from '@allmaps/components'
-  import { setAuthContext, UserMenu } from '@allmaps/components/auth'
+  import { setAuthContext } from '@allmaps/components/auth'
   import type { AllmapsAuthClient } from '@allmaps/components/auth'
 
+  import ConsoleUserMenu from '$lib/components/ConsoleUserMenu.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
 
   import { authClient } from '$lib/auth-client.js'
   import { getList } from '$lib/lists.remote.js'
   import { getOrganization } from './organizations/organizations.remote.js'
+  import { getUser } from './users/users.remote.js'
 
   import type { Snippet } from 'svelte'
   import type { Organization } from '$lib/types.js'
   import type { ListDetail } from '$lib/lists.remote.js'
+  import type { ConsoleUser } from './users/users.remote.js'
 
   import './layout.css'
   import '@allmaps/components/css/fonts.css'
@@ -54,6 +57,18 @@
     }
   }
 
+  async function getUserBreadcrumbLabel(
+    userQuery: ReturnType<typeof getUser>
+  ): Promise<string | null> {
+    try {
+      const user: ConsoleUser = await userQuery
+
+      return user.name || user.email || null
+    } catch {
+      return null
+    }
+  }
+
   let { children: pageChildren }: Props = $props()
 
   const apiBaseURL = page.data.env.PUBLIC_REST_BASE_URL
@@ -63,16 +78,51 @@
     apiBaseURL
   })
 
+  const viewTransitionTimeoutMs = 1_500
+  let activeViewTransition: ViewTransition | null = null
+
+  function timeout(ms: number) {
+    return new Promise<void>((resolve) => {
+      setTimeout(resolve, ms)
+    })
+  }
+
   onNavigate((navigation) => {
-    if (!document.startViewTransition) {
+    if (
+      !document.startViewTransition ||
+      document.visibilityState !== 'visible' ||
+      navigation.willUnload
+    ) {
       return
     }
 
     return new Promise((resolve) => {
-      document.startViewTransition(async () => {
+      try {
+        activeViewTransition?.skipTransition()
+
+        const transition = document.startViewTransition(async () => {
+          resolve()
+          await Promise.race([
+            navigation.complete.catch(() => {}),
+            timeout(viewTransitionTimeoutMs)
+          ])
+        })
+
+        activeViewTransition = transition
+
+        transition.ready.catch(() => {})
+        transition.updateCallbackDone.catch(() => {})
+        transition.finished
+          .catch(() => {})
+          .finally(() => {
+            if (activeViewTransition === transition) {
+              activeViewTransition = null
+            }
+          })
+      } catch {
+        activeViewTransition = null
         resolve()
-        await navigation.complete
-      })
+      }
     })
   })
 
@@ -100,6 +150,15 @@
       ? await getOrganizationBreadcrumbLabel(organizationBreadcrumbQuery)
       : null
   )
+  const userBreadcrumbId = $derived(
+    page.route.id === '/users/[userId]' ? page.params.userId : null
+  )
+  const userBreadcrumbQuery = $derived(
+    userBreadcrumbId ? getUser(userBreadcrumbId) : null
+  )
+  const userBreadcrumbLabel = $derived(
+    userBreadcrumbQuery ? await getUserBreadcrumbLabel(userBreadcrumbQuery) : null
+  )
 
   let crumbs = $derived.by((): Crumb[] => {
     const segments = page.url.pathname.split('/').filter(Boolean)
@@ -122,7 +181,7 @@
       else if (seg === 'lists') label = 'Lists'
       else if (seg === 'new') label = 'New'
       else if (prev === 'users')
-        label = d.isCurrentUser ? 'My Profile' : (d.user?.name ?? seg)
+        label = d.isCurrentUser ? 'My Profile' : (userBreadcrumbLabel ?? seg)
       else if (prev === 'organizations')
         label = organizationBreadcrumbLabel ?? seg
       else if (prev === 'lists') label = listBreadcrumbLabel ?? seg
@@ -160,7 +219,7 @@
             {/if}
           {/each}
         </div>
-        <UserMenu />
+        <ConsoleUserMenu />
       </div>
     </Header>
   </div>

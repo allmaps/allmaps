@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from '$app/state'
-  import { getAuthContext } from '@allmaps/components/auth'
 
   import {
     addListItemByUrlForm,
@@ -10,8 +9,6 @@
   } from '$lib/lists.remote.js'
   import { queryResult } from '$lib/query-result.js'
 
-  import type { AuthSessionState } from '@allmaps/components/auth'
-  import type { Readable } from 'svelte/store'
   import type { PageProps } from './$types'
   import type {
     LanguageString,
@@ -27,8 +24,6 @@
   )
 
   const listId = $derived(data.listId)
-  const { client } = getAuthContext()
-  const session = client.useSession() as Readable<AuthSessionState>
 
   type SessionUser = {
     slug?: string | null
@@ -41,7 +36,7 @@
   let removingItem = $state<string | null>(null)
 
   let username = $derived(
-    ($session.data?.user as SessionUser | undefined)?.slug ?? null
+    (page.data.sessionData.data?.user as SessionUser | undefined)?.slug ?? null
   )
   let listUrl = $derived(
     username ? `${annotationsBaseUrl}/@${username}/lists/${listId}` : null
@@ -177,9 +172,10 @@
     <div class="bg-white rounded-lg shadow p-6 mb-6">
       <h2 class="text-xl font-semibold mb-3">List Name</h2>
       <form {...renameListForm} class="space-y-3">
-        <input {...renameListForm.fields.listId.as('hidden', listId)} />
+        <input type="hidden" name="listId" value={listId} />
         <input
-          {...renameListForm.fields.name.as('text')}
+          type="text"
+          name="name"
           value={list.name}
           required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -219,9 +215,10 @@
       })}
       class="flex gap-2"
     >
-      <input {...addListItemByUrlForm.fields.listId.as('hidden', listId)} />
+      <input type="hidden" name="listId" value={listId} />
       <input
-        {...addListItemByUrlForm.fields.url.as('url')}
+        type="url"
+        name="url"
         required
         placeholder="https://annotations.allmaps.org/maps/d9474a8524a4309d"
         class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"

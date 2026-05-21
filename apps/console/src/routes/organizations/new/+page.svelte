@@ -2,7 +2,7 @@
   import { routes } from '$lib/routes.js'
   import { createOrganizationForm } from '../organizations.remote.js'
 
-  const slugPattern = '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'
+  const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
 </script>
 
 <div class="max-w-2xl mx-auto px-4 py-8">
@@ -29,7 +29,8 @@
         </label>
         <input
           id="orgName"
-          {...createOrganizationForm.fields.name.as('text')}
+          type="text"
+          name="name"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="New Organization"
@@ -44,7 +45,8 @@
         </label>
         <input
           id="orgSlug"
-          {...createOrganizationForm.fields.slug.as('text')}
+          type="text"
+          name="slug"
           required
           pattern={slugPattern}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
