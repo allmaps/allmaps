@@ -15,7 +15,7 @@
   import { getIiifState } from '$lib/state/iiif.svelte.js'
   import { getGeocodeState } from '$lib/state/geocode.svelte.js'
 
-  import { getAllmapsId } from '$lib/shared/ids.js'
+  import { getAllmapsId, getHerePreviewUrl } from '$lib/shared/ids.js'
   import { createRouteUrl, gotoRoute } from '$lib/shared/router.js'
 
   import { OG_IMAGE_SIZE } from '$lib/shared/constants.js'
@@ -36,6 +36,11 @@
 
   let postcardUrl = $derived(
     `${page.url.origin}/${getAllmapsId(data.mapId)}/postcard?from=${data.from?.join(',')}`
+  )
+
+  let previewImageUrl = $derived(
+    data.from &&
+      getHerePreviewUrl(data.env.PUBLIC_PREVIEW_BASE_URL, data.mapId, data.from)
   )
 
   // let displayPostcardUrl = $derived(
@@ -129,9 +134,7 @@
               onerror={handleImageError}
               alt="Preview"
               class="rounded-md overflow-hidden"
-              src="{data.env.PUBLIC_PREVIEW_BASE_URL}/{getAllmapsId(
-                data.mapId
-              )}.jpg?from={data.from?.join(',')}"
+              src={previewImageUrl}
             />
             {#if !imageLoaded}
               <div
@@ -185,7 +188,7 @@
           label="Copy link only"
           link={true}
           class="disabled:cursor-not-allowed disabled:text-gray
-              active:translate-[1px] hover:translate-[0.5px]
+              active:translate-px hover:translate-[0.5px]
               hover:bg-gray/20 select-none
               text-sm
               cursor-pointer transition-all px-4 py-2 rounded-lg
@@ -196,7 +199,7 @@
           text={postcardText}
           label="Copy message"
           class="disabled:cursor-not-allowed  bg-pink
-              active:translate-[1px] hover:translate-[0.5px] shadow-none hover:shadow-lg
+              active:translate-px hover:translate-[0.5px] shadow-none hover:shadow-lg
               hover:bg-pink-100 select-none
               text-white hover:text-pink
               disabled:bg-pink/50 disabled:text-white disabled:shadow-none
