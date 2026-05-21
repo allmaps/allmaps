@@ -450,6 +450,9 @@ importers:
       bits-ui:
         specifier: ^2.15.4
         version: 2.15.6(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.2(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.51.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.51.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)))(svelte@5.51.2)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@eslint/compat':
         specifier: ^1.4.0
