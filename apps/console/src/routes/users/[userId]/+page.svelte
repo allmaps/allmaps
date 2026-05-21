@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
+  import { getAbortSignal } from 'svelte'
 
   import { getOrganizationId } from '$lib/organizations.js'
   import { queryResult } from '$lib/query-result.js'
@@ -25,22 +26,13 @@
   const sessionUser = $derived(
     data.sessionData.data?.user as ConsoleUser | undefined
   )
-  const userResult = $derived(
-    data.isAdmin ? await queryResult<ConsoleUser>(getUser(userId)) : null
-  )
-  const organizationsResult = $derived(
-    data.isAdmin
-      ? await queryResult<Organization[]>(getOrganizations())
-      : null
-  )
-  const user = $derived(
-    data.isAdmin
-      ? (userResult?.data ?? null)
-      : data.isCurrentUser
-        ? (sessionUser ?? null)
-        : null
-  )
-  const organizations = $derived(organizationsResult?.data ?? [])
+
+  let user = $state<ConsoleUser | null>(null)
+  let organizations = $state<Organization[]>([])
+  let isLoadingUser = $state(true)
+  let isLoadingOrganizations = $state(false)
+  let loadError = $state<unknown>(null)
+
   const userOrganizations = $derived(user?.organizations ?? [])
 
   let editUserName = $state('')
@@ -56,19 +48,92 @@
   let error = $state<string | null>(null)
   let initializedUserId = $state<string | null>(null)
 
-  const slugPattern = '^[a-z](?:[a-z0-9-]*[a-z0-9])?$'
+  const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
+  const organizationItems = $derived([
+    {
+      value: '',
+      label: isLoadingOrganizations
+        ? 'Loading organizations...'
+        : 'Select an organization'
+    },
+    ...organizations.map((organization) => ({
+      value: organization.id,
+      label: organization.name
+    }))
+  ])
 
-  $effect(() => {
-    if (!user || initializedUserId === userId) {
+  function initializeUserForm(nextUser: ConsoleUser) {
+    editUserName = nextUser.name || ''
+    editUserSlug = nextUser.slug || ''
+    editUserEmail = nextUser.email || ''
+    editUserBanned = nextUser.banned || false
+    editUserRole = (nextUser.role as 'user' | 'admin') || 'user'
+    initializedUserId = userId
+  }
+
+  async function loadUser(signal?: AbortSignal) {
+    isLoadingUser = true
+    loadError = null
+
+    const userLoadResult =
+      data.isAdmin || data.isCurrentUser
+        ? await queryResult<ConsoleUser>(getUser(userId))
+        : { data: null, error: null }
+
+    if (signal?.aborted) {
       return
     }
 
-    editUserName = user.name || ''
-    editUserSlug = user.slug || ''
-    editUserEmail = user.email || ''
-    editUserBanned = user.banned || false
-    editUserRole = (user.role as 'user' | 'admin') || 'user'
-    initializedUserId = userId
+    isLoadingUser = false
+
+    if (userLoadResult.error || !userLoadResult.data) {
+      user = data.isCurrentUser ? (sessionUser ?? null) : null
+      loadError = userLoadResult.error ?? new Error('User not found')
+      return
+    }
+
+    user = userLoadResult.data
+    if (initializedUserId !== userId) {
+      initializeUserForm(userLoadResult.data)
+    }
+  }
+
+  async function loadOrganizations(signal?: AbortSignal) {
+    if (!data.isAdmin) {
+      organizations = []
+      return
+    }
+
+    isLoadingOrganizations = true
+
+    const result = await queryResult<Organization[]>(getOrganizations())
+
+    if (signal?.aborted) {
+      return
+    }
+
+    organizations = result.data ?? []
+    isLoadingOrganizations = false
+  }
+
+  $effect(() => {
+    const signal = getAbortSignal()
+
+    user = null
+    organizations = []
+    isLoadingOrganizations = false
+    editUserName = ''
+    editUserSlug = ''
+    editUserEmail = ''
+    editUserBanned = false
+    editUserRole = 'user'
+    initializedUserId = null
+
+    loadUser(signal).then(() => {
+      if (!signal.aborted) {
+        loadOrganizations(signal)
+      }
+    })
   })
 
   async function changeRole() {
@@ -86,7 +151,8 @@
       await setUserRole({
         userId,
         role: editUserRole
-      }).updates(getUser(userId))
+      })
+      await loadUser()
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to change role'
     } finally {
@@ -115,8 +181,9 @@
         organizationId,
         email: user?.email ?? '',
         role: selectedOrganizationRole
-      }).updates(getUser(userId))
+      })
 
+      await loadUser()
       selectedOrganizationId = ''
       selectedOrganizationRole = 'member'
     } catch (err) {
@@ -151,9 +218,8 @@
     error = null
 
     try {
-      await removeOrganizationMember({ organizationId, userId }).updates(
-        getUser(userId)
-      )
+      await removeOrganizationMember({ organizationId, userId })
+      await loadUser()
     } catch (err) {
       error =
         err instanceof Error
@@ -176,7 +242,25 @@
     </h1>
   </div>
 
-  {#if !user}
+  {#if isLoadingUser}
+    <div class="bg-white rounded-lg shadow p-6" aria-busy="true">
+      <div class="space-y-6">
+        <div>
+          <div class="mb-2 h-4 w-16 rounded bg-gray-200"></div>
+          <div class="h-10 w-full rounded bg-gray-100"></div>
+        </div>
+        <div>
+          <div class="mb-2 h-4 w-16 rounded bg-gray-200"></div>
+          <div class="h-10 w-full rounded bg-gray-100"></div>
+        </div>
+        <div>
+          <div class="mb-2 h-4 w-12 rounded bg-gray-200"></div>
+          <div class="h-10 w-full rounded bg-gray-100"></div>
+        </div>
+        <p class="text-sm text-gray-500">Loading user details...</p>
+      </div>
+    </div>
+  {:else if loadError || !user}
     <div class="bg-white rounded-lg shadow p-6">
       <p class="text-gray-500">User not found.</p>
     </div>
@@ -190,7 +274,7 @@
     {/if}
 
     <form {...updateUserForm} class="bg-white rounded-lg shadow p-6">
-      <input {...updateUserForm.fields.userId.as('hidden', userId)} />
+      <input type="hidden" name="userId" value={userId} />
       <div class="space-y-6">
         <div>
           <label
@@ -201,7 +285,8 @@
           </label>
           <input
             id="userName"
-            {...updateUserForm.fields.name.as('text')}
+            type="text"
+            name="name"
             bind:value={editUserName}
             class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="John Doe"
@@ -217,7 +302,8 @@
           </label>
           <input
             id="userEmail"
-            {...updateUserForm.fields.email.as('email')}
+            type="email"
+            name="email"
             bind:value={editUserEmail}
             required
             class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -234,7 +320,8 @@
           </label>
           <input
             id="userSlug"
-            {...updateUserForm.fields.slug.as('text')}
+            type="text"
+            name="slug"
             bind:value={editUserSlug}
             disabled={!data.isAdmin}
             pattern={slugPattern}
@@ -273,8 +360,9 @@
         <div class="flex items-center">
           <input
             id="userBanned"
-            {...updateUserForm.fields.banned.as('checkbox')}
-            checked={editUserBanned}
+            type="checkbox"
+            name="banned"
+            bind:checked={editUserBanned}
             disabled={!data.isAdmin}
             class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
           />
@@ -374,16 +462,12 @@
                 >
                   Select Organization
                 </label>
-                <select
+                <AppSelect
                   id="orgSelect"
                   bind:value={selectedOrganizationId}
-                  class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">-- Select an organization --</option>
-                  {#each organizations as organization (organization.id)}
-                    <option value={organization.id}>{organization.name}</option>
-                  {/each}
-                </select>
+                  items={organizationItems}
+                  disabled={isLoadingOrganizations}
+                />
               </div>
               <div>
                 <label

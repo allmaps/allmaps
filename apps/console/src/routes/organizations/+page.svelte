@@ -5,7 +5,6 @@
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
   import { getOrganizationId, getUserId } from '$lib/organizations.js'
-  import { queryResult } from '$lib/query-result.js'
   import { routes } from '$lib/routes.js'
   import {
     getSearchField,
@@ -14,9 +13,11 @@
     matchesSearch as matchesSearchValue,
     tableStatePath
   } from '$lib/table.js'
-  import { getOrganizations } from './organizations.remote.js'
 
+  import type { PageProps } from './$types.js'
   import type { Organization } from '$lib/types.js'
+
+  let { data }: PageProps = $props()
 
   const organizationSearchFields = ['name', 'slug', 'domain'] as const
   const organizationSortFields = ['name', 'slug', 'plan', 'createdAt'] as const
@@ -120,8 +121,7 @@
 
     return organizations
   }
-
-  const organizationsResult = $derived(await queryResult(getOrganizations()))
+  const organizations = $derived(data.organizations)
 </script>
 
 {#snippet sortIcon(col: string)}
@@ -170,8 +170,7 @@
     />
   </div>
 
-  {#if organizationsResult.data}
-    {@const organizations = organizationsResult.data}
+  {#if organizations}
     {@const displayedOrganizations = getDisplayedOrganizations(organizations)}
     <DataTable>
       {#snippet thead()}

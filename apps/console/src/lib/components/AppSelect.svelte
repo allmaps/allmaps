@@ -8,6 +8,7 @@
     items,
     placeholder = 'Select…',
     disabled = false,
+    id,
     onchange,
     class: className = 'w-full'
   }: {
@@ -15,6 +16,7 @@
     items: Item[]
     placeholder?: string
     disabled?: boolean
+    id?: string
     onchange?: (value: T) => void
     class?: string
   } = $props()
@@ -31,6 +33,7 @@
   {disabled}
 >
   <Select.Trigger
+    {id}
     class="{className} flex items-center justify-between gap-2 px-3 py-2 border border-gray-300 rounded bg-white text-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
   >
     <span>{selectedLabel}</span>
@@ -38,8 +41,7 @@
   </Select.Trigger>
   <Select.Portal>
     <Select.Content
-      class="z-50 rounded-xl border border-gray-200 bg-white shadow-lg py-1 outline-none"
-      style="width: var(--bits-select-trigger-width)"
+      class="z-50 w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)] rounded-xl border border-gray-200 bg-white shadow-lg py-1 outline-none"
       sideOffset={4}
     >
       <Select.Viewport>
@@ -47,7 +49,7 @@
           <Select.Item
             value={item.value}
             label={item.label}
-            class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 cursor-pointer select-none outline-none data-[highlighted]:bg-gray-50 data-[state=checked]:text-blue-600 data-[state=checked]:font-medium"
+            class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 cursor-pointer select-none outline-none hover:bg-gray-50 data-[highlighted]:bg-gray-50 data-[state=checked]:text-blue-600 data-[state=checked]:font-medium"
           >
             {item.label}
           </Select.Item>

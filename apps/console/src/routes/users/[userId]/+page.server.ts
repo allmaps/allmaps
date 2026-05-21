@@ -1,3 +1,5 @@
+import { getUserId } from '$lib/organizations.js'
+
 import type { PageServerLoad } from './$types'
 
 import type { ConsoleUser } from '../users.remote.js'
@@ -18,7 +20,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
   const session = sessionData as SessionData
   const sessionUser = session.data?.user
   const isAdmin = sessionUser?.role === 'admin'
-  const isCurrentUser = sessionUser?.id === userId
+  const isCurrentUser = sessionUser ? getUserId(sessionUser.id) === userId : false
 
   return {
     userId,

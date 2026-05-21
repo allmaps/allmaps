@@ -16,7 +16,8 @@
         </label>
         <input
           id="name"
-          {...createListForm.fields.name.as('text')}
+          type="text"
+          name="name"
           required
           placeholder="My List"
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
