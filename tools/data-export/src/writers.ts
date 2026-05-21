@@ -1,5 +1,5 @@
 import { createWriteStream } from 'node:fs'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { once } from 'node:events'
 
@@ -21,10 +21,25 @@ type DataExportWritersOptions = {
   outputDirectory: string
 }
 
+type DataExportFile = {
+  filename: string
+  size: number
+}
+
 export type DataExportWriters = {
   close: () => Promise<void>
   writeMap: (map: ApiMap) => Promise<void>
 }
+
+const dataExportFilenames = [
+  'maps.json',
+  'maps.ndjson',
+  'maps.geojson',
+  'maps.geojsonl',
+  'maps-flattened.geojson',
+  'annotations.json',
+  'domains-counted.json'
+]
 
 export async function createDataExportWriters({
   outputDirectory
@@ -94,6 +109,8 @@ export async function createDataExportWriters({
         join(outputDirectory, 'domains-counted.json'),
         `${JSON.stringify(serializeDomainCounts(domainCounts), null, 2)}\n`
       )
+
+      await writeFilesManifest(outputDirectory)
     }
   }
 }
@@ -156,4 +173,18 @@ function getLastPathPart(url: string) {
   } catch {
     return url
   }
+}
+
+async function writeFilesManifest(outputDirectory: string) {
+  const files: DataExportFile[] = await Promise.all(
+    dataExportFilenames.map(async (filename) => ({
+      filename,
+      size: (await stat(join(outputDirectory, filename))).size
+    }))
+  )
+
+  await writeFile(
+    join(outputDirectory, 'files.json'),
+    `${JSON.stringify({ files }, null, 2)}\n`
+  )
 }
