@@ -58,7 +58,11 @@ function createOrganizationDataExportWriters({
 
       if (!writers) {
         writers = await createDataExportWriters({
-          outputDirectory: join(outputDirectory, organizationSlug),
+          outputDirectory: join(
+            outputDirectory,
+            'organizations',
+            organizationSlug
+          ),
           includeDomainCounts: false
         })
         writersByOrganizationSlug.set(organizationSlug, writers)
