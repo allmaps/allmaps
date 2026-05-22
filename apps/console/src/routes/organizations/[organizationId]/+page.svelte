@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
   import { Combobox } from 'bits-ui'
-  import { getAbortSignal } from 'svelte'
 
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { planItems, orgMemberRoleItems } from '$lib/select-items'
@@ -22,10 +21,17 @@
 
   let { data }: PageProps = $props()
   const organizationId = $derived(data.organizationId)
-
-  let organization = $state<Organization | null>(null)
-  let isLoadingOrganization = $state(true)
-  let loadError = $state<unknown>(null)
+  const organizationQuery = $derived(getOrganization(organizationId))
+  const organization = $derived(organizationQuery.current ?? null)
+  const isLoadingOrganization = $derived(
+    !organizationQuery.ready || organizationQuery.loading
+  )
+  const loadError = $derived(
+    organizationQuery.error ??
+      (organizationQuery.ready && !organization
+        ? new Error('Organization not found')
+        : null)
+  )
 
   let editOrgName = $state('')
   let editOrgSlug = $state('')
@@ -117,44 +123,20 @@
     initializedOrganizationId = organizationId
   }
 
-  async function loadOrganization(signal?: AbortSignal) {
-    isLoadingOrganization = true
-    loadError = null
-
-    const result = await queryResult<Organization>(
-      getOrganization(organizationId)
-    )
-
-    if (signal?.aborted) {
-      return
-    }
-
-    isLoadingOrganization = false
-
-    if (result.error || !result.data) {
-      organization = null
-      loadError = result.error ?? new Error('Organization not found')
-      return
-    }
-
-    organization = result.data
-    if (initializedOrganizationId !== organizationId) {
-      initializeOrganizationForm(result.data)
-    }
-  }
-
   $effect(() => {
-    const signal = getAbortSignal()
-
-    organization = null
+    organizationId
     editOrgName = ''
     editOrgSlug = ''
     editHomepage = ''
     editPlan = ''
     editDomains = []
     initializedOrganizationId = null
+  })
 
-    loadOrganization(signal)
+  $effect(() => {
+    if (organization && initializedOrganizationId !== organizationId) {
+      initializeOrganizationForm(organization)
+    }
   })
 
   async function deleteOrganization() {
@@ -222,7 +204,7 @@
         role: newMemberRole
       })
 
-      await loadOrganization()
+      await organizationQuery.refresh()
       resetAddMemberModal()
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to add member'
@@ -244,7 +226,7 @@
     error = null
     try {
       await removeOrganizationMember({ organizationId, userId })
-      await loadOrganization()
+      await organizationQuery.refresh()
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to remove member'
     } finally {
@@ -260,7 +242,7 @@
     error = null
     try {
       await updateOrganizationMemberRole({ organizationId, userId, role })
-      await loadOrganization()
+      await organizationQuery.refresh()
     } catch (err) {
       error =
         err instanceof Error ? err.message : 'Failed to update member role'
