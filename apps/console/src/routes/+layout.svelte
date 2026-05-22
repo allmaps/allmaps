@@ -17,9 +17,6 @@
   import { getUser } from './users/users.remote.js'
 
   import type { Snippet } from 'svelte'
-  import type { Organization } from '$lib/types.js'
-  import type { ListDetail } from '$lib/lists.remote.js'
-  import type { ConsoleUser } from './users/users.remote.js'
 
   import './layout.css'
   import '@allmaps/components/css/fonts.css'
@@ -33,42 +30,6 @@
     href: string
   }
 
-  async function getListBreadcrumbLabel(
-    listQuery: ReturnType<typeof getList>
-  ): Promise<string | null> {
-    try {
-      const list: ListDetail = await listQuery
-
-      return list.label || list.name
-    } catch {
-      return null
-    }
-  }
-
-  async function getOrganizationBreadcrumbLabel(
-    organizationQuery: ReturnType<typeof getOrganization>
-  ): Promise<string | null> {
-    try {
-      const organization: Organization = await organizationQuery
-
-      return organization.name
-    } catch {
-      return null
-    }
-  }
-
-  async function getUserBreadcrumbLabel(
-    userQuery: ReturnType<typeof getUser>
-  ): Promise<string | null> {
-    try {
-      const user: ConsoleUser = await userQuery
-
-      return user.name || user.email || null
-    } catch {
-      return null
-    }
-  }
-
   let { children: pageChildren }: Props = $props()
 
   const apiBaseURL = page.data.env.PUBLIC_REST_BASE_URL
@@ -78,14 +39,7 @@
     apiBaseURL
   })
 
-  const viewTransitionTimeoutMs = 1_500
   let activeViewTransition: ViewTransition | null = null
-
-  function timeout(ms: number) {
-    return new Promise<void>((resolve) => {
-      setTimeout(resolve, ms)
-    })
-  }
 
   onNavigate((navigation) => {
     if (
@@ -100,12 +54,8 @@
       try {
         activeViewTransition?.skipTransition()
 
-        const transition = document.startViewTransition(async () => {
+        const transition = document.startViewTransition(() => {
           resolve()
-          await Promise.race([
-            navigation.complete.catch(() => {}),
-            timeout(viewTransitionTimeoutMs)
-          ])
         })
 
         activeViewTransition = transition
@@ -133,10 +83,24 @@
     listBreadcrumbId ? getList(listBreadcrumbId) : null
   )
   const listBreadcrumbLabel = $derived(
-    listBreadcrumbQuery
-      ? await getListBreadcrumbLabel(listBreadcrumbQuery)
+    listBreadcrumbQuery?.current
+      ? listBreadcrumbQuery.current.label || listBreadcrumbQuery.current.name
       : null
   )
+  let listBreadcrumbLabels = $state<Record<string, string>>({})
+
+  $effect(() => {
+    if (listBreadcrumbId && listBreadcrumbLabel) {
+      listBreadcrumbLabels[listBreadcrumbId] = listBreadcrumbLabel
+    }
+  })
+
+  const resolvedListBreadcrumbLabel = $derived(
+    listBreadcrumbId
+      ? (listBreadcrumbLabel ?? listBreadcrumbLabels[listBreadcrumbId] ?? 'List')
+      : null
+  )
+
   const organizationBreadcrumbId = $derived(
     page.route.id === '/organizations/[organizationId]'
       ? page.params.organizationId
@@ -146,10 +110,25 @@
     organizationBreadcrumbId ? getOrganization(organizationBreadcrumbId) : null
   )
   const organizationBreadcrumbLabel = $derived(
-    organizationBreadcrumbQuery
-      ? await getOrganizationBreadcrumbLabel(organizationBreadcrumbQuery)
+    organizationBreadcrumbQuery?.current?.name ?? null
+  )
+  let organizationBreadcrumbLabels = $state<Record<string, string>>({})
+
+  $effect(() => {
+    if (organizationBreadcrumbId && organizationBreadcrumbLabel) {
+      organizationBreadcrumbLabels[organizationBreadcrumbId] =
+        organizationBreadcrumbLabel
+    }
+  })
+
+  const resolvedOrganizationBreadcrumbLabel = $derived(
+    organizationBreadcrumbId
+      ? (organizationBreadcrumbLabel ??
+        organizationBreadcrumbLabels[organizationBreadcrumbId] ??
+        'Organization')
       : null
   )
+
   const userBreadcrumbId = $derived(
     page.route.id === '/users/[userId]' ? page.params.userId : null
   )
@@ -157,7 +136,22 @@
     userBreadcrumbId ? getUser(userBreadcrumbId) : null
   )
   const userBreadcrumbLabel = $derived(
-    userBreadcrumbQuery ? await getUserBreadcrumbLabel(userBreadcrumbQuery) : null
+    userBreadcrumbQuery?.current
+      ? userBreadcrumbQuery.current.name || userBreadcrumbQuery.current.email
+      : null
+  )
+  let userBreadcrumbLabels = $state<Record<string, string>>({})
+
+  $effect(() => {
+    if (userBreadcrumbId && userBreadcrumbLabel) {
+      userBreadcrumbLabels[userBreadcrumbId] = userBreadcrumbLabel
+    }
+  })
+
+  const resolvedUserBreadcrumbLabel = $derived(
+    userBreadcrumbId
+      ? (userBreadcrumbLabel ?? userBreadcrumbLabels[userBreadcrumbId] ?? 'User')
+      : null
   )
 
   let crumbs = $derived.by((): Crumb[] => {
@@ -181,10 +175,12 @@
       else if (seg === 'lists') label = 'Lists'
       else if (seg === 'new') label = 'New'
       else if (prev === 'users')
-        label = d.isCurrentUser ? 'My Profile' : (userBreadcrumbLabel ?? seg)
+        label = d.isCurrentUser
+          ? 'My Profile'
+          : (resolvedUserBreadcrumbLabel ?? 'User')
       else if (prev === 'organizations')
-        label = organizationBreadcrumbLabel ?? seg
-      else if (prev === 'lists') label = listBreadcrumbLabel ?? seg
+        label = resolvedOrganizationBreadcrumbLabel ?? 'Organization'
+      else if (prev === 'lists') label = resolvedListBreadcrumbLabel ?? 'List'
       else label = seg
 
       result.push({ label, href })
