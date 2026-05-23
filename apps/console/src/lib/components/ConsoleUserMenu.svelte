@@ -9,9 +9,9 @@
     image?: string | null
   }
 
-  const user = $derived(page.data.sessionData.data?.user as
-    | SessionUser
-    | undefined)
+  const user = $derived(
+    page.data.sessionData.data?.user as SessionUser | undefined
+  )
   const apiBaseURL = $derived(page.data.env.PUBLIC_REST_BASE_URL)
   const signInURL = $derived(
     `${apiBaseURL}/login/github?returnTo=${encodeURIComponent(page.url.href)}`
