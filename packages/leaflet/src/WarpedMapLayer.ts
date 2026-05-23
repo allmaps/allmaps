@@ -277,19 +277,19 @@ export class WarpedMapLayer
 
   // Note: borrowed from L.ImageOverlay
   // https://github.com/Leaflet/Leaflet/blob/3b62c7ec96242ee4040cf438a8101a48f8da316d/src/layer/ImageOverlay.js#L225
-  _animateZoom(e: L.ZoomAnimEvent) {
+  _animateZoom(event: L.ZoomAnimEvent) {
     if (!this.canvas) {
       return
     }
 
-    const scale = this._map.getZoomScale(e.zoom)
+    const scale = this._map.getZoomScale(event.zoom)
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     const offset = this._map._latLngBoundsToNewLayerBounds(
       this._map.getBounds(),
-      e.zoom,
-      e.center
+      event.zoom,
+      event.center
     ).min
 
     L.DomUtil.setTransform(this.canvas, offset, scale)

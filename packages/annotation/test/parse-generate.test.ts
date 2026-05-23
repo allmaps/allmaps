@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 
 import { describe, expect, test } from 'vitest'
 
@@ -130,8 +130,14 @@ describe('Generating annotations with invalid resource dimensions', () => {
       }
     }
 
-    expect(annotation.target.source).not.toHaveProperty('width')
-    expect(annotation.target.source).not.toHaveProperty('height')
+    const serializedSource = JSON.parse(
+      JSON.stringify(annotation.target.source)
+    )
+
+    expect(annotation.target.source.width).toBeUndefined()
+    expect(annotation.target.source.height).toBeUndefined()
+    expect(serializedSource).not.toHaveProperty('width')
+    expect(serializedSource).not.toHaveProperty('height')
     expect(annotation.target.selector.value).toBe(
       '<svg><polygon points="117,120 113,1776 4587,1772 4568,101" /></svg>'
     )

@@ -62,12 +62,25 @@ export const HomepageItemSchema = z.object({
   language: z.union([z.string(), z.array(z.string())]).optional()
 })
 
-export const HomepageSchema = oneOrMany(HomepageItemSchema)
+const OptionalHomepageItemSchema = z.union([
+  HomepageItemSchema,
+  z.unknown().transform(() => undefined)
+])
+
+export const HomepageSchema = oneOrMany(OptionalHomepageItemSchema).transform(
+  (values) =>
+    values.filter(
+      (value): value is z.infer<typeof HomepageItemSchema> =>
+        value !== undefined
+    )
+)
 
 export const ProviderItemSchema = z.object({
   id: z.string().url().optional(),
   label: LanguageValueSchema.optional(),
-  homepage: HomepageSchema.optional()
+  homepage: HomepageSchema.transform((values) =>
+    values.length > 0 ? values : undefined
+  ).optional()
 })
 
 export const ProviderSchema = oneOrMany(ProviderItemSchema)
