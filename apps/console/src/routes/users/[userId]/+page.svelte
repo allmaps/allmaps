@@ -28,9 +28,7 @@
   const userQuery = $derived(
     data.isAdmin || data.isCurrentUser ? getUser(userId) : null
   )
-  const organizationsQuery = $derived(
-    data.isAdmin ? getOrganizations() : null
-  )
+  const organizationsQuery = $derived(data.isAdmin ? getOrganizations() : null)
   const user = $derived(
     userQuery?.current ??
       (data.isCurrentUser && userQuery?.error ? (sessionUser ?? null) : null)
@@ -105,6 +103,7 @@
   }
 
   $effect(() => {
+    // eslint-disable-next-line
     userId
     editUserName = ''
     editUserSlug = ''
@@ -170,10 +169,7 @@
         role: selectedOrganizationRole
       })
 
-      await Promise.all([
-        userQuery?.refresh(),
-        organizationsQuery?.refresh()
-      ])
+      await Promise.all([userQuery?.refresh(), organizationsQuery?.refresh()])
       selectedOrganizationId = ''
       organizationSearchValue = ''
       selectedOrganizationRole = 'member'
@@ -210,10 +206,7 @@
 
     try {
       await removeOrganizationMember({ organizationId, userId })
-      await Promise.all([
-        userQuery?.refresh(),
-        organizationsQuery?.refresh()
-      ])
+      await Promise.all([userQuery?.refresh(), organizationsQuery?.refresh()])
     } catch (err) {
       error =
         err instanceof Error
@@ -508,15 +501,11 @@
                                   {organization.name}
                                 </span>
                                 {#if organization.isMember}
-                                  <span
-                                    class="shrink-0 text-xs text-gray-400"
-                                  >
+                                  <span class="shrink-0 text-xs text-gray-400">
                                     Member
                                   </span>
                                 {:else if selected}
-                                  <span
-                                    class="shrink-0 text-xs text-blue-600"
-                                  >
+                                  <span class="shrink-0 text-xs text-blue-600">
                                     Selected
                                   </span>
                                 {/if}

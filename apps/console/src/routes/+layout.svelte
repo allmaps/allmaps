@@ -41,23 +41,18 @@
 
   let activeViewTransition: ViewTransition | null = null
 
-  onNavigate((navigation) => {
+  function startNavigationViewTransition() {
     if (
       !document.startViewTransition ||
       document.visibilityState !== 'visible' ||
-      navigation.willUnload
+      activeViewTransition
     ) {
       return
     }
 
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       try {
-        activeViewTransition?.skipTransition()
-
-        const transition = document.startViewTransition(() => {
-          resolve()
-        })
-
+        const transition = document.startViewTransition(resolve)
         activeViewTransition = transition
 
         transition.ready.catch(() => {})
@@ -74,6 +69,14 @@
         resolve()
       }
     })
+  }
+
+  onNavigate((navigation) => {
+    if (navigation.willUnload) {
+      return
+    }
+
+    return startNavigationViewTransition()
   })
 
   const listBreadcrumbId = $derived(
@@ -97,7 +100,9 @@
 
   const resolvedListBreadcrumbLabel = $derived(
     listBreadcrumbId
-      ? (listBreadcrumbLabel ?? listBreadcrumbLabels[listBreadcrumbId] ?? 'List')
+      ? (listBreadcrumbLabel ??
+          listBreadcrumbLabels[listBreadcrumbId] ??
+          'List')
       : null
   )
 
@@ -124,8 +129,8 @@
   const resolvedOrganizationBreadcrumbLabel = $derived(
     organizationBreadcrumbId
       ? (organizationBreadcrumbLabel ??
-        organizationBreadcrumbLabels[organizationBreadcrumbId] ??
-        'Organization')
+          organizationBreadcrumbLabels[organizationBreadcrumbId] ??
+          'Organization')
       : null
   )
 
@@ -150,7 +155,9 @@
 
   const resolvedUserBreadcrumbLabel = $derived(
     userBreadcrumbId
-      ? (userBreadcrumbLabel ?? userBreadcrumbLabels[userBreadcrumbId] ?? 'User')
+      ? (userBreadcrumbLabel ??
+          userBreadcrumbLabels[userBreadcrumbId] ??
+          'User')
       : null
   )
 
