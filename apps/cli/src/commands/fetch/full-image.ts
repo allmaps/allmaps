@@ -8,7 +8,7 @@ import { generateId } from '@allmaps/id'
 import { fetchImageInfo } from '@allmaps/stdlib'
 import { Image as IIIFImage } from '@allmaps/iiif-parser'
 
-import { readLines } from '../../lib/io.js'
+import { readLines } from '../../lib/io.ts'
 
 export function fullImage() {
   return new Command('full-image')

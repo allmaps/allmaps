@@ -9,19 +9,19 @@ import {
   mergePartialOptions
 } from '@allmaps/stdlib'
 
-import { parseJsonInput, printJson } from '../../lib/io.js'
+import { parseJsonInput, printJson } from '../../lib/io.ts'
 import {
   mustContainGcpsMessage,
   parseAnnotationsValidateMaps,
   parseProjectedGcpTransformOptions,
   parseProjectedGcpTransformerInputOptionsAndMap,
   parseProjectedGcpTransformerOptions
-} from '../../lib/parse.js'
+} from '../../lib/parse.ts'
 import {
   addProjectedGcpTransformerInputOptions,
   addProjectedGcpTransformerOptions,
   addProjectedGcpTransformOptions
-} from '../../lib/options.js'
+} from '../../lib/options.ts'
 
 export function resourceMask() {
   const command = addProjectedGcpTransformerOptions(

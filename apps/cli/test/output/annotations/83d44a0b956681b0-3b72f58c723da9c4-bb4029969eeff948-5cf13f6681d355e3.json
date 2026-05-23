@@ -89,7 +89,35 @@
               "coordinates": [4.9417609671249405, 52.34760385375825]
             }
           }
-        ]
+        ],
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/83d44a0b956681b0",
+          "version": "https://annotations.allmaps.org/maps/83d44a0b956681b0@d072529125f957fc",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/b001de2950590a8d",
+            "version": "https://annotations.allmaps.org/images/b001de2950590a8d@321276476d7b013e",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/fe9bb80c5aeac58f",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/8bb6f2b16a067248",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.068398,
+          "area": 3383975.23
+        }
       }
     },
     {
@@ -179,7 +207,35 @@
               "coordinates": [4.9111822943835675, 52.34277438041752]
             }
           }
-        ]
+        ],
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/3b72f58c723da9c4",
+          "version": "https://annotations.allmaps.org/maps/3b72f58c723da9c4@0c29592708721a1a",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/44a2797e3fc5e3cf",
+            "version": "https://annotations.allmaps.org/images/44a2797e3fc5e3cf@39507e7f79b9be46",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/690ef0be4115bf17",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/d7fe98c9f35ddaa7",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.06824,
+          "area": 3319349.7
+        }
       }
     },
     {
@@ -269,7 +325,35 @@
               "coordinates": [4.947694791032933, 52.33443690782316]
             }
           }
-        ]
+        ],
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/bb4029969eeff948",
+          "version": "https://annotations.allmaps.org/maps/bb4029969eeff948@478767f5cd4d6ae2",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/0618d3727f002bcf",
+            "version": "https://annotations.allmaps.org/images/0618d3727f002bcf@456f123b9180507b",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/8fbb7c2af2d4f414",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/0d2df66aeb62d500",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.125203,
+          "area": 3033063.57
+        }
       }
     },
     {
@@ -359,7 +443,35 @@
               "coordinates": [4.9111822943835675, 52.34277438041752]
             }
           }
-        ]
+        ],
+        "_allmaps": {
+          "id": "https://annotations.allmaps.org/maps/5cf13f6681d355e3",
+          "version": "https://annotations.allmaps.org/maps/5cf13f6681d355e3@e8956fa88f6c1f0a",
+          "image": {
+            "id": "https://annotations.allmaps.org/images/bc5d7040bad8e28b",
+            "version": "https://annotations.allmaps.org/images/bc5d7040bad8e28b@7b01ba21740e99e4",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/52315752c7f388d8",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              },
+              {
+                "id": "https://annotations.allmaps.org/canvases/f0ab0e804fa21f0f",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.009398,
+          "area": 3702571.35
+        }
       }
     }
   ]

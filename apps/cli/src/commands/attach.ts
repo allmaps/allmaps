@@ -3,12 +3,12 @@ import { Command } from '@commander-js/extra-typings'
 import { AttachedTransformation } from '@allmaps/attach'
 import { generateAnnotation } from '@allmaps/annotation'
 
-import { parseJsonInput, printJson } from '../lib/io.js'
+import { parseJsonInput, printJson } from '../lib/io.ts'
 import {
   parseAnnotationsValidateMaps,
   parseAttachInputs
-} from '../lib/parse.js'
-import { addAttachOptions } from '../lib/options.js'
+} from '../lib/parse.ts'
+import { addAttachOptions } from '../lib/options.ts'
 
 export function attach() {
   const command = addAttachOptions(

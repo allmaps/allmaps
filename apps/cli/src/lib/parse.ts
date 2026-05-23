@@ -1,7 +1,6 @@
 import { parseAnnotation, validateGeoreferencedMap } from '@allmaps/annotation'
 
 import {
-  InverseOptions,
   transformationTypeToTypeAndOrder,
   typeAndOrderToTransformationType
 } from '@allmaps/transform'
@@ -17,22 +16,25 @@ import {
   parseGcps,
   parseGcpProjectionFromGcpString,
   parseGdalCoordinateLines,
-  GcpFileFormat,
   supportedGcpFileFormats,
-  GcpResourceOrigin,
-  GcpResourceYAxis,
   supportedGcpResourceYAxis,
   supportedGcpResourceOrigin
 } from '@allmaps/io'
 
-import { readFromFile, parseJsonFromFile } from './io.js'
+import { readFromFile, parseJsonFromFile } from './io.ts'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type {
+  InverseOptions,
   TransformationType,
   TransformationTypeInputs as TransformationTypeInputOptions,
   GcpsInputs as GcpsInputOptions
 } from '@allmaps/transform'
+import type {
+  GcpFileFormat,
+  GcpResourceOrigin,
+  GcpResourceYAxis
+} from '@allmaps/io'
 import type { Gcp, Ring } from '@allmaps/types'
 import type {
   Rcp,

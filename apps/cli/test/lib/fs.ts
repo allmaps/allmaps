@@ -6,8 +6,10 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 export const baseDir = path.join(__dirname, '..')
 
-// TODO: run TS instead of built version
-export const cliPath = path.join(baseDir, '..', 'dist', 'index.js')
+export const cliPath = [
+  'node',
+  path.join(baseDir, '..', 'src', 'index.ts')
+].join(' ')
 
 export function readFile(filename: string) {
   return fs.readFileSync(path.join(baseDir, filename), 'utf8')
