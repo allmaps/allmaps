@@ -10,11 +10,11 @@ import {
   computeBbox
 } from '@allmaps/stdlib'
 
-import { parseJsonInput, printJson } from '../lib/io.js'
+import { parseJsonInput, printJson } from '../lib/io.ts'
 import {
   mustContainGcpsMessage,
   parseAnnotationsValidateMaps
-} from '../lib/parse.js'
+} from '../lib/parse.ts'
 
 import type { Bbox, Polygon } from '@allmaps/types'
 

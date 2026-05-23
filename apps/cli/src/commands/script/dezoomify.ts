@@ -4,7 +4,7 @@ import path from 'path'
 import { generateId } from '@allmaps/id'
 import { generateCheckCommand } from '@allmaps/io'
 
-import { readLines, printString } from '../../lib/io.js'
+import { readLines, printString } from '../../lib/io.ts'
 
 const dezoomifyNotFoundMessage = 'Please install dezoomify-rs'
 

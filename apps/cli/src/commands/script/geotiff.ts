@@ -12,15 +12,15 @@ import {
   addProjectedGcpTransformerInputOptions,
   addProjectedGcpTransformerOptions,
   addProjectedGcpTransformOptions
-} from '../../lib/options.js'
-import { parseJsonInput, printString } from '../../lib/io.js'
+} from '../../lib/options.ts'
+import { parseJsonInput, printString } from '../../lib/io.ts'
 import {
   parseAnnotationsValidateMaps,
   parseProjectedGcpTransformOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformerInputOptionsAndMap,
   mustContainGcpsMessage
-} from '../../lib/parse.js'
+} from '../../lib/parse.ts'
 
 export function geotiff() {
   const command = addProjectedGcpTransformerOptions(

@@ -6,7 +6,7 @@ import {
   mergePartialOptions
 } from '@allmaps/stdlib'
 
-import { readInput, printString, readFromStdinLine } from '../../lib/io.js'
+import { readInput, printString, readFromStdinLine } from '../../lib/io.ts'
 import {
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
@@ -14,13 +14,13 @@ import {
   parseInverseOptions,
   parseCoordinates,
   mustContainGcpsMessage
-} from '../../lib/parse.js'
+} from '../../lib/parse.ts'
 import {
   addAnnotationOptions,
   addProjectedGcpTransformOptions,
   addInverseOptions,
   addProjectedGcpTransformerOptions
-} from '../../lib/options.js'
+} from '../../lib/options.ts'
 
 import type { Point } from '@allmaps/types'
 import type { InverseOptions } from '@allmaps/transform'

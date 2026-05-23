@@ -7,18 +7,18 @@ import {
 } from '@allmaps/stdlib'
 import { lonLatProjection, ProjectedGcpTransformer } from '@allmaps/project'
 
-import { parseJsonInput, printString } from '../../lib/io.js'
+import { parseJsonInput, printString } from '../../lib/io.ts'
 import {
   addAnnotationOptions,
   addProjectedGcpTransformerOptions,
   addProjectedGcpTransformOptions
-} from '../../lib/options.js'
+} from '../../lib/options.ts'
 import {
   mustContainGcpsMessage,
   parseProjectedGcpTransformerInputOptions,
   parseProjectedGcpTransformerOptions,
   parseProjectedGcpTransformOptions
-} from '../../lib/parse.js'
+} from '../../lib/parse.ts'
 
 import type { GeojsonGeometry } from '@allmaps/types/geojson.js'
 

@@ -2,12 +2,12 @@ import { Command } from '@commander-js/extra-typings'
 
 import { Analyzer } from '@allmaps/analyze'
 
-import { parseJsonInput, printAnalysisItem } from '../../lib/io.js'
-import { addAnalyzeInputs } from '../../lib/options.js'
+import { parseJsonInput, printAnalysisItem } from '../../lib/io.ts'
+import { addAnalyzeInputs } from '../../lib/options.ts'
 import {
   parseAnnotationsValidateMaps,
   parseAnalyzeInputs
-} from '../../lib/parse.js'
+} from '../../lib/parse.ts'
 
 export function all() {
   const command = addAnalyzeInputs(

@@ -1,10 +1,10 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { parse } from './annotation/parse.js'
-import { generate } from './annotation/generate.js'
-import { svg } from './annotation/svg.js'
-import { imageIds } from './annotation/image-ids.js'
-import { gcps } from './annotation/gcps.js'
+import { parse } from './annotation/parse.ts'
+import { generate } from './annotation/generate.ts'
+import { svg } from './annotation/svg.ts'
+import { imageIds } from './annotation/image-ids.ts'
+import { gcps } from './annotation/gcps.ts'
 
 export function annotation() {
   return new Command('annotation')
