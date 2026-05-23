@@ -9,6 +9,7 @@ The main pipelines run as follows:
 - Openlayers: [@allmaps/render](../../packages/openlayers/) → [@allmaps/leaflet](../../packages/openlayers/)
 
 With [@allmaps/render](../../packages/render/) relying of most other Allmaps packages, including:
+
 - [@allmaps/id](../../packages/id/)
 - [@allmaps/iiif-parser](../../packages/iiif-parser/)
 - [@allmaps/project](../../packages/project/)
