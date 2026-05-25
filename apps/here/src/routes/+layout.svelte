@@ -31,7 +31,8 @@
     imageInfoState,
     errorState,
     uiState,
-    data.env.PUBLIC_ANNOTATIONS_BASE_URL
+    data.env.PUBLIC_ANNOTATIONS_BASE_URL,
+    data.limit
   )
   // svelte-ignore state_referenced_locally
   setGeocodeState(data.env.PUBLIC_GEOCODE_EARTH_KEY)

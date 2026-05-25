@@ -20,8 +20,6 @@ const THRESHOLD_DISTANCE = 10 // 10 meters
 
 const MAX_AREA = 500_000_000_000
 
-const NEARBY_MAPS_COUNT = 40
-
 const MAPS_KEY = Symbol('maps')
 
 export class MapsState {
@@ -29,6 +27,7 @@ export class MapsState {
   #imageInfoState: ImageInfoState
   #uiState: UiState
   #annotationsBaseUrl: string
+  #limit: number
 
   #fetchCount = $state(0)
   #loading = $state(false)
@@ -69,12 +68,14 @@ export class MapsState {
     imageInfoState: ImageInfoState,
     errorState: ErrorState,
     uiState: UiState,
-    annotationsBaseUrl: string
+    annotationsBaseUrl: string,
+    limit: number
   ) {
     this.#sensorsState = sensorsState
     this.#imageInfoState = imageInfoState
     this.#uiState = uiState
     this.#annotationsBaseUrl = annotationsBaseUrl
+    this.#limit = limit
 
     $effect(() => {
       const newPosition = this.#sensorsState.position
@@ -122,12 +123,12 @@ export class MapsState {
       coords: { latitude, longitude }
     } = position
 
-    const url = `${this.#annotationsBaseUrl}/maps?limit=${NEARBY_MAPS_COUNT}&intersects=${[
+    const url = `${this.#annotationsBaseUrl}/maps?limit=${this.#limit}&intersects=${[
       latitude,
       longitude
     ].join(',')}&maxarea=${MAX_AREA}`
 
-    const annotations = await fetchJson(url)
+    const annotations = await fetchJson(url, { credentials: 'include' })
     const maps = parseAnnotation(annotations)
 
     this.#mapsFromCoordinates = new SvelteMap(
@@ -200,7 +201,8 @@ export function setMapsState(
   imageInfoState: ImageInfoState,
   errorState: ErrorState,
   uiState: UiState,
-  annotationsBaseUrl: string
+  annotationsBaseUrl: string,
+  limit: number
 ) {
   return setContext(
     MAPS_KEY,
@@ -209,7 +211,8 @@ export function setMapsState(
       imageInfoState,
       errorState,
       uiState,
-      annotationsBaseUrl
+      annotationsBaseUrl,
+      limit
     )
   )
 }
