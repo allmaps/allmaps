@@ -11,6 +11,7 @@ import type { GeojsonRoute } from '$lib/shared/types.js'
 import type { LayoutServerLoad } from './$types.js'
 
 const herePublicEnv = parseHerePublicEnv(publicEnv)
+const DEFAULT_LIMIT = 50
 
 export const load: LayoutServerLoad = async ({ url, fetch }) => {
   let geojsonRoute: GeojsonRoute | undefined
@@ -22,6 +23,11 @@ export const load: LayoutServerLoad = async ({ url, fetch }) => {
   const fromParam = url.searchParams.get('from') || undefined
   const colorParam = url.searchParams.get('color') || undefined
   const positionParam = url.searchParams.get('position') || undefined
+  const limitParam = url.searchParams.get('limit') || undefined
+  const urlLimit = limitParam ? Number(limitParam) : DEFAULT_LIMIT
+  const limit = Number.isFinite(urlLimit)
+    ? Math.max(1, urlLimit)
+    : DEFAULT_LIMIT
 
   if (geojsonParam) {
     let response: Response | undefined
@@ -170,6 +176,7 @@ export const load: LayoutServerLoad = async ({ url, fetch }) => {
     from,
     color,
     position,
+    limit,
     env: herePublicEnv
   }
 }
