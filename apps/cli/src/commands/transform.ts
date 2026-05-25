@@ -1,9 +1,9 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { svg } from './transform/svg.js'
-import { geojson } from './transform/geojson.js'
-import { resourceMask } from './transform/resource-mask.js'
-import { coordinates } from './transform/coordinates.js'
+import { svg } from './transform/svg.ts'
+import { geojson } from './transform/geojson.ts'
+import { resourceMask } from './transform/resource-mask.ts'
+import { coordinates } from './transform/coordinates.ts'
 
 export function transform() {
   return new Command('transform')

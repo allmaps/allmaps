@@ -2,7 +2,7 @@ import { Command } from '@commander-js/extra-typings'
 
 import { generateId } from '@allmaps/id'
 
-import { readFromStdin, printString } from '../lib/io.js'
+import { readFromStdin, printString } from '../lib/io.ts'
 
 export function id() {
   return new Command('id')

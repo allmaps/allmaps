@@ -1,7 +1,8 @@
-import { AnalysisItem } from '@allmaps/analyze'
 import { createReadStream, readFileSync, ReadStream } from 'fs'
 import { Readable } from 'stream'
 import StreamValues from 'stream-json/streamers/StreamValues.js'
+
+import type { AnalysisItem } from '@allmaps/analyze'
 
 // Read Input: files (or file) and stdin. For reading general files (svg, strings, ...).
 

@@ -20,7 +20,9 @@ export const load: PageServerLoad = async ({ params, parent }) => {
   const session = sessionData as SessionData
   const sessionUser = session.data?.user
   const isAdmin = sessionUser?.role === 'admin'
-  const isCurrentUser = sessionUser ? getUserId(sessionUser.id) === userId : false
+  const isCurrentUser = sessionUser
+    ? getUserId(sessionUser.id) === userId
+    : false
 
   return {
     userId,

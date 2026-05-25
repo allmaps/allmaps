@@ -36,7 +36,7 @@
     const mapsUrl = `https://api.allmaps.org/maps?limit=${count}`
 
     try {
-      const response = await fetch(mapsUrl)
+      const response = await fetch(mapsUrl, { credentials: 'include' })
       apiMaps = await response.json()
 
       if (!Array.isArray(apiMaps)) {

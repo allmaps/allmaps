@@ -5,7 +5,7 @@ import {
   parseCommanderGcpFileFormatOption,
   parseCommanderGcpResourceOrigin,
   parseCommanderGcpResourceYAxis
-} from './parse.js'
+} from './parse.ts'
 
 export function addAnnotationOptions<
   Args extends unknown[] = [],

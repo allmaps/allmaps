@@ -5,16 +5,15 @@
 
   import Latest from '$lib/components/Latest.svelte'
 
-  const DEFAULT_COUNT = 250
-  const MAX_COUNT = 1000
+  const DEFAULT_LIMIT = 100
 
-  let urlCount = $derived(
-    Number(page.url.searchParams.get('count')) || DEFAULT_COUNT
+  let urlLimit = $derived(
+    Number(page.url.searchParams.get('limit')) || DEFAULT_LIMIT
   )
-  let count = $derived(Math.max(1, Math.min(MAX_COUNT, urlCount)))
+  let limit = $derived(Math.max(1, urlLimit))
 </script>
 
 <Stats />
 <main class="p-3">
-  <Latest {count} showHeader={true} />
+  <Latest count={limit} showHeader={true} />
 </main>

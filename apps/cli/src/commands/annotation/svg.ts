@@ -1,15 +1,15 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { parseJsonInput, printString } from '../../lib/io.js'
+import { parseJsonInput, printString } from '../../lib/io.ts'
 import {
   parseAnnotationInputOptions,
   parseAnnotationsValidateMaps
-} from '../../lib/parse.js'
+} from '../../lib/parse.ts'
 import {
   svgGeometriesToSvgString,
   mapToResourceMaskSvgPolygon
 } from '@allmaps/stdlib'
-import { addAnnotationInputOptions } from '../../lib/options.js'
+import { addAnnotationInputOptions } from '../../lib/options.ts'
 
 export function svg() {
   const command = addAnnotationInputOptions(

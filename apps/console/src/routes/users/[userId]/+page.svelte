@@ -1,9 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { getAbortSignal } from 'svelte'
+  import { Combobox } from 'bits-ui'
 
   import { getOrganizationId } from '$lib/organizations.js'
-  import { queryResult } from '$lib/query-result.js'
   import { routes } from '$lib/routes.js'
 
   import UserLists from '$lib/components/UserLists.svelte'
@@ -17,7 +16,6 @@
   import { getUser, setUserRole, updateUserForm } from '../users.remote.js'
 
   import type { PageProps } from './$types'
-  import type { Organization } from '$lib/types.js'
   import type { ConsoleUser } from '../users.remote.js'
 
   let { data }: PageProps = $props()
@@ -27,11 +25,27 @@
     data.sessionData.data?.user as ConsoleUser | undefined
   )
 
-  let user = $state<ConsoleUser | null>(null)
-  let organizations = $state<Organization[]>([])
-  let isLoadingUser = $state(true)
-  let isLoadingOrganizations = $state(false)
-  let loadError = $state<unknown>(null)
+  const userQuery = $derived(
+    data.isAdmin || data.isCurrentUser ? getUser(userId) : null
+  )
+  const organizationsQuery = $derived(data.isAdmin ? getOrganizations() : null)
+  const user = $derived(
+    userQuery?.current ??
+      (data.isCurrentUser && userQuery?.error ? (sessionUser ?? null) : null)
+  )
+  const organizations = $derived(organizationsQuery?.current ?? [])
+  const isLoadingUser = $derived(
+    userQuery ? !userQuery.ready || userQuery.loading : false
+  )
+  const isLoadingOrganizations = $derived(
+    organizationsQuery
+      ? !organizationsQuery.ready || organizationsQuery.loading
+      : false
+  )
+  const loadError = $derived(
+    userQuery?.error ??
+      (userQuery?.ready && !user ? new Error('User not found') : null)
+  )
 
   const userOrganizations = $derived(user?.organizations ?? [])
 
@@ -42,6 +56,7 @@
   let editUserRole = $state<'user' | 'admin'>('user')
   let isChangingRole = $state(false)
   let selectedOrganizationId = $state('')
+  let organizationSearchValue = $state('')
   let selectedOrganizationRole = $state<'admin' | 'member'>('member')
   let isAddingToOrganization = $state(false)
   let removingOrganizationId = $state<string | null>(null)
@@ -49,18 +64,34 @@
   let initializedUserId = $state<string | null>(null)
 
   const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
-  const organizationItems = $derived([
-    {
-      value: '',
-      label: isLoadingOrganizations
-        ? 'Loading organizations...'
-        : 'Select an organization'
-    },
-    ...organizations.map((organization) => ({
-      value: organization.id,
-      label: organization.name
-    }))
-  ])
+  const userOrganizationIdSet = $derived(
+    new Set(
+      userOrganizations.map((membership) =>
+        getOrganizationId(membership.organization.id)
+      )
+    )
+  )
+  const organizationItems = $derived(
+    organizations
+      .map((organization) => ({
+        value: organization.id,
+        label: organization.name,
+        name: organization.name,
+        isMember: userOrganizationIdSet.has(getOrganizationId(organization.id))
+      }))
+      .sort((firstOrganization, secondOrganization) =>
+        firstOrganization.label.localeCompare(secondOrganization.label)
+      )
+  )
+  const filteredOrganizationItems = $derived(
+    organizationSearchValue.trim()
+      ? organizationItems.filter((organization) =>
+          organization.label
+            .toLowerCase()
+            .includes(organizationSearchValue.trim().toLowerCase())
+        )
+      : organizationItems
+  )
 
   function initializeUserForm(nextUser: ConsoleUser) {
     editUserName = nextUser.name || ''
@@ -71,69 +102,24 @@
     initializedUserId = userId
   }
 
-  async function loadUser(signal?: AbortSignal) {
-    isLoadingUser = true
-    loadError = null
-
-    const userLoadResult =
-      data.isAdmin || data.isCurrentUser
-        ? await queryResult<ConsoleUser>(getUser(userId))
-        : { data: null, error: null }
-
-    if (signal?.aborted) {
-      return
-    }
-
-    isLoadingUser = false
-
-    if (userLoadResult.error || !userLoadResult.data) {
-      user = data.isCurrentUser ? (sessionUser ?? null) : null
-      loadError = userLoadResult.error ?? new Error('User not found')
-      return
-    }
-
-    user = userLoadResult.data
-    if (initializedUserId !== userId) {
-      initializeUserForm(userLoadResult.data)
-    }
-  }
-
-  async function loadOrganizations(signal?: AbortSignal) {
-    if (!data.isAdmin) {
-      organizations = []
-      return
-    }
-
-    isLoadingOrganizations = true
-
-    const result = await queryResult<Organization[]>(getOrganizations())
-
-    if (signal?.aborted) {
-      return
-    }
-
-    organizations = result.data ?? []
-    isLoadingOrganizations = false
-  }
-
   $effect(() => {
-    const signal = getAbortSignal()
-
-    user = null
-    organizations = []
-    isLoadingOrganizations = false
+    // eslint-disable-next-line
+    userId
     editUserName = ''
     editUserSlug = ''
     editUserEmail = ''
     editUserBanned = false
     editUserRole = 'user'
     initializedUserId = null
+    selectedOrganizationId = ''
+    organizationSearchValue = ''
+    selectedOrganizationRole = 'member'
+  })
 
-    loadUser(signal).then(() => {
-      if (!signal.aborted) {
-        loadOrganizations(signal)
-      }
-    })
+  $effect(() => {
+    if (user && initializedUserId !== userId) {
+      initializeUserForm(user)
+    }
   })
 
   async function changeRole() {
@@ -152,7 +138,7 @@
         userId,
         role: editUserRole
       })
-      await loadUser()
+      await userQuery?.refresh()
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to change role'
     } finally {
@@ -183,8 +169,9 @@
         role: selectedOrganizationRole
       })
 
-      await loadUser()
+      await Promise.all([userQuery?.refresh(), organizationsQuery?.refresh()])
       selectedOrganizationId = ''
+      organizationSearchValue = ''
       selectedOrganizationRole = 'member'
     } catch (err) {
       error =
@@ -219,7 +206,7 @@
 
     try {
       await removeOrganizationMember({ organizationId, userId })
-      await loadUser()
+      await Promise.all([userQuery?.refresh(), organizationsQuery?.refresh()])
     } catch (err) {
       error =
         err instanceof Error
@@ -462,12 +449,74 @@
                 >
                   Select Organization
                 </label>
-                <AppSelect
-                  id="orgSelect"
+                <Combobox.Root
+                  type="single"
                   bind:value={selectedOrganizationId}
                   items={organizationItems}
-                  disabled={isLoadingOrganizations}
-                />
+                  onOpenChangeComplete={(open) => {
+                    if (!open) organizationSearchValue = ''
+                  }}
+                >
+                  <div class="relative">
+                    <Combobox.Input
+                      autocomplete="off"
+                      id="orgSelect"
+                      oninput={(event) =>
+                        (organizationSearchValue = event.currentTarget.value)}
+                      class="w-full px-3 py-2 pr-9 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      placeholder={isLoadingOrganizations
+                        ? 'Loading organizations...'
+                        : 'Search organizations'}
+                      disabled={isLoadingOrganizations}
+                      aria-label="Search organizations"
+                    />
+                    <Combobox.Trigger
+                      class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs disabled:opacity-50 cursor-pointer"
+                      disabled={isLoadingOrganizations}
+                      aria-label="Show organizations"
+                    >
+                      ▾
+                    </Combobox.Trigger>
+                  </div>
+                  <Combobox.Portal>
+                    <Combobox.Content
+                      class="z-50 w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)] rounded-xl border border-gray-200 bg-white shadow-lg py-1 outline-none"
+                      sideOffset={4}
+                    >
+                      <Combobox.Viewport class="max-h-72 overflow-y-auto">
+                        {#if filteredOrganizationItems.length === 0}
+                          <div class="px-3 py-2 text-sm text-gray-500">
+                            No organizations found.
+                          </div>
+                        {:else}
+                          {#each filteredOrganizationItems as organization (organization.value)}
+                            <Combobox.Item
+                              value={organization.value}
+                              label={organization.label}
+                              disabled={organization.isMember}
+                              class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 cursor-pointer select-none outline-none hover:bg-gray-50 data-[highlighted]:bg-gray-50 data-[state=checked]:text-blue-600 data-[state=checked]:font-medium data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:bg-white"
+                            >
+                              {#snippet children({ selected })}
+                                <span class="min-w-0 flex-1 truncate">
+                                  {organization.name}
+                                </span>
+                                {#if organization.isMember}
+                                  <span class="shrink-0 text-xs text-gray-400">
+                                    Member
+                                  </span>
+                                {:else if selected}
+                                  <span class="shrink-0 text-xs text-blue-600">
+                                    Selected
+                                  </span>
+                                {/if}
+                              {/snippet}
+                            </Combobox.Item>
+                          {/each}
+                        {/if}
+                      </Combobox.Viewport>
+                    </Combobox.Content>
+                  </Combobox.Portal>
+                </Combobox.Root>
               </div>
               <div>
                 <label

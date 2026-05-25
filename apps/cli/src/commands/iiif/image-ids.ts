@@ -1,9 +1,9 @@
 import { Command } from '@commander-js/extra-typings'
 import { prettifyError, ZodError } from 'zod'
 
-import { parseJsonInput, printString } from '../../lib/io.js'
-import { parseIiif } from '../../lib/iiif.js'
-import { addParseIiifOptions } from '../../lib/options.js'
+import { parseJsonInput, printString } from '../../lib/io.ts'
+import { parseIiif } from '../../lib/iiif.ts'
+import { addParseIiifOptions } from '../../lib/options.ts'
 
 import type {
   Image as IIIFImage,

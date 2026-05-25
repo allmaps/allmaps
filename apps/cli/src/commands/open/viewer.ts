@@ -1,8 +1,8 @@
 import open from 'open'
 import { Command } from '@commander-js/extra-typings'
 
-import { parseJsonInput } from '../../lib/io.js'
-import { parseAnnotationsValidateMaps } from '../../lib/parse.js'
+import { parseJsonInput } from '../../lib/io.ts'
+import { parseAnnotationsValidateMaps } from '../../lib/parse.ts'
 import { generateAnnotation } from '@allmaps/annotation'
 
 export function viewer() {

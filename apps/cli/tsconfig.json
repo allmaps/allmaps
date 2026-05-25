@@ -4,6 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "declaration": false,
     "composite": false,
+    "rewriteRelativeImportExtensions": true,
     "rootDir": "./src",
     "outDir": "./dist"
   },

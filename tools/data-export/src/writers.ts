@@ -19,6 +19,7 @@ import type { Writable } from 'node:stream'
 
 type DataExportWritersOptions = {
   outputDirectory: string
+  includeDomainCounts?: boolean
 }
 
 type DataExportFile = {
@@ -37,12 +38,14 @@ const dataExportFilenames = [
   'maps.geojson',
   'maps.geojsonl',
   'maps-flattened.geojson',
-  'annotations.json',
-  'domains-counted.json'
+  'annotations.json'
 ]
 
+const dataExportDomainCountFilenames = ['domains-counted.json']
+
 export async function createDataExportWriters({
-  outputDirectory
+  outputDirectory,
+  includeDomainCounts = true
 }: DataExportWritersOptions): Promise<DataExportWriters> {
   await mkdir(outputDirectory, { recursive: true })
 
@@ -73,7 +76,9 @@ export async function createDataExportWriters({
       const separator = isFirstMap ? '' : ','
       const annotation = generateAnnotation(map)
 
-      addMapDomain(domainCounts, map)
+      if (includeDomainCounts) {
+        addMapDomain(domainCounts, map)
+      }
 
       await write(mapsJson, `${separator}${JSON.stringify(map)}`)
       await write(mapsNdjson, `${JSON.stringify(map)}\n`)
@@ -105,12 +110,14 @@ export async function createDataExportWriters({
         close(annotationsJson)
       ])
 
-      await writeFile(
-        join(outputDirectory, 'domains-counted.json'),
-        `${JSON.stringify(serializeDomainCounts(domainCounts), null, 2)}\n`
-      )
+      if (includeDomainCounts) {
+        await writeFile(
+          join(outputDirectory, 'domains-counted.json'),
+          `${JSON.stringify(serializeDomainCounts(domainCounts), null, 2)}\n`
+        )
+      }
 
-      await writeFilesManifest(outputDirectory)
+      await writeFilesManifest(outputDirectory, includeDomainCounts)
     }
   }
 }
@@ -175,9 +182,16 @@ function getLastPathPart(url: string) {
   }
 }
 
-async function writeFilesManifest(outputDirectory: string) {
+async function writeFilesManifest(
+  outputDirectory: string,
+  includeDomainCounts: boolean
+) {
+  const filenames = includeDomainCounts
+    ? [...dataExportFilenames, ...dataExportDomainCountFilenames]
+    : dataExportFilenames
+
   const files: DataExportFile[] = await Promise.all(
-    dataExportFilenames.map(async (filename) => ({
+    filenames.map(async (filename) => ({
       filename,
       size: (await stat(join(outputDirectory, filename))).size
     }))

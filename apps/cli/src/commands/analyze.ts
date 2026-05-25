@@ -1,9 +1,9 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { info } from './analyze/info.js'
-import { warnings } from './analyze/warnings.js'
-import { errors } from './analyze/errors.js'
-import { all } from './analyze/all.js'
+import { info } from './analyze/info.ts'
+import { warnings } from './analyze/warnings.ts'
+import { errors } from './analyze/errors.ts'
+import { all } from './analyze/all.ts'
 
 export function analyze() {
   return new Command('analyze')

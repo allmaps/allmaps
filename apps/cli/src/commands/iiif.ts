@@ -1,8 +1,8 @@
 import { Command } from '@commander-js/extra-typings'
 
-import { parse } from './iiif/parse.js'
-import { manifest } from './iiif/manifest.js'
-import { imageIds } from './iiif/image-ids.js'
+import { parse } from './iiif/parse.ts'
+import { manifest } from './iiif/manifest.ts'
+import { imageIds } from './iiif/image-ids.ts'
 
 export function iiif() {
   return new Command('iiif')

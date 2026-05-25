@@ -2,8 +2,8 @@ import { Command } from '@commander-js/extra-typings'
 
 import { IIIF, Image, Manifest } from '@allmaps/iiif-parser'
 
-import { parseJsonInput, printJson } from '../../lib/io.js'
-import { generateManifest } from '../../lib/iiif.js'
+import { parseJsonInput, printJson } from '../../lib/io.ts'
+import { generateManifest } from '../../lib/iiif.ts'
 
 // Instead of supplying input files, you can also use the standard input
 
