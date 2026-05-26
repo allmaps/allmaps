@@ -65,6 +65,7 @@
       // @ts-expect-error MapLibre types are incompatible
       style: basemapStyle('en'),
       maxPitch: 0,
+      bearingSnap: 0,
       hash: true,
       attributionControl: false
     })
