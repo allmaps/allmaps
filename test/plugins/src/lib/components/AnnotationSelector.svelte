@@ -11,6 +11,15 @@
     annotationObjects?: (AnnotationObject | undefined)[]
   } = $props()
 
+  let annotationInput: HTMLInputElement | undefined = $state()
+
+  $effect(() => {
+    setTimeout(() => {
+      annotationInput?.focus()
+      annotationInput?.select()
+    }, 0)
+  })
+
   $effect(() => {
     if (!annotationUrl) {
       return
@@ -48,6 +57,7 @@
     <label for="annotation-input">Annotation</label>
     <div class="range-row">
       <input
+        bind:this={annotationInput}
         type="url"
         id="annotation-input"
         placeholder="URL or JSON…"
