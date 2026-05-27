@@ -52,7 +52,8 @@ import type {
   AnimationOptions,
   Renderer,
   SpecificWebGL2RenderOptions,
-  WebGL2RenderOptions
+  WebGL2RenderOptions,
+  WebGL2WarpedMapOptions
 } from '../shared/types.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
@@ -174,30 +175,26 @@ export class WebGL2Renderer
       pointsProgram
     )
 
+    const defaultSpecificWebGL2RenderOptions = {
+      warpedMapFactory,
+      anticipateInteraction: true
+    }
+
     super(
       CacheableWorkerImageDataTile.createFactory(
         wrappedWorker,
         wrappedSpritesWorker
       ),
-      mergeOptions(
-        {
-          warpedMapFactory
-        },
-        options
-      )
+      mergeOptions(defaultSpecificWebGL2RenderOptions, options)
     )
-
-    this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS = { warpedMapFactory }
 
     this.#worker = worker
     this.#spritesWorker = spritesWorker
     this.gl = gl
     this.#boundThrottledChangedByMapId = new Map()
 
-    this.options = mergeOptions(
-      this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
-      this.options
-    )
+    this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS =
+      defaultSpecificWebGL2RenderOptions
 
     this.mapProgram = mapProgram
     this.linesProgram = linesProgram
@@ -294,6 +291,16 @@ export class WebGL2Renderer
     for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
       webgl2WarpedMap.initializeWebGL(mapProgram, linesProgram, pointsProgram)
     }
+  }
+
+  /**
+   * Get the default options of the renderer and list
+   */
+  getDefaultOptions(): WebGL2RenderOptions & WebGL2WarpedMapOptions {
+    return mergeOptions(
+      super.getDefaultOptions(),
+      this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS
+    )
   }
 
   /**
@@ -477,11 +484,6 @@ export class WebGL2Renderer
         return false
       }
     }
-  }
-
-  protected shouldAnticipateInteraction() {
-    // Get a map's overview tiles only for this render
-    return true
   }
 
   #renderInternal() {

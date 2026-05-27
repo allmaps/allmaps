@@ -87,22 +87,24 @@ export function triangulateToUnique(
 ): TriangulationToUnique {
   const options = mergeOptions(defaultTriangulationOptions, partialOptions)
 
-  // Conform polygon and steiner polygons (this also checks if there are at least 3 points)
+  // Conform polygon and Steiner polygons (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
   const polygonIsRectangle = polygonIsBboxRectangle(polygon)
   let steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
     conformPolygon(steinerPolygon)
   )
-  // Split polygon and steiner polygons
+
+  // Split polygon and Steiner polygons using Steiner points
   const steinerPointIndex = buildKDBushPointIndex(options.steinerPoints)
   polygon = splitPolygonLines(polygon, options.steinerPoints, steinerPointIndex)
   steinerPolygons = steinerPolygons.map((steinerPolygon) =>
     splitPolygonLines(steinerPolygon, options.steinerPoints, steinerPointIndex)
   )
+
   // Preprocess polygon
   const polygonForInsidenessCheck = preprocessPolygonForInsideCheck(polygon)
 
-  // Gather Steinerpoints (don't require them to be in polygon)
+  // Gather Steinerpoints
   const steinerPointsInPolygon = options.steinerPoints.filter((point) =>
     coordsInPolygonForInsidenessCheck(
       point[0],
