@@ -45,6 +45,7 @@
     "@allmaps/types": "workspace:^",
     "@kninnug/constrainautor": "^4.0.1",
     "delaunator": "^5.0.1",
+    "kdbush": "^4.1.0",
     "robust-predicates": "^3.0.3"
   },
   "devDependencies": {

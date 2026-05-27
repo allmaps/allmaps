@@ -20,12 +20,14 @@ import type {
 } from '@allmaps/types'
 
 import {
-  getGridPointsInBbox,
+  bboxToGridPoints,
   interpolateRing,
   interpolatePolygon,
   coordsInPolygonForInsidenessCheck,
   preprocessPolygonForInsideCheck,
-  coordsInPolygonsForInsidenessCheck
+  coordsInPolygonsForInsidenessCheck,
+  buildKDBushPointIndex,
+  splitPolygonLines
 } from './shared.js'
 
 import type { TriangluationOptions, TriangulationToUnique } from './types.js'
@@ -85,13 +87,20 @@ export function triangulateToUnique(
 ): TriangulationToUnique {
   const options = mergeOptions(defaultTriangulationOptions, partialOptions)
 
-  // Conform polygons (this also checks if there are at least 3 points)
+  // Conform polygon and steiner polygons (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
-  const polygonForInsidenessCheck = preprocessPolygonForInsideCheck(polygon)
-  const polygonIsBbox = polygonIsBboxRectangle(polygon)
-  const steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
+  const polygonIsRectangle = polygonIsBboxRectangle(polygon)
+  let steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
     conformPolygon(steinerPolygon)
   )
+  // Split polygon and steiner polygons
+  const steinerPointIndex = buildKDBushPointIndex(options.steinerPoints)
+  polygon = splitPolygonLines(polygon, options.steinerPoints, steinerPointIndex)
+  steinerPolygons = steinerPolygons.map((steinerPolygon) =>
+    splitPolygonLines(steinerPolygon, options.steinerPoints, steinerPointIndex)
+  )
+  // Preprocess polygon
+  const polygonForInsidenessCheck = preprocessPolygonForInsideCheck(polygon)
 
   // Gather Steinerpoints (don't require them to be in polygon)
   const steinerPointsInPolygon = options.steinerPoints.filter((point) =>
@@ -119,7 +128,7 @@ export function triangulateToUnique(
     )
 
     // Add grid points inside the polygon
-    gridPoints = getGridPointsInBbox(computeBbox(polygon), distance)
+    gridPoints = bboxToGridPoints(computeBbox(polygon), distance)
     gridPointsInPolygon = gridPoints.filter((point) =>
       coordsInPolygonForInsidenessCheck(
         point[0],
@@ -233,7 +242,7 @@ export function triangulateToUnique(
     // This check for every triangle is expensive!
     if (triangleIsAlongInterpolatedPolygon[index]) {
       return (
-        (polygonIsBbox
+        (polygonIsRectangle
           ? true
           : coordsInPolygonForInsidenessCheck(
               triangleMidPoints[index][0],
