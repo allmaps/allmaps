@@ -68,9 +68,9 @@ export const DEFAULT_WARPED_MAP_OPTIONS: WarpedMapOptions = {
   internalProjection: webMercatorProjection,
   projection: webMercatorProjection,
   visible: true,
-  overviewTiles: false,
-  overviewTilesSelection: 'lowest',
+  anticipateVisibility: false,
   overviewTilesMaxResolution: undefined, // Used to be 1024 * 1024 to support one such tile, e.g. for Rotterdam map.
+  overviewTilesSelection: 'lowest',
   applyMask: true,
   distortionMeasure: undefined
 }

@@ -79,7 +79,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // TODO: move defaults for tunable options here
     this.DEFAULT_SPECIFIC_BASE_RENDER_OPTIONS = {
-      anticipateOverviewTiles: true,
+      anticipateInteraction: false,
 
       // These buffers should be in growing order
       requestViewportBufferRatio: 0,
@@ -422,7 +422,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // to make sure prune info is made and maps are pruned
     return Array.from(
       this.findMapsInViewport(
-        this.shouldAnticipateInteraction()
+        this.options.anticipateInteraction
           ? this.options.overviewPruneViewportBufferRatio
           : 1
       )
@@ -434,12 +434,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
   protected shouldRequestFetchableTiles() {
     return true
-  }
-
-  // Should we anticipate user interaction (panning or zooming)
-  // and hence buffer the viewport or get overview tiles
-  protected shouldAnticipateInteraction() {
-    return false
   }
 
   protected assureProjection() {
@@ -466,25 +460,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const overviewFetchableTilesForViewport: FetchableTile[] = []
 
     const mapsInViewportForRequest = this.findMapsInViewport(
-      this.shouldAnticipateInteraction()
+      this.options.anticipateInteraction
         ? this.options.requestViewportBufferRatio
         : 1
     )
     const mapsInViewportForOverviewRequest = new Set([
       ...this.findMapsInViewport(
-        this.shouldAnticipateInteraction()
+        this.options.anticipateInteraction
           ? this.options.overviewRequestViewportBufferRatio
           : 1
       ),
       ...this.findMapsToAnticipate()
     ])
     const mapsInViewportForPrune = this.findMapsInViewport(
-      this.shouldAnticipateInteraction()
+      this.options.anticipateInteraction
         ? this.options.pruneViewportBufferRatio
         : 1
     )
     const mapsInViewportForOverviewPrune = this.findMapsInViewport(
-      this.shouldAnticipateInteraction()
+      this.options.anticipateInteraction
         ? this.options.overviewPruneViewportBufferRatio
         : 1
     )
@@ -520,10 +514,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Get overview fetchable tiles for all maps in viewport with overview buffer
     // (and set properties for the current viewport for all maps in viewport with prune buffer)
-    if (
-      this.shouldAnticipateInteraction() &&
-      this.options.anticipateOverviewTiles
-    ) {
+    if (this.options.anticipateInteraction) {
       for (const mapId of mapsInViewportForOverviewPrune) {
         const mapOverviewFetchableTilesForViewport =
           this.getMapOverviewFetchableTilesForViewport(
@@ -551,7 +542,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const allRequestedTilesForViewport = allFetchableTilesForViewport.filter(
       (fetchableTile) => {
         const warpedMap = this.warpedMapList.getWarpedMap(fetchableTile.mapId)
-        return warpedMap?.shouldRenderMap() || warpedMap?.options.overviewTiles
+        return (
+          warpedMap?.shouldRenderMap() ||
+          warpedMap?.options.anticipateVisibility
+        )
       }
     )
 
@@ -613,7 +607,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     return new Set(
       this.warpedMapList
         .getWarpedMaps()
-        .filter((warpedMap) => warpedMap.options.overviewTiles)
+        .filter((warpedMap) => warpedMap.options.anticipateVisibility)
         .map((warpedmap) => warpedmap.mapId)
     )
   }
@@ -668,10 +662,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
     // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
     // If an internal projection is present, some refinement is needed.
-    // Note: if recursive refinement, use geographic distances and midpoints for lon-lat destination points
     const projectedGeoBufferedViewportRectangle =
       viewport.getProjectedGeoBufferedRectangle(
-        this.shouldAnticipateInteraction()
+        this.options.anticipateInteraction
           ? this.options.requestViewportBufferRatio
           : 1
       )
@@ -801,7 +794,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       return []
     }
 
-    if (!warpedMap.shouldRenderMap() && !warpedMap.options.overviewTiles) {
+    if (
+      !warpedMap.shouldRenderMap() &&
+      !warpedMap.options.anticipateVisibility
+    ) {
       return []
     }
 
@@ -861,7 +857,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // in thise case we only ran this function to set the properties for the current viewport
     // so we can use them relyably while pruning
     if (
-      !warpedMap.options.overviewTiles &&
+      !warpedMap.options.anticipateVisibility &&
       (!mapsInViewportForOverviewRequest.has(mapId) ||
         !warpedMap.shouldRenderMap())
     ) {

@@ -61,7 +61,7 @@ export type WarpedMapOptions = {
   internalProjection: Projection
   projection: Projection
   visible: boolean
-  overviewTiles: boolean
+  anticipateVisibility: boolean
   overviewTilesSelection: 'highest' | 'lowest'
   overviewTilesMaxResolution: number | undefined
   applyMask: boolean
@@ -160,7 +160,7 @@ export type WarpedMapListOptions<W extends WarpedMap> =
 
 export type SpecificBaseRenderOptions<W extends WarpedMap> = {
   warpedMapList?: WarpedMapList<W>
-  anticipateOverviewTiles: boolean
+  anticipateInteraction: boolean
   requestViewportBufferRatio: number
   overviewRequestViewportBufferRatio: number
   pruneViewportBufferRatio: number
