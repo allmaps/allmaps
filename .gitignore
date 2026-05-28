@@ -28,3 +28,6 @@ vite.config.ts.timestamp-*
 .turbo
 .claude
 plans
+
+# Cloudflare Worker generated TypeScript declarations
+worker-configuration.d.ts
