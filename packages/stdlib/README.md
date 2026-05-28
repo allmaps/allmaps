@@ -40,6 +40,18 @@ MIT
 
 `{item: T; index: number} | undefined`.
 
+### `arrayDifference(array0, array1, isEqualObject)`
+
+###### Parameters
+
+* `array0` (`Array<T>`)
+* `array1` (`Array<T>`)
+* `isEqualObject` (`((t0: T, t1: T) => boolean) | undefined`)
+
+###### Returns
+
+`Array<T>`.
+
 ### `arrayMatrixSize(arrayMatrix)`
 
 ###### Parameters
@@ -60,6 +72,17 @@ MIT
 ###### Returns
 
 `Array<{item: T; index: number}>`.
+
+### `arrayUnique(array, isEqualObject)`
+
+###### Parameters
+
+* `array` (`Array<T>`)
+* `isEqualObject` (`((t0: T, t1: T) => boolean) | undefined`)
+
+###### Returns
+
+`Array<T>`.
 
 ### `bboxToCenter(bbox)`
 
@@ -1324,7 +1347,7 @@ RGB, e (`[number, number, number, number]`).g. \[0, 51, 255, 255]
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
+* `map` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
 
 ###### Returns
 
@@ -1608,6 +1631,16 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 `Array<Line>`.
 
+### `polygonIsBboxRectangle(polygon)`
+
+###### Parameters
+
+* `polygon` (`Array<Array<Point>>`)
+
+###### Returns
+
+`boolean`.
+
 ### `polygonSelfIntersectionPoints(polygon, options)`
 
 ###### Parameters
@@ -1710,6 +1743,16 @@ Convert RBGA to HEX
 
 HEX string, e (`string`).g. '#0033ffff'
 
+### `ringIsBboxRectangle(ring)`
+
+###### Parameters
+
+* `ring` (`Array<Point>`)
+
+###### Returns
+
+`boolean`.
+
 ### `ringToGeojsonPolygon(ring, close)`
 
 ###### Parameters
@@ -1731,6 +1774,17 @@ HEX string, e (`string`).g. '#0033ffff'
 ###### Returns
 
 `number`.
+
+### `rotateArray(array, offset)`
+
+###### Parameters
+
+* `array` (`Array<T>`)
+* `offset` (`number`)
+
+###### Returns
+
+`Array<T>`.
 
 ### `rotatePoint(point, angle, pivot, cosAngle, sinAngle)`
 

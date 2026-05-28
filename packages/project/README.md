@@ -388,10 +388,10 @@ MIT
 ```ts
 ProjectionInputs & {
   maxDepth: number
+  minSourceDistance: number
+  minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
-  geoIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
   postToGeo: ProjectionFunction
@@ -426,6 +426,84 @@ Get GCPs as they were inputed to the GCP Transformer (`Array<Gcp>`).
 
 For a Projected GCP Transformer, these are the GCPs in projected coordinates.
 
+### `ProjectedGcpTransformer#getToGeoTransformationResolution(resourceBbox, partialProjectedGcpTransformOptions)`
+
+Get the resolution of the toGeo transformation in resource space, within a given bbox.
+
+This informs you in how fine the warping is, in resource space.
+It can be useful e.g. to create a triangulation in resource space
+that is fine enough for this warping or set the minSourceDistance options.
+
+It is obtained by transforming toGeo two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The toGeo transformation will refine these lines:
+it will break them in small enough pieces to obtain a near continuous result.
+
+Resolution returned in the length of the shortest piece, measured in resource coordinates,
+or undefined if no refinements were needed.
+
+###### Parameters
+
+* `resourceBbox?` (`Bbox | undefined`)
+  * BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+* `partialProjectedGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
+
+###### Returns
+
+Resolution of the toGeo transformation in resource space (`number | undefined`).
+
+### `ProjectedGcpTransformer#getToProjectedGeoTransformationResolution(resourceBbox, partialProjectedGcpTransformOptions)`
+
+Get the resolution of the toProjectedGeo transformation in resource space, within a given bbox.
+
+This informs you in how fine the warping is, in resource space.
+It can be useful e.g. to create a triangulation in resource space
+that is fine enough for this warping or set the minSourceDistance options.
+
+It is obtained by transforming toProjectedGeo two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The toProjectedGeo transformation will refine these lines:
+it will break them in small enough pieces to obtain a near continuous result.
+
+Resolution returned in the length of the shortest piece, measured in resource coordinates,
+or undefined if no refinements were needed.
+
+###### Parameters
+
+* `resourceBbox?` (`Bbox | undefined`)
+  * BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+* `partialProjectedGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
+
+###### Returns
+
+Resolution of the toProjectedGeo transformation in resource space (`number | undefined`).
+
+### `ProjectedGcpTransformer#getToResourceTransformationResolution(projectedGeoBbox, partialProjectedGcpTransformOptions)`
+
+Get the resolution of the toResource transformation in projected geo space, within a given bbox.
+
+This informs you in how fine the warping is, in projected geo space.
+It can be useful e.g. to create a triangulation in projected geo space
+that is fine enough for this warping or set the minDestionationDistance options.
+
+It is obtained by transforming toResource two linestring,
+namely the horizontal and vertical midlines of the given bbox.
+The toResource transformation will refine these lines:
+it will break them in small enough pieces to obtain a near continuous result.
+
+Resolution returned in the length of the shortest piece, measured in internal projected geo coordinates,
+or undefined if no refinements were needed.
+
+###### Parameters
+
+* `projectedGeoBbox?` (`Bbox | undefined`)
+  * BBox in projected geo space where the resolution is requested, or undefined to get this from the GCPs
+* `partialProjectedGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
+
+###### Returns
+
+Resolution of the toResource transformation in internal projected geo space (`number | undefined`).
+
 ### `ProjectedGcpTransformer#interalProjectedGcps`
 
 Get GCPs in interal projected coordinates (`Array<Gcp>`).
@@ -445,6 +523,16 @@ Get GCPs in interal projected coordinates (`Array<Gcp>`).
 ```ts
 (point: Point) => Point
 ```
+
+### `ProjectedGcpTransformer#isNonWarping()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`boolean`.
 
 ### `ProjectedGcpTransformer#lonLatToProjection`
 
@@ -486,11 +574,11 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 (point: Point) => Point
 ```
 
-### `ProjectedGcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
+### `ProjectedGcpTransformer#transformToGeo(resourcePoint, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `resourcePoint` (`[number, number]`)
 * `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
@@ -498,11 +586,11 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 
 `P`.
 
-### `ProjectedGcpTransformer#transformToProjectedGeo(point, partialGcpTransformOptions, gcpToP)`
+### `ProjectedGcpTransformer#transformToProjectedGeo(resourcePoint, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `resourcePoint` (`[number, number]`)
 * `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
@@ -510,11 +598,11 @@ Get GCPs in projected coordinates (`Array<Gcp>`).
 
 `P`.
 
-### `ProjectedGcpTransformer#transformToResource(point, partialGcpTransformOptions, gcpToP)`
+### `ProjectedGcpTransformer#transformToResource(projectedGeoPoint, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `projectedGeoPoint` (`[number, number]`)
 * `partialGcpTransformOptions?` (`Partial<ProjectedGcpTransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
@@ -528,9 +616,9 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * A Georeferenced Map
-* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; ... 5 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
   * Options, including Projected GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
 
 ###### Returns
@@ -579,7 +667,7 @@ GcpsInputs &
 ###### Type
 
 ```ts
-{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; ... 4 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions
+{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; ... 5 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions
 ```
 
 ### `Projection`
@@ -641,12 +729,12 @@ string | PROJJSONDefinition
 
 ###### Parameters
 
-* `projection0` (`Projection | undefined`)
-* `projection1` (`Projection | undefined`)
+* `projection0` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
+* `projection1` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
 
 ###### Returns
 
-`boolean | undefined`.
+`boolean`.
 
 ### `lonLatProjection`
 

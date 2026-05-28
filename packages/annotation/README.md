@@ -80,7 +80,7 @@ MIT
 ###### Type
 
 ```ts
-{ type: "Annotation"; target: { type: "SpecificResource"; source: { type: "ImageService1" | "ImageService2" | "ImageService3"; height: number; width: number; '@id': string; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }; }; ... 6 more ...; ...
+{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }...
 ```
 
 ### `AnnotationPage`
@@ -88,7 +88,7 @@ MIT
 ###### Type
 
 ```ts
-{ type: "AnnotationPage"; items: Array<{ type: "Annotation"; target: { type: "SpecificResource"; source: { type: "ImageService1" | "ImageService2" | "ImageService3"; height: number; width: number; '@id': string; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; ...
+{ type: "AnnotationPage"; items: Array<{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | ...
 ```
 
 ### `AnnotationPageSchema`
@@ -128,7 +128,7 @@ GeoreferencedMap2GCPSchema
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }
+{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }
 ```
 
 ### `GeoreferencedMapSchema`
@@ -152,7 +152,7 @@ GeoreferencedMaps2Schema
 ###### Type
 
 ```ts
-Array<PartOfItem> | undefined
+Array<{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<...> | undefined; }> | undefined; }>
 ```
 
 ### `PartOfItem`
@@ -160,11 +160,7 @@ Array<PartOfItem> | undefined
 ###### Type
 
 ```ts
-{
-  type: string
-  id: string
-  label?: Record<string, Array<string | number | boolean>> | undefined
-} & {partOf?: PartOfItem[]}
+{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<...> | undefined; }> | undefined; }
 ```
 
 ### `ResourceSchema`
@@ -195,7 +191,7 @@ an Annotation Page containing multiple Georeference Annotations from an array of
 
 ###### Returns
 
-Georeference Annotation or Annotation Page (`{ type: "Annotation"; target: { type: "SpecificResource"; source: { type: "ImageService1" | "ImageService2" | "ImageService3"; height: number; width: number; '@id': string; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }; }; ... 6 more ...; ...`).
+Georeference Annotation or Annotation Page (`{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }...`).
 
 ###### Examples
 
@@ -219,7 +215,7 @@ and returns an array of Georeferenced Maps.
 
 ###### Returns
 
-Array of maps (`Array<{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`).
+Array of maps (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`).
 
 ###### Examples
 
@@ -239,7 +235,7 @@ const maps = parseAnnotation(annotation)
 
 ###### Returns
 
-`{ type: "Annotation"; target: { type: "SpecificResource"; source: { type: "ImageService1" | "ImageService2" | "ImageService3"; height: number; width: number; '@id': string; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }; }; ... 6 more ...; ...`.
+`{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }...`.
 
 ### `validateGeoreferencedMap(mapOrMaps)`
 
@@ -249,4 +245,4 @@ const maps = parseAnnotation(annotation)
 
 ###### Returns
 
-`{ type: "GeoreferencedMap"; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItem> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; } | Array<{ type: "...`.
+`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; } | Array<{ type: "Ge...`.
