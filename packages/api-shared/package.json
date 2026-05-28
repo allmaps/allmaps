@@ -60,6 +60,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
     "@allmaps/types": "workspace:^",
     "@types/geojson": "^7946.0.16",
     "@types/sharedb": "^3.3.12",
