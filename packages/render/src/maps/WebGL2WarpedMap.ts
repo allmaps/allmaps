@@ -15,7 +15,6 @@ import {
   pink,
   white,
   yellow,
-  gray,
   red,
   darkblue
 } from '@allmaps/tailwind'

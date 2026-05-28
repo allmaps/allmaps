@@ -15,7 +15,8 @@ import {
   ProjectionOptions,
   AnimationOptions,
   BaseRenderOptions,
-  Sprite
+  Sprite,
+  WarpedMapListOptions
 } from '@allmaps/render'
 import {
   rectangleToSize,

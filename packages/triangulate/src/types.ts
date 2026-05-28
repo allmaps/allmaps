@@ -1,3 +1,5 @@
+import type KDBush from 'kdbush'
+
 import type {
   Bbox,
   Point,
@@ -29,6 +31,11 @@ export type TriangluationOptions = {
   steinerPolygons: Polygon[]
   minimumTriangleAngle: number
   computeInsideSteinerPolygons: boolean
+}
+
+export type KDBushPointIndex = {
+  tree: KDBush
+  points: [number, number][]
 }
 
 export type PolygonForInsidenessCheck = {

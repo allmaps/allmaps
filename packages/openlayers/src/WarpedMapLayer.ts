@@ -18,7 +18,8 @@ import type {
   ProjectionOptions,
   AnimationOptions,
   WarpedMapList,
-  Sprite
+  Sprite,
+  WarpedMapListOptions
 } from '@allmaps/render'
 import type {
   WebGL2RenderOptions,
