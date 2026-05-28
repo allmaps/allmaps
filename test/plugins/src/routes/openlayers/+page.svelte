@@ -68,7 +68,8 @@
     warpedMapList = new WarpedMapList()
     warpedMapList.addGeoreferenceAnnotation(annotation)
     bbox = warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:3857' }
+      projection:
+        WebGL2WarpedMap.getDefaultWithoutGeoreferencedMapOptions().projection
     })
 
     options = mergeOptions(

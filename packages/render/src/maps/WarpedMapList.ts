@@ -1197,8 +1197,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const projection = options?.projection
     return projection
       ? WarpedMapList.projectPointsIfNeeded(
-          projection,
           lonLatProjection,
+          projection,
           geoMaskPoints
         )
       : geoMaskPoints
