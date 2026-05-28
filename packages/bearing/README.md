@@ -50,15 +50,19 @@ MIT
 
 ### `BearingOptions`
 
-###### Fields
+###### Type
 
-* `orientation` (`'horizontal' | 'vertical' | 'mean'`)
+```ts
+Partial<MaskOptions> & {orientation?: 'horizontal' | 'vertical'}
+```
 
 ### `DEFAULT_BEARING_OPTIONS`
 
-###### Fields
+###### Type
 
-* `orientation` (`'mean'`)
+```ts
+any
+```
 
 ### `computeGeoreferencedMapBearing(georeferencedMap, options)`
 
@@ -66,9 +70,9 @@ Compute the bearing of a Georeferenced Map.
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * Georeferenced Map
-* `options?` (`Partial<BearingOptions & { internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { ...; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<Partial<MaskOptions> & { orientation?: "horizontal" | "vertical"; } & { internalProjection: Projection; projection: Projection; } & { ...; } & { ...; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 
@@ -82,7 +86,7 @@ Compute the bearing of a Warped Map.
 
 * `warpedMap` (`WarpedMap`)
   * Warped Map
-* `options?` (`Partial<BearingOptions & { internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { ...; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
+* `options?` (`Partial<Partial<MaskOptions> & { orientation?: "horizontal" | "vertical"; } & { internalProjection: Projection; projection: Projection; } & { ...; } & { ...; } & MultiGeometryOptions & TransformationTypeInputs> | undefined`)
 
 ###### Returns
 

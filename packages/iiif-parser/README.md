@@ -341,7 +341,7 @@ MIT
 
 ###### Parameters
 
-* `parsedCanvas` (`{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | undefined; '@type'?: "ImageService2" | ... 2 more ... | undefined; } | ...`)
+* `parsedCanvas` (`{ '@id': string; '@type': "sc:Canvas"; width: number; height: number; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@type'?: "ImageService2" | ... 2 more ... | undefined; width?: number | undefined; height?: number | undefined; '@context'?: string | undefined; } | ...`)
 
 ###### Returns
 
@@ -504,7 +504,7 @@ number
 
 ###### Parameters
 
-* `parsedCollection` (`Collection2 | Collection3`)
+* `parsedCollection` (`{ '@id': string; '@type': "sc:Collection"; manifests?: Array<{ '@id': string; '@type': "sc:Collection"; manifests?: Array<... | { '@id': string; '@type': "sc:Manifest"; label?: string | Array<string> | { '@value': string | Array<string>; '@language'?: string | undefined; } | Array<{ '@value': string | Array<string>;...`)
 * `options?` (`Partial<ConstructorOptions> | undefined`)
 
 ###### Returns
@@ -706,7 +706,7 @@ Parsed IIIF Collection (`Collection`).
 
 ###### Parameters
 
-* `parsedCollection` (`Collection2 | Collection3 | EmbeddedCollectionType`)
+* `parsedCollection` (`{ '@id': string; '@type': "sc:Collection"; manifests?: Array<{ '@id': string; '@type': "sc:Collection"; manifests?: Array<... | { '@id': string; '@type': "sc:Manifest"; label?: string | Array<string> | { '@value': string | Array<string>; '@language'?: string | undefined; } | Array<{ '@value': string | Array<string>;...`)
 
 ###### Returns
 
@@ -931,7 +931,7 @@ number
 
 ###### Parameters
 
-* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | ...`)
+* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: Array<{ '@id': string; '@type': "sc:Canvas"; width: number; height: number; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@type'?: "ImageService2" | ... 2 more ... | undefined; width?: number | u...`)
 
 ###### Returns
 
@@ -1175,7 +1175,7 @@ Parsed IIIF Image (`Image`).
 
 ###### Parameters
 
-* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: [{ '@id': string; width: number; height: number; '@type': "sc:Canvas"; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@context'?: string | undefined; width?: number | undefined; height?: number | ...`)
+* `parsedManifest` (`{ '@id': string; '@type': "sc:Manifest"; sequences: Array<{ canvases: Array<{ '@id': string; '@type': "sc:Canvas"; width: number; height: number; images: Array<{ resource: { service: { '@id': string; profile: string | ValidImage2ProfileArray; '@type'?: "ImageService2" | ... 2 more ... | undefined; width?: number | u...`)
 * `options?` (`Partial<ConstructorOptions> | undefined`)
 
 ###### Returns
