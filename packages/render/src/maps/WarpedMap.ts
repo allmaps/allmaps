@@ -497,11 +497,7 @@ export class WarpedMap extends EventTarget {
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
   ): object {
-    return this.setMapOptionsAndListOptions(
-      undefined,
-      listOptions,
-      animationOptions
-    )
+    return this.setMapAndListOptions(undefined, listOptions, animationOptions)
   }
 
   /**
@@ -514,11 +510,7 @@ export class WarpedMap extends EventTarget {
     mapOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
-    return this.setMapOptionsAndListOptions(
-      mapOptions,
-      undefined,
-      animationOptions
-    )
+    return this.setMapAndListOptions(mapOptions, undefined, animationOptions)
   }
 
   /**
@@ -528,7 +520,7 @@ export class WarpedMap extends EventTarget {
    * @param listOptions - list options
    * @param animationOptions - Animation options
    */
-  setMapOptionsAndListOptions(
+  setMapAndListOptions(
     mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>

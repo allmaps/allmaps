@@ -209,16 +209,12 @@ export class TriangulatedWarpedMap extends WarpedMap {
    * @param listOptions - list options
    * @param animationOptions - Animation options
    */
-  setMapOptionsAndListOptions(
+  setMapAndListOptions(
     mapOptions?: Partial<TriangulatedWarpedMapOptions>,
     listOptions?: Partial<TriangulatedWarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
-    return super.setMapOptionsAndListOptions(
-      mapOptions,
-      listOptions,
-      animationOptions
-    )
+    return super.setMapAndListOptions(mapOptions, listOptions, animationOptions)
   }
 
   /**
