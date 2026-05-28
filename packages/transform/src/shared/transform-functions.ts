@@ -1,7 +1,3 @@
-// TODO: consider implementing these functions in stdlib instead of using dependencies
-import getWorldMidpoint from '@turf/midpoint'
-import getWorldDistance from '@turf/distance'
-
 import { mergeOptions } from '@allmaps/stdlib'
 
 import { defaultRefinementOptions } from './refinement-functions.js'

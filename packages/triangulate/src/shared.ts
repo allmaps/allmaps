@@ -18,12 +18,7 @@ import type {
   Point
 } from '@allmaps/types'
 
-import type { PolygonForInsidenessCheck } from './types.js'
-
-interface KDBushPointIndex {
-  tree: KDBush
-  points: [number, number][]
-}
+import type { KDBushPointIndex, PolygonForInsidenessCheck } from './types.js'
 
 // Split lines using points
 
