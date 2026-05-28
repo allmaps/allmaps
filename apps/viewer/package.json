@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.87",
+  "version": "1.0.0-beta.88",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -30,18 +30,18 @@
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
-    "@allmaps/id": "workspace:^",
-    "@allmaps/ui": "workspace:^",
     "@allmaps/basemap": "workspace:^",
     "@allmaps/bearing": "workspace:^",
-    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/components": "workspace:^",
+    "@allmaps/env": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
-    "@allmaps/components": "workspace:^",
-    "@allmaps/env": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "bits-ui": "catalog:",
     "maplibre-gl": "catalog:"
   },
@@ -58,6 +58,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.13.1",
     "globals": "^16.5.0",
+    "phosphor-svelte": "^3.0.1",
     "prettier": "^3.7.4",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
@@ -68,7 +69,6 @@
     "typescript-eslint": "^8.48.1",
     "vite": "catalog:",
     "vite-plugin-devtools-json": "^1.0.0",
-    "phosphor-svelte": "^3.0.1",
     "wrangler": "^4.3.0"
   }
 }

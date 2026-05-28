@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/env",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "private": true,
   "description": "Shared environment schemas for Allmaps workspaces",
   "type": "module",
@@ -41,9 +41,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "typescript": "catalog:",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "typescript": "catalog:"
   }
 }

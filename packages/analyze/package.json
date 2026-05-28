@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/analyze",
-  "version": "1.0.0-beta.12",
+  "version": "1.0.0-beta.13",
   "author": {
     "name": "Manuel Claeys Bouuaert",
     "email": "manuel.claeys.b@gmail.com",
@@ -45,10 +45,10 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
-    "@allmaps/project": "workspace:^",
     "@allmaps/types": "workspace:^",
     "ml-matrix": "^6.12.0",
     "ml-ransac": "^1.0.0",
