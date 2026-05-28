@@ -312,16 +312,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * @param listOptions - list options
    * @param animationOptions - Animation options
    */
-  setMapOptionsAndListOptions(
+  setMapAndListOptions(
     mapOptions?: Partial<WebGL2WarpedMapOptions>,
     listOptions?: Partial<WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
   ): object {
-    return super.setMapOptionsAndListOptions(
-      mapOptions,
-      listOptions,
-      animationOptions
-    )
+    return super.setMapAndListOptions(mapOptions, listOptions, animationOptions)
   }
 
   protected applyOptions(animationOptions?: Partial<AnimationOptions>) {
