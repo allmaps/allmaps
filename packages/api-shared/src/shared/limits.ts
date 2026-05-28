@@ -1,9 +1,14 @@
-export const DEFAULT_LIMIT = 100
+export const DEFAULT_LIMIT = 50
 
-export const PUBLIC_MAX_LIMIT = 100
-export const USER_MAX_LIMIT = 250
-export const PAID_ORGANIZATION_MEMBER_MAX_LIMIT = 500
-export const ADMIN_MAX_LIMIT = 500
+export const PUBLIC_MAX_LIMIT = 200
+export const USER_MAX_LIMIT = 400
+export const PAID_ORGANIZATION_MEMBER_MAX_LIMIT = 600
+export const ADMIN_MAX_LIMIT = 600
+
+export const PUBLIC_MAX_PAGES = 5
+export const USER_MAX_PAGES = 10
+export const PAID_ORGANIZATION_MEMBER_MAX_PAGES = undefined // no limit
+export const ADMIN_MAX_PAGES = undefined // no limit
 
 export type UserRole = 'public' | 'user' | 'paidOrganizationMember' | 'admin'
 
