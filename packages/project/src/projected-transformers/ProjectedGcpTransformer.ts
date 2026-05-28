@@ -9,6 +9,7 @@ import {
   GcpAndDistortions,
   GcpTransformer,
   GcpTransformerOptions,
+  nonWarpingTransformationTypes,
   ProjectionFunction,
   TransformationType,
   TransformationTypeInputs
@@ -22,7 +23,8 @@ import {
 import {
   defaultProjectedGcpTransformerOptions,
   isEqualProjection,
-  lonLatProjection
+  lonLatProjection,
+  projectedGcpTransformOptionsToGcpTransformOptions
 } from '../shared/project-functions.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -40,7 +42,8 @@ import type {
   TypedMultiPoint,
   TypedMultiLineString,
   TypedMultiPolygon,
-  TypedGeometry
+  TypedGeometry,
+  Bbox
 } from '@allmaps/types'
 
 /**
@@ -174,127 +177,116 @@ export class ProjectedGcpTransformer extends GcpTransformer {
   }
 
   transformToProjectedGeo<P = Point>(
-    point: Point,
+    resourcePoint: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToProjectedGeo<P = Point>(
-    lineString: LineString,
+    resourceLineString: LineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToProjectedGeo<P = Point>(
-    polygon: Polygon,
+    resourcePolygon: Polygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToProjectedGeo<P = Point>(
-    multiPoint: MultiPoint,
+    resourceMultiPoint: MultiPoint,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToProjectedGeo<P = Point>(
-    multiLineString: MultiLineString,
+    resourceMultiLineString: MultiLineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToProjectedGeo<P = Point>(
-    multiPoint: MultiPolygon,
+    resourceMultiPoint: MultiPolygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToProjectedGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to projected geo space
+   * Transform a geometry from resource space to projected geo space
    *
-   * @param geometry - Geometry to transform
+   * @param resourceGeometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
    * @param gcpToP - Return type function
    * @returns Input geometry transformed to projected geo space
    */
   transformToProjectedGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
-    const projection = partialProjectedGcpTransformOptions?.projection
-
-    let partialGcpTransformOptions = partialProjectedGcpTransformOptions
-
-    if (projection) {
-      const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection.definition,
-        projection.definition
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
       )
-      const postToGeo = internalProjectionToProjectionConverter.forward
-      const preToResource = internalProjectionToProjectionConverter.inverse
 
-      partialGcpTransformOptions = mergePartialOptions(
-        partialGcpTransformOptions,
-        {
-          postToGeo,
-          preToResource
-        }
-      )
-    }
-
-    return super.transformToGeo(geometry, partialGcpTransformOptions, gcpToP)
+    return super.transformToGeo(
+      resourceGeometry,
+      partialGcpTransformOptions,
+      gcpToP
+    )
   }
 
   transformToGeo<P = Point>(
-    point: Point,
+    resourcePoint: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToGeo<P = Point>(
-    lineString: LineString,
+    resourceLineString: LineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToGeo<P = Point>(
-    polygon: Polygon,
+    resourcePolygon: Polygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToGeo<P = Point>(
-    multiPoint: MultiPoint,
+    resourceMultiPoint: MultiPoint,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToGeo<P = Point>(
-    multiLineString: MultiLineString,
+    resourceMultiLineString: MultiLineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToGeo<P = Point>(
-    multiPoint: MultiPolygon,
+    resourceMultiPoint: MultiPolygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to geo space
+   * Transform a geometry from resource space to geo space
    *
-   * @param geometry - Geometry to transform
+   * @param resourceGeometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
    * @param gcpToP - Return type function
    * @returns Input geometry transformed to projected geo space
    */
   transformToGeo<P = Point>(
-    geometry: Geometry,
+    resourceGeometry: Geometry,
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
     return this.transformToProjectedGeo(
-      geometry,
+      resourceGeometry,
       mergePartialOptions(partialProjectedGcpTransformOptions, {
         projection: lonLatProjection
       }),
@@ -303,78 +295,169 @@ export class ProjectedGcpTransformer extends GcpTransformer {
   }
 
   transformToResource<P = Point>(
-    point: Point,
+    projectedGeoPoint: Point,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): P
   transformToResource<P = Point>(
-    lineString: LineString,
+    projectedGeoLineString: LineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedLineString<P>
   transformToResource<P = Point>(
-    polygon: Polygon,
+    projectedGeoPolygon: Polygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedPolygon<P>
   transformToResource<P = Point>(
-    multiPoint: MultiPoint,
+    projectedGeoMultiPoint: MultiPoint,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPoint<P>
   transformToResource<P = Point>(
-    multiLineString: MultiLineString,
+    projectedGeoMultiLineString: MultiLineString,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiLineString<P>
   transformToResource<P = Point>(
-    multiPolygon: MultiPolygon,
+    projectedGeoMultiPolygon: MultiPolygon,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedMultiPolygon<P>
   transformToResource<P = Point>(
-    geometry: Geometry,
+    projectedGeoGeometry: Geometry,
     partialGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P>
   /**
-   * Transform a geometry to resource space
+   * Transform a geometry from projected geo space to resource space
    *
-   * @param geometry - Geometry to transform
+   * @param projectedGeoGeometry - Geometry to transform
    * @param partialProjectedGcpTransformOptions - Projected GCP Transform options
    * @param gcpToP - Return type function
    * @returns Input geometry transformed to resource space
    */
   transformToResource<P>(
-    geometry: Geometry,
+    projectedGeoGeometry: Geometry,
     partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>,
     gcpToP?: (gcp: GcpAndDistortions) => P
   ): TypedGeometry<P> {
-    const projection = partialProjectedGcpTransformOptions?.projection
-
-    let partialGcpTransformOptions = partialProjectedGcpTransformOptions
-
-    if (projection) {
-      const internalProjectionToProjectionConverter = proj4(
-        this.internalProjection.definition,
-        projection.definition
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
       )
-      const postToGeo = internalProjectionToProjectionConverter.forward
-      const preToResource = internalProjectionToProjectionConverter.inverse
-
-      partialGcpTransformOptions = mergePartialOptions(
-        partialGcpTransformOptions,
-        {
-          postToGeo,
-          preToResource
-        }
-      )
-    }
 
     return super.transformToResource(
-      geometry,
+      projectedGeoGeometry,
       partialGcpTransformOptions,
       gcpToP
+    )
+  }
+
+  protected isNonWarping(): boolean {
+    return (
+      isEqualProjection(this.projection, this.internalProjection) === true &&
+      nonWarpingTransformationTypes.includes(this.type)
+    )
+  }
+
+  /**
+   * Get the resolution of the toProjectedGeo transformation in resource space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in resource space.
+   * It can be useful e.g. to create a triangulation in resource space
+   * that is fine enough for this warping or set the minSourceDistance options.
+   *
+   * It is obtained by transforming toProjectedGeo two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toProjectedGeo transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in resource coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param resourceBbox - BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toProjectedGeo transformation in resource space
+   */
+  getToProjectedGeoTransformationResolution(
+    resourceBbox?: Bbox,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+  ): number | undefined {
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
+      )
+    return super.getToGeoTransformationResolution(
+      resourceBbox,
+      partialGcpTransformOptions
+    )
+  }
+
+  /**
+   * Get the resolution of the toGeo transformation in resource space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in resource space.
+   * It can be useful e.g. to create a triangulation in resource space
+   * that is fine enough for this warping or set the minSourceDistance options.
+   *
+   * It is obtained by transforming toGeo two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toGeo transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in resource coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param resourceBbox - BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toGeo transformation in resource space
+   */
+  getToGeoTransformationResolution(
+    resourceBbox?: Bbox,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+  ): number | undefined {
+    return this.getToProjectedGeoTransformationResolution(
+      resourceBbox,
+      mergePartialOptions(partialProjectedGcpTransformOptions, {
+        projection: lonLatProjection
+      })
+    )
+  }
+
+  /**
+   * Get the resolution of the toResource transformation in projected geo space, within a given bbox.
+   *
+   * This informs you in how fine the warping is, in projected geo space.
+   * It can be useful e.g. to create a triangulation in projected geo space
+   * that is fine enough for this warping or set the minDestionationDistance options.
+   *
+   * It is obtained by transforming toResource two linestring,
+   * namely the horizontal and vertical midlines of the given bbox.
+   * The toResource transformation will refine these lines:
+   * it will break them in small enough pieces to obtain a near continuous result.
+   *
+   * Resolution returned in the length of the shortest piece, measured in internal projected geo coordinates,
+   * or undefined if no refinements were needed.
+   *
+   * @param projectedGeoBbox - BBox in projected geo space where the resolution is requested, or undefined to get this from the GCPs
+   * @param partialGcpTransformOptions - GCP Transform options to consider during the transformation
+   * @returns Resolution of the toResource transformation in internal projected geo space
+   */
+  getToResourceTransformationResolution(
+    projectedGeoBbox?: Bbox,
+    partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+  ): number | undefined {
+    const partialGcpTransformOptions =
+      projectedGcpTransformOptionsToGcpTransformOptions(
+        this.internalProjection,
+        partialProjectedGcpTransformOptions
+      )
+    return super.getToResourceTransformationResolution(
+      projectedGeoBbox,
+      partialGcpTransformOptions
     )
   }
 
@@ -451,9 +534,7 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     // They have already been converted to the internal projection
     // in the GCP Transformer constructor
 
-    projectedTransformer.setTransformerOptionsInternal(
-      partialGcpTransformerOptions
-    )
+    projectedTransformer.setTransformerOptions(partialGcpTransformerOptions)
 
     projectedTransformer.projection = projection
 

@@ -14,10 +14,12 @@ import type { Extent } from 'ol/extent'
 
 import type {
   BaseRenderOptions,
+  MaskOptions,
   ProjectionOptions,
   AnimationOptions,
   WarpedMapList,
-  Sprite
+  Sprite,
+  WarpedMapListOptions
 } from '@allmaps/render'
 import type {
   WebGL2RenderOptions,
@@ -292,9 +294,9 @@ export class WarpedMapLayer
   }
 
   // Normal functions
-  //
-  // These are copied manually from @allmaps/warpedmaplayermap
-  // since classes can only extend one class
+  // These function are copied automatically from @allmaps/warpedmaplayer's WarpedMapLayer.ts
+
+  // START_AUTOMATED_COPY
 
   /**
    * Adds a Georeference Annotation
@@ -514,13 +516,15 @@ export class WarpedMapLayer
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The center of the bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getCenter(projectionOptions?: Partial<ProjectionOptions>): Point | undefined {
+  getCenter(
+    options?: Partial<ProjectionOptions & MaskOptions>
+  ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.warpedMapList.getMapsCenter(projectionOptions)
+    return this.renderer.warpedMapList.getMapsCenter(options)
   }
 
   /**
@@ -531,17 +535,17 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsCenter(
     mapIds: string[],
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Point | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsCenter(
-      mergePartialOptions({ mapIds }, projectionOptions)
+      mergePartialOptions({ mapIds }, options)
     )
   }
 
@@ -552,13 +556,15 @@ export class WarpedMapLayer
    *
    * Note: more selection options are available on this function of WarpedMapList
    *
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The bbox of all maps, in the chosen projection, or undefined if there were no maps.
    */
-  getBbox(projectionOptions?: Partial<ProjectionOptions>): Bbox | undefined {
+  getBbox(
+    options?: Partial<ProjectionOptions & MaskOptions>
+  ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.warpedMapList.getMapsBbox(projectionOptions)
+    return this.renderer.warpedMapList.getMapsBbox(options)
   }
 
   /**
@@ -569,17 +575,17 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
     mapIds: string[],
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Bbox | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsBbox(
-      mergePartialOptions({ mapIds }, projectionOptions)
+      mergePartialOptions({ mapIds }, options)
     )
   }
 
@@ -591,15 +597,15 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The convex hull of all maps, in the chosen projection, or undefined if there were no maps.
    */
   getConvexHull(
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    return this.renderer.warpedMapList.getMapsConvexHull(projectionOptions)
+    return this.renderer.warpedMapList.getMapsConvexHull(options)
   }
 
   /**
@@ -610,17 +616,17 @@ export class WarpedMapLayer
    * Note: more selection options are available on this function of WarpedMapList
    *
    * @param mapIds - Map IDs
-   * @param projection - Projection in which to return the result
+   * @param options - Mask and projection options, defaults to applied mask and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
     mapIds: string[],
-    projectionOptions?: Partial<ProjectionOptions>
+    options?: Partial<ProjectionOptions & MaskOptions>
   ): Ring | undefined {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     return this.renderer.warpedMapList.getMapsConvexHull(
-      mergePartialOptions({ mapIds }, projectionOptions)
+      mergePartialOptions({ mapIds }, options)
     )
   }
 
@@ -721,25 +727,36 @@ export class WarpedMapLayer
   }
 
   /**
+   * Set the options
+   *
+   * @param options - Options to set
+   */
+  setOptions(
+    options?:
+      | Partial<SpecificWarpedMapLayerOptions>
+      | Partial<WebGL2RenderOptions>
+  ): void {
+    this.options = mergeOptions(this.options, options)
+  }
+
+  /**
    * Set the layer options
+   *
+   * Doesn't set render options or specific warped map layer options. Use setOptions() instead.
    *
    * @param layerOptions - Layer options to set
    * @param animationOptions - Animation options
-   * @example
    * ```js
    * warpedMapLayer.setLayerOptions({ transformationType: 'thinPlateSpline' })
    * ```
    */
   setLayerOptions(
-    layerOptions:
-      | Partial<SpecificWarpedMapLayerOptions>
-      | Partial<WebGL2RenderOptions>,
+    layerOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
     animationOptions?: Partial<AnimationOptions>
-  ) {
+  ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    this.options = mergeOptions(this.options, layerOptions)
-    this.renderer.setOptions(layerOptions, animationOptions)
+    this.renderer.setListOptions(layerOptions, animationOptions)
   }
 
   /**
@@ -777,7 +794,7 @@ export class WarpedMapLayer
     gcps: Gcp[],
     animationOptions?: Partial<AnimationOptions>
   ) {
-    return this.setMapOptions(mapId, { gcps }, undefined, animationOptions)
+    return this.setMapOptions(mapId, { gcps }, animationOptions)
   }
 
   /**
@@ -799,12 +816,7 @@ export class WarpedMapLayer
     resourceMask: Ring,
     animationOptions?: Partial<AnimationOptions>
   ) {
-    return this.setMapOptions(
-      mapId,
-      { resourceMask },
-      undefined,
-      animationOptions
-    )
+    return this.setMapOptions(mapId, { resourceMask }, animationOptions)
   }
 
   /**
@@ -829,7 +841,6 @@ export class WarpedMapLayer
     return this.setMapOptions(
       mapId,
       { transformationType: transformationType },
-      undefined,
       animationOptions
     )
   }
@@ -856,13 +867,12 @@ export class WarpedMapLayer
     return this.setMapsOptions(
       mapIds,
       { transformationType: transformationType },
-      undefined,
       animationOptions
     )
   }
 
   /**
-   * Set the map-specific options of a map (and the layer options)
+   * Set the map-specific options of a map
    *
    * In general setting a map-specific option
    * also sets the corresponding option of the map,
@@ -875,7 +885,6 @@ export class WarpedMapLayer
    *
    * @param mapId - Map ID for which to set the options
    * @param mapOptions - Map-specific options to set
-   * @param layerOptions - Layer options to set
    * @param animationOptions - Animation options
    * @example
    * ```js
@@ -885,21 +894,13 @@ export class WarpedMapLayer
   setMapOptions(
     mapId: string,
     mapOptions: Partial<WebGL2WarpedMapOptions>,
-    layerOptions?:
-      | Partial<SpecificWarpedMapLayerOptions>
-      | Partial<WebGL2RenderOptions>,
     animationOptions?: Partial<AnimationOptions>
   ) {
-    return this.setMapsOptions(
-      [mapId],
-      mapOptions,
-      layerOptions,
-      animationOptions
-    )
+    return this.setMapsOptions([mapId], mapOptions, animationOptions)
   }
 
   /**
-   * Set the map-specific options of maps (and the layer options)
+   * Set the map-specific options of the specified maps
    *
    * In general setting a map-specific option
    * also sets the corresponding option of the map,
@@ -910,9 +911,11 @@ export class WarpedMapLayer
    * then the corresponding option is derived from the default, georeferenced map or layer option.
    * This is equivalent to using the reset function for map-specific option.
    *
-   * @param mapIds - Map IDs for which to set the options
-   * @param mapOptions - Map-specific options to set
-   * @param layerOptions - Layer options to set
+   * Useful when map-specific options are changed for multiple maps at once,
+   * but only one animation should be fired.
+   *
+   * @param mapIds - Map IDs of the maps whose options to set
+   * @param mapsOptions - Map-specific options to apply to each of those maps
    * @param animationOptions - Animation options
    * @example
    * ```js
@@ -921,27 +924,11 @@ export class WarpedMapLayer
    */
   setMapsOptions(
     mapIds: string[],
-    mapOptions: Partial<WebGL2WarpedMapOptions>,
-    layerOptions?:
-      | Partial<SpecificWarpedMapLayerOptions>
-      | Partial<WebGL2RenderOptions>,
+    mapsOptions?: Partial<WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
-  ) {
-    BaseWarpedMapLayer.assertRenderer(this.renderer)
-
-    if (layerOptions) {
-      this.options = mergeOptions(this.options, layerOptions)
-    }
-    this.renderer.setMapsOptions(
-      mapIds,
-      mapOptions,
-      layerOptions,
-      animationOptions
-    )
-  }
-
+  ): void
   /**
-   * Set the map-specific options of maps by map ID (and the layer options)
+   * Set the map-specific options of all maps using a per-map callback
    *
    * In general setting a map-specific option
    * also sets the corresponding option of the map,
@@ -952,36 +939,143 @@ export class WarpedMapLayer
    * then the corresponding option is derived from the default, georeferenced map or layer option.
    * This is equivalent to using the reset function for map-specific option.
    *
-   * @param mapOptionsByMapId - Map-specific options to set by map ID
-   * @param layerOptions - Layer options to set
+   * Useful when map-specific options are changed for multiple maps at once
+   * (with possibly different options for different maps), but only one animation should be fired.
+   *
+   * The callback receives each map's ID and returns the options to apply,
+   * or `undefined` to leave that map unchanged.
+   *
+   * @param mapsOptionsCallbackFn - Callback returning the options to apply for a given map
    * @param animationOptions - Animation options
+   * @example
+   * ```js
+   * warpedMapLayer.setMapsOptions((mapId) => mapId == myMapId ? { transformationType: 'thinPlateSpline' } : undefined)
+   * ```
    */
-  setMapsOptionsByMapId(
-    mapOptionsByMapId: Map<string, Partial<WebGL2WarpedMapOptions>>,
-    layerOptions?:
-      | Partial<SpecificWarpedMapLayerOptions>
-      | Partial<WebGL2RenderOptions>,
+  setMapsOptions(
+    mapsOptionsCallbackFn: (
+      mapId: string
+    ) => Partial<WebGL2WarpedMapOptions> | undefined,
     animationOptions?: Partial<AnimationOptions>
-  ) {
+  ): void
+  setMapsOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
+  ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    if (layerOptions) {
-      this.options = mergeOptions(this.options, layerOptions)
-    }
-    this.renderer.setMapsOptionsByMapId(
-      mapOptionsByMapId,
-      layerOptions,
-      animationOptions
+    this.renderer.setMapsOptions(firstArgument, secondArgument, thirdArgument)
+  }
+
+  /**
+   * Set the map-specific options of the specified maps, and the layer options
+   *
+   * Useful when map-specific options are changed for multiple maps at once,
+   * together with the layer options, but only one animation should be fired.
+   *
+   * Doesn't set render options or specific warped map layer options. Use setOptions() instead.
+   *
+   * @param mapIds - IDs of the maps whose options to set
+   * @param mapsOptions - Map-specific options to apply to each of those maps
+   * @param layerOptions - Layer options to apply
+   * @param animationOptions - Animation options
+   * @example
+   * ```js
+   * warpedMapLayer.setMapsAndLayerOptions([myMapId], { transformationType: 'thinPlateSpline' }, { visible: true })
+   * ```
+   */
+  setMapsAndLayerOptions(
+    mapIds: string[],
+    mapsOptions?: Partial<WebGL2WarpedMapOptions>,
+    layerOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  /**
+   * Set the map-specific options of all maps using a per-map callback, and the layer options
+   *
+   * Useful when map-specific options are changed for multiple maps at once (with possibly different options for different maps),
+   * together with the layer options, but only one animation should be fired.
+   *
+   * The callback receives each map's ID and returns the options to apply,
+   * or `undefined` to leave that map unchanged.
+   *
+   * Doesn't set render options or specific warped map layer options. Use setOptions() instead.
+   *
+   * @param mapsOptionsCallbackFn - Callback returning the options to apply for a given map
+   * @param layerOptions - Layer options to apply
+   * @param animationOptions - Animation options
+   * @example
+   * ```js
+   * warpedMapLayer.setMapsOptions((mapId) => mapId == myMapId ? { transformationType: 'thinPlateSpline' } : undefined, {visible: true})
+   * ```
+   */
+  setMapsAndLayerOptions(
+    mapsOptionsCallbackFn: (
+      mapId: string
+    ) => Partial<WebGL2WarpedMapOptions> | undefined,
+    layerOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsAndLayerOptions(
+    mapIds: string[],
+    mapsOptions?: Partial<WebGL2WarpedMapOptions>,
+    layerOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsAndLayerOptions(
+    mapsOptionsCallbackFn: (
+      mapId: string
+    ) => Partial<WebGL2WarpedMapOptions> | undefined,
+    layerOptions?: Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsAndLayerOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
+    thirdArgument?:
+      | Partial<WarpedMapListOptions<WebGL2WarpedMap>>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void
+  setMapsAndLayerOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<WarpedMapListOptions<WebGL2WarpedMap>>,
+    thirdArgument?:
+      | Partial<WarpedMapListOptions<WebGL2WarpedMap>>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void {
+    BaseWarpedMapLayer.assertRenderer(this.renderer)
+
+    this.renderer.setMapsAndListOptions(
+      firstArgument,
+      secondArgument,
+      thirdArgument,
+      fourthArgument
     )
   }
 
   /**
    * Reset the layer options
    *
-   * An empty array resets all options, undefined resets no options.
-   * Doesn't reset render options or specific warped map layer options
+   * Undefined option keys reset all options
    *
-   * @param layerOptionKeys - Keys of the options to reset
+   * Doesn't reset render options or specific warped map layer options. Use setOptions() instead.
+   *
+   * @param layerOptionKeys - Keys of the layer options to reset
    * @param animationOptions - Animation options
    */
   resetLayerOptions(
@@ -990,57 +1084,125 @@ export class WarpedMapLayer
   ) {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    this.renderer.resetOptions(layerOptionKeys, animationOptions)
+    this.renderer.resetListOptions(layerOptionKeys, animationOptions)
   }
 
   /**
-   * Reset the map-specific options of maps (and the layer options)
+   * Reset the map-specific options of the specified maps
    *
-   * An empty array resets all options, undefined resets no options.
-   * Doesn't reset render options or specific warped map layer options
+   * Omitting `mapsOptionKeys` resets all options; passing an empty array resets none.
    *
-   * @param mapIds - Map IDs for which to reset the options
-   * @param mapOptionKeys - Keys of the map-specific options to reset
-   * @param layerOptionKeys - Keys of the layer options to reset
+   * @param mapIds - IDs of the maps whose options to reset
+   * @param mapsOptionKeys - Keys of the options to reset
    * @param animationOptions - Animation options
    */
   resetMapsOptions(
     mapIds: string[],
-    mapOptionKeys?: string[],
-    layerOptionKeys?: string[],
+    mapsOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
-  ) {
+  ): void
+  /**
+   * Reset the map-specific options of all maps using a per-map callback
+   *
+   * The callback receives each map's ID and returns the keys to reset for that map.
+   * Returning `undefined` from the callback resets all options for that map, returning an empty array resets none.
+   *
+   * @param mapsOptionKeysCallbackFn - Callback returning the option keys to reset for a given map
+   * @param animationOptions - Animation options
+   */
+  resetMapsOptions(
+    mapsOptionKeysCallbackFn: (
+      mapId: string
+    ) => Array<keyof WebGL2WarpedMapOptions> | undefined,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  resetMapsOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
+  ): void
+  resetMapsOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
+  ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    this.renderer.resetMapsOptions(
-      mapIds,
-      mapOptionKeys,
-      layerOptionKeys,
-      animationOptions
-    )
+    this.renderer.resetMapsOptions(firstArgument, secondArgument, thirdArgument)
   }
 
   /**
-   * Reset the map-specific options of maps by map ID (and the layer options)
+   * Reset the map-specific options of the specified maps, and the layer options
    *
-   * An empty array or map resets all options (for all maps), undefined resets no options.
-   * Doesn't reset render options or specific warped map layer options
+   * Omitting `mapsOptionKeys` or `layerOptionKeys` resets all options for that scope;
+   * passing an empty array resets none.
    *
-   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
+   * @param mapIds - IDs of the maps whose options to reset
+   * @param mapsOptionKeys - Keys of the map-specific options to reset
    * @param layerOptionKeys - Keys of the layer options to reset
    * @param animationOptions - Animation options
    */
-  resetMapsOptionsByMapId(
-    mapOptionkeysByMapId: Map<string, string[]>,
-    layerOptionKeys?: string[],
+  resetMapsAndListOptions(
+    mapIds: string[],
+    mapsOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
+    layerOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
-  ) {
+  ): void
+  /**
+   * Reset the map-specific options of all maps using a per-map callback, and the layer options
+   *
+   * The callback receives each map's ID and returns the keys to reset for that map.
+   * Returning `undefined` from the callback resets all options for that map, returning an empty array resets none.
+   * Omitting `layerOptionKeys` resets all layer options.
+   *
+   * Doesn't reset render options or specific warped map layer options. Use setOptions() instead.
+   *
+   * @param mapsOptionKeysCallbackFn - Callback returning the option keys to reset for a given map
+   * @param layerOptionKeys - Keys of the layer options to reset
+   * @param animationOptions - Animation options
+   */
+  resetMapsAndListOptions(
+    mapsOptionKeysCallbackFn: (
+      mapId: string
+    ) => Array<keyof WebGL2WarpedMapOptions> | undefined,
+    layerOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  resetMapsAndListOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
+    thirdArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void
+  resetMapsAndListOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
+    thirdArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    this.renderer.resetMapsOptionsByMapId(
-      mapOptionkeysByMapId,
-      layerOptionKeys,
-      animationOptions
+    this.renderer.resetMapsAndListOptions(
+      firstArgument,
+      secondArgument,
+      thirdArgument,
+      fourthArgument
     )
   }
 
@@ -1289,4 +1451,6 @@ export class WarpedMapLayer
       this.nativeUpdate.bind(this)
     )
   }
+
+  // END_AUTOMATED_COPY
 }

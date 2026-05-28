@@ -1,7 +1,9 @@
 import proj4 from 'proj4'
 
 import { defaultGcpTransformerOptions } from '@allmaps/transform'
-import { mergeOptions } from '@allmaps/stdlib'
+import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
+
+import type { GcpTransformOptions } from '@allmaps/transform'
 
 import type {
   ProjectedGcpTransformerOptions,
@@ -185,13 +187,49 @@ export function projectionToAntialiasedProjection(
 }
 
 export function isEqualProjection(
-  projection0: Projection | undefined,
-  projection1: Projection | undefined
-): boolean | undefined {
+  projection0: Projection,
+  projection1: Projection
+): boolean {
   return (
     projectionDefinitionToAntialiasedDefinition(
       String(projection0?.definition)
     ) ==
     projectionDefinitionToAntialiasedDefinition(String(projection1?.definition))
   )
+}
+
+export function projectedGcpTransformOptionsToGcpTransformOptions(
+  internalProjection: Projection,
+  partialProjectedGcpTransformOptions?: Partial<ProjectedGcpTransformOptions>
+): Partial<GcpTransformOptions> {
+  if (
+    partialProjectedGcpTransformOptions === undefined ||
+    Object.keys(partialProjectedGcpTransformOptions).length === 0
+  ) {
+    return {}
+  }
+
+  let partialGcpTransformOptions =
+    partialProjectedGcpTransformOptions as Partial<GcpTransformOptions>
+
+  const projection = partialProjectedGcpTransformOptions?.projection
+
+  if (projection) {
+    const internalProjectionToProjectionConverter = proj4(
+      internalProjection.definition,
+      projection.definition
+    )
+    const postToGeo = internalProjectionToProjectionConverter.forward
+    const preToResource = internalProjectionToProjectionConverter.inverse
+
+    partialGcpTransformOptions = mergePartialOptions(
+      partialGcpTransformOptions,
+      {
+        postToGeo,
+        preToResource
+      }
+    )
+  }
+
+  return partialGcpTransformOptions
 }

@@ -19,6 +19,32 @@ import type {
   Polygon
 } from '@allmaps/types'
 
+describe('Transform LineString Forward To LineString, with maxDepth = 0', async () => {
+  const transformOptions = {
+    maxDepth: 0
+  }
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
+  const resourceLineString: LineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const geoLineString = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.420666790347598, 51.959985351835975]
+  ]
+
+  test(`should transform the lineString (without closing) and add no midpoints`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformToGeo(resourceLineString, transformOptions),
+      geoLineString
+    )
+  })
+})
+
 describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetRatio', async () => {
   const transformOptions = {
     minOffsetRatio: 0.01,
@@ -77,7 +103,35 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
   })
 })
 
-describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetDistance', async () => {
+describe('Transform LineString Forward To LineString, with maxDepth = 1, minSourceDistance = 4000 and minOffsetDistance = 0.0001', async () => {
+  const transformOptions = {
+    minOffsetDistance: 0.0001,
+    maxDepth: 1,
+    minSourceDistance: 4000
+  }
+  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
+  const resourceLineString: LineString = [
+    [1000, 1000],
+    [1000, 2000],
+    [2000, 2000],
+    [2000, 1000]
+  ]
+  const geoLineString: LineString = [
+    [4.388957777030093, 51.959084191571606],
+    [4.392938913951547, 51.94062947962427],
+    [4.425874493300959, 51.94172557475595],
+    [4.420666790347598, 51.959985351835975]
+  ]
+
+  test(`should transform the lineString (without closing) and add no midpoints`, () => {
+    expectToBeCloseToArrayArray(
+      transformer.transformToGeo(resourceLineString, transformOptions),
+      geoLineString
+    )
+  })
+})
+
+describe('Transform LineString Forward To LineString, with maxDepth = 1 and minOffsetDistance = 0.0001', async () => {
   const transformOptions = {
     minOffsetRatio: Infinity,
     minOffsetDistance: 0.0001,
@@ -106,185 +160,24 @@ describe('Transform LineString Forward To LineString, with maxDepth = 1 and minO
   })
 })
 
-describe('Transform LineString Forward To LineString, with maxDepth = 1 and minLineDistance', async () => {
-  const transformOptions = {
-    minOffsetRatio: Infinity,
-    minLineDistance: 0.02,
-    maxDepth: 1
-  }
-  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
-  const resourceLineString: LineString = [
-    [1000, 1000],
-    [1000, 2000],
-    [2000, 2000],
-    [2000, 1000]
-  ]
-  const geoLineString: LineString = [
-    [4.388957777030093, 51.959084191571606],
-    [4.392938913951547, 51.94062947962427],
-    [4.409493277493718, 51.94119110133424],
-    [4.425874493300959, 51.94172557475595],
-    [4.420666790347598, 51.959985351835975]
-  ]
-
-  test(`should transform the lineString (without closing) and add some midpoints`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformToGeo(resourceLineString, transformOptions),
-      geoLineString
-    )
-  })
-})
-
-describe('Transform LineString Forward To LineString, with maxDepth = 1 and input as GCP instead of GeneralGCP', async () => {
-  const transformOptions = {
-    minOffsetRatio: 0.01,
-    maxDepth: 1
-  }
-  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
-  const resourceLineString: LineString = [
-    [1000, 1000],
-    [1000, 2000],
-    [2000, 2000],
-    [2000, 1000]
-  ]
-  const geoLineString: LineString = [
-    [4.388957777030093, 51.959084191571606],
-    [4.392938913951547, 51.94062947962427],
-    [4.425874493300959, 51.94172557475595],
-    [4.4230497784967655, 51.950815146974556],
-    [4.420666790347598, 51.959985351835975]
-  ]
-
-  test(`should give the same result as with input as GeneralGCP`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformToGeo(resourceLineString, transformOptions),
-      geoLineString
-    )
-  })
-})
-
-describe('Transform LineString Forward To LineString, with maxDepth = 1 and destinationIsGeographic = true', async () => {
-  const transformOptions = {
-    minOffsetRatio: 0.01,
-    maxDepth: 1,
-    destinationIsGeographic: true
-  }
-  const transformer = new GcpTransformer(gcps6, 'thinPlateSpline')
-  const resourceLineString: LineString = [
-    [1000, 1000],
-    [1000, 2000],
-    [2000, 2000],
-    [2000, 1000]
-  ]
-  const geoLineString: LineString = [
-    [4.388957777030093, 51.959084191571606],
-    [4.392938913951547, 51.94062947962427],
-    [4.425874493300959, 51.94172557475595],
-    [4.420666790347598, 51.959985351835975]
-  ]
-
-  test(`should transform the lineString (without closing) and add no midpoints`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformToGeo(resourceLineString, transformOptions),
-      geoLineString
-    )
-  })
-})
-
 describe('Transform LineString Backward To LineString of horizontal line, with maxDepth = 2', async () => {
   const transformOptions = {
     maxDepth: 2
   }
-  const transformer = new GcpTransformer(gcps7, 'polynomial')
+  const transformer = new GcpTransformer(gcps7, 'thinPlateSpline')
   const geoLineString: LineString = [
     [10, 50],
     [50, 50]
   ]
   const resourceLineString: LineString = [
-    [31.06060606060611, 155.30303030303048],
-    [82.57575757575762, 162.8787878787881],
-    [134.09090909090912, 170.45454545454567],
-    [185.60606060606065, 178.0303030303033],
-    [237.12121212121218, 185.60606060606085]
+    [44.27384434127721, 221.36922170638508],
+    [95.55738564741294, 227.78692823706382],
+    [145.95772421640729, 229.78862108203538],
+    [195.16931671863088, 225.84658359315318],
+    [242.8859015221895, 214.42950761094625]
   ]
 
   test(`should transform the lineString (without closing) and add two layers of midpoints`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformToResource(geoLineString, transformOptions),
-      resourceLineString
-    )
-  })
-})
-
-describe('Transform LineString Backward To LineString of horizontal line, with destinationIsGeographic = true and maxDepth = 2', async () => {
-  const transformOptions = {
-    maxDepth: 2,
-    destinationIsGeographic: true
-  }
-  const transformer = new GcpTransformer(gcps7, 'polynomial')
-  const geoLineString: LineString = [
-    [10, 50],
-    [50, 50]
-  ]
-  const resourceLineString: LineString = [
-    [31.06060606060611, 155.30303030303048],
-    [80.91200458875993, 165.7903106766409],
-    [133.1658635549907, 174.5511756850417],
-    [185.89024742146262, 181.22828756380306],
-    [237.12121212121218, 185.60606060606085]
-  ]
-
-  test(`should transform the lineString (without closing) and add two layers of midpoints, with slighly different locations since midpoints computed geographically`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformToResource(geoLineString, transformOptions),
-      resourceLineString
-    )
-  })
-})
-
-describe('Transform LineString Backward To LineString of vertical line, with destinationIsGeographic = true and maxDepth = 2 and minOffsetRatio = 0.001', async () => {
-  const transformOptions = {
-    minOffsetRatio: 0.001,
-    maxDepth: 2,
-    destinationIsGeographic: true
-  }
-  const transformer = new GcpTransformer(gcps7, 'polynomial')
-  const geoLineString: LineString = [
-    [50, 10],
-    [50, 50]
-  ]
-  const resourceLineString: LineString = [
-    [258.3333333333333, 91.66666666666677],
-    [237.12121212121218, 185.60606060606085]
-  ]
-
-  test(`should transform the lineString (without closing) and add no midpoints`, () => {
-    expectToBeCloseToArrayArray(
-      transformer.transformToResource(geoLineString, transformOptions),
-      resourceLineString
-    )
-  })
-})
-
-describe('Transform LineString Backward To LineString, with destinationIsGeographic as true', async () => {
-  const transformOptions = {
-    maxDepth: 2,
-    destinationIsGeographic: true
-  }
-  const transformer = new GcpTransformer(gcps7, 'polynomial')
-  const geoLineString: LineString = [
-    [10, 50],
-    [50, 50]
-  ]
-  const resourceLineString: LineString = [
-    [31.06060606060611, 155.30303030303048],
-    [80.91200458875993, 165.7903106766409],
-    [133.1658635549907, 174.5511756850417],
-    [185.89024742146262, 181.22828756380306],
-    [237.12121212121218, 185.60606060606085]
-  ]
-
-  test(`should give almost the same result as transforming from lineString, since the geographic distance and midpoint functions are used`, () => {
     expectToBeCloseToArrayArray(
       transformer.transformToResource(geoLineString, transformOptions),
       resourceLineString
@@ -529,5 +422,27 @@ describe('Transform LineString Forward To LineString, with reading out the sourc
       ),
       geoLineString
     )
+  })
+
+  describe('Get resolutions', async () => {
+    const transformerOptions = {
+      minOffsetDistance: 0.0001,
+      maxDepth: 5
+    }
+    const transformer = new GcpTransformer(
+      gcps6,
+      'thinPlateSpline',
+      transformerOptions
+    )
+
+    test(`should correctly compute the resolution of the to geo transformation`, () => {
+      expect(transformer.getToGeoTransformationResolution()).to.equal(71.03125)
+    })
+
+    test(`should correctly compute the resolution of the to resource transformation`, () => {
+      expect(transformer.getToResourceTransformationResolution()).to.equal(
+        0.0013075593749931613
+      )
+    })
   })
 })

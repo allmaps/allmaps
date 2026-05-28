@@ -1,4 +1,4 @@
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
 // TODO: move to test helper file in /test/
 import {
@@ -255,11 +255,12 @@ describe('Projected Transform LineString Forward To LineString with EPSG:4326 in
   })
 })
 
-describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection', () => {
+describe('Projected Transform LineString Forward To LineString with EPSG:4326 internal projection and not setting sourceDistanceFromResolution', () => {
   const transformerOptions = {
     minOffsetRatio: 0.01,
     maxDepth: 1,
-    internalProjection: epsg4326
+    internalProjection: epsg4326,
+    setMinSourceDistanceFromResolution: false
   }
   const transformer = new GcpTransformer(
     gcps6,
@@ -410,5 +411,35 @@ describe('Support PROJJSON projections', () => {
       projectedTransformer.transformToProjectedGeo(resourceLineString),
       projectedTransformerProjjson.transformToProjectedGeo(resourceLineString)
     )
+  })
+
+  describe('Get resolutions', async () => {
+    const transformerOptions = {
+      minOffsetDistance: 0.0001,
+      maxDepth: 5
+    }
+    const projectedTransformer = new ProjectedGcpTransformer(
+      gcps6,
+      'thinPlateSpline',
+      transformerOptions
+    )
+
+    test(`should correctly compute the resolution of the to projected geo transformation`, () => {
+      expect(
+        projectedTransformer.getToProjectedGeoTransformationResolution()
+      ).to.equal(71.03125)
+    })
+
+    test(`should correctly compute the resolution of the to geo transformation`, () => {
+      expect(projectedTransformer.getToGeoTransformationResolution()).to.equal(
+        71.03125
+      )
+    })
+
+    test(`should correctly compute the resolution of the to resource transformation`, () => {
+      expect(
+        projectedTransformer.getToResourceTransformationResolution()
+      ).to.equal(235.99268526304513)
+    })
   })
 })

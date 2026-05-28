@@ -113,22 +113,32 @@ export function addProjectedGcpTransformOptions<
   return command
     .option(
       '-m, --max-depth <number>',
-      `Maximum recursion depth when recursively adding midpoints (higher means more midpoints). Default ${defaultProjectedGcpTransformOptions.maxDepth}, so no midpoints by default!`,
+      `Maximum recursion depth when recursively refining (higher means more midpoints). Default ${defaultProjectedGcpTransformOptions.maxDepth}, so no midpoints by default!`,
+      parseInt
+    )
+    .option(
+      '--min-source-distance <number>',
+      `Minimum distance of a source segment when recursively refining (lower means more midpoints). Default ${defaultProjectedGcpTransformOptions.minSourceDistance}.`,
+      parseInt
+    )
+    .option(
+      '--min-destination-distance <number>',
+      `Minimum distance of a destination segment when recursively refining (lower means more midpoints). Default ${defaultProjectedGcpTransformOptions.minDestinationDistance}.`,
       parseInt
     )
     .option(
       '--min-offset-ratio <number>',
-      `Minimum offset ratio when recursively adding midpoints (lower means more midpoints). Default ${defaultProjectedGcpTransformOptions.minOffsetRatio}.`,
+      `Minimum offset ratio when recursively refining (lower means more midpoints). Default ${defaultProjectedGcpTransformOptions.minOffsetRatio}.`,
       parseFloat
     )
     .option(
       '--min-offset-distance <number>',
-      `Minimum offset distance when recursively adding midpoints (lower means more midpoints). Default 'Infinity'.`,
+      `Minimum offset distance when recursively refining (lower means more midpoints). Default 'Infinity'.`,
       parseFloat
     )
     .option(
       '--min-line-distance <number>',
-      `Minimum line distance when recursively adding midpoints (lower means more midpoints). Default 'Infinity'.`,
+      `Minimum line distance when recursively refining (lower means more midpoints). Default 'Infinity'.`,
       parseFloat
     )
     .option(

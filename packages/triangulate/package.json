@@ -45,7 +45,8 @@
     "@allmaps/types": "workspace:^",
     "@kninnug/constrainautor": "^4.0.1",
     "delaunator": "^5.0.1",
-    "point-in-polygon-hao": "^1.2.4"
+    "kdbush": "^4.1.0",
+    "robust-predicates": "^3.0.3"
   },
   "devDependencies": {
     "@types/delaunator": "^5.0.3",

@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "watch": "turbo watch watch --filter \"./packages/**\"",
+    "watch": "turbo watch build --filter \"./packages/**\"",
     "build:packages": "turbo run build --filter \"./packages/**\"",
     "build:packages:force": "turbo run build --force --filter \"./packages/**\"",
     "build:apps": "turbo run build --filter \"./apps/**\"",

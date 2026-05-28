@@ -348,7 +348,6 @@
               visible: true,
               transformationType: undefined
             },
-            undefined,
             { animate: false }
           )
 
@@ -361,7 +360,7 @@
 
           // TODO: later, when visibility should be animated for otherMapIds,
           // animate it together with transformationType for selectedMapIdForImageView
-          // using setMapsOptionsByMapId() as below
+          // using setMapsOptionsByMapIdAndLayerOptions() as below
           // (after setting only transformationType but not visibilty with { animate: false } ) as above
           // and same when view == image
           //
@@ -377,7 +376,7 @@
           //     visible: true,
           //   })
           // }
-          // warpedMapLayer?.setMapsOptionsByMapId(mapsOptionsByMapId)
+          // warpedMapLayer?.setMapsOptionsByMapIdAndLayerOptions(mapsOptionsByMapId)
 
           if (previousMapBounds) {
             map.fitBounds(previousMapBounds, {
@@ -416,7 +415,6 @@
               visible: false,
               transformationType: 'helmert'
             },
-            undefined,
             { animate: false }
           )
 

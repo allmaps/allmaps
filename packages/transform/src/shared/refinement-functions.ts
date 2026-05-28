@@ -43,12 +43,12 @@ import type {
 
 export const defaultRefinementOptions: RefinementOptions = {
   maxDepth: 0,
+  minSourceDistance: 0,
+  minDestinationDistance: 0,
   minOffsetRatio: 0,
   minOffsetDistance: Infinity,
-  minLineDistance: Infinity,
   sourceMidPointFunction: midPoint,
-  destinationMidPointFunction: midPoint,
-  destinationDistanceFunction: distance
+  destinationMidPointFunction: midPoint
 }
 
 // Refine Geometries
@@ -138,7 +138,14 @@ export function newMidGcpIfShouldSplitGcpLine(
   refinementOptions: RefinementOptions,
   depth: number
 ): GeneralGcp | undefined {
-  if (depth >= refinementOptions.maxDepth || refinementOptions.maxDepth <= 0) {
+  if (
+    depth >= refinementOptions.maxDepth ||
+    refinementOptions.maxDepth <= 0 ||
+    distance(gcpLine[0].source, gcpLine[1].source) <
+      refinementOptions.minSourceDistance ||
+    distance(gcpLine[0].destination, gcpLine[1].destination) <
+      refinementOptions.minDestinationDistance
+  ) {
     return undefined
   }
 
@@ -146,15 +153,13 @@ export function newMidGcpIfShouldSplitGcpLine(
     sourceMidPoint,
     destinationMidPointFromRefinementFunction,
     destinationMidPointsDistance,
-    destinationLineDistance,
-    destinationRefinedLineDistance
+    destinationLineDistance
   } = splitGcpLinePointInfo(gcpLine, refinementFunction, refinementOptions)
 
   const shouldSplit = shouldSplitGcpLine(
     {
       destinationMidPointsDistance,
-      destinationLineDistance,
-      destinationRefinedLineDistance
+      destinationLineDistance
     },
     refinementOptions
   )
@@ -182,44 +187,32 @@ function splitGcpLinePointInfo(
   )
   const destinationMidPointFromRefinementFunction =
     refinementFunction(sourceMidPoint)
+  const destinationMidPointsDistance = distance(
+    destinationMidPoint,
+    destinationMidPointFromRefinementFunction
+  )
 
-  const destinationLineDistance = refinementOptions.destinationDistanceFunction(
+  const destinationLineDistance = distance(
     gcpLine[0].destination,
     gcpLine[1].destination
   )
-  const destinationRefinedLineDistance =
-    refinementOptions.destinationDistanceFunction(
-      refinementFunction(gcpLine[0].source),
-      refinementFunction(gcpLine[1].source)
-    )
-  const destinationMidPointsDistance =
-    refinementOptions.destinationDistanceFunction(
-      destinationMidPoint,
-      destinationMidPointFromRefinementFunction
-    )
 
   return {
     sourceMidPoint,
     destinationMidPointFromRefinementFunction,
     destinationMidPointsDistance,
-    destinationLineDistance,
-    destinationRefinedLineDistance
+    destinationLineDistance
   }
 }
 
 function shouldSplitGcpLine(
-  {
-    destinationMidPointsDistance,
-    destinationLineDistance,
-    destinationRefinedLineDistance
-  }: SplitGcpLineInfo,
+  { destinationMidPointsDistance, destinationLineDistance }: SplitGcpLineInfo,
   refinementOptions: RefinementOptions
 ): boolean {
   return (
     destinationMidPointsDistance / destinationLineDistance >
       refinementOptions.minOffsetRatio ||
-    destinationMidPointsDistance > refinementOptions.minOffsetDistance ||
-    destinationRefinedLineDistance > refinementOptions.minLineDistance
+    destinationMidPointsDistance > refinementOptions.minOffsetDistance
   )
 }
 
@@ -232,86 +225,67 @@ export function getSourceRefinementResolution(
 ): number | undefined {
   const sourceRectangle = bboxToRectangle(sourceBbox)
 
-  const sourcePointNE = sourceRectangle[2]
-  const sourcePointNW = sourceRectangle[3]
-  const sourcePointSE = sourceRectangle[1]
-  const sourcePointSW = sourceRectangle[0]
+  const sourceTRPoint = sourceRectangle[2]
+  const sourceTLPoint = sourceRectangle[3]
+  const sourceBRPoint = sourceRectangle[1]
+  const sourceBLPoint = sourceRectangle[0]
 
-  const sourcePointCE = refinementOptions.sourceMidPointFunction(
-    sourcePointNE,
-    sourcePointSE
+  const sourceCRPoint = refinementOptions.sourceMidPointFunction(
+    sourceTRPoint,
+    sourceBRPoint
   )
-  const sourcePointCW = refinementOptions.sourceMidPointFunction(
-    sourcePointNW,
-    sourcePointSW
+  const sourceCLPoint = refinementOptions.sourceMidPointFunction(
+    sourceTLPoint,
+    sourceBLPoint
   )
-  const sourcePointNC = refinementOptions.sourceMidPointFunction(
-    sourcePointNE,
-    sourcePointNW
+  const sourceTCPoint = refinementOptions.sourceMidPointFunction(
+    sourceTRPoint,
+    sourceTLPoint
   )
-  const sourcePointSC = refinementOptions.sourceMidPointFunction(
-    sourcePointSE,
-    sourcePointSW
+  const sourceBCPoint = refinementOptions.sourceMidPointFunction(
+    sourceBRPoint,
+    sourceBLPoint
   )
 
   // Get horizontal and vertical lines from points
-  const sourceHorizontalLine = [sourcePointCE, sourcePointCW] as Line
-  const sourceVerticalLine = [sourcePointNC, sourcePointSC] as Line
+  // Note: Could also add sourceHTLine, sourceHBLine, sourceVLLine, sourceVRLine
+  // to get a more accurate resolution (at the expense of more refinement computations),
+  // but testing showed this was not needed
+  const sourceHCLine = [sourceCRPoint, sourceCLPoint] as Line
+  const sourceVCLine = [sourceTCPoint, sourceBCPoint] as Line
+  const sourceMultiLine = [sourceHCLine, sourceVCLine]
 
   // Refine lines
-  const sourceRefinedHorizontalLineString = refineLineString(
-    sourceHorizontalLine,
-    refinementFunction,
-    refinementOptions
-  ).map((generalGcp) => generalGcp.source)
-  const sourceRefinedVerticalLineString = refineLineString(
-    sourceVerticalLine,
-    refinementFunction,
-    refinementOptions
-  ).map((generalGcp) => generalGcp.source)
+  const sourceRefinedMultiLineString = sourceMultiLine.map((sourceLine) =>
+    refineLineString(sourceLine, refinementFunction, refinementOptions).map(
+      (generalGcp) => generalGcp.source
+    )
+  )
 
   if (
-    sourceRefinedHorizontalLineString.length === 2 &&
-    sourceRefinedVerticalLineString.length === 2
+    sourceRefinedMultiLineString.every(
+      (sourceRefinedLineString) => sourceRefinedLineString.length == 2
+    )
   ) {
     return undefined
   }
 
   // Compute minimal line length of refinement
-  const sourceMinHorizontalLineSquaredLengths = []
-  for (let i = 0; i < sourceRefinedHorizontalLineString.length - 1; i++) {
-    sourceMinHorizontalLineSquaredLengths.push(
-      squaredDistance(
-        sourceRefinedHorizontalLineString[i],
-        sourceRefinedHorizontalLineString[i + 1]
-      )
-    )
-  }
-  const sourceMinHorizontalLineLength = Math.sqrt(
-    Math.min(...sourceMinHorizontalLineSquaredLengths)
-  )
-  const sourceMinVerticalLineSquaredLengths = []
-  for (let i = 0; i < sourceRefinedVerticalLineString.length - 1; i++) {
-    sourceMinVerticalLineSquaredLengths.push(
-      squaredDistance(
-        sourceRefinedVerticalLineString[i],
-        sourceRefinedVerticalLineString[i + 1]
-      )
-    )
-  }
-  const sourceMinVerticalLineLength = Math.sqrt(
-    Math.min(...sourceMinVerticalLineSquaredLengths)
-  )
-
-  // Compute cols and rows by comparing minimal line length to original length
   // Note: Tried to acchieve this by working with unflattened refined line and computing depth
   // but that proved difficult for TypeScript
-  const sourceMinLineLength = Math.min(
-    sourceMinHorizontalLineLength,
-    sourceMinVerticalLineLength
+  const sourceRefinedMultiLineStringSquaredLengths =
+    sourceRefinedMultiLineString.map((sourceRefinedLineString) =>
+      sourceRefinedLineString
+        .slice(0, -1)
+        .map((sourcePoint, index) =>
+          squaredDistance(sourcePoint, sourceRefinedLineString[index + 1])
+        )
+    )
+  const sourceRefinedMultiLineStringMinLength = Math.sqrt(
+    Math.min(...sourceRefinedMultiLineStringSquaredLengths.flat())
   )
 
-  return sourceMinLineLength
+  return sourceRefinedMultiLineStringMinLength
 }
 
 // Convert
