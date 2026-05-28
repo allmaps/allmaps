@@ -28,14 +28,14 @@ const divisions: Division[] = [
 ]
 
 export function getMapLabels(map: GeoreferencedMap): string[] {
-  const manifests = findManifests(map.resource.partOf)
-  const canvases = findCanvases(map.resource.partOf)
+  const manifests = findManifests(map.resource.partOf ?? [])
+  const canvases = findCanvases(map.resource.partOf ?? [])
 
   const firstCanvasWithManifestLabel = canvases
     .map((canvas) => ({
       canvas,
       label: labelFromPartOfItem(canvas),
-      manifests: findManifests(canvas.partOf)
+      manifests: findManifests(canvas.partOf ?? [])
         .map((manifest) => ({
           manifest,
           label: labelFromPartOfItem(manifest)
