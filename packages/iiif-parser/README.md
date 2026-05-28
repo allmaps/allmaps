@@ -842,7 +842,7 @@ true
 
 `ImageRequest | Array<Array<ImageRequest>>`.
 
-### `EmbeddedImage#getImageUrl(imageRequest)`
+### `EmbeddedImage#getImageUrl(imageRequest, options)`
 
 Generates a IIIF Image API URL for the requested region and size
 
@@ -850,6 +850,8 @@ Generates a IIIF Image API URL for the requested region and size
 
 * `imageRequest` (`{region?: Region; size?: SizeObject}`)
   * Image request object containing the desired region and size of the requested image
+* `options?` (`ImageUrlOptions | undefined`)
+  * Options for generating the requested image URL
 
 ###### Returns
 
@@ -893,6 +895,22 @@ number | undefined
 
 ```ts
 number | undefined
+```
+
+### `EmbeddedImage#preferredFormats?`
+
+###### Type
+
+```ts
+Array<string>
+```
+
+### `EmbeddedImage#supportedFormats`
+
+###### Type
+
+```ts
+Array<string>
 ```
 
 ### `EmbeddedImage#supportsAnyRegionAndSize`
@@ -1156,6 +1174,12 @@ Parsed IIIF Image (`Image`).
 
 * `region?` (`{x: number; y: number; width: number; height: number}`)
 * `size?` (`{width: number; height: number}`)
+
+### `ImageUrlOptions`
+
+###### Fields
+
+* `preferredFormats?` (`Array<string>`)
 
 ### `LanguageString`
 

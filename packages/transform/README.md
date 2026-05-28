@@ -1302,7 +1302,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * A Georeferenced Map
 * `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeo...`)
   * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map

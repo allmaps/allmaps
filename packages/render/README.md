@@ -410,7 +410,7 @@ Creates an instance of a TriangulatedWarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * Georeferenced map used to construct the WarpedMap
 * `listOptions?` (`Partial<WarpedMapListOptions<TriangulatedWarpedMap>> | undefined`)
 * `mapOptions?` (`Partial<WarpedMapOptions> | undefined`)
@@ -1318,7 +1318,7 @@ Creates an instance of WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * Georeferenced map used to construct the WarpedMap
 * `listOptions` (`Partial<WarpedMapListOptions<WarpedMap>> | undefined`)
 * `mapOptions` (`Partial<WarpedMapOptions> | undefined`)
@@ -1510,7 +1510,7 @@ Array<Point>
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }
+{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }
 ```
 
 ### `WarpedMap#georeferencedMapOptions`
@@ -3900,7 +3900,7 @@ Creates an instance of WebGL2WarpedMap.
 
 * `mapId` (`string`)
   * ID of the map
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * Georeferenced map used to construct the WarpedMap
 * `gl` (`WebGL2RenderingContext`)
   * WebGL rendering context

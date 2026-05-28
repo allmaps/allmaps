@@ -80,7 +80,7 @@ MIT
 ###### Type
 
 ```ts
-{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }...
+{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...
 ```
 
 ### `AnnotationPage`
@@ -88,7 +88,7 @@ MIT
 ###### Type
 
 ```ts
-{ type: "AnnotationPage"; items: Array<{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | ...
+{ type: "AnnotationPage"; items: Array<{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined...
 ```
 
 ### `AnnotationPageSchema`
@@ -128,7 +128,7 @@ GeoreferencedMap2GCPSchema
 ###### Type
 
 ```ts
-{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }
+{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }
 ```
 
 ### `GeoreferencedMapSchema`
@@ -152,7 +152,7 @@ GeoreferencedMaps2Schema
 ###### Type
 
 ```ts
-Array<{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<...> | undefined; }> | undefined; }>
+Array<PartOfItemType>
 ```
 
 ### `PartOfItem`
@@ -160,7 +160,12 @@ Array<{ id: string; type: string; label?: Record<string, Array<string | number |
 ###### Type
 
 ```ts
-{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<{ id: string; type: string; label?: Record<string, Array<string | number | boolean>> | undefined; partOf?: Array<...> | undefined; }> | undefined; }
+{
+  id: string
+  type: string
+  label?: z.infer<typeof LanguageValueSchema>
+  partOf?: PartOfItemType[]
+}
 ```
 
 ### `ResourceSchema`
@@ -191,7 +196,7 @@ an Annotation Page containing multiple Georeference Annotations from an array of
 
 ###### Returns
 
-Georeference Annotation or Annotation Page (`{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }...`).
+Georeference Annotation or Annotation Page (`{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...`).
 
 ###### Examples
 
@@ -215,7 +220,7 @@ and returns an array of Georeferenced Maps.
 
 ###### Returns
 
-Array of maps (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`).
+Array of maps (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`).
 
 ###### Examples
 
@@ -235,7 +240,7 @@ const maps = parseAnnotation(annotation)
 
 ###### Returns
 
-`{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...; }...`.
+`{ type: "Annotation"; target: { type: "SpecificResource"; source: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; } | { ...; } | { ...; }; selector: { ...`.
 
 ### `validateGeoreferencedMap(mapOrMaps)`
 
@@ -245,4 +250,4 @@ const maps = parseAnnotation(annotation)
 
 ###### Returns
 
-`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; } | Array<{ type: "Ge...`.
+`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; } | Array<{ typ...`.

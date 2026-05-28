@@ -179,11 +179,11 @@ Creates a WarpedMapLayer
 
 * `BaseWarpedMapLayer`
 
-### `WarpedMapLayer#_animateZoom(e)`
+### `WarpedMapLayer#_animateZoom(event)`
 
 ###### Parameters
 
-* `e` (`L.ZoomAnimEvent`)
+* `event` (`L.ZoomAnimEvent`)
 
 ###### Returns
 

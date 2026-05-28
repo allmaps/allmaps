@@ -218,7 +218,7 @@ and will be infered from the map by default.
 
 ###### Parameters
 
-* `map` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
+* `map` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
 * `options?` (`  | Partial<{
         gcpFileFormat: GcpFileFormat
         gcpResourceYAxis: GcpResourceYAxis
@@ -239,7 +239,7 @@ and will be infered from the map by default.
 
 ###### Parameters
 
-* `maps` (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`)
+* `maps` (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`)
 * `options?` (`  | Partial<{
         projectedTransformers: ProjectedGcpTransformer[]
         imageFilenames: {[key: string]: string}

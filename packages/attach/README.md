@@ -290,7 +290,7 @@ There are no parameters.
 
 ###### Returns
 
-`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`.
+`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`.
 
 ### `AttachedTransformation#trailingCumulativeCoefsArrayMatrixSizeById`
 
@@ -336,7 +336,7 @@ or specifically set the option 'useMapTransformationTypes' to true to use the ty
 
 ###### Parameters
 
-* `georeferencedMaps` (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<{ ...; }> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`)
+* `georeferencedMaps` (`Array<{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }>`)
   * Georeferenced Maps
 * `rcps` (`Array<Rcp>`)
 * `options?` (`Partial<{ internalProjection: Projection; projection: Projection; } & { differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; ... 6 more ...; preToResource: ProjectionFunction; } & MultiGeometryOptions & TransformationTypeInputs & { ...; }> | undefined`)
