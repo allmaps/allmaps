@@ -212,18 +212,26 @@ This can be used as input for
 
 ###### Parameters
 
-* `options?` (`  | Partial<
-        CenterZoomBearingOptions &
-          CenterZoomBearing & {
-            pitch?: number
-            roll?: number
-            elevation?: number
-          } & {
-            padding?: number | PaddingOptions
-            offset?: PointLike
-            maxZoom?: number
-          }     >
-    | undefined`)
+* `options?` (`Partial<Partial<MaskOptions> & { bearingSelection: "first" | "angularMean"; fit: Fit; } & CenterZoomBearing & { pitch?: number; roll?: number; elevation?: number; } & { ...; }> | undefined`)
+
+###### Returns
+
+center, zoom and bearing (`{center?: LngLatLike; zoom?: number; bearing?: number}`).
+
+### `WarpedMapLayer#getMapCenterZoomBearing(mapId, options)`
+
+Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit the selected map.
+
+This can be used as input for
+
+* Map.jumpTo() for immediate change
+* Map.easeTo() for smooth panning
+* Map.flyTo() for a flying animation which zooms out and back in
+
+###### Parameters
+
+* `mapId` (`string`)
+* `options?` (`Partial<Partial<MaskOptions> & { bearingSelection: "first" | "angularMean"; fit: Fit; } & CenterZoomBearing & { pitch?: number; roll?: number; elevation?: number; } & { ...; }> | undefined`)
 
 ###### Returns
 
@@ -259,18 +267,7 @@ This can be used as input for
 ###### Parameters
 
 * `mapIds` (`Array<string>`)
-* `options?` (`  | Partial<
-        CenterZoomBearingOptions &
-          CenterZoomBearing & {
-            pitch?: number
-            roll?: number
-            elevation?: number
-          } & {
-            padding?: number | PaddingOptions
-            offset?: PointLike
-            maxZoom?: number
-          }     >
-    | undefined`)
+* `options?` (`Partial<Partial<MaskOptions> & { bearingSelection: "first" | "angularMean"; fit: Fit; } & CenterZoomBearing & { pitch?: number; roll?: number; elevation?: number; } & { ...; }> | undefined`)
 
 ###### Returns
 

@@ -15,7 +15,6 @@ import {
   pink,
   white,
   yellow,
-  gray,
   red,
   darkblue
 } from '@allmaps/tailwind'
@@ -96,7 +95,7 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     saturation: 1,
     removeColor: false,
     removeColorColor: black,
-    removeColorThreshold: 0,
+    removeColorThreshold: 0.3,
     removeColorHardness: 0.7,
     colorize: false,
     colorizeColor: pink,
@@ -108,8 +107,7 @@ const DEFAULT_SPECIFIC_WEBGL2_WARPED_MAP_OPTIONS: SpecificWebGL2WarpedMapOptions
     distortionColor2: yellow,
     distortionColor3: red,
     debugTiles: false,
-    debugTriangles: false,
-    debugTriangulation: false
+    debugTriangles: false
   }
 
 const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
@@ -274,18 +272,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * Set the map-specific options (and the list options)
-   *
-   * @param mapOptions - Map-specific options
-   * @param listOptions - list options
-   * @param animationOptions - Animation options
+   * Set the defaultOptions
    */
-  setMapOptions(
-    mapOptions?: Partial<WebGL2WarpedMapOptions>,
-    listOptions?: Partial<WebGL2WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
-  ): object {
-    return super.setMapOptions(mapOptions, listOptions, animationOptions)
+  setDefaultOptions() {
+    this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
   }
 
   /**
@@ -302,10 +292,31 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * Set the defaultOptions
+   * Set the map-specific options
+   *
+   * @param mapOptions - Map-specific options
+   * @param animationOptions - Animation options
    */
-  setDefaultOptions() {
-    this.defaultOptions = WebGL2WarpedMap.getDefaultOptions()
+  setMapOptions(
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return super.setMapOptions(mapOptions, animationOptions)
+  }
+
+  /**
+   * Set the map-specific options, and the list options
+   *
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setMapAndListOptions(
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    listOptions?: Partial<WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return super.setMapAndListOptions(mapOptions, listOptions, animationOptions)
   }
 
   protected applyOptions(animationOptions?: Partial<AnimationOptions>) {
@@ -345,9 +356,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     return (
       super.shouldRenderPoints() &&
       this.options.renderPoints !== false &&
-      (this.options.renderGcps ||
-        this.options.renderTransformedGcps ||
-        this.options.debugTriangulation)
+      (this.options.renderGcps || this.options.renderTransformedGcps)
     )
   }
 
@@ -513,17 +522,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         color: this.options.renderTransformedGcpsColor,
         viewportBorderSize: this.options.renderTransformedGcpsBorderSize,
         borderColor: this.options.renderTransformedGcpsBorderColor
-      })
-    }
-
-    if (this.options.debugTriangulation) {
-      this.pointGroups.push({
-        projectedGeoPoints: this.projectedGeoPreviousTrianglePoints,
-        color: gray
-      })
-      this.pointGroups.push({
-        projectedGeoPoints: this.projectedGeoTrianglePoints,
-        color: yellow
       })
     }
   }
@@ -1171,16 +1169,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     for (const fetchableTile of this.overviewFetchableTilesForViewport) {
       const cachedTile = this.cachedTilesByTileUrl.get(fetchableTile.tileUrl)
       if (cachedTile) {
-        // If they are available, consider to include them
-        const tileZoolLevelTilesCount = this.tileZoomLevelForViewport
+        // If they are available, consider to include them,
+        // if this map's cached tiles don't already cover the entire zoomlevel
+        const tileZoomLevelTilesCount = this.tileZoomLevelForViewport
           ? this.tileZoomLevelForViewport.rows *
             this.tileZoomLevelForViewport.columns
           : undefined
-        // If this map's cached tiles don't already cover the entire zoomlevel
         if (
           cachedTiles.length === 0 ||
-          (tileZoolLevelTilesCount &&
-            cachedTiles.length < tileZoolLevelTilesCount)
+          (tileZoomLevelTilesCount &&
+            cachedTiles.length < tileZoomLevelTilesCount)
         ) {
           overviewCachedTiles.push(cachedTile)
         }

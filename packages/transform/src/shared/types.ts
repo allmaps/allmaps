@@ -38,16 +38,6 @@ export type TransformationType =
   | 'projective'
   | 'linear'
 
-// export const SupportedTransformationTypes: TransformationType[] = [
-//   'straight',
-//   'helmert',
-//   'polynomial', // Note: no 'polynomial1' here
-//   'polynomial2',
-//   'polynomial3',
-//   'thinPlateSpline',
-//   'projective'
-// ]
-
 // Stored here as object to facilitate parsing in CLI and elsewhere
 export type GcpsInputs = {
   gcps: Gcp[]
@@ -78,12 +68,12 @@ export type InverseOptions = {
 
 export type RefinementOptions = {
   maxDepth: number
+  minSourceDistance: number
+  minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
   sourceMidPointFunction: (p0: Point, p1: Point) => Point
   destinationMidPointFunction: (p0: Point, p1: Point) => Point
-  destinationDistanceFunction: (p0: Point, p1: Point) => number
 }
 
 export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
@@ -94,16 +84,14 @@ export type SplitGcpLinePointInfo = SplitGcpLineInfo & {
 export type SplitGcpLineInfo = {
   destinationMidPointsDistance: number
   destinationLineDistance: number
-  destinationRefinedLineDistance: number
 }
 
 export type GeneralGcpTransformOptions = {
   maxDepth: number
+  minSourceDistance: number
+  minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
-  sourceIsGeographic: boolean
-  destinationIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
   preForward: ProjectionFunction
@@ -114,10 +102,10 @@ export type GeneralGcpTransformOptions = {
 
 export type GcpTransformOptions = {
   maxDepth: number
+  minSourceDistance: number
+  minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
-  geoIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
   postToGeo: ProjectionFunction

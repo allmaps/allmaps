@@ -1,5 +1,7 @@
 import { rewind } from '@turf/rewind'
 
+import { isEqualArray } from './main.js'
+
 import type {
   Point,
   Line,
@@ -365,29 +367,14 @@ export function isEqualPointArray(
   pointArray0: Point[],
   pointArray1: Point[]
 ): boolean {
-  if (pointArray0 === pointArray1) return true
-  if (!pointArray0 || !pointArray1) return false
-  if (pointArray0.length !== pointArray1.length) return false
-
-  for (let i = 0; i < pointArray0.length; ++i) {
-    if (isEqualPoint(pointArray0[i], pointArray1[i])) return false
-  }
-  return true
+  return isEqualArray(pointArray0, pointArray1, isEqualPoint)
 }
 
 export function isEqualPointArrayArray(
   pointArrayArray0: Point[][],
   pointArrayArray1: Point[][]
 ): boolean {
-  if (pointArrayArray0 === pointArrayArray1) return true
-  if (!pointArrayArray0 || !pointArrayArray1) return false
-  if (pointArrayArray0.length !== pointArrayArray1.length) return false
-
-  for (let i = 0; i < pointArrayArray0.length; ++i) {
-    if (isEqualPointArray(pointArrayArray0[i], pointArrayArray1[i]))
-      return false
-  }
-  return true
+  return isEqualArray(pointArrayArray0, pointArrayArray1, isEqualPointArray)
 }
 
 // Split, combine, shift, flip

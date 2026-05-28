@@ -1,18 +1,22 @@
 import * as turf from '@turf/helpers'
 import turfArea from '@turf/area'
-import turfIntersect from '@turf/intersect'
 import turfCentroid from '@turf/centroid'
+import turfIntersect from '@turf/intersect'
 import polylabel from 'polylabel'
 
 import { combineBboxes, computeBbox, doBboxesIntersect } from '@allmaps/stdlib'
 
-import type { Size, Bbox, Polygon } from '@allmaps/types'
+import type { Bbox, Polygon, Size } from '@allmaps/types'
 
-type CandidateResult = {
-  bbox: Bbox
+type Point = {
+  lon: number
+  lat: number
+}
+
+type FrameMetrics = {
   fill: number
+  rawFill: number
   coverage: number
-  score: number
 }
 
 type Cluster = {
@@ -21,223 +25,190 @@ type Cluster = {
   totalArea: number
 }
 
-/**
- * Close rings for GeoJSON compatibility (append first point if not already closed).
- */
+type ScoringContext = {
+  features: ReturnType<typeof polygonsToFeatures>
+  bboxes: Bbox[]
+  totalArea: number
+  targetCoverage: number
+  minFill: number
+}
+
+type Candidate = {
+  bbox: Bbox
+  score: number
+  context: ScoringContext
+}
+
+type ApproximateCandidate = {
+  bbox: Bbox
+  score: number
+}
+
+const ZOOM_MIN = -6
+const ZOOM_MAX = 1.5
+const ZOOM_SAMPLES = 28
+const SIMPLIFY_TOLERANCE_FACTOR = 0.0015
+
 function closeRing(ring: number[][]): number[][] {
   const first = ring[0]
   const last = ring[ring.length - 1]
+
   if (first[0] !== last[0] || first[1] !== last[1]) {
     return [...ring, first]
   }
+
   return ring
 }
 
-/**
- * Convert Allmaps Polygon[] (Ring[][] with unclosed rings) to Turf polygon features.
- */
 function polygonsToFeatures(mapPolygons: Polygon[]) {
   return mapPolygons.map((polygon) => turf.polygon(polygon.map(closeRing)))
 }
 
-/**
- * Compute fill (intersection / viewport) and coverage (intersection / total map)
- * for a candidate viewport bbox against map polygon features.
- * Uses bbox pre-filtering to skip non-overlapping polygons.
- */
-function computeFillAndCoverage(
-  candidateBbox: Bbox,
-  polygonFeatures: ReturnType<typeof polygonsToFeatures>,
-  polygonBboxes: Bbox[],
-  totalMapArea: number
-): { fill: number; coverage: number } {
-  const viewportPoly = turf.polygon([
-    [
-      [candidateBbox[0], candidateBbox[1]],
-      [candidateBbox[2], candidateBbox[1]],
-      [candidateBbox[2], candidateBbox[3]],
-      [candidateBbox[0], candidateBbox[3]],
-      [candidateBbox[0], candidateBbox[1]]
-    ]
-  ])
+function addPoint(points: Point[], seenPoints: Set<string>, point: Point) {
+  const key = `${point.lon.toFixed(6)},${point.lat.toFixed(6)}`
 
-  let intersectionArea = 0
-  for (let i = 0; i < polygonFeatures.length; i++) {
-    // Skip polygons whose bbox doesn't overlap the candidate viewport
-    if (!doBboxesIntersect(candidateBbox, polygonBboxes[i])) {
-      continue
-    }
-    const inter = turfIntersect(
-      turf.featureCollection([viewportPoly, polygonFeatures[i]])
-    )
-    if (inter) {
-      intersectionArea += turfArea(inter)
-    }
+  if (seenPoints.has(key)) {
+    return
   }
 
-  const viewportArea = turfArea(viewportPoly)
+  seenPoints.add(key)
+  points.push(point)
+}
+
+function centerOfBbox(bbox: Bbox): Point {
   return {
-    // Cap fill at 1.0: overlapping polygons can sum to more than viewport area
-    fill: viewportArea > 0 ? Math.min(1, intersectionArea / viewportArea) : 0,
-    coverage: totalMapArea > 0 ? intersectionArea / totalMapArea : 0
+    lon: (bbox[0] + bbox[2]) / 2,
+    lat: (bbox[1] + bbox[3]) / 2
   }
 }
 
-/**
- * Shift a viewport bbox so the visible map content is centered within it.
- * Computes the area-weighted centroid of all map-viewport intersections,
- * then shifts the viewport to center that content.
- */
-function refineCenter(
-  viewportBbox: Bbox,
-  polygonFeatures: ReturnType<typeof polygonsToFeatures>,
-  polygonBboxes: Bbox[]
-): Bbox {
-  const viewportPoly = turf.polygon([
-    [
-      [viewportBbox[0], viewportBbox[1]],
-      [viewportBbox[2], viewportBbox[1]],
-      [viewportBbox[2], viewportBbox[3]],
-      [viewportBbox[0], viewportBbox[3]],
-      [viewportBbox[0], viewportBbox[1]]
-    ]
-  ])
-
-  let totalArea = 0
-  let weightedLon = 0
-  let weightedLat = 0
-
-  for (let i = 0; i < polygonFeatures.length; i++) {
-    if (!doBboxesIntersect(viewportBbox, polygonBboxes[i])) continue
-    const inter = turfIntersect(
-      turf.featureCollection([viewportPoly, polygonFeatures[i]])
-    )
-    if (inter) {
-      const area = turfArea(inter)
-      const centroid = turfCentroid(inter)
-      weightedLon += centroid.geometry.coordinates[0] * area
-      weightedLat += centroid.geometry.coordinates[1] * area
-      totalArea += area
-    }
-  }
-
-  if (totalArea === 0) {
-    return viewportBbox
-  }
-
-  const contentLon = weightedLon / totalArea
-  const contentLat = weightedLat / totalArea
-  const vpCenterLon = (viewportBbox[0] + viewportBbox[2]) / 2
-  const vpCenterLat = (viewportBbox[1] + viewportBbox[3]) / 2
-
-  const shiftLon = contentLon - vpCenterLon
-  const shiftLat = contentLat - vpCenterLat
+function bboxWithCenter(bbox: Bbox, center: Point): Bbox {
+  const halfWidth = (bbox[2] - bbox[0]) / 2
+  const halfHeight = (bbox[3] - bbox[1]) / 2
 
   return [
-    viewportBbox[0] + shiftLon,
-    viewportBbox[1] + shiftLat,
-    viewportBbox[2] + shiftLon,
-    viewportBbox[3] + shiftLat
+    center.lon - halfWidth,
+    center.lat - halfHeight,
+    center.lon + halfWidth,
+    center.lat + halfHeight
   ]
 }
 
-/**
- * Group polygons into spatial clusters using union-find.
- * Polygons whose bbox centers are within 2x the average bbox diagonal
- * are merged into the same cluster.
- */
-function clusterPolygons(
-  polygonBboxes: Bbox[],
-  polygonAreas: number[]
-): Cluster[] {
-  const n = polygonBboxes.length
-  if (n === 0) {
-    return []
-  }
-
-  if (n === 1) {
-    return [
-      { indices: [0], bbox: polygonBboxes[0], totalArea: polygonAreas[0] }
-    ]
-  }
-
-  // Compute average bbox diagonal (in degrees)
-  const diags = polygonBboxes.map((bbox) => {
-    const dx = bbox[2] - bbox[0]
-    const dy = bbox[3] - bbox[1]
-    return Math.sqrt(dx * dx + dy * dy)
-  })
-  const avgDiag = diags.reduce((sum, d) => sum + d, 0) / n
-  const threshold = 2 * avgDiag
-
-  // Union-find
-  const parent = Array.from({ length: n }, (_, i) => i)
-  const rank = new Array(n).fill(0)
-
-  function find(x: number): number {
-    if (parent[x] !== x) {
-      parent[x] = find(parent[x])
-    }
-    return parent[x]
-  }
-
-  function unite(a: number, b: number) {
-    const ra = find(a)
-    const rb = find(b)
-    if (ra === rb) {
-      return
-    }
-
-    if (rank[ra] < rank[rb]) {
-      parent[ra] = rb
-    } else if (rank[ra] > rank[rb]) {
-      parent[rb] = ra
-    } else {
-      parent[rb] = ra
-      rank[ra]++
-    }
-  }
-
-  // Merge polygons whose bbox centers are within threshold
-  for (let i = 0; i < n; i++) {
-    const cxi = (polygonBboxes[i][0] + polygonBboxes[i][2]) / 2
-    const cyi = (polygonBboxes[i][1] + polygonBboxes[i][3]) / 2
-    for (let j = i + 1; j < n; j++) {
-      const cxj = (polygonBboxes[j][0] + polygonBboxes[j][2]) / 2
-      const cyj = (polygonBboxes[j][1] + polygonBboxes[j][3]) / 2
-      const dx = cxi - cxj
-      const dy = cyi - cyj
-      if (Math.sqrt(dx * dx + dy * dy) < threshold) {
-        unite(i, j)
-      }
-    }
-  }
-
-  // Group by cluster root
-  const clusterMap = new Map<number, number[]>()
-  for (let i = 0; i < n; i++) {
-    const root = find(i)
-    if (!clusterMap.has(root)) clusterMap.set(root, [])
-    clusterMap.get(root)!.push(i)
-  }
-
-  // Build cluster objects
-  const clusters: Cluster[] = []
-  for (const indices of clusterMap.values()) {
-    const bboxes = indices.map((i) => polygonBboxes[i])
-    const combined = combineBboxes(...bboxes)!
-    const totalArea = indices.reduce((sum, i) => sum + polygonAreas[i], 0)
-    clusters.push({ indices, bbox: combined, totalArea })
-  }
-
-  return clusters
+function bboxArea(bbox: Bbox): number {
+  return (
+    (bbox[2] - bbox[0]) *
+    (bbox[3] - bbox[1]) *
+    Math.cos(((bbox[1] + bbox[3]) / 2) * (Math.PI / 180))
+  )
 }
 
-/**
- * Build a candidate bbox centered on (lon, lat) at a given zoom level.
- * The resulting bbox is in lon/lat degrees. The Viewport projection
- * handles Mercator distortion, so we do NOT apply cosLat correction here.
- */
+function bboxIntersectionArea(a: Bbox, b: Bbox): number {
+  const minLon = Math.max(a[0], b[0])
+  const minLat = Math.max(a[1], b[1])
+  const maxLon = Math.min(a[2], b[2])
+  const maxLat = Math.min(a[3], b[3])
+
+  if (minLon >= maxLon || minLat >= maxLat) {
+    return 0
+  }
+
+  return bboxArea([minLon, minLat, maxLon, maxLat])
+}
+
+function scaleBbox(bbox: Bbox, scale: number): Bbox {
+  const center = centerOfBbox(bbox)
+  const halfWidth = ((bbox[2] - bbox[0]) * scale) / 2
+  const halfHeight = ((bbox[3] - bbox[1]) * scale) / 2
+
+  return [
+    center.lon - halfWidth,
+    center.lat - halfHeight,
+    center.lon + halfWidth,
+    center.lat + halfHeight
+  ]
+}
+
+function pointSegmentDistance(
+  point: number[],
+  start: number[],
+  end: number[]
+): number {
+  const dx = end[0] - start[0]
+  const dy = end[1] - start[1]
+
+  if (dx === 0 && dy === 0) {
+    return Math.hypot(point[0] - start[0], point[1] - start[1])
+  }
+
+  const t = Math.max(
+    0,
+    Math.min(
+      1,
+      ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) /
+        (dx * dx + dy * dy)
+    )
+  )
+
+  return Math.hypot(
+    point[0] - (start[0] + t * dx),
+    point[1] - (start[1] + t * dy)
+  )
+}
+
+function simplifyOpenRing(points: number[][], tolerance: number): number[][] {
+  if (points.length <= 2) {
+    return points
+  }
+
+  let maxDistance = 0
+  let maxIndex = 0
+  const start = points[0]
+  const end = points[points.length - 1]
+
+  for (let i = 1; i < points.length - 1; i++) {
+    const distance = pointSegmentDistance(points[i], start, end)
+
+    if (distance > maxDistance) {
+      maxDistance = distance
+      maxIndex = i
+    }
+  }
+
+  if (maxDistance <= tolerance) {
+    return [start, end]
+  }
+
+  return [
+    ...simplifyOpenRing(points.slice(0, maxIndex + 1), tolerance).slice(0, -1),
+    ...simplifyOpenRing(points.slice(maxIndex), tolerance)
+  ]
+}
+
+function simplifyRing(ring: number[][], tolerance: number): number[][] {
+  const closedRing = closeRing(ring)
+  const openRing = closedRing.slice(0, -1)
+
+  if (openRing.length <= 4) {
+    return closedRing
+  }
+
+  const simplifiedRing = closeRing(simplifyOpenRing(openRing, tolerance))
+
+  return simplifiedRing.length >= 4 ? simplifiedRing : closedRing
+}
+
+function simplifyPolygons(mapPolygons: Polygon[]): Polygon[] {
+  const mapBbox = combineBboxes(
+    ...mapPolygons.map((polygon) => computeBbox(polygon[0]))
+  )!
+  const diagonal = Math.hypot(mapBbox[2] - mapBbox[0], mapBbox[3] - mapBbox[1])
+  const tolerance = diagonal * SIMPLIFY_TOLERANCE_FACTOR
+
+  return mapPolygons.map((polygon) =>
+    polygon.map((ring) => simplifyRing(ring, tolerance))
+  ) as Polygon[]
+}
+
 function buildCandidateBbox(
   centerLon: number,
   centerLat: number,
@@ -246,287 +217,499 @@ function buildCandidateBbox(
   zoom: number
 ): Bbox {
   const size = baseSize * Math.pow(2, zoom)
-
-  const h = aspectRatio >= 1 ? size / aspectRatio : size
-  const w = aspectRatio >= 1 ? size : size * aspectRatio
+  const height = aspectRatio >= 1 ? size / aspectRatio : size
+  const width = aspectRatio >= 1 ? size : size * aspectRatio
 
   return [
-    centerLon - w / 2,
-    centerLat - h / 2,
-    centerLon + w / 2,
-    centerLat + h / 2
+    centerLon - width / 2,
+    centerLat - height / 2,
+    centerLon + width / 2,
+    centerLat + height / 2
   ]
 }
 
-/**
- * Find the best zoom level at a given center point by sampling multiple
- * scales and picking the one with the best fill x coverage score.
- */
-function findOptimalScaleAtCenter(
-  centerLon: number,
-  centerLat: number,
-  aspectRatio: number,
-  baseSize: number,
-  polygonFeatures: ReturnType<typeof polygonsToFeatures>,
-  polygonBboxes: Bbox[],
-  totalMapArea: number,
-  minCoverage: number
-): CandidateResult {
-  // Sample zoom levels from zoomed-in (-6 = 1/64 of map extent) to
-  // zoomed-out (1.5 = 3x map extent).
-  const zoomMin = -6.0
-  const zoomMax = 1.5
-  const numSamples = 40
+function clusterPolygons(polygonBboxes: Bbox[], polygonAreas: number[]) {
+  const count = polygonBboxes.length
 
-  let bestResult: CandidateResult = {
-    bbox: buildCandidateBbox(centerLon, centerLat, aspectRatio, baseSize, 0),
-    fill: 0,
-    coverage: 0,
-    score: 0
+  if (count === 0) {
+    return []
   }
 
-  for (let i = 0; i < numSamples; i++) {
-    const zoom = zoomMin + ((zoomMax - zoomMin) * i) / (numSamples - 1)
-    const candidateBbox = buildCandidateBbox(
-      centerLon,
-      centerLat,
-      aspectRatio,
-      baseSize,
-      zoom
-    )
+  if (count === 1) {
+    return [
+      {
+        indices: [0],
+        bbox: polygonBboxes[0],
+        totalArea: polygonAreas[0]
+      }
+    ]
+  }
 
-    const { fill, coverage } = computeFillAndCoverage(
-      candidateBbox,
-      polygonFeatures,
-      polygonBboxes,
-      totalMapArea
-    )
+  const averageDiagonal =
+    polygonBboxes.reduce((sum, bbox) => {
+      return sum + Math.hypot(bbox[2] - bbox[0], bbox[3] - bbox[1])
+    }, 0) / count
+  const threshold = 2 * averageDiagonal
+  const parents = Array.from({ length: count }, (_, index) => index)
+  const ranks = new Array(count).fill(0)
 
-    // Enforce floors: at least 30% fill and minimum coverage
-    if (fill < 0.3 || coverage < minCoverage) {
+  function find(index: number): number {
+    if (parents[index] !== index) {
+      parents[index] = find(parents[index])
+    }
+
+    return parents[index]
+  }
+
+  function unite(a: number, b: number) {
+    const rootA = find(a)
+    const rootB = find(b)
+
+    if (rootA === rootB) {
+      return
+    }
+
+    if (ranks[rootA] < ranks[rootB]) {
+      parents[rootA] = rootB
+    } else if (ranks[rootA] > ranks[rootB]) {
+      parents[rootB] = rootA
+    } else {
+      parents[rootB] = rootA
+      ranks[rootA]++
+    }
+  }
+
+  for (let i = 0; i < count; i++) {
+    const centerI = centerOfBbox(polygonBboxes[i])
+
+    for (let j = i + 1; j < count; j++) {
+      const centerJ = centerOfBbox(polygonBboxes[j])
+
+      if (
+        Math.hypot(centerI.lon - centerJ.lon, centerI.lat - centerJ.lat) <
+        threshold
+      ) {
+        unite(i, j)
+      }
+    }
+  }
+
+  const clusterMap = new Map<number, number[]>()
+
+  for (let i = 0; i < count; i++) {
+    const root = find(i)
+    clusterMap.set(root, [...(clusterMap.get(root) ?? []), i])
+  }
+
+  return [...clusterMap.values()].map((indices): Cluster => {
+    return {
+      indices,
+      bbox: combineBboxes(...indices.map((index) => polygonBboxes[index]))!,
+      totalArea: indices.reduce((sum, index) => sum + polygonAreas[index], 0)
+    }
+  })
+}
+
+function exactMetrics(
+  candidateBbox: Bbox,
+  polygonFeatures: ReturnType<typeof polygonsToFeatures>,
+  polygonBboxes: Bbox[],
+  totalArea: number
+): FrameMetrics {
+  const viewportPolygon = turf.polygon([
+    [
+      [candidateBbox[0], candidateBbox[1]],
+      [candidateBbox[2], candidateBbox[1]],
+      [candidateBbox[2], candidateBbox[3]],
+      [candidateBbox[0], candidateBbox[3]],
+      [candidateBbox[0], candidateBbox[1]]
+    ]
+  ])
+  const viewportArea = turfArea(viewportPolygon)
+  let intersectionArea = 0
+
+  for (let i = 0; i < polygonFeatures.length; i++) {
+    if (!doBboxesIntersect(candidateBbox, polygonBboxes[i])) {
       continue
     }
 
-    // Maximize fill (minimize background). The coverage floor
-    // ensures a meaningful portion of the map is shown.
-    const score = fill
-    if (score > bestResult.score) {
-      bestResult = { bbox: candidateBbox, fill, coverage, score }
+    const intersection = turfIntersect(
+      turf.featureCollection([viewportPolygon, polygonFeatures[i]])
+    )
+
+    if (intersection) {
+      intersectionArea += turfArea(intersection)
     }
   }
 
-  return bestResult
+  return {
+    fill: viewportArea > 0 ? Math.min(1, intersectionArea / viewportArea) : 0,
+    rawFill: viewportArea > 0 ? intersectionArea / viewportArea : 0,
+    coverage: totalArea > 0 ? intersectionArea / totalArea : 0
+  }
+}
+
+function approximateMetrics(
+  candidateBbox: Bbox,
+  polygonBboxes: Bbox[],
+  totalBboxArea: number
+): FrameMetrics {
+  const viewportArea = bboxArea(candidateBbox)
+  const intersectionArea = polygonBboxes.reduce((sum, polygonBbox) => {
+    return sum + bboxIntersectionArea(candidateBbox, polygonBbox)
+  }, 0)
+
+  return {
+    fill: viewportArea > 0 ? Math.min(1, intersectionArea / viewportArea) : 0,
+    rawFill: viewportArea > 0 ? intersectionArea / viewportArea : 0,
+    coverage: totalBboxArea > 0 ? intersectionArea / totalBboxArea : 0
+  }
+}
+
+function relaxedCenters(bbox: Bbox, polygonBboxes: Bbox[]) {
+  const center = centerOfBbox(bbox)
+  const influenceBbox = scaleBbox(bbox, 1.8)
+  const centers: Point[] = []
+  const seenCenters = new Set<string>()
+  const intersectingBboxes = polygonBboxes.filter((polygonBbox) =>
+    doBboxesIntersect(influenceBbox, polygonBbox)
+  )
+
+  addPoint(centers, seenCenters, center)
+
+  if (intersectingBboxes.length === 0) {
+    return centers
+  }
+
+  let weightedLon = 0
+  let weightedLat = 0
+  let totalWeight = 0
+
+  for (const polygonBbox of intersectingBboxes) {
+    const weight = bboxArea(polygonBbox)
+    const polygonCenter = centerOfBbox(polygonBbox)
+    weightedLon += polygonCenter.lon * weight
+    weightedLat += polygonCenter.lat * weight
+    totalWeight += weight
+  }
+
+  if (totalWeight > 0) {
+    const weightedCenter = {
+      lon: weightedLon / totalWeight,
+      lat: weightedLat / totalWeight
+    }
+
+    addPoint(centers, seenCenters, weightedCenter)
+    addPoint(centers, seenCenters, {
+      lon: (center.lon + weightedCenter.lon) / 2,
+      lat: (center.lat + weightedCenter.lat) / 2
+    })
+  }
+
+  const combinedCenter = centerOfBbox(combineBboxes(...intersectingBboxes)!)
+  addPoint(centers, seenCenters, combinedCenter)
+  addPoint(centers, seenCenters, {
+    lon: (center.lon + combinedCenter.lon) / 2,
+    lat: (center.lat + combinedCenter.lat) / 2
+  })
+
+  return centers
+}
+
+function centerBalanceScore(bbox: Bbox, polygonBboxes: Bbox[]) {
+  const influenceBbox = scaleBbox(bbox, 1.5)
+  const relevantBboxes = polygonBboxes.filter((polygonBbox) =>
+    doBboxesIntersect(influenceBbox, polygonBbox)
+  )
+
+  if (relevantBboxes.length === 0) {
+    return 1
+  }
+
+  const contentCenter = centerOfBbox(combineBboxes(...relevantBboxes)!)
+  const frameCenter = centerOfBbox(bbox)
+  const dx = Math.abs(contentCenter.lon - frameCenter.lon) / (bbox[2] - bbox[0])
+  const dy = Math.abs(contentCenter.lat - frameCenter.lat) / (bbox[3] - bbox[1])
+
+  return 1 / (1 + 3 * Math.hypot(dx, dy))
+}
+
+function relaxFrame(bbox: Bbox, context: ScoringContext) {
+  let bestBbox = bbox
+  let bestScore = -Infinity
+
+  for (const center of relaxedCenters(bbox, context.bboxes)) {
+    const candidateBbox = bboxWithCenter(bbox, center)
+    const metrics = exactMetrics(
+      candidateBbox,
+      context.features,
+      context.bboxes,
+      context.totalArea
+    )
+
+    if (metrics.fill < context.minFill * 0.72) {
+      continue
+    }
+
+    const coverageScore =
+      metrics.coverage >= context.targetCoverage
+        ? 1 / (1 + (metrics.coverage - context.targetCoverage) * 0.12)
+        : metrics.coverage / context.targetCoverage
+    const fillScore = Math.min(1, metrics.fill / context.minFill)
+    const score =
+      fillScore *
+      coverageScore *
+      centerBalanceScore(candidateBbox, context.bboxes)
+
+    if (score > bestScore) {
+      bestScore = score
+      bestBbox = candidateBbox
+    }
+  }
+
+  return bestBbox
 }
 
 /**
  * Find the best viewport frame for preview images of map polygons.
  *
- * Generates multiple candidate viewports (varying center + scale),
- * scores each by fill x coverage, and picks the best one.
- *
- * - fill  = map area visible in viewport / viewport area  (higher = less background)
- * - coverage = map area visible in viewport / total map area  (higher = more map shown)
- * - score = fill x coverage  (balances tight crop vs showing enough map)
- *
- * Uses spatial clustering to evaluate each cluster independently,
- * so "coverage" means "how much of this cluster is shown" rather than
- * "how much of all maps is shown."
- *
- * Handles:
- * - Single large polygon: shows most of it with minimal background
- * - Scattered small maps: zooms into the densest cluster
- * - Long thin chains: shows a well-filled section
- * - Irregular polygon with outliers: focuses on the main mass
- *
- * @param mapPolygons - Array of polygons representing the map geometry
- * @param viewportSize - Target viewport dimensions [width, height]
- * @returns Optimal viewport bounding box for preview generation
+ * The search uses simplified geometry and bbox-based approximate scoring to
+ * keep most candidate checks cheap. Exact Turf intersections are only run on a
+ * small shortlist, then the winning frame is gently recentered.
  */
 export function findBestFrame(
   mapPolygons: Polygon[],
   viewportSize: Size
 ): Bbox {
-  const aspectRatio = viewportSize[0] / viewportSize[1]
-
-  // Convert to Turf features and precompute bboxes + areas
-  const polygonFeatures = polygonsToFeatures(mapPolygons)
-  const polygonBboxes: Bbox[] = mapPolygons.map(
-    (polygon) => computeBbox(polygon[0]) // outer ring
-  )
-  const polygonAreas = polygonFeatures.map((f) => turfArea(f))
-  const totalMapArea = polygonAreas.reduce((sum, a) => sum + a, 0)
-
-  // Compute the combined bounding box from all polygons
-  const mapBbox = combineBboxes(...polygonBboxes)!
-  const mapWidth = mapBbox[2] - mapBbox[0]
-  const mapHeight = mapBbox[3] - mapBbox[1]
-
-  const bboxCenterLon = (mapBbox[0] + mapBbox[2]) / 2
-  const bboxCenterLat = (mapBbox[1] + mapBbox[3]) / 2
-
-  // If total map area is effectively zero (turf precision loss), use simple fallback
-  if (totalMapArea < 1) {
-    const baseSizeH = aspectRatio >= 1 ? mapHeight * aspectRatio : mapHeight
-    const baseSizeW = aspectRatio >= 1 ? mapWidth : mapWidth / aspectRatio
-    const baseSize = Math.max(baseSizeH, baseSizeW)
-    return buildCandidateBbox(
-      bboxCenterLon,
-      bboxCenterLat,
-      aspectRatio,
-      baseSize * 1.1,
-      0
-    )
+  if (mapPolygons.length === 0) {
+    return [0, 0, 0, 0]
   }
 
-  // Compute spatial clusters
-  const clusters = clusterPolygons(polygonBboxes, polygonAreas)
-  // Sort by total area descending (largest cluster first for fallback)
-  clusters.sort((a, b) => b.totalArea - a.totalArea)
+  const aspectRatio = viewportSize[0] / viewportSize[1]
+  const simplifiedPolygons = simplifyPolygons(mapPolygons)
+  const polygonFeatures = polygonsToFeatures(simplifiedPolygons)
+  const polygonBboxes = simplifiedPolygons.map((polygon) =>
+    computeBbox(polygon[0])
+  )
+  const polygonBboxAreas = polygonBboxes.map(bboxArea)
+  const polygonAreas = polygonFeatures.map((feature) => turfArea(feature))
+  const polygonCentroids: Point[] = polygonFeatures.map((feature) => {
+    const centroid = turfCentroid(feature)
+    return {
+      lon: centroid.geometry.coordinates[0],
+      lat: centroid.geometry.coordinates[1]
+    }
+  })
+  const totalMapArea = polygonAreas.reduce((sum, area) => sum + area, 0)
+  const clusters = clusterPolygons(polygonBboxes, polygonAreas).sort(
+    (a, b) => b.totalArea - a.totalArea
+  )
 
-  let overallBestScore = 0
-  let overallBestBbox: Bbox | null = null
+  let bestCandidate: Candidate | undefined
 
   for (const cluster of clusters) {
-    const clusterFeatures = cluster.indices.map((i) => polygonFeatures[i])
-    const clusterBboxes = cluster.indices.map((i) => polygonBboxes[i])
-    const clusterAreas = cluster.indices.map((i) => polygonAreas[i])
-
+    const clusterFeatures = cluster.indices.map(
+      (index) => polygonFeatures[index]
+    )
+    const clusterBboxes = cluster.indices.map((index) => polygonBboxes[index])
+    const clusterAreas = cluster.indices.map((index) => polygonAreas[index])
+    const clusterBboxAreas = cluster.indices.map(
+      (index) => polygonBboxAreas[index]
+    )
+    const clusterBboxArea = clusterBboxAreas.reduce(
+      (sum, area) => sum + area,
+      0
+    )
+    const originalClusterDensity = clusterBboxArea / bboxArea(cluster.bbox)
     const clusterWidth = cluster.bbox[2] - cluster.bbox[0]
     const clusterHeight = cluster.bbox[3] - cluster.bbox[1]
-
-    // Compute cluster-scoped baseSize
-    const baseSizeH =
-      aspectRatio >= 1 ? clusterHeight * aspectRatio : clusterHeight
-    const baseSizeW =
+    const baseSize = Math.max(
+      aspectRatio >= 1 ? clusterHeight * aspectRatio : clusterHeight,
       aspectRatio >= 1 ? clusterWidth : clusterWidth / aspectRatio
-    const clusterBaseSize = Math.max(baseSizeH, baseSizeW)
+    )
 
-    if (clusterBaseSize === 0) continue
-
-    // Coverage floor: show at least 25% of the cluster for small clusters.
-    // For larger clusters, scale down so we can zoom into a subset.
-    const clusterSize = cluster.indices.length
-    const minCoverage =
-      clusterSize <= 3 ? 0.25 : Math.max(0.05, 0.5 / clusterSize)
-
-    const clusterCenterLon = (cluster.bbox[0] + cluster.bbox[2]) / 2
-    const clusterCenterLat = (cluster.bbox[1] + cluster.bbox[3]) / 2
-
-    // Generate candidate centers for this cluster
-    const candidates: { lon: number; lat: number }[] = []
-
-    // 1. Cluster bbox center
-    candidates.push({ lon: clusterCenterLon, lat: clusterCenterLat })
-
-    // 2. Centroids of cluster members (top 8 by area)
-    const indexedAreas = clusterAreas
-      .map((area, localIdx) => ({
-        area,
-        globalIdx: cluster.indices[localIdx]
-      }))
-      .sort((a, b) => b.area - a.area)
-    const topPolygons = indexedAreas.slice(0, 8)
-
-    for (const { globalIdx } of topPolygons) {
-      const centroid = turfCentroid(polygonFeatures[globalIdx])
-      candidates.push({
-        lon: centroid.geometry.coordinates[0],
-        lat: centroid.geometry.coordinates[1]
-      })
+    if (baseSize === 0) {
+      continue
     }
 
-    // 3. Midpoints between adjacent top polygon centroids
-    if (topPolygons.length >= 2) {
-      const topCentroids = topPolygons.map(({ globalIdx }) => {
-        const c = turfCentroid(polygonFeatures[globalIdx])
-        return {
-          lon: c.geometry.coordinates[0],
-          lat: c.geometry.coordinates[1]
+    const isSmallScatteredCluster =
+      cluster.indices.length <= 3 && clusters.length > 4
+    const isDenseCollection =
+      clusters.length === 1 &&
+      cluster.indices.length >= 8 &&
+      originalClusterDensity > 0.7
+    const isSparseChain =
+      clusters.length === 1 &&
+      cluster.indices.length >= 8 &&
+      originalClusterDensity < 0.45
+    const isSmallMultiMap =
+      clusters.length === 1 &&
+      cluster.indices.length > 1 &&
+      cluster.indices.length <= 3
+    const targetCoverage = isSmallScatteredCluster
+      ? 0.32
+      : isSparseChain
+        ? 0.07
+        : isDenseCollection
+          ? 0.35
+          : isSmallMultiMap
+            ? 0.24
+            : 0.38
+    const minFill = isSmallScatteredCluster
+      ? 0.78
+      : isSparseChain
+        ? 0.65
+        : isDenseCollection
+          ? 0.7
+          : isSmallMultiMap
+            ? 0.94
+            : 0.72
+    const coverageOvershootPenalty = isSmallMultiMap ? 8 : 0.3
+    const centers: Point[] = []
+    const seenCenters = new Set<string>()
+    const clusterCenter = centerOfBbox(cluster.bbox)
+
+    addPoint(centers, seenCenters, clusterCenter)
+
+    const topPolygons = clusterAreas
+      .map((area, localIndex) => ({
+        area,
+        globalIndex: cluster.indices[localIndex]
+      }))
+      .sort((a, b) => b.area - a.area)
+      .slice(0, 4)
+
+    for (const { globalIndex } of topPolygons) {
+      addPoint(centers, seenCenters, polygonCentroids[globalIndex])
+    }
+
+    if (topPolygons.length > 0) {
+      const largestGlobalIndex = topPolygons[0].globalIndex
+
+      try {
+        const pole = polylabel(
+          [closeRing(simplifiedPolygons[largestGlobalIndex][0])],
+          0.0001
+        )
+
+        if (Number.isFinite(pole[0]) && Number.isFinite(pole[1])) {
+          addPoint(centers, seenCenters, {
+            lon: pole[0],
+            lat: pole[1]
+          })
         }
-      })
-      for (let j = 0; j < topCentroids.length - 1; j++) {
-        candidates.push({
-          lon: (topCentroids[j].lon + topCentroids[j + 1].lon) / 2,
-          lat: (topCentroids[j].lat + topCentroids[j + 1].lat) / 2
+      } catch {
+        // Degenerate polygons can make polylabel fail; other centers remain.
+      }
+    }
+
+    const approximateCandidates: ApproximateCandidate[] = []
+
+    for (const { lon, lat } of centers) {
+      for (let sample = 0; sample < ZOOM_SAMPLES; sample++) {
+        const fraction = sample / (ZOOM_SAMPLES - 1)
+        const zoom = ZOOM_MIN + (ZOOM_MAX - ZOOM_MIN) * fraction
+        const candidateBbox = buildCandidateBbox(
+          lon,
+          lat,
+          aspectRatio,
+          baseSize,
+          zoom
+        )
+        const metrics = approximateMetrics(
+          candidateBbox,
+          clusterBboxes,
+          clusterBboxArea
+        )
+
+        if (metrics.fill < 0.25 || metrics.coverage < 0.03) {
+          continue
+        }
+
+        const coverageScore =
+          metrics.coverage >= targetCoverage
+            ? 1 /
+              (1 +
+                (metrics.coverage - targetCoverage) * coverageOvershootPenalty)
+            : metrics.coverage / targetCoverage
+        const fillScore = Math.min(1, metrics.fill / minFill)
+
+        approximateCandidates.push({
+          bbox: candidateBbox,
+          score: fillScore * coverageScore
         })
       }
     }
 
-    // 4. Pole of inaccessibility of the largest polygon in this cluster
-    if (topPolygons.length > 0) {
-      const largestGlobalIdx = topPolygons[0].globalIdx
-      const outerRing = mapPolygons[largestGlobalIdx][0]
-      const closedOuterRing = closeRing(outerRing)
-      try {
-        const pole = polylabel([closedOuterRing], 0.0001)
-        if (isFinite(pole[0]) && isFinite(pole[1])) {
-          candidates.push({ lon: pole[0], lat: pole[1] })
-        }
-      } catch {
-        // polylabel can fail on degenerate polygons - skip
-      }
+    approximateCandidates.sort((a, b) => b.score - a.score)
+
+    const exactCandidateCount = isSmallScatteredCluster
+      ? 5
+      : isDenseCollection && cluster.indices.length > 16
+        ? 8
+        : 14
+    const context = {
+      features: clusterFeatures,
+      bboxes: clusterBboxes,
+      totalArea: clusterAreas.reduce((sum, area) => sum + area, 0),
+      targetCoverage,
+      minFill
     }
 
-    // Evaluate each candidate center with cluster-scoped scoring
-    let clusterBest: CandidateResult = {
-      bbox: buildCandidateBbox(
-        clusterCenterLon,
-        clusterCenterLat,
-        aspectRatio,
-        clusterBaseSize * 1.1,
-        0
-      ),
-      fill: 0,
-      coverage: 0,
-      score: 0
-    }
-
-    for (const { lon, lat } of candidates) {
-      const result = findOptimalScaleAtCenter(
-        lon,
-        lat,
-        aspectRatio,
-        clusterBaseSize,
-        clusterFeatures,
-        clusterBboxes,
-        cluster.totalArea,
-        minCoverage
+    for (const candidate of approximateCandidates.slice(
+      0,
+      exactCandidateCount
+    )) {
+      const metrics = exactMetrics(
+        candidate.bbox,
+        context.features,
+        context.bboxes,
+        context.totalArea
       )
-      if (result.score > clusterBest.score) {
-        clusterBest = result
+
+      if (metrics.fill < minFill * 0.75) {
+        continue
+      }
+
+      const coverageScore =
+        metrics.coverage >= targetCoverage
+          ? 1 /
+            (1 + (metrics.coverage - targetCoverage) * coverageOvershootPenalty)
+          : metrics.coverage / targetCoverage
+      const fillScore = Math.min(1, metrics.fill / minFill)
+      const clusterWeight = isSmallScatteredCluster
+        ? Math.sqrt(cluster.totalArea / totalMapArea)
+        : Math.pow(cluster.totalArea / totalMapArea, 0.25)
+      const score = fillScore * coverageScore * clusterWeight
+
+      if (!bestCandidate || score > bestCandidate.score) {
+        bestCandidate = {
+          bbox: candidate.bbox,
+          score,
+          context
+        }
       }
     }
-
-    // Weight the cluster's best score by its relative size.
-    // sqrt() gently prefers larger clusters without ignoring small ones.
-    const clusterWeight = Math.sqrt(cluster.totalArea / totalMapArea)
-    const finalScore = clusterBest.score * clusterWeight
-
-    if (finalScore > overallBestScore) {
-      overallBestScore = finalScore
-      overallBestBbox = clusterBest.bbox
-    }
   }
 
-  // If a candidate was found, refine centering and return
-  if (overallBestBbox) {
-    return refineCenter(overallBestBbox, polygonFeatures, polygonBboxes)
+  if (bestCandidate) {
+    return relaxFrame(bestCandidate.bbox, bestCandidate.context)
   }
 
-  // Fallback: use the largest cluster's bbox with padding (not the global bbox)
-  const largestCluster = clusters[0]
-  const lcWidth = largestCluster.bbox[2] - largestCluster.bbox[0]
-  const lcHeight = largestCluster.bbox[3] - largestCluster.bbox[1]
-  const lcBaseSizeH = aspectRatio >= 1 ? lcHeight * aspectRatio : lcHeight
-  const lcBaseSizeW = aspectRatio >= 1 ? lcWidth : lcWidth / aspectRatio
-  const lcBaseSize = Math.max(lcBaseSizeH, lcBaseSizeW) * 1.1
-  const lcCenterLon = (largestCluster.bbox[0] + largestCluster.bbox[2]) / 2
-  const lcCenterLat = (largestCluster.bbox[1] + largestCluster.bbox[3]) / 2
+  const fallbackBbox = combineBboxes(...polygonBboxes)!
+  const fallbackCenter = centerOfBbox(fallbackBbox)
+  const fallbackWidth = fallbackBbox[2] - fallbackBbox[0]
+  const fallbackHeight = fallbackBbox[3] - fallbackBbox[1]
+  const fallbackBaseSize = Math.max(
+    aspectRatio >= 1 ? fallbackHeight * aspectRatio : fallbackHeight,
+    aspectRatio >= 1 ? fallbackWidth : fallbackWidth / aspectRatio
+  )
+
   return buildCandidateBbox(
-    lcCenterLon,
-    lcCenterLat,
+    fallbackCenter.lon,
+    fallbackCenter.lat,
     aspectRatio,
-    lcBaseSize,
+    fallbackBaseSize * 1.1,
     0
   )
 }

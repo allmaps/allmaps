@@ -52,7 +52,8 @@ import type {
   AnimationOptions,
   Renderer,
   SpecificWebGL2RenderOptions,
-  WebGL2RenderOptions
+  WebGL2RenderOptions,
+  WebGL2WarpedMapOptions
 } from '../shared/types.js'
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
@@ -174,30 +175,26 @@ export class WebGL2Renderer
       pointsProgram
     )
 
+    const defaultSpecificWebGL2RenderOptions = {
+      warpedMapFactory,
+      anticipateInteraction: true
+    }
+
     super(
       CacheableWorkerImageDataTile.createFactory(
         wrappedWorker,
         wrappedSpritesWorker
       ),
-      mergeOptions(
-        {
-          warpedMapFactory
-        },
-        options
-      )
+      mergeOptions(defaultSpecificWebGL2RenderOptions, options)
     )
-
-    this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS = { warpedMapFactory }
 
     this.#worker = worker
     this.#spritesWorker = spritesWorker
     this.gl = gl
     this.#boundThrottledChangedByMapId = new Map()
 
-    this.options = mergeOptions(
-      this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS,
-      this.options
-    )
+    this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS =
+      defaultSpecificWebGL2RenderOptions
 
     this.mapProgram = mapProgram
     this.linesProgram = linesProgram
@@ -294,6 +291,16 @@ export class WebGL2Renderer
     for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
       webgl2WarpedMap.initializeWebGL(mapProgram, linesProgram, pointsProgram)
     }
+  }
+
+  /**
+   * Get the default options of the renderer and list
+   */
+  getDefaultOptions(): WebGL2RenderOptions & WebGL2WarpedMapOptions {
+    return mergeOptions(
+      super.getDefaultOptions(),
+      this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS
+    )
   }
 
   /**
@@ -409,8 +416,8 @@ export class WebGL2Renderer
     }
   }
 
-  protected resetPrevious(mapIds?: string[]) {
-    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps({ mapIds })
+  protected resetPrevious() {
+    const webgl2WarpedMaps = this.warpedMapList.getWarpedMaps()
     for (const webgl2WarpedMap of webgl2WarpedMaps) {
       webgl2WarpedMap.resetPrevious()
     }
@@ -477,11 +484,6 @@ export class WebGL2Renderer
         return false
       }
     }
-  }
-
-  protected shouldAnticipateInteraction() {
-    // Get a map's overview tiles only for this render
-    return true
   }
 
   #renderInternal() {
@@ -1043,7 +1045,7 @@ export class WebGL2Renderer
   }
 
   #finishAnimation(mapIds: string[]) {
-    this.resetPrevious(mapIds)
+    this.resetPrevious()
     this.updateVertexBuffers(mapIds)
 
     this.animating = false
@@ -1140,10 +1142,10 @@ export class WebGL2Renderer
         throw new Error('Event data missing')
       }
       const { mapIds } = event.data
-      for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
-        mapIds
-      })) {
-        if (this.animating) {
+      if (this.animating) {
+        for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps({
+          mapIds
+        })) {
           webgl2WarpedMap.mixPreviousAndNew(1 - this.animationProgress)
         }
       }

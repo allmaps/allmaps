@@ -7,7 +7,11 @@ import {
   validateGeoreferencedMap,
   type GeoreferencedMap
 } from '@allmaps/annotation'
-import { isEqualProjection, webMercatorProjection } from '@allmaps/project'
+import {
+  isEqualProjection,
+  lonLatProjection,
+  webMercatorProjection
+} from '@allmaps/project'
 import { Image } from '@allmaps/iiif-parser'
 
 import { RTree } from './RTree.js'
@@ -23,7 +27,6 @@ import {
   doBboxesIntersect,
   mergeOptions,
   mergePartialOptions,
-  optionKeysByMapIdToUndefinedOptionsByMapId,
   optionKeysToUndefinedOptions,
   pointInBbox
 } from '@allmaps/stdlib'
@@ -39,7 +42,8 @@ import type {
   AnimationOptions,
   WarpedMapListOptions,
   AnimationInternalOptions,
-  AnimationStage
+  AnimationStage,
+  WebGL2WarpedMapOptions
 } from '../shared/types.js'
 
 const DEFAULT_SELECTION_OPTIONS: SelectionOptions = { applyMask: true }
@@ -325,18 +329,18 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get mapIds for selected maps
    *
-   * The selectionOptions allow a.o. to:
+   * The options allow a.o. to:
    * - filter for visible maps
    * - filter for specific mapIds
-   * - filter for maps whose geoBbox overlap with the specified geoBbox
-   * - filter for maps that overlap with a given geoPoint
+   * - filter for maps that overlap with a given point. Use geoPoint or projectedGeoPoint. Optionally specify projection for projectedGeoPoint. Optionally specify whether mask should be applied when computing overlap using applyMask.
+   * - filter for maps whose bbox overlap with the specified bbox. Use geoBbox or projectedGeoBbox. Optionally specify projection for projectedGeoBbox. Optionally specify whether mask should be applied when computing overlap using applyMask.
    *
-   * @param partialSelectionOptions - Selection options (e.g. mapIds), defaults to all visible maps
+   * @param partialOptions - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns mapIds
    */
-  getMapIds(partialSelectionOptions?: Partial<SelectionOptions>): string[] {
+  getMapIds(partialOptions?: Partial<SelectionOptions>): string[] {
     // Enable the same selection options when getting mapIds
-    return this.getWarpedMaps(partialSelectionOptions).map(
+    return this.getWarpedMaps(partialOptions).map(
       (warpedMap) => warpedMap.mapId
     )
   }
@@ -344,81 +348,71 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   /**
    * Get the WarpedMap instances for selected maps
    *
-   * The selectionOptions allow a.o. to:
+   * The options allow a.o. to:
    * - filter for visible maps
    * - filter for specific mapIds
    * - filter for maps that overlap with a given point. Use geoPoint or projectedGeoPoint. Optionally specify projection for projectedGeoPoint. Optionally specify whether mask should be applied when computing overlap using applyMask.
    * - filter for maps whose bbox overlap with the specified bbox. Use geoBbox or projectedGeoBbox. Optionally specify projection for projectedGeoBbox. Optionally specify whether mask should be applied when computing overlap using applyMask.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param partialOptions - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns WarpedMap instances
    */
   getWarpedMaps(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    partialOptions?: Partial<SelectionOptions & ProjectionOptions>
   ): Array<W> {
-    const selectionAndProjectionOptions = mergeOptions(
+    const options = mergeOptions(
       mergeOptions(DEFAULT_SELECTION_OPTIONS, {
         projection: this.options.projection
       }),
-      partialSelectionAndProjectionOptions
+      partialOptions
     )
 
     let mapIds
-    if (selectionAndProjectionOptions.mapIds === undefined) {
-      if (selectionAndProjectionOptions.geoPoint) {
+    if (options.mapIds === undefined) {
+      if (options.geoPoint) {
         // Select by geoPoint
-        if (selectionAndProjectionOptions.applyMask) {
+        if (options.applyMask) {
           mapIds =
-            this.geoMaskRTree?.searchFromPoint(
-              selectionAndProjectionOptions.geoPoint
-            ) ??
+            this.geoMaskRTree?.searchFromPoint(options.geoPoint) ??
             this.#getMapIdsFromPoint(
-              selectionAndProjectionOptions.geoPoint,
+              options.geoPoint,
               (warpedMap) => warpedMap.geoMaskBbox,
               (warpedMap) => warpedMap.geoMask
             )
         } else {
           mapIds =
-            this.geoFullMaskRTree?.searchFromPoint(
-              selectionAndProjectionOptions.geoPoint
-            ) ??
+            this.geoFullMaskRTree?.searchFromPoint(options.geoPoint) ??
             this.#getMapIdsFromPoint(
-              selectionAndProjectionOptions.geoPoint,
+              options.geoPoint,
               (warpedMap) => warpedMap.geoFullMaskBbox,
               (warpedMap) => warpedMap.geoFullMask
             )
         }
-      } else if (selectionAndProjectionOptions.geoBbox) {
+      } else if (options.geoBbox) {
         // Select by geoBbox
-        if (selectionAndProjectionOptions.applyMask) {
+        if (options.applyMask) {
           mapIds =
-            this.geoMaskRTree?.searchFromBbox(
-              selectionAndProjectionOptions.geoBbox
-            ) ??
+            this.geoMaskRTree?.searchFromBbox(options.geoBbox) ??
             this.#getMapIdsFromBbox(
-              selectionAndProjectionOptions.geoBbox,
+              options.geoBbox,
               (warpedMap) => warpedMap.geoMaskBbox
             )
         } else {
           mapIds =
-            this.geoFullMaskRTree?.searchFromBbox(
-              selectionAndProjectionOptions.geoBbox
-            ) ??
+            this.geoFullMaskRTree?.searchFromBbox(options.geoBbox) ??
             this.#getMapIdsFromBbox(
-              selectionAndProjectionOptions.geoBbox,
+              options.geoBbox,
               (warpedMap) => warpedMap.geoFullMaskBbox
             )
         }
-      } else if (selectionAndProjectionOptions.projectedGeoPoint) {
+      } else if (options.projectedGeoPoint) {
         // Select by projectedGeoPoint
         const projectedGeoPoint = WarpedMapList.projectPointIfNeeded(
           this.options.projection,
-          selectionAndProjectionOptions.projection,
-          selectionAndProjectionOptions.projectedGeoPoint
+          options.projection,
+          options.projectedGeoPoint
         )
-        if (selectionAndProjectionOptions.applyMask) {
+        if (options.applyMask) {
           mapIds =
             this.projectedGeoMaskRTree?.searchFromPoint(projectedGeoPoint) ??
             this.#getMapIdsFromPoint(
@@ -437,14 +431,14 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
               (warpedMap) => warpedMap.projectedGeoFullMask
             )
         }
-      } else if (selectionAndProjectionOptions.projectedGeoBbox) {
+      } else if (options.projectedGeoBbox) {
         // Select by projectedGeoBbox
         const projectedGeoBbox = WarpedMapList.projectBboxIfNeeded(
           this.options.projection,
-          selectionAndProjectionOptions.projection,
-          selectionAndProjectionOptions.projectedGeoBbox
+          options.projection,
+          options.projectedGeoBbox
         )
-        if (selectionAndProjectionOptions.applyMask) {
+        if (options.applyMask) {
           mapIds =
             this.projectedGeoMaskRTree?.searchFromBbox(projectedGeoBbox) ??
             this.#getMapIdsFromBbox(
@@ -465,7 +459,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     } else {
       // Select specified
-      mapIds = selectionAndProjectionOptions.mapIds
+      mapIds = options.mapIds
     }
 
     const warpedMaps: W[] = []
@@ -480,9 +474,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       const warpedMap = this.warpedMapsById.get(mapId)
       if (
         warpedMap &&
-        (selectionAndProjectionOptions.onlyVisible
-          ? warpedMap.options.visible
-          : true)
+        (options.onlyVisible ? warpedMap.options.visible : true)
       ) {
         warpedMaps.push(warpedMap)
       }
@@ -511,15 +503,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param options - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns The center of the bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsCenter(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Point | undefined {
-    const bbox = this.getMapsBbox(partialSelectionAndProjectionOptions)
+    const bbox = this.getMapsBbox(options)
     if (bbox) {
       return bboxToCenter(bbox)
     }
@@ -530,20 +520,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param options - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns The bbox of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsBbox(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Bbox | undefined {
     // Note: we can't use the geoMaskBboxes since creating a bbox
     // gives a different result in a different projection
 
-    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(
-      partialSelectionAndProjectionOptions
-    )
+    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(options)
 
     if (projectedGeoMaskPoints.length === 0) {
       return
@@ -557,17 +543,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    *
    * The result is returned in lon-lat `EPSG:4326` by default.
    *
-   * @param partialSelectionAndProjectionOptions - Selection (e.g. mapIds) and projection options, defaults to all visible maps and current projection
+   * @param options - Selection, mask and projection options, defaults to all visible maps, applied mask and current projection
    * @returns The convex hull of all selected maps, in the chosen projection, or undefined if there were no maps matching the selection.
    */
   getMapsConvexHull(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Ring | undefined {
-    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(
-      partialSelectionAndProjectionOptions
-    )
+    const projectedGeoMaskPoints = this.#getProjectedGeoMaskPoints(options)
     return convexHull(projectedGeoMaskPoints)
   }
 
@@ -609,6 +591,13 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * Get the options of this list
    */
   getOptions(): Partial<WarpedMapListOptions<W>> {
+    return this.getListOptions()
+  }
+
+  /**
+   * Get the options of this list
+   */
+  getListOptions(): Partial<WarpedMapListOptions<W>> {
     return this.options
   }
 
@@ -638,22 +627,16 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the options of this list
+   * Set the options
    *
    * Note: Map-specific options set here will be passed to newly added maps.
    *
-   * @param options - List Options
-   * @param animationOptions - Animation options
+   * @param listOptions - List Options
    */
-  setOptions(
-    options?: Partial<WarpedMapListOptions<W>>,
-    animationOptions?: Partial<AnimationOptions>
-  ): void {
-    this.options = mergeOptions(this.options, options)
-    this.#setMapsOptionsByMapIdInternal(undefined, options, animationOptions)
-
+  setOptions(listOptions?: Partial<WarpedMapListOptions<W>>): void {
+    this.options = mergeOptions(this.options, listOptions)
     // Also update RTree sunce projectedGeoMask and projectedGeoFullMask changed
-    if (options && 'projection' in options) {
+    if (listOptions && 'projection' in listOptions) {
       for (const warpedMap of this.getWarpedMaps()) {
         this.#addToOrUpdateRtree(warpedMap)
       }
@@ -661,72 +644,203 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Set the map-specific options of maps (and the list options)
+   * Set the options of this list
    *
-   * @param mapIds - Map IDs for which the options apply
-   * @param mapOptions - Map-specific options
-   * @param listOptions - list options
+   * Note: Map-specific options set here will be passed to newly added maps.
+   *
+   * @param listOptions - List Options
+   * @param animationOptions - Animation options
+   */
+  setListOptions(
+    listOptions?: Partial<WarpedMapListOptions<W>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void {
+    this.#setMapsAndListOptionsInternal(
+      undefined,
+      listOptions,
+      animationOptions
+    )
+  }
+
+  /**
+   * Set the map-specific options of the specified maps
+   *
+   * Useful when map-specific options are changed for multiple maps at once,
+   * but only one animation should be fired.
+   *
+   * @param mapIds - Map IDs of the maps whose options to set
+   * @param mapsOptions - Map-specific options to apply to each of those maps
    * @param animationOptions - Animation options
    */
   setMapsOptions(
     mapIds: string[],
-    mapOptions?: Partial<WarpedMapListOptions<W>>,
-    listOptions?: Partial<WarpedMapListOptions<W>>,
+    mapsOptions?: Partial<WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
-  ): void {
-    const optionsByMapId = new Map<
-      string,
-      Partial<WarpedMapListOptions<W>> | undefined
-    >()
-    for (const mapId of mapIds) {
-      optionsByMapId.set(mapId, mapOptions)
-    }
-    this.#setMapsOptionsByMapIdInternal(
-      optionsByMapId,
-      listOptions,
-      animationOptions
-    )
-  }
-
+  ): void
   /**
-   * Set the map-specific options of maps by map ID (and the list options)
+   * Set the map-specific options of all maps using a per-map callback
    *
-   * This is useful when when multiple (and possibly different)
-   * map-specific options are changed at once,
-   * but only one animation should be fired
+   * Useful when map-specific options are changed for multiple maps at once
+   * (with possibly different options for different maps), but only one animation should be fired.
    *
-   * @param mapOptionsByMapId - Map-specific options by map ID
-   * @param listOptions - List options
+   * The callback receives each map's ID and returns the options to apply,
+   * or `undefined` to leave that map unchanged.
+   *
+   * @param mapsOptionsCallbackFn - Callback returning the options to apply for a given map
    * @param animationOptions - Animation options
    */
-  setMapsOptionsByMapId(
-    mapOptionsByMapId?: Map<string, Partial<WarpedMapListOptions<W>>>,
-    listOptions?: Partial<WarpedMapListOptions<W>>,
+  setMapsOptions(
+    mapsOptionsCallbackFn: (
+      mapId: string
+    ) => Partial<WebGL2WarpedMapOptions> | undefined,
     animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
+  ): void
+  setMapsOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
   ): void {
-    this.#setMapsOptionsByMapIdInternal(
-      mapOptionsByMapId,
-      listOptions,
-      animationOptions
-    )
+    if (Array.isArray(firstArgument)) {
+      this.#setMapsAndListOptionsInternal(
+        (mapId: string) =>
+          firstArgument.includes(mapId) ? secondArgument : undefined,
+        undefined,
+        thirdArgument
+      )
+    } else {
+      if (firstArgument === undefined) {
+        throw new Error('mapsOptionsCallbackFn is undefined')
+      }
+      this.#setMapsAndListOptionsInternal(
+        firstArgument,
+        undefined,
+        secondArgument as Partial<AnimationOptions> | undefined
+      )
+    }
   }
 
   /**
-   * Resets the list options
+   * Set the map-specific options of the specified maps, and the list options
    *
-   * An empty array resets all options, undefined resets no options.
+   * Useful when map-specific options are changed for multiple maps at once,
+   * together with the list options, but only one animation should be fired.
+   *
+   * @param mapIds - IDs of the maps whose options to set
+   * @param mapsOptions - Map-specific options to apply to each of those maps
+   * @param listOptions - List options to apply
+   * @param animationOptions - Animation options
+   */
+  setMapsAndListOptions(
+    mapIds: string[],
+    mapsOptions?: Partial<WebGL2WarpedMapOptions>,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  /**
+   * Set the map-specific options of all maps using a per-map callback, and the list options
+   *
+   * Useful when map-specific options are changed for multiple maps at once (with possibly different options for different maps),
+   * together with the list options, but only one animation should be fired.
+   *
+   * The callback receives each map's ID and returns the options to apply,
+   * or `undefined` to leave that map unchanged.
+   *
+   * @param mapsOptionsCallbackFn - Callback returning the options to apply for a given map
+   * @param listOptions - List options to apply
+   * @param animationOptions - Animation options
+   */
+  setMapsAndListOptions(
+    mapsOptionsCallbackFn: (
+      mapId: string
+    ) => Partial<WebGL2WarpedMapOptions> | undefined,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsAndListOptions(
+    mapIds: string[],
+    mapsOptions?: Partial<WebGL2WarpedMapOptions>,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsAndListOptions(
+    mapsOptionsCallbackFn: (
+      mapId: string
+    ) => Partial<WebGL2WarpedMapOptions> | undefined,
+    listOptions?: Partial<WarpedMapListOptions<W>>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  setMapsAndListOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<WarpedMapListOptions<W>>,
+    thirdArgument?:
+      | Partial<WarpedMapListOptions<W>>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void
+  setMapsAndListOptions(
+    firstArgument:
+      | string[]
+      | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Partial<WebGL2WarpedMapOptions>
+      | Partial<WarpedMapListOptions<W>>,
+    thirdArgument?:
+      | Partial<WarpedMapListOptions<W>>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void {
+    if (Array.isArray(firstArgument)) {
+      this.#setMapsAndListOptionsInternal(
+        (mapId: string) =>
+          firstArgument.includes(mapId) ? secondArgument : undefined,
+        thirdArgument,
+        fourthArgument
+      )
+    } else {
+      if (firstArgument === undefined) {
+        throw new Error('mapsOptionsCallbackFn is undefined')
+      }
+      this.#setMapsAndListOptionsInternal(
+        firstArgument,
+        secondArgument,
+        thirdArgument
+      )
+    }
+  }
+
+  /**
+   * Reset the list options
+   *
+   * Undefined option keys reset all options
    *
    * @param listOptionKeys - Keys of the list options to reset
    * @param animationOptions - Animation options
    */
-  resetOptions(
+  resetListOptions(
     listOptionKeys?: string[],
     animationOptions?: Partial<AnimationOptions>
   ) {
-    if (listOptionKeys && listOptionKeys.length == 0) {
+    if (listOptionKeys === undefined) {
       listOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
     }
-    this.setOptions(
+    this.setListOptions(
       optionKeysToUndefinedOptions(listOptionKeys) as Partial<
         WarpedMapListOptions<W>
       >,
@@ -735,84 +849,191 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Resets the map-specific options of maps (and the list options)
+   * Reset the map-specific options of the specified maps
    *
-   * An empty array resets all options, undefined resets no options.
+   * Omitting `mapsOptionKeys` resets all options; passing an empty array resets none.
    *
-   * @param mapIds - Map IDs for which to reset the options
-   * @param mapOptionKeys - Keys of the map-specific options to reset
-   * @param listOptionKeys - Keys of the list options to reset
+   * @param mapIds - IDs of the maps whose options to reset
+   * @param mapsOptionKeys - Keys of the options to reset
    * @param animationOptions - Animation options
    */
   resetMapsOptions(
     mapIds: string[],
-    mapOptionKeys?: string[],
-    listOptionKeys?: string[],
+    mapsOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
-  ) {
-    if (mapOptionKeys && mapOptionKeys.length == 0) {
-      mapOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
+  ): void
+  /**
+   * Reset the map-specific options of all maps using a per-map callback
+   *
+   * The callback receives each map's ID and returns the keys to reset for that map.
+   * Returning `undefined` from the callback resets all options for that map, returning an empty array resets none.
+   *
+   * @param mapsOptionKeysCallbackFn - Callback returning the option keys to reset for a given map
+   * @param animationOptions - Animation options
+   */
+  resetMapsOptions(
+    mapsOptionKeysCallbackFn: (
+      mapId: string
+    ) => Array<keyof WebGL2WarpedMapOptions> | undefined,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  resetMapsOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
+  ): void
+  resetMapsOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    thirdArgument?: Partial<AnimationOptions>
+  ): void {
+    const defaultWebGL2WarpedMapOptions = WebGL2WarpedMap.getDefaultOptions()
+    const defaultWebGL2WarpedMapOptionKeys = Object.keys(
+      defaultWebGL2WarpedMapOptions
+    ) as Array<keyof WebGL2WarpedMapOptions>
+    if (Array.isArray(firstArgument)) {
+      if (secondArgument === undefined) {
+        secondArgument = defaultWebGL2WarpedMapOptionKeys
+      }
+      this.setMapsOptions(
+        firstArgument,
+        optionKeysToUndefinedOptions(
+          secondArgument as Array<keyof WebGL2WarpedMapOptions>
+        ) as Partial<WebGL2WarpedMapOptions>,
+        thirdArgument
+      )
+    } else {
+      if (firstArgument === undefined) {
+        throw new Error('mapsOptionKeysCallbackFn is undefined')
+      }
+      const mapOptionKeysCallbackFn = firstArgument as (
+        mapId: string
+      ) => Array<keyof WebGL2WarpedMapOptions>
+      this.setMapsOptions(
+        (mapId) => {
+          let mapOptionKeys = mapOptionKeysCallbackFn(mapId)
+          if (mapOptionKeys === undefined) {
+            mapOptionKeys = defaultWebGL2WarpedMapOptionKeys
+          }
+          return optionKeysToUndefinedOptions(mapOptionKeys)
+        },
+        secondArgument as Partial<AnimationOptions> | undefined
+      )
     }
-    // Note: undefined resets no options,
-    // otherwise leaving out listOptionKeys would reset all list options
-    if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
-    }
-    this.setMapsOptions(
-      mapIds,
-      optionKeysToUndefinedOptions(mapOptionKeys) as Partial<
-        WarpedMapListOptions<W>
-      >,
-      optionKeysToUndefinedOptions(listOptionKeys) as Partial<
-        WarpedMapListOptions<W>
-      >,
-      animationOptions
-    )
   }
 
   /**
-   * Resets the map-specific options of maps by map ID (and the list options)
+   * Reset the map-specific options of the specified maps, and the list options
    *
-   * An empty array or map resets all options (for all maps), undefined resets no options.
+   * Omitting `mapsOptionKeys` or `listOptionKeys` resets all options for that scope;
+   * passing an empty array resets none.
    *
-   * @param mapOptionkeysByMapId - Keys of map-specific options to reset by map ID
+   * @param mapIds - IDs of the maps whose options to reset
+   * @param mapsOptionKeys - Keys of the map-specific options to reset
    * @param listOptionKeys - Keys of the list options to reset
    * @param animationOptions - Animation options
    */
-  resetMapsOptionsByMapId(
-    mapOptionkeysByMapId?: Map<string, string[]>,
-    listOptionKeys?: string[],
+  resetMapsAndListOptions(
+    mapIds: string[],
+    mapsOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
+    listOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions>
-  ) {
-    if (mapOptionkeysByMapId && mapOptionkeysByMapId.size == 0) {
-      const mapIds = this.getMapIds()
-      const defaultMapOptionsKeys = Object.keys(
-        WebGL2WarpedMap.getDefaultOptions()
-      )
-      for (const mapId of mapIds) {
-        mapOptionkeysByMapId.set(mapId, defaultMapOptionsKeys)
+  ): void
+  /**
+   * Reset the map-specific options of all maps using a per-map callback, and the list options
+   *
+   * The callback receives each map's ID and returns the keys to reset for that map.
+   * Returning `undefined` from the callback resets all options for that map, returning an empty array resets none.
+   * Omitting `listOptionKeys` resets all list options.
+   *
+   * @param mapsOptionKeysCallbackFn - Callback returning the option keys to reset for a given map
+   * @param listOptionKeys - Keys of the list options to reset
+   * @param animationOptions - Animation options
+   */
+  resetMapsAndListOptions(
+    mapsOptionKeysCallbackFn: (
+      mapId: string
+    ) => Array<keyof WebGL2WarpedMapOptions> | undefined,
+    listOptionKeys?: Array<keyof WebGL2WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ): void
+  resetMapsAndListOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
+    thirdArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void
+  resetMapsAndListOptions(
+    firstArgument?:
+      | string[]
+      | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
+    secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
+    thirdArgument?:
+      | Array<keyof WebGL2WarpedMapOptions>
+      | Partial<AnimationOptions>,
+    fourthArgument?: Partial<AnimationOptions>
+  ): void {
+    const defaultWebGL2WarpedMapOptions = WebGL2WarpedMap.getDefaultOptions()
+    const defaultWebGL2WarpedMapOptionKeys = Object.keys(
+      defaultWebGL2WarpedMapOptions
+    ) as Array<keyof WebGL2WarpedMapOptions>
+    if (Array.isArray(firstArgument)) {
+      if (secondArgument === undefined) {
+        secondArgument = defaultWebGL2WarpedMapOptionKeys
       }
+      if (thirdArgument === undefined) {
+        thirdArgument = defaultWebGL2WarpedMapOptionKeys
+      }
+      this.setMapsAndListOptions(
+        firstArgument,
+        optionKeysToUndefinedOptions(
+          secondArgument as Array<keyof WebGL2WarpedMapOptions>
+        ) as Partial<WebGL2WarpedMapOptions>,
+        optionKeysToUndefinedOptions(
+          thirdArgument as Array<keyof WebGL2WarpedMapOptions>
+        ) as Partial<WebGL2WarpedMapOptions>,
+        fourthArgument as Partial<AnimationOptions>
+      )
+    } else {
+      if (firstArgument === undefined) {
+        throw new Error('mapsOptionKeysCallbackFn is undefined')
+      }
+      const mapOptionKeysCallbackFn = firstArgument as (
+        mapId: string
+      ) => Array<keyof WebGL2WarpedMapOptions>
+      if (secondArgument === undefined) {
+        secondArgument = defaultWebGL2WarpedMapOptionKeys
+      }
+      this.setMapsAndListOptions(
+        (mapId) => {
+          let mapOptionKeys = mapOptionKeysCallbackFn(mapId)
+          if (mapOptionKeys === undefined) {
+            mapOptionKeys = defaultWebGL2WarpedMapOptionKeys
+          }
+          return optionKeysToUndefinedOptions(mapOptionKeys)
+        },
+        optionKeysToUndefinedOptions(
+          secondArgument as Array<keyof WebGL2WarpedMapOptions>
+        ) as Partial<WebGL2WarpedMapOptions>,
+        thirdArgument as Partial<AnimationOptions> | undefined
+      )
     }
-    // Note: undefined resets no options,
-    // otherwise leaving out listOptionKeys would reset all list options
-    if (listOptionKeys && listOptionKeys.length == 0) {
-      listOptionKeys = Object.keys(WebGL2WarpedMap.getDefaultOptions())
-    }
-
-    this.setMapsOptionsByMapId(
-      optionKeysByMapIdToUndefinedOptionsByMapId(mapOptionkeysByMapId) as Map<
-        string,
-        Partial<WarpedMapListOptions<W>>
-      >,
-      optionKeysToUndefinedOptions(listOptionKeys) as Partial<
-        WarpedMapListOptions<W>
-      >,
-      animationOptions
-    )
   }
 
   /**
-   * Changes the z-index of the specified maps to bring them to front
+   * Change the z-index of the specified maps to bring them to front
    *
    * @param mapIds - Map IDs
    */
@@ -829,7 +1050,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the z-index of the specified maps to send them to back
+   * Change the z-index of the specified maps to send them to back
    *
    * @param mapIds - Map IDs
    */
@@ -846,7 +1067,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the z-index of the specified maps to bring them forward
+   * Change the z-index of the specified maps to bring them forward
    *
    * @param mapIds - Map IDs
    */
@@ -865,7 +1086,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   /**
-   * Changes the zIndex of the specified maps to send them backward
+   * Change the zIndex of the specified maps to send them backward
    *
    * @param mapIds - Map IDs
    */
@@ -1008,49 +1229,43 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   #getProjectedGeoMaskPoints(
-    partialSelectionAndProjectionOptions?: Partial<
-      SelectionOptions & ProjectionOptions
-    >
+    options?: Partial<SelectionOptions & ProjectionOptions>
   ): Point[] {
-    const warpedMaps = this.getWarpedMaps(partialSelectionAndProjectionOptions)
+    const warpedMaps = this.getWarpedMaps(options)
 
-    // If a projection is specified in options, project the geoMask using projection
-    // otherwise (by default) use available geoMask, i.e. use lonLatProjection
-    const projection = partialSelectionAndProjectionOptions?.projection
-    if (projection) {
-      const geoMaskPoints: Point[] = []
-      for (const warpedMap of warpedMaps) {
-        geoMaskPoints.push(...warpedMap.geoMask)
-      }
-
-      const projectedGeoMaskPoints = geoMaskPoints.map((point) =>
-        proj4(projection.definition, point)
-      )
-      return projectedGeoMaskPoints
-    } else {
-      const projectedGeoMaskPoints: Point[] = []
-      for (const warpedMap of warpedMaps) {
-        projectedGeoMaskPoints.push(...warpedMap.geoMask)
-      }
-
-      return projectedGeoMaskPoints
+    const geoMaskPoints: Point[] = []
+    for (const warpedMap of warpedMaps) {
+      geoMaskPoints.push(...warpedMap.getGeoAppliedMask(options?.applyMask))
     }
+
+    // If a projection is specified in options, project the geoMaskPoints using projection
+    // otherwise (by default) use available geoMask, i.e. use lonLatProjection
+    const projection = options?.projection
+    return projection
+      ? WarpedMapList.projectPointsIfNeeded(
+          lonLatProjection,
+          projection,
+          geoMaskPoints
+        )
+      : geoMaskPoints
   }
 
   /**
    * Internal set map options
    */
-  #setMapsOptionsByMapIdInternal(
-    mapOptionsByMapId?: Map<
-      string,
-      Partial<WarpedMapListOptions<W>> | undefined
-    >,
+  #setMapsAndListOptionsInternal(
+    mapsOptionsCallbackFn?: (
+      mapId: string
+    ) => Partial<WarpedMapListOptions<W>> | undefined,
     listOptions?: Partial<WarpedMapListOptions<W>>,
-    partialAnimationOptions?: Partial<AnimationOptions> &
-      Partial<AnimationInternalOptions>
+    partialAnimationOptions?:
+      | (Partial<AnimationOptions> & Partial<AnimationInternalOptions>)
+      | undefined
   ): void {
+    this.setOptions(listOptions)
+
     // If there are no maps yet, return
-    if (this.warpedMapsById.size === 0 || mapOptionsByMapId?.size === 0) {
+    if (this.warpedMapsById.size === 0) {
       return
     }
 
@@ -1077,7 +1292,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       )
     }
 
-    // We loop over all warped maps and set the maps options (if there are in mapOptionsByMapId)
+    // We loop over all warped maps and set the maps options (if there are)
     // and list options (if there are)
 
     // Animation options:
@@ -1101,10 +1316,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     const changedMapIds = []
     for (const warpedMap of this.getWarpedMaps()) {
       let warpedMapChangedOptions = {}
+      const mapOptions = mapsOptionsCallbackFn
+        ? mapsOptionsCallbackFn(warpedMap.mapId)
+        : undefined
       if (animationOptions.animate && animationOptions.stage == 'pre') {
         // If animating and in the 'pre' stage: set all options except those to be animated
-        const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
-        warpedMapChangedOptions = warpedMap.setMapOptions(
+        warpedMapChangedOptions = warpedMap.setMapAndListOptions(
           mapOptions,
           listOptions,
           mergePartialOptions(animationOptions, {
@@ -1118,8 +1335,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         !animationOptions.animate
       ) {
         // If animating and in the 'animate' stage, or if not animating: set all options
-        const mapOptions = mapOptionsByMapId?.get(warpedMap.mapId)
-        warpedMapChangedOptions = warpedMap.setMapOptions(
+        warpedMapChangedOptions = warpedMap.setMapAndListOptions(
           mapOptions,
           listOptions,
           animationOptions
@@ -1162,8 +1378,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       if (animationOptions.animate && animationOptions.stage == 'pre') {
         // If animating and in the 'pre' stage:
         // call this function again but now all options and with animation
-        this.#setMapsOptionsByMapIdInternal(
-          mapOptionsByMapId,
+        this.#setMapsAndListOptionsInternal(
+          mapsOptionsCallbackFn,
           listOptions,
           mergePartialOptions(animationOptions, {
             stage: 'animate'

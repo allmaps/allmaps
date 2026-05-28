@@ -13,4 +13,4 @@ package-lock.json
 yarn.lock
 
 # Ignore Cloudflare Worker TypeScript declaration files
-# worker-configuration.d.ts
+worker-configuration.d.ts

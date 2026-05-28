@@ -36,7 +36,7 @@ import type { Projection } from '@allmaps/project'
 
 export const DEFAULT_SPECIFIC_TRIANGULATED_WARPED_MAP_OPTIONS: SpecificTriangulatedWarpedMapOptions =
   {
-    distortionMeasures: ['log2sigma']
+    distortionMeasures: [] // List of distortion measures to compute starts empty, and is filled as individual distortion measures are requested. To precompute multiple distortion measures, pass a list here.
   }
 
 export function createTriangulatedWarpedMapFactory() {
@@ -170,18 +170,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Set the map-specific options (and the list options)
-   *
-   * @param mapOptions - Map-specific options
-   * @param listOptions - list options
-   * @param animationOptions - Animation options
+   * Set the defaultOptions
    */
-  setMapOptions(
-    mapOptions?: Partial<TriangulatedWarpedMapOptions>,
-    listOptions?: Partial<TriangulatedWarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
-  ): object {
-    return super.setMapOptions(mapOptions, listOptions, animationOptions)
+  setDefaultOptions() {
+    this.defaultOptions = TriangulatedWarpedMap.getDefaultOptions()
   }
 
   /**
@@ -198,10 +190,31 @@ export class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Set the defaultOptions
+   * Set the map-specific options
+   *
+   * @param mapOptions - Map-specific options
+   * @param animationOptions - Animation options
    */
-  setDefaultOptions() {
-    this.defaultOptions = TriangulatedWarpedMap.getDefaultOptions()
+  setMapOptions(
+    mapOptions?: Partial<TriangulatedWarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return super.setMapOptions(mapOptions, animationOptions)
+  }
+
+  /**
+   * Set the map-specific options, and the list options
+   *
+   * @param mapOptions - Map-specific options
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setMapAndListOptions(
+    mapOptions?: Partial<TriangulatedWarpedMapOptions>,
+    listOptions?: Partial<TriangulatedWarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return super.setMapAndListOptions(mapOptions, listOptions, animationOptions)
   }
 
   /**
@@ -232,6 +245,12 @@ export class TriangulatedWarpedMap extends WarpedMap {
    */
   protected setDistortionMeasure(distortionMeasure?: DistortionMeasure) {
     super.setDistortionMeasure(distortionMeasure)
+    if (
+      distortionMeasure &&
+      !this.options.distortionMeasures.includes(distortionMeasure)
+    ) {
+      this.options.distortionMeasures.push(distortionMeasure)
+    }
     this.updateTriangulation()
   }
 
@@ -417,43 +436,54 @@ export class TriangulatedWarpedMap extends WarpedMap {
           this.resourceTriangulationCache,
           this.resourceResolution,
           String(this.resourceMask),
-          () =>
-            triangulateToUnique(
-              bboxToPolygon(
-                combineBboxes(
-                  computeBbox(this.resourceFullMask),
-                  bufferBbox(computeBbox(this.resourceMask), 1)
-                  // Buffer mask before combining bboxes
-                  // such that triangulated polygon (full mask + mask)
-                  // and steiner polygons (mask)
-                  // dont have touching edges, which hinders constraining triangulation
-                  // This could make trianguation way too big if mask >> full mask
-                  // In that case, consider clipping applyable mask.
-                )!
-              ),
-              this.resourceResolution,
-              {
-                steinerPoints: this.gcps.map((gcp) => gcp.resource),
-                steinerPolygons: [[this.resourceMask]],
-                computeInsideSteinerPolygons: true
+          () => {
+            try {
+              return triangulateToUnique(
+                bboxToPolygon(
+                  combineBboxes(
+                    computeBbox(this.resourceFullMask),
+                    bufferBbox(computeBbox(this.resourceMask), 1)
+                    // Buffer mask before combining bboxes
+                    // such that triangulated polygon (full mask + mask)
+                    // and steiner polygons (mask)
+                    // dont have touching edges, which hinders constraining triangulation
+                    // This could make trianguation way too big if mask >> full mask
+                    // In that case, consider clipping applyable mask.
+                  )!
+                ),
+                this.resourceResolution,
+                {
+                  steinerPoints: this.gcps.map((gcp) => gcp.resource),
+                  steinerPolygons: [[this.resourceMask]],
+                  computeInsideSteinerPolygons: true
+                }
+              )
+            } catch (error) {
+              if (error instanceof Error) {
+                error.message =
+                  `Failed to triangulate map ${this.mapId}: ` + error.message
+                throw error
+              } else {
+                throw new Error(`Failed to triangulate map ${this.mapId}`)
               }
-            )
+            }
+          }
         )
 
         // Extend Triangulation to ProjectedGcpTriangulation
         // By including projectedGeo and distortions
         const resourceResolution = this.resourceResolution
         const resourceUniquePoints = uniquePoints as Point[]
-        const gcpUniquePoints = resourceUniquePoints.map((resourcePoint) =>
+        const gcpUniquePoints =
           this.projectedTransformer.transformToProjectedGeo(
-            resourcePoint,
+            resourceUniquePoints,
             {
               distortionMeasures: this.options.distortionMeasures,
-              referenceScale: this.getReferenceScale()
+              referenceScale: this.getReferenceScale(),
+              isMultiGeometry: true
             },
             (gcpPartialDistortion) => gcpPartialDistortion
           )
-        )
         const uniquePointIndices = uniquePointIndexTriangles.flat() as number[]
 
         return {
@@ -493,16 +523,16 @@ export class TriangulatedWarpedMap extends WarpedMap {
               resourceResolution:
                 this.projectedGcpTriangulation.resourceResolution,
               gcpUniquePoints:
-                this.projectedGcpTriangulation.gcpUniquePoints.map(
-                  (projectedGcp) =>
-                    this.projectedPreviousTransformer.transformToProjectedGeo(
-                      projectedGcp.resource,
-                      {
-                        distortionMeasures: this.options.distortionMeasures,
-                        referenceScale: this.getReferenceScale()
-                      },
-                      (gcpPartialDistortion) => gcpPartialDistortion
-                    )
+                this.projectedPreviousTransformer.transformToProjectedGeo(
+                  this.projectedGcpTriangulation.gcpUniquePoints.map(
+                    (projectedGcp) => projectedGcp.resource
+                  ),
+                  {
+                    distortionMeasures: this.options.distortionMeasures,
+                    referenceScale: this.getReferenceScale(),
+                    isMultiGeometry: true
+                  },
+                  (gcpPartialDistortion) => gcpPartialDistortion
                 ),
               uniquePointIndices:
                 this.projectedGcpTriangulation.uniquePointIndices,

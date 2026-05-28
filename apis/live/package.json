@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/api-live",
-  "version": "3.0.0",
+  "version": "3.0.1-alpha.0",
   "private": "true",
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -16,11 +16,11 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/api-shared": "workspace:^",
     "@allmaps/db": "workspace:^",
+    "@allmaps/env": "workspace:^",
     "@allmaps/id": "workspace:^",
+    "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/transform": "workspace:^",
-    "@allmaps/project": "workspace:^",
-    "@allmaps/env": "workspace:^",
     "@teamwork/websocket-json-stream": "^2.0.0",
     "cors": "^2.8.5",
     "diff-match-patch": "^1.0.5",
@@ -45,10 +45,10 @@
     "@types/ramda": "^0.29.3",
     "@types/sharedb": "^3.3.12",
     "@types/ws": "^8.5.5",
-    "typescript": "catalog:",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0"
+    "eslint-config-prettier": "^9.1.0",
+    "typescript": "catalog:"
   }
 }

@@ -68,8 +68,9 @@ export const DEFAULT_WARPED_MAP_OPTIONS: WarpedMapOptions = {
   internalProjection: webMercatorProjection,
   projection: webMercatorProjection,
   visible: true,
-  anticipate: false,
-  anticipateTileZoomLevel: 'overview',
+  anticipateVisibility: false,
+  overviewTilesMaxResolution: undefined, // Used to be 1024 * 1024 to support one such tile, e.g. for Rotterdam map.
+  overviewTilesSelection: 'lowest',
   applyMask: true,
   distortionMeasure: undefined
 }
@@ -196,12 +197,12 @@ export class WarpedMap extends EventTarget {
 
   visible!: boolean
   previousVisible!: boolean
-  visibilityOpacity = 1
-  previousVisibilityOpacity = 1
+  visibilityOpacity!: number
+  previousVisibilityOpacity!: number
   applyMask!: boolean
   previousApplyMask!: boolean
-  applyMaskOpacity = 0
-  previousApplyMaskOpacity = 0
+  applyMaskOpacity!: number
+  previousApplyMaskOpacity!: number
 
   gcps!: Gcp[]
   projectedGcps!: Gcp[]
@@ -338,6 +339,45 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
+   * Get the resource applied mask, mask or full mask, based on an input option.
+   */
+  getResourceAppliedMask(applyMask?: boolean): Ring {
+    if (applyMask === undefined) {
+      return this.resourceAppliedMask
+    } else if (applyMask) {
+      return this.resourceMask
+    } else {
+      return this.resourceFullMask
+    }
+  }
+
+  /**
+   * Get the geo applied mask, mask or full mask, based on an input option.
+   */
+  getGeoAppliedMask(applyMask?: boolean): Ring {
+    if (applyMask === undefined) {
+      return this.geoAppliedMask
+    } else if (applyMask) {
+      return this.geoMask
+    } else {
+      return this.geoFullMask
+    }
+  }
+
+  /**
+   * Get the projected geo applied mask, mask or full mask, based on an input option.
+   */
+  getProjectedGeoAppliedMask(applyMask?: boolean): Ring {
+    if (applyMask === undefined) {
+      return this.projectedGeoAppliedMask
+    } else if (applyMask) {
+      return this.projectedGeoMask
+    } else {
+      return this.projectedGeoFullMask
+    }
+  }
+
+  /**
    * Get default and georeferenced map options
    */
   getDefaultAndGeoreferencedMapOptions(): WarpedMapOptions {
@@ -401,7 +441,6 @@ export class WarpedMap extends EventTarget {
    *
    * @params transformationType - the transformation type
    * @params partialProjectedGcpTransformerOptions - options
-   * @params useCache - whether to use the cached projected transformers previously computed
    * @returns A projected transformer
    */
   getProjectedTransformer(
@@ -442,13 +481,46 @@ export class WarpedMap extends EventTarget {
   }
 
   /**
-   * Set the map-specific options (and the list options)
+   * Set the defaultOptions
+   */
+  setDefaultOptions() {
+    this.defaultOptions = WarpedMap.getDefaultOptions()
+  }
+
+  /**
+   * Set the list options
+   *
+   * @param listOptions - list options
+   * @param animationOptions - Animation options
+   */
+  setListOptions(
+    listOptions?: Partial<WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions>
+  ): object {
+    return this.setMapAndListOptions(undefined, listOptions, animationOptions)
+  }
+
+  /**
+   * Set the map-specific options
+   *
+   * @param mapOptions - Map-specific options
+   * @param animationOptions - Animation options
+   */
+  setMapOptions(
+    mapOptions?: Partial<WarpedMapOptions>,
+    animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
+  ): object {
+    return this.setMapAndListOptions(mapOptions, undefined, animationOptions)
+  }
+
+  /**
+   * Set the map-specific options, and the list options
    *
    * @param mapOptions - Map-specific options
    * @param listOptions - list options
    * @param animationOptions - Animation options
    */
-  setMapOptions(
+  setMapAndListOptions(
     mapOptions?: Partial<WarpedMapOptions>,
     listOptions?: Partial<WarpedMapOptions>,
     animationOptions?: Partial<AnimationOptions & AnimationInternalOptions>
@@ -465,26 +537,6 @@ export class WarpedMap extends EventTarget {
     return this.applyOptions(
       mergePartialOptions(animationOptions, { optionKeysPossiblyChanged })
     )
-  }
-
-  /**
-   * Set the list options
-   *
-   * @param listOptions - list options
-   * @param animationOptions - Animation options
-   */
-  setListOptions(
-    listOptions?: Partial<WarpedMapOptions>,
-    animationOptions?: Partial<AnimationOptions>
-  ): object {
-    return this.setMapOptions(undefined, listOptions, animationOptions)
-  }
-
-  /**
-   * Set the defaultOptions
-   */
-  setDefaultOptions() {
-    this.defaultOptions = WarpedMap.getDefaultOptions()
   }
 
   protected applyOptions(
@@ -519,6 +571,8 @@ export class WarpedMap extends EventTarget {
 
       this.visible = this.options.visible
       this.previousVisible = this.visible
+      this.visibilityOpacity = this.visible ? 1 : 0
+      this.previousVisibilityOpacity = this.visibilityOpacity
       this.applyMask = this.options.applyMask
       this.previousApplyMask = this.applyMask
       this.applyMaskOpacity = this.applyMask ? 0 : 1
@@ -795,13 +849,13 @@ export class WarpedMap extends EventTarget {
    */
   mixPreviousAndNew(t: number) {
     this.mixed = true
-    this.previousVisible = true
+    this.previousVisible = this.visible
     this.previousVisibilityOpacity = mixNumbers(
       this.visibilityOpacity,
       this.previousVisibilityOpacity,
       t
     )
-    this.previousApplyMask = true
+    this.previousApplyMask = this.applyMask
     this.previousApplyMaskOpacity = mixNumbers(
       this.applyMaskOpacity,
       this.previousApplyMaskOpacity,
@@ -934,17 +988,6 @@ export class WarpedMap extends EventTarget {
     )[0] as Rectangle
   }
 
-  private updateAppliedGeoMask(): void {
-    this.geoAppliedMask = this.projectedTransformer.transformToGeo([
-      this.resourceAppliedMask
-    ])[0]
-    this.geoAppliedMaskBbox = computeBbox(this.geoAppliedMask)
-    this.geoAppliedMaskRectangle = this.projectedTransformer.transformToGeo(
-      [this.resourceAppliedMaskRectangle],
-      { maxDepth: 0 }
-    )[0] as Rectangle
-  }
-
   private updateGeoMask(): void {
     this.geoMask = this.projectedTransformer.transformToGeo([
       this.resourceMask
@@ -954,6 +997,16 @@ export class WarpedMap extends EventTarget {
       [this.resourceMaskRectangle],
       { maxDepth: 0 }
     )[0] as Rectangle
+  }
+
+  private updateAppliedGeoMask(): void {
+    this.geoAppliedMask = this.applyMask ? this.geoMask : this.geoFullMask
+    this.geoAppliedMaskBbox = this.applyMask
+      ? this.geoMaskBbox
+      : this.geoFullMaskBbox
+    this.geoAppliedMaskRectangle = this.applyMask
+      ? this.geoMaskRectangle
+      : this.geoFullMaskRectangle
   }
 
   private updateProjectedFullGeoMask(): void {
@@ -969,19 +1022,6 @@ export class WarpedMap extends EventTarget {
       )[0] as Rectangle
   }
 
-  private updateProjectedAppliedGeoMask(): void {
-    this.projectedGeoAppliedMask =
-      this.projectedTransformer.transformToProjectedGeo([
-        this.resourceAppliedMask
-      ])[0]
-    this.projectedGeoAppliedMaskBbox = computeBbox(this.projectedGeoAppliedMask)
-    this.projectedGeoAppliedMaskRectangle =
-      this.projectedTransformer.transformToProjectedGeo(
-        [this.resourceAppliedMaskRectangle],
-        { maxDepth: 0 }
-      )[0] as Rectangle
-  }
-
   private updateProjectedGeoMask(): void {
     this.projectedGeoMask = this.projectedTransformer.transformToProjectedGeo([
       this.resourceMask
@@ -992,6 +1032,18 @@ export class WarpedMap extends EventTarget {
         [this.resourceMaskRectangle],
         { maxDepth: 0 }
       )[0] as Rectangle
+  }
+
+  private updateProjectedAppliedGeoMask(): void {
+    this.projectedGeoAppliedMask = this.applyMask
+      ? this.projectedGeoMask
+      : this.projectedGeoFullMask
+    this.projectedGeoAppliedMaskBbox = this.applyMask
+      ? this.projectedGeoMaskBbox
+      : this.projectedGeoFullMaskBbox
+    this.projectedGeoAppliedMaskRectangle = this.applyMask
+      ? this.projectedGeoMaskRectangle
+      : this.projectedGeoFullMaskRectangle
   }
 
   private updateResourceToProjectedGeoScale(): void {

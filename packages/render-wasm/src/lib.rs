@@ -3,7 +3,7 @@ mod mask;
 mod renderer;
 mod transforms;
 
-use image::codecs::jpeg::{JpegDecoder, JpegEncoder};
+use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::{PngDecoder, PngEncoder};
 use image::codecs::webp::WebPEncoder;
 use image::{DynamicImage, ImageDecoder, ImageEncoder};
@@ -20,13 +20,14 @@ pub fn init() {
     console_error_panic_hook::set_once();
 }
 
-/// Decode a JPEG from raw bytes into an RGBA Vec
-fn decode_jpeg(data: &[u8]) -> (Vec<u8>, u32, u32) {
-    let decoder = JpegDecoder::new(Cursor::new(data)).expect("Failed to create JPEG decoder");
-    let (width, height) = decoder.dimensions();
-    let img = DynamicImage::from_decoder(decoder).expect("Failed to decode JPEG");
+/// Decode an image (JPEG, PNG or WebP, auto-detected from magic bytes) into an RGBA Vec.
+/// Returns an error message instead of panicking, so an unexpected tile format
+fn decode_image(data: &[u8]) -> Result<(Vec<u8>, u32, u32), String> {
+    let img = image::load_from_memory(data)
+        .map_err(|e| format!("Failed to decode image: {}", e))?;
     let rgba = img.to_rgba8();
-    (rgba.into_raw(), width, height)
+    let (width, height) = rgba.dimensions();
+    Ok((rgba.into_raw(), width, height))
 }
 
 /// Decode a PNG from raw bytes into an RGBA Vec
@@ -114,9 +115,9 @@ pub struct DecodedImage {
 }
 
 #[wasm_bindgen]
-pub fn decode_jpeg_test(jpeg_data: &[u8]) -> DecodedImage {
-    let (_, width, height) = decode_jpeg(jpeg_data);
-    DecodedImage { width, height }
+pub fn decode_jpeg_test(jpeg_data: &[u8]) -> Result<DecodedImage, JsError> {
+    let (_, width, height) = decode_image(jpeg_data).map_err(|e| JsError::new(&e))?;
+    Ok(DecodedImage { width, height })
 }
 
 /// Render warped tile from pre-decoded RGBA tiles (most efficient - no JPEG decoding)
@@ -214,13 +215,20 @@ pub fn render_warped_tile_rgba(
             jpeg_tiles.len()
         };
 
-        let jpeg_data = &jpeg_tiles[start..end];
-        let (rgba, decoded_w, decoded_h) = decode_jpeg(jpeg_data);
+        let tile_data = &jpeg_tiles[start..end];
 
-        // ALWAYS use decoded dimensions to match RGBA buffer size
-        // The provided tile_widths/heights may not match actual JPEG dimensions
-        let w = decoded_w;
-        let h = decoded_h;
+        // Decode the tile (JPEG, PNG or WebP, auto-detected). Skip any tile that
+        // fails to decode rather than panicking, so one bad/unexpected tile can't
+        // trap the WASM instance and hang the request.
+        // ALWAYS use decoded dimensions to match the RGBA buffer size; the provided
+        // tile_widths/heights may not match the actual decoded dimensions.
+        let (rgba, w, h) = match decode_image(tile_data) {
+            Ok(decoded) => decoded,
+            Err(e) => {
+                web_sys::console::error_1(&format!("Skipping undecodable tile: {}", e).into());
+                continue;
+            }
+        };
 
         decoded_tiles.push(DecodedTile::new(
             rgba,
@@ -279,13 +287,17 @@ pub fn render_warped_tile(
             jpeg_tiles.len()
         };
 
-        let jpeg_data = &jpeg_tiles[start..end];
-        let (rgba, decoded_w, decoded_h) = decode_jpeg(jpeg_data);
+        let tile_data = &jpeg_tiles[start..end];
 
-        // ALWAYS use decoded dimensions to match RGBA buffer size
-        // The provided tile_widths/heights may not match actual JPEG dimensions
-        let w = decoded_w;
-        let h = decoded_h;
+        // ALWAYS use decoded dimensions to match the RGBA buffer size; the provided
+        // tile_widths/heights may not match the actual decoded dimensions.
+        let (rgba, w, h) = match decode_image(tile_data) {
+            Ok(decoded) => decoded,
+            Err(e) => {
+                web_sys::console::error_1(&format!("Skipping undecodable tile: {}", e).into());
+                continue;
+            }
+        };
 
         decoded_tiles.push(DecodedTile::new(
             rgba,
@@ -347,13 +359,17 @@ pub fn render_warped_tile_webp(
             jpeg_tiles.len()
         };
 
-        let jpeg_data = &jpeg_tiles[start..end];
-        let (rgba, decoded_w, decoded_h) = decode_jpeg(jpeg_data);
+        let tile_data = &jpeg_tiles[start..end];
 
-        // ALWAYS use decoded dimensions to match RGBA buffer size
-        // The provided tile_widths/heights may not match actual JPEG dimensions
-        let w = decoded_w;
-        let h = decoded_h;
+        // ALWAYS use decoded dimensions to match the RGBA buffer size; the provided
+        // tile_widths/heights may not match the actual decoded dimensions.
+        let (rgba, w, h) = match decode_image(tile_data) {
+            Ok(decoded) => decoded,
+            Err(e) => {
+                web_sys::console::error_1(&format!("Skipping undecodable tile: {}", e).into());
+                continue;
+            }
+        };
 
         decoded_tiles.push(DecodedTile::new(
             rgba,
@@ -416,13 +432,17 @@ pub fn render_warped_tile_jpeg(
             jpeg_tiles.len()
         };
 
-        let jpeg_data = &jpeg_tiles[start..end];
-        let (rgba, decoded_w, decoded_h) = decode_jpeg(jpeg_data);
+        let tile_data = &jpeg_tiles[start..end];
 
-        // ALWAYS use decoded dimensions to match RGBA buffer size
-        // The provided tile_widths/heights may not match actual JPEG dimensions
-        let w = decoded_w;
-        let h = decoded_h;
+        // ALWAYS use decoded dimensions to match the RGBA buffer size; the provided
+        // tile_widths/heights may not match the actual decoded dimensions.
+        let (rgba, w, h) = match decode_image(tile_data) {
+            Ok(decoded) => decoded,
+            Err(e) => {
+                web_sys::console::error_1(&format!("Skipping undecodable tile: {}", e).into());
+                continue;
+            }
+        };
 
         decoded_tiles.push(DecodedTile::new(
             rgba,

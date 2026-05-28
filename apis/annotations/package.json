@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/api-annotations",
-  "version": "3.0.0",
+  "version": "3.0.1-alpha.0",
   "private": "true",
   "module": "src/index.js",
   "license": "AGPL-3.0-only",
@@ -33,11 +33,11 @@
   "devDependencies": {
     "@types/geojson": "^7946.0.14",
     "@types/node": "catalog:",
-    "drizzle-kit": "catalog:",
-    "typescript": "catalog:",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
+    "drizzle-kit": "catalog:",
     "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0"
+    "eslint-config-prettier": "^9.1.0",
+    "typescript": "catalog:"
   }
 }

@@ -68,7 +68,8 @@
     warpedMapList = new WarpedMapList()
     warpedMapList.addGeoreferenceAnnotation(annotation)
     bbox = warpedMapList.getMapsBbox({
-      projection: { definition: 'EPSG:3857' }
+      projection:
+        WebGL2WarpedMap.getDefaultWithoutGeoreferencedMapOptions().projection
     })
 
     options = mergeOptions(
@@ -111,9 +112,9 @@
       return
     }
 
-    // Spread options to ensure all properties are read, registering them as reactive dependencies
-    const copiedOptions = { ...options }
-    warpedMapLayer.setLayerOptions(copiedOptions)
+    warpedMapLayer.setLayerOptions(
+      $state.snapshot(options) as WebGL2WarpedMapOptions
+    )
   })
 
   $effect(() => {

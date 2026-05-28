@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/components",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.8",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -72,20 +72,20 @@
     "./css/*": "./dist/css/*"
   },
   "peerDependencies": {
-    "svelte": "catalog:",
-    "@sveltejs/kit": "catalog:"
+    "@sveltejs/kit": "catalog:",
+    "svelte": "catalog:"
   },
   "keywords": [
     "svelte"
   ],
   "dependencies": {
-    "better-auth": "catalog:",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "better-auth": "catalog:",
     "bits-ui": "^2.11.4",
     "flatbush": "^4.4.0",
     "fuse.js": "^7.1.0",

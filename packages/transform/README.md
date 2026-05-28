@@ -11,7 +11,7 @@ This package exports the `GeneralGcpTransformer` and `GcpTransformer` classes.
 * A **General GCP Transformer** is useful in the general case: it takes in ground control points of the `GeneralGcp` type, with 'source' and 'destination' fields, and has methods `generalTransformer.transformForward()` to transform geometries from 'source' space to 'destination' space, and `generalTransformer.transformBackward()` to transform from 'destination' space to 'source' space.
 * A **GCP Transformer** it useful in the typical Allmaps case: it takes in ground control points of the `Gcp` type, with 'resource' and 'geo' fields, and has methods `transformer.transformToGeo()` to transform geometries from 'resource' space to 'geo' space, and `transformer.transformToResource()` to transform from 'geo' space to 'resource' space. Apart from naming, there is also one default option set for this type of transformer: `differentHandedness = true` by default, since the most common case is that the resource space had a downward y-axis.
 
-In both cases, calling a transform method will build a transformation of the specified type using the input GCPs, or use it if it already exists. These transformations can then transform points one by one. For lineStrings and polygons the transform options can be used to add extra mid-points to assure sufficiently smooth results.
+In both cases, calling a transform method will build a transformation of the specified type using the input GCPs, or use it if it already exists. These transformations can then transform points one by one. For lineStrings and polygons the transform options can be used to **refine** the geometry during transformation as needed, i.e. add extra midpoints to assure sufficiently smooth results.
 
 As an **example** for the georeferenced map *L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae* ([Open in Allmaps Viewer](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F135dfd2d58dc26ec)): based on the map's GCPs in resource and (projected) geo coordinates, a GCP Transformer can be built (visualized by the grid) allowing to transform any geometry from resource to geo space. Here, the resource mask is transformed from resource to (projected) geo space.
 
@@ -278,22 +278,22 @@ Only **linearly independent control points** should be considered when checking 
 
 The following transformation types are supported.
 
-|                                                                                                                 | Type                                       | Description                                                              | Properties                                                                                                                           | Minimum number of GCPs |
-| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/straight.svg" alt="straight">                 | `straight`                                 | Straight transformation                                                  | Applies translation and scaling. Preserves shapes and angles.                                                                        | 2                      |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/helmert.svg" alt="helmert">                   | `helmert`                                  | Helmert transformation or 'similarity transformation'                    | Applies translation, scaling and rotation. Preserves shapes and angles.                                                              | 2                      |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-1.svg" alt="polynomial">           | `polynomial` (default), also `polynomial1` | First order polynomial transformation                                    | Applies translation, scaling, rotation and shearing. Preserves lines and parallelism.                                                | 3                      |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-2.svg" alt="polynomial2">          | `polynomial2`                              | Second order polynomial transformation.                                  | Applies second order effects. Adds some bending flexibility.                                                                         | 6                      |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/polynomial-3.svg" alt="polynomial3">          | `polynomial3`                              | Third order polynomial transformation                                    | Applies third order effects. Adds more bending flexibility.                                                                          | 10                     |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/thin-plate-spline.svg" alt="thinPlateSpline"> | `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Applies smooth transformation. Transformation is 'exact' at GPCs. (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
-| <img width="100" src="../ui/src/lib/shared/images/transformations/projective.svg" alt="projective">             | `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Follow perspective rules. Preserves lines and cross-ratios.                                                                          | 4                      |
+|                                                                                                                                                                                          | Type                                       | Description                                                              | Properties                                                                                                                           | Minimum number of GCPs |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------|
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages/ui/src/lib/shared/images/transformations/straight.svg" alt="straight">                  | `straight`                                 | Straight transformation                                                  | Applies translation and scaling. Preserves shapes and angles.                                                                        | 2                      |
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages//ui/src/lib/shared/images/transformations/helmert.svg" alt="helmert">                   | `helmert`                                  | Helmert transformation or 'similarity transformation'                    | Applies translation, scaling and rotation. Preserves shapes and angles.                                                              | 2                      |
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages//ui/src/lib/shared/images/transformations/polynomial-1.svg" alt="polynomial">           | `polynomial` (default), also `polynomial1` | First order polynomial transformation                                    | Applies translation, scaling, rotation and shearing. Preserves lines and parallelism.                                                | 3                      |
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages//ui/src/lib/shared/images/transformations/polynomial-2.svg" alt="polynomial2">          | `polynomial2`                              | Second order polynomial transformation.                                  | Applies second order effects. Adds some bending flexibility.                                                                         | 6                      |
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages//ui/src/lib/shared/images/transformations/polynomial-3.svg" alt="polynomial3">          | `polynomial3`                              | Third order polynomial transformation                                    | Applies third order effects. Adds more bending flexibility.                                                                          | 10                     |
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages//ui/src/lib/shared/images/transformations/thin-plate-spline.svg" alt="thinPlateSpline"> | `thinPlateSpline`                          | Thin Plate Spline transformation or 'rubber sheeting' (with affine part) | Applies smooth transformation. Transformation is 'exact' at GPCs. (see [this notebook](https://observablehq.com/d/0b57d3b587542794)) | 3                      |
+| <img width="100" src="https://raw.githubusercontent.com/allmaps/allmaps/refs/heads/main/packages//ui/src/lib/shared/images/transformations/projective.svg" alt="projective">             | `projective`                               | Projective or 'perspective' transformation, used for aerial images       | Follow perspective rules. Preserves lines and cross-ratios.                                                                          | 4                      |
 
 ### Transformer options
 
 When creating a transformer, 'transformer options' can be specified. Apart from the options below, any 'transform options' (e.g. `maxDepth`) specified when creating a transformer will become the default options, used when calling a transform method.
 
-| Option                    | Description                                                                                                                                                                                                                                                                                                                                                               | Type                  | Default                                            |
-|:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
+| Option | Description | Type | Default |
+|:-------|:------------|:-----|:--------|
 | `differentHandedness`     | Whether one of the axes should be flipped (internally) while computing the transformation parameters. Should be true if the handedness differs between the source and destination coordinate spaces. This makes a difference for specific transformation types like the Helmert transform. (Flipping will not alter the axis orientation of the output (use the 'return type function' for this)). | `boolean`             | `false` for General GCP Transformer, `true` for GCP Transformer
 
 #### Handedness
@@ -387,13 +387,12 @@ Some 'transform options' are available when we transform geometries:
 The 'transform options' for a General GCP Transformer methods and a GCP Transformer methods are similar but may have different names. When this is the case this is reflected in the table below.
 
 | Option                                                                                                       | Description                                                                                                                                                                                                                                                                  | Type                  | Default                                            |
-| :----------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------- | :------------------------------------------------- |
-| `maxDepth`                                                                                                   | Maximum recursion depth when recursively adding midpoints (higher means more midpoints)                                                                                                                                                                                      | `number`              | `0` (i.e. no midpoints by default!)                |
-| `minOffsetRatio`                                                                                             | Minimum offset ratio when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                          | `number`              | `0`                                                |
-| `minOffsetDistance`                                                                                          | Minimum offset distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                       | `number`              | `Infinity` (i.e. condition not applied by default) |
-| `minLineDistance`                                                                                            | Minimum line distance when recursively adding midpoints (lower means more midpoints)                                                                                                                                                                                         | `number`              | `Infinity` (i.e. condition not applied by default) |
-| `sourceIsGeographic` (not available for GCP Transformer methods)                                             | Use geographic distances and midpoints in 'source' domain in lon-lat WGS84.                                                                                                                                                                                                  | `boolean`             | `false`                                            |
-| `destinationIsGeographic` for General GCP Transformer methods, `geoIsGeographic` for GCP Transformer methods | Use geographic distances and midpoints in 'destination' ('geo') domain in lon-lat WGS84.                                                                                                                                                                                     | `boolean`             | `false`                                            |
+|:-------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------|:---------------------------------------------------|
+| `maxDepth`                                                                                                   | Maximum recursion depth when recursively refining (higher means more midpoints)                                                                                                                                                                                              | `number`              | `0`                                                |
+| `minSourceDistance`                                                                                          | Minimum distance of a source segment when recursively refining (lower means more midpoints)                                                                                                                                                                                  | `number`              | `0`                                                |
+| `minDestinationDistance`                                                                                     | Minimum distance of a destination segment when recursively refining (lower means more midpoints)                                                                                                                                                                             | `number`              | `0`                                                |
+| `minOffsetRatio`                                                                                             | Minimum offset ratio when recursively refining (lower means more midpoints)                                                                                                                                                                                                  | `number`              | `0`                                                |
+| `minOffsetDistance`                                                                                          | Minimum offset distance when recursively refining (lower means more midpoints)                                                                                                                                                                                               | `number`              | `Infinity` (i.e. condition not applied by default) |
 | `distortionMeasures`                                                                                         | A list of distortion measures to compute. E.g. `['log2sigma', 'twoOmega']`. Use in combination with a 'return type function' to find the distortion values in the output.                                                                                                    | `DistortionMeasure[]` | `[]`                                               |
 | `referenceScale`                                                                                             | The reference area scaling (sigma) to take into account for certain distortion measures, notably `'log2sigma'`.                                                                                                                                                              | `number`              | `1`                                                |
 | `isMultiGeometry`                                                                                            | Whether the input should be considered as a MultiPoint, MultiLineString or MultiPolygon. This is necessary since the standard geometry types are not deterministic: the types of LineString and MultiPoint are identical.                                                    | `boolean`             | `false`                                            |
@@ -402,21 +401,24 @@ The 'transform options' for a General GCP Transformer methods and a GCP Transfor
 | `preBackward` for General GCP Transformer methods, `preToResource` for GCP Transformer methods               | A projection function to be applied to the General GCP 'destination' (GCP 'geo') points before building a transformation, and to be applied during a 'backward' ('toResource') transform before evaluating the 'backward' ('toResource') transformation at the input points. | `Projection Function` | Identity projection `(point: Point) => point`      |
 | `postBackward` (not available for GCP Transformer methods)                                                   | A projection function to be applied during a 'backward' transform after evaluating the 'backward' transformation.                                                                                                                                                            | `Projection Function` | Identity projection `(point: Point) => point`      |
 
-#### Recursively adding midpoints
+#### Recursively refining (adding midpoints)
 
 When transforming LineStrings and Polygons, it can happen that simply transforming every Point is not sufficient.
 
 Two factors are at play which may require a more granular transformation: the transformation (which can be non-shape preserving, as is the case with all transformation in this package except for Helmert and 1st degree polynomial) or the geographic nature of the coordinates (where lines are generally meant as 'great arcs' but could be interpreted as lon-lat cartesian lines).
 
-An algorithm will therefore recursively add midpoints in each segment (i.e. between two Points) to make the line more granular. A midpoint is added at the transformed middle Point of the original segment if the number of iterations is smaller than or equal to `maxDepth`, and if at least one of the following conditions are met:
+An algorithm will therefore recursively add midpoints in each segment (i.e. between two Points) to make the line more granular. A midpoint is added at the transformed middle Point of the original segment if **all of the following conditions** are met:
+
+* The number of iterations is smaller than or equal to `maxDepth`
+* The length of the considered segment, in source space, is larger than `minSourceDistance`
+* The length of the considered segment, in destination space, is larger than `minDestinationDistance`
+
+and **at least one of the following conditions** are met:
 
 * The ratio of (the distance between the middle Point of the transformed segment and the transformed middle Point of the original segment) to the length of the transformed segment, is larger than or equal to the specified `minOffsetRatio`.
 * The distance between the middle Point of the transformed segment and the transformed middle Point of the original segment is larger than or equal to the specified `minOffsetDistance`.
-* The transformed segment is larger than or equal to the specified `minLineDistance`.
 
-Note that only one is met by default. Set a value to a number to opt in to a condition, set a value to `Infinity` to opt out of a condition.
-
-The computation of the midpoints and distances in the source and destination domains during this process uses geometric algorithms, unless `sourceIsGeographic` or `destinationIsGeographic` are set to `true`, in which case geographic algorithms (such as 'Great-circle distance') are used.
+By default, `maxDepth = 0` and no refinement is applied. If it would be set to `1`, then all three conditions (on `maxDepth`, `minSourceDistance` and `minDestinationDistance`) are true and the default value `minOffsetRatio = 0` will trigger one refinement check of each segment.
 
 #### Distortions
 
@@ -429,7 +431,7 @@ We can compute these distortions locally, at every point. The approach implement
 The supported distortion measures are available via the exported `supportedDistortionMeasures` constant. These include:
 
 | Key         | Type                               | Description                                                                                                                                                                                                                              | Example                                                                                                              |
-| ----------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+|-------------|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
 | `log2sigma` | Area distortion measure            | The base-2 logarithm of the area scale factor σ, which indicates how much a local infinitesimal surface element is enlarged on the map (relative to the map’s scale).                                                                    | `0` for no area distortion, `1` if the area is twice as big, `-1` if the are is twice as small after transformation. |
 | `twoOmega`  | Angular distortion measure         | The maximum angular distortion 2Ω, which indicated the maximal (taken over all possible angles between two direction from that point) difference between an angle before and after the transformation, making it a measure for shearing. | `0` for no angular distortion, `>0` for angular distortion.                                                          |
 | `airyKavr`  | Airy-Kavrayskiy distortion measure | A measure combining the effects of areal and angular distortion.                                                                                                                                                                         | `0` for no distortion, `>0` for distortion.                                                                          |
@@ -477,8 +479,6 @@ The crucial insight here is that the map's geographic projection *can* be differ
 To simplify the computation of these optional projection functions from the map's geographic projection and viewport geographic projection, use the class **Projected GCP Transformer** from the [@allmaps/project](../../packages/project/) module.
 
 The optional projection functions are part of the transform options to allow them to be specified not just at the construction of a transformer but for any transform call. Since they are also applied at construction when reading the GCPs, be careful when specifying such a function in a transform call. In a Projected GCP Transformer, the use-case for specifying a different projection in a transform call (and reusing existing the transformation!) has been implemented with care and can be used safely.
-
-Note: there is one other place where projections matter: the `destinationIsGeographic`/`geoIsGeographic` and `sourceIsGeographic` options should only be used when the corresponding coordinates are in lon-lat WGS84 geographic projection. When using these options, coordinates are considered lying on a sphere and geographic distances and midpoints are computed using great arcs (rather than using geometric distances and midpoints on a projected space).
 
 ### Return Type Function
 
@@ -1132,10 +1132,10 @@ Gcp & Partial<Distortions>
 ```ts
 {
   maxDepth: number
+  minSourceDistance: number
+  minDestinationDistance: number
   minOffsetRatio: number
   minOffsetDistance: number
-  minLineDistance: number
-  geoIsGeographic: boolean
   distortionMeasures: DistortionMeasure[]
   referenceScale: number
   postToGeo: ProjectionFunction
@@ -1186,18 +1186,20 @@ Get the resolution of the toGeo transformation in resource space, within a given
 
 This informs you in how fine the warping is, in resource space.
 It can be useful e.g. to create a triangulation in resource space
-that is fine enough for this warping.
+that is fine enough for this warping or set the minSourceDistance options.
 
 It is obtained by transforming toGeo two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The toGeo transformation will refine these lines:
 it will break them in small enough pieces to obtain a near continuous result.
-Returned in the length of the shortest piece, measured in resource coordinates.
+
+Resolution returned in the length of the shortest piece, measured in resource coordinates,
+or undefined if no refinements were needed.
 
 ###### Parameters
 
-* `resourceBbox` (`[number, number, number, number]`)
-  * BBox in resource space where the resolution is requested
+* `resourceBbox?` (`Bbox | undefined`)
+  * BBox in resource space where the resolution is requested, or undefined to get this from the GCPs
 * `partialGcpTransformOptions?` (`Partial<GcpTransformOptions> | undefined`)
   * GCP Transform options to consider during the transformation
 
@@ -1223,19 +1225,21 @@ Get the resolution of the toResource transformation in geo space, within a given
 
 This informs you in how fine the warping is, in geo space.
 It can be useful e.g. to create a triangulation in geo space
-that is fine enough for this warping.
+that is fine enough for this warping or set the minDestionationDistance options.
 
 It is obtained by transforming toResource two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The toResource transformation will refine these lines:
 it will break them in small enough pieces to obtain a near continuous result.
-Returned in the length of the shortest piece, measured in geo coordinates.
+
+Resolution returned in the length of the shortest piece, measured in geo coordinates,
+or undefined if no refinements were needed.
 
 ###### Parameters
 
-* `geoBbox` (`[number, number, number, number]`)
-  * BBox in geo space where the resolution is requested
-* `partialGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; geoIsGeographic?: boolean | undefined; ... 4 more ...; isMultiGeometry?: boolean | undefined; }`)
+* `geoBbox?` (`Bbox | undefined`)
+  * BBox in geo space where the resolution is requested, or undefined to get this from the GCPs
+* `partialGcpTransformOptions?` (`Partial<GcpTransformOptions> | undefined`)
   * GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -1252,9 +1256,9 @@ There are no parameters.
 
 ###### Returns
 
-`{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; ... 5 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions`.
+`{ differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; ... 4 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions`.
 
-### `GcpTransformer#setTransformerOptionsInternal(partialGcpTransformerOptions)`
+### `GcpTransformer#setTransformerOptions(partialGcpTransformerOptions)`
 
 Set the transformer options.
 
@@ -1262,17 +1266,17 @@ Use with caution, especially for options that have effects in the constructor.
 
 ###### Parameters
 
-* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; ... 5 more ...; isMultiGeometry?: boolean | undefined; }`)
+* `partialGcpTransformerOptions` (`{ differentHandedness?: boolean | undefined; maxDepth?: number | undefined; minSourceDistance?: number | undefined; minDestinationDistance?: number | undefined; minOffsetRatio?: number | undefined; ... 5 more ...; isMultiGeometry?: boolean | undefined; }`)
 
 ###### Returns
 
 `void`.
 
-### `GcpTransformer#transformToGeo(point, partialGcpTransformOptions, gcpToP)`
+### `GcpTransformer#transformToGeo(resourcePoint, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `resourcePoint` (`[number, number]`)
 * `partialGcpTransformOptions?` (`Partial<GcpTransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
@@ -1280,11 +1284,11 @@ Use with caution, especially for options that have effects in the constructor.
 
 `P`.
 
-### `GcpTransformer#transformToResource(point, partialGcpTransformOptions, gcpToP)`
+### `GcpTransformer#transformToResource(geoPoint, partialGcpTransformOptions, gcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `geoPoint` (`[number, number]`)
 * `partialGcpTransformOptions?` (`Partial<GcpTransformOptions> | undefined`)
 * `gcpToP?` (`((gcp: GcpAndDistortions) => P) | undefined`)
 
@@ -1298,9 +1302,9 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 ###### Parameters
 
-* `georeferencedMap` (`{ type: "GeoreferencedMap"; gcps: { resource: [number, number]; geo: [number, number]; }[]; resource: { type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; id: string; height?: number | undefined; width?: number | undefined; partOf?: ({ type: string; id: string; label?: Record<string, (string | num...`)
+* `georeferencedMap` (`{ type: "GeoreferencedMap"; resource: { id: string; type: "ImageService1" | "ImageService2" | "ImageService3" | "Canvas"; height?: number | undefined; width?: number | undefined; partOf?: Array<PartOfItemType> | undefined; provider?: Array<{ ...; }> | undefined; }; ... 8 more ...; _allmaps?: unknown; }`)
   * A Georeferenced Map
-* `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; geoIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...`)
+* `options?` (`Partial<{ differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeo...`)
   * Options, including GCP Transformer Options, and a transformation type to overrule the type defined in the Georeferenced Map
 
 ###### Returns
@@ -1309,10 +1313,9 @@ A Projected GCP Transformer (`GcpTransformer`).
 
 ### `GcpTransformer.transformGeojsonFeatureCollectionToSvgString(transformer, geojson, partialGcpTransformOptions)`
 
-Transform a GeoJSON FeatureCollection to resource space to a SVG string
+Transform a GeoJSON FeatureCollection from geo space to resource space to a SVG string
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-Note: since this converts from GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -1330,10 +1333,9 @@ Input GeoJSON FeaturesCollection transformed to resource space, as SVG string (`
 
 ### `GcpTransformer.transformGeojsonToSvg(transformer, geojsonGeometry, partialGcpTransformOptions)`
 
-Transform a GeoJSON Geometry to resource space to a SVG geometry
+Transform a GeoJSON Geometry from geo space to resource space to a SVG geometry
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-Note: since this converts from GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -1356,10 +1358,9 @@ Input GeoJSON Geometry transform to resource space, as SVG geometry (`SvgCircle 
 
 ### `GcpTransformer.transformSvgStringToGeojsonFeatureCollection(transformer, svg, partialGcpTransformOptions)`
 
-Transform an SVG string to geo space to a GeoJSON FeatureCollection
+Transform an SVG string from resource space to geo space to a GeoJSON FeatureCollection
 
 This is a shortcut method, available as static method in order not to overpopulate intellisense suggestions
-Note: since this converts to GeoJSON we assume geo-space is in lon-lat WGS84 and automatically set `destinationIsGeographic` to use geographically computed midpoints.
 Note: Multi-geometries are not supported
 
 ###### Parameters
@@ -1400,17 +1401,7 @@ GcpsInputs & TransformationTypeInputs
 ###### Type
 
 ```ts
-{differentHandedness: boolean} & {
-  maxDepth: number
-  minOffsetRatio: number
-  minOffsetDistance: number
-  minLineDistance: number
-  geoIsGeographic: boolean
-  distortionMeasures: DistortionMeasure[]
-  referenceScale: number
-  postToGeo: ProjectionFunction
-  preToResource: ProjectionFunction
-} & MultiGeometryOptions
+{ differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; referenceScale: number; postToGeo: ProjectionFunction; preToResource: ProjectionFunction; } & MultiGeometryOpt...
 ```
 
 ### `GcpsInputs`
@@ -1439,7 +1430,7 @@ GeneralGcp & Partial<Distortions>
 ###### Type
 
 ```ts
-{ maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; distortionMeasures: DistortionMeasure[]; ... 4 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions
+{ maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; referenceScale: number; preForward: ProjectionFunction; postForward: ProjectionFunction; preBackward: ProjectionFunction; postBackward: Projection...
 ```
 
 ### `new GeneralGcpTransformer(generalGcps, type, partialGeneralGcpTransformerOptions)`
@@ -1495,13 +1486,15 @@ It is obtained by transforming backward two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The backward transformation will refine these lines:
 it will break them in small enough pieces to obtain a near continuous result.
-Returned in the length of the shortest piece, measured in destination coordinates.
+
+Resolution returned in the length of the shortest piece, measured in destination coordinates,
+or undefined if no refinements were needed.
 
 ###### Parameters
 
-* `destinationBbox` (`[number, number, number, number]`)
-  * BBox in destination space where the resolution is requested
-* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: boolean | undefined; }`)
+* `destinationBbox?` (`Bbox | undefined`)
+  * BBox in destination space where the resolution is requested, or undefined to get this from the GCPs
+* `partialGeneralGcpTransformOptions?` (`Partial<GeneralGcpTransformOptions> | undefined`)
   * General GCP Transform options to consider during the transformation
 
 ###### Returns
@@ -1532,24 +1525,26 @@ It is obtained by transforming forward two linestring,
 namely the horizontal and vertical midlines of the given bbox.
 The forward transformation will refine these lines:
 it will break them in small enough pieces to obtain a near continuous result.
-Returned in the length of the shortest piece, measured in source coordinates.
+
+Resolution returned in the length of the shortest piece, measured in source coordinates,
+or undefined if no refinements were needed.
 
 ###### Parameters
 
-* `sourceBbox` (`[number, number, number, number]`)
-  * BBox in source space where the resolution is requested
-* `partialGeneralGcpTransformOptions` (`{ maxDepth?: number | undefined; minOffsetRatio?: number | undefined; minOffsetDistance?: number | undefined; minLineDistance?: number | undefined; sourceIsGeographic?: boolean | undefined; ... 7 more ...; isMultiGeometry?: boolean | undefined; }`)
+* `sourceBbox?` (`Bbox | undefined`)
+  * BBox in source space where the resolution is requested, or undefined to get this from the GCPs
+* `partialGeneralGcpTransformOptions?` (`Partial<GeneralGcpTransformOptions> | undefined`)
   * General GCP Transform options to consider during the transformation
 
 ###### Returns
 
 Resolution of the forward transformation in source space (`number | undefined`).
 
-### `GeneralGcpTransformer#transformBackward(point, partialGeneralGcpTransformOptions, generalGcpToP)`
+### `GeneralGcpTransformer#transformBackward(destinationPoint, partialGeneralGcpTransformOptions, generalGcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `destinationPoint` (`[number, number]`)
 * `partialGeneralGcpTransformOptions?` (`Partial<GeneralGcpTransformOptions> | undefined`)
 * `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
 
@@ -1557,11 +1552,11 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 `P`.
 
-### `GeneralGcpTransformer#transformForward(point, partialGeneralGcpTransformOptions, generalGcpToP)`
+### `GeneralGcpTransformer#transformForward(sourcePoint, partialGeneralGcpTransformOptions, generalGcpToP)`
 
 ###### Parameters
 
-* `point` (`[number, number]`)
+* `sourcePoint` (`[number, number]`)
 * `partialGeneralGcpTransformOptions?` (`Partial<GeneralGcpTransformOptions> | undefined`)
 * `generalGcpToP?` (`((generalGcp: GeneralGcpAndDistortions) => P) | undefined`)
 
@@ -1574,7 +1569,7 @@ Resolution of the forward transformation in source space (`number | undefined`).
 ###### Type
 
 ```ts
-{ differentHandedness: boolean; } & { maxDepth: number; minOffsetRatio: number; minOffsetDistance: number; minLineDistance: number; sourceIsGeographic: boolean; destinationIsGeographic: boolean; ... 5 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions
+{ differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; ... 4 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions
 ```
 
 ### `new Helmert(sourcePoints, destinationPoints)`
@@ -2313,12 +2308,12 @@ There are no parameters.
 
 ###### Fields
 
-* `destinationDistanceFunction` (`(p0: Point, p1: Point) => number`)
 * `destinationMidPointFunction` (`(p0: Point, p1: Point) => Point`)
 * `maxDepth` (`number`)
-* `minLineDistance` (`number`)
+* `minDestinationDistance` (`number`)
 * `minOffsetDistance` (`number`)
 * `minOffsetRatio` (`number`)
+* `minSourceDistance` (`number`)
 * `sourceMidPointFunction` (`(p0: Point, p1: Point) => Point`)
 
 ### `SplitGcpLineInfo`
@@ -2327,7 +2322,6 @@ There are no parameters.
 
 * `destinationLineDistance` (`number`)
 * `destinationMidPointsDistance` (`number`)
-* `destinationRefinedLineDistance` (`number`)
 
 ### `SplitGcpLinePointInfo`
 
@@ -2477,25 +2471,32 @@ A map of distortion measures and distortion values at the point (`Map<Distortion
 
 ###### Fields
 
-* `destinationIsGeographic` (`false`)
 * `distortionMeasures` (`Array<never>`)
 * `isMultiGeometry` (`false`)
 * `maxDepth` (`number`)
-* `minLineDistance` (`number`)
+* `minDestinationDistance` (`number`)
 * `minOffsetDistance` (`number`)
 * `minOffsetRatio` (`number`)
+* `minSourceDistance` (`number`)
 * `postBackward` (`(point: Point) => Point`)
 * `postForward` (`(point: Point) => Point`)
 * `preBackward` (`(point: Point) => Point`)
 * `preForward` (`(point: Point) => Point`)
 * `referenceScale` (`number`)
-* `sourceIsGeographic` (`false`)
 
 ### `defaultGeneralGcpTransformerOptions`
 
 ###### Fields
 
 * `differentHandedness` (`false`)
+
+### `nonWarpingTransformationTypes`
+
+###### Type
+
+```ts
+Array<string>
+```
 
 ### `solveIndependentlyInverse(coefsArrayMatrix, destinationPointsArrays)`
 

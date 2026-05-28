@@ -20,6 +20,7 @@ export type {
   IntArrayRenderOptions,
   AnimationOptions,
   SelectionOptions,
+  MaskOptions,
   ProjectionOptions,
   TransformationOptions,
   Sprite,

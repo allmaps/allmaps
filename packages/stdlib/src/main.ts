@@ -39,13 +39,21 @@ export function groupBy<T, K extends keyof any>(arr: T[], key: (i: T) => K) {
   )
 }
 
-// Note: this checks equality of the object
-// which is only a good idea for primitive types (string, number), not JSON objects
+// From rotateArray([a, b, c, d], 1) => [b, c, d, a]
+export function rotateArray<T>(array: T[], offset: number) {
+  return Array.from(
+    { length: array.length },
+    (_, i) => array[(i + offset) % array.length]
+  )
+}
+
 export function isEqualArray<T>(
   array0: T[],
   array1: T[],
   isEqualObject: (t0: T, t1: T) => boolean = (t0, t1) => t0 == t1
 ): boolean {
+  if (array0 === array1) return true
+  if (!array0 || !array1) return false
   if (array0.length !== array1.length) {
     return false
   }

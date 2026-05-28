@@ -26,7 +26,6 @@ describe('allmaps transform svg', () => {
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polygon.svg'
     )
-    // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
     expect(expected).toRoughlyEqual(output, 0.0001)
   })
 
@@ -38,7 +37,6 @@ describe('allmaps transform svg', () => {
       'transform svg -a input/annotations/7a69f9470b49a744.json',
       'input/svg/polylines.svg'
     )
-    // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
     expect(expected).toRoughlyEqual(output, 0.0001)
   })
 
@@ -50,7 +48,6 @@ describe('allmaps transform svg', () => {
       'transform svg -a input/annotations/7a69f9470b49a744.json --max-depth 1',
       'input/svg/polylines.svg'
     )
-    // Checking very precisely to verify that the correct distance functions are used, via destinationIsGeographic
     expect(expected).toRoughlyEqual(output, 0.0001)
   })
 })

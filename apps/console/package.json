@@ -1,7 +1,7 @@
 {
   "name": "@allmaps/console",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.0",
   "type": "module",
   "scripts": {
     "dev": "vite dev --mode localhost",
@@ -43,9 +43,9 @@
   },
   "dependencies": {
     "@allmaps/components": "workspace:^",
-    "@allmaps/ui": "workspace:^",
-    "@allmaps/tailwind": "workspace:^",
     "@allmaps/env": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "better-auth": "catalog:",
     "bits-ui": "catalog:",
     "zod": "catalog:"

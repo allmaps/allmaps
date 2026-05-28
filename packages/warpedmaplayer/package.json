@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/warpedmaplayer",
-  "version": "1.0.0-beta.42",
+  "version": "1.0.0-beta.43",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -42,7 +42,8 @@
     "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "format": "prettier --ignore-path ../../.gitignore --write src",
-    "documentation": "remark . --output --use remark-api"
+    "documentation": "remark . --output --use remark-api",
+    "copy-between": "node ../../scripts/copy-between.ts src/WarpedMapLayer.ts ../openlayers/src/WarpedMapLayer.ts && node ../../scripts/copy-between.ts src/WarpedMapLayer.ts ../leaflet/src/WarpedMapLayer.ts"
   },
   "license": "MIT",
   "dependencies": {

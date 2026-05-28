@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.51",
+  "version": "1.0.0-beta.52",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -45,8 +45,6 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/stdlib": "workspace:^",
-    "@turf/distance": "^7.2.0",
-    "@turf/midpoint": "^7.2.0",
     "ml-matrix": "^6.12.0"
   },
   "devDependencies": {

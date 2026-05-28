@@ -43,7 +43,14 @@ const ResourceTypes = [...ImageServices, ...['Canvas' as const]] as const
 export const ImageServiceSchema = z.enum(ImageServices)
 export const ResourceTypeSchema = z.enum(ResourceTypes)
 
-export const PartOfItemSchema = z.object({
+export type PartOfItemType = {
+  id: string
+  type: string
+  label?: z.infer<typeof LanguageValueSchema>
+  partOf?: PartOfItemType[]
+}
+
+export const PartOfItemSchema: z.ZodType<PartOfItemType> = z.object({
   id: z.string().url(),
   type: z.string(),
   label: LanguageValueSchema.optional(),

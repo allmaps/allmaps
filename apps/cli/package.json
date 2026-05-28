@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/cli",
-  "version": "1.0.0-beta.52",
+  "version": "1.0.0-beta.53",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -41,8 +41,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@allmaps/annotation": "workspace:^",
     "@allmaps/analyze": "workspace:^",
+    "@allmaps/annotation": "workspace:^",
     "@allmaps/attach": "workspace:^",
     "@allmaps/frame": "workspace:^",
     "@allmaps/id": "workspace:^",

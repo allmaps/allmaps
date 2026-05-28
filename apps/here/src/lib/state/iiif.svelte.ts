@@ -38,7 +38,7 @@ export class IiifState {
 
   #manifestItems = $derived.by(() => {
     if (this.#mapState && this.#mapState.map) {
-      return findManifests(this.#mapState.map.resource.partOf)
+      return findManifests(this.#mapState.map.resource.partOf ?? [])
     }
 
     return []

@@ -2,10 +2,12 @@ import Delaunator from 'delaunator'
 import Constrainautor from '@kninnug/constrainautor'
 
 import {
+  closePolygon,
   computeBbox,
   conformPolygon,
   mergeOptions,
   midPoint,
+  polygonIsBboxRectangle,
   triangleAngles
 } from '@allmaps/stdlib'
 import type {
@@ -18,10 +20,14 @@ import type {
 } from '@allmaps/types'
 
 import {
-  getGridPointsInBbox,
+  bboxToGridPoints,
   interpolateRing,
   interpolatePolygon,
-  pointInPolygon
+  coordsInPolygonForInsidenessCheck,
+  preprocessPolygonForInsideCheck,
+  coordsInPolygonsForInsidenessCheck,
+  buildKDBushPointIndex,
+  splitPolygonLines
 } from './shared.js'
 
 import type { TriangluationOptions, TriangulationToUnique } from './types.js'
@@ -81,14 +87,31 @@ export function triangulateToUnique(
 ): TriangulationToUnique {
   const options = mergeOptions(defaultTriangulationOptions, partialOptions)
 
-  // Conform polygons (this also checks if there are at least 3 points)
+  // Conform polygon and Steiner polygons (this also checks if there are at least 3 points)
   polygon = conformPolygon(polygon)
-  const steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
+  const polygonIsRectangle = polygonIsBboxRectangle(polygon)
+  let steinerPolygons = options.steinerPolygons.map((steinerPolygon) =>
     conformPolygon(steinerPolygon)
   )
 
-  // Gather Steinerpoints (don't require them to be in polygon)
-  const steinerPointsInPolygon = options.steinerPoints
+  // Split polygon and Steiner polygons using Steiner points
+  const steinerPointIndex = buildKDBushPointIndex(options.steinerPoints)
+  polygon = splitPolygonLines(polygon, options.steinerPoints, steinerPointIndex)
+  steinerPolygons = steinerPolygons.map((steinerPolygon) =>
+    splitPolygonLines(steinerPolygon, options.steinerPoints, steinerPointIndex)
+  )
+
+  // Preprocess polygon
+  const polygonForInsidenessCheck = preprocessPolygonForInsideCheck(polygon)
+
+  // Gather Steinerpoints
+  const steinerPointsInPolygon = options.steinerPoints.filter((point) =>
+    coordsInPolygonForInsidenessCheck(
+      point[0],
+      point[1],
+      polygonForInsidenessCheck
+    )
+  )
 
   // Interpolate polygons and create grid based on distance
   let interpolatedPolygon: Polygon = []
@@ -107,9 +130,13 @@ export function triangulateToUnique(
     )
 
     // Add grid points inside the polygon
-    gridPoints = getGridPointsInBbox(computeBbox(polygon), distance)
+    gridPoints = bboxToGridPoints(computeBbox(polygon), distance)
     gridPointsInPolygon = gridPoints.filter((point) =>
-      pointInPolygon(point, polygon)
+      coordsInPolygonForInsidenessCheck(
+        point[0],
+        point[1],
+        polygonForInsidenessCheck
+      )
     )
   } else {
     interpolatedPolygon = polygon
@@ -146,6 +173,9 @@ export function triangulateToUnique(
   // Lookup point indices for the edges of the interpolated polygon
   const uniquePointIndexInterpolatedPolygon: TypedPolygon<number> =
     interpolatedPolygon.map((ring) => ring.map(getPointIndex))
+  const uniquePointIndexSetInterpolatedPolygon = new Set(
+    uniquePointIndexInterpolatedPolygon.flat()
+  )
   // Lookup point indices for the edges of the interpolated steiner polygons
   const uniquePointIndexInterpolatedSteinerPolygons: TypedPolygon<number>[] =
     interpolatedSteinerPolygons.map((polygon) =>
@@ -180,7 +210,7 @@ export function triangulateToUnique(
 
   let uniquePointIndexTriangles: TypedTriangle<number>[] = []
   let triangles: Triangle[] = []
-  const shouldClassifyTriangles: boolean[] = []
+  const triangleIsAlongInterpolatedPolygon: boolean[] = []
   for (let i = 0; i < constrainautor.del.triangles.length; i += 3) {
     uniquePointIndexTriangles.push([
       constrainautor.del.triangles[i],
@@ -193,20 +223,34 @@ export function triangulateToUnique(
       uniquePoints[constrainautor.del.triangles[i + 2]]
     ])
     // Only classify triangles if they are along the border
-    shouldClassifyTriangles.push(
-      constrainautor.del.triangles[i] < interpolatedPolygonPoints.length ||
-        constrainautor.del.triangles[i + 1] <
-          interpolatedPolygonPoints.length ||
-        constrainautor.del.triangles[i + 2] < interpolatedPolygonPoints.length
+    triangleIsAlongInterpolatedPolygon.push(
+      uniquePointIndexSetInterpolatedPolygon.has(
+        constrainautor.del.triangles[i]
+      ) ||
+        uniquePointIndexSetInterpolatedPolygon.has(
+          constrainautor.del.triangles[i + 1]
+        ) ||
+        uniquePointIndexSetInterpolatedPolygon.has(
+          constrainautor.del.triangles[i + 2]
+        )
     )
   }
 
+  // Triangle midPoints
+  let triangleMidPoints = triangles.map((triangle) => midPoint(...triangle))
   // Only keep triangles inside polygon
-  const shouldKeep = triangles.map((triangle, index) => {
-    // Only keep if inside
-    if (shouldClassifyTriangles[index]) {
+  const triangleShouldKeep = triangles.map((triangle, index) => {
+    // Only keep if inside (and can't be outside if polygon is bbox)
+    // This check for every triangle is expensive!
+    if (triangleIsAlongInterpolatedPolygon[index]) {
       return (
-        pointInPolygon(midPoint(...triangle), polygon) &&
+        (polygonIsRectangle
+          ? true
+          : coordsInPolygonForInsidenessCheck(
+              triangleMidPoints[index][0],
+              triangleMidPoints[index][1],
+              polygonForInsidenessCheck
+            )) &&
         triangleAngles(triangle).every(
           (angle) => angle >= options.minimumTriangleAngle
         )
@@ -216,17 +260,30 @@ export function triangulateToUnique(
     }
   })
   uniquePointIndexTriangles = uniquePointIndexTriangles.filter(
-    (_triangle, index) => shouldKeep[index]
+    (_triangle, index) => triangleShouldKeep[index]
   )
-  triangles = triangles.filter((_triangle, index) => shouldKeep[index])
+  triangles = triangles.filter((_triangle, index) => triangleShouldKeep[index])
+  triangleMidPoints = triangleMidPoints.filter(
+    (_triangle, index) => triangleShouldKeep[index]
+  )
 
   // If requested, compute if triangles are inside steiner polygons
+  // This check for every triangle is expensive!
   let insideSteinerPolygonsTriangles: boolean[] = []
+  const steinerClosedPolygons = steinerPolygons.map((steinerPolygon) =>
+    closePolygon(steinerPolygon)
+  )
   if (options.computeInsideSteinerPolygons) {
-    insideSteinerPolygonsTriangles = triangles.map((triangle) =>
-      steinerPolygons.some((steinerPolygon) =>
-        pointInPolygon(midPoint(...triangle), steinerPolygon)
-      )
+    const steinerClosedPolygonsForInsidenessCheck = steinerClosedPolygons.map(
+      (steinerPolygon) => preprocessPolygonForInsideCheck(steinerPolygon)
+    )
+    insideSteinerPolygonsTriangles = triangles.map(
+      (_triangle, index) =>
+        coordsInPolygonsForInsidenessCheck(
+          triangleMidPoints[index][0],
+          triangleMidPoints[index][1],
+          steinerClosedPolygonsForInsidenessCheck
+        ) === true
     )
   }
 

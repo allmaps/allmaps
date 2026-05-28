@@ -25,14 +25,17 @@ export type ShouldRenderOptions = {
   checkOpacity: boolean
 }
 
-export type SelectionOptions = {
+export type SelectionOptions = MaskOptions & {
   onlyVisible?: boolean
   mapIds?: Iterable<string>
   geoPoint?: Point
   geoBbox?: Bbox
   projectedGeoPoint?: Point
   projectedGeoBbox?: Bbox
-  applyMask?: boolean
+}
+
+export type MaskOptions = {
+  applyMask: boolean
 }
 
 export type ProjectionOptions = {
@@ -58,8 +61,9 @@ export type WarpedMapOptions = {
   internalProjection: Projection
   projection: Projection
   visible: boolean
-  anticipate: boolean
-  anticipateTileZoomLevel: 'overview' | 'top'
+  anticipateVisibility: boolean
+  overviewTilesSelection: 'highest' | 'lowest'
+  overviewTilesMaxResolution: number | undefined
   applyMask: boolean
   distortionMeasure: DistortionMeasure | undefined
 }
@@ -127,7 +131,6 @@ export type SpecificWebGL2WarpedMapOptions = {
   renderGrid: boolean
   renderGridColor: string
   debugTriangles: boolean
-  debugTriangulation: boolean
   debugTiles: boolean
 }
 export type WebGL2WarpedMapOptions = SpecificWebGL2WarpedMapOptions &
@@ -157,6 +160,7 @@ export type WarpedMapListOptions<W extends WarpedMap> =
 
 export type SpecificBaseRenderOptions<W extends WarpedMap> = {
   warpedMapList?: WarpedMapList<W>
+  anticipateInteraction: boolean
   requestViewportBufferRatio: number
   overviewRequestViewportBufferRatio: number
   pruneViewportBufferRatio: number
@@ -165,7 +169,6 @@ export type SpecificBaseRenderOptions<W extends WarpedMap> = {
   log2ScaleFactorCorrection: number
   spritesMaxHigherLog2ScaleFactorDiff: number
   spritesMaxLowerLog2ScaleFactorDiff: number
-  maxMapOverviewResolution: number
   maxTotalOverviewResolutionRatio: number
   maxGcpsExactTpsToResource: number
 }

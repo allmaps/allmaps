@@ -435,7 +435,9 @@ export class TileCache<D> extends EventTarget {
       }
       const { tileUrl } = event.data
 
-      if (!this.tilesByTileUrl.has(tileUrl)) {
+      // A failed fetch must decrement the in-flight count just like a successful
+      // one (see tileFetched), otherwise tilesFetchingCount never reaches zero.
+      if (this.tilesByTileUrl.has(tileUrl)) {
         this.updateTilesFetchingCount(-1)
       }
     }
