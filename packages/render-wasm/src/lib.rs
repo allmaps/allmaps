@@ -10,7 +10,7 @@ use image::{DynamicImage, ImageDecoder, ImageEncoder};
 use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 
-use renderer::{render, DecodedTile};
+use renderer::{render, render_triangles, DecodedTile};
 use transforms::Transform;
 
 #[wasm_bindgen(start)]
@@ -23,8 +23,8 @@ pub fn init() {
 /// Decode an image (JPEG, PNG or WebP, auto-detected from magic bytes) into an RGBA Vec.
 /// Returns an error message instead of panicking, so an unexpected tile format
 fn decode_image(data: &[u8]) -> Result<(Vec<u8>, u32, u32), String> {
-    let img = image::load_from_memory(data)
-        .map_err(|e| format!("Failed to decode image: {}", e))?;
+    let img =
+        image::load_from_memory(data).map_err(|e| format!("Failed to decode image: {}", e))?;
     let rgba = img.to_rgba8();
     let (width, height) = rgba.dimensions();
     Ok((rgba.into_raw(), width, height))
@@ -36,8 +36,8 @@ fn decode_png(data: &[u8]) -> Result<(Vec<u8>, u32, u32), String> {
     let decoder = PngDecoder::new(Cursor::new(data))
         .map_err(|e| format!("Failed to create PNG decoder: {}", e))?;
     let (width, height) = decoder.dimensions();
-    let img = DynamicImage::from_decoder(decoder)
-        .map_err(|e| format!("Failed to decode PNG: {}", e))?;
+    let img =
+        DynamicImage::from_decoder(decoder).map_err(|e| format!("Failed to decode PNG: {}", e))?;
     let rgba = img.to_rgba8();
     Ok((rgba.into_raw(), width, height))
 }
@@ -251,6 +251,66 @@ pub fn render_warped_tile_rgba(
         &transform,
         mask_polygon,
         canvas_to_geo,
+        output_width,
+        output_height,
+    )
+}
+
+#[wasm_bindgen]
+pub fn render_warped_triangles_rgba(
+    jpeg_tiles: &[u8],
+    tile_offsets: &[u32],
+    _tile_widths: &[u32],
+    _tile_heights: &[u32],
+    tile_columns: &[f64],
+    tile_rows: &[f64],
+    tile_scale_factors: &[f64],
+    tile_original_widths: &[f64],
+    tile_original_heights: &[f64],
+    resource_triangle_points: &[f64],
+    canvas_triangle_points: &[f64],
+    triangle_inside: &[u8],
+    output_width: u32,
+    output_height: u32,
+) -> Vec<u8> {
+    let tile_count = tile_offsets.len();
+
+    let mut decoded_tiles = Vec::with_capacity(tile_count);
+    for i in 0..tile_count {
+        let start = tile_offsets[i] as usize;
+        let end = if i + 1 < tile_count {
+            tile_offsets[i + 1] as usize
+        } else {
+            jpeg_tiles.len()
+        };
+
+        let tile_data = &jpeg_tiles[start..end];
+
+        let (rgba, w, h) = match decode_image(tile_data) {
+            Ok(decoded) => decoded,
+            Err(e) => {
+                web_sys::console::error_1(&format!("Skipping undecodable tile: {}", e).into());
+                continue;
+            }
+        };
+
+        decoded_tiles.push(DecodedTile::new(
+            rgba,
+            w,
+            h,
+            tile_columns[i],
+            tile_rows[i],
+            tile_scale_factors[i],
+            tile_original_widths[i],
+            tile_original_heights[i],
+        ));
+    }
+
+    render_triangles(
+        &decoded_tiles,
+        resource_triangle_points,
+        canvas_triangle_points,
+        triangle_inside,
         output_width,
         output_height,
     )
