@@ -1,7 +1,16 @@
 <script lang="ts">
-  import { Logo, Modal } from '@allmaps/components'
+  import { Logo, Modal, MovingMapsBackground } from '@allmaps/components'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
+
+  type Props = {
+    annotationsApiBaseUrl: string
+    mapsApiBaseUrl: string
+    viewerBaseUrl: string
+  }
+
+  let { annotationsApiBaseUrl, mapsApiBaseUrl, viewerBaseUrl }: Props =
+    $props()
 
   let allmapsViewerVersion = $state<string>()
 
@@ -16,6 +25,13 @@
 </script>
 
 <Modal bind:open={uiState.modalOpen.about}>
+  {#snippet background()}
+    <MovingMapsBackground
+      {mapsApiBaseUrl}
+      href={(id) => `${viewerBaseUrl}/?url=${annotationsApiBaseUrl}/${id}`}
+    />
+  {/snippet}
+
   {#snippet title()}
     <span class="flex items-center gap-2">
       <div class="size-8"><Logo /></div>

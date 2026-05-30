@@ -113,5 +113,9 @@
   <p class="text-red-500">{errorMessage}</p>
 {:else if browser}
   {@render children?.()}
-  <About />
+  <About
+    mapsApiBaseUrl={data.env.PUBLIC_REST_BASE_URL}
+    annotationsApiBaseUrl={data.env.PUBLIC_ANNOTATIONS_BASE_URL}
+    viewerBaseUrl={data.env.PUBLIC_VIEWER_BASE_URL}
+  />
 {/if}

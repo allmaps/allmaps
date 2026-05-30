@@ -9,7 +9,6 @@ import type {
 } from '@allmaps/iiif-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { GeojsonPolygon } from '@allmaps/types'
 import type { PickerProjection } from '@allmaps/components/projections'
 
 export type Organization = {
@@ -177,9 +176,4 @@ export type Breadcrumb = {
   path: CollectionPath
   type: 'collection' | 'manifest' | 'canvas'
   id: string
-}
-
-export type WarpedResourceMask = {
-  id: string
-  polygon: GeojsonPolygon
 }

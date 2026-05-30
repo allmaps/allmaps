@@ -11,6 +11,7 @@ import LoadingSmall from '$lib/components/LoadingSmall.svelte'
 import Logo from '$lib/components/Logo.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
 import Modal from '$lib/components/Modal.svelte'
+import MovingMapsBackground from '$lib/components/MovingMapsBackground.svelte'
 import NorthArrow from './components/NorthArrow.svelte'
 import Popover from './components/Popover.svelte'
 import ProjectionPicker from '$lib/components/ProjectionPicker.svelte'
@@ -36,6 +37,7 @@ export {
   Logo,
   MapMonster,
   Modal,
+  MovingMapsBackground,
   NorthArrow,
   Popover,
   ProjectionPicker,
