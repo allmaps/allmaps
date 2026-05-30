@@ -28,7 +28,7 @@ function countManifestsById(
   return manifestCounts
 }
 
-function* flattenPartOf(partOf?: PartOf): Generator<PartOfItem> {
+export function* flattenPartOf(partOf?: PartOf): Generator<PartOfItem> {
   if (partOf) {
     for (const partOfItem of partOf) {
       yield partOfItem
