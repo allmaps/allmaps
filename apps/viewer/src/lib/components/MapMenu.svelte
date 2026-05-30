@@ -16,10 +16,15 @@
     CaretRight as CaretRightIcon,
     Globe as GlobeIcon
   } from 'phosphor-svelte'
+  import { generateAnnotation } from '@allmaps/annotation'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
+  import { flattenPartOf } from '$lib/shared/metadata.js'
 
-  import type { GeoreferencedMap } from '@allmaps/annotation'
+  import type {
+    GeoreferencedMap,
+    PartOfItem
+  } from '@allmaps/annotation'
   import type { WarpedMapLayer } from '@allmaps/maplibre'
   import type { Snippet } from 'svelte'
 
@@ -57,6 +62,17 @@
 
   // Get image URI for URL generation
   const imageUri = $derived(georeferencedMap.resource.id)
+  const manifestUri = $derived.by(() => {
+    return findFirstPartOfItemOfType(
+      georeferencedMap.resource.partOf,
+      'Manifest'
+    )?.id
+  })
+  const theseusViewerUrl = $derived(
+    manifestUri
+      ? `https://theseusviewer.org/?iiif-content=${encodeURIComponent(manifestUri)}`
+      : undefined
+  )
   const editorUrl = $derived(
     imageUri
       ? `https://editor.allmaps.org/#/mask?url=${encodeURIComponent(imageUri)}`
@@ -114,6 +130,17 @@
     warpedMapLayer.sendMapsToBack([mapId])
   }
 
+  function findFirstPartOfItemOfType(
+    partOf: GeoreferencedMap['resource']['partOf'],
+    type: string
+  ) {
+    for (const partOfItem of flattenPartOf(partOf)) {
+      if (partOfItem.type === type) {
+        return partOfItem
+      }
+    }
+  }
+
   async function handleCopyAnnotationUrl() {
     try {
       // const annotationUrl = `https://annotations.allmaps.org/maps/${mapId}`
@@ -123,11 +150,33 @@
     }
   }
 
-  async function handleCopyImageUrl() {
+  async function handleCopyAnnotation() {
+    try {
+      await navigator.clipboard.writeText(
+        JSON.stringify(generateAnnotation(georeferencedMap), null, 2)
+      )
+    } catch (error) {
+      console.error('Failed to copy annotation:', error)
+    }
+  }
+
+  async function handleCopyImageId() {
     try {
       await navigator.clipboard.writeText(imageUri)
     } catch (error) {
-      console.error('Failed to copy image URL:', error)
+      console.error('Failed to copy image ID:', error)
+    }
+  }
+
+  async function handleCopyManifestId() {
+    if (!manifestUri) {
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(manifestUri)
+    } catch (error) {
+      console.error('Failed to copy manifest ID:', error)
     }
   }
 
@@ -292,15 +341,55 @@
         <span>Copy Annotation URL</span>
       </DropdownMenu.Item>
 
-      <!-- Copy Image URL -->
+      <!-- Copy Annotation -->
       <DropdownMenu.Item
         class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-        onSelect={handleCopyImageUrl}
-        disabled={!imageUri}
+        onSelect={handleCopyAnnotation}
+        disabled={!georeferencedMap}
       >
         <CopyIcon class="size-4" />
-        <span>Copy Image URL</span>
+        <span>Copy Annotation</span>
       </DropdownMenu.Item>
+
+      <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
+
+      <!-- IIIF submenu -->
+      <DropdownMenu.Sub>
+        <DropdownMenu.SubTrigger
+          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+        >
+          <ImageIcon class="size-4" />
+          <span class="flex-1">IIIF</span>
+          <CaretRightIcon class="size-4 ml-auto" />
+        </DropdownMenu.SubTrigger>
+        <DropdownMenu.SubContent
+          class="z-50 min-w-[200px] rounded-lg border border-gray-200 bg-white px-1 py-1.5 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+        >
+          <DropdownMenu.Item
+            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+            onSelect={handleCopyImageId}
+            disabled={!imageUri}
+          >
+            <CopyIcon class="size-4" />
+            <span>Copy Image ID</span>
+          </DropdownMenu.Item>
+
+          {#if manifestUri}
+            <DropdownMenu.Item
+              class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+              onSelect={handleCopyManifestId}
+            >
+              <CopyIcon class="size-4" />
+              <span>Copy Manifest ID</span>
+            </DropdownMenu.Item>
+
+            {@render externalLinkMenuItem(
+              'Open in Theseus Viewer',
+              theseusViewerUrl
+            )}
+          {/if}
+        </DropdownMenu.SubContent>
+      </DropdownMenu.Sub>
 
       <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
 
