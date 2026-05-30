@@ -1,19 +1,36 @@
-import { doBboxesIntersect } from '@allmaps/stdlib'
+import { doBboxesIntersect, mergePartialOptions } from '@allmaps/stdlib'
+import { isEqualProjection } from '@allmaps/project'
 
 import { BaseRenderer } from './BaseRenderer.js'
 import { Viewport } from '../viewport/Viewport.js'
 import {
+  createTriangulatedWarpedMapFactory,
+  TriangulatedWarpedMap
+} from '../maps/TriangulatedWarpedMap.js'
+import {
   CacheableRawJpegTile,
   type RawJpegData
 } from '../tilecache/CacheableRawJpegTile.js'
-import { invertHomogeneousTransform } from '../shared/homogeneous-transform.js'
+import {
+  applyHomogeneousTransform,
+  invertHomogeneousTransform
+} from '../shared/homogeneous-transform.js'
 
-import type { Renderer, IntArrayRenderOptions } from '../shared/types.js'
+import type { BaseRenderOptions, Renderer } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
-import type { WarpedMap } from '../maps/WarpedMap.js'
 
 // Type for the WASM module
 type WasmModule = {
+  RenderContext: {
+    new (
+      outputWidth: number,
+      outputHeight: number,
+      backgroundRed: number,
+      backgroundGreen: number,
+      backgroundBlue: number,
+      hasBackground: boolean
+    ): WasmRenderContext
+  }
   decode_jpeg_test(jpegBytes: Uint8Array): { width: number; height: number }
   encode_rgba_to_png(
     pixels: Uint8Array,
@@ -46,6 +63,22 @@ type WasmModule = {
     source_points: Float64Array,
     mask_polygon: Float64Array,
     canvas_to_geo: Float64Array,
+    output_width: number,
+    output_height: number
+  ): Uint8Array
+  render_warped_triangles_rgba(
+    jpeg_tiles: Uint8Array,
+    tile_offsets: Uint32Array,
+    tile_widths: Uint32Array,
+    tile_heights: Uint32Array,
+    tile_columns: Float64Array,
+    tile_rows: Float64Array,
+    tile_scale_factors: Float64Array,
+    tile_original_widths: Float64Array,
+    tile_original_heights: Float64Array,
+    resource_triangle_points: Float64Array,
+    canvas_triangle_points: Float64Array,
+    triangle_inside: Uint8Array,
     output_width: number,
     output_height: number
   ): Uint8Array
@@ -124,6 +157,50 @@ type WasmModule = {
   ): Uint8Array
 }
 
+type WasmRenderContext = {
+  render_warped_tile_rgba(
+    jpeg_tiles: Uint8Array,
+    tile_offsets: Uint32Array,
+    tile_widths: Uint32Array,
+    tile_heights: Uint32Array,
+    tile_columns: Float64Array,
+    tile_rows: Float64Array,
+    tile_scale_factors: Float64Array,
+    tile_original_widths: Float64Array,
+    tile_original_heights: Float64Array,
+    transform_type: string,
+    transform_args: Float64Array,
+    source_points: Float64Array,
+    mask_polygon: Float64Array,
+    canvas_to_geo: Float64Array,
+    render_min_x: number,
+    render_min_y: number,
+    render_max_x: number,
+    render_max_y: number
+  ): void
+  render_warped_triangles_rgba(
+    jpeg_tiles: Uint8Array,
+    tile_offsets: Uint32Array,
+    tile_widths: Uint32Array,
+    tile_heights: Uint32Array,
+    tile_columns: Float64Array,
+    tile_rows: Float64Array,
+    tile_scale_factors: Float64Array,
+    tile_original_widths: Float64Array,
+    tile_original_heights: Float64Array,
+    resource_triangle_points: Float64Array,
+    canvas_triangle_points: Float64Array,
+    triangle_inside: Uint8Array,
+    render_min_x: number,
+    render_min_y: number,
+    render_max_x: number,
+    render_max_y: number
+  ): void
+  encode_png(): Uint8Array
+  encode_webp(): Uint8Array
+  encode_jpeg(quality: number): Uint8Array
+}
+
 export type OutputFormat = 'png' | 'webp' | 'jpeg'
 
 /**
@@ -131,7 +208,7 @@ export type OutputFormat = 'png' | 'webp' | 'jpeg'
  * Caches raw JPEG bytes and decodes them in WASM for maximum performance
  */
 export class WasmRenderer
-  extends BaseRenderer<WarpedMap, RawJpegData>
+  extends BaseRenderer<TriangulatedWarpedMap, RawJpegData>
   implements Renderer
 {
   wasmModule: WasmModule
@@ -140,7 +217,7 @@ export class WasmRenderer
 
   constructor(
     wasmModule: WasmModule,
-    options?: Partial<IntArrayRenderOptions> & {
+    options?: Partial<BaseRenderOptions<TriangulatedWarpedMap>> & {
       outputFormat?: OutputFormat
       backgroundColor?: [number, number, number]
     }
@@ -150,7 +227,12 @@ export class WasmRenderer
       return wasmModule.decode_jpeg_test(new Uint8Array(jpegBytes))
     }
 
-    super(CacheableRawJpegTile.createFactory(decodeJpegForDimensions), options)
+    super(
+      CacheableRawJpegTile.createFactory(decodeJpegForDimensions),
+      mergePartialOptions(options, {
+        warpedMapFactory: createTriangulatedWarpedMapFactory()
+      })
+    )
     this.wasmModule = wasmModule
     this.outputFormat = options?.outputFormat || 'png'
     this.backgroundColor = options?.backgroundColor
@@ -173,21 +255,18 @@ export class WasmRenderer
     this.requestFetchableTiles()
     await this.tileCache.allRequestedTilesLoaded()
 
-    // Initialize output buffer (will be filled by rendering each map)
     const outputWidth = viewport.canvasSize[0]
     const outputHeight = viewport.canvasSize[1]
-    const outputPixels = new Uint8ClampedArray(outputWidth * outputHeight * 4)
-
-    // Fill background color if specified (important for opaque formats like JPEG)
-    if (this.backgroundColor) {
-      const [r, g, b] = this.backgroundColor
-      for (let i = 0; i < outputPixels.length; i += 4) {
-        outputPixels[i] = r
-        outputPixels[i + 1] = g
-        outputPixels[i + 2] = b
-        outputPixels[i + 3] = 255
-      }
-    }
+    const [backgroundRed, backgroundGreen, backgroundBlue] = this
+      .backgroundColor || [0, 0, 0]
+    const renderContext = new this.wasmModule.RenderContext(
+      outputWidth,
+      outputHeight,
+      backgroundRed,
+      backgroundGreen,
+      backgroundBlue,
+      Boolean(this.backgroundColor)
+    )
 
     // Get canvas-to-geo transform (same for all maps)
     const geoToCanvas = viewport.projectedGeoToCanvasHomogeneousTransform
@@ -213,34 +292,92 @@ export class WasmRenderer
         continue
       }
 
-      // Render this map using WASM
-      const mapPixels = await this.#renderMap(
+      const renderBounds = this.#getCanvasRenderBounds(
         warpedMap,
-        cachedTiles,
-        canvasToGeo,
         outputWidth,
         outputHeight
       )
+      if (!renderBounds) {
+        continue
+      }
 
-      // Composite into output buffer (overwrite non-transparent pixels)
-      for (let i = 0; i < outputPixels.length; i += 4) {
-        const alpha = mapPixels[i + 3]
-        if (alpha > 0) {
-          outputPixels[i] = mapPixels[i]
-          outputPixels[i + 1] = mapPixels[i + 1]
-          outputPixels[i + 2] = mapPixels[i + 2]
-          outputPixels[i + 3] = mapPixels[i + 3]
-        }
+      const shouldUseTriangleRenderer = !isEqualProjection(
+        warpedMap.internalProjection,
+        viewport.projection
+      )
+
+      if (shouldUseTriangleRenderer) {
+        this.#renderMapWithTrianglesInto(
+          warpedMap,
+          cachedTiles,
+          renderContext,
+          outputWidth,
+          outputHeight,
+          renderBounds
+        )
+      } else {
+        this.#renderMapInto(
+          warpedMap,
+          cachedTiles,
+          canvasToGeo,
+          renderContext,
+          outputWidth,
+          outputHeight,
+          renderBounds
+        )
       }
     }
 
     // Encode output based on format
     if (this.outputFormat === 'webp') {
-      return this.#encodeWebP(outputPixels, outputWidth, outputHeight)
+      return renderContext.encode_webp()
     } else if (this.outputFormat === 'jpeg') {
-      return this.#encodeJPEG(outputPixels, outputWidth, outputHeight)
+      return renderContext.encode_jpeg(85)
     } else {
-      return this.#encodePNG(outputPixels, outputWidth, outputHeight)
+      return renderContext.encode_png()
+    }
+  }
+
+  #getCanvasRenderBounds(
+    warpedMap: TriangulatedWarpedMap,
+    outputWidth: number,
+    outputHeight: number
+  ) {
+    if (!this.viewport) {
+      throw new Error('Cannot render without viewport')
+    }
+
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+
+    for (const projectedGeoPoint of warpedMap.projectedGeoMask) {
+      const canvasPoint = applyHomogeneousTransform(
+        this.viewport.projectedGeoToCanvasHomogeneousTransform,
+        projectedGeoPoint
+      )
+
+      minX = Math.min(minX, canvasPoint[0])
+      minY = Math.min(minY, canvasPoint[1])
+      maxX = Math.max(maxX, canvasPoint[0])
+      maxY = Math.max(maxY, canvasPoint[1])
+    }
+
+    const renderMinX = Math.max(0, Math.floor(minX))
+    const renderMinY = Math.max(0, Math.floor(minY))
+    const renderMaxX = Math.min(outputWidth, Math.ceil(maxX))
+    const renderMaxY = Math.min(outputHeight, Math.ceil(maxY))
+
+    if (renderMinX >= renderMaxX || renderMinY >= renderMaxY) {
+      return
+    }
+
+    return {
+      minX: renderMinX,
+      minY: renderMinY,
+      maxX: renderMaxX,
+      maxY: renderMaxY
     }
   }
 
@@ -248,14 +385,7 @@ export class WasmRenderer
    * Render a single map using WASM with raw JPEG tiles
    * WASM decodes JPEG natively - no JavaScript decoding needed!
    */
-  async #renderMap(
-    warpedMap: WarpedMap,
-    cachedTiles: CachedTile<RawJpegData>[],
-    canvasToGeo: Float64Array,
-    outputWidth: number,
-    outputHeight: number
-  ): Promise<Uint8ClampedArray> {
-    // Use raw JPEG bytes from cache - WASM will decode them
+  #getTileBuffers(cachedTiles: CachedTile<RawJpegData>[]) {
     const jpegBuffers: Uint8Array[] = []
     const tileWidths: number[] = []
     const tileHeights: number[] = []
@@ -267,14 +397,10 @@ export class WasmRenderer
 
     for (const cachedTile of cachedTiles) {
       const tile = cachedTile.fetchableTile.tile
+      const rawJpegData = cachedTile.data
 
-      // cachedTile.data contains raw JPEG bytes (not decoded!)
-      const rawJpegData = cachedTile.data as RawJpegData
-
-      // Get raw JPEG bytes - WASM will decode (convert to Uint8Array for compatibility)
       jpegBuffers.push(new Uint8Array(rawJpegData.jpegBytes))
 
-      // Store tile metadata
       tileColumns.push(tile.column)
       tileRows.push(tile.row)
       tileScaleFactors.push(tile.tileZoomLevel.scaleFactor)
@@ -284,7 +410,6 @@ export class WasmRenderer
       tileHeights.push(rawJpegData.height)
     }
 
-    // Concatenate all JPEG buffers
     const totalLength = jpegBuffers.reduce((sum, buf) => sum + buf.length, 0)
     const concatenatedJpeg = new Uint8Array(totalLength)
     const tileOffsets = new Uint32Array(jpegBuffers.length)
@@ -294,6 +419,38 @@ export class WasmRenderer
       concatenatedJpeg.set(jpegBuffers[i], offset)
       offset += jpegBuffers[i].length
     }
+
+    return {
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths: new Uint32Array(tileWidths),
+      tileHeights: new Uint32Array(tileHeights),
+      tileColumns: new Float64Array(tileColumns),
+      tileRows: new Float64Array(tileRows),
+      tileScaleFactors: new Float64Array(tileScaleFactors),
+      tileOriginalWidths: new Float64Array(tileOriginalWidths),
+      tileOriginalHeights: new Float64Array(tileOriginalHeights)
+    }
+  }
+
+  async #renderMap(
+    warpedMap: TriangulatedWarpedMap,
+    cachedTiles: CachedTile<RawJpegData>[],
+    canvasToGeo: Float64Array,
+    outputWidth: number,
+    outputHeight: number
+  ): Promise<Uint8ClampedArray> {
+    const {
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights
+    } = this.#getTileBuffers(cachedTiles)
 
     // Extract transformation
     const transformer = warpedMap.projectedTransformer
@@ -312,13 +469,13 @@ export class WasmRenderer
     const rgbaPixels = this.wasmModule.render_warped_tile_rgba(
       concatenatedJpeg,
       tileOffsets,
-      new Uint32Array(tileWidths),
-      new Uint32Array(tileHeights),
-      new Float64Array(tileColumns),
-      new Float64Array(tileRows),
-      new Float64Array(tileScaleFactors),
-      new Float64Array(tileOriginalWidths),
-      new Float64Array(tileOriginalHeights),
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights,
       transformType,
       weights,
       sourcePoints,
@@ -329,6 +486,183 @@ export class WasmRenderer
     )
 
     return new Uint8ClampedArray(rgbaPixels)
+  }
+
+  #renderMapInto(
+    warpedMap: TriangulatedWarpedMap,
+    cachedTiles: CachedTile<RawJpegData>[],
+    canvasToGeo: Float64Array,
+    renderContext: WasmRenderContext,
+    outputWidth: number,
+    outputHeight: number,
+    renderBounds: { minX: number; minY: number; maxX: number; maxY: number }
+  ) {
+    const {
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights
+    } = this.#getTileBuffers(cachedTiles)
+
+    const transformer = warpedMap.projectedTransformer
+    const transformation = transformer.getToResourceTransformation()
+    const { weights, sourcePoints } =
+      transformation.getTransformationDataAsFloat64Array()
+    const transformType = transformation.type
+
+    const maskPolygon = new Float64Array(
+      warpedMap.resourceMask.flatMap((p: [number, number]) => [p[0], p[1]])
+    )
+
+    renderContext.render_warped_tile_rgba(
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights,
+      transformType,
+      weights,
+      sourcePoints,
+      maskPolygon,
+      canvasToGeo,
+      renderBounds.minX,
+      renderBounds.minY,
+      renderBounds.maxX,
+      renderBounds.maxY
+    )
+  }
+
+  async #renderMapWithTriangles(
+    warpedMap: TriangulatedWarpedMap,
+    cachedTiles: CachedTile<RawJpegData>[],
+    outputWidth: number,
+    outputHeight: number
+  ): Promise<Uint8ClampedArray> {
+    const {
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights
+    } = this.#getTileBuffers(cachedTiles)
+
+    const resourceTrianglePoints = new Float64Array(
+      warpedMap.resourceTrianglePoints.flatMap((point) => [point[0], point[1]])
+    )
+
+    const canvasTrianglePoints = new Float64Array(
+      warpedMap.projectedGeoTrianglePoints.flatMap((point) => {
+        if (!this.viewport) {
+          throw new Error('Cannot render without viewport')
+        }
+        const canvasPoint = applyHomogeneousTransform(
+          this.viewport.projectedGeoToCanvasHomogeneousTransform,
+          point
+        )
+        return [canvasPoint[0], canvasPoint[1]]
+      })
+    )
+
+    const triangleInside = new Uint8Array(
+      warpedMap.trianglePointsInside
+        .filter((_inside, index) => index % 3 === 0)
+        .map((inside) => (inside ? 1 : 0))
+    )
+
+    const rgbaPixels = this.wasmModule.render_warped_triangles_rgba(
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights,
+      resourceTrianglePoints,
+      canvasTrianglePoints,
+      triangleInside,
+      outputWidth,
+      outputHeight
+    )
+
+    return new Uint8ClampedArray(rgbaPixels)
+  }
+
+  #renderMapWithTrianglesInto(
+    warpedMap: TriangulatedWarpedMap,
+    cachedTiles: CachedTile<RawJpegData>[],
+    renderContext: WasmRenderContext,
+    outputWidth: number,
+    outputHeight: number,
+    renderBounds: { minX: number; minY: number; maxX: number; maxY: number }
+  ) {
+    const {
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights
+    } = this.#getTileBuffers(cachedTiles)
+
+    const resourceTrianglePoints = new Float64Array(
+      warpedMap.resourceTrianglePoints.flatMap((point) => [point[0], point[1]])
+    )
+
+    const canvasTrianglePoints = new Float64Array(
+      warpedMap.projectedGeoTrianglePoints.flatMap((point) => {
+        if (!this.viewport) {
+          throw new Error('Cannot render without viewport')
+        }
+        const canvasPoint = applyHomogeneousTransform(
+          this.viewport.projectedGeoToCanvasHomogeneousTransform,
+          point
+        )
+        return [canvasPoint[0], canvasPoint[1]]
+      })
+    )
+
+    const triangleInside = new Uint8Array(
+      warpedMap.trianglePointsInside
+        .filter((_inside, index) => index % 3 === 0)
+        .map((inside) => (inside ? 1 : 0))
+    )
+
+    renderContext.render_warped_triangles_rgba(
+      concatenatedJpeg,
+      tileOffsets,
+      tileWidths,
+      tileHeights,
+      tileColumns,
+      tileRows,
+      tileScaleFactors,
+      tileOriginalWidths,
+      tileOriginalHeights,
+      resourceTrianglePoints,
+      canvasTrianglePoints,
+      triangleInside,
+      renderBounds.minX,
+      renderBounds.minY,
+      renderBounds.maxX,
+      renderBounds.maxY
+    )
   }
 
   /**

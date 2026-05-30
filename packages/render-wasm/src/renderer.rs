@@ -15,10 +15,10 @@ impl BBox {
     /// Check if two bounding boxes intersect
     #[inline(always)]
     fn intersects(&self, other: &BBox) -> bool {
-        !(self.max_x < other.min_x ||
-          self.min_x > other.max_x ||
-          self.max_y < other.min_y ||
-          self.min_y > other.max_y)
+        !(self.max_x < other.min_x
+            || self.min_x > other.max_x
+            || self.max_y < other.min_y
+            || self.min_y > other.max_y)
     }
 
     /// Check if a point is inside this bbox
@@ -59,7 +59,12 @@ impl DecodedTile {
             width,
             height,
             scale_factor,
-            bbox: BBox { min_x, max_x, min_y, max_y },
+            bbox: BBox {
+                min_x,
+                max_x,
+                min_y,
+                max_y,
+            },
         }
     }
 
@@ -156,6 +161,42 @@ pub fn render(
     let pixel_count = (output_width * output_height) as usize;
     let mut output = vec![0u8; pixel_count * 4];
 
+    render_into(
+        tiles,
+        transform,
+        mask_polygon,
+        canvas_to_geo,
+        &mut output,
+        output_width,
+        output_height,
+        0,
+        0,
+        output_width,
+        output_height,
+    );
+
+    output
+}
+
+/// Render a map directly into an existing output buffer. Only pixels inside the
+/// supplied canvas bounds are evaluated.
+pub fn render_into(
+    tiles: &[DecodedTile],
+    transform: &Transform,
+    mask_polygon: &[f64],
+    canvas_to_geo: &[f64], // 6-element homogeneous transform
+    output: &mut [u8],
+    output_width: u32,
+    output_height: u32,
+    render_min_x: u32,
+    render_min_y: u32,
+    render_max_x: u32,
+    render_max_y: u32,
+) {
+    if output.len() < (output_width * output_height * 4) as usize {
+        return;
+    }
+
     let a = canvas_to_geo[0];
     let b = canvas_to_geo[1];
     let c = canvas_to_geo[2];
@@ -164,7 +205,8 @@ pub fn render(
     let f = canvas_to_geo[5];
 
     // OPTIMIZATION: Compute viewport bounding box for early culling
-    let viewport_bbox = compute_viewport_bbox(transform, canvas_to_geo, output_width, output_height);
+    let viewport_bbox =
+        compute_viewport_bbox(transform, canvas_to_geo, output_width, output_height);
 
     // OPTIMIZATION: Bounding box culling - filter tiles that don't intersect viewport
     let visible_tiles: Vec<&DecodedTile> = tiles
@@ -174,11 +216,16 @@ pub fn render(
 
     // If no tiles intersect, return empty image
     if visible_tiles.is_empty() {
-        return output;
+        return;
     }
 
-    for cy in 0..output_height {
-        for cx in 0..output_width {
+    let min_x = render_min_x.min(output_width);
+    let min_y = render_min_y.min(output_height);
+    let max_x = render_max_x.min(output_width);
+    let max_y = render_max_y.min(output_height);
+
+    for cy in min_y..max_y {
+        for cx in min_x..max_x {
             let fx = cx as f64;
             let fy = cy as f64;
 
@@ -221,22 +268,197 @@ pub fn render(
             let tile_y = (ry - tile.origin_y()) / tile.scale_factor;
 
             // Safety check: ensure coordinates are within tile bounds
-            if tile_x < 0.0 || tile_x >= tile.width as f64 || tile_y < 0.0 || tile_y >= tile.height as f64 {
+            if tile_x < 0.0
+                || tile_x >= tile.width as f64
+                || tile_y < 0.0
+                || tile_y >= tile.height as f64
+            {
                 // Out of bounds - skip this pixel
                 continue;
             }
 
             // Bilinear sample
-            let color =
-                sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
+            let color = sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
 
             let idx = ((cy * output_width + cx) * 4) as usize;
+            if color[3] <= 0.0 {
+                continue;
+            }
+
             output[idx] = color[0].round().min(255.0).max(0.0) as u8;
             output[idx + 1] = color[1].round().min(255.0).max(0.0) as u8;
             output[idx + 2] = color[2].round().min(255.0).max(0.0) as u8;
             output[idx + 3] = color[3].round().min(255.0).max(0.0) as u8;
         }
     }
+}
+
+#[inline(always)]
+fn edge_function(ax: f64, ay: f64, bx: f64, by: f64, px: f64, py: f64) -> f64 {
+    (px - ax) * (by - ay) - (py - ay) * (bx - ax)
+}
+
+#[inline(always)]
+fn clamp_to_canvas_floor(value: f64, max: u32) -> u32 {
+    value.floor().max(0.0).min(max as f64) as u32
+}
+
+#[inline(always)]
+fn clamp_to_canvas_ceil(value: f64, max: u32) -> u32 {
+    value.ceil().max(0.0).min(max as f64) as u32
+}
+
+/// Render by rasterizing projected/canvas triangles and interpolating resource
+/// coordinates inside each triangle. Projection handling is baked into the
+/// triangle vertices on the JavaScript side, mirroring the WebGL renderer.
+pub fn render_triangles(
+    tiles: &[DecodedTile],
+    resource_triangle_points: &[f64],
+    canvas_triangle_points: &[f64],
+    triangle_inside: &[u8],
+    output_width: u32,
+    output_height: u32,
+) -> Vec<u8> {
+    let pixel_count = (output_width * output_height) as usize;
+    let mut output = vec![0u8; pixel_count * 4];
+
+    render_triangles_into(
+        tiles,
+        resource_triangle_points,
+        canvas_triangle_points,
+        triangle_inside,
+        &mut output,
+        output_width,
+        output_height,
+        0,
+        0,
+        output_width,
+        output_height,
+    );
 
     output
+}
+
+/// Render projected triangles directly into an existing output buffer. Only
+/// triangle pixels inside the supplied canvas bounds are evaluated.
+pub fn render_triangles_into(
+    tiles: &[DecodedTile],
+    resource_triangle_points: &[f64],
+    canvas_triangle_points: &[f64],
+    triangle_inside: &[u8],
+    output: &mut [u8],
+    output_width: u32,
+    output_height: u32,
+    render_min_x: u32,
+    render_min_y: u32,
+    render_max_x: u32,
+    render_max_y: u32,
+) {
+    if tiles.is_empty() {
+        return;
+    }
+
+    if output.len() < (output_width * output_height * 4) as usize {
+        return;
+    }
+
+    let triangle_count = resource_triangle_points
+        .len()
+        .min(canvas_triangle_points.len())
+        / 6;
+
+    let bounds_min_x = render_min_x.min(output_width);
+    let bounds_min_y = render_min_y.min(output_height);
+    let bounds_max_x = render_max_x.min(output_width);
+    let bounds_max_y = render_max_y.min(output_height);
+
+    for triangle_index in 0..triangle_count {
+        if triangle_inside
+            .get(triangle_index)
+            .is_some_and(|inside| *inside == 0)
+        {
+            continue;
+        }
+
+        let point_offset = triangle_index * 6;
+
+        let r0x = resource_triangle_points[point_offset];
+        let r0y = resource_triangle_points[point_offset + 1];
+        let r1x = resource_triangle_points[point_offset + 2];
+        let r1y = resource_triangle_points[point_offset + 3];
+        let r2x = resource_triangle_points[point_offset + 4];
+        let r2y = resource_triangle_points[point_offset + 5];
+
+        let c0x = canvas_triangle_points[point_offset];
+        let c0y = canvas_triangle_points[point_offset + 1];
+        let c1x = canvas_triangle_points[point_offset + 2];
+        let c1y = canvas_triangle_points[point_offset + 3];
+        let c2x = canvas_triangle_points[point_offset + 4];
+        let c2y = canvas_triangle_points[point_offset + 5];
+
+        let area = edge_function(c0x, c0y, c1x, c1y, c2x, c2y);
+        if area.abs() < f64::EPSILON {
+            continue;
+        }
+
+        let min_x = clamp_to_canvas_floor(c0x.min(c1x).min(c2x), output_width);
+        let max_x = clamp_to_canvas_ceil(c0x.max(c1x).max(c2x), output_width);
+        let min_y = clamp_to_canvas_floor(c0y.min(c1y).min(c2y), output_height);
+        let max_y = clamp_to_canvas_ceil(c0y.max(c1y).max(c2y), output_height);
+
+        let min_x = min_x.max(bounds_min_x);
+        let min_y = min_y.max(bounds_min_y);
+        let max_x = max_x.min(bounds_max_x);
+        let max_y = max_y.min(bounds_max_y);
+
+        if min_x >= max_x || min_y >= max_y {
+            continue;
+        }
+
+        for cy in min_y..max_y {
+            for cx in min_x..max_x {
+                let px = cx as f64 + 0.5;
+                let py = cy as f64 + 0.5;
+
+                let w0 = edge_function(c1x, c1y, c2x, c2y, px, py) / area;
+                let w1 = edge_function(c2x, c2y, c0x, c0y, px, py) / area;
+                let w2 = edge_function(c0x, c0y, c1x, c1y, px, py) / area;
+
+                let epsilon = -1e-9;
+                if w0 < epsilon || w1 < epsilon || w2 < epsilon {
+                    continue;
+                }
+
+                let rx = w0 * r0x + w1 * r1x + w2 * r2x;
+                let ry = w0 * r0y + w1 * r1y + w2 * r2y;
+
+                let tile = match tiles.iter().find(|t| t.contains(rx, ry)) {
+                    Some(t) => t,
+                    None => continue,
+                };
+
+                let tile_x = (rx - tile.origin_x()) / tile.scale_factor;
+                let tile_y = (ry - tile.origin_y()) / tile.scale_factor;
+
+                if tile_x < 0.0
+                    || tile_x >= tile.width as f64
+                    || tile_y < 0.0
+                    || tile_y >= tile.height as f64
+                {
+                    continue;
+                }
+
+                let color = sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
+                let idx = ((cy * output_width + cx) * 4) as usize;
+                if color[3] <= 0.0 {
+                    continue;
+                }
+
+                output[idx] = color[0].round().min(255.0).max(0.0) as u8;
+                output[idx + 1] = color[1].round().min(255.0).max(0.0) as u8;
+                output[idx + 2] = color[2].round().min(255.0).max(0.0) as u8;
+                output[idx + 3] = color[3].round().min(255.0).max(0.0) as u8;
+            }
+        }
+    }
 }
