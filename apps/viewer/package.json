@@ -30,11 +30,12 @@
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/background-color": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@allmaps/basemap": "workspace:^",
     "@allmaps/bearing": "workspace:^",
     "@allmaps/components": "workspace:^",
     "@allmaps/env": "workspace:^",
-    "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/project": "workspace:^",
@@ -43,6 +44,7 @@
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "bits-ui": "catalog:",
+    "comlink": "^4.4.1",
     "maplibre-gl": "catalog:"
   },
   "devDependencies": {
@@ -53,12 +55,11 @@
     "@sveltejs/kit": "^2.49.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tailwindcss/vite": "^4.1.17",
-    "@types/node": "^22",
+    "@types/node": "catalog:",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.13.1",
     "globals": "^16.5.0",
-    "phosphor-svelte": "^3.0.1",
     "prettier": "^3.7.4",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
@@ -69,6 +70,7 @@
     "typescript-eslint": "^8.48.1",
     "vite": "catalog:",
     "vite-plugin-devtools-json": "^1.0.0",
-    "wrangler": "^4.3.0"
+    "phosphor-svelte": "^3.0.1",
+    "wrangler": "catalog:"
   }
 }

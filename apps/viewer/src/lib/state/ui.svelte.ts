@@ -5,19 +5,52 @@ import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 const UI_KEY = Symbol('ui')
 
 type View = 'map' | 'image'
+type Modal = 'about'
+type ModalOpen = Modal | undefined
 
 export class UiState extends UiEventTarget {
   #opacity = $state(1)
-  #removeColorThreshold = $state(1)
+  #removeBackground = $state(false)
 
   #mapBearing = $state(0)
+  #imageUpBearing = $state<number>()
+
+  #metadataScrollTop = $state(0)
 
   #view: View = $state('map')
 
+  #modalOpen = $state<ModalOpen>()
+
+  modalOpen: Record<Modal, boolean>
+
+  constructor() {
+    super()
+
+    this.modalOpen = new Proxy({} as Record<Modal, boolean>, {
+      get: (target, prop: string | symbol) => {
+        if (typeof prop === 'string') {
+          return this.#modalOpen === prop
+        }
+
+        return undefined
+      },
+      set: (target, prop: string | symbol, value: boolean) => {
+        if (typeof prop === 'string') {
+          this.#modalOpen = value ? (prop as Modal) : undefined
+          return true
+        }
+
+        return false
+      }
+    })
+  }
+
   reset() {
     this.#opacity = 1
-    this.#removeColorThreshold = 0
+    this.#removeBackground = false
+    this.#metadataScrollTop = 0
     this.#view = 'map'
+    this.#modalOpen = undefined
   }
 
   dispatchZoomToExtent() {
@@ -44,12 +77,12 @@ export class UiState extends UiEventTarget {
     this.#opacity = value
   }
 
-  get removeColorThreshold() {
-    return this.#removeColorThreshold
+  get removeBackground() {
+    return this.#removeBackground
   }
 
-  set removeColorThreshold(value: number) {
-    this.#removeColorThreshold = value
+  set removeBackground(value: boolean) {
+    this.#removeBackground = value
   }
 
   get view() {
@@ -66,6 +99,22 @@ export class UiState extends UiEventTarget {
 
   set mapBearing(value: number) {
     this.#mapBearing = value
+  }
+
+  get imageUpBearing() {
+    return this.#imageUpBearing
+  }
+
+  set imageUpBearing(value: number | undefined) {
+    this.#imageUpBearing = value
+  }
+
+  get metadataScrollTop() {
+    return this.#metadataScrollTop
+  }
+
+  set metadataScrollTop(value: number) {
+    this.#metadataScrollTop = value
   }
 }
 

@@ -1,14 +1,20 @@
 <script lang="ts">
+  import { browser } from '$app/environment'
+  import { page } from '$app/state'
+
   import { generateChecksum } from '@allmaps/id/sync'
 
   import { getUrlState } from '$lib/shared/params.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
   import { setSourceState } from '$lib/state/source.svelte.js'
   import { setMetadataState } from '$lib/state/metadata.svelte.js'
+  import { setImagesState } from '$lib/state/images.svelte.js'
+  import { setBackgroundColorsState } from '$lib/state/background-colors.svelte.js'
 
   import { sourceFromUrl, sourceFromData } from '$lib/shared/source.js'
 
   import Head from '$lib/components/Head.svelte'
+  import About from '$lib/components/modals/About.svelte'
 
   import type { LayoutProps } from './$types'
 
@@ -22,25 +28,59 @@
   // svelte-ignore state_referenced_locally
   const sourceState = setSourceState(urlState, uiState, data.source)
   const metadataState = setMetadataState(sourceState, urlState)
+  const imagesState = setImagesState(sourceState)
+  if (browser) {
+    setBackgroundColorsState(sourceState, imagesState)
+  }
 
   let currentUrlParam = $state<string>()
   let currentDataParamChecksum = $state<string>()
 
+  function getCurrentUrlParam() {
+    const pageUrlParam = page.url.searchParams.get('url') || undefined
+
+    if (browser) {
+      return new URL(window.location.href).searchParams.get('url') || undefined
+    }
+
+    return pageUrlParam
+  }
+
+  let urlParam = $derived.by(() => getCurrentUrlParam())
+
   $effect(() => {
-    if (data.source && data.source.url !== currentUrlParam) {
-      currentUrlParam = data.source.url
+    if (!urlParam && !urlState.params.data) {
+      errorMessage = undefined
+      sourceState.source = undefined
+      currentUrlParam = undefined
       currentDataParamChecksum = undefined
-      sourceState.source = data.source
-    } else if (!data.source && data.urlParam) {
+    } else if (
+      data.source &&
+      data.urlParam &&
+      data.urlParam === urlParam &&
+      data.urlParam !== currentUrlParam
+    ) {
       currentUrlParam = data.urlParam
       currentDataParamChecksum = undefined
-      sourceFromUrl(data.env.PUBLIC_REST_BASE_URL, data.urlParam)
+      errorMessage = undefined
+      sourceState.source = data.source
+    } else if ((!data.source || data.source.url !== urlParam) && urlParam) {
+      const requestedUrlParam = urlParam
+
+      currentUrlParam = requestedUrlParam
+      currentDataParamChecksum = undefined
+      sourceFromUrl(data.env.PUBLIC_REST_BASE_URL, requestedUrlParam)
         .then((source) => {
-          sourceState.source = source
+          if (getCurrentUrlParam() === requestedUrlParam) {
+            errorMessage = undefined
+            sourceState.source = source
+          }
         })
         .catch((err) => {
-          errorMessage =
-            err.message || 'Failed to load source from url parameter'
+          if (getCurrentUrlParam() === requestedUrlParam) {
+            errorMessage =
+              err.message || 'Failed to load source from url parameter'
+          }
         })
     } else if (urlState.params.data) {
       const dataChecksum = generateChecksum(urlState.params.data)
@@ -51,6 +91,7 @@
         // TODO: cancel fetch in sourceFromData when still fetching
         sourceFromData(data.env.PUBLIC_REST_BASE_URL, urlState.params.data)
           .then((source) => {
+            errorMessage = undefined
             sourceState.source = source
           })
           .catch((err) => {
@@ -58,10 +99,6 @@
               err.message || 'Failed to load source from data parameter'
           })
       }
-    } else if (!data.source && !urlState.params.data && !data.urlParam) {
-      sourceState.source = undefined
-      currentUrlParam = undefined
-      currentDataParamChecksum = undefined
     }
   })
 </script>
@@ -74,6 +111,7 @@
 
 {#if errorMessage}
   <p class="text-red-500">{errorMessage}</p>
-{:else}
+{:else if browser}
   {@render children?.()}
+  <About />
 {/if}

@@ -85,7 +85,10 @@ export function getSourceLabels(
   }
   // Convert to array and sort by count desc, then id asc
   const sorted = Array.from(manifestCounts.entries()).sort((a, b) => {
-    if (b[1].count !== a[1].count) return b[1].count - a[1].count
+    if (b[1].count !== a[1].count) {
+      return b[1].count - a[1].count
+    }
+
     return a[0].localeCompare(b[0])
   })
   // Return label of manifest with highest count
@@ -142,7 +145,10 @@ export function getOrganization(
 
   // Sort by count desc, then key asc
   const sorted = Array.from(organizationCounts.entries()).sort((a, b) => {
-    if (b[1].count !== a[1].count) return b[1].count - a[1].count
+    if (b[1].count !== a[1].count) {
+      return b[1].count - a[1].count
+    }
+
     return a[0].localeCompare(b[0])
   })
 

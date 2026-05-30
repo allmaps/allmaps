@@ -19,7 +19,7 @@
   >
     {@render children()}
   </div>
-  <div class="row-1 col-span-full z-10 pointer-events-none">
+  <div class="row-1 col-span-full z-20 pointer-events-none">
     {@render header()}
   </div>
   {#if controls}

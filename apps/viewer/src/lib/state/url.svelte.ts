@@ -5,7 +5,6 @@ import { setContext, getContext } from 'svelte'
 import { SvelteURL } from 'svelte/reactivity'
 
 import { goto } from '$app/navigation'
-import { page } from '$app/state'
 
 import type {
   SearchParam,
@@ -114,7 +113,11 @@ export class UrlState<T extends SearchParams> {
             const newHashParams = this.#getHashParams()
 
             if (shouldSetValue) {
-              newHashParams.set(paramConfig.key, stringValue!)
+              if (stringValue) {
+                newHashParams.set(paramConfig.key, stringValue)
+              } else {
+                newHashParams.delete(paramConfig.key)
+              }
             } else {
               newHashParams.delete(paramConfig.key)
             }
@@ -126,11 +129,9 @@ export class UrlState<T extends SearchParams> {
               // Navigate to the new URL with hash
               const searchString = this.#url.searchParams.toString()
               const search = searchString ? `?${searchString}` : ''
+              const url = `${this.#url.pathname}${search}${hash}`
 
-              goto(`${page.url.pathname}${search}${hash}`, {
-                replaceState: false,
-                keepFocus: true
-              })
+              this.#goto(url)
             }
 
             return true
@@ -139,7 +140,11 @@ export class UrlState<T extends SearchParams> {
             const newSearchParams = new URLSearchParams(this.#url.searchParams)
 
             if (shouldSetValue) {
-              newSearchParams.set(paramConfig.key, stringValue!)
+              if (stringValue) {
+                newSearchParams.set(paramConfig.key, stringValue)
+              } else {
+                newSearchParams.delete(paramConfig.key)
+              }
             } else {
               newSearchParams.delete(paramConfig.key)
             }
@@ -148,11 +153,9 @@ export class UrlState<T extends SearchParams> {
               const searchString = newSearchParams.toString()
               const search = searchString ? `?${searchString}` : ''
               const hash = this.#url.hash
+              const url = `${this.#url.pathname}${search}${hash}`
 
-              goto(`${page.url.pathname}${search}${hash}`, {
-                replaceState: false,
-                keepFocus: true
-              })
+              this.#goto(url)
             }
 
             return true
@@ -167,6 +170,27 @@ export class UrlState<T extends SearchParams> {
     if (this.#url.href !== url.href) {
       this.#url.href = url.href
     }
+  }
+
+  updateParams<K extends keyof T>(params: SearchParamsInput<T, K>) {
+    const newSearchParams = this.generateSearchParams(params)
+    const searchString = newSearchParams.toString()
+    const search = searchString ? `?${searchString}` : ''
+    const hash = this.generateHash(params)
+    const url = `${this.#url.pathname}${search}${hash}`
+
+    if (new URL(url, this.#url).href !== this.#url.href) {
+      this.#goto(url)
+    }
+  }
+
+  #goto(url: string) {
+    this.#url.href = new URL(url, this.#url).href
+
+    goto(url, {
+      replaceState: true,
+      keepFocus: true
+    })
   }
 
   #getHashParams(): URLSearchParams {
