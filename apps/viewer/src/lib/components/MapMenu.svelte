@@ -1,35 +1,39 @@
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui'
   import {
-    BringMapsToFront,
-    BringMapsForward,
-    SendMapsBackward,
-    SendMapsToBack
+    BringMapsToFront as BringMapsToFrontIcon,
+    BringMapsForward as BringMapsForwardIcon,
+    SendMapsBackward as SendMapsBackwardIcon,
+    SendMapsToBack as SendMapsToBackIcon
   } from '@allmaps/ui'
   import {
-    Eye,
-    EyeSlash,
-    ArrowSquareOut,
-    Copy,
-    CaretRight,
-    MapPin,
-    Globe
+    Eye as EyeIcon,
+    EyeSlash as EyeSlashIcon,
+    Image as ImageIcon,
+    ArrowsOut as ArrowsOutIcon,
+    ArrowSquareOut as ArrowSquareOutIcon,
+    Copy as CopyIcon,
+    CaretRight as CaretRightIcon,
+    Globe as GlobeIcon
   } from 'phosphor-svelte'
-  import { generateId } from '@allmaps/id'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMapLayer } from '@allmaps/maplibre'
+  import type { Snippet } from 'svelte'
 
   type Props = {
     open: boolean
     x: number
     y: number
     latLon: [number, number]
+    view: 'map' | 'image'
     mapId: string
     georeferencedMap: GeoreferencedMap
     warpedMapLayer: WarpedMapLayer
+    onViewImage: (mapId: string) => void
+    onZoomToExtent: (mapId: string) => void
   }
 
   let {
@@ -37,9 +41,12 @@
     x,
     y,
     latLon,
+    view,
     mapId,
     georeferencedMap,
-    warpedMapLayer
+    warpedMapLayer,
+    onViewImage,
+    onZoomToExtent
   }: Props = $props()
 
   const sourceState = getSourceState()
@@ -50,12 +57,45 @@
 
   // Get image URI for URL generation
   const imageUri = $derived(georeferencedMap.resource.id)
+  const editorUrl = $derived(
+    imageUri
+      ? `https://editor.allmaps.org/#/mask?url=${encodeURIComponent(imageUri)}`
+      : undefined
+  )
+  const openStreetMapUrl = $derived.by(() => {
+    const [lat, lon] = latLon
+    return `https://www.openstreetmap.org/#map=17/${lat}/${lon}`
+  })
+  const googleMapsUrl = $derived.by(() => {
+    const [lat, lon] = latLon
+    return `https://www.google.com/maps/@${lat},${lon},17z`
+  })
+  const googleStreetViewUrl = $derived.by(() => {
+    const [lat, lon] = latLon
+    return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`
+  })
+  const bingMapsUrl = $derived.by(() => {
+    const [lat, lon] = latLon
+    return `https://www.bing.com/maps?cp=${lat}~${lon}&lvl=17`
+  })
+  const mapillaryUrl = $derived.by(() => {
+    const [lat, lon] = latLon
+    return `https://www.mapillary.com/app/?lat=${lat}&lng=${lon}&z=17`
+  })
 
   async function handleHideToggle() {
     isHidden = !isHidden
     warpedMapLayer.setMapOptions(mapId, {
       opacity: isHidden ? 0 : 1
     })
+  }
+
+  function handleView() {
+    onViewImage(mapId)
+  }
+
+  function handleZoomToExtent() {
+    onZoomToExtent(mapId)
   }
 
   function handleBringToFront() {
@@ -74,20 +114,10 @@
     warpedMapLayer.sendMapsToBack([mapId])
   }
 
-  async function handleOpenInEditor() {
-    if (!imageUri) {
-      return
-    }
-
-    const editorUrl = `https://editor.allmaps.org/#/mask?url=${encodeURIComponent(imageUri)}`
-    window.open(editorUrl, '_blank')
-  }
-
   async function handleCopyAnnotationUrl() {
     try {
-      const imageId = await generateId(imageUri)
-      const annotationUrl = `https://annotations.allmaps.org/images/${imageId}`
-      await navigator.clipboard.writeText(annotationUrl)
+      // const annotationUrl = `https://annotations.allmaps.org/maps/${mapId}`
+      await navigator.clipboard.writeText(mapId)
     } catch (error) {
       console.error('Failed to copy annotation URL:', error)
     }
@@ -101,47 +131,41 @@
     }
   }
 
-  async function handleCopyMapUrl() {
-    try {
-      const currentUrl = new URL(window.location.href)
-      currentUrl.searchParams.set('map', mapId)
-      await navigator.clipboard.writeText(currentUrl.toString())
-    } catch (error) {
-      console.error('Failed to copy map URL:', error)
-    }
-  }
-
-  function openOpenStreetMap() {
-    const [lat, lon] = latLon
-    window.open(`https://www.openstreetmap.org/#map=17/${lat}/${lon}`, '_blank')
-  }
-
-  function openGoogleMaps() {
-    const [lat, lon] = latLon
-    window.open(`https://www.google.com/maps/@${lat},${lon},17z`, '_blank')
-  }
-
-  function openGoogleStreetView() {
-    const [lat, lon] = latLon
-    window.open(
-      `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`,
-      '_blank'
-    )
-  }
-
-  function openBingMaps() {
-    const [lat, lon] = latLon
-    window.open(`https://www.bing.com/maps?cp=${lat}~${lon}&lvl=17`, '_blank')
-  }
-
-  function openMapillary() {
-    const [lat, lon] = latLon
-    window.open(
-      `https://www.mapillary.com/app/?lat=${lat}&lng=${lon}&z=17`,
-      '_blank'
-    )
-  }
+  const menuItemClass =
+    'flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100'
 </script>
+
+{#snippet externalLinkIcon()}
+  <ArrowSquareOutIcon class="size-4" />
+{/snippet}
+
+{#snippet externalLinkMenuItem(
+  label: string,
+  href: string | undefined,
+  icon: Snippet = externalLinkIcon
+)}
+  <DropdownMenu.Item textValue={label} disabled={!href}>
+    {#snippet child({ props })}
+      {#if href}
+        <a
+          {...props}
+          class={menuItemClass}
+          {href}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {@render icon()}
+          <span>{label}</span>
+        </a>
+      {:else}
+        <span {...props} class={menuItemClass}>
+          {@render icon()}
+          <span>{label}</span>
+        </span>
+      {/if}
+    {/snippet}
+  </DropdownMenu.Item>
+{/snippet}
 
 <!-- Invisible anchor element that moves with x/y coordinates -->
 <div
@@ -163,71 +187,98 @@
       align="start"
       sideOffset={0}
     >
-      <!-- Hide/Show -->
+      <!-- View image / map -->
       <DropdownMenu.Item
         class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-        onSelect={handleHideToggle}
+        onSelect={handleView}
       >
-        {#if isHidden}
-          <Eye class="size-4" />
-          <span>Show</span>
-        {:else}
-          <EyeSlash class="size-4" />
-          <span>Hide</span>
-        {/if}
+        <ImageIcon class="size-4" />
+        <span>{view === 'image' ? 'View on map' : 'View image'}</span>
       </DropdownMenu.Item>
 
-      {#if sourceState.mapCount > 1}
+      <!-- Zoom to extent -->
+      <DropdownMenu.Item
+        class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+        onSelect={handleZoomToExtent}
+      >
+        <ArrowsOutIcon class="size-4" />
+        <span>Zoom to extent</span>
+      </DropdownMenu.Item>
+
+      {#if view === 'map'}
+        <!-- Hide/Show -->
+        <DropdownMenu.Item
+          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+          onSelect={handleHideToggle}
+        >
+          {#if isHidden}
+            <EyeIcon class="size-4" />
+            <span>Show</span>
+          {:else}
+            <EyeSlashIcon class="size-4" />
+            <span>Hide</span>
+          {/if}
+        </DropdownMenu.Item>
+      {/if}
+
+      {#if view === 'map' && sourceState.mapCount > 1}
         <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
 
-        <!-- Bring to Front -->
-        <DropdownMenu.Item
-          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-          onSelect={handleBringToFront}
-        >
-          <span class="size-4"><BringMapsToFront /></span>
-          <span>Bring to Front</span>
-        </DropdownMenu.Item>
+        <!-- Arrange submenu -->
+        <DropdownMenu.Sub>
+          <DropdownMenu.SubTrigger
+            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+          >
+            <span class="size-4"><BringMapsToFrontIcon /></span>
+            <span class="flex-1">Arrange</span>
+            <CaretRightIcon class="size-4 ml-auto" />
+          </DropdownMenu.SubTrigger>
+          <DropdownMenu.SubContent
+            class="z-50 min-w-[200px] rounded-lg border border-gray-200 bg-white px-1 py-1.5 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
+          >
+            <!-- Bring to Front -->
+            <DropdownMenu.Item
+              class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+              onSelect={handleBringToFront}
+            >
+              <span class="size-4"><BringMapsToFrontIcon /></span>
+              <span>Bring to Front</span>
+            </DropdownMenu.Item>
 
-        <!-- Bring Forward -->
-        <DropdownMenu.Item
-          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-          onSelect={handleBringForward}
-        >
-          <span class="size-4"><BringMapsForward /></span>
-          <span>Bring Forward</span>
-        </DropdownMenu.Item>
+            <!-- Bring Forward -->
+            <DropdownMenu.Item
+              class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+              onSelect={handleBringForward}
+            >
+              <span class="size-4"><BringMapsForwardIcon /></span>
+              <span>Bring Forward</span>
+            </DropdownMenu.Item>
 
-        <!-- Send Backward -->
-        <DropdownMenu.Item
-          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-          onSelect={handleSendBackward}
-        >
-          <span class="size-4"><SendMapsBackward /></span>
-          <span>Send Backward</span>
-        </DropdownMenu.Item>
+            <!-- Send Backward -->
+            <DropdownMenu.Item
+              class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+              onSelect={handleSendBackward}
+            >
+              <span class="size-4"><SendMapsBackwardIcon /></span>
+              <span>Send Backward</span>
+            </DropdownMenu.Item>
 
-        <!-- Send to Back -->
-        <DropdownMenu.Item
-          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-          onSelect={handleSendToBack}
-        >
-          <span class="size-4"><SendMapsToBack /></span>
-          <span>Send to Back</span>
-        </DropdownMenu.Item>
+            <!-- Send to Back -->
+            <DropdownMenu.Item
+              class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+              onSelect={handleSendToBack}
+            >
+              <span class="size-4"><SendMapsToBackIcon /></span>
+              <span>Send to Back</span>
+            </DropdownMenu.Item>
+          </DropdownMenu.SubContent>
+        </DropdownMenu.Sub>
       {/if}
 
       <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
 
       <!-- Open in Allmaps Editor -->
-      <DropdownMenu.Item
-        class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-        onSelect={handleOpenInEditor}
-        disabled={!imageUri}
-      >
-        <ArrowSquareOut class="size-4" />
-        <span>Open in Allmaps Editor</span>
-      </DropdownMenu.Item>
+      {@render externalLinkMenuItem('Open in Allmaps Editor', editorUrl)}
 
       <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
 
@@ -235,9 +286,9 @@
       <DropdownMenu.Item
         class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
         onSelect={handleCopyAnnotationUrl}
-        disabled={!imageUri}
+        disabled={!mapId}
       >
-        <Copy class="size-4" />
+        <CopyIcon class="size-4" />
         <span>Copy Annotation URL</span>
       </DropdownMenu.Item>
 
@@ -247,18 +298,8 @@
         onSelect={handleCopyImageUrl}
         disabled={!imageUri}
       >
-        <Copy class="size-4" />
+        <CopyIcon class="size-4" />
         <span>Copy Image URL</span>
-      </DropdownMenu.Item>
-
-      <!-- Copy Map URL -->
-      <DropdownMenu.Item
-        class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-        onSelect={handleCopyMapUrl}
-        disabled={!mapId}
-      >
-        <Copy class="size-4" />
-        <span>Copy Map URL</span>
       </DropdownMenu.Item>
 
       <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
@@ -268,48 +309,21 @@
         <DropdownMenu.SubTrigger
           class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
         >
-          <Globe class="size-4" />
+          <GlobeIcon class="size-4" />
           <span class="flex-1">Open location in&hellip;</span>
-          <CaretRight class="size-4 ml-auto" />
+          <CaretRightIcon class="size-4 ml-auto" />
         </DropdownMenu.SubTrigger>
         <DropdownMenu.SubContent
           class="z-50 min-w-[200px] rounded-lg border border-gray-200 bg-white px-1 py-1.5 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95"
         >
-          <DropdownMenu.Item
-            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-            onSelect={openOpenStreetMap}
-          >
-            <ArrowSquareOut class="size-4" />
-            <span>OpenStreetMap</span>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-            onSelect={openGoogleMaps}
-          >
-            <ArrowSquareOut class="size-4" />
-            <span>Google Maps</span>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-            onSelect={openGoogleStreetView}
-          >
-            <MapPin class="size-4" />
-            <span>Google Street View</span>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-            onSelect={openBingMaps}
-          >
-            <ArrowSquareOut class="size-4" />
-            <span>Bing Maps</span>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
-            onSelect={openMapillary}
-          >
-            <ArrowSquareOut class="size-4" />
-            <span>Mapillary</span>
-          </DropdownMenu.Item>
+          {@render externalLinkMenuItem('OpenStreetMap', openStreetMapUrl)}
+          {@render externalLinkMenuItem('Google Maps', googleMapsUrl)}
+          {@render externalLinkMenuItem(
+            'Google Street View',
+            googleStreetViewUrl
+          )}
+          {@render externalLinkMenuItem('Bing Maps', bingMapsUrl)}
+          {@render externalLinkMenuItem('Mapillary', mapillaryUrl)}
         </DropdownMenu.SubContent>
       </DropdownMenu.Sub>
     </DropdownMenu.Content>

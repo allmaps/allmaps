@@ -1,7 +1,15 @@
 <script lang="ts">
+  import { navigating } from '$app/state'
+
   import examples from '$lib/components/examples.js'
 
-  const PUBLIC_PREVIEW_URL = 'https://dev.preview.allmaps.org'
+  let navigatingToUrl = $derived(navigating.to?.url.searchParams.get('url'))
+
+  type Props = {
+    previewUrl: string
+  }
+
+  let { previewUrl }: Props = $props()
 </script>
 
 <p class="text-2xl font-bold text-black p-8 text-center">
@@ -9,13 +17,18 @@
 </p>
 
 <ul class="grid grid-cols-1 sm:grid-cols-2 list-none gap-4 rounded-2xl">
-  {#each examples as example (example.allmapsId)}
-    <li class="flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2">
+  {#each examples as example (example.url)}
+    <li
+      class={[
+        'flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2',
+        navigatingToUrl === example.url && 'animate-pulse'
+      ]}
+    >
       <a class="contents" href={`?url=${encodeURIComponent(example.url)}`}>
         <img
           alt={`Preview of ${example.title}`}
           class="border-2 bg-white/50 border-pink/20 rounded-lg aspect-3/2 overflow-clip"
-          src={`${PUBLIC_PREVIEW_URL}/${example.allmapsId}.jpg?fit=best&background=fff&width=600&height=400`}
+          src={`${previewUrl}/${example.allmapsId}.jpg?fit=best&background=fff&width=600&height=400`}
         />
 
         <span class="underline">{example.title}</span>

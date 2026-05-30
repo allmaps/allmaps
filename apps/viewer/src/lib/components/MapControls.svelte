@@ -1,20 +1,16 @@
 <script lang="ts">
-  import {
-    Plus as PlusIcon,
-    Minus as MinusIcon,
-    ArrowUp as ArrowUpIcon
-  } from 'phosphor-svelte'
+  import { Plus as PlusIcon, Minus as MinusIcon } from 'phosphor-svelte'
 
   import ControlContainer from '$lib/components/ControlContainer.svelte'
+  import ZoomToExtent from '$lib/components/ZoomToExtent.svelte'
 
   type Props = {
     onZoomIn: () => void
     onZoomOut: () => void
-    mapBearing: number
-    onResetBearing: () => void
+    onZoomToExtent: () => void
   }
 
-  let { onZoomIn, onZoomOut, mapBearing, onResetBearing }: Props = $props()
+  let { onZoomIn, onZoomOut, onZoomToExtent }: Props = $props()
 </script>
 
 <div class="flex flex-col gap-2">
@@ -34,12 +30,6 @@
   </ControlContainer>
 
   <ControlContainer>
-    <button
-      onclick={onResetBearing}
-      class="cursor-pointer hover:bg-pink/10 hover:text-pink rounded transition-colors"
-      ><div style:rotate={-mapBearing + 'deg'}>
-        <ArrowUpIcon class="size-5" weight="bold" />
-      </div>
-    </button>
+    <ZoomToExtent {onZoomToExtent} />
   </ControlContainer>
 </div>

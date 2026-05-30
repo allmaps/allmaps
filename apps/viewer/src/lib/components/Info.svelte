@@ -1,20 +1,38 @@
 <script lang="ts">
+  import { Info as InfoIcon } from 'phosphor-svelte'
+
   import { Popover } from '@allmaps/components'
 
   import AnnotationInput from '$lib/components/AnnotationInput.svelte'
+  import Metadata from '$lib/components/Metadata.svelte'
 
   import { parseLanguageString } from '$lib/shared/iiif.js'
   import { hasInputTarget } from '$lib/shared/keyboard.js'
 
-  import type { Source, SourceLabels, Organization } from '$lib/types/shared.js'
+  import type {
+    Source,
+    SourceLabels,
+    Organization,
+    MapsHierarchy
+  } from '$lib/types/shared.js'
 
   type Props = {
     source: Source
     labels: SourceLabels
+    title?: string
     organization?: Organization
+    mapsHierarchy: MapsHierarchy
+    selectedMapId?: string
   }
 
-  let { source, labels, organization }: Props = $props()
+  let {
+    source,
+    labels,
+    title,
+    organization,
+    mapsHierarchy,
+    selectedMapId = $bindable()
+  }: Props = $props()
 
   let open = $state(false)
 
@@ -129,7 +147,6 @@
     autoFocus={true}
   />
 {/snippet}
-{#snippet metadata()}...{/snippet}
 
 <Popover bind:open>
   {#snippet button()}
@@ -162,21 +179,26 @@
     </div> -->
 
     <div
-      class="min-w-0 max-w-4xl truncate shadow hover:shadow-lg transition-all duration-100
+      class="min-w-0 max-w-xl truncate shadow hover:shadow-lg transition-all duration-100
           bg-white rounded-full px-2 py-1.5 cursor-pointer text-sm text-green font-medium leading-tight
             flex gap-2 items-center"
     >
-      {@render segments({
-        labelStrings,
-        sourceUrl,
-        organization
-      })}
+      <InfoIcon class="size-5 text-black/80" weight="bold" />
+      {#if title}
+        <span class="min-w-0 truncate font-medium">{title}</span>
+      {:else}
+        {@render segments({
+          labelStrings,
+          sourceUrl,
+          organization
+        })}
+      {/if}
     </div>
   {/snippet}
   {#snippet contents()}
     <div class="max-w-full w-xl">
       {@render urlInput()}
-      {@render metadata()}
+      <Metadata {mapsHierarchy} bind:selectedMapId {open} />
     </div>
   {/snippet}
 </Popover>

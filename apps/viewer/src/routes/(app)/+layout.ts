@@ -4,15 +4,30 @@ import { sourceFromUrl } from '$lib/shared/source.js'
 
 import type { LayoutLoad } from './$types'
 
-export const load: LayoutLoad = async ({ fetch, url }) => {
+export const load: LayoutLoad = async ({ data, fetch, url, parent }) => {
+  const { env } = await parent()
+  const source = data?.source
+
   const urlParam = url.searchParams.get('url')
+
+  if (source || !urlParam) {
+    return {
+      source,
+      urlParam
+    }
+  }
 
   if (urlParam) {
     try {
-      const source = await sourceFromUrl(urlParam, fetch)
+      const fallbackSource = await sourceFromUrl(
+        env.PUBLIC_REST_BASE_URL,
+        urlParam,
+        fetch
+      )
 
       return {
-        source
+        source: fallbackSource,
+        urlParam
       }
     } catch (err) {
       let message = 'Failed to load source'
@@ -24,5 +39,9 @@ export const load: LayoutLoad = async ({ fetch, url }) => {
         message
       })
     }
+  }
+
+  return {
+    urlParam
   }
 }
