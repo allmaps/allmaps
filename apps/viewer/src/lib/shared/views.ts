@@ -1,3 +1,5 @@
+import { webMercatorProjection } from '@allmaps/project'
+
 import type { Map as MapLibreMap, LngLatBoundsLike } from 'maplibre-gl'
 
 import type { WarpedMapLayer } from '@allmaps/maplibre'
@@ -48,12 +50,14 @@ function setMapView(
           applyMask: true,
           renderMask: true,
           transformationType: undefined,
+          internalProjection: undefined,
           renderAppliedMask: true
         }
       : {
           renderMask: false,
           visible: true,
           transformationType: undefined,
+          internalProjection: undefined,
           renderAppliedMask: false
         }
   )
@@ -98,9 +102,14 @@ function setImageView(
             applyMask: false,
             renderAppliedMask: false,
             renderMask: true,
-            transformationType: 'helmert'
+            transformationType: 'helmert',
+            internalProjection: webMercatorProjection
           }
-        : { visible: false, transformationType: 'helmert' }
+        : {
+            visible: false,
+            transformationType: 'helmert',
+            internalProjection: webMercatorProjection
+          }
     )
 
     // previousMapBounds = map.getBounds()
@@ -117,10 +126,10 @@ function setImageView(
       duration
     })
 
-    map.once('idle', () => {
-      // map.setMaxBounds(map.getBounds())
-      // map.setMaxBounds(bufferBboxByRatio(selectedWarpedMap.geoFullMaskBbox, 3))
-    })
+    // map.once('idle', () => {
+    // map.setMaxBounds(map.getBounds())
+    // map.setMaxBounds(bufferBboxByRatio(selectedWarpedMap.geoFullMaskBbox, 3))
+    // })
   }
 }
 
