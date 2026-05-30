@@ -161,6 +161,42 @@ pub fn render(
     let pixel_count = (output_width * output_height) as usize;
     let mut output = vec![0u8; pixel_count * 4];
 
+    render_into(
+        tiles,
+        transform,
+        mask_polygon,
+        canvas_to_geo,
+        &mut output,
+        output_width,
+        output_height,
+        0,
+        0,
+        output_width,
+        output_height,
+    );
+
+    output
+}
+
+/// Render a map directly into an existing output buffer. Only pixels inside the
+/// supplied canvas bounds are evaluated.
+pub fn render_into(
+    tiles: &[DecodedTile],
+    transform: &Transform,
+    mask_polygon: &[f64],
+    canvas_to_geo: &[f64], // 6-element homogeneous transform
+    output: &mut [u8],
+    output_width: u32,
+    output_height: u32,
+    render_min_x: u32,
+    render_min_y: u32,
+    render_max_x: u32,
+    render_max_y: u32,
+) {
+    if output.len() < (output_width * output_height * 4) as usize {
+        return;
+    }
+
     let a = canvas_to_geo[0];
     let b = canvas_to_geo[1];
     let c = canvas_to_geo[2];
@@ -180,11 +216,16 @@ pub fn render(
 
     // If no tiles intersect, return empty image
     if visible_tiles.is_empty() {
-        return output;
+        return;
     }
 
-    for cy in 0..output_height {
-        for cx in 0..output_width {
+    let min_x = render_min_x.min(output_width);
+    let min_y = render_min_y.min(output_height);
+    let max_x = render_max_x.min(output_width);
+    let max_y = render_max_y.min(output_height);
+
+    for cy in min_y..max_y {
+        for cx in min_x..max_x {
             let fx = cx as f64;
             let fy = cy as f64;
 
@@ -240,14 +281,16 @@ pub fn render(
             let color = sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
 
             let idx = ((cy * output_width + cx) * 4) as usize;
+            if color[3] <= 0.0 {
+                continue;
+            }
+
             output[idx] = color[0].round().min(255.0).max(0.0) as u8;
             output[idx + 1] = color[1].round().min(255.0).max(0.0) as u8;
             output[idx + 2] = color[2].round().min(255.0).max(0.0) as u8;
             output[idx + 3] = color[3].round().min(255.0).max(0.0) as u8;
         }
     }
-
-    output
 }
 
 #[inline(always)]
@@ -279,14 +322,55 @@ pub fn render_triangles(
     let pixel_count = (output_width * output_height) as usize;
     let mut output = vec![0u8; pixel_count * 4];
 
+    render_triangles_into(
+        tiles,
+        resource_triangle_points,
+        canvas_triangle_points,
+        triangle_inside,
+        &mut output,
+        output_width,
+        output_height,
+        0,
+        0,
+        output_width,
+        output_height,
+    );
+
+    output
+}
+
+/// Render projected triangles directly into an existing output buffer. Only
+/// triangle pixels inside the supplied canvas bounds are evaluated.
+pub fn render_triangles_into(
+    tiles: &[DecodedTile],
+    resource_triangle_points: &[f64],
+    canvas_triangle_points: &[f64],
+    triangle_inside: &[u8],
+    output: &mut [u8],
+    output_width: u32,
+    output_height: u32,
+    render_min_x: u32,
+    render_min_y: u32,
+    render_max_x: u32,
+    render_max_y: u32,
+) {
     if tiles.is_empty() {
-        return output;
+        return;
+    }
+
+    if output.len() < (output_width * output_height * 4) as usize {
+        return;
     }
 
     let triangle_count = resource_triangle_points
         .len()
         .min(canvas_triangle_points.len())
         / 6;
+
+    let bounds_min_x = render_min_x.min(output_width);
+    let bounds_min_y = render_min_y.min(output_height);
+    let bounds_max_x = render_max_x.min(output_width);
+    let bounds_max_y = render_max_y.min(output_height);
 
     for triangle_index in 0..triangle_count {
         if triangle_inside
@@ -321,6 +405,11 @@ pub fn render_triangles(
         let max_x = clamp_to_canvas_ceil(c0x.max(c1x).max(c2x), output_width);
         let min_y = clamp_to_canvas_floor(c0y.min(c1y).min(c2y), output_height);
         let max_y = clamp_to_canvas_ceil(c0y.max(c1y).max(c2y), output_height);
+
+        let min_x = min_x.max(bounds_min_x);
+        let min_y = min_y.max(bounds_min_y);
+        let max_x = max_x.min(bounds_max_x);
+        let max_y = max_y.min(bounds_max_y);
 
         if min_x >= max_x || min_y >= max_y {
             continue;
@@ -361,6 +450,10 @@ pub fn render_triangles(
 
                 let color = sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
                 let idx = ((cy * output_width + cx) * 4) as usize;
+                if color[3] <= 0.0 {
+                    continue;
+                }
+
                 output[idx] = color[0].round().min(255.0).max(0.0) as u8;
                 output[idx + 1] = color[1].round().min(255.0).max(0.0) as u8;
                 output[idx + 2] = color[2].round().min(255.0).max(0.0) as u8;
@@ -368,6 +461,4 @@ pub fn render_triangles(
             }
         }
     }
-
-    output
 }
