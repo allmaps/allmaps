@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { browser } from '$app/environment'
+
   import { Info as InfoIcon } from 'phosphor-svelte'
 
   import { Popover } from '@allmaps/components'
@@ -35,6 +37,31 @@
   }: Props = $props()
 
   let open = $state(false)
+  let autoFocusUrlInput = $state(false)
+
+  function updateAutoFocusUrlInput(coarsePointerQuery: MediaQueryList) {
+    autoFocusUrlInput = !coarsePointerQuery.matches
+  }
+
+  $effect(() => {
+    if (!browser) {
+      return
+    }
+
+    const coarsePointerQuery = window.matchMedia('(pointer: coarse)')
+    const handleCoarsePointerChange = () =>
+      updateAutoFocusUrlInput(coarsePointerQuery)
+
+    updateAutoFocusUrlInput(coarsePointerQuery)
+    coarsePointerQuery.addEventListener('change', handleCoarsePointerChange)
+
+    return () => {
+      coarsePointerQuery.removeEventListener(
+        'change',
+        handleCoarsePointerChange
+      )
+    }
+  })
 
   let labelStrings = $derived.by(() => {
     let manifestLabel: string | undefined
@@ -144,7 +171,7 @@
     jsonModeHeightClass="h-24"
     submitButton={false}
     roundedFull={false}
-    autoFocus={true}
+    autoFocus={autoFocusUrlInput}
   />
 {/snippet}
 
