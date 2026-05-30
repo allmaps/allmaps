@@ -159,14 +159,17 @@
 
   type PolygonWithAnimation = {
     id: string
-    polygon: GeojsonPolygon
-    x: number
-    y: number
-    vx: number
-    vy: number
-    rotation: number
-    rotationSpeed: number
+    path: string
+    href?: string
+    fromX: number
+    fromY: number
+    toX: number
+    toY: number
+    fromRotation: number
+    toRotation: number
     scale: number
+    duration: number
+    delay: number
   }
 
   type Props = {
@@ -209,12 +212,9 @@
   let viewportWidth = $state(0)
   let viewportHeight = $state(0)
 
-  let maxSpeed = 1.5
-
   let warpedResourceMasksLoaded = $state(false)
 
-  let animatedPolygons: PolygonWithAnimation[] = $state([])
-  let animationFrameId: number | undefined
+  let animatedPolygons: PolygonWithAnimation[] = $state.raw([])
 
   $effect(() => {
     if (
@@ -223,31 +223,15 @@
       warpedResourceMasksLoaded &&
       animatedPolygons.length === 0
     ) {
-      animatedPolygons = warpedResourceMasks.map(({ id, polygon }) => {
-        const { x, y } = getRandomPositionJustOutsideViewport(
-          viewportWidth,
-          viewportHeight,
-          polygonWidth,
-          polygonHeight
-        )
+      animatedPolygons = warpedResourceMasks.flatMap(({ id, polygon }) => {
+        const path = geometryToPath(polygon, polygonWidth, polygonHeight)
 
-        const vx = maxSpeed * (Math.random() - 0.5)
-        const vy = maxSpeed * (Math.random() - 0.5)
-
-        return {
-          id,
-          polygon,
-          x,
-          y,
-          vx,
-          vy,
-          rotation: Math.random() * 360,
-          rotationSpeed: (Math.random() - 0.5) * 0.5,
-          scale: (Math.random() - 0.5) * 0.2 + 1
+        if (!path) {
+          return []
         }
-      })
 
-      startAnimation()
+        return createAnimatedPolygon(id, path)
+      })
     }
   })
 
@@ -292,44 +276,51 @@
     }
   }
 
-  function startAnimation() {
-    function animate() {
-      animatedPolygons = animatedPolygons.map((polygon) => {
-        let newX = polygon.x + polygon.vx
-        let newY = polygon.y + polygon.vy
-        let newVx = polygon.vx
-        let newVy = polygon.vy
-
-        if (newX < -polygonWidth) {
-          newVx = Math.abs(polygon.vx)
-          newX = polygon.x + newVx
-        } else if (newX > viewportWidth + polygonWidth) {
-          newVx = -Math.abs(polygon.vx)
-          newX = polygon.x + newVx
-        }
-
-        if (newY < -polygonHeight) {
-          newVy = Math.abs(polygon.vy)
-          newY = polygon.y + newVy
-        } else if (newY > viewportHeight + polygonHeight) {
-          newVy = -Math.abs(polygon.vy)
-          newY = polygon.y + newVy
-        }
-
-        return {
-          ...polygon,
-          x: newX,
-          y: newY,
-          vx: newVx,
-          vy: newVy,
-          rotation: polygon.rotation + polygon.rotationSpeed
-        }
-      })
-
-      animationFrameId = requestAnimationFrame(animate)
+  function getRandomPositionInsideViewport(
+    viewportWidth: number,
+    viewportHeight: number,
+    polygonWidth: number,
+    polygonHeight: number
+  ): { x: number; y: number } {
+    return {
+      x: Math.random() * Math.max(0, viewportWidth - polygonWidth),
+      y: Math.random() * Math.max(0, viewportHeight - polygonHeight)
     }
+  }
 
-    animate()
+  function createAnimatedPolygon(
+    id: string,
+    path: string
+  ): PolygonWithAnimation {
+    const { x, y } = getRandomPositionJustOutsideViewport(
+      viewportWidth,
+      viewportHeight,
+      polygonWidth,
+      polygonHeight
+    )
+    const { x: toX, y: toY } = getRandomPositionInsideViewport(
+      viewportWidth,
+      viewportHeight,
+      polygonWidth,
+      polygonHeight
+    )
+
+    const fromRotation = Math.random() * 360
+
+    return {
+      id,
+      path,
+      href: href?.(id),
+      fromX: x,
+      fromY: y,
+      toX,
+      toY,
+      fromRotation,
+      toRotation: fromRotation + 180 + Math.random() * 360,
+      scale: (Math.random() - 0.5) * 0.2 + 1,
+      duration: 24 + Math.random() * 24,
+      delay: 0
+    }
   }
 
   onMount(() => {
@@ -348,10 +339,6 @@
 
     return () => {
       cancelled = true
-
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId)
-      }
     }
   })
 </script>
@@ -360,39 +347,65 @@
   bind:clientWidth={viewportWidth}
   bind:clientHeight={viewportHeight}
   viewBox="0 0 {viewportWidth} {viewportHeight}"
-  class="pointer-events-none h-full w-full"
+  class="pointer-events-none h-full w-full overflow-hidden"
 >
   {#if warpedResourceMasksLoaded}
-    {#each animatedPolygons as { id, polygon, x, y, rotation, scale }, index (index)}
-      <g transform="translate({x}, {y}) rotate({rotation}) scale({scale})">
-        {#if href}
-          <!-- eslint-disable svelte/no-navigation-without-resolve -->
-          <a
-            target="_blank"
-            class="pointer-events-auto"
-            href={href(id)}
-            title={linkTitle}
-          >
-            <path
-              class={[
-                strokeColors[index % strokeColors.length],
-                fillColors[index % fillColors.length],
-                'stroke-[4px]'
-              ]}
-              d={geometryToPath(polygon, polygonWidth, polygonHeight)}
-            />
-          </a>
-          <!-- eslint-enable svelte/no-navigation-without-resolve -->
-        {:else}
-          <path
-            class={[
-              strokeColors[index % strokeColors.length],
-              fillColors[index % fillColors.length],
-              'stroke-[4px]'
-            ]}
-            d={geometryToPath(polygon, polygonWidth, polygonHeight)}
+    {#each animatedPolygons as polygon, index (polygon.id)}
+      <g>
+        <animateTransform
+          attributeName="transform"
+          type="translate"
+          values="{polygon.fromX} {polygon.fromY}; {polygon.toX} {polygon.toY}; {polygon.fromX} {polygon.fromY}"
+          dur="{polygon.duration}s"
+          begin="{polygon.delay}s"
+          repeatCount="indefinite"
+        />
+        <g>
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            values="{polygon.fromRotation} {polygonWidth / 2} {polygonHeight /
+              2}; {polygon.toRotation} {polygonWidth / 2} {polygonHeight /
+              2}; {polygon.fromRotation} {polygonWidth / 2} {polygonHeight / 2}"
+            dur="{polygon.duration}s"
+            begin="{polygon.delay}s"
+            repeatCount="indefinite"
           />
-        {/if}
+          <g
+            transform="translate({polygonWidth / 2} {polygonHeight /
+              2}) scale({polygon.scale}) translate({-polygonWidth /
+              2} {-polygonHeight / 2})"
+          >
+            {#if polygon.href}
+              <!-- eslint-disable svelte/no-navigation-without-resolve -->
+              <a
+                target="_blank"
+                class="pointer-events-auto"
+                href={polygon.href}
+                title={linkTitle}
+              >
+                <path
+                  class={[
+                    strokeColors[index % strokeColors.length],
+                    fillColors[index % fillColors.length],
+                    'stroke-[4px]'
+                  ]}
+                  d={polygon.path}
+                />
+              </a>
+              <!-- eslint-enable svelte/no-navigation-without-resolve -->
+            {:else}
+              <path
+                class={[
+                  strokeColors[index % strokeColors.length],
+                  fillColors[index % fillColors.length],
+                  'stroke-[4px]'
+                ]}
+                d={polygon.path}
+              />
+            {/if}
+          </g>
+        </g>
       </g>
     {/each}
   {/if}
