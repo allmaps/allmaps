@@ -150,7 +150,8 @@
         <button
           {...props}
           {disabled}
-          class="size-7 rounded-md bg-white not-disabled:cursor-pointer disabled:text-gray group flex items-center justify-center"
+          class="size-7 rounded-full bg-white not-disabled:cursor-pointer disabled:text-gray group flex items-center justify-center
+          transition-colors hover:bg-pink/10 hover:text-pink group"
           onclick={handleClick}
           onpointerdown={handlePointerDown}
           onpointermove={handlePointerMove}

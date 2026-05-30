@@ -25,7 +25,7 @@
       <MagicWandIcon class="size-5" />
       {#if checked}
         <span
-          class="pointer-events-none absolute h-0.75 w-7 rotate-45 rounded-full bg-red group-disabled:bg-gray"
+          class="pointer-events-none absolute h-0.75 w-7 rotate-45 rounded-full bg-pink group-disabled:bg-gray"
           transition:fade={{ duration: 100 }}
         ></span>
       {/if}
