@@ -1,0 +1,54 @@
+name: Update pnpm lockfile
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-pnpm-lockfile-develop
+  cancel-in-progress: true
+
+jobs:
+  update-lockfile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Update lockfile
+        run: pnpm install --lockfile-only --no-frozen-lockfile
+
+      - name: Commit lockfile if it is the only changed file
+        run: |
+          changed_files="$(git status --porcelain | sed 's/^...//')"
+
+          if [ -z "$changed_files" ]; then
+            echo "No changes."
+            exit 0
+          fi
+
+          if [ "$changed_files" != "pnpm-lock.yaml" ]; then
+            echo "Unexpected changed files:"
+            echo "$changed_files"
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add pnpm-lock.yaml
+          git commit -m "update pnpm lockfile"
+          git push
