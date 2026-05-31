@@ -9,8 +9,7 @@
     viewerBaseUrl: string
   }
 
-  let { annotationsApiBaseUrl, mapsApiBaseUrl, viewerBaseUrl }: Props =
-    $props()
+  let { annotationsApiBaseUrl, mapsApiBaseUrl, viewerBaseUrl }: Props = $props()
 
   let allmapsViewerVersion = $state<string>()
 
@@ -43,8 +42,18 @@
     <p>
       Allmaps Viewer is a web application to view georeferenced <a
         href="https://iiif.io/"
-        class="underline">IIIF</a
-      > maps.
+        class="underline">IIIF maps</a
+      >.
+    </p>
+    <p>
+      To display one or more georeferenced maps, Allmaps Viewer needs a <a
+        href="https://iiif.io/api/extension/georef/"
+        class="underline">Georeference Annotation</a
+      >. You can use
+      <a href="https://editor.allmaps.org/" class="underline">Allmaps Editor</a>
+      to georeference any map that's available through IIIF and create these annotations.
+      <a href="https://here.allmaps.org/" class="underline">Allmaps Here</a> helps
+      you find georeferenced maps around your current location.
     </p>
 
     <p>
