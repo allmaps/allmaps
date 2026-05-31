@@ -18,16 +18,14 @@
 
 <ul class="grid grid-cols-1 sm:grid-cols-2 list-none gap-4 rounded-2xl">
   {#each examples as example (example.url)}
-    <li
-      class={[
-        'flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2',
-        navigatingToUrl === example.url && 'animate-pulse'
-      ]}
-    >
+    <li class="flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2">
       <a class="contents" href={`?url=${encodeURIComponent(example.url)}`}>
         <img
           alt={`Preview of ${example.title}`}
-          class="border-2 bg-white/50 border-pink/20 rounded-lg aspect-3/2 overflow-clip"
+          class={[
+            'border-2 bg-white/50 border-pink/20 rounded-lg aspect-3/2 overflow-clip',
+            navigatingToUrl === example.url && 'animate-pulse'
+          ]}
           src={`${previewUrl}/${example.allmapsId}.webp?fit=best&width=600&height=400`}
         />
 
