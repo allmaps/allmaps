@@ -37,10 +37,13 @@
   }: Props = $props()
 
   let open = $state(false)
-  let autoFocusUrlInput = $state(false)
+  let showUrlInput = $state(false)
 
-  function updateAutoFocusUrlInput(coarsePointerQuery: MediaQueryList) {
-    autoFocusUrlInput = !coarsePointerQuery.matches
+  function updateShowUrlInput(
+    coarsePointerQuery: MediaQueryList,
+    smallViewportQuery: MediaQueryList
+  ) {
+    showUrlInput = !coarsePointerQuery.matches && !smallViewportQuery.matches
   }
 
   $effect(() => {
@@ -49,16 +52,22 @@
     }
 
     const coarsePointerQuery = window.matchMedia('(pointer: coarse)')
-    const handleCoarsePointerChange = () =>
-      updateAutoFocusUrlInput(coarsePointerQuery)
+    const smallViewportQuery = window.matchMedia('(max-width: 639px)')
+    const handleInputVisibilityChange = () =>
+      updateShowUrlInput(coarsePointerQuery, smallViewportQuery)
 
-    updateAutoFocusUrlInput(coarsePointerQuery)
-    coarsePointerQuery.addEventListener('change', handleCoarsePointerChange)
+    updateShowUrlInput(coarsePointerQuery, smallViewportQuery)
+    coarsePointerQuery.addEventListener('change', handleInputVisibilityChange)
+    smallViewportQuery.addEventListener('change', handleInputVisibilityChange)
 
     return () => {
       coarsePointerQuery.removeEventListener(
         'change',
-        handleCoarsePointerChange
+        handleInputVisibilityChange
+      )
+      smallViewportQuery.removeEventListener(
+        'change',
+        handleInputVisibilityChange
       )
     }
   })
@@ -162,7 +171,13 @@
       {@render url(sourceUrl)}
     </span>
   {:else}
-    <span>WAT NU</span>
+    <span>
+      {source.parsed.type === 'annotation'
+        ? source.parsed.maps.length === 1
+          ? 'Georeferenced map'
+          : `${source.parsed.maps.length} georeferenced maps`
+        : 'IIIF resource'}
+    </span>
   {/if}
   {#if organizationLabel}
     <span
@@ -188,7 +203,7 @@
     jsonModeHeightClass="h-24"
     submitButton={false}
     roundedFull={false}
-    autoFocus={autoFocusUrlInput}
+    autoFocus={showUrlInput}
   />
 {/snippet}
 
@@ -247,8 +262,10 @@
     </div>
   {/snippet}
   {#snippet contents()}
-    <div class="max-w-full w-xl">
-      {@render urlInput()}
+    <div class="max-w-full w-xl space-y-2">
+      {#if showUrlInput}
+        {@render urlInput()}
+      {/if}
       <Metadata {mapsHierarchy} bind:selectedMapId {open} />
     </div>
   {/snippet}
