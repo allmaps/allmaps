@@ -190,33 +190,17 @@
   let {
     mapsApiBaseUrl,
     count = 40,
-    href,
+    href: getHref,
     linkTitle = 'Open in Allmaps Viewer'
   }: Props = $props()
 
   const polygonWidth = 80
   const polygonHeight = 80
 
-  const strokeColors = [
-    'stroke-blue',
-    'stroke-purple',
-    'stroke-orange',
-    'stroke-red',
-    'stroke-pink',
-    'stroke-green',
-    'stroke-yellow'
-  ]
+  const strokeColors = [blue, purple, orange, red, pink, green, yellow]
+  const fillColors = strokeColors.map((color) => `${color}1a`)
 
-  const fillColors = [
-    'fill-blue/10',
-    'fill-purple/10',
-    'fill-orange/10',
-    'fill-red/10',
-    'fill-pink/10',
-    'fill-green/10',
-    'fill-yellow/10'
-  ]
-
+  let canvas = $state<HTMLCanvasElement>()
   let viewportWidth = $state(0)
   let viewportHeight = $state(0)
 
@@ -398,15 +382,14 @@
           newY = polygon.y + newVy
         }
 
-        return {
-          ...polygon,
-          x: newX,
-          y: newY,
-          vx: newVx,
-          vy: newVy,
-          rotation: polygon.rotation + polygon.rotationSpeed
-        }
-      })
+        polygon.x = newX
+        polygon.y = newY
+        polygon.vx = newVx
+        polygon.vy = newVy
+        polygon.rotation += polygon.rotationSpeed
+
+        drawPolygon(drawingContext, polygon, index)
+      }
 
       animationFrameId = requestAnimationFrame(animate)
     }
@@ -438,44 +421,10 @@
   })
 </script>
 
-<svg
+<canvas
+  bind:this={canvas}
   bind:clientWidth={viewportWidth}
   bind:clientHeight={viewportHeight}
-  viewBox="0 0 {viewportWidth} {viewportHeight}"
-  class="pointer-events-none h-full w-full"
->
-  {#if warpedResourceMasksLoaded}
-    {#each animatedPolygons as { id, polygon, x, y, rotation, scale }, index (index)}
-      <g transform="translate({x}, {y}) rotate({rotation}) scale({scale})">
-        {#if href}
-          <!-- eslint-disable svelte/no-navigation-without-resolve -->
-          <a
-            target="_blank"
-            class="pointer-events-auto"
-            href={href(id)}
-            title={linkTitle}
-          >
-            <path
-              class={[
-                strokeColors[index % strokeColors.length],
-                fillColors[index % fillColors.length],
-                'stroke-[4px]'
-              ]}
-              d={geometryToPath(polygon, polygonWidth, polygonHeight)}
-            />
-          </a>
-          <!-- eslint-enable svelte/no-navigation-without-resolve -->
-        {:else}
-          <path
-            class={[
-              strokeColors[index % strokeColors.length],
-              fillColors[index % fillColors.length],
-              'stroke-[4px]'
-            ]}
-            d={geometryToPath(polygon, polygonWidth, polygonHeight)}
-          />
-        {/if}
-      </g>
-    {/each}
-  {/if}
-</svg>
+  title={getHref ? linkTitle : undefined}
+  class="pointer-events-none h-full w-full overflow-hidden"
+></canvas>
