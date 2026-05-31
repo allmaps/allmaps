@@ -24,6 +24,18 @@
         <td class="p-1" colspan="2">General</td>
       </tr>
       <tr>
+        <td class="p-1">Zoom in</td>
+        <td class="p-1 whitespace-nowrap"><Kbd>+</Kbd></td>
+      </tr>
+      <tr>
+        <td class="p-1">Zoom out</td>
+        <td class="p-1 whitespace-nowrap"><Kbd>-</Kbd></td>
+      </tr>
+      <tr>
+        <td class="p-1">Zoom to extent</td>
+        <td class="p-1 whitespace-nowrap"><Kbd>0</Kbd></td>
+      </tr>
+      <tr>
         <td class="p-1">Previous map</td>
         <td class="p-1 whitespace-nowrap"><Kbd>[</Kbd></td>
       </tr>
