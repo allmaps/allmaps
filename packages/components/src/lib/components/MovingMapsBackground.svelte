@@ -157,9 +157,20 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
+  import {
+    blue,
+    purple,
+    orange,
+    red,
+    pink,
+    green,
+    yellow
+  } from '@allmaps/tailwind'
+
   type PolygonWithAnimation = {
     id: string
-    polygon: GeojsonPolygon
+    path: Path2D
+    href?: string
     x: number
     y: number
     vx: number
@@ -213,38 +224,25 @@
 
   let warpedResourceMasksLoaded = $state(false)
 
-  let animatedPolygons: PolygonWithAnimation[] = $state([])
+  let animatedPolygons: PolygonWithAnimation[] = $state.raw([])
   let animationFrameId: number | undefined
 
   $effect(() => {
     if (
+      canvas &&
       viewportWidth > 0 &&
       viewportHeight > 0 &&
       warpedResourceMasksLoaded &&
       animatedPolygons.length === 0
     ) {
-      animatedPolygons = warpedResourceMasks.map(({ id, polygon }) => {
-        const { x, y } = getRandomPositionJustOutsideViewport(
-          viewportWidth,
-          viewportHeight,
-          polygonWidth,
-          polygonHeight
-        )
+      animatedPolygons = warpedResourceMasks.flatMap(({ id, polygon }) => {
+        const path = geometryToPath(polygon, polygonWidth, polygonHeight)
 
-        const vx = maxSpeed * (Math.random() - 0.5)
-        const vy = maxSpeed * (Math.random() - 0.5)
-
-        return {
-          id,
-          polygon,
-          x,
-          y,
-          vx,
-          vy,
-          rotation: Math.random() * 360,
-          rotationSpeed: (Math.random() - 0.5) * 0.5,
-          scale: (Math.random() - 0.5) * 0.2 + 1
+        if (!path) {
+          return []
         }
+
+        return createAnimatedPolygon(id, path)
       })
 
       startAnimation()
@@ -292,9 +290,93 @@
     }
   }
 
+  function createAnimatedPolygon(
+    id: string,
+    pathString: string
+  ): PolygonWithAnimation {
+    const { x, y } = getRandomPositionJustOutsideViewport(
+      viewportWidth,
+      viewportHeight,
+      polygonWidth,
+      polygonHeight
+    )
+
+    const vx = maxSpeed * (Math.random() - 0.5)
+    const vy = maxSpeed * (Math.random() - 0.5)
+
+    return {
+      id,
+      path: new Path2D(pathString),
+      href: getHref?.(id),
+      x,
+      y,
+      vx,
+      vy,
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 0.5,
+      scale: (Math.random() - 0.5) * 0.2 + 1
+    }
+  }
+
+  function drawPolygon(
+    context: CanvasRenderingContext2D,
+    polygon: PolygonWithAnimation,
+    index: number
+  ) {
+    context.save()
+    context.translate(polygon.x, polygon.y)
+    context.rotate((polygon.rotation * Math.PI) / 180)
+    context.scale(polygon.scale, polygon.scale)
+    context.fillStyle = fillColors[index % fillColors.length]
+    context.strokeStyle = strokeColors[index % strokeColors.length]
+    context.lineWidth = 4
+    context.fill(polygon.path)
+    context.stroke(polygon.path)
+    context.restore()
+  }
+
   function startAnimation() {
+    if (!canvas) {
+      return
+    }
+
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
+    }
+
+    const context = canvas.getContext('2d')
+
+    if (!context) {
+      return
+    }
+
+    const drawingContext = context
+
     function animate() {
-      animatedPolygons = animatedPolygons.map((polygon) => {
+      if (!canvas) {
+        return
+      }
+
+      const devicePixelRatio = window.devicePixelRatio || 1
+      const canvasWidth = Math.round(viewportWidth * devicePixelRatio)
+      const canvasHeight = Math.round(viewportHeight * devicePixelRatio)
+
+      if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+        canvas.width = canvasWidth
+        canvas.height = canvasHeight
+      }
+
+      drawingContext.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+      )
+      drawingContext.clearRect(0, 0, viewportWidth, viewportHeight)
+
+      for (const [index, polygon] of animatedPolygons.entries()) {
         let newX = polygon.x + polygon.vx
         let newY = polygon.y + polygon.vy
         let newVx = polygon.vx
