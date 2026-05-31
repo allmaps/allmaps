@@ -20,6 +20,11 @@ export type Organization = {
   url?: string
 }
 
+export type OrganizationSummary = {
+  organization: Organization
+  otherOrganizationCount: number
+}
+
 type BaseSource = {
   hash: string
   data: unknown

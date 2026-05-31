@@ -14,7 +14,7 @@
   import type {
     Source,
     SourceLabels,
-    Organization,
+    OrganizationSummary,
     MapsHierarchy
   } from '$lib/types/shared.js'
 
@@ -22,7 +22,7 @@
     source: Source
     labels: SourceLabels
     title?: string
-    organization?: Organization
+    organization?: OrganizationSummary
     mapsHierarchy: MapsHierarchy
     selectedMapId?: string
   }
@@ -89,6 +89,23 @@
     }
   })
 
+  let organizationLabel = $derived.by(() => {
+    const label = parseLanguageString(organization?.organization.label, 'en')
+
+    if (!label) {
+      return
+    }
+
+    if (organization?.otherOrganizationCount) {
+      const count = organization.otherOrganizationCount
+      const suffix = count === 1 ? 'other' : 'others'
+
+      return `${label} + ${count} ${suffix}`
+    }
+
+    return label
+  })
+
   function handleKeyDown(event: KeyboardEvent) {
     if (hasInputTarget(event)) {
       return
@@ -129,11 +146,11 @@
 {#snippet segments({
   labelStrings,
   sourceUrl,
-  organization
+  organizationLabel
 }: {
   labelStrings: string[]
   sourceUrl?: string
-  organization?: Organization
+  organizationLabel?: string
 })}
   {#if labelStrings.length}
     <!-- <span class="hidden @min-2xl:contents">
@@ -147,11 +164,11 @@
   {:else}
     <span>WAT NU</span>
   {/if}
-  {#if organization?.label}
+  {#if organizationLabel}
     <span
-      class="hidden @min-2xl:inline bg-blue/10 text-blue-600/80 border-[0.5px] border-blue rounded-full px-2 py-0.5 text-xs"
+      class="hidden @min-2xl:inline shrink-0 bg-blue/10 text-blue-600/80 border-[0.5px] border-blue rounded-full px-2 py-0.5 text-xs"
     >
-      {parseLanguageString(organization.label, 'en')}
+      {organizationLabel}
     </span>
   {/if}
 {/snippet}
@@ -196,7 +213,7 @@
         {@render segments({
           labelStrings,
           sourceUrl,
-          organization
+          organizationLabel
         })}
       </span>
       <InfoIcon
@@ -210,14 +227,21 @@
           bg-white rounded-full px-2 py-1.5 cursor-pointer text-sm text-green font-medium leading-tight
             flex gap-2 items-center"
     >
-      <InfoIcon class="size-5 text-black/80" weight="bold" />
+      <InfoIcon class="size-5 shrink-0 text-black/80" weight="bold" />
       {#if title}
         <span class="min-w-0 truncate font-medium">{title}</span>
+        {#if organizationLabel}
+          <span
+            class="hidden @min-2xl:inline shrink-0 bg-blue/10 text-blue-600/80 border-[0.5px] border-blue rounded-full px-2 py-0.5 text-xs"
+          >
+            {organizationLabel}
+          </span>
+        {/if}
       {:else}
         {@render segments({
           labelStrings,
           sourceUrl,
-          organization
+          organizationLabel
         })}
       {/if}
     </div>

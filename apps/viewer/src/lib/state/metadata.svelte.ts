@@ -3,7 +3,10 @@ import { setContext, getContext } from 'svelte'
 import { searchParams } from '$lib/shared/params.js'
 import { truncate } from '$lib/shared/strings.js'
 import { parseLanguageString } from '$lib/shared/iiif.js'
-import { getSourceLabels, getOrganization } from '$lib/shared/metadata.js'
+import {
+  getSourceLabels,
+  getOrganizationSummary
+} from '$lib/shared/metadata.js'
 
 import type { SourceState } from '$lib/state/source.svelte.js'
 import type { UrlState } from '$lib/state/url.svelte.js'
@@ -26,7 +29,7 @@ export class MetadataState {
   )
 
   #organization = $derived.by(() =>
-    getOrganization(this.#sourceState.maps, this.#selectedMapId)
+    getOrganizationSummary(this.#sourceState.maps, this.#selectedMapId)
   )
 
   #manifestLabelString = $derived(

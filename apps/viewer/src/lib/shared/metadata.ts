@@ -1,7 +1,9 @@
 import type { LanguageString } from '@allmaps/iiif-parser'
 import type { GeoreferencedMap, PartOf, PartOfItem } from '@allmaps/annotation'
 
-import type { Organization, SourceLabels } from '$lib/types/shared.js'
+import type { OrganizationSummary, SourceLabels } from '$lib/types/shared.js'
+
+const DOMINANT_ORGANIZATION_THRESHOLD = 0.6
 
 function countManifestsById(
   maps: GeoreferencedMap[]
@@ -95,20 +97,27 @@ export function getSourceLabels(
   return { manifest: sorted[0][1].label, canvas: undefined }
 }
 
-export function getOrganization(
+export function getOrganizationSummary(
   maps: GeoreferencedMap[],
   selectedMapId?: string
-): Organization | undefined {
+): OrganizationSummary | undefined {
   if (selectedMapId) {
     const selectedMap = maps.find((map) => map.id === selectedMapId)
     if (selectedMap && selectedMap.resource.provider) {
       const provider = selectedMap.resource.provider[0]
       if (provider && provider.label) {
         return {
-          label: provider.label,
-          url: provider.homepage?.[0]?.id
+          organization: {
+            label: provider.label,
+            url: provider.homepage?.[0]?.id
+          },
+          otherOrganizationCount: 0
         }
       }
+    }
+
+    if (selectedMap) {
+      return undefined
     }
   }
 
@@ -117,11 +126,14 @@ export function getOrganization(
     string,
     { count: number; label: LanguageString; url?: string }
   >()
+  let mapsWithOrganization = 0
 
   for (const map of maps) {
     if (map.resource.provider) {
       const provider = map.resource.provider[0]
       if (provider && provider.label) {
+        mapsWithOrganization++
+
         // Use a stringified version of the label as key
         const key = JSON.stringify(provider.label)
         const url = provider.homepage?.[0]?.id
@@ -139,7 +151,7 @@ export function getOrganization(
     }
   }
 
-  if (organizationCounts.size === 0) {
+  if (organizationCounts.size === 0 || maps.length === 0) {
     return undefined
   }
 
@@ -152,5 +164,28 @@ export function getOrganization(
     return a[0].localeCompare(b[0])
   })
 
-  return { label: sorted[0][1].label, url: sorted[0][1].url }
+  const topOrganization = sorted[0][1]
+
+  if (organizationCounts.size === 1 && mapsWithOrganization === maps.length) {
+    return {
+      organization: {
+        label: topOrganization.label,
+        url: topOrganization.url
+      },
+      otherOrganizationCount: 0
+    }
+  }
+
+  if (
+    organizationCounts.size > 1 &&
+    topOrganization.count / maps.length >= DOMINANT_ORGANIZATION_THRESHOLD
+  ) {
+    return {
+      organization: {
+        label: topOrganization.label,
+        url: topOrganization.url
+      },
+      otherOrganizationCount: organizationCounts.size - 1
+    }
+  }
 }
