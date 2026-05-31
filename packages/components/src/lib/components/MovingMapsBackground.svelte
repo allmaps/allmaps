@@ -157,19 +157,27 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
+  import {
+    blue,
+    purple,
+    orange,
+    red,
+    pink,
+    green,
+    yellow
+  } from '@allmaps/tailwind'
+
   type PolygonWithAnimation = {
     id: string
-    path: string
+    path: Path2D
     href?: string
-    fromX: number
-    fromY: number
-    toX: number
-    toY: number
-    fromRotation: number
-    toRotation: number
+    x: number
+    y: number
+    vx: number
+    vy: number
+    rotation: number
+    rotationSpeed: number
     scale: number
-    duration: number
-    delay: number
   }
 
   type Props = {
@@ -182,42 +190,30 @@
   let {
     mapsApiBaseUrl,
     count = 40,
-    href,
+    href: getHref,
     linkTitle = 'Open in Allmaps Viewer'
   }: Props = $props()
 
   const polygonWidth = 80
   const polygonHeight = 80
 
-  const strokeColors = [
-    'stroke-blue',
-    'stroke-purple',
-    'stroke-orange',
-    'stroke-red',
-    'stroke-pink',
-    'stroke-green',
-    'stroke-yellow'
-  ]
+  const strokeColors = [blue, purple, orange, red, pink, green, yellow]
+  const fillColors = strokeColors.map((color) => `${color}1a`)
 
-  const fillColors = [
-    'fill-blue/10',
-    'fill-purple/10',
-    'fill-orange/10',
-    'fill-red/10',
-    'fill-pink/10',
-    'fill-green/10',
-    'fill-yellow/10'
-  ]
-
+  let canvas = $state<HTMLCanvasElement>()
   let viewportWidth = $state(0)
   let viewportHeight = $state(0)
+
+  let maxSpeed = 1.5
 
   let warpedResourceMasksLoaded = $state(false)
 
   let animatedPolygons: PolygonWithAnimation[] = $state.raw([])
+  let animationFrameId: number | undefined
 
   $effect(() => {
     if (
+      canvas &&
       viewportWidth > 0 &&
       viewportHeight > 0 &&
       warpedResourceMasksLoaded &&
@@ -232,6 +228,8 @@
 
         return createAnimatedPolygon(id, path)
       })
+
+      startAnimation()
     }
   })
 
@@ -276,21 +274,9 @@
     }
   }
 
-  function getRandomPositionInsideViewport(
-    viewportWidth: number,
-    viewportHeight: number,
-    polygonWidth: number,
-    polygonHeight: number
-  ): { x: number; y: number } {
-    return {
-      x: Math.random() * Math.max(0, viewportWidth - polygonWidth),
-      y: Math.random() * Math.max(0, viewportHeight - polygonHeight)
-    }
-  }
-
   function createAnimatedPolygon(
     id: string,
-    path: string
+    pathString: string
   ): PolygonWithAnimation {
     const { x, y } = getRandomPositionJustOutsideViewport(
       viewportWidth,
@@ -298,29 +284,117 @@
       polygonWidth,
       polygonHeight
     )
-    const { x: toX, y: toY } = getRandomPositionInsideViewport(
-      viewportWidth,
-      viewportHeight,
-      polygonWidth,
-      polygonHeight
-    )
 
-    const fromRotation = Math.random() * 360
+    const vx = maxSpeed * (Math.random() - 0.5)
+    const vy = maxSpeed * (Math.random() - 0.5)
 
     return {
       id,
-      path,
-      href: href?.(id),
-      fromX: x,
-      fromY: y,
-      toX,
-      toY,
-      fromRotation,
-      toRotation: fromRotation + 180 + Math.random() * 360,
-      scale: (Math.random() - 0.5) * 0.2 + 1,
-      duration: 24 + Math.random() * 24,
-      delay: 0
+      path: new Path2D(pathString),
+      href: getHref?.(id),
+      x,
+      y,
+      vx,
+      vy,
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 0.5,
+      scale: (Math.random() - 0.5) * 0.2 + 1
     }
+  }
+
+  function drawPolygon(
+    context: CanvasRenderingContext2D,
+    polygon: PolygonWithAnimation,
+    index: number
+  ) {
+    context.save()
+    context.translate(polygon.x, polygon.y)
+    context.rotate((polygon.rotation * Math.PI) / 180)
+    context.scale(polygon.scale, polygon.scale)
+    context.fillStyle = fillColors[index % fillColors.length]
+    context.strokeStyle = strokeColors[index % strokeColors.length]
+    context.lineWidth = 4
+    context.fill(polygon.path)
+    context.stroke(polygon.path)
+    context.restore()
+  }
+
+  function startAnimation() {
+    if (!canvas) {
+      return
+    }
+
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
+    }
+
+    const context = canvas.getContext('2d')
+
+    if (!context) {
+      return
+    }
+
+    const drawingContext = context
+
+    function animate() {
+      if (!canvas) {
+        return
+      }
+
+      const devicePixelRatio = window.devicePixelRatio || 1
+      const canvasWidth = Math.round(viewportWidth * devicePixelRatio)
+      const canvasHeight = Math.round(viewportHeight * devicePixelRatio)
+
+      if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
+        canvas.width = canvasWidth
+        canvas.height = canvasHeight
+      }
+
+      drawingContext.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+      )
+      drawingContext.clearRect(0, 0, viewportWidth, viewportHeight)
+
+      for (const [index, polygon] of animatedPolygons.entries()) {
+        let newX = polygon.x + polygon.vx
+        let newY = polygon.y + polygon.vy
+        let newVx = polygon.vx
+        let newVy = polygon.vy
+
+        if (newX < -polygonWidth) {
+          newVx = Math.abs(polygon.vx)
+          newX = polygon.x + newVx
+        } else if (newX > viewportWidth + polygonWidth) {
+          newVx = -Math.abs(polygon.vx)
+          newX = polygon.x + newVx
+        }
+
+        if (newY < -polygonHeight) {
+          newVy = Math.abs(polygon.vy)
+          newY = polygon.y + newVy
+        } else if (newY > viewportHeight + polygonHeight) {
+          newVy = -Math.abs(polygon.vy)
+          newY = polygon.y + newVy
+        }
+
+        polygon.x = newX
+        polygon.y = newY
+        polygon.vx = newVx
+        polygon.vy = newVy
+        polygon.rotation += polygon.rotationSpeed
+
+        drawPolygon(drawingContext, polygon, index)
+      }
+
+      animationFrameId = requestAnimationFrame(animate)
+    }
+
+    animate()
   }
 
   onMount(() => {
@@ -339,74 +413,18 @@
 
     return () => {
       cancelled = true
+
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
     }
   })
 </script>
 
-<svg
+<canvas
+  bind:this={canvas}
   bind:clientWidth={viewportWidth}
   bind:clientHeight={viewportHeight}
-  viewBox="0 0 {viewportWidth} {viewportHeight}"
+  title={getHref ? linkTitle : undefined}
   class="pointer-events-none h-full w-full overflow-hidden"
->
-  {#if warpedResourceMasksLoaded}
-    {#each animatedPolygons as polygon, index (polygon.id)}
-      <g>
-        <animateTransform
-          attributeName="transform"
-          type="translate"
-          values="{polygon.fromX} {polygon.fromY}; {polygon.toX} {polygon.toY}; {polygon.fromX} {polygon.fromY}"
-          dur="{polygon.duration}s"
-          begin="{polygon.delay}s"
-          repeatCount="indefinite"
-        />
-        <g>
-          <animateTransform
-            attributeName="transform"
-            type="rotate"
-            values="{polygon.fromRotation} {polygonWidth / 2} {polygonHeight /
-              2}; {polygon.toRotation} {polygonWidth / 2} {polygonHeight /
-              2}; {polygon.fromRotation} {polygonWidth / 2} {polygonHeight / 2}"
-            dur="{polygon.duration}s"
-            begin="{polygon.delay}s"
-            repeatCount="indefinite"
-          />
-          <g
-            transform="translate({polygonWidth / 2} {polygonHeight /
-              2}) scale({polygon.scale}) translate({-polygonWidth /
-              2} {-polygonHeight / 2})"
-          >
-            {#if polygon.href}
-              <!-- eslint-disable svelte/no-navigation-without-resolve -->
-              <a
-                target="_blank"
-                class="pointer-events-auto"
-                href={polygon.href}
-                title={linkTitle}
-              >
-                <path
-                  class={[
-                    strokeColors[index % strokeColors.length],
-                    fillColors[index % fillColors.length],
-                    'stroke-[4px]'
-                  ]}
-                  d={polygon.path}
-                />
-              </a>
-              <!-- eslint-enable svelte/no-navigation-without-resolve -->
-            {:else}
-              <path
-                class={[
-                  strokeColors[index % strokeColors.length],
-                  fillColors[index % fillColors.length],
-                  'stroke-[4px]'
-                ]}
-                d={polygon.path}
-              />
-            {/if}
-          </g>
-        </g>
-      </g>
-    {/each}
-  {/if}
-</svg>
+></canvas>
