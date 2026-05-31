@@ -33,10 +33,12 @@
   let error = $state('')
   let isDraggingOver = $state(false)
   let mode = $state<Mode>('url')
+  let hasSelectedInitialInput = $state(false)
 
   $effect(() => {
-    if (autoFocus && inputRef) {
+    if (autoFocus && inputRef && !hasSelectedInitialInput) {
       inputRef.select()
+      hasSelectedInitialInput = true
     }
   })
 
@@ -128,13 +130,12 @@
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      if (!isMultiLine(inputValue)) {
-        // Single-line mode: Enter submits the form
-        event.preventDefault()
-        form?.requestSubmit()
-      }
-      // Multi-line mode: allow default (insert newline)
+    if (
+      event.key === 'Enter' &&
+      (event.shiftKey || !isMultiLine(inputValue))
+    ) {
+      event.preventDefault()
+      form?.requestSubmit()
     }
   }
 
@@ -286,7 +287,7 @@
         disabled={error !== '' || inputValue.length === 0}
         class="text-white bg-pink-500 hover:bg-pink-400 transition-colors disabled:bg-gray-500 focus:ring focus:ring-pink-200 font-medium
           rounded-full text-sm px-5 py-2.5 focus:outline-none not-disabled:cursor-pointer"
-        >Go!</button
+        >Open</button
       >
       <!-- {#if error}
         <p class="text-red-500">{error}</p>
