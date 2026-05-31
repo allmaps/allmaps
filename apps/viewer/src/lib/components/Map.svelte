@@ -28,7 +28,6 @@
   import type { Image as IIIFImage } from '@allmaps/iiif-parser'
   import type { WarpedMap } from '@allmaps/render'
   import type { WebGL2WarpedMap } from '@allmaps/render/webgl2'
-
   import type { Source } from '$lib/types/shared.js'
   import type { BackgroundColorChangeEvent } from '$lib/shared/background-color-events.js'
 
@@ -72,6 +71,8 @@
   let toggledRemoveBackground = $state(false)
 
   let previousSelectedMapId: string | undefined
+  let previousView: 'map' | 'image' | undefined
+  let previousImageViewBearing: number | undefined
   let selectionCameFromMapClick = false
   let originalMapOrder: string[] = []
 
@@ -273,6 +274,19 @@
     })[0]
   }
 
+  function findMapIdAtViewportCenter() {
+    if (!map || !warpedMapLayer) {
+      return
+    }
+
+    const center = map.getCenter()
+
+    return warpedMapLayer.getWarpedMapList().getMapIds({
+      geoPoint: [center.lng, center.lat],
+      onlyVisible: true
+    })[0]
+  }
+
   function handleMapClick(event: MapMouseEvent) {
     if (!warpedMapLayer || view === 'image') {
       return
@@ -284,7 +298,7 @@
 
     let newSelectedMapId = findMapIdFromMapMouseEvent(event)
 
-    if (newSelectedMapId && previousSelectedMapId !== newSelectedMapId) {
+    if (newSelectedMapId && selectedMapId !== newSelectedMapId) {
       selectionCameFromMapClick = true
       selectedMapId = newSelectedMapId
     } else {
@@ -352,6 +366,41 @@
     }
   }
 
+  function isMapInViewport(mapId: string | undefined) {
+    if (!mapId) {
+      return false
+    }
+
+    return warpedMapLayer?.renderer?.mapsInViewport.has(mapId) ?? false
+  }
+
+  function shouldPreserveCameraOnViewChange(
+    fromView: 'map' | 'image' | undefined,
+    toView: 'map' | 'image',
+    mapIdForView: string | undefined
+  ) {
+    if (!fromView || fromView === toView) {
+      return false
+    }
+
+    return fromView === 'image' || isMapInViewport(mapIdForView)
+  }
+
+  function getMapIdForViewChange(
+    fromView: 'map' | 'image' | undefined,
+    toView: 'map' | 'image'
+  ) {
+    if (fromView === 'map' && toView === 'image' && !selectedMapId) {
+      const centerMapId = findMapIdAtViewportCenter()
+
+      if (centerMapId) {
+        return centerMapId
+      }
+    }
+
+    return selectedMapIdForImageView
+  }
+
   export function zoomIn() {
     map?.zoomIn()
   }
@@ -411,14 +460,39 @@
     if (view) {
       untrack(() => {
         if (map && warpedMapLayer && selectedMapIdForImageView) {
-          setView(
+          const mapIdForView =
+            view === 'map'
+              ? selectedMapId
+              : getMapIdForViewChange(previousView, view)
+
+          if (view === 'image' && !mapIdForView) {
+            return
+          }
+
+          const preserveCameraIfZoomedIn = shouldPreserveCameraOnViewChange(
+            previousView,
+            view,
+            mapIdForView
+          )
+
+          const setViewResult = setView(
             view,
             map,
             warpedMapLayer,
-            selectedMapIdForImageView,
+            mapIdForView,
             DURATION,
-            PADDING
+            PADDING,
+            undefined,
+            preserveCameraIfZoomedIn,
+            previousView,
+            previousImageViewBearing
           )
+
+          if (view === 'image') {
+            previousImageViewBearing = setViewResult.naturalBearing
+          }
+
+          previousView = view
         }
       })
     }
@@ -473,6 +547,8 @@
     if (!container) {
       return
     }
+
+    previousView = view
 
     // warpedMapLayer?.renderer?.mapsInViewport
     // const protocol = new Protocol()
