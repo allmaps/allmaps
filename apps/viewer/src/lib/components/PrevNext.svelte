@@ -52,13 +52,13 @@
       href={previousMapIdUrl}
       class="cursor-pointer hover:bg-pink/10 hover:text-pink rounded transition-colors p-1"
     >
-      <ArrowLeftIcon class="size-5" weight="bold" />
+      <ArrowLeftIcon class="size-6" weight="bold" />
     </a>
     <a
       href={nextMapIdUrl}
       class="cursor-pointer hover:bg-pink/10 hover:text-pink rounded transition-colors p-1"
     >
-      <ArrowRightIcon class="size-5" weight="bold" />
+      <ArrowRightIcon class="size-6" weight="bold" />
     </a>
   </ControlContainer>
 {/if}

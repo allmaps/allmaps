@@ -17,7 +17,7 @@
   <Checkbox.Root
     bind:checked={uiState.removeBackground}
     {disabled}
-    class="relative flex size-7 items-center justify-center rounded-full bg-white transition-colors not-disabled:cursor-pointer disabled:text-gray
+    class="relative flex size-8 items-center justify-center rounded-full bg-white transition-colors not-disabled:cursor-pointer disabled:text-gray
       hover:bg-pink/10 hover:text-pink group"
     aria-label="Remove background color"
   >
