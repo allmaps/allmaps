@@ -48,6 +48,8 @@ export class UiState extends UiEventTarget {
   reset() {
     this.#opacity = 1
     this.#removeBackground = false
+    this.#mapBearing = 0
+    this.#imageUpBearing = undefined
     this.#metadataScrollTop = 0
     this.#view = 'map'
     this.#modalOpen = undefined
