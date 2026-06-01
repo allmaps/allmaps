@@ -1,5 +1,6 @@
 import {
   bboxToCenter,
+  bufferBbox,
   computeBbox,
   squaredDistance,
   intersectBboxes,
@@ -27,7 +28,7 @@ import {
   getTileResolution
 } from '../shared/tiles.js'
 
-import type { Size, Tile } from '@allmaps/types'
+import type { Bbox, Size, Tile, TileZoomLevel } from '@allmaps/types'
 
 import type { Viewport } from '../viewport/Viewport.js'
 import type { WarpedMap, WarpedMapWithImage } from '../maps/WarpedMap.js'
@@ -907,13 +908,34 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Find tiles covering this intersection of bboxes of to-resource-back-transformed viewport and mask
     // by computing the tiles covering this bbox's rectangle at the tilezoomlevel
-    let tiles = computeTilesCoveringRingAtTileZoomLevel(
+    const unpaddedTiles = computeTilesCoveringRingAtTileZoomLevel(
       bboxToRectangle(
         resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
       ),
       tileZoomLevel,
       [warpedMap.image.width, warpedMap.image.height]
     )
+
+    const resourceTileRequestBbox = this.getResourceTileRequestBbox(
+      warpedMap,
+      resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection,
+      tileZoomLevel,
+      unpaddedTiles
+    )
+
+    if (!resourceTileRequestBbox) {
+      return []
+    }
+
+    let tiles =
+      resourceTileRequestBbox ===
+      resourceBufferedViewportRingBboxAndResourceAppliedMaskBboxIntersection
+        ? unpaddedTiles
+        : computeTilesCoveringRingAtTileZoomLevel(
+            bboxToRectangle(resourceTileRequestBbox),
+            tileZoomLevel,
+            [warpedMap.image.width, warpedMap.image.height]
+          )
 
     // Don't include tiles that have zoomlevels close to sprite tiles of this map
     tiles = this.filterOutTilesCloseToSpriteTiles(tiles, warpedMap)
@@ -1054,6 +1076,50 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     warpedMap.setOverviewFetchableTilesForViewport(overviewFetchableTiles)
 
     return overviewFetchableTiles
+  }
+
+  private getResourceTileRequestBbox(
+    warpedMap: WarpedMapWithImage,
+    resourceBbox: Bbox,
+    tileZoomLevel: TileZoomLevel,
+    tiles: Tile[]
+  ) {
+    if (
+      !['thinPlateSpline', 'polynomial2', 'polynomial3'].includes(
+        warpedMap.transformationType
+      )
+    ) {
+      return resourceBbox
+    }
+
+    const columns = tiles.map((tile) => tile.column)
+    const rows = tiles.map((tile) => tile.row)
+    const columnSpan = Math.max(...columns) - Math.min(...columns) + 1
+    const rowSpan = Math.max(...rows) - Math.min(...rows) + 1
+
+    if (tiles.length <= 4) {
+      return intersectBboxes(
+        bufferBbox(
+          resourceBbox,
+          tileZoomLevel.originalWidth,
+          tileZoomLevel.originalHeight
+        ),
+        warpedMap.resourceAppliedMaskBbox
+      )
+    }
+
+    if (columnSpan <= 2 || rowSpan <= 2) {
+      return intersectBboxes(
+        bufferBbox(
+          resourceBbox,
+          columnSpan <= 2 ? tileZoomLevel.originalWidth : 0,
+          rowSpan <= 2 ? tileZoomLevel.originalHeight : 0
+        ),
+        warpedMap.resourceAppliedMaskBbox
+      )
+    }
+
+    return resourceBbox
   }
 
   protected updateMapsForViewport(

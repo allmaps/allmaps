@@ -972,23 +972,24 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.updateCachedTilesForTextures()
 
     // Don't update if request without tiles, or if
-    // same request is (non-null) subset of previous request
+    // same request is (non-null) subset of previous uploaded request
     // This reduces (expensive) texture updates when just reducing the number of tiles
     // (But keeps them when all tiles are gone to free up texture)
     // And blocking updates on equal requests is important to
     // prevent triggering an infinite loop
     // caused by the TEXTURESUPDATED event at the end
+    if (this.cachedTilesForTexture.length == 0) {
+      return
+    }
     if (
-      this.cachedTilesForTexture.length == 0 ||
-      (this.cachedTilesForTexture.length !== 0 &&
-        subSetArray(
-          this.previousCachedTilesForTexture.map(
-            (textureTile) => textureTile.fetchableTile.tileUrl
-          ),
-          this.cachedTilesForTexture.map(
-            (textureTile) => textureTile.fetchableTile.tileUrl
-          )
-        ))
+      subSetArray(
+        this.previousCachedTilesForTexture.map(
+          (textureTile) => textureTile.fetchableTile.tileUrl
+        ),
+        this.cachedTilesForTexture.map(
+          (textureTile) => textureTile.fetchableTile.tileUrl
+        )
+      )
     ) {
       return
     }
@@ -1132,6 +1133,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
+    this.previousCachedTilesForTexture = this.cachedTilesForTexture
+
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
   }
 
@@ -1205,7 +1208,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
     cachedTilesForTextures = [...cachedTilesForTexturesByTileUrl.values()]
 
-    this.previousCachedTilesForTexture = this.cachedTilesForTexture
     this.cachedTilesForTexture = cachedTilesForTextures
 
     return
