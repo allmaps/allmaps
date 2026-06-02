@@ -45,11 +45,11 @@
       </tr>
       <tr>
         <td class="p-1">Switch to map view</td>
-        <td class="p-1 whitespace-nowrap"><Kbd>M</Kbd></td>
+        <td class="p-1 whitespace-nowrap"><Kbd>m</Kbd></td>
       </tr>
       <tr>
         <td class="p-1">Switch to image view</td>
-        <td class="p-1 whitespace-nowrap"><Kbd>I</Kbd></td>
+        <td class="p-1 whitespace-nowrap"><Kbd>i</Kbd></td>
       </tr>
 
       <tr class="border-b-2 border-pink font-bold">
@@ -61,7 +61,7 @@
       </tr>
       <tr>
         <td class="p-1">Temporarily remove background color</td>
-        <td class="p-1 whitespace-nowrap"><Kbd>B</Kbd></td>
+        <td class="p-1 whitespace-nowrap"><Kbd>b</Kbd></td>
       </tr>
       <tr>
         <td class="p-1">Select map</td>
