@@ -236,6 +236,37 @@
       "Northwestern University Libraries’ Map & Atlas Collection allows access to an ever-growing selection of our cartographic resources in high resolution."
     ]
   },
+  "provider": [
+    {
+      "homepage": [
+        {
+          "format": "text/html",
+          "id": "https://dc.library.northwestern.edu/",
+          "label": {
+            "none": [
+              "Northwestern University Libraries Digital Collections Homepage"
+            ]
+          },
+          "language": ["en"],
+          "type": "Text"
+        }
+      ],
+      "id": "https://www.library.northwestern.edu/",
+      "label": {
+        "none": ["Northwestern University Libraries"]
+      },
+      "logo": [
+        {
+          "format": "image/webp",
+          "height": 139,
+          "id": "https://iiif.dc.library.northwestern.edu/iiif/2/00000000-0000-0000-0000-000000000003/full/pct:50/0/default.webp",
+          "type": "Image",
+          "width": 1190
+        }
+      ],
+      "type": "Agent"
+    }
+  ],
   "requiredStatement": {
     "label": {
       "none": ["Attribution"]

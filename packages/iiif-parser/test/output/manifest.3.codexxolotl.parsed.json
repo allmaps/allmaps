@@ -359,6 +359,15 @@
       "format": "text/html"
     }
   ],
+  "provider": [
+    {
+      "id": "https://codexxolotl.com/",
+      "label": {
+        "none": ["Codex Xolotl"]
+      },
+      "type": "Agent"
+    }
+  ],
   "seeAlso": [
     {
       "id": "https://dlc.services/iiif-img/22/2/?pretty_print=1",

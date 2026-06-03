@@ -82,6 +82,19 @@ export const Metadata3Schema = filterValidItems(ValidMetadataItem3Schema)
 // Invalid requiredStatement values are intentionally treated as absent.
 export const RequiredStatement3Schema = MetadataItem3Schema
 
+export const Rights3Schema = z.string()
+
+export const Agent3Schema = z.object({
+  id: z.string().url(),
+  type: z.literal('Agent'),
+  label: LanguageValue3Schema.optional(),
+  homepage: Homepage3Schema.optional(),
+  logo: Thumbnail3Schema.optional(),
+  seeAlso: SeeAlso3Schema.optional()
+})
+
+export const Provider3Schema = Agent3Schema.array()
+
 export const AnnotationImageBody3Schema = z.object({
   type: z.literal('Image'),
   width: z.number().int().optional(),
@@ -139,6 +152,8 @@ export const Canvas3Schema = z.object({
   seeAlso: SeeAlso3Schema.optional(),
   summary: Summary3Schema.optional(),
   requiredStatement: RequiredStatement3Schema.optional(),
+  rights: Rights3Schema.optional(),
+  provider: Provider3Schema.optional(),
   annotations: NonPaintingAnnotations3.optional()
 })
 
@@ -156,6 +171,8 @@ export const Manifest3Schema = z.object({
   rendering: Rendering3Schema.optional(),
   seeAlso: SeeAlso3Schema.optional(),
   summary: Summary3Schema.optional(),
+  rights: Rights3Schema.optional(),
+  provider: Provider3Schema.optional(),
   requiredStatement: RequiredStatement3Schema.optional(),
   annotations: NonPaintingAnnotations3.optional()
 })
@@ -204,6 +221,8 @@ export const Collection3Schema = z.object({
   rendering: Rendering3Schema.optional(),
   seeAlso: SeeAlso3Schema.optional(),
   summary: Summary3Schema.optional(),
+  rights: Rights3Schema.optional(),
+  provider: Provider3Schema.optional(),
   requiredStatement: RequiredStatement3Schema.optional(),
   annotations: NonPaintingAnnotations3.optional()
 })

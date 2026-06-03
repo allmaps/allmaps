@@ -75,6 +75,33 @@
       "type": "Image"
     }
   ],
+  "provider": [
+    {
+      "homepage": [
+        {
+          "id": "https://commons.wikimedia.org/wiki/Main_Page",
+          "label": {
+            "en": ["Wikimedia Commons"]
+          },
+          "language": ["en"],
+          "type": "Text"
+        }
+      ],
+      "id": "https://commons.wikimedia.org/wiki/Main_Page",
+      "label": {
+        "en": ["Wikimedia Commons"]
+      },
+      "logo": [
+        {
+          "id": "https://upload.wikimedia.org/wikipedia/en/4/4a/Commons-logo.svg",
+          "type": "Image",
+          "width": 150
+        }
+      ],
+      "type": "Agent"
+    }
+  ],
+  "rights": "http://creativecommons.org/publicdomain/zero/1.0/",
   "summary": {
     "en": ["Jan 1925.   41 Sheet(s)."]
   }
