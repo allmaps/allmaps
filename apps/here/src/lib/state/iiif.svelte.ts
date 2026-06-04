@@ -5,13 +5,10 @@ import {
   Manifest as IIIFManifest,
   Canvas as IIIFCanvas
 } from '@allmaps/iiif-parser'
+import { findYearInCanvas, findYearInManifest } from '@allmaps/iiif-inspector'
 import { fetchJson } from '@allmaps/stdlib'
 
-import {
-  findManifests,
-  findYearFromCanvas,
-  findYearFromManifest
-} from '$lib/shared/iiif.js'
+import { findManifests } from '$lib/shared/iiif.js'
 
 import type { MapState } from '$lib/state/map.svelte.js'
 
@@ -80,8 +77,8 @@ export class IiifState {
         }
 
         return {
-          manifest: findYearFromManifest(manifest),
-          canvas: findYearFromCanvas(canvas)
+          manifest: findYearInManifest(manifest),
+          canvas: findYearInCanvas(canvas)
         }
       })
       .filter(({ manifest, canvas }) => manifest || canvas)

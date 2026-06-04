@@ -1,6 +1,6 @@
 import type { PartOfItem } from '@allmaps/annotation'
+import { parseLanguageString } from '@allmaps/iiif-inspector'
 import type {
-  LanguageString,
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage,
   Manifest as IIIFManifest,
@@ -40,28 +40,7 @@ export function getImages(
   return images
 }
 
-export function parseLanguageString(
-  languageString?: LanguageString,
-  preferredLanguage?: string
-) {
-  if (!languageString) {
-    return ''
-  }
-
-  let strings: (string | number | boolean)[] = []
-
-  if (preferredLanguage && languageString[preferredLanguage]) {
-    strings = languageString[preferredLanguage]
-  } else if (languageString['none']) {
-    strings = languageString['none']
-  } else if (typeof languageString === 'object' && languageString !== null) {
-    if (Object.values(languageString)[0]) {
-      strings = Object.values(languageString)[0]
-    }
-  }
-
-  return strings.map((string) => String(string)).join(' ')
-}
+export { parseLanguageString } from '@allmaps/iiif-inspector'
 
 export function labelFromPartOfItem(item: PartOfItem) {
   if (item.label) {
