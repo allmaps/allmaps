@@ -1,0 +1,22 @@
+{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "rootDir": ".",
+    "types": ["node"]
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.svelte",
+    "svelte.config.js",
+    "vite.config.ts"
+  ],
+  "references": [
+    { "path": "../../packages/annotation" },
+    { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/id" },
+    { "path": "../../packages/transform" }
+  ]
+}

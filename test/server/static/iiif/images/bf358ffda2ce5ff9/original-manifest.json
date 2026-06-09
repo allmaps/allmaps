@@ -1,0 +1,114 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m/manifest",
+  "@type": "sc:Manifest",
+  "label": "Map of Boston Common",
+  "thumbnail": {
+    "@id": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m/thumbnail",
+    "service": {
+      "@context": "http://iiif.io/api/image/2/context.json",
+      "@id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:jh343z26w",
+      "profile": "http://iiif.io/api/image/2/level2.json"
+    }
+  },
+  "viewingHint": "individuals",
+  "metadata": [
+    {
+      "label": "Title",
+      "value": "Map of Boston Common : with surrounding streets & adjacent parts of Beacon Hill"
+    },
+    {
+      "label": "Date",
+      "value": "[1934]"
+    },
+    {
+      "label": "Creator",
+      "value": ["Tyng, Griswold", "Little, Brown and Company"]
+    },
+    {
+      "label": "Publisher",
+      "value": "[Boston] : Little, Brown, & Co."
+    },
+    {
+      "label": "Type of Resource",
+      "value": "Cartographic"
+    },
+    {
+      "label": "Format",
+      "value": "Maps"
+    },
+    {
+      "label": "Language",
+      "value": "English"
+    },
+    {
+      "label": "Subjects",
+      "value": [
+        "Parks--Massachusetts--Boston--Maps",
+        "Boston Common (Boston, Mass.)--History--Maps",
+        "Boston (Mass.)--Maps",
+        "Pictorial maps"
+      ]
+    },
+    {
+      "label": "Location",
+      "value": "Boston Public Library"
+    },
+    {
+      "label": "Collection (local)",
+      "value": "Norman B. Leventhal Map Center Collection"
+    },
+    {
+      "label": "Identifier",
+      "value": [
+        "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m",
+        "06_01_016819",
+        "G3764.B6:2B2A5 1934 .T96",
+        "39999065651596"
+      ]
+    },
+    {
+      "label": "Terms of Use",
+      "value": [
+        "No known copyright restrictions.",
+        "No known restrictions on use."
+      ]
+    }
+  ],
+  "attribution": "No known copyright restrictions. No known restrictions on use.",
+  "seeAlso": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m",
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m/canvas/jh343z26w",
+          "@type": "sc:Canvas",
+          "label": "image 1",
+          "width": 7415,
+          "height": 5837,
+          "images": [
+            {
+              "@id": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m/annotation/jh343z26w",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z26w/large_image",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 7415,
+                "height": 5837,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:jh343z26w",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                }
+              },
+              "on": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m/canvas/jh343z26w"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

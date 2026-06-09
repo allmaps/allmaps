@@ -1,0 +1,382 @@
+{
+  "id": "http://localhost:5506/cors/annotations/images/670dbd9ccc9a453a.json",
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/46708584259540cf.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2026-06-09T09:43:35.774Z",
+      "modified": "2026-06-09T09:43:35.774Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/670dbd9ccc9a453a",
+          "type": "ImageService2",
+          "height": 3032,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/670dbd9ccc9a453a.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": ["recto"]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/670dbd9ccc9a453a.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": ["Van Vogelenzang Tot Scheveningen."]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": ["Yale University Library"]
+              },
+              "homepage": [
+                {
+                  "id": "https://collections.library.yale.edu/catalog?f%5Bgenre_ssim%5D%5B%5D=Maps"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"3032\"><polygon points=\"263.84,779.45 259.646,1545.935 759.494,1548.604 845.661,1424.289 848.711,779.45\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [593.259, 1235.528]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.314565190575337, 52.08036081240334]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [545.981, 1037.996]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.304914662941599, 52.08617541038277]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [452.951, 1177.565]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.3048963449816995, 52.079313725639224]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/46708584259540cf.json",
+          "version": "https://annotations.allmaps.org/maps/46708584259540cf@4225fe09e8b6aca2",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/670dbd9ccc9a453a.json",
+            "version": "https://annotations.allmaps.org/images/670dbd9ccc9a453a@e7ee25fd49177d25",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/caad25f573983f07",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/80a732346415b159"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.6228,
+          "area": 8995891.42
+        }
+      }
+    },
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/6a0f6e58fa70d0d7.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2026-06-09T09:43:35.774Z",
+      "modified": "2026-06-09T09:43:35.774Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/670dbd9ccc9a453a",
+          "type": "ImageService2",
+          "height": 3032,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/670dbd9ccc9a453a.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": ["recto"]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/670dbd9ccc9a453a.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": ["Van Vogelenzang Tot Scheveningen."]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": ["Yale University Library"]
+              },
+              "homepage": [
+                {
+                  "id": "https://collections.library.yale.edu/catalog?f%5Bgenre_ssim%5D%5B%5D=Maps"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"3032\"><polygon points=\"266.128,226.132 263.84,749.706 927.253,754.282 931.066,229.564\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [810.203, 634.924]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.50002673975672, 52.154985242839615]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [834.986, 376.76]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.502911253050684, 52.16100093632574]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [597.453, 504.888]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.492453970559723, 52.15898855403983]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [431.6, 700.895]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.484509236101815, 52.15492651305661]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [333.994, 352.736]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.483142967879019, 52.16351456758861]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/6a0f6e58fa70d0d7.json",
+          "version": "https://annotations.allmaps.org/maps/6a0f6e58fa70d0d7@83366d2a82987451",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/670dbd9ccc9a453a.json",
+            "version": "https://annotations.allmaps.org/images/670dbd9ccc9a453a@e7ee25fd49177d25",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/caad25f573983f07",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/80a732346415b159"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.6228,
+          "area": 2565572.38
+        }
+      }
+    },
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/7c53bd5fd7da37f0.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2026-06-09T09:43:35.774Z",
+      "modified": "2026-06-09T09:43:35.774Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/670dbd9ccc9a453a",
+          "type": "ImageService2",
+          "height": 3032,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/670dbd9ccc9a453a.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": ["recto"]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/670dbd9ccc9a453a.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": ["Van Vogelenzang Tot Scheveningen."]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": ["Yale University Library"]
+              },
+              "homepage": [
+                {
+                  "id": "https://collections.library.yale.edu/catalog?f%5Bgenre_ssim%5D%5B%5D=Maps"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"3032\"><polygon points=\"259.265,2716.254 2238.066,2729.982 2246.073,212.023 939.835,202.489 940.598,766.866 854.812,766.866 854.049,1431.534 762.163,1560.807 260.409,1558.519\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [362.59, 2252.931]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.2813909350382175, 52.11028788487167]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [2086.701, 429.765]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.565386757576334, 52.29803166432913]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [2184.307, 2102.685]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.582782200696499, 52.127865134335345]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1647.857, 1792.278]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.492451308268812, 52.158991959911845]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/7c53bd5fd7da37f0.json",
+          "version": "https://annotations.allmaps.org/maps/7c53bd5fd7da37f0@a4a7b4f284359a88",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/670dbd9ccc9a453a.json",
+            "version": "https://annotations.allmaps.org/images/670dbd9ccc9a453a@e7ee25fd49177d25",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/caad25f573983f07",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/80a732346415b159"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.6228,
+          "area": 530746312.53
+        }
+      }
+    }
+  ]
+}

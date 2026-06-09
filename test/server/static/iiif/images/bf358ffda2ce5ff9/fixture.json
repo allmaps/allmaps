@@ -1,0 +1,16 @@
+{
+  "id": "bf358ffda2ce5ff9",
+  "label": "Map of Boston Common - image 1",
+  "imageLabel": "image 1",
+  "manifestLabel": "Map of Boston Common",
+  "width": 2500,
+  "height": 1968,
+  "originalWidth": 7415,
+  "originalHeight": 5837,
+  "originalAnnotationUrl": "https://annotations.allmaps.org/maps/3038d45494907c64",
+  "originalManifestUrl": "https://ark.digitalcommonwealth.org/ark:/50959/jh343z25m/manifest",
+  "originalImageService": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:jh343z26w",
+  "originalImageRequest": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:jh343z26w/full/2500,/0/default.jpg",
+  "institution": "Digital Commonwealth",
+  "institutionHomepage": "https://www.digitalcommonwealth.org/search?f%5Bgenre_basic_ssim%5D%5B%5D=Maps"
+}

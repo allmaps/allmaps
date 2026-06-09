@@ -1,0 +1,172 @@
+{
+  "id": "http://localhost:5506/cors/annotations/images/bf358ffda2ce5ff9.json",
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/3038d45494907c64.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-06-11T19:16:12.150Z",
+      "modified": "2025-06-11T19:16:12.150Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/bf358ffda2ce5ff9",
+          "type": "ImageService2",
+          "height": 1968,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/bf358ffda2ce5ff9.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": ["image 1"]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/bf358ffda2ce5ff9.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": ["Map of Boston Common"]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": ["Digital Commonwealth"]
+              },
+              "homepage": [
+                {
+                  "id": "https://www.digitalcommonwealth.org/search?f%5Bgenre_basic_ssim%5D%5B%5D=Maps"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"1968\"><polygon points=\"607.889,687.131 967.633,1473.724 1461.902,1489.571 1648.011,918.085 1901.551,606.887 1667.229,311.535\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1616.993, 873.243]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0633788, 42.3552369]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1805.799, 599.132]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0621856, 42.3564814]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1199.595, 545.524]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0658398, 42.35677]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [670.6, 729.276]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0691246, 42.3560721]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1412.003, 1437.311]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0646664, 42.352502]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [998.989, 1425.848]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0672478, 42.3526766]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1637.896, 373.236]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0632103, 42.3575335]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1282.535, 1069.807]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [-71.0655205, 42.3543297]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/3038d45494907c64.json",
+          "version": "https://annotations.allmaps.org/maps/3038d45494907c64@7c09aaa8e22a5141",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/bf358ffda2ce5ff9.json",
+            "version": "https://annotations.allmaps.org/images/bf358ffda2ce5ff9@649f33fcbadbb442",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/09c7605340c64f86",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/09d2de2727b7c288"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 2.966,
+          "area": 239299.21
+        }
+      }
+    }
+  ]
+}

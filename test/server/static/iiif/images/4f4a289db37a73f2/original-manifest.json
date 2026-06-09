@@ -1,0 +1,3913 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5415/manifest.json",
+  "label": "Atlas van de gemeente Amsterdam : bevattende de grondteekening van alle gebouwen met de tegenwoordige nommering, en onderscheiding van gemeente-eigendommen, publieke en bijzondere gebouwen, woon- en pakhuizen : in 101 kaarten / naar officiële bronnen bewerkt; [schaal 1:1.250]",
+  "metadata": [
+    {
+      "label": "Beperking van de toegang",
+      "value": "Full access"
+    },
+    {
+      "label": "Gebruik en reproductie",
+      "value": "https://creativecommons.org/publicdomain/mark/1.0/"
+    },
+    {
+      "label": "Documentsoort",
+      "value": "Boekmateriaal"
+    },
+    {
+      "label": "Jaar van uitgave",
+      "value": "1876"
+    },
+    {
+      "label": "Gegevens digitalisering",
+      "value": "Jaar: 2012;; Opdrachtgever: Amsterdam : Universiteitsbibliotheek Vrije Universiteit;; Uitvoering: Heiloo : Pictura;; Locatie origineel: NL, Universiteitsbibliotheek Vrije Universiteit, LK.04491gk: 162/od;; Fysieke gegevens: tiff-bestand;; Gedigitaliseerd: september 2012"
+    },
+    {
+      "label": "Land van uitgave",
+      "value": "nl"
+    },
+    {
+      "label": "(Co)auteurs",
+      "value": "Jan Christiaan Loman Jr. 1825-1897;; J.Smulders & Co./1 Den Haag"
+    },
+    {
+      "label": "Uitgave",
+      "value": "Amsterdam : J.C. Loman Jr. / ([Den Haag: J. Smulders & Co. lith. des Konings])"
+    },
+    {
+      "label": "Specificaties kaart",
+      "value": "101 bl. + titelbl, gedigitaliseerd : krt ; 47 x 59 cm"
+    },
+    {
+      "label": "Toegangsgegevens (URL)",
+      "value": "http://imagebase.ubvu.vu.nl/getobj.php?ppn=341451827"
+    },
+    {
+      "label": "Annotatie",
+      "value": "Blad 1: Bladwijzer; aanduiding der teekens. Blad 2: Gemeente Amsterdam met aanwijzing van de verdeeling in buurten (schaal 1:20.000);; Register in: Toponiemenlijst van de Atlas van de gemeente Amsterdam uitgegeven door J.C. Loman Jr. in 1876 / Marc Hameleers en Gertjan Klein. - [Amsterdam] : Gemeentearchief Amsterdam, cop. 1990"
+    },
+    {
+      "label": "EPN",
+      "value": "581563379"
+    },
+    {
+      "label": "Referentie",
+      "value": "Koeman, II, p. 270; D'Ailly, no. 533 II, Hameleers, no. 25"
+    },
+    {
+      "label": "PPN origineel",
+      "value": "091467446"
+    },
+    {
+      "label": "Geografische trefwoorden",
+      "value": "4.210.150 Amsterdam (stad)"
+    },
+    {
+      "label": "Vormtrefwoorden",
+      "value": "Kaarten (vorm);; Atlassen (vorm)"
+    },
+    {
+      "label": "Taal",
+      "value": "ned"
+    },
+    {
+      "label": "Nederlandse Basisclassificatie",
+      "value": "74.20 geografie van Nederland"
+    },
+    {
+      "label": "Lokale classificatie",
+      "value": "66.ae.Nederland;; 66.wl.2"
+    },
+    {
+      "label": "Collectie",
+      "value": "Beeldbank cartografisch materiaal"
+    },
+    {
+      "label": "Identifier",
+      "value": "OCLC nummer: 786131331"
+    },
+    {
+      "label": "PPN",
+      "value": "341451827"
+    },
+    {
+      "label": "Rights Statement",
+      "value": "Public Domain"
+    },
+    {
+      "label": "Titel",
+      "value": "Atlas van de gemeente Amsterdam : bevattende de grondteekening van alle gebouwen met de tegenwoordige nommering, en onderscheiding van gemeente-eigendommen, publieke en bijzondere gebouwen, woon- en pakhuizen : in 101 kaarten / naar officiële bronnen bewerkt; [schaal 1:1.250]"
+    },
+    {
+      "label": "Repository",
+      "value": "Universiteitsbibliotheek, Beeldbank"
+    },
+    {
+      "label": "Source",
+      "value": "<span>From: <a href=\"https://vu.contentdm.oclc.org/digital/collection/krt/id/5415\">Atlas van de gemeente Amsterdam : bevattende de grondteekening van alle gebouwen met de tegenwoordige nommering, en onderscheiding van gemeente-eigendommen, publieke en bijzondere gebouwen, woon- en pakhuizen : in 101 kaarten / naar officiële bronnen bewerkt; [schaal 1:1.250]</a></span>"
+    }
+  ],
+  "attribution": ["", "Public Domain"],
+  "seeAlso": {
+    "@id": "https://cdm21033.contentdm.oclc.org/oai/oai.php?verb=GetRecord&identifier=oai:cdm21033.contentdm.oclc.org:krt/5415&metadataPrefix=oai_qdc",
+    "format": "application/xml",
+    "profile": "http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd"
+  },
+  "within": "https://cdm21033.contentdm.oclc.org/iiif/krt/manifest.json",
+  "sequences": [
+    {
+      "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5415/sequence/s0",
+      "@type": "sc:Sequence",
+      "label": "Atlas van de gemeente Amsterdam : bevattende de grondteekening van alle gebouwen met de tegenwoordige nommering, en onderscheiding van gemeente-eigendommen, publieke en bijzondere gebouwen, woon- en pakhuizen : in 101 kaarten / naar officiële bronnen bewerkt; [schaal 1:1.250]",
+      "canvases": [
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5313/canvas/c0",
+          "@type": "sc:Canvas",
+          "label": "[Voorblad]",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5313/annotation/a0",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5313/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5313",
+                  "width": 3038,
+                  "height": 2467,
+                  "tiles": [
+                    {
+                      "width": 3038,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3038,
+                "height": 2467
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5313/canvas/c0"
+            }
+          ],
+          "width": 3038,
+          "height": 2467
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5314/canvas/c1",
+          "@type": "sc:Canvas",
+          "label": "N.1 Bladwijzer",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5314/annotation/a1",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5314/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5314",
+                  "width": 3053,
+                  "height": 2456,
+                  "tiles": [
+                    {
+                      "width": 3053,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3053,
+                "height": 2456
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5314/canvas/c1"
+            }
+          ],
+          "width": 3053,
+          "height": 2456
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5315/canvas/c2",
+          "@type": "sc:Canvas",
+          "label": "N.2 [Overzichtskaart]",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5315/annotation/a2",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5315/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5315",
+                  "width": 3052,
+                  "height": 2457,
+                  "tiles": [
+                    {
+                      "width": 3052,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3052,
+                "height": 2457
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5315/canvas/c2"
+            }
+          ],
+          "width": 3052,
+          "height": 2457
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5316/canvas/c3",
+          "@type": "sc:Canvas",
+          "label": "N.3 Buurt A",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5316/annotation/a3",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5316/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5316",
+                  "width": 3065,
+                  "height": 2446,
+                  "tiles": [
+                    {
+                      "width": 3065,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3065,
+                "height": 2446
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5316/canvas/c3"
+            }
+          ],
+          "width": 3065,
+          "height": 2446
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5317/canvas/c4",
+          "@type": "sc:Canvas",
+          "label": "N.4 Buurt B",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5317/annotation/a4",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5317/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5317",
+                  "width": 3058,
+                  "height": 2452,
+                  "tiles": [
+                    {
+                      "width": 3058,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3058,
+                "height": 2452
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5317/canvas/c4"
+            }
+          ],
+          "width": 3058,
+          "height": 2452
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5318/canvas/c5",
+          "@type": "sc:Canvas",
+          "label": "N.5 Buurt C",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5318/annotation/a5",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5318/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5318",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5318/canvas/c5"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5319/canvas/c6",
+          "@type": "sc:Canvas",
+          "label": "N.6 Buurt D",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5319/annotation/a6",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5319/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5319",
+                  "width": 3037,
+                  "height": 2468,
+                  "tiles": [
+                    {
+                      "width": 3037,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3037,
+                "height": 2468
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5319/canvas/c6"
+            }
+          ],
+          "width": 3037,
+          "height": 2468
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5320/canvas/c7",
+          "@type": "sc:Canvas",
+          "label": "N.7 Buurt E",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5320/annotation/a7",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5320/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5320",
+                  "width": 3054,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3054,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3054,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5320/canvas/c7"
+            }
+          ],
+          "width": 3054,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5321/canvas/c8",
+          "@type": "sc:Canvas",
+          "label": "N.8 Buurt F",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5321/annotation/a8",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5321/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5321",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5321/canvas/c8"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5322/canvas/c9",
+          "@type": "sc:Canvas",
+          "label": "N.9 Buurt G",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5322/annotation/a9",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5322/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5322",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5322/canvas/c9"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5323/canvas/c10",
+          "@type": "sc:Canvas",
+          "label": "N.10 Buurt H",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5323/annotation/a10",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5323/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5323",
+                  "width": 3067,
+                  "height": 2444,
+                  "tiles": [
+                    {
+                      "width": 3067,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3067,
+                "height": 2444
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5323/canvas/c10"
+            }
+          ],
+          "width": 3067,
+          "height": 2444
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5324/canvas/c11",
+          "@type": "sc:Canvas",
+          "label": "N.11 Buurt J",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5324/annotation/a11",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5324/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5324",
+                  "width": 3056,
+                  "height": 2453,
+                  "tiles": [
+                    {
+                      "width": 3056,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3056,
+                "height": 2453
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5324/canvas/c11"
+            }
+          ],
+          "width": 3056,
+          "height": 2453
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5325/canvas/c12",
+          "@type": "sc:Canvas",
+          "label": "N.12 Buurt K",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5325/annotation/a12",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5325/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5325",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5325/canvas/c12"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5326/canvas/c13",
+          "@type": "sc:Canvas",
+          "label": "N.13 Buurt L",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5326/annotation/a13",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5326/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5326",
+                  "width": 3064,
+                  "height": 2447,
+                  "tiles": [
+                    {
+                      "width": 3064,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3064,
+                "height": 2447
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5326/canvas/c13"
+            }
+          ],
+          "width": 3064,
+          "height": 2447
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5327/canvas/c14",
+          "@type": "sc:Canvas",
+          "label": "N.14 Buurt M",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5327/annotation/a14",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5327/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5327",
+                  "width": 3061,
+                  "height": 2450,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2450
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5327/canvas/c14"
+            }
+          ],
+          "width": 3061,
+          "height": 2450
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5328/canvas/c15",
+          "@type": "sc:Canvas",
+          "label": "N.15 Buurt N",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5328/annotation/a15",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5328/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5328",
+                  "width": 3059,
+                  "height": 2451,
+                  "tiles": [
+                    {
+                      "width": 3059,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3059,
+                "height": 2451
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5328/canvas/c15"
+            }
+          ],
+          "width": 3059,
+          "height": 2451
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5329/canvas/c16",
+          "@type": "sc:Canvas",
+          "label": "N.16 Buurt O",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5329/annotation/a16",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5329/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5329",
+                  "width": 3064,
+                  "height": 2447,
+                  "tiles": [
+                    {
+                      "width": 3064,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3064,
+                "height": 2447
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5329/canvas/c16"
+            }
+          ],
+          "width": 3064,
+          "height": 2447
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5330/canvas/c17",
+          "@type": "sc:Canvas",
+          "label": "N.17 Buurt P",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5330/annotation/a17",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5330/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5330",
+                  "width": 3067,
+                  "height": 2444,
+                  "tiles": [
+                    {
+                      "width": 3067,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3067,
+                "height": 2444
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5330/canvas/c17"
+            }
+          ],
+          "width": 3067,
+          "height": 2444
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5331/canvas/c18",
+          "@type": "sc:Canvas",
+          "label": "N.18 Buurt Q",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5331/annotation/a18",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5331/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5331",
+                  "width": 3073,
+                  "height": 2440,
+                  "tiles": [
+                    {
+                      "width": 3073,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3073,
+                "height": 2440
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5331/canvas/c18"
+            }
+          ],
+          "width": 3073,
+          "height": 2440
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5332/canvas/c19",
+          "@type": "sc:Canvas",
+          "label": "N.19 Buurt R",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5332/annotation/a19",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5332/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5332",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5332/canvas/c19"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5333/canvas/c20",
+          "@type": "sc:Canvas",
+          "label": "N.20 Buurt S",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5333/annotation/a20",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5333/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5333",
+                  "width": 3066,
+                  "height": 2445,
+                  "tiles": [
+                    {
+                      "width": 3066,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3066,
+                "height": 2445
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5333/canvas/c20"
+            }
+          ],
+          "width": 3066,
+          "height": 2445
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5334/canvas/c21",
+          "@type": "sc:Canvas",
+          "label": "N.21 Buurt T 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5334/annotation/a21",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5334/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5334",
+                  "width": 3053,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3053,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3053,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5334/canvas/c21"
+            }
+          ],
+          "width": 3053,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5335/canvas/c22",
+          "@type": "sc:Canvas",
+          "label": "N.22 Buurt T 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5335/annotation/a22",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5335/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5335",
+                  "width": 3054,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3054,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3054,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5335/canvas/c22"
+            }
+          ],
+          "width": 3054,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5336/canvas/c23",
+          "@type": "sc:Canvas",
+          "label": "N.23 Buurt T 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5336/annotation/a23",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5336/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5336",
+                  "width": 3065,
+                  "height": 2446,
+                  "tiles": [
+                    {
+                      "width": 3065,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3065,
+                "height": 2446
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5336/canvas/c23"
+            }
+          ],
+          "width": 3065,
+          "height": 2446
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5337/canvas/c24",
+          "@type": "sc:Canvas",
+          "label": "N.24 Buurt T 4de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5337/annotation/a24",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5337/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5337",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5337/canvas/c24"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5338/canvas/c25",
+          "@type": "sc:Canvas",
+          "label": "N.25 Buurt T 5de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5338/annotation/a25",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5338/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5338",
+                  "width": 3063,
+                  "height": 2448,
+                  "tiles": [
+                    {
+                      "width": 3063,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3063,
+                "height": 2448
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5338/canvas/c25"
+            }
+          ],
+          "width": 3063,
+          "height": 2448
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5339/canvas/c26",
+          "@type": "sc:Canvas",
+          "label": "N.26 Buurt U 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5339/annotation/a26",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5339/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5339",
+                  "width": 3053,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3053,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3053,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5339/canvas/c26"
+            }
+          ],
+          "width": 3053,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5340/canvas/c27",
+          "@type": "sc:Canvas",
+          "label": "N.27 Buurt U 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5340/annotation/a27",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5340/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5340",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5340/canvas/c27"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5341/canvas/c28",
+          "@type": "sc:Canvas",
+          "label": "N.28 Buurt U 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5341/annotation/a28",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5341/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5341",
+                  "width": 3048,
+                  "height": 2460,
+                  "tiles": [
+                    {
+                      "width": 3048,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3048,
+                "height": 2460
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5341/canvas/c28"
+            }
+          ],
+          "width": 3048,
+          "height": 2460
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5342/canvas/c29",
+          "@type": "sc:Canvas",
+          "label": "N.29 Buurt U 4de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5342/annotation/a29",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5342/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5342",
+                  "width": 3067,
+                  "height": 2445,
+                  "tiles": [
+                    {
+                      "width": 3067,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3067,
+                "height": 2445
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5342/canvas/c29"
+            }
+          ],
+          "width": 3067,
+          "height": 2445
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5343/canvas/c30",
+          "@type": "sc:Canvas",
+          "label": "N.30 Buurt U 5de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5343/annotation/a30",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5343/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5343",
+                  "width": 3050,
+                  "height": 2458,
+                  "tiles": [
+                    {
+                      "width": 3050,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3050,
+                "height": 2458
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5343/canvas/c30"
+            }
+          ],
+          "width": 3050,
+          "height": 2458
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5344/canvas/c31",
+          "@type": "sc:Canvas",
+          "label": "N.31 Buurt V 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5344/annotation/a31",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5344/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5344",
+                  "width": 3057,
+                  "height": 2453,
+                  "tiles": [
+                    {
+                      "width": 3057,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3057,
+                "height": 2453
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5344/canvas/c31"
+            }
+          ],
+          "width": 3057,
+          "height": 2453
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5345/canvas/c32",
+          "@type": "sc:Canvas",
+          "label": "N.32 Buurt V 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5345/annotation/a32",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5345/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5345",
+                  "width": 3054,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3054,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3054,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5345/canvas/c32"
+            }
+          ],
+          "width": 3054,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5346/canvas/c33",
+          "@type": "sc:Canvas",
+          "label": "N.33 Buurt V 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5346/annotation/a33",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5346/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5346",
+                  "width": 3064,
+                  "height": 2447,
+                  "tiles": [
+                    {
+                      "width": 3064,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3064,
+                "height": 2447
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5346/canvas/c33"
+            }
+          ],
+          "width": 3064,
+          "height": 2447
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5347/canvas/c34",
+          "@type": "sc:Canvas",
+          "label": "N.34 Buurt W 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5347/annotation/a34",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5347/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5347",
+                  "width": 3064,
+                  "height": 2447,
+                  "tiles": [
+                    {
+                      "width": 3064,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3064,
+                "height": 2447
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5347/canvas/c34"
+            }
+          ],
+          "width": 3064,
+          "height": 2447
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5348/canvas/c35",
+          "@type": "sc:Canvas",
+          "label": "N.35 Buurt W 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5348/annotation/a35",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5348/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5348",
+                  "width": 3054,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3054,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3054,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5348/canvas/c35"
+            }
+          ],
+          "width": 3054,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5349/canvas/c36",
+          "@type": "sc:Canvas",
+          "label": "N.36 Buurt W 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5349/annotation/a36",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5349/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5349",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5349/canvas/c36"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5350/canvas/c37",
+          "@type": "sc:Canvas",
+          "label": "N.37 Buurt X",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5350/annotation/a37",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5350/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5350",
+                  "width": 3056,
+                  "height": 2453,
+                  "tiles": [
+                    {
+                      "width": 3056,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3056,
+                "height": 2453
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5350/canvas/c37"
+            }
+          ],
+          "width": 3056,
+          "height": 2453
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5351/canvas/c38",
+          "@type": "sc:Canvas",
+          "label": "N.38 Buurt Y",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5351/annotation/a38",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5351/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5351",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5351/canvas/c38"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5352/canvas/c39",
+          "@type": "sc:Canvas",
+          "label": "N.39 Buurt Z 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5352/annotation/a39",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5352/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5352",
+                  "width": 3056,
+                  "height": 2453,
+                  "tiles": [
+                    {
+                      "width": 3056,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3056,
+                "height": 2453
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5352/canvas/c39"
+            }
+          ],
+          "width": 3056,
+          "height": 2453
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5353/canvas/c40",
+          "@type": "sc:Canvas",
+          "label": "N.40 Buurt Z 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5353/annotation/a40",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5353/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5353",
+                  "width": 3048,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3048,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3048,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5353/canvas/c40"
+            }
+          ],
+          "width": 3048,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5354/canvas/c41",
+          "@type": "sc:Canvas",
+          "label": "N.41 Buurt AA",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5354/annotation/a41",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5354/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5354",
+                  "width": 3060,
+                  "height": 2450,
+                  "tiles": [
+                    {
+                      "width": 3060,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3060,
+                "height": 2450
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5354/canvas/c41"
+            }
+          ],
+          "width": 3060,
+          "height": 2450
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5355/canvas/c42",
+          "@type": "sc:Canvas",
+          "label": "N.42 Buurt BB",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5355/annotation/a42",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5355/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5355",
+                  "width": 3051,
+                  "height": 2457,
+                  "tiles": [
+                    {
+                      "width": 3051,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3051,
+                "height": 2457
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5355/canvas/c42"
+            }
+          ],
+          "width": 3051,
+          "height": 2457
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5356/canvas/c43",
+          "@type": "sc:Canvas",
+          "label": "N.43 Buurt CC",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5356/annotation/a43",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5356/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5356",
+                  "width": 3058,
+                  "height": 2452,
+                  "tiles": [
+                    {
+                      "width": 3058,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3058,
+                "height": 2452
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5356/canvas/c43"
+            }
+          ],
+          "width": 3058,
+          "height": 2452
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5357/canvas/c44",
+          "@type": "sc:Canvas",
+          "label": "N.44 Buurt DD",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5357/annotation/a44",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5357/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5357",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5357/canvas/c44"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5358/canvas/c45",
+          "@type": "sc:Canvas",
+          "label": "N.45 Buurt EE",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5358/annotation/a45",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5358/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5358",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5358/canvas/c45"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5359/canvas/c46",
+          "@type": "sc:Canvas",
+          "label": "N.46 Buurt FF",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5359/annotation/a46",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5359/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5359",
+                  "width": 3051,
+                  "height": 2457,
+                  "tiles": [
+                    {
+                      "width": 3051,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3051,
+                "height": 2457
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5359/canvas/c46"
+            }
+          ],
+          "width": 3051,
+          "height": 2457
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5360/canvas/c47",
+          "@type": "sc:Canvas",
+          "label": "N.47 Buurt GG",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5360/annotation/a47",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5360/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5360",
+                  "width": 3047,
+                  "height": 2461,
+                  "tiles": [
+                    {
+                      "width": 3047,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3047,
+                "height": 2461
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5360/canvas/c47"
+            }
+          ],
+          "width": 3047,
+          "height": 2461
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5361/canvas/c48",
+          "@type": "sc:Canvas",
+          "label": "N.48 Buurt HH",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5361/annotation/a48",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5361/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5361",
+                  "width": 3057,
+                  "height": 2452,
+                  "tiles": [
+                    {
+                      "width": 3057,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3057,
+                "height": 2452
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5361/canvas/c48"
+            }
+          ],
+          "width": 3057,
+          "height": 2452
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5362/canvas/c49",
+          "@type": "sc:Canvas",
+          "label": "N.49 Buurt JJ 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5362/annotation/a49",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5362/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5362",
+                  "width": 3037,
+                  "height": 2469,
+                  "tiles": [
+                    {
+                      "width": 3037,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3037,
+                "height": 2469
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5362/canvas/c49"
+            }
+          ],
+          "width": 3037,
+          "height": 2469
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5363/canvas/c50",
+          "@type": "sc:Canvas",
+          "label": "N.50 Buurt JJ 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5363/annotation/a50",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5363/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5363",
+                  "width": 3044,
+                  "height": 2463,
+                  "tiles": [
+                    {
+                      "width": 3044,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3044,
+                "height": 2463
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5363/canvas/c50"
+            }
+          ],
+          "width": 3044,
+          "height": 2463
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5364/canvas/c51",
+          "@type": "sc:Canvas",
+          "label": "N.51 Buurt KK",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5364/annotation/a51",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5364/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5364",
+                  "width": 3060,
+                  "height": 2450,
+                  "tiles": [
+                    {
+                      "width": 3060,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3060,
+                "height": 2450
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5364/canvas/c51"
+            }
+          ],
+          "width": 3060,
+          "height": 2450
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5365/canvas/c52",
+          "@type": "sc:Canvas",
+          "label": "N.52 Buurt LL",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5365/annotation/a52",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5365/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5365",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5365/canvas/c52"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5366/canvas/c53",
+          "@type": "sc:Canvas",
+          "label": "N.53 Buurt MM",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5366/annotation/a53",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5366/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5366",
+                  "width": 3059,
+                  "height": 2451,
+                  "tiles": [
+                    {
+                      "width": 3059,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3059,
+                "height": 2451
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5366/canvas/c53"
+            }
+          ],
+          "width": 3059,
+          "height": 2451
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5367/canvas/c54",
+          "@type": "sc:Canvas",
+          "label": "N.54 Buurt NN",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5367/annotation/a54",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5367/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5367",
+                  "width": 3048,
+                  "height": 2460,
+                  "tiles": [
+                    {
+                      "width": 3048,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3048,
+                "height": 2460
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5367/canvas/c54"
+            }
+          ],
+          "width": 3048,
+          "height": 2460
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5368/canvas/c55",
+          "@type": "sc:Canvas",
+          "label": "N.55 Buurt OO 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5368/annotation/a55",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5368/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5368",
+                  "width": 3056,
+                  "height": 2453,
+                  "tiles": [
+                    {
+                      "width": 3056,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3056,
+                "height": 2453
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5368/canvas/c55"
+            }
+          ],
+          "width": 3056,
+          "height": 2453
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5369/canvas/c56",
+          "@type": "sc:Canvas",
+          "label": "N.56 Buurt OO 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5369/annotation/a56",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5369/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5369",
+                  "width": 3048,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3048,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3048,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5369/canvas/c56"
+            }
+          ],
+          "width": 3048,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5370/canvas/c57",
+          "@type": "sc:Canvas",
+          "label": "N.57 Buurt PP 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5370/annotation/a57",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5370/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5370",
+                  "width": 3069,
+                  "height": 2443,
+                  "tiles": [
+                    {
+                      "width": 3069,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3069,
+                "height": 2443
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5370/canvas/c57"
+            }
+          ],
+          "width": 3069,
+          "height": 2443
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5371/canvas/c58",
+          "@type": "sc:Canvas",
+          "label": "N.58 Buurt PP 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5371/annotation/a58",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5371/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5371",
+                  "width": 3043,
+                  "height": 2464,
+                  "tiles": [
+                    {
+                      "width": 3043,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3043,
+                "height": 2464
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5371/canvas/c58"
+            }
+          ],
+          "width": 3043,
+          "height": 2464
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5372/canvas/c59",
+          "@type": "sc:Canvas",
+          "label": "N.59 Buurt QQ",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5372/annotation/a59",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5372/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5372",
+                  "width": 3063,
+                  "height": 2448,
+                  "tiles": [
+                    {
+                      "width": 3063,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3063,
+                "height": 2448
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5372/canvas/c59"
+            }
+          ],
+          "width": 3063,
+          "height": 2448
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5373/canvas/c60",
+          "@type": "sc:Canvas",
+          "label": "N.60 Buurt RR",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5373/annotation/a60",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5373/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5373",
+                  "width": 3067,
+                  "height": 2445,
+                  "tiles": [
+                    {
+                      "width": 3067,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3067,
+                "height": 2445
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5373/canvas/c60"
+            }
+          ],
+          "width": 3067,
+          "height": 2445
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5374/canvas/c61",
+          "@type": "sc:Canvas",
+          "label": "N.61 Buurt SS",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5374/annotation/a61",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5374/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5374",
+                  "width": 3046,
+                  "height": 2461,
+                  "tiles": [
+                    {
+                      "width": 3046,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3046,
+                "height": 2461
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5374/canvas/c61"
+            }
+          ],
+          "width": 3046,
+          "height": 2461
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5375/canvas/c62",
+          "@type": "sc:Canvas",
+          "label": "N.62 Buurt TT",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5375/annotation/a62",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5375/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5375",
+                  "width": 3054,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3054,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3054,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5375/canvas/c62"
+            }
+          ],
+          "width": 3054,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5376/canvas/c63",
+          "@type": "sc:Canvas",
+          "label": "N.63 Buurt UU 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5376/annotation/a63",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5376/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5376",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5376/canvas/c63"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5377/canvas/c64",
+          "@type": "sc:Canvas",
+          "label": "N.64 Buurt UU 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5377/annotation/a64",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5377/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5377",
+                  "width": 3072,
+                  "height": 2441,
+                  "tiles": [
+                    {
+                      "width": 3072,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3072,
+                "height": 2441
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5377/canvas/c64"
+            }
+          ],
+          "width": 3072,
+          "height": 2441
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5378/canvas/c65",
+          "@type": "sc:Canvas",
+          "label": "N.65 Buurt VV 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5378/annotation/a65",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5378/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5378",
+                  "width": 3051,
+                  "height": 2458,
+                  "tiles": [
+                    {
+                      "width": 3051,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3051,
+                "height": 2458
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5378/canvas/c65"
+            }
+          ],
+          "width": 3051,
+          "height": 2458
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5379/canvas/c66",
+          "@type": "sc:Canvas",
+          "label": "N.66 Buurt VV 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5379/annotation/a66",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5379/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5379",
+                  "width": 3060,
+                  "height": 2450,
+                  "tiles": [
+                    {
+                      "width": 3060,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3060,
+                "height": 2450
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5379/canvas/c66"
+            }
+          ],
+          "width": 3060,
+          "height": 2450
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5380/canvas/c67",
+          "@type": "sc:Canvas",
+          "label": "N.67 Buurt WW 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5380/annotation/a67",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5380/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5380",
+                  "width": 3053,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3053,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3053,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5380/canvas/c67"
+            }
+          ],
+          "width": 3053,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5381/canvas/c68",
+          "@type": "sc:Canvas",
+          "label": "N.68 Buurt WW 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5381/annotation/a68",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5381/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5381",
+                  "width": 3065,
+                  "height": 2446,
+                  "tiles": [
+                    {
+                      "width": 3065,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3065,
+                "height": 2446
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5381/canvas/c68"
+            }
+          ],
+          "width": 3065,
+          "height": 2446
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5382/canvas/c69",
+          "@type": "sc:Canvas",
+          "label": "N.69 Buurt WW 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5382/annotation/a69",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5382/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5382",
+                  "width": 3063,
+                  "height": 2448,
+                  "tiles": [
+                    {
+                      "width": 3063,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3063,
+                "height": 2448
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5382/canvas/c69"
+            }
+          ],
+          "width": 3063,
+          "height": 2448
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5383/canvas/c70",
+          "@type": "sc:Canvas",
+          "label": "N.70 Buurt WW 4de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5383/annotation/a70",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5383/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5383",
+                  "width": 3059,
+                  "height": 2451,
+                  "tiles": [
+                    {
+                      "width": 3059,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3059,
+                "height": 2451
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5383/canvas/c70"
+            }
+          ],
+          "width": 3059,
+          "height": 2451
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5384/canvas/c71",
+          "@type": "sc:Canvas",
+          "label": "N.71 Buurt WW 5de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5384/annotation/a71",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5384/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5384",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5384/canvas/c71"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5385/canvas/c72",
+          "@type": "sc:Canvas",
+          "label": "N.72 Buurt WW 6de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5385/annotation/a72",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5385/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5385",
+                  "width": 3043,
+                  "height": 2464,
+                  "tiles": [
+                    {
+                      "width": 3043,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3043,
+                "height": 2464
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5385/canvas/c72"
+            }
+          ],
+          "width": 3043,
+          "height": 2464
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5386/canvas/c73",
+          "@type": "sc:Canvas",
+          "label": "N.73 Buurt WW 7de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5386/annotation/a73",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5386/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5386",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5386/canvas/c73"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5387/canvas/c74",
+          "@type": "sc:Canvas",
+          "label": "N.74 Buurt WW 8ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5387/annotation/a74",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5387/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5387",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5387/canvas/c74"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5388/canvas/c75",
+          "@type": "sc:Canvas",
+          "label": "N.75 Buurt WW 9de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5388/annotation/a75",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5388/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5388",
+                  "width": 3057,
+                  "height": 2452,
+                  "tiles": [
+                    {
+                      "width": 3057,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3057,
+                "height": 2452
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5388/canvas/c75"
+            }
+          ],
+          "width": 3057,
+          "height": 2452
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5389/canvas/c76",
+          "@type": "sc:Canvas",
+          "label": "N.76 Buurt XX 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5389/annotation/a76",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5389/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5389",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5389/canvas/c76"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5390/canvas/c77",
+          "@type": "sc:Canvas",
+          "label": "N.77 Buurt XX 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5390/annotation/a77",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5390/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5390",
+                  "width": 3048,
+                  "height": 2460,
+                  "tiles": [
+                    {
+                      "width": 3048,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3048,
+                "height": 2460
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5390/canvas/c77"
+            }
+          ],
+          "width": 3048,
+          "height": 2460
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5391/canvas/c78",
+          "@type": "sc:Canvas",
+          "label": "N.78 Buurt XX 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5391/annotation/a78",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5391/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5391",
+                  "width": 3045,
+                  "height": 2462,
+                  "tiles": [
+                    {
+                      "width": 3045,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3045,
+                "height": 2462
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5391/canvas/c78"
+            }
+          ],
+          "width": 3045,
+          "height": 2462
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5392/canvas/c79",
+          "@type": "sc:Canvas",
+          "label": "N.79 Buurt XX 4de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5392/annotation/a79",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5392/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5392",
+                  "width": 3051,
+                  "height": 2457,
+                  "tiles": [
+                    {
+                      "width": 3051,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3051,
+                "height": 2457
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5392/canvas/c79"
+            }
+          ],
+          "width": 3051,
+          "height": 2457
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5393/canvas/c80",
+          "@type": "sc:Canvas",
+          "label": "N.80 Buurt YY 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5393/annotation/a80",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5393/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5393",
+                  "width": 3046,
+                  "height": 2461,
+                  "tiles": [
+                    {
+                      "width": 3046,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3046,
+                "height": 2461
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5393/canvas/c80"
+            }
+          ],
+          "width": 3046,
+          "height": 2461
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5394/canvas/c81",
+          "@type": "sc:Canvas",
+          "label": "N.81 Buurt YY 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5394/annotation/a81",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5394/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5394",
+                  "width": 3066,
+                  "height": 2445,
+                  "tiles": [
+                    {
+                      "width": 3066,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3066,
+                "height": 2445
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5394/canvas/c81"
+            }
+          ],
+          "width": 3066,
+          "height": 2445
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5395/canvas/c82",
+          "@type": "sc:Canvas",
+          "label": "N.82 Buurt YY 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5395/annotation/a82",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5395/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5395",
+                  "width": 3064,
+                  "height": 2447,
+                  "tiles": [
+                    {
+                      "width": 3064,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3064,
+                "height": 2447
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5395/canvas/c82"
+            }
+          ],
+          "width": 3064,
+          "height": 2447
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5396/canvas/c83",
+          "@type": "sc:Canvas",
+          "label": "N.83 Buurt YY 4de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5396/annotation/a83",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5396/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5396",
+                  "width": 3046,
+                  "height": 2462,
+                  "tiles": [
+                    {
+                      "width": 3046,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3046,
+                "height": 2462
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5396/canvas/c83"
+            }
+          ],
+          "width": 3046,
+          "height": 2462
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5397/canvas/c84",
+          "@type": "sc:Canvas",
+          "label": "N.84 Buurt YY 5de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5397/annotation/a84",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5397/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5397",
+                  "width": 3042,
+                  "height": 2465,
+                  "tiles": [
+                    {
+                      "width": 3042,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3042,
+                "height": 2465
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5397/canvas/c84"
+            }
+          ],
+          "width": 3042,
+          "height": 2465
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5398/canvas/c85",
+          "@type": "sc:Canvas",
+          "label": "N.85 Buurt YY 6de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5398/annotation/a85",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5398/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5398",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5398/canvas/c85"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5399/canvas/c86",
+          "@type": "sc:Canvas",
+          "label": "N.86 Buurt YY 7de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5399/annotation/a86",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5399/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5399",
+                  "width": 3051,
+                  "height": 2457,
+                  "tiles": [
+                    {
+                      "width": 3051,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3051,
+                "height": 2457
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5399/canvas/c86"
+            }
+          ],
+          "width": 3051,
+          "height": 2457
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5400/canvas/c87",
+          "@type": "sc:Canvas",
+          "label": "N.87 Buurt ZZ 1ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5400/annotation/a87",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5400/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5400",
+                  "width": 3054,
+                  "height": 2455,
+                  "tiles": [
+                    {
+                      "width": 3054,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3054,
+                "height": 2455
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5400/canvas/c87"
+            }
+          ],
+          "width": 3054,
+          "height": 2455
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5401/canvas/c88",
+          "@type": "sc:Canvas",
+          "label": "N.88 Buurt ZZ 2de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5401/annotation/a88",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5401/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5401",
+                  "width": 3063,
+                  "height": 2448,
+                  "tiles": [
+                    {
+                      "width": 3063,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3063,
+                "height": 2448
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5401/canvas/c88"
+            }
+          ],
+          "width": 3063,
+          "height": 2448
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5402/canvas/c89",
+          "@type": "sc:Canvas",
+          "label": "N.89 Buurt ZZ 3de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5402/annotation/a89",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5402/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5402",
+                  "width": 3055,
+                  "height": 2454,
+                  "tiles": [
+                    {
+                      "width": 3055,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3055,
+                "height": 2454
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5402/canvas/c89"
+            }
+          ],
+          "width": 3055,
+          "height": 2454
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5403/canvas/c90",
+          "@type": "sc:Canvas",
+          "label": "N.90 Buurt ZZ 4de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5403/annotation/a90",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5403/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5403",
+                  "width": 3071,
+                  "height": 2441,
+                  "tiles": [
+                    {
+                      "width": 3071,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3071,
+                "height": 2441
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5403/canvas/c90"
+            }
+          ],
+          "width": 3071,
+          "height": 2441
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5404/canvas/c91",
+          "@type": "sc:Canvas",
+          "label": "N.91 Buurt ZZ 5de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5404/annotation/a91",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5404/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5404",
+                  "width": 3057,
+                  "height": 2452,
+                  "tiles": [
+                    {
+                      "width": 3057,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3057,
+                "height": 2452
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5404/canvas/c91"
+            }
+          ],
+          "width": 3057,
+          "height": 2452
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5405/canvas/c92",
+          "@type": "sc:Canvas",
+          "label": "N.92 Buurt ZZ 6de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5405/annotation/a92",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5405/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5405",
+                  "width": 3048,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3048,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3048,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5405/canvas/c92"
+            }
+          ],
+          "width": 3048,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5406/canvas/c93",
+          "@type": "sc:Canvas",
+          "label": "N.93 Buurt ZZ 7de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5406/annotation/a93",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5406/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5406",
+                  "width": 3051,
+                  "height": 2458,
+                  "tiles": [
+                    {
+                      "width": 3051,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3051,
+                "height": 2458
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5406/canvas/c93"
+            }
+          ],
+          "width": 3051,
+          "height": 2458
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5407/canvas/c94",
+          "@type": "sc:Canvas",
+          "label": "N.94 Buurt ZZ 8ste blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5407/annotation/a94",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5407/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5407",
+                  "width": 3062,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3062,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3062,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5407/canvas/c94"
+            }
+          ],
+          "width": 3062,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5408/canvas/c95",
+          "@type": "sc:Canvas",
+          "label": "N.95 Buurt ZZ 9de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5408/annotation/a95",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5408/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5408",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5408/canvas/c95"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5409/canvas/c96",
+          "@type": "sc:Canvas",
+          "label": "N.96 Buurt ZZ 10de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5409/annotation/a96",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5409/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5409",
+                  "width": 3061,
+                  "height": 2449,
+                  "tiles": [
+                    {
+                      "width": 3061,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3061,
+                "height": 2449
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5409/canvas/c96"
+            }
+          ],
+          "width": 3061,
+          "height": 2449
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5410/canvas/c97",
+          "@type": "sc:Canvas",
+          "label": "N.97 Buurt ZZ 11de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5410/annotation/a97",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5410/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5410",
+                  "width": 3072,
+                  "height": 2440,
+                  "tiles": [
+                    {
+                      "width": 3072,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3072,
+                "height": 2440
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5410/canvas/c97"
+            }
+          ],
+          "width": 3072,
+          "height": 2440
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5411/canvas/c98",
+          "@type": "sc:Canvas",
+          "label": "N.98 Buurt ZZ 12de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5411/annotation/a98",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5411/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5411",
+                  "width": 3060,
+                  "height": 2450,
+                  "tiles": [
+                    {
+                      "width": 3060,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3060,
+                "height": 2450
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5411/canvas/c98"
+            }
+          ],
+          "width": 3060,
+          "height": 2450
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5412/canvas/c99",
+          "@type": "sc:Canvas",
+          "label": "N.99 Buurt ZZ 13de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5412/annotation/a99",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5412/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5412",
+                  "width": 3049,
+                  "height": 2459,
+                  "tiles": [
+                    {
+                      "width": 3049,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3049,
+                "height": 2459
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5412/canvas/c99"
+            }
+          ],
+          "width": 3049,
+          "height": 2459
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5413/canvas/c100",
+          "@type": "sc:Canvas",
+          "label": "N.100 Buurt ZZ 14de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5413/annotation/a100",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5413/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5413",
+                  "width": 3050,
+                  "height": 2458,
+                  "tiles": [
+                    {
+                      "width": 3050,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3050,
+                "height": 2458
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5413/canvas/c100"
+            }
+          ],
+          "width": 3050,
+          "height": 2458
+        },
+        {
+          "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5414/canvas/c101",
+          "@type": "sc:Canvas",
+          "label": "N.101 Buurt ZZ 15de blad",
+          "images": [
+            {
+              "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5414/annotation/a101",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5414/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://cdm21033.contentdm.oclc.org/iiif/2/krt:5414",
+                  "width": 3046,
+                  "height": 2462,
+                  "tiles": [
+                    {
+                      "width": 3046,
+                      "scaleFactors": [1, 2, 4, 8, 16]
+                    }
+                  ],
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 3046,
+                "height": 2462
+              },
+              "on": "https://cdm21033.contentdm.oclc.org/iiif/krt:5414/canvas/c101"
+            }
+          ],
+          "width": 3046,
+          "height": 2462
+        }
+      ]
+    }
+  ],
+  "structures": [
+    {
+      "@id": "https://cdm21033.contentdm.oclc.org/iiif/krt:5415/range/r0",
+      "@type": "sc:Range",
+      "label": "Atlas van de gemeente Amsterdam : bevattende de grondteekening van alle gebouwen met de tegenwoordige nommering, en onderscheiding van gemeente-eigendommen, publieke en bijzondere gebouwen, woon- en pakhuizen : in 101 kaarten / naar officiële bronnen bewerkt; [schaal 1:1.250]",
+      "ranges": [],
+      "canvases": [
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5313/canvas/c0",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5314/canvas/c1",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5315/canvas/c2",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5316/canvas/c3",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5317/canvas/c4",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5318/canvas/c5",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5319/canvas/c6",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5320/canvas/c7",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5321/canvas/c8",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5322/canvas/c9",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5323/canvas/c10",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5324/canvas/c11",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5325/canvas/c12",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5326/canvas/c13",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5327/canvas/c14",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5328/canvas/c15",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5329/canvas/c16",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5330/canvas/c17",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5331/canvas/c18",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5332/canvas/c19",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5333/canvas/c20",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5334/canvas/c21",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5335/canvas/c22",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5336/canvas/c23",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5337/canvas/c24",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5338/canvas/c25",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5339/canvas/c26",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5340/canvas/c27",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5341/canvas/c28",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5342/canvas/c29",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5343/canvas/c30",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5344/canvas/c31",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5345/canvas/c32",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5346/canvas/c33",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5347/canvas/c34",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5348/canvas/c35",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5349/canvas/c36",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5350/canvas/c37",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5351/canvas/c38",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5352/canvas/c39",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5353/canvas/c40",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5354/canvas/c41",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5355/canvas/c42",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5356/canvas/c43",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5357/canvas/c44",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5358/canvas/c45",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5359/canvas/c46",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5360/canvas/c47",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5361/canvas/c48",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5362/canvas/c49",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5363/canvas/c50",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5364/canvas/c51",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5365/canvas/c52",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5366/canvas/c53",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5367/canvas/c54",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5368/canvas/c55",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5369/canvas/c56",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5370/canvas/c57",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5371/canvas/c58",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5372/canvas/c59",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5373/canvas/c60",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5374/canvas/c61",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5375/canvas/c62",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5376/canvas/c63",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5377/canvas/c64",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5378/canvas/c65",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5379/canvas/c66",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5380/canvas/c67",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5381/canvas/c68",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5382/canvas/c69",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5383/canvas/c70",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5384/canvas/c71",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5385/canvas/c72",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5386/canvas/c73",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5387/canvas/c74",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5388/canvas/c75",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5389/canvas/c76",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5390/canvas/c77",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5391/canvas/c78",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5392/canvas/c79",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5393/canvas/c80",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5394/canvas/c81",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5395/canvas/c82",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5396/canvas/c83",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5397/canvas/c84",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5398/canvas/c85",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5399/canvas/c86",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5400/canvas/c87",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5401/canvas/c88",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5402/canvas/c89",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5403/canvas/c90",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5404/canvas/c91",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5405/canvas/c92",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5406/canvas/c93",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5407/canvas/c94",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5408/canvas/c95",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5409/canvas/c96",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5410/canvas/c97",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5411/canvas/c98",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5412/canvas/c99",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5413/canvas/c100",
+        "https://cdm21033.contentdm.oclc.org/iiif/krt:5414/canvas/c101"
+      ],
+      "viewingHint": "top"
+    }
+  ]
+}
