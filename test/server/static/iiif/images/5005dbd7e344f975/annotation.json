@@ -1,0 +1,111 @@
+{
+  "id": "http://localhost:5506/cors/annotations/images/5005dbd7e344f975.json",
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/0450bef8668f4982.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2025-03-11T19:36:36.689Z",
+      "modified": "2025-03-12T10:00:29.103Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/5005dbd7e344f975",
+          "type": "ImageService2",
+          "height": 1808,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/5005dbd7e344f975.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": [
+                  "Oudeland van Diependorst door Heyman van Dyck, uitgave 1701"
+                ]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/5005dbd7e344f975.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": ["Atlas der Neederlanden"]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": ["4TU.ResearchData"]
+              },
+              "homepage": [
+                {
+                  "id": "https://data.4tu.nl/"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"1808\"><polygon points=\"0,0 2500,0 2500,1808 0,1808\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "helmert"
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [2446.279, 642.831]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [3.959352084449268, 51.822473343416995]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [449.8, 692.91]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [3.90762368217863, 51.80121007761881]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/0450bef8668f4982.json",
+          "version": "https://annotations.allmaps.org/maps/0450bef8668f4982@62886b82e7a6dd8b",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/5005dbd7e344f975.json",
+            "version": "https://annotations.allmaps.org/images/5005dbd7e344f975@0e2306c7a77c57c3",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/880e587352821b3d",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/e7a8fd602e854cb2"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 3.2948,
+          "area": 27198559.81
+        }
+      }
+    }
+  ]
+}

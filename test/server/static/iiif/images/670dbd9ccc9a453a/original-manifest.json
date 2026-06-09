@@ -1,0 +1,341 @@
+{
+  "@context": [
+    "http://iiif.io/api/search/1/context.json",
+    "http://iiif.io/api/extension/navplace/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "id": "https://collections.library.yale.edu/manifests/15826821",
+  "type": "Manifest",
+  "label": {
+    "none": ["Van Vogelenzang Tot Scheveningen."]
+  },
+  "homepage": [
+    {
+      "id": "https://collections.library.yale.edu/catalog/15826821",
+      "type": "Text",
+      "format": "text/html",
+      "label": {
+        "en": ["Yale Digital Collections page"]
+      }
+    }
+  ],
+  "requiredStatement": {
+    "label": {
+      "en": ["Provider"]
+    },
+    "value": {
+      "en": ["Yale University Library"]
+    }
+  },
+  "rendering": [
+    {
+      "id": "https://collections.library.yale.edu/pdfs/15826821.pdf",
+      "type": "Text",
+      "format": "application/pdf",
+      "label": {
+        "en": ["Download as PDF"]
+      }
+    }
+  ],
+  "seeAlso": [
+    {
+      "id": "https://collections.library.yale.edu/catalog/oai?verb=GetRecord&metadataPrefix=oai_mods&identifier=oai:collections.library.yale.edu:15826821",
+      "type": "Dataset",
+      "format": "application/mods+xml",
+      "profile": "http://www.loc.gov/mods/v3"
+    }
+  ],
+  "metadata": [
+    {
+      "label": {
+        "en": ["Published/Created Date"]
+      },
+      "value": {
+        "none": ["1908"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Description"]
+      },
+      "value": {
+        "none": [
+          "Insets: Leiden, 1:12 500; 'S Gravenhage, 1:20 000.",
+          "Shows railroads, highways, and canals."
+        ]
+      }
+    },
+    {
+      "label": {
+        "en": ["Extent"]
+      },
+      "value": {
+        "none": ["1 map : col. ; 56 x 44 cm."]
+      }
+    },
+    {
+      "label": {
+        "en": ["Scale"]
+      },
+      "value": {
+        "none": ["Scale [ca. 1:50 000]."]
+      }
+    },
+    {
+      "label": {
+        "en": ["Coordinates"]
+      },
+      "value": {
+        "none": ["50000", "a"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Language"]
+      },
+      "value": {
+        "none": ["Dutch; Flemish"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Repository"]
+      },
+      "value": {
+        "none": ["Beinecke Library"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Call Number"]
+      },
+      "value": {
+        "none": ["331 Sc29 1908"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Container / Volume Information"]
+      },
+      "value": {
+        "none": ["BRBL_00080"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Extent of Digitization"]
+      },
+      "value": {
+        "none": ["Completely digitized"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Format"]
+      },
+      "value": {
+        "none": ["cartographic"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Genre"]
+      },
+      "value": {
+        "none": ["Maps"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Resource Type"]
+      },
+      "value": {
+        "none": ["Maps, Atlases &amp; Globes"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Subject (Geographic)"]
+      },
+      "value": {
+        "none": ["Scheveningen (Netherlands)--Maps"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Access"]
+      },
+      "value": {
+        "none": ["Public"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Rights"]
+      },
+      "value": {
+        "none": [
+          "The use of this image may be subject to the copyright law of the United States (Title 17, United States Code) or to site license or other rights management terms and conditions. The person using the image is liable for any infringement"
+        ]
+      }
+    },
+    {
+      "label": {
+        "en": ["Orbis ID"]
+      },
+      "value": {
+        "none": ["8578488"]
+      }
+    },
+    {
+      "label": {
+        "en": ["Object ID (OID)"]
+      },
+      "value": {
+        "none": ["15826821"]
+      }
+    }
+  ],
+  "provider": [
+    {
+      "id": "https://www.wikidata.org/wiki/Q2583293",
+      "type": "Agent",
+      "label": {
+        "en": ["Yale Library"]
+      },
+      "homepage": [
+        {
+          "id": "https://library.yale.edu/",
+          "type": "Text",
+          "label": {
+            "en": ["Yale Library homepage"]
+          },
+          "format": "text/html"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "type": "Canvas",
+      "items": [
+        {
+          "id": "https://collections.library.yale.edu/manifests/oid/15826821/canvas/15828022/page/1",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://collections.library.yale.edu/manifests/oid/15826821/canvas/15828022/image/1",
+              "type": "Annotation",
+              "motivation": "painting",
+              "target": "https://collections.library.yale.edu/manifests/oid/15826821/canvas/15828022",
+              "body": {
+                "id": "https://collections.library.yale.edu/iiif/2/15828022/full/full/0/default.jpg",
+                "type": "Image",
+                "format": "image/jpeg",
+                "height": 7951,
+                "width": 6557,
+                "service": [
+                  {
+                    "@id": "https://collections.library.yale.edu/iiif/2/15828022",
+                    "@type": "ImageService2",
+                    "profile": "http://iiif.io/api/image/2/level2.json"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "https://collections.library.yale.edu/manifests/oid/15826821/canvas/15828022",
+      "label": {
+        "none": ["recto"]
+      },
+      "thumbnail": [
+        {
+          "id": "https://collections.library.yale.edu/iiif/2/15828022/full/!300,300/0/default.jpg",
+          "type": "Image",
+          "format": "image/jpeg",
+          "height": 300,
+          "width": 247,
+          "service": [
+            {
+              "@id": "https://collections.library.yale.edu/iiif/2/15828022",
+              "@type": "ImageService2",
+              "profile": "http://iiif.io/api/image/2/level2.json"
+            }
+          ]
+        }
+      ],
+      "rendering": [
+        {
+          "id": "https://collections.library.yale.edu/iiif/2/15828022/full/full/0/default.jpg",
+          "label": {
+            "en": ["Full size"]
+          },
+          "type": "Image",
+          "format": "image/jpeg"
+        },
+        {
+          "id": "https://collections.library.yale.edu/download/tiff/15828022",
+          "label": {
+            "en": ["Full size original"]
+          },
+          "type": "Image",
+          "format": "image/tiff"
+        }
+      ],
+      "height": 7951,
+      "width": 6557,
+      "metadata": [
+        {
+          "label": {
+            "en": ["Image ID"]
+          },
+          "value": {
+            "none": ["15828022"]
+          }
+        },
+        {
+          "label": {
+            "en": ["Image Label"]
+          },
+          "value": {
+            "none": ["recto"]
+          }
+        },
+        {
+          "label": {
+            "en": ["Link to this Image"]
+          },
+          "value": {
+            "none": [
+              "https://collections.library.yale.edu/catalog/15826821?child_oid=15828022"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "thumbnail": [
+    {
+      "id": "https://collections.library.yale.edu/iiif/2/15828022/full/!300,300/0/default.jpg",
+      "type": "Image",
+      "format": "image/jpeg",
+      "height": 300,
+      "width": 247,
+      "service": [
+        {
+          "@id": "https://collections.library.yale.edu/iiif/2/15828022",
+          "@type": "ImageService2",
+          "profile": "http://iiif.io/api/image/2/level2.json"
+        }
+      ]
+    }
+  ],
+  "start": {
+    "id": "https://collections.library.yale.edu/manifests/oid/15826821/canvas/15828022",
+    "type": "Canvas"
+  },
+  "structures": [],
+  "navDate": "1908-01-01T00:00:00Z"
+}
