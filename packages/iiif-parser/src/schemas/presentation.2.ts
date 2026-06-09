@@ -56,6 +56,8 @@ export const RenderingItem2Schema = z.object({
 
 export const Rendering2Schema = oneOrMany(RenderingItem2Schema)
 
+export const License2Schema = oneOrMany(z.string())
+
 const ValidLanguageValue2Schema = z
   .union([
     z.object({ '@value': Value2Schema, '@language': z.string().optional() }),
@@ -116,6 +118,7 @@ export const Canvas2Schema = z.object({
   description: PossibleLanguageValue2Schema.optional(),
   related: Related2Schema.optional(),
   attribution: Attribution2Schema.optional(),
+  license: License2Schema.optional(),
   thumbnail: Thumbnail2Schema.optional(),
   rendering: Rendering2Schema.optional(),
   metadata: Metadata2Schema.optional(),
@@ -136,6 +139,7 @@ export const Manifest2Schema = z.object({
   metadata: Metadata2Schema.optional(),
   related: Related2Schema.optional(),
   attribution: Attribution2Schema.optional(),
+  license: License2Schema.optional(),
   rendering: Rendering2Schema.optional(),
   thumbnail: Thumbnail2Schema.optional(),
   navDate: NavDateSchema.optional(),
@@ -208,5 +212,6 @@ export const Collection2Schema = z.object({
   navPlace: NavPlaceSchema.optional(),
   related: Related2Schema.optional(),
   attribution: Attribution2Schema.optional(),
+  license: License2Schema.optional(),
   rendering: Rendering2Schema.optional()
 })

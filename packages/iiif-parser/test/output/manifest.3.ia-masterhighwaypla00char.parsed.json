@@ -4258,6 +4258,34 @@
       "format": "text/html"
     }
   ],
+  "provider": [
+    {
+      "homepage": [
+        {
+          "format": "text/html",
+          "id": "https://archive.org",
+          "label": {
+            "en": ["Internet Archive Homepage"]
+          },
+          "type": "Text"
+        }
+      ],
+      "id": "https://archive.org",
+      "label": {
+        "en": ["The Internet Archive"]
+      },
+      "logo": [
+        {
+          "format": "image/png",
+          "height": 79,
+          "id": "https://archive.org/images/glogo.png",
+          "type": "Image",
+          "width": 79
+        }
+      ],
+      "type": "Agent"
+    }
+  ],
   "summary": {
     "none": [
       "\"February 1, 1948\"",

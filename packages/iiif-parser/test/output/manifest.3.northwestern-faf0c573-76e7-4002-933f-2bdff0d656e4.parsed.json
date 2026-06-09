@@ -143,6 +143,7 @@
       "height": 300
     }
   ],
+  "rights": "http://rightsstatements.org/vocab/NoC-US/1.0/",
   "seeAlso": [
     {
       "id": "https://api.dc.library.northwestern.edu/api/v2/works/faf0c573-76e7-4002-933f-2bdff0d656e4",

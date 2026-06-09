@@ -8,6 +8,7 @@
     ]
   },
   "majorVersion": 2,
+  "rights": "iiif_license",
   "canvases": [
     {
       "uri": "https://digital.zlb.de/viewer/api/v1/records/34231622/pages/1/canvas/",

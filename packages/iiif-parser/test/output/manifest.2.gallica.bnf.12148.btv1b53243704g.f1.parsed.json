@@ -5,6 +5,7 @@
   "label": {
     "none": ["BnF, département Cartes et plans, GE DD-2998"]
   },
+  "rights": "https://gallica.bnf.fr/html/und/conditions-dutilisation-des-contenus-de-gallica",
   "majorVersion": 2,
   "canvases": [
     {

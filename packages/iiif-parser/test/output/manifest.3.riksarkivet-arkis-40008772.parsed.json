@@ -145,6 +145,36 @@
   ],
   "type": "manifest",
   "uri": "https://lbiiif.riksarkivet.se/arkis!40008772/manifest",
+  "provider": [
+    {
+      "homepage": [
+        {
+          "format": "text/html",
+          "id": "https://riksarkivet.se",
+          "label": {
+            "en": ["National Archives of Sweden"],
+            "sv": ["Riksarkivet"]
+          },
+          "language": ["sv"],
+          "type": "Homepage"
+        }
+      ],
+      "id": "http://data.riksarkivet.se/agent/Riksarkivet",
+      "label": {
+        "en": ["National Archives of Sweden"],
+        "sv": ["Riksarkivet"]
+      },
+      "logo": [
+        {
+          "format": "image/png",
+          "id": "https://riksarkivet.se/Administration/Images/Layout/logo.png",
+          "type": "Image"
+        }
+      ],
+      "type": "Agent"
+    }
+  ],
+  "rights": "https://creativecommons.org/publicdomain/mark/1.0/",
   "thumbnail": [
     {
       "format": "image/jpg",
