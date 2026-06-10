@@ -101,6 +101,12 @@ function getGeoreferencedMap(image: ImageFixture) {
   return map
 }
 
+function hasMultipleMapAnnotations(image: ImageFixture) {
+  const annotation = JSON.parse(readFileSync(image.annotationPath, 'utf8'))
+
+  return Array.isArray(annotation.items) && annotation.items.length > 1
+}
+
 function getFirstCanvas(sourceManifest: JsonObject) {
   return cloneJsonObject(sourceManifest.sequences?.[0]?.canvases?.[0])
 }
@@ -229,20 +235,39 @@ function createEmbeddedAnnotation(
   image: ImageFixture,
   manifestId: string,
   manifestLabel: JsonObject,
-  canvasId: string
+  canvasId: string,
+  errorVariant?: string
 ) {
+  const sourceAnnotation = JSON.parse(
+    readFileSync(image.annotationPath, 'utf8')
+  )
+  const baseUrl = getBaseUrl(request, corsMode)
   const annotation = cloneJsonObject(
-    localizeFixtureUrls(
-      JSON.parse(readFileSync(image.annotationPath, 'utf8')),
-      getBaseUrl(request, corsMode)
-    )
+    localizeFixtureUrls(sourceAnnotation, baseUrl)
   )
 
   return {
     ...annotation,
     items: Array.isArray(annotation.items)
-      ? annotation.items.map((item) => {
-          const mapAnnotation = cloneJsonObject(item)
+      ? annotation.items.map((item, index) => {
+          const errorVariantForMap =
+            errorVariant === 'mixed-errors'
+              ? index % 2 === 0
+                ? undefined
+                : getCombinedAnnotationErrorVariant(index)
+              : errorVariant
+          const mapAnnotation = errorVariantForMap
+            ? createBrokenAnnotationMap(
+                cloneJsonObject(item),
+                image,
+                errorVariantForMap
+              )
+            : cloneJsonObject(item)
+
+          if (errorVariantForMap === 'missing-target') {
+            return mapAnnotation
+          }
+
           const target = cloneJsonObject(mapAnnotation.target)
 
           mapAnnotation.target = {
@@ -263,6 +288,39 @@ function createEmbeddedAnnotation(
         })
       : []
   }
+}
+
+function getEmbeddedAnnotationErrorVariant(variant: string) {
+  if (variant === 'embedded-annotation-missing-target') {
+    return 'missing-target'
+  }
+
+  if (variant === 'embedded-annotation-one-gcp') {
+    return 'one-gcp'
+  }
+
+  if (variant === 'embedded-annotation-mixed-errors') {
+    return 'mixed-errors'
+  }
+
+  return undefined
+}
+
+function isEmbeddedAnnotationVariant(variant: string) {
+  return (
+    variant === 'embedded-annotation' ||
+    getEmbeddedAnnotationErrorVariant(variant) !== undefined
+  )
+}
+
+function isIiif3ManifestVariant(variant: string) {
+  return (
+    variant === 'default' ||
+    variant === 'bad-service-type' ||
+    isEmbeddedAnnotationVariant(variant) ||
+    variant === 'navplace-midpoint' ||
+    variant === 'navplace-bbox'
+  )
 }
 
 function getCombinedImages() {
@@ -340,6 +398,7 @@ function createCombinedAnnotation(
 
   const url = new URL(request.url)
   const baseUrl = getBaseUrl(request, corsMode)
+  let annotationIndex = 0
 
   return {
     '@context': 'http://www.w3.org/ns/anno.jsonld',
@@ -349,17 +408,30 @@ function createCombinedAnnotation(
       const targetCorsMode = getCombinedTargetCorsMode(corsMode, variant, index)
       const targetBaseUrl = `${url.origin}/${targetCorsMode}`
       const annotation = JSON.parse(readFileSync(image.annotationPath, 'utf8'))
-      const annotationPage = shouldBreakCombinedAnnotation(variant, index)
-        ? createBrokenAnnotation(
-            annotation,
-            targetBaseUrl,
-            image,
-            getCombinedAnnotationErrorVariant(index)
-          )
-        : cloneJsonObject(localizeFixtureUrls(annotation, targetBaseUrl))
-      const firstMap = cloneJsonObject(annotationPage.items?.[0])
+      const annotationPage = cloneJsonObject(
+        localizeFixtureUrls(annotation, targetBaseUrl)
+      )
 
-      return firstMap.id ? [firstMap] : []
+      return Array.isArray(annotationPage.items)
+        ? annotationPage.items
+            .map((item) => cloneJsonObject(item))
+            .flatMap((map) => {
+              const currentAnnotationIndex = annotationIndex
+              annotationIndex += 1
+              const outputMap = shouldBreakCombinedAnnotation(
+                variant,
+                currentAnnotationIndex
+              )
+                ? createBrokenAnnotationMap(
+                    map,
+                    image,
+                    getCombinedAnnotationErrorVariant(currentAnnotationIndex)
+                  )
+                : map
+
+              return outputMap.id ? [outputMap] : []
+            })
+        : []
     })
   }
 }
@@ -418,7 +490,7 @@ function createIiif3Canvas(
     ]
   }
 
-  if (variant === 'embedded-annotation') {
+  if (isEmbeddedAnnotationVariant(variant)) {
     canvas.annotations = [
       createEmbeddedAnnotation(
         request,
@@ -426,7 +498,8 @@ function createIiif3Canvas(
         image,
         manifestId,
         manifestLabel,
-        canvasId
+        canvasId,
+        getEmbeddedAnnotationErrorVariant(variant)
       )
     ]
   }
@@ -584,6 +657,80 @@ function parseOutputFormat(format: string) {
   }
 
   throw new Error(`Unsupported format: ${format}`)
+}
+
+function getOutputDimensions(region: Region, size: Size | undefined) {
+  if (!size) {
+    return {
+      width: region.width,
+      height: region.height
+    }
+  }
+
+  if (size.width && size.height) {
+    if (size.fit === 'inside') {
+      const scale = Math.min(
+        size.width / region.width,
+        size.height / region.height
+      )
+
+      return {
+        width: Math.round(region.width * scale),
+        height: Math.round(region.height * scale)
+      }
+    }
+
+    return {
+      width: size.width,
+      height: size.height
+    }
+  }
+
+  if (size.width) {
+    return {
+      width: size.width,
+      height: Math.round((region.height / region.width) * size.width)
+    }
+  }
+
+  if (size.height) {
+    return {
+      width: Math.round((region.width / region.height) * size.height),
+      height: size.height
+    }
+  }
+
+  return {
+    width: region.width,
+    height: region.height
+  }
+}
+
+function createWatermark(output: { width: number; height: number }) {
+  const label =
+    output.width < 240 ? 'Scaled-down copy' : 'Scaled-down copy of original'
+  const fontSize = Math.max(12, Math.min(22, Math.round(output.width / 32)))
+  const paddingX = Math.max(8, Math.round(fontSize * 0.7))
+  const paddingY = Math.max(5, Math.round(fontSize * 0.45))
+  const textWidth = Math.ceil(label.length * fontSize * 0.56)
+  const width = Math.min(output.width, textWidth + paddingX * 2)
+  const height = fontSize + paddingY * 2
+
+  return Buffer.from(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+      <rect width="100%" height="100%" fill="black" fill-opacity="0.58"/>
+      <text
+        x="${width - paddingX}"
+        y="${paddingY + fontSize * 0.78}"
+        fill="white"
+        fill-opacity="0.92"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="${fontSize}"
+        font-weight="700"
+        text-anchor="end"
+      >${label}</text>
+    </svg>
+  `)
 }
 
 function getScaleFactors(image: ImageFixture) {
@@ -948,18 +1095,27 @@ async function createImageRequestResponse(
   const region = parseRegion(regionParameter, image)
   const size = parseSize(sizeParameter, region)
   const outputFormat = parseOutputFormat(format)
+  const outputDimensions = getOutputDimensions(region, size)
   let transformer = sharp(image.imagePath).extract(region)
 
   if (size) {
     transformer = transformer.resize(size)
   }
 
-  const buffer = await transformer.toFormat(outputFormat.sharpFormat).toBuffer()
+  const buffer = await transformer
+    .composite([
+      {
+        input: createWatermark(outputDimensions),
+        gravity: 'southeast'
+      }
+    ])
+    .toFormat(outputFormat.sharpFormat)
+    .toBuffer()
 
   return imageResponse(buffer, corsMode, outputFormat.contentType)
 }
 
-function createCatalog(request: Request, corsMode: CorsMode) {
+export function createCatalog(request: Request, corsMode: CorsMode) {
   const baseUrl = getBaseUrl(request, corsMode)
 
   return {
@@ -1016,7 +1172,26 @@ function createCatalog(request: Request, corsMode: CorsMode) {
               {
                 label: 'IIIF 3 manifest with bad service type',
                 href: `${baseUrl}/manifests/3/${image.id}/bad-service-type.json`
-              }
+              },
+              {
+                label:
+                  'IIIF 3 manifest with embedded annotation without target',
+                href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation-missing-target.json`
+              },
+              {
+                label:
+                  'IIIF 3 manifest with embedded annotation with only 1 GCP',
+                href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation-one-gcp.json`
+              },
+              ...(hasMultipleMapAnnotations(image)
+                ? [
+                    {
+                      label:
+                        'IIIF 3 manifest with mixed correct/incorrect embedded annotations',
+                      href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation-mixed-errors.json`
+                    }
+                  ]
+                : [])
             ]
           : []
       },
@@ -1180,13 +1355,7 @@ async function routeFixtureRequest(
       return textResponse('No manifest for image', corsMode, 404)
     }
 
-    if (
-      variant !== 'default' &&
-      variant !== 'bad-service-type' &&
-      variant !== 'embedded-annotation' &&
-      variant !== 'navplace-midpoint' &&
-      variant !== 'navplace-bbox'
-    ) {
+    if (!isIiif3ManifestVariant(variant)) {
       return textResponse('Unknown manifest variant', corsMode, 404)
     }
 
