@@ -5,6 +5,7 @@
   import { Thumbnail } from '@allmaps/ui'
   import { GcpTransformer } from '@allmaps/transform'
   import { pink, red } from '@allmaps/tailwind'
+  import { isGeojsonPoint } from '@allmaps/stdlib'
 
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
@@ -88,6 +89,22 @@
       resourceRouteCoordinates.map((point) => point.join(',')).join(' ')
   )
 
+  let resourceMarkerCoordinates = $derived.by(() => {
+    if (geojsonRoute?.markers.length && resourceSize && svgSize) {
+      return geojsonRoute.markers.flatMap((marker) => {
+        if (!isGeojsonPoint(marker.geometry)) {
+          return []
+        }
+
+        const resourcePoint = transformer.transformToResource(
+          marker.geometry.coordinates as Point
+        )
+
+        return [svgCoordinates(resourceSize, svgSize, resourcePoint)]
+      })
+    }
+  })
+
   let svgPositionCoordinates = $derived.by(() => {
     if (resourceSize && svgSize && resourcePositionCoordinates) {
       return svgCoordinates(resourceSize, svgSize, resourcePositionCoordinates)
@@ -147,7 +164,7 @@
             height={width * devicePixelRatio}
           />
         </div>
-        {#if svgSize && svgPositionCoordinates}
+        {#if svgSize && (svgPositionCoordinates || resourceRouteCoordinates || resourceMarkerCoordinates?.length)}
           <div
             class="group absolute top-0 w-full h-full flex items-center justify-center"
           >
@@ -170,22 +187,38 @@
                   stroke-width="0.6"
                 />
               {/if}
-              <g
-                class="opacity-90 delay-300 transition-opacity group-hover:opacity-0"
-              >
+              {#each resourceMarkerCoordinates || [] as markerCoordinates}
                 <circle
-                  cx={svgPositionCoordinates[0]}
-                  cy={svgPositionCoordinates[1]}
+                  cx={markerCoordinates[0]}
+                  cy={markerCoordinates[1]}
                   r={pinRadius}
                   fill="white"
                 />
                 <circle
-                  cx={svgPositionCoordinates[0]}
-                  cy={svgPositionCoordinates[1]}
+                  cx={markerCoordinates[0]}
+                  cy={markerCoordinates[1]}
                   r={pinRadius * 0.5}
-                  fill={pink}
+                  fill={red}
                 />
-              </g>
+              {/each}
+              {#if svgPositionCoordinates}
+                <g
+                  class="opacity-90 delay-300 transition-opacity group-hover:opacity-0"
+                >
+                  <circle
+                    cx={svgPositionCoordinates[0]}
+                    cy={svgPositionCoordinates[1]}
+                    r={pinRadius}
+                    fill="white"
+                  />
+                  <circle
+                    cx={svgPositionCoordinates[0]}
+                    cy={svgPositionCoordinates[1]}
+                    r={pinRadius * 0.5}
+                    fill={pink}
+                  />
+                </g>
+              {/if}
             </svg>
             {#if pinOriginPosition}
               <div
