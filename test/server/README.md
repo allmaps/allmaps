@@ -12,6 +12,23 @@ Vite serves the fixture endpoints on port `5506`, using the `iiif` entry in
 Every endpoint is available under either `/cors` or `/no-cors`. The `/cors`
 variant sends permissive CORS headers, while `/no-cors` omits them.
 
+## Railway deployment
+
+This app uses `@sveltejs/adapter-node` and can be deployed on Railway with the
+root `railway.toml` config-as-code file.
+
+When creating the Railway service from this monorepo, use `/railway.toml` as the
+service config file if Railway does not pick it up automatically. The config
+uses Railpack and runs:
+
+```sh
+pnpm turbo run build --filter=@allmaps/test-iiif-server...
+pnpm --filter @allmaps/test-iiif-server start
+```
+
+Railway provides the `PORT` environment variable, which the SvelteKit node
+adapter reads automatically.
+
 Useful endpoints:
 
 ```text
@@ -31,6 +48,9 @@ GET /cors/manifests/3/:imageId/navplace-midpoint.json
 GET /cors/manifests/3/:imageId/navplace-bbox.json
 GET /cors/manifests/2/:imageId/missing-service.json
 GET /cors/manifests/3/:imageId/bad-service-type.json
+GET /cors/manifests/3/:imageId/embedded-annotation-missing-target.json
+GET /cors/manifests/3/:imageId/embedded-annotation-one-gcp.json
+GET /cors/manifests/3/:imageId/embedded-annotation-mixed-errors.json
 ```
 
 The image endpoint supports `full`, pixel, and percentage regions; `full`,
@@ -42,8 +62,9 @@ handling tests. The root page groups these under “Resources with errors” in
 both the CORS and no-CORS columns.
 
 The IIIF 3 manifest variants include one manifest with the georeference
-annotation embedded on the canvas, and two `navPlace` manifests using either
-the midpoint or bounding box of the transformed geographic mask.
+annotation embedded on the canvas, three incorrect embedded annotation
+manifests, and two `navPlace` manifests using either the midpoint or bounding
+box of the transformed geographic mask.
 
 ## Importing fixtures
 

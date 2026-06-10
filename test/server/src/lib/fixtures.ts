@@ -1,6 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 export type ImageFixtureMetadata = {
   id?: string
@@ -34,16 +33,18 @@ export type ImageFixtureDefinition = {
   originalManifestPath?: string
 }
 
-const rootDirectory = dirname(fileURLToPath(import.meta.url))
-
-export const fixturesDirectory = join(
-  rootDirectory,
-  '..',
-  '..',
-  'static',
+const sourceFixturesDirectory = join(process.cwd(), 'static', 'iiif', 'images')
+const builtFixturesDirectory = join(
+  process.cwd(),
+  'build',
+  'client',
   'iiif',
   'images'
 )
+
+export const fixturesDirectory = existsSync(sourceFixturesDirectory)
+  ? sourceFixturesDirectory
+  : builtFixturesDirectory
 
 export function getFixtureDirectory(imageId: string) {
   return join(fixturesDirectory, imageId)

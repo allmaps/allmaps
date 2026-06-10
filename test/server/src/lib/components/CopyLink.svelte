@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from '$app/environment'
   import { onDestroy } from 'svelte'
   import { Check as CheckIcon, Copy as CopyIcon } from 'phosphor-svelte'
 
@@ -35,7 +36,9 @@
   }
 
   onDestroy(() => {
-    window.clearTimeout(copyTimeout)
+    if (browser) {
+      window.clearTimeout(copyTimeout)
+    }
   })
 </script>
 

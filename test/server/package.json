@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port $(../../port.js iiif) --host",
+    "build": "vite build",
+    "start": "node build",
     "import": "node scripts/import.ts",
     "types": "svelte-kit sync && tsc --noEmit",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
