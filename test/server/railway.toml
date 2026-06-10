@@ -1,0 +1,26 @@
+"$schema" = "https://railway.com/railway.schema.json"
+
+[build]
+builder = "RAILPACK"
+buildCommand = "pnpm turbo run build --filter=@allmaps/test-iiif-server..."
+watchPatterns = [
+  "test/server/**",
+  "packages/annotation/**",
+  "packages/iiif-parser/**",
+  "packages/id/**",
+  "packages/transform/**",
+  "packages/stdlib/**",
+  "packages/types/**",
+  "packages/schemas/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "turbo.json",
+  "tsconfig.base.json",
+]
+
+[deploy]
+startCommand = "pnpm --filter @allmaps/test-iiif-server start"
+healthcheckPath = "/"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
