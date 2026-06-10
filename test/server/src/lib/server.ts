@@ -708,29 +708,92 @@ function getOutputDimensions(region: Region, size: Size | undefined) {
 
 function createWatermark(output: { width: number; height: number }) {
   const label =
-    output.width < 240 ? 'Scaled-down copy' : 'Scaled-down copy of original'
-  const fontSize = Math.max(12, Math.min(22, Math.round(output.width / 32)))
-  const paddingX = Math.max(8, Math.round(fontSize * 0.7))
-  const paddingY = Math.max(5, Math.round(fontSize * 0.45))
-  const textWidth = Math.ceil(label.length * fontSize * 0.56)
-  const width = Math.min(output.width, textWidth + paddingX * 2)
-  const height = fontSize + paddingY * 2
+    output.width < 240 ? 'SCALED-DOWN COPY' : 'SCALED-DOWN COPY OF ORIGINAL'
+  const pixelSize = Math.max(1, Math.min(3, Math.floor(output.width / 260)))
+  const paddingX = Math.max(6, pixelSize * 5)
+  const paddingY = Math.max(5, pixelSize * 4)
+  const letterGap = pixelSize
+  const spaceWidth = pixelSize * 3
+  const glyphHeight = pixelSize * 7
+  const logoSize = Math.max(10, pixelSize * 9)
+  const contentHeight = Math.max(glyphHeight, logoSize)
+  const logoX = paddingX
+  const logoY = paddingY + Math.round((contentHeight - logoSize) / 2)
+  const glyphY = paddingY + Math.round((contentHeight - glyphHeight) / 2)
+  let cursorX = paddingX + logoSize + pixelSize * 4
+  const rects: string[] = []
+
+  for (const character of label) {
+    if (character === ' ') {
+      cursorX += spaceWidth
+      continue
+    }
+
+    const glyph = watermarkGlyphs[character]
+
+    if (!glyph) {
+      continue
+    }
+
+    for (const [rowIndex, row] of glyph.entries()) {
+      for (const [columnIndex, value] of [...row].entries()) {
+        if (value === '1') {
+          rects.push(
+            `<rect x="${cursorX + columnIndex * pixelSize}" y="${
+              glyphY + rowIndex * pixelSize
+            }" width="${pixelSize}" height="${pixelSize}"/>`
+          )
+        }
+      }
+    }
+
+    cursorX += glyph[0].length * pixelSize + letterGap
+  }
+
+  const width = Math.min(output.width, cursorX + paddingX - letterGap)
+  const height = contentHeight + paddingY * 2
 
   return Buffer.from(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
       <rect width="100%" height="100%" fill="black" fill-opacity="0.58"/>
-      <text
-        x="${width - paddingX}"
-        y="${paddingY + fontSize * 0.78}"
-        fill="white"
-        fill-opacity="0.92"
-        font-family="Arial, Helvetica, sans-serif"
-        font-size="${fontSize}"
-        font-weight="700"
-        text-anchor="end"
-      >${label}</text>
+      <g fill="white" fill-opacity="0.92">
+        ${createWatermarkLogo(logoX, logoY, logoSize)}
+        ${rects.join('')}
+      </g>
     </svg>
   `)
+}
+
+function createWatermarkLogo(x: number, y: number, size: number) {
+  return `
+    <svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 1440 1440">
+      <polygon points="1275.2,1031.6 720,1359.5 164.9,1031.7 230.3,993 720,1282.2 1209.8,993"/>
+      <polygon points="1275.2,875.8 720,1203.7 164.8,875.8 230.2,837.2 720,1126.4 1209.8,837.2"/>
+      <polygon points="1275.2,720 720,1047.9 164.8,720 230.2,681.4 720,970.5 1209.8,681.4"/>
+      <polygon points="1275.1,564.2 1209.7,602.8 1143.2,642.1 720,892 296.7,642.1 230.2,602.8 164.8,564.2 230.2,525.5 720,814.7 1209.7,525.5"/>
+      <path d="M720,80.5L164.8,408.4L720,736.2l555.1-327.9L720,80.5z M676.6,639.9l-93.5-54l68.6-71.1L513.6,435l-122.7,39.8l-93.5-54l608-178.7l80.6,46.5L676.6,639.9z"/>
+      <polygon points="827.2,334.1 705.9,459.1 610.5,404"/>
+    </svg>
+  `
+}
+
+const watermarkGlyphs: Record<string, string[]> = {
+  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+  C: ['01111', '10000', '10000', '10000', '10000', '10000', '01111'],
+  D: ['11110', '10001', '10001', '10001', '10001', '10001', '11110'],
+  E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+  F: ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+  G: ['01111', '10000', '10000', '10011', '10001', '10001', '01111'],
+  I: ['11111', '00100', '00100', '00100', '00100', '00100', '11111'],
+  L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+  N: ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+  O: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+  P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+  R: ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+  S: ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+  W: ['10001', '10001', '10001', '10101', '10101', '10101', '01010'],
+  Y: ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+  '-': ['00000', '00000', '00000', '11111', '00000', '00000', '00000']
 }
 
 function getScaleFactors(image: ImageFixture) {
