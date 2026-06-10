@@ -2,11 +2,13 @@ import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import { createAuth } from '@allmaps/db/auth'
+import type { Db } from '@allmaps/db'
 import type { RestEnv } from '@allmaps/env/rest'
 import {
   normalizeOrganizationSlug,
   normalizeHomepageUrl,
   normalizeDomains,
+  normalizeOrganizationLocation,
   listOrganizations,
   listOrganizationsWithUsers,
   listOrganizationsWithUsersByOrganizationIds,
@@ -38,6 +40,14 @@ const OrganizationBody = t.Object({
   logo: t.Optional(t.Nullable(t.String())),
   homepage: t.Optional(t.Nullable(t.String())),
   plan: t.Optional(t.Nullable(t.UnionEnum(['supporter', 'innovator']))),
+  location: t.Optional(
+    t.Nullable(
+      t.Object({
+        type: t.Literal('Point'),
+        coordinates: t.Tuple([t.Number(), t.Number()])
+      })
+    )
+  ),
   domains: t.Optional(t.Array(t.String()))
 })
 
@@ -58,6 +68,11 @@ const organizationMutationDetail = {
   'x-badges': [{ name: 'Admin or paid organization member', color: '#df0' }]
 }
 
+const organizationsQuerySchema = t.Object({
+  limit: t.Optional(t.Number()),
+  plan: t.Optional(t.Array(t.UnionEnum(['supporter', 'innovator'])))
+})
+
 async function createIiifFromBody<T>(
   body: CreateIiifBody,
   create: (url: string) => Promise<T>
@@ -67,6 +82,68 @@ async function createIiifFromBody<T>(
   }
 
   return create(body.url)
+}
+
+async function listOrganizationsForRequest({
+  auth,
+  db,
+  env,
+  request,
+  set
+}: {
+  auth: BetterAuthContext['auth']
+  db: Db
+  env: RestEnv
+  request: Request
+  set: { headers: Record<string, string | number> }
+}) {
+  const queryParams = normalizeOrganizationsQueryParams(request)
+  const session = await auth.api.getSession({ headers: request.headers })
+
+  if (session?.user.role === 'admin') {
+    setCacheControl(set, 'private-no-store')
+    return listOrganizationsWithUsers(db, env.PUBLIC_REST_BASE_URL, {
+      ...queryParams,
+      userRole: 'admin'
+    })
+  }
+
+  if (session?.user.id) {
+    const organizationIds = await queryOrganizationIdsByUserId(
+      db,
+      session.user.id
+    )
+
+    if (organizationIds.length > 0) {
+      setCacheControl(set, 'private-no-store')
+      return listOrganizationsWithUsersByOrganizationIds(
+        db,
+        env.PUBLIC_REST_BASE_URL,
+        organizationIds,
+        { ...queryParams, userRole: 'user' }
+      )
+    }
+  }
+
+  setCacheControl(set, 'public-medium')
+  return listOrganizations(db, env.PUBLIC_REST_BASE_URL, queryParams)
+}
+
+function organizationsToGeojson(
+  organizations: Awaited<ReturnType<typeof listOrganizationsForRequest>>
+) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: organizations.map((organization) => {
+      const { location, ...properties } = organization
+
+      return {
+        type: 'Feature' as const,
+        properties,
+        geometry: location ?? null
+      }
+    })
+  }
 }
 
 export function createOrganizationsRoutes(
@@ -81,43 +158,25 @@ export function createOrganizationsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/organizations',
-      async ({ db, env, request, set }) => {
-        const queryParams = normalizeOrganizationsQueryParams(request)
-        const session = await auth.api.getSession({ headers: request.headers })
-        if (session?.user.role === 'admin') {
-          setCacheControl(set, 'private-no-store')
-          return listOrganizationsWithUsers(db, env.PUBLIC_REST_BASE_URL, {
-            ...queryParams,
-            userRole: 'admin'
-          })
-        }
-
-        if (session?.user.id) {
-          const organizationIds = await queryOrganizationIdsByUserId(
-            db,
-            session.user.id
-          )
-
-          if (organizationIds.length > 0) {
-            setCacheControl(set, 'private-no-store')
-            return listOrganizationsWithUsersByOrganizationIds(
-              db,
-              env.PUBLIC_REST_BASE_URL,
-              organizationIds,
-              { ...queryParams, userRole: 'user' }
-            )
-          }
-        }
-
-        setCacheControl(set, 'public-medium')
-        return listOrganizations(db, env.PUBLIC_REST_BASE_URL, queryParams)
-      },
+      async ({ db, env, request, set }) =>
+        listOrganizationsForRequest({ auth, db, env, request, set }),
       {
-        query: t.Object({
-          limit: t.Optional(t.Number()),
-          plan: t.Optional(t.Array(t.UnionEnum(['supporter', 'innovator'])))
-        }),
+        query: organizationsQuerySchema,
         detail: { summary: 'Get all organizations', tags: ['Organizations'] }
+      }
+    )
+    .get(
+      '/organizations.geojson',
+      async ({ db, env, request, set }) =>
+        organizationsToGeojson(
+          await listOrganizationsForRequest({ auth, db, env, request, set })
+        ),
+      {
+        query: organizationsQuerySchema,
+        detail: {
+          summary: 'Get all organizations as GeoJSON',
+          tags: ['Organizations']
+        }
       }
     )
     .get(
@@ -406,12 +465,21 @@ export function createOrganizationsRoutes(
           })
         }
 
+        const validLocation = normalizeOrganizationLocation(body.location)
+        if (body.location !== undefined && validLocation === undefined) {
+          return status(400, {
+            error:
+              'Invalid location. Use a GeoJSON Point with [longitude, latitude] coordinates.'
+          })
+        }
+
         const organization = await createOrganization(
           db,
           env.PUBLIC_REST_BASE_URL,
           {
             ...body,
             homepage: validHomepage,
+            location: validLocation,
             slug: validSlug,
             domains: validDomains
           }
@@ -472,6 +540,14 @@ export function createOrganizationsRoutes(
           })
         }
 
+        const validLocation = normalizeOrganizationLocation(body.location)
+        if (body.location !== undefined && validLocation === undefined) {
+          return status(400, {
+            error:
+              'Invalid location. Use a GeoJSON Point with [longitude, latitude] coordinates.'
+          })
+        }
+
         const { domains, ...patch } = body
         const organization = await updateOrganization(
           db,
@@ -480,6 +556,7 @@ export function createOrganizationsRoutes(
           {
             ...patch,
             ...(body.homepage !== undefined ? { homepage: validHomepage } : {}),
+            ...(body.location !== undefined ? { location: validLocation } : {}),
             ...(validSlug !== undefined ? { slug: validSlug } : {})
           },
           domains !== undefined ? validDomains : undefined

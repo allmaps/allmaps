@@ -9,6 +9,10 @@ import type { UserRole } from './shared/limits.js'
 export type IntersectsWith = [number, number] | [number, number, number, number]
 export type ContainedBy = [number, number, number, number]
 export type OrganizationPlan = 'supporter' | 'innovator'
+export type OrganizationLocation = {
+  type: 'Point'
+  coordinates: [number, number]
+}
 
 export type OrganizationsQueryParams = {
   limit: number
