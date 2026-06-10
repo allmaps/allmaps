@@ -41,6 +41,42 @@ const createOrganizationSchema = z.object({
   slug: slugSchema
 }) satisfies z.ZodType<CreateOrganizationInput>
 
+function parseLocationInput(value: string) {
+  const location = value.trim()
+
+  if (!location) {
+    return null
+  }
+
+  const coordinates = location
+    .split(/[,\s]+/)
+    .filter(Boolean)
+    .map(Number)
+
+  if (coordinates.length !== 2) {
+    throw new Error('Invalid location. Use Latitude, longitude.')
+  }
+
+  const [latitude, longitude] = coordinates
+  const isLatitude = (coordinate: number) =>
+    Number.isFinite(coordinate) && coordinate >= -90 && coordinate <= 90
+  const isLongitude = (coordinate: number) =>
+    Number.isFinite(coordinate) && coordinate >= -180 && coordinate <= 180
+
+  if (!isLatitude(latitude)) {
+    throw new Error('Invalid latitude. Enter location as Latitude, longitude.')
+  }
+
+  if (!isLongitude(longitude)) {
+    throw new Error('Invalid longitude. Enter location as Latitude, longitude.')
+  }
+
+  return {
+    type: 'Point' as const,
+    coordinates: [longitude, latitude] as [number, number]
+  }
+}
+
 const updateOrganizationFormSchema = z.object({
   organizationId: organizationIdSchema,
   name: z.string().trim().min(1),
@@ -52,6 +88,7 @@ const updateOrganizationFormSchema = z.object({
   plan: z
     .union([z.enum(['supporter', 'innovator']), z.literal('')])
     .transform((value) => value || null),
+  location: z.string().transform(parseLocationInput),
   domains: z.string().transform((value) =>
     value
       .split('\n')

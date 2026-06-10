@@ -4,6 +4,10 @@ export type Organization = {
   slug: string
   logo?: string | null
   homepage?: string | null
+  location?: {
+    type: 'Point'
+    coordinates: [number, number]
+  } | null
   createdAt: string
   domains: string[]
   plan: 'supporter' | 'innovator' | null
