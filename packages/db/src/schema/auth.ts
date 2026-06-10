@@ -4,10 +4,16 @@ import {
   text,
   timestamp,
   boolean,
+  jsonb,
   index,
   check,
   uniqueIndex
 } from 'drizzle-orm/pg-core'
+
+export type OrganizationLocation = {
+  type: 'Point'
+  coordinates: [number, number]
+}
 
 export const users = pgTable(
   'users',
@@ -111,7 +117,8 @@ export const organizations = pgTable(
     createdAt: timestamp('created_at').notNull(),
     metadata: text('metadata'),
     homepage: text('homepage'),
-    plan: text('plan')
+    plan: text('plan'),
+    location: jsonb('location').$type<OrganizationLocation>()
   },
   (table) => [
     uniqueIndex('organizations_slug_uidx').on(table.slug),

@@ -24,19 +24,22 @@
   const organizationQuery = $derived(getOrganization(organizationId))
   const organization = $derived(organizationQuery.current ?? null)
   const isLoadingOrganization = $derived(
-    !organizationQuery.ready || organizationQuery.loading
+    !organization && (!organizationQuery.ready || organizationQuery.loading)
   )
   const loadError = $derived(
-    organizationQuery.error ??
-      (organizationQuery.ready && !organization
-        ? new Error('Organization not found')
-        : null)
+    !organization
+      ? (organizationQuery.error ??
+          (organizationQuery.ready
+            ? new Error('Organization not found')
+            : null))
+      : null
   )
 
   let editOrgName = $state('')
   let editOrgSlug = $state('')
   let editHomepage = $state('')
   let editPlan = $state<'supporter' | 'innovator' | ''>('')
+  let editLocation = $state('')
   let editDomains = $state<string[]>([])
   let error = $state<string | null>(null)
   let initializedOrganizationId = $state<string | null>(null)
@@ -119,6 +122,12 @@
     editOrgSlug = nextOrganization.slug
     editHomepage = nextOrganization.homepage ?? ''
     editPlan = nextOrganization.plan ?? ''
+    editLocation = nextOrganization.location
+      ? [
+          nextOrganization.location.coordinates[1],
+          nextOrganization.location.coordinates[0]
+        ].join(', ')
+      : ''
     editDomains = nextOrganization.domains ?? []
     initializedOrganizationId = organizationId
   }
@@ -130,6 +139,7 @@
     editOrgSlug = ''
     editHomepage = ''
     editPlan = ''
+    editLocation = ''
     editDomains = []
     initializedOrganizationId = null
   })
@@ -360,6 +370,24 @@
           </label>
           <AppSelect bind:value={editPlan} items={planItems} />
           <input type="hidden" name="plan" value={editPlan} />
+        </div>
+
+        <div>
+          <label
+            for="orgLocation"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Location
+          </label>
+          <input
+            id="orgLocation"
+            type="text"
+            inputmode="decimal"
+            name="location"
+            bind:value={editLocation}
+            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Latitude, longitude"
+          />
         </div>
 
         <div>

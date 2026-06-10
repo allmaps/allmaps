@@ -50,6 +50,8 @@ export {
   normalizeHomepageUrl,
   normalizeDomain,
   normalizeDomains,
+  normalizeOrganizationLocation,
+  organizationLocationGeographySql,
   fromDbOrganization,
   fromDbOrganizationWithUsers,
   queryOrganizationUrls,

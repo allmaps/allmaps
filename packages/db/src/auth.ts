@@ -88,6 +88,11 @@ export function createAuth(env: BetterAuthEnv) {
                 type: 'string',
                 required: false,
                 input: true
+              },
+              location: {
+                type: 'json',
+                required: false,
+                input: true
               }
             }
           }

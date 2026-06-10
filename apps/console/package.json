@@ -48,6 +48,7 @@
     "@allmaps/ui": "workspace:^",
     "better-auth": "catalog:",
     "bits-ui": "catalog:",
+    "phosphor-svelte": "^3.0.1",
     "zod": "catalog:"
   }
 }
