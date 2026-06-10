@@ -24,13 +24,15 @@
   const organizationQuery = $derived(getOrganization(organizationId))
   const organization = $derived(organizationQuery.current ?? null)
   const isLoadingOrganization = $derived(
-    !organizationQuery.ready || organizationQuery.loading
+    !organization && (!organizationQuery.ready || organizationQuery.loading)
   )
   const loadError = $derived(
-    organizationQuery.error ??
-      (organizationQuery.ready && !organization
-        ? new Error('Organization not found')
-        : null)
+    !organization
+      ? (organizationQuery.error ??
+          (organizationQuery.ready
+            ? new Error('Organization not found')
+            : null))
+      : null
   )
 
   let editOrgName = $state('')

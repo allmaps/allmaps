@@ -35,7 +35,7 @@
   )
   const organizations = $derived(organizationsQuery?.current ?? [])
   const isLoadingUser = $derived(
-    userQuery ? !userQuery.ready || userQuery.loading : false
+    userQuery ? !user && (!userQuery.ready || userQuery.loading) : false
   )
   const isLoadingOrganizations = $derived(
     organizationsQuery
@@ -43,8 +43,10 @@
       : false
   )
   const loadError = $derived(
-    userQuery?.error ??
-      (userQuery?.ready && !user ? new Error('User not found') : null)
+    !user
+      ? (userQuery?.error ??
+          (userQuery?.ready ? new Error('User not found') : null))
+      : null
   )
 
   const userOrganizations = $derived(user?.organizations ?? [])
