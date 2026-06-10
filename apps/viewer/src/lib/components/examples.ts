@@ -13,19 +13,6 @@ export default [
     allmapsId: 'manifests/631b96e4d6d3f421'
   },
   {
-    title: 'Watergraafs of Diemer-meer',
-    organization: 'Delft University of Technology Library',
-    url: 'https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a',
-    allmapsId: 'manifests/a0d6d3379cfd9f0a'
-  },
-  {
-    title:
-      'Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide',
-    organization: 'Library of Congress',
-    url: 'https://annotations.allmaps.org/images/7f2494dd1ad9ed7a',
-    allmapsId: 'images/7f2494dd1ad9ed7a'
-  },
-  {
     title: 'Atlas of the city of Lynn, Massachusetts',
     organization: 'Leventhal Map & Education Center',
     url: 'https://annotations.allmaps.org/manifests/23379602e8187445',
@@ -83,6 +70,19 @@ export default [
     allmapsId: 'manifests/071c6ba31f9c88d4'
   },
   {
+    title: 'Watergraafs of Diemer-meer',
+    organization: 'Delft University of Technology Library',
+    url: 'https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a',
+    allmapsId: 'manifests/a0d6d3379cfd9f0a'
+  },
+  {
+    title:
+      'Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide',
+    organization: 'Library of Congress',
+    url: 'https://annotations.allmaps.org/images/7f2494dd1ad9ed7a',
+    allmapsId: 'images/7f2494dd1ad9ed7a'
+  },
+  {
     title: 'Phnom-Penh',
     organization: 'Bibliothèque nationale de France',
     url: 'https://annotations.allmaps.org/maps/86029c1bf591ecd8',
@@ -93,6 +93,30 @@ export default [
     organization: 'National Library of Scotland',
     url: 'https://annotations.allmaps.org/maps/d9474a8524a4309d',
     allmapsId: 'maps/d9474a8524a4309d'
+  },
+  {
+    title: 'Nirenstein Atlas, Hollywood, 1956',
+    organization: 'Los Angeles Public Library',
+    url: 'https://annotations.allmaps.org/manifests/64d6e35b64564692',
+    allmapsId: 'manifests/64d6e35b64564692'
+  },
+  {
+    title: 'San Francisco Model',
+    organization: 'David Rumsey Map Collection',
+    url: 'https://annotations.allmaps.org/manifests/085e15806bb30c5d',
+    allmapsId: 'manifests/085e15806bb30c5d'
+  },
+  {
+    title: 'Riool- en Huisnummerkaart Utrecht 1938-1940',
+    organization: 'Het Utrechts Archief',
+    url: 'https://annotations.allmaps.org/manifests/a35b2badba5505ab',
+    allmapsId: 'manifests/a35b2badba5505ab'
+  },
+  {
+    title: 'No.14. Europa : Geologie, Tektonic',
+    organization: 'David Rumsey Map Collection',
+    url: 'https://annotations.allmaps.org/images/f6033bee94f7763e',
+    allmapsId: 'images/f6033bee94f7763e'
   }
 
   // https://sammeltassen.nl/iiif-manifests/allmaps/top25-1.json

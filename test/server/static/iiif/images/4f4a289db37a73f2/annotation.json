@@ -1,0 +1,144 @@
+{
+  "id": "http://localhost:5506/cors/annotations/images/4f4a289db37a73f2.json",
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/176f66a6e5793f18.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2023-03-03T18:50:45.436Z",
+      "modified": "2023-05-05T08:47:02.530Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/4f4a289db37a73f2",
+          "type": "ImageService2",
+          "height": 2007,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/4f4a289db37a73f2.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": ["N.39 Buurt Z 1ste blad"]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/4f4a289db37a73f2.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": [
+                      "Atlas van de gemeente Amsterdam : bevattende de grondteekening van alle gebouwen met de tegenwoordige nommering, en onderscheiding van gemeente-eigendommen, publieke en bijzondere gebouwen, woon- en pakhuizen : in 101 kaarten / naar officiële bronnen bewerkt; [schaal 1:1.250]"
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": ["Universiteitsbibliotheek VU"]
+              },
+              "homepage": [
+                {
+                  "id": "https://researchworks.oclc.org/iiif-explorer/search?q=collection.id%3Ahttps%3A%2F%2Fresearchworks.oclc.org%2Fdigital%2Fdataset%2F21033_krt"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"2007\"><polygon points=\"2431.283,408.924 2437.009,789.224 2241.492,794.949 2233.312,1818.895 726.44,1780.456 492.474,1690.493 663.449,1222.683 544.012,1165.434 463.024,1106.549 631.545,506.248 670.812,376.21\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1618.946, 1408.335]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.901438113372573, 52.35972234659829]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [786.158, 918.444]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.897311200770118, 52.36028303602973]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [580.007, 917.626]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.896443127057443, 52.36011583389947]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [1338.351, 626.472]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.899214703581, 52.361487925137254]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [616.001, 786.77]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [4.896416847794209, 52.36048779491827]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/176f66a6e5793f18.json",
+          "version": "https://annotations.allmaps.org/maps/176f66a6e5793f18@aa183883016c910c",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/4f4a289db37a73f2.json",
+            "version": "https://annotations.allmaps.org/images/4f4a289db37a73f2@b86742996f3a32fb",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/a1fa0d2823dd1a70",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/abf95dbd1b667133"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 1.2224,
+          "area": 216106.73
+        }
+      }
+    }
+  ]
+}

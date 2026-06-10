@@ -1,10 +1,13 @@
 <script lang="ts">
   import { getUiState } from '$lib/state/ui.svelte'
 
-  import { Modal, Logo } from '@allmaps/components'
+  import { Modal, Logo, MovingMapsBackground } from '@allmaps/components'
 
-  import AboutBackground from '$lib/components/AboutBackground.svelte'
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
+  import { getViewerUrl } from '$lib/shared/urls.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
+
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   let allmapsEditorVersion = $state<string>()
 
@@ -16,11 +19,20 @@
   }
 
   const uiState = getUiState()
+  const varsState = getVarsState<EditorPublicEnv>()
+
+  const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
+  const mapsApiBaseUrl = varsState.PUBLIC_REST_BASE_URL
+  const viewerBaseUrl = varsState.PUBLIC_VIEWER_BASE_URL
 </script>
 
 <Modal bind:open={uiState.modalOpen.about}>
   {#snippet background()}
-    <AboutBackground />
+    <MovingMapsBackground
+      {mapsApiBaseUrl}
+      href={(id) =>
+        getViewerUrl(viewerBaseUrl, annotationsApiBaseUrl, id, true)}
+    />
   {/snippet}
 
   {#snippet title()}

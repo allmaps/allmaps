@@ -4,9 +4,9 @@ import { generateChecksum } from '@allmaps/id/sync'
 
 import { searchParams } from '$lib/shared/params.js'
 
-import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap, PartOfItem } from '@allmaps/annotation'
 
-import type { Source } from '$lib/types/shared.js'
+import type { MapsHierarchy, Source } from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
 import type { UiState } from '$lib/state/ui.svelte.js'
@@ -20,6 +20,8 @@ export class SourceState {
   #source = $state<Source | undefined>()
 
   #maps = $derived(this.#getMapsFromSource(this.#source))
+
+  #mapsHierarchy = $derived(this.#getMapsHierarchy(this.#maps))
 
   #previousMapId = $derived.by(() => {
     const currentMapId = this.#urlState.params.mapId
@@ -90,9 +92,107 @@ export class SourceState {
     return []
   }
 
+  #getMapsHierarchy(maps: GeoreferencedMap[]): MapsHierarchy {
+    type ByResource = Map<
+      string,
+      { resource: GeoreferencedMap['resource']; maps: GeoreferencedMap[] }
+    >
+    type ByCanvas = Map<string, { canvas: PartOfItem; byResource: ByResource }>
+
+    const byManifest = new Map<
+      string,
+      { manifest: PartOfItem; byCanvas: ByCanvas }
+    >()
+    const byCanvasOnly = new Map<
+      string,
+      { canvas: PartOfItem; byResource: ByResource }
+    >()
+    const byResourceOnly: ByResource = new Map()
+
+    const addToResource = (byResource: ByResource, map: GeoreferencedMap) => {
+      const id = map.resource.id
+      if (!byResource.has(id)) {
+        byResource.set(id, { resource: map.resource, maps: [] })
+      }
+      byResource.get(id)!.maps.push(map)
+    }
+
+    for (const map of maps) {
+      const canvasItems = (map.resource.partOf ?? []).filter(
+        (item) => item.type === 'Canvas'
+      )
+
+      if (canvasItems.length === 0) {
+        addToResource(byResourceOnly, map)
+      } else {
+        for (const canvas of canvasItems) {
+          const manifestItems = (canvas.partOf ?? []).filter(
+            (item) => item.type === 'Manifest'
+          )
+
+          if (manifestItems.length === 0) {
+            if (!byCanvasOnly.has(canvas.id)) {
+              byCanvasOnly.set(canvas.id, { canvas, byResource: new Map() })
+            }
+            addToResource(byCanvasOnly.get(canvas.id)!.byResource, map)
+          } else {
+            for (const manifest of manifestItems) {
+              if (!byManifest.has(manifest.id)) {
+                byManifest.set(manifest.id, { manifest, byCanvas: new Map() })
+              }
+              const manifestEntry = byManifest.get(manifest.id)!
+
+              if (!manifestEntry.byCanvas.has(canvas.id)) {
+                manifestEntry.byCanvas.set(canvas.id, {
+                  canvas,
+                  byResource: new Map()
+                })
+              }
+              addToResource(
+                manifestEntry.byCanvas.get(canvas.id)!.byResource,
+                map
+              )
+            }
+          }
+        }
+      }
+    }
+
+    const result: MapsHierarchy = {}
+
+    if (byManifest.size > 0) {
+      result.mapsByManifest = [...byManifest.values()].map(
+        ({ manifest, byCanvas }) => ({
+          manifest,
+          mapsByCanvas: [...byCanvas.values()].map(
+            ({ canvas, byResource }) => ({
+              canvas,
+              mapsByImage: [...byResource.values()]
+            })
+          )
+        })
+      )
+    }
+
+    if (byCanvasOnly.size > 0) {
+      result.mapsByCanvas = [...byCanvasOnly.values()].map(
+        ({ canvas, byResource }) => ({
+          canvas,
+          mapsByImage: [...byResource.values()]
+        })
+      )
+    }
+
+    if (byResourceOnly.size > 0) {
+      result.mapsByImage = [...byResourceOnly.values()]
+    }
+
+    return result
+  }
+
   set source(source: Source | undefined) {
     this.#uiState.reset()
-
+    // this.#urlState.params.mapId = undefined
     this.#source = source
   }
 
@@ -114,6 +214,10 @@ export class SourceState {
 
   get nextMapId() {
     return this.#nextMapId
+  }
+
+  get mapsHierarchy() {
+    return this.#mapsHierarchy
   }
 }
 

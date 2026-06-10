@@ -1,0 +1,16 @@
+{
+  "id": "5005dbd7e344f975",
+  "label": "Atlas der Neederlanden - Oudeland van Diependorst door Heyman van Dyck, uitgave 1701",
+  "imageLabel": "Oudeland van Diependorst door Heyman van Dyck, uitgave 1701",
+  "manifestLabel": "Atlas der Neederlanden",
+  "width": 2500,
+  "height": 1808,
+  "originalWidth": 8237,
+  "originalHeight": 5957,
+  "originalAnnotationUrl": "https://annotations.allmaps.org/maps/0450bef8668f4982",
+  "originalManifestUrl": "https://sammeltassen.nl/iiif-manifests/uva/atlas-der-neederlanden.json",
+  "originalImageService": "https://data.4tu.nl/iiif/v3/589aae3e-5e5a-4610-b190-8891c22c19d6",
+  "originalImageRequest": "https://data.4tu.nl/iiif/v3/589aae3e-5e5a-4610-b190-8891c22c19d6/full/2500,/0/default.jpg",
+  "institution": "4TU.ResearchData",
+  "institutionHomepage": "https://data.4tu.nl/"
+}

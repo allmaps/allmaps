@@ -5,6 +5,13 @@
     baseUrl: string
   }
 
+  type FilesManifest = {
+    files: {
+      filename: string
+      size: number
+    }[]
+  }
+
   const { baseUrl }: Props = $props()
 
   const files = $state([
@@ -38,26 +45,25 @@
   ])
 
   onMount(() => {
-    files.forEach((file, index) => {
-      const url = `${baseUrl}${file.filename}`
-      fetch(url, {
-        method: 'HEAD',
-        headers: {
-          // Cloudflare GZIPs plaintext and JSON files
-          // For these files, the Content-Length header
-          // will not be set.
-          // I've tried disabling compression by setting:
-          // 'Accept-Encoding': 'identify'
-          // However, this doesn't work.
-        }
-      }).then((response) => {
-        if (response.ok) {
-          const contentLength = response.headers.get('Content-Length')
-          files[index].size = Number(contentLength)
-        }
-      })
-    })
+    void loadFileSizes()
   })
+
+  async function loadFileSizes() {
+    const response = await fetch(`${baseUrl}files.json`).catch(() => undefined)
+
+    if (!response?.ok) {
+      return
+    }
+
+    const filesManifest = (await response.json()) as FilesManifest
+    const fileSizes = new Map(
+      filesManifest.files.map((file) => [file.filename, file.size])
+    )
+
+    files.forEach((file, index) => {
+      files[index].size = fileSizes.get(file.filename) ?? 0
+    })
+  }
 
   function formatSize(size: number) {
     return size ? `${Math.round(size / 1024 / 1024)} MB` : ''

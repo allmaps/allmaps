@@ -239,73 +239,77 @@
         })
       }
 
-      if (
-        geojsonRoute &&
-        geojsonRoute.route &&
-        resourceTransformerState.transformer
-      ) {
+      if (geojsonRoute && resourceTransformerState.transformer) {
         const transformer = resourceTransformerState.transformer
 
-        const projectedGeojsonRoute = transformer.transformToResource(
-          // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
-          geojsonRoute.route.coordinates.map(
-            (point): Point => [point[0], point[1]]
-          )
-        )
-        geojsonRouteFeature.setGeometry(
-          new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
-        )
-
-        const geojsonMarkerFeatures = geojsonRoute.markers.map((marker) => {
-          if (isGeojsonPoint(marker.geometry)) {
-            const projectedPoint = transformer.transformToResource(
-              // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
-              marker.geometry.coordinates as Point
+        if (geojsonRoute.route) {
+          const projectedGeojsonRoute = transformer.transformToResource(
+            // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
+            geojsonRoute.route.coordinates.map(
+              (point): Point => [point[0], point[1]]
             )
+          )
+          geojsonRouteFeature.setGeometry(
+            new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
+          )
+        } else {
+          geojsonRouteFeature.setGeometry(undefined)
+        }
 
-            let title: string | undefined
-            let image: string | undefined
-            let url: string | undefined
-            let description: string | undefined
+        const geojsonMarkerFeatures = geojsonRoute.markers.flatMap((marker) => {
+          if (!isGeojsonPoint(marker.geometry)) {
+            return []
+          }
 
-            if (marker.properties && typeof marker.properties === 'object') {
-              if (
-                'title' in marker.properties &&
-                typeof marker.properties.title === 'string'
-              ) {
-                title = marker.properties.title
-              }
+          const projectedPoint = transformer.transformToResource(
+            // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
+            marker.geometry.coordinates as Point
+          )
 
-              if (
-                'image' in marker.properties &&
-                typeof marker.properties.image === 'string'
-              ) {
-                image = marker.properties.image
-              }
+          let title: string | undefined
+          let image: string | undefined
+          let url: string | undefined
+          let description: string | undefined
 
-              if (
-                'description' in marker.properties &&
-                typeof marker.properties.description === 'string'
-              ) {
-                description = marker.properties.description
-              }
-
-              if (
-                'url' in marker.properties &&
-                typeof marker.properties.url === 'string'
-              ) {
-                url = marker.properties.url
-              }
+          if (marker.properties && typeof marker.properties === 'object') {
+            if (
+              'title' in marker.properties &&
+              typeof marker.properties.title === 'string'
+            ) {
+              title = marker.properties.title
             }
 
-            return new Feature({
+            if (
+              'image' in marker.properties &&
+              typeof marker.properties.image === 'string'
+            ) {
+              image = marker.properties.image
+            }
+
+            if (
+              'description' in marker.properties &&
+              typeof marker.properties.description === 'string'
+            ) {
+              description = marker.properties.description
+            }
+
+            if (
+              'url' in marker.properties &&
+              typeof marker.properties.url === 'string'
+            ) {
+              url = marker.properties.url
+            }
+          }
+
+          return [
+            new Feature({
               geometry: new OLPoint([projectedPoint[0], -projectedPoint[1]]),
               title,
               image,
               url,
               description
             })
-          }
+          ]
         })
 
         geojsonMarkersLayer.getSource()?.addFeatures(geojsonMarkerFeatures)

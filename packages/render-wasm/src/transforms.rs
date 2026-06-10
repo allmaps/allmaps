@@ -44,14 +44,11 @@ impl<'a> Transform<'a> {
         match self {
             Transform::Straight { tx, ty, scale } => (tx + scale * x, ty + scale * y),
 
-            Transform::Helmert { w0, w1, w2, w3 } => {
-                (w0 + w2 * x - w3 * y, w1 + w2 * y + w3 * x)
-            }
+            Transform::Helmert { w0, w1, w2, w3 } => (w0 + w2 * x - w3 * y, w1 + w2 * y + w3 * x),
 
-            Transform::Polynomial1 { wx, wy } => (
-                wx[0] + wx[1] * x + wx[2] * y,
-                wy[0] + wy[1] * x + wy[2] * y,
-            ),
+            Transform::Polynomial1 { wx, wy } => {
+                (wx[0] + wx[1] * x + wx[2] * y, wy[0] + wy[1] * x + wy[2] * y)
+            }
 
             Transform::Polynomial2 { wx, wy } => {
                 let rx =

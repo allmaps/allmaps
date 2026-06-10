@@ -1,0 +1,45 @@
+{
+  "name": "@allmaps/test-iiif-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port $(../../port.js iiif) --host",
+    "import": "node scripts/import.ts",
+    "types": "svelte-kit sync && tsc --noEmit",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
+    "format": "prettier --ignore-path ../../.gitignore --write ."
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "phosphor-svelte": "^3.0.1",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.4.0",
+    "@eslint/js": "^9.39.1",
+    "@sveltejs/adapter-node": "^5.3.3",
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/node": "catalog:",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.13.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4",
+    "prettier-plugin-svelte": "^3.4.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "svelte": "catalog:",
+    "svelte-check": "^4.3.4",
+    "tailwindcss": "^4.1.17",
+    "typescript": "catalog:",
+    "typescript-eslint": "^8.48.1",
+    "vite": "catalog:"
+  }
+}

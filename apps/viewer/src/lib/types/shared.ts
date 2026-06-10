@@ -4,7 +4,7 @@ import type {
   Collection,
   LanguageString
 } from '@allmaps/iiif-parser'
-import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { GeoreferencedMap, PartOfItem } from '@allmaps/annotation'
 
 type AllmapsSourceType = 'manifests' | 'images' | 'maps'
 
@@ -49,3 +49,26 @@ export type StringSource = BaseSource & {
 }
 
 export type Source = UrlSource | StringSource
+
+export type MapsByManifest = {
+  manifest: PartOfItem
+  mapsByCanvas: MapsByCanvas[]
+}
+
+export type MapsByCanvas = {
+  canvas: PartOfItem
+  mapsByImage: MapsByImage[]
+}
+
+export type MapsByImage = {
+  resource: GeoreferencedMap['resource']
+  maps: GeoreferencedMap[]
+}
+
+// export type MapsHierarchy = (MapsByManifest | MapsByCanvas | MapsByImage)[]
+
+export type MapsHierarchy = {
+  mapsByManifest?: MapsByManifest[]
+  mapsByCanvas?: MapsByCanvas[]
+  mapsByImage?: MapsByImage[]
+}

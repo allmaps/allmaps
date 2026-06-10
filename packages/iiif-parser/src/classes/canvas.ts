@@ -16,7 +16,8 @@ import type {
   Summary,
   Annotations,
   Homepage,
-  Rendering
+  Rendering,
+  Provider
 } from '../lib/types.js'
 import {
   parseVersion2String,
@@ -67,6 +68,8 @@ export class Canvas {
   seeAlso?: SeeAlso
   summary?: Summary
   requiredStatement?: RequiredStatement
+  rights?: string
+  provider?: Provider
 
   annotations?: Annotations
 
@@ -92,6 +95,7 @@ export class Canvas {
       this.thumbnail = parseVersion2Thumbnail(parsedCanvas.thumbnail)
       this.rendering = parseVersion2Rendering(parsedCanvas.rendering)
       this.homepage = parseVersion2Related(parsedCanvas.related)
+      this.rights = parsedCanvas.license?.[0]
 
       this.image = new EmbeddedImage(parsedCanvas.images[0].resource, {
         parsedCanvas
@@ -113,6 +117,8 @@ export class Canvas {
       this.seeAlso = parsedCanvas.seeAlso
       this.summary = parsedCanvas.summary
       this.requiredStatement = parsedCanvas.requiredStatement
+      this.rights = parsedCanvas.rights
+      this.provider = parsedCanvas.provider
 
       this.annotations = parsedCanvas.annotations
 

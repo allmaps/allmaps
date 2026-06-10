@@ -31,6 +31,7 @@ import type {
   SeeAlso,
   Summary,
   RequiredStatement,
+  Provider,
   Annotations,
   Homepage,
   Rendering,
@@ -161,6 +162,8 @@ export class Collection extends EmbeddedCollection {
   seeAlso?: SeeAlso
   summary?: Summary
   requiredStatement?: RequiredStatement
+  rights?: string
+  provider?: Provider
 
   annotations?: Annotations
 
@@ -181,6 +184,7 @@ export class Collection extends EmbeddedCollection {
 
       this.rendering = parseVersion2Rendering(parsedCollection.rendering)
       this.homepage = parseVersion2Related(parsedCollection.related)
+      this.rights = parsedCollection.license?.[0]
 
       const manifests =
         'manifests' in parsedCollection && parsedCollection.manifests
@@ -208,6 +212,8 @@ export class Collection extends EmbeddedCollection {
       this.seeAlso = parsedCollection.seeAlso
       this.summary = parsedCollection.summary
       this.requiredStatement = parsedCollection.requiredStatement
+      this.rights = parsedCollection.rights
+      this.provider = parsedCollection.provider
 
       this.annotations = parsedCollection.annotations
 

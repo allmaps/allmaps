@@ -65,11 +65,18 @@
 
     if (isMultiLine(inputValue)) {
       // Multi-line: treat as JSON
-      urlState.params.data = JSON.parse(inputValue)
+      urlState.updateParams({
+        data: JSON.parse(inputValue),
+        url: undefined,
+        mapId: undefined
+      })
     } else {
       // Single-line: treat as URL
-
-      urlState.params.url = inputValue
+      urlState.updateParams({
+        url: inputValue,
+        data: undefined,
+        mapId: undefined
+      })
     }
   }
 

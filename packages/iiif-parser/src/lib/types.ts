@@ -82,6 +82,17 @@ export type SeeAlso = {
   profile?: string
 }[]
 
+export type Agent = {
+  id: string
+  type: 'Agent'
+  label?: LanguageString
+  homepage?: Homepage
+  logo?: Thumbnail
+  seeAlso?: SeeAlso
+}
+
+export type Provider = Agent[]
+
 export type Annotations = {
   id: string
   type: 'AnnotationPage'

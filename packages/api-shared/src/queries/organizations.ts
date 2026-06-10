@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 
 import { generateRandomId } from '@allmaps/id/sync'
 
@@ -13,8 +13,10 @@ import {
 import { clampLimit } from '../shared/limits.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
+import type { SQL } from 'drizzle-orm'
 import type { UserRole } from '../shared/limits.js'
 import type { OrganizationPlan } from '../types.js'
+import type { OrganizationLocation } from '@allmaps/db/schema/auth'
 
 type DbOrganization = {
   id: string
@@ -23,6 +25,7 @@ type DbOrganization = {
   logo: string | null
   homepage: string | null
   plan: string | null
+  location: OrganizationLocation | null
   createdAt: Date
   updatedAt?: Date
   urls: {
@@ -133,6 +136,74 @@ export function normalizeDomains(domains: string[] | undefined) {
   return { validDomains: [...valid], invalidDomains: invalid }
 }
 
+export function normalizeOrganizationLocation(
+  location: unknown
+): OrganizationLocation | null | undefined {
+  if (location === undefined) {
+    return
+  }
+
+  if (location === null) {
+    return null
+  }
+
+  if (
+    typeof location !== 'object' ||
+    !location ||
+    !('type' in location) ||
+    !('coordinates' in location)
+  ) {
+    return
+  }
+
+  const { type, coordinates } = location
+
+  if (
+    type !== 'Point' ||
+    !Array.isArray(coordinates) ||
+    coordinates.length !== 2
+  ) {
+    return
+  }
+
+  const [longitude, latitude] = coordinates
+
+  if (
+    typeof longitude !== 'number' ||
+    typeof latitude !== 'number' ||
+    !Number.isFinite(longitude) ||
+    !Number.isFinite(latitude) ||
+    longitude < -180 ||
+    longitude > 180 ||
+    latitude < -90 ||
+    latitude > 90
+  ) {
+    return
+  }
+
+  return {
+    type: 'Point',
+    coordinates: [longitude, latitude]
+  }
+}
+
+export function organizationLocationGeographySql(
+  location: SQL = sql`${authSchema.organizations.location}`
+) {
+  return sql`
+    CASE
+      WHEN ${location} IS NULL THEN NULL
+      ELSE ST_SetSRID(
+        ST_MakePoint(
+          ((${location}->'coordinates'->>0))::double precision,
+          ((${location}->'coordinates'->>1))::double precision
+        ),
+        4326
+      )::geography
+    END
+  `
+}
+
 export function fromDbOrganization(
   restBaseUrl: string,
   dbOrganization: DbOrganization
@@ -146,6 +217,7 @@ export function fromDbOrganization(
     logo: dbOrganization.logo,
     homepage: dbOrganization.homepage,
     plan: dbOrganization.plan,
+    location: dbOrganization.location,
     createdAt: dbOrganization.createdAt,
     domains: dbOrganization.urls
       .filter(({ type }) => type === 'domain')
@@ -376,6 +448,7 @@ export async function createOrganization(
     logo?: string | null
     homepage?: string | null
     plan?: 'supporter' | 'innovator' | null
+    location?: OrganizationLocation | null
     domains?: string[]
   }
 ) {
@@ -398,6 +471,7 @@ export async function createOrganization(
       logo: data.logo ?? null,
       homepage: data.homepage ?? null,
       plan: data.plan ?? null,
+      location: data.location ?? null,
       createdAt: new Date()
     })
     .returning()
@@ -418,6 +492,7 @@ export async function updateOrganization(
     logo: string | null
     homepage: string | null
     plan: 'supporter' | 'innovator' | null
+    location: OrganizationLocation | null
   }>,
   domains?: string[]
 ) {

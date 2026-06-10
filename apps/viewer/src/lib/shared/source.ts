@@ -5,6 +5,8 @@ import { generateChecksum } from '@allmaps/id/sync'
 
 import { getAllmapsIdFromUrl } from '$lib/shared/api.js'
 
+import type { GeoreferencedMap } from '@allmaps/annotation'
+
 import type {
   ParsedSource,
   UrlSource,
@@ -12,6 +14,7 @@ import type {
 } from '$lib/types/shared.js'
 
 async function parseSource(
+  restBaseUrl: string,
   json: unknown,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetch?: typeof globalThis.fetch
@@ -33,15 +36,24 @@ async function parseSource(
     // Try iiif-parser instead
     const parsedIiif = IIIF.parse(json)
 
+    let apiMaps: GeoreferencedMap[] | undefined
+
     // let embeddedMaps: GeoreferencedMap[] | undefined
 
     // TODO: handle embedded annotations inside manifests
     // if (parsedIiif.type==='manifest' ) {
     //   parsedIiif.annotations
     // }
-
-    const apiAnnotations = await fetchAnnotationsFromApi(parsedIiif)
-    const apiMaps = parseAnnotation(apiAnnotations)
+    try {
+      const apiAnnotations = await fetchAnnotationsFromApi(
+        restBaseUrl,
+        parsedIiif,
+        fetch
+      )
+      apiMaps = parseAnnotation(apiAnnotations)
+    } catch {
+      // Ignore errors, just return the parsed IIIF data without maps
+    }
 
     return {
       type: 'iiif',
@@ -52,6 +64,7 @@ async function parseSource(
 }
 
 export async function sourceFromUrl(
+  restBaseUrl: string,
   url: string,
   fetch = globalThis.fetch
 ): Promise<UrlSource> {
@@ -65,11 +78,12 @@ export async function sourceFromUrl(
     hash: generateChecksum(url),
     url,
     data,
-    parsed: await parseSource(data, fetch)
+    parsed: await parseSource(restBaseUrl, data, fetch)
   }
 }
 
 export async function sourceFromData(
+  restBaseUrl: string,
   data: unknown,
   fetch?: typeof globalThis.fetch
 ): Promise<StringSource> {
@@ -77,6 +91,6 @@ export async function sourceFromData(
     sourceType: 'string',
     hash: generateChecksum(data),
     data,
-    parsed: await parseSource(data, fetch)
+    parsed: await parseSource(restBaseUrl, data, fetch)
   }
 }

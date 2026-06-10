@@ -58,7 +58,7 @@
 
 {#if isLoading}
   {@render loading()}
-{:else if sourceState.source}
+{:else if shouldHaveSource && sourceState.source}
   {@const source = sourceState.source}
   <!-- TODO: instead of using key, the Map component could
    fly to the new location instead? -->
@@ -69,26 +69,34 @@
           ><Info
             {source}
             labels={metadataState.labels}
+            title={metadataState.title}
             organization={metadataState.organization}
+            mapsHierarchy={sourceState.mapsHierarchy}
+            bind:selectedMapId={urlState.params.mapId}
           /></Header
         >
       {/snippet}
       {#snippet controls()}
         <Controls
           mapBearing={uiState.mapBearing}
+          imageUpBearing={uiState.view === 'image'
+            ? uiState.imageUpBearing
+            : undefined}
           onZoomIn={() => uiState.dispatchZoomIn()}
           onZoomOut={() => uiState.dispatchZoomOut()}
+          onZoomToExtent={() => uiState.dispatchZoomToExtent()}
           onResetBearing={() => uiState.dispatchResetBearing()}
         />
       {/snippet}
       <Map
         bind:this={map}
         {source}
-        opacity={uiState.opacity}
-        removeColorThreshold={uiState.removeColorThreshold}
         view={uiState.view}
+        bind:opacity={uiState.opacity}
+        bind:removeBackground={uiState.removeBackground}
         bind:selectedMapId={urlState.params.mapId}
         bind:bearing={uiState.mapBearing}
+        bind:imageUpBearing={uiState.imageUpBearing}
       />
     </View>
   {/key}

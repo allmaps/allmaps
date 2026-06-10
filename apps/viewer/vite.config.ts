@@ -8,6 +8,7 @@ import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
   server: {
+    host: '0.0.0.0',
     port: ports.viewer,
     fs: {
       strict: false,
@@ -16,6 +17,9 @@ export default defineConfig({
   },
   ssr: {
     noExternal: ['maplibre-gl', 'maplibre-contour']
+  },
+  define: {
+    __ALLMAPS_VIEWER_VERSION__: JSON.stringify(process.env.npm_package_version)
   },
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
 }) satisfies UserConfig

@@ -11,7 +11,7 @@ import type { UrlState } from '$lib/state/url.svelte.js'
 const METADATA_KEY = Symbol('metadata')
 
 const truncateOptions = {
-  maxLength: 32,
+  maxLength: 48,
   toNearestSpace: true
 }
 
@@ -51,11 +51,21 @@ export class MetadataState {
 
     if (manifestLabelString) {
       if (canvasLabelString) {
-        labels = [
-          truncate(canvasLabelString, truncateOptions),
-          truncate(manifestLabelString, truncateOptions),
-          ...labels
-        ]
+        const truncatedCanvasLabelString = truncate(
+          canvasLabelString,
+          truncateOptions
+        )
+        const truncatedManifestLabelString = truncate(
+          manifestLabelString,
+          truncateOptions
+        )
+
+        const resourceLabels =
+          truncatedCanvasLabelString === truncatedManifestLabelString
+            ? [truncatedManifestLabelString]
+            : [truncatedCanvasLabelString, truncatedManifestLabelString]
+
+        labels = [...resourceLabels, ...labels]
       } else {
         labels = [truncate(manifestLabelString, truncateOptions), ...labels]
       }

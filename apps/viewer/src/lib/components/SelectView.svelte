@@ -29,15 +29,15 @@
   <button
     onclick={() => (uiState.view = 'map')}
     class={[
-      'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-all cursor-pointer',
-      isMapView && 'font-bold bg-pink/5 text-pink'
+      'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-all cursor-pointer font-medium',
+      isMapView && 'bg-pink/5 text-pink'
     ]}>Map</button
   >
   <button
     onclick={() => (uiState.view = 'image')}
     class={[
-      'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-colors cursor-pointer',
-      isImageView && 'font-bold bg-pink/5 text-pink'
+      'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-colors cursor-pointer font-medium',
+      isImageView && 'bg-pink/5 text-pink'
     ]}>Image</button
   >
 </ControlContainer>

@@ -1,26 +1,36 @@
 <script lang="ts">
   import { onMount, untrack, tick } from 'svelte'
 
-  import maplibregl from 'maplibre-gl'
+  import { Map as MapLibreMap } from 'maplibre-gl'
 
   import { basemapStyle, addTerrain, removeTerrain } from '@allmaps/basemap'
   import { WarpedMapLayer } from '@allmaps/maplibre'
-  import { pink } from '@allmaps/tailwind'
-  import { bufferBboxByRatio } from '@allmaps/stdlib'
+  import { WarpedMapList } from '@allmaps/render'
+
+  import { rgbToHex } from '@allmaps/stdlib'
   import { computeWarpedMapBearing } from '@allmaps/bearing'
+
+  import { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
   import MapMenu from './MapMenu.svelte'
 
-  import { hasInputTarget } from '$lib/shared/keyboard.js'
+  import { getImagesState } from '$lib/state/images.svelte'
+  import { getBackgroundColorsState } from '$lib/state/background-colors.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import type { LngLatBounds, MapMouseEvent } from 'maplibre-gl'
+  import { BackGroundColorEvents } from '$lib/shared/background-color-events.js'
+  import { hasInputTarget } from '$lib/shared/keyboard.js'
+  import { setView, selectMap } from '$lib/shared/views.js'
+
+  import type { MapMouseEvent } from 'maplibre-gl'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
+  import type { Image as IIIFImage } from '@allmaps/iiif-parser'
   import type { WarpedMap } from '@allmaps/render'
-
-  import type { Bbox } from '@allmaps/types'
+  import type { WebGL2WarpedMap } from '@allmaps/render/webgl2'
 
   import type { Source } from '$lib/types/shared.js'
+  import type { BackgroundColorChangeEvent } from '$lib/shared/background-color-events.js'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -35,10 +45,10 @@
     view?: 'map' | 'image'
     selectedMapId?: string
     opacity?: number
-    removeColorThreshold?: number
+    removeBackground?: boolean
     terrain?: boolean
-    // overlay?: { streets: boolean; buildings: boolean }
     bearing?: number
+    imageUpBearing?: number
   }
 
   let {
@@ -46,11 +56,24 @@
     view = 'map',
     selectedMapId = $bindable(),
     opacity = 1,
-    removeColorThreshold = 1,
+    removeBackground = false,
     terrain = false,
-    // overlay = { streets: false, buildings: false },
-    bearing = $bindable(0)
+    bearing = $bindable(0),
+    imageUpBearing = $bindable()
   }: Props = $props()
+
+  let container = $state<HTMLElement>()
+  let map = $state.raw<MapLibreMap>()
+  let warpedMapList: WarpedMapList<WebGL2WarpedMap> = new WarpedMapList()
+  let warpedMapLayer = $state.raw<WarpedMapLayer>()
+  let warpedMaps = $state<WarpedMap[]>([])
+
+  let toggledOpacity = $state(false)
+  let toggledRemoveBackground = $state(false)
+
+  let previousSelectedMapId: string | undefined
+  let selectionCameFromMapClick = false
+  let originalMapOrder: string[] = []
 
   let georeferencedMaps = $derived.by(() => {
     if (source.parsed.type === 'annotation') {
@@ -72,20 +95,28 @@
     if (view === 'image') {
       return 0
     } else {
-      return toggledRemoveColorThreshold ? 1 : removeColorThreshold
+      return toggledRemoveBackground || removeBackground ? 1 : 0
     }
   })
 
   let mapLoaded = $state(false)
   let terrainAdded = $state(false)
 
+  const imagesState = getImagesState()
+  const backgroundColorsState = getBackgroundColorsState()
+  const uiState = getUiState()
+
   $effect(() => {
     if (warpedMapLayer) {
       warpedMapLayer?.setLayerOptions({
-        opacity: derivedOpacity,
-        removeColorColor: '#f2e2d0',
-        removeColor: true,
-        removeColorHardness: 0.1,
+        opacity: derivedOpacity
+      })
+    }
+  })
+
+  $effect(() => {
+    if (warpedMapLayer) {
+      warpedMapLayer.setMapsOptions(warpedMapLayer.getMapIds(), {
         removeColorThreshold: derivedRemoveColorThreshold / 3
       })
     }
@@ -103,54 +134,59 @@
         addTerrain(map, maplibregl)
         terrainAdded = true
       } else if (terrainAdded) {
-        // @ts-expect-error incorrect MapLibre types
         removeTerrain(map)
         terrainAdded = false
       }
     }
   })
 
-  // // Control overlay layers visibility
-  // $effect(() => {
-  //   if (!map) {
-  //     return
-  //   }
-
-  //   if (mapLoaded) {
-  //     if (map.getLayer('overlay-streets')) {
-  //       map.setLayoutProperty(
-  //         'overlay-streets',
-  //         'visibility',
-  //         overlay.streets ? 'visible' : 'none'
-  //       )
-  //     }
-
-  //     if (map.getLayer('overlay-buildings')) {
-  //       map.setLayoutProperty(
-  //         'overlay-buildings',
-  //         'visibility',
-  //         overlay.buildings ? 'visible' : 'none'
-  //       )
-  //     }
-  //   }
-  // })
-
   export function zoomToExtent() {
-    const bounds = warpedMapLayer?.getBounds()
-    if (bounds) {
-      // @ts-expect-error incorrect MapLibre types
-      map?.fitBounds(bounds, {
-        padding: PADDING,
-        duration: DURATION
-      })
+    if (view === 'map') {
+      if (selectedMapId) {
+        const warpedMap = warpedMapLayer?.getWarpedMap(selectedMapId)
+        const bounds = warpedMap?.geoMaskBbox
+        if (bounds) {
+          map?.fitBounds(bounds, {
+            padding: PADDING,
+            duration: DURATION
+          })
+        }
+      } else {
+        const bounds = warpedMapLayer?.getBounds()
+        if (bounds) {
+          map?.fitBounds(bounds, {
+            padding: PADDING,
+            duration: DURATION
+          })
+        }
+      }
+    } else if (view === 'image' && selectedMapIdForImageView) {
+      if (map && warpedMapLayer) {
+        const { center, zoom, bearing } =
+          warpedMapLayer.getMapsCenterZoomBearing([selectedMapIdForImageView], {
+            padding: PADDING
+          })
+
+        map.flyTo({
+          center,
+          zoom,
+          bearing,
+          duration: DURATION
+        })
+      }
+      // const warpedMap = warpedMapLayer?.getWarpedMap(selectedMapId)
+      // const imageBounds = warpedMap?.imageBounds
+      // if (imageBounds) {
+      //   map?.fitBounds(imageBounds, {
+      //     padding: PADDING,
+      //     duration: DURATION
+      //   })
+      // }
     }
   }
 
-  let container = $state<HTMLElement>()
-  let map = $state.raw<maplibregl.Map>()
-  let warpedMapLayer = $state<WarpedMapLayer>()
-  let geoBbox = $state<Bbox>()
-  let warpedMaps = $state<WarpedMap[]>([])
+  const pendingParsedImages = new Map<string, IIIFImage>()
+  let flushParsedImagesHandle: number | undefined
 
   // Context menu state
   let contextMenuOpen = $state(false)
@@ -173,50 +209,68 @@
     )
   })
 
-  let toggledOpacity = $state(false)
-  let toggledRemoveColorThreshold = $state(false)
+  $effect(() => {
+    if (!selectedWarpedMap) {
+      imageUpBearing = undefined
+      return
+    }
 
-  let previousSelectedMapId: string | undefined
-  let internalSelection = false
+    imageUpBearing = computeWarpedMapBearing(selectedWarpedMap, {
+      orientation: 'vertical'
+    })
+  })
 
-  let previousMapBounds: LngLatBounds | undefined
+  function flushParsedImages() {
+    imagesState.addParsedImages(pendingParsedImages)
+    pendingParsedImages.clear()
+    flushParsedImagesHandle = undefined
+  }
+
+  function queueParsedImage(imageId: string, parsedImage: IIIFImage) {
+    pendingParsedImages.set(imageId, parsedImage)
+
+    if (flushParsedImagesHandle !== undefined) {
+      return
+    }
+
+    flushParsedImagesHandle = requestAnimationFrame(flushParsedImages)
+  }
+
+  function handleImageLoaded(event: WarpedMapEvent) {
+    const mapIds = event.data?.mapIds
+
+    if (!mapIds) {
+      return
+    }
+
+    mapIds.forEach((mapId) => {
+      const warpedMap = warpedMapList.getWarpedMap(mapId)
+      if (warpedMap?.hasImage()) {
+        queueParsedImage(
+          warpedMap.georeferencedMap.resource.id,
+          warpedMap.image
+        )
+      }
+    })
+  }
+
+  function updateSelectedMapZOrder(mapId?: string) {
+    if (!warpedMapLayer || originalMapOrder.length === 0) {
+      return
+    }
+
+    warpedMapLayer.bringMapsToFront(originalMapOrder)
+
+    if (mapId) {
+      warpedMapLayer.bringMapsToFront([mapId])
+    }
+  }
 
   function findMapIdFromMapMouseEvent(event: MapMouseEvent) {
     return warpedMapLayer?.getWarpedMapList().getMapIds({
       geoPoint: [event.lngLat.lng, event.lngLat.lat],
       onlyVisible: true
     })[0]
-  }
-
-  function selectMap(mapId: string | undefined) {
-    if (!warpedMapLayer || view === 'image') {
-      return
-    }
-
-    if (previousSelectedMapId) {
-      warpedMapLayer.setMapOptions(previousSelectedMapId, {
-        renderMask: false
-      })
-    }
-
-    if (mapId) {
-      warpedMapLayer.setMapOptions(mapId, {
-        renderMask: true
-      })
-
-      const warpedMap = warpedMaps.find((wm) => wm.mapId === mapId)
-      if (map && warpedMap && !internalSelection) {
-        map.fitBounds(warpedMap.geoMaskBbox, {
-          padding: PADDING,
-          duration: DURATION
-        })
-      }
-
-      warpedMapLayer.bringMapsToFront([mapId])
-      internalSelection = false
-    }
-
-    previousSelectedMapId = mapId
   }
 
   function handleMapClick(event: MapMouseEvent) {
@@ -231,10 +285,10 @@
     let newSelectedMapId = findMapIdFromMapMouseEvent(event)
 
     if (newSelectedMapId && previousSelectedMapId !== newSelectedMapId) {
-      internalSelection = true
+      selectionCameFromMapClick = true
       selectedMapId = newSelectedMapId
     } else {
-      internalSelection = false
+      selectionCameFromMapClick = false
       selectedMapId = undefined
     }
   }
@@ -262,6 +316,42 @@
     }
   }
 
+  function handleViewImage(mapId: string) {
+    selectedMapId = mapId
+    uiState.view = view === 'image' ? 'map' : 'image'
+  }
+
+  function handleZoomToExtent(mapId: string) {
+    if (!map || !warpedMapLayer) {
+      return
+    }
+
+    if (view === 'image') {
+      const { center, zoom, bearing } = warpedMapLayer.getMapsCenterZoomBearing(
+        [mapId],
+        {
+          padding: PADDING
+        }
+      )
+
+      map.flyTo({
+        center,
+        zoom,
+        bearing,
+        duration: DURATION
+      })
+    } else {
+      const bounds = warpedMapLayer.getWarpedMap(mapId)?.geoMaskBbox
+
+      if (bounds) {
+        map.fitBounds(bounds, {
+          padding: PADDING,
+          duration: DURATION
+        })
+      }
+    }
+  }
+
   export function zoomIn() {
     map?.zoomIn()
   }
@@ -271,202 +361,68 @@
   }
 
   export function resetBearing() {
-    map?.rotateTo(0, { duration: DURATION })
+    if (map) {
+      const bearing = map.getBearing()
+
+      if (bearing !== 0) {
+        map?.rotateTo(0, { duration: DURATION })
+      } else if (view === 'image') {
+        if (warpedMapLayer && selectedMapIdForImageView) {
+          const { bearing } = warpedMapLayer.getMapsCenterZoomBearing([
+            selectedMapIdForImageView
+          ])
+
+          if (bearing) {
+            map?.rotateTo(bearing, { duration: DURATION })
+          }
+        }
+      }
+    }
   }
 
-  // Select map
   $effect(() => {
     if (previousSelectedMapId === selectedMapId) {
       return
     }
 
-    if (view === 'map') {
-      untrack(() => {
-        selectMap(selectedMapId)
-      })
-    } else if (view === 'image') {
-      untrack(() => {
-        if (selectedMapId) {
-          previousMapBounds = undefined
+    untrack(() => {
+      if (map && warpedMapLayer) {
+        updateSelectedMapZOrder(selectedMapId)
 
-          warpedMapLayer?.setMapOptions(selectedMapId, {
-            visible: true,
-            applyMask: false,
-            renderAppliedMask: false,
-            renderMask: true,
-            transformationType: 'helmert'
-          })
+        selectMap(
+          view,
+          map,
+          warpedMapLayer,
+          DURATION,
+          PADDING,
+          selectedMapId,
+          previousSelectedMapId,
+          !selectionCameFromMapClick
+        )
 
-          if (map && selectedWarpedMap) {
-            map.fitBounds(selectedWarpedMap.geoMaskBbox, {
-              padding: PADDING,
-              animate: false,
-              // duration: DURATION,
-              bearing: computeWarpedMapBearing(selectedWarpedMap)
-            })
+        previousSelectedMapId = selectedMapId
+      }
+    })
 
-            if (previousSelectedMapId) {
-              warpedMapLayer?.setMapOptions(previousSelectedMapId, {
-                transformationType: undefined
-              })
-
-              warpedMapLayer?.setMapOptions(previousSelectedMapId, {
-                visible: false,
-                applyMask: true,
-                renderAppliedMask: false,
-                renderMask: false
-              })
-            }
-
-            previousSelectedMapId = selectedMapId
-          }
-        }
-      })
-    }
+    selectionCameFromMapClick = false
   })
 
-  // Switch between 'map' and 'image'
   $effect(() => {
-    if (view === 'map') {
+    if (view) {
       untrack(() => {
-        if (!map) {
-          return
-        }
-
-        map.setMaxBounds()
-
-        showBasemap(map)
-
-        if (selectedMapId) {
-          const otherMapIds = warpedMapLayer
-            ? warpedMapLayer.getMapIds().filter((id) => id !== selectedMapId)
-            : []
-
-          warpedMapLayer?.setMapsOptions(
-            otherMapIds,
-            {
-              visible: true,
-              transformationType: undefined
-            },
-            { animate: false }
+        if (map && warpedMapLayer && selectedMapIdForImageView) {
+          setView(
+            view,
+            map,
+            warpedMapLayer,
+            selectedMapIdForImageView,
+            DURATION,
+            PADDING
           )
-
-          warpedMapLayer?.setMapOptions(selectedMapId, {
-            applyMask: true,
-            renderAppliedMask: true,
-            renderMask: false,
-            transformationType: undefined
-          })
-
-          // TODO: later, when visibility should be animated for otherMapIds,
-          // animate it together with transformationType for selectedMapIdForImageView
-          // using setMapsOptionsByMapIdAndLayerOptions() as below
-          // (after setting only transformationType but not visibilty with { animate: false } ) as above
-          // and same when view == image
-          //
-          // const mapsOptionsByMapId = new Map()
-          // mapsOptionsByMapId.set(selectedMapIdForImageView, {
-          //   applyMask: true,
-          //   renderAppliedMask: true,
-          //   renderMask: false,
-          //   transformationType: undefined
-          // })
-          // for (const mapId of otherMapIds) {
-          //   mapsOptionsByMapId.set(mapId, {
-          //     visible: true,
-          //   })
-          // }
-          // warpedMapLayer?.setMapsOptionsByMapIdAndLayerOptions(mapsOptionsByMapId)
-
-          if (previousMapBounds) {
-            map.fitBounds(previousMapBounds, {
-              padding: PADDING,
-              duration: DURATION,
-              bearing: 0
-            })
-          } else if (selectedWarpedMap) {
-            map.fitBounds(selectedWarpedMap.geoMaskBbox, {
-              padding: PADDING,
-              duration: DURATION,
-              bearing: 0
-            })
-          }
-        }
-      })
-    } else if (view === 'image') {
-      untrack(() => {
-        if (!map) {
-          return
-        }
-
-        const untrackedSelectedWarpedMap = untrack(() => selectedWarpedMap)
-
-        if (untrackedSelectedWarpedMap && selectedMapIdForImageView) {
-          hideBasemap(map)
-
-          const otherMapIds = warpedMapLayer
-            ? warpedMapLayer
-                .getMapIds()
-                .filter((id) => id !== selectedMapIdForImageView)
-            : []
-          warpedMapLayer?.setMapsOptions(
-            otherMapIds,
-            {
-              visible: false,
-              transformationType: 'helmert'
-            },
-            { animate: false }
-          )
-
-          warpedMapLayer?.setMapOptions(selectedMapIdForImageView, {
-            applyMask: false,
-            renderAppliedMask: false,
-            renderMask: true,
-            transformationType: 'helmert'
-          })
-
-          // TODO: same remark as for view == map
-
-          previousMapBounds = map.getBounds()
-
-          map.fitBounds(untrackedSelectedWarpedMap.geoMaskBbox, {
-            padding: PADDING,
-            duration: DURATION,
-            bearing: computeWarpedMapBearing(untrackedSelectedWarpedMap)
-          })
-
-          map.once('idle', () => {
-            map?.setMaxBounds(
-              bufferBboxByRatio(untrackedSelectedWarpedMap.geoFullMaskBbox, 3)
-            )
-          })
         }
       })
     }
   })
-
-  async function showBasemap(map: maplibregl.Map) {
-    for (const layer of map.getLayersOrder()) {
-      if (layer !== warpedMapLayer?.id) {
-        map.setLayoutProperty(layer, 'visibility', 'visible')
-      }
-    }
-
-    await tick()
-    map.setPaintProperty('white-background', 'background-opacity', 0)
-  }
-
-  function hideBasemap(map: maplibregl.Map) {
-    map.setPaintProperty('white-background', 'background-opacity', 1)
-
-    setTimeout(() => {
-      for (const layer of map.getLayersOrder()) {
-        if (layer !== warpedMapLayer?.id) {
-          map.setLayoutProperty(layer, 'visibility', 'none')
-        }
-      }
-    }, DURATION)
-  }
 
   function handleKeyDown(event: KeyboardEvent) {
     if (hasInputTarget(event)) {
@@ -476,7 +432,7 @@
     if (event.code === 'Space') {
       toggledOpacity = true
     } else if (event.key === 'b') {
-      toggledRemoveColorThreshold = true
+      toggledRemoveBackground = true
     } else {
       return
     }
@@ -492,7 +448,7 @@
     if (event.code === 'Space') {
       toggledOpacity = false
     } else if (event.key === 'b') {
-      toggledRemoveColorThreshold = false
+      toggledRemoveBackground = false
     } else {
       return
     }
@@ -506,25 +462,47 @@
     }
   }
 
+  function handleBackgroundColorChange(event: BackgroundColorChangeEvent) {
+    const { mapId, backgroundColor } = event.detail
+    warpedMapLayer?.setMapOptions(mapId, {
+      removeColorColor: backgroundColor ? rgbToHex(backgroundColor) : undefined
+    })
+  }
+
   onMount(() => {
     if (!container) {
       return
     }
 
+    // warpedMapLayer?.renderer?.mapsInViewport
     // const protocol = new Protocol()
     // maplibregl.addProtocol('pmtiles', protocol.tile)
 
-    map = new maplibregl.Map({
+    warpedMapList.addGeoreferencedMaps(georeferencedMaps)
+    warpedMaps = warpedMapList.getWarpedMaps()
+
+    warpedMapList.addEventListener(
+      WarpedMapEventType.IMAGELOADED,
+      handleImageLoaded
+    )
+
+    const bbox = warpedMapList.getMapsBbox()
+
+    map = new MapLibreMap({
       container,
       // @ts-expect-error incorrect MapLibre types
       style: basemapStyle('en'),
       maxPitch: 0,
       bearingSnap: 0,
       attributionControl: false,
-      navigationControl: false
+      navigationControl: false,
+      bounds: bbox,
+      fitBoundsOptions: {
+        padding: PADDING
+      }
     })
 
-    map.on('load', async () => {
+    map.on('load', () => {
       if (!map) {
         return
       }
@@ -540,86 +518,24 @@
         }
       })
 
-      warpedMapLayer = new WarpedMapLayer()
+      warpedMapLayer = new WarpedMapLayer({ warpedMapList })
 
-      // @ts-expect-error MapLibre types are incompatible
       map.addLayer(warpedMapLayer)
+      originalMapOrder = warpedMapLayer.getMapIds()
 
-      // // Add overlay layers on top of warped maps
-      // map.addLayer({
-      //   id: 'overlay-streets',
-      //   type: 'line',
-      //   source: 'protomaps',
-      //   'source-layer': 'roads',
-      //   paint: {
-      //     'line-color': '#ffffff',
-      //     'line-width': 2,
-      //     'line-opacity': 0.8
-      //   },
-      //   layout: {
-      //     visibility: overlay.streets ? 'visible' : 'none'
-      //   }
-      // })
+      warpedMapLayer.setMapsOptions((mapId) => {
+        const backgroundColor =
+          backgroundColorsState.getBackgroundColorForMap(mapId)
 
-      // map.addLayer({
-      //   id: 'overlay-buildings',
-      //   type: 'fill',
-      //   source: 'protomaps',
-      //   'source-layer': 'buildings',
-      //   paint: {
-      //     'fill-color': pink,
-      //     'fill-opacity': 0.3,
-      //     'fill-outline-color': 'rgba(0, 0, 0, 1)'
-      //     // 'fill-outline-opacity': 0.8
-      //   },
-      //   layout: {
-      //     visibility: overlay.buildings ? 'visible' : 'none'
-      //   }
-      // })
-
-      // map.addLayer({
-      //   id: 'overlay-buildings-line',
-      //   type: 'line',
-      //   source: 'protomaps',
-      //   'source-layer': 'buildings',
-      //   paint: {
-      //     'line-color': pink,
-      //     'line-opacity': 1,
-      //     'line-width': 2
-
-      //     // 'line-outline-opacity': 0.8
-      //   },
-      //   layout: {
-      //     visibility: overlay.buildings ? 'visible' : 'none'
-      //   }
-      // })
-
-      await Promise.allSettled(
-        georeferencedMaps.map((georeferencedMap) =>
-          warpedMapLayer?.addGeoreferencedMap(georeferencedMap, {
-            renderAppliedMaskColor: pink,
-            renderAppliedMaskSize: 3,
-            renderMaskColor: pink,
-            renderMaskSize: 3
-          })
-        )
-      )
-
-      const warpedMapList = warpedMapLayer?.renderer?.warpedMapList
-      warpedMaps = warpedMapList ? warpedMapList.getWarpedMaps() : []
-
-      geoBbox = warpedMapList?.getMapsBbox({
-        projection: { definition: 'EPSG:4326' }
+        return {
+          removeColorColor: backgroundColor
+            ? rgbToHex(backgroundColor)
+            : undefined,
+          removeColor: true,
+          removeColorHardness: 0.1,
+          removeColorThreshold: 0
+        }
       })
-
-      if (geoBbox) {
-        map.fitBounds(geoBbox, {
-          animate: false,
-          padding: PADDING,
-          duration: DURATION,
-          bearing: 0
-        })
-      }
 
       map.on('click', handleMapClick)
       map.on('contextmenu', handleMapContextMenu)
@@ -627,11 +543,46 @@
 
       // Select initial map if one is provided
       if (selectedMapId) {
-        selectMap(selectedMapId)
+        updateSelectedMapZOrder(selectedMapId)
+        selectMap(view, map, warpedMapLayer, DURATION, PADDING, selectedMapId)
+        previousSelectedMapId = selectedMapId
       }
 
       mapLoaded = true
+
+      map.once(WarpedMapEventType.ALLREQUESTEDTILESLOADED, () => {
+        imagesState.resumeFetchingThumbnails()
+        backgroundColorsState.resume()
+      })
+
+      backgroundColorsState.addEventListener(
+        BackGroundColorEvents.BACKGROUND_COLOR_CHANGE,
+        handleBackgroundColorChange
+      )
+
+      // backgroundColorsState.resume()
     })
+
+    return () => {
+      imagesState.pauseFetchingThumbnails()
+      backgroundColorsState.pause()
+
+      map?.stop()
+
+      warpedMapList.removeEventListener(
+        WarpedMapEventType.IMAGELOADED,
+        handleImageLoaded
+      )
+      backgroundColorsState.removeEventListener(
+        BackGroundColorEvents.BACKGROUND_COLOR_CHANGE,
+        handleBackgroundColorChange
+      )
+      if (flushParsedImagesHandle !== undefined) {
+        cancelAnimationFrame(flushParsedImagesHandle)
+      }
+
+      map?.remove()
+    }
   })
 </script>
 
@@ -641,7 +592,10 @@
   oncontextmenu={handleContextMenu}
 />
 
-<div class="h-full w-full" bind:this={container}></div>
+<div
+  class="h-full w-full [&_canvas:focus-visible]:outline-none"
+  bind:this={container}
+></div>
 
 {#if contextMenuMapId && contextMenuGeoreferencedMap && warpedMapLayer}
   <MapMenu
@@ -649,8 +603,11 @@
     x={contextMenuX}
     y={contextMenuY}
     latLon={contextMenuLatLon}
+    {view}
     mapId={contextMenuMapId}
     georeferencedMap={contextMenuGeoreferencedMap}
     {warpedMapLayer}
+    onViewImage={handleViewImage}
+    onZoomToExtent={handleZoomToExtent}
   />
 {/if}

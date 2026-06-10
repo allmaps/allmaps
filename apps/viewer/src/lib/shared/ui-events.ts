@@ -5,7 +5,7 @@ export const UiEvents = {
   RESET_BEARING: 'RESET_BEARING' as const
 }
 
-interface UiEventMap {
+type UiEventMap = {
   ZOOM_TO_EXTENT: void
   ZOOM_IN: void
   ZOOM_OUT: void

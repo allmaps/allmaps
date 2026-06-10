@@ -1,6 +1,7 @@
 <script lang="ts">
   import { replaceState } from '$app/navigation'
   import { page } from '$app/state'
+  import { GpsFix as GpsFixIcon } from 'phosphor-svelte'
 
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
@@ -205,12 +206,25 @@
           {#each displayedOrganizations as organization (organization.id)}
             <tr class="hover:bg-gray-50 transition">
               <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
-                <a
-                  href={routes.organization(getOrganizationId(organization.id))}
-                  class="font-sans text-sm font-medium hover:text-pink"
-                >
-                  {organization.name}
-                </a>
+                <div class="flex items-center gap-1.5">
+                  <a
+                    href={routes.organization(
+                      getOrganizationId(organization.id)
+                    )}
+                    class="font-sans text-sm font-medium hover:text-pink"
+                  >
+                    {organization.name}
+                  </a>
+                  {#if organization.location}
+                    <span title="Has location" class="text-blue-500">
+                      <GpsFixIcon
+                        size="14"
+                        weight="bold"
+                        aria-label="Has location"
+                      />
+                    </span>
+                  {/if}
+                </div>
               </td>
               <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
                 {#if organization.plan === 'supporter'}

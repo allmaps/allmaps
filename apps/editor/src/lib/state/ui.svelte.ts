@@ -11,8 +11,7 @@ import type {
   AllmapsPluginId,
   ClickedItem,
   BasemapPresetItem,
-  AllmapsPluginItem,
-  WarpedResourceMask
+  AllmapsPluginItem
 } from '$lib/types/shared.js'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
@@ -139,8 +138,6 @@ export class UiState extends UiEventTarget {
     warpedMapLayerOpacity: 1,
     renderMasks: false
   })
-
-  #warpedResourceMasks = $state.raw<WarpedResourceMask[]>([])
 
   // Proxy objects for dynamic modal/popover access
   /**
@@ -385,13 +382,6 @@ export class UiState extends UiEventTarget {
     this.#resultsOptions = { ...this.#resultsOptions, ...options }
   }
 
-  get warpedResourceMasks() {
-    return this.#warpedResourceMasks
-  }
-
-  set warpedResourceMasks(warpedResourceMasks: WarpedResourceMask[]) {
-    this.#warpedResourceMasks = warpedResourceMasks
-  }
 }
 
 export function setUiState(

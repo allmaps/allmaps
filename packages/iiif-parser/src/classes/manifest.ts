@@ -35,6 +35,7 @@ import type {
   SeeAlso,
   Summary,
   RequiredStatement,
+  Provider,
   Annotations,
   Homepage,
   Rendering,
@@ -120,6 +121,8 @@ export class Manifest extends EmbeddedManifest {
   seeAlso?: SeeAlso
   summary?: Summary
   requiredStatement?: RequiredStatement
+  rights?: string
+  provider?: Provider
 
   annotations?: Annotations
 
@@ -145,6 +148,7 @@ export class Manifest extends EmbeddedManifest {
       this.thumbnail = parseVersion2Thumbnail(parsedManifest.thumbnail)
       this.rendering = parseVersion2Rendering(parsedManifest.rendering)
       this.homepage = parseVersion2Related(parsedManifest.related)
+      this.rights = parsedManifest.license?.[0]
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
 
@@ -153,6 +157,8 @@ export class Manifest extends EmbeddedManifest {
       this.seeAlso = parsedManifest.seeAlso
       this.summary = parsedManifest.summary
       this.requiredStatement = parsedManifest.requiredStatement
+      this.rights = parsedManifest.rights
+      this.provider = parsedManifest.provider
 
       this.annotations = parsedManifest.annotations
 
