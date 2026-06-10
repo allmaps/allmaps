@@ -53,6 +53,26 @@
         })
       : 0
   )
+
+  let markerCount = $derived(geojsonRoute?.markers.length || 0)
+
+  let currentGeojsonLabel = $derived.by(() => {
+    if (geojsonRoute?.route) {
+      return markerCount
+        ? `Current route: ${length.toFixed(2)} km with ${markerCount} POIs`
+        : `Current route: ${length.toFixed(2)} km`
+    }
+
+    if (markerCount === 1) {
+      return 'Current GeoJSON: 1 POI'
+    }
+
+    if (markerCount > 1) {
+      return `Current GeoJSON: ${markerCount} POIs`
+    }
+
+    return 'Current GeoJSON loaded'
+  })
 </script>
 
 <div
@@ -85,12 +105,7 @@
           {#if geojsonRoute?.error}
             <span>Error: {geojsonRoute?.error}</span>
           {:else}
-            <div>
-              <span>Current route: {length.toFixed(2)} km</span>
-              {#if geojsonRoute?.markers.length}
-                <span>with {geojsonRoute.markers.length} POIs</span>
-              {/if}
-            </div>
+            <span>{currentGeojsonLabel}</span>
           {/if}
           <button
             class="cursor-pointer px-2 py-1 shrink-0 bg-white/30 rounded"
@@ -117,8 +132,9 @@
         >
       </div>
       <p class="text-xs text-center px-8">
-        The GeoJSON file must be a FeatureCollection <br />with Point and
-        LineString Features, or a single LineString Feature.
+        The GeoJSON file must be a FeatureCollection <br />with Point and/or
+        LineString Features, a single Point Feature, or a single LineString
+        Feature.
       </p>
     </div>
   {/if}
