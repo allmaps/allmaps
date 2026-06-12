@@ -33,38 +33,87 @@ Useful endpoints:
 
 ```text
 GET /cors
-GET /cors/iiif/2/:imageId/info.json
-GET /cors/iiif/3/:imageId/info.json
-GET /cors/errors/iiif/:version/:imageId/missing-dimensions/info.json
-GET /cors/errors/iiif/:version/:imageId/bad-tiles/info.json
-GET /cors/iiif/:version/:imageId/:region/:size/:rotation/:quality.:format
+GET /cors/iiif/2/:level/:imageId
+GET /cors/iiif/3/:level/:imageId
+GET /cors/iiif/2/:level/:imageId/info.json
+GET /cors/iiif/3/:level/:imageId/info.json
+GET /cors/errors/iiif/:version/:level/:imageId/missing-dimensions/info.json
+GET /cors/errors/iiif/:version/:level/:imageId/bad-tiles/info.json
+GET /cors/iiif/:version/:level/:imageId/:region/:size/:rotation/:quality.:format
 GET /cors/annotations/images/:imageId.json
+GET /cors/annotations/images/:version/:level/:imageId.json
+GET /cors/annotations/combined/iiif{2|3}-level{0|1|2}.json
+GET /cors/annotations/combined/mixed-iiif2-level0-level2.json
+GET /cors/annotations/combined/mixed-iiif3-level0-level2.json
+GET /cors/annotations/combined/mixed-iiif2-level0-iiif3-level2.json
+GET /cors/annotations/combined/mixed-iiif2-level2-iiif3-level0.json
 GET /cors/errors/annotations/images/:imageId/missing-target.json
 GET /cors/errors/annotations/images/:imageId/bad-resource-size.json
+GET /cors/errors/annotations/images/:version/:level/:imageId/:variant.json
 GET /cors/manifests/2/:imageId.json
+GET /cors/manifests/2/:level/:imageId.json
 GET /cors/manifests/3/:imageId.json
+GET /cors/manifests/3/:version/:level/:imageId.json
 GET /cors/manifests/3/:imageId/embedded-annotation.json
+GET /cors/manifests/3/:imageId/linked-annotation.json
+GET /cors/manifests/3/:version/:level/:imageId/embedded-annotation.json
+GET /cors/manifests/3/:version/:level/:imageId/linked-annotation.json
+GET /cors/annotations/manifests/3/:imageId/linked-annotation.json
+GET /cors/annotations/manifests/3/:version/:level/:imageId/linked-annotation.json
 GET /cors/manifests/3/:imageId/navplace-midpoint.json
 GET /cors/manifests/3/:imageId/navplace-bbox.json
+GET /cors/manifests/3/:version/:level/:imageId/navplace-midpoint.json
+GET /cors/manifests/3/:version/:level/:imageId/navplace-bbox.json
 GET /cors/manifests/2/:imageId/missing-service.json
+GET /cors/manifests/2/:level/:imageId/missing-service.json
 GET /cors/manifests/3/:imageId/bad-service-type.json
 GET /cors/manifests/3/:imageId/embedded-annotation-missing-target.json
+GET /cors/manifests/3/:imageId/linked-annotation-missing-target.json
 GET /cors/manifests/3/:imageId/embedded-annotation-one-gcp.json
+GET /cors/manifests/3/:imageId/linked-annotation-one-gcp.json
 GET /cors/manifests/3/:imageId/embedded-annotation-mixed-errors.json
+GET /cors/manifests/3/:imageId/linked-annotation-mixed-errors.json
+GET /cors/manifests/3/:version/:level/:imageId/:variant.json
+GET /cors/manifests/3/combined/embedded-annotations.json
+GET /cors/manifests/3/combined/linked-annotations.json
+GET /cors/manifests/3/combined/image-services-iiif{2|3}-level{0|1|2}-embedded-annotations.json
+GET /cors/manifests/3/combined/image-services-iiif{2|3}-level{0|1|2}-linked-annotations.json
+GET /cors/manifests/3/combined/partial-embedded-annotations.json
+GET /cors/manifests/3/combined/partial-linked-annotations.json
+GET /cors/manifests/3/combined/mixed-embedded-annotation-errors.json
+GET /cors/manifests/3/combined/mixed-linked-annotation-errors.json
+GET /cors/manifests/3/combined/image-services-iiif2-level0-level2.json
+GET /cors/manifests/3/combined/image-services-iiif3-level0-level2.json
+GET /cors/manifests/3/combined/image-services-iiif2-level0-iiif3-level2.json
+GET /cors/manifests/3/combined/image-services-iiif2-level2-iiif3-level0.json
+GET /cors/annotations/manifests/3/combined/:variant/canvas/:canvasIndex.json
 ```
 
-The image endpoint supports `full`, pixel, and percentage regions; `full`,
-`max`, `w,`, `,h`, `w,h`, `!w,h`, and `pct:n` sizes; rotation `0`; qualities
-`default` and `color`; and output formats `jpg`, `jpeg`, `png`, and `webp`.
+The image endpoint supports IIIF Image API 2.1 and 3.0 `level0`, `level1`, and
+`level2` URLs. Level 0 serves JPEG full-image requests for dimensions listed in
+the `sizes` array, including the full image size, and JPEG tile requests
+declared by the `tiles` array in `info.json`. Higher levels support `full`,
+pixel, and percentage regions; `full`, `max`, `w,`, `,h`, `w,h`, `!w,h`, and
+`pct:n` sizes; rotation `0`; qualities `default` and `color`; and output
+formats `jpg`, `jpeg`, `png`, and `webp`.
+
+The root catalog lists only `level0` and `level2` resources to keep the fixture
+overview compact; `level1` routes remain available for direct requests.
 
 The `/errors` endpoints return deliberately invalid resources for client error
 handling tests. The root page groups these under “Resources with errors” in
 both the CORS and no-CORS columns.
 
 The IIIF 3 manifest variants include one manifest with the georeference
-annotation embedded on the canvas, three incorrect embedded annotation
+annotation embedded on the canvas, one manifest with the georeference
+annotation linked from the canvas, incorrect embedded and linked annotation
 manifests, and two `navPlace` manifests using either the midpoint or bounding
 box of the transformed geographic mask.
+
+The combined IIIF 3 manifests include variants where all canvases have embedded
+or linked annotations, only some canvases have embedded or linked annotations,
+embedded or linked annotations mix correct and incorrect annotations, or
+painting annotations mix level 0 image services with higher-level services.
 
 ## Importing fixtures
 
@@ -79,7 +128,8 @@ The importer:
 
 - reads a local annotation file or remote annotation URL;
 - takes the georeference annotations from the page;
-- downloads the source IIIF image at 2500px wide;
+- downloads the source IIIF image at 2500px wide, or wider when needed to keep
+  the imported image at least 1000px high, capped by WebP's maximum dimension;
 - converts it to `default.webp`;
 - scales the saved annotation to the resized image dimensions;
 - rewrites annotation image, manifest, and canvas URLs to the local fixture

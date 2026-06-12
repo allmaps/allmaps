@@ -1,5 +1,6 @@
 <script lang="ts">
   import '../app.css'
+  import '@allmaps/ui/css/fonts.css'
 
   let { children } = $props()
 </script>
