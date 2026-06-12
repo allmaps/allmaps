@@ -34,6 +34,7 @@
     "@allmaps/components": "workspace:^",
     "@allmaps/env": "workspace:^",
     "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-inspector": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/io": "workspace:^",
     "@allmaps/maplibre": "workspace:^",

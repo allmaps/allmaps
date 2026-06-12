@@ -1,0 +1,55 @@
+{
+  "name": "@allmaps/iiif-inspector",
+  "version": "1.0.0-beta.1",
+  "author": {
+    "name": "Bert Spaan",
+    "email": "hello@bertspaan.nl",
+    "url": "https://bertspaan.nl"
+  },
+  "description": "Inspect IIIF resources and extract useful metadata",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "packages/iiif-inspector"
+  },
+  "homepage": "https://allmaps.org",
+  "keywords": [
+    "allmaps",
+    "iiif",
+    "inspector"
+  ],
+  "scripts": {
+    "watch": "tsc --watch --noCheck",
+    "build": "tsc --noCheck",
+    "types": "tsc --noEmit",
+    "test": "NODE_ENV=test vitest run",
+    "lint": "prettier --ignore-path ../../.gitignore --check src test && eslint src test --ext .js,.ts",
+    "documentation": "remark . --output --use remark-api",
+    "format": "prettier --ignore-path ../../.gitignore --write src test"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@allmaps/iiif-parser": "workspace:^"
+  },
+  "devDependencies": {
+    "@allmaps/types": "workspace:^",
+    "@types/eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.6.2",
+    "remark-api": "^1.1.0",
+    "remark-cli": "^12.0.1",
+    "typescript": "catalog:",
+    "vitest": "^4.0.4"
+  }
+}
