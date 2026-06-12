@@ -13,6 +13,7 @@ import {
   bboxToRectangle,
   rectanglesToScale,
   fetchImageInfo,
+  ResourceFetchError,
   getPropertyFromCacheOrComputation,
   getPropertyFromDoubleCacheOrComputation,
   mixLineStrings,
@@ -26,7 +27,11 @@ import {
 } from '@allmaps/stdlib'
 
 import { applyHomogeneousTransform } from '../shared/homogeneous-transform.js'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 
 import type {
   Gcp,
@@ -83,6 +88,19 @@ const DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
 const DEFAULT_PROJECTED_GCP_TRANSFORMER_OPTIONS = {
   ...DEFAULT_WARPED_MAP_OPTIONS,
   ...DEFAULT_SPECIFIC_PROJECTED_GCP_TRANSFORMER_OPTIONS
+}
+
+function ensureError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error))
+}
+
+function isAbortError(error: unknown) {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'name' in error &&
+    error.name === 'AbortError'
+  )
 }
 
 export function createWarpedMapFactory<W extends WarpedMap>() {
@@ -188,6 +206,7 @@ export class WarpedMap extends EventTarget {
   options!: WarpedMapOptions
 
   fetchingImageInfo: boolean
+  imageInfoError?: Error
   image?: Image
   tileSize?: Size
 
@@ -887,6 +906,12 @@ export class WarpedMap extends EventTarget {
    * @returns
    */
   async loadImage(imagesById?: Map<string, Image>): Promise<void> {
+    if (this.imageInfoError) {
+      throw this.imageInfoError
+    }
+
+    let imageInfoFetched = false
+
     try {
       const resourceId = this.georeferencedMap.resource.id
 
@@ -901,6 +926,7 @@ export class WarpedMap extends EventTarget {
           { signal },
           this.options.fetchFn
         )
+        imageInfoFetched = true
         this.abortController = undefined
         this.image = Image.parse(imageInfo)
         if (imagesById) {
@@ -912,11 +938,42 @@ export class WarpedMap extends EventTarget {
         Math.max(...this.image.tileZoomLevels.map((size) => size.height))
       ]
 
+      this.imageInfoError = undefined
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.IMAGELOADED))
     } catch (err) {
-      this.fetchingImageInfo = false
-      throw err
+      if (isAbortError(err)) {
+        throw err
+      }
+
+      const error = ensureError(err)
+      const resourceId = this.georeferencedMap.resource.id
+      const errorData =
+        error instanceof ResourceFetchError
+          ? {
+              errorKind: error.kind,
+              corsLikely: error.corsLikely,
+              status: error.status
+            }
+          : {
+              errorKind: imageInfoFetched ? 'parse' : 'unknown'
+            }
+
+      this.imageInfoError = error
+      this.dispatchEvent(
+        new WarpedMapErrorEvent(
+          error,
+          {
+            mapIds: [this.mapId],
+            imageId: resourceId,
+            imageInfoUrl: `${resourceId}/info.json`,
+            ...errorData
+          },
+          WarpedMapEventType.IMAGEINFOFETCHERROR
+        )
+      )
+      throw error
     } finally {
+      this.abortController = undefined
       this.fetchingImageInfo = false
     }
   }

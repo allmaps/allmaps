@@ -30,7 +30,11 @@ import {
   optionKeysToUndefinedOptions,
   pointInBbox
 } from '@allmaps/stdlib'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 
 import type { Ring, Bbox, Point } from '@allmaps/types'
 import type { Projection } from '@allmaps/project'
@@ -83,6 +87,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   options: WarpedMapListOptions<W>
 
   #boundImageLoadedByMapId: Map<string, EventListener>
+  #boundImageInfoFetchErrorByMapId: Map<string, EventListener>
 
   /**
    * Creates an instance of a WarpedMapList
@@ -118,6 +123,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     this.zIndices = new Map()
     this.imagesById = new Map()
     this.#boundImageLoadedByMapId = new Map()
+    this.#boundImageInfoFetchErrorByMapId = new Map()
 
     this.options = mergeOptions(
       this.DEFAULT_WARPED_MAP_LIST_OPTIONS,
@@ -1479,18 +1485,62 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     )
   }
 
-  #addEventListenersToWarpedMap(warpedMap: W) {
-    const bound = this.#imageLoaded.bind(this, warpedMap.mapId)
-    this.#boundImageLoadedByMapId.set(warpedMap.mapId, bound)
+  #imageInfoFetchError(mapId: string, event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      this.dispatchEvent(
+        new WarpedMapErrorEvent(
+          ensureError(event.error),
+          {
+            ...event.data,
+            mapIds: [mapId]
+          },
+          WarpedMapEventType.IMAGEINFOFETCHERROR
+        )
+      )
+    }
+  }
 
-    warpedMap.addEventListener(WarpedMapEventType.IMAGELOADED, bound)
+  #addEventListenersToWarpedMap(warpedMap: W) {
+    const boundImageLoaded = this.#imageLoaded.bind(this, warpedMap.mapId)
+    const boundImageInfoFetchError = this.#imageInfoFetchError.bind(
+      this,
+      warpedMap.mapId
+    )
+    this.#boundImageLoadedByMapId.set(warpedMap.mapId, boundImageLoaded)
+    this.#boundImageInfoFetchErrorByMapId.set(
+      warpedMap.mapId,
+      boundImageInfoFetchError
+    )
+
+    warpedMap.addEventListener(
+      WarpedMapEventType.IMAGELOADED,
+      boundImageLoaded
+    )
+    warpedMap.addEventListener(
+      WarpedMapEventType.IMAGEINFOFETCHERROR,
+      boundImageInfoFetchError
+    )
   }
 
   #removeEventListenersFromWarpedMap(warpedMap: W) {
-    const bound = this.#boundImageLoadedByMapId.get(warpedMap.mapId)
-    if (bound) {
-      warpedMap.removeEventListener(WarpedMapEventType.IMAGELOADED, bound)
+    const boundImageLoaded = this.#boundImageLoadedByMapId.get(warpedMap.mapId)
+    if (boundImageLoaded) {
+      warpedMap.removeEventListener(
+        WarpedMapEventType.IMAGELOADED,
+        boundImageLoaded
+      )
       this.#boundImageLoadedByMapId.delete(warpedMap.mapId)
+    }
+
+    const boundImageInfoFetchError = this.#boundImageInfoFetchErrorByMapId.get(
+      warpedMap.mapId
+    )
+    if (boundImageInfoFetchError) {
+      warpedMap.removeEventListener(
+        WarpedMapEventType.IMAGEINFOFETCHERROR,
+        boundImageInfoFetchError
+      )
+      this.#boundImageInfoFetchErrorByMapId.delete(warpedMap.mapId)
     }
   }
 
