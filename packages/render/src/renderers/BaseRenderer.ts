@@ -67,6 +67,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   #boundMapTileLoaded = this.mapTileLoaded.bind(this)
   #boundMapTileDeleted = this.mapTileDeleted.bind(this)
   #boundImageLoaded = this.imageLoaded.bind(this)
+  #boundImageInfoFetchError = this.imageInfoFetchError.bind(this)
   #boundWarpedMapAdded = this.warpedMapAdded.bind(this)
   #boundWarpedMapRemoved = this.warpedMapRemoved.bind(this)
   #boundPrepareChange = this.prepareChange.bind(this)
@@ -566,7 +567,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
         applyMask: false
       })
       .filter(
-        (warpedMap) => !warpedMap.hasImage() && !warpedMap.fetchingImageInfo
+        (warpedMap) =>
+          !warpedMap.hasImage() &&
+          !warpedMap.fetchingImageInfo &&
+          !warpedMap.imageInfoError
       )
       .map((warpedMap) => warpedMap.loadImage(this.warpedMapList.imagesById))
   }
@@ -1208,6 +1212,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected imageLoaded(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  protected imageInfoFetchError(event: Event): void {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected warpedMapAdded(event: Event): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
@@ -1234,6 +1241,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.#boundImageLoaded
+    )
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.IMAGEINFOFETCHERROR,
+      this.#boundImageInfoFetchError
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.WARPEDMAPADDED,
@@ -1269,6 +1280,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.#boundImageLoaded
+    )
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.IMAGEINFOFETCHERROR,
+      this.#boundImageInfoFetchError
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPADDED,

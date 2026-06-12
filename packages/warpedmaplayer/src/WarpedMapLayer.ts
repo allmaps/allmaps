@@ -1076,6 +1076,11 @@ export abstract class BaseWarpedMapLayer<
     )
 
     this.renderer.addEventListener(
+      WarpedMapEventType.IMAGEINFOFETCHERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.addEventListener(
       WarpedMapEventType.ERROR,
       this.nativePassWarpedMapEvent.bind(this)
     )
@@ -1164,6 +1169,11 @@ export abstract class BaseWarpedMapLayer<
     this.renderer.removeEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.nativeUpdate.bind(this)
+    )
+
+    this.renderer.removeEventListener(
+      WarpedMapEventType.IMAGEINFOFETCHERROR,
+      this.nativePassWarpedMapEvent.bind(this)
     )
 
     this.renderer.removeEventListener(
