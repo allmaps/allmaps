@@ -3036,9 +3036,15 @@ importers:
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/tailwind':
+        specifier: workspace:^
+        version: link:../../packages/tailwind
       '@allmaps/transform':
         specifier: workspace:^
         version: link:../../packages/transform
+      '@allmaps/ui':
+        specifier: workspace:^
+        version: link:../../packages/ui
       phosphor-svelte:
         specifier: ^3.0.1
         version: 3.0.1(svelte@5.51.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
