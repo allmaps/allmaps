@@ -34,6 +34,8 @@ type SourceImage = {
 
 const localBaseUrl = 'http://localhost:5506/cors'
 const targetWidth = 2500
+const minimumTargetHeight = 1000
+const maximumWebpDimension = 16_383
 
 function parseArguments(args: string[]): ImportOptions {
   const options: Partial<ImportOptions> = {}
@@ -76,6 +78,17 @@ function isUrl(value: string) {
 
 function isJsonObject(value: unknown): value is JsonObject {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+function getTargetWidth(originalWidth: number, originalHeight: number) {
+  const widthForMinimumHeight = Math.ceil(
+    (minimumTargetHeight / originalHeight) * originalWidth
+  )
+
+  return Math.min(
+    maximumWebpDimension,
+    Math.max(targetWidth, widthForMinimumHeight)
+  )
 }
 
 function cloneJsonObject(value: unknown): JsonObject {
@@ -536,7 +549,7 @@ function createLocalMap(
 
   const localSource: JsonObject = {
     ...source,
-    id: `${localBaseUrl}/iiif/2/${imageId}`,
+    id: `${localBaseUrl}/iiif/2/level1/${imageId}`,
     type: 'ImageService2',
     width,
     height,
@@ -676,11 +689,12 @@ async function importAnnotation() {
     (options.label ??
       [manifestLabel, imageLabel].filter(Boolean).join(' - ')) ||
     imageId
-  const imageRequestUrl = `${sourceImage.serviceId}/full/${targetWidth},/0/default.jpg`
+  const importedImageWidth = getTargetWidth(dimensions.width, dimensions.height)
+  const imageRequestUrl = `${sourceImage.serviceId}/full/${importedImageWidth},/0/default.jpg`
   const imageBytes = await fetchBytes(imageRequestUrl)
   const webpBuffer = await sharp(imageBytes)
     .resize({
-      width: targetWidth,
+      width: importedImageWidth,
       withoutEnlargement: true
     })
     .webp({

@@ -16,6 +16,7 @@ import {
   cloneJsonObject,
   localizeFixtureUrls,
   parseCorsMode,
+  parseImageComplianceLevel,
   parseIiifVersion,
   parseJsonFilename,
   parsePath,
@@ -24,6 +25,7 @@ import {
 import {
   imageResponse,
   jsonResponse,
+  redirectResponse,
   textResponse,
   withCors
 } from './responses.ts'
@@ -31,6 +33,7 @@ import type {
   Bbox,
   CorsMode,
   IiifVersion,
+  ImageComplianceLevel,
   JsonObject,
   Point,
   Region,
@@ -39,6 +42,20 @@ import type {
 } from './types.ts'
 
 type ImageFixture = ImageFixtureDefinition
+type Link = {
+  label: string
+  href: string
+  version?: IiifVersion
+  versionLabel?: string
+  complianceLevel?: ImageComplianceLevel
+  complianceLabel?: string
+  group?: string
+}
+
+type ImageApiService = {
+  version: IiifVersion
+  complianceLevel: ImageComplianceLevel
+}
 
 const navPlaceContext = 'http://iiif.io/api/extension/navplace/context.json'
 const presentation3Context = 'http://iiif.io/api/presentation/3/context.json'
@@ -74,6 +91,61 @@ const originalManifests = new Map(
     ]
   })
 )
+
+const catalogImageComplianceLevels = ['level0', 'level2'] as const
+const catalogImageApiServices = (['2', '3'] as const).flatMap((version) =>
+  catalogImageComplianceLevels.map((complianceLevel) => ({
+    version,
+    complianceLevel
+  }))
+)
+
+function getImageApiVersionLabel(version: IiifVersion) {
+  return version === '2' ? '2.1' : '3.0'
+}
+
+function getImageApiLabel(version: IiifVersion) {
+  return `IIIF Image API ${getImageApiVersionLabel(version)}`
+}
+
+function createImageApiLink(
+  version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
+  label: string,
+  href: string
+) {
+  return {
+    label,
+    href,
+    version,
+    versionLabel: getImageApiLabel(version),
+    complianceLevel,
+    complianceLabel: complianceLevel
+  }
+}
+
+function isImageComplianceLevel(value: string): value is ImageComplianceLevel {
+  return value === 'level0' || value === 'level1' || value === 'level2'
+}
+
+function getIiif2Profile(complianceLevel: ImageComplianceLevel) {
+  return `http://iiif.io/api/image/2/${complianceLevel}.json`
+}
+
+function getImageServiceProfile(
+  version: IiifVersion,
+  complianceLevel: ImageComplianceLevel
+) {
+  return version === '2' ? getIiif2Profile(complianceLevel) : complianceLevel
+}
+
+function getImageServiceType(version: IiifVersion) {
+  return version === '2' ? 'ImageService2' : 'ImageService3'
+}
+
+function isJsonObject(value: unknown): value is JsonObject {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
 
 function getImage(imageId: string) {
   const image = images.get(imageId)
@@ -306,10 +378,33 @@ function getEmbeddedAnnotationErrorVariant(variant: string) {
   return undefined
 }
 
+function getLinkedAnnotationErrorVariant(variant: string) {
+  if (variant === 'linked-annotation-missing-target') {
+    return 'missing-target'
+  }
+
+  if (variant === 'linked-annotation-one-gcp') {
+    return 'one-gcp'
+  }
+
+  if (variant === 'linked-annotation-mixed-errors') {
+    return 'mixed-errors'
+  }
+
+  return undefined
+}
+
 function isEmbeddedAnnotationVariant(variant: string) {
   return (
     variant === 'embedded-annotation' ||
     getEmbeddedAnnotationErrorVariant(variant) !== undefined
+  )
+}
+
+function isLinkedAnnotationVariant(variant: string) {
+  return (
+    variant === 'linked-annotation' ||
+    getLinkedAnnotationErrorVariant(variant) !== undefined
   )
 }
 
@@ -318,6 +413,7 @@ function isIiif3ManifestVariant(variant: string) {
     variant === 'default' ||
     variant === 'bad-service-type' ||
     isEmbeddedAnnotationVariant(variant) ||
+    isLinkedAnnotationVariant(variant) ||
     variant === 'navplace-midpoint' ||
     variant === 'navplace-bbox'
   )
@@ -327,34 +423,389 @@ function getCombinedImages() {
   return [...images.values()]
 }
 
+function createCombinedImageServiceLink(
+  label: string,
+  href: string,
+  versionLabel: string,
+  complianceLabel: string
+) {
+  return {
+    label,
+    href,
+    group: 'image-services',
+    versionLabel,
+    complianceLabel
+  }
+}
+
+function getImageApiServiceVariant({
+  version,
+  complianceLevel
+}: ImageApiService) {
+  return `iiif${version}-${complianceLevel}`
+}
+
+function getCombinedImageServiceManifestVariant(
+  service: ImageApiService,
+  annotationMode: 'embedded' | 'linked'
+) {
+  return `image-services-${getImageApiServiceVariant(service)}-${annotationMode}-annotations`
+}
+
+function parseImageApiServiceVariant(
+  variant: string
+): ImageApiService | undefined {
+  const match = variant.match(/^iiif([23])-(level[012])$/)
+
+  if (!match) {
+    return undefined
+  }
+
+  return {
+    version: match[1] as IiifVersion,
+    complianceLevel: match[2] as ImageComplianceLevel
+  }
+}
+
+function parseCombinedImageServiceManifestVariant(variant: string):
+  | (ImageApiService & {
+      annotationMode: 'embedded' | 'linked'
+    })
+  | undefined {
+  const match = variant.match(
+    /^image-services-iiif([23])-(level[012])-(embedded|linked)-annotations$/
+  )
+
+  if (!match) {
+    return undefined
+  }
+
+  return {
+    version: match[1] as IiifVersion,
+    complianceLevel: match[2] as ImageComplianceLevel,
+    annotationMode: match[3] as 'embedded' | 'linked'
+  }
+}
+
 function getCombinedAnnotationVariants(baseUrl: string) {
   return [
-    {
-      label: 'All annotations, current image CORS mode',
-      href: `${baseUrl}/annotations/combined/all-correct.json`
-    },
-    {
-      label: 'All annotations, mixed image CORS modes',
-      href: `${baseUrl}/annotations/combined/mixed-cors.json`
-    },
-    {
-      label: 'Mixed correct and incorrect annotations',
-      href: `${baseUrl}/annotations/combined/mixed-errors.json`
-    },
-    {
-      label: 'Mixed CORS modes, correct and incorrect annotations',
-      href: `${baseUrl}/annotations/combined/mixed-cors-errors.json`
-    }
+    ...catalogImageApiServices.map((service) =>
+      createImageApiLink(
+        service.version,
+        service.complianceLevel,
+        'All annotations',
+        `${baseUrl}/annotations/combined/${getImageApiServiceVariant(service)}.json`
+      )
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'All annotations, mixed image CORS modes',
+      `${baseUrl}/annotations/combined/mixed-cors-iiif3-level2.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Mixed correct and incorrect annotations',
+      `${baseUrl}/annotations/combined/mixed-errors-iiif3-level2.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Mixed CORS modes, correct and incorrect annotations',
+      `${baseUrl}/annotations/combined/mixed-cors-errors-iiif3-level2.json`
+    ),
+    createCombinedImageServiceLink(
+      'Annotation page',
+      `${baseUrl}/annotations/combined/mixed-iiif2-level0-level2.json`,
+      'IIIF Image API 2.1',
+      'level0 + level2'
+    ),
+    createCombinedImageServiceLink(
+      'Annotation page',
+      `${baseUrl}/annotations/combined/mixed-iiif3-level0-level2.json`,
+      'IIIF Image API 3.0',
+      'level0 + level2'
+    ),
+    createCombinedImageServiceLink(
+      'Annotation page',
+      `${baseUrl}/annotations/combined/mixed-iiif2-level0-iiif3-level2.json`,
+      'IIIF Image API 2.1 + 3.0',
+      '2.1 level0 + 3.0 level2'
+    ),
+    createCombinedImageServiceLink(
+      'Annotation page',
+      `${baseUrl}/annotations/combined/mixed-iiif2-level2-iiif3-level0.json`,
+      'IIIF Image API 2.1 + 3.0',
+      '2.1 level2 + 3.0 level0'
+    )
   ]
 }
 
 function getCombinedManifestVariants(baseUrl: string) {
   return [
-    {
-      label: 'IIIF 3 manifest with all embedded annotations',
-      href: `${baseUrl}/manifests/3/combined/embedded-annotations.json`
-    }
+    ...catalogImageApiServices.flatMap((service) => [
+      createImageApiLink(
+        service.version,
+        service.complianceLevel,
+        'All embedded annotations',
+        `${baseUrl}/manifests/3/combined/${getCombinedImageServiceManifestVariant(service, 'embedded')}.json`
+      ),
+      createImageApiLink(
+        service.version,
+        service.complianceLevel,
+        'All linked annotations',
+        `${baseUrl}/manifests/3/combined/${getCombinedImageServiceManifestVariant(service, 'linked')}.json`
+      )
+    ]),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Some embedded, some linked annotations',
+      `${baseUrl}/manifests/3/combined/partial-embedded-annotations.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Some linked annotations',
+      `${baseUrl}/manifests/3/combined/partial-linked-annotations.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Mixed correct/incorrect embedded annotations',
+      `${baseUrl}/manifests/3/combined/mixed-embedded-annotation-errors.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Mixed correct/incorrect linked annotations',
+      `${baseUrl}/manifests/3/combined/mixed-linked-annotation-errors.json`
+    ),
+    createCombinedImageServiceLink(
+      'IIIF Presentation 3.0 manifest',
+      `${baseUrl}/manifests/3/combined/image-services-iiif2-level0-level2.json`,
+      'IIIF Image API 2.1',
+      'level0 + level2'
+    ),
+    createCombinedImageServiceLink(
+      'IIIF Presentation 3.0 manifest',
+      `${baseUrl}/manifests/3/combined/image-services-iiif3-level0-level2.json`,
+      'IIIF Image API 3.0',
+      'level0 + level2'
+    ),
+    createCombinedImageServiceLink(
+      'IIIF Presentation 3.0 manifest',
+      `${baseUrl}/manifests/3/combined/image-services-iiif2-level0-iiif3-level2.json`,
+      'IIIF Image API 2.1 + 3.0',
+      '2.1 level0 + 3.0 level2'
+    ),
+    createCombinedImageServiceLink(
+      'IIIF Presentation 3.0 manifest',
+      `${baseUrl}/manifests/3/combined/image-services-iiif2-level2-iiif3-level0.json`,
+      'IIIF Image API 2.1 + 3.0',
+      '2.1 level2 + 3.0 level0'
+    )
   ]
+}
+
+function isCombinedIiif3ManifestVariant(variant: string) {
+  return (
+    parseCombinedImageServiceManifestVariant(variant) !== undefined ||
+    [
+      'embedded-annotations',
+      'linked-annotations',
+      'partial-embedded-annotations',
+      'partial-linked-annotations',
+      'mixed-embedded-annotation-errors',
+      'mixed-linked-annotation-errors',
+      'image-services-iiif2-level0-level1',
+      'image-services-iiif3-level0-level1',
+      'image-services-iiif2-level0-iiif3-level1',
+      'image-services-iiif2-level1-iiif3-level0',
+      'image-services-iiif2-level0-level2',
+      'image-services-iiif3-level0-level2',
+      'image-services-iiif2-level0-iiif3-level2',
+      'image-services-iiif2-level2-iiif3-level0'
+    ].includes(variant)
+  )
+}
+
+function getCombinedManifestLabel(variant: string) {
+  const imageServiceVariant = parseCombinedImageServiceManifestVariant(variant)
+
+  if (imageServiceVariant) {
+    return `Combined fixture images with IIIF ${getImageApiVersionLabel(
+      imageServiceVariant.version
+    )} ${imageServiceVariant.complianceLevel} images and ${
+      imageServiceVariant.annotationMode
+    } annotations`
+  }
+
+  if (variant === 'linked-annotations') {
+    return 'Combined fixture images with linked annotations'
+  }
+
+  if (variant === 'partial-embedded-annotations') {
+    return 'Combined fixture images with some embedded and some linked annotations'
+  }
+
+  if (variant === 'partial-linked-annotations') {
+    return 'Combined fixture images with some linked annotations'
+  }
+
+  if (variant === 'mixed-embedded-annotation-errors') {
+    return 'Combined fixture images with mixed correct/incorrect embedded annotations'
+  }
+
+  if (variant === 'mixed-linked-annotation-errors') {
+    return 'Combined fixture images with mixed correct/incorrect linked annotations'
+  }
+
+  if (variant === 'image-services-iiif2-level0-level1') {
+    return 'Combined fixture images with IIIF 2.1 level 0 and level 1 images'
+  }
+
+  if (variant === 'image-services-iiif2-level0-level2') {
+    return 'Combined fixture images with IIIF 2.1 level 0 and level 2 images'
+  }
+
+  if (variant === 'image-services-iiif3-level0-level1') {
+    return 'Combined fixture images with IIIF 3.0 level 0 and level 1 images'
+  }
+
+  if (variant === 'image-services-iiif3-level0-level2') {
+    return 'Combined fixture images with IIIF 3.0 level 0 and level 2 images'
+  }
+
+  if (variant === 'image-services-iiif2-level0-iiif3-level1') {
+    return 'Combined fixture images with IIIF 2.1 level 0 and IIIF 3.0 level 1 images'
+  }
+
+  if (variant === 'image-services-iiif2-level0-iiif3-level2') {
+    return 'Combined fixture images with IIIF 2.1 level 0 and IIIF 3.0 level 2 images'
+  }
+
+  if (variant === 'image-services-iiif2-level1-iiif3-level0') {
+    return 'Combined fixture images with IIIF 2.1 level 1 and IIIF 3.0 level 0 images'
+  }
+
+  if (variant === 'image-services-iiif2-level2-iiif3-level0') {
+    return 'Combined fixture images with IIIF 2.1 level 2 and IIIF 3.0 level 0 images'
+  }
+
+  return 'Combined fixture images with embedded annotations'
+}
+
+function getCombinedCanvasManifestVariant(variant: string, index: number) {
+  const imageServiceVariant = parseCombinedImageServiceManifestVariant(variant)
+
+  if (imageServiceVariant) {
+    return imageServiceVariant.annotationMode === 'linked'
+      ? 'linked-annotation'
+      : 'embedded-annotation'
+  }
+
+  if (variant === 'linked-annotations') {
+    return 'linked-annotation'
+  }
+
+  if (variant === 'partial-embedded-annotations') {
+    return index % 2 === 0 ? 'embedded-annotation' : 'linked-annotation'
+  }
+
+  if (variant === 'partial-linked-annotations') {
+    return index % 2 === 0 ? 'linked-annotation' : 'default'
+  }
+
+  if (variant === 'mixed-embedded-annotation-errors') {
+    return index % 2 === 0
+      ? 'embedded-annotation'
+      : index % 4 === 1
+        ? 'embedded-annotation-one-gcp'
+        : 'embedded-annotation-missing-target'
+  }
+
+  if (variant === 'mixed-linked-annotation-errors') {
+    return index % 2 === 0
+      ? 'linked-annotation'
+      : index % 4 === 1
+        ? 'linked-annotation-one-gcp'
+        : 'linked-annotation-missing-target'
+  }
+
+  return 'embedded-annotation'
+}
+
+function getCombinedCanvasImageService(
+  variant: string,
+  index: number
+): { version: IiifVersion; complianceLevel: ImageComplianceLevel } {
+  const imageServiceVariant = parseCombinedImageServiceManifestVariant(variant)
+
+  if (imageServiceVariant) {
+    return {
+      version: imageServiceVariant.version,
+      complianceLevel: imageServiceVariant.complianceLevel
+    }
+  }
+
+  if (variant === 'image-services-iiif2-level0-level1') {
+    return {
+      version: '2',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level1'
+    }
+  }
+
+  if (variant === 'image-services-iiif2-level0-level2') {
+    return {
+      version: '2',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level2'
+    }
+  }
+
+  if (variant === 'image-services-iiif3-level0-level1') {
+    return {
+      version: '3',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level1'
+    }
+  }
+
+  if (variant === 'image-services-iiif3-level0-level2') {
+    return {
+      version: '3',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level2'
+    }
+  }
+
+  if (variant === 'image-services-iiif2-level0-iiif3-level1') {
+    return index % 2 === 0
+      ? { version: '2', complianceLevel: 'level0' }
+      : { version: '3', complianceLevel: 'level1' }
+  }
+
+  if (variant === 'image-services-iiif2-level0-iiif3-level2') {
+    return index % 2 === 0
+      ? { version: '2', complianceLevel: 'level0' }
+      : { version: '3', complianceLevel: 'level2' }
+  }
+
+  if (variant === 'image-services-iiif2-level1-iiif3-level0') {
+    return index % 2 === 0
+      ? { version: '2', complianceLevel: 'level1' }
+      : { version: '3', complianceLevel: 'level0' }
+  }
+
+  if (variant === 'image-services-iiif2-level2-iiif3-level0') {
+    return index % 2 === 0
+      ? { version: '2', complianceLevel: 'level2' }
+      : { version: '3', complianceLevel: 'level0' }
+  }
+
+  return {
+    version: '3',
+    complianceLevel: 'level2'
+  }
 }
 
 function getCombinedTargetCorsMode(
@@ -362,11 +813,150 @@ function getCombinedTargetCorsMode(
   variant: string,
   index: number
 ): CorsMode {
-  if (variant === 'mixed-cors' || variant === 'mixed-cors-errors') {
+  if (
+    variant === 'mixed-cors' ||
+    variant === 'mixed-cors-errors' ||
+    variant === 'mixed-cors-iiif3-level2' ||
+    variant === 'mixed-cors-errors-iiif3-level2'
+  ) {
     return index % 2 === 0 ? 'cors' : 'no-cors'
   }
 
   return responseCorsMode
+}
+
+function getCombinedAnnotationImageService(
+  variant: string,
+  index: number
+): { version: IiifVersion; complianceLevel: ImageComplianceLevel } | undefined {
+  const imageServiceVariant = parseImageApiServiceVariant(variant)
+
+  if (imageServiceVariant) {
+    return imageServiceVariant
+  }
+
+  if (variant === 'mixed-iiif2-level0-level1') {
+    return {
+      version: '2',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level1'
+    }
+  }
+
+  if (variant === 'mixed-iiif2-level0-level2') {
+    return {
+      version: '2',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level2'
+    }
+  }
+
+  if (variant === 'mixed-iiif3-level0-level1') {
+    return {
+      version: '3',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level1'
+    }
+  }
+
+  if (variant === 'mixed-iiif3-level0-level2') {
+    return {
+      version: '3',
+      complianceLevel: index % 2 === 0 ? 'level0' : 'level2'
+    }
+  }
+
+  if (variant === 'mixed-iiif2-level0-iiif3-level1') {
+    return index % 2 === 0
+      ? { version: '2' as const, complianceLevel: 'level0' as const }
+      : { version: '3' as const, complianceLevel: 'level1' as const }
+  }
+
+  if (variant === 'mixed-iiif2-level0-iiif3-level2') {
+    return index % 2 === 0
+      ? { version: '2' as const, complianceLevel: 'level0' as const }
+      : { version: '3' as const, complianceLevel: 'level2' as const }
+  }
+
+  if (variant === 'mixed-iiif2-level1-iiif3-level0') {
+    return index % 2 === 0
+      ? { version: '2' as const, complianceLevel: 'level1' as const }
+      : { version: '3' as const, complianceLevel: 'level0' as const }
+  }
+
+  if (variant === 'mixed-iiif2-level2-iiif3-level0') {
+    return index % 2 === 0
+      ? { version: '2' as const, complianceLevel: 'level2' as const }
+      : { version: '3' as const, complianceLevel: 'level0' as const }
+  }
+
+  if (
+    variant === 'mixed-cors-iiif3-level2' ||
+    variant === 'mixed-errors-iiif3-level2' ||
+    variant === 'mixed-cors-errors-iiif3-level2'
+  ) {
+    return {
+      version: '3',
+      complianceLevel: 'level2'
+    }
+  }
+
+  return undefined
+}
+
+function applyAnnotationImageService(
+  annotationPage: JsonObject,
+  baseUrl: string,
+  image: ImageFixture,
+  service:
+    | { version: IiifVersion; complianceLevel: ImageComplianceLevel }
+    | undefined
+) {
+  if (!service || !Array.isArray(annotationPage.items)) {
+    return annotationPage
+  }
+
+  for (const item of annotationPage.items) {
+    if (!isJsonObject(item.target) || !isJsonObject(item.target.source)) {
+      continue
+    }
+
+    item.target.source.id = `${baseUrl}/iiif/${service.version}/${service.complianceLevel}/${image.id}`
+    item.target.source.type = getImageServiceType(service.version)
+  }
+
+  return annotationPage
+}
+
+function getImageAnnotationId(
+  baseUrl: string,
+  image: ImageFixture,
+  service?: ImageApiService
+) {
+  if (!service) {
+    return `${baseUrl}/annotations/images/${image.id}.json`
+  }
+
+  return `${baseUrl}/annotations/images/${service.version}/${service.complianceLevel}/${image.id}.json`
+}
+
+function createImageAnnotation(
+  request: Request,
+  corsMode: CorsMode,
+  image: ImageFixture,
+  service?: ImageApiService
+) {
+  const baseUrl = getBaseUrl(request, corsMode)
+  const annotation = cloneJsonObject(
+    localizeFixtureUrls(
+      JSON.parse(readFileSync(image.annotationPath, 'utf8')),
+      baseUrl
+    )
+  )
+
+  applyAnnotationImageService(annotation, baseUrl, image, service)
+
+  return {
+    ...annotation,
+    id: getImageAnnotationId(baseUrl, image, service)
+  }
 }
 
 function getCombinedAnnotationErrorVariant(index: number) {
@@ -375,7 +965,10 @@ function getCombinedAnnotationErrorVariant(index: number) {
 
 function shouldBreakCombinedAnnotation(variant: string, index: number) {
   return (
-    (variant === 'mixed-errors' || variant === 'mixed-cors-errors') &&
+    (variant === 'mixed-errors' ||
+      variant === 'mixed-cors-errors' ||
+      variant === 'mixed-errors-iiif3-level2' ||
+      variant === 'mixed-cors-errors-iiif3-level2') &&
     index % 2 === 1
   )
 }
@@ -386,11 +979,23 @@ function createCombinedAnnotation(
   variant: string
 ) {
   if (
+    parseImageApiServiceVariant(variant) === undefined &&
     ![
       'all-correct',
       'mixed-cors',
       'mixed-errors',
-      'mixed-cors-errors'
+      'mixed-cors-errors',
+      'mixed-cors-iiif3-level2',
+      'mixed-errors-iiif3-level2',
+      'mixed-cors-errors-iiif3-level2',
+      'mixed-iiif2-level0-level1',
+      'mixed-iiif3-level0-level1',
+      'mixed-iiif2-level0-iiif3-level1',
+      'mixed-iiif2-level1-iiif3-level0',
+      'mixed-iiif2-level0-level2',
+      'mixed-iiif3-level0-level2',
+      'mixed-iiif2-level0-iiif3-level2',
+      'mixed-iiif2-level2-iiif3-level0'
     ].includes(variant)
   ) {
     throw new Error(`Unknown combined annotation variant: ${variant}`)
@@ -410,6 +1015,12 @@ function createCombinedAnnotation(
       const annotation = JSON.parse(readFileSync(image.annotationPath, 'utf8'))
       const annotationPage = cloneJsonObject(
         localizeFixtureUrls(annotation, targetBaseUrl)
+      )
+      applyAnnotationImageService(
+        annotationPage,
+        targetBaseUrl,
+        image,
+        getCombinedAnnotationImageService(variant, index)
       )
 
       return Array.isArray(annotationPage.items)
@@ -436,6 +1047,45 @@ function createCombinedAnnotation(
   }
 }
 
+function getLinkedAnnotationPageId(
+  baseUrl: string,
+  imageId: string,
+  variant: string,
+  service?: ImageApiService
+) {
+  if (service) {
+    return `${baseUrl}/annotations/manifests/3/${service.version}/${service.complianceLevel}/${imageId}/${variant}.json`
+  }
+
+  return `${baseUrl}/annotations/manifests/3/${imageId}/${variant}.json`
+}
+
+function getCombinedLinkedAnnotationPageId(
+  baseUrl: string,
+  variant: string,
+  index: number
+) {
+  return `${baseUrl}/annotations/manifests/3/combined/${variant}/canvas/${
+    index + 1
+  }.json`
+}
+
+function getManifestImageRequest(
+  imageServiceId: string,
+  imageApiVersion: IiifVersion
+) {
+  const imagePathSize = imageApiVersion === '2' ? 'full' : 'max'
+
+  return `${imageServiceId}/full/${imagePathSize}/0/default.jpg`
+}
+
+function getManifestImageBodyDimensions(image: ImageFixture) {
+  return {
+    width: image.width,
+    height: image.height
+  }
+}
+
 function createIiif3Canvas(
   request: Request,
   corsMode: CorsMode,
@@ -443,15 +1093,27 @@ function createIiif3Canvas(
   manifestId: string,
   manifestLabel: JsonObject,
   variant = 'default',
-  index = 1
+  index = 1,
+  linkedAnnotationPageId?: string,
+  imageApiVersion: IiifVersion = '3',
+  imageComplianceLevel: ImageComplianceLevel = 'level1'
 ) {
   const canvasId = `${manifestId}/canvas/${index}`
   const annotationPageId = `${canvasId}/annotation-page/1`
   const annotationId = `${annotationPageId}/annotation/1`
-  const imageServiceId = getImageServiceId(request, corsMode, '3', image.id)
+  const imageServiceId = getImageServiceId(
+    request,
+    corsMode,
+    imageApiVersion,
+    imageComplianceLevel,
+    image.id
+  )
   const canvasLabel = image.imageLabel ?? image.label
+  const imageBodyDimensions = getManifestImageBodyDimensions(image)
   const serviceType =
-    variant === 'bad-service-type' ? 'ImageService2' : 'ImageService3'
+    variant === 'bad-service-type'
+      ? 'ImageService2'
+      : getImageServiceType(imageApiVersion)
   const canvas: JsonObject = {
     id: canvasId,
     type: 'Canvas',
@@ -470,16 +1132,19 @@ function createIiif3Canvas(
             type: 'Annotation',
             motivation: 'painting',
             body: {
-              id: `${imageServiceId}/full/max/0/default.jpg`,
+              id: getManifestImageRequest(imageServiceId, imageApiVersion),
               type: 'Image',
               format: 'image/jpeg',
-              width: image.width,
-              height: image.height,
+              width: imageBodyDimensions.width,
+              height: imageBodyDimensions.height,
               service: [
                 {
                   id: imageServiceId,
                   type: serviceType,
-                  profile: 'level1'
+                  profile: getImageServiceProfile(
+                    imageApiVersion,
+                    imageComplianceLevel
+                  )
                 }
               ]
             },
@@ -502,16 +1167,33 @@ function createIiif3Canvas(
         getEmbeddedAnnotationErrorVariant(variant)
       )
     ]
+  } else if (isLinkedAnnotationVariant(variant)) {
+    canvas.annotations = [
+      {
+        id:
+          linkedAnnotationPageId ??
+          getLinkedAnnotationPageId(
+            getBaseUrl(request, corsMode),
+            image.id,
+            variant
+          ),
+        type: 'AnnotationPage'
+      }
+    ]
   }
 
   return canvas
 }
 
-function createCombinedIiif3Manifest(request: Request, corsMode: CorsMode) {
+function createCombinedIiif3Manifest(
+  request: Request,
+  corsMode: CorsMode,
+  variant: string
+) {
   const baseUrl = getBaseUrl(request, corsMode)
-  const manifestId = `${baseUrl}/manifests/3/combined/embedded-annotations.json`
+  const manifestId = `${baseUrl}/manifests/3/combined/${variant}.json`
   const label = {
-    none: ['Combined fixture images with embedded annotations']
+    none: [getCombinedManifestLabel(variant)]
   }
 
   return {
@@ -519,18 +1201,127 @@ function createCombinedIiif3Manifest(request: Request, corsMode: CorsMode) {
     id: manifestId,
     type: 'Manifest',
     label,
-    items: getCombinedImages().map((image, index) =>
-      createIiif3Canvas(
+    items: getCombinedImages().map((image, index) => {
+      const imageService = getCombinedCanvasImageService(variant, index)
+
+      return createIiif3Canvas(
         request,
         corsMode,
         image,
         manifestId,
         label,
-        'embedded-annotation',
-        index + 1
+        getCombinedCanvasManifestVariant(variant, index),
+        index + 1,
+        getCombinedLinkedAnnotationPageId(baseUrl, variant, index),
+        imageService.version,
+        imageService.complianceLevel
       )
-    )
+    })
   }
+}
+
+function createLinkedAnnotationPage(
+  request: Request,
+  corsMode: CorsMode,
+  image: ImageFixture,
+  manifestId: string,
+  manifestLabel: JsonObject,
+  canvasId: string,
+  annotationPageId: string,
+  variant: string
+) {
+  return {
+    ...createEmbeddedAnnotation(
+      request,
+      corsMode,
+      image,
+      manifestId,
+      manifestLabel,
+      canvasId,
+      getLinkedAnnotationErrorVariant(variant)
+    ),
+    id: annotationPageId
+  }
+}
+
+function createIiif3LinkedAnnotationPage(
+  request: Request,
+  corsMode: CorsMode,
+  image: ImageFixture,
+  variant: string,
+  imageApiVersion: IiifVersion = '3',
+  imageComplianceLevel: ImageComplianceLevel = 'level1',
+  useImageApiRoute = false
+) {
+  const baseUrl = getBaseUrl(request, corsMode)
+  const parsedOriginalManifest = getOriginalManifest(image)?.parsedManifest
+  const manifestId = `${baseUrl}/manifests/3/${
+    useImageApiRoute ? `${imageApiVersion}/${imageComplianceLevel}/` : ''
+  }${image.id}/${variant}.json`
+  const manifestLabel = image.manifestLabel ?? image.label
+  const label = parsedOriginalManifest?.label ?? {
+    none: [manifestLabel]
+  }
+  const canvasId = `${manifestId}/canvas/1`
+
+  return createLinkedAnnotationPage(
+    request,
+    corsMode,
+    image,
+    manifestId,
+    label,
+    canvasId,
+    getLinkedAnnotationPageId(
+      baseUrl,
+      image.id,
+      variant,
+      useImageApiRoute
+        ? {
+            version: imageApiVersion,
+            complianceLevel: imageComplianceLevel
+          }
+        : undefined
+    ),
+    variant
+  )
+}
+
+function createCombinedIiif3LinkedAnnotationPage(
+  request: Request,
+  corsMode: CorsMode,
+  variant: string,
+  canvasIndex: number
+) {
+  const baseUrl = getBaseUrl(request, corsMode)
+  const imageIndex = canvasIndex - 1
+  const image = getCombinedImages()[imageIndex]
+
+  if (!image) {
+    throw new Error(`Unknown combined manifest canvas: ${canvasIndex}`)
+  }
+
+  const canvasVariant = getCombinedCanvasManifestVariant(variant, imageIndex)
+
+  if (!isLinkedAnnotationVariant(canvasVariant)) {
+    throw new Error(`Canvas ${canvasIndex} does not have a linked annotation`)
+  }
+
+  const manifestId = `${baseUrl}/manifests/3/combined/${variant}.json`
+  const label = {
+    none: [getCombinedManifestLabel(variant)]
+  }
+  const canvasId = `${manifestId}/canvas/${canvasIndex}`
+
+  return createLinkedAnnotationPage(
+    request,
+    corsMode,
+    image,
+    manifestId,
+    label,
+    canvasId,
+    getCombinedLinkedAnnotationPageId(baseUrl, variant, imageIndex),
+    canvasVariant
+  )
 }
 
 function parseNumber(value: string, name: string) {
@@ -706,6 +1497,63 @@ function getOutputDimensions(region: Region, size: Size | undefined) {
   }
 }
 
+function assertLevel0TileRequest(
+  image: ImageFixture,
+  region: Region,
+  size: Size | undefined,
+  rotation: string,
+  quality: string,
+  format: string
+) {
+  if (rotation !== '0' || quality !== 'default' || format !== 'jpg') {
+    throw new Error('Level 0 only serves default JPEG requests')
+  }
+
+  const isFullRegion =
+    region.left === 0 &&
+    region.top === 0 &&
+    region.width === image.width &&
+    region.height === image.height
+  const outputDimensions = getOutputDimensions(region, size)
+  const isListedSize = getSizes(image).some(
+    (listedSize) =>
+      listedSize.width === outputDimensions.width &&
+      listedSize.height === outputDimensions.height
+  )
+
+  if (isFullRegion && !size?.fit && isListedSize) {
+    return
+  }
+
+  if (!size?.width || size.height || size.fit) {
+    throw new Error(
+      'Level 0 requests must use a listed full-image size or width-only tile size syntax'
+    )
+  }
+
+  const tile = getTiles(image)[0]
+  const scaleFactor = Math.round(region.width / size.width)
+  const expectedOutputWidth = Math.ceil(region.width / scaleFactor)
+  const expectedOutputHeight = Math.ceil(region.height / scaleFactor)
+
+  if (
+    !tile.scaleFactors.includes(scaleFactor) ||
+    size.width !== expectedOutputWidth ||
+    expectedOutputWidth > tile.width ||
+    expectedOutputHeight > tile.height ||
+    region.left % (tile.width * scaleFactor) !== 0 ||
+    region.top % (tile.height * scaleFactor) !== 0 ||
+    region.width > tile.width * scaleFactor ||
+    region.height > tile.height * scaleFactor ||
+    region.left + region.width > image.width ||
+    region.top + region.height > image.height
+  ) {
+    throw new Error(
+      'Level 0 only serves listed full-image sizes and tiles declared in info.json'
+    )
+  }
+}
+
 function createWatermark(output: { width: number; height: number }) {
   const label =
     output.width < 240 ? 'SCALED-DOWN COPY' : 'SCALED-DOWN COPY OF ORIGINAL'
@@ -808,10 +1656,23 @@ function getScaleFactors(image: ImageFixture) {
 }
 
 function getSizes(image: ImageFixture) {
-  return [...getScaleFactors(image)].reverse().map((scaleFactor) => ({
+  const sizes = [...getScaleFactors(image)].reverse().map((scaleFactor) => ({
     width: Math.ceil(image.width / scaleFactor),
     height: Math.ceil(image.height / scaleFactor)
   }))
+  const hasFullSize = sizes.some(
+    (size) => size.width === image.width && size.height === image.height
+  )
+
+  return hasFullSize
+    ? sizes
+    : [
+        ...sizes,
+        {
+          width: image.width,
+          height: image.height
+        }
+      ]
 }
 
 function getTiles(image: ImageFixture) {
@@ -828,40 +1689,84 @@ function createInfoJson(
   request: Request,
   corsMode: CorsMode,
   version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
   image: ImageFixture
 ) {
-  const id = getImageServiceId(request, corsMode, version, image.id)
+  const id = getImageServiceId(
+    request,
+    corsMode,
+    version,
+    complianceLevel,
+    image.id
+  )
   const sizes = getSizes(image)
   const tiles = getTiles(image)
 
   if (version === '2') {
+    const profile: (JsonObject | string)[] =
+      complianceLevel === 'level0'
+        ? [`http://iiif.io/api/image/2/${complianceLevel}.json`]
+        : [
+            `http://iiif.io/api/image/2/${complianceLevel}.json`,
+            {
+              formats:
+                complianceLevel === 'level2'
+                  ? ['jpg', 'png', 'webp']
+                  : ['jpg', 'webp'],
+              qualities:
+                complianceLevel === 'level2'
+                  ? ['default', 'color']
+                  : ['default'],
+              supports:
+                complianceLevel === 'level2'
+                  ? [
+                      'regionByPx',
+                      'regionByPct',
+                      'sizeByW',
+                      'sizeByH',
+                      'sizeByWh',
+                      'sizeByPct',
+                      'sizeByConfinedWh',
+                      'cors'
+                    ]
+                  : ['regionByPx', 'sizeByW', 'sizeByH', 'sizeByPct', 'cors']
+            }
+          ]
+
     return {
       '@context': 'http://iiif.io/api/image/2/context.json',
       '@id': id,
       protocol: 'http://iiif.io/api/image',
       width: image.width,
       height: image.height,
-      sizes,
       tiles,
-      profile: [
-        'http://iiif.io/api/image/2/level1.json',
-        {
-          formats: ['jpg', 'png', 'webp'],
-          qualities: ['default', 'color'],
-          supports: [
-            'regionByPx',
-            'regionByPct',
-            'sizeByW',
-            'sizeByH',
-            'sizeByWh',
-            'sizeByPct',
-            'sizeByConfinedWh',
-            'cors'
-          ]
-        }
-      ]
+      sizes,
+      profile
     }
   }
+
+  const level3Extras =
+    complianceLevel === 'level0'
+      ? {}
+      : complianceLevel === 'level1'
+        ? {
+            extraFormats: ['webp'],
+            extraFeatures: ['regionByPx', 'sizeByW', 'sizeByH', 'cors']
+          }
+        : {
+            extraFormats: ['png', 'webp'],
+            extraQualities: ['color'],
+            extraFeatures: [
+              'regionByPx',
+              'regionByPct',
+              'sizeByW',
+              'sizeByH',
+              'sizeByWh',
+              'sizeByPct',
+              'sizeByConfinedWh',
+              'cors'
+            ]
+          }
 
   return {
     '@context': 'http://iiif.io/api/image/3/context.json',
@@ -870,21 +1775,10 @@ function createInfoJson(
     protocol: 'http://iiif.io/api/image',
     width: image.width,
     height: image.height,
-    sizes,
     tiles,
-    profile: 'level1',
-    extraFormats: ['jpg', 'png', 'webp'],
-    extraQualities: ['color'],
-    extraFeatures: [
-      'regionByPx',
-      'regionByPct',
-      'sizeByW',
-      'sizeByH',
-      'sizeByWh',
-      'sizeByPct',
-      'sizeByConfinedWh',
-      'cors'
-    ]
+    sizes,
+    profile: complianceLevel,
+    ...level3Extras
   }
 }
 
@@ -892,11 +1786,12 @@ function createBrokenInfoJson(
   request: Request,
   corsMode: CorsMode,
   version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
   image: ImageFixture,
   variant: string
 ) {
   const infoJson = cloneJsonObject(
-    createInfoJson(request, corsMode, version, image)
+    createInfoJson(request, corsMode, version, complianceLevel, image)
   )
 
   if (variant === 'missing-dimensions') {
@@ -996,25 +1891,35 @@ function createIiif2Manifest(
   request: Request,
   corsMode: CorsMode,
   image: ImageFixture,
-  variant = 'default'
+  variant = 'default',
+  imageComplianceLevel: ImageComplianceLevel = 'level1',
+  useImageApiRoute = false
 ) {
   const baseUrl = getBaseUrl(request, corsMode)
   const sourceManifest = cloneJsonObject(getOriginalManifest(image)?.source)
   const sourceCanvas = getFirstCanvas(sourceManifest)
   const sourceAnnotation = getFirstImageAnnotation(sourceManifest)
   const sourceResource = getFirstImageResource(sourceManifest)
-  const manifestId = `${baseUrl}/manifests/2/${image.id}${
-    variant === 'default' ? '' : `/${variant}`
-  }.json`
+  const manifestId = `${baseUrl}/manifests/2/${
+    useImageApiRoute ? `${imageComplianceLevel}/` : ''
+  }${image.id}${variant === 'default' ? '' : `/${variant}`}.json`
   const manifestLabel = image.manifestLabel ?? image.label
   const canvasLabel = image.imageLabel ?? image.label
   const canvasId = `${manifestId}/canvas/1`
-  const imageServiceId = getImageServiceId(request, corsMode, '2', image.id)
-  const imageUrl = `${imageServiceId}/full/full/0/default.jpg`
+  const imageServiceId = getImageServiceId(
+    request,
+    corsMode,
+    '2',
+    imageComplianceLevel,
+    image.id
+  )
+  const imageUrl = getManifestImageRequest(imageServiceId, '2')
+  const imageBodyDimensions = getManifestImageBodyDimensions(image)
+  const imageServiceProfile = getIiif2Profile(imageComplianceLevel)
   const thumbnailService = {
     '@context': 'http://iiif.io/api/image/2/context.json',
     '@id': imageServiceId,
-    profile: 'http://iiif.io/api/image/2/level1.json'
+    profile: imageServiceProfile
   }
 
   const service =
@@ -1023,7 +1928,7 @@ function createIiif2Manifest(
       : {
           '@context': 'http://iiif.io/api/image/2/context.json',
           '@id': imageServiceId,
-          profile: 'http://iiif.io/api/image/2/level1.json'
+          profile: imageServiceProfile
         }
 
   return {
@@ -1048,7 +1953,10 @@ function createIiif2Manifest(
             height: image.height,
             thumbnail: {
               ...cloneJsonObject(sourceCanvas.thumbnail),
-              '@id': `${imageServiceId}/full/250,/0/default.jpg`,
+              '@id':
+                imageComplianceLevel === 'level0'
+                  ? getLevel0TileExample(image, imageServiceId)
+                  : `${imageServiceId}/full/250,/0/default.jpg`,
               service: thumbnailService
             },
             images: [
@@ -1062,8 +1970,8 @@ function createIiif2Manifest(
                   '@id': imageUrl,
                   '@type': 'dctypes:Image',
                   format: 'image/jpeg',
-                  width: image.width,
-                  height: image.height,
+                  width: imageBodyDimensions.width,
+                  height: imageBodyDimensions.height,
                   ...(service ? { service } : { service: undefined })
                 },
                 on: canvasId
@@ -1080,24 +1988,38 @@ function createIiif3Manifest(
   request: Request,
   corsMode: CorsMode,
   image: ImageFixture,
-  variant = 'default'
+  variant = 'default',
+  imageApiVersion: IiifVersion = '3',
+  imageComplianceLevel: ImageComplianceLevel = 'level1',
+  useImageApiRoute = false
 ) {
   const baseUrl = getBaseUrl(request, corsMode)
   const parsedOriginalManifest = getOriginalManifest(image)?.parsedManifest
-  const manifestId = `${baseUrl}/manifests/3/${image.id}${
-    variant === 'default' ? '' : `/${variant}`
-  }.json`
+  const manifestId = `${baseUrl}/manifests/3/${
+    useImageApiRoute ? `${imageApiVersion}/${imageComplianceLevel}/` : ''
+  }${image.id}${variant === 'default' ? '' : `/${variant}`}.json`
   const manifestLabel = image.manifestLabel ?? image.label
   const label = parsedOriginalManifest?.label ?? {
     none: [manifestLabel]
   }
+  const linkedAnnotationPageId =
+    useImageApiRoute && isLinkedAnnotationVariant(variant)
+      ? getLinkedAnnotationPageId(baseUrl, image.id, variant, {
+          version: imageApiVersion,
+          complianceLevel: imageComplianceLevel
+        })
+      : undefined
   const canvas = createIiif3Canvas(
     request,
     corsMode,
     image,
     manifestId,
     label,
-    variant
+    variant,
+    1,
+    linkedAnnotationPageId,
+    imageApiVersion,
+    imageComplianceLevel
   )
 
   const manifest: JsonObject = {
@@ -1128,6 +2050,7 @@ function createIiif3Manifest(
 
 async function createImageRequestResponse(
   corsMode: CorsMode,
+  complianceLevel: ImageComplianceLevel,
   image: ImageFixture,
   regionParameter: string,
   sizeParameter: string,
@@ -1158,6 +2081,11 @@ async function createImageRequestResponse(
   const region = parseRegion(regionParameter, image)
   const size = parseSize(sizeParameter, region)
   const outputFormat = parseOutputFormat(format)
+
+  if (complianceLevel === 'level0') {
+    assertLevel0TileRequest(image, region, size, rotation, quality, format)
+  }
+
   const outputDimensions = getOutputDimensions(region, size)
   let transformer = sharp(image.imagePath).extract(region)
 
@@ -1178,6 +2106,220 @@ async function createImageRequestResponse(
   return imageResponse(buffer, corsMode, outputFormat.contentType)
 }
 
+function getImageServiceBaseUrl(
+  baseUrl: string,
+  version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
+  imageId: string
+) {
+  return `${baseUrl}/iiif/${version}/${complianceLevel}/${imageId}`
+}
+
+function getLevel0TileExample(image: ImageFixture, imageServiceUrl: string) {
+  const tile = getTiles(image)[0]
+  const width = Math.min(tile.width, image.width)
+  const height = Math.min(tile.height, image.height)
+
+  return `${imageServiceUrl}/0,0,${width},${height}/${width},/0/default.jpg`
+}
+
+function getImageRequestExamples(
+  image: ImageFixture,
+  version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
+  imageServiceUrl: string
+): Link[] {
+  if (complianceLevel === 'level0') {
+    return [
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Declared tile',
+        getLevel0TileExample(image, imageServiceUrl)
+      )
+    ]
+  }
+
+  const examples = [
+    createImageApiLink(
+      version,
+      complianceLevel,
+      'Full image, 600px wide',
+      `${imageServiceUrl}/full/600,/0/default.jpg`
+    ),
+    createImageApiLink(
+      version,
+      complianceLevel,
+      'Pixel region',
+      `${imageServiceUrl}/0,0,512,512/256,/0/default.jpg`
+    )
+  ]
+
+  if (complianceLevel === 'level2') {
+    examples.push(
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Percentage region',
+        `${imageServiceUrl}/pct:10,10,50,50/400,/0/default.jpg`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Confined WebP thumbnail',
+        `${imageServiceUrl}/full/!300,300/0/default.webp`
+      )
+    )
+  }
+
+  return examples
+}
+
+function getImageAnnotationLinks(baseUrl: string, image: ImageFixture) {
+  return catalogImageApiServices.map(({ version, complianceLevel }) =>
+    createImageApiLink(
+      version,
+      complianceLevel,
+      'Georeference Annotation',
+      `${baseUrl}/annotations/images/${version}/${complianceLevel}/${image.id}.json`
+    )
+  )
+}
+
+function getImageAnnotationErrorLinks(baseUrl: string, image: ImageFixture) {
+  const variants = [
+    ['Missing target', 'missing-target'],
+    ['Invalid resource size', 'bad-resource-size'],
+    ['Only 1 GCP', 'one-gcp'],
+    ['Mixed correct/incorrect maps', 'mixed-errors']
+  ] as const
+
+  return catalogImageApiServices.flatMap(({ version, complianceLevel }) =>
+    variants.map(([label, variant]) =>
+      createImageApiLink(
+        version,
+        complianceLevel,
+        label,
+        `${baseUrl}/errors/annotations/images/${version}/${complianceLevel}/${image.id}/${variant}.json`
+      )
+    )
+  )
+}
+
+function getManifestResourceLinks(baseUrl: string, image: ImageFixture) {
+  if (!image.hasManifest) {
+    return []
+  }
+
+  return [
+    ...catalogImageComplianceLevels.map((complianceLevel) =>
+      createImageApiLink(
+        '2',
+        complianceLevel,
+        'IIIF Presentation 2.0',
+        `${baseUrl}/manifests/2/${complianceLevel}/${image.id}.json`
+      )
+    ),
+    ...catalogImageApiServices.flatMap(({ version, complianceLevel }) => [
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'IIIF Presentation 3.0',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Embedded annotation',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/embedded-annotation.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Linked annotation',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/linked-annotation.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'navPlace midpoint',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/navplace-midpoint.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'navPlace bbox',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/navplace-bbox.json`
+      )
+    ])
+  ]
+}
+
+function getManifestErrorLinks(baseUrl: string, image: ImageFixture) {
+  if (!image.hasManifest) {
+    return []
+  }
+
+  return [
+    ...catalogImageComplianceLevels.map((complianceLevel) =>
+      createImageApiLink(
+        '2',
+        complianceLevel,
+        'Presentation 2.0 missing image service',
+        `${baseUrl}/manifests/2/${complianceLevel}/${image.id}/missing-service.json`
+      )
+    ),
+    ...catalogImageApiServices.flatMap(({ version, complianceLevel }) => [
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Presentation 3.0 bad service type',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/bad-service-type.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Embedded annotation missing target',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/embedded-annotation-missing-target.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Linked annotation missing target',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/linked-annotation-missing-target.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Embedded annotation with only 1 GCP',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/embedded-annotation-one-gcp.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        'Linked annotation with only 1 GCP',
+        `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/linked-annotation-one-gcp.json`
+      ),
+      ...(hasMultipleMapAnnotations(image)
+        ? [
+            createImageApiLink(
+              version,
+              complianceLevel,
+              'Mixed correct/incorrect embedded annotations',
+              `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/embedded-annotation-mixed-errors.json`
+            ),
+            createImageApiLink(
+              version,
+              complianceLevel,
+              'Mixed correct/incorrect linked annotations',
+              `${baseUrl}/manifests/3/${version}/${complianceLevel}/${image.id}/linked-annotation-mixed-errors.json`
+            )
+          ]
+        : [])
+    ])
+  ]
+}
+
 export function createCatalog(request: Request, corsMode: CorsMode) {
   const baseUrl = getBaseUrl(request, corsMode)
 
@@ -1194,86 +2336,69 @@ export function createCatalog(request: Request, corsMode: CorsMode) {
       originalImageAnnotation: `https://annotations.allmaps.org/images/${image.id}`,
       width: image.width,
       height: image.height,
-      annotation: `${baseUrl}/annotations/images/${image.id}.json`,
-      imageService2: `${baseUrl}/iiif/2/${image.id}`,
-      imageService3: `${baseUrl}/iiif/3/${image.id}`,
+      annotation: `${baseUrl}/annotations/images/3/level2/${image.id}.json`,
+      imageService2: `${baseUrl}/iiif/2/level2/${image.id}`,
+      imageService3: `${baseUrl}/iiif/3/level2/${image.id}`,
+      annotations: getImageAnnotationLinks(baseUrl, image),
+      imageServices: catalogImageApiServices.map(
+        ({ version, complianceLevel }) =>
+          createImageApiLink(
+            version,
+            complianceLevel,
+            'info.json',
+            getImageServiceBaseUrl(baseUrl, version, complianceLevel, image.id)
+          )
+      ),
+      imageExamples: catalogImageApiServices.flatMap(
+        ({ version, complianceLevel }) =>
+          getImageRequestExamples(
+            image,
+            version,
+            complianceLevel,
+            getImageServiceBaseUrl(baseUrl, version, complianceLevel, image.id)
+          )
+      ),
       errors: {
-        infoJsons: [
-          {
-            label: 'IIIF 2 info without dimensions',
-            href: `${baseUrl}/errors/iiif/2/${image.id}/missing-dimensions/info.json`
-          },
-          {
-            label: 'IIIF 3 info with invalid tiles',
-            href: `${baseUrl}/errors/iiif/3/${image.id}/bad-tiles/info.json`
-          }
-        ],
-        annotations: [
-          {
-            label: 'Annotation without target',
-            href: `${baseUrl}/errors/annotations/images/${image.id}/missing-target.json`
-          },
-          {
-            label: 'Annotation with invalid resource size',
-            href: `${baseUrl}/errors/annotations/images/${image.id}/bad-resource-size.json`
-          },
-          {
-            label: 'Annotation with only 1 GCP',
-            href: `${baseUrl}/errors/annotations/images/${image.id}/one-gcp.json`
-          },
-          {
-            label: 'Annotation with mixed correct/incorrect maps',
-            href: `${baseUrl}/errors/annotations/images/${image.id}/mixed-errors.json`
-          }
-        ],
-        manifests: image.hasManifest
-          ? [
-              {
-                label: 'IIIF 2 manifest without image service',
-                href: `${baseUrl}/manifests/2/${image.id}/missing-service.json`
-              },
-              {
-                label: 'IIIF 3 manifest with bad service type',
-                href: `${baseUrl}/manifests/3/${image.id}/bad-service-type.json`
-              },
-              {
-                label:
-                  'IIIF 3 manifest with embedded annotation without target',
-                href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation-missing-target.json`
-              },
-              {
-                label:
-                  'IIIF 3 manifest with embedded annotation with only 1 GCP',
-                href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation-one-gcp.json`
-              },
-              ...(hasMultipleMapAnnotations(image)
-                ? [
-                    {
-                      label:
-                        'IIIF 3 manifest with mixed correct/incorrect embedded annotations',
-                      href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation-mixed-errors.json`
-                    }
-                  ]
-                : [])
-            ]
-          : []
+        infoJsons: catalogImageApiServices.flatMap(
+          ({ version, complianceLevel }) => [
+            createImageApiLink(
+              version,
+              complianceLevel,
+              'Missing dimensions',
+              `${baseUrl}/errors/iiif/${version}/${complianceLevel}/${image.id}/missing-dimensions/info.json`
+            ),
+            createImageApiLink(
+              version,
+              complianceLevel,
+              'Invalid tiles',
+              `${baseUrl}/errors/iiif/${version}/${complianceLevel}/${image.id}/bad-tiles/info.json`
+            )
+          ]
+        ),
+        annotations: getImageAnnotationErrorLinks(baseUrl, image),
+        manifests: getManifestErrorLinks(baseUrl, image)
       },
+      manifestResources: getManifestResourceLinks(baseUrl, image),
       manifests: image.hasManifest
         ? {
-            iiif2: `${baseUrl}/manifests/2/${image.id}.json`,
-            iiif3: `${baseUrl}/manifests/3/${image.id}.json`,
+            iiif2: `${baseUrl}/manifests/2/level2/${image.id}.json`,
+            iiif3: `${baseUrl}/manifests/3/3/level2/${image.id}.json`,
             variants: [
               {
-                label: 'IIIF 3 with embedded annotation',
-                href: `${baseUrl}/manifests/3/${image.id}/embedded-annotation.json`
+                label: 'IIIF 3.0 with embedded annotation',
+                href: `${baseUrl}/manifests/3/3/level2/${image.id}/embedded-annotation.json`
               },
               {
-                label: 'IIIF 3 with navPlace midpoint',
-                href: `${baseUrl}/manifests/3/${image.id}/navplace-midpoint.json`
+                label: 'IIIF 3.0 with linked annotation',
+                href: `${baseUrl}/manifests/3/3/level2/${image.id}/linked-annotation.json`
               },
               {
-                label: 'IIIF 3 with navPlace bbox',
-                href: `${baseUrl}/manifests/3/${image.id}/navplace-bbox.json`
+                label: 'IIIF 3.0 with navPlace midpoint',
+                href: `${baseUrl}/manifests/3/3/level2/${image.id}/navplace-midpoint.json`
+              },
+              {
+                label: 'IIIF 3.0 with navPlace bbox',
+                href: `${baseUrl}/manifests/3/3/level2/${image.id}/navplace-bbox.json`
               }
             ]
           }
@@ -1296,42 +2421,86 @@ async function routeFixtureRequest(
   if (
     segments[0] === 'errors' &&
     segments[1] === 'iiif' &&
-    segments[5] === 'info.json'
+    (segments[5] === 'info.json' || segments[6] === 'info.json')
   ) {
     const version = parseIiifVersion(segments[2])
-    const image = getImage(segments[3])
+    const hasComplianceLevel = segments.length === 7
+    const complianceLevel = hasComplianceLevel
+      ? parseImageComplianceLevel(segments[3])
+      : 'level1'
+    const image = getImage(hasComplianceLevel ? segments[4] : segments[3])
+    const variant = hasComplianceLevel ? segments[5] : segments[4]
 
     return jsonResponse(
-      createBrokenInfoJson(request, corsMode, version, image, segments[4]),
+      createBrokenInfoJson(
+        request,
+        corsMode,
+        version,
+        complianceLevel,
+        image,
+        variant
+      ),
       corsMode
     )
   }
 
   if (
     segments[0] === 'iiif' &&
-    segments.length === 4 &&
-    segments[3] === 'info.json'
+    (segments.length === 3 || segments.length === 4)
+  ) {
+    parseIiifVersion(segments[1])
+
+    if (segments.length === 4) {
+      parseImageComplianceLevel(segments[2])
+      getImage(segments[3])
+    } else {
+      getImage(segments[2])
+    }
+
+    const url = new URL(request.url)
+    url.pathname = `${url.pathname.replace(/\/$/, '')}/info.json`
+
+    return redirectResponse(url, corsMode)
+  }
+
+  if (
+    segments[0] === 'iiif' &&
+    (segments.length === 4 || segments.length === 5) &&
+    segments.at(-1) === 'info.json'
   ) {
     const version = parseIiifVersion(segments[1])
-    const image = getImage(segments[2])
+    const hasComplianceLevel = segments.length === 5
+    const complianceLevel = hasComplianceLevel
+      ? parseImageComplianceLevel(segments[2])
+      : 'level1'
+    const image = getImage(hasComplianceLevel ? segments[3] : segments[2])
 
     return jsonResponse(
-      createInfoJson(request, corsMode, version, image),
+      createInfoJson(request, corsMode, version, complianceLevel, image),
       corsMode
     )
   }
 
-  if (segments[0] === 'iiif' && segments.length === 7) {
+  if (
+    segments[0] === 'iiif' &&
+    (segments.length === 7 || segments.length === 8)
+  ) {
     parseIiifVersion(segments[1])
+    const hasComplianceLevel = segments.length === 8
+    const complianceLevel = hasComplianceLevel
+      ? parseImageComplianceLevel(segments[2])
+      : 'level1'
+    const offset = hasComplianceLevel ? 1 : 0
 
     return createImageRequestResponse(
       corsMode,
-      getImage(segments[2]),
-      segments[3],
-      segments[4],
-      segments[5],
-      segments[6].replace(/\.(jpg|jpeg|png|webp)$/, ''),
-      segments[6]
+      complianceLevel,
+      getImage(segments[2 + offset]),
+      segments[3 + offset],
+      segments[4 + offset],
+      segments[5 + offset],
+      segments[6 + offset].replace(/\.(jpg|jpeg|png|webp)$/, ''),
+      segments[6 + offset]
     )
   }
 
@@ -1340,11 +2509,25 @@ async function routeFixtureRequest(
     segments[1] === 'annotations' &&
     segments[2] === 'images'
   ) {
-    const { imageId, variant } = parseVariantJsonFilename(
-      segments.slice(3).join('/')
-    )
-    const image = getImage(imageId)
-    const annotation = JSON.parse(await readFile(image.annotationPath, 'utf8'))
+    const hasImageApiService =
+      segments.length === 7 &&
+      (segments[3] === '2' || segments[3] === '3') &&
+      isImageComplianceLevel(segments[4])
+    const service = hasImageApiService
+      ? {
+          version: parseIiifVersion(segments[3]),
+          complianceLevel: parseImageComplianceLevel(segments[4])
+        }
+      : undefined
+    const image = hasImageApiService
+      ? getImage(segments[5])
+      : getImage(parseVariantJsonFilename(segments.slice(3).join('/')).imageId)
+    const variant = hasImageApiService
+      ? parseJsonFilename(segments[6])
+      : parseVariantJsonFilename(segments.slice(3).join('/')).variant
+    const annotation = hasImageApiService
+      ? createImageAnnotation(request, corsMode, image, service)
+      : JSON.parse(await readFile(image.annotationPath, 'utf8'))
 
     return jsonResponse(
       createBrokenAnnotation(
@@ -1368,18 +2551,129 @@ async function routeFixtureRequest(
     )
   }
 
+  if (
+    segments[0] === 'annotations' &&
+    segments[1] === 'manifests' &&
+    segments[2] === '3'
+  ) {
+    if (
+      segments[3] === 'combined' &&
+      segments[5] === 'canvas' &&
+      segments.length === 7
+    ) {
+      const variant = segments[4]
+      const canvasIndex = parsePositiveNumber(
+        parseJsonFilename(segments[6]),
+        'canvas index'
+      )
+      const canvasVariant = getCombinedCanvasManifestVariant(
+        variant,
+        canvasIndex - 1
+      )
+
+      if (
+        !isCombinedIiif3ManifestVariant(variant) ||
+        !isLinkedAnnotationVariant(canvasVariant)
+      ) {
+        return textResponse('No linked annotation for canvas', corsMode, 404)
+      }
+
+      return jsonResponse(
+        createCombinedIiif3LinkedAnnotationPage(
+          request,
+          corsMode,
+          variant,
+          canvasIndex
+        ),
+        corsMode
+      )
+    }
+
+    if (
+      segments.length === 7 &&
+      (segments[3] === '2' || segments[3] === '3') &&
+      isImageComplianceLevel(segments[4])
+    ) {
+      const version = parseIiifVersion(segments[3])
+      const complianceLevel = parseImageComplianceLevel(segments[4])
+      const image = getImage(segments[5])
+      const variant = parseJsonFilename(segments[6])
+
+      if (!image.hasManifest) {
+        return textResponse('No manifest for image', corsMode, 404)
+      }
+
+      if (!isLinkedAnnotationVariant(variant)) {
+        return textResponse('Unknown linked annotation variant', corsMode, 404)
+      }
+
+      return jsonResponse(
+        createIiif3LinkedAnnotationPage(
+          request,
+          corsMode,
+          image,
+          variant,
+          version,
+          complianceLevel,
+          true
+        ),
+        corsMode
+      )
+    }
+
+    if (segments.length === 5) {
+      const image = getImage(segments[3])
+      const variant = parseJsonFilename(segments[4])
+
+      if (!image.hasManifest) {
+        return textResponse('No manifest for image', corsMode, 404)
+      }
+
+      if (!isLinkedAnnotationVariant(variant)) {
+        return textResponse('Unknown linked annotation variant', corsMode, 404)
+      }
+
+      return jsonResponse(
+        createIiif3LinkedAnnotationPage(request, corsMode, image, variant),
+        corsMode
+      )
+    }
+  }
+
   if (segments[0] === 'annotations' && segments[1] === 'images') {
+    if (
+      segments.length === 5 &&
+      (segments[2] === '2' || segments[2] === '3') &&
+      isImageComplianceLevel(segments[3])
+    ) {
+      const version = parseIiifVersion(segments[2])
+      const complianceLevel = parseImageComplianceLevel(segments[3])
+      const image = getImage(parseJsonFilename(segments[4]))
+
+      return jsonResponse(
+        createImageAnnotation(request, corsMode, image, {
+          version,
+          complianceLevel
+        }),
+        corsMode
+      )
+    }
+
     const image = getImage(parseJsonFilename(segments[2]))
-    const annotation = JSON.parse(await readFile(image.annotationPath, 'utf8'))
 
     return jsonResponse(
-      localizeFixtureUrls(annotation, getBaseUrl(request, corsMode)),
+      createImageAnnotation(request, corsMode, image),
       corsMode
     )
   }
 
   if (segments[0] === 'manifests' && segments[1] === '2') {
-    const path = segments.slice(2).join('/')
+    const hasImageApiRoute =
+      segments.length >= 4 && isImageComplianceLevel(segments[2])
+    const imageComplianceLevel = hasImageApiRoute
+      ? parseImageComplianceLevel(segments[2])
+      : 'level1'
+    const path = segments.slice(hasImageApiRoute ? 3 : 2).join('/')
     const { imageId, variant } = path.includes('/')
       ? parseVariantJsonFilename(path)
       : { imageId: parseJsonFilename(path), variant: 'default' }
@@ -1394,24 +2688,46 @@ async function routeFixtureRequest(
     }
 
     return jsonResponse(
-      createIiif2Manifest(request, corsMode, image, variant),
+      createIiif2Manifest(
+        request,
+        corsMode,
+        image,
+        variant,
+        imageComplianceLevel,
+        hasImageApiRoute
+      ),
       corsMode
     )
   }
 
   if (segments[0] === 'manifests' && segments[1] === '3') {
-    const path = segments.slice(2).join('/')
+    if (segments[2] === 'combined' && segments.length === 4) {
+      const variant = parseJsonFilename(segments[3])
 
-    if (path === 'combined/embedded-annotations.json') {
+      if (!isCombinedIiif3ManifestVariant(variant)) {
+        return textResponse('Unknown manifest variant', corsMode, 404)
+      }
+
       return jsonResponse(
-        createCombinedIiif3Manifest(request, corsMode),
+        createCombinedIiif3Manifest(request, corsMode, variant),
         corsMode
       )
     }
 
-    const { imageId, variant } = path.includes('/')
-      ? parseVariantJsonFilename(path)
-      : { imageId: parseJsonFilename(path), variant: 'default' }
+    const hasImageApiRoute =
+      segments.length >= 5 &&
+      (segments[2] === '2' || segments[2] === '3') &&
+      isImageComplianceLevel(segments[3])
+    const imageApiVersion = hasImageApiRoute
+      ? parseIiifVersion(segments[2])
+      : '3'
+    const imageComplianceLevel = hasImageApiRoute
+      ? parseImageComplianceLevel(segments[3])
+      : 'level1'
+    const imagePath = segments.slice(hasImageApiRoute ? 4 : 2).join('/')
+    const { imageId, variant } = imagePath.includes('/')
+      ? parseVariantJsonFilename(imagePath)
+      : { imageId: parseJsonFilename(imagePath), variant: 'default' }
     const image = getImage(imageId)
 
     if (!image.hasManifest) {
@@ -1423,7 +2739,15 @@ async function routeFixtureRequest(
     }
 
     return jsonResponse(
-      createIiif3Manifest(request, corsMode, image, variant),
+      createIiif3Manifest(
+        request,
+        corsMode,
+        image,
+        variant,
+        imageApiVersion,
+        imageComplianceLevel,
+        hasImageApiRoute
+      ),
       corsMode
     )
   }

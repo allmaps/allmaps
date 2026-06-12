@@ -1,0 +1,197 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~354185~90121323/manifest",
+  "label": "No.14. Europa : Geologie, Tektonic",
+  "attribution": "David Rumsey Historical Map Collection",
+  "service": {
+    "@context": "http://iiif.io/api/search/1/context.json",
+    "@id": "https://www.davidrumsey.com/luna/servlet/iiif/services/RUMSEY~8~1~354185~90121323/search",
+    "profile": "http://iiif.io/api/search/1/search"
+  },
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~354185~90121323/canvas/c1",
+          "@type": "sc:Canvas",
+          "label": "No.14. Europa : Geologie, Tektonic",
+          "description": "",
+          "metadata": [
+            {
+              "label": "Author",
+              "value": "Sydow, Emil von., 1812-1873"
+            },
+            {
+              "label": "Author",
+              "value": "Wagner, Hermann, 1840-1929"
+            },
+            {
+              "label": "Date",
+              "value": "1944"
+            },
+            {
+              "label": "Short Title",
+              "value": "No.14. Europa : Geologie, Tektonic"
+            },
+            {
+              "label": "Publisher",
+              "value": "Justus Perthes"
+            },
+            {
+              "label": "Publisher Location",
+              "value": "Gotha"
+            },
+            {
+              "label": "Type",
+              "value": "Atlas Map"
+            },
+            {
+              "label": "Obj Height cm",
+              "value": "28"
+            },
+            {
+              "label": "Obj Width cm",
+              "value": "33"
+            },
+            {
+              "label": "Scale 1",
+              "value": "15,000,000"
+            },
+            {
+              "label": "Note",
+              "value": "Geologic map of Europe, Bonnesche projektion. With inset map: Tektonische Karte. Includes color coded reference to rock formations and land features."
+            },
+            {
+              "label": "World Area",
+              "value": "Europe"
+            },
+            {
+              "label": "Subject",
+              "value": "Geology"
+            },
+            {
+              "label": "Full Title",
+              "value": "Europa : Geologie, Tektonic. Gotha : Justus Perthes. Sydow-Wagners method. Schul-Atlas. XXIII."
+            },
+            {
+              "label": "List No",
+              "value": "13559.041"
+            },
+            {
+              "label": "Series No",
+              "value": "41"
+            },
+            {
+              "label": "Page No",
+              "value": "14 map"
+            },
+            {
+              "label": "Engraver or Printer",
+              "value": "Haack, Hermann, 1872-1966"
+            },
+            {
+              "label": "Engraver or Printer",
+              "value": "Lautensach, Hermann, 1886-1971"
+            },
+            {
+              "label": "Engraver or Printer",
+              "value": "Stollt, O."
+            },
+            {
+              "label": "Publication Author",
+              "value": "Sydow, Emil von., 1812-1873"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Wagner, Hermann, 1840-1929"
+            },
+            {
+              "label": "Pub Date",
+              "value": "1944"
+            },
+            {
+              "label": "Pub Title",
+              "value": "Sydow-Wagners methodischer Schul-Atlas. Bearbeitet von H. Haack u. H. Lautensach. 23., von O. Stollt kartographisch durchgesehene Auflage : 62 Haupt- und 260 Nebenkarten. auf 61 Tafeln ; mit einem Namenverzeichnis. Justus Perthes in Gotha, 1944."
+            },
+            {
+              "label": "Pub Note",
+              "value": "1944. 23rd revised edition of Sydow-Wagner's methodical school atlas of the world. Edited by H. Haack and H. Lautensach. cartographically reviewed and revised by O. Stollt, published by Justus Perthes in Gotha, 1944. Contains 15 pages of text, and, 62 main and 260 secondary of double-page colored maps, in variable scales on 61 sheets. Maps include color coded reference, text, legend, secondary title page, some with location map and index. Atlas consists of political and thematic maps, city plans and views. Showing political boundaries, major cities, towns, roads, railroads, telegraph cables, rivers, lakes shipping routes, distances, rivers and mountains. Also showing routes of voyages and discovery. Relief shown by hachures, spot heights and gradient tints. Depth shown by bathymetric tints, isolines and soundings. Prime meridian: Greenwich. Atlas includes alphabetical index: “Namenverzeichniz” in 42 pages."
+            },
+            {
+              "label": "Pub List No",
+              "value": "13559.000"
+            },
+            {
+              "label": "Pub Type",
+              "value": "World Atlas"
+            },
+            {
+              "label": "Pub Maps",
+              "value": "90"
+            },
+            {
+              "label": "Pub Height cm",
+              "value": "31"
+            },
+            {
+              "label": "Pub Width cm",
+              "value": "21"
+            },
+            {
+              "label": "Image No",
+              "value": "13559041.jp2"
+            },
+            {
+              "label": "Download 1",
+              "value": "<a href=https://www.davidrumsey.com/rumsey/download.pl?image=/205/13559041.jp2 target=_blank>Full Image Download in JP2 Format</a>"
+            },
+            {
+              "label": "Download 2",
+              "value": "<a href=https://www.extensis.com/support/geoviewer-9 target=_blank >GeoViewer for JP2 and SID files</a>"
+            },
+            {
+              "label": "Authors",
+              "value": "Sydow, Emil von., 1812-1873; Wagner, Hermann, 1840-1929"
+            }
+          ],
+          "thumbnail": {
+            "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~354185~90121323/full/!96,96/0/default.jpg",
+            "format": "image/jpeg"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~354185~90121323/full/!1024,1024/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~354185~90121323",
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 9147,
+                "height": 6661
+              },
+              "on": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~354185~90121323/canvas/c1"
+            }
+          ],
+          "otherContent": [
+            "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~354185~90121323/list/luna"
+          ],
+          "width": 9147,
+          "height": 6661
+        }
+      ]
+    }
+  ],
+  "logo": {
+    "@id": "https://www.davidrumsey.com/luna/images/LUNAIIIF80.png",
+    "format": "image/png"
+  },
+  "related": "https://www.davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~354185~90121323"
+}

@@ -1,5 +1,6 @@
 export type CorsMode = 'cors' | 'no-cors'
 export type IiifVersion = '2' | '3'
+export type ImageComplianceLevel = 'level0' | 'level1' | 'level2'
 
 export type Region = {
   left: number
