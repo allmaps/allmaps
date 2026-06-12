@@ -1,0 +1,189 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~344467~90112435/manifest",
+  "label": "L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae",
+  "attribution": "David Rumsey Historical Map Collection",
+  "service": {
+    "@context": "http://iiif.io/api/search/1/context.json",
+    "@id": "https://www.davidrumsey.com/luna/servlet/iiif/services/RUMSEY~8~1~344467~90112435/search",
+    "profile": "http://iiif.io/api/search/1/search"
+  },
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~344467~90112435/canvas/c1",
+          "@type": "sc:Canvas",
+          "label": "L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae",
+          "description": "",
+          "metadata": [
+            {
+              "label": "Author",
+              "value": "Jollain, Gerhard"
+            },
+            {
+              "label": "Date",
+              "value": "1650"
+            },
+            {
+              "label": "Short Title",
+              "value": "L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae"
+            },
+            {
+              "label": "Publisher",
+              "value": "Mariette (Sanson)"
+            },
+            {
+              "label": "Publisher Location",
+              "value": "Paris"
+            },
+            {
+              "label": "Type",
+              "value": "Atlas Map"
+            },
+            {
+              "label": "Obj Height cm",
+              "value": "36"
+            },
+            {
+              "label": "Obj Width cm",
+              "value": "48"
+            },
+            {
+              "label": "Scale 1",
+              "value": "3,400,000"
+            },
+            {
+              "label": "Country",
+              "value": "United Kingdom"
+            },
+            {
+              "label": "Country",
+              "value": "Ireland"
+            },
+            {
+              "label": "Full Title",
+              "value": "L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae"
+            },
+            {
+              "label": "List No",
+              "value": "15185.041"
+            },
+            {
+              "label": "Series No",
+              "value": "41"
+            },
+            {
+              "label": "Page No",
+              "value": "39"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Sanson, Nicolas, 1600-1667"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Jollain, Gerhard"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Berey, Nicolas"
+            },
+            {
+              "label": "Publication Author",
+              "value": "Du Val, Pierre, 1619-1683"
+            },
+            {
+              "label": "Pub Date",
+              "value": "1675"
+            },
+            {
+              "label": "Pub Title",
+              "value": "[Composite World Atlas]"
+            },
+            {
+              "label": "Pub Reference",
+              "value": "Shirley 315. Shirley EPMBI-1 664. Pastoureau. Sanson IX; Sanson XI."
+            },
+            {
+              "label": "Pub Note",
+              "value": "\"Fascinating Composite World Atlas. With a Honervogt/Jollain World Map and Additional Exceedingly Rare Berey and Jollain Maps. Bound with Two Regional French Atlases. Unusual composite atlas containing some of the rarest examples of 17th-century French cartography, with maps by many of the important mapmakers of that era including Berey, Jollain, and Honervogt. This atlas is filled with important double-page maps and one extensive folding map of the Alsace region and represents one of the more notable French atlases factices of the period to appear on the market. In addition to the initial composite section, two regional French atlases are bound into the volume. Both books are very rare, and these two complete atlases represent detailed, rare looks at northern France and the Low Countries. Some of the atlas's noteworthy maps are the Jollain edition of the Honervogt world map and a Jollain map of the Low Countries that includes a very rare inset of Nieu Nederland, naming the locations of Dutch forts. The work includes a total of 11 maps credited to Jollain and 8 maps by Berey.  Cartes Exactes et Particulieres de La Flandre, ou des Pays Bas Catholiques ou sont less Duches de Brabant This is a very rare regional atlas by Sanson that includes twelve maps of the Low Countries. The BNF copy calls for 14 - the two not included in this portion of the work (according to Pastoreau Sanson IX) are bound into the composite section (maps 13 and 21; note for the second that the Jaillot and not Sanson edition of the Low Countries map was used).  The 1658 edition of this work is not in Pastoreau, only the 1657 (of a slightly different name) edition is (holdings at BNF and LOC). We traced an example of the 1658 edition at the BNF.  La Picardie, la Champagne & la Lorraine en plusieurs & diverses cartes particulieres là où les dioceses des archeveschés et eveschés sont distingués en leurs archidiaconnés, & doyennés ruraux This is another very rare regional Sanson atlas that includes 22 maps of northern and eastern France. According to Pastoreau, this 1658 edition adds three maps to the 1656 edition, although this edition appears extra-complete with a third map of Lingones that Pastoreau does not mention. The first two maps from this atlas in the BNF example are included in the section Cartes Exactes et Particulieres de la Flandre and are not repeated. This work is very rare. Pastoureau notes two examples of the 1656 edition (Sanson X) and one of the 1658 edition (Sanson XI), all at the BNF. Notable Maps Nova Totius Terrarum Orbis Geographica ac Hydrographica Tabula auct. Iud Hondio. The atlas opens with the extremely rare Honervogt/Jollain edition of the 1617 Hondius world map, with border details adapted from Hondius's ca. 1625 map. This was the earliest of several French derivatives of that Hondius map and is engraved in distinctly French style. This map was copied by Melchoir Tavernier in 1630 in another rare map that features the same geography and decorative elements. The Tavernier is differentiable from the Honervogt as the line of the zodiac is reflected - that is, it is north of the equator in the Western Hemisphere, rather than in the Eastern as on the present map. States and Rarity The present map was published in two states, the first in 1625 by Honervogt and the second (this example) by Jollain in 1655, with the imprint changed in the Southern Continent. Shirley lists only three examples of the map: Newberry (first state); Clements (second state); Nederlands Scheepvaartmuseum, Amsterdam (second state). No additional entries on RBH and no records of it having previously traded. L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae This is an extremely rare British Isles map, originally published by Jacques Honervogt and here issued by Jollain. The map divides Britain and Ireland according to county and includes a lengthy description of the region in the upper right, alongside an inset of the Orkneys. The decoration is very representative of the early French style of map engraving. States and Rarity Three states of the map are recorded: the first lacks \"L'Angleterre\" in the title; the second replaces Honervogt's imprint; and the third adds a large title cartouche in the middle of the North Sea.  Only five examples of this map are known, including the present. The first was noted by a British dealer some thirty years ago and unrecorded; the second in an atlas that was sold in Lyon, France, in 2016; a third is in a private American collection; a fourth at the RGS; and the fifthis the present example. Special thanks to Art Kelly for his assistance in cataloging this map. Cartes des Provinces Unies des Pays Bas connues soubs le nom de Hollande. . . [with] Description des Pais Que less Holandois Possedent Dans let Quatre Parties du Monde Another rarity, this Jollain map is notable for the four insets in the upper left. One of the insets is focused primarily on the Hudson River Valley region and shows the region between Fort \"Orenge\" (present-day Albany) and Fort de Nassau (in the Delaware Valley). The Manhattan tribe is named. The island itself appears at the mouth of the North River, several other islands including Long Island is visible nearby. The geography is very primitive. The other three inset maps are also of interest, particularly the map of West Africa that divides the region into four areas. Rarity OCLC lists a single example of the map, at the BNF. Not in Burden, though included in the Addenda. Description de la Hautte Alsace et Suntgow Avec Partie du Territoire de Basle [Carte Generalle de la Haute et Basse Alsace] This is the largest map in the book, which folds out to appear as a three-sheet map of the Rhine in the Alsace region of France. This is an impressively decorative and very attractive map of the region. Rarity OCLC lists a single example, at the BNF.  Contents The atlas consists of 3 books, bound as one: Composite World Atlas (No Title Page) (Belgium)  Cartes Exactes & Particulieres de La Flandre ou des Pays Catholiques ou sont les Duches de Brabant, LImbourg Luxembourg; &c. les Comtes des Flandres, Artois Haynaut, Namur &c. & les Estats de Treves, Cambray, & Lyege . . . . Par Nicolas Sanson . . . M. DC. LVIII (Northern & Central France)  Cartes Exactes & Particulieres  de Picardie, Champagne, & Lorraine, &c. Les Dioceses Des Archevesches & Evesches . . . Pars Nicolas Sanson . . . M. DC. LVIII Essentially three volumes in one; the first without a title page (as a traditional composite atlas), followed by two volumes with title pages: \"Cartes Exactes & Particulieres de la Flandre\" (complete per Pastoureau IX, although variant title page, some maps bound into other sections, and Sanson Low Countries map replaced by Jaillot edition) and \"Cartes Exactes & Particulieres de Picardie, Champagne\" (complete per Pastoureau XI, although some maps bound into other sections and not duplicated with the previous volume). Contemporary ink manuscript numbering 1-58 in maps from the composite section; no numbering on map 59. Wear to edges of some maps, some tears. Jacob Honervogt Biography Honervogt was a German born engraver, who moved to Paris in about 1608. Honervogt had established a map shop in Paris by 1624.  Sometime after 1654, he took on Gerard Jollain as a partner.  Jollain continued the business after Honervogt's death.\" (Ruderman, 2022)"
+            },
+            {
+              "label": "Pub List No",
+              "value": "15185.000"
+            },
+            {
+              "label": "Pub Type",
+              "value": "World Atlas"
+            },
+            {
+              "label": "Pub Maps",
+              "value": "93"
+            },
+            {
+              "label": "Pub Height cm",
+              "value": "46"
+            },
+            {
+              "label": "Pub Width cm",
+              "value": "33"
+            },
+            {
+              "label": "Image No",
+              "value": "15185041.jp2"
+            },
+            {
+              "label": "Download 1",
+              "value": "<a href=https://www.davidrumsey.com/rumsey/download.pl?image=/199/15185041.jp2 target=_blank>Full Image Download in JP2 Format</a>"
+            },
+            {
+              "label": "Download 2",
+              "value": "<a href=https://www.extensis.com/support/geoviewer-9 target=_blank >GeoViewer for JP2 and SID files</a>"
+            },
+            {
+              "label": "Authors",
+              "value": "Jollain, Gerhard"
+            }
+          ],
+          "thumbnail": {
+            "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~344467~90112435/full/!96,96/0/default.jpg",
+            "format": "image/jpeg"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~344467~90112435/full/!1024,1024/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~344467~90112435",
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg",
+                "width": 15882,
+                "height": 11198
+              },
+              "on": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~344467~90112435/canvas/c1"
+            }
+          ],
+          "otherContent": [
+            "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~344467~90112435/list/luna"
+          ],
+          "width": 15882,
+          "height": 11198
+        }
+      ]
+    }
+  ],
+  "logo": {
+    "@id": "https://www.davidrumsey.com/luna/images/LUNAIIIF80.png",
+    "format": "image/png"
+  },
+  "related": "https://www.davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~344467~90112435"
+}
