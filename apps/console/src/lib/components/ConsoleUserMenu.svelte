@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { UserCircle as UserCircleIcon } from 'phosphor-svelte'
 
   import { authClient } from '$lib/auth-client.js'
 
@@ -65,6 +66,6 @@
     aria-label="Sign in"
     title="Sign in"
   >
-    <span class="block size-5 text-center leading-5">?</span>
+    <UserCircleIcon class="size-5" />
   </a>
 {/if}
