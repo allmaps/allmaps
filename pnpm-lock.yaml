@@ -2532,6 +2532,9 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../annotation
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../iiif-parser
