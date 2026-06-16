@@ -1,11 +1,11 @@
 export { fetchAnnotationsFromApi } from './api.js'
 
-export {
-  getImageData,
-  getColorsArray,
-  getColorHistogram,
-  getMaxOccurringColor
-} from './background-color.js'
+// export {
+//   getImageData,
+//   getColorsArray,
+//   getColorHistogram,
+//   getMaxOccurringColor
+// } from './background-color.js'
 
 export {
   computeMinMax,
