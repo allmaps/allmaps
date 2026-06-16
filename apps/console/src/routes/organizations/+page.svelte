@@ -196,9 +196,22 @@
             >Members</span
           >
         </th>
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('createdAt', 'Created')}</th
-        >
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('createdAt')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Created
+            {#if sortBy === 'createdAt'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
       {/snippet}
 
       {#snippet tbody()}
