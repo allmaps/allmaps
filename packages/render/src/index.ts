@@ -27,6 +27,11 @@ export type {
   MaskOptions,
   ProjectionOptions,
   TransformationOptions,
+  BatchFailureMode,
+  BatchOptions,
+  BatchMapSuccess,
+  BatchMapError,
+  BatchMapResult,
   Sprite,
   SpritesInfo
 } from './shared/types.js'

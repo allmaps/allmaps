@@ -2,7 +2,6 @@ import { fetchUrl } from '@allmaps/stdlib'
 
 import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile } from './CacheableTile.js'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
 
@@ -33,21 +32,13 @@ export class CacheableImageBitmapTile extends CacheableTile<ImageBitmap> {
         this.fetchableTile.tile.tileZoomLevel.height
       )
 
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-          tileUrl: this.fetchableTile.tileUrl
-        })
-      )
+      this.dispatchTileFetched()
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
+      if (this.isAbortError(err)) {
         // fetchImage was aborted because viewport was moved and tile
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.fetchableTile.tileUrl
-          })
-        )
+        this.dispatchTileFetchError(err)
       }
     }
 

@@ -2,7 +2,6 @@ import { proxy as comlinkProxy, wrap as comlinkWrap } from 'comlink'
 
 import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile } from './CacheableTile.js'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
 import type { FetchAndGetImageBitmapWorkerType } from '../workers/fetch-and-get-image-bitmap.js'
@@ -30,32 +29,21 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
       const wrappedWorker = comlinkWrap<FetchAndGetImageBitmapWorkerType>(
         this.#worker
       )
-      wrappedWorker
-        .getImageBitmap(
-          this.fetchableTile.tileUrl,
-          comlinkProxy(this.abortController.signal),
-          this.fetchFn,
-          this.fetchableTile.tile.tileZoomLevel.width,
-          this.fetchableTile.tile.tileZoomLevel.height
-        )
-        .then((response) => {
-          this.data = response
-          this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-              tileUrl: this.fetchableTile.tileUrl
-            })
-          )
-        })
+      this.data = await wrappedWorker.getImageBitmap(
+        this.fetchableTile.tileUrl,
+        comlinkProxy(this.abortController.signal),
+        this.fetchFn,
+        this.fetchableTile.tile.tileZoomLevel.width,
+        this.fetchableTile.tile.tileZoomLevel.height
+      )
+
+      this.dispatchTileFetched()
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
+      if (this.isAbortError(err)) {
         // fetchImage was aborted because viewport was moved and tile
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.fetchableTile.tileUrl
-          })
-        )
+        this.dispatchTileFetchError(err)
       }
     }
 
