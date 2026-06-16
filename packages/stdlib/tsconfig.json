@@ -8,6 +8,7 @@
   "references": [
     { "path": "../types" },
     { "path": "../annotation" },
+    { "path": "../id" },
     { "path": "../iiif-parser" }
   ],
   "include": ["./src/**/*"]

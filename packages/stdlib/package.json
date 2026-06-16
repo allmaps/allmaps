@@ -45,6 +45,7 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@turf/rewind": "^7.2.0",
     "@types/lodash-es": "^4.17.12",
     "hex-rgb": "^5.0.0",
