@@ -43,6 +43,10 @@ GET /cors/iiif/:version/:level/:imageId/:region/:size/:rotation/:quality.:format
 GET /cors/annotations/images/:imageId.json
 GET /cors/annotations/images/:version/:level/:imageId.json
 GET /cors/annotations/combined/iiif{2|3}-level{0|1|2}.json
+GET /cors/annotations/combined/image-500-iiif3-level2.json
+GET /cors/annotations/combined/slow-iiif3-level2.json
+GET /cors/annotations/combined/mixed-slow-iiif3-level2.json
+GET /cors/annotations/combined/mixed-partof-hierarchy-iiif3-level2.json
 GET /cors/annotations/combined/mixed-iiif2-level0-level2.json
 GET /cors/annotations/combined/mixed-iiif3-level0-level2.json
 GET /cors/annotations/combined/mixed-iiif2-level0-iiif3-level2.json
@@ -52,8 +56,12 @@ GET /cors/errors/annotations/images/:imageId/bad-resource-size.json
 GET /cors/errors/annotations/images/:version/:level/:imageId/:variant.json
 GET /cors/manifests/2/:imageId.json
 GET /cors/manifests/2/:level/:imageId.json
+GET /cors/manifests/2/:imageId.json/canvas/1
+GET /cors/manifests/2/:level/:imageId.json/canvas/1
 GET /cors/manifests/3/:imageId.json
 GET /cors/manifests/3/:version/:level/:imageId.json
+GET /cors/manifests/3/:imageId.json/canvas/1
+GET /cors/manifests/3/:version/:level/:imageId.json/canvas/1
 GET /cors/manifests/3/:imageId/embedded-annotation.json
 GET /cors/manifests/3/:imageId/linked-annotation.json
 GET /cors/manifests/3/:version/:level/:imageId/embedded-annotation.json
@@ -78,6 +86,8 @@ GET /cors/manifests/3/combined/embedded-annotations.json
 GET /cors/manifests/3/combined/linked-annotations.json
 GET /cors/manifests/3/combined/image-services-iiif{2|3}-level{0|1|2}-embedded-annotations.json
 GET /cors/manifests/3/combined/image-services-iiif{2|3}-level{0|1|2}-linked-annotations.json
+GET /cors/manifests/3/combined/manifest-embedded-annotations.json
+GET /cors/manifests/3/combined/partial-manifest-embedded-annotations.json
 GET /cors/manifests/3/combined/partial-embedded-annotations.json
 GET /cors/manifests/3/combined/partial-linked-annotations.json
 GET /cors/manifests/3/combined/mixed-embedded-annotation-errors.json
@@ -86,16 +96,17 @@ GET /cors/manifests/3/combined/image-services-iiif2-level0-level2.json
 GET /cors/manifests/3/combined/image-services-iiif3-level0-level2.json
 GET /cors/manifests/3/combined/image-services-iiif2-level0-iiif3-level2.json
 GET /cors/manifests/3/combined/image-services-iiif2-level2-iiif3-level0.json
+GET /cors/manifests/3/combined/:variant.json/canvas/:canvasIndex
 GET /cors/annotations/manifests/3/combined/:variant/canvas/:canvasIndex.json
 ```
 
 The image endpoint supports IIIF Image API 2.1 and 3.0 `level0`, `level1`, and
-`level2` URLs. Level 0 serves JPEG full-image requests for dimensions listed in
-the `sizes` array, including the full image size, and JPEG tile requests
-declared by the `tiles` array in `info.json`. Higher levels support `full`,
-pixel, and percentage regions; `full`, `max`, `w,`, `,h`, `w,h`, `!w,h`, and
-`pct:n` sizes; rotation `0`; qualities `default` and `color`; and output
-formats `jpg`, `jpeg`, `png`, and `webp`.
+`level2` URLs. Level 0 omits the `sizes` array and serves only JPEG `full/full`
+or `full/max` full-image requests plus JPEG tile requests declared by the
+`tiles` array in `info.json`. Higher levels support `full`, pixel, and
+percentage regions; `full`, `max`, `w,`, `,h`, `w,h`, `!w,h`, and `pct:n`
+sizes; rotation `0`; qualities `default` and `color`; and output formats `jpg`,
+`jpeg`, `png`, and `webp`.
 
 The root catalog lists only `level0` and `level2` resources to keep the fixture
 overview compact; `level1` routes remain available for direct requests.
