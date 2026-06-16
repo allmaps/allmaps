@@ -7,9 +7,11 @@
   import { getUrlState } from '$lib/shared/params.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
   import { setSourceState } from '$lib/state/source.svelte.js'
+  import { setMapsState } from '$lib/state/maps.svelte.js'
   import { setMetadataState } from '$lib/state/metadata.svelte.js'
   import { setImagesState } from '$lib/state/images.svelte.js'
   import { setBackgroundColorsState } from '$lib/state/background-colors.svelte.js'
+  import { setIiifState } from '$lib/state/iiif.svelte.js'
 
   import { sourceFromUrl, sourceFromData } from '$lib/shared/source.js'
 
@@ -20,17 +22,17 @@
 
   let { data, children }: LayoutProps = $props()
 
-  let errorMessage = $state<string>()
-
   const urlState = getUrlState()
   const uiState = setUiState()
 
   // svelte-ignore state_referenced_locally
-  const sourceState = setSourceState(urlState, uiState, data.source)
-  const metadataState = setMetadataState(sourceState, urlState)
-  const imagesState = setImagesState(sourceState)
+  const sourceState = setSourceState(uiState, data.source)
+  const mapsState = setMapsState(sourceState, urlState, uiState)
+  const metadataState = setMetadataState(mapsState, urlState)
+  const imagesState = setImagesState(mapsState)
+  setIiifState(mapsState)
   if (browser) {
-    setBackgroundColorsState(sourceState, imagesState)
+    setBackgroundColorsState(mapsState, imagesState)
   }
 
   let currentUrlParam = $state<string>()
@@ -48,9 +50,12 @@
 
   let urlParam = $derived.by(() => getCurrentUrlParam())
 
+  function getErrorMessage(err: unknown, fallback: string) {
+    return err instanceof Error ? err.message : fallback
+  }
+
   $effect(() => {
     if (!urlParam && !urlState.params.data) {
-      errorMessage = undefined
       sourceState.source = undefined
       currentUrlParam = undefined
       currentDataParamChecksum = undefined
@@ -62,24 +67,29 @@
     ) {
       currentUrlParam = data.urlParam
       currentDataParamChecksum = undefined
-      errorMessage = undefined
       sourceState.source = data.source
     } else if ((!data.source || data.source.url !== urlParam) && urlParam) {
       const requestedUrlParam = urlParam
 
       currentUrlParam = requestedUrlParam
       currentDataParamChecksum = undefined
-      sourceFromUrl(data.env.PUBLIC_REST_BASE_URL, requestedUrlParam)
+      sourceState.source = undefined
+      sourceFromUrl(data.env.PUBLIC_ANNOTATIONS_BASE_URL, requestedUrlParam)
         .then((source) => {
           if (getCurrentUrlParam() === requestedUrlParam) {
-            errorMessage = undefined
             sourceState.source = source
           }
         })
         .catch((err) => {
           if (getCurrentUrlParam() === requestedUrlParam) {
-            errorMessage =
-              err.message || 'Failed to load source from url parameter'
+            sourceState.error = {
+              reason: 'url',
+              message: getErrorMessage(
+                err,
+                'Failed to load source from url parameter'
+              ),
+              sourceUrl: requestedUrlParam
+            }
           }
         })
     } else if (urlState.params.data) {
@@ -87,16 +97,24 @@
       if (dataChecksum !== currentDataParamChecksum) {
         currentDataParamChecksum = dataChecksum
         currentUrlParam = undefined
+        sourceState.source = undefined
 
         // TODO: cancel fetch in sourceFromData when still fetching
-        sourceFromData(data.env.PUBLIC_REST_BASE_URL, urlState.params.data)
+        sourceFromData(
+          data.env.PUBLIC_ANNOTATIONS_BASE_URL,
+          urlState.params.data
+        )
           .then((source) => {
-            errorMessage = undefined
             sourceState.source = source
           })
           .catch((err) => {
-            errorMessage =
-              err.message || 'Failed to load source from data parameter'
+            sourceState.error = {
+              reason: 'data',
+              message: getErrorMessage(
+                err,
+                'Failed to load source from data parameter'
+              )
+            }
           })
       }
     }
@@ -109,9 +127,7 @@
   previewUrl={data.env.PUBLIC_PREVIEW_BASE_URL}
 />
 
-{#if errorMessage}
-  <p class="text-red-500">{errorMessage}</p>
-{:else if browser}
+{#if browser}
   {@render children?.()}
   <About
     mapsApiBaseUrl={data.env.PUBLIC_REST_BASE_URL}

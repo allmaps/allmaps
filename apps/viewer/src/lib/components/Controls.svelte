@@ -6,6 +6,7 @@
   import OpacityControl from '$lib/components/OpacityControl.svelte'
   import BackgroundColorControl from '$lib/components/BackgroundColorControl.svelte'
   import PrevNext from '$lib/components/PrevNext.svelte'
+  import ControlContainer from '$lib/components/ControlContainer.svelte'
 
   type Props = {
     onZoomIn: () => void
@@ -43,14 +44,13 @@
       <PrevNext />
     </div>
   </div>
-  <div class="col-2 row-3 self-end place-self-center flex flex-row gap-1">
-    <div>
+  <div class="col-2 row-3 self-end place-self-center flex flex-row">
+    <ControlContainer roundedFull>
       <OpacityControl />
-    </div>
-    <div>
       <BackgroundColorControl />
-    </div>
+    </ControlContainer>
   </div>
+
   <div
     class="col-3 row-3 place-self-end flex flex-row gap-2 *:pointer-events-auto"
   >

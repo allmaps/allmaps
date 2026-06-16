@@ -1,11 +1,16 @@
 import { setContext, getContext } from 'svelte'
 
+import { parseLanguageString } from '@allmaps/iiif-inspector'
+
 import { searchParams } from '$lib/shared/params.js'
 import { truncate } from '$lib/shared/strings.js'
-import { parseLanguageString } from '$lib/shared/iiif.js'
-import { getSourceLabels, getOrganization } from '$lib/shared/metadata.js'
 
-import type { SourceState } from '$lib/state/source.svelte.js'
+import {
+  getSourceLabels,
+  getOrganizationSummary
+} from '$lib/shared/metadata.js'
+
+import type { MapsState } from '$lib/state/maps.svelte.js'
 import type { UrlState } from '$lib/state/url.svelte.js'
 
 const METADATA_KEY = Symbol('metadata')
@@ -16,40 +21,42 @@ const truncateOptions = {
 }
 
 export class MetadataState {
-  #sourceState: SourceState
+  #mapsState: MapsState
   #urlState: UrlState<typeof searchParams>
 
   #selectedMapId = $derived.by(() => this.#urlState.params.mapId)
 
   #labels = $derived.by(() =>
-    getSourceLabels(this.#sourceState.maps, this.#selectedMapId)
+    getSourceLabels(this.#mapsState.maps, this.#selectedMapId)
   )
 
   #organization = $derived.by(() =>
-    getOrganization(this.#sourceState.maps, this.#selectedMapId)
+    getOrganizationSummary(this.#mapsState.maps, this.#selectedMapId)
   )
 
   #manifestLabelString = $derived(
     parseLanguageString(this.#labels?.manifest, 'en')
   )
   #canvasLabelString = $derived(parseLanguageString(this.#labels?.canvas, 'en'))
+  #summaryTitleString = $derived(this.#labels?.title)
+  #titleBadge = $derived(this.#labels?.badge)
 
-  constructor(
-    sourceState: SourceState,
-    urlState: UrlState<typeof searchParams>
-  ) {
-    this.#sourceState = sourceState
+  constructor(mapsState: MapsState, urlState: UrlState<typeof searchParams>) {
+    this.#mapsState = mapsState
     this.#urlState = urlState
   }
 
   #getTitle(
     manifestLabelString: string,
     canvasLabelString: string,
+    summaryTitleString: string | undefined,
     includeAppName = false
   ) {
     let labels = includeAppName ? ['Allmaps Viewer'] : []
 
-    if (manifestLabelString) {
+    if (summaryTitleString) {
+      labels = [summaryTitleString, ...labels]
+    } else if (manifestLabelString) {
       if (canvasLabelString) {
         const truncatedCanvasLabelString = truncate(
           canvasLabelString,
@@ -82,12 +89,21 @@ export class MetadataState {
     return this.#getTitle(
       this.#manifestLabelString,
       this.#canvasLabelString,
+      this.#summaryTitleString,
       true
     )
   }
 
   get title() {
-    return this.#getTitle(this.#manifestLabelString, this.#canvasLabelString)
+    return this.#getTitle(
+      this.#manifestLabelString,
+      this.#canvasLabelString,
+      this.#summaryTitleString
+    )
+  }
+
+  get titleBadge() {
+    return this.#titleBadge
   }
 
   get organization() {
@@ -96,10 +112,10 @@ export class MetadataState {
 }
 
 export function setMetadataState(
-  sourceState: SourceState,
+  mapsState: MapsState,
   urlState: UrlState<typeof searchParams>
 ) {
-  return setContext(METADATA_KEY, new MetadataState(sourceState, urlState))
+  return setContext(METADATA_KEY, new MetadataState(mapsState, urlState))
 }
 
 export function getMetadataState() {

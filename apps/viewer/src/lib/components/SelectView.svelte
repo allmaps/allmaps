@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Globe as GlobeIcon, Image as ImageIcon } from 'phosphor-svelte'
+
   import ControlContainer from '$lib/components/ControlContainer.svelte'
 
   import { hasInputTarget } from '$lib/shared/keyboard.js'
@@ -29,15 +31,21 @@
   <button
     onclick={() => (uiState.view = 'map')}
     class={[
-      'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-all cursor-pointer font-medium',
+      'flex items-center px-2 py-1 gap-2 hover:bg-pink/10 hover:text-pink rounded transition-all cursor-pointer font-medium',
       isMapView && 'bg-pink/5 text-pink'
-    ]}>Map</button
+    ]}
+  >
+    <GlobeIcon class="size-6 inline" />
+    <span class="hidden sm:inline">Map</span></button
   >
   <button
     onclick={() => (uiState.view = 'image')}
     class={[
-      'px-2 py-1 hover:bg-pink/10 hover:text-pink rounded transition-colors cursor-pointer font-medium',
+      'flex items-center px-2 py-1 gap-2 hover:bg-pink/10 hover:text-pink rounded transition-colors cursor-pointer font-medium',
       isImageView && 'bg-pink/5 text-pink'
-    ]}>Image</button
+    ]}
+  >
+    <ImageIcon class="size-6 inline" />
+    <span class="hidden sm:inline">Image</span></button
   >
 </ControlContainer>

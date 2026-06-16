@@ -2,6 +2,7 @@
   import { navigating } from '$app/state'
 
   import examples from '$lib/components/examples.js'
+  import Image from '$lib/components/Image.svelte'
 
   let navigatingToUrl = $derived(navigating.to?.url.searchParams.get('url'))
 
@@ -19,18 +20,21 @@
 <ul class="grid grid-cols-1 sm:grid-cols-2 list-none gap-4 rounded-2xl">
   {#each examples as example (example.url)}
     <li
-      class={[
-        'flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2',
-        navigatingToUrl === example.url && 'animate-pulse'
-      ]}
+      class="flex flex-col p-4 bg-white rounded-2xl shadow-md gap-2 hover:shadow-lg transition-all"
     >
       <a class="contents" href={`?url=${encodeURIComponent(example.url)}`}>
-        <img
-          alt={`Preview of ${example.title}`}
-          class="border-2 bg-white/50 border-pink/20 rounded-lg aspect-3/2 overflow-clip"
-          src={`${previewUrl}/${example.allmapsId}.webp?fit=best&width=600&height=400`}
-        />
-
+        <div
+          class="w-full aspect-3/2 border-2 bg-blue/20 border-blue inset-shadow-sm rounded-lg overflow-clip"
+        >
+          <Image
+            alt={`Preview of ${example.title}`}
+            class={[
+              ' hover:scale-105 duration-700 transition-transform',
+              navigatingToUrl === example.url && 'animate-pulse'
+            ]}
+            src={`${previewUrl}/${example.allmapsId}.webp?fit=best&width=600&height=400`}
+          />
+        </div>
         <span class="underline">{example.title}</span>
       </a>
       <span class=" font-light">{example.organization}</span>

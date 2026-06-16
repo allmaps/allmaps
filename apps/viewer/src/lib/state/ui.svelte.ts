@@ -16,6 +16,11 @@ export class UiState extends UiEventTarget {
   #imageUpBearing = $state<number>()
 
   #metadataScrollTop = $state(0)
+  #expandedMetadataSectionKeys = $state<string[]>([])
+
+  #hiddenMapIds = $state<string[]>([])
+
+  #tilesLoading = $state(false)
 
   #view: View = $state('map')
 
@@ -48,7 +53,12 @@ export class UiState extends UiEventTarget {
   reset() {
     this.#opacity = 1
     this.#removeBackground = false
+    this.#mapBearing = 0
+    this.#imageUpBearing = undefined
     this.#metadataScrollTop = 0
+    this.#expandedMetadataSectionKeys = []
+    this.#hiddenMapIds = []
+    this.#tilesLoading = false
     this.#view = 'map'
     this.#modalOpen = undefined
   }
@@ -67,6 +77,53 @@ export class UiState extends UiEventTarget {
 
   dispatchResetBearing() {
     this.dispatchEvent(new CustomEvent(UiEvents.RESET_BEARING))
+  }
+
+  isMapHidden(mapId?: string) {
+    return mapId ? this.#hiddenMapIds.includes(mapId) : false
+  }
+
+  setMapHidden(mapId: string, hidden: boolean) {
+    if (hidden) {
+      if (!this.#hiddenMapIds.includes(mapId)) {
+        this.#hiddenMapIds = [...this.#hiddenMapIds, mapId]
+      }
+    } else {
+      this.#hiddenMapIds = this.#hiddenMapIds.filter(
+        (hiddenMapId) => hiddenMapId !== mapId
+      )
+    }
+  }
+
+  toggleMapHidden(mapId: string) {
+    this.setMapHidden(mapId, !this.isMapHidden(mapId))
+  }
+
+  isMetadataSectionCollapsed(key: string) {
+    return !this.#expandedMetadataSectionKeys.includes(key)
+  }
+
+  setMetadataSectionCollapsed(key: string, collapsed: boolean) {
+    if (collapsed) {
+      this.#expandedMetadataSectionKeys =
+        this.#expandedMetadataSectionKeys.filter(
+          (expandedKey) => expandedKey !== key
+        )
+    } else {
+      if (!this.#expandedMetadataSectionKeys.includes(key)) {
+        this.#expandedMetadataSectionKeys = [
+          ...this.#expandedMetadataSectionKeys,
+          key
+        ]
+      }
+    }
+  }
+
+  toggleMetadataSectionCollapsed(key: string) {
+    this.setMetadataSectionCollapsed(
+      key,
+      !this.isMetadataSectionCollapsed(key)
+    )
   }
 
   get opacity() {
@@ -115,6 +172,18 @@ export class UiState extends UiEventTarget {
 
   set metadataScrollTop(value: number) {
     this.#metadataScrollTop = value
+  }
+
+  get hiddenMapIds() {
+    return this.#hiddenMapIds
+  }
+
+  get tilesLoading() {
+    return this.#tilesLoading
+  }
+
+  set tilesLoading(value: boolean) {
+    this.#tilesLoading = value
   }
 }
 

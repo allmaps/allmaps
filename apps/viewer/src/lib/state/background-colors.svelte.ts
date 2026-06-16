@@ -14,14 +14,14 @@ import type { Ring, Size } from '@allmaps/types'
 import type { BackgroundColorWorkerType } from '$lib/workers/background-color.worker.js'
 
 import type { ImagesState } from '$lib/state/images.svelte.js'
-import type { SourceState } from '$lib/state/source.svelte.js'
+import type { MapsState } from '$lib/state/maps.svelte.js'
 
 import BackgroundColorWorker from '$lib/workers/background-color.worker.ts?worker'
 
 const BACKGROUND_COLORS_KEY = Symbol('background-colors')
 
 export class BackgroundColorsState extends BackgroundColorEventTarget {
-  #sourceState: SourceState
+  #mapsState: MapsState
   #imagesState: ImagesState
 
   #paused = $state(false)
@@ -31,13 +31,13 @@ export class BackgroundColorsState extends BackgroundColorEventTarget {
   #worker: Remote<BackgroundColorWorkerType>
 
   constructor(
-    sourceState: SourceState,
+    mapsState: MapsState,
     imagesState: ImagesState,
     paused: boolean
   ) {
     super()
 
-    this.#sourceState = sourceState
+    this.#mapsState = mapsState
     this.#imagesState = imagesState
     this.#paused = paused
 
@@ -48,7 +48,7 @@ export class BackgroundColorsState extends BackgroundColorEventTarget {
         return
       }
 
-      for (const map of this.#sourceState.maps) {
+      for (const map of this.#mapsState.maps) {
         const mapId = map.id!
         const imageId = map.resource.id
 
@@ -106,7 +106,7 @@ export class BackgroundColorsState extends BackgroundColorEventTarget {
         plainResourceMask
       )
 
-      if (this.#sourceState.maps.some((map) => map.id === mapId)) {
+      if (this.#mapsState.maps.some((map) => map.id === mapId)) {
         this.#backgroundColors.set(mapId, color)
         this.dispatchEvent(
           new CustomEvent(BackGroundColorEvents.BACKGROUND_COLOR_CHANGE, {
@@ -130,13 +130,13 @@ export class BackgroundColorsState extends BackgroundColorEventTarget {
 }
 
 export function setBackgroundColorsState(
-  sourceState: SourceState,
+  mapsState: MapsState,
   imagesState: ImagesState,
   paused = true
 ) {
   return setContext(
     BACKGROUND_COLORS_KEY,
-    new BackgroundColorsState(sourceState, imagesState, paused)
+    new BackgroundColorsState(mapsState, imagesState, paused)
   )
 }
 
