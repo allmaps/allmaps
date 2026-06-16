@@ -357,8 +357,13 @@ export function isClosed(input: Point[]): boolean {
 }
 
 export function isEqualPoint(point0: Point, point1: Point): boolean {
-  if (point0 === point1) return true
-  if (point0 === null || point1 === null) return false
+  if (point0 === point1) {
+    return true
+  }
+
+  if (point0 === null || point1 === null) {
+    return false
+  }
 
   return point0[0] === point1[0] && point0[1] === point1[1]
 }

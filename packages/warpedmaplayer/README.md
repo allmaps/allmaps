@@ -48,6 +48,7 @@ The following events are emitted by the native map object to inform you of the s
 | `maptileloaded`                 | A tile has been loaded to the tile cache for a map                                                                                   |
 | `maptiledeleted`                | A tile has been deleted from the tile cache for a map                                                                                |
 | `firstmaptileloaded`            | The cache loaded a first tile of a map                                                                                               |
+| `requestedtilesloading`         | New tiles requested for the current viewport started loading                                                                         |
 | `allrequestedtilesloaded`       | All tiles requested for the current viewport have been loaded                                                                        |
 | `cleared`                       | The warped map list has been cleared                                                                                                 |
 | `preparechange`                 | An upcoming options change has been prepared for a specific map (by mixing previous and new properties if the animation was ongoing) |

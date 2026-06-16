@@ -64,11 +64,14 @@ export {
 } from './color.js'
 
 export {
+  ResourceFetchError,
   fetchUrl,
   fetchJson,
   fetchImageInfo,
   fetchImageBitmap
 } from './fetch.js'
+
+export type { ResourceFetchErrorKind } from './fetch.js'
 
 export {
   isGeojsonPoint,

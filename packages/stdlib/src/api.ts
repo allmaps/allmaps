@@ -1,81 +1,54 @@
+import { generateId } from '@allmaps/id'
+
 import type {
   Image,
   EmbeddedImage,
   Manifest,
-  Collection,
-  EmbeddedCollection
+  Collection
 } from '@allmaps/iiif-parser'
 
-import { fetchJson } from './fetch.js'
+type Hash = string
 
-function fetchAnnotationsByIiifUrl(url: string) {
+type AllmapsId = `manifests/${Hash}` | `images/${Hash}`
+
+function fetchAnnotationsByAllmapsId(
+  restBaseUrl: string,
+  allmapsId: AllmapsId,
+  fetch = globalThis.fetch
+) {
   // TODO: move base URLs to env/config file
-  return fetchJson(`https://annotations.allmaps.org/?url=${url}`)
+  return fetch(`${restBaseUrl}/${allmapsId}`).then((response) =>
+    response.json()
+  )
 }
 
 async function fetchAnnotationsForImage(
-  parsedImage: Image | EmbeddedImage
-): Promise<unknown[]> {
-  try {
-    const annotations = await fetchAnnotationsByIiifUrl(
-      `${parsedImage.uri}/info.json`
-    )
-    return [annotations]
-  } catch (err) {
-    return []
-  }
+  restBaseUrl: string,
+  parsedImage: Image | EmbeddedImage,
+  fetch?: typeof globalThis.fetch
+) {
+  const allmapsId: AllmapsId = `images/${await generateId(parsedImage.uri)}`
+  return fetchAnnotationsByAllmapsId(restBaseUrl, allmapsId, fetch)
 }
 
 async function fetchAnnotationsForManifest(
-  parsedManifest: Manifest
-): Promise<unknown[]> {
-  try {
-    const annotations = await fetchAnnotationsByIiifUrl(parsedManifest.uri)
-    return [annotations]
-  } catch (err) {
-    const annotations: unknown[] = []
-    for (const canvas of parsedManifest.canvases) {
-      const imageAnnotations = await fetchAnnotationsForImage(canvas.image)
-      annotations.push(...imageAnnotations)
-    }
-
-    return annotations
-  }
-}
-
-async function fetchAnnotationsForCollection(
-  parsedCollection: Collection | EmbeddedCollection
-): Promise<unknown[]> {
-  try {
-    const annotations = await fetchAnnotationsByIiifUrl(parsedCollection.uri)
-    return [annotations]
-  } catch (err) {
-    const annotations: unknown[] = []
-    if ('items' in parsedCollection) {
-      for (const item of parsedCollection.items) {
-        if (item.type === 'collection') {
-          const itemAnnotations = await fetchAnnotationsForCollection(item)
-          annotations.push(...itemAnnotations)
-        } else if (item.type === 'manifest' && 'canvases' in item) {
-          const itemAnnotations = await fetchAnnotationsForManifest(item)
-          annotations.push(...itemAnnotations)
-        }
-      }
-    }
-
-    return annotations
-  }
+  restBaseUrl: string,
+  parsedManifest: Manifest,
+  fetch?: typeof globalThis.fetch
+) {
+  const allmapsId: AllmapsId = `manifests/${await generateId(parsedManifest.uri)}`
+  return fetchAnnotationsByAllmapsId(restBaseUrl, allmapsId, fetch)
 }
 
 export function fetchAnnotationsFromApi(
-  parsedIiif: Image | Manifest | Collection
+  restBaseUrl: string,
+  parsedIiif: Image | Manifest | Collection,
+  fetch?: typeof globalThis.fetch
 ) {
   if (parsedIiif.type === 'image') {
-    return fetchAnnotationsForImage(parsedIiif)
+    return fetchAnnotationsForImage(restBaseUrl, parsedIiif, fetch)
   } else if (parsedIiif.type === 'manifest') {
-    return fetchAnnotationsForManifest(parsedIiif)
-  } else if (parsedIiif.type === 'collection') {
-    return fetchAnnotationsForCollection(parsedIiif)
+    return fetchAnnotationsForManifest(restBaseUrl, parsedIiif, fetch)
   } else {
     throw new Error('Unsupported IIIF resource')
   }

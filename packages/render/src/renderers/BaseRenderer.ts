@@ -41,7 +41,9 @@ import type {
   SpritesInfo,
   Sprite,
   WarpedMapListOptions,
-  WebGL2WarpedMapOptions
+  WebGL2WarpedMapOptions,
+  BatchMapResult,
+  BatchOptions
 } from '../shared/types.js'
 
 /**
@@ -68,6 +70,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   #boundMapTileDeleted = this.mapTileDeleted.bind(this)
   #boundImageLoaded = this.imageLoaded.bind(this)
   #boundImageInfoFetchError = this.imageInfoFetchError.bind(this)
+  #boundError = this.error.bind(this)
   #boundWarpedMapAdded = this.warpedMapAdded.bind(this)
   #boundWarpedMapRemoved = this.warpedMapRemoved.bind(this)
   #boundPrepareChange = this.prepareChange.bind(this)
@@ -131,9 +134,14 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
    */
   addGeoreferenceAnnotation(
     annotation: unknown,
-    mapOptions?: Partial<GetWarpedMapOptions<W>>
+    mapOptions?: Partial<GetWarpedMapOptions<W>>,
+    batchOptions?: Partial<BatchOptions>
   ) {
-    return this.warpedMapList.addGeoreferenceAnnotation(annotation, mapOptions)
+    return this.warpedMapList.addGeoreferenceAnnotation(
+      annotation,
+      mapOptions,
+      batchOptions
+    )
   }
 
   /**
@@ -147,6 +155,18 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ) {
     return this.warpedMapList.addGeoreferencedMap(georeferencedMap, mapOptions)
+  }
+
+  addGeoreferencedMaps(
+    georeferencedMaps: unknown,
+    mapOptions?: Partial<GetWarpedMapOptions<W>>,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
+    return this.warpedMapList.addGeoreferencedMaps(
+      georeferencedMaps,
+      mapOptions,
+      batchOptions
+    )
   }
 
   async addSprites(sprites: Sprite[], imageUrl: string, imageSize: Size) {
@@ -1214,6 +1234,18 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected imageInfoFetchError(event: Event): void {}
 
+  protected error(event: Event): void {
+    if (event instanceof WarpedMapErrorEvent) {
+      this.dispatchEvent(
+        new WarpedMapErrorEvent(
+          event.error,
+          event.data,
+          WarpedMapEventType.ERROR
+        )
+      )
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   protected warpedMapAdded(event: Event): void {}
 
@@ -1241,6 +1273,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMAGELOADED,
       this.#boundImageLoaded
+    )
+    this.warpedMapList.addEventListener(
+      WarpedMapEventType.ERROR,
+      this.#boundError
     )
     this.warpedMapList.addEventListener(
       WarpedMapEventType.IMAGEINFOFETCHERROR,
@@ -1284,6 +1320,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.IMAGEINFOFETCHERROR,
       this.#boundImageInfoFetchError
+    )
+    this.warpedMapList.removeEventListener(
+      WarpedMapEventType.ERROR,
+      this.#boundError
     )
     this.warpedMapList.removeEventListener(
       WarpedMapEventType.WARPEDMAPADDED,

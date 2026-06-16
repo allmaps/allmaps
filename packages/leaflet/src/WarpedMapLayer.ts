@@ -16,7 +16,9 @@ import {
   AnimationOptions,
   BaseRenderOptions,
   Sprite,
-  WarpedMapListOptions
+  WarpedMapListOptions,
+  BatchMapResult,
+  BatchOptions
 } from '@allmaps/render'
 import {
   rectangleToSize,
@@ -431,13 +433,15 @@ export class WarpedMapLayer
    */
   addGeoreferenceAnnotation(
     annotation: unknown,
-    mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): (string | Error)[] {
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const results = this.renderer.addGeoreferenceAnnotation(
       annotation,
-      mapOptions
+      mapOptions,
+      batchOptions
     )
     this.nativeUpdate()
 
@@ -450,11 +454,16 @@ export class WarpedMapLayer
    * @param annotation - Georeference Annotation
    * @returns Map IDs of the maps that were removed, or an error per map
    */
-  removeGeoreferenceAnnotation(annotation: unknown): (string | Error)[] {
+  removeGeoreferenceAnnotation(
+    annotation: unknown,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const results =
-      this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+    const results = this.renderer.warpedMapList.removeGeoreferenceAnnotation(
+      annotation,
+      batchOptions
+    )
     this.nativeUpdate()
 
     return results
@@ -469,13 +478,14 @@ export class WarpedMapLayer
    */
   async addGeoreferenceAnnotationByUrl(
     annotationUrl: string,
-    mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): Promise<(string | Error)[]> {
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    batchOptions?: Partial<BatchOptions>
+  ): Promise<BatchMapResult[]> {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
 
-    return this.addGeoreferenceAnnotation(annotation, mapOptions)
+    return this.addGeoreferenceAnnotation(annotation, mapOptions, batchOptions)
   }
 
   /**
@@ -485,12 +495,13 @@ export class WarpedMapLayer
    * @returns Map IDs of the maps that were removed, or an error per map
    */
   async removeGeoreferenceAnnotationByUrl(
-    annotationUrl: string
-  ): Promise<(string | Error)[]> {
+    annotationUrl: string,
+    batchOptions?: Partial<BatchOptions>
+  ): Promise<BatchMapResult[]> {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
-    return this.removeGeoreferenceAnnotation(annotation)
+    return this.removeGeoreferenceAnnotation(annotation, batchOptions)
   }
 
   /**
@@ -1444,6 +1455,11 @@ export class WarpedMapLayer
       this.nativePassWarpedMapEvent.bind(this)
     )
 
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.TILEFETCHERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
     this.renderer.spritesTileCache.addEventListener(
       WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
@@ -1456,6 +1472,11 @@ export class WarpedMapLayer
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.REQUESTEDTILESLOADING,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -1540,6 +1561,11 @@ export class WarpedMapLayer
       this.nativePassWarpedMapEvent.bind(this)
     )
 
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.TILEFETCHERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
     this.renderer.spritesTileCache.removeEventListener(
       WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
@@ -1552,6 +1578,11 @@ export class WarpedMapLayer
 
     this.renderer.tileCache.removeEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.REQUESTEDTILESLOADING,
       this.nativePassWarpedMapEvent.bind(this)
     )
 

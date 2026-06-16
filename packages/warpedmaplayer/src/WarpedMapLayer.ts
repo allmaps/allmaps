@@ -8,7 +8,9 @@ import type {
   ProjectionOptions,
   BaseRenderOptions,
   Sprite,
-  WarpedMapListOptions
+  WarpedMapListOptions,
+  BatchMapResult,
+  BatchOptions
 } from '@allmaps/render'
 import type { Point, Bbox, Ring, Gcp, Size } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
@@ -77,13 +79,15 @@ export abstract class BaseWarpedMapLayer<
    */
   addGeoreferenceAnnotation(
     annotation: unknown,
-    mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): (string | Error)[] {
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
     const results = this.renderer.addGeoreferenceAnnotation(
       annotation,
-      mapOptions
+      mapOptions,
+      batchOptions
     )
     this.nativeUpdate()
 
@@ -96,11 +100,16 @@ export abstract class BaseWarpedMapLayer<
    * @param annotation - Georeference Annotation
    * @returns Map IDs of the maps that were removed, or an error per map
    */
-  removeGeoreferenceAnnotation(annotation: unknown): (string | Error)[] {
+  removeGeoreferenceAnnotation(
+    annotation: unknown,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    const results =
-      this.renderer.warpedMapList.removeGeoreferenceAnnotation(annotation)
+    const results = this.renderer.warpedMapList.removeGeoreferenceAnnotation(
+      annotation,
+      batchOptions
+    )
     this.nativeUpdate()
 
     return results
@@ -115,13 +124,14 @@ export abstract class BaseWarpedMapLayer<
    */
   async addGeoreferenceAnnotationByUrl(
     annotationUrl: string,
-    mapOptions?: Partial<WebGL2WarpedMapOptions>
-  ): Promise<(string | Error)[]> {
+    mapOptions?: Partial<WebGL2WarpedMapOptions>,
+    batchOptions?: Partial<BatchOptions>
+  ): Promise<BatchMapResult[]> {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
 
-    return this.addGeoreferenceAnnotation(annotation, mapOptions)
+    return this.addGeoreferenceAnnotation(annotation, mapOptions, batchOptions)
   }
 
   /**
@@ -131,12 +141,13 @@ export abstract class BaseWarpedMapLayer<
    * @returns Map IDs of the maps that were removed, or an error per map
    */
   async removeGeoreferenceAnnotationByUrl(
-    annotationUrl: string
-  ): Promise<(string | Error)[]> {
+    annotationUrl: string,
+    batchOptions?: Partial<BatchOptions>
+  ): Promise<BatchMapResult[]> {
     const annotation = await fetch(annotationUrl).then((response) =>
       response.json()
     )
-    return this.removeGeoreferenceAnnotation(annotation)
+    return this.removeGeoreferenceAnnotation(annotation, batchOptions)
   }
 
   /**
@@ -1090,6 +1101,11 @@ export abstract class BaseWarpedMapLayer<
       this.nativePassWarpedMapEvent.bind(this)
     )
 
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.TILEFETCHERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
     this.renderer.spritesTileCache.addEventListener(
       WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
@@ -1102,6 +1118,11 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.tileCache.addEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.addEventListener(
+      WarpedMapEventType.REQUESTEDTILESLOADING,
       this.nativePassWarpedMapEvent.bind(this)
     )
 
@@ -1186,6 +1207,11 @@ export abstract class BaseWarpedMapLayer<
       this.nativePassWarpedMapEvent.bind(this)
     )
 
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.TILEFETCHERROR,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
     this.renderer.spritesTileCache.removeEventListener(
       WarpedMapEventType.MAPTILESLOADEDFROMSPRITES,
       this.nativePassWarpedMapEvent.bind(this)
@@ -1198,6 +1224,11 @@ export abstract class BaseWarpedMapLayer<
 
     this.renderer.tileCache.removeEventListener(
       WarpedMapEventType.FIRSTMAPTILELOADED,
+      this.nativePassWarpedMapEvent.bind(this)
+    )
+
+    this.renderer.tileCache.removeEventListener(
+      WarpedMapEventType.REQUESTEDTILESLOADING,
       this.nativePassWarpedMapEvent.bind(this)
     )
 

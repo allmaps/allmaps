@@ -26,6 +26,7 @@ export const WarpedMapEventType = {
   MAPTILESLOADEDFROMSPRITES: 'maptilesloadedfromsprites',
   MAPTILEDELETED: 'maptiledeleted',
   FIRSTMAPTILELOADED: 'firstmaptileloaded',
+  REQUESTEDTILESLOADING: 'requestedtilesloading',
   ALLREQUESTEDTILESLOADED: 'allrequestedtilesloaded',
 
   // WebGL2WarpedMap > WebGL2Renderer

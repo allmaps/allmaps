@@ -47,6 +47,27 @@ export type TransformationOptions = {
   options?: unknown
 }
 
+export type BatchFailureMode = 'fail-fast' | 'best-effort'
+
+export type BatchOptions = {
+  failureMode: BatchFailureMode
+}
+
+export type BatchMapSuccess = {
+  ok: true
+  mapId: string
+  index: number
+}
+
+export type BatchMapError = {
+  ok: false
+  error: Error
+  index: number
+  mapId?: string
+}
+
+export type BatchMapResult = BatchMapSuccess | BatchMapError
+
 export type GeoreferencedMapOptions = {
   gcps: Gcp[]
   resourceMask: Ring
@@ -154,6 +175,7 @@ export type SpecificWarpedMapListOptions<W extends WarpedMap> = {
   animatedOptions: Array<keyof WebGL2WarpedMapOptions>
   projection: Projection
   warpedMapFactory: WarpedMapFactory<W>
+  batchFailureMode: BatchFailureMode
 }
 export type WarpedMapListOptions<W extends WarpedMap> =
   SpecificWarpedMapListOptions<W> & Partial<WebGL2WarpedMapOptions>

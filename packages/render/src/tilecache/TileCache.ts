@@ -1,7 +1,11 @@
 import { equalSet } from '@allmaps/stdlib'
 
 import { CacheableTile, CachedTile } from './CacheableTile.js'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 
 import { FetchableTile } from './FetchableTile.js'
 
@@ -440,6 +444,25 @@ export class TileCache<D> extends EventTarget {
       if (this.tilesByTileUrl.has(tileUrl)) {
         this.updateTilesFetchingCount(-1)
       }
+
+      const mapIds = [
+        ...new Set([
+          ...(event.data.mapIds ?? []),
+          ...(this.mapIdsByTileUrl.get(tileUrl) ?? [])
+        ])
+      ]
+
+      this.dispatchEvent(
+        new WarpedMapErrorEvent(
+          event.error ?? new Error(`Failed to fetch tile: ${tileUrl}`),
+          {
+            ...event.data,
+            mapIds,
+            tileUrl
+          },
+          WarpedMapEventType.TILEFETCHERROR
+        )
+      )
     }
   }
 
@@ -558,7 +581,14 @@ export class TileCache<D> extends EventTarget {
   }
 
   protected updateTilesFetchingCount(delta: number) {
+    const previousTilesFetchingCount = this.tilesFetchingCount
     this.tilesFetchingCount += delta
+
+    if (previousTilesFetchingCount === 0 && this.tilesFetchingCount > 0) {
+      this.dispatchEvent(
+        new WarpedMapEvent(WarpedMapEventType.REQUESTEDTILESLOADING)
+      )
+    }
 
     if (this.tilesFetchingCount === 0) {
       this.dispatchEvent(

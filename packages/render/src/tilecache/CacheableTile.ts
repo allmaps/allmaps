@@ -1,8 +1,17 @@
 import { FetchableTile } from './FetchableTile.js'
 
-import { bufferBboxByRatio, doBboxesIntersect } from '@allmaps/stdlib'
+import {
+  ResourceFetchError,
+  bufferBboxByRatio,
+  doBboxesIntersect
+} from '@allmaps/stdlib'
 
 import { computeBboxTile } from '../shared/tiles.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 
 import type { FetchFn } from '@allmaps/types'
 
@@ -76,6 +85,55 @@ export abstract class CacheableTile<D> extends EventTarget {
     if (!this.abortController.signal.aborted) {
       this.abortController.abort()
     }
+  }
+
+  protected isAbortError(error: unknown) {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'name' in error &&
+      error.name === 'AbortError'
+    )
+  }
+
+  protected dispatchTileFetched() {
+    this.dispatchEvent(
+      new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+        mapIds: [this.fetchableTile.mapId],
+        tileUrl: this.fetchableTile.tileUrl
+      })
+    )
+  }
+
+  protected dispatchTileFetchError(error: unknown) {
+    const normalizedError =
+      error instanceof Error ? error : new Error(String(error))
+    const resourceFetchError =
+      normalizedError instanceof ResourceFetchError ? normalizedError : undefined
+    const errorLike = normalizedError as Partial<ResourceFetchError>
+    const errorKind =
+      resourceFetchError?.kind ??
+      (typeof errorLike.kind === 'string' ? errorLike.kind : 'unknown')
+    const corsLikely =
+      resourceFetchError?.corsLikely ??
+      (typeof errorLike.corsLikely === 'boolean' ? errorLike.corsLikely : false)
+    const status =
+      resourceFetchError?.status ??
+      (typeof errorLike.status === 'number' ? errorLike.status : undefined)
+
+    this.dispatchEvent(
+      new WarpedMapErrorEvent(
+        normalizedError,
+        {
+          mapIds: [this.fetchableTile.mapId],
+          tileUrl: this.fetchableTile.tileUrl,
+          errorKind,
+          corsLikely,
+          status
+        },
+        WarpedMapEventType.TILEFETCHERROR
+      )
+    )
   }
 
   shouldPrune(
