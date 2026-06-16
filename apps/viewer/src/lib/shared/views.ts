@@ -94,7 +94,6 @@ function setMapView(
       : {
           applyMask: true,
           renderMask: false,
-          visible: true,
           transformationType: undefined,
           internalProjection: undefined,
           renderAppliedMask: false
@@ -173,7 +172,9 @@ function setImageView(
             internalProjection: webMercatorProjection
           }
         : {
-            visible: false,
+            applyMask: true,
+            renderAppliedMask: false,
+            renderMask: false,
             transformationType: 'helmert',
             internalProjection: webMercatorProjection
           }
@@ -360,7 +361,6 @@ function selectMapInImageView(
       (mapId) => {
         if (mapId === selectedMapId) {
           return {
-            visible: true,
             applyMask: false,
             renderAppliedMask: false,
             renderMask: true,
@@ -368,7 +368,6 @@ function selectMapInImageView(
           }
         } else if (mapId === previousSelectedMapId) {
           return {
-            visible: false,
             applyMask: true,
             renderAppliedMask: false,
             renderMask: false,

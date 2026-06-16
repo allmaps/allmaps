@@ -130,20 +130,57 @@
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (
-      event.key === 'Enter' &&
-      (event.shiftKey || !isMultiLine(inputValue))
-    ) {
+    if (event.key === 'Enter' && (event.shiftKey || !isMultiLine(inputValue))) {
       event.preventDefault()
       form?.requestSubmit()
     }
   }
 
+  function getClipboardText(event: ClipboardEvent) {
+    return (
+      event.clipboardData?.getData('text/plain') ||
+      event.clipboardData?.getData('text') ||
+      event.clipboardData?.getData('text/uri-list')
+    )
+  }
+
+  function getPastedInputValue(pastedText: string) {
+    const trimmedText = pastedText.trim()
+
+    if (trimmedText) {
+      try {
+        new URL(trimmedText)
+        return trimmedText
+      } catch {
+        // Keep non-URL text exactly as pasted.
+      }
+    }
+
+    return pastedText
+  }
+
+  function insertPastedText(pastedText: string) {
+    if (!inputRef) {
+      inputValue = pastedText
+      return
+    }
+
+    const selectionStart = inputRef.selectionStart ?? inputValue.length
+    const selectionEnd = inputRef.selectionEnd ?? selectionStart
+
+    inputValue =
+      inputValue.slice(0, selectionStart) +
+      pastedText +
+      inputValue.slice(selectionEnd)
+  }
+
   function handlePaste(event: ClipboardEvent) {
-    const pastedText = event.clipboardData?.getData('text')
+    const pastedText = getClipboardText(event)
     if (!pastedText) {
       return
     }
+
+    event.preventDefault()
 
     // Check if pasted content is JSON or multi-line
     const isJson = (() => {
@@ -159,7 +196,6 @@
       mode = 'json'
       // If valid JSON, format it
       if (isJson) {
-        event.preventDefault()
         try {
           const parsed = JSON.parse(pastedText)
           inputValue = JSON.stringify(parsed, null, 2)
@@ -167,9 +203,14 @@
           // This shouldn't happen since we already validated, but just in case
           inputValue = pastedText
         }
-        setTimeout(() => handleInput(), 0)
+      } else {
+        insertPastedText(getPastedInputValue(pastedText))
       }
+    } else {
+      insertPastedText(getPastedInputValue(pastedText))
     }
+
+    setTimeout(() => handleInput(), 0)
   }
 
   function handleDragOver(event: DragEvent) {
@@ -259,6 +300,7 @@
       name="input"
       bind:this={inputRef}
       bind:value={inputValue}
+      onsubmit={handleSubmit}
       oninput={handleInput}
       onkeydown={handleKeyDown}
       onpaste={handlePaste}

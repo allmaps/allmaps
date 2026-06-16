@@ -13,22 +13,40 @@
   import Info from '$lib/components/Info.svelte'
   import AnnotationInput from '$lib/components/AnnotationInput.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
+  import Error from '$lib/components/Error.svelte'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getMetadataState } from '$lib/state/metadata.svelte.js'
+  import { getImagesState } from '$lib/state/images.svelte.js'
 
   import { UiEvents } from '$lib/shared/ui-events.js'
 
   import type { PageProps } from './$types'
+  import type { ImageError } from '$lib/state/images.svelte.js'
+  import type { SourceError } from '$lib/state/source.svelte.js'
+
+  type ActiveError =
+    | {
+        type: 'source'
+        sourceError: SourceError
+      }
+    | {
+        type: 'images'
+        imageErrors: ImageError[]
+        sourceImageCount: number
+      }
 
   let { data }: PageProps = $props()
 
   const sourceState = getSourceState()
+  const mapsState = getMapsState()
   const uiState = getUiState()
   const urlState = getUrlState()
   const metadataState = getMetadataState()
+  const imagesState = getImagesState()
 
   let map = $state.raw<Map>()
 
@@ -37,9 +55,25 @@
   )
 
   let isLoading = $derived(shouldHaveSource && !sourceState.source)
+  let imageErrors = $derived([...imagesState.imageErrors.values()])
+  let activeError = $derived.by((): ActiveError | undefined => {
+    if (sourceState.error) {
+      return {
+        type: 'source',
+        sourceError: sourceState.error
+      }
+    }
+
+    if (imagesState.allSourceImagesFailed) {
+      return {
+        type: 'images',
+        imageErrors,
+        sourceImageCount: imagesState.sourceImageCount
+      }
+    }
+  })
 
   uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, () => map?.zoomToExtent())
-
   uiState.addEventListener(UiEvents.ZOOM_IN, () => map?.zoomIn())
   uiState.addEventListener(UiEvents.ZOOM_OUT, () => map?.zoomOut())
   uiState.addEventListener(UiEvents.RESET_BEARING, () => map?.resetBearing())
@@ -56,7 +90,37 @@
   </View>
 {/snippet}
 
-{#if isLoading}
+{#if activeError}
+  <View floatingHeader={true}>
+    {#snippet header()}
+      <Header appName="Viewer">
+        {#if activeError.type === 'images' && sourceState.source}
+          {@const source = sourceState.source}
+          <Info
+            {source}
+            labels={metadataState.labels}
+            title={metadataState.title}
+            titleBadge={metadataState.titleBadge}
+            organization={metadataState.organization}
+            mapsHierarchy={mapsState.mapsHierarchy}
+            bind:selectedMapId={urlState.params.mapId}
+          />
+        {/if}
+      </Header>
+    {/snippet}
+    <Error
+      sourceError={activeError.type === 'source'
+        ? activeError.sourceError
+        : undefined}
+      imageErrors={activeError.type === 'images'
+        ? activeError.imageErrors
+        : undefined}
+      sourceImageCount={activeError.type === 'images'
+        ? activeError.sourceImageCount
+        : undefined}
+    />
+  </View>
+{:else if isLoading}
   {@render loading()}
 {:else if shouldHaveSource && sourceState.source}
   {@const source = sourceState.source}
@@ -70,8 +134,9 @@
             {source}
             labels={metadataState.labels}
             title={metadataState.title}
+            titleBadge={metadataState.titleBadge}
             organization={metadataState.organization}
-            mapsHierarchy={sourceState.mapsHierarchy}
+            mapsHierarchy={mapsState.mapsHierarchy}
             bind:selectedMapId={urlState.params.mapId}
           /></Header
         >
@@ -92,8 +157,8 @@
         bind:this={map}
         {source}
         view={uiState.view}
-        bind:opacity={uiState.opacity}
-        bind:removeBackground={uiState.removeBackground}
+        opacity={uiState.opacity}
+        removeBackground={uiState.removeBackground}
         bind:selectedMapId={urlState.params.mapId}
         bind:bearing={uiState.mapBearing}
         bind:imageUpBearing={uiState.imageUpBearing}

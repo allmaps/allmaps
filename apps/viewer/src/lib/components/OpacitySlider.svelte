@@ -11,23 +11,28 @@
 
 <div
   class="relative flex h-36 w-8 flex-col items-center overflow-hidden rounded-full bg-white shadow-md
-  border-white border-3 inset-shadow-sm"
+  border-white border-3 inset-shadow-sm p-0.5"
   style:--opacity-percent={opacityPercent}
 >
   <div
-    class="pointer-events-none absolute inset-x-0 bottom-0 rounded-full bg-pink-500"
-    style:height={opacityPercent}
-  ></div>
-  <input
-    bind:this={sliderElement}
-    class="opacity-slider relative h-full w-full"
-    type="range"
-    min="0"
-    max="1"
-    step="0.01"
-    bind:value={opacity}
-    aria-label="Opacity"
-  />
+    class="relative flex h-full w-full items-center justify-center bg-gray-100 rounded-full"
+  >
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-0 rounded-full bg-pink-500"
+      style:height={opacityPercent}
+    ></div>
+
+    <input
+      bind:this={sliderElement}
+      class="opacity-slider relative h-full w-full rounded-full"
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      bind:value={opacity}
+      aria-label="Opacity"
+    />
+  </div>
 </div>
 
 <style>

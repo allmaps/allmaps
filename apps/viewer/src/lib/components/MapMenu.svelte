@@ -16,15 +16,18 @@
     CaretRight as CaretRightIcon,
     Globe as GlobeIcon
   } from 'phosphor-svelte'
-  import { generateAnnotation } from '@allmaps/annotation'
 
-  import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
+  import { getUiState } from '$lib/state/ui.svelte.js'
   import { flattenPartOf } from '$lib/shared/metadata.js'
+  import {
+    copyMapAnnotation,
+    copyMapAnnotationUrl,
+    getMapEditorUrl,
+    getViewMapLabel
+  } from '$lib/shared/map-actions.js'
 
-  import type {
-    GeoreferencedMap,
-    PartOfItem
-  } from '@allmaps/annotation'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { WarpedMapLayer } from '@allmaps/maplibre'
   import type { Snippet } from 'svelte'
 
@@ -54,11 +57,12 @@
     onZoomToExtent
   }: Props = $props()
 
-  const sourceState = getSourceState()
+  const mapsState = getMapsState()
+  const uiState = getUiState()
 
   let anchorElement: HTMLDivElement | undefined
 
-  let isHidden = $state(false)
+  let isHidden = $derived(uiState.isMapHidden(mapId))
 
   // Get image URI for URL generation
   const imageUri = $derived(georeferencedMap.resource.id)
@@ -74,9 +78,7 @@
       : undefined
   )
   const editorUrl = $derived(
-    imageUri
-      ? `https://editor.allmaps.org/#/mask?url=${encodeURIComponent(imageUri)}`
-      : undefined
+    imageUri ? getMapEditorUrl(georeferencedMap) : undefined
   )
   const openStreetMapUrl = $derived.by(() => {
     const [lat, lon] = latLon
@@ -100,10 +102,7 @@
   })
 
   async function handleHideToggle() {
-    isHidden = !isHidden
-    warpedMapLayer.setMapOptions(mapId, {
-      opacity: isHidden ? 0 : 1
-    })
+    uiState.toggleMapHidden(mapId)
   }
 
   function handleView() {
@@ -143,8 +142,7 @@
 
   async function handleCopyAnnotationUrl() {
     try {
-      // const annotationUrl = `https://annotations.allmaps.org/maps/${mapId}`
-      await navigator.clipboard.writeText(mapId)
+      await copyMapAnnotationUrl(mapId)
     } catch (error) {
       console.error('Failed to copy annotation URL:', error)
     }
@@ -152,9 +150,7 @@
 
   async function handleCopyAnnotation() {
     try {
-      await navigator.clipboard.writeText(
-        JSON.stringify(generateAnnotation(georeferencedMap), null, 2)
-      )
+      await copyMapAnnotation(georeferencedMap)
     } catch (error) {
       console.error('Failed to copy annotation:', error)
     }
@@ -196,6 +192,7 @@
   <DropdownMenu.Item textValue={label} disabled={!href}>
     {#snippet child({ props })}
       {#if href}
+        <!-- eslint-disable svelte/no-navigation-without-resolve -->
         <a
           {...props}
           class={menuItemClass}
@@ -206,6 +203,7 @@
           {@render icon()}
           <span>{label}</span>
         </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
       {:else}
         <span {...props} class={menuItemClass}>
           {@render icon()}
@@ -242,7 +240,7 @@
         onSelect={handleView}
       >
         <ImageIcon class="size-4" />
-        <span>{view === 'image' ? 'View on map' : 'View image'}</span>
+        <span>{getViewMapLabel(view)}</span>
       </DropdownMenu.Item>
 
       <!-- Zoom to extent -->
@@ -257,8 +255,9 @@
       {#if view === 'map'}
         <!-- Hide/Show -->
         <DropdownMenu.Item
-          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
+          class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent data-disabled:cursor-not-allowed data-disabled:opacity-40 data-disabled:hover:bg-transparent"
           onSelect={handleHideToggle}
+          disabled={!mapsState.canHideMap(mapId)}
         >
           {#if isHidden}
             <EyeIcon class="size-4" />
@@ -270,7 +269,7 @@
         </DropdownMenu.Item>
       {/if}
 
-      {#if view === 'map' && sourceState.mapCount > 1}
+      {#if view === 'map' && mapsState.mapCount > 1}
         <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
 
         <!-- Arrange submenu -->
@@ -399,7 +398,7 @@
           class="flex h-9 cursor-pointer select-none items-center gap-2 rounded-md px-3 text-sm outline-none transition-colors hover:bg-gray-100 data-highlighted:bg-gray-100"
         >
           <GlobeIcon class="size-4" />
-          <span class="flex-1">Open location in&hellip;</span>
+          <span class="flex-1">Open location in</span>
           <CaretRightIcon class="size-4 ml-auto" />
         </DropdownMenu.SubTrigger>
         <DropdownMenu.SubContent

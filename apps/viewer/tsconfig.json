@@ -19,6 +19,7 @@
     { "path": "../../packages/env" },
     { "path": "../../packages/id" },
     { "path": "../../packages/iiif-parser" },
+    { "path": "../../packages/iiif-inspector" },
     { "path": "../../packages/maplibre" },
     { "path": "../../packages/project" },
     { "path": "../../packages/stdlib" },

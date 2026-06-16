@@ -4,6 +4,7 @@ import type { GeoreferencedMap, PartOf, PartOfItem } from '@allmaps/annotation'
 import type { OrganizationSummary, SourceLabels } from '$lib/types/shared.js'
 
 const DOMINANT_ORGANIZATION_THRESHOLD = 0.6
+const DOMINANT_MANIFEST_THRESHOLD = 0.8
 
 function countManifestsById(
   maps: GeoreferencedMap[]
@@ -78,14 +79,11 @@ export function getSourceLabels(
     }
   }
 
-  // Find all manifest titles, sort by count,
-  // if one, return that manifest label
-  // if more, return manifest label with highest count
   const manifestCounts = countManifestsById(maps)
   if (manifestCounts.size === 0) {
     return { manifest: undefined, canvas: undefined }
   }
-  // Convert to array and sort by count desc, then id asc
+
   const sorted = Array.from(manifestCounts.entries()).sort((a, b) => {
     if (b[1].count !== a[1].count) {
       return b[1].count - a[1].count
@@ -93,8 +91,28 @@ export function getSourceLabels(
 
     return a[0].localeCompare(b[0])
   })
-  // Return label of manifest with highest count
-  return { manifest: sorted[0][1].label, canvas: undefined }
+
+  if (sorted.length === 1) {
+    return { manifest: sorted[0][1].label, canvas: undefined }
+  }
+
+  const dominantManifest = sorted[0][1]
+  const otherMapCount = maps.length - dominantManifest.count
+
+  if (
+    maps.length > 0 &&
+    dominantManifest.count / maps.length > DOMINANT_MANIFEST_THRESHOLD
+  ) {
+    return {
+      manifest: dominantManifest.label,
+      canvas: undefined,
+      badge: `+ ${otherMapCount} other ${otherMapCount === 1 ? 'map' : 'maps'}`
+    }
+  }
+
+  return {
+    title: `${maps.length} georeferenced ${maps.length === 1 ? 'map' : 'maps'}`
+  }
 }
 
 export function getOrganizationSummary(

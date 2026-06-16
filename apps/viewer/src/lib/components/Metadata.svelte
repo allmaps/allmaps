@@ -1,374 +1,461 @@
 <script lang="ts">
-  import { tick } from 'svelte'
-
-  import { Thumbnail } from '@allmaps/components'
-  import { computeBbox } from '@allmaps/stdlib'
-  import { pink } from '@allmaps/tailwind'
-
-  import { parseLanguageString } from '$lib/shared/iiif.js'
-  import { getImagesState } from '$lib/state/images.svelte.js'
-  import { getUiState } from '$lib/state/ui.svelte.js'
+  import { parseLanguageString } from '@allmaps/iiif-inspector'
 
   import type {
-    MapsByCanvas,
-    MapsByImage,
-    MapsByManifest,
-    MapsHierarchy
-  } from '$lib/types/shared.js'
-  import type { GeoreferencedMap, PartOfItem } from '@allmaps/annotation'
+    Canvas as IIIFCanvas,
+    Manifest as IIIFManifest,
+    Metadata
+  } from '@allmaps/iiif-parser'
 
-  type ThumbnailRegion = {
-    x: number
-    y: number
-    width: number
-    height: number
+  type MetadataResource = IIIFManifest | IIIFCanvas
+  type LinkItem = {
+    id: string
+    label?: Parameters<typeof parseLanguageString>[0]
+    format?: string
   }
+  type LinkItems = LinkItem[]
+  type ParsedAnchor = {
+    href: string
+    label: string
+  }
+  type MetadataValuePart =
+    | {
+        type: 'text'
+        value: string
+      }
+    | {
+        type: 'link'
+        href: string
+        label: string
+      }
+    | {
+        type: 'break'
+      }
+
+  const METADATA_GRID_CLASS =
+    'grid grid-cols-[8rem_1fr] gap-x-3 gap-y-1 overflow-auto text-xs'
 
   type Props = {
-    mapsHierarchy: MapsHierarchy
-    selectedMapId?: string
-    open?: boolean
+    resource?: MetadataResource
+    loading?: boolean
+    uri?: string
+    uriLabel?: string
+    label?: string
+    width?: number
+    height?: number
+    class?: string
   }
-
-  const THUMBNAIL_RENDER_SIZE = 400
-  const MASK_STROKE_RENDER_WIDTH = 10
 
   let {
-    mapsHierarchy,
-    selectedMapId = $bindable(),
-    open = false
+    resource,
+    loading = false,
+    uri,
+    uriLabel,
+    label,
+    width,
+    height,
+    class: className = ''
   }: Props = $props()
 
-  const imagesState = getImagesState()
-  const uiState = getUiState()
-
-  let metadataListElement = $state<HTMLDivElement>()
-
-  let manifests = $derived(
-    [...(mapsHierarchy.mapsByManifest ?? [])].sort(
-      (a, b) => countManifestMaps(b) - countManifestMaps(a)
-    )
+  let description = $derived(parseText(resource?.description))
+  let summary = $derived(parseText(resource?.summary))
+  let requiredStatementLabel = $derived(
+    parseText(resource?.requiredStatement?.label)
   )
-  let canvases = $derived(
-    [...(mapsHierarchy.mapsByCanvas ?? [])].sort(
-      (a, b) => countCanvasMaps(b) - countCanvasMaps(a)
-    )
+  let requiredStatementValue = $derived(
+    parseText(resource?.requiredStatement?.value)
   )
-  let images = $derived(
-    [...(mapsHierarchy.mapsByImage ?? [])].sort(
-      (a, b) => b.maps.length - a.maps.length
-    )
+  let resourceUri = $derived(uri ?? resource?.uri)
+  let resourceUriLabel = $derived(uriLabel ?? resourceUri ?? '')
+  let resourceLabel = $derived(label ?? parseText(resource?.label))
+  let resourceWidth = $derived(isCanvas(resource) ? resource.width : width)
+  let resourceHeight = $derived(isCanvas(resource) ? resource.height : height)
+  let dimensions = $derived(formatDimensions(resourceWidth, resourceHeight))
+  let hasMetadataItemsValue = $derived(hasMetadataItems(resource?.metadata))
+  let hasNormalMetadata = $derived(
+    !!resourceUri ||
+      !!resourceLabel ||
+      !!dimensions ||
+      !!description ||
+      !!summary ||
+      !!requiredStatementValue ||
+      !!resource?.rights ||
+      !!resource?.navDate ||
+      hasLinks(resource?.homepage) ||
+      hasLinks(resource?.seeAlso) ||
+      hasLinks(resource?.rendering)
   )
+  let hasMetadata = $derived(hasNormalMetadata || hasMetadataItemsValue)
 
-  function getLabel(item?: PartOfItem | GeoreferencedMap['resource']) {
-    const label = item && 'label' in item ? item.label : undefined
-    return parseLanguageString(label, 'en') || item?.id || 'Untitled'
-  }
-
-  function countCanvasMaps(canvas: MapsByCanvas) {
-    return canvas.mapsByImage.reduce(
-      (count, image) => count + image.maps.length,
-      0
-    )
-  }
-
-  function countManifestMaps(manifest: MapsByManifest) {
-    return manifest.mapsByCanvas.reduce(
-      (count, canvas) => count + countCanvasMaps(canvas),
-      0
-    )
-  }
-
-  function getMaskRegion(
-    map: GeoreferencedMap,
-    resource: GeoreferencedMap['resource']
-  ): ThumbnailRegion | undefined {
-    if (!resource.width || !resource.height) {
+  function parseText(value?: Parameters<typeof parseLanguageString>[0]) {
+    if (!value) {
       return
     }
 
-    const [minX, minY, maxX, maxY] = computeBbox(map.resourceMask)
-    const width = maxX - minX
-    const height = maxY - minY
-    const padding = Math.max(width, height) * 0.1
+    return parseLanguageString(value, 'en')
+  }
 
-    const x = Math.max(0, minX - padding)
-    const y = Math.max(0, minY - padding)
-    const right = Math.min(resource.width, maxX + padding)
-    const bottom = Math.min(resource.height, maxY + padding)
+  function hasLinks(links?: LinkItems) {
+    return links !== undefined && links.length > 0
+  }
 
-    if (right <= x || bottom <= y) {
+  function hasMetadataItems(metadata?: Metadata) {
+    return metadata !== undefined && metadata.length > 0
+  }
+
+  function isCanvas(resource?: MetadataResource): resource is IIIFCanvas {
+    return resource?.type === 'canvas'
+  }
+
+  function formatDate(date?: Date) {
+    if (!date) {
+      return
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(date)
+  }
+
+  function formatDimensions(width?: number, height?: number) {
+    if (width === undefined || height === undefined) {
+      return
+    }
+
+    return `${Math.round(width)} x ${Math.round(height)} pixels`
+  }
+
+  function getLinkLabel(link: LinkItem, fallback: string) {
+    if (link.label) {
+      return parseText(link.label) || fallback
+    }
+
+    if (link.format) {
+      return `${link.format} resource`
+    }
+
+    return fallback
+  }
+
+  function decodeHtmlEntities(value: string) {
+    return value
+      .replaceAll('&amp;', '&')
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&#39;', "'")
+  }
+
+  function isSafeHref(href: string) {
+    try {
+      const url = new URL(href)
+      return ['http:', 'https:', 'mailto:'].includes(url.protocol)
+    } catch {
+      return false
+    }
+  }
+
+  function parseAnchor(value: string): ParsedAnchor | undefined {
+    const match = value.trim().match(/^<a\s+([^>]*)>([^<>]*)<\/a>$/i)
+
+    if (!match) {
+      return
+    }
+
+    const [, attributes, label] = match
+    const hrefMatch = attributes.match(
+      /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i
+    )
+    const href = hrefMatch?.[1] ?? hrefMatch?.[2] ?? hrefMatch?.[3]
+
+    if (!href || !isSafeHref(href)) {
       return
     }
 
     return {
-      x,
-      y,
-      width: right - x,
-      height: bottom - y
+      href,
+      label: decodeHtmlEntities(label.trim()) || href
     }
   }
 
-  function getMaskStrokeWidth(
-    resource: GeoreferencedMap['resource'],
-    region?: ThumbnailRegion
-  ) {
-    const sourceWidth = region?.width || resource.width
-    const sourceHeight = region?.height || resource.height
+  function parseUrl(value: string) {
+    const trimmedValue = value.trim()
 
-    if (!sourceWidth || !sourceHeight) {
-      return MASK_STROKE_RENDER_WIDTH
-    }
-
-    return (
-      (MASK_STROKE_RENDER_WIDTH / THUMBNAIL_RENDER_SIZE) *
-      Math.max(sourceWidth, sourceHeight)
-    )
+    return isSafeHref(trimmedValue) ? trimmedValue : undefined
   }
 
-  function handleScroll() {
-    if (metadataListElement) {
-      uiState.metadataScrollTop = metadataListElement.scrollTop
-    }
-  }
+  function parseMetadataHtml(value: string): MetadataValuePart[] | undefined {
+    const trimmedValue = value.trim()
 
-  function selectMap(mapId?: string) {
-    selectedMapId = mapId
-  }
-
-  async function scrollSelectedMapIntoView() {
-    await tick()
-
-    const selectedMapElement = metadataListElement?.querySelector(
-      '[data-selected-map="true"]'
-    )
-
-    selectedMapElement?.scrollIntoView({
-      block: 'nearest'
-    })
-  }
-
-  $effect(() => {
-    if (!metadataListElement) {
+    if (!/<[^>]+>/.test(trimmedValue)) {
       return
     }
 
-    if (open && selectedMapId) {
-      scrollSelectedMapIntoView()
-    } else if (
-      Math.abs(metadataListElement.scrollTop - uiState.metadataScrollTop) > 1
-    ) {
-      metadataListElement.scrollTop = uiState.metadataScrollTop
+    const parts: MetadataValuePart[] = []
+    const tagPattern = /<[^>]+>/g
+    let lastIndex = 0
+    let spanDepth = 0
+    let activeLink:
+      | {
+          href: string
+          label: string
+        }
+      | undefined
+
+    const appendText = (text: string) => {
+      if (!text) {
+        return
+      }
+
+      const decodedText = decodeHtmlEntities(text)
+
+      if (activeLink) {
+        activeLink.label += decodedText
+      } else if (decodedText) {
+        parts.push({
+          type: 'text',
+          value: decodedText
+        })
+      }
     }
-  })
+
+    for (const match of trimmedValue.matchAll(tagPattern)) {
+      appendText(trimmedValue.slice(lastIndex, match.index))
+
+      const tag = match[0].slice(1, -1).trim()
+
+      if (/^span$/i.test(tag)) {
+        spanDepth += 1
+      } else if (/^\/span$/i.test(tag)) {
+        if (spanDepth === 0 || activeLink) {
+          return
+        }
+
+        spanDepth -= 1
+      } else if (/^br\s*\/?$/i.test(tag)) {
+        if (activeLink) {
+          return
+        }
+
+        parts.push({ type: 'break' })
+      } else if (/^a(?:\s|$)/i.test(tag)) {
+        if (activeLink) {
+          return
+        }
+
+        const hrefMatch = tag.match(
+          /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i
+        )
+        const href = hrefMatch?.[1] ?? hrefMatch?.[2] ?? hrefMatch?.[3]
+
+        if (!href || !isSafeHref(href)) {
+          return
+        }
+
+        activeLink = {
+          href,
+          label: ''
+        }
+      } else if (/^\/a$/i.test(tag)) {
+        if (!activeLink) {
+          return
+        }
+
+        parts.push({
+          type: 'link',
+          href: activeLink.href,
+          label: activeLink.label.trim() || activeLink.href
+        })
+        activeLink = undefined
+      } else {
+        return
+      }
+
+      lastIndex = match.index + match[0].length
+    }
+
+    appendText(trimmedValue.slice(lastIndex))
+
+    if (spanDepth !== 0 || activeLink) {
+      return
+    }
+
+    return parts.length > 0 ? parts : undefined
+  }
 </script>
 
-<!--
-Implementation:
-- show list of manifests, sorted by map count (maybe show optional filter options on top)
-Per manifest:
-- show list of images with thumbnails from thumbnail state, with label
-Per image
-- show list of maps (if >1), otherwise show single map
-
-Also show maps/images without manifest
--->
-
-{#snippet countLabel(count: number, singular: string)}
-  <span class="text-xs text-gray-500">
-    {count}
-    {count === 1 ? singular : `${singular}s`}
-  </span>
+{#snippet metadataLink(href: string, label: string, mono = false)}
+  <!-- eslint-disable svelte/no-navigation-without-resolve -->
+  <a
+    {href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class={[
+      'inline-flex max-w-full items-center gap-1.5 text-pink underline decoration-pink/30 underline-offset-2 hover:text-black',
+      mono ? 'font-mono' : ''
+    ]}
+  >
+    <span class="truncate">{label}</span>
+  </a>
+  <!-- eslint-enable svelte/no-navigation-without-resolve -->
 {/snippet}
 
-{#snippet mapList(maps: GeoreferencedMap[])}
-  <ol class="mt-2 space-y-1 text-sm text-gray-700">
-    {#each maps as map, index (map.id ?? index)}
-      {@const isSelected = selectedMapId === map.id}
+{#snippet metadataValue(value: string)}
+  {@const anchor = parseAnchor(value)}
+  {@const htmlParts = parseMetadataHtml(value)}
+  {@const url = parseUrl(value)}
+  {#if htmlParts}
+    {#each htmlParts as part, index (index)}
+      {#if part.type === 'link'}
+        {@render metadataLink(part.href, part.label)}
+      {:else if part.type === 'break'}
+        <br />
+      {:else}
+        {part.value}
+      {/if}
+    {/each}
+  {:else if anchor}
+    {@render metadataLink(anchor.href, anchor.label)}
+  {:else if url}
+    {@render metadataLink(url, url)}
+  {:else}
+    {value}
+  {/if}
+{/snippet}
+
+{#snippet linkItemsValue(links: LinkItems, fallback: string)}
+  <ul class="space-y-1">
+    {#each links as link (link.id)}
       <li>
-        <button
-          type="button"
-          onclick={() => selectMap(map.id)}
-          aria-pressed={isSelected}
-          data-selected-map={isSelected ? 'true' : undefined}
-          class={[
-            'flex w-full min-w-0 items-center justify-between gap-2 rounded px-2 py-1 text-left transition-colors',
-            isSelected
-              ? 'bg-pink/10 font-medium text-pink'
-              : 'text-gray-700 hover:bg-gray-50 hover:text-black'
-          ]}
-        >
-          <span class="truncate">{map.id ?? `Map ${index + 1}`}</span>
-          {#if isSelected}
-            <span class="shrink-0 text-xs text-pink">Selected</span>
-          {/if}
-        </button>
+        {@render metadataLink(link.id, getLinkLabel(link, fallback))}
       </li>
     {/each}
-  </ol>
+  </ul>
 {/snippet}
 
-{#snippet mapThumbnail(
-  map: GeoreferencedMap,
-  resource: GeoreferencedMap['resource']
-)}
-  {@const isSelected = selectedMapId === map.id}
-  {@const region = getMaskRegion(map, resource)}
-  <div
-    class="flex aspect-square size-20 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-200 bg-gray-50"
-  >
-    <Thumbnail
-      imageBitmap={imagesState.thumbnails.get(resource.id)}
-      width={THUMBNAIL_RENDER_SIZE}
-      sourceWidth={resource.width}
-      sourceHeight={resource.height}
-      mode="contain"
-      {region}
-      resourceMasks={[
-        {
-          resourceMask: map.resourceMask,
-
-          stroke: pink,
-          strokeWidth:
-            getMaskStrokeWidth(resource, region) * (isSelected ? 2 : 1)
-        }
-      ]}
-      alt={map.id ?? getLabel(resource)}
-    />
-  </div>
-{/snippet}
-
-{#snippet imageThumbnail(image: MapsByImage)}
-  <div
-    class="flex aspect-square size-20 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-200 bg-gray-50"
-  >
-    <Thumbnail
-      imageBitmap={imagesState.thumbnails.get(image.resource.id)}
-      width={THUMBNAIL_RENDER_SIZE}
-      sourceWidth={image.resource.width}
-      sourceHeight={image.resource.height}
-      mode="contain"
-      resourceMasks={image.maps.map((map) => ({
-        resourceMask: map.resourceMask,
-        stroke: pink,
-        strokeWidth:
-          getMaskStrokeWidth(image.resource) *
-          (selectedMapId === map.id ? 2 : 1)
-      }))}
-      alt={getLabel(image.resource)}
-    />
-  </div>
-{/snippet}
-
-{#snippet mapThumbnailList(
-  maps: GeoreferencedMap[],
-  resource: GeoreferencedMap['resource']
-)}
-  <ol class="mt-2 space-y-1 text-sm text-gray-700">
-    {#each maps as map, index (map.id ?? index)}
-      {@const isSelected = selectedMapId === map.id}
-      <li>
-        <button
-          type="button"
-          onclick={() => selectMap(map.id)}
-          aria-pressed={isSelected}
-          data-selected-map={isSelected ? 'true' : undefined}
-          class={[
-            'flex w-full min-w-0 items-center gap-2 rounded p-1 text-left transition-colors',
-            isSelected
-              ? 'bg-pink/10 font-medium text-pink'
-              : 'text-gray-700 hover:bg-gray-50 hover:text-black'
-          ]}
-        >
-          {@render mapThumbnail(map, resource)}
-          <span class="min-w-0 flex-1 truncate"
-            >{map.id ?? `Map ${index + 1}`}</span
-          >
-          {#if isSelected}
-            <span class="shrink-0 text-xs text-pink">Selected</span>
-          {/if}
-        </button>
-      </li>
-    {/each}
-  </ol>
-{/snippet}
-
-{#snippet imageList(mapsByImage: MapsByImage[])}
-  <div class="space-y-2">
-    {#each mapsByImage as image (image.resource.id)}
-      <section class="flex gap-3 rounded-md border border-gray-100 p-2">
-        {#if image.maps.length === 1}
-          {@render mapThumbnail(image.maps[0], image.resource)}
-        {:else}
-          {@render imageThumbnail(image)}
+{#if loading && !hasMetadata}
+  <p class={['text-xs text-gray-500', className]}>Loading IIIF metadata…</p>
+{:else if hasMetadata}
+  <div class={['text-sm text-gray-700', className]}>
+    {#if hasNormalMetadata}
+      <dl class={METADATA_GRID_CLASS}>
+        {#if resourceUri}
+          <dt class="max-w-32 truncate font-medium text-gray-500">ID</dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {@render metadataLink(resourceUri, resourceUriLabel, true)}
+          </dd>
         {/if}
-        <div class="min-w-0 flex-1">
-          <div class="flex items-baseline justify-between gap-3">
-            <h4 class="truncate text-sm font-medium">
-              {getLabel(image.resource)}
-            </h4>
-            {@render countLabel(image.maps.length, 'map')}
-          </div>
-          {#if image.maps.length > 1}
-            {@render mapThumbnailList(image.maps, image.resource)}
-          {:else}
-            {@render mapList(image.maps)}
+
+        {#if resourceLabel}
+          <dt class="max-w-32 truncate font-medium text-gray-500">Label</dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {resourceLabel}
+          </dd>
+        {/if}
+
+        {#if dimensions}
+          <dt class="max-w-32 truncate font-medium text-gray-500">
+            Dimensions
+          </dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {dimensions}
+          </dd>
+        {/if}
+
+        {#if description}
+          <dt class="max-w-32 truncate font-medium text-gray-500">
+            Description
+          </dt>
+          <dd
+            class="min-w-0 overflow-auto wrap-break-word leading-relaxed text-gray-700"
+          >
+            {description}
+          </dd>
+        {/if}
+
+        {#if summary}
+          <dt class="max-w-32 truncate font-medium text-gray-500">Summary</dt>
+          <dd
+            class="min-w-0 overflow-auto wrap-break-word leading-relaxed text-gray-700"
+          >
+            {summary}
+          </dd>
+        {/if}
+
+        {#if resource?.navDate}
+          <dt class="max-w-32 truncate font-medium text-gray-500">Date</dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {formatDate(resource.navDate)}
+          </dd>
+        {/if}
+
+        {#if requiredStatementValue}
+          <dt class="max-w-32 truncate font-medium text-gray-500">
+            {requiredStatementLabel ?? 'Required statement'}
+          </dt>
+          <dd
+            class="min-w-0 max-h-24 overflow-auto wrap-break-word leading-relaxed text-gray-700"
+          >
+            {requiredStatementValue}
+          </dd>
+        {/if}
+
+        {#if resource?.rights}
+          <dt class="max-w-32 truncate font-medium text-gray-500">Rights</dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {@render metadataLink(resource.rights, resource.rights)}
+          </dd>
+        {/if}
+
+        {#if resource?.homepage?.length}
+          <dt class="max-w-32 truncate font-medium text-gray-500">
+            Related links
+          </dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {@render linkItemsValue(resource.homepage, 'Related resource')}
+          </dd>
+        {/if}
+
+        {#if resource?.seeAlso?.length}
+          <dt class="max-w-32 truncate font-medium text-gray-500">See also</dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {@render linkItemsValue(resource.seeAlso, 'External resource')}
+          </dd>
+        {/if}
+
+        {#if resource?.rendering?.length}
+          <dt class="max-w-32 truncate font-medium text-gray-500">
+            Other versions
+          </dt>
+          <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+            {@render linkItemsValue(resource.rendering, 'Other version')}
+          </dd>
+        {/if}
+      </dl>
+    {/if}
+
+    {#if resource?.metadata?.length}
+      <dl
+        class={[
+          METADATA_GRID_CLASS,
+          hasNormalMetadata ? 'mt-2 border-t border-gray-200 pt-2' : ''
+        ]}
+      >
+        {#each resource.metadata as item, index (index)}
+          {@const label = parseText(item.label)}
+          {@const value = parseText(item.value)}
+          {#if label && value}
+            <dt class="max-w-32 truncate font-medium text-gray-500">
+              {label}
+            </dt>
+            <dd class="min-w-0 overflow-auto wrap-break-word text-gray-700">
+              {@render metadataValue(value)}
+            </dd>
           {/if}
-        </div>
-      </section>
-    {/each}
-  </div>
-{/snippet}
-
-<div
-  bind:this={metadataListElement}
-  onscroll={handleScroll}
-  class="max-h-[60vh] space-y-4 overflow-auto pr-1"
->
-  {#each manifests as manifest (manifest.manifest.id)}
-    <section class="space-y-2">
-      <div class="flex items-baseline justify-between gap-3">
-        <h3 class="truncate font-semibold">{getLabel(manifest.manifest)}</h3>
-        {@render countLabel(countManifestMaps(manifest), 'map')}
-      </div>
-
-      <div class="space-y-3">
-        {#each manifest.mapsByCanvas as canvas (canvas.canvas.id)}
-          <section class="space-y-2">
-            <div class="flex items-baseline justify-between gap-3">
-              <h4 class="truncate text-sm font-medium text-gray-700">
-                {getLabel(canvas.canvas)}
-              </h4>
-              {@render countLabel(countCanvasMaps(canvas), 'map')}
-            </div>
-            {@render imageList(canvas.mapsByImage)}
-          </section>
         {/each}
-      </div>
-    </section>
-  {/each}
-
-  {#if canvases.length}
-    <section class="space-y-3">
-      <!-- <h3 class="font-semibold">Images without manifest</h3> -->
-      {#each canvases as canvas (canvas.canvas.id)}
-        <section class="space-y-2">
-          <div class="flex items-baseline justify-between gap-3">
-            <h4 class="truncate text-sm font-medium text-gray-700">
-              {getLabel(canvas.canvas)}
-            </h4>
-            {@render countLabel(countCanvasMaps(canvas), 'map')}
-          </div>
-          {@render imageList(canvas.mapsByImage)}
-        </section>
-      {/each}
-    </section>
-  {/if}
-
-  {#if images.length}
-    <section class="space-y-2">
-      <!-- <h3 class="font-semibold">Maps without manifest</h3> -->
-      {@render imageList(images)}
-    </section>
-  {/if}
-</div>
+      </dl>
+    {/if}
+  </div>
+{/if}

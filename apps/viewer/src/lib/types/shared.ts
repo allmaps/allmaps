@@ -13,6 +13,8 @@ export type AllmapsId = `${AllmapsSourceType}/${string}`
 export type SourceLabels = {
   manifest?: LanguageString
   canvas?: LanguageString
+  title?: string
+  badge?: string
 }
 
 export type Organization = {
