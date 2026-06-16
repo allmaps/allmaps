@@ -24,6 +24,8 @@
   const PAGE_SIZE = 20
   const userSearchFields = ['email', 'name'] as const
   const userSortFields = ['name', 'email', 'createdAt'] as const
+  type UserSearchField = 'all' | (typeof userSearchFields)[number]
+  type UserSortField = (typeof userSortFields)[number]
 
   let searchValue = $state(page.url.searchParams.get('q') ?? '')
   let searchField = $state(getSearchField(page.url, userSearchFields))
@@ -32,13 +34,25 @@
   let sortBy = $state(getSortField(page.url, userSortFields, 'createdAt'))
   let sortDir = $state(getSortDirection(page.url, 'desc'))
 
-  function replaceTableState() {
+  function replaceTableState({
+    nextSearchValue = searchValue,
+    nextSearchField = searchField,
+    nextSortBy = sortBy,
+    nextSortDir = sortDir,
+    nextOffset = offset
+  }: {
+    nextSearchValue?: string
+    nextSearchField?: UserSearchField
+    nextSortBy?: UserSortField
+    nextSortDir?: typeof sortDir
+    nextOffset?: number
+  } = {}) {
     const path = tableStatePath('/users', {
-      searchValue,
-      searchField,
-      sortBy: sortBy === 'createdAt' ? undefined : sortBy,
-      sortDir: sortDir === 'desc' ? undefined : sortDir,
-      offset
+      searchValue: nextSearchValue,
+      searchField: nextSearchField,
+      sortBy: nextSortBy === 'createdAt' ? undefined : nextSortBy,
+      sortDir: nextSortDir === 'desc' ? undefined : nextSortDir,
+      offset: nextOffset
     })
 
     if (path !== `${page.url.pathname}${page.url.search}`) {
@@ -47,6 +61,7 @@
   }
 
   let isFiltering = $derived(searchValue.length > 0)
+  const users = $derived(data.users)
 
   function getFilteredUsers(users: ConsoleUser[]) {
     return users.filter((user) => {
@@ -79,11 +94,11 @@
     })
   }
 
-  function getDisplayedUsers(users: ConsoleUser[]) {
-    const filteredUsers = getFilteredUsers(users)
-    const displayedUsers = [...filteredUsers]
+  const filteredUsers = $derived(getFilteredUsers(users))
+  const displayedUsers = $derived.by(() => {
+    const sortedUsers = [...filteredUsers]
 
-    displayedUsers.sort((userA, userB) => {
+    sortedUsers.sort((userA, userB) => {
       let valueA: number | string = ''
       let valueB: number | string = ''
 
@@ -109,55 +124,51 @@
       return 0
     })
 
-    return displayedUsers.slice(offset, offset + PAGE_SIZE)
-  }
+    return sortedUsers.slice(offset, offset + PAGE_SIZE)
+  })
 
   function search(value: string, field: string) {
+    const nextSearchField =
+      field === 'name' || field === 'email' ? field : 'all'
+
     searchValue = value
-    searchField = field === 'name' || field === 'email' ? field : 'all'
+    searchField = nextSearchField
     offset = 0
-    replaceTableState()
+    replaceTableState({
+      nextSearchValue: value,
+      nextSearchField,
+      nextOffset: 0
+    })
   }
 
-  function sort(col: typeof sortBy) {
-    if (sortBy === col) {
-      sortDir = sortDir === 'asc' ? 'desc' : 'asc'
-    } else {
-      sortBy = col
-      sortDir = 'asc'
-    }
+  function sort(col: UserSortField) {
+    const nextSortBy = col
+    const nextSortDir = sortBy === col && sortDir === 'asc' ? 'desc' : 'asc'
+
+    sortBy = nextSortBy
+    sortDir = nextSortDir
     offset = 0
-    replaceTableState()
+    replaceTableState({
+      nextSortBy,
+      nextSortDir,
+      nextOffset: 0
+    })
   }
 
   function prevPage() {
-    offset = Math.max(0, offset - PAGE_SIZE)
-    replaceTableState()
+    const nextOffset = Math.max(0, offset - PAGE_SIZE)
+
+    offset = nextOffset
+    replaceTableState({ nextOffset })
   }
 
   function nextPage() {
-    offset = offset + PAGE_SIZE
-    replaceTableState()
+    const nextOffset = offset + PAGE_SIZE
+
+    offset = nextOffset
+    replaceTableState({ nextOffset })
   }
-  const users = $derived(data.users)
 </script>
-
-{#snippet sortIcon(col: string)}
-  {#if sortBy === col}
-    <span class="ml-1 text-blue-500">{sortDir === 'asc' ? '↑' : '↓'}</span>
-  {:else}
-    <span class="ml-1 text-gray-300">↕</span>
-  {/if}
-{/snippet}
-
-{#snippet sortBtn(col: typeof sortBy, label: string)}
-  <button
-    onclick={() => sort(col)}
-    class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
-  >
-    {label}{@render sortIcon(col)}
-  </button>
-{/snippet}
 
 <div class="max-w-7xl mx-auto px-4 py-8">
   <div class="mb-8">
@@ -178,16 +189,41 @@
   </div>
 
   {#if users}
-    {@const displayedUsers = getDisplayedUsers(users)}
-    {@const total = getFilteredUsers(users).length}
+    {@const total = filteredUsers.length}
     <DataTable>
       {#snippet thead()}
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('name', 'Name')}</th
-        >
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('email', 'Email')}</th
-        >
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('name')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Name
+            {#if sortBy === 'name'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('email')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Email
+            {#if sortBy === 'email'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
         <th class="px-3 py-2 @lg:px-4 text-left">
           <span
             class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider"
