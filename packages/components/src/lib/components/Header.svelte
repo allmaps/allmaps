@@ -23,7 +23,7 @@
       </h1>
     </a>
     {#if children}
-      <div class="flex grow">
+      <div class="flex grow justify-end">
         {@render children()}
       </div>
     {/if}
