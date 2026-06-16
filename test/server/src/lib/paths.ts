@@ -16,9 +16,10 @@ export function getImageServiceId(
   corsMode: CorsMode,
   version: IiifVersion,
   complianceLevel: ImageComplianceLevel,
-  imageId: string
+  imageId: string,
+  suffix?: string
 ) {
-  return `${getBaseUrl(request, corsMode)}/iiif/${version}/${complianceLevel}/${imageId}`
+  return `${getBaseUrl(request, corsMode)}/iiif/${version}/${complianceLevel}/${imageId}${suffix ? `/${suffix}` : ''}`
 }
 
 export function parseCorsMode(corsMode: string): CorsMode {

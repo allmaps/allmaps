@@ -528,6 +528,29 @@
                 link.label === 'All linked annotations' &&
                 isIiif3Level2(link)
             )
+          ),
+          createCombinedScenario(
+            'manifest-level-annotations',
+            'Manifest with manifest-level annotations',
+            'The combined annotation page is embedded in the top-level manifest annotations property.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'IIIF Presentation 3.0 manifest' &&
+                link.label === 'Manifest-level annotation page'
+            )
+          ),
+          createCombinedScenario(
+            'partial-manifest-level-annotations',
+            'Manifest with manifest-level and canvas-level annotations',
+            'Some georeference annotations are embedded at the manifest level, while others are embedded on their canvas.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'IIIF Presentation 3.0 manifest' &&
+                link.label ===
+                  'Some manifest-level, some canvas-level annotations'
+            )
           )
         ].filter((scenario) => scenario !== undefined)
       },
@@ -574,6 +597,47 @@
         ].filter((scenario) => scenario !== undefined)
       },
       {
+        key: 'loading-behavior',
+        label: 'Loading Behavior',
+        description:
+          'Variants for testing successful metadata fetches with failing or slow follow-up resources.',
+        scenarios: [
+          createCombinedScenario(
+            'image-requests-return-500',
+            'Info.jsons load, image requests return 500',
+            'The annotation page and image service info.jsons load, but every image request fails with a 500 response.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'All info.jsons load, image requests return 500'
+            )
+          ),
+          createCombinedScenario(
+            'slow-manifest-and-resources',
+            'Slow manifest and resources',
+            'The manifest, linked annotation pages, image service info.jsons, and image requests all respond slowly.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'IIIF Presentation 3.0 manifest' &&
+                link.label === 'Slow manifest and resources'
+            )
+          ),
+          createCombinedScenario(
+            'some-slow-some-fast-images',
+            'Some slow, some fast images',
+            'The annotation page loads normally, but some image services respond slowly while others stay fast.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'Some slow, some fast images'
+            )
+          )
+        ].filter((scenario) => scenario !== undefined)
+      },
+      {
         key: 'mixed-structure',
         label: 'Partial And Mixed Structure',
         description:
@@ -588,6 +652,17 @@
               (link) =>
                 link.resourceKind === 'IIIF Presentation 3.0 manifest' &&
                 link.label === 'Some embedded, some linked annotations'
+            )
+          ),
+          createCombinedScenario(
+            'mixed-partof-hierarchy',
+            'All annotations with mixed hierarchy',
+            'Some annotation targets include manifest and canvas hierarchy, some omit the manifest, and some omit the canvas hierarchy.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'All annotations, mixed partOf hierarchy'
             )
           ),
           createCombinedScenario(
