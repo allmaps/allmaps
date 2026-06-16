@@ -72,6 +72,51 @@ fs.readdirSync(inputDir)
   })
   .forEach(runTests)
 
+describe('Parsing georeference annotation pages in Presentation 3 manifests', () => {
+  test('should preserve embedded and linked canvas annotation pages', () => {
+    const embeddedManifest = IIIF.parse(
+      readJSONFile(
+        path.join(
+          inputDir,
+          'manifest.3.pica-toegankelijke-kaartcollectie-embedded-annotations.json'
+        )
+      )
+    )
+    const linkedManifest = IIIF.parse(
+      readJSONFile(
+        path.join(inputDir, 'manifest.3.pica-toegankelijke-kaartcollectie.json')
+      )
+    )
+
+    if (embeddedManifest.type !== 'manifest') {
+      throw new Error('Expected embedded fixture to parse as manifest')
+    }
+
+    if (linkedManifest.type !== 'manifest') {
+      throw new Error('Expected linked fixture to parse as manifest')
+    }
+
+    expect(
+      embeddedManifest.canvases.every((canvas) =>
+        canvas.annotations?.some(
+          (annotationPage) => annotationPage.items?.length
+        )
+      )
+    ).toBe(true)
+
+    expect(
+      linkedManifest.canvases.every((canvas) =>
+        canvas.annotations?.some(
+          (annotationPage) =>
+            annotationPage.id &&
+            annotationPage.type === 'AnnotationPage' &&
+            !annotationPage.items
+        )
+      )
+    ).toBe(true)
+  })
+})
+
 export function readJSONFile(filename: string) {
   try {
     return JSON.parse(fs.readFileSync(filename, 'utf-8'))
