@@ -57,6 +57,14 @@ export default defineConfig({
               link: '/introduction'
             },
             {
+              label: 'International Image Interoperability Framework',
+              link: '/iiif'
+            },
+            {
+              label: 'Georeferencing',
+              link: '/georeferencing'
+            },
+            {
               label: 'Getting Started',
               link: '/getting-started'
             },
