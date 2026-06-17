@@ -15,10 +15,16 @@ export const load: LayoutServerLoad = async ({ fetch, url, parent }) => {
   if (urlParam) {
     try {
       const source = await sourceFromUrl(
-        env.PUBLIC_REST_BASE_URL,
+        env.PUBLIC_ANNOTATIONS_BASE_URL,
         urlParam,
         fetchWithTimeout
       )
+
+      if (source.parsed.type === 'iiif') {
+        return {
+          urlParam
+        }
+      }
 
       return {
         source,

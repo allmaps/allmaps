@@ -5,6 +5,7 @@ import Footer from '$lib/components/Footer.svelte'
 import Geocoder from '$lib/components/Geocoder.svelte'
 import Grid from '$lib/components/Grid.svelte'
 import Header from '$lib/components/Header.svelte'
+import IIIFLogo from '$lib/components/images/IIIFLogo.svelte'
 import Kbd from '$lib/components/Kbd.svelte'
 import Loading from '$lib/components/Loading.svelte'
 import LoadingSmall from '$lib/components/LoadingSmall.svelte'
@@ -31,6 +32,7 @@ export {
   Geocoder,
   Grid,
   Header,
+  IIIFLogo,
   Kbd,
   Loading,
   LoadingSmall,

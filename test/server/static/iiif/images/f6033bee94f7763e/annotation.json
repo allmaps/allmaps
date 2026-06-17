@@ -1,0 +1,151 @@
+{
+  "id": "http://localhost:5506/cors/annotations/images/f6033bee94f7763e.json",
+  "type": "AnnotationPage",
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "items": [
+    {
+      "id": "http://localhost:5506/cors/annotations/maps/393a52e3e3882bc6.json",
+      "type": "Annotation",
+      "@context": [
+        "http://iiif.io/api/extension/georef/1/context.json",
+        "http://iiif.io/api/presentation/3/context.json"
+      ],
+      "created": "2026-03-03T10:39:51.098Z",
+      "modified": "2026-03-03T10:39:51.098Z",
+      "motivation": "georeferencing",
+      "target": {
+        "type": "SpecificResource",
+        "source": {
+          "id": "http://localhost:5506/cors/iiif/2/f6033bee94f7763e",
+          "type": "ImageService2",
+          "height": 1820,
+          "width": 2500,
+          "partOf": [
+            {
+              "id": "http://localhost:5506/cors/manifests/2/f6033bee94f7763e.json/canvas/1",
+              "type": "Canvas",
+              "label": {
+                "none": [
+                  "No.14. Europa : Geologie, Tektonic"
+                ]
+              },
+              "partOf": [
+                {
+                  "id": "http://localhost:5506/cors/manifests/2/f6033bee94f7763e.json",
+                  "type": "Manifest",
+                  "label": {
+                    "none": [
+                      "No.14. Europa : Geologie, Tektonic"
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          "provider": [
+            {
+              "label": {
+                "none": [
+                  "David Rumsey Map Collection"
+                ]
+              },
+              "homepage": [
+                {
+                  "id": "https://www.davidrumsey.com/luna/servlet/view/all"
+                }
+              ]
+            }
+          ]
+        },
+        "selector": {
+          "type": "SvgSelector",
+          "value": "<svg width=\"2500\" height=\"1820\"><polygon points=\"427.189,593.734 414.344,1628.191 2158.905,1651.416 2163.278,182.246 912.321,169.95 907.948,476.517 897.835,526.519 873.784,566.41 837.706,586.63 799.716,594.007\" /></svg>"
+        }
+      },
+      "body": {
+        "type": "FeatureCollection",
+        "transformation": {
+          "type": "polynomial",
+          "options": {
+            "order": 1
+          }
+        },
+        "resourceCrs": {
+          "id": "https://annotations.allmaps.org/projections/28a27b564b017dca",
+          "name": "EPSG:5637 - TUREF / LCC Europe",
+          "definition": "+proj=lcc +lat_1=35 +lat_2=65 +lat_0=52 +lon_0=10 +x_0=4000000 +y_0=2800000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [
+                1542.856,
+                628.981
+              ]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                30.3088374,
+                59.9265149
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [
+                487.865,
+                1186.648
+              ]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                -9.288174,
+                43.0615478
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "resourceCoords": [
+                1845.687,
+                1585.84
+              ]
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                34.5756332,
+                35.6739821
+              ]
+            }
+          }
+        ],
+        "_allmaps": {
+          "id": "http://localhost:5506/cors/annotations/maps/393a52e3e3882bc6.json",
+          "version": "https://annotations.allmaps.org/maps/393a52e3e3882bc6@54aa318fc333b686",
+          "image": {
+            "id": "http://localhost:5506/cors/annotations/images/f6033bee94f7763e.json",
+            "version": "https://annotations.allmaps.org/images/f6033bee94f7763e@446ee73749d710eb",
+            "canvases": [
+              {
+                "id": "https://annotations.allmaps.org/canvases/26cbfb8b02b712f8",
+                "manifests": [
+                  {
+                    "id": "https://annotations.allmaps.org/manifests/ac8747b6a738cc27"
+                  }
+                ]
+              }
+            ]
+          },
+          "scale": 3.6588,
+          "area": 17553182042668.74
+        }
+      }
+    }
+  ]
+}

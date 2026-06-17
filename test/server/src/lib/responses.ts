@@ -42,6 +42,22 @@ export function textResponse(
   )
 }
 
+export function redirectResponse(
+  url: string | URL,
+  corsMode: CorsMode,
+  status = 302
+): Response {
+  return withCors(
+    new Response(null, {
+      status,
+      headers: {
+        location: url.toString()
+      }
+    }),
+    corsMode
+  )
+}
+
 export function imageResponse(
   image: Buffer,
   corsMode: CorsMode,

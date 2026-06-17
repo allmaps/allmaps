@@ -36,39 +36,21 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
    */
   async fetch() {
     try {
-      this.#worker
-        .getImageData(
-          this.fetchableTile.tileUrl,
-          comlinkProxy(() => this.abortController.abort()),
-          this.fetchFn,
-          this.fetchableTile.tile.tileZoomLevel.width,
-          this.fetchableTile.tile.tileZoomLevel.height
-        )
-        .then((response) => {
-          this.data = response
-          this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-              tileUrl: this.fetchableTile.tileUrl
-            })
-          )
-        })
-        .catch((err) => {
-          if (err instanceof Error && err.name === 'AbortError') {
-            console.log('Fetch aborted') // Handle the abort error
-          } else {
-            console.error(err) // Handle other errors
-          }
-        })
+      this.data = await this.#worker.getImageData(
+        this.fetchableTile.tileUrl,
+        comlinkProxy(() => this.abortController.abort()),
+        this.fetchFn,
+        this.fetchableTile.tile.tileZoomLevel.width,
+        this.fetchableTile.tile.tileZoomLevel.height
+      )
+
+      this.dispatchTileFetched()
     } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
+      if (this.isAbortError(err)) {
         // fetchImage was aborted because viewport was moved and tile
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
-        this.dispatchEvent(
-          new WarpedMapEvent(WarpedMapEventType.TILEFETCHERROR, {
-            tileUrl: this.fetchableTile.tileUrl
-          })
-        )
+        this.dispatchTileFetchError(err)
       }
     }
 

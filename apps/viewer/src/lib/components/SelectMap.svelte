@@ -6,27 +6,27 @@
     ArrowRight as ArrowRightIcon
   } from 'phosphor-svelte'
 
-  import { getSourceState } from '$lib/state/source.svelte.js'
+  import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
 
   import { hasInputTarget } from '$lib/shared/keyboard.js'
 
   import ControlContainer from '$lib/components/ControlContainer.svelte'
 
-  const sourceState = getSourceState()
+  const mapsState = getMapsState()
   const urlState = getUrlState()
 
   let previousMapIdUrl = $derived(
-    sourceState.previousMapId &&
-      urlState.generateUrl('/', { mapId: sourceState.previousMapId })
+    mapsState.previousMapId &&
+      urlState.generateUrl('/', { mapId: mapsState.previousMapId })
   )
   let nextMapIdUrl = $derived(
-    sourceState.nextMapId &&
-      urlState.generateUrl('/', { mapId: sourceState.nextMapId })
+    mapsState.nextMapId &&
+      urlState.generateUrl('/', { mapId: mapsState.nextMapId })
   )
 
   let showControl = $derived(
-    sourceState.maps.length > 1 && previousMapIdUrl && nextMapIdUrl
+    mapsState.maps.length > 1 && previousMapIdUrl && nextMapIdUrl
   )
 
   function handleKeyPress(event: KeyboardEvent) {
@@ -39,9 +39,9 @@
     }
 
     if (event.key === '[' && previousMapIdUrl) {
-      urlState.params.mapId = sourceState.previousMapId
+      urlState.params.mapId = mapsState.previousMapId
     } else if (event.key === ']' && nextMapIdUrl) {
-      urlState.params.mapId = sourceState.nextMapId
+      urlState.params.mapId = mapsState.nextMapId
     }
   }
 </script>

@@ -3,6 +3,7 @@
   import { Combobox } from 'bits-ui'
 
   import AppSelect from '$lib/components/AppSelect.svelte'
+  import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
   import { planItems, orgMemberRoleItems } from '$lib/select-items'
   import { getUserId } from '$lib/organizations.js'
   import { queryResult } from '$lib/query-result.js'
@@ -178,7 +179,9 @@
     isLoadingUsers = true
     usersLoadError = null
 
-    const result = await queryResult<ConsoleUser[]>(getUsers(10000))
+    const result = await queryResult<ConsoleUser[]>(
+      getUsers(CONSOLE_LIST_LIMIT)
+    )
 
     if (result.error || !result.data) {
       usersLoadError = result.error ?? new Error('Failed to load users')

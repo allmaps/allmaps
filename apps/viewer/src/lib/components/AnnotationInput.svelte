@@ -33,10 +33,12 @@
   let error = $state('')
   let isDraggingOver = $state(false)
   let mode = $state<Mode>('url')
+  let hasSelectedInitialInput = $state(false)
 
   $effect(() => {
-    if (autoFocus && inputRef) {
+    if (autoFocus && inputRef && !hasSelectedInitialInput) {
       inputRef.select()
+      hasSelectedInitialInput = true
     }
   })
 
@@ -128,21 +130,57 @@
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      if (!isMultiLine(inputValue)) {
-        // Single-line mode: Enter submits the form
-        event.preventDefault()
-        form?.requestSubmit()
-      }
-      // Multi-line mode: allow default (insert newline)
+    if (event.key === 'Enter' && (event.shiftKey || !isMultiLine(inputValue))) {
+      event.preventDefault()
+      form?.requestSubmit()
     }
   }
 
+  function getClipboardText(event: ClipboardEvent) {
+    return (
+      event.clipboardData?.getData('text/plain') ||
+      event.clipboardData?.getData('text') ||
+      event.clipboardData?.getData('text/uri-list')
+    )
+  }
+
+  function getPastedInputValue(pastedText: string) {
+    const trimmedText = pastedText.trim()
+
+    if (trimmedText) {
+      try {
+        new URL(trimmedText)
+        return trimmedText
+      } catch {
+        // Keep non-URL text exactly as pasted.
+      }
+    }
+
+    return pastedText
+  }
+
+  function insertPastedText(pastedText: string) {
+    if (!inputRef) {
+      inputValue = pastedText
+      return
+    }
+
+    const selectionStart = inputRef.selectionStart ?? inputValue.length
+    const selectionEnd = inputRef.selectionEnd ?? selectionStart
+
+    inputValue =
+      inputValue.slice(0, selectionStart) +
+      pastedText +
+      inputValue.slice(selectionEnd)
+  }
+
   function handlePaste(event: ClipboardEvent) {
-    const pastedText = event.clipboardData?.getData('text')
+    const pastedText = getClipboardText(event)
     if (!pastedText) {
       return
     }
+
+    event.preventDefault()
 
     // Check if pasted content is JSON or multi-line
     const isJson = (() => {
@@ -158,7 +196,6 @@
       mode = 'json'
       // If valid JSON, format it
       if (isJson) {
-        event.preventDefault()
         try {
           const parsed = JSON.parse(pastedText)
           inputValue = JSON.stringify(parsed, null, 2)
@@ -166,9 +203,14 @@
           // This shouldn't happen since we already validated, but just in case
           inputValue = pastedText
         }
-        setTimeout(() => handleInput(), 0)
+      } else {
+        insertPastedText(getPastedInputValue(pastedText))
       }
+    } else {
+      insertPastedText(getPastedInputValue(pastedText))
     }
+
+    setTimeout(() => handleInput(), 0)
   }
 
   function handleDragOver(event: DragEvent) {
@@ -258,6 +300,7 @@
       name="input"
       bind:this={inputRef}
       bind:value={inputValue}
+      onsubmit={handleSubmit}
       oninput={handleInput}
       onkeydown={handleKeyDown}
       onpaste={handlePaste}
@@ -286,7 +329,7 @@
         disabled={error !== '' || inputValue.length === 0}
         class="text-white bg-pink-500 hover:bg-pink-400 transition-colors disabled:bg-gray-500 focus:ring focus:ring-pink-200 font-medium
           rounded-full text-sm px-5 py-2.5 focus:outline-none not-disabled:cursor-pointer"
-        >Go!</button
+        >Open</button
       >
       <!-- {#if error}
         <p class="text-red-500">{error}</p>

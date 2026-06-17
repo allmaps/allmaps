@@ -30,12 +30,18 @@ import {
   optionKeysToUndefinedOptions,
   pointInBbox
 } from '@allmaps/stdlib'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 
 import type { Ring, Bbox, Point } from '@allmaps/types'
 import type { Projection } from '@allmaps/project'
 
 import type {
+  BatchMapResult,
+  BatchOptions,
   GetWarpedMapOptions,
   ProjectionOptions,
   SelectionOptions,
@@ -83,6 +89,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   options: WarpedMapListOptions<W>
 
   #boundImageLoadedByMapId: Map<string, EventListener>
+  #boundImageInfoFetchErrorByMapId: Map<string, EventListener>
 
   /**
    * Creates an instance of a WarpedMapList
@@ -111,13 +118,15 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
         'distortionMeasure'
       ],
       projection: webMercatorProjection,
-      warpedMapFactory: createWarpedMapFactory<W>()
+      warpedMapFactory: createWarpedMapFactory<W>(),
+      batchFailureMode: 'best-effort'
     }
 
     this.warpedMapsById = new Map()
     this.zIndices = new Map()
     this.imagesById = new Map()
     this.#boundImageLoadedByMapId = new Map()
+    this.#boundImageInfoFetchErrorByMapId = new Map()
 
     this.options = mergeOptions(
       this.DEFAULT_WARPED_MAP_LIST_OPTIONS,
@@ -165,7 +174,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   addGeoreferencedMaps(
     georeferencedMaps: unknown,
-    mapOptions?: Partial<GetWarpedMapOptions<W>>
+    mapOptions?: Partial<GetWarpedMapOptions<W>>,
+    batchOptions?: Partial<BatchOptions>
   ) {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMaps)
@@ -178,7 +188,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
     const results = this.#addGeoreferencedMapsInternal(
       validatedGeoreferencedMaps,
-      mapOptions
+      mapOptions,
+      batchOptions
     )
 
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
@@ -209,7 +220,10 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     return results
   }
 
-  removeGeoreferencedMaps(georeferencedMaps: unknown): (string | Error)[] {
+  removeGeoreferencedMaps(
+    georeferencedMaps: unknown,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
     const validatedGeoreferencedMapOrMaps =
       validateGeoreferencedMap(georeferencedMaps)
 
@@ -220,7 +234,8 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       : [validatedGeoreferencedMapOrMaps]
 
     const results = this.#removeGeoreferencedMapsInternal(
-      validatedGeoreferencedMaps
+      validatedGeoreferencedMaps,
+      batchOptions
     )
 
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
@@ -248,10 +263,15 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    */
   addGeoreferenceAnnotation(
     annotation: unknown,
-    mapOptions?: Partial<GetWarpedMapOptions<W>>
+    mapOptions?: Partial<GetWarpedMapOptions<W>>,
+    batchOptions?: Partial<BatchOptions>
   ) {
     const maps = parseAnnotation(annotation)
-    const results = this.#addGeoreferencedMapsInternal(maps, mapOptions)
+    const results = this.#addGeoreferencedMapsInternal(
+      maps,
+      mapOptions,
+      batchOptions
+    )
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return results
   }
@@ -262,9 +282,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param annotation
    * @returns Map IDs of the maps that were removed, or an error per map
    */
-  removeGeoreferenceAnnotation(annotation: unknown): (string | Error)[] {
+  removeGeoreferenceAnnotation(
+    annotation: unknown,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
     const maps = parseAnnotation(annotation)
-    const results = this.#removeGeoreferencedMapsInternal(maps)
+    const results = this.#removeGeoreferencedMapsInternal(maps, batchOptions)
     this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
     return results
   }
@@ -281,30 +304,57 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * It is import to do this after the event listeners on the warpedmaplist
    * are added to the renderer, so the WARPEDMAPADDED event is passed.
    */
-  updateWarpedMapsUsingFactory() {
-    for (const warpedMap of this.warpedMapsById.values()) {
-      const updatedWarpedMap = this.options.warpedMapFactory(
-        warpedMap.mapId,
-        warpedMap.georeferencedMap,
-        this.options,
-        warpedMap.mapOptions as Partial<GetWarpedMapOptions<W>>
-      )
+  updateWarpedMapsUsingFactory(
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
+    const results: BatchMapResult[] = []
 
-      this.warpedMapsById.set(warpedMap.mapId, updatedWarpedMap)
+    for (const [index, warpedMap] of Array.from(
+      this.warpedMapsById.values()
+    ).entries()) {
+      try {
+        const updatedWarpedMap = this.options.warpedMapFactory(
+          warpedMap.mapId,
+          warpedMap.georeferencedMap,
+          this.options,
+          warpedMap.mapOptions as Partial<GetWarpedMapOptions<W>>
+        )
 
-      // Note: zIndices don't have to be updated since they only use mapId
-      // Note: RTree doesn't have to be updated since they only use mapId and geoMask
+        this.warpedMapsById.set(warpedMap.mapId, updatedWarpedMap)
+        this.#removeEventListenersFromWarpedMap(warpedMap)
+        warpedMap.destroy()
 
-      this.#addEventListenersToWarpedMap(updatedWarpedMap)
+        // Note: zIndices don't have to be updated since they only use mapId
+        // Note: RTree doesn't have to be updated since they only use mapId and geoMask
 
-      this.dispatchEvent(
-        new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, {
-          mapIds: [warpedMap.mapId]
+        this.#addEventListenersToWarpedMap(updatedWarpedMap)
+
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.WARPEDMAPADDED, {
+            mapIds: [warpedMap.mapId]
+          })
+        )
+
+        results.push({ ok: true, mapId: warpedMap.mapId, index })
+      } catch (error) {
+        const batchError = ensureError(error)
+
+        if (this.#getBatchFailureMode(batchOptions) === 'fail-fast') {
+          throw batchError
+        }
+
+        this.#removeGeoreferencedMapByIdInternal(warpedMap.mapId)
+        this.#dispatchBatchError(batchError, warpedMap.mapId)
+        results.push({
+          ok: false,
+          error: batchError,
+          index,
+          mapId: warpedMap.mapId
         })
-      )
+      }
     }
 
-    return this
+    return results
   }
 
   /**
@@ -1162,18 +1212,27 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
 
   #addGeoreferencedMapsInternal(
     georeferencedMaps: GeoreferencedMap[],
-    mapOptions?: Partial<GetWarpedMapOptions<W>>
-  ) {
-    const results: (string | Error)[] = []
-    for (const georeferencedMap of georeferencedMaps) {
+    mapOptions?: Partial<GetWarpedMapOptions<W>>,
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
+    const results: BatchMapResult[] = []
+    for (const [index, georeferencedMap] of georeferencedMaps.entries()) {
+      const mapId = this.#getOrComputeMapId(georeferencedMap)
       try {
-        const mapId = this.#addGeoreferencedMapInternal(
+        const addedMapId = this.#addGeoreferencedMapInternal(
           georeferencedMap,
           mapOptions
         )
-        results.push(mapId)
+        results.push({ ok: true, mapId: addedMapId, index })
       } catch (error) {
-        results.push(ensureError(error))
+        const batchError = ensureError(error)
+
+        if (this.#getBatchFailureMode(batchOptions) === 'fail-fast') {
+          throw batchError
+        }
+
+        this.#dispatchBatchError(batchError, mapId)
+        results.push({ ok: false, error: batchError, index, mapId })
       }
     }
 
@@ -1199,6 +1258,7 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       this.#removeZIndexHoles()
       this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.CHANGED))
 
+      this.#removeEventListenersFromWarpedMap(warpedMap)
       warpedMap.destroy()
     } else {
       throw new Error(`No map found with ID ${mapId}`)
@@ -1207,20 +1267,44 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   #removeGeoreferencedMapsInternal(
-    georeferencedMaps: GeoreferencedMap[]
-  ): (string | Error)[] {
-    const results: (string | Error)[] = []
+    georeferencedMaps: GeoreferencedMap[],
+    batchOptions?: Partial<BatchOptions>
+  ): BatchMapResult[] {
+    const results: BatchMapResult[] = []
 
-    for (const georeferencedMap of georeferencedMaps) {
+    for (const [index, georeferencedMap] of georeferencedMaps.entries()) {
+      let mapId: string | undefined
       try {
-        const mapId = this.#removeGeoreferencedMapInternal(georeferencedMap)
-        results.push(mapId)
+        mapId = this.#getOrComputeMapId(georeferencedMap)
+        this.#removeGeoreferencedMapByIdInternal(mapId)
+        results.push({ ok: true, mapId, index })
       } catch (error) {
-        results.push(ensureError(error))
+        const batchError = ensureError(error)
+
+        if (this.#getBatchFailureMode(batchOptions) === 'fail-fast') {
+          throw batchError
+        }
+
+        this.#dispatchBatchError(batchError, mapId)
+        results.push({ ok: false, error: batchError, index, mapId })
       }
     }
 
     return results
+  }
+
+  #getBatchFailureMode(batchOptions?: Partial<BatchOptions>) {
+    return batchOptions?.failureMode ?? this.options.batchFailureMode
+  }
+
+  #dispatchBatchError(error: Error, mapId?: string): void {
+    this.dispatchEvent(
+      new WarpedMapErrorEvent(
+        error,
+        mapId ? { mapIds: [mapId] } : undefined,
+        WarpedMapEventType.ERROR
+      )
+    )
   }
 
   #getOrComputeMapId(georeferencedMap: GeoreferencedMap): string {
@@ -1479,18 +1563,59 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     )
   }
 
-  #addEventListenersToWarpedMap(warpedMap: W) {
-    const bound = this.#imageLoaded.bind(this, warpedMap.mapId)
-    this.#boundImageLoadedByMapId.set(warpedMap.mapId, bound)
+  #imageInfoFetchError(mapId: string, event: Event) {
+    if (event instanceof WarpedMapEvent) {
+      this.dispatchEvent(
+        new WarpedMapErrorEvent(
+          ensureError(event.error),
+          {
+            ...event.data,
+            mapIds: [mapId]
+          },
+          WarpedMapEventType.IMAGEINFOFETCHERROR
+        )
+      )
+    }
+  }
 
-    warpedMap.addEventListener(WarpedMapEventType.IMAGELOADED, bound)
+  #addEventListenersToWarpedMap(warpedMap: W) {
+    const boundImageLoaded = this.#imageLoaded.bind(this, warpedMap.mapId)
+    const boundImageInfoFetchError = this.#imageInfoFetchError.bind(
+      this,
+      warpedMap.mapId
+    )
+    this.#boundImageLoadedByMapId.set(warpedMap.mapId, boundImageLoaded)
+    this.#boundImageInfoFetchErrorByMapId.set(
+      warpedMap.mapId,
+      boundImageInfoFetchError
+    )
+
+    warpedMap.addEventListener(WarpedMapEventType.IMAGELOADED, boundImageLoaded)
+    warpedMap.addEventListener(
+      WarpedMapEventType.IMAGEINFOFETCHERROR,
+      boundImageInfoFetchError
+    )
   }
 
   #removeEventListenersFromWarpedMap(warpedMap: W) {
-    const bound = this.#boundImageLoadedByMapId.get(warpedMap.mapId)
-    if (bound) {
-      warpedMap.removeEventListener(WarpedMapEventType.IMAGELOADED, bound)
+    const boundImageLoaded = this.#boundImageLoadedByMapId.get(warpedMap.mapId)
+    if (boundImageLoaded) {
+      warpedMap.removeEventListener(
+        WarpedMapEventType.IMAGELOADED,
+        boundImageLoaded
+      )
       this.#boundImageLoadedByMapId.delete(warpedMap.mapId)
+    }
+
+    const boundImageInfoFetchError = this.#boundImageInfoFetchErrorByMapId.get(
+      warpedMap.mapId
+    )
+    if (boundImageInfoFetchError) {
+      warpedMap.removeEventListener(
+        WarpedMapEventType.IMAGEINFOFETCHERROR,
+        boundImageInfoFetchError
+      )
+      this.#boundImageInfoFetchErrorByMapId.delete(warpedMap.mapId)
     }
   }
 

@@ -22,6 +22,10 @@
 
   const organizationSearchFields = ['name', 'slug', 'domain'] as const
   const organizationSortFields = ['name', 'slug', 'plan', 'createdAt'] as const
+  type OrganizationSearchField =
+    | 'all'
+    | (typeof organizationSearchFields)[number]
+  type OrganizationSortField = (typeof organizationSortFields)[number]
 
   let searchValue = $state(page.url.searchParams.get('q') ?? '')
   let searchField = $state(getSearchField(page.url, organizationSearchFields))
@@ -31,12 +35,22 @@
 
   const planOrder: Record<string, number> = { supporter: 1, innovator: 2 }
 
-  function replaceTableState() {
+  function replaceTableState({
+    nextSearchValue = searchValue,
+    nextSearchField = searchField,
+    nextSortBy = sortBy,
+    nextSortDir = sortDir
+  }: {
+    nextSearchValue?: string
+    nextSearchField?: OrganizationSearchField
+    nextSortBy?: OrganizationSortField
+    nextSortDir?: typeof sortDir
+  } = {}) {
     const path = tableStatePath('/organizations', {
-      searchValue,
-      searchField,
-      sortBy: sortBy === 'plan' ? undefined : sortBy,
-      sortDir: sortDir === 'desc' ? undefined : sortDir
+      searchValue: nextSearchValue,
+      searchField: nextSearchField,
+      sortBy: nextSortBy === 'plan' ? undefined : nextSortBy,
+      sortDir: nextSortDir === 'desc' ? undefined : nextSortDir
     })
 
     if (path !== `${page.url.pathname}${page.url.search}`) {
@@ -44,21 +58,34 @@
     }
   }
 
-  function sort(col: typeof sortBy) {
-    if (sortBy === col) {
-      sortDir = sortDir === 'asc' ? 'desc' : 'asc'
-    } else {
-      sortBy = col
-      sortDir = col === 'createdAt' ? 'desc' : 'asc'
-    }
-    replaceTableState()
+  function sort(col: OrganizationSortField) {
+    const nextSortBy = col
+    const nextSortDir =
+      sortBy === col
+        ? sortDir === 'asc'
+          ? 'desc'
+          : 'asc'
+        : col === 'createdAt'
+          ? 'desc'
+          : 'asc'
+
+    sortBy = nextSortBy
+    sortDir = nextSortDir
+    replaceTableState({ nextSortBy, nextSortDir })
   }
 
   function search(value: string, field: string) {
+    const nextSearchField =
+      field === 'name' || field === 'slug' || field === 'domain'
+        ? field
+        : 'all'
+
     searchValue = value
-    searchField =
-      field === 'name' || field === 'slug' || field === 'domain' ? field : 'all'
-    replaceTableState()
+    searchField = nextSearchField
+    replaceTableState({
+      nextSearchValue: value,
+      nextSearchField
+    })
   }
 
   function organizationMatchesSearch(organization: Organization) {
@@ -94,10 +121,11 @@
     return matchesSearchValue(normalizedSearchValue, searchableValues)
   }
 
-  function getDisplayedOrganizations(allOrganizations: Organization[]) {
-    let organizations = allOrganizations.filter(organizationMatchesSearch)
+  const organizations = $derived(data.organizations)
+  const displayedOrganizations = $derived.by(() => {
+    const nextOrganizations = organizations.filter(organizationMatchesSearch)
 
-    organizations.sort((a: Organization, b: Organization) => {
+    nextOrganizations.sort((a: Organization, b: Organization) => {
       let av: number | string
       let bv: number | string
       if (sortBy === 'createdAt') {
@@ -120,27 +148,9 @@
       }
     })
 
-    return organizations
-  }
-  const organizations = $derived(data.organizations)
+    return nextOrganizations
+  })
 </script>
-
-{#snippet sortIcon(col: string)}
-  {#if sortBy === col}
-    <span class="ml-1 text-blue-500">{sortDir === 'asc' ? '↑' : '↓'}</span>
-  {:else}
-    <span class="ml-1 text-gray-300">↕</span>
-  {/if}
-{/snippet}
-
-{#snippet sortBtn(col: typeof sortBy, label: string)}
-  <button
-    onclick={() => sort(col)}
-    class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
-  >
-    {label}{@render sortIcon(col)}
-  </button>
-{/snippet}
 
 <div class="max-w-7xl mx-auto px-4 py-8">
   <div class="mb-8 flex items-center justify-between">
@@ -172,18 +182,56 @@
   </div>
 
   {#if organizations}
-    {@const displayedOrganizations = getDisplayedOrganizations(organizations)}
     <DataTable>
       {#snippet thead()}
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('name', 'Name')}</th
-        >
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('plan', 'Plan')}</th
-        >
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('slug', 'Slug')}</th
-        >
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('name')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Name
+            {#if sortBy === 'name'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('plan')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Plan
+            {#if sortBy === 'plan'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('slug')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Slug
+            {#if sortBy === 'slug'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
         <th class="px-3 py-2 @lg:px-4 text-left">
           <span
             class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -196,9 +244,22 @@
             >Members</span
           >
         </th>
-        <th class="px-3 py-2 @lg:px-4 text-left"
-          >{@render sortBtn('createdAt', 'Created')}</th
-        >
+        <th class="px-3 py-2 @lg:px-4 text-left">
+          <button
+            type="button"
+            onclick={() => sort('createdAt')}
+            class="font-sans text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-black cursor-pointer"
+          >
+            Created
+            {#if sortBy === 'createdAt'}
+              <span class="ml-1 text-blue-500"
+                >{sortDir === 'asc' ? '↑' : '↓'}</span
+              >
+            {:else}
+              <span class="ml-1 text-gray-300">↕</span>
+            {/if}
+          </button>
+        </th>
       {/snippet}
 
       {#snippet tbody()}

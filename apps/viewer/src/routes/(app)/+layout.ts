@@ -20,7 +20,7 @@ export const load: LayoutLoad = async ({ data, fetch, url, parent }) => {
   if (urlParam) {
     try {
       const fallbackSource = await sourceFromUrl(
-        env.PUBLIC_REST_BASE_URL,
+        env.PUBLIC_ANNOTATIONS_BASE_URL,
         urlParam,
         fetch
       )

@@ -550,6 +550,9 @@ importers:
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
+      '@allmaps/iiif-inspector':
+        specifier: workspace:^
+        version: link:../../packages/iiif-inspector
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
@@ -813,6 +816,9 @@ importers:
       '@allmaps/env':
         specifier: workspace:^
         version: link:../../packages/env
+      '@allmaps/iiif-inspector':
+        specifier: workspace:^
+        version: link:../../packages/iiif-inspector
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
@@ -1258,6 +1264,9 @@ importers:
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
+      '@allmaps/iiif-inspector':
+        specifier: workspace:^
+        version: link:../../packages/iiif-inspector
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
@@ -2006,6 +2015,46 @@ importers:
         specifier: ^4.0.4
         version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/iiif-inspector:
+    dependencies:
+      '@allmaps/iiif-parser':
+        specifier: workspace:^
+        version: link:../iiif-parser
+    devDependencies:
+      '@allmaps/types':
+        specifier: workspace:^
+        version: link:../types
+      '@types/eslint':
+        specifier: ^8.56.0
+        version: 8.56.12
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.0.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^7.0.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.9.3)
+      eslint:
+        specifier: ^8.56.0
+        version: 8.57.1
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.2(eslint@8.57.1)
+      prettier:
+        specifier: ^3.6.2
+        version: 3.8.1
+      remark-api:
+        specifier: ^1.1.0
+        version: 1.1.0
+      remark-cli:
+        specifier: ^12.0.1
+        version: 12.0.1
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.4
+        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/iiif-parser:
     dependencies:
       zod:
@@ -2438,6 +2487,9 @@ importers:
       vite-plugin-no-bundle:
         specifier: ^4.0.0
         version: 4.0.0
+      vitest:
+        specifier: ^4.0.4
+        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/render-wasm: {}
 
@@ -2480,6 +2532,9 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../annotation
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../iiif-parser
@@ -2990,9 +3045,15 @@ importers:
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/tailwind':
+        specifier: workspace:^
+        version: link:../../packages/tailwind
       '@allmaps/transform':
         specifier: workspace:^
         version: link:../../packages/transform
+      '@allmaps/ui':
+        specifier: workspace:^
+        version: link:../../packages/ui
       phosphor-svelte:
         specifier: ^3.0.1
         version: 3.0.1(svelte@5.51.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -11516,6 +11577,7 @@ packages:
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
     engines: {node: ^18 || >=20}
+    deprecated: unmaintained
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0

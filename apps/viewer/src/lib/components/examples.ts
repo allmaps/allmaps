@@ -37,13 +37,13 @@ export default [
   //   url: 'https://annotations.allmaps.org/images/3d3cb6e11cb24f96',
   //   allmapsId: 'images/3d3cb6e11cb24f96'
   // },
-  {
-    title:
-      'A pictorial map of that portion of New York City known as Manhattan, also showing parts of the Bronx',
-    organization: 'Harvard Map Collection',
-    url: 'https://annotations.allmaps.org/manifests/02c7b8df6fac1378',
-    allmapsId: 'manifests/02c7b8df6fac1378'
-  },
+  // {
+  //   title:
+  //     'A pictorial map of that portion of New York City known as Manhattan, also showing parts of the Bronx',
+  //   organization: 'Harvard Map Collection',
+  //   url: 'https://annotations.allmaps.org/manifests/02c7b8df6fac1378',
+  //   allmapsId: 'manifests/02c7b8df6fac1378'
+  // },
   {
     title: "L'Angleterre Novissima Descriptio Angliae Scotiae et Hiberniae",
     organization: 'David Rumsey Map Collection',
@@ -56,44 +56,44 @@ export default [
     url: 'https://annotations.allmaps.org/maps/751ae05935adba4f',
     allmapsId: 'maps/751ae05935adba4f'
   },
-  {
-    title:
-      'V.R. Melbourne yard proposed alterations & additions to trackwork etc.',
-    organization: 'State Library Victoria',
-    url: 'https://annotations.allmaps.org/maps/c4e43e93c588312c',
-    allmapsId: 'maps/c4e43e93c588312c'
-  },
+  // {
+  //   title:
+  //     'V.R. Melbourne yard proposed alterations & additions to trackwork etc.',
+  //   organization: 'State Library Victoria',
+  //   url: 'https://annotations.allmaps.org/maps/c4e43e93c588312c',
+  //   allmapsId: 'maps/c4e43e93c588312c'
+  // },
   {
     title: 'Richards standard atlas of the city of Holyoke, Massachusetts',
     organization: 'Digital Commonwealth',
     url: 'https://annotations.allmaps.org/manifests/071c6ba31f9c88d4',
     allmapsId: 'manifests/071c6ba31f9c88d4'
   },
-  {
-    title: 'Watergraafs of Diemer-meer',
-    organization: 'Delft University of Technology Library',
-    url: 'https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a',
-    allmapsId: 'manifests/a0d6d3379cfd9f0a'
-  },
-  {
-    title:
-      'Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide',
-    organization: 'Library of Congress',
-    url: 'https://annotations.allmaps.org/images/7f2494dd1ad9ed7a',
-    allmapsId: 'images/7f2494dd1ad9ed7a'
-  },
+  // {
+  //   title: 'Watergraafs of Diemer-meer',
+  //   organization: 'Delft University of Technology Library',
+  //   url: 'https://annotations.allmaps.org/manifests/a0d6d3379cfd9f0a',
+  //   allmapsId: 'manifests/a0d6d3379cfd9f0a'
+  // },
+  // {
+  //   title:
+  //     'Chesapeake and Ohio Canal, Washington, D.C., Maryland, West Virginia, official map and guide',
+  //   organization: 'Library of Congress',
+  //   url: 'https://annotations.allmaps.org/images/7f2494dd1ad9ed7a',
+  //   allmapsId: 'images/7f2494dd1ad9ed7a'
+  // },
   {
     title: 'Phnom-Penh',
     organization: 'Bibliothèque nationale de France',
     url: 'https://annotations.allmaps.org/maps/86029c1bf591ecd8',
     allmapsId: 'maps/86029c1bf591ecd8'
   },
-  {
-    title: 'Plymouth',
-    organization: 'National Library of Scotland',
-    url: 'https://annotations.allmaps.org/maps/d9474a8524a4309d',
-    allmapsId: 'maps/d9474a8524a4309d'
-  },
+  // {
+  //   title: 'Plymouth',
+  //   organization: 'National Library of Scotland',
+  //   url: 'https://annotations.allmaps.org/maps/d9474a8524a4309d',
+  //   allmapsId: 'maps/d9474a8524a4309d'
+  // },
   {
     title: 'Nirenstein Atlas, Hollywood, 1956',
     organization: 'Los Angeles Public Library',

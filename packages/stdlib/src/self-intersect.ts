@@ -82,7 +82,11 @@ export function linesIntersectionPoint(
 
   const intersectionPoint = prolongedLinesIntersectionPoint(line0, line1)
 
-  if (intersectionPoint === undefined) return undefined // discard parallels and coincidence
+  // discard parallels and coincidence
+  if (intersectionPoint === undefined) {
+    return
+  }
+
   let frac0, frac1
   if (line0[1][0] != line0[0][0]) {
     frac0 = (intersectionPoint[0] - line0[0][0]) / (line0[1][0] - line0[0][0])
@@ -98,7 +102,7 @@ export function linesIntersectionPoint(
   // There are roughly three cases we need to deal with.
   // 1. If at least one of the fracs lies outside [0,1], there is no intersection.
   if (isOutside(frac0, options.epsilon) || isOutside(frac1, options.epsilon)) {
-    return undefined
+    return
   }
 
   // 2. If both are either exactly 0 or exactly 1, this is not an intersection but just
@@ -132,7 +136,10 @@ export function prolongedLinesIntersectionPoint(
   const denom =
     (line0[0][0] - line0[1][0]) * (line1[0][1] - line1[1][1]) -
     (line0[0][1] - line0[1][1]) * (line1[0][0] - line1[1][0])
-  if (denom === 0) return undefined
+
+  if (denom === 0) {
+    return
+  }
 
   const x =
     ((line0[0][0] * line0[1][1] - line0[0][1] * line0[1][0]) *

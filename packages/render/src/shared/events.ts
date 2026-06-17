@@ -12,6 +12,7 @@ export const WarpedMapEventType = {
 
   // WarpedMap > WarpedMapList > Renderer > ...
   IMAGELOADED: 'imageloaded',
+  IMAGEINFOFETCHERROR: 'imageinfofetcherror',
 
   // Tile > TileCache
   TILEFETCHED: 'tilefetched',
@@ -25,6 +26,7 @@ export const WarpedMapEventType = {
   MAPTILESLOADEDFROMSPRITES: 'maptilesloadedfromsprites',
   MAPTILEDELETED: 'maptiledeleted',
   FIRSTMAPTILELOADED: 'firstmaptileloaded',
+  REQUESTEDTILESLOADING: 'requestedtilesloading',
   ALLREQUESTEDTILESLOADED: 'allrequestedtilesloaded',
 
   // WebGL2WarpedMap > WebGL2Renderer
@@ -46,6 +48,11 @@ export type WarpedMapEventType =
 
 export type WarpedMapEventData = {
   mapIds: string[]
+  imageId: string
+  imageInfoUrl: string
+  errorKind: string
+  corsLikely: boolean
+  status: number
   tileUrl: string
   optionKeys: string[]
   animationOptions: Partial<AnimationOptions>
@@ -67,8 +74,12 @@ export class WarpedMapEvent extends Event {
 export class WarpedMapErrorEvent extends WarpedMapEvent {
   error: Error
 
-  constructor(error: Error, data?: Partial<WarpedMapEventData>) {
-    super(WarpedMapEventType.ERROR, data)
+  constructor(
+    error: Error,
+    data?: Partial<WarpedMapEventData>,
+    type: WarpedMapEventType = WarpedMapEventType.ERROR
+  ) {
+    super(type, data)
 
     this.error = error
   }

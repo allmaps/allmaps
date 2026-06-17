@@ -96,7 +96,7 @@ export type Provider = Agent[]
 export type Annotations = {
   id: string
   type: 'AnnotationPage'
-  // items?: object[]
+  items?: unknown[]
 }[]
 
 export type ConstructorOptions = {

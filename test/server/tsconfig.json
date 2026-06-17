@@ -17,6 +17,7 @@
     { "path": "../../packages/annotation" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/id" },
+    { "path": "../../packages/tailwind" },
     { "path": "../../packages/transform" }
   ]
 }

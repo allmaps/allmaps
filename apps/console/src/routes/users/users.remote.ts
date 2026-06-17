@@ -1,6 +1,7 @@
 import { command, form, query } from '$app/server'
 import { redirect } from '@sveltejs/kit'
 
+import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
 import { routes } from '$lib/routes.js'
 import { restFetch } from '$lib/server/rest.js'
 import { z } from 'zod'
@@ -88,7 +89,10 @@ export const updateUserForm = form(
       }
     })
 
-    await Promise.all([getUsers(10000).refresh(), getUser(userId).refresh()])
+    await Promise.all([
+      getUsers(CONSOLE_LIST_LIMIT).refresh(),
+      getUser(userId).refresh()
+    ])
 
     redirect(303, routes.users())
   }
@@ -106,7 +110,10 @@ export const setUserRole = command<
     }
   )
 
-  await Promise.all([getUsers(10000).refresh(), getUser(body.userId).refresh()])
+  await Promise.all([
+    getUsers(CONSOLE_LIST_LIMIT).refresh(),
+    getUser(body.userId).refresh()
+  ])
 
   return result.user
 })

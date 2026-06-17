@@ -1,24 +1,69 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteSet, SvelteMap } from 'svelte/reactivity'
 
-import { fetchImageBitmap } from '@allmaps/stdlib'
+import { ResourceFetchError, fetchImageBitmap } from '@allmaps/stdlib'
 
 import type { Image as IIIFImage } from '@allmaps/iiif-parser'
 import type { ImageRequest } from '@allmaps/types'
 
-import type { SourceState } from '$lib/state/source.svelte.js'
+import type { MapsState } from '$lib/state/maps.svelte.js'
 
 const IMAGES_KEY = Symbol('images')
-// type ImageInfoJson = Awaited<ReturnType<typeof fetchImageInfo>>
+
+export type ImageErrorKind =
+  | 'network-or-cors'
+  | 'http'
+  | 'parse'
+  | 'unknown'
+
+export type ImageErrorSource = 'info-json' | 'tile'
+
+type BaseImageError = {
+  imageId: string
+  source: ImageErrorSource
+  kind: ImageErrorKind
+  corsLikely: boolean
+  status?: number
+  message: string
+  error: Error
+}
+
+export type ImageInfoError = BaseImageError & {
+  source: 'info-json'
+  imageInfoUrl?: string
+}
+
+export type ImageTileError = BaseImageError & {
+  source: 'tile'
+  tileUrl: string
+}
+
+export type ImageError = ImageInfoError | ImageTileError
+
+type ImageErrorOptions = {
+  imageInfoUrl?: string
+  tileUrl?: string
+  kind?: string
+  corsLikely?: boolean
+  status?: number
+}
+
+function normalizeImageErrorKind(kind?: string): ImageErrorKind {
+  if (kind === 'network-or-cors' || kind === 'http' || kind === 'parse') {
+    return kind
+  }
+
+  return 'unknown'
+}
 
 export class ImagesState {
-  #sourceState: SourceState
+  #mapsState: MapsState
 
   #fetchingThumbnailsPaused = $state(false)
 
   #sourceImageIds = $derived.by(() => {
     const imageIds = new SvelteSet<string>()
-    this.#sourceState.maps.forEach((map) => {
+    this.#mapsState.maps.forEach((map) => {
       imageIds.add(map.resource.id)
     })
 
@@ -44,13 +89,31 @@ export class ImagesState {
   })
 
   #thumbnails = $state(new SvelteMap<string, ImageBitmap>())
+  #imageInfoErrors = $state(new SvelteMap<string, ImageInfoError>())
+  #imageTileErrors = $state(
+    new SvelteMap<string, SvelteMap<string, ImageTileError>>()
+  )
   #fetchingIds = new Set<string>()
 
-  constructor(sourceState: SourceState, fetchingThumbnailsPaused = true) {
-    this.#sourceState = sourceState
+  constructor(mapsState: MapsState, fetchingThumbnailsPaused = true) {
+    this.#mapsState = mapsState
     this.#fetchingThumbnailsPaused = fetchingThumbnailsPaused
 
     $effect(() => {
+      const sourceImageIds = this.#sourceImageIds
+
+      for (const imageId of this.#imageInfoErrors.keys()) {
+        if (!sourceImageIds.has(imageId)) {
+          this.#imageInfoErrors.delete(imageId)
+        }
+      }
+
+      for (const imageId of this.#imageTileErrors.keys()) {
+        if (!sourceImageIds.has(imageId)) {
+          this.#imageTileErrors.delete(imageId)
+        }
+      }
+
       if (this.#fetchingThumbnailsPaused) {
         return
       }
@@ -75,7 +138,7 @@ export class ImagesState {
 
   async #fetchThumbnailFor(imageId: string, parsedImage: IIIFImage) {
     this.#fetchingIds.add(imageId)
-    const thumbnailSize = { width: 256, height: 256 }
+    const thumbnailSize = { width: 512, height: 512 }
     try {
       const imageRequest = parsedImage.getImageRequest(thumbnailSize)
 
@@ -145,6 +208,89 @@ export class ImagesState {
     return this.#thumbnails
   }
 
+  get imageInfoErrors() {
+    return this.#imageInfoErrors
+  }
+
+  get imageTileErrors() {
+    return this.#imageTileErrors
+  }
+
+  get imageErrors() {
+    const imageErrors = new Map<string, ImageError>()
+
+    for (const [imageId, imageInfoError] of this.#imageInfoErrors) {
+      imageErrors.set(imageId, imageInfoError)
+    }
+
+    for (const [imageId, tileErrors] of this.#imageTileErrors) {
+      if (imageErrors.has(imageId)) {
+        continue
+      }
+
+      const tileError = tileErrors.values().next().value
+      if (tileError) {
+        imageErrors.set(imageId, tileError)
+      }
+    }
+
+    return imageErrors
+  }
+
+  get failedImageIds() {
+    return [...this.imageErrors.keys()]
+  }
+
+  get imageErrorCount() {
+    return this.imageErrors.size
+  }
+
+  get sourceImageCount() {
+    return this.#sourceImageIds.size
+  }
+
+  get allSourceImagesFailed() {
+    return (
+      this.sourceImageCount > 0 &&
+      this.imageErrorCount === this.sourceImageCount
+    )
+  }
+
+  get someSourceImagesFailed() {
+    return this.imageErrorCount > 0
+  }
+
+  getImageError(imageId: string) {
+    return this.imageErrors.get(imageId)
+  }
+
+  getImageErrors(imageId: string) {
+    return [
+      this.#imageInfoErrors.get(imageId),
+      ...Array.from(this.#imageTileErrors.get(imageId)?.values() ?? [])
+    ].filter((error): error is ImageError => error !== undefined)
+  }
+
+  getImageTileErrors(imageId: string) {
+    return [...(this.#imageTileErrors.get(imageId)?.values() ?? [])]
+  }
+
+  getImageTileErrorCount(imageId: string) {
+    return this.#imageTileErrors.get(imageId)?.size ?? 0
+  }
+
+  getFirstImageTileError(imageId: string) {
+    return this.#imageTileErrors.get(imageId)?.values().next().value
+  }
+
+  hasImageTileErrors(imageId: string) {
+    return this.getImageTileErrorCount(imageId) > 0
+  }
+
+  hasAnyImageErrors(imageId: string) {
+    return this.getImageError(imageId) !== undefined
+  }
+
   addParsedImage(imageId: string, parsedImage: IIIFImage) {
     this.addParsedImages(new Map([[imageId, parsedImage]]))
   }
@@ -158,12 +304,63 @@ export class ImagesState {
       }
 
       this.#parsedImages.set(imageId, parsedImage)
+      this.#imageInfoErrors.delete(imageId)
       changed = true
     }
 
     if (changed) {
       this.#parsedImagesRevision += 1
     }
+  }
+
+  addImageInfoError(
+    imageId: string,
+    error: Error,
+    options: ImageErrorOptions = {}
+  ) {
+    const resourceFetchError =
+      error instanceof ResourceFetchError ? error : undefined
+
+    this.#imageInfoErrors.set(imageId, {
+      imageId,
+      source: 'info-json',
+      imageInfoUrl: options.imageInfoUrl,
+      kind: normalizeImageErrorKind(options.kind ?? resourceFetchError?.kind),
+      corsLikely: options.corsLikely ?? resourceFetchError?.corsLikely ?? false,
+      status: options.status ?? resourceFetchError?.status,
+      message: error.message,
+      error
+    })
+  }
+
+  addImageTileError(
+    imageId: string,
+    error: Error,
+    options: ImageErrorOptions = {}
+  ) {
+    const tileUrl = options.tileUrl
+    if (!tileUrl) {
+      return
+    }
+
+    const resourceFetchError =
+      error instanceof ResourceFetchError ? error : undefined
+    let tileErrors = this.#imageTileErrors.get(imageId)
+    if (!tileErrors) {
+      tileErrors = new SvelteMap<string, ImageTileError>()
+      this.#imageTileErrors.set(imageId, tileErrors)
+    }
+
+    tileErrors.set(tileUrl, {
+      imageId,
+      source: 'tile',
+      tileUrl,
+      kind: normalizeImageErrorKind(options.kind ?? resourceFetchError?.kind),
+      corsLikely: options.corsLikely ?? resourceFetchError?.corsLikely ?? false,
+      status: options.status ?? resourceFetchError?.status,
+      message: error.message,
+      error
+    })
   }
 
   pauseFetchingThumbnails() {
@@ -176,12 +373,12 @@ export class ImagesState {
 }
 
 export function setImagesState(
-  sourceState: SourceState,
+  mapsState: MapsState,
   fetchingThumbnailsPaused?: boolean
 ) {
   return setContext(
     IMAGES_KEY,
-    new ImagesState(sourceState, fetchingThumbnailsPaused)
+    new ImagesState(mapsState, fetchingThumbnailsPaused)
   )
 }
 

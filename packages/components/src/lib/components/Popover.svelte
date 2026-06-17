@@ -46,13 +46,13 @@
     >
       {#snippet child({ wrapperProps, props, open })}
         {#if open}
-          <div {...wrapperProps}>
+          <div {...wrapperProps} style:z-index={50}>
             <div transition:scale={{ start: 0.95, duration: 75 }}>
               <Popover.Arrow
                 width={10}
                 height={6}
                 class="text-white drop-shadow-md
-                data-[side=top]:translate-y-[-1px] data-[side=bottom]:translate-y-[1px]"
+                data-[side=top]:translate-y-px data-[side=bottom]:translate-y-px"
               />
               <div
                 {...props}
@@ -60,8 +60,8 @@
                 class="px-2 max-w-screen"
               >
                 <div
-                  class="bg-white p-2 shadow-lg rounded-md
-                    border-1 border-gray-200 overflow-auto
+                  class="bg-white p-2 shadow-xl/20 rounded-xl
+                    border border-gray-200 overflow-auto
                     max-h-[calc((var(--bits-popover-content-available-height))-(--spacing(2)))]"
                 >
                   {#if title}

@@ -1,6 +1,7 @@
 import { command, form, query } from '$app/server'
 import { redirect } from '@sveltejs/kit'
 
+import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
 import { restFetch } from '$lib/server/rest.js'
 import { routes } from '$lib/routes.js'
 import { z } from 'zod'
@@ -115,7 +116,7 @@ const updateOrganizationMemberRoleSchema = z.object({
 }) satisfies z.ZodType<UpdateOrganizationMemberRoleInput>
 
 export const getOrganizations = query(async () => {
-  return restFetch<Organization[]>('/organizations')
+  return restFetch<Organization[]>(`/organizations?limit=${CONSOLE_LIST_LIMIT}`)
 })
 
 export const getOrganization = query(

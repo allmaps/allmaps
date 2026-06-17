@@ -8,8 +8,8 @@ import type { Color, ColorWithTransparancy } from '@allmaps/types'
  * @param rgb - RGB color array, e.g. [0, 51, 255]
  * @returns HEX string, e.g. '#0033ff'
  */
-export function rgbToHex(color: Color): string {
-  return '#' + rgbHex(...color)
+export function rgbToHex(rgb: Color): string {
+  return '#' + rgbHex(...rgb)
 }
 
 /**
@@ -17,8 +17,8 @@ export function rgbToHex(color: Color): string {
  * @param rgb - RGBA color array, e.g. [0, 51, 255, 255]
  * @returns HEX string, e.g. '#0033ffff'
  */
-export function rgbaToHex(color: ColorWithTransparancy): string {
-  return '#' + rgbHex(...color)
+export function rgbaToHex(rgba: ColorWithTransparancy): string {
+  return '#' + rgbHex(...rgba)
 }
 
 /**

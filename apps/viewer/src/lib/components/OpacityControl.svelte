@@ -1,13 +1,12 @@
 <script lang="ts">
   import { tick } from 'svelte'
-  import { scale } from 'svelte/transition'
+  import { fade, scale } from 'svelte/transition'
 
   import { Popover } from 'bits-ui'
 
   import { Drop as DropIcon } from 'phosphor-svelte'
 
   import OpacitySlider from '$lib/components/OpacitySlider.svelte'
-  import ControlContainer from '$lib/components/ControlContainer.svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 
@@ -19,6 +18,9 @@
 
   const HOLD_DELAY_MS = 220
   const DRAG_THRESHOLD_PX = 8
+  const HIDDEN_OPACITY_THRESHOLD = 0.05
+
+  let opacityHidden = $derived(uiState.opacity <= HIDDEN_OPACITY_THRESHOLD)
 
   let holdTimeout: ReturnType<typeof setTimeout> | undefined
   let sliderElement = $state<HTMLInputElement>()
@@ -143,41 +145,45 @@
   }
 </script>
 
-<ControlContainer roundedFull>
-  <Popover.Root bind:open>
-    <Popover.Trigger {disabled}>
-      {#snippet child({ props })}
-        <button
-          {...props}
-          {disabled}
-          class="size-7 rounded-full bg-white not-disabled:cursor-pointer disabled:text-gray group flex items-center justify-center
+<Popover.Root bind:open>
+  <Popover.Trigger {disabled}>
+    {#snippet child({ props })}
+      <button
+        {...props}
+        {disabled}
+        class="relative size-8 rounded-full bg-white not-disabled:cursor-pointer disabled:text-gray group flex items-center justify-center
           transition-colors hover:bg-pink/10 hover:text-pink group"
-          onclick={handleClick}
-          onpointerdown={handlePointerDown}
-          onpointermove={handlePointerMove}
-          onpointerup={handlePointerUp}
-          onpointercancel={handlePointerUp}
-          onkeydown={handleKeyDown}
-        >
-          <DropIcon class="size-6" />
-        </button>
-      {/snippet}
-    </Popover.Trigger>
-    <Popover.Portal>
-      <Popover.Content sideOffset={10} forceMount>
-        {#snippet child({ wrapperProps, props, open })}
-          {#if open}
-            <div {...wrapperProps}>
-              <div {...props} transition:scale={{ start: 0.95, duration: 75 }}>
-                <OpacitySlider
-                  bind:opacity={uiState.opacity}
-                  bind:sliderElement
-                />
-              </div>
+        onclick={handleClick}
+        onpointerdown={handlePointerDown}
+        onpointermove={handlePointerMove}
+        onpointerup={handlePointerUp}
+        onpointercancel={handlePointerUp}
+        onkeydown={handleKeyDown}
+      >
+        <DropIcon class="size-6" />
+        {#if opacityHidden}
+          <span
+            class="pointer-events-none absolute h-1 w-7 rotate-45 rounded-full bg-pink border-white border group-disabled:bg-gray"
+            transition:fade={{ duration: 100 }}
+          ></span>
+        {/if}
+      </button>
+    {/snippet}
+  </Popover.Trigger>
+  <Popover.Portal>
+    <Popover.Content sideOffset={10} forceMount>
+      {#snippet child({ wrapperProps, props, open })}
+        {#if open}
+          <div {...wrapperProps}>
+            <div {...props} transition:scale={{ start: 0.95, duration: 75 }}>
+              <OpacitySlider
+                bind:opacity={uiState.opacity}
+                bind:sliderElement
+              />
             </div>
-          {/if}
-        {/snippet}
-      </Popover.Content>
-    </Popover.Portal>
-  </Popover.Root>
-</ControlContainer>
+          </div>
+        {/if}
+      {/snippet}
+    </Popover.Content>
+  </Popover.Portal>
+</Popover.Root>

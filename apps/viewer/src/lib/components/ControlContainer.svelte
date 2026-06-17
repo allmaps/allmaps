@@ -18,7 +18,7 @@
 
 <div
   class={[
-    'p-1 pointer-events-auto flex gap-2 overflow-clip',
+    'p-1 pointer-events-auto flex gap-1 overflow-clip',
     direction === 'row' ? 'flex-row' : 'flex-col',
     !transparent && 'bg-white shadow-lg border-gray-100 border-[0.5px]',
     roundedFull ? 'rounded-full' : 'rounded-lg'

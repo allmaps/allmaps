@@ -18,7 +18,11 @@ import {
 } from '../maps/WebGL2WarpedMap.js'
 import { DEFAULT_ANIMATION_OPTIONS } from '../maps/WarpedMapList.js'
 import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import {
+  WarpedMapErrorEvent,
+  WarpedMapEvent,
+  WarpedMapEventType
+} from '../shared/events.js'
 import {
   multiplyHomogeneousTransform,
   invertHomogeneousTransform,
@@ -325,7 +329,11 @@ export class WebGL2Renderer
       )
 
     // Not awaiting this, using events to trigger new render calls
-    this.loadMissingImagesInViewport()
+    this.loadMissingImagesInViewport().forEach((promise) => {
+      promise.catch(() => {
+        // Image-info failures are emitted as IMAGEINFOFETCHERROR events.
+      })
+    })
 
     // Don't fire throttled function unless it could result in something
     // Otherwise we have to wait for that cycle to finish before useful cycle can be started
@@ -1068,6 +1076,18 @@ export class WebGL2Renderer
     if (event instanceof WarpedMapEvent) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.IMAGELOADED, event.data)
+      )
+    }
+  }
+
+  protected imageInfoFetchError(event: Event) {
+    if (event instanceof WarpedMapEvent && event.error) {
+      this.dispatchEvent(
+        new WarpedMapErrorEvent(
+          event.error,
+          event.data,
+          WarpedMapEventType.IMAGEINFOFETCHERROR
+        )
       )
     }
   }

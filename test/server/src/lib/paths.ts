@@ -1,4 +1,9 @@
-import type { CorsMode, IiifVersion, JsonObject } from './types.ts'
+import type {
+  CorsMode,
+  IiifVersion,
+  ImageComplianceLevel,
+  JsonObject
+} from './types.ts'
 
 export function getBaseUrl(request: Request, corsMode: CorsMode) {
   const url = new URL(request.url)
@@ -10,9 +15,11 @@ export function getImageServiceId(
   request: Request,
   corsMode: CorsMode,
   version: IiifVersion,
-  imageId: string
+  complianceLevel: ImageComplianceLevel,
+  imageId: string,
+  suffix?: string
 ) {
-  return `${getBaseUrl(request, corsMode)}/iiif/${version}/${imageId}`
+  return `${getBaseUrl(request, corsMode)}/iiif/${version}/${complianceLevel}/${imageId}${suffix ? `/${suffix}` : ''}`
 }
 
 export function parseCorsMode(corsMode: string): CorsMode {
@@ -31,6 +38,22 @@ export function parseIiifVersion(version: string): IiifVersion {
   throw new Error('IIIF version must be 2 or 3')
 }
 
+export function parseImageComplianceLevel(
+  complianceLevel: string
+): ImageComplianceLevel {
+  if (
+    complianceLevel === 'level0' ||
+    complianceLevel === 'level1' ||
+    complianceLevel === 'level2'
+  ) {
+    return complianceLevel
+  }
+
+  throw new Error(
+    'IIIF image compliance level must be level0, level1, or level2'
+  )
+}
+
 export function cloneJsonObject(value: unknown): JsonObject {
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     return structuredClone(value) as JsonObject
@@ -41,7 +64,15 @@ export function cloneJsonObject(value: unknown): JsonObject {
 
 export function localizeFixtureUrls(value: unknown, baseUrl: string): unknown {
   if (typeof value === 'string') {
-    return value.replace(/^http:\/\/localhost:5506\/(?:cors|no-cors)/, baseUrl)
+    const localized = value.replace(
+      /^http:\/\/localhost:5506\/(?:cors|no-cors)/,
+      baseUrl
+    )
+
+    return localized.replace(
+      /^(https?:\/\/[^/]+\/(?:cors|no-cors)\/iiif\/[23])\/(?!level[012]\/)/,
+      '$1/level1/'
+    )
   }
 
   if (Array.isArray(value)) {

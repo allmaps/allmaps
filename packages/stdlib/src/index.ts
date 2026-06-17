@@ -1,11 +1,11 @@
 export { fetchAnnotationsFromApi } from './api.js'
 
-export {
-  getImageData,
-  getColorsArray,
-  getColorHistogram,
-  getMaxOccurringColor
-} from './background-color.js'
+// export {
+//   getImageData,
+//   getColorsArray,
+//   getColorHistogram,
+//   getMaxOccurringColor
+// } from './background-color.js'
 
 export {
   computeMinMax,
@@ -64,11 +64,14 @@ export {
 } from './color.js'
 
 export {
+  ResourceFetchError,
   fetchUrl,
   fetchJson,
   fetchImageInfo,
   fetchImageBitmap
 } from './fetch.js'
+
+export type { ResourceFetchErrorKind } from './fetch.js'
 
 export {
   isGeojsonPoint,

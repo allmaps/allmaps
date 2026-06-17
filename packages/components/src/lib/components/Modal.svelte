@@ -62,7 +62,7 @@
     {/if}
     <div
       class="absolute m-4 flex max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] flex-col gap-2
-          rounded-lg bg-white p-2 shadow-lg outline-none sm:gap-4 sm:p-4 md:m-16 md:max-h-[calc(100%-8rem)] md:max-w-[calc(100%-8rem)]"
+        rounded-lg bg-white p-2 shadow-lg outline-none sm:gap-4 sm:p-4 md:m-16 md:max-h-[calc(100%-8rem)] md:max-w-[calc(100%-8rem)]"
     >
       {#if title}
         <div class="flex justify-between items-center">
@@ -78,8 +78,9 @@
           {/if}
         </div>
       {/if}
-
-      {@render children?.()}
+      <div class="overflow-scroll">
+        {@render children?.()}
+      </div>
     </div>
   </dialog>
 {/if}

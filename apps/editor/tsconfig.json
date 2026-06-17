@@ -14,8 +14,8 @@
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/basemap" },
-    { "path": "../../packages/components" },
     { "path": "../../packages/id" },
+    { "path": "../../packages/iiif-inspector" },
     { "path": "../../packages/iiif-parser" },
     { "path": "../../packages/io" },
     { "path": "../../packages/maplibre" },
