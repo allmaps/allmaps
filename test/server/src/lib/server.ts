@@ -57,7 +57,7 @@ type ImageApiService = {
   complianceLevel: ImageComplianceLevel
 }
 
-type ImageServiceBehavior = 'image-500' | 'slow'
+type ImageServiceBehavior = 'image-500' | 'slow' | 'too-many-requests-after-20s'
 
 type ImageApiServiceReference = ImageApiService & {
   behavior?: ImageServiceBehavior
@@ -68,8 +68,10 @@ const presentation3Context = 'http://iiif.io/api/presentation/3/context.json'
 
 const imageDefinitions = loadImageDefinitions()
 const slowResourceDelayMs = 4_000
+const tooManyRequestsAfterMs = 20_000
 
 const images = new Map(imageDefinitions.map((image) => [image.id, image]))
+const imageServiceBehaviorStartedAt = new Map<string, number>()
 const originalManifests = new Map(
   imageDefinitions.flatMap((image) => {
     if (!image.originalManifestPath) {
@@ -148,6 +150,10 @@ function getImageServiceProfile(
 
 function getImageServiceType(version: IiifVersion) {
   return version === '2' ? 'ImageService2' : 'ImageService3'
+}
+
+function getWrongImageServiceType(version: IiifVersion) {
+  return version === '2' ? 'ImageService3' : 'ImageService2'
 }
 
 function isJsonObject(value: unknown): value is JsonObject {
@@ -501,7 +507,11 @@ function parseImageServiceBehavior(
     return undefined
   }
 
-  if (behavior === 'image-500' || behavior === 'slow') {
+  if (
+    behavior === 'image-500' ||
+    behavior === 'slow' ||
+    behavior === 'too-many-requests-after-20s'
+  ) {
     return behavior
   }
 
@@ -517,6 +527,10 @@ function getCombinedImageServiceBehavior(
 
   if (variant === 'slow-iiif3-level2') {
     return 'slow'
+  }
+
+  if (variant === 'too-many-requests-after-20s-iiif3-level2') {
+    return 'too-many-requests-after-20s'
   }
 
   return undefined
@@ -536,6 +550,51 @@ async function delaySlowResource(variantOrBehavior: string | undefined) {
   if (variantOrBehavior === 'slow') {
     await delay(slowResourceDelayMs)
   }
+}
+
+function getImageServiceBehaviorKey(
+  corsMode: CorsMode,
+  version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
+  imageId: string,
+  behavior: ImageServiceBehavior
+) {
+  return [corsMode, version, complianceLevel, imageId, behavior].join(':')
+}
+
+function shouldReturnTooManyRequests(
+  corsMode: CorsMode,
+  version: IiifVersion,
+  complianceLevel: ImageComplianceLevel,
+  imageId: string,
+  behavior: ImageServiceBehavior | undefined
+) {
+  if (behavior !== 'too-many-requests-after-20s') {
+    return false
+  }
+
+  const key = getImageServiceBehaviorKey(
+    corsMode,
+    version,
+    complianceLevel,
+    imageId,
+    behavior
+  )
+  const now = Date.now()
+  const startedAt = imageServiceBehaviorStartedAt.get(key) ?? now
+
+  if (!imageServiceBehaviorStartedAt.has(key)) {
+    imageServiceBehaviorStartedAt.set(key, startedAt)
+  }
+
+  return now - startedAt >= tooManyRequestsAfterMs
+}
+
+function tooManyRequestsResponse(corsMode: CorsMode) {
+  const response = textResponse('Too Many Requests', corsMode, 429)
+  response.headers.set('retry-after', '20')
+
+  return response
 }
 
 function getCombinedAnnotationVariants(baseUrl: string) {
@@ -583,6 +642,18 @@ function getCombinedAnnotationVariants(baseUrl: string) {
       'level2',
       'Some slow, some fast images',
       `${baseUrl}/annotations/combined/mixed-slow-iiif3-level2.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Image services return 429 after 20 seconds',
+      `${baseUrl}/annotations/combined/too-many-requests-after-20s-iiif3-level2.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Some image services return 429 after 20 seconds',
+      `${baseUrl}/annotations/combined/mixed-too-many-requests-after-20s-iiif3-level2.json`
     ),
     createImageApiLink(
       '3',
@@ -681,6 +752,18 @@ function getCombinedManifestVariants(baseUrl: string) {
       'Slow manifest and resources',
       `${baseUrl}/manifests/3/combined/slow-iiif3-level2.json`
     ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Image services return 429 after 20 seconds',
+      `${baseUrl}/manifests/3/combined/too-many-requests-after-20s-iiif3-level2.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
+      'Some image services return 429 after 20 seconds',
+      `${baseUrl}/manifests/3/combined/mixed-too-many-requests-after-20s-iiif3-level2.json`
+    ),
     createCombinedImageServiceLink(
       'IIIF Presentation 3.0 manifest',
       `${baseUrl}/manifests/3/combined/image-services-iiif2-level0-level2.json`,
@@ -722,6 +805,8 @@ function isCombinedIiif3ManifestVariant(variant: string) {
       'mixed-linked-annotation-errors',
       'image-500-iiif3-level2',
       'slow-iiif3-level2',
+      'too-many-requests-after-20s-iiif3-level2',
+      'mixed-too-many-requests-after-20s-iiif3-level2',
       'image-services-iiif2-level0-level1',
       'image-services-iiif3-level0-level1',
       'image-services-iiif2-level0-iiif3-level1',
@@ -781,6 +866,14 @@ function getCombinedManifestLabel(variant: string) {
     return 'Combined fixture images whose resources load slowly'
   }
 
+  if (variant === 'too-many-requests-after-20s-iiif3-level2') {
+    return 'Combined fixture images whose image services return 429 after 20 seconds'
+  }
+
+  if (variant === 'mixed-too-many-requests-after-20s-iiif3-level2') {
+    return 'Combined fixture images with some image services that return 429 after 20 seconds'
+  }
+
   if (variant === 'image-services-iiif2-level0-level1') {
     return 'Combined fixture images with IIIF 2.1 level 0 and level 1 images'
   }
@@ -837,7 +930,12 @@ function getCombinedCanvasManifestVariant(variant: string, index: number) {
     return index % 2 === 0 ? 'default' : 'embedded-annotation'
   }
 
-  if (variant === 'image-500-iiif3-level2' || variant === 'slow-iiif3-level2') {
+  if (
+    variant === 'image-500-iiif3-level2' ||
+    variant === 'slow-iiif3-level2' ||
+    variant === 'too-many-requests-after-20s-iiif3-level2' ||
+    variant === 'mixed-too-many-requests-after-20s-iiif3-level2'
+  ) {
     return 'linked-annotation'
   }
 
@@ -871,7 +969,7 @@ function getCombinedCanvasManifestVariant(variant: string, index: number) {
 function getCombinedCanvasImageService(
   variant: string,
   index: number
-): { version: IiifVersion; complianceLevel: ImageComplianceLevel } {
+): ImageApiServiceReference {
   const imageServiceVariant = parseCombinedImageServiceManifestVariant(variant)
 
   if (imageServiceVariant) {
@@ -931,6 +1029,22 @@ function getCombinedCanvasImageService(
     return index % 2 === 0
       ? { version: '2', complianceLevel: 'level2' }
       : { version: '3', complianceLevel: 'level0' }
+  }
+
+  if (variant === 'too-many-requests-after-20s-iiif3-level2') {
+    return {
+      version: '3',
+      complianceLevel: 'level2',
+      behavior: 'too-many-requests-after-20s'
+    }
+  }
+
+  if (variant === 'mixed-too-many-requests-after-20s-iiif3-level2') {
+    return {
+      version: '3',
+      complianceLevel: 'level2',
+      behavior: index % 2 === 0 ? undefined : 'too-many-requests-after-20s'
+    }
   }
 
   return {
@@ -1024,7 +1138,8 @@ function getCombinedAnnotationImageService(
     variant === 'mixed-cors-errors-iiif3-level2' ||
     variant === 'mixed-partof-hierarchy-iiif3-level2' ||
     variant === 'image-500-iiif3-level2' ||
-    variant === 'slow-iiif3-level2'
+    variant === 'slow-iiif3-level2' ||
+    variant === 'too-many-requests-after-20s-iiif3-level2'
   ) {
     return {
       version: '3',
@@ -1038,6 +1153,14 @@ function getCombinedAnnotationImageService(
       version: '3',
       complianceLevel: 'level2',
       behavior: index % 2 === 0 ? undefined : 'slow'
+    }
+  }
+
+  if (variant === 'mixed-too-many-requests-after-20s-iiif3-level2') {
+    return {
+      version: '3',
+      complianceLevel: 'level2',
+      behavior: index % 2 === 0 ? undefined : 'too-many-requests-after-20s'
     }
   }
 
@@ -1214,6 +1337,8 @@ function createCombinedAnnotation(
       'image-500-iiif3-level2',
       'slow-iiif3-level2',
       'mixed-slow-iiif3-level2',
+      'too-many-requests-after-20s-iiif3-level2',
+      'mixed-too-many-requests-after-20s-iiif3-level2',
       'mixed-partof-hierarchy-iiif3-level2',
       'mixed-iiif2-level0-level1',
       'mixed-iiif3-level0-level1',
@@ -1366,7 +1491,7 @@ function createIiif3Canvas(
   const imageBodyDimensions = getManifestImageBodyDimensions(image)
   const serviceType =
     variant === 'bad-service-type'
-      ? 'ImageService2'
+      ? getWrongImageServiceType(imageApiVersion)
       : getImageServiceType(imageApiVersion)
   const canvas: JsonObject = {
     id: canvasId,
@@ -1469,7 +1594,7 @@ function createCombinedIiif3Manifest(
         getCombinedLinkedAnnotationPageId(baseUrl, variant, index),
         imageService.version,
         imageService.complianceLevel,
-        getCombinedImageServiceBehavior(variant)
+        imageService.behavior ?? getCombinedImageServiceBehavior(variant)
       )
     })
   }
@@ -1523,7 +1648,7 @@ function createCombinedIiif3CanvasResource(
     getCombinedLinkedAnnotationPageId(baseUrl, variant, imageIndex),
     imageService.version,
     imageService.complianceLevel,
-    getCombinedImageServiceBehavior(variant)
+    imageService.behavior ?? getCombinedImageServiceBehavior(variant)
   )
 }
 
@@ -2293,6 +2418,24 @@ function createIiif2Manifest(
   }
 }
 
+function normalizeLabeledContentResources(
+  resources: JsonObject | JsonObject[] | undefined,
+  fallbackLabel: string
+) {
+  if (!resources) {
+    return undefined
+  }
+
+  const resourceItems = Array.isArray(resources) ? resources : [resources]
+
+  return resourceItems.map((resource) => ({
+    ...cloneJsonObject(resource),
+    label: resource.label ?? {
+      none: [fallbackLabel]
+    }
+  }))
+}
+
 function createIiif3Manifest(
   request: Request,
   corsMode: CorsMode,
@@ -2340,8 +2483,14 @@ function createIiif3Manifest(
     summary: parsedOriginalManifest?.summary,
     requiredStatement: parsedOriginalManifest?.requiredStatement,
     rights: parsedOriginalManifest?.rights,
-    homepage: parsedOriginalManifest?.homepage,
-    rendering: parsedOriginalManifest?.rendering,
+    homepage: normalizeLabeledContentResources(
+      parsedOriginalManifest?.homepage,
+      'Homepage'
+    ),
+    rendering: normalizeLabeledContentResources(
+      parsedOriginalManifest?.rendering,
+      'Rendering'
+    ),
     seeAlso: parsedOriginalManifest?.seeAlso,
     thumbnail: parsedOriginalManifest?.thumbnail,
     items: [canvas]
@@ -2516,6 +2665,33 @@ function getImageAnnotationErrorLinks(baseUrl: string, image: ImageFixture) {
   )
 }
 
+function getRateLimitedImageServiceLinks(baseUrl: string, image: ImageFixture) {
+  return catalogImageApiServices.flatMap(({ version, complianceLevel }) => {
+    const imageServiceUrl = getImageServiceBaseUrl(
+      baseUrl,
+      version,
+      complianceLevel,
+      image.id,
+      'too-many-requests-after-20s'
+    )
+
+    return [
+      createImageApiLink(
+        version,
+        complianceLevel,
+        '429 after 20s info.json',
+        `${imageServiceUrl}/info.json`
+      ),
+      createImageApiLink(
+        version,
+        complianceLevel,
+        '429 after 20s tile',
+        getLevel0TileExample(image, imageServiceUrl)
+      )
+    ]
+  })
+}
+
 function getManifestResourceLinks(baseUrl: string, image: ImageFixture) {
   if (!image.hasManifest) {
     return []
@@ -2685,6 +2861,7 @@ export function createCatalog(request: Request, corsMode: CorsMode) {
             )
           ]
         ),
+        imageServices: getRateLimitedImageServiceLinks(baseUrl, image),
         annotations: getImageAnnotationErrorLinks(baseUrl, image),
         manifests: getManifestErrorLinks(baseUrl, image)
       },
@@ -2796,6 +2973,18 @@ async function routeFixtureRequest(
 
     await delaySlowResource(behavior)
 
+    if (
+      shouldReturnTooManyRequests(
+        corsMode,
+        version,
+        complianceLevel,
+        image.id,
+        behavior
+      )
+    ) {
+      return tooManyRequestsResponse(corsMode)
+    }
+
     return jsonResponse(
       createInfoJson(
         request,
@@ -2813,7 +3002,7 @@ async function routeFixtureRequest(
     segments[0] === 'iiif' &&
     (segments.length === 7 || segments.length === 8 || segments.length === 9)
   ) {
-    parseIiifVersion(segments[1])
+    const version = parseIiifVersion(segments[1])
     const hasBehavior = segments.length === 9
     const hasComplianceLevel = segments.length >= 8
     const complianceLevel = hasComplianceLevel
@@ -2827,6 +3016,18 @@ async function routeFixtureRequest(
     const image = getImage(segments[2 + offset])
 
     await delaySlowResource(behavior)
+
+    if (
+      shouldReturnTooManyRequests(
+        corsMode,
+        version,
+        complianceLevel,
+        image.id,
+        behavior
+      )
+    ) {
+      return tooManyRequestsResponse(corsMode)
+    }
 
     if (behavior === 'image-500') {
       return textResponse('Image request failed intentionally', corsMode, 500)
