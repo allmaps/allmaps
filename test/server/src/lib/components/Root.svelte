@@ -33,6 +33,7 @@
     }
     errors: {
       infoJsons: Link[]
+      imageServices: Link[]
       annotations: Link[]
       manifests: Link[]
     }
@@ -128,6 +129,7 @@
       manifests,
       errors: {
         infoJsons: image.errors.infoJsons.map(withMode),
+        imageServices: image.errors.imageServices.map(withMode),
         annotations: image.errors.annotations.map(withMode),
         manifests: image.errors.manifests.map(withMode)
       },
@@ -245,6 +247,11 @@
       key: 'info-jsons',
       label: 'Broken info.json',
       getLinks: (links) => links.errors.infoJsons
+    },
+    {
+      key: 'image-services',
+      label: 'Rate Limited Image Services',
+      getLinks: (links) => links.errors.imageServices
     },
     {
       key: 'annotations',
@@ -633,6 +640,28 @@
               (link) =>
                 link.resourceKind === 'Annotation page' &&
                 link.label === 'Some slow, some fast images'
+            )
+          ),
+          createCombinedScenario(
+            'image-services-rate-limited-after-20s',
+            'Image services return 429 after 20 seconds',
+            'The annotation page loads normally and points at image services that serve info.json and tiles for 20 seconds, then return 429 responses.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'Image services return 429 after 20 seconds'
+            )
+          ),
+          createCombinedScenario(
+            'some-image-services-rate-limited-after-20s',
+            'Some image services return 429 after 20 seconds',
+            'Only some image services in the annotation page become rate limited, while the others continue responding normally.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'Some image services return 429 after 20 seconds'
             )
           )
         ].filter((scenario) => scenario !== undefined)
