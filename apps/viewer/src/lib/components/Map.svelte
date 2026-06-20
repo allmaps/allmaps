@@ -13,6 +13,7 @@
   import { WarpedMapEvent, WarpedMapEventType } from '@allmaps/render'
 
   import MapMenu from './MapMenu.svelte'
+  import UserLocation from './UserLocation.svelte'
 
   import { getImagesState } from '$lib/state/images.svelte'
   import { getBackgroundColorsState } from '$lib/state/background-colors.svelte.js'
@@ -76,6 +77,7 @@
   let warpedMapList: WarpedMapList<WebGL2WarpedMap> = new WarpedMapList()
   let warpedMapLayer = $state.raw<WarpedMapLayer>()
   let warpedMaps = $state<WarpedMap[]>([])
+  let userLocation = $state.raw<UserLocation>()
 
   let opacityBeforeShortcut: number | undefined
   let removeBackgroundBeforeShortcut: boolean | undefined
@@ -538,6 +540,10 @@
     map?.zoomOut()
   }
 
+  export function locateUser() {
+    userLocation?.locateUser()
+  }
+
   export function resetBearing() {
     if (map) {
       const bearing = map.getBearing()
@@ -881,7 +887,15 @@
 <div
   class="h-full w-full [&_canvas:focus-visible]:outline-none"
   bind:this={container}
-></div>
+>
+  <UserLocation
+    bind:this={userLocation}
+    {map}
+    {view}
+    {selectedWarpedMap}
+    duration={DURATION}
+  />
+</div>
 
 {#if contextMenuMapId && contextMenuGeoreferencedMap && warpedMapLayer}
   <MapMenu

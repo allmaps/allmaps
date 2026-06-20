@@ -26,6 +26,13 @@ export default [
     allmapsId: 'manifests/fc2c32dc51b145d8'
   },
   {
+    title:
+      'Kaart van Amsterdam 1:10.000 / Stadsontwikkeling, Dienst der Publieke Werken',
+    organization: 'Universiteitsbibliotheek van Amsterdam',
+    url: 'https://annotations.allmaps.org/maps/eaa990689f45a090',
+    allmapsId: 'maps/eaa990689f45a090'
+  },
+  {
     title: 'Waag',
     organization: 'Rijksdienst voor het Cultureel Erfgoed',
     url: 'https://annotations.allmaps.org/maps/e23c02b29dbc2e8b',

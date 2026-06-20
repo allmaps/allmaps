@@ -77,6 +77,7 @@
   uiState.addEventListener(UiEvents.ZOOM_IN, () => map?.zoomIn())
   uiState.addEventListener(UiEvents.ZOOM_OUT, () => map?.zoomOut())
   uiState.addEventListener(UiEvents.RESET_BEARING, () => map?.resetBearing())
+  uiState.addEventListener(UiEvents.LOCATE_USER, () => map?.locateUser())
 </script>
 
 {#snippet loading()}
@@ -150,6 +151,8 @@
           onZoomIn={() => uiState.dispatchZoomIn()}
           onZoomOut={() => uiState.dispatchZoomOut()}
           onZoomToExtent={() => uiState.dispatchZoomToExtent()}
+          onLocateUser={() => uiState.dispatchLocateUser()}
+          locateUserActive={uiState.locatingUser}
           onResetBearing={() => uiState.dispatchResetBearing()}
         />
       {/snippet}

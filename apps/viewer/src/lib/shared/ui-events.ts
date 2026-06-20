@@ -2,7 +2,8 @@ export const UiEvents = {
   ZOOM_TO_EXTENT: 'ZOOM_TO_EXTENT' as const,
   ZOOM_IN: 'ZOOM_IN' as const,
   ZOOM_OUT: 'ZOOM_OUT' as const,
-  RESET_BEARING: 'RESET_BEARING' as const
+  RESET_BEARING: 'RESET_BEARING' as const,
+  LOCATE_USER: 'LOCATE_USER' as const
 }
 
 type UiEventMap = {
@@ -10,6 +11,7 @@ type UiEventMap = {
   ZOOM_IN: void
   ZOOM_OUT: void
   RESET_BEARING: void
+  LOCATE_USER: void
 }
 
 interface IUiEventTarget extends EventTarget {
