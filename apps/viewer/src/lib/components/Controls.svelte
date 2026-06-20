@@ -12,6 +12,8 @@
     onZoomIn: () => void
     onZoomOut: () => void
     onZoomToExtent: () => void
+    onLocateUser: () => void
+    locateUserActive: boolean
     mapBearing: number
     imageUpBearing?: number
     onResetBearing: () => void
@@ -21,6 +23,8 @@
     onZoomIn,
     onZoomOut,
     onZoomToExtent,
+    onLocateUser,
+    locateUserActive,
     mapBearing,
     imageUpBearing,
     onResetBearing
@@ -35,7 +39,13 @@
   class="w-full h-full grid grid-cols-[auto_auto_auto] sm:grid-cols-3 grid-rows-3 gap-4 p-2"
 >
   <div class="col-3 row-1 self-start place-self-end">
-    <MapControls {onZoomIn} {onZoomOut} {onZoomToExtent} />
+    <MapControls
+      {onZoomIn}
+      {onZoomOut}
+      {onZoomToExtent}
+      {onLocateUser}
+      {locateUserActive}
+    />
   </div>
 
   <div class="col-1 row-3 self-end place-self-start flex flex-row gap-2">

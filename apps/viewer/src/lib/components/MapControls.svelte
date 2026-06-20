@@ -3,14 +3,23 @@
 
   import ControlContainer from '$lib/components/ControlContainer.svelte'
   import ZoomToExtent from '$lib/components/ZoomToExtent.svelte'
+  import LocateUser from '$lib/components/LocateUser.svelte'
 
   type Props = {
     onZoomIn: () => void
     onZoomOut: () => void
     onZoomToExtent: () => void
+    onLocateUser: () => void
+    locateUserActive: boolean
   }
 
-  let { onZoomIn, onZoomOut, onZoomToExtent }: Props = $props()
+  let {
+    onZoomIn,
+    onZoomOut,
+    onZoomToExtent,
+    onLocateUser,
+    locateUserActive
+  }: Props = $props()
 </script>
 
 <div class="flex flex-col gap-2">
@@ -31,5 +40,9 @@
 
   <ControlContainer>
     <ZoomToExtent {onZoomToExtent} />
+  </ControlContainer>
+
+  <ControlContainer>
+    <LocateUser {onLocateUser} active={locateUserActive} />
   </ControlContainer>
 </div>
