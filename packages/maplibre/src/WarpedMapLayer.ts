@@ -77,7 +77,6 @@ export class WarpedMapLayer
   /**
    * Creates a WarpedMapLayer instance
    *
-   * @param id - Unique ID for this layer
    * @param options - options
    */
   constructor(options?: Partial<MapLibreWarpedMapLayerOptions>) {

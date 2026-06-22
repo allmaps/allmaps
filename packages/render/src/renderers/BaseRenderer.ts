@@ -88,7 +88,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       anticipateInteraction: false,
 
       // These buffers should be in growing order
-      requestViewportBufferRatio: 0,
+      requestViewportBufferRatio: 1.2,
+      // requestViewportBufferRatio being more then 1 takes care of imperfections
+      // related to forward and backward TPS transform not being identical
       overviewRequestViewportBufferRatio: 8,
       pruneViewportBufferRatio: 8,
       overviewPruneViewportBufferRatio: 16,
@@ -895,10 +897,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       resourceBufferedViewportRing
     )
     // Assure variables exist on warpedMap, that should be computed by the setters above
-    if (
-      !warpedMap.resourceBufferedViewportRingBboxForViewport ||
-      !warpedMap.resourceBufferedViewportRingBboxForViewport
-    ) {
+    if (!warpedMap.resourceBufferedViewportRingBboxForViewport) {
       throw new Error(
         'No resourceBufferedViewportRingBboxForViewport or resourceBufferedViewportRingBboxForViewport'
       )
