@@ -70,3 +70,6 @@
 - name: Pourbus
   url: https://raw.githubusercontent.com/mclaeysb/claeissens/refs/heads/main/final-annotation-page.json
   reason: Extremely high number of GCPs
+- name: Peutinger
+  url: https://annotations.allmaps.org/maps/a24d6070e998e981
+  reason: Extremely high number of GCPs
