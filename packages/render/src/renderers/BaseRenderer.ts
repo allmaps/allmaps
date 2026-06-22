@@ -56,7 +56,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   tileCache: TileCache<D>
   spritesTileCache: TileCache<D>
 
-  mapsInList: Set<string> = new Set()
+  visibleMapsInList: Set<string> = new Set()
   mapsInPreviousViewport: Set<string> = new Set()
   mapsInViewport: Set<string> = new Set()
   mapsWithFetchableTilesForPreviousViewport: Set<string> = new Set()
@@ -1011,7 +1011,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
             viewport.viewportResolution,
             (viewport.viewportResolution *
               this.options.maxTotalOverviewResolutionRatio) /
-              this.mapsInList.size
+              this.visibleMapsInList.size
           )
         : warpedMap.options.overviewTilesMaxResolution
     const overviewTileZoomLevel = warpedMap.image.tileZoomLevels
@@ -1087,7 +1087,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     mapsInViewportEntering: string[]
     mapsInViewportLeaving: string[]
   } {
-    this.mapsInList = new Set(this.warpedMapList.getMapIds())
+    this.visibleMapsInList = new Set(this.warpedMapList.getMapIds())
 
     this.mapsWithFetchableTilesForPreviousViewport =
       this.mapsWithFetchableTilesForViewport

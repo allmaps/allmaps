@@ -40,7 +40,8 @@ export type SpecificMapLibreWarpedMapLayerOptions = {
 }
 
 export type CenterZoomBearingOptions = Partial<MaskOptions> & {
-  bearingSelection: 'first' | 'angularMean'
+  bearingMapIds?: string[]
+  bearingCallbackFn: (bearing: number) => number
   fit: Fit
 }
 
@@ -54,7 +55,7 @@ const DEFFAULT_SPECIFIC_MAPLIBRE_WARPED_MAP_LAYER_OPTIONS: SpecificMapLibreWarpe
     layerRenderingMode: '2d'
   }
 const DEFAULT_BEARING_OPTIONS: CenterZoomBearingOptions = {
-  bearingSelection: 'first',
+  bearingCallbackFn: (bearing) => bearing,
   fit: 'contain'
 }
 
@@ -202,7 +203,7 @@ export class WarpedMapLayer
    */
   getMapsCenterZoomBearing(
     mapIds: string[],
-    options?: Partial<CenterZoomBearingOptions & CameraForBoundsOptions>
+    partialOptions?: Partial<CenterZoomBearingOptions & CameraForBoundsOptions>
   ): CenterZoomBearing {
     // When MapLibre is asked to fit to a bbox while the map is rotated,
     // it will compute a CenterZoomBearing, that fits the entire bbox
@@ -218,7 +219,7 @@ export class WarpedMapLayer
 
     BaseWarpedMapLayer.assertRenderer(this.renderer)
 
-    options = mergeOptions(DEFAULT_BEARING_OPTIONS, options)
+    const options = mergeOptions(DEFAULT_BEARING_OPTIONS, partialOptions)
 
     // Get warped maps
     const warpedMaps = this.getWarpedMaps(mapIds)
@@ -228,19 +229,22 @@ export class WarpedMapLayer
 
     // Compute bearing
     let bearing
-    if (options.bearingSelection == 'first') {
+    const bearingMapIds = options.bearingMapIds
+    if (bearingMapIds === undefined) {
       bearing = computeWarpedMapBearing(warpedMaps[0], options)
-    } else if (options.bearingSelection == 'angularMean') {
+    } else {
       bearing = radiansToDegrees(
         angularMean(
-          ...warpedMaps.map((warpedMap) =>
-            degreesToRadians(computeWarpedMapBearing(warpedMap, options))
-          )
+          ...warpedMaps
+            .filter((warpedMap) => bearingMapIds.includes(warpedMap.mapId))
+            .map((warpedMap) =>
+              degreesToRadians(computeWarpedMapBearing(warpedMap, options))
+            )
         )
       )
-    } else {
-      throw new Error('Unknown bearing selection method')
     }
+
+    bearing = options.bearingCallbackFn(bearing)
 
     // Rotate projectedGeoMasks in the opposite direction and get center and bbox
     //
