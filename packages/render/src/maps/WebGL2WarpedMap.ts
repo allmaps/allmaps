@@ -178,6 +178,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourceOriginPointsAndSizesTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
+  private cachedTilesTextureArrayAllocatedDepth = 0
 
   // About renderHomogeneousTransform and InvertedRenderHomogeneousTransform:
   // renderHomogeneousTransform is the product of:
@@ -971,13 +972,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Find out which tiles to include in texture
     this.updateCachedTilesForTextures()
 
-    // Don't update if request without tiles, or if
-    // same request is (non-null) subset of previous request
-    // This reduces (expensive) texture updates when just reducing the number of tiles
-    // (But keeps them when all tiles are gone to free up texture)
-    // And blocking updates on equal requests is important to
-    // prevent triggering an infinite loop
-    // caused by the TEXTURESUPDATED event at the end
+    // Don't update if no tiles, or if current set is a non-null subset of the
+    // previous set (reduces expensive updates when just dropping tiles, but keeps
+    // them when all tiles are gone to free the texture). Blocking equal requests
+    // prevents an infinite loop via the TEXTURESUPDATED event below.
     if (
       this.cachedTilesForTexture.length == 0 ||
       (this.cachedTilesForTexture.length !== 0 &&
@@ -1002,22 +1000,33 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const requiredTextureHeight = this.tileSize[1]
     const requiredTextureDepth = this.cachedTilesForTexture.length
 
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
 
-    gl.texImage3D(
-      gl.TEXTURE_2D_ARRAY,
-      0,
-      gl.RGBA,
-      requiredTextureWidth,
-      requiredTextureHeight,
-      requiredTextureDepth,
-      0,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      null
-    )
+    // Use texStorage3D to allocate once at a fixed depth, avoiding a full
+    // GPU reallocation on every tile arrival. texStorage3D is immutable after
+    // the first call, so we only call it when depth grows beyond the current
+    // allocation. In practice depth stays stable once tiles are loaded.
+    if (requiredTextureDepth > this.cachedTilesTextureArrayAllocatedDepth) {
+      // Delete the existing texture object and create a fresh one, because
+      // texStorage3D cannot be called twice on the same texture object.
+      gl.deleteTexture(this.cachedTilesTextureArray)
+      this.cachedTilesTextureArray = gl.createTexture()
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
 
+      gl.texStorage3D(
+        gl.TEXTURE_2D_ARRAY,
+        1,
+        gl.RGBA8,
+        requiredTextureWidth,
+        requiredTextureHeight,
+        requiredTextureDepth
+      )
+      this.cachedTilesTextureArrayAllocatedDepth = requiredTextureDepth
+    }
+
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
+
+    // Upload each tile's ImageData via a PBO, then immediately delete the PBO.
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
       const imageData = this.cachedTilesForTexture[i].data
 
@@ -1055,6 +1064,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       )
 
       gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
+      gl.deleteBuffer(pbo)
     }
 
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
