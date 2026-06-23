@@ -403,12 +403,16 @@ export class WebGL2Renderer
   protected updateMapsForViewport(
     allFechableTilesForViewport: FetchableTile[]
   ): {
+    mapsInListEntering: string[]
+    mapsInListLeaving: string[]
     mapsInViewportEntering: string[]
     mapsInViewportLeaving: string[]
     mapsWithFetchableTilesForViewportEntering: string[]
     mapsWithFetchableTilesForViewportLeaving: string[]
   } {
     const {
+      mapsInListEntering,
+      mapsInListLeaving,
       mapsWithFetchableTilesForViewportEntering,
       mapsWithFetchableTilesForViewportLeaving,
       mapsInViewportEntering,
@@ -418,6 +422,8 @@ export class WebGL2Renderer
     this.updateVertexBuffers(mapsWithFetchableTilesForViewportEntering)
 
     return {
+      mapsInListEntering,
+      mapsInListLeaving,
       mapsWithFetchableTilesForViewportEntering,
       mapsWithFetchableTilesForViewportLeaving,
       mapsInViewportEntering,

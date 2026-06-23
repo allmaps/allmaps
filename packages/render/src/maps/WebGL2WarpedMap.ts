@@ -250,6 +250,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
     this.cachedTilesResourceOriginPointsAndSizesTexture =
       this.gl.createTexture()
+    this.cachedTilesTextureArrayAllocatedDepth = 0
   }
 
   /**
@@ -388,8 +389,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * Clear textures for this map
    */
   clearTextures() {
-    // TODO: implement clearing of texture: maybe a 1x1x1 texture that's empty
-    // this.throttledUpdateTextures()
+    const gl = this.gl
+    gl.deleteTexture(this.cachedTilesTextureArray)
+    this.cachedTilesTextureArray = gl.createTexture()
+    this.cachedTilesTextureArrayAllocatedDepth = 0
+    this.cachedTilesForTexture = []
+    this.previousCachedTilesForTexture = []
   }
 
   /**

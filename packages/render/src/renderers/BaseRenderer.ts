@@ -56,6 +56,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   tileCache: TileCache<D>
   spritesTileCache: TileCache<D>
 
+  previousVisibleMapsInList: Set<string> = new Set()
   visibleMapsInList: Set<string> = new Set()
   mapsInPreviousViewport: Set<string> = new Set()
   mapsInViewport: Set<string> = new Set()
@@ -1082,12 +1083,25 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   protected updateMapsForViewport(
     allFechableTilesForViewport: FetchableTile[]
   ): {
+    mapsInListEntering: string[]
+    mapsInListLeaving: string[]
     mapsWithFetchableTilesForViewportEntering: string[]
     mapsWithFetchableTilesForViewportLeaving: string[]
     mapsInViewportEntering: string[]
     mapsInViewportLeaving: string[]
   } {
-    this.visibleMapsInList = new Set(this.warpedMapList.getMapIds())
+    this.previousVisibleMapsInList = this.visibleMapsInList
+    this.visibleMapsInList = new Set(
+      this.warpedMapList.getMapIds({ onlyVisible: true })
+    )
+
+    const {
+      mapsForViewportEntering: mapsInListEntering,
+      mapsForViewportLeaving: mapsInListLeaving
+    } = this.mapsInViewportsToEnteringAndLeaving(
+      Array.from(this.previousVisibleMapsInList),
+      Array.from(this.visibleMapsInList)
+    )
 
     this.mapsWithFetchableTilesForPreviousViewport =
       this.mapsWithFetchableTilesForViewport
@@ -1118,6 +1132,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       Array.from(this.mapsInViewport)
     )
 
+    for (const mapId of mapsInListLeaving) {
+      this.clearMap(mapId)
+    }
+
     for (const mapId of mapsInViewportEntering) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPENTERED, {
@@ -1126,7 +1144,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       )
     }
     for (const mapId of mapsInViewportLeaving) {
-      this.clearMap(mapId)
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.WARPEDMAPLEFT, {
           mapIds: [mapId]
@@ -1135,6 +1152,8 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     }
 
     return {
+      mapsInListEntering,
+      mapsInListLeaving,
       mapsWithFetchableTilesForViewportEntering,
       mapsWithFetchableTilesForViewportLeaving,
       mapsInViewportEntering,
