@@ -337,10 +337,11 @@ export class WebGL2Renderer
 
     // Don't fire throttled function unless it could result in something
     // Otherwise we have to wait for that cycle to finish before useful cycle can be started
-    if (this.someImagesInViewport()) {
-      this.#throttledPrepareRenderInternal()
+    if (!this.someImagesInViewport()) {
+      return
     }
 
+    this.#throttledPrepareRenderInternal()
     this.#renderInternal()
   }
 
