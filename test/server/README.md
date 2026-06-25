@@ -46,6 +46,10 @@ GET /cors/annotations/images/:imageId.json
 GET /cors/annotations/images/:version/:level/:imageId.json
 GET /cors/annotations/combined/iiif{2|3}-level{0|1|2}.json
 GET /cors/annotations/combined/image-500-iiif3-level2.json
+GET /cors/annotations/combined/mixed-image-500-iiif3-level2.json
+GET /cors/annotations/combined/service-500-iiif3-level2.json
+GET /cors/annotations/combined/mixed-service-500-iiif3-level2.json
+GET /cors/annotations/combined/http-{401|403|404|429|500|503}.json
 GET /cors/annotations/combined/slow-iiif3-level2.json
 GET /cors/annotations/combined/mixed-slow-iiif3-level2.json
 GET /cors/annotations/combined/too-many-requests-after-20s-iiif3-level2.json
@@ -94,6 +98,7 @@ GET /cors/manifests/3/combined/manifest-embedded-annotations.json
 GET /cors/manifests/3/combined/partial-manifest-embedded-annotations.json
 GET /cors/manifests/3/combined/partial-embedded-annotations.json
 GET /cors/manifests/3/combined/partial-linked-annotations.json
+GET /cors/manifests/3/combined/all-embedded-annotations-mixed-errors.json
 GET /cors/manifests/3/combined/mixed-embedded-annotation-errors.json
 GET /cors/manifests/3/combined/mixed-linked-annotation-errors.json
 GET /cors/manifests/3/combined/too-many-requests-after-20s-iiif3-level2.json
