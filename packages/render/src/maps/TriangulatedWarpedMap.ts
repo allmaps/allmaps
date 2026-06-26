@@ -255,16 +255,6 @@ export class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Set the internal projection
-   *
-   * @param projection - the internal projection
-   */
-  protected setInternalProjection(projection: Projection) {
-    super.setInternalProjection(projection)
-    this.updateTriangulation()
-  }
-
-  /**
    * Set the projection
    *
    * @param projection - the projection
@@ -401,7 +391,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     // Adapt resolution from previous
     let refinePrevious = false
     if (resourceResolution && this.previousResourceResolution) {
-      refinePrevious = this.previousResourceResolution < resourceResolution
+      refinePrevious = resourceResolution < this.previousResourceResolution
       this.resourceResolution = Math.min(
         resourceResolution,
         this.previousResourceResolution
@@ -681,7 +671,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
   protected clearProjectedTransformerCaches() {
     super.clearProjectedTransformerCaches()
-    this.clearResourceTriangulationCaches()
+    this.clearProjectedTriangulationCaches()
   }
 
   protected clearResourceTriangulationCaches() {
