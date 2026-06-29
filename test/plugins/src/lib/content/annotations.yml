@@ -73,3 +73,6 @@
 - name: Peutinger
   url: https://annotations.allmaps.org/maps/a24d6070e998e981
   reason: Extremely high number of GCPs
+- name: Chinese coastline
+  url: https://annotations.allmaps.org/images/ea20959651600e01
+  reason: Extremely high number of GCPs
