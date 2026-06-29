@@ -10,6 +10,8 @@ import type { Polynomial1Measures } from '../shared/types.js'
  * This transformation is a composition of a translation, rotation, scaling and shearing.
  */
 export class Polynomial1 extends BasePolynomialTransformation {
+  measures?: Polynomial1Measures
+
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
     super(sourcePoints, destinationPoints, 1)
   }
@@ -32,16 +34,15 @@ export class Polynomial1 extends BasePolynomialTransformation {
   }
 
   getHomogeneousTransform(): HomogeneousTransform | undefined {
-    if (!this.weightsArrays) {
-      return undefined
-    }
+    const weightsArrays = this.getWeightsArrays()
+
     return [
-      this.weightsArrays[0][1],
-      this.weightsArrays[1][1],
-      this.weightsArrays[0][2],
-      this.weightsArrays[1][2],
-      this.weightsArrays[0][0],
-      this.weightsArrays[1][0]
+      weightsArrays[0][1],
+      weightsArrays[1][1],
+      weightsArrays[0][2],
+      weightsArrays[1][2],
+      weightsArrays[0][0],
+      weightsArrays[1][0]
     ]
   }
 
@@ -63,94 +64,73 @@ export class Polynomial1 extends BasePolynomialTransformation {
   }
 
   getMeasures(): Polynomial1Measures {
-    if (!this.weightsArrays) {
-      this.solve()
+    if (!this.measures) {
+      const weightsArrays = this.getWeightsArrays()
+
+      // From: https://stackoverflow.com/questions/12469770/get-skew-or-rotation-value-from-affine-transformation-matrix
+
+      const translation = [weightsArrays[0][0], weightsArrays[1][0]] as Point
+
+      const a = weightsArrays[0][1]
+      const b = weightsArrays[1][1]
+      const c = weightsArrays[0][2]
+      const d = weightsArrays[1][2]
+      const delta = a * d - b * c
+
+      // Apply the QR-like decomposition.
+      let rotation, scales, shears
+      if (a != 0 || b != 0) {
+        const r = Math.sqrt(a * a + b * b)
+        rotation = b > 0 ? Math.acos(a / r) : -Math.acos(a / r)
+        scales = [r, delta / r] as Point
+        shears = [Math.atan((a * c + b * d) / (r * r)), 0] as Point
+      } else if (c != 0 || d != 0) {
+        const s = Math.sqrt(c * c + d * d)
+        rotation = Math.PI / 2 - (d > 0 ? Math.acos(-c / s) : -Math.acos(c / s))
+        scales = [delta / s, s] as Point
+        shears = [0, Math.atan((a * c + b * d) / (s * s))] as Point
+      } else {
+        // a = b = c = d = 0
+        throw new Error("Can't compute measures")
+      }
+
+      this.measures = { translation, rotation, scales, shears }
     }
 
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
-
-    const measures: Partial<Polynomial1Measures> = {}
-
-    // From: https://stackoverflow.com/questions/12469770/get-skew-or-rotation-value-from-affine-transformation-matrix
-
-    measures.translation = [this.weightsArrays[0][0], this.weightsArrays[1][0]]
-
-    const a = this.weightsArrays[0][1]
-    const b = this.weightsArrays[1][1]
-    const c = this.weightsArrays[0][2]
-    const d = this.weightsArrays[1][2]
-    const delta = a * d - b * c
-
-    // Apply the QR-like decomposition.
-    if (a != 0 || b != 0) {
-      const r = Math.sqrt(a * a + b * b)
-      measures.rotation = b > 0 ? Math.acos(a / r) : -Math.acos(a / r)
-      measures.scales = [r, delta / r]
-      measures.shears = [Math.atan((a * c + b * d) / (r * r)), 0]
-    } else if (c != 0 || d != 0) {
-      const s = Math.sqrt(c * c + d * d)
-      measures.rotation =
-        Math.PI / 2 - (d > 0 ? Math.acos(-c / s) : -Math.acos(c / s))
-      measures.scales = [delta / s, s]
-      measures.shears = [0, Math.atan((a * c + b * d) / (s * s))]
-    } else {
-      // a = b = c = d = 0
-    }
-
-    return measures as Polynomial1Measures
+    return this.measures
   }
 
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     const newDestinationPoint: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       newDestinationPoint[i] +=
-        this.weightsArrays[i][0] +
-        this.weightsArrays[i][1] * newSourcePoint[0] +
-        this.weightsArrays[i][2] * newSourcePoint[1]
+        weightsArrays[i][0] +
+        weightsArrays[i][1] * newSourcePoint[0] +
+        weightsArrays[i][2] * newSourcePoint[1]
     }
 
     return newDestinationPoint
   }
 
   evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     const newDestinationPointPartDerX: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
-      newDestinationPointPartDerX[i] += this.weightsArrays[i][1]
+      newDestinationPointPartDerX[i] += weightsArrays[i][1]
     }
 
     return newDestinationPointPartDerX
   }
 
   evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     const newDestinationPointPartDerY: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
-      newDestinationPointPartDerY[i] += this.weightsArrays[i][2]
+      newDestinationPointPartDerY[i] += weightsArrays[i][2]
     }
 
     return newDestinationPointPartDerY

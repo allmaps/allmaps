@@ -34,24 +34,18 @@ export class Polynomial2 extends BasePolynomialTransformation {
 
   // Evaluate the transformation function at a new point
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     // Apply the helmert coefficients to the input point
     const newDestinationPoint: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       newDestinationPoint[i] +=
-        this.weightsArrays[i][0] +
-        this.weightsArrays[i][1] * newSourcePoint[0] +
-        this.weightsArrays[i][2] * newSourcePoint[1] +
-        this.weightsArrays[i][3] * newSourcePoint[0] ** 2 +
-        this.weightsArrays[i][4] * newSourcePoint[1] ** 2 +
-        this.weightsArrays[i][5] * newSourcePoint[0] * newSourcePoint[1]
+        weightsArrays[i][0] +
+        weightsArrays[i][1] * newSourcePoint[0] +
+        weightsArrays[i][2] * newSourcePoint[1] +
+        weightsArrays[i][3] * newSourcePoint[0] ** 2 +
+        weightsArrays[i][4] * newSourcePoint[1] ** 2 +
+        weightsArrays[i][5] * newSourcePoint[0] * newSourcePoint[1]
     }
 
     return newDestinationPoint
@@ -59,21 +53,15 @@ export class Polynomial2 extends BasePolynomialTransformation {
 
   // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeX(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerX: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       newDestinationPointPartDerX[i] +=
-        this.weightsArrays[i][1] +
-        2 * this.weightsArrays[i][3] * newSourcePoint[0] +
-        this.weightsArrays[i][5] * newSourcePoint[1]
+        weightsArrays[i][1] +
+        2 * weightsArrays[i][3] * newSourcePoint[0] +
+        weightsArrays[i][5] * newSourcePoint[1]
     }
 
     return newDestinationPointPartDerX
@@ -81,21 +69,15 @@ export class Polynomial2 extends BasePolynomialTransformation {
 
   // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeY(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     // Apply the helmert coefficients to the input point
     const newDestinationPointPartDerY: Point = [0, 0]
     for (let i = 0; i < 2; i++) {
       newDestinationPointPartDerY[i] +=
-        this.weightsArrays[i][2] +
-        2 * this.weightsArrays[i][4] * newSourcePoint[1] +
-        this.weightsArrays[i][5] * newSourcePoint[0]
+        weightsArrays[i][2] +
+        2 * weightsArrays[i][4] * newSourcePoint[1] +
+        weightsArrays[i][5] * newSourcePoint[0]
     }
 
     return newDestinationPointPartDerY

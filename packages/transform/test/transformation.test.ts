@@ -7,7 +7,7 @@ import { GcpTransformer, GeneralGcpTransformer } from '../src/index.js'
 
 import {
   gcps3,
-  generalGcps3Identity,
+  generalGcps2Identity,
   generalGcps3Polynomial,
   gcps6,
   gcps10
@@ -17,7 +17,7 @@ import { Point } from '@allmaps/types'
 
 describe('Helmert transformation', async () => {
   const generalTransformer = new GeneralGcpTransformer(
-    generalGcps3Identity,
+    generalGcps2Identity,
     'helmert'
   )
   const sourcePoint: Point = [1, 1]
@@ -60,12 +60,24 @@ describe('Helmert transformation with different handeness only specified in tran
 
 describe('Helmert backward transformation', async () => {
   const transformer = new GcpTransformer(gcps3, 'helmert')
-  const resourcePoint: Point = [4.925027120153211, 52.46506809004473]
-  const geoPoint = [146.25183291709982, 122.59989116975339]
+  const resourcePoint: Point = [100, 100]
+  const geoPoint: Point = [4.925027120153211, 52.46506809004473]
 
   test(`should have the correct output, and respect different handedness automatically`, () => {
     expectToBeCloseToArray(
-      transformer.transformToResource(resourcePoint),
+      transformer.transformToResource(geoPoint),
+      resourcePoint
+    )
+  })
+})
+
+describe('Helmert roundtrip transformation', async () => {
+  const transformer = new GcpTransformer(gcps3, 'helmert')
+  const geoPoint: Point = [4.925027120153211, 52.46506809004473]
+
+  test(`should do an exact roundtrip`, () => {
+    expectToBeCloseToArray(
+      transformer.transformToGeo(transformer.transformToResource(geoPoint)),
       geoPoint
     )
   })
@@ -73,16 +85,16 @@ describe('Helmert backward transformation', async () => {
 
 describe('Helmert backward transformation with flipped y axis', async () => {
   const transformer = new GcpTransformer(gcps3, 'helmert')
-  const resourcePoint: Point = [4.925027120153211, 52.46506809004473]
-  const geoPoint = [146.25183291709982, -122.59989116975339]
+  const resourcePoint: Point = [100, -100]
+  const geoPoint: Point = [4.925027120153211, 52.46506809004473]
 
   test(`should have the correct output with flipped y axis, and respect different handedness automatically`, () => {
     expectToBeCloseToArray(
-      transformer.transformToResource(resourcePoint, {}, (gcp) => [
+      transformer.transformToResource(geoPoint, {}, (gcp) => [
         gcp.resource[0],
         -gcp.resource[1]
       ]),
-      geoPoint
+      resourcePoint
     )
   })
 })
@@ -128,6 +140,20 @@ describe('Polynomial transformation, order 1', async () => {
 
   test(`should have the same output as running GDAL's gdaltransform`, () => {
     expectToBeCloseToArray(transformer.transformToGeo(resourcePoint), geoPoint)
+  })
+})
+
+describe('Polynomial transformation, order 1, roundtrip', async () => {
+  const transformer = new GcpTransformer(gcps3, 'polynomial')
+  const resourcePoint: Point = [100, 100]
+
+  test(`should have the same output as running GDAL's gdaltransform`, () => {
+    expectToBeCloseToArray(
+      transformer.transformToResource(
+        transformer.transformToGeo(resourcePoint)
+      ),
+      resourcePoint
+    )
   })
 })
 

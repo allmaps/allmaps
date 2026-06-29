@@ -4,16 +4,23 @@ import { BaseTransformation } from './BaseTransformation.js'
 
 import type { Point } from '@allmaps/types'
 
-export class Straight extends BaseTransformation {
-  weightsArrays?: {
-    scale: number
-    sourcePointsCenter: Point
-    destinationPointsCenter: Point
-    translation: Point
-  }
+import type { StraightMeasures } from '../shared/types.js'
 
-  constructor(sourcePoints: Point[], destinationPoints: Point[]) {
+export class Straight extends BaseTransformation {
+  weightsArrays?: [number[], number[]]
+
+  measures?: StraightMeasures
+
+  constructor(
+    sourcePoints: Point[],
+    destinationPoints: Point[],
+    measures?: StraightMeasures
+  ) {
     super(sourcePoints, destinationPoints, 'straight', 2)
+
+    if (measures) {
+      this.measures = measures
+    }
   }
 
   /** Solve the x and y components jointly.
@@ -25,31 +32,10 @@ export class Straight extends BaseTransformation {
       this.sourcePoints,
       this.destinationPoints
     )
-    const scale = helmertTransformation.getMeasures().scale
-
-    // Compute the centers of the source points and destination points
-    const sourcePointsCenter = this.sourcePoints
-      .reduce((center, point) => [center[0] + point[0], center[1] + point[1]])
-      .map((coordinate) => coordinate / this.pointCount) as Point
-    const destinationPointsCenter = this.destinationPoints
-      .reduce((center, point) => [center[0] + point[0], center[1] + point[1]])
-      .map((coordinate) => coordinate / this.pointCount) as Point
-
-    // Compute the translation vector from the (scaled) center of the source points to the center of the destination points
-    const translation = destinationPointsCenter.map(
-      (coord, i) => coord - sourcePointsCenter[i] * scale
-    ) as Point
-
-    this.weightsArrays = {
-      scale,
-      sourcePointsCenter,
-      destinationPointsCenter,
-      translation
-    }
+    this.weightsArrays = helmertTransformation.getWeightsArrays()
   }
 
-  // Evaluate the transformation function at a new point
-  evaluateFunction(newSourcePoint: Point): Point {
+  getWeightsArrays(): [number[], number[]] {
     if (!this.weightsArrays) {
       this.solve()
     }
@@ -58,11 +44,30 @@ export class Straight extends BaseTransformation {
       throw new Error('Weights not computed')
     }
 
+    return this.weightsArrays
+  }
+
+  getMeasures(): StraightMeasures {
+    if (!this.measures) {
+      const weightsArrays = this.getWeightsArrays()
+      const weightsArray = weightsArrays[0]
+
+      const scale = Math.sqrt(weightsArray[2] ** 2 + weightsArray[3] ** 2)
+      const translation = [weightsArray[0], weightsArray[1]] as Point
+
+      this.measures = { scale, translation }
+    }
+
+    return this.measures
+  }
+
+  // Evaluate the transformation function at a new point
+  evaluateFunction(newSourcePoint: Point): Point {
+    const { scale, translation } = this.getMeasures()
+
     const newDestinationPoint: Point = [
-      this.weightsArrays.translation[0] +
-        this.weightsArrays.scale * newSourcePoint[0],
-      this.weightsArrays.translation[1] +
-        this.weightsArrays.scale * newSourcePoint[1]
+      translation[0] + scale * newSourcePoint[0],
+      translation[1] + scale * newSourcePoint[1]
     ]
 
     return newDestinationPoint
@@ -70,30 +75,18 @@ export class Straight extends BaseTransformation {
 
   // Evaluate the transformation function's partial derivative to x at a new point
   evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
+    const { scale } = this.getMeasures()
 
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
-
-    const newDestinationPointPartDerX: Point = [this.weightsArrays.scale, 0]
+    const newDestinationPointPartDerX: Point = [scale, 0]
 
     return newDestinationPointPartDerX
   }
 
   // Evaluate the transformation function's partial derivative to y at a new point
   evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
+    const { scale } = this.getMeasures()
 
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
-
-    const newDestinationPointPartDerY: Point = [0, this.weightsArrays.scale]
+    const newDestinationPointPartDerY: Point = [0, scale]
 
     return newDestinationPointPartDerY
   }
@@ -102,21 +95,11 @@ export class Straight extends BaseTransformation {
     weights: Float64Array
     sourcePoints: Float64Array
   } {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const { scale, translation } = this.getMeasures()
 
     // Straight: [tx, ty, scale]
     return {
-      weights: new Float64Array([
-        this.weightsArrays.translation[0],
-        this.weightsArrays.translation[1],
-        this.weightsArrays.scale
-      ]),
+      weights: new Float64Array([translation[0], translation[1], scale]),
       sourcePoints: new Float64Array(0)
     }
   }

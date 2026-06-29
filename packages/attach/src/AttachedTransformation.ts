@@ -269,11 +269,20 @@ export class AttachedTransformation {
     this.processWeightsArrays()
   }
 
-  processWeightsArrays() {
+  getWeightsArrays(): [number[], number[]] {
+    if (!this.weightsArrays) {
+      this.solve()
+    }
+
     if (!this.weightsArrays) {
       throw new Error('Weights not computed')
     }
-    const weightsArrays = this.weightsArrays
+
+    return this.weightsArrays
+  }
+
+  processWeightsArrays() {
+    const weightsArrays = this.getWeightsArrays()
 
     // For each transformation, identify which part of the weights corresponds to it,
     // and set these weights on the transformation

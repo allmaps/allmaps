@@ -19,19 +19,30 @@ import type { HelmertMeasures } from '../shared/types.js'
  * For this transformations, the system of equations is solved for x and y jointly.
  */
 export class Helmert extends BaseLinearWeightsTransformation {
-  coefsArrayMatrices: [number[][], number[][]]
-  coefsArrayMatricesSize: [Size, Size]
+  coefsArrayMatrices?: [number[][], number[][]]
+  coefsArrayMatricesSize?: [Size, Size]
 
   weightsArray?: number[]
   weightsArrays?: [number[], number[]]
 
-  constructor(sourcePoints: Point[], destinationPoints: Point[]) {
+  measures?: HelmertMeasures
+
+  constructor(
+    sourcePoints: Point[],
+    destinationPoints: Point[],
+    weightsArray?: number[]
+  ) {
     super(sourcePoints, destinationPoints, 'helmert', 2)
 
     this.coefsArrayMatrices = this.getCoefsArrayMatrices()
     this.coefsArrayMatricesSize = this.coefsArrayMatrices.map(
       (coefsArrayMatrix) => arrayMatrixSize(coefsArrayMatrix)
     ) as [[number, number], [number, number]]
+
+    if (weightsArray) {
+      this.weightsArray = weightsArray
+      this.weightsArrays = [weightsArray, weightsArray]
+    }
   }
 
   getDestinationPointsArrays(): [number[], number[]] {
@@ -78,49 +89,40 @@ export class Helmert extends BaseLinearWeightsTransformation {
   }
 
   solve() {
+    const coefsArrayMatrices = this.getCoefsArrayMatrices()
     this.weightsArray = solveJointlyPseudoInverse(
-      this.coefsArrayMatrices,
+      coefsArrayMatrices,
       this.destinationPointsArrays
     )
     this.weightsArrays = [this.weightsArray, this.weightsArray]
   }
 
   getMeasures(): HelmertMeasures {
-    if (!this.weightsArrays) {
-      this.solve()
+    if (!this.measures) {
+      const weightsArrays = this.getWeightsArrays()
+      const weightsArray = weightsArrays[0]
+
+      const scale = Math.sqrt(weightsArray[2] ** 2 + weightsArray[3] ** 2)
+      const rotation = Math.atan2(weightsArray[3], weightsArray[2])
+      const translation = [weightsArray[0], weightsArray[1]] as Point
+
+      this.measures = { scale, rotation, translation }
     }
 
-    if (!this.weightsArray) {
-      throw new Error('Helmert weights not computed')
-    }
-
-    const measures: Partial<HelmertMeasures> = {}
-
-    measures.scale = Math.sqrt(
-      this.weightsArray[2] ** 2 + this.weightsArray[3] ** 2
-    )
-    measures.rotation = Math.atan2(this.weightsArray[3], this.weightsArray[2])
-    measures.translation = [this.weightsArray[0], this.weightsArray[1]]
-
-    return measures as HelmertMeasures
+    return this.measures
   }
 
   evaluateFunction(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArray) {
-      throw new Error('Helmert weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
+    const weightsArray = weightsArrays[0]
 
     const newDestinationPoint: Point = [
-      this.weightsArray[0] +
-        this.weightsArray[2] * newSourcePoint[0] -
-        this.weightsArray[3] * newSourcePoint[1],
-      this.weightsArray[1] +
-        this.weightsArray[2] * newSourcePoint[1] +
-        this.weightsArray[3] * newSourcePoint[0]
+      weightsArray[0] +
+        weightsArray[2] * newSourcePoint[0] -
+        weightsArray[3] * newSourcePoint[1],
+      weightsArray[1] +
+        weightsArray[2] * newSourcePoint[1] +
+        weightsArray[3] * newSourcePoint[0]
     ]
     // Alternatively, using derived helmert measures
     // this.translation[0] +
@@ -134,34 +136,24 @@ export class Helmert extends BaseLinearWeightsTransformation {
   }
 
   evaluatePartialDerivativeX(_newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArray) {
-      throw new Error('Helmert weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
+    const weightsArray = weightsArrays[0]
 
     const newDestinationPointPartDerX: Point = [
-      this.weightsArray[2],
-      this.weightsArray[3]
+      weightsArray[2],
+      weightsArray[3]
     ]
 
     return newDestinationPointPartDerX
   }
 
   evaluatePartialDerivativeY(_newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArray) {
-      throw new Error('Helmert weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
+    const weightsArray = weightsArrays[0]
 
     const newDestinationPointPartDerY: Point = [
-      -this.weightsArray[3],
-      this.weightsArray[2]
+      -weightsArray[3],
+      weightsArray[2]
     ]
 
     return newDestinationPointPartDerY
@@ -171,17 +163,12 @@ export class Helmert extends BaseLinearWeightsTransformation {
     weights: Float64Array
     sourcePoints: Float64Array
   } {
-    if (!this.weightsArray) {
-      this.solve()
-    }
-
-    if (!this.weightsArray) {
-      throw new Error('Helmert weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
+    const weightsArray = weightsArrays[0]
 
     // Helmert: [w0, w1, w2, w3]
     return {
-      weights: new Float64Array(this.weightsArray),
+      weights: new Float64Array(weightsArray),
       sourcePoints: new Float64Array(0)
     }
   }

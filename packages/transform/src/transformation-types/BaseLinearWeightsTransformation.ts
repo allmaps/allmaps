@@ -26,6 +26,18 @@ export abstract class BaseLinearWeightsTransformation extends BaseTransformation
     this.destinationPointsArrays = this.getDestinationPointsArrays()
   }
 
+  getWeightsArrays(): [number[], number[]] {
+    if (!this.weightsArrays) {
+      this.solve()
+    }
+
+    if (!this.weightsArrays) {
+      throw new Error('Weights not computed')
+    }
+
+    return this.weightsArrays
+  }
+
   abstract getDestinationPointsArrays(): [number[], number[]]
 
   abstract getCoefsArrayMatrices(): [number[][], number[][]]

@@ -47,6 +47,10 @@ export type TransformationTypeInputs = {
 }
 export type GcpTransformerInputs = GcpsInputs & TransformationTypeInputs
 
+export type StraightMeasures = {
+  translation: Point
+  scale: number
+}
 export type HelmertMeasures = {
   translation: Point
   rotation: number
@@ -58,7 +62,10 @@ export type Polynomial1Measures = {
   scales: Point
   shears: Point
 }
-export type TransformationTypeMeasures = HelmertMeasures | Polynomial1Measures
+export type TransformationTypeMeasures =
+  | StraightMeasures
+  | HelmertMeasures
+  | Polynomial1Measures
 // | object
 
 // Stored here as object to facilitate parsing in CLI
