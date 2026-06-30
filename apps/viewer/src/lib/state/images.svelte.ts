@@ -1,20 +1,20 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteSet, SvelteMap } from 'svelte/reactivity'
 
-import { ResourceFetchError, fetchImageBitmap } from '@allmaps/stdlib'
+import {
+  ResourceFetchError,
+  fetchImageBitmap,
+  fetchImageInfo
+} from '@allmaps/stdlib'
 
-import type { Image as IIIFImage } from '@allmaps/iiif-parser'
+import { Image, type Image as IIIFImage } from '@allmaps/iiif-parser'
 import type { ImageRequest } from '@allmaps/types'
 
 import type { MapsState } from '$lib/state/maps.svelte.js'
 
 const IMAGES_KEY = Symbol('images')
 
-export type ImageErrorKind =
-  | 'network-or-cors'
-  | 'http'
-  | 'parse'
-  | 'unknown'
+export type ImageErrorKind = 'network-or-cors' | 'http' | 'parse' | 'unknown'
 
 export type ImageErrorSource = 'info-json' | 'tile'
 
@@ -40,12 +40,24 @@ export type ImageTileError = BaseImageError & {
 
 export type ImageError = ImageInfoError | ImageTileError
 
+export type ImageThumbnailError = Omit<BaseImageError, 'source'> & {
+  source: 'thumbnail'
+  thumbnailUrl?: string
+}
+
+export type ImageDisplayError = ImageError | ImageThumbnailError
+
 type ImageErrorOptions = {
   imageInfoUrl?: string
   tileUrl?: string
+  thumbnailUrl?: string
   kind?: string
   corsLikely?: boolean
   status?: number
+}
+
+function ensureError(error: unknown) {
+  return error instanceof Error ? error : new Error(String(error))
 }
 
 function normalizeImageErrorKind(kind?: string): ImageErrorKind {
@@ -65,6 +77,9 @@ export class ImagesState {
     const imageIds = new SvelteSet<string>()
     this.#mapsState.maps.forEach((map) => {
       imageIds.add(map.resource.id)
+    })
+    this.#mapsState.invalidEmbeddedAnnotations.forEach((invalidAnnotation) => {
+      imageIds.add(invalidAnnotation.resource.id)
     })
 
     return imageIds
@@ -89,10 +104,13 @@ export class ImagesState {
   })
 
   #thumbnails = $state(new SvelteMap<string, ImageBitmap>())
+  #loadedImageIds = $state(new SvelteSet<string>())
   #imageInfoErrors = $state(new SvelteMap<string, ImageInfoError>())
   #imageTileErrors = $state(
     new SvelteMap<string, SvelteMap<string, ImageTileError>>()
   )
+  #thumbnailErrors = $state(new SvelteMap<string, ImageThumbnailError>())
+  #fetchingImageInfoIds = new Set<string>()
   #fetchingIds = new Set<string>()
 
   constructor(mapsState: MapsState, fetchingThumbnailsPaused = true) {
@@ -114,8 +132,32 @@ export class ImagesState {
         }
       }
 
+      for (const imageId of this.#loadedImageIds.keys()) {
+        if (!sourceImageIds.has(imageId)) {
+          this.#loadedImageIds.delete(imageId)
+        }
+      }
+
+      for (const imageId of this.#thumbnailErrors.keys()) {
+        if (!sourceImageIds.has(imageId)) {
+          this.#thumbnailErrors.delete(imageId)
+        }
+      }
+
       if (this.#fetchingThumbnailsPaused) {
         return
+      }
+
+      for (const imageId of sourceImageIds) {
+        if (
+          this.#parsedImages.has(imageId) ||
+          this.#imageInfoErrors.has(imageId) ||
+          this.#fetchingImageInfoIds.has(imageId)
+        ) {
+          continue
+        }
+
+        this.#fetchImageInfoFor(imageId)
       }
 
       const currentIds = new Set(this.#parsedImagesBySourceImageId.keys())
@@ -128,7 +170,11 @@ export class ImagesState {
       }
 
       for (const [imageId, parsedImage] of this.#parsedImagesBySourceImageId) {
-        if (this.#thumbnails.has(imageId) || this.#fetchingIds.has(imageId)) {
+        if (
+          this.#thumbnails.has(imageId) ||
+          this.#thumbnailErrors.has(imageId) ||
+          this.#fetchingIds.has(imageId)
+        ) {
           continue
         }
         this.#fetchThumbnailFor(imageId, parsedImage)
@@ -136,27 +182,60 @@ export class ImagesState {
     })
   }
 
+  async #fetchImageInfoFor(imageId: string) {
+    this.#fetchingImageInfoIds.add(imageId)
+    const imageInfoUrl = `${imageId}/info.json`
+
+    try {
+      const imageInfo = await fetchImageInfo(imageId)
+      const parsedImage = Image.parse(imageInfo)
+
+      if (this.#sourceImageIds.has(imageId)) {
+        this.addParsedImage(imageId, parsedImage)
+      }
+    } catch (error) {
+      const imageInfoError = ensureError(error)
+      this.addImageInfoError(imageId, imageInfoError, {
+        imageInfoUrl,
+        kind: error instanceof ResourceFetchError ? undefined : 'parse'
+      })
+      console.warn(
+        `Unable to fetch image information for image ${imageId}:`,
+        imageInfoError
+      )
+    } finally {
+      this.#fetchingImageInfoIds.delete(imageId)
+    }
+  }
+
   async #fetchThumbnailFor(imageId: string, parsedImage: IIIFImage) {
     this.#fetchingIds.add(imageId)
     const thumbnailSize = { width: 512, height: 512 }
+    let thumbnailUrl: string | undefined
     try {
       const imageRequest = parsedImage.getImageRequest(thumbnailSize)
 
       const bitmap = Array.isArray(imageRequest)
         ? await this.#fetchTiledThumbnail(parsedImage, imageRequest)
         : await fetchImageBitmap(
-            parsedImage.getImageUrl(imageRequest, {
+            (thumbnailUrl = parsedImage.getImageUrl(imageRequest, {
               preferredFormats: ['webp', 'jpg']
-            })
+            }))
           )
 
       if (this.#parsedImagesBySourceImageId.has(imageId)) {
+        this.#thumbnailErrors.delete(imageId)
         this.#thumbnails.set(imageId, bitmap)
       } else {
         bitmap.close()
       }
     } catch (error) {
-      console.warn(`Unable to fetch thumbnail for image ${imageId}:`, error)
+      const thumbnailError = ensureError(error)
+      this.addImageThumbnailError(imageId, thumbnailError, { thumbnailUrl })
+      console.warn(
+        `Unable to fetch thumbnail for image ${imageId}:`,
+        thumbnailError
+      )
     } finally {
       this.#fetchingIds.delete(imageId)
     }
@@ -208,10 +287,6 @@ export class ImagesState {
     return this.#thumbnails
   }
 
-  get imageInfoErrors() {
-    return this.#imageInfoErrors
-  }
-
   get imageTileErrors() {
     return this.#imageTileErrors
   }
@@ -220,11 +295,15 @@ export class ImagesState {
     const imageErrors = new Map<string, ImageError>()
 
     for (const [imageId, imageInfoError] of this.#imageInfoErrors) {
+      if (this.#loadedImageIds.has(imageId)) {
+        continue
+      }
+
       imageErrors.set(imageId, imageInfoError)
     }
 
     for (const [imageId, tileErrors] of this.#imageTileErrors) {
-      if (imageErrors.has(imageId)) {
+      if (imageErrors.has(imageId) || this.#loadedImageIds.has(imageId)) {
         continue
       }
 
@@ -256,12 +335,16 @@ export class ImagesState {
     )
   }
 
-  get someSourceImagesFailed() {
-    return this.imageErrorCount > 0
-  }
-
   getImageError(imageId: string) {
     return this.imageErrors.get(imageId)
+  }
+
+  getImageThumbnailError(imageId: string) {
+    return this.#thumbnailErrors.get(imageId)
+  }
+
+  getThumbnailDisplayError(imageId: string): ImageDisplayError | undefined {
+    return this.#thumbnailErrors.get(imageId) ?? this.getImageError(imageId)
   }
 
   getImageErrors(imageId: string) {
@@ -305,6 +388,7 @@ export class ImagesState {
 
       this.#parsedImages.set(imageId, parsedImage)
       this.#imageInfoErrors.delete(imageId)
+      this.#thumbnailErrors.delete(imageId)
       changed = true
     }
 
@@ -318,6 +402,10 @@ export class ImagesState {
     error: Error,
     options: ImageErrorOptions = {}
   ) {
+    if (this.#loadedImageIds.has(imageId)) {
+      return
+    }
+
     const resourceFetchError =
       error instanceof ResourceFetchError ? error : undefined
 
@@ -338,6 +426,10 @@ export class ImagesState {
     error: Error,
     options: ImageErrorOptions = {}
   ) {
+    if (this.#loadedImageIds.has(imageId)) {
+      return
+    }
+
     const tileUrl = options.tileUrl
     if (!tileUrl) {
       return
@@ -363,6 +455,36 @@ export class ImagesState {
     })
   }
 
+  markImageTileLoaded(imageId: string) {
+    if (!this.#sourceImageIds.has(imageId)) {
+      return
+    }
+
+    this.#loadedImageIds.add(imageId)
+    this.#imageInfoErrors.delete(imageId)
+    this.#imageTileErrors.delete(imageId)
+  }
+
+  addImageThumbnailError(
+    imageId: string,
+    error: Error,
+    options: ImageErrorOptions = {}
+  ) {
+    const resourceFetchError =
+      error instanceof ResourceFetchError ? error : undefined
+
+    this.#thumbnailErrors.set(imageId, {
+      imageId,
+      source: 'thumbnail',
+      thumbnailUrl: options.thumbnailUrl,
+      kind: normalizeImageErrorKind(options.kind ?? resourceFetchError?.kind),
+      corsLikely: options.corsLikely ?? resourceFetchError?.corsLikely ?? false,
+      status: options.status ?? resourceFetchError?.status,
+      message: error.message,
+      error
+    })
+  }
+
   pauseFetchingThumbnails() {
     this.#fetchingThumbnailsPaused = true
   }
@@ -376,10 +498,10 @@ export function setImagesState(
   mapsState: MapsState,
   fetchingThumbnailsPaused?: boolean
 ) {
-  return setContext(
-    IMAGES_KEY,
-    new ImagesState(mapsState, fetchingThumbnailsPaused)
-  )
+  const imagesState = new ImagesState(mapsState, fetchingThumbnailsPaused)
+  mapsState.setImagesState(imagesState)
+
+  return setContext(IMAGES_KEY, imagesState)
 }
 
 export function getImagesState() {

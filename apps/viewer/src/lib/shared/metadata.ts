@@ -1,10 +1,23 @@
+import { parseLanguageString } from '@allmaps/iiif-inspector'
 import type { LanguageString } from '@allmaps/iiif-parser'
 import type { GeoreferencedMap, PartOf, PartOfItem } from '@allmaps/annotation'
+
+import { getCanonicalCanvas, getCanonicalManifest } from '$lib/shared/iiif.js'
 
 import type { OrganizationSummary, SourceLabels } from '$lib/types/shared.js'
 
 const DOMINANT_ORGANIZATION_THRESHOLD = 0.6
 const DOMINANT_MANIFEST_THRESHOLD = 0.8
+
+function getMeaningfulLabel(label?: LanguageString) {
+  const labelString = parseLanguageString(label, 'en')?.trim()
+
+  if (!labelString || labelString === '-') {
+    return undefined
+  }
+
+  return label
+}
 
 function countManifestsById(
   maps: GeoreferencedMap[]
@@ -14,16 +27,18 @@ function countManifestsById(
     { count: number; label: LanguageString }
   >()
   for (const map of maps) {
-    for (const partOfItem of flattenPartOf(map.resource.partOf)) {
-      if (partOfItem.type === 'Manifest' && partOfItem.id) {
-        const key = partOfItem.id
-        const label = partOfItem.label
+    const manifest = getCanonicalManifest(map)
+
+    if (manifest?.id && manifest.label) {
+      const key = manifest.id
+
+      if (manifestCounts.has(key)) {
+        manifestCounts.get(key)!.count++
+      } else {
+        const label = getMeaningfulLabel(manifest.label)
+
         if (label) {
-          if (manifestCounts.has(key)) {
-            manifestCounts.get(key)!.count++
-          } else {
-            manifestCounts.set(key, { count: 1, label })
-          }
+          manifestCounts.set(key, { count: 1, label })
         }
       }
     }
@@ -42,39 +57,17 @@ export function* flattenPartOf(partOf?: PartOf): Generator<PartOfItem> {
   }
 }
 
-function getPartOfItemsByMapId(maps: GeoreferencedMap[]) {
-  const partOfItemsByMapId: Map<string, PartOfItem[]> = new Map()
-
-  for (const map of maps) {
-    const partOfs = [...flattenPartOf(map.resource.partOf)]
-    if (map.id) {
-      partOfItemsByMapId.set(map.id, partOfs)
-    }
-  }
-
-  return partOfItemsByMapId
-}
-
-function findFirstParfOfItemOfType(
-  partOfItems: PartOfItem[],
-  type: string
-): PartOfItem | undefined {
-  return partOfItems.find((partOfItem) => partOfItem.type === type)
-}
-
 export function getSourceLabels(
   maps: GeoreferencedMap[],
   selectedMapId?: string
 ): SourceLabels {
   if (selectedMapId) {
-    const partOfItemsByMapId = getPartOfItemsByMapId(maps)
+    const selectedMap = maps.find((map) => map.id === selectedMapId)
 
-    if (partOfItemsByMapId.has(selectedMapId)) {
-      const partOfItems = partOfItemsByMapId.get(selectedMapId) || []
-
+    if (selectedMap) {
       return {
-        manifest: findFirstParfOfItemOfType(partOfItems, 'Manifest')?.label,
-        canvas: findFirstParfOfItemOfType(partOfItems, 'Canvas')?.label
+        manifest: getMeaningfulLabel(getCanonicalManifest(selectedMap)?.label),
+        canvas: getMeaningfulLabel(getCanonicalCanvas(selectedMap)?.label)
       }
     }
   }
@@ -101,6 +94,7 @@ export function getSourceLabels(
 
   if (
     maps.length > 0 &&
+    otherMapCount > 0 &&
     dominantManifest.count / maps.length > DOMINANT_MANIFEST_THRESHOLD
   ) {
     return {
