@@ -38,7 +38,10 @@
     currentSourceValue
   }: Props = $props()
 
-  const placeholder = 'URL of a Georeference Annotation or IIIF Manifest'
+  const inputLabel = 'URL of a Georeference Annotation or IIIF Manifest'
+  const desktopPlaceholder = inputLabel
+  const smallScreenPlaceholder = 'Georeference Annotation or IIIF URL'
+  const smallScreenMediaQuery = '(max-width: 639px)'
   const JSON_VALIDATION_DEBOUNCE_MS = 300
   const COPY_FEEDBACK_DURATION_MS = 1500
   const inputId = $props.id()
@@ -73,6 +76,10 @@
   let copyFeedbackTimeout: ReturnType<typeof setTimeout> | undefined
   let mode = $state<Mode>('url')
   let hasSelectedInitialInput = $state(false)
+  let isSmallScreen = $state(false)
+  let placeholder = $derived(
+    isSmallScreen ? smallScreenPlaceholder : desktopPlaceholder
+  )
   let sourceValueForCopy = $derived(currentSourceValue ?? initialInputValue)
   let inputMatchesCurrentSource = $derived(inputValue === sourceValueForCopy)
   let visibleButton = $derived.by(() => {
@@ -85,6 +92,20 @@
     }
 
     return button
+  })
+
+  $effect(() => {
+    const mediaQuery = window.matchMedia(smallScreenMediaQuery)
+    const updateSmallScreen = () => {
+      isSmallScreen = mediaQuery.matches
+    }
+
+    updateSmallScreen()
+    mediaQuery.addEventListener('change', updateSmallScreen)
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateSmallScreen)
+    }
   })
 
   $effect(() => {
@@ -439,7 +460,7 @@
       ondragleave={handleDragLeave}
       ondrop={handleDrop}
       {placeholder}
-      aria-label={placeholder}
+      aria-label={inputLabel}
       aria-invalid={error ? 'true' : undefined}
       aria-describedby={error ? errorId : undefined}
       aria-required="true"
@@ -461,7 +482,7 @@
       ondragleave={handleDragLeave}
       ondrop={handleDrop}
       {placeholder}
-      aria-label={placeholder}
+      aria-label={inputLabel}
       aria-invalid={error ? 'true' : undefined}
       aria-describedby={error ? errorId : undefined}
       aria-required="true"
