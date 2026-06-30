@@ -361,6 +361,44 @@ export class UrlState<T extends SearchParams> {
 
     return `${url}${search}${newHash}`
   }
+
+  generateUrlsForParam<K extends keyof T>(
+    url: string,
+    key: K,
+    values: Array<InferParamType<T[K]> | undefined>
+  ): Map<InferParamType<T[K]> | undefined, string> {
+    const paramConfig = this.#searchParams[key] as SearchParam<any>
+    const baseSearchParams = new URLSearchParams(this.#url.searchParams)
+    const baseHashParams = this.#getHashParams()
+    const urls = new Map<InferParamType<T[K]> | undefined, string>()
+
+    for (const value of values) {
+      const stringValue = this.#stringifyParam(value as any, key)
+      const searchParams = new URLSearchParams(baseSearchParams)
+      const hashParams = new URLSearchParams(baseHashParams)
+
+      if (paramConfig.hash) {
+        if (stringValue !== undefined && stringValue !== null) {
+          hashParams.set(paramConfig.key, stringValue)
+        } else {
+          hashParams.delete(paramConfig.key)
+        }
+      } else if (stringValue !== undefined && stringValue !== null) {
+        searchParams.set(paramConfig.key, stringValue)
+      } else {
+        searchParams.delete(paramConfig.key)
+      }
+
+      const searchString = searchParams.toString()
+      const search = searchString ? `?${searchString}` : ''
+      const hashString = hashParams.toString()
+      const hash = hashString ? `#${hashString}` : ''
+
+      urls.set(value, `${url}${search}${hash}`)
+    }
+
+    return urls
+  }
 }
 
 export function setUrlState<T extends SearchParams>(url: URL, params: T) {

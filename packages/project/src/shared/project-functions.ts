@@ -50,7 +50,7 @@ export function getLonLatDefinition(
     if (projectionDefinitionOptions.over) {
       return lonLatProj4StringDefinition + ' +over'
     } else {
-      lonLatProj4StringDefinition
+      return lonLatProj4StringDefinition
     }
   } else if (projectionDefinitionOptions.type == 'epsg') {
     return lonLatEpsgDefinition
@@ -95,7 +95,7 @@ export function getWebMercatorDefinition(
     if (projectionDefinitionOptions.over) {
       return webMercatorProj4StringDefinition + ' +over'
     } else {
-      webMercatorProj4StringDefinition
+      return webMercatorProj4StringDefinition
     }
   } else if (projectionDefinitionOptions.type == 'epsg') {
     return webMercatorEpsgDefinition

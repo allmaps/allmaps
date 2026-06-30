@@ -2,6 +2,7 @@ import { setContext, getContext } from 'svelte'
 
 import type { Source } from '$lib/types/shared.js'
 import type { UiState } from '$lib/state/ui.svelte.js'
+import type { SourceLoadErrorCode } from '$lib/shared/source-errors.js'
 
 const SOURCE_KEY = Symbol('source')
 
@@ -10,6 +11,10 @@ export type SourceErrorReason = 'url' | 'data'
 export type SourceError = {
   reason: SourceErrorReason
   message: string
+  code?: SourceLoadErrorCode
+  title?: string
+  details?: string
+  corsLikely?: boolean
   sourceUrl?: string
 }
 

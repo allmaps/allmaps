@@ -66,7 +66,7 @@
     >
       {#if title}
         <div class="flex justify-between items-center">
-          <h3 class="text-xl font-medium">{@render title()}</h3>
+          <h2 class="text-xl font-medium">{@render title()}</h2>
           {#if closeButtonInTitle}
             <button
               onclick={() => (open = false)}

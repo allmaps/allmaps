@@ -1,12 +1,9 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteMap } from 'svelte/reactivity'
 
-import {
-  Manifest as IIIFManifest,
-  type Canvas as IIIFCanvas
-} from '@allmaps/iiif-parser'
-import { findYearInCanvas, findYearInManifest } from '@allmaps/iiif-inspector'
+import { Manifest as IIIFManifest } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
+// import { findYearInCanvas, findYearInManifest } from '@allmaps/iiif-inspector'
 
 import { findManifests } from '$lib/shared/iiif.js'
 
@@ -33,11 +30,25 @@ type FetchResult = FetchingResult | ManifestResult | ErrorResult
 export class IiifState {
   #mapsState: MapsState
 
-  #manifestItems = $derived.by(() =>
-    this.#mapsState.maps.flatMap((map) =>
+  #manifestItems = $derived.by(() => [
+    ...this.#mapsState.maps.flatMap((map) =>
       findManifests(map.resource.partOf ?? [])
+    ),
+    ...this.#mapsState.invalidEmbeddedAnnotations.flatMap(
+      (invalidAnnotation) => [
+        ...(invalidAnnotation.manifest
+          ? [
+              {
+                ...invalidAnnotation.manifest,
+                parent: invalidAnnotation.canvas
+              }
+            ]
+          : []),
+        ...findManifests(invalidAnnotation.canvas?.partOf ?? []),
+        ...findManifests(invalidAnnotation.resource?.partOf ?? [])
+      ]
     )
-  )
+  ])
 
   #manifestIds = $derived.by(() => {
     const manifestIds: string[] = []
@@ -53,24 +64,6 @@ export class IiifState {
     return manifestIds
   })
 
-  #manifestCanvasIds = $derived.by(() => {
-    const canvasIdsByManifestId = new SvelteMap<string, string[]>()
-
-    for (const item of this.#manifestItems) {
-      if (item.parent?.type !== 'Canvas') {
-        continue
-      }
-
-      const canvasIds = canvasIdsByManifestId.get(item.id) ?? []
-
-      if (!canvasIds.includes(item.parent.id)) {
-        canvasIdsByManifestId.set(item.id, [...canvasIds, item.parent.id])
-      }
-    }
-
-    return canvasIdsByManifestId
-  })
-
   #fetchedManifests = $state<SvelteMap<string, FetchResult>>(new SvelteMap())
   #parsedManifests = $derived(
     new SvelteMap(
@@ -83,33 +76,51 @@ export class IiifState {
     )
   )
 
-  #year = $derived.by(() => {
-    const years = [...this.#parsedManifests.entries()]
-      .map(([manifestId, manifest]) => {
-        const canvasYears = (this.#manifestCanvasIds.get(manifestId) ?? [])
-          .map((canvasId) => {
-            const canvas = this.getParsedCanvas(manifestId, canvasId)
-            return findYearInCanvas(canvas)
-          })
-          .filter((year) => year !== undefined)
+  // #manifestCanvasIds = $derived.by(() => {
+  //   const canvasIdsByManifestId = new SvelteMap<string, string[]>()
 
-        return {
-          manifest: findYearInManifest(manifest),
-          canvas: canvasYears[0]
-        }
-      })
-      .filter(({ manifest, canvas }) => manifest || canvas)
+  //   for (const item of this.#manifestItems) {
+  //     if (item.parent?.type !== 'Canvas') {
+  //       continue
+  //     }
 
-    if (years.length > 0) {
-      const year = years[0]
+  //     const canvasIds = canvasIdsByManifestId.get(item.id) ?? []
 
-      if (year.canvas) {
-        return year.canvas
-      } else {
-        return year.manifest
-      }
-    }
-  })
+  //     if (!canvasIds.includes(item.parent.id)) {
+  //       canvasIdsByManifestId.set(item.id, [...canvasIds, item.parent.id])
+  //     }
+  //   }
+
+  //   return canvasIdsByManifestId
+  // })
+
+  // #year = $derived.by(() => {
+  //   const years = [...this.#parsedManifests.entries()]
+  //     .map(([manifestId, manifest]) => {
+  //       const canvasYears = (this.#manifestCanvasIds.get(manifestId) ?? [])
+  //         .map((canvasId) => {
+  //           const canvas = this.getParsedCanvas(manifestId, canvasId)
+  //           return findYearInCanvas(canvas)
+  //         })
+  //         .filter((year) => year !== undefined)
+
+  //       return {
+  //         manifest: findYearInManifest(manifest),
+  //         canvas: canvasYears[0]
+  //       }
+  //     })
+  //     .filter(({ manifest, canvas }) => manifest || canvas)
+
+  //   if (years.length > 0) {
+  //     const year = years[0]
+
+  //     if (year.canvas) {
+  //       return year.canvas
+  //     } else {
+  //       return year.manifest
+  //     }
+  //   }
+  // })
 
   constructor(mapsState: MapsState) {
     this.#mapsState = mapsState
@@ -164,10 +175,6 @@ export class IiifState {
     }
   }
 
-  get parsedManifests() {
-    return [...this.#parsedManifests.values()]
-  }
-
   get manifestIds() {
     return this.#manifestIds
   }
@@ -176,10 +183,6 @@ export class IiifState {
     return [...this.#fetchedManifests.values()].some(
       (result) => result.state === 'fetching'
     )
-  }
-
-  get year() {
-    return this.#year
   }
 }
 

@@ -5,7 +5,7 @@ import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 const UI_KEY = Symbol('ui')
 
 type View = 'map' | 'image'
-type Modal = 'about'
+type Modal = 'about' | 'attribution' | 'keyboard'
 type ModalOpen = Modal | undefined
 
 export class UiState extends UiEventTarget {
@@ -21,6 +21,7 @@ export class UiState extends UiEventTarget {
   #hiddenMapIds = $state<string[]>([])
 
   #tilesLoading = $state(false)
+  #locatingUser = $state(false)
 
   #view: View = $state('map')
 
@@ -59,6 +60,7 @@ export class UiState extends UiEventTarget {
     this.#expandedMetadataSectionKeys = []
     this.#hiddenMapIds = []
     this.#tilesLoading = false
+    this.#locatingUser = false
     this.#view = 'map'
     this.#modalOpen = undefined
   }
@@ -77,6 +79,10 @@ export class UiState extends UiEventTarget {
 
   dispatchResetBearing() {
     this.dispatchEvent(new CustomEvent(UiEvents.RESET_BEARING))
+  }
+
+  dispatchLocateUser() {
+    this.dispatchEvent(new CustomEvent(UiEvents.LOCATE_USER))
   }
 
   isMapHidden(mapId?: string) {
@@ -120,10 +126,7 @@ export class UiState extends UiEventTarget {
   }
 
   toggleMetadataSectionCollapsed(key: string) {
-    this.setMetadataSectionCollapsed(
-      key,
-      !this.isMetadataSectionCollapsed(key)
-    )
+    this.setMetadataSectionCollapsed(key, !this.isMetadataSectionCollapsed(key))
   }
 
   get opacity() {
@@ -184,6 +187,14 @@ export class UiState extends UiEventTarget {
 
   set tilesLoading(value: boolean) {
     this.#tilesLoading = value
+  }
+
+  get locatingUser() {
+    return this.#locatingUser
+  }
+
+  set locatingUser(value: boolean) {
+    this.#locatingUser = value
   }
 }
 

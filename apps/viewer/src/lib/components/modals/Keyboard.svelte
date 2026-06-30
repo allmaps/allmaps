@@ -6,14 +6,12 @@
 
   import { Kbd, Modal } from '@allmaps/components'
 
-  type Props = {
-    open?: boolean
-  }
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
-  let { open = $bindable(false) }: Props = $props()
+  const uiState = getUiState()
 </script>
 
-<Modal bind:open>
+<Modal bind:open={uiState.modalOpen.keyboard}>
   {#snippet title()}
     Keyboard shortcuts
   {/snippet}
@@ -51,6 +49,10 @@
         <td class="p-1">Switch to image view</td>
         <td class="p-1 whitespace-nowrap"><Kbd>i</Kbd></td>
       </tr>
+      <tr>
+        <td class="p-1">Open map list</td>
+        <td class="p-1 whitespace-nowrap"><Kbd>Meta</Kbd> + <Kbd>/</Kbd></td>
+      </tr>
 
       <tr class="border-b-2 border-pink font-bold">
         <td class="p-1 pt-4" colspan="2">Map</td>
@@ -78,6 +80,15 @@
           <div class="flex flex-row items-center gap-1">
             <MouseRightClickIcon class="size-6" />
             <span>Right click</span>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="p-1">Rotate map</td>
+        <td class="p-1 whitespace-nowrap">
+          <div class="flex flex-row items-center gap-1">
+            <MouseRightClickIcon class="size-6" />
+            <span>Right click</span> + drag
           </div>
         </td>
       </tr>

@@ -30,11 +30,7 @@ export class BackgroundColorsState extends BackgroundColorEventTarget {
   #computingIds = new Set<string>()
   #worker: Remote<BackgroundColorWorkerType>
 
-  constructor(
-    mapsState: MapsState,
-    imagesState: ImagesState,
-    paused: boolean
-  ) {
+  constructor(mapsState: MapsState, imagesState: ImagesState, paused: boolean) {
     super()
 
     this.#mapsState = mapsState
@@ -126,6 +122,16 @@ export class BackgroundColorsState extends BackgroundColorEventTarget {
 
   getBackgroundColorForMap(mapId: string) {
     return this.#backgroundColors.get(mapId)
+  }
+
+  hasBackgroundColorForMap(mapId: string) {
+    return this.#backgroundColors.has(mapId)
+  }
+
+  get hasBackgroundColors() {
+    return this.#mapsState.maps.some(
+      (map) => map.id && this.hasBackgroundColorForMap(map.id)
+    )
   }
 }
 
