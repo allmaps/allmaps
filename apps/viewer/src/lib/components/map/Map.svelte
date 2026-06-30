@@ -735,6 +735,7 @@
       return
     }
 
+    uiState.tilesLoading = true
     previousView = view
 
     const mapRenderResults =
