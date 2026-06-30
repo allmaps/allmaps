@@ -1,43 +1,32 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+
   import { Footer } from '@allmaps/components'
   import { Loading } from '@allmaps/ui'
-  import { pink } from '@allmaps/tailwind'
+  import { green } from '@allmaps/tailwind'
 
-  import Title from '$lib/components/Title.svelte'
-  import Examples from '$lib/components/Examples.svelte'
-  import View from '$lib/components/View.svelte'
-  import PageSection from '$lib/components/PageSection.svelte'
-  import Map from '$lib/components/Map.svelte'
-  import Controls from '$lib/components/Controls.svelte'
-  import Header from '$lib/components/Header.svelte'
-  import Info from '$lib/components/Info.svelte'
-  import AnnotationInput from '$lib/components/AnnotationInput.svelte'
+  import Title from '$lib/components/app/Title.svelte'
+  import Examples from '$lib/components/input/Examples.svelte'
+  import View from '$lib/components/app/View.svelte'
+  import PageSection from '$lib/components/app/PageSection.svelte'
+  import Map from '$lib/components/map/Map.svelte'
+  import Controls from '$lib/components/controls/Controls.svelte'
+  import Header from '$lib/components/app/Header.svelte'
+  import SourceInfoPopover from '$lib/components/metadata/SourceInfoPopover.svelte'
+  import AnnotationInput from '$lib/components/input/AnnotationInput.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
-  import Error from '$lib/components/Error.svelte'
+  import Error from '$lib/components/errors/Error.svelte'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getMetadataState } from '$lib/state/metadata.svelte.js'
-  import { getImagesState } from '$lib/state/images.svelte.js'
+  import { getErrorsState } from '$lib/state/errors.svelte.js'
 
   import { UiEvents } from '$lib/shared/ui-events.js'
 
   import type { PageProps } from './$types'
-  import type { ImageError } from '$lib/state/images.svelte.js'
-  import type { SourceError } from '$lib/state/source.svelte.js'
-
-  type ActiveError =
-    | {
-        type: 'source'
-        sourceError: SourceError
-      }
-    | {
-        type: 'images'
-        imageErrors: ImageError[]
-        sourceImageCount: number
-      }
 
   let { data }: PageProps = $props()
 
@@ -46,7 +35,7 @@
   const uiState = getUiState()
   const urlState = getUrlState()
   const metadataState = getMetadataState()
-  const imagesState = getImagesState()
+  const errorsState = getErrorsState()
 
   let map = $state.raw<Map>()
 
@@ -55,29 +44,29 @@
   )
 
   let isLoading = $derived(shouldHaveSource && !sourceState.source)
-  let imageErrors = $derived([...imagesState.imageErrors.values()])
-  let activeError = $derived.by((): ActiveError | undefined => {
-    if (sourceState.error) {
-      return {
-        type: 'source',
-        sourceError: sourceState.error
-      }
-    }
+  let viewerBlockingError = $derived(errorsState.viewerBlockingError)
 
-    if (imagesState.allSourceImagesFailed) {
-      return {
-        type: 'images',
-        imageErrors,
-        sourceImageCount: imagesState.sourceImageCount
-      }
+  onMount(() => {
+    const handleZoomToExtent = () => map?.zoomToExtent()
+    const handleZoomIn = () => map?.zoomIn()
+    const handleZoomOut = () => map?.zoomOut()
+    const handleResetBearing = () => map?.resetBearing()
+    const handleLocateUser = () => map?.locateUser()
+
+    uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
+    uiState.addEventListener(UiEvents.ZOOM_IN, handleZoomIn)
+    uiState.addEventListener(UiEvents.ZOOM_OUT, handleZoomOut)
+    uiState.addEventListener(UiEvents.RESET_BEARING, handleResetBearing)
+    uiState.addEventListener(UiEvents.LOCATE_USER, handleLocateUser)
+
+    return () => {
+      uiState.removeEventListener(UiEvents.ZOOM_TO_EXTENT, handleZoomToExtent)
+      uiState.removeEventListener(UiEvents.ZOOM_IN, handleZoomIn)
+      uiState.removeEventListener(UiEvents.ZOOM_OUT, handleZoomOut)
+      uiState.removeEventListener(UiEvents.RESET_BEARING, handleResetBearing)
+      uiState.removeEventListener(UiEvents.LOCATE_USER, handleLocateUser)
     }
   })
-
-  uiState.addEventListener(UiEvents.ZOOM_TO_EXTENT, () => map?.zoomToExtent())
-  uiState.addEventListener(UiEvents.ZOOM_IN, () => map?.zoomIn())
-  uiState.addEventListener(UiEvents.ZOOM_OUT, () => map?.zoomOut())
-  uiState.addEventListener(UiEvents.RESET_BEARING, () => map?.resetBearing())
-  uiState.addEventListener(UiEvents.LOCATE_USER, () => map?.locateUser())
 </script>
 
 {#snippet loading()}
@@ -91,13 +80,13 @@
   </View>
 {/snippet}
 
-{#if activeError}
+{#if viewerBlockingError}
   <View floatingHeader={true}>
     {#snippet header()}
       <Header appName="Viewer">
-        {#if activeError.type === 'images' && sourceState.source}
+        {#if viewerBlockingError.type === 'images' && sourceState.source}
           {@const source = sourceState.source}
-          <Info
+          <SourceInfoPopover
             {source}
             labels={metadataState.labels}
             title={metadataState.title}
@@ -110,14 +99,27 @@
       </Header>
     {/snippet}
     <Error
-      sourceError={activeError.type === 'source'
-        ? activeError.sourceError
+      sourceError={viewerBlockingError.type === 'source'
+        ? viewerBlockingError.sourceError
         : undefined}
-      imageErrors={activeError.type === 'images'
-        ? activeError.imageErrors
+      imageErrors={viewerBlockingError.type === 'images'
+        ? viewerBlockingError.imageErrors
         : undefined}
-      sourceImageCount={activeError.type === 'images'
-        ? activeError.sourceImageCount
+      sourceImageCount={viewerBlockingError.type === 'images'
+        ? viewerBlockingError.sourceImageCount
+        : undefined}
+      title={viewerBlockingError.type === 'map-render'
+        ? 'Could not render map'
+        : undefined}
+      message={viewerBlockingError.type === 'map-render'
+        ? 'This georeferenced map was loaded, but Allmaps Viewer could not create a warped map from it.'
+        : undefined}
+      details={viewerBlockingError.type === 'map-render'
+        ? viewerBlockingError.mapRenderError.message
+        : undefined}
+      sourceUrl={viewerBlockingError.type === 'map-render' &&
+      sourceState.source?.sourceType === 'url'
+        ? sourceState.source.url
         : undefined}
     />
   </View>
@@ -131,7 +133,7 @@
     <View>
       {#snippet header()}
         <Header appName="Viewer"
-          ><Info
+          ><SourceInfoPopover
             {source}
             labels={metadataState.labels}
             title={metadataState.title}
@@ -158,7 +160,6 @@
       {/snippet}
       <Map
         bind:this={map}
-        {source}
         view={uiState.view}
         opacity={uiState.opacity}
         removeBackground={uiState.removeBackground}
@@ -172,19 +173,35 @@
   <PageSection>
     <div class="flex w-full max-w-md flex-col items-center gap-6">
       <Title />
-      <p class="text-center text-black">
-        View warped maps and their metadata with Allmaps Viewer. Explore
-        georeferenced maps, compare them with modern maps.
+      <p class="text-center text-green font-medium text-lg leading-snug">
+        View georeferenced maps and their metadata with Allmaps Viewer. Compare
+        them with modern maps and discover the history behind each map.
       </p>
     </div>
     <div class="w-full max-w-xl">
       <AnnotationInput autoFocus />
     </div>
-    <div></div>
+    <p class="w-full max-w-xl text-sm text-center text-gray-600">
+      To get started, enter the URL of a <a
+        class="underline"
+        href="https://iiif.io/api/extension/georef/">Georeference Annotation</a
+      >
+      or
+      <a class="underline" href="https://iiif.io/api/presentation/3.0/"
+        >IIIF Manifest</a
+      >
+      in the input box. You can also paste or drag and drop their complete JSON contents.
+      If you enter a IIIF Manifest, Allmaps Viewer will use the manifest's
+      <a
+        class="underline"
+        href="https://iiif.io/api/presentation/3.0/#annotations"
+        >embedded annotations</a
+      > or look for associated georeferenced maps in the Allmaps database.
+    </p>
   </PageSection>
 
-  <div class="bg-pink/10">
-    <DotsPattern color={pink} opacity={0.3}>
+  <div class="bg-green/10">
+    <DotsPattern color={green} opacity={0.3}>
       <div class="pb-16">
         <PageSection>
           <Examples previewUrl={data.env.PUBLIC_PREVIEW_BASE_URL} />
