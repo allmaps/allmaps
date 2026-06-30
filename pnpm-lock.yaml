@@ -1294,9 +1294,15 @@ importers:
       comlink:
         specifier: ^4.4.1
         version: 4.4.2
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       maplibre-gl:
         specifier: 'catalog:'
         version: 5.18.0
+      simplify-js:
+        specifier: ^1.2.4
+        version: 1.2.4
     devDependencies:
       '@allmaps/types':
         specifier: workspace:^
@@ -1319,6 +1325,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.17
         version: 4.1.17(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/node':
         specifier: 'catalog:'
         version: 24.10.2
@@ -3121,6 +3130,9 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
   tools/data-export:
     dependencies:
@@ -11084,6 +11096,9 @@ packages:
 
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
+
+  simplify-js@1.2.4:
+    resolution: {integrity: sha512-vITfSlwt7h/oyrU42R83mtzFpwYk3+mkH9bOHqq/Qw6n8rtR7aE3NZQ5fbcyCUVVmuMJR6ynsAhOfK2qoah8Jg==}
 
   sirv@3.0.2:
     resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
@@ -21944,6 +21959,8 @@ snapshots:
       once: 1.4.0
       simple-concat: 1.0.1
     optional: true
+
+  simplify-js@1.2.4: {}
 
   sirv@3.0.2:
     dependencies:

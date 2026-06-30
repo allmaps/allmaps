@@ -146,6 +146,18 @@ export class ImagesState {
         }
       }
 
+      for (const imageId of sourceImageIds) {
+        if (
+          this.#parsedImages.has(imageId) ||
+          this.#imageInfoErrors.has(imageId) ||
+          this.#fetchingImageInfoIds.has(imageId)
+        ) {
+          continue
+        }
+
+        this.#fetchImageInfoFor(imageId)
+      }
+
       const currentIds = new Set(this.#parsedImagesBySourceImageId.keys())
 
       for (const imageId of this.#thumbnails.keys()) {
