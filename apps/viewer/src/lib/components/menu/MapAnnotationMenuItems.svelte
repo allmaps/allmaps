@@ -66,7 +66,7 @@
   <DropdownMenu.GroupHeading
     class="text-xs leading-snug bg-gray-100/50 p-2 mx-px rounded w-58"
   >
-    THis map's <a
+    This map's <a
       class="underline"
       href="https://iiif.io/api/extension/georef/"
       target="_blank"
