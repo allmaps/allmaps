@@ -185,6 +185,10 @@ export class MapsState {
       byResource: ByResource,
       invalidAnnotation: InvalidGeoreferenceAnnotation
     ) => {
+      if (!invalidAnnotation.resource) {
+        return
+      }
+
       const id = invalidAnnotation.resource.id
       if (!byResource.has(id)) {
         byResource.set(id, {
@@ -219,7 +223,7 @@ export class MapsState {
       invalidAnnotation: InvalidGeoreferenceAnnotation
     ) =>
       invalidAnnotation.canvas ??
-      findPartOfItem(invalidAnnotation.resource.partOf, 'Canvas')
+      findPartOfItem(invalidAnnotation.resource?.partOf, 'Canvas')
 
     const getInvalidAnnotationManifest = (
       invalidAnnotation: InvalidGeoreferenceAnnotation,
@@ -227,7 +231,7 @@ export class MapsState {
     ) =>
       invalidAnnotation.manifest ??
       findPartOfItem(canvas?.partOf, 'Manifest') ??
-      findPartOfItem(invalidAnnotation.resource.partOf, 'Manifest')
+      findPartOfItem(invalidAnnotation.resource?.partOf, 'Manifest')
 
     for (const map of maps) {
       const canvas = getCanonicalCanvas(map)

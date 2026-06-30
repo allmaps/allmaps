@@ -23,7 +23,7 @@
   )
 </script>
 
-<div class="w-12 md:w-14 max-w-full rounded-full shadow-md">
+<div class="w-full rounded-full shadow-md">
   <button class="contents cursor-pointer" {onclick}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
