@@ -79,7 +79,9 @@ export class ImagesState {
       imageIds.add(map.resource.id)
     })
     this.#mapsState.invalidEmbeddedAnnotations.forEach((invalidAnnotation) => {
-      imageIds.add(invalidAnnotation.resource.id)
+      if (invalidAnnotation.resource) {
+        imageIds.add(invalidAnnotation.resource.id)
+      }
     })
 
     return imageIds
@@ -144,6 +146,15 @@ export class ImagesState {
         }
       }
 
+      const currentIds = new Set(this.#parsedImagesBySourceImageId.keys())
+
+      for (const imageId of this.#thumbnails.keys()) {
+        if (!currentIds.has(imageId)) {
+          this.#thumbnails.get(imageId)?.close()
+          this.#thumbnails.delete(imageId)
+        }
+      }
+
       if (this.#fetchingThumbnailsPaused) {
         return
       }
@@ -158,15 +169,6 @@ export class ImagesState {
         }
 
         this.#fetchImageInfoFor(imageId)
-      }
-
-      const currentIds = new Set(this.#parsedImagesBySourceImageId.keys())
-
-      for (const imageId of this.#thumbnails.keys()) {
-        if (!currentIds.has(imageId)) {
-          this.#thumbnails.get(imageId)?.close()
-          this.#thumbnails.delete(imageId)
-        }
       }
 
       for (const [imageId, parsedImage] of this.#parsedImagesBySourceImageId) {

@@ -79,7 +79,7 @@ export type MapsByImage = {
 export type InvalidGeoreferenceAnnotation = {
   id: string
   annotationId?: string
-  resource: GeoreferencedMap['resource']
+  resource?: GeoreferencedMap['resource']
   canvas?: PartOfItem
   manifest?: PartOfItem
   message: string

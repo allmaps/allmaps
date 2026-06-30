@@ -328,7 +328,7 @@
   )
   let errorTitle = $derived(getThumbnailErrorTitle(error))
   let errorMessage = $derived(
-    getThumbnailErrorMessage(error) ?? loadError?.message
+    getThumbnailErrorMessage(error) ?? errorTitle ?? loadError?.message
   )
 
   $effect(() => {

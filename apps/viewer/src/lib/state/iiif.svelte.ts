@@ -44,7 +44,8 @@ export class IiifState {
               }
             ]
           : []),
-        ...findManifests(invalidAnnotation.resource.partOf ?? [])
+        ...findManifests(invalidAnnotation.canvas?.partOf ?? []),
+        ...findManifests(invalidAnnotation.resource?.partOf ?? [])
       ]
     )
   ])

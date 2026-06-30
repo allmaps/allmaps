@@ -624,29 +624,31 @@
       />
     {/each}
     {#each invalidAnnotations as invalidAnnotation, index (invalidAnnotation.id)}
-      {@const mapNumber = getInvalidAnnotationMapNumber(
-        invalidAnnotation,
-        rows.length + index
-      )}
-      {@const thumbnail = imagesState.thumbnails.get(
-        invalidAnnotation.resource.id
-      )}
-      {@const thumbnailError = thumbnail
-        ? undefined
-        : getThumbnailDisplayError(invalidAnnotation.resource.id)}
-      <li class="w-full flex flex-row min-w-0 gap-3 text-gray-700">
-        <ResourceThumbnail
-          resource={invalidAnnotation.resource}
-          {thumbnail}
-          {thumbnailError}
-          alt={invalidAnnotation.annotationId ?? invalidAnnotation.id}
-        />
-        <MapRowError
-          title={`Map ${mapNumber}`}
-          errorTitle="Georeference annotation error"
-          errorMessage={invalidAnnotation.message}
-        />
-      </li>
+      {#if invalidAnnotation.resource}
+        {@const mapNumber = getInvalidAnnotationMapNumber(
+          invalidAnnotation,
+          rows.length + index
+        )}
+        {@const thumbnail = imagesState.thumbnails.get(
+          invalidAnnotation.resource.id
+        )}
+        {@const thumbnailError = thumbnail
+          ? undefined
+          : getThumbnailDisplayError(invalidAnnotation.resource.id)}
+        <li class="w-full flex flex-row min-w-0 gap-3 text-gray-700">
+          <ResourceThumbnail
+            resource={invalidAnnotation.resource}
+            {thumbnail}
+            {thumbnailError}
+            alt={invalidAnnotation.annotationId ?? invalidAnnotation.id}
+          />
+          <MapRowError
+            title={`Map ${mapNumber}`}
+            errorTitle="Georeference annotation error"
+            errorMessage={invalidAnnotation.message}
+          />
+        </li>
+      {/if}
     {/each}
   </ol>
 {/snippet}
