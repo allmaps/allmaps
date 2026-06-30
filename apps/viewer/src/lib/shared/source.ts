@@ -198,13 +198,9 @@ function createInvalidGeoreferenceAnnotation(
   error: unknown,
   context: AnnotationParseContext,
   index: number
-): InvalidGeoreferenceAnnotation | undefined {
+): InvalidGeoreferenceAnnotation {
   const annotationContext = getAnnotationContext(annotation, context)
   const { resource } = annotationContext
-
-  if (!resource) {
-    return
-  }
 
   const annotationId = getAnnotationId(annotation)
   const validationIssues = getErrorIssues(error)
@@ -216,7 +212,9 @@ function createInvalidGeoreferenceAnnotation(
       generateChecksum({
         annotation,
         index,
-        resourceId: resource.id,
+        resourceId: resource?.id,
+        canvasId: annotationContext.canvas?.id,
+        manifestId: annotationContext.manifest?.id,
         message
       }),
     annotationId,
@@ -248,7 +246,7 @@ function parseGeoreferenceAnnotation(
 
     return {
       maps: [],
-      invalidAnnotations: invalidAnnotation ? [invalidAnnotation] : []
+      invalidAnnotations: [invalidAnnotation]
     }
   }
 }
@@ -349,6 +347,10 @@ function addInvalidAnnotationCanvasIds(
     canvasIds.add(invalidAnnotation.canvas.id)
   }
 
+  if (!invalidAnnotation.resource) {
+    return
+  }
+
   for (const canvas of findPartOfItemsOfType(
     invalidAnnotation.resource.partOf,
     'Canvas'
@@ -431,7 +433,8 @@ async function parseManifestGeoreferenceAnnotations(
 ) {
   const maps: GeoreferencedMap[] = []
   const invalidAnnotations: InvalidGeoreferenceAnnotation[] = []
-  const canvasIds = new Set<string>()
+  const validMapCanvasIds = new Set<string>()
+  const annotatedCanvasIds = new Set<string>()
   const manifestPartOfItem = getManifestPartOfItem(manifest)
 
   for (const annotationPage of manifest.annotations ?? []) {
@@ -451,11 +454,12 @@ async function parseManifestGeoreferenceAnnotations(
     )
 
     for (const map of pageMaps) {
-      addMapCanvasIds(map, canvasIds)
+      addMapCanvasIds(map, validMapCanvasIds)
+      addMapCanvasIds(map, annotatedCanvasIds)
     }
 
     for (const invalidAnnotation of parsedAnnotationPage.invalidAnnotations) {
-      addInvalidAnnotationCanvasIds(invalidAnnotation, canvasIds)
+      addInvalidAnnotationCanvasIds(invalidAnnotation, annotatedCanvasIds)
     }
 
     maps.push(...pageMaps)
@@ -489,10 +493,11 @@ async function parseManifestGeoreferenceAnnotations(
       if (pageMaps.length > 0 || pageInvalidAnnotations.length > 0) {
         canvasHasGeoreferenceAnnotation = true
         for (const map of pageMaps) {
-          addMapCanvasIds(map, canvasIds)
+          addMapCanvasIds(map, validMapCanvasIds)
+          addMapCanvasIds(map, annotatedCanvasIds)
         }
         for (const invalidAnnotation of pageInvalidAnnotations) {
-          addInvalidAnnotationCanvasIds(invalidAnnotation, canvasIds)
+          addInvalidAnnotationCanvasIds(invalidAnnotation, annotatedCanvasIds)
         }
         maps.push(...pageMaps)
         invalidAnnotations.push(...pageInvalidAnnotations)
@@ -500,17 +505,22 @@ async function parseManifestGeoreferenceAnnotations(
     }
 
     if (canvasHasGeoreferenceAnnotation) {
-      canvasIds.add(canvas.uri)
+      annotatedCanvasIds.add(canvas.uri)
+
+      if (maps.some((map) => getMapCanvasIds(map).has(canvas.uri))) {
+        validMapCanvasIds.add(canvas.uri)
+      }
     }
   }
 
   return {
     maps,
     invalidAnnotations,
-    canvasIds,
+    validMapCanvasIds,
+    annotatedCanvasIds,
     hasAnnotationsForAllCanvases:
       manifest.canvases.length > 0 &&
-      canvasIds.size === manifest.canvases.length
+      validMapCanvasIds.size === manifest.canvases.length
   }
 }
 
@@ -554,7 +564,7 @@ async function parseSource(
       embeddedMaps = manifestGeoreferenceAnnotations.maps
       invalidEmbeddedAnnotations =
         manifestGeoreferenceAnnotations.invalidAnnotations
-      embeddedCanvasIds = manifestGeoreferenceAnnotations.canvasIds
+      embeddedCanvasIds = manifestGeoreferenceAnnotations.validMapCanvasIds
       hasAnnotationsForAllCanvases =
         manifestGeoreferenceAnnotations.hasAnnotationsForAllCanvases
     }

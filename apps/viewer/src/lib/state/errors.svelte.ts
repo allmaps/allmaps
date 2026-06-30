@@ -239,7 +239,10 @@ export class ErrorsState {
       }
     }
 
-    if (this.#mapsState.mapCount === 1 && this.#mapRenderErrors.length === 1) {
+    if (
+      this.#mapsState.mapCount > 0 &&
+      this.#mapRenderErrors.length === this.#mapsState.mapCount
+    ) {
       return {
         type: 'map-render',
         mapRenderError: this.#mapRenderErrors[0]

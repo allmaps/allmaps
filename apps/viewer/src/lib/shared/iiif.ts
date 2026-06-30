@@ -63,9 +63,7 @@ export function getCanonicalCanvas(map: GeoreferencedMap) {
 
 export function getCanonicalManifest(map: GeoreferencedMap) {
   const canvas = getCanonicalCanvas(map)
-  const manifests = (canvas?.partOf ?? []).filter(
-    (item) => item.type === 'Manifest'
-  )
+  const manifests = findManifests(canvas?.partOf ?? [])
 
   if (manifests.length > 0) {
     return manifests[0]
