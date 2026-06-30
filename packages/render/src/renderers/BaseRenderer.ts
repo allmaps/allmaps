@@ -105,9 +105,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       spritesMaxHigherLog2ScaleFactorDiff: Infinity,
       spritesMaxLowerLog2ScaleFactorDiff: 1,
 
-      maxTotalOverviewResolutionRatio: 50,
-
-      maxGcpsExactTpsToResource: 100
+      maxTotalOverviewResolutionRatio: 50
     }
 
     this.options = mergeOptions(
@@ -855,18 +853,6 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
           ? this.options.requestViewportBufferRatio
           : 1
       )
-    // Optimise computation time of backwards transformation:
-    // Since this is the only place transformToResource is called
-    // (and hence backwards transformation is computed)
-    // and computing thinPlateSpline can be expensive for maps with many gcps
-    // we can chose to compute the less expensive polynomial backward transformation.
-    // Note: for very deformed maps (with TPS and many gcps),
-    // this could lead to inaccurate tile loading (in addition to the reason explained below).
-    const projectedTransformer =
-      warpedMap.transformationType === 'thinPlateSpline' &&
-      warpedMap.gcps.length > this.options.maxGcpsExactTpsToResource
-        ? warpedMap.getProjectedTransformer('polynomial')
-        : warpedMap.projectedTransformer
     // Compute viewport in resource
     // Note: since the backward transformation is not the exact inverse of the forward
     // there is an inherent imperfection in this computation
@@ -877,10 +863,11 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     // so we catch such error and pass them to the user as events.
     let resourceBufferedViewportRing
     try {
-      resourceBufferedViewportRing = projectedTransformer.transformToResource(
-        [projectedGeoBufferedViewportRectangle],
-        transformerOptions
-      )[0]
+      resourceBufferedViewportRing =
+        warpedMap.projectedTransformer.transformToResource(
+          [projectedGeoBufferedViewportRectangle],
+          transformerOptions
+        )[0]
     } catch (error) {
       if (error instanceof Error) {
         error.message = 'Error while transforming to resource: ' + error.message
