@@ -1,4 +1,14 @@
+import { error } from '@sveltejs/kit'
+
 import { sourceFromUrl } from '$lib/shared/source.js'
+import {
+  getSourceErrorCode,
+  getSourceErrorDetails,
+  getSourceErrorTitle,
+  getSourceLoadErrorStatus,
+  SourceHttpError,
+  SourceLoadError
+} from '$lib/shared/source-errors.js'
 
 import type { LayoutServerLoad } from './$types'
 
@@ -30,7 +40,16 @@ export const load: LayoutServerLoad = async ({ fetch, url, parent }) => {
         source,
         urlParam
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof SourceLoadError || err instanceof SourceHttpError) {
+        error(getSourceLoadErrorStatus(err), {
+          message: err.message,
+          code: getSourceErrorCode(err),
+          title: getSourceErrorTitle(err),
+          details: getSourceErrorDetails(err)
+        })
+      }
+
       // An error occurred while fetching the source.
       // This probably means the URL is invalid or unvailable, but it
       // could also mean the host institution is blocking traffic from

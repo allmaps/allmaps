@@ -4,12 +4,18 @@ import { fetchAnnotationsFromApi } from '@allmaps/stdlib'
 import { generateChecksum } from '@allmaps/id/sync'
 
 import { getAllmapsIdFromUrl } from '$lib/shared/api.js'
+import { SourceHttpError, SourceLoadError } from '$lib/shared/source-errors.js'
+import {
+  formatIssues,
+  formatValidationIssuesFromMessage
+} from '$lib/shared/validation-error.js'
 
 import type { GeoreferencedMap, PartOfItem } from '@allmaps/annotation'
 import type { Canvas } from '@allmaps/iiif-parser'
 import type { Manifest } from '@allmaps/iiif-parser'
 
 import type {
+  InvalidGeoreferenceAnnotation,
   ParsedSource,
   UrlSource,
   StringSource
@@ -24,6 +30,22 @@ type AnnotationPage = {
 type AnnotationWithPurpose = {
   motivation?: unknown
   purpose?: unknown
+}
+
+type AnnotationParseContext = {
+  resource?: GeoreferencedMap['resource']
+  canvas?: PartOfItem
+  manifest?: PartOfItem
+  iiifManifest?: Manifest
+}
+
+type ParsedGeoreferenceAnnotations = {
+  maps: GeoreferencedMap[]
+  invalidAnnotations: InvalidGeoreferenceAnnotation[]
+}
+
+type ErrorWithIssues = {
+  issues?: unknown
 }
 
 function hasGeoreferencingValue(value: unknown) {
@@ -46,24 +68,225 @@ function hasGeoreferencingPurpose(annotation: unknown) {
   return hasGeoreferencingValue(motivation) || hasGeoreferencingValue(purpose)
 }
 
-function parseGeoreferenceAnnotation(annotation: unknown) {
-  try {
-    return parseAnnotation(annotation)
-  } catch {
-    return []
+function getStringProperty(value: unknown, key: string) {
+  if (value && typeof value === 'object' && key in value) {
+    const property = value[key as keyof typeof value]
+
+    if (typeof property === 'string') {
+      return property
+    }
   }
 }
 
-function parseGeoreferenceAnnotationPage(annotationPage: AnnotationPage) {
+function getAnnotationId(annotation: unknown) {
+  return (
+    getStringProperty(annotation, 'id') ?? getStringProperty(annotation, '@id')
+  )
+}
+
+function getErrorIssues(error: unknown) {
+  const issues = formatIssues(
+    error && typeof error === 'object'
+      ? (error as ErrorWithIssues).issues
+      : undefined
+  )
+
+  if (issues.length > 0 || !(error instanceof Error)) {
+    return issues
+  }
+
+  return formatValidationIssuesFromMessage(error.message)
+}
+
+function getErrorMessage(error: unknown) {
+  const issues = getErrorIssues(error)
+  const firstIssue = issues[0]
+
+  if (firstIssue) {
+    return `${firstIssue.message} at ${firstIssue.path}`
+  }
+
+  return error instanceof Error
+    ? error.message
+    : 'Invalid Georeference Annotation'
+}
+
+function getAnnotationTargetSource(annotation: unknown) {
+  if (
+    !annotation ||
+    typeof annotation !== 'object' ||
+    !('target' in annotation)
+  ) {
+    return
+  }
+
+  const target = annotation.target
+
+  if (!target || typeof target !== 'object' || !('source' in target)) {
+    return
+  }
+
+  const source = target.source
+
+  return source && typeof source === 'object' ? source : undefined
+}
+
+function getManifestPartOfItem(manifest: Manifest): PartOfItem {
+  return {
+    id: manifest.uri,
+    type: 'Manifest',
+    label: manifest.label
+  }
+}
+
+function getCanvasPartOfItem(canvas: Canvas, manifest: Manifest): PartOfItem {
+  return {
+    id: canvas.uri,
+    type: 'Canvas',
+    label: canvas.label,
+    partOf: [getManifestPartOfItem(manifest)]
+  }
+}
+
+function getCanvasResource(
+  canvas: Canvas,
+  manifest: Manifest
+): GeoreferencedMap['resource'] {
+  return {
+    id: canvas.image.uri,
+    type: getImageServiceType(canvas.image.majorVersion),
+    width: canvas.image.width,
+    height: canvas.image.height,
+    partOf: [getCanvasPartOfItem(canvas, manifest)]
+  }
+}
+
+function getAnnotationContext(
+  annotation: unknown,
+  context: AnnotationParseContext
+): AnnotationParseContext {
+  if (context.resource || !context.iiifManifest) {
+    return context
+  }
+
+  const source = getAnnotationTargetSource(annotation)
+  const sourceId =
+    getStringProperty(source, 'id') ?? getStringProperty(source, '@id')
+
+  if (!sourceId) {
+    return context
+  }
+
+  const canvas = context.iiifManifest.canvases.find(
+    (currentCanvas) => currentCanvas.uri === sourceId
+  )
+
+  if (!canvas) {
+    return context
+  }
+
+  return {
+    ...context,
+    resource: getCanvasResource(canvas, context.iiifManifest),
+    canvas: getCanvasPartOfItem(canvas, context.iiifManifest),
+    manifest: getManifestPartOfItem(context.iiifManifest)
+  }
+}
+
+function createInvalidGeoreferenceAnnotation(
+  annotation: unknown,
+  error: unknown,
+  context: AnnotationParseContext,
+  index: number
+): InvalidGeoreferenceAnnotation | undefined {
+  const annotationContext = getAnnotationContext(annotation, context)
+  const { resource } = annotationContext
+
+  if (!resource) {
+    return
+  }
+
+  const annotationId = getAnnotationId(annotation)
+  const validationIssues = getErrorIssues(error)
+  const message = getErrorMessage(error)
+
+  return {
+    id:
+      annotationId ??
+      generateChecksum({
+        annotation,
+        index,
+        resourceId: resource.id,
+        message
+      }),
+    annotationId,
+    resource,
+    canvas: annotationContext.canvas,
+    manifest: annotationContext.manifest,
+    message,
+    validationIssues
+  }
+}
+
+function parseGeoreferenceAnnotation(
+  annotation: unknown,
+  context: AnnotationParseContext,
+  index: number
+): ParsedGeoreferenceAnnotations {
+  try {
+    return {
+      maps: parseAnnotation(annotation),
+      invalidAnnotations: []
+    }
+  } catch (error) {
+    const invalidAnnotation = createInvalidGeoreferenceAnnotation(
+      annotation,
+      error,
+      context,
+      index
+    )
+
+    return {
+      maps: [],
+      invalidAnnotations: invalidAnnotation ? [invalidAnnotation] : []
+    }
+  }
+}
+
+function emptyGeoreferenceAnnotations(): ParsedGeoreferenceAnnotations {
+  return {
+    maps: [],
+    invalidAnnotations: []
+  }
+}
+
+function parseGeoreferenceAnnotationPage(
+  annotationPage: AnnotationPage,
+  context: AnnotationParseContext = {}
+): ParsedGeoreferenceAnnotations {
   const annotations = hasGeoreferencingPurpose(annotationPage)
     ? annotationPage.items
     : annotationPage.items?.filter(hasGeoreferencingPurpose)
 
   if (!annotations || annotations.length === 0) {
-    return []
+    return emptyGeoreferenceAnnotations()
   }
 
-  return annotations.flatMap(parseGeoreferenceAnnotation)
+  return annotations.reduce<ParsedGeoreferenceAnnotations>(
+    (result, annotation, index) => {
+      const parsedAnnotation = parseGeoreferenceAnnotation(
+        annotation,
+        context,
+        index
+      )
+
+      result.maps.push(...parsedAnnotation.maps)
+      result.invalidAnnotations.push(...parsedAnnotation.invalidAnnotations)
+
+      return result
+    },
+    emptyGeoreferenceAnnotations()
+  )
 }
 
 async function fetchAnnotationPage(
@@ -118,6 +341,22 @@ function addMapCanvasIds(map: GeoreferencedMap, canvasIds: Set<string>) {
   }
 }
 
+function addInvalidAnnotationCanvasIds(
+  invalidAnnotation: InvalidGeoreferenceAnnotation,
+  canvasIds: Set<string>
+) {
+  if (invalidAnnotation.canvas?.id) {
+    canvasIds.add(invalidAnnotation.canvas.id)
+  }
+
+  for (const canvas of findPartOfItemsOfType(
+    invalidAnnotation.resource.partOf,
+    'Canvas'
+  )) {
+    canvasIds.add(canvas.id)
+  }
+}
+
 function filterApiMaps(
   apiMaps: GeoreferencedMap[],
   embeddedMaps: GeoreferencedMap[],
@@ -136,21 +375,6 @@ function filterApiMaps(
 
     return ![...canvasIds].some((canvasId) => embeddedCanvasIds.has(canvasId))
   })
-}
-
-function getCanvasPartOfItem(canvas: Canvas, manifest: Manifest): PartOfItem {
-  return {
-    id: canvas.uri,
-    type: 'Canvas',
-    label: canvas.label,
-    partOf: [
-      {
-        id: manifest.uri,
-        type: 'Manifest',
-        label: manifest.label
-      }
-    ]
-  }
 }
 
 function getImageServiceType(
@@ -180,10 +404,7 @@ function normalizeMapResourceForCanvas(
     ...map,
     resource: {
       ...map.resource,
-      id: canvas.image.uri,
-      type: getImageServiceType(canvas.image.majorVersion),
-      width: canvas.image.width,
-      height: canvas.image.height,
+      ...getCanvasResource(canvas, manifest),
       partOf: [canvasPartOfItem]
     }
   }
@@ -209,42 +430,72 @@ async function parseManifestGeoreferenceAnnotations(
   fetch = globalThis.fetch
 ) {
   const maps: GeoreferencedMap[] = []
+  const invalidAnnotations: InvalidGeoreferenceAnnotation[] = []
   const canvasIds = new Set<string>()
+  const manifestPartOfItem = getManifestPartOfItem(manifest)
 
   for (const annotationPage of manifest.annotations ?? []) {
     const fetchedAnnotationPage = await fetchAnnotationPage(
       annotationPage,
       fetch
     )
-    const pageMaps = parseGeoreferenceAnnotationPage(fetchedAnnotationPage).map(
-      (map) => normalizeMapResourceForManifest(map, manifest)
+    const parsedAnnotationPage = parseGeoreferenceAnnotationPage(
+      fetchedAnnotationPage,
+      {
+        manifest: manifestPartOfItem,
+        iiifManifest: manifest
+      }
+    )
+    const pageMaps = parsedAnnotationPage.maps.map((map) =>
+      normalizeMapResourceForManifest(map, manifest)
     )
 
     for (const map of pageMaps) {
       addMapCanvasIds(map, canvasIds)
     }
 
+    for (const invalidAnnotation of parsedAnnotationPage.invalidAnnotations) {
+      addInvalidAnnotationCanvasIds(invalidAnnotation, canvasIds)
+    }
+
     maps.push(...pageMaps)
+    invalidAnnotations.push(...parsedAnnotationPage.invalidAnnotations)
   }
 
   for (const canvas of manifest.canvases) {
     let canvasHasGeoreferenceAnnotation = false
+    const canvasPartOfItem = getCanvasPartOfItem(canvas, manifest)
+    const canvasContext = {
+      resource: getCanvasResource(canvas, manifest),
+      canvas: canvasPartOfItem,
+      manifest: manifestPartOfItem,
+      iiifManifest: manifest
+    }
 
     for (const annotationPage of canvas.annotations ?? []) {
       const fetchedAnnotationPage = await fetchAnnotationPage(
         annotationPage,
         fetch
       )
-      const pageMaps = parseGeoreferenceAnnotationPage(
-        fetchedAnnotationPage
-      ).map((map) => normalizeMapResourceForCanvas(map, canvas, manifest))
+      const parsedAnnotationPage = parseGeoreferenceAnnotationPage(
+        fetchedAnnotationPage,
+        canvasContext
+      )
+      const pageMaps = parsedAnnotationPage.maps.map((map) =>
+        normalizeMapResourceForCanvas(map, canvas, manifest)
+      )
+      const pageInvalidAnnotations = parsedAnnotationPage.invalidAnnotations
 
-      if (pageMaps.length > 0) {
+      if (pageMaps.length > 0 || pageInvalidAnnotations.length > 0) {
         canvasHasGeoreferenceAnnotation = true
         for (const map of pageMaps) {
           addMapCanvasIds(map, canvasIds)
         }
+        for (const invalidAnnotation of pageInvalidAnnotations) {
+          addInvalidAnnotationCanvasIds(invalidAnnotation, canvasIds)
+        }
         maps.push(...pageMaps)
+        invalidAnnotations.push(...pageInvalidAnnotations)
       }
     }
 
@@ -255,6 +506,7 @@ async function parseManifestGeoreferenceAnnotations(
 
   return {
     maps,
+    invalidAnnotations,
     canvasIds,
     hasAnnotationsForAllCanvases:
       manifest.canvases.length > 0 &&
@@ -275,6 +527,11 @@ async function parseSource(
   ) {
     // json is probably a Georeference Annotation
     const maps = parseAnnotation(json)
+
+    if (maps.length === 0) {
+      throw new SourceLoadError('annotation-without-maps')
+    }
+
     return {
       type: 'annotation',
       maps
@@ -286,6 +543,7 @@ async function parseSource(
 
     let apiMaps: GeoreferencedMap[] | undefined
     let embeddedMaps: GeoreferencedMap[] | undefined
+    let invalidEmbeddedAnnotations: InvalidGeoreferenceAnnotation[] | undefined
     let embeddedCanvasIds = new Set<string>()
     let hasAnnotationsForAllCanvases = false
 
@@ -294,6 +552,8 @@ async function parseSource(
         await parseManifestGeoreferenceAnnotations(parsedIiif, fetch)
 
       embeddedMaps = manifestGeoreferenceAnnotations.maps
+      invalidEmbeddedAnnotations =
+        manifestGeoreferenceAnnotations.invalidAnnotations
       embeddedCanvasIds = manifestGeoreferenceAnnotations.canvasIds
       hasAnnotationsForAllCanvases =
         manifestGeoreferenceAnnotations.hasAnnotationsForAllCanvases
@@ -301,6 +561,7 @@ async function parseSource(
 
     if (!hasAnnotationsForAllCanvases) {
       try {
+        // TODO: rename function... this doesn't fetch annotations, but maps.
         const apiAnnotations = await fetchAnnotationsFromApi(
           annotationsBaseUrl,
           parsedIiif,
@@ -322,10 +583,24 @@ async function parseSource(
       }
     }
 
+    if (
+      parsedIiif.type === 'manifest' &&
+      (embeddedMaps?.length ?? 0) === 0 &&
+      (invalidEmbeddedAnnotations?.length ?? 0) === 0 &&
+      (apiMaps?.length ?? 0) === 0
+    ) {
+      throw new SourceLoadError('manifest-without-maps')
+    }
+
+    if (parsedIiif.type === 'image' && (apiMaps?.length ?? 0) === 0) {
+      throw new SourceLoadError('image-without-maps')
+    }
+
     return {
       type: 'iiif',
       iiif: parsedIiif,
       embeddedMaps,
+      invalidEmbeddedAnnotations,
       apiMaps
     }
   }
@@ -336,7 +611,25 @@ export async function sourceFromUrl(
   url: string,
   fetch = globalThis.fetch
 ): Promise<UrlSource> {
-  const data = await fetch(url).then((response) => response.json())
+  const response = await fetch(url)
+  let data: unknown
+
+  try {
+    data = await response.json()
+  } catch (err) {
+    if (!response.ok) {
+      throw new SourceHttpError(url, response.status, response.statusText, {
+        cause: err,
+        details: err instanceof Error ? err.message : String(err)
+      })
+    }
+
+    throw err
+  }
+
+  if (!response.ok) {
+    throw new SourceHttpError(url, response.status, response.statusText)
+  }
 
   const allmapsId = getAllmapsIdFromUrl(url)
 

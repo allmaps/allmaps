@@ -1,6 +1,12 @@
 import { error } from '@sveltejs/kit'
 
 import { sourceFromUrl } from '$lib/shared/source.js'
+import {
+  getSourceErrorCode,
+  getSourceErrorDetails,
+  getSourceErrorTitle,
+  getSourceLoadErrorStatus
+} from '$lib/shared/source-errors.js'
 
 import type { LayoutLoad } from './$types'
 
@@ -35,8 +41,11 @@ export const load: LayoutLoad = async ({ data, fetch, url, parent }) => {
         message = err.message
       }
 
-      error(500, {
-        message
+      error(getSourceLoadErrorStatus(err), {
+        message,
+        code: getSourceErrorCode(err),
+        title: getSourceErrorTitle(err),
+        details: getSourceErrorDetails(err)
       })
     }
   }
