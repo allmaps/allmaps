@@ -13,6 +13,9 @@ describe('viewer safe rich text parsing', () => {
     expect(decodeHtmlEntities('&lt;a&gt;AT&amp;T &quot;Maps&quot;&#39;s')).toBe(
       '<a>AT&T "Maps"\'s'
     )
+    expect(decodeHtmlEntities('Maps&nbsp;&#169;&#xAE;')).toBe(
+      'Maps \u00a9\u00ae'
+    )
   })
 
   test('only allows absolute http, https, and mailto hrefs', () => {
@@ -117,6 +120,23 @@ describe('viewer safe rich text parsing', () => {
     expect(parseSafeHref(' https://example.org/maps ')).toBe(
       'https://example.org/maps'
     )
+    expect(parseSafeHref('https://example.org/maps?a=1&amp;b=2')).toBe(
+      'https://example.org/maps?a=1&b=2'
+    )
     expect(parseSafeHref('not a url')).toBeUndefined()
+  })
+
+  test('decodes safe anchor href entities before storing links', () => {
+    expect(
+      parseSafeHtmlParts(
+        '<a href="https://example.org/maps?a=1&amp;b=2">Example</a>'
+      )
+    ).toEqual([
+      {
+        type: 'link',
+        href: 'https://example.org/maps?a=1&b=2',
+        label: 'Example'
+      }
+    ])
   })
 })
