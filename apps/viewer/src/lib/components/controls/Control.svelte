@@ -54,8 +54,8 @@
   aria-pressed={isButton ? pressed : undefined}
   class={[
     'inline-flex items-center justify-center transition-colors',
-    size === 'normal' && 'size-5 pointer-coarse:size-9 pointer-coarse:p-1',
-    size === 'large' && 'size-7 pointer-coarse:size-10 pointer-coarse:p-1',
+    size === 'normal' && 'size-5 pointer-coarse:size-7 pointer-coarse:p-1',
+    size === 'large' && 'size-7 pointer-coarse:size-9 pointer-coarse:p-1',
     label && 'gap-2 font-medium sm:h-auto sm:w-auto sm:px-2 sm:py-1',
     variant === 'round' ? 'rounded-full' : 'rounded',
     isButton
