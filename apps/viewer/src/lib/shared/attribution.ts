@@ -68,14 +68,23 @@ function getOrganizationAttribution(map: GeoreferencedMap) {
 
   try {
     const url = new URL(map.resource.id)
+    const href = url.origin === 'null' ? url.href : url.origin
+    const label = url.hostname || url.href
 
-    return [
-      {
-        type: 'link' as const,
-        label: url.hostname,
-        href: url.origin
-      }
-    ]
+    return isSafeHref(href)
+      ? [
+          {
+            type: 'link' as const,
+            label,
+            href
+          }
+        ]
+      : [
+          {
+            type: 'text' as const,
+            value: label
+          }
+        ]
   } catch {
     return
   }
@@ -184,11 +193,6 @@ export function getGeoreferencedMapAttributionGroups(
 
   maps.forEach((map, index) => {
     const scope = getAttributionScope(map, index)
-
-    if (groups.has(scope.key)) {
-      return
-    }
-
     const organization = getOrganizationAttribution(map)
     const attribution = getAttributionForScope(
       scope,
@@ -200,23 +204,31 @@ export function getGeoreferencedMapAttributionGroups(
       return
     }
 
-    groups.set(scope.key, {
-      key: scope.key,
+    const row = {
+      key: [
+        scope.key,
+        scope.label,
+        getPartsKey(organization),
+        getPartsKey(attribution)
+      ].join(':'),
       label: scope.label,
-      rows: [
-        {
-          key: [
-            scope.key,
-            scope.label,
-            getPartsKey(organization),
-            getPartsKey(attribution)
-          ].join(':'),
-          label: scope.label,
-          organization,
-          attribution
-        }
-      ]
-    })
+      organization,
+      attribution
+    }
+
+    if (!groups.has(scope.key)) {
+      groups.set(scope.key, {
+        key: scope.key,
+        label: scope.label,
+        rows: []
+      })
+    }
+
+    const group = groups.get(scope.key)!
+
+    if (!group.rows.some((currentRow) => currentRow.key === row.key)) {
+      group.rows.push(row)
+    }
   })
 
   return [...groups.values()]

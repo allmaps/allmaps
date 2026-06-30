@@ -16,13 +16,37 @@ type ParseRichTextOptions = {
   decodeText?: boolean
 }
 
+const HTML_ENTITIES: Record<string, string> = {
+  amp: '&',
+  apos: "'",
+  copy: '\u00a9',
+  gt: '>',
+  lt: '<',
+  nbsp: ' ',
+  quot: '"',
+  reg: '\u00ae'
+}
+
 export function decodeHtmlEntities(value: string) {
-  return value
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
+  return value.replace(
+    /&(?:#(\d+)|#x([0-9a-f]+)|([a-z][a-z0-9]+));/gi,
+    (entity, decimal, hexadecimal, name) => {
+      if (decimal || hexadecimal) {
+        const codePoint = Number.parseInt(
+          decimal ?? hexadecimal,
+          decimal ? 10 : 16
+        )
+
+        try {
+          return String.fromCodePoint(codePoint)
+        } catch {
+          return entity
+        }
+      }
+
+      return HTML_ENTITIES[name.toLowerCase()] ?? entity
+    }
+  )
 }
 
 export function isSafeHref(href: string) {
@@ -35,7 +59,7 @@ export function isSafeHref(href: string) {
 }
 
 export function parseSafeHref(value: string) {
-  const trimmedValue = value.trim()
+  const trimmedValue = decodeHtmlEntities(value).trim()
 
   return isSafeHref(trimmedValue) ? trimmedValue : undefined
 }
@@ -103,13 +127,14 @@ export function parseSafeHtmlParts(value: string): RichTextPart[] | undefined {
         /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i
       )
       const href = hrefMatch?.[1] ?? hrefMatch?.[2] ?? hrefMatch?.[3]
+      const safeHref = href ? parseSafeHref(href) : undefined
 
-      if (!href || !isSafeHref(href)) {
+      if (!safeHref) {
         return
       }
 
       activeLink = {
-        href,
+        href: safeHref,
         label: ''
       }
     } else if (/^\/a$/i.test(tag)) {
