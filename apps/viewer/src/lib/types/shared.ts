@@ -6,6 +6,8 @@ import type {
 } from '@allmaps/iiif-parser'
 import type { GeoreferencedMap, PartOfItem } from '@allmaps/annotation'
 
+import type { FormattedValidationIssue } from '$lib/shared/validation-error.js'
+
 type AllmapsSourceType = 'manifests' | 'images' | 'maps'
 
 export type AllmapsId = `${AllmapsSourceType}/${string}`
@@ -24,7 +26,7 @@ export type Organization = {
 
 export type OrganizationSummary = {
   organization: Organization
-  otherOrganizationCount: number
+  otherOrganizationCount?: number
 }
 
 type BaseSource = {
@@ -43,6 +45,7 @@ export type ParsedSource =
       type: 'iiif'
       iiif: Image | Manifest | Collection
       embeddedMaps?: GeoreferencedMap[]
+      invalidEmbeddedAnnotations?: InvalidGeoreferenceAnnotation[]
       apiMaps?: GeoreferencedMap[]
     }
 
@@ -70,9 +73,18 @@ export type MapsByCanvas = {
 export type MapsByImage = {
   resource: GeoreferencedMap['resource']
   maps: GeoreferencedMap[]
+  invalidAnnotations?: InvalidGeoreferenceAnnotation[]
 }
 
-// export type MapsHierarchy = (MapsByManifest | MapsByCanvas | MapsByImage)[]
+export type InvalidGeoreferenceAnnotation = {
+  id: string
+  annotationId?: string
+  resource: GeoreferencedMap['resource']
+  canvas?: PartOfItem
+  manifest?: PartOfItem
+  message: string
+  validationIssues: FormattedValidationIssue[]
+}
 
 export type MapsHierarchy = {
   mapsByManifest?: MapsByManifest[]
