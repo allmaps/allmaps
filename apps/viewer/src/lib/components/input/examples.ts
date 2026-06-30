@@ -89,12 +89,12 @@ export default [
   //   url: 'https://annotations.allmaps.org/images/7f2494dd1ad9ed7a',
   //   allmapsId: 'images/7f2494dd1ad9ed7a'
   // },
-  {
-    title: 'Phnom-Penh',
-    organization: 'Bibliothèque nationale de France',
-    url: 'https://annotations.allmaps.org/maps/86029c1bf591ecd8',
-    allmapsId: 'maps/86029c1bf591ecd8'
-  },
+  // {
+  //   title: 'Phnom-Penh',
+  //   organization: 'Bibliothèque nationale de France',
+  //   url: 'https://annotations.allmaps.org/maps/86029c1bf591ecd8',
+  //   allmapsId: 'maps/86029c1bf591ecd8'
+  // },
   // {
   //   title: 'Plymouth',
   //   organization: 'National Library of Scotland',
