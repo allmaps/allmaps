@@ -152,13 +152,12 @@ export abstract class BaseGcpTransformer {
    */
   protected getBackwardTransformationInternal(): BaseTransformation {
     if (!this.backwardTransformation) {
-      // Special treatment for some transformation types
       if (this.type === 'straight') {
         const forwardHelmertTransformation = new Helmert(
           this.sourcePointsInternal,
           this.destinationPointsInternal
         )
-        return new Straight(
+        this.backwardTransformation = new Straight(
           this.destinationPointsInternal,
           this.sourcePointsInternal,
           invertStraightMeasures(forwardHelmertTransformation.getMeasures())
@@ -170,18 +169,18 @@ export abstract class BaseGcpTransformer {
           forwardHelmertTransformation.getWeightsArrays()
         const backwardHelmertTransformationWeightsArrays =
           invertHelmertWeightsArrays(forwardHelmertTransformationWeightsArrays)
-        return new Helmert(
+        this.backwardTransformation = new Helmert(
           this.destinationPointsInternal,
           this.sourcePointsInternal,
           backwardHelmertTransformationWeightsArrays[0]
         )
+      } else {
+        // By default just invert source and destination
+        this.backwardTransformation = this.createTransformation(
+          this.destinationPointsInternal,
+          this.sourcePointsInternal
+        )
       }
-
-      // By default just invert source and destination
-      this.backwardTransformation = this.createTransformation(
-        this.destinationPointsInternal,
-        this.sourcePointsInternal
-      )
     }
     return this.backwardTransformation
   }
