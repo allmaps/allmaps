@@ -25,18 +25,14 @@
               "id": "http://localhost:5506/cors/manifests/2/f6033bee94f7763e.json/canvas/1",
               "type": "Canvas",
               "label": {
-                "none": [
-                  "No.14. Europa : Geologie, Tektonic"
-                ]
+                "none": ["No.14. Europa : Geologie, Tektonic"]
               },
               "partOf": [
                 {
                   "id": "http://localhost:5506/cors/manifests/2/f6033bee94f7763e.json",
                   "type": "Manifest",
                   "label": {
-                    "none": [
-                      "No.14. Europa : Geologie, Tektonic"
-                    ]
+                    "none": ["No.14. Europa : Geologie, Tektonic"]
                   }
                 }
               ]
@@ -45,9 +41,7 @@
           "provider": [
             {
               "label": {
-                "none": [
-                  "David Rumsey Map Collection"
-                ]
+                "none": ["David Rumsey Map Collection"]
               },
               "homepage": [
                 {
@@ -79,49 +73,31 @@
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1542.856,
-                628.981
-              ]
+              "resourceCoords": [1542.856, 628.981]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                30.3088374,
-                59.9265149
-              ]
+              "coordinates": [30.3088374, 59.9265149]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                487.865,
-                1186.648
-              ]
+              "resourceCoords": [487.865, 1186.648]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                -9.288174,
-                43.0615478
-              ]
+              "coordinates": [-9.288174, 43.0615478]
             }
           },
           {
             "type": "Feature",
             "properties": {
-              "resourceCoords": [
-                1845.687,
-                1585.84
-              ]
+              "resourceCoords": [1845.687, 1585.84]
             },
             "geometry": {
               "type": "Point",
-              "coordinates": [
-                34.5756332,
-                35.6739821
-              ]
+              "coordinates": [34.5756332, 35.6739821]
             }
           }
         ],

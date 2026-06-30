@@ -600,6 +600,17 @@
                 link.resourceKind === 'IIIF Presentation 3.0 manifest' &&
                 link.label === 'Mixed correct/incorrect embedded annotations'
             )
+          ),
+          createCombinedScenario(
+            'all-embedded-some-incorrect',
+            'Manifest with all maps embedded and some incorrect',
+            'Every canvas embeds its annotation page, while individual map annotations alternate between valid and intentionally broken.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'IIIF Presentation 3.0 manifest' &&
+                link.label === 'All embedded annotations, some incorrect'
+            )
           )
         ].filter((scenario) => scenario !== undefined)
       },
@@ -618,6 +629,53 @@
               (link) =>
                 link.resourceKind === 'Annotation page' &&
                 link.label === 'All info.jsons load, image requests return 500'
+            )
+          ),
+          createCombinedScenario(
+            'some-image-requests-return-500',
+            'Some image requests return 500',
+            'The annotation page loads normally, but only some referenced image requests fail with a 500 response.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'Some image requests return 500'
+            )
+          ),
+          createCombinedScenario(
+            'image-services-return-500',
+            'Annotation page loads, image services return 500',
+            'The annotation page loads normally, but every referenced image service info.json and image request fails with a 500 response.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label ===
+                  'Annotation page loads, image services return 500'
+            )
+          ),
+          createCombinedScenario(
+            'some-image-services-return-500',
+            'Some image services return 500',
+            'The annotation page loads normally, but only some referenced image service info.jsons and image requests fail with a 500 response.',
+            findCombinedLink(
+              'cors',
+              (link) =>
+                link.resourceKind === 'Annotation page' &&
+                link.label === 'Some image services return 500'
+            )
+          ),
+          ...[401, 403, 404, 429, 500, 503].map((status) =>
+            createCombinedScenario(
+              `annotation-page-http-${status}`,
+              `Annotation page returns ${status}`,
+              `The combined annotation page request itself fails with a ${status} response.`,
+              findCombinedLink(
+                'cors',
+                (link) =>
+                  link.resourceKind === 'Annotation page' &&
+                  link.label === `Annotation page returns ${status}`
+              )
             )
           ),
           createCombinedScenario(

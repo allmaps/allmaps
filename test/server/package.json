@@ -8,6 +8,7 @@
     "build": "vite build",
     "start": "node build",
     "import": "node scripts/import.ts",
+    "test": "vitest run",
     "types": "svelte-kit sync && tsc --noEmit",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -16,8 +17,8 @@
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
-    "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/ui": "workspace:^",
@@ -44,6 +45,7 @@
     "tailwindcss": "^4.1.17",
     "typescript": "catalog:",
     "typescript-eslint": "^8.48.1",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   }
 }

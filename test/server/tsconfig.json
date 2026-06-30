@@ -4,12 +4,14 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "rootDir": ".",
+    "skipLibCheck": true,
     "types": ["node"]
   },
   "include": [
     "scripts/**/*.ts",
     "src/**/*.ts",
     "src/**/*.svelte",
+    "test/**/*.ts",
     "svelte.config.js",
     "vite.config.ts"
   ],
