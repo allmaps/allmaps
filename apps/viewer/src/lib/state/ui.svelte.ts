@@ -5,7 +5,7 @@ import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 const UI_KEY = Symbol('ui')
 
 type View = 'map' | 'image'
-type Modal = 'about'
+type Modal = 'about' | 'attribution' | 'keyboard'
 type ModalOpen = Modal | undefined
 
 export class UiState extends UiEventTarget {
@@ -126,10 +126,7 @@ export class UiState extends UiEventTarget {
   }
 
   toggleMetadataSectionCollapsed(key: string) {
-    this.setMetadataSectionCollapsed(
-      key,
-      !this.isMetadataSectionCollapsed(key)
-    )
+    this.setMetadataSectionCollapsed(key, !this.isMetadataSectionCollapsed(key))
   }
 
   get opacity() {
