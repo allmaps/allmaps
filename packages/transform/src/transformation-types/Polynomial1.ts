@@ -61,6 +61,7 @@ export class Polynomial1 extends BasePolynomialTransformation {
         homogeneousTransform[3]
       ]
     ]
+    this.measures = undefined
   }
 
   getMeasures(): Polynomial1Measures {

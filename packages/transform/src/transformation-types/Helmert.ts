@@ -40,9 +40,14 @@ export class Helmert extends BaseLinearWeightsTransformation {
     ) as [[number, number], [number, number]]
 
     if (weightsArray) {
-      this.weightsArray = weightsArray
-      this.weightsArrays = [weightsArray, weightsArray]
+      this.setWeightsArrays([weightsArray, weightsArray])
     }
+  }
+
+  setWeightsArrays(weightsArrays: [number[], number[]]): void {
+    super.setWeightsArrays(weightsArrays)
+    this.weightsArray = weightsArrays[0]
+    this.measures = undefined
   }
 
   getDestinationPointsArrays(): [number[], number[]] {

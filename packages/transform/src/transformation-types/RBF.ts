@@ -174,6 +174,9 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     if (epsilon) {
       this.epsilon = epsilon
     }
+    this.rbfWeightsArrays = undefined
+    this.affineWeightsArrays = undefined
+
     super.setWeightsArrays(weightsArrays)
   }
 
