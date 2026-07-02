@@ -837,12 +837,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
 
     // Transforming the viewport back to resource
     const transformerOptions = {
-      maxDepth: isEqualProjection(
-        warpedMap.internalProjection,
-        webMercatorProjection
-      )
-        ? 0
-        : 2,
+      maxDepth: 2,
       minOffsetRatio: 0.00001
     }
     // This can be expensive at high maxDepth and seems to work fine with maxDepth = 0
