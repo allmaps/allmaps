@@ -77,7 +77,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   DEFAULT_WARPED_MAP_LIST_OPTIONS: WarpedMapListOptions<W>
 
   warpedMapsById: Map<string, W>
-  #cachedWarpedMaps?: W[]
   zIndices: Map<string, number>
 
   imagesById: Map<string, Image>
@@ -411,11 +410,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   getWarpedMaps(
     partialOptions?: Partial<SelectionOptions & ProjectionOptions>
   ): Array<W> {
-    // Use cache if available
-    if (partialOptions === undefined && this.#cachedWarpedMaps) {
-      return this.#cachedWarpedMaps
-    }
-
     const options = mergeOptions(
       mergeOptions(DEFAULT_SELECTION_OPTIONS, {
         projection: this.options.projection
@@ -540,11 +534,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     warpedMaps.sort((map0, map1) =>
       this.orderMapIdsByZIndex(map0.mapId, map1.mapId)
     )
-
-    // Set cache
-    if (partialOptions === undefined) {
-      this.#cachedWarpedMaps = warpedMaps
-    }
 
     return warpedMaps
   }
@@ -1099,8 +1088,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapIds - Map IDs
    */
   bringMapsToFront(mapIds: Iterable<string>): void {
-    this.#cachedWarpedMaps = undefined
-
     let newZIndex = this.warpedMapsById.size
     for (const mapId of mapIds) {
       if (this.zIndices.has(mapId)) {
@@ -1118,8 +1105,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapIds - Map IDs
    */
   sendMapsToBack(mapIds: Iterable<string>): void {
-    this.#cachedWarpedMaps = undefined
-
     let newZIndex = -Array.from(mapIds).length
     for (const mapId of mapIds) {
       if (this.zIndices.has(mapId)) {
@@ -1137,8 +1122,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapIds - Map IDs
    */
   bringMapsForward(mapIds: Iterable<string>): void {
-    this.#cachedWarpedMaps = undefined
-
     for (const [mapId, zIndex] of this.zIndices.entries()) {
       this.zIndices.set(mapId, zIndex * 2)
     }
@@ -1158,8 +1141,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
    * @param mapIds - Map IDs
    */
   sendMapsBackward(mapIds: Iterable<string>): void {
-    this.#cachedWarpedMaps = undefined
-
     for (const [mapId, zIndex] of this.zIndices.entries()) {
       this.zIndices.set(mapId, zIndex * 2)
     }
@@ -1210,8 +1191,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
     georeferencedMap: GeoreferencedMap,
     mapOptions?: Partial<GetWarpedMapOptions<W>>
   ): string {
-    this.#cachedWarpedMaps = undefined
-
     const mapId = this.#getOrComputeMapId(georeferencedMap)
 
     const warpedMap = this.options.warpedMapFactory(
@@ -1266,8 +1245,6 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
   }
 
   #removeGeoreferencedMapByIdInternal(mapId: string): string {
-    this.#cachedWarpedMaps = undefined
-
     const warpedMap = this.warpedMapsById.get(mapId)
     if (warpedMap) {
       this.warpedMapsById.delete(mapId)
