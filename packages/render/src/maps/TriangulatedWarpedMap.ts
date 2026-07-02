@@ -469,7 +469,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
             resourceUniquePoints,
             {
               distortionMeasures: this.options.distortionMeasures,
-              referenceScale: this.getReferenceScale(),
+              referenceScale:
+                this.options.distortionMeasures.length > 0
+                  ? this.getReferenceScale()
+                  : undefined,
               isMultiGeometry: true
             },
             (gcpPartialDistortion) => gcpPartialDistortion
@@ -519,7 +522,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
                   ),
                   {
                     distortionMeasures: this.options.distortionMeasures,
-                    referenceScale: this.getReferenceScale(),
+                    referenceScale:
+                      this.options.distortionMeasures.length > 0
+                        ? this.getReferenceScale()
+                        : undefined,
                     isMultiGeometry: true
                   },
                   (gcpPartialDistortion) => gcpPartialDistortion
