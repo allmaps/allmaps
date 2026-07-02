@@ -551,40 +551,54 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.mapProgram
     gl.bindVertexArray(this.mapVao)
 
+    const resourceTrianglePointsFlat = new Float32Array(
+      this.resourceTrianglePoints.length * 2
+    )
+    for (let i = 0; i < this.resourceTrianglePoints.length; i++) {
+      const p = this.resourceTrianglePoints[i]
+      resourceTrianglePointsFlat[i * 2] = p[0]
+      resourceTrianglePointsFlat[i * 2 + 1] = p[1]
+    }
     createBuffer(
       gl,
       program,
-      new Float32Array(this.resourceTrianglePoints.flat()),
+      resourceTrianglePointsFlat,
       2,
       'a_resourceTrianglePoint'
     )
 
-    const clipPreviousTrianglePoints =
-      this.projectedGeoPreviousTrianglePoints.map((point) =>
-        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+    const clipPreviousTrianglePointsFlat = new Float32Array(
+      this.projectedGeoPreviousTrianglePoints.length * 2
+    )
+    for (let i = 0; i < this.projectedGeoPreviousTrianglePoints.length; i++) {
+      const transformed = applyHomogeneousTransform(
+        projectedGeoToClipHomogeneousTransform,
+        this.projectedGeoPreviousTrianglePoints[i]
       )
+      clipPreviousTrianglePointsFlat[i * 2] = transformed[0]
+      clipPreviousTrianglePointsFlat[i * 2 + 1] = transformed[1]
+    }
     createBuffer(
       gl,
       program,
-      new Float32Array(clipPreviousTrianglePoints.flat()),
+      clipPreviousTrianglePointsFlat,
       2,
       'a_clipPreviousTrianglePoint'
     )
 
-    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) =>
-      applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+    const clipTrianglePointsFlat = new Float32Array(
+      this.projectedGeoTrianglePoints.length * 2
     )
-    createBuffer(
-      gl,
-      program,
-      new Float32Array(clipTrianglePoints.flat()),
-      2,
-      'a_clipTrianglePoint'
-    )
+    for (let i = 0; i < this.projectedGeoTrianglePoints.length; i++) {
+      const transformed = applyHomogeneousTransform(
+        projectedGeoToClipHomogeneousTransform,
+        this.projectedGeoTrianglePoints[i]
+      )
+      clipTrianglePointsFlat[i * 2] = transformed[0]
+      clipTrianglePointsFlat[i * 2 + 1] = transformed[1]
+    }
+    createBuffer(gl, program, clipTrianglePointsFlat, 2, 'a_clipTrianglePoint')
 
-    // Previous and new distortion
-    // Note: we must update the distortion data even when we don't render distortions
-    // to ensure this array buffer is of the correct length, for example when triangulation changes
     createBuffer(
       gl,
       program,
@@ -603,9 +617,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
-    ).map((_v, i) => {
-      return i
-    })
+    )
+    for (let i = 0; i < this.resourceTrianglePoints.length; i++) {
+      trianglePointsTriangleIndex[i] = i
+    }
     createBuffer(
       gl,
       program,
@@ -614,12 +629,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_trianglePointIndex'
     )
 
+    const trianglePointsInsideFlat = new Float32Array(
+      this.trianglePointsInside.length
+    )
+    for (let i = 0; i < this.trianglePointsInside.length; i++) {
+      trianglePointsInsideFlat[i] = this.trianglePointsInside[i] ? 1 : 0
+    }
     createBuffer(
       gl,
       program,
-      new Float32Array(
-        this.trianglePointsInside.map((inside) => (inside ? 1 : 0))
-      ),
+      trianglePointsInsideFlat,
       1,
       'a_trianglePointInside'
     )
