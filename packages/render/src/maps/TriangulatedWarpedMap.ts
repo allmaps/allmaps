@@ -384,7 +384,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
     // Get resolution from transform
     const resourceResolution =
       this.options.resourceResolution ||
-      this.projectedTransformer.getToGeoTransformationResolution(
+      this.projectedTransformer.getToProjectedGeoTransformationResolution(
         this.resourceMaskBbox
       )
 

@@ -1,4 +1,5 @@
 import proj4 from 'proj4'
+import { cloneDeep } from 'lodash-es'
 
 import {
   mergeOptions,
@@ -503,13 +504,15 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    *
    * @returns this
    */
-  static setProjection(
+  static fromProjection(
     projectedTransformer: ProjectedGcpTransformer,
     projection: Projection
   ) {
     if (isEqualProjection(projection, projectedTransformer.projection)) {
       return projectedTransformer
     }
+
+    projectedTransformer = cloneDeep(projectedTransformer)
 
     const internalProjectionToProjectionConverter = proj4(
       projectedTransformer.internalProjection.definition,

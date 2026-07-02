@@ -1,5 +1,3 @@
-import { cloneDeep } from 'lodash-es'
-
 import { GeoreferencedMap } from '@allmaps/annotation'
 import { Image } from '@allmaps/iiif-parser'
 import {
@@ -491,8 +489,8 @@ export class WarpedMap extends EventTarget {
               omit(options, ['projection'])
             )
         )
-        return ProjectedGcpTransformer.setProjection(
-          cloneDeep(projectedTransformer),
+        return ProjectedGcpTransformer.fromProjection(
+          projectedTransformer,
           options.projection
         )
       }
@@ -856,7 +854,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
+    this.projectedPreviousTransformer = this.projectedTransformer
     this.projectedGeoPreviousTransformedResourcePoints =
       this.projectedGeoTransformedResourcePoints
   }
@@ -883,7 +881,7 @@ export class WarpedMap extends EventTarget {
     this.previousTransformationType = this.transformationType
     this.previousDistortionMeasure = this.distortionMeasure
     this.previousInternalProjection = this.internalProjection
-    this.projectedPreviousTransformer = cloneDeep(this.projectedTransformer)
+    this.projectedPreviousTransformer = this.projectedTransformer
     this.projectedGeoPreviousTransformedResourcePoints = mixLineStrings(
       this.projectedGeoTransformedResourcePoints,
       this.projectedGeoPreviousTransformedResourcePoints,
