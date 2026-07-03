@@ -45,6 +45,7 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
 import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
 import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
+import { WorkerPool } from '../workers/PoolWorkers.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -59,6 +60,11 @@ import type {
   WebGL2RenderOptions,
   WebGL2WarpedMapOptions
 } from '../shared/types.js'
+
+const POOL_SIZE = Math.max(
+  1,
+  Math.min((navigator.hardwareConcurrency || 4) - 1, 4)
+)
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
 const THROTTLE_PREPARE_RENDER_OPTIONS = {
@@ -82,7 +88,7 @@ export class WebGL2Renderer
   extends BaseRenderer<WebGL2WarpedMap, ImageData>
   implements Renderer
 {
-  #worker: Worker
+  #workerPool: WorkerPool<FetchAndGetImageDataWorkerType>
   #spritesWorker: Worker
 
   DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions
@@ -166,9 +172,12 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
-    const worker = new FetchAndGetImageDataWorker()
+    const workerPool = new WorkerPool<FetchAndGetImageDataWorkerType>(
+      FetchAndGetImageDataWorker,
+      POOL_SIZE
+    )
+
     const spritesWorker = new ApplySpritesImageDataWorker()
-    const wrappedWorker = comlinkWrap<FetchAndGetImageDataWorkerType>(worker)
     const wrappedSpritesWorker =
       comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
@@ -186,13 +195,13 @@ export class WebGL2Renderer
 
     super(
       CacheableWorkerImageDataTile.createFactory(
-        wrappedWorker,
+        workerPool,
         wrappedSpritesWorker
       ),
       mergeOptions(defaultSpecificWebGL2RenderOptions, options)
     )
 
-    this.#worker = worker
+    this.#workerPool = workerPool
     this.#spritesWorker = spritesWorker
     this.gl = gl
     this.#boundThrottledChangedByMapId = new Map()
@@ -373,7 +382,7 @@ export class WebGL2Renderer
     this.gl.deleteProgram(this.linesProgram)
     this.gl.deleteProgram(this.pointsProgram)
 
-    this.#worker.terminate()
+    this.#workerPool.destroy()
     this.#spritesWorker.terminate()
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
