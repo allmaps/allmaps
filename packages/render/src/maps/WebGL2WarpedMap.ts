@@ -1,7 +1,6 @@
 import { throttle } from 'lodash-es'
 
 import {
-  hexToFractionalOpaqueRgba,
   lineStringToLines,
   mergeOptions,
   pointsAndPointsToLines,
@@ -28,6 +27,7 @@ import {
 } from '../shared/homogeneous-transform.js'
 import { createBuffer } from '../shared/webgl2.js'
 import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
+import { getCachedFractionalOpaqueRgba } from '../shared/colors-cache.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -821,7 +821,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const colors = this.lineGroups.reduce(
       (accumulator: number[][], lineGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           lineGroup.color ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.color
         )
         return accumulator.concat(
@@ -856,7 +856,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const borderColors = this.lineGroups.reduce(
       (accumulator: number[][], lineGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           lineGroup.borderColor ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.borderColor
         )
         return accumulator.concat(
@@ -947,7 +947,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const colors = this.pointGroups.reduce(
       (accumulator: number[][], pointGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           pointGroup.color ?? DEFAULT_RENDER_POINT_GROUP_OPTION.color
         )
         return accumulator.concat(
@@ -979,7 +979,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const borderColors = this.pointGroups.reduce(
       (accumulator: number[][], pointGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           pointGroup.borderColor ??
             DEFAULT_RENDER_POINT_GROUP_OPTION.borderColor
         )

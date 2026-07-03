@@ -3,12 +3,7 @@ import { wrap as comlinkWrap } from 'comlink'
 
 // TODO: convert colors to fractional rgb
 // when setting options, not every render call
-import {
-  hexToFractionalOpaqueRgba,
-  hexToFractionalRgb,
-  mergeOptions,
-  squaredDistance
-} from '@allmaps/stdlib'
+import { mergeOptions, squaredDistance } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
 
 import { BaseRenderer } from './BaseRenderer.js'
@@ -29,6 +24,10 @@ import {
   homogeneousTransformToMatrix4
 } from '../shared/homogeneous-transform.js'
 import { createShader, createProgram } from '../shared/webgl2.js'
+import {
+  getCachedFractionalOpaqueRgba,
+  getCachedFractionalRgb
+} from '../shared/colors-cache.js'
 import { Viewport } from '../viewport/Viewport.js'
 
 import mapVertexShaderSource from '../shaders/map/vertex-shader.glsl'
@@ -703,7 +702,7 @@ export class WebGL2Renderer
     )
     gl.uniform3fv(
       removeColorColorLocation,
-      hexToFractionalRgb(webgl2WarpedMap.options.removeColorColor)
+      getCachedFractionalRgb(webgl2WarpedMap.options.removeColorColor)
     )
 
     const removeColorThresholdLocation = this.#getUniformLocation(
@@ -737,7 +736,7 @@ export class WebGL2Renderer
     )
     gl.uniform3fv(
       colorizeColorLocation,
-      hexToFractionalRgb(webgl2WarpedMap.options.colorizeColor)
+      getCachedFractionalRgb(webgl2WarpedMap.options.colorizeColor)
     )
 
     // Grid
@@ -747,7 +746,7 @@ export class WebGL2Renderer
     const colorGrid = this.#getUniformLocation(gl, program, 'u_renderGridColor')
     gl.uniform4fv(
       colorGrid,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
     )
 
     // Distortion
@@ -777,7 +776,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor00Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
     )
 
     const distortionColor01Location = this.#getUniformLocation(
@@ -787,7 +786,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor01Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
     )
 
     const distortionColor1Location = this.#getUniformLocation(
@@ -797,7 +796,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor1Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
     )
 
     const distortionColor2Location = this.#getUniformLocation(
@@ -807,7 +806,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor2Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
     )
 
     const distortionColorLocation3 = this.#getUniformLocation(
@@ -817,7 +816,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColorLocation3,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
     )
 
     // Debug Triangles
