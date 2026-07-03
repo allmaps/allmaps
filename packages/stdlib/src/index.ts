@@ -197,6 +197,7 @@ export {
   subArrayMatrix,
   transposeArrayMatrix,
   pasteArrayMatrix,
+  pasteArrayMatrixInPlace,
   sliceArrayMatrix,
   shallowCopyArrayMatrix,
   newBlockArrayMatrix

@@ -2,7 +2,7 @@ import {
   arrayMatrixSize,
   newArrayMatrix,
   newBlockArrayMatrix,
-  pasteArrayMatrix,
+  pasteArrayMatrixInPlace,
   transposeArrayMatrix
 } from '@allmaps/stdlib'
 
@@ -119,9 +119,9 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     // 1 x1 y1
     // 1 x2 y2
     // ...
-    let affineCoefsArrayMatrix = newArrayMatrix(this.pointCount, 3, 0)
+    const affineCoefsArrayMatrix = newArrayMatrix(this.pointCount, 3, 0)
     for (let i = 0; i < this.pointCount; i++) {
-      affineCoefsArrayMatrix = pasteArrayMatrix(affineCoefsArrayMatrix, i, 0, [
+      pasteArrayMatrixInPlace(affineCoefsArrayMatrix, i, 0, [
         Polynomial1.getPolynomial1SourcePointCoefsArray(this.sourcePoints[i])
       ])
     }

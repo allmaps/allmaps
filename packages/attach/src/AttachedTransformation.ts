@@ -6,7 +6,7 @@ import {
   mergeOptions,
   multiplyArrayMatrix,
   newArrayMatrix,
-  pasteArrayMatrix,
+  pasteArrayMatrixInPlace,
   sliceArrayMatrix
 } from '@allmaps/stdlib'
 import {
@@ -168,7 +168,7 @@ export class AttachedTransformation {
       ]
     })
     size = [size[0] + this.attachments.length, size[1]]
-    let coefsArrayMatrix = newArrayMatrix(...size)
+    const coefsArrayMatrix = newArrayMatrix(...size)
 
     // Add each transformation's coefs matrices as a block of a diagonal block-matrix
     // while keeping track of their locations
@@ -177,7 +177,7 @@ export class AttachedTransformation {
       transformationId,
       transformation
     ] of this.transformationsById.entries()) {
-      coefsArrayMatrix = pasteArrayMatrix(
+      pasteArrayMatrixInPlace(
         coefsArrayMatrix,
         ...trailingCumulativeCoefsArrayMatrixSize,
         transformation.coefsArrayMatrix
@@ -238,13 +238,13 @@ export class AttachedTransformation {
         )
       }
 
-      coefsArrayMatrix = pasteArrayMatrix(
+      pasteArrayMatrixInPlace(
         coefsArrayMatrix,
         trailingCumulativeCoefsArrayMatrixSize[0],
         trailingCumulativeCoefsArrayMatrixSize0[1],
         [attachementSourcePointCoefsArray0]
       )
-      coefsArrayMatrix = pasteArrayMatrix(
+      pasteArrayMatrixInPlace(
         coefsArrayMatrix,
         trailingCumulativeCoefsArrayMatrixSize[0],
         trailingCumulativeCoefsArrayMatrixSize1[1],

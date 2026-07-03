@@ -1,6 +1,6 @@
 import {
   newArrayMatrix,
-  pasteArrayMatrix,
+  pasteArrayMatrixInPlace,
   arrayMatrixSize
 } from '@allmaps/stdlib'
 
@@ -58,16 +58,16 @@ export class Helmert extends BaseLinearWeightsTransformation {
   }
 
   getCoefsArrayMatrices(): [number[][], number[][]] {
-    let coefsArrayMatrix0 = newArrayMatrix(this.pointCount, 4, 0)
-    let coefsArrayMatrix1 = newArrayMatrix(this.pointCount, 4, 0)
+    const coefsArrayMatrix0 = newArrayMatrix(this.pointCount, 4, 0)
+    const coefsArrayMatrix1 = newArrayMatrix(this.pointCount, 4, 0)
     for (let i = 0; i < this.pointCount; i++) {
       const sourcePointCoefsArrays = this.getSourcePointCoefsArrays(
         this.sourcePoints[i]
       )
-      coefsArrayMatrix0 = pasteArrayMatrix(coefsArrayMatrix0, i, 0, [
+      pasteArrayMatrixInPlace(coefsArrayMatrix0, i, 0, [
         sourcePointCoefsArrays[0]
       ])
-      coefsArrayMatrix1 = pasteArrayMatrix(coefsArrayMatrix1, i, 0, [
+      pasteArrayMatrixInPlace(coefsArrayMatrix1, i, 0, [
         sourcePointCoefsArrays[1]
       ])
     }

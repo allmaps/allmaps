@@ -1,7 +1,7 @@
 import {
   arrayMatrixSize,
   newArrayMatrix,
-  pasteArrayMatrix
+  pasteArrayMatrixInPlace
 } from '@allmaps/stdlib'
 
 import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
@@ -62,13 +62,13 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
   }
 
   getCoefsArrayMatrix(): number[][] {
-    let coefsArrayArray = newArrayMatrix(
+    const coefsArrayArray = newArrayMatrix(
       this.pointCount,
       this.pointCountMinimum,
       0
     )
     for (let i = 0; i < this.pointCount; i++) {
-      coefsArrayArray = pasteArrayMatrix(coefsArrayArray, i, 0, [
+      pasteArrayMatrixInPlace(coefsArrayArray, i, 0, [
         this.getSourcePointCoefsArray(this.sourcePoints[i])
       ])
     }

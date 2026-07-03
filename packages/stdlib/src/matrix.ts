@@ -126,6 +126,27 @@ export function pasteArrayMatrix<T>(
   return result
 }
 
+// Pastes a subArrayMatrix inside an arrayMatrix at a specific location, in place.
+// Mutates arrayMatrix directly (does not copy) and returns it for convenience.
+// Use only when the caller owns arrayMatrix and doesn't need the pre-paste
+// version to remain intact (e.g. a freshly allocated accumulator).
+export function pasteArrayMatrixInPlace<T>(
+  arrayMatrix: T[][],
+  rowsStart: number,
+  colsStart: number,
+  subArrayMatrix: T[][]
+): T[][] {
+  const subSize = arrayMatrixSize(subArrayMatrix)
+
+  for (let i = 0; i < subSize[0]; i++) {
+    for (let j = 0; j < subSize[1]; j++) {
+      arrayMatrix[rowsStart + i][colsStart + j] = subArrayMatrix[i][j]
+    }
+  }
+
+  return arrayMatrix
+}
+
 export function transposeArrayMatrix<T>(arrayMatrix: T[][]): T[][] {
   const rows = arrayMatrix.length
   const cols = arrayMatrix[0].length
@@ -190,11 +211,11 @@ export function newBlockArrayMatrix<T = number>(
   })
   const colsCumulative = sum
 
-  let result = newArrayMatrix<T>(rowsCumulative, colsCumulative, emptyValue)
+  const result = newArrayMatrix<T>(rowsCumulative, colsCumulative, emptyValue)
 
   for (let i = 0; i < size[0]; i++) {
     for (let j = 0; j < size[1]; j++) {
-      result = pasteArrayMatrix(
+      pasteArrayMatrixInPlace(
         result,
         rowsTrailingCumulativeArray[i],
         rowsTrailingCumulativeArray[j],
