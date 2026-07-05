@@ -234,28 +234,30 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     const { rbfWeightsArrays, affineWeightsArrays } =
       this.getRbfAndAffineWeightsArrays()
 
-    // Compute the distances of that point to all control points
-    const newDistances = this.sourcePoints.map((sourcePoint) =>
-      this.normFunction(newSourcePoint, sourcePoint)
-    )
+    const kernelOptions = { epsilon: this.epsilon }
 
-    // Sum the weighted contributions of the input point
-    const newDestinationPoint: Point = [0, 0]
-    for (let i = 0; i < 2; i++) {
-      // Apply the weights to the new distances
-      newDestinationPoint[i] = newDistances.reduce(
-        (sum, dist, index) =>
-          sum +
-          this.kernelFunction(dist, { epsilon: this.epsilon }) *
-            rbfWeightsArrays[i][index],
-        0
-      )
-      // Add the affine part
-      newDestinationPoint[i] +=
-        affineWeightsArrays[i][0] +
-        affineWeightsArrays[i][1] * newSourcePoint[0] +
-        affineWeightsArrays[i][2] * newSourcePoint[1]
+    // Compute the distances of that point to all control points
+    // and sum the weighted contributions of the input point
+    let sum0 = 0
+    let sum1 = 0
+    for (let index = 0; index < this.sourcePoints.length; index++) {
+      const dist = this.normFunction(newSourcePoint, this.sourcePoints[index])
+      const k = this.kernelFunction(dist, kernelOptions)
+      sum0 += k * rbfWeightsArrays[0][index]
+      sum1 += k * rbfWeightsArrays[1][index]
     }
+
+    const newDestinationPoint = [
+      sum0 +
+        affineWeightsArrays[0][0] +
+        affineWeightsArrays[0][1] * newSourcePoint[0] +
+        affineWeightsArrays[0][2] * newSourcePoint[1],
+      sum1 +
+        affineWeightsArrays[1][0] +
+        affineWeightsArrays[1][1] * newSourcePoint[0] +
+        affineWeightsArrays[1][2] * newSourcePoint[1]
+    ] as Point
+
     return newDestinationPoint
   }
 
@@ -263,31 +265,26 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     const { rbfWeightsArrays, affineWeightsArrays } =
       this.getRbfAndAffineWeightsArrays()
 
-    // Compute the distances of that point to all control points
-    const newDistances = this.sourcePoints.map((sourcePoint) =>
-      this.normFunction(newSourcePoint, sourcePoint)
-    )
+    const kernelOptions = { derivative: 1, epsilon: this.epsilon }
 
-    // Sum the weighted contributions of the input point
-    const newDestinationPointPartDerX: Point = [0, 0]
-    for (let i = 0; i < 2; i++) {
-      // Apply the weights to the new distances
-      newDestinationPointPartDerX[i] = newDistances.reduce(
-        (sum, dist, index) =>
-          sum +
-          (dist === 0
-            ? 0
-            : this.kernelFunction(dist, {
-                derivative: 1,
-                epsilon: this.epsilon
-              }) *
-              ((newSourcePoint[0] - this.sourcePoints[index][0]) / dist) *
-              rbfWeightsArrays[i][index]),
-        0
-      )
-      // Add the affine part
-      newDestinationPointPartDerX[i] += affineWeightsArrays[i][1]
+    let sum0 = 0
+    let sum1 = 0
+    for (let index = 0; index < this.sourcePoints.length; index++) {
+      const dist = this.normFunction(newSourcePoint, this.sourcePoints[index])
+      if (dist === 0) continue
+
+      const k = this.kernelFunction(dist, kernelOptions)
+      const term =
+        k * ((newSourcePoint[0] - this.sourcePoints[index][0]) / dist)
+      sum0 += term * rbfWeightsArrays[0][index]
+      sum1 += term * rbfWeightsArrays[1][index]
     }
+
+    const newDestinationPointPartDerX = [
+      sum0 + affineWeightsArrays[0][1],
+      sum1 + affineWeightsArrays[1][1]
+    ] as Point
+
     return newDestinationPointPartDerX
   }
 
@@ -295,31 +292,26 @@ export class RBF extends BaseIndependentLinearWeightsTransformation {
     const { rbfWeightsArrays, affineWeightsArrays } =
       this.getRbfAndAffineWeightsArrays()
 
-    // Compute the distances of that point to all control points
-    const newDistances = this.sourcePoints.map((sourcePoint) =>
-      this.normFunction(newSourcePoint, sourcePoint)
-    )
+    const kernelOptions = { derivative: 1, epsilon: this.epsilon }
 
-    // Sum the weighted contributions of the input point
-    const newDestinationPointPartDerY: Point = [0, 0]
-    for (let i = 0; i < 2; i++) {
-      // Apply the weights to the new distances
-      newDestinationPointPartDerY[i] = newDistances.reduce(
-        (sum, dist, index) =>
-          sum +
-          (dist === 0
-            ? 0
-            : this.kernelFunction(dist, {
-                derivative: 1,
-                epsilon: this.epsilon
-              }) *
-              ((newSourcePoint[1] - this.sourcePoints[index][1]) / dist) *
-              rbfWeightsArrays[i][index]),
-        0
-      )
-      // Add the affine part
-      newDestinationPointPartDerY[i] += affineWeightsArrays[i][2]
+    let sum0 = 0
+    let sum1 = 0
+    for (let index = 0; index < this.sourcePoints.length; index++) {
+      const dist = this.normFunction(newSourcePoint, this.sourcePoints[index])
+      if (dist === 0) continue
+
+      const k = this.kernelFunction(dist, kernelOptions)
+      const term =
+        k * ((newSourcePoint[1] - this.sourcePoints[index][1]) / dist)
+      sum0 += term * rbfWeightsArrays[0][index]
+      sum1 += term * rbfWeightsArrays[1][index]
     }
+
+    const newDestinationPointPartDerY = [
+      sum0 + affineWeightsArrays[0][2],
+      sum1 + affineWeightsArrays[1][2]
+    ] as Point
+
     return newDestinationPointPartDerY
   }
 
