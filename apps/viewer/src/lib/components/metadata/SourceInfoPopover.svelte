@@ -1,10 +1,7 @@
 <script lang="ts">
   import { crossfade } from 'svelte/transition'
 
-  import {
-    Info as InfoIcon,
-    SealWarning as SealWarningIcon
-  } from 'phosphor-svelte'
+  import { InfoIcon, SealWarningIcon } from 'phosphor-svelte'
 
   import { LoadingSmall, Popover } from '@allmaps/components'
   import { parseLanguageString } from '@allmaps/iiif-inspector'
@@ -15,8 +12,6 @@
 
   import { getErrorsState } from '$lib/state/errors.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
-
-  import { hasInputTarget } from '$lib/shared/keyboard.js'
 
   import type {
     Source,
@@ -106,10 +101,6 @@
   })
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (hasInputTarget(event)) {
-      return
-    }
-
     if (event.key === '/' && event.metaKey) {
       open = !open
     }

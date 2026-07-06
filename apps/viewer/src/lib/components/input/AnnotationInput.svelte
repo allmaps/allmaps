@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { tick } from 'svelte'
   import { fade } from 'svelte/transition'
   import { debounce } from 'lodash-es'
 
@@ -51,7 +50,6 @@
 
   let form = $state<HTMLFormElement>()
   let inputRef = $state<HTMLInputElement | HTMLTextAreaElement>()
-  let submitButtonRef = $state<HTMLButtonElement>()
 
   function getInitialInputValue() {
     if (initialValue !== undefined) {
@@ -253,15 +251,6 @@
     }
   }
 
-  async function focusSubmitButton() {
-    if (visibleButton !== 'submit') {
-      return
-    }
-
-    await tick()
-    submitButtonRef?.focus()
-  }
-
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && (event.shiftKey || !isMultiLine(inputValue))) {
       event.preventDefault()
@@ -344,7 +333,6 @@
     }
 
     resizeInput()
-    void focusSubmitButton()
   }
 
   function handleDragOver(event: DragEvent) {
@@ -492,8 +480,7 @@
       ]}
       autocomplete="off"
       autocapitalize="off"
-      spellcheck="false"
-    ></textarea>
+      spellcheck="false"></textarea>
   {/if}
 
   <div
@@ -515,7 +502,6 @@
     {#if visibleButton === 'submit'}
       <div class="flex flex-row gap-2 items-center">
         <button
-          bind:this={submitButtonRef}
           type="submit"
           disabled={error !== '' || inputValue.length === 0}
           class={[
