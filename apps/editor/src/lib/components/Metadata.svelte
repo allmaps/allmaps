@@ -8,7 +8,8 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
 
   import { formatNavDate } from '$lib/shared/metadata.js'
-  import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   const sourceState = getSourceState()
 
@@ -28,7 +29,7 @@
         {#if manifest.label}
           <div class="flex flex-col gap-2 border-b border-gray-200 pb-4">
             <h4 class="text-lg leading-tight font-semibold text-gray-900">
-              {parseLanguageString(manifest.label, 'en')}
+              {parseLocalizedLanguageString(manifest.label)}
             </h4>
             <a
               href={manifest.uri}
@@ -54,10 +55,10 @@
             <h5
               class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
-              Description
+              {m.description_label().replace(':', '')}
             </h5>
             <p class="text-sm leading-relaxed text-gray-700">
-              {parseLanguageString(manifest.description, 'en')}
+              {parseLocalizedLanguageString(manifest.description)}
             </p>
           </div>
         {/if}
@@ -68,10 +69,10 @@
             <h5
               class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
-              Summary
+              {m.summary()}
             </h5>
             <p class="text-sm leading-relaxed text-gray-700">
-              {parseLanguageString(manifest.summary, 'en')}
+              {parseLocalizedLanguageString(manifest.summary)}
             </p>
           </div>
         {/if}
@@ -81,7 +82,7 @@
           <div class="bg-gray-50 flex items-start gap-3 rounded-lg p-3">
             <CalendarIcon size="18" class="mt-0.5 shrink-0 text-gray-600" />
             <div class="flex flex-col gap-0.5">
-              <span class="text-xs font-medium text-gray-500">Date</span>
+              <span class="text-xs font-medium text-gray-500">{m.date()}</span>
               <span class="text-sm font-medium text-gray-900">
                 {formatNavDate(manifest.navDate)}
               </span>
@@ -93,10 +94,10 @@
         {#if manifest.requiredStatement}
           <div class="bg-amber-50/50 rounded-lg border border-gray-200 p-4">
             <h5 class="mb-2 text-xs font-semibold text-gray-700">
-              {parseLanguageString(manifest.requiredStatement.label, 'en')}
+              {parseLocalizedLanguageString(manifest.requiredStatement.label)}
             </h5>
             <p class="text-sm leading-relaxed text-gray-700">
-              {parseLanguageString(manifest.requiredStatement.value, 'en')}
+              {parseLocalizedLanguageString(manifest.requiredStatement.value)}
             </p>
           </div>
         {/if}
@@ -107,7 +108,7 @@
             <h5
               class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
-              Additional Information
+              {m.additional_information()}
             </h5>
             <dl
               class="bg-gray-50 grid grid-cols-1 gap-4 rounded-lg border border-gray-200 p-4"
@@ -116,10 +117,10 @@
                 {#if item.label && item.value}
                   <div class="flex flex-col gap-1">
                     <dt class="text-xs font-medium break-all text-gray-600">
-                      {parseLanguageString(item.label, 'en')}
+                      {parseLocalizedLanguageString(item.label)}
                     </dt>
                     <dd class="text-sm break-all text-gray-900">
-                      {parseLanguageString(item.value, 'en')}
+                      {parseLocalizedLanguageString(item.value)}
                     </dd>
                   </div>
                 {/if}
@@ -134,7 +135,7 @@
             <h5
               class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
-              Related Links
+              {m.related_links()}
             </h5>
             <div class="flex flex-col gap-2">
               {#each manifest.homepage as homepage (homepage.id)}
@@ -147,7 +148,7 @@
                   <LinkIcon size="16" class="shrink-0" />
                   <span class="break-all">
                     {homepage.label
-                      ? parseLanguageString(homepage.label, 'en')
+                      ? parseLocalizedLanguageString(homepage.label)
                       : homepage.id}
                   </span>
                   <ArrowSquareOutIcon
@@ -166,7 +167,7 @@
             <h5
               class="text-xs font-semibold tracking-wider text-gray-500 uppercase"
             >
-              See Also
+              {m.see_also()}
             </h5>
             <div class="flex flex-col gap-2">
               {#each manifest.seeAlso as seeAlso (seeAlso.id)}
@@ -179,8 +180,8 @@
                   <LinkIcon size="16" class="shrink-0" />
                   <span class="break-all">
                     {seeAlso.format
-                      ? `${seeAlso.format} resource`
-                      : 'External resource'}
+                      ? m.formatted_resource({ format: seeAlso.format })
+                      : m.external_resource()}
                   </span>
                   <ArrowSquareOutIcon
                     size="14"

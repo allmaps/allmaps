@@ -11,12 +11,14 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import { isCallbackValid } from '$lib/shared/organizations.js'
 
   import { Popover } from '@allmaps/components'
 
   import Export from '$lib/components/popovers/Export.svelte'
+  import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte'
 
   const uiState = getUiState()
   const sourceState = getSourceState()
@@ -39,7 +41,7 @@
         class="size-5 shrink-0"
         size="100%"
         weight="bold"
-      /><span class="hidden sm:inline-block">Done</span>
+      /><span class="hidden sm:inline-block">{m.done()}</span>
     </a>{:else}
     <Popover bind:open={uiState.popoverOpen.export} disabled={exportDisabled}>
       {#snippet button()}
@@ -48,7 +50,7 @@
           px-3 py-2 font-medium text-white shadow-none transition-all group-disabled:bg-green-300 hover:not-group-disabled:bg-green/90 hover:not-group-disabled:shadow-md"
         >
           <ExportIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
-            class="hidden sm:inline-block">Export</span
+            class="hidden sm:inline-block">{m.export()}</span
           >
         </div>
       {/snippet}
@@ -71,14 +73,16 @@
         onclick={() => (uiState.modalOpen.keyboard = true)}
         class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
       >
-        Keyboard shortcuts…
+        {m.keyboard_shortcuts_ellipsis()}
       </DropdownMenu.Item>
       <DropdownMenu.Item
         onclick={() => (uiState.modalOpen.about = true)}
         class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
       >
-        About Allmaps Editor…
+        {m.about_editor_ellipsis()}
       </DropdownMenu.Item>
+      <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
+      <LanguageSwitcher />
     </DropdownMenu.Content>
   </DropdownMenu.Root>
 </div>

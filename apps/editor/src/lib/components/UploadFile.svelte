@@ -1,5 +1,6 @@
 <script lang="ts">
   import { FileArrowUp as FileArrowUpIcon } from 'phosphor-svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   type Props = { value: string }
 
@@ -30,6 +31,6 @@
     shadow-md transition-colors hover:bg-white/20"
 >
   <FileArrowUpIcon class="size-5" />
-  <span>Upload file</span>
+  <span>{m.upload_file()}</span>
   <input bind:files id="upload" type="file" class="hidden" />
 </label>

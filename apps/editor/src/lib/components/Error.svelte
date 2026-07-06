@@ -5,6 +5,7 @@
   import { shades } from '@allmaps/tailwind'
 
   import { FetchError, type FetchErrorDetails } from '$lib/shared/errors.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   type Props = {
     error: unknown
@@ -77,7 +78,7 @@
     } else if (typeof error === 'string') {
       message = error
     } else {
-      message = 'An unknown error occurred.'
+      message = m.unknown_error()
     }
 
     return { type: 'other' as const, message }
@@ -92,71 +93,47 @@
 
 {#snippet fetchError({ url, details }: ParsedFetchError)}
   {#if details.type === FetchError.INVALID_JSON}
-    <p>The server did not return valid JSON.</p>
-    <p>
-      You might have used the URL of an HTML web page instead of a IIIF
-      resource, or the IIIF resource is invalid.
-    </p>
+    <p>{m.invalid_json_error()}</p>
+    <p>{m.invalid_json_hint()}</p>
   {:else if details.type === FetchError.STATUS_CODE}
     <p>
-      The server returned a {details.status} status code.
+      {m.status_code_error({ status: details.status })}
     </p>
     {#if details.status === 401 || details.status === 403}
-      <p>
-        You're not authorized to access this resource. Allmaps Editor can only
-        access IIIF resources that are publicly available.
-      </p>
+      <p>{m.unauthorized_error()}</p>
     {:else if details.status === 404}
-      <p>Not found.</p>
+      <p>{m.not_found_error()}</p>
     {:else if details.status === 500}
-      <p>Internal server error.</p>
+      <p>{m.internal_server_error()}</p>
     {/if}
   {:else if details.type === FetchError.MAYBE_CORS}
     <p>
-      The IIIF resource you are trying to load may be blocked by a missing or
-      invalid <a
+      {m.cors_error()}
+      <a
         class="underline"
         href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS"
         >CORS policy</a
       >.
     </p>
     <p>
-      You can try to open the JSON contents of the IIIF resource <a
-        class="underline"
-        target="_blank"
-        href={url}>in a new tab</a
-      >. If your browser can correctly display its contents, this probably means
-      that the IIIF server does not send the correct CORS headers. To fix this,
-      contact the institution that manages the IIIF server and ask them to
-      enable CORS.
+      {m.cors_hint()}
     </p>
   {:else if details.type === FetchError.INVALID_URL}
-    <p>The IIIF URL you are trying to load is invalid.</p>
+    <p>{m.invalid_url_error()}</p>
   {:else if details.type === FetchError.INVALID_PROTOCOL}
     <p>
-      Allmaps Editor can only load IIIF resources over HTTPS. Because Allmaps
-      Editor itself is loaded from a secure HTTPS origin, browsers
-      <a
-        class="underline"
-        href="https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content"
-        >disallows loading resources from insecure origins</a
-      >.
+      {m.invalid_protocol_error()}
     </p>
   {:else if details.type === FetchError.INVALID_DOMAIN}
-    <p>The resource domain cannot be accessed: {details.domain}</p>
+    <p>{m.invalid_domain_error({ domain: details.domain })}</p>
   {/if}
 {/snippet}
 
 {#snippet parseError({ details }: ParsedParseError)}
   <p>
-    Allmaps Editor couldn't parse the IIIF resource you're trying to load. This
-    probably means that the IIIF resource is incorrect but it could also mean
-    that the Allmaps IIIF parser needs to be improved. You can use the
-    <a class="underline" href="https://presentation-validator.iiif.io/"
-      >IIIF Presentation API Validator</a
-    > to see if the IIIF resource contains errors.
+    {m.parse_iiif_error()}
   </p>
-  <p>This is the output of the Allmaps IIIF parser:</p>
+  <p>{m.parser_output()}</p>
   <p
     class="max-h-96 overflow-y-auto rounded-md bg-[#2e3440ff] p-2 font-mono text-sm break-all text-[#eceff4]"
   >
@@ -186,9 +163,8 @@
         {/if}
 
         <p>
-          <a class="font-semibold underline" href="/"
-            >Please reload Allmaps Editor</a
-          > and try loading a different IIIF resource.
+          <a class="font-semibold underline" href="/">{m.reload_editor()}</a>
+          {m.reload_and_try_different_resource()}
         </p>
       </div>
     </MapMonster>

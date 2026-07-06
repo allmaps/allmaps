@@ -29,6 +29,7 @@
 
   import Resource from '$lib/components/maplibre/Resource.svelte'
   import YesNo from '$lib/components/YesNo.svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { GeoJSONStoreFeatures } from 'terra-draw'
 
@@ -658,8 +659,8 @@
           shadow"
       >
         <YesNo
-          yes="Finish"
-          no="Cancel"
+          yes={m.finish()}
+          no={m.cancel()}
           onYes={finishDrawing}
           onNo={abortDrawing}
           yesDisabled={!canFinishDrawing}

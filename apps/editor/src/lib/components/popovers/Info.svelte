@@ -1,7 +1,8 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
 
-  import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import { getSourceState } from '$lib/state/source.svelte'
 
@@ -58,14 +59,14 @@
     }
   })
 
-  const labelString = $derived(parseLanguageString(label, 'en'))
-  const descriptionString = $derived(parseLanguageString(description, 'en'))
+  const labelString = $derived(parseLocalizedLanguageString(label))
+  const descriptionString = $derived(parseLocalizedLanguageString(description))
 
   const metadataStrings = $derived(
     metadata
       ? metadata.map((item) => ({
-          label: parseLanguageString(item.label, 'en'),
-          value: parseLanguageString(item.value, 'en')
+          label: parseLocalizedLanguageString(item.label),
+          value: parseLocalizedLanguageString(item.value)
         }))
       : []
   )
@@ -75,7 +76,7 @@
   )
 
   const activeImageLabel = $derived(
-    parseLanguageString(sourceState.activeCanvas?.label, 'en')
+    parseLocalizedLanguageString(sourceState.activeCanvas?.label)
   )
 
   // TODO: use labels!
@@ -83,26 +84,26 @@
 
 <div class="grid grid-cols-[max-content_1fr] gap-2">
   <div class="col-span-2 font-bold">
-    You're georeferencing this IIIF resource
+    {m.georeferencing_this_resource()}
   </div>
   {#if sourceState.source}
-    <div>Type:</div>
+    <div>{m.type_label()}</div>
     <a class="underline" href={typeUrl}>{typeString}</a>
-    <div>URL:</div>
+    <div>{m.url_label()}</div>
     <a class="break-all underline" href={sourceState.source.url}
       >{sourceState.source?.url}</a
     >
   {/if}
   {#if labelString}
-    <div>Label:</div>
+    <div>{m.label_label()}</div>
     <div>{labelString}</div>
   {/if}
   {#if descriptionString}
-    <div>Description:</div>
+    <div>{m.description_label()}</div>
     <div>{descriptionString}</div>
   {/if}
   {#if metadataStrings.length}
-    <div class="col-span-2">Metadata:</div>
+    <div class="col-span-2">{m.metadata_label()}</div>
     <dl
       class="col-span-2 grid max-h-36 w-full grid-cols-subgrid gap-2 overflow-auto rounded-md bg-[rgba(220,220,220,0.1)] p-2 shadow-inner"
     >
@@ -114,8 +115,8 @@
   {/if}
 
   {#if showActiveImageInfo}
-    <div class="col-span-2 font-bold">Current image:</div>
-    <div>URL:</div>
+    <div class="col-span-2 font-bold">{m.current_image_label()}</div>
+    <div>{m.url_label()}</div>
     <div>
       <a
         class="break-all underline"
@@ -124,14 +125,15 @@
       >
     </div>
     {#if activeImageLabel}
-      <div>Label:</div>
+      <div>{m.label_label()}</div>
       <div>{activeImageLabel}</div>
     {/if}
-    <div>Resolution:</div>
+    <div>{m.resolution_label()}</div>
     <div>
       {#if sourceState.activeImage && !sourceState.activeImage.embedded}
         <span transition:fade
-          >{sourceState.activeImage?.width} × {sourceState.activeImage?.height} pixels</span
+          >{sourceState.activeImage?.width} × {sourceState.activeImage?.height}
+          {m.pixels()}</span
         >
       {/if}
     </div>

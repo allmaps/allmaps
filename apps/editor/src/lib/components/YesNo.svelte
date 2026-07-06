@@ -1,5 +1,6 @@
 <script lang="ts">
   import { X as XIcon, Check as CheckIcon } from 'phosphor-svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   type Color = 'red' | 'green' | 'gray'
 
@@ -15,8 +16,8 @@
   } & Record<string, unknown>
 
   let {
-    yes = 'Yes',
-    no = 'No',
+    yes = m.yes(),
+    no = m.no(),
     yesColor = 'green',
     noColor = 'red',
     onYes,

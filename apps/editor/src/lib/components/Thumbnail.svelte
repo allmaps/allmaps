@@ -2,6 +2,7 @@
   import { fetchImageInfo } from '@allmaps/stdlib'
 
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { Fit } from '@allmaps/types'
 
@@ -54,7 +55,7 @@
       class="h-full w-full {mode === 'cover'
         ? 'object-cover'
         : 'object-contain'}"
-      alt={`Thumbnail for ${firstThumbnail.id}`}
+      alt={m.thumbnail_for({ id: firstThumbnail.id })}
       src={firstThumbnail.id}
     />
   {:else if parsedIiif.type === 'image'}
@@ -68,18 +69,18 @@
           class="h-full w-full {mode === 'cover'
             ? 'object-cover'
             : 'object-contain'}"
-          alt={`Thumbnail for ${parsedImage.uri}`}
+          alt={m.thumbnail_for({ id: parsedImage.uri })}
           src={parsedImage.getImageUrl(imageRequest)}
         />
       {:else}
         <div class="flex h-full w-full items-center justify-center">
-          <span>Cannot display tiled images yet</span>
+          <span>{m.cannot_display_tiled_images()}</span>
         </div>
       {/if}
     {/await}
   {:else}
     <div class="flex h-full w-full items-center justify-center">
-      <span>No Thumbnail Available</span>
+      <span>{m.no_thumbnail_available()}</span>
     </div>
   {/if}
 </div>

@@ -60,6 +60,9 @@
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
+    "@inlang/paraglide-js": "^2.20.2",
+    "@inlang/plugin-m-function-matcher": "^2.2.6",
+    "@inlang/plugin-message-format": "^4.4.0",
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.36.0",
     "@sveltejs/adapter-cloudflare": "^7.2.4",

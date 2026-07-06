@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
 
   import { Copy as CopyIcon, Check as CheckIcon } from 'phosphor-svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   type Props = {
     value: string
@@ -35,7 +36,7 @@
 <button
   class="relative flex aspect-square size-8 cursor-pointer
    items-center justify-center rounded-full"
-  title="Copy to clipboard"
+  title={m.copy_to_clipboard()}
   onclick={handleClick}
 >
   {#if showCheckInterval}

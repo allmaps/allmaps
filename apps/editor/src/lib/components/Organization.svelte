@@ -9,6 +9,7 @@
   } from 'phosphor-svelte'
 
   import { getExamplesState } from '$lib/state/examples.svelte.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import Example from '$lib/components/Example.svelte'
 
@@ -88,7 +89,7 @@
               <a
                 href="/organizations/{organization.id}"
                 class="font-bold text-pink after:content-['_›'] hover:underline"
-                >More from this collection
+                >{m.more_from_this_collection()}
               </a>
             </div>
           </div>

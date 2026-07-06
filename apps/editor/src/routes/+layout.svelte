@@ -11,11 +11,14 @@
   import { setVarsState } from '$lib/state/vars.svelte.js'
 
   import { searchParams } from '$lib/shared/params.js'
+  import { defineQueryParamClientStrategy } from '$lib/i18n/query-param-strategy.js'
 
   import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   import '../app.css'
   import '@allmaps/components/css/fonts.css'
+
+  defineQueryParamClientStrategy()
 
   let { data, children } = $props()
 

@@ -12,6 +12,7 @@
   import Highlight from '$lib/components/Highlight.svelte'
 
   import { Modal } from '@allmaps/components'
+  import { m } from '$lib/paraglide/messages.js'
 
   import {
     generateLeafletExample,
@@ -51,7 +52,8 @@
   <div class="contents" bind:this={selectPortal}></div>
   {#snippet title()}
     <div class="flex flex-col items-center gap-2 sm:flex-row">
-      <span class="shrink-0 text-sm md:text-base">Export options for </span>
+      <span class="shrink-0 text-sm md:text-base">{m.export_options_for()}</span
+      >
       <div class="w-48 text-base font-normal">
         <!-- Somehow, selectPortal is set to null when the modal closes,
          which causes an error in the bits-ui component -->
@@ -66,11 +68,13 @@
       openUrl={`https://geojson.io/#data=data:text/x-url,${encodeURIComponent(getGeoJsonUrl(annotationsApiBaseUrl, scopeState.allmapsId))}`}
       label="GeoJSON"
     >
-      <p>Export the mask of current map view as a GeoJSON file.</p>
+      <p>{m.export_geojson_description()}</p>
     </ExportUrl>
 
     <div class="flex items-center gap-2">
-      <h3 class="shrink-0 text-lg font-bold">Web mapping libraries</h3>
+      <h3 class="shrink-0 text-lg font-bold">
+        {m.web_mapping_libraries()}
+      </h3>
       <div class="w-42">
         <Select
           items={uiState.allmapsPlugins}
@@ -91,10 +95,7 @@
 
     <h3 class="text-lg font-bold">GeoTIFF</h3>
 
-    <p>
-      It's possible to turn Georeference Annotations into GeoTIFFs. To do this,
-      you need to install GDAL. Install Allmaps CLI.
-    </p>
+    <p>{m.geotiff_description()}</p>
     <Highlight value={geotiffScript} lang="bash" />
   {/if}
 </Modal>

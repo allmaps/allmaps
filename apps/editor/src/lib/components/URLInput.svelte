@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getUrlState } from '$lib/shared/params.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import iiifLogoBlack from '$lib/images/iiif-black.svg'
 
@@ -14,7 +15,7 @@
   let {
     onSubmit,
     // autofocus = false,
-    placeholder = 'Open a IIIF resource from a URL'
+    placeholder = m.open_iiif_resource_from_url()
   }: Props = $props()
 
   let value = $state(urlState.params.url)
