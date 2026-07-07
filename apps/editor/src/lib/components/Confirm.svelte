@@ -2,6 +2,7 @@
   import { Popover } from '@allmaps/components'
 
   import YesNo from '$lib/components/YesNo.svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { Snippet } from 'svelte'
 
@@ -35,15 +36,15 @@
         {#if question}
           {@render question()}
         {:else}
-          Are you sure?
+          {m.are_you_sure()}
         {/if}
       </span>
       <YesNo
         onYes={handleYesClick}
-        yes="Delete"
+        yes={m.delete()}
         yesColor="red"
         onNo={handleNoClick}
-        no="Cancel"
+        no={m.cancel()}
         noColor="gray"
       />
     </div>

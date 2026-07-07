@@ -9,7 +9,7 @@ import type { ErrorState } from '$lib/state/error.svelte.js'
 import { searchParams } from '$lib/shared/params.js'
 import { superFetch } from '$lib/shared/fetch.js'
 import { generateId } from '$lib/shared/ids.js'
-import { parseLanguageString } from '$lib/shared/iiif.js'
+import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
 
 import type {
   Image as IIIFImage,
@@ -152,7 +152,7 @@ export class SourceState {
         ['collection', 'manifest'].includes(parsedIiifAtPath.type)
       ) {
         if ('label' in parsedIiifAtPath) {
-          label = parseLanguageString(parsedIiifAtPath.label)
+          label = parseLocalizedLanguageString(parsedIiifAtPath.label)
         }
 
         crumbs.push({

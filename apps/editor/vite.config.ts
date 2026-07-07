@@ -1,6 +1,7 @@
 import devtoolsJson from 'vite-plugin-devtools-json'
 import tailwindcss from '@tailwindcss/vite'
 import { sveltekit } from '@sveltejs/kit/vite'
+import { paraglideVitePlugin } from '@inlang/paraglide-js'
 
 import { defineConfig, searchForWorkspaceRoot, type UserConfig } from 'vite'
 
@@ -17,7 +18,21 @@ export default defineConfig({
   define: {
     __ALLMAPS_EDITOR_VERSION__: JSON.stringify(process.env.npm_package_version)
   },
-  plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+  plugins: [
+    tailwindcss(),
+    sveltekit(),
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/lib/paraglide',
+      strategy: [
+        'custom-queryParam',
+        'cookie',
+        'preferredLanguage',
+        'baseLocale'
+      ]
+    }),
+    devtoolsJson()
+  ],
   ssr: {
     noExternal: [
       'terra-draw',

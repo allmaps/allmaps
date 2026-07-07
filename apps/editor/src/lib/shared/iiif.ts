@@ -1,5 +1,6 @@
 import type { PartOfItem } from '@allmaps/annotation'
 import { parseLanguageString } from '@allmaps/iiif-inspector'
+import { getCurrentLocale } from '$lib/i18n/locale.js'
 import type {
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage,
@@ -42,8 +43,14 @@ export function getImages(
 
 export { parseLanguageString } from '@allmaps/iiif-inspector'
 
+export function parseLocalizedLanguageString(
+  value: Parameters<typeof parseLanguageString>[0]
+) {
+  return parseLanguageString(value, getCurrentLocale())
+}
+
 export function labelFromPartOfItem(item: PartOfItem) {
   if (item.label) {
-    return parseLanguageString(item.label)
+    return parseLocalizedLanguageString(item.label)
   }
 }

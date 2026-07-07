@@ -1,4 +1,6 @@
 import { truncate } from '$lib/shared/strings.js'
+import { getLocaleFormatters } from '$lib/i18n/formatters.js'
+import { m } from '$lib/paraglide/messages.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 export {
@@ -8,10 +10,6 @@ export {
 } from '@allmaps/iiif-inspector'
 
 import type { SourceType } from '$lib/types/shared.js'
-
-const formatter = new Intl.RelativeTimeFormat(undefined, {
-  numeric: 'auto'
-})
 
 type Division = {
   amount: number
@@ -55,11 +53,11 @@ export function formatLabels(labels: string[], maxLength = 64): string {
 
 export function formatSourceType(sourceType: SourceType, plural = false) {
   if (sourceType === 'image') {
-    return plural ? 'Images' : 'Image'
+    return plural ? m.images() : m.image()
   } else if (sourceType === 'manifest') {
-    return plural ? 'Manifests' : 'Manifest'
+    return plural ? m.manifests() : m.manifest()
   } else if (sourceType === 'collection') {
-    return plural ? 'Collections' : 'Collection'
+    return plural ? m.collections() : m.collection()
   }
 }
 
@@ -69,13 +67,14 @@ function formatTimeAgo(dateStr?: string) {
   }
 
   const date = new Date(dateStr)
+  const { relativeTime } = getLocaleFormatters()
 
   // From https://blog.webdevsimplified.com/2020-07/relative-time-format/
   let duration = (date.getTime() - new Date().getTime()) / 1000
   for (let i = 0; i <= divisions.length; i++) {
     const division = divisions[i]
     if (Math.abs(duration) < division.amount) {
-      return formatter.format(Math.round(duration), division.name)
+      return relativeTime.format(Math.round(duration), division.name)
     }
     duration /= division.amount
   }
@@ -90,9 +89,5 @@ export function formatNavDate(navDate?: Date): string {
     return ''
   }
 
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(navDate)
+  return getLocaleFormatters().navDate.format(navDate)
 }

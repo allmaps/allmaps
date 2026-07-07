@@ -4,6 +4,7 @@
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 
   import { truncate } from '$lib/shared/strings.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { Example } from '$lib/types/shared.js'
 
@@ -23,7 +24,7 @@
     class="flex aspect-square animate-pulse items-center justify-center space-y-2 rounded-md bg-[#fafafa]
 text-xs text-gray-500 transition-colors hover:text-gray-800"
   >
-    <p>Loading…</p>
+    <p>{m.loading_ellipsis()}</p>
   </li>
 {:then imageInfo}
   <li

@@ -6,6 +6,7 @@
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
   import { getViewerUrl } from '$lib/shared/urls.js'
   import { getVarsState } from '$lib/state/vars.svelte.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { EditorPublicEnv } from '@allmaps/env/editor'
 
@@ -43,12 +44,11 @@
   {/snippet}
   <div class="flex max-w-sm flex-col gap-2">
     <p>
-      Georeference any <a class="underline" href="https://iiif.io/">IIIF</a> map
-      with Allmaps Editor.
+      {m.about_intro()}
       <a class="underline" href="https://allmaps.org/#getting-started"
-        >Find a map</a
-      > in the digital collections of an institution or public repository that supports
-      IIIF , copy its IIIF URL and paste it into Allmaps Editor.
+        >{m.find_a_map()}</a
+      >.
+      {m.about_find_map()}
     </p>
     <!-- TODO: Add link to terms of use -->
     <div
@@ -58,19 +58,17 @@
     </div>
 
     <p>
-      For more information about Allmaps, see <a
-        class="underline"
-        href="https://allmaps.org">allmaps.org</a
-      >. The source code of Allmaps Editor is
+      {m.about_more_info()}
+      <a class="underline" href="https://allmaps.org">allmaps.org</a>. {m.about_source_code()}
       <a
         class="underline"
         href="https://github.com/allmaps/allmaps/tree/main/apps/editor"
-        >available on GitHub</a
+        >{m.available_on_github()}</a
       >.
     </p>
     {#if allmapsEditorVersion}
       <p class="text-xs text-gray-500">
-        Allmaps Editor version: {allmapsEditorVersion}
+        {m.editor_version({ version: allmapsEditorVersion })}
       </p>
     {/if}
   </div>

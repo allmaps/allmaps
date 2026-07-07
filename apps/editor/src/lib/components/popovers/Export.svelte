@@ -17,6 +17,7 @@
   import Scope from '$lib/components/Scope.svelte'
   import ExportUrl from '$lib/components/ExportUrl.svelte'
   import Cloud from '$lib/components/Cloud.svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { EditorPublicEnv } from '@allmaps/env/editor'
 
@@ -32,7 +33,7 @@
 <div class="flex flex-col gap-4">
   {#if scopeState.mapsCount}
     <div class="flex items-center gap-2">
-      <span class="shrink-0">Export options for</span>
+      <span class="shrink-0">{m.export_options_for()}</span>
       <div class="w-48">
         <Scope />
       </div>
@@ -45,14 +46,14 @@
           annotationsApiBaseUrl,
           scopeState.allmapsId
         )}
-        label="View in Allmaps Viewer"
+        label={m.view_in_viewer()}
       >
         <!-- <p>View the georeferenced map</p> -->
       </ExportUrl>
 
       <ExportUrl
         url={getAnnotationUrl(annotationsApiBaseUrl, scopeState.allmapsId)}
-        label="Georeference Annotation"
+        label={m.georeference_annotation()}
       >
         {#snippet header()}
           <button
@@ -63,7 +64,7 @@
           >
             <CodeIcon class="size-5 shrink-0" size="100%" weight="bold" /><span
               class="hidden sm:inline-block"
-              >Code
+              >{m.code()}
             </span>
           </button>
         {/snippet}
@@ -76,10 +77,12 @@
           scopeState.allmapsId,
           uiState.retinaTiles
         )}
-        label="XYZ map tiles"
+        label={m.xyz_map_tiles()}
       >
         {#snippet header()}
-          <Switch bind:checked={uiState.retinaTiles}>2x resolution</Switch>
+          <Switch bind:checked={uiState.retinaTiles}
+            >{m.double_resolution()}</Switch
+          >
         {/snippet}
       </ExportUrl>
 
@@ -88,7 +91,7 @@
         class="cursor-pointer self-center rounded-full bg-green px-4 py-2
         font-medium text-white drop-shadow-xs
         transition-all hover:bg-green/90 hover:drop-shadow-lg/30"
-        >Show more export options</button
+        >{m.show_more_export_options()}</button
       >
     {/if}
   {:else}

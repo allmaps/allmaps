@@ -8,6 +8,7 @@
 
   import { getSourceState } from '$lib/state/source.svelte'
   import { getUrlState } from '$lib/shared/params.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   const sourceState = getSourceState()
   const urlState = getUrlState()
@@ -29,14 +30,16 @@
     class="flex items-center gap-1 rounded-md bg-white p-2 shadow-md sm:gap-2"
   >
     <div class="hidden leading-tight whitespace-nowrap sm:inline-block">
-      <span class="hidden md:inline-block">Image&nbsp;</span
-      >{sourceState.activeImageIndex + 1} of {sourceState.imageCount}
+      {m.image_number_of_count({
+        number: sourceState.activeImageIndex + 1,
+        count: sourceState.imageCount
+      })}
     </div>
     <a
       class="cursor-pointer rounded-full bg-white p-0 transition-colors
        duration-200 hover:bg-gray-100/80"
       href={previousHref}
-      title="Previous image"
+      title={m.previous_image()}
     >
       <ArrowLeftIcon class="size-6" />
     </a>
@@ -44,7 +47,7 @@
       class="cursor-pointer rounded-full bg-white p-0 transition-colors
        duration-200 hover:bg-gray-100/80"
       href={nextHref}
-      title="Next image"
+      title={m.next_image()}
     >
       <ArrowRightIcon class="size-6" />
     </a>

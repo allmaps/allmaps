@@ -21,6 +21,7 @@
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import { getView, getViewUrl } from '$lib/shared/router.js'
 
@@ -86,7 +87,7 @@
         class="flex items-center justify-center gap-2 rounded-md bg-white px-2 py-1 transition-colors duration-200 hover:bg-blue/10 data-[state=active]:bg-blue/25 sm:px-4 sm:py-2"
       >
         <ImagesIcon size={28} class="inline" />
-        <span class="hidden lg:inline-block">Images</span>
+        <span class="hidden lg:inline-block">{m.images()}</span>
       </a>
       {@render separator()}
       <a
@@ -107,7 +108,7 @@
         ]}
       >
         <PolygonIcon size={28} class="inline" />
-        <span class="hidden lg:inline-block">Draw mask</span>
+        <span class="hidden lg:inline-block">{m.draw_mask()}</span>
       </a>
       {@render separator()}
       <a
@@ -128,7 +129,7 @@
         ]}
       >
         <MapPinSimpleIcon size={28} class="inline" />
-        <span class="hidden lg:inline-block">Georeference</span>
+        <span class="hidden lg:inline-block">{m.georeference()}</span>
 
         <!-- <Popover customAnchor={georeferenceViewButton}>
           {#snippet button()}
@@ -158,7 +159,7 @@
         ]}
       >
         <MapTrifoldIcon size={28} class="inline" />
-        <span class="hidden lg:inline-block">Results</span>
+        <span class="hidden lg:inline-block">{m.results()}</span>
         <!-- <CaretDownIcon size={16} weight="bold" /> -->
       </a>
     </nav>
@@ -187,7 +188,7 @@
             gap-2 rounded-lg bg-white p-1 shadow-md"
           transition:fade={{ duration: 100 }}
         >
-          <span class="hidden pl-1 sm:inline-block">Show</span>
+          <span class="hidden pl-1 sm:inline-block">{m.show()}</span>
           <div class="w-48">
             <Scope />
           </div>
@@ -213,7 +214,7 @@
             >
               <RowsIcon class="size-5" weight="bold" />
               <!-- <span>Masks &amp; GCPs</span> -->
-              <span>Maps</span>
+              <span>{m.maps()}</span>
             </div>
           {/snippet}
           {#snippet contents()}<Maps />{/snippet}

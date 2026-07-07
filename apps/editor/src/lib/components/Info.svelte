@@ -9,12 +9,14 @@
     getViewUrl,
     getNewParamsFromUrl
   } from '$lib/shared/router.js'
-  import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getErrorState } from '$lib/state/error.svelte.js'
+  import { formatSourceType } from '$lib/shared/metadata.js'
 
   import { Popover, LoadingSmall } from '@allmaps/components'
 
@@ -54,7 +56,7 @@
       sourceState.parsedIiif &&
       sourceState.parsedIiif.type === 'collection'
     ) {
-      return parseLanguageString(sourceState.parsedIiif.label, 'en')
+      return parseLocalizedLanguageString(sourceState.parsedIiif.label)
     }
   })
 
@@ -63,18 +65,22 @@
     let canvasLabel: string | undefined
 
     if (sourceState.parsedManifest?.label) {
-      manifestLabel = parseLanguageString(
-        sourceState.parsedManifest?.label,
-        'en'
+      manifestLabel = parseLocalizedLanguageString(
+        sourceState.parsedManifest?.label
       )
     } else if (sourceState.parsedManifest) {
-      manifestLabel = 'Manifest'
+      manifestLabel = m.manifest()
     }
 
     if (sourceState.activeCanvas?.label) {
-      canvasLabel = parseLanguageString(sourceState.activeCanvas?.label, 'en')
+      canvasLabel = parseLocalizedLanguageString(
+        sourceState.activeCanvas?.label
+      )
     } else if (sourceState.activeImageIndex !== undefined) {
-      canvasLabel = `Image ${sourceState.activeImageIndex + 1}`
+      canvasLabel = m.image_number_of_count({
+        number: sourceState.activeImageIndex + 1,
+        count: sourceState.imageCount
+      })
     }
 
     // If the manifest and canvas labels are the same, don't show the canvas label
@@ -133,7 +139,7 @@
       {@render arrow()}
       <span
         class="rounded-md border-1 border-red bg-red-400 px-1 py-0 text-xs text-white"
-        >Error loading URL</span
+        >{m.error_loading_url()}</span
       >
     {:else if sourceType}
       <span
@@ -178,9 +184,11 @@
           {@render arrow()}
           <span
             class="rounded-md border-1 border-blue bg-blue-200 px-1 py-0 text-xs"
-            >Browse to find maps <span class="@min-1xl:inline hidden"
-              >in this collection <span class="hidden @min-4xl:inline"
-                >and start georeferencing</span
+            >{m.browse_collection_hint()}
+            <span class="@min-1xl:inline hidden"
+              >{m.browse_collection_suffix()}
+              <span class="hidden @min-4xl:inline"
+                >{m.browse_collection_end()}</span
               ></span
             ></span
           >
@@ -193,7 +201,7 @@
       {@render url(sourceUrl)}
     {/if}
   {:else}
-    <span class="text-gray-500">No URL loaded</span>
+    <span class="text-gray-500">{m.no_url_loaded()}</span>
   {/if}
 {/snippet}
 
@@ -237,7 +245,9 @@
     <div class="flex max-w-2xl flex-col gap-2">
       <span class="text-center text-sm">
         {#if sourceType}
-          You're georeferencing a <IIIFSource {sourceType} /> from this URL:
+          {m.georeferencing_from_url({
+            sourceType: formatSourceType(sourceType) || ''
+          })}
         {/if}
       </span>
       <URLInput onSubmit={handleInputSubmit} />

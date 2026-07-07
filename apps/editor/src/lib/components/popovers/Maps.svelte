@@ -22,6 +22,7 @@
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import SelectTransformation from '$lib/components/SelectTransformationWrapper.svelte'
   import ProjectionPicker from '$lib/components/ProjectionPickerWrapper.svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   import EditGcps from '$lib/components/modals/EditGcps.svelte'
   import EditResourceMask from '$lib/components/modals/EditResourceMask.svelte'
@@ -128,7 +129,7 @@
               <button
                 class="relative size-16 cursor-pointer"
                 onclick={() => handleMapClick(map.id)}
-                aria-label="Select map {index + 1}"
+                aria-label={m.select_map({ number: index + 1 })}
               >
                 <svg
                   class="h-full w-full fill-none stroke-pink stroke-2"
@@ -148,14 +149,14 @@
           <div
             class="col-span-7 flex items-center gap-1 place-self-start self-center sm:gap-2"
           >
-            <span>Map {index + 1}</span>
+            <span>{m.map_number({ number: index + 1 })}</span>
 
             <div>
               {#if isActiveMap}
                 <button
                   class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
                   onclick={() => (uiState.modalOpen.editResourceMask = true)}
-                  >Edit or import mask…</button
+                  >{m.edit_or_import_mask()}</button
                 >
               {/if}
 
@@ -182,7 +183,7 @@
               <TrashIcon />
             {/snippet}
             {#snippet question()}
-              Do you really want to delete this map?
+              {m.delete_map_question()}
             {/snippet}
           </Confirm>
         </div>
@@ -193,10 +194,11 @@
               items-center gap-x-4 gap-y-2 pb-2 text-sm
               sm:pl-7"
           >
-            <label for="select-transformation">Transformation:</label>
+            <label for="select-transformation">{m.transformation_label()}</label
+            >
             <SelectTransformation {map} id="select-transformation" />
 
-            <label for="select-projection">Projection:</label>
+            <label for="select-projection">{m.projection_label()}</label>
             <ProjectionPicker {map} id="select-projection" />
           </div>
           {#if gcpCount > 0}
@@ -214,7 +216,7 @@
                     <button
                       class="inline-block h-8 cursor-pointer"
                       onclick={() => handleGcpClick(map.id, gcp.id)}
-                      aria-label="Select GCP {index + 1}"
+                      aria-label={m.select_gcp({ number: index + 1 })}
                     >
                       <div
                         class="inline-flex size-4 items-center justify-center"
@@ -275,7 +277,7 @@
                         <TrashIcon />
                       {/snippet}
                       {#snippet question()}
-                        Do you really want to delete this GCP?
+                        {m.delete_gcp_question()}
                       {/snippet}
                     </Confirm>
                   </div>
@@ -288,7 +290,7 @@
             <button
               class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
               onclick={() => (uiState.modalOpen.editGcps = true)}
-              >Edit or import GCPs…</button
+              >{m.edit_or_import_gcps()}</button
             >
 
             {#if uiState.modalOpen.editGcps}

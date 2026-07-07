@@ -8,7 +8,8 @@
 
   import { LoadingSmall } from '@allmaps/components'
 
-  import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type {
     CollectionPath,
@@ -98,10 +99,10 @@
     class="max-h-48 w-full overflow-y-auto rounded-md bg-blue-100 p-2 text-blue-900 inset-shadow-sm"
   >
     <h3 class="font-medium">
-      {parseLanguageString(parsedIiifAtPath.label, 'en')}
+      {parseLocalizedLanguageString(parsedIiifAtPath.label)}
     </h3>
     <p class="italic">
-      {parseLanguageString(parsedIiifAtPath.description, 'en')}
+      {parseLocalizedLanguageString(parsedIiifAtPath.description)}
     </p>
   </div>
 {/if}
@@ -113,7 +114,7 @@
 {#if fetching}
   <div class="flex items-center gap-2 p-2 text-sm">
     <LoadingSmall />
-    <span class="text-sm">Loading</span>
+    <span class="text-sm">{m.loading()}</span>
   </div>
 {:else if parsedIiifAtPath && parsedIiifAtPath.type === 'collection' && 'items' in parsedIiifAtPath}
   {@const items = parsedIiifAtPath.items.slice(

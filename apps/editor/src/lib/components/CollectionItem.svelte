@@ -6,7 +6,8 @@
 
   import IIIFSource from '$lib/components/IIIFSource.svelte'
 
-  import { parseLanguageString } from '$lib/shared/iiif.js'
+  import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type {
     Manifest as IIIFManifest,
@@ -130,7 +131,7 @@
         <img
           class="h-full w-full rounded object-contain inset-shadow-xs"
           src={thumbnail.id}
-          alt="Thumbnail"
+          alt={m.thumbnail()}
         />
       {/if}
     </div>
@@ -138,10 +139,10 @@
 
   <div class="flex min-h-0 flex-col gap-2 overflow-y-auto text-sm">
     {#if item.label}
-      <h3 class="font-medium">{parseLanguageString(item.label)}</h3>
+      <h3 class="font-medium">{parseLocalizedLanguageString(item.label)}</h3>
     {/if}
     {#if item.description}
-      <p>{parseLanguageString(item.description)}</p>
+      <p>{parseLocalizedLanguageString(item.description)}</p>
     {/if}
   </div>
 

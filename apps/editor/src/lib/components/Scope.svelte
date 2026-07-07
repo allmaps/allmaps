@@ -8,6 +8,7 @@
   import { Select } from '@allmaps/components'
 
   import { getScopeState } from '$lib/state/scope.svelte.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   type Props = {
     to?: HTMLElement
@@ -19,9 +20,9 @@
 
   let items = $derived(
     [
-      { value: 'images' as const, label: 'All images', Icon: ImagesIcon },
-      { value: 'image' as const, label: 'Current image', Icon: ImageIcon },
-      { value: 'map' as const, label: 'Current map', Icon: MapTrifoldIcon }
+      { value: 'images' as const, label: m.all_images(), Icon: ImagesIcon },
+      { value: 'image' as const, label: m.current_image(), Icon: ImageIcon },
+      { value: 'map' as const, label: m.current_map(), Icon: MapTrifoldIcon }
     ].filter((items) => scopeState.scopes.includes(items.value))
   )
 </script>

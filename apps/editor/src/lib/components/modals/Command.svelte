@@ -21,6 +21,7 @@
     getNewParamsFromUrl
   } from '$lib/shared/router.js'
   import { getAnnotationUrl, getViewerUrl } from '$lib/shared/urls.js'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { Example } from '$lib/types/shared.js'
   import type { EditorPublicEnv } from '@allmaps/env/editor'
@@ -107,7 +108,7 @@
       <Command.Input
         class="focus-override placeholder:text-foreground-alt/50 inline-flex w-full truncate rounded-lg border-none bg-white
         transition-colors focus:ring-0 focus:outline-none"
-        placeholder="Search for something or paste a IIIF URL…"
+        placeholder={m.search_or_paste_iiif_url()}
         bind:value
       />
       <Kbd>Esc</Kbd>
@@ -124,13 +125,13 @@
         <Command.Empty
           class="text-muted-foreground flex w-full items-center justify-center pt-8 pb-6 text-sm"
         >
-          No results found.
+          {m.no_results_found()}
         </Command.Empty>
         <Command.Group>
           <Command.GroupHeading
             class="text-muted-foreground px-3 pt-4 pb-2 text-xs"
           >
-            Georeference a new map
+            {m.georeference_new_map()}
           </Command.GroupHeading>
           <Command.GroupItems>
             {#if mightBeUrl}
@@ -141,7 +142,7 @@
               >
                 <CopyIcon class="size-4 shrink-0" />
                 <span class="flex w-full items-center gap-1">
-                  <span class="shrink-0">Open URL</span>
+                  <span class="shrink-0">{m.open_url()}</span>
                   <span class="truncate">{value}</span>
                 </span>
               </Command.Item>
@@ -149,20 +150,28 @@
 
             <Command.Item
               class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
-              keywords={['iiif resource', 'open']}
+              keywords={['iiif resource', 'open', 'iiif-resource', 'openen']}
               onSelect={handleNewIiifResource}
             >
               <LinkIcon class="size-4 shrink-0" />
-              Open a IIIF resource from a URL
+              {m.open_iiif_resource_from_url()}
             </Command.Item>
 
             <Command.Item
               class="flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none select-none data-selected:bg-gray-100"
-              keywords={['iiif', 'resource', 'open', 'random', 'example']}
+              keywords={[
+                'iiif',
+                'resource',
+                'open',
+                'random',
+                'example',
+                'willekeurig',
+                'voorbeeld'
+              ]}
               onSelect={handleRandomIiifResource}
             >
               <ShuffleIcon class="size-4 shrink-0" />
-              Open a random IIIF resource
+              {m.open_random_iiif_resource()}
             </Command.Item>
           </Command.GroupItems>
         </Command.Group>
@@ -170,7 +179,7 @@
           <Command.GroupHeading
             class="text-muted-foreground px-3 pt-4 pb-2 text-xs"
           >
-            Copy to Clipboard
+            {m.copy_to_clipboard_group()}
           </Command.GroupHeading>
           <Command.GroupItems>
             <Command.Item
@@ -185,7 +194,7 @@
               onSelect={handleCopyGeoreferenceAnnotationUrlToClipboard}
             >
               <CopyIcon class="size-4 shrink-0" />
-              Copy Georeference Annotation URL to clipboard
+              {m.copy_georeference_annotation_url()}
               <span>
                 <Kbd>Cmd</Kbd>+<Kbd>Shift</Kbd>+<Kbd>C</Kbd>
               </span>
@@ -197,7 +206,7 @@
               onSelect={handleCopyViewerUrlToClipboard}
             >
               <CopyIcon class="size-4 " />
-              Copy Allmaps Viewer URL to clipboard
+              {m.copy_viewer_url()}
             </Command.Item>
 
             <Command.Item
@@ -206,7 +215,7 @@
               onSelect={handleCopyGeoreferenceAnnotationToClipboard}
             >
               <CopyIcon class="size-4 " />
-              Copy Georeference Annotation to clipboard
+              {m.copy_georeference_annotation()}
             </Command.Item>
           </Command.GroupItems>
         </Command.Group>

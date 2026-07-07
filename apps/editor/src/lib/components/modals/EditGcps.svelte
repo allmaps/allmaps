@@ -7,6 +7,7 @@
   import Message from '$lib/components/Message.svelte'
   import YesNo from '$lib/components/YesNo.svelte'
   import FileUpload from '$lib/components/UploadFile.svelte'
+  import { m } from '$lib/paraglide/messages.js'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
@@ -39,7 +40,7 @@
 
   function getMessageFromGcps(gcps: GCPs): MessageType {
     return {
-      text: `Successfully parsed ${gcps.length} GCPs`,
+      text: m.successfully_parsed_gcps({ count: gcps.length }),
       type: 'success'
     }
   }
@@ -62,7 +63,7 @@
     } else {
       gcps = []
       message = {
-        text: 'No GCPs provided',
+        text: m.no_gcps_provided(),
         type: 'info'
       }
     }
@@ -80,13 +81,10 @@
 
 <Modal bind:open>
   {#snippet title()}
-    Edit Ground Control Points
+    {m.edit_gcps_title()}
   {/snippet}
-  <p>Edit the GCPs of the current map in the text field below.</p>
-  <p>
-    You can use the formats used by QGIS, GDAL and ESRI. You can use the Upload
-    button to read the GCPs from a file on your computer.
-  </p>
+  <p>{m.edit_gcps_description()}</p>
+  <p>{m.edit_gcps_formats()}</p>
 
   <Textarea rows={10} bind:value={gcpsString} />
 
@@ -96,8 +94,8 @@
   </div>
 
   <YesNo
-    yes="Save"
-    no="Cancel"
+    yes={m.save()}
+    no={m.cancel()}
     noColor="gray"
     yesDisabled={!gcps.length}
     onNo={handleCancel}

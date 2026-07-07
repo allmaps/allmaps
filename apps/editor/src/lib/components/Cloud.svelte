@@ -2,6 +2,7 @@
   import { CloudCheck as CloudCheckIcon } from 'phosphor-svelte'
 
   import { green } from '@allmaps/tailwind'
+  import { m } from '$lib/paraglide/messages.js'
 </script>
 
 <p
@@ -12,7 +13,7 @@
     class="relative -top-0.5 inline-block size-6 pr-1"
     weight="duotone"
   />
-  <span>All edits are automatically saved in the Allmaps database</span>
+  <span>{m.autosave_notice()}</span>
 </p>
 
 <style>

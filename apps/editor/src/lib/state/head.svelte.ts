@@ -1,10 +1,12 @@
 import { setContext, getContext } from 'svelte'
 
 import { truncate } from '$lib/shared/strings.js'
-import { parseLanguageString } from '$lib/shared/iiif.js'
+import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
+import { m } from '$lib/paraglide/messages.js'
 
 import type { SourceState } from '$lib/state/source.svelte'
 
+const appName = 'Allmaps Editor'
 const ogImageSize = [1200, 627]
 
 const truncateOptions = {
@@ -31,8 +33,10 @@ export class HeadState {
 
   #canvas = $derived.by(() => this.#sourceState.activeCanvas)
 
-  #sourceLabelString = $derived(parseLanguageString(this.#sourceLabel, 'en'))
-  #canvasLabelString = $derived(parseLanguageString(this.#canvas?.label, 'en'))
+  #sourceLabelString = $derived(parseLocalizedLanguageString(this.#sourceLabel))
+  #canvasLabelString = $derived(
+    parseLocalizedLanguageString(this.#canvas?.label)
+  )
 
   constructor(previewUrl: string, sourceState: SourceState) {
     this.#previewUrl = previewUrl
@@ -44,7 +48,7 @@ export class HeadState {
     canvasLabelString: string,
     includeAppName = false
   ) {
-    let labels = includeAppName ? ['Allmaps Editor'] : []
+    let labels = includeAppName ? [appName] : []
 
     if (sourceLabelString) {
       if (canvasLabelString) {
@@ -62,7 +66,7 @@ export class HeadState {
   }
 
   #getDescription() {
-    return 'Georeference IIIF maps with Allmaps Editor'
+    return m.head_description()
   }
 
   #getOgImageUrl() {
@@ -126,7 +130,7 @@ export class HeadState {
         },
         {
           property: 'og:site_name',
-          content: 'Allmaps Editor'
+          content: appName
         },
         {
           property: 'og:type',

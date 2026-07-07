@@ -1,4 +1,5 @@
 import { basemapStyle } from '@allmaps/basemap'
+import { getCurrentLocale } from '$lib/i18n/locale.js'
 
 import { LngLat } from 'maplibre-gl'
 
@@ -48,7 +49,7 @@ export function getStyle(basemap: BasemapPreset) {
 
 export function getProtomapsStyle(): StyleSpecification {
   // @ts-expect-error incorrect MapLibre types
-  return basemapStyle('en')
+  return basemapStyle(getCurrentLocale())
 }
 
 export function getXyzLayerStyle(
