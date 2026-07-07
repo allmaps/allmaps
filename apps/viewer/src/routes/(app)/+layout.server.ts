@@ -6,7 +6,6 @@ import {
   getSourceErrorDetails,
   getSourceErrorTitle,
   getSourceLoadErrorStatus,
-  SourceHttpError,
   SourceLoadError
 } from '$lib/shared/source-errors.js'
 
@@ -41,7 +40,7 @@ export const load: LayoutServerLoad = async ({ fetch, url, parent }) => {
         urlParam
       }
     } catch (err) {
-      if (err instanceof SourceLoadError || err instanceof SourceHttpError) {
+      if (err instanceof SourceLoadError) {
         error(getSourceLoadErrorStatus(err), {
           message: err.message,
           code: getSourceErrorCode(err),

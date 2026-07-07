@@ -1,3 +1,4 @@
+import { browser } from '$app/environment'
 import { error } from '@sveltejs/kit'
 
 import { sourceFromUrl } from '$lib/shared/source.js'
@@ -16,7 +17,7 @@ export const load: LayoutLoad = async ({ data, fetch, url, parent }) => {
 
   const urlParam = url.searchParams.get('url')
 
-  if (source || !urlParam) {
+  if (source || !urlParam || !browser) {
     return {
       source,
       urlParam
