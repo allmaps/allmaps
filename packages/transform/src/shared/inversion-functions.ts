@@ -1,18 +1,28 @@
 // TODO: adding these in Helmert or Straight class would be better, but failed to call from there
 
-import { scalePoint } from '@allmaps/stdlib'
+import { midPoint, scalePoint, translatePoint } from '@allmaps/stdlib'
+
+import type { Point } from '@allmaps/types'
 
 import type { StraightMeasures } from './types'
 
 export function invertStraightMeasures(
-  forwardTransformationMeasures: StraightMeasures
+  forwardTransformationMeasures: StraightMeasures,
+  sourcePointsForward: Point[],
+  destinationPointsForward: Point[]
 ): StraightMeasures {
-  const { scale: forwardScale, translation: forwardTranslation } =
-    forwardTransformationMeasures
+  const { scale: forwardScale } = forwardTransformationMeasures
+
+  const scale = 1 / forwardScale
+  const translation = translatePoint(
+    midPoint(...sourcePointsForward),
+    scalePoint(midPoint(...destinationPointsForward), scale),
+    'substract'
+  )
 
   return {
-    scale: 1 / forwardScale,
-    translation: scalePoint(forwardTranslation, -1 / forwardScale)
+    scale,
+    translation
   }
 }
 export function invertHelmertWeightsArrays(

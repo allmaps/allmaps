@@ -1,5 +1,6 @@
-import { Helmert } from './Helmert.js'
+import { midPoint, scalePoint, translatePoint } from '@allmaps/stdlib'
 
+import { Helmert } from './Helmert.js'
 import { BaseTransformation } from './BaseTransformation.js'
 
 import type { Point } from '@allmaps/types'
@@ -53,7 +54,11 @@ export class Straight extends BaseTransformation {
       const weightsArray = weightsArrays[0]
 
       const scale = Math.sqrt(weightsArray[2] ** 2 + weightsArray[3] ** 2)
-      const translation = [weightsArray[0], weightsArray[1]] as Point
+      const translation = translatePoint(
+        midPoint(...this.destinationPoints),
+        scalePoint(midPoint(...this.sourcePoints), scale),
+        'substract'
+      )
 
       this.measures = { scale, translation }
     }

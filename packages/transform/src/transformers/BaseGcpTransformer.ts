@@ -160,7 +160,11 @@ export abstract class BaseGcpTransformer {
         this.backwardTransformation = new Straight(
           this.destinationPointsInternal,
           this.sourcePointsInternal,
-          invertStraightMeasures(forwardHelmertTransformation.getMeasures())
+          invertStraightMeasures(
+            forwardHelmertTransformation.getMeasures(),
+            this.sourcePointsInternal,
+            this.destinationPointsInternal
+          )
         )
       } else if (this.type === 'helmert') {
         const forwardHelmertTransformation =
