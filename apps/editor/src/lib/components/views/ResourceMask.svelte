@@ -640,7 +640,7 @@
   })
 </script>
 
-<div class="relative h-full w-full">
+<div data-tour="editor-mask-view" class="relative h-full w-full">
   {#if mapsState.connectedImageId}
     <Resource
       bind:resourceMap

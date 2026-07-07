@@ -211,6 +211,7 @@
 >
   {#snippet button()}
     <div
+      data-tour="editor-source"
       bind:clientWidth={infoButtonWidth}
       class="group w-full min-w-0 truncate rounded-full border-2 bg-gray/10
         py-1.5 pr-2 pl-3
@@ -242,7 +243,7 @@
     </div>
   {/snippet}
   {#snippet contents()}
-    <div class="flex max-w-2xl flex-col gap-2">
+    <div data-tour="editor-info-popover" class="flex max-w-2xl flex-col gap-2">
       <span class="text-center text-sm">
         {#if sourceType}
           {m.georeferencing_from_url({

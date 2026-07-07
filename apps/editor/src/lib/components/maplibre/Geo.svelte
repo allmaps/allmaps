@@ -378,7 +378,6 @@
           layerId: 'background-warped-map-layer'
         })
 
-        // @ts-expect-error MapLibre types are incompatible
         geoMap.addLayer(backgroundWarpedMapLayer)
         geoMap.moveLayer('background-warped-map-layer', 'warped-map-layer')
       }
@@ -423,7 +422,6 @@
         setGeoreferencedMaps(maps)
       } finally {
         if (warpedMapLayer && currentMapIds.size) {
-          // @ts-expect-error incorrect MapLibre types
           warpedMapLayerBounds = warpedMapLayer.getBounds()
         }
       }
@@ -467,7 +465,6 @@
       geoMap = newGeoMap
       warpedMapLayer = new WarpedMapLayer(renderOptions)
 
-      // @ts-expect-error MapLibre types are incompatible
       newGeoMap.addLayer(warpedMapLayer)
     })
 
@@ -551,4 +548,8 @@
   })
 </script>
 
-<div bind:this={geoMapContainer} class="h-full w-full"></div>
+<div
+  bind:this={geoMapContainer}
+  data-tour="editor-geo-map"
+  class="h-full w-full"
+></div>

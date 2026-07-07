@@ -1169,6 +1169,7 @@
 </script>
 
 <div
+  data-tour="editor-georeference-view"
   class="grid h-full w-full grid-rows-2 gap-0.5 sm:grid-cols-2 sm:grid-rows-1"
 >
   <Resource

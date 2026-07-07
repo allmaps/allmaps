@@ -254,4 +254,8 @@
   })
 </script>
 
-<div bind:this={resourceMapContainer} class="h-full w-full"></div>
+<div
+  bind:this={resourceMapContainer}
+  data-tour="editor-resource-map"
+  class="h-full w-full"
+></div>

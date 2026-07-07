@@ -45,6 +45,7 @@
     "@turf/rewind": "^7.2.0",
     "bits-ui": "^2.14",
     "d3-geo": "^3.1.1",
+    "driver.js": "^1.6.0",
     "js-sha1": "^0.7.0",
     "lodash-es": "^4.17.21",
     "maplibre-gl": "catalog:",

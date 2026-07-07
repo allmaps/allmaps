@@ -234,14 +234,16 @@
   })
 </script>
 
-<Geo
-  bind:geoMap
-  bind:warpedMapLayerBounds
-  bind:warpedMapLayer
-  mapIds={scopeState.mapIds}
-  initialViewport={geoViewport}
-  onmoveend={handleMoveend}
-  onMapIdsChanged={handleMapIdsChanged}
-  warpedMapsOpacity={uiState.resultsOptions.warpedMapLayerOpacity}
-  renderMasks={uiState.resultsOptions.renderMasks}
-/>
+<div data-tour="editor-results-view" class="h-full w-full">
+  <Geo
+    bind:geoMap
+    bind:warpedMapLayerBounds
+    bind:warpedMapLayer
+    mapIds={scopeState.mapIds}
+    initialViewport={geoViewport}
+    onmoveend={handleMoveend}
+    onMapIdsChanged={handleMapIdsChanged}
+    warpedMapsOpacity={uiState.resultsOptions.warpedMapLayerOpacity}
+    renderMasks={uiState.resultsOptions.renderMasks}
+  />
+</div>
