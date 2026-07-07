@@ -95,7 +95,10 @@
         currentUrlParam = data.urlParam
         currentDataParamChecksum = undefined
         setSource(data.source)
-      } else if (!data.source || data.source.url !== urlParam) {
+      } else if (
+        data.clientSourceLoadReason &&
+        (!data.source || data.source.url !== urlParam)
+      ) {
         const requestedUrlParam = urlParam
 
         currentUrlParam = requestedUrlParam

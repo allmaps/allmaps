@@ -1,17 +1,19 @@
-import { error } from '@sveltejs/kit'
-
 import { sourceFromUrl } from '$lib/shared/source.js'
-import {
-  getSourceErrorCode,
-  getSourceErrorDetails,
-  getSourceErrorTitle,
-  getSourceLoadErrorStatus,
-  SourceLoadError
-} from '$lib/shared/source-errors.js'
 
 import type { LayoutServerLoad } from './$types'
 
 const FETCH_TIMEOUT_MS = 2000
+type ClientSourceLoadReason = 'iiif' | 'server-source-error'
+
+function clientSourceLoad(
+  urlParam: string,
+  clientSourceLoadReason: ClientSourceLoadReason
+) {
+  return {
+    urlParam,
+    clientSourceLoadReason
+  }
+}
 
 export const load: LayoutServerLoad = async ({ fetch, url, parent }) => {
   const { env } = await parent()
@@ -30,34 +32,21 @@ export const load: LayoutServerLoad = async ({ fetch, url, parent }) => {
       )
 
       if (source.parsed.type === 'iiif') {
-        return {
-          urlParam
-        }
+        return clientSourceLoad(urlParam, 'iiif')
       }
 
       return {
         source,
         urlParam
       }
-    } catch (err) {
-      if (err instanceof SourceLoadError) {
-        error(getSourceLoadErrorStatus(err), {
-          message: err.message,
-          code: getSourceErrorCode(err),
-          title: getSourceErrorTitle(err),
-          details: getSourceErrorDetails(err)
-        })
-      }
-
+    } catch {
       // An error occurred while fetching the source.
       // This probably means the URL is invalid or unvailable, but it
       // could also mean the host institution is blocking traffic from
       // our server on Cloudflare because it thinks it's an AI bot.
       // We should try again in the browser!
 
-      return {
-        urlParam
-      }
+      return clientSourceLoad(urlParam, 'server-source-error')
     }
   }
 }
