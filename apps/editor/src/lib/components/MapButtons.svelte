@@ -45,7 +45,7 @@
         class="inline-flex size-8 items-center justify-center rounded-full bg-white p-1.5 shadow-md transition-all"
       >
         <GearSixIcon size="100%" weight="regular" />
-      </div>
+      </span>
     {/snippet}
 
     {#snippet contents()}<MapSettings />{/snippet}
