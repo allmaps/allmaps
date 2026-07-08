@@ -287,7 +287,10 @@
         uiState.popoverOpen[options.popover] = true
       }
 
-      await waitForElement(options.targetSelector)
+      const targetElement = await waitForElement(options.targetSelector)
+      if (!targetElement) {
+        return
+      }
 
       if (options.direction === 'next') {
         driver.moveNext()
