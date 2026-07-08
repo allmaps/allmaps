@@ -583,7 +583,7 @@
     tour.drive()
   }
 
-  function handleStartTour(_event: CustomEvent<void>) {
+  function handleStartTour() {
     void startTour()
   }
 
