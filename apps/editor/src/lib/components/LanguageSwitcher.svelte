@@ -3,7 +3,8 @@
   import { DropdownMenu } from 'bits-ui'
   import {
     CaretRight as CaretRightIcon,
-    Check as CheckIcon
+    Check as CheckIcon,
+    Translate as TranslateIcon
   } from 'phosphor-svelte'
 
   import { m } from '$lib/paraglide/messages.js'
@@ -28,8 +29,9 @@
 
 <DropdownMenu.Sub>
   <DropdownMenu.SubTrigger
-    class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
+    class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center gap-2 rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
   >
+    <TranslateIcon class="size-4 shrink-0" />
     <span class="min-w-0 flex-1 truncate">{m.language()}</span>
     <CaretRightIcon class="size-4 shrink-0 text-gray-400" />
   </DropdownMenu.SubTrigger>

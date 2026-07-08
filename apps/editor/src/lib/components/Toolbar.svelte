@@ -4,7 +4,9 @@
   import {
     Export as ExportIcon,
     List as ListIcon,
-    ArrowUDownLeft as ArrowUDownLeftIcon
+    ArrowUDownLeft as ArrowUDownLeftIcon,
+    Command as CommandIcon,
+    Play as PlayIcon
   } from 'phosphor-svelte'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
@@ -15,7 +17,7 @@
 
   import { isCallbackValid } from '$lib/shared/organizations.js'
 
-  import { Popover } from '@allmaps/components'
+  import { Logo, Popover } from '@allmaps/components'
 
   import Export from '$lib/components/popovers/Export.svelte'
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte'
@@ -73,25 +75,30 @@
     >
       <DropdownMenu.Item
         onclick={() => uiState.dispatchStartTour()}
-        class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
+        class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center gap-2 rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
       >
-        {m.tour_start_ellipsis()}
+        <PlayIcon class="size-4 shrink-0" />
+        <span class="min-w-0 flex-1 truncate">{m.tour_start_ellipsis()}</span>
       </DropdownMenu.Item>
       <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
       <DropdownMenu.Item
         onclick={() => (uiState.modalOpen.keyboard = true)}
-        class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
+        class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center gap-2 rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
       >
-        {m.keyboard_shortcuts_ellipsis()}
+        <CommandIcon class="size-4 shrink-0" />
+        <span class="min-w-0 flex-1 truncate">
+          {m.keyboard_shortcuts_ellipsis()}
+        </span>
       </DropdownMenu.Item>
+      <LanguageSwitcher />
+      <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
       <DropdownMenu.Item
         onclick={() => (uiState.modalOpen.about = true)}
-        class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
+        class="data-highlighted:bg-muted flex h-10 cursor-pointer items-center gap-2 rounded-md py-3 pr-1.5 pl-3 text-sm font-medium ring-0! ring-transparent! select-none hover:bg-gray-100"
       >
-        {m.about_editor_ellipsis()}
+        <span class="size-4 shrink-0 [&_svg]:size-full"><Logo /></span>
+        <span class="min-w-0 flex-1 truncate">{m.about_editor_ellipsis()}</span>
       </DropdownMenu.Item>
-      <DropdownMenu.Separator class="my-1 h-px bg-gray-200" />
-      <LanguageSwitcher />
     </DropdownMenu.Content>
   </DropdownMenu.Root>
 </div>
