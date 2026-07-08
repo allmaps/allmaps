@@ -41,7 +41,7 @@
   "tour_workflow_title": "De workflow voor georefereren",
   "tour_workflow_description": "Allmaps Editor werkt van bronafbeeldingen, naar maskers, naar controlepunten, naar de uiteindelijke vervormde kaart.",
   "tour_source_title": "Geladen IIIF-resource",
-  "tour_source_description": "Deze balk toont de IIIF-resource die je georefereerd.",
+  "tour_source_description": "Deze balk toont de IIIF-resource die je georefereert.",
   "tour_info_title": "Details van de bron",
   "tour_info_description": "Open dit paneel om de bron-URL, IIIF-metadata, huidige afbeelding en context van collectie of manifest te bekijken.",
   "tour_images_title": "Kies een afbeelding",
