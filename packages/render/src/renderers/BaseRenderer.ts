@@ -7,7 +7,7 @@ import {
   mergeOptions,
   mergePartialOptions
 } from '@allmaps/stdlib'
-import { isEqualProjection, webMercatorProjection } from '@allmaps/project'
+import { isEqualProjection } from '@allmaps/project'
 
 import { TileCache } from '../tilecache/TileCache.js'
 import { WarpedMapList } from '../maps/WarpedMapList.js'

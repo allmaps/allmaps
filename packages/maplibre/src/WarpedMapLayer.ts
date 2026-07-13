@@ -310,11 +310,14 @@ export class WarpedMapLayer
 
     // Getting the viewportSize should also be possible through getting the bounds
     // And using project() to go to resource coordintas
+    //
+    // Note that we use canvas.offsetWidth and canvas.offsetHeight here
+    // instead of canvas.width / window.devicePixelRatio and canvas.height / window.devicePixelRatio
+    // because MapLibre's canvasSize as [canvas.width, canvas.height] is capped at 4096
+    // (see https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/#maxcanvassize)
+    // which gives issues for canvas sizes > 4096 (e.g. on 5K screens)
     const canvas = this.map.getCanvas()
-    const viewportSize = [
-      canvas.width / window.devicePixelRatio,
-      canvas.height / window.devicePixelRatio
-    ] as Size
+    const viewportSize = [canvas.offsetWidth, canvas.offsetHeight] as Size
 
     const geoCenterAsLngLat = this.map.getCenter()
     const projectedGeoCenter = lonLatToWebMercator([
