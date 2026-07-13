@@ -218,7 +218,7 @@ export function newBlockArrayMatrix<T = number>(
       pasteArrayMatrixInPlace(
         result,
         rowsTrailingCumulativeArray[i],
-        rowsTrailingCumulativeArray[j],
+        colsTrailingCumulativeArray[j],
         blocks[i][j]
       )
     }
