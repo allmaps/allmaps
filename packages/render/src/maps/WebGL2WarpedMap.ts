@@ -1059,6 +1059,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
     // Upload each tile's ImageData via a PBO, then immediately delete the PBO.
+    const pbo = gl.createBuffer()
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
       const imageData = this.cachedTilesForTexture[i].data
 
@@ -1077,7 +1078,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         throw new Error("Cached tile doesn't fit in texture")
       }
 
-      const pbo = gl.createBuffer()
       gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo)
       gl.bufferData(gl.PIXEL_UNPACK_BUFFER, imageData.data, gl.STATIC_DRAW)
 
@@ -1096,8 +1096,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       )
 
       gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
-      gl.deleteBuffer(pbo)
     }
+    gl.deleteBuffer(pbo)
 
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
