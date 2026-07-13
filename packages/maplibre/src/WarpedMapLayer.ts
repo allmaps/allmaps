@@ -233,13 +233,19 @@ export class WarpedMapLayer
     if (bearingMapIds === undefined) {
       bearing = computeWarpedMapBearing(warpedMaps[0], options)
     } else {
+      const bearingWarpedMaps = warpedMaps.filter((warpedMap) =>
+        bearingMapIds.includes(warpedMap.mapId)
+      )
+      if (bearingWarpedMaps.length === 0) {
+        throw new Error(
+          "Map IDs for bearing don't overlap with selected map IDs."
+        )
+      }
       bearing = radiansToDegrees(
         angularMean(
-          ...warpedMaps
-            .filter((warpedMap) => bearingMapIds.includes(warpedMap.mapId))
-            .map((warpedMap) =>
-              degreesToRadians(computeWarpedMapBearing(warpedMap, options))
-            )
+          ...bearingWarpedMaps.map((warpedMap) =>
+            degreesToRadians(computeWarpedMapBearing(warpedMap, options))
+          )
         )
       )
     }
