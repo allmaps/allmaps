@@ -246,6 +246,16 @@ There are no parameters.
 
 `[Array<number>, Array<number>]`.
 
+### `AttachedTransformation#getWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
 ### `AttachedTransformation#options?`
 
 ###### Type

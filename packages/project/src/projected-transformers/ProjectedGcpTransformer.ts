@@ -499,9 +499,6 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * To do this more systematically, it's possible to set
    * a projected gcp transformer's projection using this method.
    *
-   * Combine this with a deep clone of the transformer instance
-   * to keep the original transformer as well.
-   *
    * @returns this
    */
   static fromProjection(

@@ -533,7 +533,7 @@ There are no parameters.
 
 ###### Returns
 
-`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; warpedMapFactory?: WarpedMapFactory<WebGL2WarpedMap> | undefined; ... 78 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
+`{ interactive?: boolean | undefined; className?: string | undefined; pane?: string | undefined; zIndex?: number | undefined; warpedMapFactory?: WarpedMapFactory<WebGL2WarpedMap> | undefined; ... 77 more ...; distortionMeasure?: DistortionMeasure | undefined; }`.
 
 ### `WarpedMapLayer#getMapDefaultOptions(mapId)`
 

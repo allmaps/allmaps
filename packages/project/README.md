@@ -625,7 +625,7 @@ Create a Projected GCP Transformer from a Georeferenced Map
 
 A Projected GCP Transformer (`ProjectedGcpTransformer`).
 
-### `ProjectedGcpTransformer.setProjection(projectedTransformer, projection)`
+### `ProjectedGcpTransformer.fromProjection(projectedTransformer, projection)`
 
 Set the projection.
 
@@ -638,9 +638,6 @@ of the toGeo and/or toResource transformations.
 
 To do this more systematically, it's possible to set
 a projected gcp transformer's projection using this method.
-
-Combine this with a deep clone of the transformer instance
-to keep the original transformer as well.
 
 ###### Parameters
 

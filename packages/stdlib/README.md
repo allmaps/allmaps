@@ -1575,6 +1575,19 @@ Create and fill a ArrayMatrix: an Arrays of Arrays, that can later be loaded as 
 
 `Array<Array<T>>`.
 
+### `pasteArrayMatrixInPlace(arrayMatrix, rowsStart, colsStart, subArrayMatrix)`
+
+###### Parameters
+
+* `arrayMatrix` (`Array<Array<T>>`)
+* `rowsStart` (`number`)
+* `colsStart` (`number`)
+* `subArrayMatrix` (`Array<Array<T>>`)
+
+###### Returns
+
+`Array<Array<T>>`.
+
 ### `pixelToIntArrayIndex(pixel, size, channels, flipY)`
 
 ###### Parameters
