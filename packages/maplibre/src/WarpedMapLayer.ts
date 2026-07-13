@@ -274,10 +274,7 @@ export class WarpedMapLayer
     // Scale bbox based on fit with viewport bbox
     if (options.fit) {
       const canvas = map.getCanvas()
-      const viewportSize = [
-        canvas.width / window.devicePixelRatio,
-        canvas.height / window.devicePixelRatio
-      ] as Size
+      const viewportSize = [canvas.offsetWidth, canvas.offsetHeight] as Size
 
       const adjustmentScale =
         sizesToScale(bboxToSize(projectedGeoBbox), viewportSize, options.fit) /
