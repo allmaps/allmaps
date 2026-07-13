@@ -3,8 +3,8 @@ import { wrap as comlinkWrap } from 'comlink'
 import type { Remote } from 'comlink'
 
 export class WorkerPool<T> {
-  workers: Worker[] = []
-  wrapped: Remote<T>[] = []
+  private workers: Worker[] = []
+  private wrapped: Remote<T>[] = []
   #outstanding: number[] = []
 
   constructor(WorkerCtor: new () => Worker, size: number) {
