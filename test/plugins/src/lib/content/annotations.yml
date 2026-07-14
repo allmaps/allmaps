@@ -37,6 +37,9 @@
 - name: Antarctic Peninsula
   url: https://sammeltassen.nl/iiif-manifests/allmaps/antarctic-allmaps.json
   reason: Extreme latitudes, best with projection
+- name: Amsterdam copper plate
+  url: https://annotations.allmaps.org/maps/a4df2856b405de5b
+  reason: Map with flipped y-axis
 - name: Caledonia
   url: https://annotations.allmaps.org/maps/63ac1b4bd125ca05
   reason: Left of antimeridian
@@ -69,4 +72,10 @@
   reason: Images with multiple tile sizes, dateline
 - name: Pourbus
   url: https://raw.githubusercontent.com/mclaeysb/claeissens/refs/heads/main/final-annotation-page.json
+  reason: Extremely high number of GCPs
+- name: Peutinger
+  url: https://annotations.allmaps.org/maps/16b519f8f559495f@4c65523134f319f2
+  reason: Extremely high number of GCPs
+- name: Chinese coastline
+  url: https://annotations.allmaps.org/images/ea20959651600e01
   reason: Extremely high number of GCPs

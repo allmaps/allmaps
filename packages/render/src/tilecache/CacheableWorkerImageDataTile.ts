@@ -3,6 +3,7 @@ import { proxy as comlinkProxy, type Remote as ComlinkRemote } from 'comlink'
 import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile, CachedTile } from './CacheableTile.js'
 import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
+import { WorkerPool } from '../workers/PoolWorkers.js'
 
 import type { FetchFn } from '@allmaps/types'
 
@@ -15,17 +16,17 @@ import type { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-i
  * Class for tiles that can be cached, and whose data can be processed to its imageData using a WebWorker.
  */
 export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
-  #worker: ComlinkRemote<FetchAndGetImageDataWorkerType>
+  #workerPool: WorkerPool<FetchAndGetImageDataWorkerType>
   #spritesWorker: ComlinkRemote<ApplySpritesImageDataWorkerType>
 
   constructor(
     fetchableTile: FetchableTile,
-    worker: ComlinkRemote<FetchAndGetImageDataWorkerType>,
+    workerPool: WorkerPool<FetchAndGetImageDataWorkerType>,
     spritesWorker: ComlinkRemote<ApplySpritesImageDataWorkerType>,
     fetchFn?: FetchFn
   ) {
     super(fetchableTile, fetchFn)
-    this.#worker = worker
+    this.#workerPool = workerPool
     this.#spritesWorker = spritesWorker
   }
 
@@ -35,18 +36,37 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
    * @returns
    */
   async fetch() {
+    const { worker, index } = this.#workerPool.acquire()
     try {
-      this.data = await this.#worker.getImageData(
-        this.fetchableTile.tileUrl,
-        comlinkProxy(() => this.abortController.abort()),
-        this.fetchFn,
-        this.fetchableTile.tile.tileZoomLevel.width,
-        this.fetchableTile.tile.tileZoomLevel.height
-      )
-
-      this.dispatchTileFetched()
+      worker
+        .getImageData(
+          this.fetchableTile.tileUrl,
+          comlinkProxy(() => this.abortController.abort()),
+          this.fetchFn,
+          this.fetchableTile.tile.tileZoomLevel.width,
+          this.fetchableTile.tile.tileZoomLevel.height
+        )
+        .then((response) => {
+          this.data = response
+          this.dispatchEvent(
+            new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+              tileUrl: this.fetchableTile.tileUrl
+            })
+          )
+        })
+        .catch((err) => {
+          if (err instanceof Error && err.name === 'AbortError') {
+            console.log('Fetch aborted') // Handle the abort error
+          } else {
+            console.error(err) // Handle other errors
+          }
+        })
+        .finally(() => {
+          this.#workerPool.release(index)
+        })
     } catch (err) {
-      if (this.isAbortError(err)) {
+      this.#workerPool.release(index) // release even if setup itself throws synchronously
+      if (err instanceof Error && err.name === 'AbortError') {
         // fetchImage was aborted because viewport was moved and tile
         // is no longer needed. This error can be ignored, nothing to do.
       } else {
@@ -112,7 +132,7 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
           FetchableTile.fromSprite(sprite, spritesInfo.imageSize, warpedMap, {
             spritesInfo
           }),
-          this.#worker,
+          this.#workerPool,
           this.#spritesWorker,
           clippedImageDatas[index]
         )
@@ -124,13 +144,13 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
   }
 
   static createFactory(
-    worker: ComlinkRemote<FetchAndGetImageDataWorkerType>,
+    workerPool: WorkerPool<FetchAndGetImageDataWorkerType>,
     spritesWorker: ComlinkRemote<ApplySpritesImageDataWorkerType>
   ) {
     return (fetchableTile: FetchableTile, fetchFn?: FetchFn) =>
       new CacheableWorkerImageDataTile(
         fetchableTile,
-        worker,
+        workerPool,
         spritesWorker,
         fetchFn
       )
@@ -152,11 +172,11 @@ export class CachedWorkerImageDataTile extends CacheableWorkerImageDataTile {
    */
   constructor(
     fetchableTile: FetchableTile,
-    worker: ComlinkRemote<FetchAndGetImageDataWorkerType>,
+    workerPool: WorkerPool<FetchAndGetImageDataWorkerType>,
     spritesWorker: ComlinkRemote<ApplySpritesImageDataWorkerType>,
     data: ImageData
   ) {
-    super(fetchableTile, worker, spritesWorker)
+    super(fetchableTile, workerPool, spritesWorker)
     this.data = data
   }
 }

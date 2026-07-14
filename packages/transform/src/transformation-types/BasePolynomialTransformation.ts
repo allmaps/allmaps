@@ -1,7 +1,7 @@
 import {
   arrayMatrixSize,
   newArrayMatrix,
-  pasteArrayMatrix
+  pasteArrayMatrixInPlace
 } from '@allmaps/stdlib'
 
 import { BaseIndependentLinearWeightsTransformation } from './BaseIndependentLinearWeightsTransformation.js'
@@ -62,13 +62,13 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
   }
 
   getCoefsArrayMatrix(): number[][] {
-    let coefsArrayArray = newArrayMatrix(
+    const coefsArrayArray = newArrayMatrix(
       this.pointCount,
       this.pointCountMinimum,
       0
     )
     for (let i = 0; i < this.pointCount; i++) {
-      coefsArrayArray = pasteArrayMatrix(coefsArrayArray, i, 0, [
+      pasteArrayMatrixInPlace(coefsArrayArray, i, 0, [
         this.getSourcePointCoefsArray(this.sourcePoints[i])
       ])
     }
@@ -87,20 +87,11 @@ export abstract class BasePolynomialTransformation extends BaseIndependentLinear
     weights: Float64Array
     sourcePoints: Float64Array
   } {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Polynomial transformation weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     // Polynomial: [wx[0], wx[1], ..., wy[0], wy[1], ...]
     return {
-      weights: new Float64Array([
-        ...this.weightsArrays[0],
-        ...this.weightsArrays[1]
-      ]),
+      weights: new Float64Array([...weightsArrays[0], ...weightsArrays[1]]),
       sourcePoints: new Float64Array(0)
     }
   }

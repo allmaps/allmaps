@@ -328,7 +328,6 @@ MaskOptions & {
 
 * `anticipateInteraction` (`boolean`)
 * `log2ScaleFactorCorrection` (`number`)
-* `maxGcpsExactTpsToResource` (`number`)
 * `maxTotalOverviewResolutionRatio` (`number`)
 * `overviewPruneViewportBufferRatio` (`number`)
 * `overviewRequestViewportBufferRatio` (`number`)
@@ -707,19 +706,6 @@ Update the ground control points loaded from a georeferenced map to new ground c
 
 * `gcps` (`Array<Gcp>`)
   * the new ground control points
-
-###### Returns
-
-`void`.
-
-### `TriangulatedWarpedMap#setInternalProjection(projection)`
-
-Set the internal projection
-
-###### Parameters
-
-* `projection` (`{id?: string; name?: string; definition: ProjectionDefinition}`)
-  * the internal projection
 
 ###### Returns
 
@@ -3866,6 +3852,8 @@ There are no parameters.
 ###### Returns
 
 `{
+  mapsInListEntering: string[]
+  mapsInListLeaving: string[]
   mapsInViewportEntering: string[]
   mapsInViewportLeaving: string[]
   mapsWithFetchableTilesForViewportEntering: string[]
@@ -3987,6 +3975,14 @@ null
 
 ```ts
 null
+```
+
+### `WebGL2WarpedMap#cachedTilesTextureArrayAllocatedDepth`
+
+###### Type
+
+```ts
+0
 ```
 
 ### `WebGL2WarpedMap#cancelThrottledFunctions()`

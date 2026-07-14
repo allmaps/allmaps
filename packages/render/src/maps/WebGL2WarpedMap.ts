@@ -1,7 +1,6 @@
 import { throttle } from 'lodash-es'
 
 import {
-  hexToFractionalOpaqueRgba,
   lineStringToLines,
   mergeOptions,
   pointsAndPointsToLines,
@@ -28,6 +27,7 @@ import {
 } from '../shared/homogeneous-transform.js'
 import { createBuffer } from '../shared/webgl2.js'
 import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
+import { getCachedFractionalOpaqueRgba } from '../shared/colors-cache.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -178,6 +178,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourceOriginPointsAndSizesTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
+  private cachedTilesTextureArrayAllocatedDepth = 0
 
   // About renderHomogeneousTransform and InvertedRenderHomogeneousTransform:
   // renderHomogeneousTransform is the product of:
@@ -249,6 +250,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
     this.cachedTilesResourceOriginPointsAndSizesTexture =
       this.gl.createTexture()
+    this.cachedTilesTextureArrayAllocatedDepth = 0
   }
 
   /**
@@ -387,8 +389,20 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * Clear textures for this map
    */
   clearTextures() {
-    // TODO: implement clearing of texture: maybe a 1x1x1 texture that's empty
-    // this.throttledUpdateTextures()
+    const gl = this.gl
+
+    gl.deleteTexture(this.cachedTilesTextureArray)
+    this.cachedTilesTextureArray = gl.createTexture()
+    this.cachedTilesTextureArrayAllocatedDepth = 0
+
+    gl.deleteTexture(this.cachedTilesResourceOriginPointsAndSizesTexture)
+    this.cachedTilesResourceOriginPointsAndSizesTexture = gl.createTexture()
+
+    gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
+    this.cachedTilesScaleFactorsTexture = gl.createTexture()
+
+    this.cachedTilesForTexture = []
+    this.previousCachedTilesForTexture = []
   }
 
   /**
@@ -537,40 +551,54 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const program = this.mapProgram
     gl.bindVertexArray(this.mapVao)
 
+    const resourceTrianglePointsFlat = new Float32Array(
+      this.resourceTrianglePoints.length * 2
+    )
+    for (let i = 0; i < this.resourceTrianglePoints.length; i++) {
+      const p = this.resourceTrianglePoints[i]
+      resourceTrianglePointsFlat[i * 2] = p[0]
+      resourceTrianglePointsFlat[i * 2 + 1] = p[1]
+    }
     createBuffer(
       gl,
       program,
-      new Float32Array(this.resourceTrianglePoints.flat()),
+      resourceTrianglePointsFlat,
       2,
       'a_resourceTrianglePoint'
     )
 
-    const clipPreviousTrianglePoints =
-      this.projectedGeoPreviousTrianglePoints.map((point) =>
-        applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+    const clipPreviousTrianglePointsFlat = new Float32Array(
+      this.projectedGeoPreviousTrianglePoints.length * 2
+    )
+    for (let i = 0; i < this.projectedGeoPreviousTrianglePoints.length; i++) {
+      const transformed = applyHomogeneousTransform(
+        projectedGeoToClipHomogeneousTransform,
+        this.projectedGeoPreviousTrianglePoints[i]
       )
+      clipPreviousTrianglePointsFlat[i * 2] = transformed[0]
+      clipPreviousTrianglePointsFlat[i * 2 + 1] = transformed[1]
+    }
     createBuffer(
       gl,
       program,
-      new Float32Array(clipPreviousTrianglePoints.flat()),
+      clipPreviousTrianglePointsFlat,
       2,
       'a_clipPreviousTrianglePoint'
     )
 
-    const clipTrianglePoints = this.projectedGeoTrianglePoints.map((point) =>
-      applyHomogeneousTransform(projectedGeoToClipHomogeneousTransform, point)
+    const clipTrianglePointsFlat = new Float32Array(
+      this.projectedGeoTrianglePoints.length * 2
     )
-    createBuffer(
-      gl,
-      program,
-      new Float32Array(clipTrianglePoints.flat()),
-      2,
-      'a_clipTrianglePoint'
-    )
+    for (let i = 0; i < this.projectedGeoTrianglePoints.length; i++) {
+      const transformed = applyHomogeneousTransform(
+        projectedGeoToClipHomogeneousTransform,
+        this.projectedGeoTrianglePoints[i]
+      )
+      clipTrianglePointsFlat[i * 2] = transformed[0]
+      clipTrianglePointsFlat[i * 2 + 1] = transformed[1]
+    }
+    createBuffer(gl, program, clipTrianglePointsFlat, 2, 'a_clipTrianglePoint')
 
-    // Previous and new distortion
-    // Note: we must update the distortion data even when we don't render distortions
-    // to ensure this array buffer is of the correct length, for example when triangulation changes
     createBuffer(
       gl,
       program,
@@ -589,9 +617,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const trianglePointsTriangleIndex = new Float32Array(
       this.resourceTrianglePoints.length
-    ).map((_v, i) => {
-      return i
-    })
+    )
+    for (let i = 0; i < this.resourceTrianglePoints.length; i++) {
+      trianglePointsTriangleIndex[i] = i
+    }
     createBuffer(
       gl,
       program,
@@ -600,12 +629,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       'a_trianglePointIndex'
     )
 
+    const trianglePointsInsideFlat = new Float32Array(
+      this.trianglePointsInside.length
+    )
+    for (let i = 0; i < this.trianglePointsInside.length; i++) {
+      trianglePointsInsideFlat[i] = this.trianglePointsInside[i] ? 1 : 0
+    }
     createBuffer(
       gl,
       program,
-      new Float32Array(
-        this.trianglePointsInside.map((inside) => (inside ? 1 : 0))
-      ),
+      trianglePointsInsideFlat,
       1,
       'a_trianglePointInside'
     )
@@ -788,7 +821,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const colors = this.lineGroups.reduce(
       (accumulator: number[][], lineGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           lineGroup.color ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.color
         )
         return accumulator.concat(
@@ -823,7 +856,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const borderColors = this.lineGroups.reduce(
       (accumulator: number[][], lineGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           lineGroup.borderColor ?? DEFAULT_RENDER_LINE_GROUP_OPTIONS.borderColor
         )
         return accumulator.concat(
@@ -914,7 +947,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const colors = this.pointGroups.reduce(
       (accumulator: number[][], pointGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           pointGroup.color ?? DEFAULT_RENDER_POINT_GROUP_OPTION.color
         )
         return accumulator.concat(
@@ -946,7 +979,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     const borderColors = this.pointGroups.reduce(
       (accumulator: number[][], pointGroup) => {
-        const color = hexToFractionalOpaqueRgba(
+        const color = getCachedFractionalOpaqueRgba(
           pointGroup.borderColor ??
             DEFAULT_RENDER_POINT_GROUP_OPTION.borderColor
         )
@@ -971,13 +1004,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Find out which tiles to include in texture
     this.updateCachedTilesForTextures()
 
-    // Don't update if request without tiles, or if
-    // same request is (non-null) subset of previous request
-    // This reduces (expensive) texture updates when just reducing the number of tiles
-    // (But keeps them when all tiles are gone to free up texture)
-    // And blocking updates on equal requests is important to
-    // prevent triggering an infinite loop
-    // caused by the TEXTURESUPDATED event at the end
+    // Don't update if no tiles, or if current set is a non-null subset of the
+    // previous set (reduces expensive updates when just dropping tiles, but keeps
+    // them when all tiles are gone to free the texture). Blocking equal requests
+    // prevents an infinite loop via the TEXTURESUPDATED event below.
     if (
       this.cachedTilesForTexture.length == 0 ||
       (this.cachedTilesForTexture.length !== 0 &&
@@ -1002,22 +1032,34 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     const requiredTextureHeight = this.tileSize[1]
     const requiredTextureDepth = this.cachedTilesForTexture.length
 
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
     gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
 
-    gl.texImage3D(
-      gl.TEXTURE_2D_ARRAY,
-      0,
-      gl.RGBA,
-      requiredTextureWidth,
-      requiredTextureHeight,
-      requiredTextureDepth,
-      0,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      null
-    )
+    // Use texStorage3D to allocate once at a fixed depth, avoiding a full
+    // GPU reallocation on every tile arrival. texStorage3D is immutable after
+    // the first call, so we only call it when depth grows beyond the current
+    // allocation. In practice depth stays stable once tiles are loaded.
+    if (requiredTextureDepth > this.cachedTilesTextureArrayAllocatedDepth) {
+      // Delete the existing texture object and create a fresh one, because
+      // texStorage3D cannot be called twice on the same texture object.
+      gl.deleteTexture(this.cachedTilesTextureArray)
+      this.cachedTilesTextureArray = gl.createTexture()
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
 
+      gl.texStorage3D(
+        gl.TEXTURE_2D_ARRAY,
+        1,
+        gl.RGBA8,
+        requiredTextureWidth,
+        requiredTextureHeight,
+        requiredTextureDepth
+      )
+      this.cachedTilesTextureArrayAllocatedDepth = requiredTextureDepth
+    }
+
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
+
+    // Upload each tile's ImageData via a PBO, then immediately delete the PBO.
+    const pbo = gl.createBuffer()
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
       const imageData = this.cachedTilesForTexture[i].data
 
@@ -1036,7 +1078,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         throw new Error("Cached tile doesn't fit in texture")
       }
 
-      const pbo = gl.createBuffer()
       gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo)
       gl.bufferData(gl.PIXEL_UNPACK_BUFFER, imageData.data, gl.STATIC_DRAW)
 
@@ -1056,6 +1097,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
       gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
     }
+    gl.deleteBuffer(pbo)
 
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)

@@ -41,6 +41,10 @@ import {
   generalGcpToPointForBackward,
   invertGeneralGcp
 } from '../shared/conversion-functions.js'
+import {
+  invertHelmertWeightsArrays,
+  invertStraightMeasures
+} from '../shared/inversion-functions.js'
 
 import type {
   Point,
@@ -148,10 +152,39 @@ export abstract class BaseGcpTransformer {
    */
   protected getBackwardTransformationInternal(): BaseTransformation {
     if (!this.backwardTransformation) {
-      this.backwardTransformation = this.createTransformation(
-        this.destinationPointsInternal,
-        this.sourcePointsInternal
-      )
+      if (this.type === 'straight') {
+        const forwardHelmertTransformation = new Helmert(
+          this.sourcePointsInternal,
+          this.destinationPointsInternal
+        )
+        this.backwardTransformation = new Straight(
+          this.destinationPointsInternal,
+          this.sourcePointsInternal,
+          invertStraightMeasures(
+            forwardHelmertTransformation.getMeasures(),
+            this.sourcePointsInternal,
+            this.destinationPointsInternal
+          )
+        )
+      } else if (this.type === 'helmert') {
+        const forwardHelmertTransformation =
+          this.getForwardTransformationInternal() as Helmert
+        const forwardHelmertTransformationWeightsArrays =
+          forwardHelmertTransformation.getWeightsArrays()
+        const backwardHelmertTransformationWeightsArrays =
+          invertHelmertWeightsArrays(forwardHelmertTransformationWeightsArrays)
+        this.backwardTransformation = new Helmert(
+          this.destinationPointsInternal,
+          this.sourcePointsInternal,
+          backwardHelmertTransformationWeightsArrays[0]
+        )
+      } else {
+        // By default just invert source and destination
+        this.backwardTransformation = this.createTransformation(
+          this.destinationPointsInternal,
+          this.sourcePointsInternal
+        )
+      }
     }
     return this.backwardTransformation
   }

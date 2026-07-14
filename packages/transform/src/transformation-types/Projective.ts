@@ -69,7 +69,7 @@ export class Projective extends BaseTransformation {
     )
   }
 
-  evaluateFunction(newSourcePoint: Point): Point {
+  getWeightsArrays(): number[][] {
     if (!this.weightsArrays) {
       this.solve()
     }
@@ -78,76 +78,70 @@ export class Projective extends BaseTransformation {
       throw new Error('Weights not computed')
     }
 
+    return this.weightsArrays
+  }
+
+  evaluateFunction(newSourcePoint: Point): Point {
+    const weightsArrays = this.getWeightsArrays()
+
     const c =
-      this.weightsArrays[0][2] * newSourcePoint[0] +
-      this.weightsArrays[1][2] * newSourcePoint[1] +
-      this.weightsArrays[2][2]
+      weightsArrays[0][2] * newSourcePoint[0] +
+      weightsArrays[1][2] * newSourcePoint[1] +
+      weightsArrays[2][2]
     const num1 =
-      this.weightsArrays[0][0] * newSourcePoint[0] +
-      this.weightsArrays[1][0] * newSourcePoint[1] +
-      this.weightsArrays[2][0]
+      weightsArrays[0][0] * newSourcePoint[0] +
+      weightsArrays[1][0] * newSourcePoint[1] +
+      weightsArrays[2][0]
     const num2 =
-      this.weightsArrays[0][1] * newSourcePoint[0] +
-      this.weightsArrays[1][1] * newSourcePoint[1] +
-      this.weightsArrays[2][1]
+      weightsArrays[0][1] * newSourcePoint[0] +
+      weightsArrays[1][1] * newSourcePoint[1] +
+      weightsArrays[2][1]
     const newDestinationPoint: Point = [num1 / c, num2 / c]
 
     return newDestinationPoint
   }
 
   evaluatePartialDerivativeX(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     const c =
-      this.weightsArrays[0][2] * newSourcePoint[0] +
-      this.weightsArrays[1][2] * newSourcePoint[1] +
-      this.weightsArrays[2][2]
+      weightsArrays[0][2] * newSourcePoint[0] +
+      weightsArrays[1][2] * newSourcePoint[1] +
+      weightsArrays[2][2]
     const num1 =
-      this.weightsArrays[0][0] * newSourcePoint[0] +
-      this.weightsArrays[1][0] * newSourcePoint[1] +
-      this.weightsArrays[2][0]
+      weightsArrays[0][0] * newSourcePoint[0] +
+      weightsArrays[1][0] * newSourcePoint[1] +
+      weightsArrays[2][0]
     const num2 =
-      this.weightsArrays[0][1] * newSourcePoint[0] +
-      this.weightsArrays[1][1] * newSourcePoint[1] +
-      this.weightsArrays[2][1]
+      weightsArrays[0][1] * newSourcePoint[0] +
+      weightsArrays[1][1] * newSourcePoint[1] +
+      weightsArrays[2][1]
     const newDestinationPointPartDerX: Point = [
-      (c * this.weightsArrays[0][0] - this.weightsArrays[0][2] * num1) / c ** 2,
-      (c * this.weightsArrays[0][1] - this.weightsArrays[0][2] * num2) / c ** 2
+      (c * weightsArrays[0][0] - weightsArrays[0][2] * num1) / c ** 2,
+      (c * weightsArrays[0][1] - weightsArrays[0][2] * num2) / c ** 2
     ]
 
     return newDestinationPointPartDerX
   }
 
   evaluatePartialDerivativeY(newSourcePoint: Point): Point {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     const c =
-      this.weightsArrays[0][2] * newSourcePoint[0] +
-      this.weightsArrays[1][2] * newSourcePoint[1] +
-      this.weightsArrays[2][2]
+      weightsArrays[0][2] * newSourcePoint[0] +
+      weightsArrays[1][2] * newSourcePoint[1] +
+      weightsArrays[2][2]
     const num1 =
-      this.weightsArrays[0][0] * newSourcePoint[0] +
-      this.weightsArrays[1][0] * newSourcePoint[1] +
-      this.weightsArrays[2][0]
+      weightsArrays[0][0] * newSourcePoint[0] +
+      weightsArrays[1][0] * newSourcePoint[1] +
+      weightsArrays[2][0]
     const num2 =
-      this.weightsArrays[0][1] * newSourcePoint[0] +
-      this.weightsArrays[1][1] * newSourcePoint[1] +
-      this.weightsArrays[2][1]
+      weightsArrays[0][1] * newSourcePoint[0] +
+      weightsArrays[1][1] * newSourcePoint[1] +
+      weightsArrays[2][1]
     const newDestinationPointPartDerY: Point = [
-      (c * this.weightsArrays[1][0] - this.weightsArrays[1][2] * num1) / c ** 2,
-      (c * this.weightsArrays[1][1] - this.weightsArrays[1][2] * num2) / c ** 2
+      (c * weightsArrays[1][0] - weightsArrays[1][2] * num1) / c ** 2,
+      (c * weightsArrays[1][1] - weightsArrays[1][2] * num2) / c ** 2
     ]
 
     return newDestinationPointPartDerY
@@ -157,19 +151,13 @@ export class Projective extends BaseTransformation {
     weights: Float64Array
     sourcePoints: Float64Array
   } {
-    if (!this.weightsArrays) {
-      this.solve()
-    }
-
-    if (!this.weightsArrays) {
-      throw new Error('Projective transformation weights not computed')
-    }
+    const weightsArrays = this.getWeightsArrays()
 
     // Projective: 3x3 matrix flattened column-major
     const flatWeights: number[] = []
     for (let col = 0; col < 3; col++) {
       for (let row = 0; row < 3; row++) {
-        flatWeights.push(this.weightsArrays[col][row])
+        flatWeights.push(weightsArrays[col][row])
       }
     }
 

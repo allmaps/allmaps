@@ -2,18 +2,14 @@ import type { Gcp } from '@allmaps/types'
 
 import { GeneralGcp } from '../../src/index.js'
 
-export const gcps3: Gcp[] = [
+export const generalGcps2Identity: GeneralGcp[] = [
   {
-    resource: [518, 991],
-    geo: [4.9516614, 52.4633102]
+    source: [0, 0],
+    destination: [0, 0]
   },
   {
-    resource: [4345, 2357],
-    geo: [5.0480391, 52.5123762]
-  },
-  {
-    resource: [2647, 475],
-    geo: [4.9702906, 52.5035815]
+    source: [0, 1],
+    destination: [0, 1]
   }
 ]
 
@@ -44,6 +40,21 @@ export const generalGcps3Polynomial: GeneralGcp[] = [
   {
     source: [1, 0],
     destination: [5, 10]
+  }
+]
+
+export const gcps3: Gcp[] = [
+  {
+    resource: [518, 991],
+    geo: [4.9516614, 52.4633102]
+  },
+  {
+    resource: [4345, 2357],
+    geo: [5.0480391, 52.5123762]
+  },
+  {
+    resource: [2647, 475],
+    geo: [4.9702906, 52.5035815]
   }
 ]
 

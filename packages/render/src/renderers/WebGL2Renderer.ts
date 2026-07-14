@@ -3,12 +3,7 @@ import { wrap as comlinkWrap } from 'comlink'
 
 // TODO: convert colors to fractional rgb
 // when setting options, not every render call
-import {
-  hexToFractionalOpaqueRgba,
-  hexToFractionalRgb,
-  mergeOptions,
-  squaredDistance
-} from '@allmaps/stdlib'
+import { mergeOptions, squaredDistance } from '@allmaps/stdlib'
 import { supportedDistortionMeasures } from '@allmaps/transform'
 
 import { BaseRenderer } from './BaseRenderer.js'
@@ -29,6 +24,10 @@ import {
   homogeneousTransformToMatrix4
 } from '../shared/homogeneous-transform.js'
 import { createShader, createProgram } from '../shared/webgl2.js'
+import {
+  getCachedFractionalOpaqueRgba,
+  getCachedFractionalRgb
+} from '../shared/colors-cache.js'
 import { Viewport } from '../viewport/Viewport.js'
 
 import mapVertexShaderSource from '../shaders/map/vertex-shader.glsl'
@@ -45,6 +44,7 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
 import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
 import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
+import { WorkerPool } from '../workers/PoolWorkers.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
@@ -59,6 +59,11 @@ import type {
   WebGL2RenderOptions,
   WebGL2WarpedMapOptions
 } from '../shared/types.js'
+
+const POOL_SIZE = Math.max(
+  1,
+  Math.min((navigator.hardwareConcurrency || 4) - 1, 4)
+)
 
 const THROTTLE_PREPARE_RENDER_WAIT_MS = 200
 const THROTTLE_PREPARE_RENDER_OPTIONS = {
@@ -82,7 +87,7 @@ export class WebGL2Renderer
   extends BaseRenderer<WebGL2WarpedMap, ImageData>
   implements Renderer
 {
-  #worker: Worker
+  #workerPool: WorkerPool<FetchAndGetImageDataWorkerType>
   #spritesWorker: Worker
 
   DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions
@@ -166,9 +171,12 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
-    const worker = new FetchAndGetImageDataWorker()
+    const workerPool = new WorkerPool<FetchAndGetImageDataWorkerType>(
+      FetchAndGetImageDataWorker,
+      POOL_SIZE
+    )
+
     const spritesWorker = new ApplySpritesImageDataWorker()
-    const wrappedWorker = comlinkWrap<FetchAndGetImageDataWorkerType>(worker)
     const wrappedSpritesWorker =
       comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
@@ -186,13 +194,13 @@ export class WebGL2Renderer
 
     super(
       CacheableWorkerImageDataTile.createFactory(
-        wrappedWorker,
+        workerPool,
         wrappedSpritesWorker
       ),
       mergeOptions(defaultSpecificWebGL2RenderOptions, options)
     )
 
-    this.#worker = worker
+    this.#workerPool = workerPool
     this.#spritesWorker = spritesWorker
     this.gl = gl
     this.#boundThrottledChangedByMapId = new Map()
@@ -337,10 +345,11 @@ export class WebGL2Renderer
 
     // Don't fire throttled function unless it could result in something
     // Otherwise we have to wait for that cycle to finish before useful cycle can be started
-    if (this.someImagesInViewport()) {
-      this.#throttledPrepareRenderInternal()
+    if (!this.someImagesInViewport()) {
+      return
     }
 
+    this.#throttledPrepareRenderInternal()
     this.#renderInternal()
   }
 
@@ -372,7 +381,7 @@ export class WebGL2Renderer
     this.gl.deleteProgram(this.linesProgram)
     this.gl.deleteProgram(this.pointsProgram)
 
-    this.#worker.terminate()
+    this.#workerPool.destroy()
     this.#spritesWorker.terminate()
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
@@ -402,12 +411,16 @@ export class WebGL2Renderer
   protected updateMapsForViewport(
     allFechableTilesForViewport: FetchableTile[]
   ): {
+    mapsInListEntering: string[]
+    mapsInListLeaving: string[]
     mapsInViewportEntering: string[]
     mapsInViewportLeaving: string[]
     mapsWithFetchableTilesForViewportEntering: string[]
     mapsWithFetchableTilesForViewportLeaving: string[]
   } {
     const {
+      mapsInListEntering,
+      mapsInListLeaving,
       mapsWithFetchableTilesForViewportEntering,
       mapsWithFetchableTilesForViewportLeaving,
       mapsInViewportEntering,
@@ -417,6 +430,8 @@ export class WebGL2Renderer
     this.updateVertexBuffers(mapsWithFetchableTilesForViewportEntering)
 
     return {
+      mapsInListEntering,
+      mapsInListLeaving,
       mapsWithFetchableTilesForViewportEntering,
       mapsWithFetchableTilesForViewportLeaving,
       mapsInViewportEntering,
@@ -687,7 +702,7 @@ export class WebGL2Renderer
     )
     gl.uniform3fv(
       removeColorColorLocation,
-      hexToFractionalRgb(webgl2WarpedMap.options.removeColorColor)
+      getCachedFractionalRgb(webgl2WarpedMap.options.removeColorColor)
     )
 
     const removeColorThresholdLocation = this.#getUniformLocation(
@@ -721,7 +736,7 @@ export class WebGL2Renderer
     )
     gl.uniform3fv(
       colorizeColorLocation,
-      hexToFractionalRgb(webgl2WarpedMap.options.colorizeColor)
+      getCachedFractionalRgb(webgl2WarpedMap.options.colorizeColor)
     )
 
     // Grid
@@ -731,7 +746,7 @@ export class WebGL2Renderer
     const colorGrid = this.#getUniformLocation(gl, program, 'u_renderGridColor')
     gl.uniform4fv(
       colorGrid,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
     )
 
     // Distortion
@@ -761,7 +776,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor00Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
     )
 
     const distortionColor01Location = this.#getUniformLocation(
@@ -771,7 +786,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor01Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
     )
 
     const distortionColor1Location = this.#getUniformLocation(
@@ -781,7 +796,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor1Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
     )
 
     const distortionColor2Location = this.#getUniformLocation(
@@ -791,7 +806,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColor2Location,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
     )
 
     const distortionColorLocation3 = this.#getUniformLocation(
@@ -801,7 +816,7 @@ export class WebGL2Renderer
     )
     gl.uniform4fv(
       distortionColorLocation3,
-      hexToFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
+      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
     )
 
     // Debug Triangles

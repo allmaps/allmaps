@@ -743,6 +743,16 @@ There are no parameters.
 
 `[Array<number>, Array<number>]`.
 
+### `BaseLinearWeightsTransformation#getWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
 ### `BaseLinearWeightsTransformation#weightsArrays?`
 
 ###### Type
@@ -993,7 +1003,9 @@ There are no parameters.
 
 ###### Returns
 
-`Partial<HelmertMeasures> | Partial<Polynomial1Measures>`.
+`  | Partial<StraightMeasures>
+  | Partial<HelmertMeasures>
+  | Partial<Polynomial1Measures>`.
 
 ### `BaseTransformation#getTransformationDataAsFloat64Array()`
 
@@ -1572,12 +1584,13 @@ Resolution of the forward transformation in source space (`number | undefined`).
 { differentHandedness: boolean; } & { maxDepth: number; minSourceDistance: number; minDestinationDistance: number; minOffsetRatio: number; minOffsetDistance: number; distortionMeasures: DistortionMeasure[]; ... 4 more ...; postBackward: ProjectionFunction; } & MultiGeometryOptions
 ```
 
-### `new Helmert(sourcePoints, destinationPoints)`
+### `new Helmert(sourcePoints, destinationPoints, weightsArray)`
 
 ###### Parameters
 
 * `sourcePoints` (`Array<Point>`)
 * `destinationPoints` (`Array<Point>`)
+* `weightsArray?` (`Array<number> | undefined`)
 
 ###### Returns
 
@@ -1587,7 +1600,7 @@ Resolution of the forward transformation in source space (`number | undefined`).
 
 * `BaseLinearWeightsTransformation`
 
-### `Helmert#coefsArrayMatrices`
+### `Helmert#coefsArrayMatrices?`
 
 ###### Type
 
@@ -1595,7 +1608,7 @@ Resolution of the forward transformation in source space (`number | undefined`).
 [Array<Array<number>>, Array<Array<number>>]
 ```
 
-### `Helmert#coefsArrayMatricesSize`
+### `Helmert#coefsArrayMatricesSize?`
 
 ###### Type
 
@@ -1690,6 +1703,24 @@ There are no parameters.
 ###### Returns
 
 `{weights: Float64Array; sourcePoints: Float64Array}`.
+
+### `Helmert#measures?`
+
+###### Type
+
+```ts
+{translation: Point; rotation: number; scale: number}
+```
+
+### `Helmert#setWeightsArrays(weightsArrays)`
+
+###### Parameters
+
+* `weightsArrays` (`[Array<number>, Array<number>]`)
+
+###### Returns
+
+`void`.
 
 ### `Helmert#solve()`
 
@@ -1820,6 +1851,14 @@ There are no parameters.
 ###### Returns
 
 `Array<number>`.
+
+### `Polynomial1#measures?`
+
+###### Type
+
+```ts
+{translation: Point; rotation: number; scales: Point; shears: Point}
+```
 
 ### `Polynomial1#setWeightsArraysFromHomogeneousTransform(homogeneousTransform)`
 
@@ -2056,6 +2095,16 @@ There are no parameters.
 
 `{weights: Float64Array; sourcePoints: Float64Array}`.
 
+### `Projective#getWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`Array<Array<number>>`.
+
 ### `Projective#solve()`
 
 ###### Parameters
@@ -2199,6 +2248,19 @@ There are no parameters.
 
 `[Array<number>, Array<number>]`.
 
+### `RBF#getRbfAndAffineWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{
+  rbfWeightsArrays: [number[], number[]]
+  affineWeightsArrays: [number[], number[]]
+}`.
+
 ### `RBF#getRbfKernelSourcePointCoefsArray(sourcePoint)`
 
 ###### Parameters
@@ -2334,12 +2396,13 @@ SplitGcpLineInfo & {
 }
 ```
 
-### `new Straight(sourcePoints, destinationPoints)`
+### `new Straight(sourcePoints, destinationPoints, measures)`
 
 ###### Parameters
 
 * `sourcePoints` (`Array<Point>`)
 * `destinationPoints` (`Array<Point>`)
+* `measures?` (`StraightMeasures | undefined`)
 
 ###### Returns
 
@@ -2379,6 +2442,16 @@ SplitGcpLineInfo & {
 
 `[number, number]`.
 
+### `Straight#getMeasures()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`{translation: Point; scale: number}`.
+
 ### `Straight#getTransformationDataAsFloat64Array()`
 
 ###### Parameters
@@ -2388,6 +2461,24 @@ There are no parameters.
 ###### Returns
 
 `{weights: Float64Array; sourcePoints: Float64Array}`.
+
+### `Straight#getWeightsArrays()`
+
+###### Parameters
+
+There are no parameters.
+
+###### Returns
+
+`[Array<number>, Array<number>]`.
+
+### `Straight#measures?`
+
+###### Type
+
+```ts
+{translation: Point; scale: number}
+```
 
 ### `Straight#solve()`
 
@@ -2408,12 +2499,7 @@ There are no parameters.
 ###### Type
 
 ```ts
-{
-  scale: number
-  sourcePointsCenter: Point
-  destinationPointsCenter: Point
-  translation: Point
-}
+[Array<number>, Array<number>]
 ```
 
 ### `TransformationType`

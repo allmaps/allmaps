@@ -192,7 +192,6 @@ export type SpecificBaseRenderOptions<W extends WarpedMap> = {
   spritesMaxHigherLog2ScaleFactorDiff: number
   spritesMaxLowerLog2ScaleFactorDiff: number
   maxTotalOverviewResolutionRatio: number
-  maxGcpsExactTpsToResource: number
 }
 export type BaseRenderOptions<W extends WarpedMap> =
   SpecificBaseRenderOptions<W> & Partial<WarpedMapListOptions<W>>

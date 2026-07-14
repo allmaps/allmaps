@@ -212,7 +212,7 @@ This can be used as input for
 
 ###### Parameters
 
-* `options?` (`Partial<Partial<MaskOptions> & { bearingSelection: "first" | "angularMean"; fit: Fit; } & CenterZoomBearing & { pitch?: number; roll?: number; elevation?: number; } & { ...; }> | undefined`)
+* `options?` (`Partial<Partial<MaskOptions> & { bearingMapIds?: string[]; bearingCallbackFn: (bearing: number) => number; fit: Fit; } & CenterZoomBearing & { ...; } & { ...; }> | undefined`)
 
 ###### Returns
 
@@ -231,7 +231,7 @@ This can be used as input for
 ###### Parameters
 
 * `mapId` (`string`)
-* `options?` (`Partial<Partial<MaskOptions> & { bearingSelection: "first" | "angularMean"; fit: Fit; } & CenterZoomBearing & { pitch?: number; roll?: number; elevation?: number; } & { ...; }> | undefined`)
+* `options?` (`Partial<Partial<MaskOptions> & { bearingMapIds?: string[]; bearingCallbackFn: (bearing: number) => number; fit: Fit; } & CenterZoomBearing & { ...; } & { ...; }> | undefined`)
 
 ###### Returns
 
@@ -254,7 +254,7 @@ The result is returned in lon-lat `EPSG:4326`.
 
 bounding box of all selected maps (`LngLatBoundsLike | undefined`).
 
-### `WarpedMapLayer#getMapsCenterZoomBearing(mapIds, options)`
+### `WarpedMapLayer#getMapsCenterZoomBearing(mapIds, partialOptions)`
 
 Get the center, zoom and bearing needed to make the Maplibre Map's viewport fit all selected maps.
 
@@ -267,7 +267,7 @@ This can be used as input for
 ###### Parameters
 
 * `mapIds` (`Array<string>`)
-* `options?` (`Partial<Partial<MaskOptions> & { bearingSelection: "first" | "angularMean"; fit: Fit; } & CenterZoomBearing & { pitch?: number; roll?: number; elevation?: number; } & { ...; }> | undefined`)
+* `partialOptions?` (`Partial<Partial<MaskOptions> & { bearingMapIds?: string[]; bearingCallbackFn: (bearing: number) => number; fit: Fit; } & CenterZoomBearing & { ...; } & { ...; }> | undefined`)
 
 ###### Returns
 

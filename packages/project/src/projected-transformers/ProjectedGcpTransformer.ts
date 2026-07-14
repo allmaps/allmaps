@@ -1,4 +1,5 @@
 import proj4 from 'proj4'
+import { cloneDeep } from 'lodash-es'
 
 import {
   mergeOptions,
@@ -498,18 +499,17 @@ export class ProjectedGcpTransformer extends GcpTransformer {
    * To do this more systematically, it's possible to set
    * a projected gcp transformer's projection using this method.
    *
-   * Combine this with a deep clone of the transformer instance
-   * to keep the original transformer as well.
-   *
    * @returns this
    */
-  static setProjection(
+  static fromProjection(
     projectedTransformer: ProjectedGcpTransformer,
     projection: Projection
   ) {
     if (isEqualProjection(projection, projectedTransformer.projection)) {
       return projectedTransformer
     }
+
+    projectedTransformer = cloneDeep(projectedTransformer)
 
     const internalProjectionToProjectionConverter = proj4(
       projectedTransformer.internalProjection.definition,

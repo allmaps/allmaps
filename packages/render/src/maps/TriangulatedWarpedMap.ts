@@ -255,16 +255,6 @@ export class TriangulatedWarpedMap extends WarpedMap {
   }
 
   /**
-   * Set the internal projection
-   *
-   * @param projection - the internal projection
-   */
-  protected setInternalProjection(projection: Projection) {
-    super.setInternalProjection(projection)
-    this.updateTriangulation()
-  }
-
-  /**
    * Set the projection
    *
    * @param projection - the projection
@@ -394,14 +384,14 @@ export class TriangulatedWarpedMap extends WarpedMap {
     // Get resolution from transform
     const resourceResolution =
       this.options.resourceResolution ||
-      this.projectedTransformer.getToGeoTransformationResolution(
+      this.projectedTransformer.getToProjectedGeoTransformationResolution(
         this.resourceMaskBbox
       )
 
     // Adapt resolution from previous
     let refinePrevious = false
     if (resourceResolution && this.previousResourceResolution) {
-      refinePrevious = this.previousResourceResolution < resourceResolution
+      refinePrevious = resourceResolution < this.previousResourceResolution
       this.resourceResolution = Math.min(
         resourceResolution,
         this.previousResourceResolution
@@ -479,7 +469,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
             resourceUniquePoints,
             {
               distortionMeasures: this.options.distortionMeasures,
-              referenceScale: this.getReferenceScale(),
+              referenceScale:
+                this.options.distortionMeasures.length > 0
+                  ? this.getReferenceScale()
+                  : undefined,
               isMultiGeometry: true
             },
             (gcpPartialDistortion) => gcpPartialDistortion
@@ -529,7 +522,10 @@ export class TriangulatedWarpedMap extends WarpedMap {
                   ),
                   {
                     distortionMeasures: this.options.distortionMeasures,
-                    referenceScale: this.getReferenceScale(),
+                    referenceScale:
+                      this.options.distortionMeasures.length > 0
+                        ? this.getReferenceScale()
+                        : undefined,
                     isMultiGeometry: true
                   },
                   (gcpPartialDistortion) => gcpPartialDistortion
@@ -681,7 +677,7 @@ export class TriangulatedWarpedMap extends WarpedMap {
 
   protected clearProjectedTransformerCaches() {
     super.clearProjectedTransformerCaches()
-    this.clearResourceTriangulationCaches()
+    this.clearProjectedTriangulationCaches()
   }
 
   protected clearResourceTriangulationCaches() {

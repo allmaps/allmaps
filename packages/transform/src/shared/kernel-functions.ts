@@ -72,12 +72,12 @@ export function thinPlateKernel(r: number, options: KernelFunctionOptions) {
     if (r === 0) {
       return 0
     }
-    return Math.pow(r, 2) * Math.log(r)
+    return r * r * Math.log(r)
   } else if (options.derivative === 1) {
     if (r === 0) {
       return 0
     }
-    return r + 2 * r * Math.log(r)
+    return r * (1 + 2 * Math.log(r))
   } else {
     throw new Error(
       'Derivate of order ' + options.derivative + ' not implemented'

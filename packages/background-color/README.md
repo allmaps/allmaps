@@ -2,13 +2,13 @@
 
 ## API
 
-### `detectBackgroundColor(resourceSize, resourceMask, imageBitmap)`
+### `detectBackgroundColor(resourceSize, imageBitmap, resourceMask)`
 
 ###### Parameters
 
 * `resourceSize` (`[number, number]`)
-* `resourceMask` (`Array<Point>`)
 * `imageBitmap` (`ImageBitmap`)
+* `resourceMask?` (`Ring | undefined`)
 
 ###### Returns
 
