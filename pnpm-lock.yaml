@@ -583,6 +583,9 @@ importers:
       d3-geo:
         specifier: ^3.1.1
         version: 3.1.1
+      driver.js:
+        specifier: ^1.6.0
+        version: 1.7.0
       js-sha1:
         specifier: ^0.7.0
         version: 0.7.0
@@ -7104,6 +7107,9 @@ packages:
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
+
+  driver.js@1.7.0:
+    resolution: {integrity: sha512-IWkESaVWaoxIWu3TqTpLRDgOFmDdjZsg/Oz7hrrr4ApBUapTFm9YCXYnptu3mKN8l4eAdtrxpU54l7kHLK96tw==}
 
   drizzle-kit@1.0.0-rc.4-ca0f029:
     resolution: {integrity: sha512-hM1K72ptIPOpJDScHo7cAF+K8A8Tr3q2yHvBJvOZWvLn2lN+G4RDUvG3rT3ohlSE2O3BN/s7g3e3JiQLStt8iQ==}
@@ -15886,6 +15892,8 @@ snapshots:
       is-obj: 2.0.0
 
   dotenv@17.4.2: {}
+
+  driver.js@1.7.0: {}
 
   drizzle-kit@1.0.0-rc.4-ca0f029:
     dependencies:
