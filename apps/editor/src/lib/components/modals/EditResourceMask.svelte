@@ -22,9 +22,14 @@
 
   let { open = $bindable(), map, onsubmit }: Props = $props()
 
-  let resourceDimensions = $derived(
-    map.resource ? [map.resource.width, map.resource.height] : undefined
-  )
+  let resourceDimensions = $derived.by<[number, number] | undefined>(() => {
+    const width = map.resource?.width
+    const height = map.resource?.height
+
+    if (width !== undefined && height !== undefined) {
+      return [width, height]
+    }
+  })
 
   let resourceMaskString = $state<string>(
     resourceMaskToString(map.resourceMask)

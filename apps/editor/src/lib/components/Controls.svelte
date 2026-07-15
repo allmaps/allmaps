@@ -77,9 +77,11 @@
   >
     <div></div>
     <nav
+      data-tour="editor-workflow"
       class="grid grid-cols-[1fr_min-content_1fr_min-content_1fr_min-content_1fr] gap-0.5 rounded-lg bg-white p-1 font-semibold shadow-md sm:gap-1"
     >
       <a
+        data-tour="editor-images"
         href={urlState.generateUrl(getViewUrl('images'), {
           imageId: sourceState.activeImageId || undefined
         })}
@@ -91,6 +93,7 @@
       </a>
       {@render separator()}
       <a
+        data-tour="editor-mask"
         href={editEnabled
           ? urlState.generateUrl(getViewUrl('mask'), {
               imageId: sourceState.activeImageId || undefined
@@ -112,6 +115,7 @@
       </a>
       {@render separator()}
       <a
+        data-tour="editor-georeference"
         href={editEnabled
           ? urlState.generateUrl(getViewUrl('georeference'), {
               imageId: sourceState.activeImageId || undefined
@@ -142,6 +146,7 @@
       </a>
       {@render separator()}
       <a
+        data-tour="editor-results"
         href={resultsEnabled
           ? urlState.generateUrl(getViewUrl('results'), {
               imageId: sourceState.activeImageId || undefined
@@ -208,6 +213,7 @@
         >
           {#snippet button()}
             <div
+              data-tour="editor-maps"
               class="flex flex-row items-center justify-center gap-1 rounded-md
             bg-pink p-2 font-medium text-white shadow-md
             transition-all hover:bg-pink/90"

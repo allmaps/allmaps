@@ -30,7 +30,7 @@
   const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
 </script>
 
-<div class="flex flex-col gap-4">
+<div data-tour="editor-export-popover" class="flex flex-col gap-4">
   {#if scopeState.mapsCount}
     <div class="flex items-center gap-2">
       <span class="shrink-0">{m.export_options_for()}</span>

@@ -8,7 +8,8 @@ export const UiEvents = {
   FIT_BBOX: 'FIT_BBOX' as const,
   SET_CENTER: 'SET_CENTER' as const,
   TOGGLE_VISIBLE: 'TOGGLE_VISIBLE' as const,
-  TOGGLE_RENDER_MASKS: 'TOGGLE_RENDER_MASKS' as const
+  TOGGLE_RENDER_MASKS: 'TOGGLE_RENDER_MASKS' as const,
+  START_TOUR: 'START_TOUR' as const
 }
 
 type UiEventMap = {
@@ -18,6 +19,7 @@ type UiEventMap = {
   SET_CENTER: Point
   TOGGLE_VISIBLE: boolean
   TOGGLE_RENDER_MASKS: void
+  START_TOUR: void
 }
 
 interface IUiEventTarget extends EventTarget {

@@ -24,6 +24,7 @@
   import Head from '$lib/components/Head.svelte'
   import Header from '$lib/components/Header.svelte'
   import Controls from '$lib/components/Controls.svelte'
+  import EditorTour from '$lib/components/EditorTour.svelte'
 
   import About from '$lib/components/modals/About.svelte'
   import Annotation from '$lib/components/modals/Annotation.svelte'
@@ -223,6 +224,7 @@
       <div class="pointer-events-none z-10 col-span-full row-span-full min-h-0">
         <Controls />
       </div>
+      <EditorTour />
     {/if}
   </div>
 </div>
