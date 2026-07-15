@@ -235,6 +235,10 @@ export class UiState extends UiEventTarget {
     this.dispatchEvent(new CustomEvent(UiEvents.TOGGLE_RENDER_MASKS))
   }
 
+  dispatchStartTour() {
+    this.dispatchEvent(new CustomEvent(UiEvents.START_TOUR))
+  }
+
   dispatchFitBbox(bbox: Bbox) {
     this.dispatchEvent(
       new CustomEvent<Bbox>(UiEvents.FIT_BBOX, {

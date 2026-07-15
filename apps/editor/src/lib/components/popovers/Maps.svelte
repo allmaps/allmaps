@@ -110,12 +110,13 @@
   }
 </script>
 
-{#if mapCount === 0}
-  <StartGeoreferencing />
-{:else}
-  <ol
-    class="grid auto-rows-auto grid-cols-[repeat(2,max-content)_1fr] gap-1 sm:grid-cols-[repeat(8,max-content)_1fr] sm:gap-2"
-  >
+<div data-tour="editor-maps-popover">
+  {#if mapCount === 0}
+    <StartGeoreferencing />
+  {:else}
+    <ol
+      class="grid auto-rows-auto grid-cols-[repeat(2,max-content)_1fr] gap-1 sm:grid-cols-[repeat(8,max-content)_1fr] sm:gap-2"
+    >
     {#each mapsState.maps as map, index (map.id)}
       {@const gcpCount = Object.values(map.gcps).length}
       {@const isActiveMap = mapsState.activeMapId === map.id}
@@ -310,5 +311,6 @@
         {/if}
       </li>
     {/each}
-  </ol>
-{/if}
+    </ol>
+  {/if}
+</div>

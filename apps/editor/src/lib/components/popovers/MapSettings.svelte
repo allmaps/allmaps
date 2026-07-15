@@ -39,7 +39,10 @@
   }
 </script>
 
-<div class="grid grid-cols-1 gap-2 *:break-all">
+<div
+  data-tour="editor-map-settings-popover"
+  class="grid grid-cols-1 gap-2 *:break-all"
+>
   <h3 class="text-lg font-bold">{m.georeference()}</h3>
 
   <Label.Root for="georeference-warped-map-layer-opacity" class="text-sm "

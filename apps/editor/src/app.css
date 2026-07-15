@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'driver.js/dist/driver.css';
 
 @config '../tailwind.config.ts';
 
