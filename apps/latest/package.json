@@ -29,6 +29,7 @@
     "watch": "svelte-package --watch",
     "build": "vite build && pnpm run package",
     "package": "svelte-kit sync && svelte-package && publint",
+    "prepare": "svelte-kit sync || echo ''",
     "prepublishOnly": "pnpm run package",
     "lerna-build": "lerna run build --scope @allmaps/latest --include-dependencies",
     "preview": "vite preview",
