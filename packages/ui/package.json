@@ -36,6 +36,7 @@
   "scripts": {
     "dev": "vite dev",
     "watch": "svelte-package --watch",
+    "prepare": "svelte-kit sync || echo ''",
     "build": "svelte-kit sync && svelte-package && publint",
     "html-build": "vite build",
     "lerna-html-build": "lerna run html-build --scope @allmaps/ui --include-dependencies"
