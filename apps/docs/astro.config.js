@@ -50,41 +50,50 @@ export default defineConfig({
       },
       sidebar: [
         {
-          label: 'Start Here',
+          label: 'Getting started',
           items: [
             {
               label: 'Introduction',
-              link: '/introduction'
+              link: '/'
             },
             {
-              label: 'International Image Interoperability Framework',
+              label: 'IIIF',
               link: '/iiif'
             },
-            {
-              label: 'Georeferencing',
-              link: '/georeferencing'
-            },
-            {
-              label: 'Getting Started',
-              link: '/getting-started'
-            },
-            {
-              label: 'Core Principles',
-              link: '/core-principles'
-            },
-            {
-              label: 'FAQ',
-              link: '/faq'
-            },
-            {
-              label: 'Timeline',
-              link: '/timeline'
-            }
+            // {
+            //   label: 'Core Principles',
+            //   link: '/core-principles'
+            // },
+            // {
+            //   label: 'FAQ',
+            //   link: '/faq'
+            // },
+            // {
+            //   label: 'Timeline',
+            //   link: '/timeline'
+            // }
           ]
         },
         {
           label: 'Guides',
-          items: [{ autogenerate: { directory: 'guides' } }]
+          items: [
+            {
+              label: 'Finding maps',
+              link: '/guides/finding-maps'
+            },
+            {
+              label: 'Georeferencing maps',
+              link: '/guides/georeferencing-maps'
+            },
+            {
+              label: 'Viewing maps',
+              link: '/guides/viewing-maps'
+            },
+            {
+              label: 'Importing and exporting maps',
+              link: '/guides/importing-and-exporting-maps'
+            }
+          ]
         },
         {
           label: 'Examples',

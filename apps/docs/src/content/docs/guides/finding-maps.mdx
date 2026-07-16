@@ -1,15 +1,48 @@
 ---
 title: Finding Maps
-description: ''
+description: 'Guide for finding maps through Allmaps or content providers'
 ---
 
 import UrlFinder from '../../../components/UrlFinder.svelte'
 
 This section offers guidelines for finding maps at selected institutions and copying the IIIF Image or Manifest URL. You can open the maps in [Allmaps Editor](http://editor.allmaps.org) by pasting the URL. Of course you can use other IIIF compatible collections too.
 
-## Internet Archive
+## From Allmaps
 
-As of September 2023 the IIIF API of the [Internet Archive](https://archive.org/) was upgraded in collaboration with the IIIF Consortium. The implementation is still under development and some items might throw an error when opening them in Allmaps. Please notify us when this happens and we'll make sure to investigate and publish a fix when possible.
+### Allmaps Here
+
+[Allmaps Here](https://here.allmaps.org/) is an Allmaps tool that allows you to look up previously georeferenced maps available in the Allmaps database (which keeps a copy of all Georeference Annotations created with Allmaps Editor). It look up maps around your current (GPS) location by default, but you can give it a custom location too. The [Allmaps There](https://observablehq.com/d/47f259cec6c42178) tool/notebook allows you to look up and set custom locations.
+
+### Allmaps Explore (experimental!)
+
+[Allmaps Explore](https://dev.explore.allmaps.org/) is a prototype that allows you to look up previously georeferenced maps available in the Allmaps database. It shows all available map outlines on an interactive map. You can click to display a map or open it in Editor or Viewer.
+
+### Annotations API
+You can  use the following method to see if an annotation exists of a certain IIIF Resource:
+
+- Copy the IIIF resource URL
+- Open this URL: [https://annotations.allmaps.org/?url=](https://annotations.allmaps.org/?url=)
+- Paste the IIIF resource URL link after ?url= in the browser address bar and press enter
+- The response can be loaded in Allmaps Viewer or Editor.
+
+You can also query the Allmaps API for maps of a certain location. Please refer to the [API](/../api) documentation for more information.
+
+## From content providers
+
+### detektIIIF3
+
+[detektIIIF3](https://chromewebstore.google.com/detail/detektiiif3/aaodcobgcadinjipaocibamdfcffpcpp) is a browser extension for Chrome that will indicate if a IIIF URL is available for the currently opened web page. If this is the case, it will list those URLs and allow you to copy them. This is a great way of finding IIIF resources and opening them in Allmaps: URLs copied from the Manifests, Images and Collections tabs can be pasted in Allmaps Editor and Viewer.
+
+In the options of the plugin you can also add the following patterns under Manifest Viewers for opening resources in Allmaps directly:
+
+| Label | URL |
+|---|---|
+|Allmaps Viewer|`https://viewer.allmaps.org/?url=%%%URI%%%`|
+|Allmaps Editor|`https://editor.allmaps.org/images?url=%%%URI%%%`|
+
+### Internet Archive
+
+As of September 2023 the IIIF APIs of the [Internet Archive](https://archive.org/) were upgraded in collaboration with the IIIF Consortium. This means you can use the Internet Archive to host your own collection of maps. Use the form below to open a resource in Allmaps.
 
 Some collections containing maps:
 
@@ -35,7 +68,7 @@ Please enter a valid URL below to an object in the Internet Archive. Please note
 - [Making IIIF Official at the Internet Archive](https://blog.archive.org/2023/09/18/making-iiif-official-at-the-internet-archive/)
 - [Documentation](https://iiif.archive.org/iiif/documentation)
 
-## La Bibliothèque nationale de France
+### La Bibliothèque nationale de France
 
 The digital collections of the BnF can be found in [Gallica](gallica.bnf.fr).
 
@@ -53,7 +86,7 @@ Map collections:
   testUrl="https://gallica.bnf.fr/ark:/12148/btv1b532238549"
 />
 
-## Leventhal Map & Education Center
+### Leventhal Map & Education Center
 
 Browse the collections [here](https://www.leventhalmap.org/collections/).
 

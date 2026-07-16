@@ -1,0 +1,31 @@
+---
+title: Importing and Exporting Maps
+description: 'Guide for importing and exporting maps from Allmaps'
+---
+
+### Importing masks and GCPs
+
+In Allmaps Editor, masks and ground control points can be imported from various formats.
+
+- First, make sure a mask is present. If you want to import a mask, first draw a simple mask using three points.
+- Open the Maps panel from the bottom right.
+- Click 'Edit or import mask...' at the top or 'Edit or import GCPs...' at the bottom of the panel.
+- This will open a modal to import existing data with instructions
+
+For bulk imports, please contact Allmaps to discuss options.
+
+### XYZ map tiles
+
+In order to load a Georeference Annotation as a layer in [geojson.io](https://geojson.io), [Felt](https://felt.com/), or in GIS-applications like QGIS or ESRI ArcMap, you need to use the Allmaps Tile Server. The Tile Server creates [XYZ map tiles](https://en.wikipedia.org/wiki/Tiled_web_map): a very broadly supported format in GIS applications to load maps. It acts as a 'proxy server' and creates the requested XYZ tiles on the fly, using the Georeferencing Annotation. This way you can load maps in applications that don't directly support Georeference Annotations. You can export XYZ tile URLs directly from Allmaps Viewer and Allmaps Editor. Use [this notebook](https://observablehq.com/@allmaps/allmaps-tile-server) to test the Allmaps XYZ server and learn how to use the tileserver in other applications.
+
+### GeoTIFF
+
+It's possible to create GeoTIFFs from Georeference Annotations using GDAL. The Allmaps Command Line Interface can create a script for this.
+
+### Leaflet, MapLibre or OpenLayers
+
+Leaflet, MapLibre and OpenLayers are popular open source web map libraries. Allmaps offers plugins for each of these libraries to load Georeference Annotations directly. Please refer to the documentation for the respective [packages](/packages).
+
+### GeoJSON
+
+By adding `.geojson` to any URL served from annotations.allmaps.org you can request a GeoJSON document containing a polygon of the mask. Using the @allmaps/transform package you can convert between pixels and geospatial coordinates.

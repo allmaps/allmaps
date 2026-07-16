@@ -1,6 +1,6 @@
 ---
 title: What is IIIF?
-description: ''
+description: 'Explanation of the open standards used by Allmaps'
 ---
 
 Allmaps is based on the [International Image Interoperability Framework](https://iiif.io/) (IIIF, pronounced as "Triple-Eye-Eff"), a set of standards that have been implemented by libraries, archives and museums around the world to open up their digital collections for reuse.
