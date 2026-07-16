@@ -3,7 +3,4 @@ title: Examples
 description: Examples for using Allmaps with IIIF maps and web mapping tools
 ---
 
-Examples will live here.
-
-See also the [Finding Maps guide](/guides/finding-maps/) and the package
-documentation for the MapLibre, OpenLayers, and Leaflet plugins.
+_Selected examples will be transferred here from the [Observable Notebooks](https://observablehq.com/@allmaps) platform. In the meantime, you can browse the examples over there._
