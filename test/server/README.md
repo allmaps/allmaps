@@ -101,6 +101,7 @@ GET /cors/manifests/3/combined/partial-linked-annotations.json
 GET /cors/manifests/3/combined/all-embedded-annotations-mixed-errors.json
 GET /cors/manifests/3/combined/mixed-embedded-annotation-errors.json
 GET /cors/manifests/3/combined/mixed-linked-annotation-errors.json
+GET /cors/manifests/3/combined/browser-only-iiif3-level2.json
 GET /cors/manifests/3/combined/too-many-requests-after-20s-iiif3-level2.json
 GET /cors/manifests/3/combined/mixed-too-many-requests-after-20s-iiif3-level2.json
 GET /cors/manifests/3/combined/image-services-iiif2-level0-level2.json

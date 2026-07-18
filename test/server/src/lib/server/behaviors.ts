@@ -4,6 +4,8 @@ import type { ImageServiceBehavior } from './image-api.ts'
 
 export const slowResourceDelayMs = 4_000
 const tooManyRequestsAfterMs = 20_000
+const allmapsViewerUserAgent = 'AllmapsViewer (+https://viewer.allmaps.org/)'
+const allmapsWorkerZone = 'allmaps.org'
 
 const imageServiceBehaviorStartedAt = new Map<string, number>()
 
@@ -15,6 +17,7 @@ export function parseImageServiceBehavior(
   }
 
   if (
+    behavior === 'browser-only' ||
     behavior === 'image-500' ||
     behavior === 'service-500' ||
     behavior === 'slow' ||
@@ -31,6 +34,10 @@ export function getCombinedImageServiceBehavior(
 ): ImageServiceBehavior | undefined {
   if (variant === 'image-500-iiif3-level2') {
     return 'image-500'
+  }
+
+  if (variant === 'browser-only-iiif3-level2') {
+    return 'browser-only'
   }
 
   if (variant === 'service-500-iiif3-level2') {
@@ -107,4 +114,29 @@ export function tooManyRequestsResponse(corsMode: CorsMode) {
   response.headers.set('retry-after', '20')
 
   return response
+}
+
+export function isBrowserRequest(request: Request) {
+  if (isViewerServerRequest(request)) {
+    return false
+  }
+
+  return (
+    request.headers.has('origin') ||
+    request.headers.has('sec-fetch-dest') ||
+    request.headers.has('sec-fetch-mode') ||
+    request.headers.has('sec-fetch-site') ||
+    request.headers.has('sec-fetch-user')
+  )
+}
+
+export function isViewerServerRequest(request: Request) {
+  return (
+    request.headers.get('user-agent') === allmapsViewerUserAgent ||
+    request.headers.get('cf-worker') === allmapsWorkerZone
+  )
+}
+
+export function browserOnlyResponse(corsMode: CorsMode) {
+  return textResponse('Browser request headers required', corsMode, 403)
 }
