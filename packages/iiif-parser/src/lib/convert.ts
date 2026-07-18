@@ -80,7 +80,6 @@ export function parseVersion2String(
 
     return strings
   } else if (str && typeof str === 'object') {
-    str
     const language = str['@language'] || 'none'
     const valueOrValues = str['@value'] || ''
 

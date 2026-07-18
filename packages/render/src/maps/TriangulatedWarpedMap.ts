@@ -454,7 +454,9 @@ export class TriangulatedWarpedMap extends WarpedMap {
                   `Failed to triangulate map ${this.mapId}: ` + error.message
                 throw error
               } else {
-                throw new Error(`Failed to triangulate map ${this.mapId}`)
+                throw new Error(`Failed to triangulate map ${this.mapId}`, {
+                  cause: error
+                })
               }
             }
           }

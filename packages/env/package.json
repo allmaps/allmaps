@@ -41,8 +41,8 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
     "prettier": "^3.6.2",
     "typescript": "catalog:"
   }

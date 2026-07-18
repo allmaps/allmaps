@@ -120,7 +120,7 @@ describe('Parsing georeference annotation pages in Presentation 3 manifests', ()
 export function readJSONFile(filename: string) {
   try {
     return JSON.parse(fs.readFileSync(filename, 'utf-8'))
-  } catch (err) {
+  } catch {
     return undefined
   }
 }

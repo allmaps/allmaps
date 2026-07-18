@@ -22,6 +22,8 @@
         "src/**",
         "package.json",
         "eslint.config.js",
+        "$TURBO_ROOT$/eslint.config.js",
+        "$TURBO_ROOT$/.gitignore",
         ".prettierrc",
         "tsconfig.json",
         ".prettierignore"

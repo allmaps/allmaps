@@ -70,7 +70,6 @@ export function getImageRequest(
     const thumbnailMaxHeight = thumbnailMaxWidth * aspectRatio
 
     width = Math.floor(thumbnailMaxHeight) / aspectRatio
-    height = width * aspectRatio
   }
 
   const aspectRatio = imageSize.width / imageSize.height

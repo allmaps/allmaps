@@ -55,13 +55,10 @@
     "point-in-polygon-hao": "^1.2.4"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.0",
     "@types/node": "catalog:",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
     "documentation": "^14.0.0",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
     "prettier": "^2.8.0",
     "typescript": "catalog:",
     "vitest": "^4.0.4"

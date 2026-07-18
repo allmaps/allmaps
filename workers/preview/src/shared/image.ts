@@ -24,6 +24,6 @@ export async function loadImage(
 
     return `data:${contentType};base64,${base64Image}`
   } catch (error) {
-    throw new Error(`Failed to load image ${imagePath}:`)
+    throw new Error(`Failed to load image ${imagePath}:`, { cause: error })
   }
 }
