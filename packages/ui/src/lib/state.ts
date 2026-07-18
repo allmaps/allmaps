@@ -2,12 +2,12 @@ import { getUrlState, setUrlState } from '$lib/state/url.svelte.js'
 import {
   getProjectionsState,
   setProjectionsState
-} from './state/projections.svelte'
+} from './state/projections.svelte.js'
 
 export { getUrlState, setUrlState }
 export { getProjectionsState, setProjectionsState }
 
 import type { UrlState } from '$lib/state/url.svelte.js'
-import type { ProjectionsState } from './state/projections.svelte'
+import type { ProjectionsState } from './state/projections.svelte.js'
 
 export type { UrlState, ProjectionsState }

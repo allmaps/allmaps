@@ -61,6 +61,7 @@
     "eslint-config-prettier": "catalog:",
     "prettier": "^2.8.0",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "^4.0.4"
   }
 }

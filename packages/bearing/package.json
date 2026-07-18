@@ -58,6 +58,7 @@
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "^4.0.4"
   }
 }

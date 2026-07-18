@@ -54,6 +54,7 @@
     "tsx": "^4.19.2",
     "typescript": "catalog:",
     "upng-js": "^2.1.0",
+    "vite": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"
   }

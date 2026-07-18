@@ -64,6 +64,7 @@
     "globals": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
+    "vite": "catalog:",
     "vitest": "^4.0.4",
     "zod": "catalog:",
     "eslint": "catalog:",
