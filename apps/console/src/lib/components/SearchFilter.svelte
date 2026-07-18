@@ -53,7 +53,7 @@
       type="text"
       bind:value
       onkeydown={(e) => e.key === 'Enter' && search()}
-      placeholder="Search..."
+      placeholder="Search…"
       class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white font-sans text-sm focus:outline-none focus:border-blue-400 pr-8"
     />
     {#if value}
