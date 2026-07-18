@@ -1961,6 +1961,9 @@ importers:
       '@types/eslint':
         specifier: ^8.56.0
         version: 8.56.12
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.3
       '@types/sharedb':
         specifier: ^3.3.12
         version: 3.3.13
