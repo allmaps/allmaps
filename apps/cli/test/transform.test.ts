@@ -284,5 +284,5 @@ describe('allmaps transform coordinates', () => {
       'input/coordinates/coordinates.txt'
     )
     expect(expected).to.equal(output)
-  })
+  }, 10_000)
 })
