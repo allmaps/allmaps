@@ -9,37 +9,57 @@ packages:
 catalog:
   '@types/node': ^24
 
-  'vite': ^8.0
-  'vitest': ^4.0.5
-  'typescript': ^5.9.3
+  vite: ^8.0.16
+  vitest: ^4.1.8
+  typescript: ^6.0.3
 
-  'eslint': ^9.36.0
-  'eslint-config-prettier': ^9.1.0
-  'prettier': ^3.6.2
-  'typescript-eslint': ^8.44.1
+  '@eslint/js': ^10.0.1
+  eslint: ^10.4.1
+  eslint-config-prettier: ^10.1.8
+  eslint-plugin-svelte: ^3.19.0
+  globals: ^17.6.0
+  prettier: ^3.8.3
+  prettier-plugin-svelte: ^4.1.0
+  prettier-plugin-tailwindcss: ^0.8.0
+  typescript-eslint: ^8.60.1
+  '@typescript-eslint/eslint-plugin': ^7.0.0
+  '@typescript-eslint/parser': ^7.0.0
 
-  'zod': ^4.3.6
-  'tailwindcss': ^4.1.13
-  'svelte': ^5.43.2
-  'svelte-check': ^4.3.2
-  '@sveltejs/kit': ^2.47.1
-  '@sveltejs/vite-plugin-svelte': ^7.0.0
-  'bits-ui': ^2.15
+  zod: ^4.3.6
+  tailwindcss: ^4.3.0
+  '@tailwindcss/typography': ^0.5.19
+  '@tailwindcss/vite': ^4.3.0
+  'svelte': ^5.56.1
+  'svelte-check': ^4.6.0
+  '@sveltejs/adapter-auto': ^7.0.1
+  '@sveltejs/adapter-cloudflare': ^7.2.8
+  '@sveltejs/adapter-node': ^5.3.3
+  '@sveltejs/adapter-static': ^3.0.10
+  '@sveltejs/kit': ^2.63.0
+  '@sveltejs/vite-plugin-svelte': ^7.1.2
+  'vite-plugin-devtools-json': ^1.0.0
 
-  'wrangler': ^4.74.0
+  bits-ui: ^2.15
 
-  'drizzle-kit': ^1.0.0-beta.17
-  'drizzle-orm': ^1.0.0-beta.17
-  'better-auth': ^1.5.0
+  wrangler: ^4.97.0
+
+  drizzle-kit: ^1.0.0-beta.17
+  drizzle-orm: ^1.0.0-beta.17
+  better-auth: ^1.5.0
   '@neondatabase/serverless': ^1.0
-  'elysia': ^1.4
+  elysia: ^1.4
   '@elysiajs/cors': ^1.4
   '@elysiajs/openapi': ^1.4
-  'postgres': ^3.4
+  postgres: ^3.4
 
-  'proj4': ^2.20.0
-  'leaflet': ^1.9.4
+  proj4: ^2.20.0
+  leaflet: ^1.9.4
   '@types/leaflet': ^1.9.4
-  'ol': ^10.8.0
-  'maplibre-gl': ^5.16
-  'pmtiles': ^4.3.0
+  ol: ^10.8.0
+  maplibre-gl: ^5.16
+  pmtiles: ^4.3.0
+  lodash-es: ^4.17
+  '@types/lodash-es': ^4.17
+  phosphor-svelte: ^3.1.0
+  sharp: ^0.35.2
+  comlink: ^4.4.1
