@@ -1,8 +1,6 @@
 import { parseLanguageString } from '@allmaps/iiif-inspector'
 import type { PartOf, PartOfItem } from '@allmaps/annotation'
 
-export { parseLanguageString } from '@allmaps/iiif-inspector'
-
 type PartOfItemWithParent = PartOfItem & {
   parent?: PartOfItem
 }
