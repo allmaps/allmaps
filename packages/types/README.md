@@ -234,12 +234,7 @@ GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon
 ###### Type
 
 ```ts
-  | Point
-  | LineString
-  | Polygon
-  | MultiPoint
-  | MultiLineString
-  | MultiPolygon
+  Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon
 ```
 
 ### `Histogram`
