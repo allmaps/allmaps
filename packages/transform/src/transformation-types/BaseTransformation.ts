@@ -54,9 +54,9 @@ export abstract class BaseTransformation {
           this.type +
           ' transformation requires a minimum of ' +
           this.pointCountMinimum +
-          ' points, but ' +
+          ' points, but only ' +
           this.pointCount +
-          ' are given.'
+          (this.pointCount === 1 ? ' is given.' : ' are given.')
       )
     }
   }
