@@ -39,12 +39,7 @@ export type MultiLineString = Point[][]
 export type MultiPolygon = Point[][][]
 
 export type Geometry =
-  | Point
-  | LineString
-  | Polygon
-  | MultiPoint
-  | MultiLineString
-  | MultiPolygon
+  Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon
 
 export type TypedLine<P> = [P, P]
 export type TypedTriangle<P> = [P, P, P]

@@ -27,9 +27,7 @@ export type ViewerBlockingError =
     }
 
 export type SourceInfoWarningType =
-  | 'invalid-annotation'
-  | 'image'
-  | 'map-render'
+  'invalid-annotation' | 'image' | 'map-render'
 
 export type SourceInfoWarningDetail = {
   type: SourceInfoWarningType
@@ -37,8 +35,7 @@ export type SourceInfoWarningDetail = {
 }
 
 export type ViewerErrorType =
-  | ViewerBlockingError['type']
-  | SourceInfoWarningType
+  ViewerBlockingError['type'] | SourceInfoWarningType
 
 function isJsonObject(value: unknown): value is JsonObject {
   return !!value && typeof value === 'object' && !Array.isArray(value)

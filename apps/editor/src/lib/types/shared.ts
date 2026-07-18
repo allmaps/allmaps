@@ -45,9 +45,7 @@ export type IIIFPresentationResource =
   | IIIFEmbeddedManifest
 
 export type IIIFResource =
-  | IIIFPresentationResource
-  | IIIFEmbeddedImage
-  | IIIFImage
+  IIIFPresentationResource | IIIFEmbeddedImage | IIIFImage
 
 type BaseSource = {
   url: string
@@ -111,10 +109,7 @@ export type AllmapsPluginItem = {
 }
 
 export type BasemapPresetId =
-  | 'protomaps'
-  | 'esri-world-topo'
-  | 'esri-world-imagery'
-  | 'osm'
+  'protomaps' | 'esri-world-topo' | 'esri-world-imagery' | 'osm'
 
 export type BasemapProtomapsPreset = {
   type: 'protomaps'
@@ -135,8 +130,7 @@ export type BasemapPresetItem = {
 } & BasemapPreset
 
 export type ClickedItem =
-  | { type: 'map'; mapId: string }
-  | { type: 'gcp'; mapId: string; gcpId: string }
+  { type: 'map'; mapId: string } | { type: 'gcp'; mapId: string; gcpId: string }
 
 // export type GetProjectionById = (id: string) => PickerProjection | undefined
 export type ProjectionsById = Record<string, PickerProjection>

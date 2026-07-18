@@ -868,8 +868,7 @@ export class WarpedMapLayer
    */
   setOptions(
     options?:
-      | Partial<SpecificWarpedMapLayerOptions>
-      | Partial<WebGL2RenderOptions>
+      Partial<SpecificWarpedMapLayerOptions> | Partial<WebGL2RenderOptions>
   ): void {
     this.options = mergeOptions(this.options, options)
   }
@@ -1098,8 +1097,7 @@ export class WarpedMapLayer
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Partial<WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -1256,8 +1254,7 @@ export class WarpedMapLayer
       | string[]
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void
   resetMapsOptions(
@@ -1265,8 +1262,7 @@ export class WarpedMapLayer
       | string[]
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)
@@ -1317,8 +1313,7 @@ export class WarpedMapLayer
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
     thirdArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void
   resetMapsAndListOptions(
@@ -1327,8 +1322,7 @@ export class WarpedMapLayer
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
     thirdArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void {
     BaseWarpedMapLayer.assertRenderer(this.renderer)

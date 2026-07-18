@@ -109,7 +109,9 @@ export abstract class CacheableTile<D> extends EventTarget {
     const normalizedError =
       error instanceof Error ? error : new Error(String(error))
     const resourceFetchError =
-      normalizedError instanceof ResourceFetchError ? normalizedError : undefined
+      normalizedError instanceof ResourceFetchError
+        ? normalizedError
+        : undefined
     const errorLike = normalizedError as Partial<ResourceFetchError>
     const errorKind =
       resourceFetchError?.kind ??

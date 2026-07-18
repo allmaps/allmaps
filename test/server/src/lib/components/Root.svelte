@@ -172,8 +172,7 @@
   type CombinedLinks = ReturnType<typeof getCombinedLinks>
 
   type CombinedResourceKind =
-    | 'Annotation page'
-    | 'IIIF Presentation 3.0 manifest'
+    'Annotation page' | 'IIIF Presentation 3.0 manifest'
 
   type CombinedScenarioLink = Link & {
     corsMode: CorsMode

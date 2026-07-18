@@ -277,8 +277,7 @@
     keepMarker = false
   } = {}) {
     const control = geolocateControl as
-      | GeolocateControlWithWatchState
-      | undefined
+      GeolocateControlWithWatchState | undefined
 
     if (!control || !isMaplibreGeolocationTracking()) {
       return

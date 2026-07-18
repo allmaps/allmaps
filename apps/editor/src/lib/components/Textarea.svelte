@@ -13,5 +13,4 @@
   class="h-auto w-full p-2 align-top font-mono rounded-md inset-shadow-2xs
     outline-1 outline-gray focus:outline-2 focus:outline-pink transition-all"
   bind:value
-  {...restProps}
-></textarea>
+  {...restProps}></textarea>
