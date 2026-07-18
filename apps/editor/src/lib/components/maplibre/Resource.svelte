@@ -71,7 +71,9 @@
     mapId,
     resourceMask,
     renderMasks,
+    // eslint-disable-next-line no-useless-assignment
     transformer = $bindable<GcpTransformer | undefined>(),
+    // eslint-disable-next-line no-useless-assignment
     warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>()
   }: Props = $props()
 

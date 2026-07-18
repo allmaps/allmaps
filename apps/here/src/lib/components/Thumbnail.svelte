@@ -187,7 +187,7 @@
                   stroke-width="0.6"
                 />
               {/if}
-              {#each resourceMarkerCoordinates || [] as markerCoordinates}
+              {#each resourceMarkerCoordinates || [] as markerCoordinates, index (index)}
                 <circle
                   cx={markerCoordinates[0]}
                   cy={markerCoordinates[1]}
