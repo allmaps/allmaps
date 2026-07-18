@@ -26,7 +26,7 @@ function execInput(command: string, input?: string) {
       typeof err.stderr === 'string'
     ) {
       const output = err.stderr
-      throw new Error(output)
+      throw new Error(output, { cause: err })
     } else {
       throw err
     }
