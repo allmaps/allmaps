@@ -1,4 +1,4 @@
-import { expose } from 'comlink'
+import { expose, transfer } from 'comlink'
 
 import { fetchUrl } from '@allmaps/stdlib'
 
@@ -7,16 +7,15 @@ import type { FetchFn } from '@allmaps/types'
 const fetchAndGetImageBitmapWorker = {
   async getImageBitmap(
     tileUrl: string,
-    abortControllerSignal: AbortSignal,
+    onAbort: () => void, // Define as a no-arguments function
     fetchFn: FetchFn | undefined,
     width: number,
     height: number
   ): Promise<ImageBitmap> {
     const workerAbortController = new AbortController()
 
-    abortControllerSignal.onabort = () => {
-      workerAbortController.abort()
-    }
+    // Connect the abort signal with a listener
+    onAbort()
 
     const response = await fetchUrl(
       tileUrl,
@@ -28,9 +27,12 @@ const fetchAndGetImageBitmapWorker = {
 
     const blob = await response.blob()
 
+    // createImageBitmap decodes off the main thread and yields a GPU-uploadable
+    // bitmap, avoiding the OffscreenCanvas getImageData() readback that the
+    // ImageData worker needs. The bitmap is transferred (not cloned) back.
     const imageBitmap = await createImageBitmap(blob, 0, 0, width, height)
 
-    return imageBitmap
+    return transfer(imageBitmap, [imageBitmap])
   }
 }
 

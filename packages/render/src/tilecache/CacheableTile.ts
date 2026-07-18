@@ -56,7 +56,7 @@ export abstract class CacheableTile<D> extends EventTarget {
 
   abstract applySprites(): Promise<void>
   abstract spritesDataToCachedTiles(
-    clippedImageDatas: ImageData[],
+    clippedTilesData: D[],
     spritesInfo: SpritesInfo,
     warpedMapsByResourceId: Map<string, WarpedMapWithImage[]>
   ): CachedTile<D>[]

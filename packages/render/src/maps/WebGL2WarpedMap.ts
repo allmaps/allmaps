@@ -170,10 +170,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   pointGroups: PointGroup[] = []
 
   // Consider to store cachedTilesByTileKey as a quadtree for faster lookups
-  cachedTilesByTileKey: Map<string, CachedTile<ImageData>>
-  cachedTilesByTileUrl: Map<string, CachedTile<ImageData>>
-  cachedTilesForTexture: CachedTile<ImageData>[] = []
-  previousCachedTilesForTexture: CachedTile<ImageData>[] = []
+  cachedTilesByTileKey: Map<string, CachedTile<ImageBitmap>>
+  cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>>
+  cachedTilesForTexture: CachedTile<ImageBitmap>[] = []
+  previousCachedTilesForTexture: CachedTile<ImageBitmap>[] = []
 
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourceOriginPointsAndSizesTexture: WebGLTexture | null = null
@@ -410,7 +410,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    *
    * @param cachedTile
    */
-  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageData>) {
+  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
     this.cachedTilesByTileKey.set(cachedTile.fetchableTile.tileKey, cachedTile)
     this.cachedTilesByTileUrl.set(cachedTile.fetchableTile.tileUrl, cachedTile)
     this.throttledUpdateTextures()
@@ -1058,28 +1058,30 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
 
-    // Upload each tile's ImageData via a PBO, then immediately delete the PBO.
-    const pbo = gl.createBuffer()
+    // Ensure no PIXEL_UNPACK_BUFFER is bound so the DOM-source texSubImage3D
+    // overload is used (uploading directly from the ImageBitmap / ImageData).
+    gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
+
+    // Upload each tile directly from its ImageBitmap (decoded off the main
+    // thread, no getImageData readback). Sprite tiles are ImageBitmaps too,
+    // clipped from their atlas in CacheableWorkerImageBitmapTile.applySprites.
     for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
-      const imageData = this.cachedTilesForTexture[i].data
+      const source = this.cachedTilesForTexture[i].data
 
       // The texture size is the largest available size in the image's tileZoomLevels
       // (since the image could be served in multiple sizes).
-      // The size of the imageData is determined when fetching tiles
+      // The size of the source is determined when fetching tiles
       // and getting the optimal tileZoomLevel based on the scale derived from the viewport.
-      // Hence, the image data could be smaller then the texture.
+      // Hence, the source could be smaller then the texture.
       // This is not a problem in se, but sub-optimal if the difference is large.
       // (Also note that if the resource is only on part of the image,
-      // the image data is still its the full size).
+      // the source is still its the full size).
       if (
-        imageData.width > requiredTextureWidth ||
-        imageData.height > requiredTextureHeight
+        source.width > requiredTextureWidth ||
+        source.height > requiredTextureHeight
       ) {
         throw new Error("Cached tile doesn't fit in texture")
       }
-
-      gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo)
-      gl.bufferData(gl.PIXEL_UNPACK_BUFFER, imageData.data, gl.STATIC_DRAW)
 
       gl.texSubImage3D(
         gl.TEXTURE_2D_ARRAY,
@@ -1087,17 +1089,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         0,
         0,
         i,
-        imageData.width,
-        imageData.height,
+        source.width,
+        source.height,
         1,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
-        0
+        source
       )
-
-      gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
     }
-    gl.deleteBuffer(pbo)
 
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
@@ -1237,7 +1236,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Making tiles unique by tileUrl
     const cachedTilesForTexturesByTileUrl: Map<
       string,
-      CachedTile<ImageData>
+      CachedTile<ImageBitmap>
     > = new Map()
     cachedTilesForTextures.forEach((cachedTile) =>
       cachedTilesForTexturesByTileUrl.set(
@@ -1255,7 +1254,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   private getCachedTilesAtOtherScaleFactors(
     tile: Tile
-  ): CachedTile<ImageData>[] {
+  ): CachedTile<ImageBitmap>[] {
     if (this.cachedTilesByTileUrl.size === 0) {
       return []
     }
@@ -1285,7 +1284,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
   // Lookup by tileKey (zoomlevel, row, column) instead of tileUrl
   // Because computing the tileUrl for every tile is expensive
-  private tileToCachedTile(tile: Tile): CachedTile<ImageData> | undefined {
+  private tileToCachedTile(tile: Tile): CachedTile<ImageBitmap> | undefined {
     return this.cachedTilesByTileKey.get(tileKey(tile))
   }
 
