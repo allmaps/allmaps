@@ -13,8 +13,6 @@
 
   let { data }: LayoutProps = $props()
 
-  let error: string | undefined
-
   let tileJson = $derived(data.tileJson)
   let tileUrl = $derived(tileJson ? tileJson.tiles[0] : undefined)
 
@@ -29,17 +27,13 @@
       <Copy string={tileUrl} />
     {/if}
   </Header>
-  {#if !tileJson || error}
+  {#if !tileJson}
     <main class="container m-auto p-1 md:p-2">
       {#if !data.url}
         <URLInput
           onsubmit={handleUrlSubmit}
           placeholder="Type the URL of a Allmaps Tile Server TileJSON file"
         />
-      {:else if error}
-        <div class="flex flex-col items-center">
-          <p>Error: {error}</p>
-        </div>
       {:else if !tileJson}
         <div class="flex flex-col items-center">
           <Loading />

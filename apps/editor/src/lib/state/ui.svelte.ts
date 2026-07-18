@@ -385,7 +385,6 @@ export class UiState extends UiEventTarget {
   set resultsOptions(options: Partial<ResultsOptions>) {
     this.#resultsOptions = { ...this.#resultsOptions, ...options }
   }
-
 }
 
 export function setUiState(

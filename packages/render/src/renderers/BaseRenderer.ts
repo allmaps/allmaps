@@ -338,8 +338,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Partial<WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void
   setMapsOptions(
@@ -347,8 +346,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Partial<WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.setMapsOptions(
@@ -413,11 +411,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<WarpedMapListOptions<W>>,
+      Partial<WebGL2WarpedMapOptions> | Partial<WarpedMapListOptions<W>>,
     thirdArgument?:
-      | Partial<WarpedMapListOptions<W>>
-      | Partial<AnimationOptions>,
+      Partial<WarpedMapListOptions<W>> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void
   setMapsAndListOptions(
@@ -425,11 +421,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<WarpedMapListOptions<W>>,
+      Partial<WebGL2WarpedMapOptions> | Partial<WarpedMapListOptions<W>>,
     thirdArgument?:
-      | Partial<WarpedMapListOptions<W>>
-      | Partial<AnimationOptions>,
+      Partial<WarpedMapListOptions<W>> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.setMapsAndListOptions(
@@ -489,8 +483,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void
   resetMapsOptions(
@@ -498,8 +491,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.resetMapsOptions(
@@ -550,8 +542,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
     thirdArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void
   resetMapsAndListOptions(
@@ -560,8 +551,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
     thirdArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.resetMapsAndListOptions(

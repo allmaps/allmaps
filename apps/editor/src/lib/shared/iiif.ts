@@ -41,8 +41,6 @@ export function getImages(
   return images
 }
 
-export { parseLanguageString } from '@allmaps/iiif-inspector'
-
 export function parseLocalizedLanguageString(
   value: Parameters<typeof parseLanguageString>[0]
 ) {

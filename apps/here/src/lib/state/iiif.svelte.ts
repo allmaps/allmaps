@@ -53,7 +53,6 @@ export class IiifState {
   )
 
   #fetchedManifests = $state<SvelteMap<string, FetchResult>>(new SvelteMap())
-  #fetchedManifestCount = $state(0)
 
   #parsedManifests = $derived(
     new SvelteMap(
@@ -120,8 +119,6 @@ export class IiifState {
         state: 'error',
         error: err instanceof Error ? err : new Error(String(err))
       })
-    } finally {
-      this.#fetchedManifestCount++
     }
   }
 
@@ -149,10 +146,6 @@ export class IiifState {
 
   get manifestIds() {
     return this.#manifestIds
-  }
-
-  get manifestNotFetchedCount() {
-    return this.#manifestIds.length - this.#fetchedManifestCount
   }
 
   get hasLoadingManifests() {

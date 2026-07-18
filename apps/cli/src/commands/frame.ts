@@ -101,7 +101,8 @@ export function frame() {
       )
 
       // Transform resourceMask from pixel coordinates to geographic coordinates
-      const geoPolygon = projectedTransformer.transformToGeo([map.resourceMask])
+      const resourcePolygon: Polygon = [map.resourceMask]
+      const geoPolygon = projectedTransformer.transformToGeo(resourcePolygon)
       mapPolygons.push(geoPolygon)
     }
 

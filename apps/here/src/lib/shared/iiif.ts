@@ -1,8 +1,6 @@
 import { parseLanguageString } from '@allmaps/iiif-inspector'
 import type { PartOf, PartOfItem } from '@allmaps/annotation'
 
-export { parseLanguageString } from '@allmaps/iiif-inspector'
-
 type PartOfItemWithParent = PartOfItem & {
   parent?: PartOfItem
 }
@@ -15,7 +13,7 @@ function findPartOfItems(
   const items: PartOfItemWithParent[] = []
 
   if (partOf) {
-    partOf.forEach((item) => {
+    partOf.forEach((item: PartOfItem) => {
       if (item.type === type) {
         items.push({ ...item, parent })
       }

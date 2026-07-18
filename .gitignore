@@ -23,6 +23,9 @@ lerna-debug.log
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Paraglide JS generated output
+**/src/lib/paraglide/
+
 .pnpm-store
 
 .turbo

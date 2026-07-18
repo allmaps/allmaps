@@ -1,10 +1,13 @@
 <script lang="ts">
-  import { FileArrowUp as FileArrowUpIcon } from 'phosphor-svelte'
+  import { FileArrowUpIcon } from 'phosphor-svelte'
   import { m } from '$lib/paraglide/messages.js'
 
   type Props = { value: string }
 
-  let { value = $bindable() }: Props = $props()
+  let {
+    // eslint-disable-next-line no-useless-assignment
+    value = $bindable()
+  }: Props = $props()
 
   let files = $state<FileList>()
 

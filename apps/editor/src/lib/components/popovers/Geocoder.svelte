@@ -16,7 +16,11 @@
     open?: boolean
   }
 
-  let { geocodeEarthKey, open = $bindable(false) }: Props = $props()
+  let {
+    geocodeEarthKey,
+    // eslint-disable-next-line no-useless-assignment
+    open = $bindable(false)
+  }: Props = $props()
 
   const uiState = getUiState()
 

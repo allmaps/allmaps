@@ -1,13 +1,11 @@
 import { expect } from 'vitest'
 
 declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Assertion {
     toRoughlyEqual(expected: unknown, precision: number): void
     toRoughlyEqualText(expected: string, decimalPlaces: number): void
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface AsymmetricMatchersContaining {
     toRoughlyEqual(expected: unknown, precision: number): void
     toRoughlyEqualText(expected: string, decimalPlaces: number): void

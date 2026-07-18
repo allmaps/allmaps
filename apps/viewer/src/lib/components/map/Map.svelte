@@ -65,7 +65,9 @@
     opacity = 1,
     removeBackground = false,
     terrain = false,
+    // eslint-disable-next-line no-useless-assignment
     bearing = $bindable(0),
+    // eslint-disable-next-line no-useless-assignment
     imageUpBearing = $bindable()
   }: Props = $props()
 

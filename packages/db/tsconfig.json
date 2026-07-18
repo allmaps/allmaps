@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "paths": {}
+    "paths": {},
+    "types": ["node"]
   },
   "references": [{ "path": "../iiif-parser" }, { "path": "../id" }],
   "include": ["./src/**/*"]

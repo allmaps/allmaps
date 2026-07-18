@@ -65,7 +65,8 @@ The current scaffold writes:
 For organizations with a `supporter` or `innovator` plan, the export also
 writes organization-specific dumps to
 `DATA_EXPORT_OUTPUT_DIR/organizations/<organizationSlug>/` with the same files
-except `domains-counted.json`.
+except `domains-counted.json`. Organization-specific directories do not include
+PMTiles.
 
 The PMTiles command reads `maps-flattened.geojson` and writes:
 

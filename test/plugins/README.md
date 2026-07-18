@@ -1,12 +1,12 @@
 # Plugin tests
 
-This test contains a Svelte application with separate pages for each of the Allmaps webmap plugins. This can be used to test the entire rendering pipeline of the plugins.
+This directory contains a Svelte application with separate pages for each of the Allmaps plugins. This can be used to test the entire rendering pipeline of the plugins.
 
 The main pipelines run as follows:
 
-- Maplibre: [@allmaps/render](../../packages/render/) → [@allmaps/warpedmaplayer](../../packages/warpedmaplayer/) → [@allmaps/maplibre](../../packages/maplibre/)
+- MapLibre: [@allmaps/render](../../packages/render/) → [@allmaps/warpedmaplayer](../../packages/warpedmaplayer/) → [@allmaps/maplibre](../../packages/maplibre/)
 - Leaflet: [@allmaps/render](../../packages/render/) → [@allmaps/leaflet](../../packages/leaflet/)
-- Openlayers: [@allmaps/render](../../packages/openlayers/) → [@allmaps/leaflet](../../packages/openlayers/)
+- OpenLayers: [@allmaps/render](../../packages/openlayers/) → [@allmaps/leaflet](../../packages/openlayers/)
 
 With [@allmaps/render](../../packages/render/) relying of most other Allmaps packages, including:
 

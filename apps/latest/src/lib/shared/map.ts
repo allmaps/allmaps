@@ -57,7 +57,7 @@ export function getDisplayMap(
         if (err instanceof Error) {
           message = err.message
         }
-        throw new Error(message)
+        throw new Error(message, { cause: err })
       }
     } else {
       throw new Error('resource mask should have more than 2 points')

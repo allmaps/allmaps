@@ -311,7 +311,7 @@ export function parseGcpInputOptions(
       // The GCP option was provided by another georeferenced map
       gcps = parseMap(options.gcps).gcps
       return { gcps, gcpProjection }
-    } catch (e) {
+    } catch {
       // The GCP option was provided by a file with GCPs
       const gcpString = readFromFile(options.gcps)
       gcps = parseGcps(gcpString, mergeOptions(options, { gcpProjection })).gcps

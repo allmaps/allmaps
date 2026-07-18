@@ -1,10 +1,12 @@
 <script lang="ts">
   import {
-    ArrowSquareOut as ArrowSquareOutIcon,
-    Calendar as CalendarIcon,
-    Link as LinkIcon,
-    Info as InfoIcon
+    ArrowSquareOutIcon,
+    CalendarIcon,
+    LinkIcon,
+    InfoIcon
   } from 'phosphor-svelte'
+
+  import { parseLanguageString } from '@allmaps/iiif-inspector'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getIiifState } from '$lib/state/iiif.svelte.js'
@@ -17,7 +19,6 @@
     formatLabels,
     getTimeAgo
   } from '$lib/shared/metadata.js'
-  import { parseLanguageString } from '$lib/shared/iiif.js'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 

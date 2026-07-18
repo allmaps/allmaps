@@ -406,9 +406,7 @@ export function expandGeojsonMultiPolygonToGeojsonPolygons(
 
 export function expandGeojsonMultiGeometryToGeojsonGeometries(
   geojsonMultiGeometry:
-    | GeojsonMultiPoint
-    | GeojsonMultiLineString
-    | GeojsonMultiPolygon
+    GeojsonMultiPoint | GeojsonMultiLineString | GeojsonMultiPolygon
 ): GeojsonPoint[] | GeojsonLineString[] | GeojsonPolygon[] {
   if (isGeojsonMultiPoint(geojsonMultiGeometry)) {
     return expandGeojsonMultiPointToGeojsonPoints(geojsonMultiGeometry)

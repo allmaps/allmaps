@@ -117,200 +117,201 @@
     <ol
       class="grid auto-rows-auto grid-cols-[repeat(2,max-content)_1fr] gap-1 sm:grid-cols-[repeat(8,max-content)_1fr] sm:gap-2"
     >
-    {#each mapsState.maps as map, index (map.id)}
-      {@const gcpCount = Object.values(map.gcps).length}
-      {@const isActiveMap = mapsState.activeMapId === map.id}
-      <li
-        class="col-span-9 grid grid-cols-subgrid"
-        transition:slide={{ duration: 250, axis: 'y' }}
-      >
-        <div class="group col-span-8 grid grid-cols-subgrid">
-          <div>
-            {#if hasResourceMask(map)}
-              <button
-                class="relative size-16 cursor-pointer"
-                onclick={() => handleMapClick(map.id)}
-                aria-label={m.select_map({ number: index + 1 })}
-              >
-                <svg
-                  class="h-full w-full fill-none stroke-pink stroke-2"
-                  viewBox={thumbnailViewbox(map)}
-                >
-                  <polygon
-                    points={thumbnailPolygonPoints(map)}
-                    class="group-hover:fill-pink/10 {isActiveMap
-                      ? 'fill-pink/25'
-                      : 'fill-none'}"
-                    class:fill-none={!isActiveMap}
-                  />
-                </svg>
-              </button>
-            {/if}
-          </div>
-          <div
-            class="col-span-7 flex items-center gap-1 place-self-start self-center sm:gap-2"
-          >
-            <span>{m.map_number({ number: index + 1 })}</span>
-
+      {#each mapsState.maps as map, index (map.id)}
+        {@const gcpCount = Object.values(map.gcps).length}
+        {@const isActiveMap = mapsState.activeMapId === map.id}
+        <li
+          class="col-span-9 grid grid-cols-subgrid"
+          transition:slide={{ duration: 250, axis: 'y' }}
+        >
+          <div class="group col-span-8 grid grid-cols-subgrid">
             <div>
-              {#if isActiveMap}
+              {#if hasResourceMask(map)}
                 <button
-                  class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
-                  onclick={() => (uiState.modalOpen.editResourceMask = true)}
-                  >{m.edit_or_import_mask()}</button
+                  class="relative size-16 cursor-pointer"
+                  onclick={() => handleMapClick(map.id)}
+                  aria-label={m.select_map({ number: index + 1 })}
                 >
+                  <svg
+                    class="h-full w-full fill-none stroke-pink stroke-2"
+                    viewBox={thumbnailViewbox(map)}
+                  >
+                    <polygon
+                      points={thumbnailPolygonPoints(map)}
+                      class="group-hover:fill-pink/10 {isActiveMap
+                        ? 'fill-pink/25'
+                        : 'fill-none'}"
+                      class:fill-none={!isActiveMap}
+                    />
+                  </svg>
+                </button>
               {/if}
+            </div>
+            <div
+              class="col-span-7 flex items-center gap-1 place-self-start self-center sm:gap-2"
+            >
+              <span>{m.map_number({ number: index + 1 })}</span>
 
-              {#if uiState.modalOpen.editResourceMask}
+              <div>
+                {#if isActiveMap}
+                  <button
+                    class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
+                    onclick={() => (uiState.modalOpen.editResourceMask = true)}
+                    >{m.edit_or_import_mask()}</button
+                  >
+                {/if}
+
+                {#if uiState.modalOpen.editResourceMask}
+                  <!-- TODO: what happens if ShareDB updates the map while editing? -->
+                  <EditResourceMask
+                    bind:open={uiState.modalOpen.editResourceMask}
+                    map={toGeoreferencedMap(
+                      apiBaseUrl,
+                      annotationsApiBaseUrl,
+                      map,
+                      projectionsState.projectionsById
+                    )}
+                    onsubmit={(resourceMask) =>
+                      handleResourceMaskEdited(map.id, resourceMask)}
+                  />
+                {/if}
+              </div>
+            </div>
+          </div>
+          <div class="place-self-end self-center">
+            <Confirm onconfirm={() => mapsState.removeMap({ mapId: map.id })}>
+              {#snippet button()}
+                <TrashIcon />
+              {/snippet}
+              {#snippet question()}
+                {m.delete_map_question()}
+              {/snippet}
+            </Confirm>
+          </div>
+
+          {#if isActiveMap}
+            <div
+              class="col-span-9 grid grid-cols-[min-content_1fr]
+              items-center gap-x-4 gap-y-2 pb-2 text-sm
+              sm:pl-7"
+            >
+              <label for="select-transformation"
+                >{m.transformation_label()}</label
+              >
+              <SelectTransformation {map} id="select-transformation" />
+
+              <label for="select-projection">{m.projection_label()}</label>
+              <ProjectionPicker {map} id="select-projection" />
+            </div>
+            {#if gcpCount > 0}
+              {@const gcps = Object.values(map.gcps).toSorted(
+                (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
+              )}
+              <ol
+                class="col-span-9 grid grid-cols-subgrid"
+                transition:slide={{ duration: 250, axis: 'y' }}
+              >
+                {#each gcps as gcp, index (gcp.id)}
+                  {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
+                  <li class="contents">
+                    <div class="col-span-8 grid grid-cols-subgrid gap-0">
+                      <button
+                        class="inline-block h-8 cursor-pointer"
+                        onclick={() => handleGcpClick(map.id, gcp.id)}
+                        aria-label={m.select_gcp({ number: index + 1 })}
+                      >
+                        <div
+                          class="inline-flex size-4 items-center justify-center"
+                        >
+                          <span
+                            class="size-3 rounded-full bg-pink transition-all"
+                            class:size-3={!isActiveGcp}
+                            class:size-4={isActiveGcp}
+                          ></span>
+                        </div>
+                        <span class="relative top-2 text-sm">
+                          {index + 1}
+                        </span>
+                      </button>
+
+                      <div
+                        class="geograph-tnum col-span-7 grid grid-cols-subgrid place-items-end items-center gap-1 text-xs sm:text-base"
+                      >
+                        {#if gcp.resource}
+                          <span inert class="text-gray-300">(</span><span
+                            >{formatResourceCoordinate(gcp.resource[0])}<span
+                              inert
+                              class="text-gray-600">,</span
+                            ></span
+                          ><span class="space-x-1">
+                            <span
+                              >{formatResourceCoordinate(gcp.resource[1])}</span
+                            ><span inert class="text-gray-300">)</span></span
+                          >
+                        {:else}
+                          <span class="col-span-3"></span>
+                        {/if}
+                        <span inert class="text-gray-300">⇒</span>
+                        {#if gcp.geo}
+                          <span inert class="text-gray-300">(</span><span
+                            >{formatGeoCoordinate(gcp.geo[0])}<span
+                              inert
+                              class="text-gray-600">,</span
+                            ></span
+                          >
+                          <span class="space-x-1">
+                            <span>{formatGeoCoordinate(gcp.geo[1])}</span><span
+                              inert
+                              class="text-gray-300">)</span
+                            ></span
+                          >
+                        {:else}
+                          <span class="col-span-3"></span>
+                        {/if}
+                      </div>
+                    </div>
+                    <div class="place-self-end self-center">
+                      <Confirm
+                        onconfirm={() =>
+                          mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
+                      >
+                        {#snippet button()}
+                          <TrashIcon />
+                        {/snippet}
+                        {#snippet question()}
+                          {m.delete_gcp_question()}
+                        {/snippet}
+                      </Confirm>
+                    </div>
+                  </li>
+                {/each}
+              </ol>
+            {/if}
+
+            <div class="col-span-9 place-self-end">
+              <button
+                class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
+                onclick={() => (uiState.modalOpen.editGcps = true)}
+                >{m.edit_or_import_gcps()}</button
+              >
+
+              {#if uiState.modalOpen.editGcps}
                 <!-- TODO: what happens if ShareDB updates the map while editing? -->
-                <EditResourceMask
-                  bind:open={uiState.modalOpen.editResourceMask}
+                <EditGcps
+                  bind:open={uiState.modalOpen.editGcps}
                   map={toGeoreferencedMap(
                     apiBaseUrl,
                     annotationsApiBaseUrl,
                     map,
                     projectionsState.projectionsById
                   )}
-                  onsubmit={(resourceMask) =>
-                    handleResourceMaskEdited(map.id, resourceMask)}
+                  onsubmit={(gcps) => handleGcpsEdited(map.id, gcps)}
                 />
               {/if}
             </div>
-          </div>
-        </div>
-        <div class="place-self-end self-center">
-          <Confirm onconfirm={() => mapsState.removeMap({ mapId: map.id })}>
-            {#snippet button()}
-              <TrashIcon />
-            {/snippet}
-            {#snippet question()}
-              {m.delete_map_question()}
-            {/snippet}
-          </Confirm>
-        </div>
-
-        {#if isActiveMap}
-          <div
-            class="col-span-9 grid grid-cols-[min-content_1fr]
-              items-center gap-x-4 gap-y-2 pb-2 text-sm
-              sm:pl-7"
-          >
-            <label for="select-transformation">{m.transformation_label()}</label
-            >
-            <SelectTransformation {map} id="select-transformation" />
-
-            <label for="select-projection">{m.projection_label()}</label>
-            <ProjectionPicker {map} id="select-projection" />
-          </div>
-          {#if gcpCount > 0}
-            {@const gcps = Object.values(map.gcps).toSorted(
-              (gcpA, gcpB) => (gcpA.index || 0) - (gcpB.index || 0)
-            )}
-            <ol
-              class="col-span-9 grid grid-cols-subgrid"
-              transition:slide={{ duration: 250, axis: 'y' }}
-            >
-              {#each gcps as gcp, index (gcp.id)}
-                {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
-                <li class="contents">
-                  <div class="col-span-8 grid grid-cols-subgrid gap-0">
-                    <button
-                      class="inline-block h-8 cursor-pointer"
-                      onclick={() => handleGcpClick(map.id, gcp.id)}
-                      aria-label={m.select_gcp({ number: index + 1 })}
-                    >
-                      <div
-                        class="inline-flex size-4 items-center justify-center"
-                      >
-                        <span
-                          class="size-3 rounded-full bg-pink transition-all"
-                          class:size-3={!isActiveGcp}
-                          class:size-4={isActiveGcp}
-                        ></span>
-                      </div>
-                      <span class="relative top-2 text-sm">
-                        {index + 1}
-                      </span>
-                    </button>
-
-                    <div
-                      class="geograph-tnum col-span-7 grid grid-cols-subgrid place-items-end items-center gap-1 text-xs sm:text-base"
-                    >
-                      {#if gcp.resource}
-                        <span inert class="text-gray-300">(</span><span
-                          >{formatResourceCoordinate(gcp.resource[0])}<span
-                            inert
-                            class="text-gray-600">,</span
-                          ></span
-                        ><span class="space-x-1">
-                          <span
-                            >{formatResourceCoordinate(gcp.resource[1])}</span
-                          ><span inert class="text-gray-300">)</span></span
-                        >
-                      {:else}
-                        <span class="col-span-3"></span>
-                      {/if}
-                      <span inert class="text-gray-300">⇒</span>
-                      {#if gcp.geo}
-                        <span inert class="text-gray-300">(</span><span
-                          >{formatGeoCoordinate(gcp.geo[0])}<span
-                            inert
-                            class="text-gray-600">,</span
-                          ></span
-                        >
-                        <span class="space-x-1">
-                          <span>{formatGeoCoordinate(gcp.geo[1])}</span><span
-                            inert
-                            class="text-gray-300">)</span
-                          ></span
-                        >
-                      {:else}
-                        <span class="col-span-3"></span>
-                      {/if}
-                    </div>
-                  </div>
-                  <div class="place-self-end self-center">
-                    <Confirm
-                      onconfirm={() =>
-                        mapsState.removeGcp({ mapId: map.id, gcpId: gcp.id })}
-                    >
-                      {#snippet button()}
-                        <TrashIcon />
-                      {/snippet}
-                      {#snippet question()}
-                        {m.delete_gcp_question()}
-                      {/snippet}
-                    </Confirm>
-                  </div>
-                </li>
-              {/each}
-            </ol>
           {/if}
-
-          <div class="col-span-9 place-self-end">
-            <button
-              class="cursor-pointer rounded-full px-2 py-1 text-sm text-pink hover:underline"
-              onclick={() => (uiState.modalOpen.editGcps = true)}
-              >{m.edit_or_import_gcps()}</button
-            >
-
-            {#if uiState.modalOpen.editGcps}
-              <!-- TODO: what happens if ShareDB updates the map while editing? -->
-              <EditGcps
-                bind:open={uiState.modalOpen.editGcps}
-                map={toGeoreferencedMap(
-                  apiBaseUrl,
-                  annotationsApiBaseUrl,
-                  map,
-                  projectionsState.projectionsById
-                )}
-                onsubmit={(gcps) => handleGcpsEdited(map.id, gcps)}
-              />
-            {/if}
-          </div>
-        {/if}
-      </li>
-    {/each}
+        </li>
+      {/each}
     </ol>
   {/if}
 </div>

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "strict": true,
     "skipLibCheck": true,
     "allowJs": true,
@@ -35,6 +34,8 @@
       "@allmaps/frame/*": ["./packages/frame/src/*"],
       "@allmaps/id": ["./packages/id/src"],
       "@allmaps/id/*": ["./packages/id/src/*"],
+      "@allmaps/iiif-inspector": ["./packages/iiif-inspector/src"],
+      "@allmaps/iiif-inspector/*": ["./packages/iiif-inspector/src/*"],
       "@allmaps/iiif-parser": ["./packages/iiif-parser/src"],
       "@allmaps/iiif-parser/*": ["./packages/iiif-parser/src/*"],
       "@allmaps/latest": ["./apps/latest/src"],

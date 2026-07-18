@@ -9,12 +9,7 @@ const YEAR_MIN = 1500
 const YEAR_MAX = 2200
 
 export type YearCandidateSource =
-  | 'navDate'
-  | 'metadata'
-  | 'label'
-  | 'summary'
-  | 'description'
-  | 'value'
+  'navDate' | 'metadata' | 'label' | 'summary' | 'description' | 'value'
 
 export type YearCandidate = {
   value: string

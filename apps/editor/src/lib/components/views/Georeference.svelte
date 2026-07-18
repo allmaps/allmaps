@@ -197,7 +197,6 @@
     let stateGeoViewport: Viewport | undefined
     let navPlaceGeoViewport: Viewport | undefined
     let urlGeoViewport: Viewport | undefined
-    let dataGeoViewport: Viewport | undefined
 
     if (geoMap) {
       navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
@@ -224,8 +223,7 @@
     const geoViewports = sortGeoViewports({
       state: stateGeoViewport,
       navPlace: navPlaceGeoViewport,
-      url: urlGeoViewport,
-      data: dataGeoViewport
+      url: urlGeoViewport
     })
 
     return geoViewports[0]

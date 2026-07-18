@@ -95,13 +95,9 @@ export class UrlState<T extends SearchParams> {
           // }
 
           // Get current value from URL
-          let currentValue: string | null = null
-          if (paramConfig.hash) {
-            const hashParams = this.#getHashParams()
-            currentValue = hashParams.get(paramConfig.key)
-          } else {
-            currentValue = this.#url.searchParams.get(paramConfig.key)
-          }
+          const currentValue = paramConfig.hash
+            ? this.#getHashParams().get(paramConfig.key)
+            : this.#url.searchParams.get(paramConfig.key)
 
           const shouldSetValue =
             // stringValue !== undefined &&

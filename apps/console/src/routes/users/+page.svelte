@@ -99,8 +99,8 @@
     const sortedUsers = [...filteredUsers]
 
     sortedUsers.sort((userA, userB) => {
-      let valueA: number | string = ''
-      let valueB: number | string = ''
+      let valueA: number | string
+      let valueB: number | string
 
       if (sortBy === 'createdAt') {
         valueA = userA.createdAt ? new Date(userA.createdAt).getTime() : 0

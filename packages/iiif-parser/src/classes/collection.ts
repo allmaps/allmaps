@@ -347,11 +347,8 @@ export class Collection extends EmbeddedCollection {
 
   getItemAtPath(path: number[]) {
     let parsedIiif:
-      | Collection
-      | EmbeddedCollection
-      | Manifest
-      | EmbeddedManifest
-      | Canvas = this as Collection
+      Collection | EmbeddedCollection | Manifest | EmbeddedManifest | Canvas =
+      this as Collection
 
     for (const index of path) {
       if ('items' in parsedIiif) {

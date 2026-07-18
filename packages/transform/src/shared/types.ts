@@ -10,11 +10,7 @@ export type GeneralGcp = {
 }
 
 export type DistortionMeasure =
-  | 'log2sigma'
-  | 'twoOmega'
-  | 'airyKavr'
-  | 'signDetJ'
-  | 'thetaa'
+  'log2sigma' | 'twoOmega' | 'airyKavr' | 'signDetJ' | 'thetaa'
 
 export type Distortions = {
   partialDerivativeX: Point
@@ -63,9 +59,7 @@ export type Polynomial1Measures = {
   shears: Point
 }
 export type TransformationTypeMeasures =
-  | StraightMeasures
-  | HelmertMeasures
-  | Polynomial1Measures
+  StraightMeasures | HelmertMeasures | Polynomial1Measures
 // | object
 
 // Stored here as object to facilitate parsing in CLI

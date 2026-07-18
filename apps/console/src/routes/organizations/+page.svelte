@@ -23,8 +23,7 @@
   const organizationSearchFields = ['name', 'slug', 'domain'] as const
   const organizationSortFields = ['name', 'slug', 'plan', 'createdAt'] as const
   type OrganizationSearchField =
-    | 'all'
-    | (typeof organizationSearchFields)[number]
+    'all' | (typeof organizationSearchFields)[number]
   type OrganizationSortField = (typeof organizationSortFields)[number]
 
   let searchValue = $state(page.url.searchParams.get('q') ?? '')
@@ -76,9 +75,7 @@
 
   function search(value: string, field: string) {
     const nextSearchField =
-      field === 'name' || field === 'slug' || field === 'domain'
-        ? field
-        : 'all'
+      field === 'name' || field === 'slug' || field === 'domain' ? field : 'all'
 
     searchValue = value
     searchField = nextSearchField

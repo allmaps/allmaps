@@ -91,7 +91,7 @@
 
 <svelte:body onmousemove={handleMousemove} bind:clientWidth bind:clientHeight />
 
-{#snippet fetchError({ url, details }: ParsedFetchError)}
+{#snippet fetchError({ details }: ParsedFetchError)}
   {#if details.type === FetchError.INVALID_JSON}
     <p>{m.invalid_json_error()}</p>
     <p>{m.invalid_json_hint()}</p>

@@ -75,6 +75,7 @@
     warpedMapsOpacity = 1,
     renderMasks = false,
     onmoveend,
+    // eslint-disable-next-line no-useless-assignment
     warpedMapLayerBounds = $bindable<LngLatBoundsLike | undefined>(),
     onBeforeSetStyle,
     onAfterSetStyle,

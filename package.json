@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "watch": "turbo watch build --filter \"./packages/**\"",
+    "init": "pnpm install --recursive && pnpm run build:packages && pnpm run check && pnpm run build:apps",
+    "types": "turbo run types",
+    "types:packages": "turbo run types --filter \"./packages/**\"",
+    "types:packages:force": "turbo run types --force --filter \"./packages/**\"",
+    "build": "turbo run build",
     "build:packages": "turbo run build --filter \"./packages/**\"",
     "build:packages:force": "turbo run build --force --filter \"./packages/**\"",
     "build:apps": "turbo run build --filter \"./apps/**\"",
-    "init": "pnpm install --recursive && pnpm run build:packages && pnpm run check && pnpm run build:apps",
-    "types": "turbo run types",
-    "build": "turbo run build",
     "check": "turbo run check",
     "lint": "turbo run lint",
     "test": "turbo run test",
@@ -22,7 +24,7 @@
     "prepare": "husky install",
     "version-prerelease": "lerna version prerelease",
     "publish-beta": "lerna publish from-git --dist-tag beta",
-    "publish": "lerna publish from-git "
+    "publish": "lerna publish from-git"
   },
   "devDependencies": {
     "@lerna-lite/cli": "^4.4.1",

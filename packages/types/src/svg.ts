@@ -33,8 +33,4 @@ export type SvgRect = {
 }
 
 export type SvgGeometry =
-  | SvgCircle
-  | SvgLine
-  | SvgPolyLine
-  | SvgPolygon
-  | SvgRect
+  SvgCircle | SvgLine | SvgPolyLine | SvgPolygon | SvgRect

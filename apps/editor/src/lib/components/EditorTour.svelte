@@ -443,10 +443,7 @@
           description: m.tour_images_description()
         },
         {
-          onPrevClick: moveToViewOnPrevious(
-            tourStartView,
-            selector.workflow
-          ),
+          onPrevClick: moveToViewOnPrevious(tourStartView, selector.workflow),
           onNextClick: moveToViewOnNext('mask', selector.maskView)
         }
       ),
@@ -489,16 +486,12 @@
           onNextClick: moveToPopoverOnNext('maps', selector.mapsPopover)
         }
       ),
-      getStep(
-        selector.mapsPopover,
-        getMapsPopoverData(),
-        {
-          onPrevClick: moveToPopoverOnPrevious(
-            'mapSettings',
-            selector.mapSettingsPopover
-          )
-        }
-      )
+      getStep(selector.mapsPopover, getMapsPopoverData(), {
+        onPrevClick: moveToPopoverOnPrevious(
+          'mapSettings',
+          selector.mapSettingsPopover
+        )
+      })
     ]
 
     setOnNextClick(
@@ -506,17 +499,13 @@
       moveToViewOnNext('results', selector.resultsView)
     )
 
-    const resultsStep = getStep(
-      selector.resultsView,
-      getResultsData(),
-      {
-        onPrevClick: moveToPopoverOnPrevious(
-          'maps',
-          selector.mapsPopover,
-          'georeference'
-        )
-      }
-    )
+    const resultsStep = getStep(selector.resultsView, getResultsData(), {
+      onPrevClick: moveToPopoverOnPrevious(
+        'maps',
+        selector.mapsPopover,
+        'georeference'
+      )
+    })
 
     if (canOpenExportPopover()) {
       setOnNextClick(
@@ -529,24 +518,16 @@
 
     if (canOpenExportPopover()) {
       steps.push(
-        getStep(
-          selector.exportPopover,
-          getExportData(),
-          {
-            side: 'left',
-            onPrevClick: moveToViewOnPrevious('results', selector.resultsView)
-          }
-        )
+        getStep(selector.exportPopover, getExportData(), {
+          side: 'left',
+          onPrevClick: moveToViewOnPrevious('results', selector.resultsView)
+        })
       )
     } else {
       steps.push(
-        getStep(
-          selector.export,
-          getExportData(),
-          {
-            side: 'left'
-          }
-        )
+        getStep(selector.export, getExportData(), {
+          side: 'left'
+        })
       )
     }
 
