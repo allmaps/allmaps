@@ -22,7 +22,7 @@ import type {
   Target,
   Source,
   PartOf,
-  ResourceType,
+  ImageService,
   Projection,
   Provider
 } from './types.js'
@@ -59,7 +59,7 @@ function generateSvgSelector(
 
 function generateSource(georeferencedMap: GeoreferencedMapAllVersions): Source {
   let id: string
-  let type: ResourceType
+  let type: ImageService
 
   let width: number | undefined
   let height: number | undefined

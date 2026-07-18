@@ -15,7 +15,7 @@ function findPartOfItems(
   const items: PartOfItemWithParent[] = []
 
   if (partOf) {
-    partOf.forEach((item) => {
+    partOf.forEach((item: PartOfItem) => {
       if (item.type === type) {
         items.push({ ...item, parent })
       }

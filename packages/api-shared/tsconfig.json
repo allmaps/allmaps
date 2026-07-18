@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "target": "es2024",
-    "lib": ["es2024"],
+    "lib": ["es2024", "DOM", "DOM.Iterable"],
     "module": "esnext",
     "moduleResolution": "Bundler",
     "rootDir": "./src",
