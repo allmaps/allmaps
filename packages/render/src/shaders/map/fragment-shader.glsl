@@ -34,6 +34,8 @@ uniform vec4 u_distortionColor3;
 
 uniform int u_scaleFactorForViewport;
 
+uniform int u_textureSlotCount;
+
 uniform lowp sampler2DArray u_cachedTilesTextureArray;
 uniform isampler2D u_cachedTilesResourceOriginPointsAndSizesTexture;
 uniform isampler2D u_cachedTilesScaleFactorsTexture;
@@ -55,7 +57,9 @@ void main() {
 
   // Reading information on cached tiles from textures
   ivec3 cachedTilesTextureSize = textureSize(u_cachedTilesTextureArray, 0);
-  int cachedTilesCount = cachedTilesTextureSize.z;
+  // The texture array is allocated with headroom, so use the actual resident
+  // tile count (not the allocated depth) to bound the loop.
+  int textureSlotCount = u_textureSlotCount;
 
   // Setting references for the for loop
   int smallestScaleFactor;
@@ -70,7 +74,7 @@ void main() {
   color = initialColor;
 
   // Loop through all cached tiles
-  for(int index = 0; index < cachedTilesCount; index += 1) {
+  for(int index = 0; index < textureSlotCount; index += 1) {
 
     // Read the information of the tile
     float cachedTileResourceOriginPointX = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4)), 0));

@@ -839,6 +839,16 @@ export class WebGL2Renderer
       : 1
     gl.uniform1i(scaleFactorForViewportLocation, scaleFactorForViewport)
 
+    // Number of resident tiles / texture slots (bounds the fragment shader's
+    // loop; the texture array is allocated with headroom, so this is not its
+    // depth)
+    const textureSlotCountLocation = this.#getUniformLocation(
+      gl,
+      program,
+      'u_textureSlotCount'
+    )
+    gl.uniform1i(textureSlotCountLocation, webgl2WarpedMap.textureSlotCount)
+
     // Cached tiles texture array
     const cachedTilesTextureArrayLocation = this.#getUniformLocation(
       gl,
