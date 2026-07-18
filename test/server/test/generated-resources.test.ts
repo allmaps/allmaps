@@ -7,7 +7,7 @@ import { createCatalog, handleFixtureRequest } from '../src/lib/server.ts'
 type JsonObject = Record<string, unknown>
 
 type InfoExpectation = 'valid' | 'missing-dimensions' | 'bad-tiles'
-type ManifestExpectation = 'valid' | 'missing-image-service'
+type ManifestExpectation = 'valid' | 'missing-image-service' | 'browser-only'
 
 type Resource<T extends string> = {
   name: string
@@ -30,6 +30,17 @@ type AnnotationResource =
 const baseUrl = 'http://localhost:5506/cors'
 const catalog = createCatalog(new Request(`${baseUrl}/`), 'cors')
 const combinedAnnotationHttpErrorStatuses = [401, 403, 404, 429, 500, 503]
+const browserRequestHeaders = {
+  'sec-fetch-mode': 'cors'
+}
+const viewerServerRequestHeaders = {
+  ...browserRequestHeaders,
+  'user-agent': 'AllmapsViewer (+https://viewer.allmaps.org/)'
+}
+const cloudflareViewerServerRequestHeaders = {
+  ...browserRequestHeaders,
+  'cf-worker': 'allmaps.org'
+}
 
 function isJsonObject(value: unknown): value is JsonObject {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -45,14 +56,14 @@ function getFixturePath(href: string) {
   }
 }
 
-async function getFixtureResponse(href: string) {
+async function getFixtureResponse(href: string, headers?: HeadersInit) {
   const { corsMode, path } = getFixturePath(href)
 
-  return handleFixtureRequest(new Request(href), corsMode, path)
+  return handleFixtureRequest(new Request(href, { headers }), corsMode, path)
 }
 
-async function getJsonResource(href: string) {
-  const response = await getFixtureResponse(href)
+async function getJsonResource(href: string, headers?: HeadersInit) {
+  const response = await getFixtureResponse(href, headers)
   const text = await response.text()
 
   expect(response.status, href).toBe(200)
@@ -111,7 +122,9 @@ function getManifestResources(): Resource<ManifestExpectation>[] {
     ...catalog.combinedImages.manifests.map((link) => ({
       name: `combined ${link.label}`,
       href: link.href,
-      expectation: 'valid' as const
+      expectation: link.href.includes('/browser-only-')
+        ? ('browser-only' as const)
+        : ('valid' as const)
     })),
     ...catalog.images.flatMap((image) => [
       ...image.manifestResources.map((link) => ({
@@ -153,6 +166,10 @@ function isCombinedAnnotationHttpErrorResource(href: string) {
 
 function isSlowResource(href: string) {
   return href.includes('/slow-iiif3-level2')
+}
+
+function isBrowserOnlyResource(href: string) {
+  return href.includes('/browser-only-')
 }
 
 function getAnnotationItems(annotation: unknown) {
@@ -244,6 +261,42 @@ function getAnnotationImageServiceIds(annotation: unknown) {
   ]
 }
 
+function getFirstPaintingImageServiceId(manifest: unknown) {
+  if (!isJsonObject(manifest) || !Array.isArray(manifest.items)) {
+    throw new Error('Manifest has no canvases')
+  }
+
+  const canvas = manifest.items[0]
+
+  if (!isJsonObject(canvas) || !Array.isArray(canvas.items)) {
+    throw new Error('Manifest canvas has no annotation pages')
+  }
+
+  const annotationPage = canvas.items[0]
+
+  if (!isJsonObject(annotationPage) || !Array.isArray(annotationPage.items)) {
+    throw new Error('Canvas has no painting annotations')
+  }
+
+  const annotation = annotationPage.items[0]
+
+  if (!isJsonObject(annotation) || !isJsonObject(annotation.body)) {
+    throw new Error('Painting annotation has no image body')
+  }
+
+  const { service } = annotation.body
+
+  if (
+    !Array.isArray(service) ||
+    !isJsonObject(service[0]) ||
+    typeof service[0].id !== 'string'
+  ) {
+    throw new Error('Painting annotation has no image service')
+  }
+
+  return service[0].id
+}
+
 function collectAnnotationPagesFromManifest(
   manifest: unknown,
   name: string
@@ -307,7 +360,7 @@ async function getGeneratedAnnotationResources() {
   )
 
   for (const resource of getManifestResources()) {
-    if (isSlowResource(resource.href)) {
+    if (isSlowResource(resource.href) || isBrowserOnlyResource(resource.href)) {
       continue
     }
 
@@ -359,10 +412,17 @@ describe('generated IIIF manifests', () => {
   test.each(getManifestResources())(
     '$name',
     async ({ href, expectation }) => {
-      const data = await getJsonResource(href)
+      if (expectation === 'browser-only') {
+        expect((await getFixtureResponse(href)).status).toBe(403)
+      }
+
+      const data = await getJsonResource(
+        href,
+        expectation === 'browser-only' ? browserRequestHeaders : undefined
+      )
       const error = getParseError(() => IIIF.parse(data))
 
-      if (expectation === 'valid') {
+      if (expectation === 'valid' || expectation === 'browser-only') {
         expect(error).toBeUndefined()
       } else {
         expect(getIssuePaths(error)).toContain(
@@ -372,6 +432,69 @@ describe('generated IIIF manifests', () => {
     },
     20_000
   )
+
+  test('browser-only combined manifest, info.json, and image requests reject server-side requests', async () => {
+    const manifestHref = `${baseUrl}/manifests/3/combined/browser-only-iiif3-level2.json`
+    const canvasHref = `${baseUrl}/manifests/3/combined/browser-only-iiif3-level2.json/canvas/1`
+
+    expect((await getFixtureResponse(manifestHref)).status).toBe(403)
+    expect((await getFixtureResponse(canvasHref)).status).toBe(403)
+    expect(
+      (await getFixtureResponse(manifestHref, viewerServerRequestHeaders))
+        .status
+    ).toBe(403)
+    expect(
+      (await getFixtureResponse(canvasHref, viewerServerRequestHeaders)).status
+    ).toBe(403)
+    expect(
+      (
+        await getFixtureResponse(
+          manifestHref,
+          cloudflareViewerServerRequestHeaders
+        )
+      ).status
+    ).toBe(403)
+
+    const manifest = await getJsonResource(manifestHref, browserRequestHeaders)
+    const canvas = await getJsonResource(canvasHref, browserRequestHeaders)
+    const serviceId = getFirstPaintingImageServiceId(manifest)
+    const infoJsonHref = `${serviceId}/info.json`
+    const imageHref = `${serviceId}/full/64,/0/default.jpg`
+
+    expect(() => IIIF.parse(manifest)).not.toThrow()
+    expect(isJsonObject(canvas) && canvas.type).toBe('Canvas')
+    expect((await getFixtureResponse(infoJsonHref)).status).toBe(403)
+    expect((await getFixtureResponse(imageHref)).status).toBe(403)
+    expect(
+      (await getFixtureResponse(infoJsonHref, viewerServerRequestHeaders))
+        .status
+    ).toBe(403)
+    expect(
+      (await getFixtureResponse(imageHref, viewerServerRequestHeaders)).status
+    ).toBe(403)
+    expect(
+      (
+        await getFixtureResponse(
+          infoJsonHref,
+          cloudflareViewerServerRequestHeaders
+        )
+      ).status
+    ).toBe(403)
+    expect(
+      (
+        await getFixtureResponse(
+          imageHref,
+          cloudflareViewerServerRequestHeaders
+        )
+      ).status
+    ).toBe(403)
+    expect(
+      IIIF.parse(await getJsonResource(infoJsonHref, browserRequestHeaders))
+    ).toBeDefined()
+    expect(
+      (await getFixtureResponse(imageHref, browserRequestHeaders)).status
+    ).toBe(200)
+  })
 })
 
 describe('generated georeference annotations', () => {

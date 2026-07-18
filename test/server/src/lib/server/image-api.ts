@@ -28,6 +28,7 @@ export type ImageApiService = {
 }
 
 export type ImageServiceBehavior =
+  | 'browser-only'
   | 'image-500'
   | 'service-500'
   | 'slow'

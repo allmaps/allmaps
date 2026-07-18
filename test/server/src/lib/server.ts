@@ -20,9 +20,11 @@ import {
   withCors
 } from './responses.ts'
 import {
+  browserOnlyResponse,
   delay,
   delaySlowResource,
   getCombinedImageServiceBehavior,
+  isBrowserRequest,
   isSlowCombinedVariant,
   parseImageServiceBehavior,
   shouldReturnTooManyRequests,
@@ -469,6 +471,12 @@ function getCombinedManifestVariants(baseUrl: string) {
     createImageApiLink(
       '3',
       'level2',
+      'Browser-only manifest and image services',
+      `${baseUrl}/manifests/3/combined/browser-only-iiif3-level2.json`
+    ),
+    createImageApiLink(
+      '3',
+      'level2',
       'Slow manifest and resources',
       `${baseUrl}/manifests/3/combined/slow-iiif3-level2.json`
     ),
@@ -524,6 +532,7 @@ function isCombinedIiif3ManifestVariant(variant: string) {
       'all-embedded-annotations-mixed-errors',
       'mixed-embedded-annotation-errors',
       'mixed-linked-annotation-errors',
+      'browser-only-iiif3-level2',
       'image-500-iiif3-level2',
       'slow-iiif3-level2',
       'too-many-requests-after-20s-iiif3-level2',
@@ -585,6 +594,10 @@ function getCombinedManifestLabel(variant: string) {
 
   if (variant === 'image-500-iiif3-level2') {
     return 'Combined fixture images whose info.json files load but image requests return 500'
+  }
+
+  if (variant === 'browser-only-iiif3-level2') {
+    return 'Combined fixture images whose manifest and image services require browser request headers'
   }
 
   if (variant === 'slow-iiif3-level2') {
@@ -656,6 +669,7 @@ function getCombinedCanvasManifestVariant(variant: string, index: number) {
   }
 
   if (
+    variant === 'browser-only-iiif3-level2' ||
     variant === 'image-500-iiif3-level2' ||
     variant === 'slow-iiif3-level2' ||
     variant === 'too-many-requests-after-20s-iiif3-level2' ||
@@ -2061,6 +2075,10 @@ async function routeFixtureRequest(
       ? parseImageServiceBehavior(segments[4])
       : undefined
 
+    if (behavior === 'browser-only' && !isBrowserRequest(request)) {
+      return browserOnlyResponse(corsMode)
+    }
+
     await delaySlowResource(behavior)
 
     if (
@@ -2108,6 +2126,10 @@ async function routeFixtureRequest(
       ? parseImageServiceBehavior(segments[4])
       : undefined
     const image = getImage(segments[2 + offset])
+
+    if (behavior === 'browser-only' && !isBrowserRequest(request)) {
+      return browserOnlyResponse(corsMode)
+    }
 
     await delaySlowResource(behavior)
 
@@ -2381,6 +2403,13 @@ async function routeFixtureRequest(
         return textResponse('Unknown manifest canvas', corsMode, 404)
       }
 
+      if (
+        variant === 'browser-only-iiif3-level2' &&
+        !isBrowserRequest(request)
+      ) {
+        return browserOnlyResponse(corsMode)
+      }
+
       if (isSlowCombinedVariant(variant)) {
         await delay(slowResourceDelayMs)
       }
@@ -2401,6 +2430,13 @@ async function routeFixtureRequest(
 
       if (!isCombinedIiif3ManifestVariant(variant)) {
         return textResponse('Unknown manifest variant', corsMode, 404)
+      }
+
+      if (
+        variant === 'browser-only-iiif3-level2' &&
+        !isBrowserRequest(request)
+      ) {
+        return browserOnlyResponse(corsMode)
       }
 
       if (isSlowCombinedVariant(variant)) {
