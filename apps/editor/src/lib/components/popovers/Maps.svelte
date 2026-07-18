@@ -12,7 +12,7 @@
 
   import { getMaskDimensions, getMaskExtent } from '$lib/shared/geometry.js'
 
-  import { getProjectionsState } from '@allmaps/components/state'
+  import { getProjectionsState } from '@allmaps/ui/state'
 
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'

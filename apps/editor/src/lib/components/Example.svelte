@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Thumbnail } from '@allmaps/components'
+  import { Thumbnail } from '@allmaps/ui'
 
   import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 

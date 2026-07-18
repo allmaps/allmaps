@@ -5,7 +5,7 @@
     PencilSimple as PencilSimpleIcon
   } from 'phosphor-svelte'
 
-  import { Logo, Modal, MovingMapsBackground } from '@allmaps/components'
+  import { Logo, Modal, MovingMapsBackground } from '@allmaps/ui'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 

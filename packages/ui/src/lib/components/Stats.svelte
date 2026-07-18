@@ -15,7 +15,11 @@
   // import { env } from '$env/dynamic/public'
   const env = import.meta.env
 
-  export let statsWebsiteId = env.VITE_STATS_WEBSITE_ID || ''
+  type Props = {
+    statsWebsiteId?: string
+  }
+
+  let { statsWebsiteId = env.VITE_STATS_WEBSITE_ID || '' }: Props = $props()
 </script>
 
 <svelte:head>

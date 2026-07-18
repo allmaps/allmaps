@@ -3,7 +3,7 @@
 
   import { InfoIcon, SealWarningIcon } from 'phosphor-svelte'
 
-  import { LoadingSmall, Popover } from '@allmaps/components'
+  import { LoadingSmall, Popover } from '@allmaps/ui'
   import { parseLanguageString } from '@allmaps/iiif-inspector'
 
   import AnnotationInput from '$lib/components/input/AnnotationInput.svelte'

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Label } from 'bits-ui'
-  import { Slider, Select, Checkbox } from '@allmaps/components'
+  import { Slider, Select, Checkbox } from '@allmaps/ui'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'

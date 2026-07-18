@@ -1,7 +1,7 @@
 <script lang="ts">
   import { parseGcps } from '@allmaps/io'
 
-  import { Modal } from '@allmaps/components'
+  import { Modal } from '@allmaps/ui'
 
   import Textarea from '$lib/components/Textarea.svelte'
   import Message from '$lib/components/Message.svelte'

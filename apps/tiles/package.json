@@ -26,7 +26,6 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@allmaps/components": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",

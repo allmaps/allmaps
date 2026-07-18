@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Command } from 'bits-ui'
 
-  import { Modal, Kbd } from '@allmaps/components'
+  import { Modal, Kbd } from '@allmaps/ui'
 
   import {
     MagnifyingGlass as MagnifyingGlassIcon,

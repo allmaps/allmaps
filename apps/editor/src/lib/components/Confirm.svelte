@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Popover } from '@allmaps/components'
+  import { Popover } from '@allmaps/ui'
 
   import YesNo from '$lib/components/YesNo.svelte'
   import { m } from '$lib/paraglide/messages.js'

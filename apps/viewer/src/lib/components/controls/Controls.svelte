@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { NorthArrow } from '@allmaps/components'
+  import { NorthArrow } from '@allmaps/ui'
 
   import MapControls from './MapControls.svelte'
   import SelectView from './SelectView.svelte'

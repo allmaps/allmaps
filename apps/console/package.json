@@ -41,7 +41,6 @@
     "wrangler": "catalog:"
   },
   "dependencies": {
-    "@allmaps/components": "workspace:^",
     "@allmaps/env": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",

@@ -4,7 +4,7 @@
     MouseRightClick as MouseRightClickIcon
   } from 'phosphor-svelte'
 
-  import { Kbd, Modal } from '@allmaps/components'
+  import { Kbd, Modal } from '@allmaps/ui'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 

@@ -5,13 +5,13 @@
 
   import { getAnnotationUrl, getGeoJsonUrl } from '$lib/shared/urls.js'
 
-  import { Select } from '@allmaps/components'
+  import { Select } from '@allmaps/ui'
 
   import Scope from '$lib/components/Scope.svelte'
   import ExportUrl from '$lib/components/ExportUrl.svelte'
   import Highlight from '$lib/components/Highlight.svelte'
 
-  import { Modal } from '@allmaps/components'
+  import { Modal } from '@allmaps/ui'
   import { m } from '$lib/paraglide/messages.js'
 
   import {

@@ -7,7 +7,7 @@ import type {
   Image as IIIFImage,
   EmbeddedImage as EmbeddedIIIFImage
 } from '@allmaps/iiif-parser'
-import type { PickerProjection } from '@allmaps/components/projections'
+import type { PickerProjection } from '@allmaps/ui/projections'
 
 import type {
   DbMap1,

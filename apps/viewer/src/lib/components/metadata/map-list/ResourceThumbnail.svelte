@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Thumbnail, MapMonster } from '@allmaps/components'
+  import { Thumbnail, MapMonster } from '@allmaps/ui'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import type { Ring } from '@allmaps/types'

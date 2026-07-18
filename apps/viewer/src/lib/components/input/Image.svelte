@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { LoadingSmall } from '@allmaps/components'
+  import { LoadingSmall } from '@allmaps/ui'
 
   type Props = {
     alt: string

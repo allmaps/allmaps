@@ -1,11 +1,7 @@
 <script lang="ts">
-  import { Select } from '@allmaps/components'
+  import Select from '$lib/components/Select.svelte'
 
-  import {
-    Polynomial1,
-    ThinPlateSpline,
-    Helmert
-  } from '@allmaps/components/icons'
+  import { Polynomial1, ThinPlateSpline, Helmert } from '$lib/icons.js'
 
   import type { TransformationType } from '@allmaps/transform'
 

@@ -33,7 +33,6 @@
     "@allmaps/background-color": "workspace:^",
     "@allmaps/basemap": "workspace:^",
     "@allmaps/bearing": "workspace:^",
-    "@allmaps/components": "workspace:^",
     "@allmaps/env": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-inspector": "workspace:^",

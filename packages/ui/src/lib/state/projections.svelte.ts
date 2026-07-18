@@ -1,6 +1,6 @@
 import { setContext, getContext } from 'svelte'
 
-import type { PickerProjection } from '@allmaps/components/projections'
+import type { PickerProjection } from '$lib/projections.js'
 
 const PROJECTIONS_KEY = Symbol('projections')
 

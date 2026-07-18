@@ -24,8 +24,6 @@
       "@allmaps/basemap/*": ["./packages/basemap/src/*"],
       "@allmaps/bearing": ["./packages/bearing/src"],
       "@allmaps/bearing/*": ["./packages/bearing/src/*"],
-      "@allmaps/components": ["./packages/components/src"],
-      "@allmaps/components/*": ["./packages/components/src/*"],
       "@allmaps/db": ["./packages/db/src"],
       "@allmaps/db/*": ["./packages/db/src/*"],
       "@allmaps/env": ["./packages/env/src"],

@@ -3,7 +3,7 @@ import { browser } from '$app/environment'
 
 import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
 
-import type { PickerProjection } from '@allmaps/components/projections'
+import type { PickerProjection } from '@allmaps/ui/projections'
 
 import type { Bbox, Point } from '@allmaps/types'
 

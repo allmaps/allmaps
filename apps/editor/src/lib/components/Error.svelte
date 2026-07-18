@@ -1,7 +1,7 @@
 <script lang="ts">
   import { prettifyError, ZodError } from 'zod'
 
-  import { MapMonster } from '@allmaps/components'
+  import { MapMonster } from '@allmaps/ui'
   import { shades } from '@allmaps/tailwind'
 
   import { FetchError, type FetchErrorDetails } from '$lib/shared/errors.js'

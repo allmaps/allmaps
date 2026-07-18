@@ -4,9 +4,9 @@
 
   import favicon from '$lib/assets/favicon.png'
 
-  import { Header } from '@allmaps/components'
-  import { setAuthContext } from '@allmaps/components/auth'
-  import type { AllmapsAuthClient } from '@allmaps/components/auth'
+  import { Header } from '@allmaps/ui'
+  import { setAuthContext } from '@allmaps/ui/auth'
+  import type { AllmapsAuthClient } from '@allmaps/ui/auth'
 
   import ConsoleUserMenu from '$lib/components/ConsoleUserMenu.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
@@ -19,7 +19,7 @@
   import type { Snippet } from 'svelte'
 
   import './layout.css'
-  import '@allmaps/components/css/fonts.css'
+  import '@allmaps/ui/css/fonts.css'
 
   type Props = {
     children: Snippet

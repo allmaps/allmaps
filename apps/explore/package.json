@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "@allmaps/basemap": "workspace:^",
-    "@allmaps/components": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",

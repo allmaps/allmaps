@@ -31,7 +31,6 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/basemap": "workspace:^",
-    "@allmaps/components": "workspace:^",
     "@allmaps/env": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-inspector": "workspace:^",
@@ -42,6 +41,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "@turf/rewind": "^7.2.0",
     "bits-ui": "catalog:",
     "d3-geo": "^3.1.1",

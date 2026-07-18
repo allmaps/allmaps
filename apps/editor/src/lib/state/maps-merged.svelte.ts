@@ -4,7 +4,7 @@ import { toGeoreferencedMap } from '$lib/shared/maps.js'
 import { isComplete } from '$lib/shared/analyze.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { ProjectionsState } from '@allmaps/components/state'
+import type { ProjectionsState } from '@allmaps/ui/state'
 
 import type { GeoreferencedMapsByImageId } from '$lib/types/shared.js'
 import type { DbMap3 } from '$lib/types/maps.js'

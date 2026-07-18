@@ -13,7 +13,7 @@
     // CaretDown as CaretDownIcon
   } from 'phosphor-svelte'
 
-  import { Popover } from '@allmaps/components'
+  import { Popover } from '@allmaps/ui'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getSourceState } from '$lib/state/source.svelte.js'

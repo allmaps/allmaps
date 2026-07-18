@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state'
 
-  import { Banner, Loading } from '@allmaps/components'
+  import { Banner, Loading } from '@allmaps/ui'
 
-  import { setProjectionsState } from '@allmaps/components/state'
+  import { setProjectionsState } from '@allmaps/ui/state'
 
   import { getErrorState } from '$lib/state/error.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'

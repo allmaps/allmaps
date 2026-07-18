@@ -2,7 +2,7 @@
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import { Modal } from '@allmaps/components'
+  import { Modal } from '@allmaps/ui'
 
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import Highlight from '$lib/components/Highlight.svelte'

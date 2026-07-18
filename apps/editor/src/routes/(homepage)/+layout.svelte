@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Banner } from '@allmaps/components'
+  import { Banner } from '@allmaps/ui'
 
   const { children, data } = $props()
 
