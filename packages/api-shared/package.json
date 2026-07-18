@@ -51,6 +51,7 @@
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
+    "@sinclair/typebox": "catalog:",
     "comlink": "^4.4.1",
     "drizzle-orm": "catalog:",
     "elysia": "catalog:",

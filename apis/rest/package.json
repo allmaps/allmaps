@@ -25,6 +25,7 @@
     "@elysiajs/cors": "catalog:",
     "@elysiajs/openapi": "catalog:",
     "@neondatabase/serverless": "catalog:",
+    "@sinclair/typebox": "catalog:",
     "better-auth": "catalog:",
     "elysia": "catalog:",
     "postgres": "catalog:",
