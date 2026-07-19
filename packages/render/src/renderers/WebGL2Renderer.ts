@@ -77,6 +77,9 @@ const THROTTLE_CHANGED_OPTIONS = {
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
 
+// The map-program uniforms that come from the map's (rarely changing) options.
+type MapAppearanceUniforms = Partial<WebGL2WarpedMapOptions>
+
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
  */
@@ -97,6 +100,13 @@ export class WebGL2Renderer
   pointsProgram: WebGLProgram
 
   #uniformCache: Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>
+
+  // Last appearance-uniform values set on the map program. These come from the
+  // map's options and are usually identical across maps and stable across
+  // frames; since uniforms are program-global they stay set, so each appearance
+  // uniform is only re-set when its value changed. Reset (to {}) on program
+  // (re)creation so they're all re-set afterwards.
+  #lastMapAppearance: MapAppearanceUniforms = {}
 
   previousSignificantViewport: Viewport | undefined
 
@@ -204,6 +214,7 @@ export class WebGL2Renderer
     this.pointsProgram = pointsProgram
 
     this.#uniformCache = new Map()
+    this.#lastMapAppearance = {}
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
@@ -288,6 +299,7 @@ export class WebGL2Renderer
     this.pointsProgram = pointsProgram
 
     this.#uniformCache = new Map()
+    this.#lastMapAppearance = {}
 
     gl.disable(gl.DEPTH_TEST)
 
@@ -662,171 +674,230 @@ export class WebGL2Renderer
       webgl2WarpedMap.previousApplyMaskOpacity
     )
 
+    // As the renderer is running this function for every webgl2WarpedMap,
+    // the appearance uniforms are often the same for consecutive maps.
+    // We check this and if so don't set the uniforms again.
+    const options = webgl2WarpedMap.options
+    const distortionMeasure = webgl2WarpedMap.distortionMeasure
+    const lastMapAppearance = this.#lastMapAppearance
+
     // Opacity
-    const opacityLocation = this.#getUniformLocation(gl, program, 'u_opacity')
-    gl.uniform1f(opacityLocation, webgl2WarpedMap.options.opacity)
+    if (lastMapAppearance.opacity !== options.opacity) {
+      const opacityLocation = this.#getUniformLocation(gl, program, 'u_opacity')
+      gl.uniform1f(opacityLocation, options.opacity)
+      lastMapAppearance.opacity = options.opacity
+    }
 
     // Saturation
-    const saturationLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_saturation'
-    )
-    gl.uniform1f(saturationLocation, webgl2WarpedMap.options.saturation)
+    if (lastMapAppearance.saturation !== options.saturation) {
+      const saturationLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_saturation'
+      )
+      gl.uniform1f(saturationLocation, options.saturation)
+      lastMapAppearance.saturation = options.saturation
+    }
 
     // Remove color
-    const removeColorLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColor'
-    )
-    gl.uniform1f(
-      removeColorLocation,
-      webgl2WarpedMap.options.removeColor ? 1 : 0
-    )
+    if (lastMapAppearance.removeColor !== options.removeColor) {
+      const removeColorLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColor'
+      )
+      gl.uniform1f(removeColorLocation, options.removeColor ? 1 : 0)
+      lastMapAppearance.removeColor = options.removeColor
+    }
 
-    const removeColorColorLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColorColor'
-    )
-    gl.uniform3fv(
-      removeColorColorLocation,
-      getCachedFractionalRgb(webgl2WarpedMap.options.removeColorColor)
-    )
+    if (lastMapAppearance.removeColorColor !== options.removeColorColor) {
+      const removeColorColorLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColorColor'
+      )
+      gl.uniform3fv(
+        removeColorColorLocation,
+        getCachedFractionalRgb(options.removeColorColor)
+      )
+      lastMapAppearance.removeColorColor = options.removeColorColor
+    }
 
-    const removeColorThresholdLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColorThreshold'
-    )
-    gl.uniform1f(
-      removeColorThresholdLocation,
-      webgl2WarpedMap.options.removeColorThreshold
-    )
+    if (
+      lastMapAppearance.removeColorThreshold !== options.removeColorThreshold
+    ) {
+      const removeColorThresholdLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColorThreshold'
+      )
+      gl.uniform1f(removeColorThresholdLocation, options.removeColorThreshold)
+      lastMapAppearance.removeColorThreshold = options.removeColorThreshold
+    }
 
-    const removeColorHardnessLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColorHardness'
-    )
-    gl.uniform1f(
-      removeColorHardnessLocation,
-      webgl2WarpedMap.options.removeColorHardness
-    )
+    if (lastMapAppearance.removeColorHardness !== options.removeColorHardness) {
+      const removeColorHardnessLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColorHardness'
+      )
+      gl.uniform1f(removeColorHardnessLocation, options.removeColorHardness)
+      lastMapAppearance.removeColorHardness = options.removeColorHardness
+    }
 
     // Colorize
-    const colorizeLocation = this.#getUniformLocation(gl, program, 'u_colorize')
-    gl.uniform1f(colorizeLocation, webgl2WarpedMap.options.colorize ? 1 : 0)
+    if (lastMapAppearance.colorize !== options.colorize) {
+      const colorizeLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_colorize'
+      )
+      gl.uniform1f(colorizeLocation, options.colorize ? 1 : 0)
+      lastMapAppearance.colorize = options.colorize
+    }
 
-    const colorizeColorLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_colorizeColor'
-    )
-    gl.uniform3fv(
-      colorizeColorLocation,
-      getCachedFractionalRgb(webgl2WarpedMap.options.colorizeColor)
-    )
+    if (lastMapAppearance.colorizeColor !== options.colorizeColor) {
+      const colorizeColorLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_colorizeColor'
+      )
+      gl.uniform3fv(
+        colorizeColorLocation,
+        getCachedFractionalRgb(options.colorizeColor)
+      )
+      lastMapAppearance.colorizeColor = options.colorizeColor
+    }
 
     // Grid
-    const gridLocation = this.#getUniformLocation(gl, program, 'u_renderGrid')
-    gl.uniform1f(gridLocation, webgl2WarpedMap.options.renderGrid ? 1 : 0)
+    if (lastMapAppearance.renderGrid !== options.renderGrid) {
+      const gridLocation = this.#getUniformLocation(gl, program, 'u_renderGrid')
+      gl.uniform1f(gridLocation, options.renderGrid ? 1 : 0)
+      lastMapAppearance.renderGrid = options.renderGrid
+    }
 
-    const colorGrid = this.#getUniformLocation(gl, program, 'u_renderGridColor')
-    gl.uniform4fv(
-      colorGrid,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
-    )
+    if (lastMapAppearance.renderGridColor !== options.renderGridColor) {
+      const colorGrid = this.#getUniformLocation(
+        gl,
+        program,
+        'u_renderGridColor'
+      )
+      gl.uniform4fv(
+        colorGrid,
+        getCachedFractionalOpaqueRgba(options.renderGridColor)
+      )
+      lastMapAppearance.renderGridColor = options.renderGridColor
+    }
 
-    // Distortion
-    const distortionLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortion'
-    )
-    gl.uniform1f(distortionLocation, webgl2WarpedMap.distortionMeasure ? 1 : 0)
+    // Distortion (drives both u_distortion and u_distortionMeasure)
+    if (lastMapAppearance.distortionMeasure !== distortionMeasure) {
+      const distortionLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortion'
+      )
+      gl.uniform1f(distortionLocation, distortionMeasure ? 1 : 0)
 
-    const distortionMeasureLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionMeasure'
-    )
-    gl.uniform1i(
-      distortionMeasureLocation,
-      webgl2WarpedMap.distortionMeasure
-        ? supportedDistortionMeasures.indexOf(webgl2WarpedMap.distortionMeasure)
-        : 0
-    )
+      const distortionMeasureLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionMeasure'
+      )
+      gl.uniform1i(
+        distortionMeasureLocation,
+        distortionMeasure
+          ? supportedDistortionMeasures.indexOf(distortionMeasure)
+          : 0
+      )
+      lastMapAppearance.distortionMeasure = distortionMeasure
+    }
 
-    const distortionColor00Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor00'
-    )
-    gl.uniform4fv(
-      distortionColor00Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
-    )
+    if (lastMapAppearance.distortionColor00 !== options.distortionColor00) {
+      const distortionColor00Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor00'
+      )
+      gl.uniform4fv(
+        distortionColor00Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor00)
+      )
+      lastMapAppearance.distortionColor00 = options.distortionColor00
+    }
 
-    const distortionColor01Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor01'
-    )
-    gl.uniform4fv(
-      distortionColor01Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
-    )
+    if (lastMapAppearance.distortionColor01 !== options.distortionColor01) {
+      const distortionColor01Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor01'
+      )
+      gl.uniform4fv(
+        distortionColor01Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor01)
+      )
+      lastMapAppearance.distortionColor01 = options.distortionColor01
+    }
 
-    const distortionColor1Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor1'
-    )
-    gl.uniform4fv(
-      distortionColor1Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
-    )
+    if (lastMapAppearance.distortionColor1 !== options.distortionColor1) {
+      const distortionColor1Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor1'
+      )
+      gl.uniform4fv(
+        distortionColor1Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor1)
+      )
+      lastMapAppearance.distortionColor1 = options.distortionColor1
+    }
 
-    const distortionColor2Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor2'
-    )
-    gl.uniform4fv(
-      distortionColor2Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
-    )
+    if (lastMapAppearance.distortionColor2 !== options.distortionColor2) {
+      const distortionColor2Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor2'
+      )
+      gl.uniform4fv(
+        distortionColor2Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor2)
+      )
+      lastMapAppearance.distortionColor2 = options.distortionColor2
+    }
 
-    const distortionColorLocation3 = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor3'
-    )
-    gl.uniform4fv(
-      distortionColorLocation3,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
-    )
+    if (lastMapAppearance.distortionColor3 !== options.distortionColor3) {
+      const distortionColorLocation3 = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor3'
+      )
+      gl.uniform4fv(
+        distortionColorLocation3,
+        getCachedFractionalOpaqueRgba(options.distortionColor3)
+      )
+      lastMapAppearance.distortionColor3 = options.distortionColor3
+    }
 
     // Debug Triangles
-    const debugTrianglesLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_debugTriangles'
-    )
-    gl.uniform1f(
-      debugTrianglesLocation,
-      webgl2WarpedMap.options.debugTriangles ? 1 : 0
-    )
+    if (lastMapAppearance.debugTriangles !== options.debugTriangles) {
+      const debugTrianglesLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_debugTriangles'
+      )
+      gl.uniform1f(debugTrianglesLocation, options.debugTriangles ? 1 : 0)
+      lastMapAppearance.debugTriangles = options.debugTriangles
+    }
 
     // Debug Tiles
-    const debugTilesLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_debugTiles'
-    )
-    gl.uniform1f(debugTilesLocation, webgl2WarpedMap.options.debugTiles ? 1 : 0)
+    if (lastMapAppearance.debugTiles !== options.debugTiles) {
+      const debugTilesLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_debugTiles'
+      )
+      gl.uniform1f(debugTilesLocation, options.debugTiles ? 1 : 0)
+      lastMapAppearance.debugTiles = options.debugTiles
+    }
 
     // Best scale factor
     const scaleFactorForViewportLocation = this.#getUniformLocation(
