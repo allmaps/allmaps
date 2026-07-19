@@ -112,8 +112,6 @@ export class EmbeddedManifest {
 export class Manifest extends EmbeddedManifest {
   source?: unknown
 
-  #itemParseOptions: Partial<ParseOptions> = {}
-
   canvases: Canvas[] = []
 
   homepage?: Homepage

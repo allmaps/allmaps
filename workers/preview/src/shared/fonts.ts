@@ -39,7 +39,8 @@ export async function getLocalFont(
     }
   } catch (error: unknown) {
     throw new Error(
-      `Failed to load fonts: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to load fonts: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error }
     )
   }
 }

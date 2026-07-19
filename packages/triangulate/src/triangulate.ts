@@ -114,10 +114,8 @@ export function triangulateToUnique(
   )
 
   // Interpolate polygons and create grid based on distance
-  let interpolatedPolygon: Polygon = []
-  let interpolatedPolygonPoints: Point[] = []
-  let interpolatedSteinerPolygons: Polygon[] = []
-  let interpolatedSteinerPolygonsPoints: Point[] = []
+  let interpolatedPolygon: Polygon
+  let interpolatedSteinerPolygons: Polygon[]
   let gridPoints: Point[] = []
   let gridPointsInPolygon: Point[] = []
   if (distance) {
@@ -143,8 +141,8 @@ export function triangulateToUnique(
     interpolatedSteinerPolygons = steinerPolygons
   }
 
-  interpolatedPolygonPoints = interpolatedPolygon.flat()
-  interpolatedSteinerPolygonsPoints = interpolatedSteinerPolygons.flat(2)
+  const interpolatedPolygonPoints = interpolatedPolygon.flat()
+  const interpolatedSteinerPolygonsPoints = interpolatedSteinerPolygons.flat(2)
 
   // Gather all points and deduplicate to keep only unique points
   // with map from points to their index in uniquePoints, and index getter

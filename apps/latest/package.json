@@ -70,8 +70,6 @@
     "@types/d3-geo": "^3.0.2",
     "@types/geojson": "^7946.0.10",
     "@types/lodash-es": "^4.17.12",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "@vitejs/plugin-basic-ssl": "^1.2.0",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",

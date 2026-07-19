@@ -547,7 +547,7 @@ export function recursivelyGetTilesAtHigherScaleFactor(
       tile,
       image,
       higherScaleFactor,
-      log2ScaleFactorDiff--,
+      log2ScaleFactorDiff - 1,
       maxScaleFactor,
       validTile
     )
@@ -586,7 +586,7 @@ export function recursivelyGetTilesAtLowerScaleFactor(
         tile,
         image,
         lowerScaleFactor,
-        log2ScaleFactorDiff--,
+        log2ScaleFactorDiff - 1,
         validTile
       )
     ]

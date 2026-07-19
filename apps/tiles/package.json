@@ -41,8 +41,6 @@
     "@tailwindcss/vite": "^4.0.0",
     "@turf/length": "^7.2.0",
     "@types/lodash-es": "catalog:",
-    "@typescript-eslint/eslint-plugin": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "@vitejs/plugin-basic-ssl": "^1.2.0",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",

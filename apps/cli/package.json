@@ -58,11 +58,8 @@
     "stream-json": "^1.9.1"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.0",
     "@types/node": "catalog:",
     "@types/stream-json": "^1.7.2",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
     "prettier": "catalog:",
     "globals": "catalog:",
     "typescript": "catalog:",

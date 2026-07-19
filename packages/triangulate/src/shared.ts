@@ -144,8 +144,8 @@ export function interpolatePolygon(polygon: Polygon, dist: number): Polygon {
 
 export function bboxToGridPoints(bbox: Bbox, gridSize: number): Point[] {
   const grid = []
-  for (let x = bbox[0] + gridSize, i = 0; x <= bbox[2]; i++, x += gridSize) {
-    for (let y = bbox[1] + gridSize, j = 0; y <= bbox[3]; j++, y += gridSize) {
+  for (let x = bbox[0] + gridSize; x <= bbox[2]; x += gridSize) {
+    for (let y = bbox[1] + gridSize; y <= bbox[3]; y += gridSize) {
       grid.push([x, y] as Point)
     }
   }

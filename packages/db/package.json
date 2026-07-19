@@ -40,15 +40,12 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
-    "@types/eslint": "^8.56.0",
     "@types/node": "catalog:",
     "@types/sharedb": "^3.3.12",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
     "typescript": "catalog:"
   }
 }

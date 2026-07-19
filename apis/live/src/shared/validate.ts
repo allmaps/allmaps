@@ -25,7 +25,7 @@ export function isGcpsValid(map: DbMap3) {
     }
 
     return true
-  } catch (err) {
+  } catch {
     return false
   }
 }
