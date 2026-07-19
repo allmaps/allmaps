@@ -21,7 +21,7 @@ import {
 import { isGcpsValid, isResourceMaskValid } from '../shared/validate.js'
 import ShareDbPostgresDb from './postgres.js'
 
-import { DbMapsSchema } from '@allmaps/db/maps'
+import { DbMap3Schema, DbMapsSchema } from '@allmaps/db/maps'
 
 import type { Polygon } from 'geojson'
 import type { WebSocket } from 'ws'
@@ -271,7 +271,8 @@ export default class AllmapsShareDB {
         )
 
       // Then, insert new maps
-      for (const map of dbMaps3) {
+      for (const unvalidatedMap of dbMaps3) {
+        const map = DbMap3Schema.parse(unvalidatedMap)
         const checksum = await generateChecksum(map)
 
         const mapId = map.id

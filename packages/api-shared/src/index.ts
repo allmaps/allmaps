@@ -1,6 +1,7 @@
 export { generateFeature, generateFeatureCollection } from './shared/geojson.js'
 export {
   fromDbRow,
+  parseStoredDbMap,
   toDbMap3,
   getCompleteGcps,
   dbMapToDbMap3,
