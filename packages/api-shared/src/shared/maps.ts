@@ -136,10 +136,14 @@ function createUrlFactory(annotationsBaseUrl: string) {
   }
 }
 
-function getAllmaps(dbRow: DbRow, urls: ReturnType<typeof createUrlFactory>) {
+function getAllmaps(
+  dbRow: DbRow,
+  mapId: string,
+  urls: ReturnType<typeof createUrlFactory>
+) {
   return {
-    id: urls.map(dbRow.map.id),
-    version: urls.map(dbRow.map.id, dbRow.checksum),
+    id: urls.map(mapId),
+    version: urls.map(mapId, dbRow.checksum),
     image: dbRow.image
       ? {
           id: urls.image(dbRow.image.id),
@@ -331,12 +335,12 @@ export function fromDbRow(dbRow: DbRow, annotationsBaseUrl: string): ApiMap {
   const partOf = getPartOf(dbRow)
   const provider = getProvider(dbRow)
 
-  const dbMap = DbMapSchema.parse(dbRow.map)
+  const dbMap = parseStoredDbMap(dbRow.map)
   const map = dbMapToDbMap3(dbMap)
 
   return {
     '@context': 'https://schemas.allmaps.org/map/2/context.json',
-    id: urls.map(dbRow.map.id),
+    id: urls.map(dbMap.id),
     type: 'GeoreferencedMap',
     created: dbRow.createdAt.toISOString(),
     modified: dbRow.updatedAt.toISOString(),
@@ -356,6 +360,12 @@ export function fromDbRow(dbRow: DbRow, annotationsBaseUrl: string): ApiMap {
       map.resourceCrs,
       annotationsBaseUrl
     ),
-    _allmaps: getAllmaps(dbRow, urls)
+    _allmaps: getAllmaps(dbRow, dbMap.id, urls)
   }
+}
+
+export function parseStoredDbMap(value: unknown): DbMap {
+  const parsedValue = typeof value === 'string' ? JSON.parse(value) : value
+
+  return DbMapSchema.parse(parsedValue)
 }
