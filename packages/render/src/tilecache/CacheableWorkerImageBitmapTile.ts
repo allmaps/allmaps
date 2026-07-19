@@ -74,6 +74,11 @@ export class CacheableWorkerImageBitmapTile extends CacheableTile<ImageBitmap> {
     return this.data
   }
 
+  release() {
+    this.data?.close()
+    this.data = undefined
+  }
+
   /**
    * Clip this tile's sprite-atlas ImageBitmap into one ImageBitmap per
    * (sprite, warped map) pair.

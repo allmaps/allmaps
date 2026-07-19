@@ -1198,7 +1198,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    */
   private uploadTileToSlot(cachedTile: CachedTile<ImageBitmap>, slot: number) {
     const gl = this.gl
-    const source = cachedTile.data
+    // The tile may have been released (its ImageBitmap closed) while briefly
+    // still referenced by a slot, just before the next reconcile removes it.
+    // In that case there is nothing to upload; the slot is cleaned up then.
+    const source = cachedTile.data as ImageBitmap | undefined
+    if (!source) {
+      return
+    }
 
     const region = cachedTile.fetchableTile.options?.imageRequest?.region
     if (!region) {
