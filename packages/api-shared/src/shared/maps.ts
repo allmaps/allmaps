@@ -38,6 +38,8 @@ const LanguageStringSchema = z.record(
 )
 
 function parseStoredJson(value: unknown) {
+  // TODO: Remove legacy string decoding after existing JSONB data is
+  // normalized and database constraints prevent encoded JSON strings.
   return typeof value === 'string' ? JSON.parse(value) : value
 }
 
@@ -46,6 +48,8 @@ function parseStoredLanguageString(value: unknown) {
     return undefined
   }
 
+  // TODO: Remove this runtime validation after existing labels are normalized
+  // and database constraints guarantee valid language-string objects.
   return LanguageStringSchema.parse(parseStoredJson(value))
 }
 
