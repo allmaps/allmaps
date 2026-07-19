@@ -1,4 +1,5 @@
 import { generateId, generateChecksum, generateRandomId } from '@allmaps/id'
+import { z } from 'zod'
 
 import { toFixed } from './numbers.js'
 import {
@@ -30,6 +31,23 @@ import type {
 import type { ApiMap, DbRow } from '../types.js'
 
 const projectionsByDbId = getProjectionsByDbId()
+
+const LanguageStringSchema = z.record(
+  z.string(),
+  z.array(z.union([z.string(), z.number(), z.boolean()]))
+)
+
+function parseStoredJson(value: unknown) {
+  return typeof value === 'string' ? JSON.parse(value) : value
+}
+
+function parseStoredLanguageString(value: unknown) {
+  if (value === null || value === undefined) {
+    return undefined
+  }
+
+  return LanguageStringSchema.parse(parseStoredJson(value))
+}
 
 export function isGcpComplete(gcp: DbGcp3): gcp is CompleteDbGcp3 {
   return gcp.resource && gcp.geo ? true : false
@@ -109,12 +127,12 @@ function getPartOf(dbRow: DbRow) {
       {
         type: 'Canvas' as const,
         id: canvas.uri,
-        label: canvas.label || undefined,
+        label: parseStoredLanguageString(canvas.label),
         partOf: canvas.manifests.flatMap((manifest) => [
           {
             type: 'Manifest' as const,
             id: manifest.uri,
-            label: manifest.label || undefined
+            label: parseStoredLanguageString(manifest.label)
           }
         ])
       }
@@ -365,7 +383,5 @@ export function fromDbRow(dbRow: DbRow, annotationsBaseUrl: string): ApiMap {
 }
 
 export function parseStoredDbMap(value: unknown): DbMap {
-  const parsedValue = typeof value === 'string' ? JSON.parse(value) : value
-
-  return DbMapSchema.parse(parsedValue)
+  return DbMapSchema.parse(parseStoredJson(value))
 }
