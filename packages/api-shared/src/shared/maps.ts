@@ -2,6 +2,10 @@ import { generateId, generateChecksum, generateRandomId } from '@allmaps/id'
 
 import { toFixed } from './numbers.js'
 import {
+  parseStoredJson,
+  parseStoredNullableLanguageString
+} from './stored-json.js'
+import {
   makeMapUrl,
   makeImageUrl,
   makeCanvasUrl,
@@ -109,12 +113,13 @@ function getPartOf(dbRow: DbRow) {
       {
         type: 'Canvas' as const,
         id: canvas.uri,
-        label: canvas.label || undefined,
+        label: parseStoredNullableLanguageString(canvas.label) ?? undefined,
         partOf: canvas.manifests.flatMap((manifest) => [
           {
             type: 'Manifest' as const,
             id: manifest.uri,
-            label: manifest.label || undefined
+            label:
+              parseStoredNullableLanguageString(manifest.label) ?? undefined
           }
         ])
       }
@@ -365,7 +370,5 @@ export function fromDbRow(dbRow: DbRow, annotationsBaseUrl: string): ApiMap {
 }
 
 export function parseStoredDbMap(value: unknown): DbMap {
-  const parsedValue = typeof value === 'string' ? JSON.parse(value) : value
-
-  return DbMapSchema.parse(parsedValue)
+  return DbMapSchema.parse(parseStoredJson(value))
 }
