@@ -7,6 +7,7 @@ import { Manifest, Image } from '@allmaps/iiif-parser'
 import { schema } from '@allmaps/db/schema'
 
 import { ResponseError, clampLimit } from '@allmaps/api-shared'
+import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 
 import type { LanguageString } from '@allmaps/iiif-parser'
 import type { Db } from '@allmaps/db'
@@ -127,6 +128,7 @@ function assertAllowedDomain(
 function fromDbManifest(restBaseUrl: string, dbManifest: DbManifest) {
   return {
     ...dbManifest,
+    label: parseStoredNullableLanguageString(dbManifest.label),
     organization: dbManifest.organizationUrl?.organization
       ? {
           id: `${restBaseUrl}/organizations/${dbManifest.organizationUrl.organization.id}`
@@ -162,9 +164,11 @@ function fromDbImage(restBaseUrl: string, dbImage: DbImage) {
     })),
     canvases: dbImage.canvases.map((canvas) => ({
       ...canvas,
+      label: parseStoredNullableLanguageString(canvas.label),
       id: `${restBaseUrl}/canvases/${canvas.id}`,
       manifests: canvas.manifests.map((manifest) => ({
         ...manifest,
+        label: parseStoredNullableLanguageString(manifest.label),
         id: `${restBaseUrl}/manifests/${manifest.id}`
       }))
     })),
@@ -175,6 +179,7 @@ function fromDbImage(restBaseUrl: string, dbImage: DbImage) {
 function fromDbCanvas(restBaseUrl: string, dbCanvas: DbCanvas) {
   return {
     ...dbCanvas,
+    label: parseStoredNullableLanguageString(dbCanvas.label),
     organization: dbCanvas.organizationUrl?.organization
       ? {
           id: `${restBaseUrl}/organizations/${dbCanvas.organizationUrl.organization.id}`
@@ -190,6 +195,7 @@ function fromDbCanvas(restBaseUrl: string, dbCanvas: DbCanvas) {
     })),
     manifests: dbCanvas.manifests.map((manifest) => ({
       ...manifest,
+      label: parseStoredNullableLanguageString(manifest.label),
       id: `${restBaseUrl}/manifests/${manifest.id}`
     })),
     organizationUrl: undefined

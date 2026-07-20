@@ -1,7 +1,10 @@
 import { generateId, generateChecksum, generateRandomId } from '@allmaps/id'
-import { z } from 'zod'
 
 import { toFixed } from './numbers.js'
+import {
+  parseStoredJson,
+  parseStoredNullableLanguageString
+} from './stored-json.js'
 import {
   makeMapUrl,
   makeImageUrl,
@@ -31,27 +34,6 @@ import type {
 import type { ApiMap, DbRow } from '../types.js'
 
 const projectionsByDbId = getProjectionsByDbId()
-
-const LanguageStringSchema = z.record(
-  z.string(),
-  z.array(z.union([z.string(), z.number(), z.boolean()]))
-)
-
-function parseStoredJson(value: unknown) {
-  // TODO: Remove legacy string decoding after existing JSONB data is
-  // normalized and database constraints prevent encoded JSON strings.
-  return typeof value === 'string' ? JSON.parse(value) : value
-}
-
-function parseStoredLanguageString(value: unknown) {
-  if (value === null || value === undefined) {
-    return undefined
-  }
-
-  // TODO: Remove this runtime validation after existing labels are normalized
-  // and database constraints guarantee valid language-string objects.
-  return LanguageStringSchema.parse(parseStoredJson(value))
-}
 
 export function isGcpComplete(gcp: DbGcp3): gcp is CompleteDbGcp3 {
   return gcp.resource && gcp.geo ? true : false
@@ -131,12 +113,13 @@ function getPartOf(dbRow: DbRow) {
       {
         type: 'Canvas' as const,
         id: canvas.uri,
-        label: parseStoredLanguageString(canvas.label),
+        label: parseStoredNullableLanguageString(canvas.label) ?? undefined,
         partOf: canvas.manifests.flatMap((manifest) => [
           {
             type: 'Manifest' as const,
             id: manifest.uri,
-            label: parseStoredLanguageString(manifest.label)
+            label:
+              parseStoredNullableLanguageString(manifest.label) ?? undefined
           }
         ])
       }

@@ -83,7 +83,6 @@ export type DbRow = {
   image: {
     id: string
     uri: string
-    data?: unknown
     embedded: boolean
     organizationUrl: {
       url: string

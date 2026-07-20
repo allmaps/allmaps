@@ -114,7 +114,6 @@ export async function queryMaps(
         columns: {
           id: true,
           uri: true,
-          data: true,
           embedded: true
         },
         with: {

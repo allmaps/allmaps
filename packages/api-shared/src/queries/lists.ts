@@ -9,6 +9,7 @@ import * as iiifSchema from '@allmaps/db/schema/iiif'
 
 import { ResponseError } from '@allmaps/api-shared'
 import { fromDbRow } from '../shared/maps.js'
+import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 
 import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 import type { Db, DbOrTx } from '@allmaps/db'
@@ -157,7 +158,6 @@ async function queryListMapRows(
         columns: {
           id: true,
           uri: true,
-          data: true,
           embedded: true
         },
         with: {
@@ -377,8 +377,12 @@ export async function queryListWithItems(
       canvasId: item.canvasId,
       manifestId: item.manifestId,
       createdAt: item.createdAt,
-      canvasLabel: item.canvas?.label ?? null,
-      manifestLabel: item.manifest?.label ?? null
+      canvasLabel: parseStoredNullableLanguageString(
+        item.canvas?.label ?? null
+      ),
+      manifestLabel: parseStoredNullableLanguageString(
+        item.manifest?.label ?? null
+      )
     }))
   }
 }
