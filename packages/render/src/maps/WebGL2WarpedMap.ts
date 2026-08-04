@@ -1,5 +1,3 @@
-import { throttle } from 'lodash-es'
-
 import {
   lineStringToLines,
   mergeOptions,
@@ -19,7 +17,6 @@ import {
 } from '@allmaps/tailwind'
 
 import { TriangulatedWarpedMap } from './TriangulatedWarpedMap.js'
-import { WarpedMapEvent, WarpedMapEventType } from '../shared/events.js'
 import {
   applyHomogeneousTransform,
   createHomogeneousTransform,
@@ -28,8 +25,6 @@ import {
 import { createBuffer } from '../shared/webgl2.js'
 import { getTilesAtOtherScaleFactors, tileKey } from '../shared/tiles.js'
 import { getCachedFractionalOpaqueRgba } from '../shared/colors-cache.js'
-
-import type { DebouncedFunc } from 'lodash-es'
 
 import type { Image } from '@allmaps/iiif-parser'
 import type {
@@ -52,12 +47,6 @@ import type {
   WebGL2WarpedMapWithoutGeoreferencedMapOptions
 } from '../shared/types.js'
 import type { CachedTile } from '../tilecache/CacheableTile.js'
-
-const THROTTLE_UPDATE_TEXTURES_WAIT_MS = 200
-const THROTTLE_UPDATE_TEXTURES_OPTIONS = {
-  leading: true,
-  trailing: true
-}
 
 const DEFAULT_RENDER_LINE_GROUP_OPTIONS = {
   viewportSize: 6,
@@ -208,8 +197,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   // this renderHomogeneousTransform is almost the identity transform [1, 0, 0, 1, 0, 0].
   invertedRenderHomogeneousTransform: HomogeneousTransform
 
-  private throttledUpdateTextures: DebouncedFunc<() => Promise<void>>
-
   /**
    * Creates an instance of WebGL2WarpedMap.
    *
@@ -244,12 +231,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.initializeWebGL(mapProgram, linesProgram, pointsProgram)
 
     this.invertedRenderHomogeneousTransform = createHomogeneousTransform()
-
-    this.throttledUpdateTextures = throttle(
-      this.updateTextures.bind(this),
-      THROTTLE_UPDATE_TEXTURES_WAIT_MS,
-      THROTTLE_UPDATE_TEXTURES_OPTIONS
-    )
   }
 
   initializeWebGL(
@@ -436,33 +417,36 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * Add cached tile to the textures of this map and update textures
+   * Add a cached tile to this map's tile set.
+   *
+   * This only records the tile; the actual texture upload happens later, in the
+   * renderer's per-frame flush (which calls {@link updateTextures}), so uploads
+   * stay bounded and frame-aligned instead of running on a per-map throttle.
    *
    * @param cachedTile
    */
-  addCachedTileAndUpdateTextures(cachedTile: CachedTile<ImageBitmap>) {
+  addCachedTile(cachedTile: CachedTile<ImageBitmap>) {
     this.cachedTilesByTileKey.set(cachedTile.fetchableTile.tileKey, cachedTile)
     this.cachedTilesByTileUrl.set(cachedTile.fetchableTile.tileUrl, cachedTile)
-    this.throttledUpdateTextures()
   }
 
   /**
-   * Remove cached tile from the textures of this map and update textures
+   * Remove a cached tile from this map's tile set.
+   *
+   * As with {@link addCachedTile}, the texture is reconciled later in the
+   * renderer's per-frame flush.
    *
    * @param tileUrl
+   * @returns whether the tile was present (and hence textures need updating)
    */
-  removeCachedTileAndUpdateTextures(tileUrl: string) {
+  removeCachedTile(tileUrl: string): boolean {
     const cachedTile = this.cachedTilesByTileUrl.get(tileUrl)
     if (!cachedTile) {
-      return
+      return false
     }
     this.cachedTilesByTileKey.delete(cachedTile.fetchableTile.tileKey)
     this.cachedTilesByTileUrl.delete(tileUrl)
-    this.throttledUpdateTextures()
-  }
-
-  cancelThrottledFunctions() {
-    this.throttledUpdateTextures.cancel()
+    return true
   }
 
   destroy() {
@@ -472,8 +456,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.gl.deleteTexture(this.cachedTilesTextureArray)
     this.gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
     this.gl.deleteTexture(this.cachedTilesResourceOriginPointsAndSizesTexture)
-
-    this.cancelThrottledFunctions()
 
     super.destroy()
   }
@@ -1028,40 +1010,84 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     )
   }
 
-  private async updateTextures() {
+  /**
+   * Reconcile this map's resident texture slots with the tiles it currently
+   * wants to show, uploading only what changed.
+   *
+   * Uploads are bounded: at most `maxUploads` tile uploads are performed per
+   * call, across both swap-remove moves and new-tile additions. Any leftover is
+   * reported as `backlog` so the renderer can drain it over subsequent frames,
+   * keeping per-frame GPU upload cost bounded (and hence smooth). This is called
+   * from the renderer's per-frame flush, not on a per-map throttle.
+   *
+   * @param maxUploads - Maximum number of tile uploads to perform this call
+   * @returns the number of uploads performed and the number of tiles still
+   *   waiting (removes + adds not yet processed); a non-zero backlog means this
+   *   map should be flushed again on a later frame
+   */
+  updateTextures(maxUploads: number): {
+    uploadsPerformed: number
+    backlog: number
+  } {
+    if (!this.image) {
+      return { uploadsPerformed: 0, backlog: 0 }
+    }
+
     // Find out which tiles to include in texture
     this.updateCachedTilesForTextures()
-
-    // Don't update if no tiles, or if current set is a non-null subset of the
-    // previous set (reduces expensive updates when just dropping tiles, but keeps
-    // them when all tiles are gone to free the texture). Blocking equal requests
-    // prevents an infinite loop via the TEXTURESUPDATED event below.
-    if (
-      this.cachedTilesForTextureByTileUrl.size == 0 ||
-      (this.cachedTilesForTextureByTileUrl.size !== 0 &&
-        subSetArray(
-          [...this.previousCachedTilesForTextureByTileUrl.keys()],
-          [...this.cachedTilesForTextureByTileUrl.keys()]
-        ))
-    ) {
-      return
-    }
-    if (!this.image) {
-      return
-    }
 
     // Reconcile the resident texture slots with the desired set of tiles,
     // uploading only what changed instead of re-uploading every tile.
 
-    // Remove tiles that are no longer desired, keeping cachedTilesByTextureSlot packed
-    // by moving the last resident tile into each freed slot (swap-remove).
+    // Desired tiles not yet resident (to add).
+    const cachedTilesToAdd = [
+      ...this.cachedTilesForTextureByTileUrl.values()
+    ].filter(
+      (cachedTile) =>
+        !this.textureSlotsByTileUrl.has(cachedTile.fetchableTile.tileUrl)
+    )
+    // Resident tiles no longer desired (to remove).
     const tileUrlsToRemove: string[] = []
     for (const tileUrl of this.textureSlotsByTileUrl.keys()) {
       if (!this.cachedTilesForTextureByTileUrl.has(tileUrl)) {
         tileUrlsToRemove.push(tileUrl)
       }
     }
-    for (const tileUrl of tileUrlsToRemove) {
+
+    // When nothing new needs adding and the desired set is only a (non-empty)
+    // subset of the previous set — i.e. tiles were merely dropped — leave the
+    // now-stale residents in place rather than doing expensive removals, until
+    // the next tile is added. Also nothing to do when there are no tiles at all.
+    // The cachedTilesToAdd.length === 0 term is essential once uploads are
+    // capped: a tile deferred to a later frame (desired but not yet uploaded,
+    // hence not resident) still shows up in cachedTilesToAdd, keeping it
+    // non-empty. That stops this guard from firing on a frame where no new tile
+    // arrived but deferred adds remain, which would otherwise strand them
+    // un-uploaded; instead we fall through and drain them below.
+    if (
+      cachedTilesToAdd.length === 0 &&
+      (this.cachedTilesForTextureByTileUrl.size === 0 ||
+        subSetArray(
+          [...this.previousCachedTilesForTextureByTileUrl.keys()],
+          [...this.cachedTilesForTextureByTileUrl.keys()]
+        ))
+    ) {
+      return { uploadsPerformed: 0, backlog: 0 }
+    }
+
+    let budget = maxUploads
+    let uploadsPerformed = 0
+
+    // Remove no-longer-desired tiles first, keeping cachedTilesByTextureSlot
+    // packed by moving the last resident tile into each freed slot (swap-remove).
+    // Each move is one upload and counts against the budget; leftover removals
+    // are retried on a later frame.
+    let removeIndex = 0
+    for (; removeIndex < tileUrlsToRemove.length; removeIndex++) {
+      if (budget <= 0) {
+        break
+      }
+      const tileUrl = tileUrlsToRemove[removeIndex]
       const slot = this.textureSlotsByTileUrl.get(tileUrl)
       if (slot === undefined) {
         continue
@@ -1073,25 +1099,25 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         this.cachedTilesByTextureSlot.set(slot, movedTile)
         this.textureSlotsByTileUrl.set(movedTile.fetchableTile.tileUrl, slot)
         this.uploadTileToSlot(movedTile, slot)
+        budget -= 1
+        uploadsPerformed += 1
       }
       this.cachedTilesByTextureSlot.delete(lastSlot)
     }
+    const remainingRemoves = tileUrlsToRemove.length - removeIndex
 
-    // Add tiles that aren't resident yet, appending them into free slots.
-    const cachedTilesToAdd = [
-      ...this.cachedTilesForTextureByTileUrl.values()
-    ].filter(
-      (cachedTile) =>
-        !this.textureSlotsByTileUrl.has(cachedTile.fetchableTile.tileUrl)
-    )
-    if (cachedTilesToAdd.length > 0) {
+    // Add tiles that aren't resident yet, appending them into free slots,
+    // bounded by the remaining budget. Leftover additions are retried later.
+    const cachedTilesToAddNow =
+      budget > 0 ? cachedTilesToAdd.slice(0, budget) : []
+    if (cachedTilesToAddNow.length > 0) {
       const requiredDepth =
-        this.cachedTilesByTextureSlot.size + cachedTilesToAdd.length
+        this.cachedTilesByTextureSlot.size + cachedTilesToAddNow.length
       if (requiredDepth > this.cachedTilesTextureArrayAllocatedDepth) {
         // Grow in steps so single arrivals append into headroom instead of
         // reallocating every time. reallocateTextures re-uploads the tiles
         // currently in cachedTilesByTextureSlot (the existing residents) into the
-        // fresh texture; the tiles in cachedTilesToAdd are appended (and
+        // fresh texture; the tiles in cachedTilesToAddNow are appended (and
         // uploaded) only in the loop below, so they are not yet in
         // cachedTilesByTextureSlot here and are not uploaded twice. Keep the
         // cachedTilesByTextureSlot.set() below this call to preserve that.
@@ -1100,17 +1126,23 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
           TEXTURE_ARRAY_DEPTH_GROWTH
         this.reallocateTextures(depth)
       }
-      for (const cachedTile of cachedTilesToAdd) {
+      for (const cachedTile of cachedTilesToAddNow) {
         const slot = this.cachedTilesByTextureSlot.size
         this.cachedTilesByTextureSlot.set(slot, cachedTile)
         this.textureSlotsByTileUrl.set(cachedTile.fetchableTile.tileUrl, slot)
         this.uploadTileToSlot(cachedTile, slot)
+        budget -= 1
+        uploadsPerformed += 1
       }
     }
+    const remainingAdds = cachedTilesToAdd.length - cachedTilesToAddNow.length
 
     this.textureSlotCount = this.cachedTilesByTextureSlot.size
 
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
+    return {
+      uploadsPerformed,
+      backlog: remainingRemoves + remainingAdds
+    }
   }
 
   /**

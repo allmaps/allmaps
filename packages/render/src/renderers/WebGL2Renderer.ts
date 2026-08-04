@@ -68,11 +68,13 @@ const THROTTLE_PREPARE_RENDER_OPTIONS = {
   trailing: true
 }
 
-const THROTTLE_CHANGED_WAIT_MS = 50
-const THROTTLE_CHANGED_OPTIONS = {
-  leading: true,
-  trailing: true
-}
+// Maximum number of tile uploads (texSubImage3D) performed per frame across all
+// maps, in #updateMapTextures. Bounds per-frame GPU upload cost so a burst of
+// arriving tiles streams in over a few frames instead of spiking one frame.
+// Tunable: higher fills faster but risks jank; lower is smoother but slower.
+// Needed since texture updates are no longer throttled (used to be 200ms)
+// but now update at the speed at which renderInternal is called (typically 50ms external throttle).
+const MAX_TILE_UPLOADS_PER_FRAME = 16
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
@@ -118,8 +120,11 @@ export class WebGL2Renderer
   disableRender = false
 
   #throttledPrepareRenderInternal: DebouncedFunc<() => void>
-  #throttledChanged: DebouncedFunc<() => void>
-  #boundThrottledChangedByMapId: Map<string, EventListener>
+
+  // Maps whose tile set changed and whose textures still need (re)uploading.
+  // Drained under a per-frame budget in #updateMapTextures, so GPU uploads stay
+  // bounded and frame-aligned instead of running on a per-map throttle.
+  #mapsWithTextureToUpdate: Set<string> = new Set()
 
   /**
    * Creates an instance of WebGL2Renderer.
@@ -204,7 +209,6 @@ export class WebGL2Renderer
 
     this.#workerPool = workerPool
     this.gl = gl
-    this.#boundThrottledChangedByMapId = new Map()
 
     this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS =
       defaultSpecificWebGL2RenderOptions
@@ -234,12 +238,6 @@ export class WebGL2Renderer
       this.#prepareRenderInternal.bind(this),
       THROTTLE_PREPARE_RENDER_WAIT_MS,
       THROTTLE_PREPARE_RENDER_OPTIONS
-    )
-
-    this.#throttledChanged = throttle(
-      this.#changed.bind(this),
-      THROTTLE_CHANGED_WAIT_MS,
-      THROTTLE_CHANGED_OPTIONS
     )
 
     this.warpedMapList.updateWarpedMapsUsingFactory()
@@ -360,21 +358,17 @@ export class WebGL2Renderer
     this.warpedMapList.clear()
     this.mapsInViewport = new Set()
     this.mapsWithFetchableTilesForViewport = new Set()
+    this.#mapsWithTextureToUpdate.clear()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
     this.tileCache.clear()
   }
 
   cancelThrottledFunctions() {
     this.#throttledPrepareRenderInternal.cancel()
-    this.#throttledChanged.cancel()
   }
 
   destroy() {
     this.cancelThrottledFunctions()
-
-    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
-      this.#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)
-    }
 
     this.removeEventListeners()
 
@@ -515,6 +509,10 @@ export class WebGL2Renderer
     if (!this.viewport) {
       return
     }
+
+    // Upload any pending tile textures (bounded per frame) before drawing, so
+    // freshly arrived tiles show this frame without spiking upload cost.
+    this.#updateMapTextures()
 
     const gl = this.gl
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
@@ -1207,7 +1205,8 @@ export class WebGL2Renderer
         return
       }
 
-      webgl2WarpedMap.addCachedTileAndUpdateTextures(tile)
+      webgl2WarpedMap.addCachedTile(tile)
+      this.#markMapWithTextureToUpdate(mapId)
     }
   }
 
@@ -1224,20 +1223,8 @@ export class WebGL2Renderer
         return
       }
 
-      webgl2WarpedMap.removeCachedTileAndUpdateTextures(tileUrl)
-    }
-  }
-
-  protected warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      if (!event.data?.mapIds) {
-        throw new Error('Event data missing')
-      }
-      const { mapIds } = event.data
-      const mapId = mapIds[0]
-      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (webgl2WarpedMap) {
-        this.#addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
+      if (webgl2WarpedMap.removeCachedTile(tileUrl)) {
+        this.#markMapWithTextureToUpdate(mapId)
       }
     }
   }
@@ -1278,20 +1265,50 @@ export class WebGL2Renderer
     }
   }
 
-  #addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    const bound = this.#throttledChanged.bind(this)
-    this.#boundThrottledChangedByMapId.set(webgl2WarpedMap.mapId, bound)
-    webgl2WarpedMap.addEventListener(WarpedMapEventType.TEXTURESUPDATED, bound)
+  /**
+   * Mark a map's textures as needing an upload and request a repaint. The
+   * actual (bounded) upload happens in #updateMapTextures at the start of the
+   * next render. Tiles arrive as separate async worker messages and
+   * triggerRepaint is cheap and coalesced by the map library to one repaint per
+   * frame, so requesting one per arrival is fine.
+   */
+  #markMapWithTextureToUpdate(mapId: string) {
+    this.#mapsWithTextureToUpdate.add(mapId)
+    this.#changed()
   }
 
-  #removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    const bound = this.#boundThrottledChangedByMapId.get(webgl2WarpedMap.mapId)
-    if (bound) {
-      webgl2WarpedMap.removeEventListener(
-        WarpedMapEventType.TEXTURESUPDATED,
-        bound
-      )
-      this.#boundThrottledChangedByMapId.delete(webgl2WarpedMap.mapId)
+  /**
+   * Upload pending tile textures for the dirty maps, bounded by a global
+   * per-frame budget (MAX_TILE_UPLOADS_PER_FRAME). Maps that still have a
+   * backlog afterwards (budget exhausted, or more tiles than the budget) stay
+   * marked dirty and a repaint is requested so they continue on later frames.
+   */
+  #updateMapTextures() {
+    if (this.#mapsWithTextureToUpdate.size === 0) {
+      return
+    }
+
+    let budget = MAX_TILE_UPLOADS_PER_FRAME
+    for (const mapId of this.#mapsWithTextureToUpdate) {
+      if (budget <= 0) {
+        break
+      }
+      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+      if (!webgl2WarpedMap) {
+        this.#mapsWithTextureToUpdate.delete(mapId)
+        continue
+      }
+      const { uploadsPerformed, backlog } =
+        webgl2WarpedMap.updateTextures(budget)
+      budget -= uploadsPerformed
+      if (backlog <= 0) {
+        this.#mapsWithTextureToUpdate.delete(mapId)
+      }
+    }
+
+    // Budget exhausted or maps still have a backlog: continue next frame.
+    if (this.#mapsWithTextureToUpdate.size > 0) {
+      this.#changed()
     }
   }
 
@@ -1299,9 +1316,9 @@ export class WebGL2Renderer
     this.disableRender = true
 
     this.cancelThrottledFunctions()
-    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
-      webgl2WarpedMap.cancelThrottledFunctions()
-    }
+
+    // The textures are gone with the context; drop any pending upload work.
+    this.#mapsWithTextureToUpdate.clear()
 
     this.tileCache.clear()
   }
