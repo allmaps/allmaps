@@ -1078,36 +1078,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     let budget = maxUploads
     let uploadsPerformed = 0
 
-    // Remove no-longer-desired tiles first, keeping cachedTilesByTextureSlot
-    // packed by moving the last resident tile into each freed slot (swap-remove).
-    // Each move is one upload and counts against the budget; leftover removals
-    // are retried on a later frame.
-    let removeIndex = 0
-    for (; removeIndex < tileUrlsToRemove.length; removeIndex++) {
-      if (budget <= 0) {
-        break
-      }
-      const tileUrl = tileUrlsToRemove[removeIndex]
-      const slot = this.textureSlotsByTileUrl.get(tileUrl)
-      if (slot === undefined) {
-        continue
-      }
-      this.textureSlotsByTileUrl.delete(tileUrl)
-      const lastSlot = this.cachedTilesByTextureSlot.size - 1
-      if (slot !== lastSlot) {
-        const movedTile = this.cachedTilesByTextureSlot.get(lastSlot)!
-        this.cachedTilesByTextureSlot.set(slot, movedTile)
-        this.textureSlotsByTileUrl.set(movedTile.fetchableTile.tileUrl, slot)
-        this.uploadTileToSlot(movedTile, slot)
-        budget -= 1
-        uploadsPerformed += 1
-      }
-      this.cachedTilesByTextureSlot.delete(lastSlot)
-    }
-    const remainingRemoves = tileUrlsToRemove.length - removeIndex
-
-    // Add tiles that aren't resident yet, appending them into free slots,
-    // bounded by the remaining budget. Leftover additions are retried later.
+    // Add newly-desired tiles first, appending them into free slots, bounded by
+    // the budget. Leftover additions are retried on a later frame.
+    //
+    // Adds run before removes on purpose. The budget can split a map's work
+    // across frames; if removes ran first they could evict the tiles covering a
+    // region before the new tiles covering it were uploaded, leaving that region
+    // uncovered for a frame — which flashes the background through (a white
+    // flicker), most visibly on zoom where the same area is re-tiled at a new
+    // scale factor. Adding first, and only removing once nothing is left to add
+    // (below), guarantees the region stays covered throughout the transition.
     const cachedTilesToAddNow =
       budget > 0 ? cachedTilesToAdd.slice(0, budget) : []
     if (cachedTilesToAddNow.length > 0) {
@@ -1137,11 +1117,46 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     }
     const remainingAdds = cachedTilesToAdd.length - cachedTilesToAddNow.length
 
+    // Remove no-longer-desired tiles, but only once every desired tile is
+    // resident (no adds still pending). Until then the stale residents are kept
+    // in place: they still cover their region, and the shader prefers the newer
+    // ideal-scale tiles as soon as those are uploaded — so the transition never
+    // shows a gap. Removals keep cachedTilesByTextureSlot packed by moving the
+    // last resident tile into each freed slot (swap-remove); each move is one
+    // upload and counts against the remaining budget. Leftover removals are
+    // retried on a later frame.
+    let remainingRemoves = tileUrlsToRemove.length
+    if (remainingAdds === 0) {
+      let removeIndex = 0
+      for (; removeIndex < tileUrlsToRemove.length; removeIndex++) {
+        if (budget <= 0) {
+          break
+        }
+        const tileUrl = tileUrlsToRemove[removeIndex]
+        const slot = this.textureSlotsByTileUrl.get(tileUrl)
+        if (slot === undefined) {
+          continue
+        }
+        this.textureSlotsByTileUrl.delete(tileUrl)
+        const lastSlot = this.cachedTilesByTextureSlot.size - 1
+        if (slot !== lastSlot) {
+          const movedTile = this.cachedTilesByTextureSlot.get(lastSlot)!
+          this.cachedTilesByTextureSlot.set(slot, movedTile)
+          this.textureSlotsByTileUrl.set(movedTile.fetchableTile.tileUrl, slot)
+          this.uploadTileToSlot(movedTile, slot)
+          budget -= 1
+          uploadsPerformed += 1
+        }
+        this.cachedTilesByTextureSlot.delete(lastSlot)
+      }
+      remainingRemoves = tileUrlsToRemove.length - removeIndex
+    }
+
     this.textureSlotCount = this.cachedTilesByTextureSlot.size
 
     return {
       uploadsPerformed,
-      backlog: remainingRemoves + remainingAdds
+      backlog: remainingAdds + remainingRemoves
     }
   }
 
