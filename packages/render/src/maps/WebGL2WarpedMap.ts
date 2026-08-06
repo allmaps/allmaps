@@ -1168,11 +1168,19 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Cached tiles resource origin points and sizes texture (4 rows per slot).
-    // A previous version used gl.RGBA_INTEGER as this texture's format.
-    // However, this seemed to cause Chrome to crash on some systems while
-    // zooming in and out. Using gl.RED_INTEGER and multiplying the height by 4
-    // to account for the 4 values per tile seems to fix the issue.
+    // Cached tiles resource origin points and sizes texture: one RGBA32F texel
+    // per slot holding (x, y, width, height), read with a single texelFetch in
+    // the fragment shader.
+    //
+    // These are integer resource coordinates, but they are stored as float
+    // (exact below 2^24, far above any image dimension) and the shader uses them
+    // as floats anyway. A previous version packed them into a single RGBA32I
+    // (RGBA_INTEGER) texel, but that crashed Chrome on some GPUs (Intel, via a
+    // webgl_image_conversion bug during texImage2D) — see issue #142. It was
+    // worked around by using RED_INTEGER with 4 rows per slot (4 texelFetches).
+    // RGBA32F packs it back into one fetch while using a different, universally
+    // supported upload path, so it avoids the crash. NEAREST filtering only, so
+    // no float-linear extension is needed.
     gl.deleteTexture(this.cachedTilesResourceOriginPointsAndSizesTexture)
     this.cachedTilesResourceOriginPointsAndSizesTexture = gl.createTexture()
     gl.bindTexture(
@@ -1182,13 +1190,13 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
-      gl.R32I,
+      gl.RGBA32F,
       1,
-      depth * 4,
+      depth,
       0,
-      gl.RED_INTEGER,
-      gl.INT,
-      new Int32Array(depth * 4)
+      gl.RGBA,
+      gl.FLOAT,
+      new Float32Array(depth * 4)
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
@@ -1275,7 +1283,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       source
     )
 
-    // Cached tiles resource origin points and sizes texture (4 rows per slot)
+    // Cached tiles resource origin points and sizes texture (one RGBA32F texel
+    // per slot: x, y, width, height)
     gl.bindTexture(
       gl.TEXTURE_2D,
       this.cachedTilesResourceOriginPointsAndSizesTexture
@@ -1284,12 +1293,12 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       gl.TEXTURE_2D,
       0,
       0,
-      slot * 4,
+      slot,
       1,
-      4,
-      gl.RED_INTEGER,
-      gl.INT,
-      new Int32Array([region.x, region.y, region.width, region.height])
+      1,
+      gl.RGBA,
+      gl.FLOAT,
+      new Float32Array([region.x, region.y, region.width, region.height])
     )
 
     // Cached tiles scale factors texture (1 row per slot)
