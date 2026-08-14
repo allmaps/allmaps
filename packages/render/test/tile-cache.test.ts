@@ -27,8 +27,15 @@ const TILE: Tile = {
 
 /** A tile that fetches nothing, so a test can decide how it ends. */
 class ControllableTile extends CacheableTile<string> {
+  aborted = false
+
   async fetch() {
     return this.data
+  }
+
+  override abort() {
+    this.aborted = true
+    super.abort()
   }
 
   succeed() {
@@ -198,13 +205,15 @@ describe('TileCache', () => {
   })
 
   test('a tile pruned while still fetching is counted out and aborted', () => {
-    const { cache, request } = createCache()
+    const { cache, request, getTile } = createCache()
 
     request()
+    const tile = getTile()
     expect(cache.finished).toBe(false)
 
     cache.prune(new Map())
 
     expect(cache.finished).toBe(true)
+    expect(tile.aborted).toBe(true)
   })
 })
