@@ -39,49 +39,44 @@ export class CacheableWorkerImageDataTile extends CacheableTile<ImageData> {
   async fetch() {
     const { worker, index } = this.#workerPool.acquire()
     this.#fetchingWorker = worker
-    try {
-      worker
-        .getImageData(
-          this.fetchableTile.tileUrl,
-          this.fetchFn,
-          this.fetchableTile.tile.tileZoomLevel.width,
-          this.fetchableTile.tile.tileZoomLevel.height
-        )
-        .then((response) => {
-          if (this.abortController.signal.aborted) {
-            return
-          }
 
-          this.data = response
-          this.dispatchEvent(
-            new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
-              tileUrl: this.fetchableTile.tileUrl
-            })
-          )
-        })
-        .catch((err) => {
-          if (!(err instanceof Error && err.name === 'AbortError')) {
-            // TODO: comlink keeps only message/name/stack, so a
-            // ResourceFetchError arrives stripped and reports as 'unknown'.
-            this.dispatchTileFetchError(err)
-          }
-        })
-        .finally(() => {
-          this.#fetchingWorker = null
-          this.#workerPool.release(index)
-        })
-    } catch (err) {
-      this.#fetchingWorker = null
-      this.#workerPool.release(index) // release even if setup itself throws synchronously
-      if (err instanceof Error && err.name === 'AbortError') {
-        // fetchImage was aborted because viewport was moved and tile
-        // is no longer needed. This error can be ignored, nothing to do.
-      } else {
-        this.dispatchTileFetchError(err)
-      }
-    }
+    worker
+      .getImageData(
+        this.fetchableTile.tileUrl,
+        this.fetchFn,
+        this.fetchableTile.tile.tileZoomLevel.width,
+        this.fetchableTile.tile.tileZoomLevel.height
+      )
+      .then((response) => {
+        if (this.abortController.signal.aborted) {
+          return
+        }
+
+        this.data = response
+        this.dispatchEvent(
+          new WarpedMapEvent(WarpedMapEventType.TILEFETCHED, {
+            tileUrl: this.fetchableTile.tileUrl
+          })
+        )
+      })
+      .catch((err) => {
+        if (!this.#isOwnAbortError(err)) {
+          // TODO: comlink keeps only message/name/stack, so a
+          // ResourceFetchError arrives stripped and reports as 'unknown'.
+          this.dispatchTileFetchError(err)
+        }
+      })
+      .finally(() => {
+        this.#fetchingWorker = null
+        this.#workerPool.release(index)
+      })
 
     return this.data
+  }
+
+  /** Our own abort is expected. One we did not ask for is a failure. */
+  #isOwnAbortError(err: unknown) {
+    return this.abortController.signal.aborted && this.isAbortError(err)
   }
 
   /** The worker cannot see our AbortSignal, so it has to be told separately. */

@@ -62,11 +62,15 @@ function createCache() {
 
   const allLoaded: Event[] = []
   const loading: Event[] = []
+  const errors: Event[] = []
   cache.addEventListener(WarpedMapEventType.ALLREQUESTEDTILESLOADED, (event) =>
     allLoaded.push(event)
   )
   cache.addEventListener(WarpedMapEventType.REQUESTEDTILESLOADING, (event) =>
     loading.push(event)
+  )
+  cache.addEventListener(WarpedMapEventType.TILEFETCHERROR, (event) =>
+    errors.push(event)
   )
 
   const request = (...tileUrls: string[]) =>
@@ -81,22 +85,34 @@ function createCache() {
     request,
     allLoaded,
     loading,
-    getTile: (tileUrl = TILE_URL) => tiles.get(tileUrl)
+    errors,
+    getTile: (tileUrl = TILE_URL) => {
+      const tile = tiles.get(tileUrl)
+
+      // Throw rather than return undefined: a test that asserts nothing
+      // happened would otherwise pass by doing nothing.
+      if (!tile) {
+        throw new Error(`no tile was created for ${tileUrl}`)
+      }
+
+      return tile
+    }
   }
 }
 
 describe('TileCache', () => {
   test('a failed tile that is then pruned leaves the count at zero', () => {
-    const { cache, request, getTile } = createCache()
+    const { cache, request, allLoaded, getTile } = createCache()
 
     request()
-    getTile()?.fail()
+    getTile().fail()
     // Pruning with no info removes it: it is neither cached nor fetching now.
     cache.prune(new Map())
 
     // Counting it out twice leaves -1, and a negative count never reads as
     // finished, so the next tile to arrive would announce "all loaded".
     expect(cache.finished).toBe(true)
+    expect(allLoaded).toHaveLength(1)
   })
 
   test('the count returns to zero when a tile succeeds', () => {
@@ -105,7 +121,7 @@ describe('TileCache', () => {
     request()
     expect(cache.finished).toBe(false)
 
-    getTile()?.succeed()
+    getTile().succeed()
 
     expect(cache.finished).toBe(true)
     expect(allLoaded).toHaveLength(1)
@@ -120,10 +136,10 @@ describe('TileCache', () => {
     expect(loading).toHaveLength(1)
     expect(allLoaded).toHaveLength(0)
 
-    getTile(TILE_URL)?.succeed()
+    getTile(TILE_URL).succeed()
     expect(allLoaded).toHaveLength(0)
 
-    getTile(second)?.succeed()
+    getTile(second).succeed()
     expect(allLoaded).toHaveLength(1)
     expect(loading).toHaveLength(1)
   })
@@ -138,6 +154,47 @@ describe('TileCache', () => {
     expect(allLoaded).toHaveLength(before.allLoaded)
     expect(loading).toHaveLength(before.loading)
     expect(cache.finished).toBe(true)
+  })
+
+  test('a removed tile that fails later is not reported', () => {
+    const { cache, request, errors, getTile } = createCache()
+
+    request()
+    const tile = getTile()
+    cache.prune(new Map())
+    tile.fail()
+
+    // Nobody wants this tile anymore, so its failure is not news.
+    expect(errors).toEqual([])
+  })
+
+  test('waiting for all tiles resolves when the last one lands', async () => {
+    const { cache, request, getTile } = createCache()
+
+    request()
+    let settled = false
+    const waiting = cache.allRequestedTilesLoaded().then(() => {
+      settled = true
+    })
+
+    expect(settled).toBe(false)
+    getTile().succeed()
+    await waiting
+
+    expect(settled).toBe(true)
+  })
+
+  test('waiting for all tiles rejects when the cache is cleared', async () => {
+    const { cache, request } = createCache()
+
+    request()
+    const waiting = cache.allRequestedTilesLoaded()
+
+    cache.clear()
+
+    // Resolving would tell the caller its tiles are ready to draw, and it
+    // would render the nothing that is left.
+    await expect(waiting).rejects.toThrow(/cleared/i)
   })
 
   test('a tile pruned while still fetching is counted out and aborted', () => {

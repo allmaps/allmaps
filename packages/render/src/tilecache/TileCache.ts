@@ -48,6 +48,11 @@ export class TileCache<D> extends EventTarget {
    */
   #tilesFetching: Set<string> = new Set()
 
+  #waitingForTiles: Set<{
+    resolve: () => void
+    reject: (error: Error) => void
+  }> = new Set()
+
   #boundTileFetched = this.tileFetched.bind(this)
   #boundTileFetchError = this.tileFetchError.bind(this)
   #boundTilesFromSpriteTile = this.tilesFromSpriteTile.bind(this)
@@ -221,22 +226,12 @@ export class TileCache<D> extends EventTarget {
    * or in a while, when the last one finishes and ALLREQUESTEDTILESLOADED is fired.
    */
   async allRequestedTilesLoaded(): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.finished) {
-        resolve()
-      } else {
-        const listener = () => {
-          this.removeEventListener(
-            WarpedMapEventType.ALLREQUESTEDTILESLOADED,
-            listener
-          )
-          resolve()
-        }
-        this.addEventListener(
-          WarpedMapEventType.ALLREQUESTEDTILESLOADED,
-          listener
-        )
-      }
+    if (this.finished) {
+      return
+    }
+
+    return new Promise((resolve, reject) => {
+      this.#waitingForTiles.add({ resolve, reject })
     })
   }
 
@@ -275,6 +270,10 @@ export class TileCache<D> extends EventTarget {
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
     this.#tilesFetching = new Set()
+
+    this.#stopWaitingForTiles(
+      new Error('Tile cache was cleared while waiting for tiles')
+    )
   }
 
   destroy() {
@@ -610,9 +609,24 @@ export class TileCache<D> extends EventTarget {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.ALLREQUESTEDTILESLOADED)
       )
+      this.#stopWaitingForTiles()
     }
 
     return true
+  }
+
+  /** With an error, so a cleared cache never reads as loaded. */
+  #stopWaitingForTiles(error?: Error) {
+    const waiting = this.#waitingForTiles
+    this.#waitingForTiles = new Set()
+
+    for (const { resolve, reject } of waiting) {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    }
   }
 
   protected addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {

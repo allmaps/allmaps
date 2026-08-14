@@ -46,7 +46,7 @@ const IMAGE_DATA: ImageData = {
  * The worker's `getImageData` hangs until `finish` is called, so a test can act
  * while the tile is still fetching.
  */
-function createTileOnRealComlink() {
+function createTileOnRealComlink({ abortRejects = false } = {}) {
   const calls: unknown[][] = []
   const aborted: string[] = []
   const released: number[] = []
@@ -66,7 +66,13 @@ function createTileOnRealComlink() {
       },
       abort(tileUrl: string) {
         aborted.push(tileUrl)
-        finish()
+
+        // The real worker rejects the fetch it was told to stop.
+        if (abortRejects) {
+          fail(new DOMException('The operation was aborted', 'AbortError'))
+        } else {
+          finish()
+        }
       }
     },
     port1
@@ -190,6 +196,40 @@ describe('CacheableWorkerImageDataTile', () => {
     await settle()
 
     expect(errors).toHaveLength(1)
+    close()
+  })
+
+  test('an abort this tile did not ask for is reported', async () => {
+    const { tile, fail, close } = createTileOnRealComlink()
+    const errors: Event[] = []
+    tile.addEventListener(WarpedMapEventType.TILEFETCHERROR, (event) =>
+      errors.push(event)
+    )
+
+    void tile.fetch()
+    await settle()
+    // A fetchFn with its own timeout, say. Staying quiet would leave the tile
+    // in the cache's in-flight set forever.
+    fail(new DOMException('The operation was aborted', 'AbortError'))
+    await settle()
+
+    expect(errors).toHaveLength(1)
+    close()
+  })
+
+  test('our own abort is not reported as a failure', async () => {
+    const { tile, close } = createTileOnRealComlink({ abortRejects: true })
+    const errors: Event[] = []
+    tile.addEventListener(WarpedMapEventType.TILEFETCHERROR, (event) =>
+      errors.push(event)
+    )
+
+    void tile.fetch()
+    await settle()
+    tile.abort()
+    await settle()
+
+    expect(errors).toEqual([])
     close()
   })
 
