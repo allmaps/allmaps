@@ -34,13 +34,19 @@ export class TileCache<D> extends EventTarget {
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
 
-  protected tilesFetchingCount = 0
   protected tileRemoveQueue: {
     tileUrl: string
     mapId: string
   }[] = []
 
   protected fetchableTiles: FetchableTile[] = []
+
+  /**
+   * The tiles in flight. Deleting returns true only for the first caller, so a
+   * tile is counted out exactly once no matter how it ends: fetched, failed, or
+   * removed while still fetching.
+   */
+  #tilesFetching: Set<string> = new Set()
 
   #boundTileFetched = this.tileFetched.bind(this)
   #boundTileFetchError = this.tileFetchError.bind(this)
@@ -211,8 +217,8 @@ export class TileCache<D> extends EventTarget {
 
   /**
    * Returns a promise that resolves when all requested tiles are loaded.
-   * This could happen immidiately, in case there are no ongoing requests and the tilesFetchingCount is zero,
-   * or in a while, when the count reaches zero and the ALLREQUESTEDTILESLOADED event is fired.
+   * This could happen immidiately, in case there are no ongoing requests,
+   * or in a while, when the last one finishes and ALLREQUESTEDTILESLOADED is fired.
    */
   async allRequestedTilesLoaded(): Promise<void> {
     return new Promise((resolve) => {
@@ -268,7 +274,7 @@ export class TileCache<D> extends EventTarget {
     this.tilesByTileUrl = new Map()
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
-    this.tilesFetchingCount = 0
+    this.#tilesFetching = new Set()
   }
 
   destroy() {
@@ -310,7 +316,7 @@ export class TileCache<D> extends EventTarget {
     // This is an async function that we are not awaiting to continue
     // The results are handled inside the tile using events
     cacheableTile.fetch()
-    this.updateTilesFetchingCount(1)
+    this.startFetching(cacheableTile.fetchableTile.tileUrl)
   }
 
   // Directly add cached tiles created from sprites
@@ -335,6 +341,14 @@ export class TileCache<D> extends EventTarget {
   }
 
   protected delayedRemoveCacheableTileForMapId(tileUrl: string, mapId: string) {
+    const cacheableTile = this.tilesByTileUrl.get(tileUrl)
+
+    // No pixels yet to keep, so queueing only pays for the rest of a download.
+    if (cacheableTile && !cacheableTile.isCachedTile()) {
+      this.removeCacheableTileForMapId(tileUrl, mapId)
+      return
+    }
+
     if (
       this.tileRemoveQueue.some(
         (tile) => tile.tileUrl === tileUrl && tile.mapId === mapId
@@ -375,15 +389,14 @@ export class TileCache<D> extends EventTarget {
     const mapIds = this.removeMapIdForTileUrl(mapId, tileUrl)
     this.removeTileUrlForMapId(tileUrl, mapId)
 
-    // If there are no other maps for this tile and it's still fetching,
-    // abort the fetch and delete the tile from the cache.
+    // No other map wants this tile, so it leaves the cache.
     if (!mapIds.size) {
-      if (!cacheableTile.isCachedTile()) {
-        // Cancel fetch if tile is still being fetched
+      // Still fetching means the download is live, so stop it.
+      if (this.stopFetching(tileUrl)) {
         cacheableTile.abort()
-        this.updateTilesFetchingCount(-1)
       }
 
+      this.removeEventListenersFromCacheableTile(cacheableTile)
       this.tilesByTileUrl.delete(tileUrl)
     }
 
@@ -402,7 +415,7 @@ export class TileCache<D> extends EventTarget {
       }
       const { tileUrl } = event.data
 
-      this.updateTilesFetchingCount(-1)
+      this.stopFetching(tileUrl)
 
       for (const mapId of this.mapIdsByTileUrl.get(tileUrl) || []) {
         this.dispatchEvent(
@@ -439,11 +452,7 @@ export class TileCache<D> extends EventTarget {
       }
       const { tileUrl } = event.data
 
-      // A failed fetch must decrement the in-flight count just like a successful
-      // one (see tileFetched), otherwise tilesFetchingCount never reaches zero.
-      if (this.tilesByTileUrl.has(tileUrl)) {
-        this.updateTilesFetchingCount(-1)
-      }
+      this.stopFetching(tileUrl)
 
       const mapIds = [
         ...new Set([
@@ -577,24 +586,33 @@ export class TileCache<D> extends EventTarget {
   }
 
   get finished() {
-    return this.tilesFetchingCount === 0
+    return this.#tilesFetching.size === 0
   }
 
-  protected updateTilesFetchingCount(delta: number) {
-    const previousTilesFetchingCount = this.tilesFetchingCount
-    this.tilesFetchingCount += delta
+  protected startFetching(tileUrl: string) {
+    const previousCount = this.#tilesFetching.size
+    this.#tilesFetching.add(tileUrl)
 
-    if (previousTilesFetchingCount === 0 && this.tilesFetchingCount > 0) {
+    if (previousCount === 0 && this.#tilesFetching.size > 0) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.REQUESTEDTILESLOADING)
       )
     }
+  }
 
-    if (this.tilesFetchingCount === 0) {
+  /** False if it had already stopped, so each tile is counted out once. */
+  protected stopFetching(tileUrl: string) {
+    if (!this.#tilesFetching.delete(tileUrl)) {
+      return false
+    }
+
+    if (this.#tilesFetching.size === 0) {
       this.dispatchEvent(
         new WarpedMapEvent(WarpedMapEventType.ALLREQUESTEDTILESLOADED)
       )
     }
+
+    return true
   }
 
   protected addEventListenersToCacheableTile(cacheableTile: CacheableTile<D>) {

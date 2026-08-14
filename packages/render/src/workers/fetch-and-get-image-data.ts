@@ -4,42 +4,56 @@ import { fetchUrl } from '@allmaps/stdlib'
 
 import type { FetchFn } from '@allmaps/types'
 
-const fetchAndGetImageDataWorker = {
+export const abortControllers = new Map<string, AbortController>()
+
+export const fetchAndGetImageDataWorker = {
   async getImageData(
     tileUrl: string,
-    onAbort: () => void, // Define as a no-arguments function
     fetchFn: FetchFn | undefined,
     width: number,
     height: number
   ): Promise<ImageData> {
-    const workerAbortController = new AbortController()
+    const abortController = new AbortController()
+    const { signal } = abortController
+    abortControllers.set(tileUrl, abortController)
 
-    // Connect the abort signal with a listener
-    onAbort()
+    try {
+      const response = await fetchUrl(tileUrl, { signal }, fetchFn)
 
-    const response = await fetchUrl(
-      tileUrl,
-      {
-        signal: workerAbortController.signal
-      },
-      fetchFn
-    )
+      const blob = await response.blob()
+      signal.throwIfAborted()
 
-    const blob = await response.blob()
+      const imageBitmap = await createImageBitmap(blob, 0, 0, width, height)
 
-    const imageBitmap = await createImageBitmap(blob, 0, 0, width, height)
+      try {
+        signal.throwIfAborted()
 
-    const canvas = new OffscreenCanvas(width, height)
-    const context = canvas.getContext('2d')
+        const canvas = new OffscreenCanvas(width, height)
+        const context = canvas.getContext('2d')
 
-    if (!context) {
-      throw new Error('Could not create OffscreenCanvas context')
+        if (!context) {
+          throw new Error('Could not create OffscreenCanvas context')
+        }
+
+        context.drawImage(imageBitmap, 0, 0)
+        const imageData = context.getImageData(0, 0, width, height)
+
+        return transfer(imageData, [imageData.data.buffer])
+      } finally {
+        imageBitmap.close()
+      }
+    } finally {
+      // A later fetch for this url may own the entry now; deleting it then
+      // would leave that fetch unabortable.
+      if (abortControllers.get(tileUrl) === abortController) {
+        abortControllers.delete(tileUrl)
+      }
     }
+  },
 
-    context.drawImage(imageBitmap, 0, 0)
-    const imageData = context.getImageData(0, 0, width, height)
-
-    return transfer(imageData, [imageData.data.buffer])
+  /** Runs while getImageData is still awaiting: the worker is idle on I/O. */
+  abort(tileUrl: string): void {
+    abortControllers.get(tileUrl)?.abort()
   }
 }
 
