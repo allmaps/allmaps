@@ -58,12 +58,12 @@
     "@types/leaflet": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "prettier": "^3.6.2",
-    "remark-api": "^1.1.0",
-    "remark-cli": "^12.0.1",
+    "prettier": "catalog:",
+    "remark-api": "catalog:",
+    "remark-cli": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-dts": "^3.8.3",
-    "vite-plugin-no-bundle": "^4.0.0"
+    "vite-plugin-dts": "catalog:",
+    "vite-plugin-no-bundle": "catalog:"
   }
 }

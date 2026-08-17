@@ -55,17 +55,17 @@
     "@commander-js/extra-typings": "^13.0.0",
     "commander": "^13.0.0",
     "open": "^10.1.2",
-    "stream-json": "^1.9.1"
+    "stream-json": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/stream-json": "^1.7.2",
+    "@types/stream-json": "catalog:",
     "prettier": "catalog:",
     "globals": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "vitest": "^4.0.4",
+    "vitest": "catalog:",
     "zod": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",

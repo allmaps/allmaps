@@ -31,7 +31,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "catalog:",
     "maplibre-gl": "catalog:",
     "pmtiles": "catalog:"
   },
@@ -41,10 +41,10 @@
     "@sveltejs/adapter-static": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
-    "@tailwindcss/vite": "^4.0.0",
-    "@turf/length": "^7.2.0",
-    "@types/lodash-es": "^4.17.12",
-    "@vitejs/plugin-basic-ssl": "^1.2.0",
+    "@tailwindcss/vite": "catalog:",
+    "@turf/length": "catalog:",
+    "@types/lodash-es": "catalog:",
+    "@vitejs/plugin-basic-ssl": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "catalog:",
@@ -57,6 +57,6 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-devtools-json": "^1.0.0"
+    "vite-plugin-devtools-json": "catalog:"
   }
 }

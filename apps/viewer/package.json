@@ -44,7 +44,7 @@
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "bits-ui": "catalog:",
-    "comlink": "^4.4.1",
+    "comlink": "catalog:",
     "lodash-es": "catalog:",
     "maplibre-gl": "catalog:",
     "simplify-js": "^1.2.4"

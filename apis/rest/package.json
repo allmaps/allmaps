@@ -33,7 +33,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/geojson": "^7946.0.14",
+    "@types/geojson": "catalog:",
     "@types/node": "catalog:",
     "drizzle-kit": "catalog:",
     "eslint": "catalog:",

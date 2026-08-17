@@ -49,15 +49,15 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "proj4": "catalog:",
-    "stream-json": "^1.9.1"
+    "stream-json": "catalog:"
   },
   "devDependencies": {
-    "@types/stream-json": "^1.7.2",
+    "@types/stream-json": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "prettier": "^3.6.2",
-    "remark-api": "^1.1.0",
-    "remark-cli": "^12.0.1",
+    "prettier": "catalog:",
+    "remark-api": "catalog:",
+    "remark-cli": "catalog:",
     "typescript": "catalog:"
   }
 }

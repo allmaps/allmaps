@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/sharedb": "^3.3.12",
+    "@types/sharedb": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "eslint": "catalog:",

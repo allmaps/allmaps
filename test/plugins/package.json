@@ -54,7 +54,7 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-devtools-json": "^1.0.0",
+    "vite-plugin-devtools-json": "catalog:",
     "vitest": "catalog:"
   }
 }

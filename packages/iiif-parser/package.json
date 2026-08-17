@@ -40,12 +40,12 @@
     "@allmaps/types": "workspace:^",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "prettier": "^3.6.2",
-    "remark-api": "^1.1.0",
-    "remark-cli": "^12.0.1",
+    "prettier": "catalog:",
+    "remark-api": "catalog:",
+    "remark-cli": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "^4.0.4"
+    "vitest": "catalog:"
   },
   "dependencies": {
     "zod": "catalog:"

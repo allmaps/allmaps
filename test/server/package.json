@@ -23,7 +23,7 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "phosphor-svelte": "catalog:",
-    "sharp": "^0.34.5"
+    "sharp": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",

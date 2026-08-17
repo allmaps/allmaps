@@ -7,12 +7,11 @@ packages:
   - 'tools/*'
 
 catalog:
+  # Runtime and TypeScript
   '@types/node': ^24
-
-  vite: 8.0.16
-  vitest: ^4.1.8
   typescript: ^6.0.3
 
+  # Linting and formatting
   '@eslint/js': ^10.0.1
   eslint: ^10.7.0
   eslint-config-prettier: ^10.1.8
@@ -23,45 +22,89 @@ catalog:
   prettier-plugin-tailwindcss: ^0.8.0
   typescript-eslint: ^8.60.1
 
-  zod: ^4.3.6
-  tailwindcss: ^4.3.0
-  '@tailwindcss/typography': ^0.5.19
-  '@tailwindcss/vite': ^4.3.0
-  'svelte': ^5.56.1
-  'svelte-check': ^4.6.0
+  # Build, test, documentation and publishing
+  '@lerna-lite/cli': ^4.4.1
+  '@lerna-lite/publish': ^4.4.1
+  '@lerna-lite/run': ^4.4.1
+  '@sveltejs/package': ^2.0.0
+  '@vitejs/plugin-basic-ssl': ^1.2.0
+  husky: ^8
+  publint: ^0.3.2
+  remark-api: ^1.1.0
+  remark-cli: ^12.0.1
+  turbo: ^2.5.5
+  vite: 8.0.16
+  vite-plugin-devtools-json: ^1.0.0
+  vite-plugin-dts: ^3.8.3
+  vite-plugin-no-bundle: ^4.0.0
+  vitest: ^4.1.8
+
+  # Svelte and UI
   '@sveltejs/adapter-auto': ^7.0.1
   '@sveltejs/adapter-cloudflare': ^7.2.8
   '@sveltejs/adapter-node': ^5.3.3
   '@sveltejs/adapter-static': ^3.0.10
   '@sveltejs/kit': ^2.63.0
   '@sveltejs/vite-plugin-svelte': ^7.1.2
-  'vite-plugin-devtools-json': ^1.0.0
-
+  '@tailwindcss/typography': ^0.5.19
+  '@tailwindcss/vite': ^4.3.0
   bits-ui: ^2.15
+  phosphor-svelte: ^3.1.0
+  svelte: ^5.56.1
+  svelte-check: ^4.6.0
+  tailwindcss: ^4.3.0
 
+  # Cloudflare and deployment
+  '@cloudflare/kv-asset-handler': ^0.3.1
   wrangler: ^4.97.0
 
-  drizzle-kit: ^1.0.0-beta.17
-  drizzle-orm: ^1.0.0-beta.17
-  better-auth: ^1.5.0
-  '@neondatabase/serverless': ^1.0
-  '@sinclair/typebox': ^0.34.52
-  elysia: ^1.4
+  # APIs, authentication, databases and collaboration
   '@elysiajs/cors': ^1.4
   '@elysiajs/openapi': ^1.4
+  '@neondatabase/serverless': ^1.0
+  '@sinclair/typebox': ^0.34.52
+  '@types/diff-match-patch': ^1.0.36
+  '@types/sharedb': ^3.3.12
+  better-auth: ^1.5.0
+  drizzle-kit: ^1.0.0-beta.17
+  drizzle-orm: ^1.0.0-beta.17
+  elysia: ^1.4
+  exact-mirror: ^0.2.7
+  itty-router: ^5.0.16
+  ot-json1: ^1.0.2
   postgres: ^3.4
+  sharedb: ^5.2.2
+  zod: ^4.3.6
 
-  proj4: ^2.20.0
-  leaflet: ^1.9.4
+  # Mapping and geospatial
+  '@turf/length': ^7.2.0
+  '@turf/rewind': ^7.2.0
+  '@types/d3-geo': ^3.1.0
+  '@types/geojson': ^7946.0.16
   '@types/leaflet': ^1.9.4
-  ol: ^10.8.0
+  d3-geo: ^3.1.1
+  leaflet: ^1.9.4
   maplibre-gl: ^5.16
+  ol: ^10.8.0
   pmtiles: ^4.3.0
-  lodash-es: ^4.17
-  '@types/lodash-es': ^4.17
-  phosphor-svelte: ^3.1.0
-  sharp: ^0.35.2
-  comlink: ^4.4.1
+  point-in-polygon-hao: ^1.2.4
+  proj4: ^2.20.0
+  rbush: ^4.0.0
 
+  # Rendering and data processing
+  '@types/stream-json': ^1.7.2
+  '@types/upng-js': ^2.1.2
+  comlink: ^4.4.1
+  jpeg-js: ^0.4.4
+  ml-matrix: ^6.12.0
+  sharp: ^0.35.2
+  stream-json: ^1.9.1
+  upng-js: ^2.1.0
+
+  # General utilities
+  '@types/lodash-es': ^4.17
+  lodash-es: ^4.17
+
+# Keep Elysia's optional Exact Mirror peer on the compatible release.
 overrides:
-  'elysia@1.4.29>exact-mirror': ^0.2.7
+  'elysia@1.4.29>exact-mirror': 'catalog:'
