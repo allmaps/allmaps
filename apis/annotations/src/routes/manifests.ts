@@ -1,17 +1,13 @@
 import { t } from 'elysia'
 
 import { queryMaps } from '@allmaps/api-shared/db'
-import { needsElevatedLimitRole, setCacheControl } from '@allmaps/api-shared'
+import { setCacheControl } from '@allmaps/api-shared'
 import { createAuth } from '@allmaps/db/auth'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
-
-const querySchema = t.Object({
-  limit: t.Optional(t.Number())
-})
 
 export function createManifestsRoutes(
   env: AnnotationsEnv,
@@ -21,29 +17,23 @@ export function createManifestsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/manifests/:manifestId',
-      async ({ request, env, db, params, query, set, getLimitRole }) => {
-        const userRole = needsElevatedLimitRole(query.limit)
-          ? await getLimitRole()
-          : 'public'
-        setCacheControl(
-          set,
-          userRole === 'public' ? 'public-medium' : 'private-no-store'
-        )
+      ({ request, env, db, params, set }) => {
+        setCacheControl(set, 'public-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          { manifestId: params.manifestId, limit: query.limit, userRole },
+          { manifestId: params.manifestId },
           {
             id: request.url,
             format: 'annotation',
             expectRows: true,
-            singular: false
+            singular: false,
+            resultScope: 'complete'
           }
         )
       },
       {
         params: t.Object({ manifestId: t.String() }),
-        query: querySchema,
         detail: {
           summary: 'Get Georeference Annotations for a single IIIF Manifest',
           tags: ['Manifests']

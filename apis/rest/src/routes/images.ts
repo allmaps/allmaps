@@ -35,7 +35,6 @@ const createImageBodySchema = t.Union([
 type CreateImageBody = { url: string } | { url: string }[]
 
 const mapsQuerySchema = t.Object({
-  limit: t.Optional(t.Number()),
   imageServiceDomain: t.Optional(t.String()),
   manifestDomain: t.Optional(t.String()),
   intersects: t.Optional(t.Array(t.Number())),
@@ -142,24 +141,22 @@ export function createImagesRoutes(
     )
     .get(
       '/images/:imageId/maps',
-      async ({ request, env, db, params, set, getLimitRole }) => {
+      ({ request, env, db, params, set }) => {
         const queryParams = normalizeMapsQueryParams(request)
-        const userRole = needsElevatedLimitRole(queryParams.limit)
-          ? await getLimitRole()
-          : 'public'
-        setCacheControl(
-          set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
-        )
+        setCacheControl(set, 'public-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
             ...queryParams,
-            imageId: params.imageId,
-            userRole
+            imageId: params.imageId
           },
-          { format: 'map', expectRows: true, singular: false }
+          {
+            format: 'map',
+            expectRows: true,
+            singular: false,
+            resultScope: 'complete'
+          }
         )
       },
       {
@@ -173,24 +170,22 @@ export function createImagesRoutes(
     )
     .get(
       '/images/:imageId/maps.geojson',
-      async ({ request, env, db, params, set, getLimitRole }) => {
+      ({ request, env, db, params, set }) => {
         const queryParams = normalizeMapsQueryParams(request)
-        const userRole = needsElevatedLimitRole(queryParams.limit)
-          ? await getLimitRole()
-          : 'public'
-        setCacheControl(
-          set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
-        )
+        setCacheControl(set, 'public-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
             ...queryParams,
-            imageId: params.imageId,
-            userRole
+            imageId: params.imageId
           },
-          { format: 'geojson', expectRows: true, singular: false }
+          {
+            format: 'geojson',
+            expectRows: true,
+            singular: false,
+            resultScope: 'complete'
+          }
         )
       },
       {
