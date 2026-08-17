@@ -8,7 +8,7 @@
 //   GeoreferencedMap
 // } from '@allmaps/annotation'
 
-// import type { ProjectionsState } from '@allmaps/components/state'
+// import type { ProjectionsState } from '@allmaps/ui/state'
 
 // import type { MapsState } from '$lib/state/maps.svelte'
 // import type { MapsMergedState } from '$lib/state/maps-merged.svelte.js'

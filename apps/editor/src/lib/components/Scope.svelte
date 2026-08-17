@@ -5,7 +5,7 @@
     MapTrifold as MapTrifoldIcon
   } from 'phosphor-svelte'
 
-  import { Select } from '@allmaps/components'
+  import { Select } from '@allmaps/ui'
 
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { m } from '$lib/paraglide/messages.js'

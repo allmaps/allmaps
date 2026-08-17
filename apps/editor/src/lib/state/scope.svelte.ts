@@ -10,7 +10,7 @@ import {
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
-import type { ProjectionsState } from '@allmaps/components/state'
+import type { ProjectionsState } from '@allmaps/ui/state'
 
 import type { SourceState } from '$lib/state/source.svelte'
 import type { MapsState } from '$lib/state/maps.svelte'

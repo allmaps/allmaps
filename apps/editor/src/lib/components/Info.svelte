@@ -18,7 +18,7 @@
   import { getErrorState } from '$lib/state/error.svelte.js'
   import { formatSourceType } from '$lib/shared/metadata.js'
 
-  import { Popover, LoadingSmall } from '@allmaps/components'
+  import { Popover, LoadingSmall } from '@allmaps/ui'
 
   import URLInput from '$lib/components/URLInput.svelte'
   import Metadata from '$lib/components/Metadata.svelte'

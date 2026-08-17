@@ -9,7 +9,7 @@
   import { WarpedMapLayer } from '@allmaps/maplibre'
   // import { basemapStyle, addTerrain, removeTerrain } from '@allmaps/basemap'
 
-  import { getProjectionsState } from '@allmaps/components/state'
+  import { getProjectionsState } from '@allmaps/ui/state'
   import { getMapsState } from '$lib/state/maps.svelte'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Modal } from '@allmaps/components'
+  import { Modal } from '@allmaps/ui'
 
   import { getIiifState } from '$lib/state/iiif.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'

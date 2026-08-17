@@ -10,7 +10,7 @@
   import { pink } from '@allmaps/tailwind'
   import { computeBbox, combineBboxes } from '@allmaps/stdlib'
 
-  import { getProjectionsState } from '@allmaps/components/state'
+  import { getProjectionsState } from '@allmaps/ui/state'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'

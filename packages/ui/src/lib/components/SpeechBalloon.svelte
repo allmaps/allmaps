@@ -1,8 +1,15 @@
 <script lang="ts">
   import { green, black } from '@allmaps/tailwind'
 
-  export let backgroundColor = green
-  export let textColor = black
+  import type { Snippet } from 'svelte'
+
+  type Props = {
+    backgroundColor?: string
+    textColor?: string
+    children?: Snippet
+  }
+
+  let { backgroundColor = green, textColor = black, children }: Props = $props()
 </script>
 
 <div
@@ -28,7 +35,7 @@
     after:ml-[-0.5em]
     after:mb-[-1.19em]"
 >
-  <slot />
+  {@render children?.()}
 </div>
 
 <style scoped>

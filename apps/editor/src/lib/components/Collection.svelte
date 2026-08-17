@@ -6,7 +6,7 @@
   import Pagination from '$lib/components/Pagination.svelte'
   import CollectionItem from '$lib/components/CollectionItem.svelte'
 
-  import { LoadingSmall } from '@allmaps/components'
+  import { LoadingSmall } from '@allmaps/ui'
 
   import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
   import { m } from '$lib/paraglide/messages.js'

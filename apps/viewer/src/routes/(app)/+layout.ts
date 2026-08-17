@@ -16,7 +16,7 @@ export const load: LayoutLoad = async ({ data, fetch, url, parent }) => {
   const source = data?.source
 
   const urlParam = url.searchParams.get('url')
-  const clientSourceLoadReason = data.clientSourceLoadReason
+  const clientSourceLoadReason = data?.clientSourceLoadReason
 
   if (source || !urlParam || !browser || !clientSourceLoadReason) {
     return {

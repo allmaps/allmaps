@@ -52,8 +52,8 @@
     "@allmaps/render": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/warpedmaplayer": "workspace:^",
-    "@types/lodash-es": "^4.17.12",
-    "lodash-es": "^4.17.21"
+    "@types/lodash-es": "catalog:",
+    "lodash-es": "catalog:"
   },
   "peerDependencies": {
     "ol": "*",
@@ -65,13 +65,14 @@
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "ol": "catalog:",
-    "prettier": "^3.6.2",
+    "prettier": "catalog:",
     "proj4": "catalog:",
-    "remark-api": "^1.1.0",
-    "remark-cli": "^12.0.1",
+    "remark-api": "catalog:",
+    "remark-cli": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-dts": "^3.8.3",
-    "vite-plugin-no-bundle": "^4.0.0"
+    "vite-plugin-dts": "catalog:",
+    "vite-plugin-no-bundle": "catalog:"
   }
 }

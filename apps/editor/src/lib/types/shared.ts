@@ -9,7 +9,7 @@ import type {
 } from '@allmaps/iiif-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { PickerProjection } from '@allmaps/components/projections'
+import type { PickerProjection } from '@allmaps/ui/projections'
 
 export type Organization = {
   title: string

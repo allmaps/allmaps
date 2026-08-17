@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { ProjectionPicker } from '@allmaps/components'
+  import { ProjectionPicker } from '@allmaps/ui'
   import {
     createBboxIndex,
     createFullTextIndex
-  } from '@allmaps/components/projections'
+  } from '@allmaps/ui/projections'
 
-  import { getProjectionsState } from '@allmaps/components/state'
+  import { getProjectionsState } from '@allmaps/ui/state'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
@@ -14,7 +14,7 @@
   import { getApiUrl } from '$lib/shared/urls.js'
   import { toDbProjection } from '$lib/shared/maps.js'
 
-  import type { PickerProjection } from '@allmaps/components/projections'
+  import type { PickerProjection } from '@allmaps/ui/projections'
 
   import type { DbMap3 } from '$lib/types/maps.js'
   import type { EditorPublicEnv } from '@allmaps/env/editor'

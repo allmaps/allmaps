@@ -17,18 +17,54 @@
   // import { env } from '$env/dynamic/public'
   const env = import.meta.env
 
-  export let bannerTextEnabled = env.VITE_BANNER_ENABLED === 'true' || false
-  export let bannerText = env.VITE_BANNER_TEXT || ''
-  export let bannerBackgroundColor = env.VITE_BANNER_BACKGROUND_COLOR || red
-  export let bannerTextColor = env.VITE_BANNER_TEXT_COLOR || 'white'
+  type Props = {
+    bannerTextEnabled?: boolean
+    bannerText?: string
+    bannerBackgroundColor?: string
+    bannerTextColor?: string
+  }
+
+  let {
+    bannerTextEnabled = env.VITE_BANNER_ENABLED === 'true' || false,
+    bannerText = env.VITE_BANNER_TEXT || '',
+    bannerBackgroundColor = env.VITE_BANNER_BACKGROUND_COLOR || red,
+    bannerTextColor = env.VITE_BANNER_TEXT_COLOR || 'white'
+  }: Props = $props()
 </script>
 
 {#if bannerTextEnabled && bannerText.length > 0}
   <div
-    class="p-0.5 text-xs text-center"
+    class="banner p-0.5 text-xs text-center"
     style:color={bannerTextColor}
-    style:background-color={bannerBackgroundColor}
+    style="--background-color: {bannerBackgroundColor}"
   >
     {bannerText}
   </div>
 {/if}
+
+<style scoped>
+  .banner {
+    --lighter-color: color-mix(in srgb, var(--background-color), white 10%);
+
+    background: repeating-linear-gradient(
+      45deg,
+      var(--background-color),
+      var(--background-color) 10px,
+      var(--lighter-color) 10px,
+      var(--lighter-color) 20px
+    );
+
+    animation-name: animation;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+  }
+
+  @keyframes animation {
+    from {
+      background-position-x: -250px;
+    }
+    to {
+      background-position-x: 0;
+    }
+  }
+</style>

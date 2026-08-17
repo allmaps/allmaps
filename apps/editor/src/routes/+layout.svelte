@@ -2,7 +2,7 @@
   import { page } from '$app/state'
   import { onNavigate, afterNavigate } from '$app/navigation'
 
-  import { Stats } from '@allmaps/components'
+  import { Stats } from '@allmaps/ui'
 
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setExamplesState } from '$lib/state/examples.svelte.js'
@@ -16,7 +16,7 @@
   import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   import '../app.css'
-  import '@allmaps/components/css/fonts.css'
+  import '@allmaps/ui/css/fonts.css'
 
   defineQueryParamClientStrategy()
 

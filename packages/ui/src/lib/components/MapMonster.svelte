@@ -1,6 +1,8 @@
 <script lang="ts">
   import SpeechBalloon from '$lib/components/SpeechBalloon.svelte'
 
+  import type { Snippet } from 'svelte'
+
   import type { MapMonsterColor, MapMonsterMood } from '$lib/shared/types.js'
 
   const shapes = [
@@ -11,16 +13,29 @@
     '98.07 2.91 24.82 2.91 3.52 44.73 1.93 97.09 82.39 97.09 82.56 79.81 98.07 79.81 98.07 2.91'
   ]
 
-  export let color: MapMonsterColor = 'green'
-  export let mood: MapMonsterMood = 'happy'
-  export let shape = 0
+  type Props = {
+    color?: MapMonsterColor
+    mood?: MapMonsterMood
+    shape?: number
+    fillClass?: string
+    strokeClass?: string
+    faceClass?: string
+    speechBalloonBackgroundColor?: string
+    speechBalloonTextColor?: string
+    children?: Snippet
+  }
 
-  export let fillClass = ''
-  export let strokeClass = ''
-  export let faceClass = ''
-
-  export let speechBalloonBackgroundColor = ''
-  export let speechBalloonTextColor = ''
+  let {
+    color = 'green',
+    mood = 'happy',
+    shape = 0,
+    fillClass = '',
+    strokeClass = '',
+    faceClass = '',
+    speechBalloonBackgroundColor = '',
+    speechBalloonTextColor = '',
+    children
+  }: Props = $props()
 
   // Tailwind CSS needs complete class strings to work
   // I don't think it's possible to create a function that outputs the object below
@@ -82,7 +97,7 @@
 
   const points = shapes[Math.max(Math.min(shape, shapes.length - 1), 0)]
 
-  const containerClasses = $$slots.default
+  const containerClasses = children
     ? 'w-full flex flex-col justify-end items-end gap-8'
     : ''
 
@@ -91,12 +106,12 @@
 </script>
 
 <div class={containerClasses}>
-  {#if $$slots.default}
+  {#if children}
     <SpeechBalloon
       backgroundColor={speechBalloonBackgroundColor}
       textColor={speechBalloonTextColor}
     >
-      <slot />
+      {@render children?.()}
     </SpeechBalloon>
   {/if}
   <!-- <img alt="Map Monster" src={mapMonsters[color]} draggable="false" /> -->

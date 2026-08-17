@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Footer } from '@allmaps/components'
+  import { Footer } from '@allmaps/ui'
 
   import Title from '$lib/components/Title.svelte'
   import Organization from '$lib/components/Organization.svelte'

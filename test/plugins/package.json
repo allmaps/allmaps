@@ -16,7 +16,6 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/basemap": "workspace:^",
-    "@allmaps/components": "workspace:^",
     "@allmaps/leaflet": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/openlayers": "workspace:^",
@@ -25,6 +24,7 @@
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "leaflet": "catalog:",
     "maplibre-gl": "catalog:",
     "ol": "catalog:",
@@ -54,7 +54,7 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-devtools-json": "^1.0.0",
+    "vite-plugin-devtools-json": "catalog:",
     "vitest": "catalog:"
   }
 }

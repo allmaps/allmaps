@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapMonster } from '@allmaps/components'
+  import { MapMonster } from '@allmaps/ui'
   import { PencilSimple as PencilSimpleIcon } from 'phosphor-svelte'
 
   import AnnotationInput from '$lib/components/input/AnnotationInput.svelte'

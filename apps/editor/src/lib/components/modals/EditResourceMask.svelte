@@ -1,7 +1,7 @@
 <script lang="ts">
   // import { parseResourceMask } from '@allmaps/io'
 
-  import { Modal } from '@allmaps/components'
+  import { Modal } from '@allmaps/ui'
 
   import FileUpload from '$lib/components/UploadFile.svelte'
   import Textarea from '$lib/components/Textarea.svelte'

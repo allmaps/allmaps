@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Header } from '@allmaps/components'
+  import { Header } from '@allmaps/ui'
 
   import Toolbar from '$lib/components/Toolbar.svelte'
   import Info from '$lib/components/Info.svelte'

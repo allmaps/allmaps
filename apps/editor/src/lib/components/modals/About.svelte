@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getUiState } from '$lib/state/ui.svelte'
 
-  import { Modal, Logo, MovingMapsBackground } from '@allmaps/components'
+  import { Modal, Logo, MovingMapsBackground } from '@allmaps/ui'
 
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
   import { getViewerUrl } from '$lib/shared/urls.js'

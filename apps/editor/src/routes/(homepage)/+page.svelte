@@ -3,7 +3,7 @@
   import { page } from '$app/state'
   import { goto } from '$app/navigation'
 
-  import { Footer } from '@allmaps/components'
+  import { Footer } from '@allmaps/ui'
 
   import { getUrlState } from '$lib/shared/params.js'
 

@@ -27,17 +27,18 @@
     "publish": "lerna publish from-git"
   },
   "devDependencies": {
-    "@lerna-lite/cli": "^4.4.1",
-    "@lerna-lite/publish": "^4.4.1",
-    "@lerna-lite/run": "^4.4.1",
+    "@lerna-lite/cli": "catalog:",
+    "@lerna-lite/publish": "catalog:",
+    "@lerna-lite/run": "catalog:",
     "@eslint/js": "catalog:",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "globals": "catalog:",
-    "turbo": "^2.5.5",
-    "husky": "^8",
-    "prettier": "^3.6.2",
+    "turbo": "catalog:",
+    "husky": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
     "typescript-eslint": "catalog:"
   },
   "engines": {

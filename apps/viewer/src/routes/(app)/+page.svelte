@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Footer } from '@allmaps/components'
+  import { Footer } from '@allmaps/ui'
   import { Loading } from '@allmaps/ui'
   import { green } from '@allmaps/tailwind'
 

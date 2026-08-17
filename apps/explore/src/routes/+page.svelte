@@ -9,11 +9,11 @@
   import { basemapStyle, addTerrain } from '@allmaps/basemap'
 
   import { Header, Thumbnail, Stats } from '@allmaps/ui'
-  import { Geocoder } from '@allmaps/components'
+  import { Geocoder } from '@allmaps/ui'
   import {
     GeocodeEarthGeocoderProvider,
     WorldHistoricalGazetteerGeocoderProvider
-  } from '@allmaps/components/geocoder'
+  } from '@allmaps/ui/geocoder'
   import { fetchImageInfo } from '@allmaps/stdlib'
   import { WarpedMapLayer } from '@allmaps/maplibre'
 
@@ -31,7 +31,7 @@
   } from '$lib/shared/mask-bands.js'
 
   import type { Bbox } from '@allmaps/types'
-  import type { GeocoderGeoJsonFeature } from '@allmaps/components/geocoder'
+  import type { GeocoderGeoJsonFeature } from '@allmaps/ui/geocoder'
 
   import 'maplibre-gl/dist/maplibre-gl.css'
 

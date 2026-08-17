@@ -2,7 +2,7 @@
   import { page } from '$app/state'
   import { afterNavigate } from '$app/navigation'
 
-  import { Grid, Thumbnail } from '@allmaps/components'
+  import { Grid, Thumbnail } from '@allmaps/ui'
   import { Image as IIIFImage } from '@allmaps/iiif-parser'
   import { darkblue } from '@allmaps/tailwind'
 

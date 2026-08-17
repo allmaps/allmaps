@@ -17,7 +17,7 @@
 
   import { isCallbackValid } from '$lib/shared/organizations.js'
 
-  import { Logo, Popover } from '@allmaps/components'
+  import { Logo, Popover } from '@allmaps/ui'
 
   import Export from '$lib/components/popovers/Export.svelte'
   import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte'

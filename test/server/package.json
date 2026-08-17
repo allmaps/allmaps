@@ -23,7 +23,7 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "phosphor-svelte": "catalog:",
-    "sharp": "^0.34.5"
+    "sharp": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",
@@ -42,6 +42,7 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",

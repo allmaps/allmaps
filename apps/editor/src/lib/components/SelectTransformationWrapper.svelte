@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SelectTransformation } from '@allmaps/components'
+  import { SelectTransformation } from '@allmaps/ui'
 
   import { getMapsState } from '$lib/state/maps.svelte.js'
 

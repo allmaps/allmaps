@@ -4,12 +4,12 @@
     MouseRightClick as MouseRightClickIcon
   } from 'phosphor-svelte'
 
-  import { Kbd } from '@allmaps/components'
+  import { Kbd } from '@allmaps/ui'
 
   import { getUiState } from '$lib/state/ui.svelte'
   import { m } from '$lib/paraglide/messages.js'
 
-  import { Modal } from '@allmaps/components'
+  import { Modal } from '@allmaps/ui'
 
   const uiState = getUiState()
 </script>

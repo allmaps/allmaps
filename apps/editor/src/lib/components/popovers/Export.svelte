@@ -11,7 +11,7 @@
     getXyzTilesUrl
   } from '$lib/shared/urls.js'
 
-  import { Switch } from '@allmaps/components'
+  import { Switch } from '@allmaps/ui'
 
   import StartGeoreferencing from '$lib/components/StartGeoreferencing.svelte'
   import Scope from '$lib/components/Scope.svelte'

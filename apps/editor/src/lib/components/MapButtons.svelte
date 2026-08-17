@@ -8,7 +8,7 @@
   import { getUiState } from '$lib/state/ui.svelte.js'
   import { getVarsState } from '$lib/state/vars.svelte.js'
 
-  import { Popover } from '@allmaps/components'
+  import { Popover } from '@allmaps/ui'
 
   import MapSettings from '$lib/components/popovers/MapSettings.svelte'
   import Geocoder from '$lib/components/popovers/Geocoder.svelte'

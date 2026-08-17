@@ -126,7 +126,7 @@
         <NorthArrow
           rotation={compassState.rotation}
           followOrientation={compassState.compassMode === 'follow-orientation'}
-          on:click={handleNorthArrowClick}
+          onclick={handleNorthArrowClick}
         />
       </div>
     {/if}
