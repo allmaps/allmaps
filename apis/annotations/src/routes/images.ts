@@ -1,17 +1,11 @@
-import { t } from 'elysia'
-
 import { queryMaps } from '@allmaps/api-shared/db'
-import { needsElevatedLimitRole, setCacheControl } from '@allmaps/api-shared'
+import { setCacheControl } from '@allmaps/api-shared'
 import { createAuth } from '@allmaps/db/auth'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin, RegExpRoute } from '../elysia.js'
-
-const querySchema = t.Object({
-  limit: t.Optional(t.Number())
-})
 
 // Matches: imageId  OR  imageId@imageChecksum  OR  imageId.geojson etc.
 const imageRoute = new RegExpRoute<{
@@ -31,18 +25,11 @@ export function createImagesRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       `/images/${imageRoute.path}`,
-      async ({ request, env, db, params, query, set, getLimitRole }) => {
+      ({ request, env, db, params, set }) => {
         const { imageId, imageChecksum, ext } = imageRoute.parse(params)
-        const userRole = needsElevatedLimitRole(query.limit)
-          ? await getLimitRole()
-          : 'public'
         setCacheControl(
           set,
-          userRole === 'public'
-            ? imageChecksum
-              ? 'public-immutable'
-              : 'public-medium'
-            : 'private-no-store'
+          imageChecksum ? 'public-immutable' : 'public-medium'
         )
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
@@ -50,16 +37,19 @@ export function createImagesRoutes(
           db,
           {
             imageId,
-            ...(imageChecksum ? { imageChecksum } : {}),
-            limit: query.limit,
-            userRole
+            ...(imageChecksum ? { imageChecksum } : {})
           },
-          { id: request.url, format, expectRows: true, singular: false }
+          {
+            id: request.url,
+            format,
+            expectRows: true,
+            singular: false,
+            resultScope: 'complete'
+          }
         )
       },
       {
         params: imageRoute.params,
-        query: querySchema,
         detail: {
           summary:
             'Get Georeference Annotations for a single IIIF Image (with optional version)',

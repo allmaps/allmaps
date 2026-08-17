@@ -78,7 +78,8 @@ export async function queryMaps(
   const defaultResponseOptions: ResponseOptions = {
     format: 'map',
     expectRows: false,
-    singular: true
+    singular: true,
+    resultScope: 'bounded'
   }
 
   responseOptions = {
@@ -251,7 +252,9 @@ export async function queryMaps(
     },
     limit: responseOptions.singular
       ? 1
-      : clampLimit(params.limit, params.userRole)
+      : responseOptions.resultScope === 'complete'
+        ? undefined
+        : clampLimit(params.limit, params.userRole)
   })
 
   if (responseOptions.expectRows && rows.length === 0) {

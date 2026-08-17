@@ -70,6 +70,7 @@ export type ResponseOptions = {
   format: ResponseFormat
   expectRows: boolean
   singular: boolean
+  resultScope: 'bounded' | 'complete'
   id?: string
 }
 

@@ -21,7 +21,6 @@ import {
 } from '@allmaps/api-shared'
 
 const mapsQuerySchema = t.Object({
-  limit: t.Optional(t.Number()),
   imageServiceDomain: t.Optional(t.String()),
   manifestDomain: t.Optional(t.String()),
   intersects: t.Optional(t.Array(t.Number())),
@@ -129,24 +128,22 @@ export function createManifestsRoutes(
     )
     .get(
       '/manifests/:manifestId/maps',
-      async ({ request, env, db, params, set, getLimitRole }) => {
+      ({ request, env, db, params, set }) => {
         const queryParams = normalizeMapsQueryParams(request)
-        const userRole = needsElevatedLimitRole(queryParams.limit)
-          ? await getLimitRole()
-          : 'public'
-        setCacheControl(
-          set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
-        )
+        setCacheControl(set, 'public-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
             ...queryParams,
-            manifestId: params.manifestId,
-            userRole
+            manifestId: params.manifestId
           },
-          { format: 'map', expectRows: true, singular: false }
+          {
+            format: 'map',
+            expectRows: true,
+            singular: false,
+            resultScope: 'complete'
+          }
         )
       },
       {
@@ -160,24 +157,22 @@ export function createManifestsRoutes(
     )
     .get(
       '/manifests/:manifestId/maps.geojson',
-      async ({ request, env, db, params, set, getLimitRole }) => {
+      ({ request, env, db, params, set }) => {
         const queryParams = normalizeMapsQueryParams(request)
-        const userRole = needsElevatedLimitRole(queryParams.limit)
-          ? await getLimitRole()
-          : 'public'
-        setCacheControl(
-          set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
-        )
+        setCacheControl(set, 'public-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
             ...queryParams,
-            manifestId: params.manifestId,
-            userRole
+            manifestId: params.manifestId
           },
-          { format: 'geojson', expectRows: true, singular: false }
+          {
+            format: 'geojson',
+            expectRows: true,
+            singular: false,
+            resultScope: 'complete'
+          }
         )
       },
       {
