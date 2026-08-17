@@ -52,6 +52,7 @@
     "pixelmatch": "^5.3.0",
     "prettier": "catalog:",
     "tsx": "^4.19.2",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "upng-js": "catalog:",
     "vite": "catalog:",

@@ -46,6 +46,7 @@
     "drizzle-orm": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

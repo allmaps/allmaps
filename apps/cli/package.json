@@ -62,6 +62,7 @@
     "@types/stream-json": "catalog:",
     "prettier": "catalog:",
     "globals": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",

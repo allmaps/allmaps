@@ -38,6 +38,7 @@
     "turbo": "catalog:",
     "husky": "catalog:",
     "prettier": "catalog:",
+    "typescript": "catalog:",
     "typescript-eslint": "catalog:"
   },
   "engines": {

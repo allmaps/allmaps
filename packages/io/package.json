@@ -58,6 +58,7 @@
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

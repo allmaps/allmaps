@@ -41,6 +41,7 @@
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }
