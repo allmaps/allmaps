@@ -2,44 +2,110 @@ import { setContext, getContext } from 'svelte'
 
 import { SvelteMap } from 'svelte/reactivity'
 
-import { uniqBy } from 'lodash-es'
+import {
+  fetchExampleOrganizations,
+  fetchUngeoreferencedImages,
+  getApiResourceId,
+  imagesToExamples,
+  isCallbackAllowedByOrganizations,
+  ORGANIZATION_EXAMPLES_COUNT,
+  shuffleImages
+} from '$lib/shared/examples.js'
 
+import type { ApiOrganization } from '$lib/shared/examples.js'
 import type { Example } from '$lib/types/shared.js'
 
 const EXAMPLES_KEY = Symbol('maps-history')
 
 export class ExamplesState {
-  #examplesApiUrl: string
+  #restBaseUrl: string
+
+  #organizations = $state<ApiOrganization[]>([])
+  #organizationsFetched = false
+  #organizationsPromise: Promise<ApiOrganization[]> | undefined
 
   #examplesByOrganizationId = $state<SvelteMap<string, Example[]>>(
     new SvelteMap()
   )
+  #exampleCountsByOrganizationId = new Map<string, number>()
+  #examplePromisesByOrganizationId = new Map<
+    string,
+    { count: number; promise: Promise<Example[]> }
+  >()
 
-  constructor(examplesApiUrl: string) {
-    this.#examplesApiUrl = examplesApiUrl
+  constructor(restBaseUrl: string) {
+    this.#restBaseUrl = restBaseUrl
   }
 
-  async fetchExamples(organizationId: string, count: number) {
-    // TODO: parse with Zod
-    const fetchedExamples = (await fetch(
-      `${this.#examplesApiUrl}/?org=${organizationId}&count=${count}`
-    ).then((response) => response.json())) as Example[]
+  setOrganizations(organizations: ApiOrganization[]) {
+    this.#organizations = organizations
+    this.#organizationsFetched = true
+  }
 
-    const examples = uniqBy(fetchedExamples, 'imageId')
+  async getOrganizations() {
+    if (this.#organizationsFetched) {
+      return this.#organizations
+    }
+
+    this.#organizationsPromise ??= fetchExampleOrganizations(
+      fetch,
+      this.#restBaseUrl
+    ).then((organizations) => {
+      this.setOrganizations(organizations)
+      return organizations
+    })
+
+    return this.#organizationsPromise
+  }
+
+  async fetchExamples(organization: ApiOrganization, count: number) {
+    const organizationId = getApiResourceId(organization.id)
+    const fetchCount = Math.max(count, ORGANIZATION_EXAMPLES_COUNT)
+    const images = await fetchUngeoreferencedImages(
+      fetch,
+      organization,
+      fetchCount
+    )
+    const examples = imagesToExamples(organization, shuffleImages(images))
+
+    this.#exampleCountsByOrganizationId.set(organizationId, fetchCount)
+    this.#examplePromisesByOrganizationId.delete(organizationId)
 
     this.#examplesByOrganizationId.set(organizationId, examples)
 
     return examples
   }
 
-  async getExamplesByOrganization(organizationId: string, count: number) {
+  async getExamplesByOrganization(
+    organization: ApiOrganization,
+    count: number
+  ) {
+    const organizationId = getApiResourceId(organization.id)
     const examples = this.#examplesByOrganizationId.get(organizationId) || []
+    const fetchedCount = this.#exampleCountsByOrganizationId.get(organizationId)
 
-    if (examples.length < count) {
-      return await this.fetchExamples(organizationId, count)
+    if (examples.length >= count || (fetchedCount ?? 0) >= count) {
+      return examples.slice(0, count)
     }
 
-    return examples.slice(0, count)
+    const currentPromise =
+      this.#examplePromisesByOrganizationId.get(organizationId)
+
+    if (currentPromise && currentPromise.count >= count) {
+      return (await currentPromise.promise).slice(0, count)
+    }
+
+    const promise = this.fetchExamples(organization, count)
+    this.#examplePromisesByOrganizationId.set(organizationId, {
+      count,
+      promise
+    })
+
+    return (await promise).slice(0, count)
+  }
+
+  isCallbackValid(callback: string) {
+    return isCallbackAllowedByOrganizations(callback, this.#organizations)
   }
 
   get allExamples() {
@@ -47,8 +113,8 @@ export class ExamplesState {
   }
 }
 
-export function setExamplesState(examplesApiUrl: string) {
-  return setContext(EXAMPLES_KEY, new ExamplesState(examplesApiUrl))
+export function setExamplesState(restBaseUrl: string) {
+  return setContext(EXAMPLES_KEY, new ExamplesState(restBaseUrl))
 }
 
 export function getExamplesState() {

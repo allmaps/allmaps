@@ -18,6 +18,8 @@ export type OrganizationLocation = {
 
 export type OrganizationsQueryParams = {
   limit: number
+  organizationIds: string[]
+  organizationSlugs: string[]
   plans: OrganizationPlan[]
   displayCollections: boolean
 }

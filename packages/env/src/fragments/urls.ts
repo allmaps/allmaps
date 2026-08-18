@@ -12,7 +12,5 @@ export const urlsEnvSchema = z.object({
 
   PUBLIC_REST_BASE_URL: z.string().url(),
   PUBLIC_ANNOTATIONS_BASE_URL: z.string().url(),
-  PUBLIC_LIVE_BASE_URL: z.string().url(),
-
-  PUBLIC_EXAMPLES_API_URL: z.string().url()
+  PUBLIC_LIVE_BASE_URL: z.string().url()
 })

@@ -18,8 +18,9 @@
   import Organizations from '$lib/components/Organizations.svelte'
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
 
-  import { organizationsWithCollectionsOnHomepage } from '$lib/shared/organizations.js'
   import { m } from '$lib/paraglide/messages.js'
+
+  let { data } = $props()
 
   const urlState = getUrlState()
 
@@ -90,7 +91,7 @@
           {m.homepage_pick_collection()}
         </h2>
       </div>
-      <Organizations organizations={organizationsWithCollectionsOnHomepage} />
+      <Organizations organizations={data.organizations} />
     </div>
   </section>
 </div>

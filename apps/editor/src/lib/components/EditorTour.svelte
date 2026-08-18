@@ -8,10 +8,10 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+  import { getExamplesState } from '$lib/state/examples.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getView, getViewUrl } from '$lib/shared/router.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
-  import { isCallbackValid } from '$lib/shared/organizations.js'
   import { m } from '$lib/paraglide/messages.js'
 
   import type {
@@ -28,6 +28,7 @@
   const mapsState = getMapsState()
   const mapsMergedState = getMapsMergedState()
   const urlState = getUrlState()
+  const examplesState = getExamplesState()
 
   let tour: Driver | undefined
   let movingToView = false
@@ -212,7 +213,7 @@
     return (
       sourceState.canEdit &&
       mapsMergedState.completeMaps.length > 0 &&
-      (!callback || !isCallbackValid(callback))
+      (!callback || !examplesState.isCallbackValid(callback))
     )
   }
 
@@ -578,6 +579,7 @@
   })
 
   onMount(() => {
+    void examplesState.getOrganizations()
     uiState.addEventListener(UiEvents.START_TOUR, handleStartTour)
 
     return () => {

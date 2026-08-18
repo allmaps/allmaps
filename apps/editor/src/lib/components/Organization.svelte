@@ -13,58 +13,87 @@
 
   import Example from '$lib/components/Example.svelte'
 
-  import type {
-    OrganizationWithId,
-    Example as ExampleType
-  } from '$lib/types/shared.js'
+  import type { ApiOrganization } from '$lib/shared/examples.js'
+  import type { Example as ExampleType } from '$lib/types/shared.js'
 
   type Props = {
     count?: number
     perPage?: number
-    organization: OrganizationWithId
+    organization: ApiOrganization
+    examples?: ExampleType[]
+    fetchExamples?: boolean
     showMoreLink?: boolean
   }
 
   const DEFAULT_COUNT = 6
 
-  let examples: ExampleType[] = $state([])
-
   let {
     count = DEFAULT_COUNT,
     perPage = Number.POSITIVE_INFINITY,
     organization,
-    showMoreLink: showMoreLink = false
+    examples: initialExamples,
+    fetchExamples = initialExamples === undefined,
+    showMoreLink = false
   }: Props = $props()
 
-  const usePagination = $derived(count > perPage)
+  // svelte-ignore state_referenced_locally
+  let examples = $state<ExampleType[]>(initialExamples ?? [])
+  // svelte-ignore state_referenced_locally
+  let loading = $state(fetchExamples)
+  let failed = $state(false)
+
+  const paginationCount = $derived(
+    Math.max(examples.length, loading ? count : 1)
+  )
+  const usePagination = $derived(!loading && examples.length > perPage)
+  const placeholderCount = $derived(
+    Math.min(count, Number.isFinite(perPage) ? perPage : count)
+  )
 
   const examplesState = getExamplesState()
 
   onMount(async () => {
-    examples = await examplesState.getExamplesByOrganization(
-      organization.id,
-      count
-    )
+    if (!fetchExamples) {
+      return
+    }
+
+    try {
+      examples = await examplesState.getExamplesByOrganization(
+        organization,
+        count
+      )
+    } catch (error) {
+      failed = true
+      console.error('Failed to fetch examples for organization', error)
+    } finally {
+      loading = false
+    }
   })
 </script>
 
-{#snippet header(organization: OrganizationWithId)}
+{#snippet header(organization: ApiOrganization)}
   <div class="contents flex-col gap-2 sm:gap-4 md:flex">
     <svelte:element
       this={showMoreLink ? 'a' : 'div'}
       class="flex flex-col items-start gap-2"
-      href={showMoreLink ? `/organizations/${organization.id}` : undefined}
+      href={showMoreLink ? `/organizations/${organization.slug}` : undefined}
     >
-      {#await import(`$lib/images/organizations/${organization.id}.svg`) then { default: src }}
-        <img class="inline-block h-16" {src} alt={organization.title} />
-      {/await}
-      <h3 class="text-xl font-bold text-black">{organization.title}</h3>
-      <!-- <h4 class="text-black">{organization.subtitle}</h4> -->
+      {#if organization.logo}
+        <img
+          class="inline-block h-16 max-w-40 object-contain"
+          src={organization.logo}
+          alt={organization.name}
+        />
+      {/if}
+      <h3 class="text-xl font-bold text-black">{organization.name}</h3>
     </svelte:element>
   </div>
 {/snippet}
 
-<Pagination.Root {count} perPage={Math.min(count, perPage)}>
+<Pagination.Root
+  count={paginationCount}
+  perPage={Math.min(paginationCount, perPage)}
+>
   {#snippet children({
     pages,
     range
@@ -75,7 +104,7 @@
       end: number
     }
   })}
-    {@const page = examples.slice(range.start, range.end)}
+    {@const page = examples.slice(range.start - 1, range.end)}
     <div
       class="grid auto-rows-auto grid-cols-2 gap-8 rounded-2xl bg-white p-4 shadow-md md:grid-cols-4 md:grid-rows-2"
     >
@@ -87,7 +116,7 @@
             {@render header(organization)}
             <div class="md:self-end">
               <a
-                href="/organizations/{organization.id}"
+                href={`/organizations/${organization.slug}`}
                 class="font-bold text-pink after:content-['_›'] hover:underline"
                 >{m.more_from_this_collection()}
               </a>
@@ -98,9 +127,25 @@
         {@render header(organization)}
       {/if}
       <ul class="contents">
-        {#each page as example (example.imageId)}
-          <Example {example} />
-        {/each}
+        {#if loading}
+          {#each Array(placeholderCount).keys() as index (index)}
+            <li
+              class="flex aspect-square animate-pulse items-center justify-center space-y-2 rounded-md bg-[#fafafa] text-xs text-gray-500"
+            >
+              <p>{m.loading_ellipsis()}</p>
+            </li>
+          {/each}
+        {:else if failed || page.length === 0}
+          <li
+            class="col-span-2 flex min-h-40 items-center justify-center rounded-md bg-[#fafafa] p-4 text-center text-xs text-gray-500 md:col-span-3"
+          >
+            <p>{m.no_results_found()}</p>
+          </li>
+        {:else}
+          {#each page as example (example.imageId)}
+            <Example {example} />
+          {/each}
+        {/if}
       </ul>
     </div>
 
