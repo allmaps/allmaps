@@ -1,9 +1,7 @@
 import { getRequestEvent } from '$app/server'
-import { env as publicEnv } from '$env/dynamic/public'
+import { error } from '@sveltejs/kit'
 
-import { parseConsolePublicEnv } from '@allmaps/env/console'
-
-const consoleEnv = parseConsolePublicEnv(publicEnv)
+import { consoleEnv } from '$lib/server/console-env.js'
 const restFetchTimeout = 10_000
 
 type RestFetchOptions = Omit<RequestInit, 'body'> & {
@@ -40,7 +38,10 @@ export async function restFetch<T>(
 
   if (!response.ok) {
     const responseText = await response.text()
-    throw new Error(responseText || `REST request failed: ${response.status}`)
+    error(
+      response.status,
+      responseText || `REST request failed: ${response.status}`
+    )
   }
 
   if (response.status === 204) {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* eslint-disable svelte/no-navigation-without-resolve -- table state paths are constructed from the active route */
   import { replaceState } from '$app/navigation'
   import { page } from '$app/state'
 
@@ -17,7 +18,7 @@
   import DataTable from '$lib/components/DataTable.svelte'
 
   import type { PageProps } from './$types.js'
-  import type { ConsoleUser } from './users.remote.js'
+  import type { ConsoleUser } from '$lib/types.js'
 
   let { data }: PageProps = $props()
 

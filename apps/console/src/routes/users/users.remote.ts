@@ -1,33 +1,11 @@
 import { command, form, query } from '$app/server'
 import { redirect } from '@sveltejs/kit'
 
-import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
 import { routes } from '$lib/routes.js'
 import { restFetch } from '$lib/server/rest.js'
 import { z } from 'zod'
 
-export type ConsoleUser = {
-  id: string
-  name?: string | null
-  slug?: string | null
-  email?: string | null
-  banned?: boolean | null
-  role?: string | null
-  createdAt?: string | Date
-  updatedAt?: string | Date
-  emailVerified?: boolean | null
-  organizations?: {
-    userRole: string
-    createdAt?: string
-    organization: {
-      id: string
-      slug: string
-      name: string
-      logo?: string | null
-      createdAt?: string
-    }
-  }[]
-}
+import type { ConsoleUser } from '$lib/types.js'
 
 const userIdSchema = z.string()
 const userLimitSchema = z.number().finite().optional()
@@ -69,10 +47,6 @@ const setUserRoleSchema = z.object({
   role: userRoleSchema
 })
 
-export const getUser = query(userIdSchema, async (userId) => {
-  return restFetch<ConsoleUser>(`/users/${userId}`)
-})
-
 export const updateUserForm = form(
   updateUserFormSchema,
   async ({ userId, name, slug, email, banned }) => {
@@ -89,11 +63,6 @@ export const updateUserForm = form(
       }
     })
 
-    await Promise.all([
-      getUsers(CONSOLE_LIST_LIMIT).refresh(),
-      getUser(userId).refresh()
-    ])
-
     redirect(303, routes.users())
   }
 )
@@ -109,11 +78,5 @@ export const setUserRole = command<
       json: body
     }
   )
-
-  await Promise.all([
-    getUsers(CONSOLE_LIST_LIMIT).refresh(),
-    getUser(body.userId).refresh()
-  ])
-
   return result.user
 })

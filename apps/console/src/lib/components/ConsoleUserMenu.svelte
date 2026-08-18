@@ -1,18 +1,11 @@
 <script lang="ts">
+  /* eslint-disable svelte/no-navigation-without-resolve -- sign-in URL is external */
   import { page } from '$app/state'
   import { UserCircle as UserCircleIcon } from 'phosphor-svelte'
 
   import { authClient } from '$lib/auth-client.js'
 
-  type SessionUser = {
-    name?: string | null
-    email?: string | null
-    image?: string | null
-  }
-
-  const user = $derived(
-    page.data.sessionData.data?.user as SessionUser | undefined
-  )
+  const user = $derived(page.data.session?.user)
   const apiBaseURL = $derived(page.data.env.PUBLIC_REST_BASE_URL)
   const signInURL = $derived(
     `${apiBaseURL}/login/github?returnTo=${encodeURIComponent(page.url.href)}`

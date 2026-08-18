@@ -1,7 +1,6 @@
-import { command, form, query } from '$app/server'
+import { command, form } from '$app/server'
 import { redirect } from '@sveltejs/kit'
 
-import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
 import { restFetch } from '$lib/server/rest.js'
 import { routes } from '$lib/routes.js'
 import { z } from 'zod'
@@ -115,17 +114,6 @@ const updateOrganizationMemberRoleSchema = z.object({
   role: organizationRoleSchema
 }) satisfies z.ZodType<UpdateOrganizationMemberRoleInput>
 
-export const getOrganizations = query(async () => {
-  return restFetch<Organization[]>(`/organizations?limit=${CONSOLE_LIST_LIMIT}`)
-})
-
-export const getOrganization = query(
-  organizationIdSchema,
-  async (organizationId) => {
-    return restFetch<Organization>(`/organizations/${organizationId}`)
-  }
-)
-
 export const createOrganizationForm = form(
   createOrganizationSchema,
   async (body) => {
@@ -136,8 +124,6 @@ export const createOrganizationForm = form(
         plan: null
       }
     })
-
-    await getOrganizations().refresh()
 
     redirect(303, routes.organizations())
   }
@@ -151,11 +137,6 @@ export const updateOrganizationForm = form(
       json: organization
     })
 
-    await Promise.all([
-      getOrganizations().refresh(),
-      getOrganization(organizationId).refresh()
-    ])
-
     redirect(303, routes.organizations())
   }
 )
@@ -167,8 +148,6 @@ export const deleteOrganization = command<
   await restFetch<{ success: true }>(`/organizations/${organizationId}`, {
     method: 'DELETE'
   })
-
-  await getOrganizations().refresh()
 })
 
 export const addOrganizationMember = command<
@@ -179,11 +158,6 @@ export const addOrganizationMember = command<
     method: 'POST',
     json: { email, role }
   })
-
-  await Promise.all([
-    getOrganizations().refresh(),
-    getOrganization(organizationId).refresh()
-  ])
 })
 
 export const removeOrganizationMember = command<
@@ -193,11 +167,6 @@ export const removeOrganizationMember = command<
   await restFetch(`/organizations/${organizationId}/users/${userId}`, {
     method: 'DELETE'
   })
-
-  await Promise.all([
-    getOrganizations().refresh(),
-    getOrganization(organizationId).refresh()
-  ])
 })
 
 export const updateOrganizationMemberRole = command<
@@ -210,10 +179,5 @@ export const updateOrganizationMemberRole = command<
       method: 'PATCH',
       json: { role }
     })
-
-    await Promise.all([
-      getOrganizations().refresh(),
-      getOrganization(organizationId).refresh()
-    ])
   }
 )

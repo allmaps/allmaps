@@ -53,6 +53,7 @@
     })
 
     if (path !== `${page.url.pathname}${page.url.search}`) {
+      // eslint-disable-next-line svelte/no-navigation-without-resolve -- table state paths are constructed from the active route
       replaceState(path, page.state)
     }
   }

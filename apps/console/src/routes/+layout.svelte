@@ -1,6 +1,7 @@
 <script lang="ts">
+  /* eslint-disable svelte/no-navigation-without-resolve -- breadcrumbs are built from the active route */
   import { onNavigate } from '$app/navigation'
-  import { page } from '$app/state'
+  import { navigating, page } from '$app/state'
 
   import favicon from '$lib/assets/favicon.png'
 
@@ -12,9 +13,6 @@
   import DotsPattern from '$lib/components/DotsPattern.svelte'
 
   import { authClient } from '$lib/auth-client.js'
-  import { getList } from '$lib/lists.remote.js'
-  import { getOrganization } from './organizations/organizations.remote.js'
-  import { getUser } from './users/users.remote.js'
 
   import type { Snippet } from 'svelte'
 
@@ -39,70 +37,37 @@
     apiBaseURL
   })
 
-  let activeViewTransition: ViewTransition | null = null
-
-  function startNavigationViewTransition() {
+  onNavigate((navigation) => {
     if (
       !document.startViewTransition ||
       document.visibilityState !== 'visible' ||
-      activeViewTransition
+      navigation.willUnload
     ) {
       return
     }
 
     return new Promise<void>((resolve) => {
       try {
-        const transition = document.startViewTransition(resolve)
-        activeViewTransition = transition
+        const transition = document.startViewTransition(async () => {
+          resolve()
+          await navigation.complete
+        })
 
         transition.ready.catch(() => {})
         transition.updateCallbackDone.catch(() => {})
-        transition.finished
-          .catch(() => {})
-          .finally(() => {
-            if (activeViewTransition === transition) {
-              activeViewTransition = null
-            }
-          })
+        transition.finished.catch(() => {})
       } catch {
-        activeViewTransition = null
         resolve()
       }
     })
-  }
-
-  onNavigate((navigation) => {
-    if (navigation.willUnload) {
-      return
-    }
-
-    return startNavigationViewTransition()
   })
 
   const listBreadcrumbId = $derived(
     page.route.id === '/profile/lists/[listId]' ? page.params.listId : null
   )
-  const listBreadcrumbQuery = $derived(
-    listBreadcrumbId ? getList(listBreadcrumbId) : null
-  )
-  const listBreadcrumbLabel = $derived(
-    listBreadcrumbQuery?.current
-      ? listBreadcrumbQuery.current.label || listBreadcrumbQuery.current.name
-      : null
-  )
-  let listBreadcrumbLabels = $state<Record<string, string>>({})
-
-  $effect(() => {
-    if (listBreadcrumbId && listBreadcrumbLabel) {
-      listBreadcrumbLabels[listBreadcrumbId] = listBreadcrumbLabel
-    }
-  })
-
   const resolvedListBreadcrumbLabel = $derived(
     listBreadcrumbId
-      ? (listBreadcrumbLabel ??
-          listBreadcrumbLabels[listBreadcrumbId] ??
-          'List')
+      ? page.data.list?.label || page.data.list?.name || 'List'
       : null
   )
 
@@ -111,53 +76,18 @@
       ? page.params.organizationId
       : null
   )
-  const organizationBreadcrumbQuery = $derived(
-    organizationBreadcrumbId ? getOrganization(organizationBreadcrumbId) : null
-  )
-  const organizationBreadcrumbLabel = $derived(
-    organizationBreadcrumbQuery?.current?.name ?? null
-  )
-  let organizationBreadcrumbLabels = $state<Record<string, string>>({})
-
-  $effect(() => {
-    if (organizationBreadcrumbId && organizationBreadcrumbLabel) {
-      organizationBreadcrumbLabels[organizationBreadcrumbId] =
-        organizationBreadcrumbLabel
-    }
-  })
-
   const resolvedOrganizationBreadcrumbLabel = $derived(
     organizationBreadcrumbId
-      ? (organizationBreadcrumbLabel ??
-          organizationBreadcrumbLabels[organizationBreadcrumbId] ??
-          'Organization')
+      ? page.data.organization?.name || 'Organization'
       : null
   )
 
   const userBreadcrumbId = $derived(
     page.route.id === '/users/[userId]' ? page.params.userId : null
   )
-  const userBreadcrumbQuery = $derived(
-    userBreadcrumbId ? getUser(userBreadcrumbId) : null
-  )
-  const userBreadcrumbLabel = $derived(
-    userBreadcrumbQuery?.current
-      ? userBreadcrumbQuery.current.name || userBreadcrumbQuery.current.email
-      : null
-  )
-  let userBreadcrumbLabels = $state<Record<string, string>>({})
-
-  $effect(() => {
-    if (userBreadcrumbId && userBreadcrumbLabel) {
-      userBreadcrumbLabels[userBreadcrumbId] = userBreadcrumbLabel
-    }
-  })
-
   const resolvedUserBreadcrumbLabel = $derived(
     userBreadcrumbId
-      ? (userBreadcrumbLabel ??
-          userBreadcrumbLabels[userBreadcrumbId] ??
-          'User')
+      ? page.data.user?.name || page.data.user?.email || 'User'
       : null
   )
 
@@ -203,6 +133,13 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-100 flex flex-col h-screen">
+  {#if navigating.to}
+    <div
+      class="fixed inset-x-0 top-0 z-[60] h-0.5 animate-pulse bg-blue-600"
+      role="progressbar"
+      aria-label="Loading page"
+    ></div>
+  {/if}
   <div class="sticky top-0 z-50 bg-white">
     <Header appName="Console">
       <div class="flex items-center justify-between w-full gap-3">
