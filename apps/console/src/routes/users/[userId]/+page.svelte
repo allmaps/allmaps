@@ -3,6 +3,7 @@
   import { Combobox } from 'bits-ui'
 
   import { getOrganizationId } from '$lib/organizations.js'
+  import { submitRemoteFormWithoutReset } from '$lib/remote-form.js'
   import { routes } from '$lib/routes.js'
 
   import UserLists from '$lib/components/UserLists.svelte'
@@ -15,7 +16,6 @@
   import { setUserRole, updateUserForm } from '../users.remote.js'
 
   import type { PageProps } from './$types'
-  import type { ConsoleUser } from '$lib/types.js'
 
   let { data }: PageProps = $props()
 
@@ -25,11 +25,13 @@
 
   const userOrganizations = $derived(user.organizations ?? [])
 
-  let editUserName = $state('')
-  let editUserSlug = $state('')
-  let editUserEmail = $state('')
-  let editUserBanned = $state(false)
-  let editUserRole = $state<'user' | 'admin'>('user')
+  let editUserName = $derived(user.name ?? '')
+  let editUserSlug = $derived(user.slug ?? '')
+  let editUserEmail = $derived(user.email ?? '')
+  let editUserBanned = $derived(user.banned ?? false)
+  let editUserRole = $derived<'user' | 'admin'>(
+    (user.role as 'user' | 'admin') ?? 'user'
+  )
   let isChangingRole = $state(false)
   let selectedOrganizationId = $state('')
   let organizationSearchValue = $state('')
@@ -37,7 +39,6 @@
   let isAddingToOrganization = $state(false)
   let removingOrganizationId = $state<string | null>(null)
   let error = $state<string | null>(null)
-  let initializedUserId = $state<string | null>(null)
 
   const slugPattern = String.raw`^[a-z](?:[a-z0-9\-]*[a-z0-9])?$`
   const userOrganizationIdSet = $derived(
@@ -69,24 +70,9 @@
       : organizationItems
   )
 
-  function initializeUserForm(nextUser: ConsoleUser) {
-    editUserName = nextUser.name || ''
-    editUserSlug = nextUser.slug || ''
-    editUserEmail = nextUser.email || ''
-    editUserBanned = nextUser.banned || false
-    editUserRole = (nextUser.role as 'user' | 'admin') || 'user'
-    initializedUserId = userId
-  }
-
-  $effect(() => {
-    // eslint-disable-next-line
-    userId
-    editUserName = ''
-    editUserSlug = ''
-    editUserEmail = ''
-    editUserBanned = false
-    editUserRole = 'user'
-    initializedUserId = null
+  $effect.pre(() => {
+    // Reset transient UI state when navigating between user routes.
+    void userId
     selectedOrganizationId = ''
     organizationSearchValue = ''
     selectedOrganizationRole = 'member'
@@ -94,12 +80,6 @@
     isAddingToOrganization = false
     removingOrganizationId = null
     error = null
-  })
-
-  $effect(() => {
-    if (initializedUserId !== userId) {
-      initializeUserForm(user)
-    }
   })
 
   async function changeRole() {
@@ -217,7 +197,10 @@
     </div>
   {/if}
 
-  <form {...updateUserForm} class="bg-white rounded-lg shadow p-6">
+  <form
+    {...updateUserForm.enhance(submitRemoteFormWithoutReset)}
+    class="bg-white rounded-lg shadow p-6"
+  >
     <input type="hidden" name="userId" value={userId} />
     <div class="space-y-6">
       <div>

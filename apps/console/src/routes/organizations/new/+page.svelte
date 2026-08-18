@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { submitRemoteFormWithoutReset } from '$lib/remote-form.js'
   import { routes } from '$lib/routes.js'
   import { createOrganizationForm } from '../organizations.remote.js'
 
@@ -19,7 +20,10 @@
   {/if}
 
   <div class="bg-white rounded-lg shadow p-6">
-    <form {...createOrganizationForm} class="space-y-4">
+    <form
+      {...createOrganizationForm.enhance(submitRemoteFormWithoutReset)}
+      class="space-y-4"
+    >
       <div>
         <label
           for="orgName"
