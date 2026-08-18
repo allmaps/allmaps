@@ -89,6 +89,11 @@ export function createAuth(env: BetterAuthEnv) {
                 required: false,
                 input: true
               },
+              displayCollections: {
+                type: 'boolean',
+                required: false,
+                input: true
+              },
               location: {
                 type: 'json',
                 required: false,

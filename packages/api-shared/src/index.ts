@@ -13,12 +13,18 @@ export {
   DEFAULT_LIMIT,
   PUBLIC_MAX_LIMIT,
   USER_MAX_LIMIT,
-  PAID_ORGANIZATION_MEMBER_MAX_LIMIT,
+  ORGANIZATION_PLAN_MEMBER_MAX_LIMIT,
   ADMIN_MAX_LIMIT,
   clampLimit,
   needsElevatedLimitRole
 } from './shared/limits.js'
 export type { UserRole } from './shared/limits.js'
+export {
+  ORGANIZATION_PLANS,
+  ORGANIZATION_PLANS_WITH_ELEVATED_LIMITS,
+  isOrganizationPlan
+} from './shared/tiers.js'
+export type { OrganizationPlan } from './shared/tiers.js'
 export {
   normalizeMapsQueryParams,
   normalizeOrganizationsQueryParams

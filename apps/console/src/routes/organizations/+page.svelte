@@ -6,6 +6,10 @@
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
   import { getOrganizationId, getUserId } from '$lib/organizations.js'
+  import {
+    organizationPlanDetails,
+    organizationPlanOrder
+  } from '$lib/organization-plans.js'
   import { routes } from '$lib/routes.js'
   import {
     getSearchField,
@@ -31,8 +35,6 @@
 
   let sortBy = $state(getSortField(page.url, organizationSortFields, 'plan'))
   let sortDir = $state(getSortDirection(page.url, 'desc'))
-
-  const planOrder: Record<string, number> = { supporter: 1, innovator: 2 }
 
   function replaceTableState({
     nextSearchValue = searchValue,
@@ -130,8 +132,8 @@
         av = new Date(a.createdAt).getTime()
         bv = new Date(b.createdAt).getTime()
       } else if (sortBy === 'plan') {
-        av = planOrder[a.plan ?? ''] ?? 0
-        bv = planOrder[b.plan ?? ''] ?? 0
+        av = a.plan ? organizationPlanOrder[a.plan] : 0
+        bv = b.plan ? organizationPlanOrder[b.plan] : 0
       } else {
         av = a[sortBy] ?? ''
         bv = b[sortBy] ?? ''
@@ -286,17 +288,14 @@
                 </div>
               </td>
               <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
-                {#if organization.plan === 'supporter'}
+                {#if organization.plan}
+                  {@const planDetails =
+                    organizationPlanDetails[organization.plan]}
                   <span
-                    class="rounded px-2 py-0.5 font-sans text-xs font-medium bg-green-100 text-green-700"
+                    class="rounded px-2 py-0.5 font-sans text-xs font-medium {planDetails.class}"
                   >
-                    🌱 Supporter
-                  </span>
-                {:else if organization.plan === 'innovator'}
-                  <span
-                    class="rounded px-2 py-0.5 font-sans text-xs font-medium bg-purple-100 text-purple-700"
-                  >
-                    🚀 Innovator
+                    {planDetails.icon}
+                    {planDetails.label}
                   </span>
                 {:else}
                   <span class="font-sans text-xs text-gray-300">—</span>

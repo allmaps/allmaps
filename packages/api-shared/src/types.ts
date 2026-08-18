@@ -5,10 +5,12 @@ import type { LanguageString } from '@allmaps/iiif-parser'
 
 import type { DbMap } from '@allmaps/db'
 import type { UserRole } from './shared/limits.js'
+import type { OrganizationPlan } from './shared/tiers.js'
+
+export type { OrganizationPlan } from './shared/tiers.js'
 
 export type IntersectsWith = [number, number] | [number, number, number, number]
 export type ContainedBy = [number, number, number, number]
-export type OrganizationPlan = 'supporter' | 'innovator'
 export type OrganizationLocation = {
   type: 'Point'
   coordinates: [number, number]
@@ -17,6 +19,7 @@ export type OrganizationLocation = {
 export type OrganizationsQueryParams = {
   limit: number
   plans: OrganizationPlan[]
+  displayCollections: boolean
 }
 
 export type MapsQueryParams = {

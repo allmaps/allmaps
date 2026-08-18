@@ -633,6 +633,9 @@ importers:
 
   apps/console:
     dependencies:
+      '@allmaps/api-shared':
+        specifier: workspace:^
+        version: link:../../packages/api-shared
       '@allmaps/env':
         specifier: workspace:^
         version: link:../../packages/env

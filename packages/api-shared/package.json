@@ -16,6 +16,7 @@
     "./db": "./dist/db.js",
     "./elysia": "./dist/elysia.js",
     "./shared": "./dist/shared.js",
+    "./tiers": "./dist/shared/tiers.js",
     "./types": "./dist/types.js",
     "./projections": "./dist/projections.js"
   },

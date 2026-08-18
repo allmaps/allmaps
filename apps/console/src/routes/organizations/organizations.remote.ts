@@ -3,6 +3,7 @@ import { redirect } from '@sveltejs/kit'
 
 import { restFetch } from '$lib/server/rest.js'
 import { routes } from '$lib/routes.js'
+import { ORGANIZATION_PLANS } from '$lib/organization-plans.js'
 import { z } from 'zod'
 
 import type { Organization } from '$lib/types.js'
@@ -86,8 +87,12 @@ const updateOrganizationFormSchema = z.object({
     .trim()
     .transform((value) => value || null),
   plan: z
-    .union([z.enum(['supporter', 'innovator']), z.literal('')])
+    .union([z.enum(ORGANIZATION_PLANS), z.literal('')])
     .transform((value) => value || null),
+  displayCollections: z
+    .union([z.literal('true'), z.literal('on'), z.literal(true)])
+    .optional()
+    .transform(Boolean),
   location: z.string().transform(parseLocationInput),
   domains: z.string().transform((value) =>
     value

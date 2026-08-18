@@ -26,6 +26,7 @@ import {
   queryManifests
 } from '@allmaps/api-shared/db'
 import {
+  ORGANIZATION_PLANS,
   needsElevatedLimitRole,
   normalizeOrganizationsQueryParams,
   setCacheControl
@@ -39,7 +40,26 @@ const OrganizationBody = t.Object({
   slug: t.String(),
   logo: t.Optional(t.Nullable(t.String())),
   homepage: t.Optional(t.Nullable(t.String())),
-  plan: t.Optional(t.Nullable(t.UnionEnum(['supporter', 'innovator']))),
+  plan: t.Optional(t.Nullable(t.UnionEnum(ORGANIZATION_PLANS))),
+  displayCollections: t.Optional(t.Boolean()),
+  location: t.Optional(
+    t.Nullable(
+      t.Object({
+        type: t.Literal('Point'),
+        coordinates: t.Tuple([t.Number(), t.Number()])
+      })
+    )
+  ),
+  domains: t.Optional(t.Array(t.String()))
+})
+
+const UpdateOrganizationBody = t.Object({
+  name: t.Optional(t.String()),
+  slug: t.Optional(t.String()),
+  logo: t.Optional(t.Nullable(t.String())),
+  homepage: t.Optional(t.Nullable(t.String())),
+  plan: t.Optional(t.Nullable(t.UnionEnum(ORGANIZATION_PLANS))),
+  displayCollections: t.Optional(t.Boolean()),
   location: t.Optional(
     t.Nullable(
       t.Object({
@@ -65,12 +85,13 @@ type CreateIiifBody = { url: string } | { url: string }[]
 
 const organizationMutationDetail = {
   security: [{ sessionCookie: [] }],
-  'x-badges': [{ name: 'Admin or paid organization member', color: '#df0' }]
+  'x-badges': [{ name: 'Admin or organization plan member', color: '#df0' }]
 }
 
 const organizationsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
-  plan: t.Optional(t.Array(t.UnionEnum(['supporter', 'innovator'])))
+  plan: t.Optional(t.Array(t.UnionEnum(ORGANIZATION_PLANS))),
+  displayCollections: t.Optional(t.Boolean())
 })
 
 async function createIiifFromBody<T>(
@@ -294,7 +315,7 @@ export function createOrganizationsRoutes(
           id: params.organizationId
         })
 
-        if (userRole !== 'admin' && userRole !== 'paidOrganizationMember') {
+        if (userRole !== 'admin' && userRole !== 'organizationPlanMember') {
           return status(403, { error: 'Forbidden' })
         }
 
@@ -408,7 +429,7 @@ export function createOrganizationsRoutes(
           id: params.organizationId
         })
 
-        if (userRole !== 'admin' && userRole !== 'paidOrganizationMember') {
+        if (userRole !== 'admin' && userRole !== 'organizationPlanMember') {
           return status(403, { error: 'Forbidden' })
         }
 
@@ -570,7 +591,7 @@ export function createOrganizationsRoutes(
       {
         admin: true,
         params: t.Object({ organizationId: t.String() }),
-        body: t.Partial(OrganizationBody),
+        body: UpdateOrganizationBody,
         detail: {
           summary: 'Update an organization',
           tags: ['Organizations'],
