@@ -1,32 +1,39 @@
+import { error } from '@sveltejs/kit'
+
+import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
 import { getUserId } from '$lib/organizations.js'
+import { restFetch } from '$lib/server/rest.js'
 
 import type { PageServerLoad } from './$types'
+import type { ConsoleUser, ListSummary, Organization } from '$lib/types.js'
 
-import type { ConsoleUser } from '../users.remote.js'
-
-type SessionData = {
-  data: {
-    user?: ConsoleUser
-    session?: {
-      id: string
-      expiresAt?: string | Date
-    }
-  } | null
-}
-
-export const load: PageServerLoad = async ({ params, parent }) => {
-  const { sessionData } = await parent()
+export const load: PageServerLoad = async ({ locals, params }) => {
   const { userId } = params
-  const session = sessionData as SessionData
-  const sessionUser = session.data?.user
+  const session = await locals.getConsoleSession()
+  const sessionUser = session?.user
   const isAdmin = sessionUser?.role === 'admin'
   const isCurrentUser = sessionUser
     ? getUserId(sessionUser.id) === userId
     : false
 
+  if (!isAdmin && !isCurrentUser) {
+    error(403, 'You do not have access to this user')
+  }
+
+  const [user, organizations, lists] = await Promise.all([
+    restFetch<ConsoleUser>(`/users/${userId}`),
+    isAdmin
+      ? restFetch<Organization[]>(`/organizations?limit=${CONSOLE_LIST_LIMIT}`)
+      : Promise.resolve([]),
+    isCurrentUser ? restFetch<ListSummary[]>('/lists') : Promise.resolve([])
+  ])
+
   return {
     userId,
     isAdmin,
-    isCurrentUser
+    isCurrentUser,
+    user,
+    organizations,
+    lists
   }
 }

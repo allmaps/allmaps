@@ -1,9 +1,6 @@
 import { getRequestEvent } from '$app/server'
-import { env as publicEnv } from '$env/dynamic/public'
 
-import { parseConsolePublicEnv } from '@allmaps/env/console'
-
-const consoleEnv = parseConsolePublicEnv(publicEnv)
+import { consoleEnv } from '$lib/server/console-env.js'
 const restFetchTimeout = 10_000
 
 type RestFetchOptions = Omit<RequestInit, 'body'> & {

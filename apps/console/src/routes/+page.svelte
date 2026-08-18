@@ -14,14 +14,15 @@
     id: string
     name?: string | null
     email?: string | null
-    role?: string
+    role?: string | null
   }
 
   function toBasicUser(user: SessionUser): BasicUser {
     return {
       ...user,
       name: user.name ?? undefined,
-      email: user.email ?? undefined
+      email: user.email ?? undefined,
+      role: user.role ?? undefined
     }
   }
 
@@ -31,9 +32,7 @@
     user?.name || user?.email || 'User'
 
   const user = $derived(
-    data.sessionData.data?.user
-      ? toBasicUser(data.sessionData.data.user)
-      : undefined
+    data.session?.user ? toBasicUser(data.session.user) : undefined
   )
   const isAdmin = $derived(user?.role === 'admin')
 

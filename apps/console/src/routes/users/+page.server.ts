@@ -1,7 +1,7 @@
 import { restFetch } from '$lib/server/rest.js'
 import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
 
-import type { ConsoleUser } from './users.remote.js'
+import type { ConsoleUser } from '$lib/types.js'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async () => {

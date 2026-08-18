@@ -2,6 +2,12 @@
 // for information about these interfaces
 declare global {
   namespace App {
+    interface Locals {
+      getConsoleSession: () => Promise<
+        import('$lib/types.js').ConsoleSessionData
+      >
+    }
+
     interface Platform {
       env: Env
       ctx: ExecutionContext
@@ -10,7 +16,6 @@ declare global {
     }
 
     // interface Error {}
-    // interface Locals {}
     // interface PageData {}
     // interface PageState {}
     // interface Platform {}
