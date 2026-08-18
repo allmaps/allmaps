@@ -1,5 +1,4 @@
 <script lang="ts">
-  /* eslint-disable svelte/no-navigation-without-resolve -- table state paths are constructed from the active route */
   import { replaceState } from '$app/navigation'
   import { page } from '$app/state'
   import { GpsFix as GpsFixIcon } from 'phosphor-svelte'
@@ -54,6 +53,7 @@
     })
 
     if (path !== `${page.url.pathname}${page.url.search}`) {
+      // eslint-disable-next-line svelte/no-navigation-without-resolve -- table state paths are constructed from the active route
       replaceState(path, page.state)
     }
   }

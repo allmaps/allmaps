@@ -23,7 +23,7 @@
   const user = $derived(data.user)
   const organizations = $derived(data.organizations)
 
-  const userOrganizations = $derived(user?.organizations ?? [])
+  const userOrganizations = $derived(user.organizations ?? [])
 
   let editUserName = $state('')
   let editUserSlug = $state('')
@@ -97,13 +97,13 @@
   })
 
   $effect(() => {
-    if (user && initializedUserId !== userId) {
+    if (initializedUserId !== userId) {
       initializeUserForm(user)
     }
   })
 
   async function changeRole() {
-    if (!user || !data.isAdmin) {
+    if (!data.isAdmin) {
       return
     }
     if (!userId) {
@@ -145,7 +145,7 @@
 
       await addOrganizationMember({
         organizationId,
-        email: user?.email ?? '',
+        email: user.email ?? '',
         role: selectedOrganizationRole
       })
 
@@ -283,6 +283,7 @@
         </label>
         <div class="flex gap-2">
           <AppSelect
+            id="userRole"
             bind:value={editUserRole}
             items={userRoleItems}
             disabled={!data.isAdmin}
@@ -479,6 +480,7 @@
                 Role in Organization
               </label>
               <AppSelect
+                id="orgRole"
                 bind:value={selectedOrganizationRole}
                 items={orgMemberRoleItems}
               />

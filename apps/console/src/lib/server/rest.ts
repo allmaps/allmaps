@@ -1,4 +1,5 @@
 import { getRequestEvent } from '$app/server'
+import { error } from '@sveltejs/kit'
 
 import { consoleEnv } from '$lib/server/console-env.js'
 const restFetchTimeout = 10_000
@@ -37,7 +38,10 @@ export async function restFetch<T>(
 
   if (!response.ok) {
     const responseText = await response.text()
-    throw new Error(responseText || `REST request failed: ${response.status}`)
+    error(
+      response.status,
+      responseText || `REST request failed: ${response.status}`
+    )
   }
 
   if (response.status === 204) {

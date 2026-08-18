@@ -78,8 +78,9 @@
       href: `${organizationApiUrl}/images?georeferenced=true`
     }
   ])
+  const members = $derived(organization.users ?? [])
   const memberEmailSet = $derived(
-    new Set((organization?.users ?? []).map((member) => member.user.email))
+    new Set(members.map((member) => member.user.email))
   )
   const userItems = $derived(
     users
@@ -147,15 +148,12 @@
   })
 
   $effect(() => {
-    if (organization && initializedOrganizationId !== organizationId) {
+    if (initializedOrganizationId !== organizationId) {
       initializeOrganizationForm(organization)
     }
   })
 
   async function deleteOrganization() {
-    if (!organization) {
-      return
-    }
     isDeleting = true
     error = null
 
@@ -432,131 +430,128 @@
     </div>
   </form>
 
-  {#if organization}
-    {@const members = organization.users || []}
-    <div class="bg-white rounded-lg shadow p-6 mt-6">
-      <div class="space-y-4 mb-8">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-gray-100">
-              {#each organizationResourceLinks as resourceLink (resourceLink.href)}
-                <tr>
-                  <th class="w-48 py-2 pr-4 text-left font-medium text-gray-500"
-                    >{resourceLink.label}</th
+  <div class="bg-white rounded-lg shadow p-6 mt-6">
+    <div class="space-y-4 mb-8">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <tbody class="divide-y divide-gray-100">
+            {#each organizationResourceLinks as resourceLink (resourceLink.href)}
+              <tr>
+                <th class="w-48 py-2 pr-4 text-left font-medium text-gray-500"
+                  >{resourceLink.label}</th
+                >
+                <td class="py-2">
+                  <a
+                    href={resourceLink.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="font-mono text-blue-600 hover:underline break-all"
+                    >{resourceLink.href}</a
                   >
-                  <td class="py-2">
-                      <a
-                      href={resourceLink.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="font-mono text-blue-600 hover:underline break-all"
-                      >{resourceLink.href}</a
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <span class="text-sm font-medium text-gray-500">Created:</span>
+        <p class="text-gray-900">
+          {new Date(organization.createdAt).toLocaleDateString()}
+        </p>
+      </div>
+    </div>
+
+    <div class="border-t pt-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">Members ({members.length})</h3>
+        <button
+          onclick={openAddMemberModal}
+          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
+        >
+          Add Member
+        </button>
+      </div>
+
+      {#if members.length === 0}
+        <p class="text-gray-500 italic">No members yet</p>
+      {:else}
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                  >Name</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                  >Email</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                  >Role</th
+                >
+                <th
+                  class="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                  >Joined</th
+                >
+                <th
+                  class="px-4 py-3 text-right text-sm font-medium text-gray-700"
+                  >Actions</th
+                >
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+              {#each members as member (member.user.id)}
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-3 text-sm">
+                    <a
+                      href={routes.user(getUserId(member.user.id))}
+                      class="text-blue-600 hover:underline"
+                      >{member.user.name || '—'}</a
                     >
+                  </td>
+                  <td class="px-4 py-3 text-sm">{member.user.email}</td>
+                  <td class="px-4 py-3 text-sm">
+                    <AppSelect
+                      value={member.role}
+                      items={orgMemberRoleItems}
+                      disabled={updatingRoleId === getUserId(member.user.id)}
+                      onchange={(role) =>
+                        updateMemberRole(
+                          getUserId(member.user.id),
+                          role as 'admin' | 'member' | 'owner'
+                        )}
+                      class="min-w-36"
+                    />
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-600">
+                    {new Date(member.createdAt).toLocaleDateString()}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-right">
+                    <button
+                      onclick={() =>
+                        removeMember(
+                          getUserId(member.user.id),
+                          member.user.email
+                        )}
+                      class="text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
+                      disabled={removingMemberId === member.user.email}
+                    >
+                      {removingMemberId === member.user.email
+                        ? 'Removing...'
+                        : 'Remove'}
+                    </button>
                   </td>
                 </tr>
               {/each}
             </tbody>
           </table>
         </div>
-        <div>
-          <span class="text-sm font-medium text-gray-500">Created:</span>
-          <p class="text-gray-900">
-            {new Date(organization.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-      </div>
-
-      <div class="border-t pt-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-semibold">Members ({members.length})</h3>
-          <button
-            onclick={openAddMemberModal}
-            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
-          >
-            Add Member
-          </button>
-        </div>
-
-        {#if members.length === 0}
-          <p class="text-gray-500 italic">No members yet</p>
-        {:else}
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="bg-gray-50 border-b">
-                <tr>
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                    >Name</th
-                  >
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                    >Email</th
-                  >
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                    >Role</th
-                  >
-                  <th
-                    class="px-4 py-3 text-left text-sm font-medium text-gray-700"
-                    >Joined</th
-                  >
-                  <th
-                    class="px-4 py-3 text-right text-sm font-medium text-gray-700"
-                    >Actions</th
-                  >
-                </tr>
-              </thead>
-              <tbody class="divide-y">
-                {#each members as member (member.user.id)}
-                  <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 text-sm">
-                      <a
-                        href={routes.user(getUserId(member.user.id))}
-                        class="text-blue-600 hover:underline"
-                        >{member.user.name || '—'}</a
-                      >
-                    </td>
-                    <td class="px-4 py-3 text-sm">{member.user.email}</td>
-                    <td class="px-4 py-3 text-sm">
-                      <AppSelect
-                        value={member.role}
-                        items={orgMemberRoleItems}
-                        disabled={updatingRoleId === getUserId(member.user.id)}
-                        onchange={(role) =>
-                          updateMemberRole(
-                            getUserId(member.user.id),
-                            role as 'admin' | 'member' | 'owner'
-                          )}
-                        class="min-w-36"
-                      />
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-600">
-                      {new Date(member.createdAt).toLocaleDateString()}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-right">
-                      <button
-                        onclick={() =>
-                          removeMember(
-                            getUserId(member.user.id),
-                            member.user.email
-                          )}
-                        class="text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
-                        disabled={removingMemberId === member.user.email}
-                      >
-                        {removingMemberId === member.user.email
-                          ? 'Removing...'
-                          : 'Remove'}
-                      </button>
-                    </td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
-        {/if}
-      </div>
+      {/if}
     </div>
-  {/if}
+  </div>
 </div>
 
 {#if showDeleteModal}
