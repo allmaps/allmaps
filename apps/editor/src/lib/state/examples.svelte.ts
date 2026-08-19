@@ -4,15 +4,16 @@ import { SvelteMap } from 'svelte/reactivity'
 
 import {
   fetchExampleOrganizations,
-  fetchUngeoreferencedImages,
+  fetchRandomOrganizationImages,
   getApiResourceId,
-  imagesToExamples,
-  isCallbackAllowedByOrganizations,
-  ORGANIZATION_EXAMPLES_COUNT,
-  shuffleImages
+  imagesToExamplesByOrganizationId,
+  isCallbackAllowedByOrganizations
 } from '$lib/shared/examples.js'
 
-import type { ApiOrganization } from '$lib/shared/examples.js'
+import type {
+  ApiOrganization,
+  ExamplesByOrganizationId
+} from '$lib/shared/examples.js'
 import type { Example } from '$lib/types/shared.js'
 
 const EXAMPLES_KEY = Symbol('maps-history')
@@ -27,11 +28,6 @@ export class ExamplesState {
   #examplesByOrganizationId = $state<SvelteMap<string, Example[]>>(
     new SvelteMap()
   )
-  #exampleCountsByOrganizationId = new Map<string, number>()
-  #examplePromisesByOrganizationId = new Map<
-    string,
-    { count: number; promise: Promise<Example[]> }
-  >()
 
   constructor(restBaseUrl: string) {
     this.#restBaseUrl = restBaseUrl
@@ -58,50 +54,42 @@ export class ExamplesState {
     return this.#organizationsPromise
   }
 
-  async fetchExamples(organization: ApiOrganization, count: number) {
-    const organizationId = getApiResourceId(organization.id)
-    const fetchCount = Math.max(count, ORGANIZATION_EXAMPLES_COUNT)
-    const images = await fetchUngeoreferencedImages(
-      fetch,
-      organization,
-      fetchCount
-    )
-    const examples = imagesToExamples(organization, shuffleImages(images))
-
-    this.#exampleCountsByOrganizationId.set(organizationId, fetchCount)
-    this.#examplePromisesByOrganizationId.delete(organizationId)
-
-    this.#examplesByOrganizationId.set(organizationId, examples)
-
-    return examples
+  setExamplesByOrganizationId(
+    examplesByOrganizationId: ExamplesByOrganizationId
+  ) {
+    for (const [organizationId, examples] of Object.entries(
+      examplesByOrganizationId
+    )) {
+      this.#examplesByOrganizationId.set(organizationId, examples)
+    }
   }
 
-  async getExamplesByOrganization(
-    organization: ApiOrganization,
+  async fetchExamplesByOrganizations(
+    organizations: ApiOrganization[],
     count: number
   ) {
+    const images = await fetchRandomOrganizationImages(
+      fetch,
+      this.#restBaseUrl,
+      organizations,
+      count
+    )
+    const examplesByOrganizationId = imagesToExamplesByOrganizationId(images)
+
+    for (const organization of organizations) {
+      const organizationId = getApiResourceId(organization.id)
+      this.#examplesByOrganizationId.set(
+        organizationId,
+        examplesByOrganizationId[organizationId] ?? []
+      )
+    }
+
+    return examplesByOrganizationId
+  }
+
+  getExamplesByOrganization(organization: ApiOrganization) {
     const organizationId = getApiResourceId(organization.id)
-    const examples = this.#examplesByOrganizationId.get(organizationId) || []
-    const fetchedCount = this.#exampleCountsByOrganizationId.get(organizationId)
-
-    if (examples.length >= count || (fetchedCount ?? 0) >= count) {
-      return examples.slice(0, count)
-    }
-
-    const currentPromise =
-      this.#examplePromisesByOrganizationId.get(organizationId)
-
-    if (currentPromise && currentPromise.count >= count) {
-      return (await currentPromise.promise).slice(0, count)
-    }
-
-    const promise = this.fetchExamples(organization, count)
-    this.#examplePromisesByOrganizationId.set(organizationId, {
-      count,
-      promise
-    })
-
-    return (await promise).slice(0, count)
+    return this.#examplesByOrganizationId.get(organizationId) ?? []
   }
 
   isCallbackValid(callback: string) {

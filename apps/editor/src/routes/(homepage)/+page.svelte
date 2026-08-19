@@ -91,7 +91,10 @@
           {m.homepage_pick_collection()}
         </h2>
       </div>
-      <Organizations organizations={data.organizations} />
+      <Organizations
+        organizations={data.organizations}
+        examplesByOrganizationId={data.examplesByOrganizationId}
+      />
     </div>
   </section>
 </div>

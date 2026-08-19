@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 
 import {
-  fetchExampleOrganizations,
+  fetchExampleOrganizationBySlug,
   fetchUngeoreferencedImages,
   imagesToExamples,
   ORGANIZATION_EXAMPLES_COUNT,
@@ -12,12 +12,10 @@ import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ fetch, params, parent }) => {
   const { env } = await parent()
-  const organizations = await fetchExampleOrganizations(
+  const organization = await fetchExampleOrganizationBySlug(
     fetch,
-    env.PUBLIC_REST_BASE_URL
-  )
-  const organization = organizations.find(
-    (organization) => organization.slug === params.id
+    env.PUBLIC_REST_BASE_URL,
+    params.id
   )
 
   if (!organization) {

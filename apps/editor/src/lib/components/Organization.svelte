@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-
   import { Pagination, type PageItem } from 'bits-ui'
 
   import {
@@ -8,7 +6,6 @@
     CaretRight as CaretRightIcon
   } from 'phosphor-svelte'
 
-  import { getExamplesState } from '$lib/state/examples.svelte.js'
   import { m } from '$lib/paraglide/messages.js'
 
   import Example from '$lib/components/Example.svelte'
@@ -21,7 +18,8 @@
     perPage?: number
     organization: ApiOrganization
     examples?: ExampleType[]
-    fetchExamples?: boolean
+    loading?: boolean
+    failed?: boolean
     showMoreLink?: boolean
   }
 
@@ -31,16 +29,11 @@
     count = DEFAULT_COUNT,
     perPage = Number.POSITIVE_INFINITY,
     organization,
-    examples: initialExamples,
-    fetchExamples = initialExamples === undefined,
+    examples = [],
+    loading = false,
+    failed = false,
     showMoreLink = false
   }: Props = $props()
-
-  // svelte-ignore state_referenced_locally
-  let examples = $state<ExampleType[]>(initialExamples ?? [])
-  // svelte-ignore state_referenced_locally
-  let loading = $state(fetchExamples)
-  let failed = $state(false)
 
   const paginationCount = $derived(
     Math.max(examples.length, loading ? count : 1)
@@ -49,26 +42,6 @@
   const placeholderCount = $derived(
     Math.min(count, Number.isFinite(perPage) ? perPage : count)
   )
-
-  const examplesState = getExamplesState()
-
-  onMount(async () => {
-    if (!fetchExamples) {
-      return
-    }
-
-    try {
-      examples = await examplesState.getExamplesByOrganization(
-        organization,
-        count
-      )
-    } catch (error) {
-      failed = true
-      console.error('Failed to fetch examples for organization', error)
-    } finally {
-      loading = false
-    }
-  })
 </script>
 
 {#snippet header(organization: ApiOrganization)}

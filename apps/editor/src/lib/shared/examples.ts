@@ -46,6 +46,8 @@ export type ApiOrganization = {
   manifests: string
 }
 
+export type ExamplesByOrganizationId = Record<string, Example[]>
+
 async function fetchJson<T>(fetchFn: Fetch, url: string) {
   const response = await fetchFn(url)
 
@@ -112,6 +114,18 @@ export function getExampleOrganizationsUrl(restBaseUrl: string) {
   return url.toString()
 }
 
+export function getExampleOrganizationBySlugUrl(
+  restBaseUrl: string,
+  organizationSlug: string
+) {
+  const url = createApiUrl(restBaseUrl, 'organizations')
+  url.searchParams.set('displayCollections', 'true')
+  url.searchParams.set('slug', organizationSlug)
+  url.searchParams.set('limit', '1')
+
+  return url.toString()
+}
+
 export function getOrganizationImagesUrl(
   organization: ApiOrganization,
   limit: number
@@ -131,6 +145,25 @@ export function getRandomImageUrl(restBaseUrl: string) {
   return url.toString()
 }
 
+export function getRandomOrganizationImagesUrl(
+  restBaseUrl: string,
+  organizations: ApiOrganization[],
+  limitPerOrganization: number
+) {
+  const url = createApiUrl(restBaseUrl, 'images/random')
+  url.searchParams.set('georeferenced', 'false')
+
+  for (const organizationId of new Set(
+    organizations.map((organization) => getApiResourceId(organization.id))
+  )) {
+    url.searchParams.append('organizationId', organizationId)
+  }
+
+  url.searchParams.set('limitPerOrganization', String(limitPerOrganization))
+
+  return url.toString()
+}
+
 export async function fetchExampleOrganizations(
   fetchFn: Fetch,
   restBaseUrl: string
@@ -141,6 +174,19 @@ export async function fetchExampleOrganizations(
   )
 
   return organizations
+}
+
+export async function fetchExampleOrganizationBySlug(
+  fetchFn: Fetch,
+  restBaseUrl: string,
+  organizationSlug: string
+) {
+  const organizations = await fetchJson<ApiOrganization[]>(
+    fetchFn,
+    getExampleOrganizationBySlugUrl(restBaseUrl, organizationSlug)
+  )
+
+  return organizations[0]
 }
 
 export async function fetchUngeoreferencedImages(
@@ -164,6 +210,26 @@ export async function fetchRandomUngeoreferencedImage(
   )
 
   return images[0]
+}
+
+export async function fetchRandomOrganizationImages(
+  fetchFn: Fetch,
+  restBaseUrl: string,
+  organizations: ApiOrganization[],
+  limitPerOrganization: number
+) {
+  if (organizations.length === 0) {
+    return []
+  }
+
+  return fetchJson<ApiImage[]>(
+    fetchFn,
+    getRandomOrganizationImagesUrl(
+      restBaseUrl,
+      organizations,
+      limitPerOrganization
+    )
+  )
 }
 
 export function imageToExample(
@@ -195,6 +261,31 @@ export function imagesToExamples(
   }
 
   return examples
+}
+
+export function imagesToExamplesByOrganizationId(images: ApiImage[]) {
+  const imagesByOrganizationId = new Map<string, ApiImage[]>()
+
+  for (const image of images) {
+    if (!image.organization?.id) {
+      continue
+    }
+
+    const organizationId = getApiResourceId(image.organization.id)
+    const organizationImages = imagesByOrganizationId.get(organizationId) ?? []
+    organizationImages.push(image)
+    imagesByOrganizationId.set(organizationId, organizationImages)
+  }
+
+  return Object.fromEntries(
+    Array.from(
+      imagesByOrganizationId,
+      ([organizationId, organizationImages]) => [
+        organizationId,
+        imagesToExamples(undefined, organizationImages)
+      ]
+    )
+  ) satisfies ExamplesByOrganizationId
 }
 
 export function getImageOpenUrl(image: ApiImage) {
