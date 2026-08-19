@@ -10,12 +10,15 @@ import { adminDetail } from '../openapi.js'
 import {
   queryImage,
   queryImages,
+  queryRandomImagesByOrganizationIds,
   createImage,
   createImageFromUrl,
   queryMaps,
   queryImageChecksums
 } from '@allmaps/api-shared/db'
 import {
+  ResponseError,
+  clampLimit,
   needsElevatedLimitRole,
   normalizeMapsQueryParams,
   queryRandom,
@@ -25,6 +28,13 @@ import {
 const imagesQuerySchema = t.Object({
   georeferenced: t.Optional(t.Boolean()),
   limit: t.Optional(t.Number())
+})
+
+const randomImagesQuerySchema = t.Object({
+  georeferenced: t.Optional(t.Boolean()),
+  limit: t.Optional(t.Number()),
+  organizationId: t.Optional(t.Array(t.String())),
+  limitPerOrganization: t.Optional(t.Integer({ minimum: 1 }))
 })
 
 const createImageBodySchema = t.Union([
@@ -86,28 +96,79 @@ export function createImagesRoutes(
     .get(
       '/images/random',
       async ({ env, db, query, set, getLimitRole }) => {
-        const userRole = needsElevatedLimitRole(query.limit)
+        const organizationIds = [...new Set(query.organizationId ?? [])]
+        const hasOrganizations = organizationIds.length > 0
+
+        if (hasOrganizations && query.limit !== undefined) {
+          throw new ResponseError(
+            'limit cannot be combined with organizationId',
+            400
+          )
+        }
+
+        if (!hasOrganizations && query.limitPerOrganization !== undefined) {
+          throw new ResponseError(
+            'limitPerOrganization requires organizationId',
+            400
+          )
+        }
+
+        const requestedLimitPerOrganization = query.limitPerOrganization ?? 1
+        const requestedLimit = hasOrganizations
+          ? organizationIds.length * requestedLimitPerOrganization
+          : query.limit
+        const userRole = needsElevatedLimitRole(requestedLimit)
           ? await getLimitRole()
           : 'public'
         setCacheControl(set, 'private-no-store')
-        return queryRandom((op, randomId) =>
-          queryImages(
+
+        if (hasOrganizations) {
+          const totalLimit = clampLimit(requestedLimit, userRole)
+          const limitPerOrganization = Math.floor(
+            totalLimit / organizationIds.length
+          )
+
+          if (limitPerOrganization < 1) {
+            throw new ResponseError('Too many organizationId parameters', 400)
+          }
+
+          return queryRandomImagesByOrganizationIds(
             env.PUBLIC_REST_BASE_URL,
             db,
             {
+              organizationIds,
               georeferenced: query.georeferenced,
-              limit: query.limit,
-              randomImageId: randomId,
-              randomImageIdOp: op,
+              limitPerOrganization,
               userRole
-            },
-            { expectRows: true, singular: false }
+            }
           )
+        }
+
+        const limit = clampLimit(query.limit ?? 100, userRole)
+        return queryRandom(
+          limit,
+          async (op, randomId, queryLimit) => {
+            const images = await queryImages(
+              env.PUBLIC_REST_BASE_URL,
+              db,
+              {
+                georeferenced: query.georeferenced,
+                limit: queryLimit,
+                randomImageId: randomId,
+                randomImageIdOp: op,
+                userRole
+              },
+              { expectRows: false, singular: false }
+            )
+
+            return Array.isArray(images) ? images : [images]
+          },
+          'Images not found'
         )
       },
       {
-        query: imagesQuerySchema,
-        detail: { summary: 'Get a random IIIF Image', tags: ['Images'] }
+        query: randomImagesQuerySchema,
+        detail: { summary: 'Get random IIIF Images', tags: ['Images'] }
       }
     )
     .get(

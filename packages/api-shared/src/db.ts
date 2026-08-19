@@ -1,6 +1,7 @@
 export {
   queryImage,
   queryImages,
+  queryRandomImagesByOrganizationIds,
   queryCanvases,
   queryManifests,
   createImage,

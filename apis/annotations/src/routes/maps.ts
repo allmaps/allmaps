@@ -1,10 +1,11 @@
 import { t } from 'elysia'
 
-import { generateRandomId } from '@allmaps/id/sync'
+import { generateAnnotation, type GeoreferencedMap } from '@allmaps/annotation'
 import { queryMaps } from '@allmaps/api-shared/db'
 import {
   needsElevatedLimitRole,
   normalizeMapsQueryParams,
+  queryRandom,
   setCacheControl
 } from '@allmaps/api-shared'
 import { createAuth } from '@allmaps/db/auth'
@@ -104,36 +105,34 @@ export function createMapsRoutes(
     )
     .get(
       '/maps/random',
-      ({ request, env, db, set }) => {
+      async ({ request, env, db, set }) => {
         setCacheControl(set, 'private-no-store')
-        const randomMapId = generateRandomId()
-
-        // Try maps with id > randomMapId first, fall back to id <= randomMapId
         const baseQuery = {
           ...normalizeMapsQueryParams(request),
           limit: 1
         }
-        const responseOptions = {
-          format: 'annotation' as const,
-          expectRows: true,
-          singular: true
-        }
+        const maps = await queryRandom(
+          1,
+          async (op, randomMapId, limit) =>
+            (await queryMaps(
+              env.PUBLIC_ANNOTATIONS_BASE_URL,
+              db,
+              {
+                ...baseQuery,
+                limit,
+                randomMapId,
+                randomMapIdOp: op
+              },
+              {
+                format: 'map',
+                expectRows: false,
+                singular: false
+              }
+            )) as GeoreferencedMap[],
+          'Maps not found'
+        )
 
-        try {
-          return queryMaps(
-            env.PUBLIC_ANNOTATIONS_BASE_URL,
-            db,
-            { ...baseQuery, randomMapId, randomMapIdOp: 'gt' },
-            responseOptions
-          )
-        } catch {
-          return queryMaps(
-            env.PUBLIC_ANNOTATIONS_BASE_URL,
-            db,
-            { ...baseQuery, randomMapId, randomMapIdOp: 'lte' },
-            responseOptions
-          )
-        }
+        return generateAnnotation(maps[0])
       },
       {
         query: mapsQuerySchema,

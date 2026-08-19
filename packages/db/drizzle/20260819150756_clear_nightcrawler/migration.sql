@@ -1,0 +1,1 @@
+CREATE INDEX "images_domain_id_idx" ON "iiif"."images" ("domain","id");

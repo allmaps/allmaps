@@ -243,7 +243,7 @@ export async function queryMaps(
     },
     orderBy: (maps, { asc, desc }) => {
       if (params.randomMapId) {
-        return params.randomMapIdOp === 'gt' ? asc(maps.id) : desc(maps.id)
+        return asc(maps.id)
       } else if (isGeospatialQuery) {
         return desc(maps.scale)
       } else {
