@@ -28,6 +28,7 @@
 
   let editOrgName = $derived(organization.name)
   let editOrgSlug = $derived(organization.slug)
+  let editLogo = $derived(organization.logo ?? '')
   let editHomepage = $derived(organization.homepage ?? '')
   let editPlan = $derived<OrganizationPlan | ''>(organization.plan ?? '')
   let editDisplayCollections = $derived(organization.displayCollections)
@@ -41,6 +42,7 @@
   )
   let editDomains = $derived<string[]>([...(organization.domains ?? [])])
   let error = $state<string | null>(null)
+  let logoPreviewFailed = $state(false)
 
   let showAddMemberModal = $state(false)
   let newMemberEmail = $state('')
@@ -115,6 +117,25 @@
         )
       : userItems
   )
+
+  function getHttpUrl(value: string) {
+    try {
+      const url = new URL(value.trim())
+
+      return url.protocol === 'http:' || url.protocol === 'https:'
+        ? url.toString()
+        : null
+    } catch {
+      return null
+    }
+  }
+
+  const logoPreviewUrl = $derived(getHttpUrl(editLogo))
+
+  $effect.pre(() => {
+    void logoPreviewUrl
+    logoPreviewFailed = false
+  })
 
   $effect.pre(() => {
     // Reset transient UI state when navigating between organization routes.
@@ -319,6 +340,47 @@
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="https://example.com"
         />
+      </div>
+
+      <div>
+        <label
+          for="orgLogo"
+          class="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Logo URL
+        </label>
+        <input
+          id="orgLogo"
+          type="url"
+          name="logo"
+          bind:value={editLogo}
+          pattern="https?://.*"
+          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="https://example.com/logo.svg"
+        />
+
+        {#if logoPreviewUrl && !logoPreviewFailed}
+          <div
+            class="mt-3 flex min-h-24 items-center justify-center rounded border border-gray-200 bg-gray-50 p-4"
+          >
+            <img
+              src={logoPreviewUrl}
+              alt={`${editOrgName || 'Organization'} logo preview`}
+              class="max-h-32 max-w-full object-contain"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              onerror={() => (logoPreviewFailed = true)}
+            />
+          </div>
+        {:else if logoPreviewUrl && logoPreviewFailed}
+          <p class="mt-2 text-sm text-red-600">
+            The logo could not be loaded from this URL.
+          </p>
+        {:else if editLogo.trim()}
+          <p class="mt-2 text-sm text-red-600">
+            Enter an absolute URL starting with http:// or https://.
+          </p>
+        {/if}
       </div>
 
       <div>

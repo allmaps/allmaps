@@ -31,6 +31,22 @@ type UpdateOrganizationMemberRoleInput = OrganizationMemberInput & {
 }
 
 const organizationIdSchema = z.string()
+const httpUrlSchema = z
+  .string()
+  .trim()
+  .refine((value) => {
+    if (!value) {
+      return true
+    }
+
+    try {
+      const url = new URL(value)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }, 'Use an absolute http(s) URL')
+  .transform((value) => value || null)
 const slugSchema = z
   .string()
   .trim()
@@ -82,10 +98,8 @@ const updateOrganizationFormSchema = z.object({
   organizationId: organizationIdSchema,
   name: z.string().trim().min(1),
   slug: slugSchema,
-  homepage: z
-    .string()
-    .trim()
-    .transform((value) => value || null),
+  logo: httpUrlSchema,
+  homepage: httpUrlSchema,
   plan: z
     .union([z.enum(ORGANIZATION_PLANS), z.literal('')])
     .transform((value) => value || null),
