@@ -25,6 +25,7 @@ type DbOrganization = {
   logo: string | null
   homepage: string | null
   plan: string | null
+  displayCollections: boolean
   location: OrganizationLocation | null
   createdAt: Date
   updatedAt?: Date
@@ -37,6 +38,7 @@ type DbOrganization = {
 type ListOrganizationsOptions = {
   limit?: number
   plans?: OrganizationPlan[]
+  displayCollections?: boolean
   userRole?: UserRole
 }
 
@@ -217,6 +219,7 @@ export function fromDbOrganization(
     logo: dbOrganization.logo,
     homepage: dbOrganization.homepage,
     plan: dbOrganization.plan,
+    displayCollections: dbOrganization.displayCollections,
     location: dbOrganization.location,
     createdAt: dbOrganization.createdAt,
     domains: dbOrganization.urls
@@ -247,13 +250,13 @@ export function fromDbOrganizationWithUsers(
   }
 }
 
-function getOrganizationPlanWhere(plans?: OrganizationPlan[]) {
-  if (plans && plans.length > 0) {
-    return {
-      plan: {
-        in: plans
-      }
-    }
+function getOrganizationsWhere(options: ListOrganizationsOptions) {
+  return {
+    plan:
+      options.plans && options.plans.length > 0
+        ? { in: options.plans }
+        : undefined,
+    displayCollections: options.displayCollections
   }
 }
 
@@ -303,7 +306,7 @@ export async function listOrganizations(
     with: {
       urls: true
     },
-    where: getOrganizationPlanWhere(options.plans),
+    where: getOrganizationsWhere(options),
     orderBy: (organizations, { asc }) => asc(organizations.name),
     limit: clampLimit(options.limit, options.userRole)
   })
@@ -323,7 +326,7 @@ export async function listOrganizationsWithUsers(
       with: {
         urls: true
       },
-      where: getOrganizationPlanWhere(options.plans),
+      where: getOrganizationsWhere(options),
       orderBy: (organizations, { asc }) => asc(organizations.name),
       limit: clampLimit(options.limit, options.userRole)
     }),
@@ -350,7 +353,7 @@ export async function listOrganizationsWithUsersByOrganizationIds(
       with: {
         urls: true
       },
-      where: getOrganizationPlanWhere(options.plans),
+      where: getOrganizationsWhere(options),
       orderBy: (organizations, { asc }) => asc(organizations.name),
       limit: clampLimit(options.limit, options.userRole)
     }),
@@ -447,7 +450,8 @@ export async function createOrganization(
     slug: string
     logo?: string | null
     homepage?: string | null
-    plan?: 'supporter' | 'innovator' | null
+    plan?: OrganizationPlan | null
+    displayCollections?: boolean
     location?: OrganizationLocation | null
     domains?: string[]
   }
@@ -471,6 +475,7 @@ export async function createOrganization(
       logo: data.logo ?? null,
       homepage: data.homepage ?? null,
       plan: data.plan ?? null,
+      displayCollections: data.displayCollections ?? false,
       location: data.location ?? null,
       createdAt: new Date()
     })
@@ -491,7 +496,8 @@ export async function updateOrganization(
     slug: string
     logo: string | null
     homepage: string | null
-    plan: 'supporter' | 'innovator' | null
+    plan: OrganizationPlan | null
+    displayCollections: boolean
     location: OrganizationLocation | null
   }>,
   domains?: string[]

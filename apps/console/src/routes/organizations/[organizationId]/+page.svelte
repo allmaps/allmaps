@@ -5,7 +5,8 @@
 
   import AppSelect from '$lib/components/AppSelect.svelte'
   import { CONSOLE_LIST_LIMIT } from '$lib/limits.js'
-  import { planItems, orgMemberRoleItems } from '$lib/select-items'
+  import { organizationPlanItems } from '$lib/organization-plans.js'
+  import { orgMemberRoleItems } from '$lib/select-items'
   import { getUserId } from '$lib/organizations.js'
   import { routes } from '$lib/routes.js'
   import {
@@ -16,6 +17,7 @@
     updateOrganizationMemberRole
   } from '../organizations.remote.js'
   import { getUsers } from '../../users/users.remote.js'
+  import type { OrganizationPlan } from '$lib/organization-plans.js'
   import type { ConsoleUser, Organization } from '$lib/types.js'
   import type { PageProps } from './$types.js'
 
@@ -26,7 +28,8 @@
   let editOrgName = $state('')
   let editOrgSlug = $state('')
   let editHomepage = $state('')
-  let editPlan = $state<'supporter' | 'innovator' | ''>('')
+  let editPlan = $state<OrganizationPlan | ''>('')
+  let editDisplayCollections = $state(false)
   let editLocation = $state('')
   let editDomains = $state<string[]>([])
   let error = $state<string | null>(null)
@@ -111,6 +114,7 @@
     editOrgSlug = nextOrganization.slug
     editHomepage = nextOrganization.homepage ?? ''
     editPlan = nextOrganization.plan ?? ''
+    editDisplayCollections = nextOrganization.displayCollections
     editLocation = nextOrganization.location
       ? [
           nextOrganization.location.coordinates[1],
@@ -128,6 +132,7 @@
     editOrgSlug = ''
     editHomepage = ''
     editPlan = ''
+    editDisplayCollections = false
     editLocation = ''
     editDomains = []
     initializedOrganizationId = null
@@ -343,9 +348,26 @@
         >
           Plan
         </label>
-        <AppSelect bind:value={editPlan} items={planItems} />
+        <AppSelect bind:value={editPlan} items={organizationPlanItems} />
         <input type="hidden" name="plan" value={editPlan} />
       </div>
+
+      <label class="flex items-start gap-3">
+        <input
+          type="checkbox"
+          name="displayCollections"
+          bind:checked={editDisplayCollections}
+          class="mt-1 size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <span>
+          <span class="block text-sm font-medium text-gray-700">
+            Display collections across Allmaps
+          </span>
+          <span class="block text-sm text-gray-500">
+            Include this organization's collections in public discovery views.
+          </span>
+        </span>
+      </label>
 
       <div>
         <label

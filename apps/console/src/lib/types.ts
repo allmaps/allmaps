@@ -1,3 +1,5 @@
+import type { OrganizationPlan } from '$lib/organization-plans.js'
+
 export type Organization = {
   id: string
   name: string
@@ -10,7 +12,8 @@ export type Organization = {
   } | null
   createdAt: string
   domains: string[]
-  plan: 'supporter' | 'innovator' | null
+  plan: OrganizationPlan | null
+  displayCollections: boolean
   users?: {
     role: string
     createdAt: string

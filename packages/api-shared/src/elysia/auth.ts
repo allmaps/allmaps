@@ -8,10 +8,12 @@ import { ResponseError } from '../shared/errors.js'
 import { createElysia } from './app.js'
 import { setCacheControl } from './cache.js'
 import { redirect } from './response.js'
+import {
+  isOrganizationPlan,
+  ORGANIZATION_PLANS_WITH_ELEVATED_LIMITS
+} from '../shared/tiers.js'
 
 import type { UserRole } from '../shared/limits.js'
-
-const PAID_ORGANIZATION_PLANS = new Set(['supporter', 'innovator'])
 
 function copySetCookieHeader(
   response: Response,
@@ -111,9 +113,10 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
 
           if (
             membership?.plan &&
-            PAID_ORGANIZATION_PLANS.has(membership.plan)
+            isOrganizationPlan(membership.plan) &&
+            ORGANIZATION_PLANS_WITH_ELEVATED_LIMITS.has(membership.plan)
           ) {
-            return 'paidOrganizationMember'
+            return 'organizationPlanMember'
           }
 
           return 'user'

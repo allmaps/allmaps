@@ -118,6 +118,7 @@ export const organizations = pgTable(
     metadata: text('metadata'),
     homepage: text('homepage'),
     plan: text('plan'),
+    displayCollections: boolean('display_collections').default(false).notNull(),
     location: jsonb('location').$type<OrganizationLocation>()
   },
   (table) => [
