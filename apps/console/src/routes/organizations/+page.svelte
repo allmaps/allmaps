@@ -1,10 +1,16 @@
 <script lang="ts">
   import { replaceState } from '$app/navigation'
   import { page } from '$app/state'
-  import { GpsFix as GpsFixIcon } from 'phosphor-svelte'
+  import { Tooltip } from 'bits-ui'
+  import {
+    GpsFix as GpsFixIcon,
+    Image as ImageIcon,
+    Stack as StackIcon
+  } from 'phosphor-svelte'
 
   import SearchFilter from '$lib/components/SearchFilter.svelte'
   import DataTable from '$lib/components/DataTable.svelte'
+  import StatusIconTooltip from '$lib/components/StatusIconTooltip.svelte'
   import { getOrganizationId, getUserId } from '$lib/organizations.js'
   import {
     organizationPlanDetails,
@@ -276,15 +282,49 @@
                   >
                     {organization.name}
                   </a>
-                  {#if organization.location}
-                    <span title="Has location" class="text-blue-500">
-                      <GpsFixIcon
-                        size="14"
-                        weight="bold"
-                        aria-label="Has location"
-                      />
-                    </span>
-                  {/if}
+                  <Tooltip.Provider delayDuration={200}>
+                    <div class="flex items-center gap-1">
+                      {#if organization.location}
+                        <StatusIconTooltip
+                          label={`Location: ${organization.location.coordinates[1]}, ${organization.location.coordinates[0]}`}
+                        >
+                          <GpsFixIcon
+                            size="14"
+                            weight="bold"
+                            class="text-blue-500"
+                            aria-hidden="true"
+                          />
+                        </StatusIconTooltip>
+                      {/if}
+                      {#if organization.displayCollections}
+                        <StatusIconTooltip
+                          label="Collections are visible in public discovery"
+                        >
+                          <StackIcon
+                            size="14"
+                            weight="bold"
+                            class="text-green-600"
+                            aria-hidden="true"
+                          />
+                        </StatusIconTooltip>
+                      {/if}
+                      {#if organization.logo}
+                        <StatusIconTooltip
+                          label={`Logo URL: ${organization.logo}`}
+                          imageUrl={organization.logo}
+                          imageAlt={`${organization.name} logo`}
+                          showLabel={false}
+                        >
+                          <ImageIcon
+                            size="14"
+                            weight="bold"
+                            class="text-purple-500"
+                            aria-hidden="true"
+                          />
+                        </StatusIconTooltip>
+                      {/if}
+                    </div>
+                  </Tooltip.Provider>
                 </div>
               </td>
               <td class="px-3 py-2 @lg:px-4 @lg:py-3 whitespace-nowrap">
