@@ -14,7 +14,7 @@ import {
 
 import type { QueryOptions, Color } from './types.js'
 import type { TransformationType } from '@allmaps/transform'
-import type { OutputFormat } from '@allmaps/render/wasm'
+import type { EncodedOutputFormat } from '@allmaps/render/wasm'
 
 // TODO: simplify when this will be aligned with TransformationOptions from @allmaps/render
 export function optionsFromQuery(req: IRequest): Partial<QueryOptions> {
@@ -30,7 +30,7 @@ export function optionsFromQuery(req: IRequest): Partial<QueryOptions> {
   let width: number | undefined
   let height: number | undefined
   let background: string | undefined
-  let format: OutputFormat = 'png' // Default to PNG
+  let format: EncodedOutputFormat = 'png' // Default to PNG
 
   // Extract format from URL path (e.g., /maps/123.jpg -> 'jpeg')
   const path = req.url ? new URL(req.url).pathname : ''

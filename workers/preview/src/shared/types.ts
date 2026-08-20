@@ -1,5 +1,5 @@
 import type { TransformationType } from '@allmaps/transform'
-import type { OutputFormat } from '@allmaps/render/wasm'
+import type { EncodedOutputFormat } from '@allmaps/render/wasm'
 import type { PreviewEnv } from '@allmaps/env/preview'
 
 // TODO: align this with TransformationOptions from @allmaps/render
@@ -13,7 +13,7 @@ export type QueryOptions = TransformationOptions & {
   width: number
   height: number
   background: string
-  format: OutputFormat
+  format: EncodedOutputFormat
   // TODO: these options are specific to Allmaps Here, move them to a separate type
   color: Color
   from: [number, number]

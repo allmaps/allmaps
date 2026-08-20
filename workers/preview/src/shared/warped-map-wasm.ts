@@ -109,7 +109,9 @@ export async function generateWarpedMapImage(
     return webp(imageBuffer)
   } else if (format === 'jpeg') {
     return jpeg(imageBuffer)
-  } else {
+  } else if (format === 'png') {
     return png(imageBuffer)
   }
+
+  throw new Error(`Unsupported preview output format: ${format}`)
 }

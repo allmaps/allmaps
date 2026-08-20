@@ -203,7 +203,8 @@ type WasmRenderContext = {
   encode_jpeg(quality: number): Uint8Array
 }
 
-export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'rgba'
+export type EncodedOutputFormat = 'png' | 'webp' | 'jpeg'
+export type OutputFormat = EncodedOutputFormat | 'rgba'
 export type Interpolation = 'bilinear' | 'cubic'
 
 /**
