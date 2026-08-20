@@ -48,7 +48,8 @@ export async function createWarpedTileResponseWasm(
     fetchFn: cachedFetch,
     createRTree: false,
     transformationType,
-    outputFormat: format
+    outputFormat: format,
+    interpolation: 'cubic'
   })
 
   for (const georeferencedMap of georeferencedMaps) {

@@ -1,1 +1,5 @@
-export { WasmRenderer, type OutputFormat } from './renderers/WasmRenderer.js'
+export {
+  WasmRenderer,
+  type Interpolation,
+  type OutputFormat
+} from './renderers/WasmRenderer.js'

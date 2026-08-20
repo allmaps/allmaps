@@ -1,4 +1,4 @@
-use crate::interpolation::sample_bilinear;
+use crate::interpolation::{sample_bilinear, sample_cubic};
 use crate::mask::point_in_polygon;
 use crate::transforms::Transform;
 
@@ -35,6 +35,27 @@ pub struct DecodedTile {
     pub height: u32,
     pub scale_factor: f64,
     bbox: BBox, // Cached bounding box for fast culling
+}
+
+#[derive(Clone, Copy)]
+pub enum Interpolation {
+    Bilinear,
+    Cubic,
+}
+
+#[inline(always)]
+fn sample_tile(
+    interpolation: Interpolation,
+    tile: &DecodedTile,
+    tile_x: f64,
+    tile_y: f64,
+) -> [f64; 4] {
+    match interpolation {
+        Interpolation::Bilinear => {
+            sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y)
+        }
+        Interpolation::Cubic => sample_cubic(&tile.rgba, tile.width, tile.height, tile_x, tile_y),
+    }
 }
 
 impl DecodedTile {
@@ -169,6 +190,7 @@ pub fn render(
         &mut output,
         output_width,
         output_height,
+        Interpolation::Bilinear,
         0,
         0,
         output_width,
@@ -188,6 +210,7 @@ pub fn render_into(
     output: &mut [u8],
     output_width: u32,
     output_height: u32,
+    interpolation: Interpolation,
     render_min_x: u32,
     render_min_y: u32,
     render_max_x: u32,
@@ -277,8 +300,7 @@ pub fn render_into(
                 continue;
             }
 
-            // Bilinear sample
-            let color = sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
+            let color = sample_tile(interpolation, tile, tile_x, tile_y);
 
             let idx = ((cy * output_width + cx) * 4) as usize;
             if color[3] <= 0.0 {
@@ -330,6 +352,7 @@ pub fn render_triangles(
         &mut output,
         output_width,
         output_height,
+        Interpolation::Bilinear,
         0,
         0,
         output_width,
@@ -349,6 +372,7 @@ pub fn render_triangles_into(
     output: &mut [u8],
     output_width: u32,
     output_height: u32,
+    interpolation: Interpolation,
     render_min_x: u32,
     render_min_y: u32,
     render_max_x: u32,
@@ -448,7 +472,7 @@ pub fn render_triangles_into(
                     continue;
                 }
 
-                let color = sample_bilinear(&tile.rgba, tile.width, tile.height, tile_x, tile_y);
+                let color = sample_tile(interpolation, tile, tile_x, tile_y);
                 let idx = ((cy * output_width + cx) * 4) as usize;
                 if color[3] <= 0.0 {
                     continue;

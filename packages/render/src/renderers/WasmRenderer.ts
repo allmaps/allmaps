@@ -158,6 +158,7 @@ type WasmModule = {
 }
 
 type WasmRenderContext = {
+  set_interpolation(interpolation: Interpolation): void
   render_warped_tile_rgba(
     jpeg_tiles: Uint8Array,
     tile_offsets: Uint32Array,
@@ -197,11 +198,13 @@ type WasmRenderContext = {
     render_max_y: number
   ): void
   encode_png(): Uint8Array
+  rgba(): Uint8Array
   encode_webp(): Uint8Array
   encode_jpeg(quality: number): Uint8Array
 }
 
-export type OutputFormat = 'png' | 'webp' | 'jpeg'
+export type OutputFormat = 'png' | 'webp' | 'jpeg' | 'rgba'
+export type Interpolation = 'bilinear' | 'cubic'
 
 /**
  * Class that renders WarpedMaps using WASM with raw JPEG tiles
@@ -213,12 +216,14 @@ export class WasmRenderer
 {
   wasmModule: WasmModule
   outputFormat: OutputFormat
+  interpolation: Interpolation
   backgroundColor?: [number, number, number]
 
   constructor(
     wasmModule: WasmModule,
     options?: Partial<BaseRenderOptions<TriangulatedWarpedMap>> & {
       outputFormat?: OutputFormat
+      interpolation?: Interpolation
       backgroundColor?: [number, number, number]
     }
   ) {
@@ -235,6 +240,7 @@ export class WasmRenderer
     )
     this.wasmModule = wasmModule
     this.outputFormat = options?.outputFormat || 'png'
+    this.interpolation = options?.interpolation || 'bilinear'
     this.backgroundColor = options?.backgroundColor
 
     // Note: WASM module should be initialized by the caller before passing to constructor
@@ -267,6 +273,7 @@ export class WasmRenderer
       backgroundBlue,
       Boolean(this.backgroundColor)
     )
+    renderContext.set_interpolation(this.interpolation)
 
     // Get canvas-to-geo transform (same for all maps)
     const geoToCanvas = viewport.projectedGeoToCanvasHomogeneousTransform
@@ -329,7 +336,9 @@ export class WasmRenderer
     }
 
     // Encode output based on format
-    if (this.outputFormat === 'webp') {
+    if (this.outputFormat === 'rgba') {
+      return renderContext.rgba()
+    } else if (this.outputFormat === 'webp') {
       return renderContext.encode_webp()
     } else if (this.outputFormat === 'jpeg') {
       return renderContext.encode_jpeg(85)

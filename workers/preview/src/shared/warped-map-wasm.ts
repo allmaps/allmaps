@@ -66,7 +66,8 @@ export async function generateWarpedMapImage(
     createRTree: false,
     transformationType,
     outputFormat: format,
-    backgroundColor
+    backgroundColor,
+    interpolation: 'cubic'
   })
 
   renderer.addGeoreferenceAnnotation(annotation)
