@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createListForm } from '$lib/lists.remote.js'
+  import { submitRemoteFormWithoutReset } from '$lib/remote-form.js'
   import { routes } from '$lib/routes.js'
 </script>
 
@@ -9,7 +10,10 @@
   </div>
 
   <div class="bg-white rounded-lg shadow p-6">
-    <form {...createListForm} class="space-y-4">
+    <form
+      {...createListForm.enhance(submitRemoteFormWithoutReset)}
+      class="space-y-4"
+    >
       <div>
         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
           Name <span class="text-red-500">*</span>
