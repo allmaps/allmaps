@@ -10,7 +10,9 @@ use image::{DynamicImage, ImageDecoder, ImageEncoder};
 use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 
-use renderer::{render, render_into, render_triangles, render_triangles_into, DecodedTile};
+use renderer::{
+    render, render_into, render_triangles, render_triangles_into, DecodedTile, Interpolation,
+};
 use transforms::Transform;
 
 #[wasm_bindgen(start)]
@@ -125,6 +127,7 @@ pub struct RenderContext {
     output_pixels: Vec<u8>,
     output_width: u32,
     output_height: u32,
+    interpolation: Interpolation,
 }
 
 #[wasm_bindgen]
@@ -154,7 +157,15 @@ impl RenderContext {
             output_pixels,
             output_width,
             output_height,
+            interpolation: Interpolation::Bilinear,
         }
+    }
+
+    pub fn set_interpolation(&mut self, interpolation: &str) {
+        self.interpolation = match interpolation {
+            "cubic" => Interpolation::Cubic,
+            _ => Interpolation::Bilinear,
+        };
     }
 
     pub fn render_warped_tile_rgba(
@@ -221,6 +232,7 @@ impl RenderContext {
             &mut self.output_pixels,
             self.output_width,
             self.output_height,
+            self.interpolation,
             render_min_x,
             render_min_y,
             render_max_x,
@@ -288,6 +300,7 @@ impl RenderContext {
             &mut self.output_pixels,
             self.output_width,
             self.output_height,
+            self.interpolation,
             render_min_x,
             render_min_y,
             render_max_x,
@@ -297,6 +310,10 @@ impl RenderContext {
 
     pub fn encode_png(&self) -> Vec<u8> {
         encode_png(&self.output_pixels, self.output_width, self.output_height)
+    }
+
+    pub fn rgba(&self) -> Vec<u8> {
+        self.output_pixels.clone()
     }
 
     pub fn encode_webp(&self) -> Vec<u8> {

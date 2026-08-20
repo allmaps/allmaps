@@ -1,7 +1,7 @@
 import { png, webp } from 'itty-router'
 
 import { Viewport } from '@allmaps/render'
-import { WasmRenderer, type OutputFormat } from '@allmaps/render/wasm'
+import { WasmRenderer } from '@allmaps/render/wasm'
 import { bboxToRectangle } from '@allmaps/stdlib'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
@@ -23,6 +23,7 @@ import wasmFile from '../../../../packages/render-wasm/pkg/allmaps_render_wasm_b
 await wasmInit({ module_or_path: wasmFile })
 
 const TILE_WIDTH = 256
+type TileOutputFormat = 'png' | 'webp'
 
 export async function createWarpedTileResponseWasm(
   env: WorkerEnv,
@@ -30,7 +31,7 @@ export async function createWarpedTileResponseWasm(
   options: TransformationOptions,
   { x, y, z }: XYZTile,
   resolution: TileResolution = 'normal',
-  format: OutputFormat = 'png'
+  format: TileOutputFormat = 'png'
 ): Promise<Response> {
   if (!(x >= 0 && y >= 0 && z >= 0)) {
     throw new Error('x, y and z must be positive integers')
@@ -48,7 +49,8 @@ export async function createWarpedTileResponseWasm(
     fetchFn: cachedFetch,
     createRTree: false,
     transformationType,
-    outputFormat: format
+    outputFormat: format,
+    interpolation: 'cubic'
   })
 
   for (const georeferencedMap of georeferencedMaps) {
@@ -66,5 +68,11 @@ export async function createWarpedTileResponseWasm(
 
   const imageBuffer = await renderer.render(viewport)
 
-  return format === 'webp' ? webp(imageBuffer) : png(imageBuffer)
+  if (format === 'webp') {
+    return webp(imageBuffer)
+  } else if (format === 'png') {
+    return png(imageBuffer)
+  }
+
+  throw new Error(`Unsupported tile output format: ${format}`)
 }

@@ -66,7 +66,8 @@ export async function generateWarpedMapImage(
     createRTree: false,
     transformationType,
     outputFormat: format,
-    backgroundColor
+    backgroundColor,
+    interpolation: 'cubic'
   })
 
   renderer.addGeoreferenceAnnotation(annotation)
@@ -108,7 +109,9 @@ export async function generateWarpedMapImage(
     return webp(imageBuffer)
   } else if (format === 'jpeg') {
     return jpeg(imageBuffer)
-  } else {
+  } else if (format === 'png') {
     return png(imageBuffer)
   }
+
+  throw new Error(`Unsupported preview output format: ${format}`)
 }
