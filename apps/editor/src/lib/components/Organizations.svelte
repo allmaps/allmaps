@@ -3,8 +3,10 @@
   import { getExamplesState } from '$lib/state/examples.svelte.js'
   import {
     HOMEPAGE_EXAMPLES_COUNT,
-    HOMEPAGE_ORGANIZATION_COUNT
+    HOMEPAGE_ORGANIZATION_COUNT,
+    getApiResourceId
   } from '$lib/shared/examples.js'
+  import { updateHomepageExamplesData } from '$lib/shared/homepage-examples-cache.js'
   import { m } from '$lib/paraglide/messages.js'
 
   import type {
@@ -15,11 +17,17 @@
   type Props = {
     organizations: ApiOrganization[]
     examplesByOrganizationId: ExamplesByOrganizationId
+    visibleOrganizationCount?: number
   }
 
-  let { organizations, examplesByOrganizationId }: Props = $props()
+  let {
+    organizations,
+    examplesByOrganizationId,
+    visibleOrganizationCount = HOMEPAGE_ORGANIZATION_COUNT
+  }: Props = $props()
 
-  let visibleCount = $state(HOMEPAGE_ORGANIZATION_COUNT)
+  // svelte-ignore state_referenced_locally
+  let visibleCount = $state(visibleOrganizationCount)
   let loadingMoreOrganizations = $state(false)
 
   const visibleOrganizations = $derived(organizations.slice(0, visibleCount))
@@ -44,11 +52,27 @@
     loadingMoreOrganizations = true
 
     try {
-      await examplesState.fetchExamplesByOrganizations(
-        nextOrganizations,
-        HOMEPAGE_EXAMPLES_COUNT
+      const examplesByOrganizationId =
+        await examplesState.fetchExamplesByOrganizations(
+          nextOrganizations,
+          HOMEPAGE_EXAMPLES_COUNT
+        )
+      visibleCount = Math.min(
+        visibleCount + HOMEPAGE_ORGANIZATION_COUNT,
+        organizations.length
       )
-      visibleCount += HOMEPAGE_ORGANIZATION_COUNT
+      updateHomepageExamplesData(
+        Object.fromEntries(
+          nextOrganizations.map((organization) => {
+            const organizationId = getApiResourceId(organization.id)
+            return [
+              organizationId,
+              examplesByOrganizationId[organizationId] ?? []
+            ]
+          })
+        ),
+        visibleCount
+      )
     } catch (error) {
       console.error('Failed to fetch more organization examples', error)
     } finally {

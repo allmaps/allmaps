@@ -6,6 +6,7 @@
   import { Footer } from '@allmaps/ui'
 
   import { getUrlState } from '$lib/shared/params.js'
+  import { setHomepageExamplesData } from '$lib/shared/homepage-examples-cache.js'
 
   import {
     gotoRoute,
@@ -31,6 +32,10 @@
   }
 
   onMount(() => {
+    if (data.examplesLoaded) {
+      setHomepageExamplesData(data)
+    }
+
     const hash = page.url.hash
     if (hash) {
       let pathWithSearchParams = hash.slice(1)
@@ -94,6 +99,7 @@
       <Organizations
         organizations={data.organizations}
         examplesByOrganizationId={data.examplesByOrganizationId}
+        visibleOrganizationCount={data.visibleOrganizationCount}
       />
     </div>
   </section>

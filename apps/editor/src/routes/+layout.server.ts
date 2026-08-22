@@ -8,6 +8,7 @@ const editorPublicEnv = parseEditorPublicEnv(publicEnv)
 
 export const load: LayoutServerLoad = () => {
   return {
-    env: editorPublicEnv
+    env: editorPublicEnv,
+    homepageExamplesSeed: crypto.randomUUID()
   }
 }
