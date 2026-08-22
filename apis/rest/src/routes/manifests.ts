@@ -14,6 +14,7 @@ import {
   queryMaps
 } from '@allmaps/api-shared/db'
 import {
+  clampLimit,
   needsElevatedLimitRole,
   normalizeMapsQueryParams,
   queryRandom,
@@ -86,19 +87,26 @@ export function createManifestsRoutes(
           ? await getLimitRole()
           : 'public'
         setCacheControl(set, 'private-no-store')
-        return queryRandom((op, randomId) =>
-          queryManifests(
-            env.PUBLIC_REST_BASE_URL,
-            db,
-            {
-              georeferenced: query.georeferenced,
-              limit: query.limit,
-              randomManifestId: randomId,
-              randomManifestIdOp: op,
-              userRole
-            },
-            { expectRows: true, singular: false }
-          )
+        const limit = clampLimit(query.limit ?? 100, userRole)
+        return queryRandom(
+          limit,
+          async (op, randomId, queryLimit) => {
+            const manifests = await queryManifests(
+              env.PUBLIC_REST_BASE_URL,
+              db,
+              {
+                georeferenced: query.georeferenced,
+                limit: queryLimit,
+                randomManifestId: randomId,
+                randomManifestIdOp: op,
+                userRole
+              },
+              { expectRows: false, singular: false }
+            )
+
+            return Array.isArray(manifests) ? manifests : [manifests]
+          },
+          'Manifests not found'
         )
       },
       {

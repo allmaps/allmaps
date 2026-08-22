@@ -37,7 +37,10 @@ export const images = iiifSchema.table(
     createdAt: createTimestamp('created_at'),
     updatedAt: createTimestamp('updated_at')
   },
-  (table) => [index().on(table.domain)]
+  (table) => [
+    index().on(table.domain),
+    index('images_domain_id_idx').on(table.domain, table.id)
+  ]
 )
 
 export const canvases = iiifSchema.table('canvases', {
