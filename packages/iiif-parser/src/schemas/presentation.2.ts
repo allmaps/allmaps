@@ -110,7 +110,7 @@ export const Annotation2Schema = z.object({
 
 export const Canvas2Schema = z.object({
   '@id': z.string().url(),
-  '@type': z.literal('sc:Canvas'),
+  '@type': z.literal('sc:Canvas').optional(),
   width: z.number().int(),
   height: z.number().int(),
   images: Annotation2Schema.array().length(1),
@@ -126,8 +126,19 @@ export const Canvas2Schema = z.object({
   navPlace: NavPlaceSchema.optional()
 })
 
+const ManifestCanvas2Schema = Canvas2Schema.extend({
+  images: Annotation2Schema.array().max(1)
+})
+
 const Sequence2Schema = z.object({
-  canvases: Canvas2Schema.array().nonempty()
+  canvases: ManifestCanvas2Schema.array()
+    .nonempty()
+    .transform((canvases): z.infer<typeof Canvas2Schema>[] =>
+      canvases.filter((canvas) => canvas.images.length === 1)
+    )
+    .refine((canvases) => canvases.length > 0, {
+      error: 'At least one Canvas must contain an image'
+    })
 })
 
 export const Manifest2Schema = z.object({

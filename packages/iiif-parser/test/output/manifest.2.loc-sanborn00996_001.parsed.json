@@ -1,0 +1,234 @@
+{
+  "canvases": [
+    {
+      "height": 1912,
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=2"
+        }
+      ],
+      "image": {
+        "embedded": true,
+        "height": 1912,
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"],
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0002",
+        "width": 1612
+      },
+      "label": {
+        "none": ["Page 2"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": ["https://www.loc.gov/resource/g4314fm.g009961886/?sp=2"]
+          }
+        }
+      ],
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 150,
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0002.gif",
+          "width": 126
+        }
+      ],
+      "type": "canvas",
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0002",
+      "width": 1612
+    },
+    {
+      "height": 1912,
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=3"
+        }
+      ],
+      "image": {
+        "embedded": true,
+        "height": 1912,
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"],
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0003",
+        "width": 1612
+      },
+      "label": {
+        "none": ["Page 3"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": ["https://www.loc.gov/resource/g4314fm.g009961886/?sp=3"]
+          }
+        }
+      ],
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 150,
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0003.gif",
+          "width": 126
+        }
+      ],
+      "type": "canvas",
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0003",
+      "width": 1612
+    },
+    {
+      "height": 1912,
+      "homepage": [
+        {
+          "id": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=4"
+        }
+      ],
+      "image": {
+        "embedded": true,
+        "height": 1912,
+        "majorVersion": 2,
+        "supportedFormats": ["jpg"],
+        "supportsAnyRegionAndSize": true,
+        "type": "image",
+        "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0004",
+        "width": 1612
+      },
+      "label": {
+        "none": ["Page 4"]
+      },
+      "metadata": [
+        {
+          "label": {
+            "none": ["Library of Congress Resource URL"]
+          },
+          "value": {
+            "none": ["https://www.loc.gov/resource/g4314fm.g009961886/?sp=4"]
+          }
+        }
+      ],
+      "thumbnail": [
+        {
+          "format": "image/jpeg",
+          "height": 150,
+          "id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0004.gif",
+          "width": 126
+        }
+      ],
+      "type": "canvas",
+      "uri": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0004",
+      "width": 1612
+    }
+  ],
+  "description": {
+    "none": ["Jun 1886. 4 sheet(s)."]
+  },
+  "embedded": false,
+  "label": {
+    "none": [
+      "Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado."
+    ]
+  },
+  "majorVersion": 2,
+  "metadata": [
+    {
+      "label": {
+        "none": ["APA Citation Style"]
+      },
+      "value": {
+        "none": [
+          "(1886) <cite>Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado</cite>. Sanborn Map Company, Jun. [Map] Retrieved from the Library of Congress, https://www.loc.gov/item/sanborn00996_001/."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["MLA Citation Style"]
+      },
+      "value": {
+        "none": [
+          "<cite>Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado</cite>. Sanborn Map Company, Jun, 1886. Map. Retrieved from the Library of Congress, &lt;www.loc.gov/item/sanborn00996_001/&gt;."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Chicago Citation Style"]
+      },
+      "value": {
+        "none": [
+          "<cite>Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado</cite>. Sanborn Map Company, Jun, 1886. Map. https://www.loc.gov/item/sanborn00996_001/."
+        ]
+      }
+    },
+    {
+      "label": {
+        "none": ["Contributors"]
+      },
+      "value": {
+        "none": [""]
+      }
+    },
+    {
+      "label": {
+        "none": ["Created Published"]
+      },
+      "value": {
+        "none": ["Sanborn Map Company, Jun 1886"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Original Format"]
+      },
+      "value": {
+        "none": ["map"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Subjects"]
+      },
+      "value": {}
+    },
+    {
+      "label": {
+        "none": ["Online Format"]
+      },
+      "value": {
+        "none": ["image"]
+      }
+    },
+    {
+      "label": {
+        "none": ["Item Url"]
+      },
+      "value": {
+        "none": ["https://www.loc.gov/item/sanborn00996_001/"]
+      }
+    }
+  ],
+  "navDate": "1970-01-01T00:00:00.000Z",
+  "requiredStatement": {
+    "label": {
+      "none": ["Attribution"]
+    },
+    "value": {
+      "none": ["Provided by the Library of Congress"]
+    }
+  },
+  "thumbnail": [
+    {
+      "id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0001.gif"
+    }
+  ],
+  "type": "manifest",
+  "uri": "https://www.loc.gov/item/sanborn00996_001/manifest.json"
+}
