@@ -1,0 +1,200 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://www.loc.gov/item/sanborn00996_001/manifest.json",
+  "@type": "sc:Manifest",
+  "attribution": "Provided by the Library of Congress",
+  "description": "Jun 1886. 4 sheet(s).",
+  "label": "Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado.",
+  "logo": "https://loc.gov/static/images/logo-loc-new-branding.svg",
+  "metadata": [
+    {
+      "label": "APA Citation Style",
+      "value": "(1886) <cite>Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado</cite>. Sanborn Map Company, Jun. [Map] Retrieved from the Library of Congress, https://www.loc.gov/item/sanborn00996_001/."
+    },
+    {
+      "label": "MLA Citation Style",
+      "value": "<cite>Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado</cite>. Sanborn Map Company, Jun, 1886. Map. Retrieved from the Library of Congress, &lt;www.loc.gov/item/sanborn00996_001/&gt;."
+    },
+    {
+      "label": "Chicago Citation Style",
+      "value": "<cite>Sanborn Fire Insurance Map from Fort Collins, Larimer County, Colorado</cite>. Sanborn Map Company, Jun, 1886. Map. https://www.loc.gov/item/sanborn00996_001/."
+    },
+    {
+      "label": "Contributors",
+      "value": ""
+    },
+    {
+      "label": "Created Published",
+      "value": ["Sanborn Map Company, Jun 1886"]
+    },
+    {
+      "label": "Original Format",
+      "value": ["map"]
+    },
+    {
+      "label": "Subjects",
+      "value": []
+    },
+    {
+      "label": "Online Format",
+      "value": ["image"]
+    },
+    {
+      "label": "Item Url",
+      "value": "https://www.loc.gov/item/sanborn00996_001/"
+    }
+  ],
+  "navDate": null,
+  "seeAlso": [],
+  "sequences": [
+    {
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0001",
+          "height": 1912,
+          "images": [],
+          "label": "Page 1",
+          "metadata": [],
+          "related": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=1",
+          "thumbnail": {
+            "@id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0001.gif",
+            "format": "image/jpeg",
+            "height": 150,
+            "width": 126
+          },
+          "type": "sc:Canvas",
+          "width": 1612
+        },
+        {
+          "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0002",
+          "height": 1912,
+          "images": [
+            {
+              "@id": "https://www.loc.gov/resource/g4314fm.g009961886/seq-2/",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0002",
+              "resource": {
+                "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0002/full/pct:25/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 1912,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0002",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                },
+                "width": 1612
+              }
+            }
+          ],
+          "label": "Page 2",
+          "metadata": [
+            {
+              "label": "Library of Congress Resource URL",
+              "value": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=2"
+            }
+          ],
+          "related": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=2",
+          "thumbnail": {
+            "@id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0002.gif",
+            "format": "image/jpeg",
+            "height": 150,
+            "width": 126
+          },
+          "type": "sc:Canvas",
+          "width": 1612
+        },
+        {
+          "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0003",
+          "height": 1912,
+          "images": [
+            {
+              "@id": "https://www.loc.gov/resource/g4314fm.g009961886/seq-3/",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0003",
+              "resource": {
+                "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0003/full/pct:25/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 1912,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0003",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                },
+                "width": 1612
+              }
+            }
+          ],
+          "label": "Page 3",
+          "metadata": [
+            {
+              "label": "Library of Congress Resource URL",
+              "value": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=3"
+            }
+          ],
+          "related": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=3",
+          "thumbnail": {
+            "@id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0003.gif",
+            "format": "image/jpeg",
+            "height": 150,
+            "width": 126
+          },
+          "type": "sc:Canvas",
+          "width": 1612
+        },
+        {
+          "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0004",
+          "height": 1912,
+          "images": [
+            {
+              "@id": "https://www.loc.gov/resource/g4314fm.g009961886/seq-4/",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0004",
+              "resource": {
+                "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0004/full/pct:25/0/default.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "height": 1912,
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd431m:g4314m:g4314fm:g009961886:00996_1886-0004",
+                  "profile": "http://iiif.io/api/image/2/level2.json"
+                },
+                "width": 1612
+              }
+            }
+          ],
+          "label": "Page 4",
+          "metadata": [
+            {
+              "label": "Library of Congress Resource URL",
+              "value": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=4"
+            }
+          ],
+          "related": "https://www.loc.gov/resource/g4314fm.g009961886/?sp=4",
+          "thumbnail": {
+            "@id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0004.gif",
+            "format": "image/jpeg",
+            "height": 150,
+            "width": 126
+          },
+          "type": "sc:Canvas",
+          "width": 1612
+        }
+      ],
+      "label": "Order of the views"
+    }
+  ],
+  "thumbnail": [
+    {
+      "@id": "https://tile.loc.gov/storage-services/service/gmd/gmd431m/g4314m/g4314fm/g009961886/00996_1886-0001.gif"
+    }
+  ],
+  "viewingDirection": "left-to-right",
+  "viewingHint": "paged"
+}
