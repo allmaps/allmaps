@@ -18,7 +18,6 @@
   import Organizations from '$lib/components/Organizations.svelte'
   import TermsOfUse from '$lib/components/TermsOfUse.svelte'
 
-  import { organizationsWithCollectionsOnHomepage } from '$lib/shared/organizations.js'
   import { m } from '$lib/paraglide/messages.js'
 
   const urlState = getUrlState()
@@ -84,13 +83,13 @@
     </div>
   </section>
   <section class="flex w-full flex-col items-center bg-[#f2feff] pb-16">
-    <div class="flex max-w-(--breakpoint-lg) flex-col items-center p-2">
+    <div class="flex w-full max-w-(--breakpoint-lg) flex-col items-center p-2">
       <div class="flex flex-col items-center space-y-4 p-8 text-center">
         <h2 class="text-2xl font-bold text-black">
           {m.homepage_pick_collection()}
         </h2>
       </div>
-      <Organizations organizations={organizationsWithCollectionsOnHomepage} />
+      <Organizations />
     </div>
   </section>
 </div>

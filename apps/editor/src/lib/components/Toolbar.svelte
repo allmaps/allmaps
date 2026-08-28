@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
   import { DropdownMenu } from 'bits-ui'
 
   import {
@@ -13,9 +14,8 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
+  import { getExamplesState } from '$lib/state/examples.svelte.js'
   import { m } from '$lib/paraglide/messages.js'
-
-  import { isCallbackValid } from '$lib/shared/organizations.js'
 
   import { Logo, Popover } from '@allmaps/ui'
 
@@ -26,14 +26,24 @@
   const sourceState = getSourceState()
   const mapsMergedState = getMapsMergedState()
   const urlState = getUrlState()
+  const examplesState = getExamplesState()
 
   let exportDisabled = $derived(
     !sourceState.canEdit || mapsMergedState.completeMaps.length === 0
   )
+  let callbackValid = $derived(
+    urlState.params.callback
+      ? examplesState.isCallbackValid(urlState.params.callback)
+      : false
+  )
+
+  onMount(() => {
+    void examplesState.getOrganizations()
+  })
 </script>
 
 <div class="flex flex-row items-center gap-1">
-  {#if urlState.params.callback && isCallbackValid(urlState.params.callback)}
+  {#if urlState.params.callback && callbackValid}
     <a
       data-tour="editor-export"
       class="flex flex-row items-center gap-1.5 rounded-full bg-green

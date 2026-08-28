@@ -89,9 +89,11 @@ const organizationMutationDetail = {
 }
 
 const organizationsQuerySchema = t.Object({
+  id: t.Optional(t.Array(t.String())),
   limit: t.Optional(t.Number()),
   plan: t.Optional(t.Array(t.UnionEnum(ORGANIZATION_PLANS))),
-  displayCollections: t.Optional(t.Boolean())
+  displayCollections: t.Optional(t.Boolean()),
+  slug: t.Optional(t.Array(t.String()))
 })
 
 async function createIiifFromBody<T>(

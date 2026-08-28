@@ -108,11 +108,19 @@ export function normalizeOrganizationsQueryParams(
   request: Request
 ): Partial<OrganizationsQueryParams> {
   const searchParams = new URL(request.url).searchParams
+  const organizationIds = new Set<string>()
+  const organizationSlugs = new Set<string>()
   const plans = new Set<OrganizationPlan>()
   const params: Partial<OrganizationsQueryParams> = {}
 
   for (const [key, value] of searchParams) {
     switch (key.toLowerCase()) {
+      case 'id':
+        organizationIds.add(value)
+        break
+      case 'slug':
+        organizationSlugs.add(value)
+        break
       case 'limit':
         params.limit = parseNumberParam('limit', value)
         break
@@ -129,6 +137,14 @@ export function normalizeOrganizationsQueryParams(
         params.displayCollections = value === 'true'
         break
     }
+  }
+
+  if (organizationIds.size > 0) {
+    params.organizationIds = [...organizationIds]
+  }
+
+  if (organizationSlugs.size > 0) {
+    params.organizationSlugs = [...organizationSlugs]
   }
 
   if (plans.size > 0) {

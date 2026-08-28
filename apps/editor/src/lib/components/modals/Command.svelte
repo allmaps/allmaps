@@ -21,9 +21,12 @@
     getNewParamsFromUrl
   } from '$lib/shared/router.js'
   import { getAnnotationUrl, getViewerUrl } from '$lib/shared/urls.js'
+  import {
+    fetchRandomUngeoreferencedImage,
+    getImageOpenUrl
+  } from '$lib/shared/examples.js'
   import { m } from '$lib/paraglide/messages.js'
 
-  import type { Example } from '$lib/types/shared.js'
   import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const scopeState = getScopeState()
@@ -31,7 +34,7 @@
   const urlState = getUrlState()
   const varsState = getVarsState<EditorPublicEnv>()
 
-  const examplesApiUrl = varsState.PUBLIC_EXAMPLES_API_URL
+  const restBaseUrl = varsState.PUBLIC_REST_BASE_URL
   const annotationsApiBaseUrl = varsState.PUBLIC_ANNOTATIONS_BASE_URL
   const viewerBaseUrl = varsState.PUBLIC_VIEWER_BASE_URL
 
@@ -52,11 +55,8 @@
 
   async function handleRandomIiifResource() {
     try {
-      const fetchedExamples = (await fetch(`${examplesApiUrl}/?count=1`).then(
-        (response) => response.json()
-      )) as Example[]
-
-      const url = fetchedExamples[0].manifestId
+      const image = await fetchRandomUngeoreferencedImage(fetch, restBaseUrl)
+      const url = image ? getImageOpenUrl(image) : undefined
 
       if (url) {
         gotoRoute(

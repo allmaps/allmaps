@@ -22,6 +22,7 @@
   "homepage_intro": "Zoek een kaart in een IIIF-kaartencollectie, kopieer de IIIF-URL en plak die hieronder om te beginnen met georefereren. Je kunt gegeorefereerde kaarten bekijken in Allmaps Viewer of gebruiken in tools zoals MapLibre, OpenLayers, Leaflet of QGIS.",
   "homepage_pick_collection": "Of kies een kaart uit deze collecties",
   "more_from_this_collection": "Meer uit deze collectie",
+  "show_more_collections": "Meer collecties tonen",
   "open_iiif_resource_from_url": "Open een IIIF-resource via een URL",
   "search_or_paste_iiif_url": "Zoek iets of plak een IIIF-URL…",
   "no_results_found": "Geen resultaten gevonden.",

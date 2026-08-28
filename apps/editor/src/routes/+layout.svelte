@@ -29,7 +29,7 @@
   const urlState = setUrlState(page.url, searchParams)
 
   // svelte-ignore state_referenced_locally
-  setExamplesState(data.env.PUBLIC_EXAMPLES_API_URL)
+  setExamplesState(data.env.PUBLIC_REST_BASE_URL)
   setImageInfoState()
 
   onNavigate((navigation) => {

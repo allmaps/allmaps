@@ -37,6 +37,8 @@ type DbOrganization = {
 
 type ListOrganizationsOptions = {
   limit?: number
+  organizationIds?: string[]
+  organizationSlugs?: string[]
   plans?: OrganizationPlan[]
   displayCollections?: boolean
   userRole?: UserRole
@@ -252,6 +254,14 @@ export function fromDbOrganizationWithUsers(
 
 function getOrganizationsWhere(options: ListOrganizationsOptions) {
   return {
+    id:
+      options.organizationIds && options.organizationIds.length > 0
+        ? { in: options.organizationIds }
+        : undefined,
+    slug:
+      options.organizationSlugs && options.organizationSlugs.length > 0
+        ? { in: options.organizationSlugs }
+        : undefined,
     plan:
       options.plans && options.plans.length > 0
         ? { in: options.plans }
