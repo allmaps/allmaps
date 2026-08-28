@@ -1,19 +1,19 @@
 import { setContext, getContext } from 'svelte'
 
-import { SvelteMap } from 'svelte/reactivity'
+import { SvelteMap, SvelteSet } from 'svelte/reactivity'
 
 import {
   fetchExampleOrganizations,
   fetchRandomOrganizationImages,
   getApiResourceId,
+  HOMEPAGE_EXAMPLES_COUNT,
+  HOMEPAGE_ORGANIZATION_COUNT,
   imagesToExamplesByOrganizationId,
-  isCallbackAllowedByOrganizations
+  isCallbackAllowedByOrganizations,
+  shuffleOrganizations
 } from '$lib/shared/examples.js'
 
-import type {
-  ApiOrganization,
-  ExamplesByOrganizationId
-} from '$lib/shared/examples.js'
+import type { ApiOrganization } from '$lib/shared/examples.js'
 import type { Example } from '$lib/types/shared.js'
 
 const EXAMPLES_KEY = Symbol('maps-history')
@@ -28,6 +28,13 @@ export class ExamplesState {
   #examplesByOrganizationId = $state<SvelteMap<string, Example[]>>(
     new SvelteMap()
   )
+  #fetchedExampleOrganizationIds = new SvelteSet<string>()
+
+  #homepageExamplesPromise: Promise<void> | undefined
+  #homepageLoading = $state(false)
+  #homepageLoadingMore = $state(false)
+  #homepageFailed = $state(false)
+  #visibleHomepageOrganizationCount = $state(HOMEPAGE_ORGANIZATION_COUNT)
 
   constructor(restBaseUrl: string) {
     this.#restBaseUrl = restBaseUrl
@@ -46,22 +53,18 @@ export class ExamplesState {
     this.#organizationsPromise ??= fetchExampleOrganizations(
       fetch,
       this.#restBaseUrl
-    ).then((organizations) => {
-      this.setOrganizations(organizations)
-      return organizations
-    })
+    )
+      .then((organizations) => {
+        const shuffledOrganizations = shuffleOrganizations(organizations)
+        this.setOrganizations(shuffledOrganizations)
+        return shuffledOrganizations
+      })
+      .catch((error) => {
+        this.#organizationsPromise = undefined
+        throw error
+      })
 
     return this.#organizationsPromise
-  }
-
-  setExamplesByOrganizationId(
-    examplesByOrganizationId: ExamplesByOrganizationId
-  ) {
-    for (const [organizationId, examples] of Object.entries(
-      examplesByOrganizationId
-    )) {
-      this.#examplesByOrganizationId.set(organizationId, examples)
-    }
   }
 
   async fetchExamplesByOrganizations(
@@ -82,14 +85,96 @@ export class ExamplesState {
         organizationId,
         examplesByOrganizationId[organizationId] ?? []
       )
+      this.#fetchedExampleOrganizationIds.add(organizationId)
     }
 
     return examplesByOrganizationId
   }
 
+  async loadHomepageExamples() {
+    if (this.#homepageExamplesPromise) {
+      return this.#homepageExamplesPromise
+    }
+
+    const visibleOrganizations = this.visibleHomepageOrganizations
+    if (
+      visibleOrganizations.length > 0 &&
+      visibleOrganizations.every((organization) =>
+        this.hasFetchedExamplesByOrganization(organization)
+      )
+    ) {
+      return
+    }
+
+    this.#homepageLoading = true
+    this.#homepageFailed = false
+
+    const promise = (async () => {
+      const organizations = await this.getOrganizations()
+      const organizationsToFetch = organizations
+        .slice(0, this.#visibleHomepageOrganizationCount)
+        .filter(
+          (organization) => !this.hasFetchedExamplesByOrganization(organization)
+        )
+
+      await this.fetchExamplesByOrganizations(
+        organizationsToFetch,
+        HOMEPAGE_EXAMPLES_COUNT
+      )
+    })()
+
+    this.#homepageExamplesPromise = promise
+
+    try {
+      await promise
+    } catch (error) {
+      this.#homepageFailed = true
+      throw error
+    } finally {
+      this.#homepageLoading = false
+      this.#homepageExamplesPromise = undefined
+    }
+  }
+
+  async showMoreHomepageOrganizations() {
+    if (this.#homepageLoading || this.#homepageLoadingMore) {
+      return
+    }
+
+    const nextOrganizations = this.#organizations.slice(
+      this.#visibleHomepageOrganizationCount,
+      this.#visibleHomepageOrganizationCount + HOMEPAGE_ORGANIZATION_COUNT
+    )
+
+    if (nextOrganizations.length === 0) {
+      return
+    }
+
+    this.#homepageLoadingMore = true
+
+    try {
+      await this.fetchExamplesByOrganizations(
+        nextOrganizations,
+        HOMEPAGE_EXAMPLES_COUNT
+      )
+      this.#visibleHomepageOrganizationCount = Math.min(
+        this.#visibleHomepageOrganizationCount + HOMEPAGE_ORGANIZATION_COUNT,
+        this.#organizations.length
+      )
+    } finally {
+      this.#homepageLoadingMore = false
+    }
+  }
+
   getExamplesByOrganization(organization: ApiOrganization) {
     const organizationId = getApiResourceId(organization.id)
     return this.#examplesByOrganizationId.get(organizationId) ?? []
+  }
+
+  hasFetchedExamplesByOrganization(organization: ApiOrganization) {
+    return this.#fetchedExampleOrganizationIds.has(
+      getApiResourceId(organization.id)
+    )
   }
 
   isCallbackValid(callback: string) {
@@ -98,6 +183,41 @@ export class ExamplesState {
 
   get allExamples() {
     return Array.from(this.#examplesByOrganizationId.values()).flat()
+  }
+
+  get organizations() {
+    return this.#organizations
+  }
+
+  get visibleHomepageOrganizations() {
+    return this.#organizations.slice(0, this.#visibleHomepageOrganizationCount)
+  }
+
+  get hasMoreHomepageOrganizations() {
+    return this.#visibleHomepageOrganizationCount < this.#organizations.length
+  }
+
+  get homepageLoading() {
+    return this.#homepageLoading
+  }
+
+  get homepagePending() {
+    return (
+      !this.#homepageFailed &&
+      (!this.#organizationsFetched ||
+        this.#homepageLoading ||
+        this.visibleHomepageOrganizations.some(
+          (organization) => !this.hasFetchedExamplesByOrganization(organization)
+        ))
+    )
+  }
+
+  get homepageLoadingMore() {
+    return this.#homepageLoadingMore
+  }
+
+  get homepageFailed() {
+    return this.#homepageFailed
   }
 }
 

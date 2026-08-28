@@ -320,31 +320,10 @@ function shuffleItems<T>(items: T[]) {
     .map(({ item }) => item)
 }
 
-function getSeededSortValue(value: string) {
-  let hash = 2166136261
-
-  for (let index = 0; index < value.length; index++) {
-    hash ^= value.charCodeAt(index)
-    hash = Math.imul(hash, 16777619)
-  }
-
-  return hash >>> 0
-}
-
 export function shuffleImages(images: ApiImage[]) {
   return shuffleItems(images)
 }
 
-export function shuffleOrganizations(
-  organizations: ApiOrganization[],
-  seed: string
-) {
-  return organizations
-    .map((organization, index) => ({
-      organization,
-      index,
-      sort: getSeededSortValue(`${seed}:${getApiResourceId(organization.id)}`)
-    }))
-    .sort((a, b) => a.sort - b.sort || a.index - b.index)
-    .map(({ organization }) => organization)
+export function shuffleOrganizations(organizations: ApiOrganization[]) {
+  return shuffleItems(organizations)
 }

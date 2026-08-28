@@ -6,7 +6,6 @@
   import { Footer } from '@allmaps/ui'
 
   import { getUrlState } from '$lib/shared/params.js'
-  import { setHomepageExamplesData } from '$lib/shared/homepage-examples-cache.js'
 
   import {
     gotoRoute,
@@ -21,8 +20,6 @@
 
   import { m } from '$lib/paraglide/messages.js'
 
-  let { data } = $props()
-
   const urlState = getUrlState()
 
   function handleInputSubmit(url: string) {
@@ -32,10 +29,6 @@
   }
 
   onMount(() => {
-    if (data.examplesLoaded) {
-      setHomepageExamplesData(data)
-    }
-
     const hash = page.url.hash
     if (hash) {
       let pathWithSearchParams = hash.slice(1)
@@ -90,17 +83,13 @@
     </div>
   </section>
   <section class="flex w-full flex-col items-center bg-[#f2feff] pb-16">
-    <div class="flex max-w-(--breakpoint-lg) flex-col items-center p-2">
+    <div class="flex w-full max-w-(--breakpoint-lg) flex-col items-center p-2">
       <div class="flex flex-col items-center space-y-4 p-8 text-center">
         <h2 class="text-2xl font-bold text-black">
           {m.homepage_pick_collection()}
         </h2>
       </div>
-      <Organizations
-        organizations={data.organizations}
-        examplesByOrganizationId={data.examplesByOrganizationId}
-        visibleOrganizationCount={data.visibleOrganizationCount}
-      />
+      <Organizations />
     </div>
   </section>
 </div>
