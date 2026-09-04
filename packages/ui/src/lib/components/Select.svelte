@@ -49,13 +49,14 @@
 
 <Select.Root bind:value type="single">
   <Select.Trigger
-    class="cursor-pointer w-full px-1 py-1 rounded-lg bg-white outline-none
+    aria-label={selectedItem?.label || placeholder}
+    class="cursor-pointer min-w-0 w-full px-1 py-1 rounded-lg bg-white outline-none
     inline-flex items-center justify-between gap-2 text-left
     border-solid border-gray-100 border-1 transition-colors
     focus-within:border-pink inset-shadow-xs"
   >
     <Icon class="size-5 shrink-0" />
-    <span class="w-full"
+    <span class="min-w-0 flex-1 truncate"
       >{selectedItem?.label ? selectedItem?.label : placeholder}</span
     >
     <CaretUpDownIcon class="size-5 shrink-0" />
@@ -67,8 +68,8 @@
       class="outline-hidden z-50
       bg-white p-1 shadow-lg rounded-md
         border-1 border-gray-200 overflow-auto
-        max-h-[calc((var(--bits-popover-content-available-height))-(--spacing(2)))]
-        w-[var(--bits-select-anchor-width)] min-w-[var(--bits-select-anchor-width)]"
+        max-h-[calc((var(--bits-popover-content-available-height))-(--spacing(2)))]"
+      style="width: min(max(12rem, var(--bits-select-anchor-width)), calc(100vw - 1rem))"
     >
       {#snippet child({ wrapperProps, props, open })}
         {#if open}

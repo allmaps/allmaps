@@ -199,26 +199,32 @@
     class="pointer-events-none w-full flex justify-between lg:grid lg:grid-cols-[1fr_max-content_1fr] items-end
       gap-2 *:pointer-events-auto"
   >
-    <div class="min-w-0">
+    <div class="min-w-0 shrink-0">
       {#if resourceLoaded}
         <MapGuide state={mapGuideState} {smallScreenPopoverContainer} />
       {/if}
     </div>
-    <div>
+    <div
+      class={isResultsView && resultsEnabled
+        ? 'min-w-18 basis-50 md:basis-64 lg:basis-auto'
+        : undefined}
+    >
       {#if isResultsView && resultsEnabled}
         <div
           class="z-50 flex items-center
             gap-2 rounded-lg bg-white p-1 shadow-md"
           transition:fade={{ duration: 100 }}
         >
-          <span class="hidden pl-1 md:inline-block">{m.show()}</span>
-          <div class="w-48">
+          <span class="hidden shrink-0 pl-1 md:inline-block">{m.show()}</span>
+          <div class="min-w-16 w-0 flex-1 lg:w-48">
             <Scope />
           </div>
         </div>
       {/if}
     </div>
-    <div class="flex flex-row items-center justify-center gap-2 place-self-end">
+    <div
+      class="flex shrink-0 flex-row items-center justify-center gap-2 place-self-end"
+    >
       {#if isResultsView && scopeState.mapsCount > 1}
         <MapSelector />
       {:else if sourceState.imageCount > 1}
