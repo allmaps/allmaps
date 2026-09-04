@@ -41,6 +41,7 @@
   }
 
   const POPOVER_TRANSITION_DURATION = 75
+  const messagesHeadingId = $props.id()
 
   let {
     state: guideState,
@@ -353,6 +354,7 @@
 {#if messagesOpen}
   <dialog
     bind:this={messagesDialog}
+    aria-labelledby={messagesHeadingId}
     class="h-full max-h-full w-full max-w-full bg-transparent backdrop:bg-black/50 open:flex open:items-center open:justify-center"
     transition:fade={{ duration: 100 }}
     onclose={handleMessagesClose}
@@ -363,7 +365,9 @@
       style:width="min(42rem, calc(100dvw - 2rem))"
     >
       <div class="mb-3 flex items-center justify-between gap-4">
-        <h2 class="text-xl font-bold">{m.mapguide_messages()}</h2>
+        <h2 id={messagesHeadingId} class="text-xl font-bold">
+          {m.mapguide_messages()}
+        </h2>
         <button
           class="cursor-pointer rounded-full bg-white p-1 transition-colors duration-200 hover:bg-gray-100/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40"
           aria-label={m.mapguide_close()}

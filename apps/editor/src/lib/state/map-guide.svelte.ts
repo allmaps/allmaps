@@ -26,13 +26,7 @@ export class MapGuideState {
   #seenMessages = $state<SeenMessages>({})
   #selectedMessageKey = $state<string>()
 
-  #displayMessages = $derived.by(() => {
-    const context = this.#context
-
-    if (!context) {
-      return []
-    }
-
+  #definitionsById = $derived.by(() => {
     const definitionsById = new Map<string, EditorMapGuideMessageDefinition>()
 
     for (const definition of this.#definitions) {
@@ -43,7 +37,17 @@ export class MapGuideState {
       definitionsById.set(definition.id, definition)
     }
 
-    return Array.from(definitionsById.values())
+    return definitionsById
+  })
+
+  #displayMessages = $derived.by(() => {
+    const context = this.#context
+
+    if (!context) {
+      return []
+    }
+
+    return Array.from(this.#definitionsById.values())
       .flatMap((definition, index) => {
         if (!this.#isDefinitionRelevant(definition, context)) {
           return []
@@ -350,18 +354,17 @@ export class MapGuideState {
       return false
     }
 
+    const message = this.#displayMessages.find(
+      (message) => message.key === messageKey
+    )
     const item =
-      this.#displayMessages.find((message) => message.key === messageKey) ??
+      message ??
       (this.#completionPrompt?.key === messageKey
         ? this.#completionPrompt
         : undefined)
-    const definition = [
-      ...this.#definitions,
-      ...this.#dynamicDefinitions,
-      ...(this.#completionPromptDefinition
-        ? [this.#completionPromptDefinition]
-        : [])
-    ].find((definition) => definition.id === item?.id)
+    const definition = message
+      ? this.#definitionsById.get(message.id)
+      : this.#completionPromptDefinition
 
     if (!item || !definition) {
       return false
@@ -372,10 +375,6 @@ export class MapGuideState {
     if (!action) {
       return false
     }
-
-    const message = this.#displayMessages.find(
-      (message) => message.key === item.key
-    )
 
     if (message) {
       this.selectMessage(message.key)
