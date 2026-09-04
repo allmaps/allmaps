@@ -9,6 +9,7 @@
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
   import { getExamplesState } from '$lib/state/examples.svelte.js'
+  import { getVarsState } from '$lib/state/vars.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getView, getViewUrl } from '$lib/shared/router.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
@@ -22,6 +23,7 @@
     State
   } from 'driver.js'
   import type { MaybeView } from '$lib/types/shared.js'
+  import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const uiState = getUiState()
   const sourceState = getSourceState()
@@ -29,6 +31,7 @@
   const mapsMergedState = getMapsMergedState()
   const urlState = getUrlState()
   const examplesState = getExamplesState()
+  const varsState = getVarsState<EditorPublicEnv>()
 
   let tour: Driver | undefined
   let movingToView = false
@@ -42,9 +45,12 @@
     imagesView: '[data-tour="editor-images-view"]',
     maskView: '[data-tour="editor-mask-view"]',
     georeferenceView: '[data-tour="editor-georeference-view"]',
+    geocoderPopover: '[data-tour="editor-geocoder-popover"]',
     mapSettingsPopover: '[data-tour="editor-map-settings-popover"]',
     maps: '[data-tour="editor-maps"]',
     mapsPopover: '[data-tour="editor-maps-popover"]',
+    transformation: '[data-tour="editor-transformation"]',
+    gcps: '[data-tour="editor-gcps"]',
     resultsView: '[data-tour="editor-results-view"]',
     export: '[data-tour="editor-export"]',
     exportPopover: '[data-tour="editor-export-popover"]'
@@ -107,7 +113,7 @@
   }
 
   type TourDirection = 'next' | 'previous'
-  type TourPopover = 'info' | 'maps' | 'mapSettings' | 'export'
+  type TourPopover = 'info' | 'maps' | 'mapSettings' | 'geocoder' | 'export'
 
   type MoveTourOptions = {
     direction: TourDirection
@@ -293,6 +299,13 @@
         return
       }
 
+      if (
+        options.targetSelector === selector.transformation ||
+        options.targetSelector === selector.gcps
+      ) {
+        targetElement.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+      }
+
       if (options.direction === 'next') {
         driver.moveNext()
       } else {
@@ -404,6 +417,9 @@
   }
 
   function getSteps(): DriveStep[] {
+    const hasGeocoder = Boolean(varsState.PUBLIC_GEOCODE_EARTH_KEY)
+    const activeMap = mapsState.activeMap
+
     const steps = [
       getStep(
         selector.source,
@@ -470,12 +486,29 @@
         },
         {
           onPrevClick: moveToViewOnPrevious('mask', selector.maskView),
-          onNextClick: moveToPopoverOnNext(
-            'mapSettings',
-            selector.mapSettingsPopover
-          )
+          onNextClick: hasGeocoder
+            ? moveToPopoverOnNext('geocoder', selector.geocoderPopover)
+            : moveToPopoverOnNext('mapSettings', selector.mapSettingsPopover)
         }
       ),
+      ...(hasGeocoder
+        ? [
+            getStep(
+              selector.geocoderPopover,
+              {
+                title: m.tour_search_title(),
+                description: m.tour_search_description()
+              },
+              {
+                onPrevClick: closePopoversOnPrevious(selector.georeferenceView),
+                onNextClick: moveToPopoverOnNext(
+                  'mapSettings',
+                  selector.mapSettingsPopover
+                )
+              }
+            )
+          ]
+        : []),
       getStep(
         selector.mapSettingsPopover,
         {
@@ -483,7 +516,9 @@
           description: m.tour_map_settings_description()
         },
         {
-          onPrevClick: closePopoversOnPrevious(selector.georeferenceView),
+          onPrevClick: hasGeocoder
+            ? moveToPopoverOnPrevious('geocoder', selector.geocoderPopover)
+            : closePopoversOnPrevious(selector.georeferenceView),
           onNextClick: moveToPopoverOnNext('maps', selector.mapsPopover)
         }
       ),
@@ -495,6 +530,48 @@
       })
     ]
 
+    let previousMapsSelector = selector.mapsPopover
+
+    if (activeMap) {
+      setOnNextClick(
+        steps[steps.length - 1],
+        moveToPopoverOnNext('maps', selector.transformation)
+      )
+      steps.push(
+        getStep(
+          selector.transformation,
+          {
+            title: m.tour_transformation_title(),
+            description: m.tour_transformation_description()
+          },
+          {
+            onPrevClick: moveToPopoverOnPrevious('maps', previousMapsSelector)
+          }
+        )
+      )
+      previousMapsSelector = selector.transformation
+
+      if (Object.keys(activeMap.gcps).length > 0) {
+        setOnNextClick(
+          steps[steps.length - 1],
+          moveToPopoverOnNext('maps', selector.gcps)
+        )
+        steps.push(
+          getStep(
+            selector.gcps,
+            {
+              title: m.tour_gcps_title(),
+              description: m.tour_gcps_description()
+            },
+            {
+              onPrevClick: moveToPopoverOnPrevious('maps', previousMapsSelector)
+            }
+          )
+        )
+        previousMapsSelector = selector.gcps
+      }
+    }
+
     setOnNextClick(
       steps[steps.length - 1],
       moveToViewOnNext('results', selector.resultsView)
@@ -503,7 +580,7 @@
     const resultsStep = getStep(selector.resultsView, getResultsData(), {
       onPrevClick: moveToPopoverOnPrevious(
         'maps',
-        selector.mapsPopover,
+        previousMapsSelector,
         'georeference'
       )
     })
