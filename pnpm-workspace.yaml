@@ -85,7 +85,7 @@ catalog:
   '@types/leaflet': ^1.9.4
   d3-geo: ^3.1.1
   leaflet: ^1.9.4
-  maplibre-gl: ^5.16
+  maplibre-gl: ^6.4
   ol: ^10.8.0
   pmtiles: ^4.3.0
   point-in-polygon-hao: ^1.2.4
