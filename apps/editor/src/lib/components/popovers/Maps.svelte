@@ -191,6 +191,7 @@
 
           {#if isActiveMap}
             <div
+              data-tour="editor-transformation"
               class="col-span-9 grid grid-cols-[min-content_1fr]
               items-center gap-x-4 gap-y-2 pb-2 text-sm
               sm:pl-7"
@@ -214,7 +215,10 @@
                 {#each gcps as gcp, index (gcp.id)}
                   {@const isActiveGcp = mapsState.activeGcpId === gcp.id}
                   <li class="contents">
-                    <div class="col-span-8 grid grid-cols-subgrid gap-0">
+                    <div
+                      data-tour={index === 0 ? 'editor-gcps' : undefined}
+                      class="col-span-8 grid grid-cols-subgrid gap-0"
+                    >
                       <button
                         class="inline-block h-8 cursor-pointer"
                         onclick={() => handleGcpClick(map.id, gcp.id)}

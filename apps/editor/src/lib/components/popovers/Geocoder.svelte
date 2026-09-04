@@ -40,10 +40,12 @@
   }
 </script>
 
-<Geocoder
-  providers={[
-    new GeocodeEarthGeocoderProvider(geocodeEarthKey),
-    new WorldHistoricalGazetteerGeocoderProvider()
-  ]}
-  onselect={handleGeocoderSelect}
-/>
+<div data-tour="editor-geocoder-popover">
+  <Geocoder
+    providers={[
+      new GeocodeEarthGeocoderProvider(geocodeEarthKey),
+      new WorldHistoricalGazetteerGeocoderProvider()
+    ]}
+    onselect={handleGeocoderSelect}
+  />
+</div>
