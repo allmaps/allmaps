@@ -19,6 +19,7 @@
   import { getSourceState } from '$lib/state/source.svelte.js'
   import { getMapsState } from '$lib/state/maps.svelte.js'
   import { getMapsMergedState } from '$lib/state/maps-merged.svelte.js'
+  import { getMapGuideState } from '$lib/state/map-guide.svelte.js'
   import { getScopeState } from '$lib/state/scope.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { m } from '$lib/paraglide/messages.js'
@@ -26,6 +27,7 @@
   import { getView, getViewUrl } from '$lib/shared/router.js'
 
   import MapButtons from '$lib/components/MapButtons.svelte'
+  import MapGuide from '$lib/components/MapGuide.svelte'
   import ImageSelector from '$lib/components/ImageSelector.svelte'
   import MapSelector from '$lib/components/MapSelector.svelte'
   import Maps from '$lib/components/popovers/Maps.svelte'
@@ -35,8 +37,11 @@
   const sourceState = getSourceState()
   const mapsState = getMapsState()
   const mapsMergedState = getMapsMergedState()
+  const mapGuideState = getMapGuideState()
   const scopeState = getScopeState()
   const urlState = getUrlState()
+
+  let smallScreenPopoverContainer = $state<HTMLDivElement>()
 
   // let imagesViewButton: HTMLAnchorElement
   // let maskViewButton: HTMLAnchorElement
@@ -45,6 +50,10 @@
 
   let resultsEnabled = $derived(
     mapsMergedState.completeMaps.length > 0 || mapsState.activeMap !== undefined
+  )
+
+  let resourceLoaded = $derived(
+    Boolean(sourceState.source && !sourceState.fetching)
   )
 
   let editEnabled = $derived(sourceState.canEdit)
@@ -180,27 +189,42 @@
     </div>
   </div>
 
+  <div
+    bind:this={smallScreenPopoverContainer}
+    class="pointer-events-none flex min-h-0 w-full flex-1 items-end"
+  ></div>
+
   <!-- class="w-full h-full shrink min-h-0 flex gap-2 items-end justify-between *:relative *:z-10 *:pointer-events-auto" -->
   <div
-    class="pointer-events-none grid w-full grid-cols-[1fr_max-content_1fr] items-center
+    class="pointer-events-none w-full flex justify-between lg:grid lg:grid-cols-[1fr_max-content_1fr] items-end
       gap-2 *:pointer-events-auto"
   >
-    <div></div>
-    <div>
+    <div class="min-w-0 shrink-0">
+      {#if resourceLoaded}
+        <MapGuide state={mapGuideState} {smallScreenPopoverContainer} />
+      {/if}
+    </div>
+    <div
+      class={isResultsView && resultsEnabled
+        ? 'min-w-18 basis-50 md:basis-64 lg:basis-auto'
+        : undefined}
+    >
       {#if isResultsView && resultsEnabled}
         <div
           class="z-50 flex items-center
             gap-2 rounded-lg bg-white p-1 shadow-md"
           transition:fade={{ duration: 100 }}
         >
-          <span class="hidden pl-1 sm:inline-block">{m.show()}</span>
-          <div class="w-48">
+          <span class="hidden shrink-0 pl-1 md:inline-block">{m.show()}</span>
+          <div class="min-w-16 w-0 flex-1 lg:w-48">
             <Scope />
           </div>
         </div>
       {/if}
     </div>
-    <div class="flex flex-row items-center justify-center gap-2 place-self-end">
+    <div
+      class="flex shrink-0 flex-row items-center justify-center gap-2 place-self-end"
+    >
       {#if isResultsView && scopeState.mapsCount > 1}
         <MapSelector />
       {:else if sourceState.imageCount > 1}

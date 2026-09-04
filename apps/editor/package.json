@@ -25,6 +25,7 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "types": "tsc --noEmit",
+    "test": "node --conditions=browser --test test/*.test.ts",
     "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
     "format": "prettier  --ignore-path ../../.gitignore --write ."
   },
