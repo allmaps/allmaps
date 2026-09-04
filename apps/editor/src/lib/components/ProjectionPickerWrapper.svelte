@@ -1,9 +1,6 @@
 <script lang="ts">
   import { ProjectionPicker } from '@allmaps/ui'
-  import {
-    createBboxIndex,
-    createFullTextIndex
-  } from '@allmaps/ui/projections'
+  import { createBboxIndex, createFullTextIndex } from '@allmaps/ui/projections'
 
   import { getProjectionsState } from '@allmaps/ui/state'
 
