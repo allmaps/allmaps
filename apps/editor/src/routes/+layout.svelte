@@ -7,6 +7,7 @@
   import { setErrorState } from '$lib/state/error.svelte.js'
   import { setExamplesState } from '$lib/state/examples.svelte.js'
   import { setImageInfoState } from '$lib/state/image-info.svelte.js'
+  import { setMapGuideState } from '$lib/state/map-guide.svelte.js'
   import { setUrlState } from '$lib/state/url.svelte.js'
   import { setVarsState } from '$lib/state/vars.svelte.js'
 
@@ -31,6 +32,7 @@
   // svelte-ignore state_referenced_locally
   setExamplesState(data.env.PUBLIC_REST_BASE_URL)
   setImageInfoState()
+  setMapGuideState()
 
   onNavigate((navigation) => {
     if (!document.startViewTransition) {
