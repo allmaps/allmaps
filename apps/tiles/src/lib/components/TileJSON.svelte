@@ -1,16 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import Map from 'ol/Map.js'
-  import XYZ from 'ol/source/XYZ.js'
-  import TileLayer from 'ol/layer/Tile.js'
-  import { toLonLat, fromLonLat } from 'ol/proj.js'
+  import { Map, NavigationControl } from 'maplibre-gl'
+  import { basemapStyle } from '@allmaps/basemap'
+
+  import type { StyleSpecification } from 'maplibre-gl'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 
-  import type { Point } from '@allmaps/types'
-
   import type { TileJSON } from '$lib/types.js'
+
+  import 'maplibre-gl/dist/maplibre-gl.css'
 
   type Props = {
     tileJson: TileJSON
@@ -19,44 +19,52 @@
   let { tileJson }: Props = $props()
 
   const uiState = getUiState()
+  let container: HTMLDivElement
 
-  onMount(async () => {
-    const tileUrl = tileJson.tiles[0]
+  onMount(() => {
+    // The shared basemap uses a separate version of the style-spec types.
+    const style = basemapStyle('en') as unknown as StyleSpecification
+    style.sources.allmaps = {
+      type: 'raster',
+      tiles: tileJson.tiles,
+      tileSize: 256,
+      maxzoom: 19,
+      bounds: tileJson.bounds
+    }
+    style.layers.push({ id: 'allmaps', type: 'raster', source: 'allmaps' })
 
     const map = new Map({
-      layers: [
-        new TileLayer({
-          source: new XYZ({
-            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            maxZoom: 19
-          })
-        }),
-        new TileLayer({
-          source: new XYZ({
-            url: tileUrl,
-            maxZoom: 19
-          })
-        })
+      container,
+      style,
+      bounds: [
+        [tileJson.bounds[0], tileJson.bounds[1]],
+        [tileJson.bounds[2], tileJson.bounds[3]]
       ],
-      target: 'ol'
+      fitBoundsOptions: { padding: 25 },
+      maxPitch: 0
     })
 
-    const bbox = [
-      ...fromLonLat([tileJson.bounds[0], tileJson.bounds[1]]),
-      ...fromLonLat([tileJson.bounds[2], tileJson.bounds[3]])
-    ]
+    map.addControl(new NavigationControl(), 'top-left')
 
-    const view = map.getView()
+    function updateViewport() {
+      // OpenHistoricalMap uses 256px zoom levels; MapLibre uses 512px.
+      uiState.zoom = map.getZoom() + 1
+      uiState.center = map.getCenter().toArray()
+    }
 
-    view.fit(bbox, {
-      padding: [25, 25, 25, 25]
-    })
+    updateViewport()
+    map.on('moveend', updateViewport)
 
-    const center = view.getCenter()
+    const resizeObserver = new ResizeObserver(() => map.resize())
+    resizeObserver.observe(container)
 
-    uiState.zoom = view.getZoom()
-    uiState.center = center ? (toLonLat(center) as Point) : undefined
+    return () => {
+      resizeObserver.disconnect()
+      map.remove()
+    }
   })
 </script>
 
-<div id="ol" class="w-full h-full"></div>
+<div class="absolute inset-0">
+  <div bind:this={container} class="w-full h-full"></div>
+</div>

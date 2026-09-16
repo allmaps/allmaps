@@ -9,8 +9,6 @@
 
   import type { LayoutProps } from './$types'
 
-  import 'ol/ol.css'
-
   let { data }: LayoutProps = $props()
 
   let tileJson = $derived(data.tileJson)
@@ -42,7 +40,9 @@
     </main>
   {:else}
     <main class="grow relative">
-      <TileJSON {tileJson} />
+      {#key tileJson}
+        <TileJSON {tileJson} />
+      {/key}
       <div
         class="absolute bottom-0 right-0 w-full pointer-events-none max-w-sm"
       >

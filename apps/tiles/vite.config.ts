@@ -14,5 +14,8 @@ export default defineConfig({
       allow: [searchForWorkspaceRoot(process.cwd())]
     }
   },
+  ssr: {
+    noExternal: ['maplibre-gl']
+  },
   plugins: [tailwindcss(), sveltekit(), devtoolsJson()]
 }) satisfies UserConfig

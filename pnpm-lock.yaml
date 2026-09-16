@@ -1359,6 +1359,9 @@ importers:
 
   apps/tiles:
     dependencies:
+      '@allmaps/basemap':
+        specifier: workspace:^
+        version: link:../../packages/basemap
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../../packages/stdlib
