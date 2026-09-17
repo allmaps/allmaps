@@ -15,7 +15,7 @@
   let tileUrl = $derived(tileJson ? tileJson.tiles[0] : undefined)
 
   function handleUrlSubmit(url: string) {
-    goto(`/?url=${url}`)
+    goto(`/?${new URLSearchParams({ url: url.trim() })}`)
   }
 </script>
 
@@ -27,11 +27,17 @@
   </Header>
   {#if !tileJson}
     <main class="container m-auto p-1 md:p-2">
-      {#if !data.url}
+      {#if !data.url || data.error}
         <URLInput
+          url={data.url}
           onsubmit={handleUrlSubmit}
-          placeholder="Type the URL of a Allmaps Tile Server TileJSON file"
+          placeholder="Paste an Allmaps annotation, tile, or TileJSON URL"
         />
+        {#if data.error}
+          <p role="alert" class="mt-3 px-3 text-sm text-red-700">
+            {data.error}
+          </p>
+        {/if}
       {:else if !tileJson}
         <div class="flex flex-col items-center">
           <Loading />
