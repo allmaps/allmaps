@@ -7,6 +7,8 @@ import { mapsFromParams, mapsFromQuery } from './lib/maps-from-request.js'
 import { optionsFromQuery } from './lib/options.js'
 import { generateTileJsonResponse as generateTileJsonResponse } from './lib/tilejson.js'
 import { generateTilesHtml } from './lib/html.js'
+import { createErrorTileResponse } from './lib/error-tile.js'
+import { TileError } from './lib/tile-error.js'
 import { match, put, headers } from './lib/cache.js'
 
 import type { TileServerEnv } from '@allmaps/env/tileserver'
@@ -19,6 +21,20 @@ const { preflight, corsify } = cors()
 
 const router = AutoRouter<IRequestStrict, CFArgs>({
   before: [preflight],
+  catch: (cause, request) => {
+    const tileError =
+      cause instanceof TileError
+        ? cause
+        : new TileError('render-failed', 500, { cause })
+    if (
+      /\/[^/]+\/[^/]+\/[^/]+(?:@2x)?\.(png|webp)$/.test(
+        new URL(request.url).pathname
+      )
+    ) {
+      return createErrorTileResponse(tileError, request)
+    }
+    return error(cause)
+  },
   finally: [corsify, headers, put]
 })
 

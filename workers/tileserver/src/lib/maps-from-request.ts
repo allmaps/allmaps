@@ -1,5 +1,5 @@
 import { validateGeoreferencedMap, parseAnnotation } from '@allmaps/annotation'
-import { StatusError } from 'itty-router'
+import { TileError } from './tile-error.js'
 
 import { createCachedFetch } from './fetch.js'
 
@@ -34,24 +34,10 @@ export async function mapsFromParams(
     return []
   }
 
-  const mapsResponse = await cachedFetch(url)
-
-  if (!mapsResponse) {
-    throw new Error(`Error fetching maps from URL: ${url}`)
-  }
-
-  if (!mapsResponse.ok) {
-    if (mapsResponse.status === 404) {
-      throw new StatusError(404, `Map not found: ${url}`)
-    }
-
-    throw new Error(
-      `Error fetching maps from URL: ${url} (${mapsResponse.status})`
-    )
-  }
-
-  const fetchedMaps = await mapsResponse.json()
-  const georeferencedMapOrMaps = validateGeoreferencedMap(fetchedMaps)
+  const fetchedMaps = await fetchMapData(cachedFetch, url)
+  const georeferencedMapOrMaps = parseMapData(() =>
+    validateGeoreferencedMap(fetchedMaps)
+  )
 
   let georeferencedMaps: GeoreferencedMap[]
   if (Array.isArray(georeferencedMapOrMaps)) {
@@ -78,18 +64,15 @@ export async function mapsFromQuery(
   const annotation = parseQueryString(query.annotation)
 
   if (annotation) {
-    const georeferencedMaps = parseAnnotation(JSON.parse(annotation))
-    return georeferencedMaps
+    const georeferencedMaps = parseMapData(() =>
+      parseAnnotation(JSON.parse(annotation))
+    )
+    return georeferencedMaps.filter((map) => map.gcps.length >= 3)
   } else if (url) {
-    const annotationResponse = await cachedFetch(url)
-
-    if (!annotationResponse) {
-      throw new Error(`Error fetching annotation from URL: ${url}`)
-    }
-
-    const fetchedAnnotation = await annotationResponse.json()
-
-    const georeferencedMaps = parseAnnotation(fetchedAnnotation)
+    const fetchedAnnotation = await fetchMapData(cachedFetch, url)
+    const georeferencedMaps = parseMapData(() =>
+      parseAnnotation(fetchedAnnotation)
+    )
 
     // Only return maps with at least 3 GCPs
     // TODO: move this check to schema parser
@@ -97,6 +80,30 @@ export async function mapsFromQuery(
       (georeferecendeMap) => georeferecendeMap.gcps.length >= 3
     )
   } else {
-    throw new Error('No annotation query parameter supplied')
+    throw new TileError('invalid-data', 400)
+  }
+}
+
+function parseMapData<T>(parse: () => T): T {
+  try {
+    return parse()
+  } catch (cause) {
+    throw new TileError('invalid-data', 422, { cause })
+  }
+}
+
+async function fetchMapData(
+  fetchFn: ReturnType<typeof createCachedFetch>,
+  url: string
+) {
+  const response = await fetchFn(url).catch((cause) => {
+    throw new TileError('map-data', 502, { cause })
+  })
+  if (!response.ok)
+    throw new TileError('map-data', response.status === 404 ? 404 : 502)
+  try {
+    return await response.json()
+  } catch (cause) {
+    throw new TileError('invalid-data', 422, { cause })
   }
 }
