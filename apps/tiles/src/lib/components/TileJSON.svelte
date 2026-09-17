@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Map, NavigationControl } from 'maplibre-gl'
+  import { Map, NavigationControl, AttributionControl } from 'maplibre-gl'
   import { basemapStyle } from '@allmaps/basemap'
 
   import type { StyleSpecification } from 'maplibre-gl'
@@ -26,7 +26,8 @@
     const style = basemapStyle('en') as unknown as StyleSpecification
     style.sources.allmaps = {
       type: 'raster',
-      tiles: tileJson.tiles,
+      tiles: [tileJson.tiles[0]],
+      attribution: tileJson.attribution,
       tileSize: 256,
       maxzoom: 19,
       bounds: tileJson.bounds
@@ -36,6 +37,7 @@
     const map = new Map({
       container,
       style,
+      attributionControl: false,
       bounds: [
         [tileJson.bounds[0], tileJson.bounds[1]],
         [tileJson.bounds[2], tileJson.bounds[3]]
@@ -45,6 +47,7 @@
     })
 
     map.addControl(new NavigationControl(), 'top-left')
+    map.addControl(new AttributionControl(), 'bottom-left')
 
     function updateViewport() {
       // OpenHistoricalMap uses 256px zoom levels; MapLibre uses 512px.

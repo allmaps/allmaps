@@ -7,6 +7,8 @@ import { mapsFromParams, mapsFromQuery } from './lib/maps-from-request.js'
 import { optionsFromQuery } from './lib/options.js'
 import { generateTileJsonResponse as generateTileJsonResponse } from './lib/tilejson.js'
 import { generateTilesHtml } from './lib/html.js'
+import { createErrorTileResponse } from './lib/error-tile.js'
+import { TileError } from './lib/tile-error.js'
 import { match, put, headers } from './lib/cache.js'
 
 import type { TileServerEnv } from '@allmaps/env/tileserver'
@@ -19,6 +21,20 @@ const { preflight, corsify } = cors()
 
 const router = AutoRouter<IRequestStrict, CFArgs>({
   before: [preflight],
+  catch: (cause, request) => {
+    const tileError =
+      cause instanceof TileError
+        ? cause
+        : new TileError('render-failed', 500, { cause })
+    if (
+      /\/[^/]+\/[^/]+\/[^/]+(?:@2x)?\.(png|webp)$/.test(
+        new URL(request.url).pathname
+      )
+    ) {
+      return createErrorTileResponse(tileError, request)
+    }
+    return error(cause)
+  },
   finally: [corsify, headers, put]
 })
 
@@ -147,7 +163,6 @@ router.get('/tiles@2x.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}@2x.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}@2x.webp${url.search}`
   ]
 
@@ -160,7 +175,6 @@ router.get('/tiles.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/{z}/{x}/{y}.webp${url.search}`
   ]
 
@@ -174,7 +188,6 @@ router.get('/maps/:mapId/tiles@2x.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}@2x.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}@2x.webp${url.search}`
   ]
 
@@ -188,7 +201,6 @@ router.get('/maps/:mapId/tiles.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/maps/${mapId}/{z}/{x}/{y}.webp${url.search}`
   ]
 
@@ -202,7 +214,6 @@ router.get('/images/:imageId/tiles@2x.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}@2x.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}@2x.webp${url.search}`
   ]
 
@@ -216,7 +227,6 @@ router.get('/images/:imageId/tiles.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/images/${imageId}/{z}/{x}/{y}.webp${url.search}`
   ]
 
@@ -230,7 +240,6 @@ router.get('/manifests/:manifestId/tiles@2x.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}@2x.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}@2x.webp${url.search}`
   ]
 
@@ -244,7 +253,6 @@ router.get('/manifests/:manifestId/tiles.json', async (req, env) => {
 
   const url = new URL(req.url)
   const urlTemplates = [
-    `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.png${url.search}`,
     `${env.PUBLIC_TILE_SERVER_BASE_URL}/manifests/${manifestId}/{z}/{x}/{y}.webp${url.search}`
   ]
 
