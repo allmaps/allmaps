@@ -27,6 +27,7 @@
     style.sources.allmaps = {
       type: 'raster',
       tiles: [tileJson.tiles[0]],
+      attribution: tileJson.attribution,
       tileSize: 256,
       maxzoom: 19,
       bounds: tileJson.bounds

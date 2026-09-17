@@ -5,6 +5,7 @@ import init from '@allmaps/render-wasm'
 import UPNG from 'upng-js'
 import { createErrorTileResponse } from '../src/lib/error-tile.js'
 import { TileError } from '../src/lib/tile-error.js'
+import { mapsFromQuery } from '../src/lib/maps-from-request.js'
 
 beforeAll(async () => {
   await init({
@@ -18,6 +19,43 @@ beforeAll(async () => {
 })
 
 describe('error tiles', () => {
+  it.each([401, 404, 429, 503])(
+    'preserves upstream HTTP %s from map loading in diagnostic headers',
+    async (status) => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(new Response(null, { status }))
+      )
+      try {
+        const env = { USE_CACHE: false } as Parameters<typeof mapsFromQuery>[0]
+        const request = Object.assign(
+          new Request('https://example.org/1/0/0.png'),
+          {
+            route: '/:z/:x/:y.png',
+            params: { z: '1', x: '0', y: '0' },
+            query: { url: 'https://example.org/annotation.json' }
+          }
+        )
+        const error = await mapsFromQuery(env, request).catch(
+          (error: unknown) => error
+        )
+        expect(error).toBeInstanceOf(TileError)
+        if (!(error instanceof TileError))
+          throw new Error('Expected a TileError')
+        expect(error.status).toBe(status === 404 ? 404 : 502)
+        const response = createErrorTileResponse(error, request)
+        expect(response.headers.get('X-Allmaps-Error')).toBe('map-data')
+        expect(response.headers.get('X-Allmaps-Upstream-Status')).toBe(
+          String(status)
+        )
+        expect(response.headers.get('X-Allmaps-Error-Status')).toBe(
+          String(error.status)
+        )
+      } finally {
+        vi.unstubAllGlobals()
+      }
+    }
+  )
   it.each([false, true])(
     'renders an opaque diagnostic PNG, retina=%s',
     async (retina) => {

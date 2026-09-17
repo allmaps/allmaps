@@ -41,6 +41,7 @@ function isTileJson(value: unknown): value is TileJSON {
     value !== null &&
     'tilejson' in value &&
     typeof value.tilejson === 'string' &&
+    (!('attribution' in value) || typeof value.attribution === 'string') &&
     'tiles' in value &&
     Array.isArray(value.tiles) &&
     value.tiles.length > 0 &&

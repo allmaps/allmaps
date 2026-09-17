@@ -99,8 +99,11 @@ async function fetchMapData(
   const response = await fetchFn(url).catch((cause) => {
     throw new TileError('map-data', 502, { cause })
   })
-  if (!response.ok)
-    throw new TileError('map-data', response.status === 404 ? 404 : 502)
+  if (!response.ok) {
+    const error = new TileError('map-data', response.status === 404 ? 404 : 502)
+    error.upstreamStatus = response.status
+    throw error
+  }
   try {
     return await response.json()
   } catch (cause) {
