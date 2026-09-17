@@ -2,6 +2,7 @@
   "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "checkJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,6 +15,7 @@
   "references": [
     { "path": "../../packages/annotation" },
     { "path": "../../packages/project" },
+    { "path": "../../packages/maplibre" },
     { "path": "../../packages/transform" },
     { "path": "../../packages/stdlib" },
     { "path": "../../packages/tailwind" },

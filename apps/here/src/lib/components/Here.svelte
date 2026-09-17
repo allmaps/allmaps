@@ -1,38 +1,25 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import { page } from '$app/state'
 
-  import Feature from 'ol/Feature.js'
-  import OLMap from 'ol/Map.js'
-  import OLPoint from 'ol/geom/Point.js'
-  import LineString from 'ol/geom/LineString.js'
-  import View from 'ol/View.js'
-  import Icon from 'ol/style/Icon.js'
-  import Style from 'ol/style/Style.js'
-  import Stroke from 'ol/style/Stroke.js'
-  import Fill from 'ol/style/Fill.js'
-  import CircleStyle from 'ol/style/Circle.js'
-  import VectorSource from 'ol/source/Vector.js'
-  import IIIF from 'ol/source/IIIF.js'
-  import IIIFInfo from 'ol/format/IIIFInfo.js'
-  import TileLayer from 'ol/layer/Tile.js'
-  import VectorLayer from 'ol/layer/Vector.js'
-
+  import { Map, Marker } from 'maplibre-gl'
+  import { WarpedMapLayer } from '@allmaps/maplibre'
   import { orange } from '@allmaps/tailwind'
   import { isGeojsonPoint } from '@allmaps/stdlib'
 
   import { getSensorsState } from '$lib/state/sensors.svelte.js'
   import { getCompassState } from '$lib/state/compass.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getErrorState } from '$lib/state/error.svelte.js'
   import { getResourceTransformerState } from '$lib/state/resource-transformer.svelte.js'
+  import {
+    createImageView,
+    getImageBearing,
+    getPositionRotation
+  } from '$lib/shared/image-view.js'
 
-  import type { ImageInformationResponse } from 'ol/format/IIIFInfo.js'
-  import type { Options as FeatureIconOptions } from 'ol/style/Icon.js'
-  import type TileGrid from 'ol/tilegrid/TileGrid.js'
-  import type { MapBrowserEvent } from 'ol'
-
+  import type { GeoJSONSource, MapMouseEvent } from 'maplibre-gl'
   import type { Point } from '@allmaps/types'
-
   import type {
     MapWithImageInfo,
     GeojsonRoute,
@@ -40,27 +27,12 @@
   } from '$lib/shared/types.js'
 
   import MarkerPopover from '$lib/components/MarkerPopover.svelte'
-
   import HereIcon from '$lib/images/here.svg?raw'
   import HereOrientationIcon from '$lib/images/here-orientation.svg?raw'
   import Pin from '$lib/images/pin.svg?raw'
   import PinShadow from '$lib/images/pin-shadow.svg?raw'
 
-  import 'ol/ol.css'
-
-  const sensorsState = getSensorsState()
-  const compassState = getCompassState()
-  const uiState = getUiState()
-  const resourceTransformerState = getResourceTransformerState()
-
-  let mounted = $state(false)
-  let currentMapId = $state<string>()
-
-  let showFrom = $derived(page.route.id === '/maps/[mapId]/postcard')
-
-  type FeatureIconSvg = {
-    svg: string
-  }
+  import 'maplibre-gl/dist/maplibre-gl.css'
 
   type Props = {
     mapWithImageInfo: MapWithImageInfo
@@ -70,527 +42,435 @@
 
   let { mapWithImageInfo, geojsonRoute, from }: Props = $props()
 
-  let ol = $state.raw<HTMLElement>()
-  let olMap = $state.raw<OLMap>()
+  const sensorsState = getSensorsState()
+  const compassState = getCompassState()
+  const uiState = getUiState()
+  const errorState = getErrorState()
+  const resourceTransformerState = getResourceTransformerState()
 
+  let container: HTMLDivElement
+  let map = $state.raw<Map>()
+  let loaded = $state(false)
+  let interacting = $state(false)
+  let warpedMapLayer: WarpedMapLayer
+  let positionMarker: Marker
+  let fromMarker: Marker
+  let fromShadowMarker: Marker
+  let positionMarkerAttached = false
+  let fromMarkersAttached = false
   let popoverContents = $state<PopoverContents>()
 
-  let geojsonRouteLayer: VectorLayer
-  let geojsonMarkersLayer: VectorLayer
-  let positionLayer: VectorLayer
-
-  let positionImageCoordinates = $derived.by<Point | undefined>(() => {
-    if (resourceTransformerState.resourcePosition) {
-      return [
-        resourceTransformerState.resourcePosition[0],
-        -resourceTransformerState.resourcePosition[1]
-      ]
-    }
-  })
-
-  let fromImageCoordinates = $derived.by<Point | undefined>(() => {
-    if (from && resourceTransformerState.transformer) {
-      const imageCoordinates =
-        resourceTransformerState.transformer.transformToResource([
+  const imageView = $derived(createImageView(mapWithImageInfo))
+  const showFrom = $derived(page.route.id === '/maps/[mapId]/postcard')
+  const positionCoordinates = $derived(
+    resourceTransformerState.resourcePosition
+  )
+  const fromCoordinates = $derived(
+    showFrom && from && resourceTransformerState.transformer
+      ? resourceTransformerState.transformer.transformToResource([
           from[1],
           from[0]
         ])
-      return [imageCoordinates[0], -imageCoordinates[1]]
-    }
-  })
+      : undefined
+  )
 
-  const tileLayer = new TileLayer()
-  const positionFeature = new Feature()
-  const fromFeature = new Feature({})
-  const geojsonRouteFeature = new Feature()
-
-  geojsonRouteFeature.setStyle([
-    new Style({
-      stroke: new Stroke({
-        color: 'white',
-        width: 5
-      })
-    }),
-    new Style({
-      stroke: new Stroke({
-        color: orange,
-        width: 3
-      })
-    })
-  ])
-
-  let dragging = $state(false)
-
-  function setResourceRotation(rotationRad: number) {
-    if (olMap) {
-      olMap.getView().animate({
-        rotation: rotationRad,
-        duration: 100
-      })
-    }
-  }
-
-  function rotateFeatureStyleImage(
-    feature: Feature,
-    style: Style,
-    rotationRad: number
-  ) {
-    const image = style?.getImage()
-    image?.setRotation(rotationRad)
-    feature.changed()
-  }
-
-  function setPinRotation(rotationRad: number) {
-    if (positionFeature) {
-      const styleLike = positionFeature.getStyle()
-
-      // here-orientation.svg is pointing east.
-      // Substract 90 degrees to rotate it to north.
-      const pinRotationRad = rotationRad - Math.PI / 2
-
-      if (Array.isArray(styleLike)) {
-        styleLike.map((style) =>
-          rotateFeatureStyleImage(positionFeature, style, pinRotationRad)
-        )
-      } else if (styleLike && 'getImage' in styleLike) {
-        rotateFeatureStyleImage(positionFeature, styleLike, pinRotationRad)
-      }
-    }
-  }
-
-  function updatePositionFeature(imageCoordinates?: Point) {
-    if (imageCoordinates) {
-      showPositionFeature()
-
-      positionFeature.setGeometry(new OLPoint(imageCoordinates))
-    }
-  }
-
-  function updateFromFeature(imageCoordinates?: Point) {
-    if (showFrom && imageCoordinates) {
-      setFeatureImage(fromFeature, [
-        {
-          height: 20,
-          displacement: [30, 0],
-          svg: PinShadow
-        },
-        {
-          width: 40,
-          displacement: [0, 34],
-          rotation: 0.2,
-          svg: Pin
-        }
-      ])
-      fromFeature.setGeometry(new OLPoint(imageCoordinates))
-    } else {
-      fromFeature.setStyle(undefined)
-    }
-  }
-
-  function centerViewAroundPoint(view: View, tileGrid: TileGrid, point: Point) {
-    view.setCenter([point[0], point[1]])
-    view.setRotation(0)
-    view.setZoom((tileGrid.getMinZoom() + tileGrid.getMaxZoom()) * 0.75)
-  }
-
-  function updateImage(mapWithImageInfo: MapWithImageInfo) {
-    geojsonMarkersLayer.getSource()?.clear()
-
-    if (!mounted || !olMap) {
-      return
-    }
-
-    const imageInfo = mapWithImageInfo.imageInfo
-
-    const options = new IIIFInfo(
-      imageInfo as ImageInformationResponse
-    ).getTileSourceOptions()
-
-    if (!options) {
-      return
-    }
-
-    options.zDirection = -1
-
-    const iiifTileSource = new IIIF(options)
-    tileLayer.setSource(iiifTileSource)
-
-    const tileGrid = iiifTileSource.getTileGrid()
-
-    if (tileGrid) {
-      const view = new View({
-        resolutions: tileGrid.getResolutions(),
-        extent: tileGrid.getExtent(),
-        constrainOnlyCenter: true
-      })
-
-      olMap.setView(view)
-
-      if (fromImageCoordinates) {
-        centerViewAroundPoint(view, tileGrid, fromImageCoordinates)
-      } else if (
-        resourceTransformerState.resourcePositionInsideResource &&
-        positionImageCoordinates
-      ) {
-        centerViewAroundPoint(view, tileGrid, positionImageCoordinates)
-      } else {
-        view.fit(tileGrid.getExtent(), {
-          padding: [10, 10, 10, 10]
-        })
-      }
-
-      if (geojsonRoute && resourceTransformerState.transformer) {
-        const transformer = resourceTransformerState.transformer
-
-        if (geojsonRoute.route) {
-          const projectedGeojsonRoute = transformer.transformToResource(
-            // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
-            geojsonRoute.route.coordinates.map(
-              (point): Point => [point[0], point[1]]
-            )
-          )
-          geojsonRouteFeature.setGeometry(
-            new LineString(projectedGeojsonRoute.map((c) => [c[0], -c[1]]))
-          )
-        } else {
-          geojsonRouteFeature.setGeometry(undefined)
-        }
-
-        const geojsonMarkerFeatures = geojsonRoute.markers.flatMap((marker) => {
-          if (!isGeojsonPoint(marker.geometry)) {
-            return []
-          }
-
-          const projectedPoint = transformer.transformToResource(
-            // TODO: we should align GeoJSON geometry types and Point/LineString/etc.
-            marker.geometry.coordinates as Point
-          )
-
-          let title: string | undefined
-          let image: string | undefined
-          let url: string | undefined
-          let description: string | undefined
-
-          if (marker.properties && typeof marker.properties === 'object') {
-            if (
-              'title' in marker.properties &&
-              typeof marker.properties.title === 'string'
-            ) {
-              title = marker.properties.title
-            }
-
-            if (
-              'image' in marker.properties &&
-              typeof marker.properties.image === 'string'
-            ) {
-              image = marker.properties.image
-            }
-
-            if (
-              'description' in marker.properties &&
-              typeof marker.properties.description === 'string'
-            ) {
-              description = marker.properties.description
-            }
-
-            if (
-              'url' in marker.properties &&
-              typeof marker.properties.url === 'string'
-            ) {
-              url = marker.properties.url
-            }
-          }
-
-          return [
-            new Feature({
-              geometry: new OLPoint([projectedPoint[0], -projectedPoint[1]]),
-              title,
-              image,
-              url,
-              description
-            })
-          ]
-        })
-
-        geojsonMarkersLayer.getSource()?.addFeatures(geojsonMarkerFeatures)
-      }
-
-      olMap.on('pointerdrag', () => {
-        dragging = true
-      })
-
-      view.on('change:rotation', () => {
-        if (dragging) {
-          compassState.compassMode = 'custom'
-          compassState.customRotation =
-            view.getRotation() * (180 / Math.PI) -
-            (compassState.selectedMapBearing || 0)
-        }
-      })
-    }
-
-    updatePositionFeature(positionImageCoordinates)
-    updateFromFeature(fromImageCoordinates)
-
-    currentMapId = mapWithImageInfo.map.id
-  }
-
-  function setPositionFeatureImage(svg: string) {
-    setFeatureImage(positionFeature, [
-      {
-        rotateWithView: true,
-        width: 40,
-        height: 40,
-        svg
-      }
-    ])
-  }
-
-  function setFeatureImage(
-    feature: Feature,
-    icons: (FeatureIconOptions & FeatureIconSvg)[]
-  ) {
-    feature.setStyle(
-      icons.map(
-        (icon) =>
-          new Style({
-            image: new Icon({
-              ...icon,
-              // Important! SVG's width, height and viewbox must be set!
-              src: `data:image/svg+xml;utf8,${encodeURIComponent(icon.svg)}`
-            })
-          })
-      )
-    )
+  function createIcon(svg: string, width?: number, height?: number) {
+    const element = document.createElement('div')
+    element.innerHTML = svg
+    const image = element.querySelector('svg')!
+    image.style.width = width ? `${width}px` : 'auto'
+    image.style.height = height ? `${height}px` : 'auto'
+    return element
   }
 
   function closeMarkerDialog() {
     popoverContents = undefined
   }
 
-  // function hidePositionFeature() {
-  //   positionFeature.setStyle()
-  // }
+  function updateScreenCoordinates() {
+    // These reads must not become dependencies of the marker effects below.
+    untrack(() => {
+      if (!map) {
+        return
+      }
 
-  function showPositionFeature() {
-    if (sensorsState.hasOrientation) {
-      setPositionFeatureImage(HereOrientationIcon)
-    } else {
-      setPositionFeatureImage(HereIcon)
-    }
+      const fromPoint = fromCoordinates
+        ? map.project(imageView.toLngLat(fromCoordinates))
+        : undefined
+      const positionPoint = positionCoordinates
+        ? map.project(imageView.toLngLat(positionCoordinates))
+        : undefined
+      uiState.fromScreenCoordinates = fromPoint
+        ? [Math.round(fromPoint.x), Math.round(fromPoint.y)]
+        : undefined
+      uiState.positionScreenCoordinates = positionPoint
+        ? [Math.round(positionPoint.x), Math.round(positionPoint.y)]
+        : undefined
+    })
+  }
+
+  function markerAtPoint(event: MapMouseEvent) {
+    if (!map || !loaded || !geojsonRoute?.markers.length) return
+    const { x, y } = event.point
+    return map.queryRenderedFeatures(
+      [
+        [x - 10, y - 10],
+        [x + 10, y + 10]
+      ],
+      { layers: ['route-markers'] }
+    )[0]
   }
 
   onMount(() => {
-    showPositionFeature()
+    const newMap = new Map({
+      container,
+      style: { version: 8, sources: {}, layers: [] },
+      maxPitch: 0,
+      renderWorldCopies: false,
+      attributionControl: false
+    })
 
-    // setFeatureImage(fromFeature, [
-    //   {
-    //     height: 20,
-    //     displacement: [30, 0],
-    //     svg: PinShadow
-    //   },
-    //   {
-    //     width: 40,
-    //     displacement: [0, 34],
-    //     rotation: 0.2,
-    //     svg: Pin
-    //   }
-    // ])
+    map = newMap
+    warpedMapLayer = new WarpedMapLayer({ applyMask: false })
 
-    geojsonRouteLayer = new VectorLayer({
-      source: new VectorSource({
-        features: [geojsonRouteFeature]
+    positionMarker = new Marker({
+      element: createIcon(HereIcon, 40, 40),
+      rotationAlignment: 'map'
+    })
+    fromMarker = new Marker({
+      element: createIcon(Pin, 40),
+      offset: [0, -34],
+      rotation: 0.2 * (180 / Math.PI),
+      rotationAlignment: 'viewport'
+    })
+    fromShadowMarker = new Marker({
+      element: createIcon(PinShadow, undefined, 20),
+      offset: [30, 0],
+      rotationAlignment: 'viewport'
+    })
+
+    newMap.on('error', (event) => {
+      errorState.error = event.error
+    })
+
+    newMap.once('load', () => {
+      newMap.addLayer(warpedMapLayer)
+      newMap.addSource('route', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
       })
-    })
-
-    geojsonMarkersLayer = new VectorLayer({
-      source: new VectorSource({
-        features: []
-      }),
-      style: [
-        new Style({
-          image: new CircleStyle({
-            radius: 9,
-            fill: new Fill({
-              color: 'white'
-            })
-          })
-        }),
-        new Style({
-          image: new CircleStyle({
-            radius: 6,
-            fill: new Fill({
-              color: 'white'
-            }),
-            stroke: new Stroke({
-              color: orange,
-              width: 4
-            })
-          })
-        })
-      ]
-    })
-
-    positionLayer = new VectorLayer({
-      source: new VectorSource({
-        features: [positionFeature, fromFeature]
+      newMap.addSource('route-markers', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
       })
+      newMap.addLayer({
+        id: 'route-outline',
+        type: 'line',
+        source: 'route',
+        paint: { 'line-color': 'white', 'line-width': 5 }
+      })
+      newMap.addLayer({
+        id: 'route',
+        type: 'line',
+        source: 'route',
+        paint: { 'line-color': orange, 'line-width': 3 }
+      })
+      newMap.addLayer({
+        id: 'route-markers-outline',
+        type: 'circle',
+        source: 'route-markers',
+        paint: { 'circle-color': 'white', 'circle-radius': 9 }
+      })
+      newMap.addLayer({
+        id: 'route-markers',
+        type: 'circle',
+        source: 'route-markers',
+        paint: {
+          'circle-color': 'white',
+          'circle-radius': 4,
+          'circle-stroke-color': orange,
+          'circle-stroke-width': 4
+        }
+      })
+      loaded = true
     })
 
-    olMap = new OLMap({
-      layers: [
-        tileLayer,
-        geojsonRouteLayer,
-        geojsonMarkersLayer,
-        positionLayer
-      ],
-      target: ol,
-      controls: []
+    newMap.on('render', updateScreenCoordinates)
+
+    newMap.on('rotate', (event) => {
+      if (event.originalEvent) {
+        compassState.compassMode = 'custom'
+        compassState.customRotation =
+          -newMap.getBearing() - (compassState.selectedMapBearing ?? 0)
+      }
     })
 
-    olMap.on('postrender', () => {
-      if (olMap && fromImageCoordinates) {
-        const fromScreenCoordinates =
-          olMap.getPixelFromCoordinate(fromImageCoordinates)
+    newMap.on('click', (event) => {
+      const feature = markerAtPoint(event)
+      if (!feature) {
+        closeMarkerDialog()
+        return
+      }
+      const properties = feature.properties
+      popoverContents = {
+        title:
+          typeof properties.title === 'string' ? properties.title : undefined,
+        image:
+          typeof properties.image === 'string' ? properties.image : undefined,
+        url: typeof properties.url === 'string' ? properties.url : undefined,
+        description:
+          typeof properties.description === 'string'
+            ? properties.description
+            : undefined
+      }
+    })
 
-        uiState.fromScreenCoordinates = [
-          Math.round(fromScreenCoordinates[0]),
-          Math.round(fromScreenCoordinates[1])
-        ]
+    newMap.on('mousemove', (event) => {
+      if (newMap.isMoving()) {
+        return
       }
 
-      if (olMap && positionImageCoordinates) {
-        const positionScreenCoordinates = olMap.getPixelFromCoordinate(
-          positionImageCoordinates
-        )
+      const cursor = markerAtPoint(event) ? 'pointer' : ''
 
-        // Somehow, positionScreenCoordinates is null sometimes, (maybe only
-        // during the component is being unmounted?)
-        if (positionScreenCoordinates) {
-          uiState.positionScreenCoordinates = [
-            Math.round(positionScreenCoordinates[0]),
-            Math.round(positionScreenCoordinates[1])
+      if (newMap.getCanvas().style.cursor !== cursor) {
+        newMap.getCanvas().style.cursor = cursor
+      }
+    })
+
+    newMap.on('movestart', (event) => {
+      if (event.originalEvent) {
+        interacting = true
+      }
+
+      closeMarkerDialog()
+      newMap.getCanvas().style.cursor = ''
+    })
+
+    newMap.on('moveend', () => {
+      interacting = false
+
+      if (!loaded) {
+        return
+      }
+
+      // Match the image view's previous constrainOnlyCenter behavior.
+      const [southwest, northeast] = imageView.bounds
+      const center = newMap.getCenter()
+      const longitude = Math.max(
+        southwest[0],
+        Math.min(northeast[0], center.lng)
+      )
+      const latitude = Math.max(
+        southwest[1],
+        Math.min(northeast[1], center.lat)
+      )
+
+      if (longitude !== center.lng || latitude !== center.lat) {
+        newMap.setCenter([longitude, latitude])
+      }
+    })
+
+    const resizeObserver = new ResizeObserver(() => newMap.resize())
+    resizeObserver.observe(container)
+
+    return () => {
+      loaded = false
+      resizeObserver.disconnect()
+      positionMarker.remove()
+      fromMarker.remove()
+      fromShadowMarker.remove()
+      positionMarkerAttached = false
+      fromMarkersAttached = false
+      newMap.remove()
+      map = undefined
+    }
+  })
+
+  $effect(() => {
+    if (!map || !loaded) {
+      return
+    }
+
+    warpedMapLayer.clear()
+    warpedMapLayer.addImageInfos([mapWithImageInfo.imageInfo])
+    warpedMapLayer.addGeoreferencedMap(imageView.map)
+    // Allow the full image to fit even when its coarsest tile level is large.
+    map.setMinZoom(0)
+    map.setMaxZoom(imageView.maxZoom)
+    map.fitBounds(imageView.bounds, { padding: 10, duration: 0, bearing: 0 })
+    map.setMinZoom(Math.min(map.getZoom(), imageView.minZoom))
+    // Location updates move the marker without resetting a user's camera.
+    untrack(() => {
+      const center =
+        fromCoordinates ??
+        (resourceTransformerState.resourcePositionInsideResource
+          ? positionCoordinates
+          : undefined)
+      if (center) {
+        map?.jumpTo({
+          center: imageView.toLngLat(center),
+          zoom: imageView.positionZoom
+        })
+      }
+      const bearing = getImageBearing(
+        compassState.compassMode,
+        compassState.selectedMapBearing,
+        sensorsState.orientationAlpha
+      )
+      if (bearing !== undefined) map?.setBearing(bearing)
+      closeMarkerDialog()
+    })
+  })
+
+  $effect(() => {
+    if (!map || !loaded) {
+      return
+    }
+
+    const transformer = resourceTransformerState.transformer
+    const route = geojsonRoute?.route
+    const coordinates =
+      route && transformer
+        ? transformer
+            .transformToResource(
+              route.coordinates.map((point): Point => [point[0], point[1]])
+            )
+            .map(imageView.toLngLat)
+        : []
+
+    map.getSource<GeoJSONSource>('route')?.setData({
+      type: 'FeatureCollection',
+      features: coordinates.length
+        ? [
+            {
+              type: 'Feature',
+              properties: {},
+              geometry: { type: 'LineString', coordinates }
+            }
           ]
-        }
-      }
+        : []
     })
 
-    olMap.on('click', (event: MapBrowserEvent) => {
-      if (olMap) {
-        const features = olMap.getFeaturesAtPixel(event.pixel, {
-          layerFilter: (layer) => layer === geojsonMarkersLayer,
-          hitTolerance: 10
-        })
-
-        const feature = features[0]
-
-        if (feature) {
-          popoverContents = {
-            title: feature.get('title'),
-            image: feature.get('image'),
-            url: feature.get('url'),
-            description: feature.get('description')
-          }
-        } else {
-          closeMarkerDialog()
-        }
-      }
+    map.getSource<GeoJSONSource>('route-markers')?.setData({
+      type: 'FeatureCollection',
+      features: transformer
+        ? (geojsonRoute?.markers ?? []).flatMap((marker) => {
+            if (!isGeojsonPoint(marker.geometry)) return []
+            const coordinates = imageView.toLngLat(
+              transformer.transformToResource(
+                marker.geometry.coordinates as Point
+              )
+            )
+            return [
+              {
+                type: 'Feature' as const,
+                properties: marker.properties ?? {},
+                geometry: { type: 'Point' as const, coordinates }
+              }
+            ]
+          })
+        : []
     })
-
-    olMap.on('pointermove', (event: MapBrowserEvent) => {
-      if (olMap) {
-        const hit = olMap.hasFeatureAtPixel(event.pixel, {
-          layerFilter: (layer) => layer === geojsonMarkersLayer,
-          hitTolerance: 10
-        })
-        olMap.getTargetElement().style.cursor = hit ? 'pointer' : ''
-      }
-    })
-
-    // Close the marker popover when the map is moved
-    olMap.on('movestart', closeMarkerDialog)
-
-    mounted = true
   })
 
   $effect(() => {
-    updatePositionFeature(positionImageCoordinates)
-  })
-
-  $effect(() => {
-    if (compassState.compassMode !== 'custom') {
-      dragging = false
+    if (!map || !loaded) {
+      return
     }
 
-    if (compassState.compassMode === 'image') {
-      setResourceRotation(0)
-    } else if (
-      compassState.compassMode === 'north' &&
-      compassState.selectedMapBearing !== undefined
-    ) {
-      setResourceRotation(compassState.selectedMapBearing * (Math.PI / 180))
-    } else if (
-      compassState.compassMode === 'follow-orientation' &&
-      sensorsState.orientationAlpha &&
-      compassState.selectedMapBearing !== undefined
-    ) {
-      setResourceRotation(
-        (sensorsState.orientationAlpha - compassState.selectedMapBearing + 45) *
-          (Math.PI / 180)
+    if (positionCoordinates) {
+      positionMarker.setLngLat(imageView.toLngLat(positionCoordinates))
+      if (!positionMarkerAttached) {
+        positionMarker.addTo(map)
+        positionMarkerAttached = true
+      }
+    } else if (positionMarkerAttached) {
+      positionMarker.remove()
+      positionMarkerAttached = false
+    }
+    updateScreenCoordinates()
+  })
+
+  $effect(() => {
+    if (!map || !loaded) {
+      return
+    }
+
+    positionMarker
+      .getElement()
+      .replaceChildren(
+        ...createIcon(
+          sensorsState.hasOrientation ? HereOrientationIcon : HereIcon,
+          40,
+          40
+        ).childNodes
       )
+  })
 
-      setPinRotation(
-        sensorsState.orientationAlpha * (Math.PI / 180)
-        // (360 -
-        //   (sensorsState.orientationAlpha -
-        //     compassState.selectedMapBearing +
-        //     45)) *
-        //   (Math.PI / 180)
-      )
+  $effect(() => {
+    if (!map || !loaded) {
+      return
     }
-  })
 
-  $effect(() => {
-    if (olMap) {
-      if (sensorsState.hasOrientation) {
-        setPositionFeatureImage(HereOrientationIcon)
-      } else {
-        setPositionFeatureImage(HereIcon)
-      }
-    }
-  })
-
-  $effect(() => {
-    updateFromFeature(fromImageCoordinates)
-  })
-
-  $effect(() => {
     if (
       sensorsState.orientationAlpha !== undefined &&
-      compassState.compassMode !== 'follow-orientation' &&
       compassState.selectedMapBearing !== undefined
     ) {
-      setPinRotation(
-        (-sensorsState.orientationAlpha - compassState.selectedMapBearing) *
-          (Math.PI / 180)
+      positionMarker.setRotation(
+        getPositionRotation(
+          compassState.compassMode,
+          compassState.selectedMapBearing,
+          sensorsState.orientationAlpha
+        )
       )
-    } else if (compassState.compassMode === 'follow-orientation') {
-      // setPinRotation(
-      //   (-sensorsState.orientationAlpha - compassState.selectedMapBearing) *
-      //     (Math.PI / 180)
-      // )
     }
   })
 
   $effect(() => {
-    if (mounted) {
-      if (mapWithImageInfo && currentMapId !== mapWithImageInfo.mapId) {
-        updateImage(mapWithImageInfo)
-      }
+    if (!map || !loaded) {
+      return
     }
+
+    if (fromCoordinates) {
+      const coordinates = imageView.toLngLat(fromCoordinates)
+      fromShadowMarker.setLngLat(coordinates)
+      fromMarker.setLngLat(coordinates)
+      if (!fromMarkersAttached) {
+        fromShadowMarker.addTo(map)
+        fromMarker.addTo(map)
+        fromMarkersAttached = true
+      }
+    } else if (fromMarkersAttached) {
+      fromMarker.remove()
+      fromShadowMarker.remove()
+      fromMarkersAttached = false
+    }
+    updateScreenCoordinates()
+  })
+
+  $effect(() => {
+    if (!map || !loaded) {
+      return
+    }
+
+    const mode = compassState.compassMode
+    const bearing = getImageBearing(
+      mode,
+      mode === 'image' ? undefined : compassState.selectedMapBearing,
+      mode === 'follow-orientation' ? sensorsState.orientationAlpha : undefined
+    )
+    if (bearing === undefined) {
+      return
+    }
+
+    // Ignore equivalent angles and let active gestures finish uninterrupted.
+    const difference =
+      ((((bearing - map.getBearing() + 180) % 360) + 360) % 360) - 180
+    if (interacting || Math.abs(difference) < 0.01) return
+    map.easeTo({ bearing, duration: 100 })
   })
 </script>
 
-<div bind:this={ol} class="w-full h-full"></div>
+<div bind:this={container} class="w-full h-full"></div>
 
 <MarkerPopover {popoverContents} />

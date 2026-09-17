@@ -26,10 +26,11 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
+    "@allmaps/basemap": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
-    "ol": "catalog:"
+    "maplibre-gl": "catalog:"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",

@@ -119,7 +119,7 @@
   <div
     bind:clientWidth={uiState.elementSizes.bottom.right[0]}
     bind:clientHeight={uiState.elementSizes.bottom.right[1]}
-    class="pointer-events-auto place-self-end"
+    class="pointer-events-auto place-self-end w-12"
   >
     {#if compassState.rotation !== undefined}
       <div class="contents" in:fade>
