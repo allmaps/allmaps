@@ -1,5 +1,4 @@
 import { throttle } from 'lodash-es'
-import { wrap as comlinkWrap } from 'comlink'
 
 // TODO: convert colors to fractional rgb
 // when setting options, not every render call
@@ -12,7 +11,7 @@ import {
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
 import { DEFAULT_ANIMATION_OPTIONS } from '../maps/WarpedMapList.js'
-import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
+import { CacheableWorkerImageBitmapTile } from '../tilecache/CacheableWorkerImageBitmapTile.js'
 import {
   WarpedMapErrorEvent,
   WarpedMapEvent,
@@ -41,16 +40,14 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 // See https://vite.dev/guide/features.html#import-with-constructors -
 // leads to import errors when publising on platforms like jsdelivr.
 // Using the inline query parameter solves this.
-import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
-import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
-import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
+import FetchAndGetImageBitmapWorker from '../workers/fetch-and-get-image-bitmap.js?worker&inline'
 import { WorkerPool } from '../workers/PoolWorkers.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
-import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
+import type { FetchAndGetImageBitmapWorkerType } from '../workers/fetch-and-get-image-bitmap.js'
 
 import type {
   AnimationOptions,
@@ -84,11 +81,10 @@ const SIGNIFICANT_VIEWPORT_DISTANCE = 5
  * Class that renders WarpedMaps to a WebGL 2 context
  */
 export class WebGL2Renderer
-  extends BaseRenderer<WebGL2WarpedMap, ImageData>
+  extends BaseRenderer<WebGL2WarpedMap, ImageBitmap>
   implements Renderer
 {
-  #workerPool: WorkerPool<FetchAndGetImageDataWorkerType>
-  #spritesWorker: Worker
+  #workerPool: WorkerPool<FetchAndGetImageBitmapWorkerType>
 
   DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions
 
@@ -171,14 +167,13 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
-    const workerPool = new WorkerPool<FetchAndGetImageDataWorkerType>(
-      FetchAndGetImageDataWorker,
+    // All tiles are decoded to ImageBitmaps and uploaded directly to the
+    // texture array (no getImageData readback). Sprite tiles are clipped from
+    // their atlas ImageBitmap in CacheableWorkerImageBitmapTile.applySprites.
+    const workerPool = new WorkerPool<FetchAndGetImageBitmapWorkerType>(
+      FetchAndGetImageBitmapWorker,
       POOL_SIZE
     )
-
-    const spritesWorker = new ApplySpritesImageDataWorker()
-    const wrappedSpritesWorker =
-      comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
     const warpedMapFactory = createWebGL2WarpedMapFactory(
       gl,
@@ -193,15 +188,11 @@ export class WebGL2Renderer
     }
 
     super(
-      CacheableWorkerImageDataTile.createFactory(
-        workerPool,
-        wrappedSpritesWorker
-      ),
+      CacheableWorkerImageBitmapTile.createFactory(workerPool),
       mergeOptions(defaultSpecificWebGL2RenderOptions, options)
     )
 
     this.#workerPool = workerPool
-    this.#spritesWorker = spritesWorker
     this.gl = gl
     this.#boundThrottledChangedByMapId = new Map()
 
@@ -382,7 +373,6 @@ export class WebGL2Renderer
     this.gl.deleteProgram(this.pointsProgram)
 
     this.#workerPool.destroy()
-    this.#spritesWorker.terminate()
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
