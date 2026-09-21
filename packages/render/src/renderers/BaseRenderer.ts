@@ -669,7 +669,10 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     )
 
     // For all maps, reset properties for the current viewport: the (overview) zoomlevels, resource viewport ring and fetchable tiles
-    for (const warpedMap of this.warpedMapList.getWarpedMaps()) {
+    // Order is irrelevant here, so skip the z-index sort.
+    for (const warpedMap of this.warpedMapList.getWarpedMaps({
+      sorted: false
+    })) {
       warpedMap.resetForViewport()
     }
 
@@ -789,11 +792,12 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
   }
 
   protected findMapsToAnticipate(): Set<string> {
+    // The result is a Set, so order is irrelevant — skip the z-index sort.
     return new Set(
       this.warpedMapList
-        .getWarpedMaps()
+        .getWarpedMaps({ sorted: false })
         .filter((warpedMap) => warpedMap.options.anticipateVisibility)
-        .map((warpedmap) => warpedmap.mapId)
+        .map((warpedMap) => warpedMap.mapId)
     )
   }
 

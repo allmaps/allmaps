@@ -32,6 +32,7 @@ export type SelectionOptions = MaskOptions & {
   geoBbox?: Bbox
   projectedGeoPoint?: Point
   projectedGeoBbox?: Bbox
+  sorted: boolean
 }
 
 export type MaskOptions = {
