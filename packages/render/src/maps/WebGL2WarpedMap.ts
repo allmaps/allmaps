@@ -117,6 +117,11 @@ const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
+// The tiles texture array depth is allocated in steps of this many layers, so
+// that individual tile arrivals append into pre-allocated headroom instead of
+// triggering a full (immutable) texStorage3D reallocation on every tile.
+const TEXTURE_ARRAY_DEPTH_GROWTH = 8
+
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
   mapProgram: WebGLProgram,
@@ -172,13 +177,27 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   // Consider to store cachedTilesByTileKey as a quadtree for faster lookups
   cachedTilesByTileKey: Map<string, CachedTile<ImageBitmap>>
   cachedTilesByTileUrl: Map<string, CachedTile<ImageBitmap>>
-  cachedTilesForTexture: CachedTile<ImageBitmap>[] = []
-  previousCachedTilesForTexture: CachedTile<ImageBitmap>[] = []
+  cachedTilesForTextureByTileUrl: Map<string, CachedTile<ImageBitmap>> =
+    new Map()
+  previousCachedTilesForTextureByTileUrl: Map<string, CachedTile<ImageBitmap>> =
+    new Map()
 
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourceOriginPointsAndSizesTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
   private cachedTilesTextureArrayAllocatedDepth = 0
+
+  // Slot bookkeeping for incremental texture updates: each resident tile keeps
+  // a fixed, packed layer (slot) in the texture array and lookup textures, so
+  // an arriving tile is uploaded into a single slot rather than re-uploading
+  // the whole map. cachedTilesByTextureSlot keeps slots packed (keys
+  // 0..size-1); its size is textureSlotCount, used by the fragment shader to
+  // bound its per-fragment loop (the allocated depth can be larger, see growth
+  // above).
+  private textureSlotsByTileUrl: Map<string, number> = new Map()
+  private cachedTilesByTextureSlot: Map<number, CachedTile<ImageBitmap>> =
+    new Map()
+  textureSlotCount = 0
 
   // About renderHomogeneousTransform and InvertedRenderHomogeneousTransform:
   // renderHomogeneousTransform is the product of:
@@ -251,6 +270,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesResourceOriginPointsAndSizesTexture =
       this.gl.createTexture()
     this.cachedTilesTextureArrayAllocatedDepth = 0
+
+    // The freshly created textures are empty, so reset the slot bookkeeping.
+    this.textureSlotsByTileUrl.clear()
+    this.cachedTilesByTextureSlot.clear()
+    this.textureSlotCount = 0
   }
 
   /**
@@ -401,8 +425,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
 
-    this.cachedTilesForTexture = []
-    this.previousCachedTilesForTexture = []
+    this.cachedTilesTextureArrayAllocatedDepth = 0
+
+    this.cachedTilesForTextureByTileUrl.clear()
+    this.previousCachedTilesForTextureByTileUrl.clear()
+
+    this.textureSlotsByTileUrl.clear()
+    this.cachedTilesByTextureSlot.clear()
+    this.textureSlotCount = 0
   }
 
   /**
@@ -999,8 +1029,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   private async updateTextures() {
-    const gl = this.gl
-
     // Find out which tiles to include in texture
     this.updateCachedTilesForTextures()
 
@@ -1009,15 +1037,11 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // them when all tiles are gone to free the texture). Blocking equal requests
     // prevents an infinite loop via the TEXTURESUPDATED event below.
     if (
-      this.cachedTilesForTexture.length == 0 ||
-      (this.cachedTilesForTexture.length !== 0 &&
+      this.cachedTilesForTextureByTileUrl.size == 0 ||
+      (this.cachedTilesForTextureByTileUrl.size !== 0 &&
         subSetArray(
-          this.previousCachedTilesForTexture.map(
-            (textureTile) => textureTile.fetchableTile.tileUrl
-          ),
-          this.cachedTilesForTexture.map(
-            (textureTile) => textureTile.fetchableTile.tileUrl
-          )
+          [...this.previousCachedTilesForTextureByTileUrl.keys()],
+          [...this.cachedTilesForTextureByTileUrl.keys()]
         ))
     ) {
       return
@@ -1026,154 +1050,223 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       return
     }
 
-    // Cached tiles texture array
+    // Reconcile the resident texture slots with the desired set of tiles,
+    // uploading only what changed instead of re-uploading every tile.
 
-    const requiredTextureWidth = this.tileSize[0]
-    const requiredTextureHeight = this.tileSize[1]
-    const requiredTextureDepth = this.cachedTilesForTexture.length
-
-    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
-
-    // Use texStorage3D to allocate once at a fixed depth, avoiding a full
-    // GPU reallocation on every tile arrival. texStorage3D is immutable after
-    // the first call, so we only call it when depth grows beyond the current
-    // allocation. In practice depth stays stable once tiles are loaded.
-    if (requiredTextureDepth > this.cachedTilesTextureArrayAllocatedDepth) {
-      // Delete the existing texture object and create a fresh one, because
-      // texStorage3D cannot be called twice on the same texture object.
-      gl.deleteTexture(this.cachedTilesTextureArray)
-      this.cachedTilesTextureArray = gl.createTexture()
-      gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
-
-      gl.texStorage3D(
-        gl.TEXTURE_2D_ARRAY,
-        1,
-        gl.RGBA8,
-        requiredTextureWidth,
-        requiredTextureHeight,
-        requiredTextureDepth
-      )
-      this.cachedTilesTextureArrayAllocatedDepth = requiredTextureDepth
-    }
-
-    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
-
-    // Ensure no PIXEL_UNPACK_BUFFER is bound so the DOM-source texSubImage3D
-    // overload is used (uploading directly from the ImageBitmap / ImageData).
-    gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
-
-    // Upload each tile directly from its ImageBitmap (decoded off the main
-    // thread, no getImageData readback). Sprite tiles are ImageBitmaps too,
-    // clipped from their atlas in CacheableWorkerImageBitmapTile.applySprites.
-    for (let i = 0; i < this.cachedTilesForTexture.length; i++) {
-      const source = this.cachedTilesForTexture[i].data
-
-      // The texture size is the largest available size in the image's tileZoomLevels
-      // (since the image could be served in multiple sizes).
-      // The size of the source is determined when fetching tiles
-      // and getting the optimal tileZoomLevel based on the scale derived from the viewport.
-      // Hence, the source could be smaller then the texture.
-      // This is not a problem in se, but sub-optimal if the difference is large.
-      // (Also note that if the resource is only on part of the image,
-      // the source is still its the full size).
-      if (
-        source.width > requiredTextureWidth ||
-        source.height > requiredTextureHeight
-      ) {
-        throw new Error("Cached tile doesn't fit in texture")
+    // Remove tiles that are no longer desired, keeping cachedTilesByTextureSlot packed
+    // by moving the last resident tile into each freed slot (swap-remove).
+    const tileUrlsToRemove: string[] = []
+    for (const tileUrl of this.textureSlotsByTileUrl.keys()) {
+      if (!this.cachedTilesForTextureByTileUrl.has(tileUrl)) {
+        tileUrlsToRemove.push(tileUrl)
       }
-
-      gl.texSubImage3D(
-        gl.TEXTURE_2D_ARRAY,
-        0,
-        0,
-        0,
-        i,
-        source.width,
-        source.height,
-        1,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
-        source
-      )
+    }
+    for (const tileUrl of tileUrlsToRemove) {
+      const slot = this.textureSlotsByTileUrl.get(tileUrl)
+      if (slot === undefined) {
+        continue
+      }
+      this.textureSlotsByTileUrl.delete(tileUrl)
+      const lastSlot = this.cachedTilesByTextureSlot.size - 1
+      if (slot !== lastSlot) {
+        const movedTile = this.cachedTilesByTextureSlot.get(lastSlot)!
+        this.cachedTilesByTextureSlot.set(slot, movedTile)
+        this.textureSlotsByTileUrl.set(movedTile.fetchableTile.tileUrl, slot)
+        this.uploadTileToSlot(movedTile, slot)
+      }
+      this.cachedTilesByTextureSlot.delete(lastSlot)
     }
 
+    // Add tiles that aren't resident yet, appending them into free slots.
+    const cachedTilesToAdd = [
+      ...this.cachedTilesForTextureByTileUrl.values()
+    ].filter(
+      (cachedTile) =>
+        !this.textureSlotsByTileUrl.has(cachedTile.fetchableTile.tileUrl)
+    )
+    if (cachedTilesToAdd.length > 0) {
+      const requiredDepth =
+        this.cachedTilesByTextureSlot.size + cachedTilesToAdd.length
+      if (requiredDepth > this.cachedTilesTextureArrayAllocatedDepth) {
+        // Grow in steps so single arrivals append into headroom instead of
+        // reallocating every time. reallocateTextures re-uploads the tiles
+        // currently in cachedTilesByTextureSlot (the existing residents) into the
+        // fresh texture; the tiles in cachedTilesToAdd are appended (and
+        // uploaded) only in the loop below, so they are not yet in
+        // cachedTilesByTextureSlot here and are not uploaded twice. Keep the
+        // cachedTilesByTextureSlot.set() below this call to preserve that.
+        const depth =
+          Math.ceil(requiredDepth / TEXTURE_ARRAY_DEPTH_GROWTH) *
+          TEXTURE_ARRAY_DEPTH_GROWTH
+        this.reallocateTextures(depth)
+      }
+      for (const cachedTile of cachedTilesToAdd) {
+        const slot = this.cachedTilesByTextureSlot.size
+        this.cachedTilesByTextureSlot.set(slot, cachedTile)
+        this.textureSlotsByTileUrl.set(cachedTile.fetchableTile.tileUrl, slot)
+        this.uploadTileToSlot(cachedTile, slot)
+      }
+    }
+
+    this.textureSlotCount = this.cachedTilesByTextureSlot.size
+
+    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
+  }
+
+  /**
+   * (Re)allocate the tiles texture array and the two lookup textures at the
+   * given depth, then re-upload all currently resident tiles into their slots.
+   *
+   * texStorage3D is immutable, so growing the depth requires a fresh texture
+   * object. This only runs when the number of resident tiles crosses a
+   * TEXTURE_ARRAY_DEPTH_GROWTH boundary, not on every tile arrival.
+   */
+  private reallocateTextures(depth: number) {
+    const gl = this.gl
+    const width = this.tileSize[0]
+    const height = this.tileSize[1]
+
+    // Cached tiles texture array
+    gl.deleteTexture(this.cachedTilesTextureArray)
+    this.cachedTilesTextureArray = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
+    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, width, height, depth)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Cached tiles resource origin points and sizes texture
-
-    const cachedTilesResourceOriginPointsAndSizes =
-      this.cachedTilesForTexture.map((textureTile) => {
-        if (
-          textureTile &&
-          textureTile.fetchableTile &&
-          textureTile.fetchableTile.options &&
-          textureTile.fetchableTile.options.imageRequest &&
-          textureTile.fetchableTile.options.imageRequest.region
-        ) {
-          return [
-            textureTile.fetchableTile.options.imageRequest.region.x,
-            textureTile.fetchableTile.options.imageRequest.region.y,
-            textureTile.fetchableTile.options.imageRequest.region.width,
-            textureTile.fetchableTile.options.imageRequest.region.height
-          ]
-        } else {
-          throw new Error('Missing resource origin points and sizes')
-        }
-      }) as number[][]
-
+    // Cached tiles resource origin points and sizes texture (4 rows per slot).
+    // A previous version used gl.RGBA_INTEGER as this texture's format.
+    // However, this seemed to cause Chrome to crash on some systems while
+    // zooming in and out. Using gl.RED_INTEGER and multiplying the height by 4
+    // to account for the 4 values per tile seems to fix the issue.
+    gl.deleteTexture(this.cachedTilesResourceOriginPointsAndSizesTexture)
+    this.cachedTilesResourceOriginPointsAndSizesTexture = gl.createTexture()
     gl.bindTexture(
       gl.TEXTURE_2D,
       this.cachedTilesResourceOriginPointsAndSizesTexture
     )
-
-    // A previous verions used gl.RGBA_INTEGER as this texture's format
-    // However, this seemed to cause Chrome to crash on some systems while
-    // zooming in and out. Using gl.RED_INTEGER and multiplying the width by 4
-    // to account for the 4 values per tile seems to fix the issue.
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.R32I,
       1,
-      this.cachedTilesForTexture.length * 4,
+      depth * 4,
       0,
       gl.RED_INTEGER,
       gl.INT,
-      new Int32Array(cachedTilesResourceOriginPointsAndSizes.flat())
+      new Int32Array(depth * 4)
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    // Cached tiles scale factors texture
-
-    const cachedTilesScaleFactors = this.cachedTilesForTexture.map(
-      (textureTile) => textureTile.fetchableTile.tile.tileZoomLevel.scaleFactor
-    )
-
+    // Cached tiles scale factors texture (1 row per slot)
+    gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
+    this.cachedTilesScaleFactorsTexture = gl.createTexture()
     gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
       gl.R32I,
       1,
-      this.cachedTilesForTexture.length,
+      depth,
       0,
       gl.RED_INTEGER,
       gl.INT,
-      new Int32Array(cachedTilesScaleFactors)
+      new Int32Array(depth)
     )
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    this.dispatchEvent(new WarpedMapEvent(WarpedMapEventType.TEXTURESUPDATED))
+    this.cachedTilesTextureArrayAllocatedDepth = depth
+
+    // Re-upload the resident tiles into the freshly allocated textures.
+    for (const [slot, cachedTile] of this.cachedTilesByTextureSlot) {
+      this.uploadTileToSlot(cachedTile, slot)
+    }
+  }
+
+  /**
+   * Upload a single tile into its slot: its ImageBitmap into the texture array
+   * layer, and its resource origin/size and scale factor into the lookup
+   * textures.
+   */
+  private uploadTileToSlot(cachedTile: CachedTile<ImageBitmap>, slot: number) {
+    const gl = this.gl
+    const source = cachedTile.data
+
+    const region = cachedTile.fetchableTile.options?.imageRequest?.region
+    if (!region) {
+      throw new Error('Missing resource origin points and sizes')
+    }
+
+    // The texture size is the largest available size in the image's
+    // tileZoomLevels (since the image could be served in multiple sizes).
+    // The size of the source is determined when fetching tiles and getting the
+    // optimal tileZoomLevel based on the scale derived from the viewport.
+    // Hence, the source could be smaller then the texture. This is not a
+    // problem in se, but sub-optimal if the difference is large. (Also note
+    // that if the resource is only on part of the image, the source is still
+    // its the full size.)
+    if (source.width > this.tileSize[0] || source.height > this.tileSize[1]) {
+      throw new Error("Cached tile doesn't fit in texture")
+    }
+
+    // Cached tiles texture array
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4)
+    // Ensure no PIXEL_UNPACK_BUFFER is bound so the DOM-source texSubImage3D
+    // overload is used (uploading directly from the ImageBitmap).
+    gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, null)
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, this.cachedTilesTextureArray)
+    gl.texSubImage3D(
+      gl.TEXTURE_2D_ARRAY,
+      0,
+      0,
+      0,
+      slot,
+      source.width,
+      source.height,
+      1,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      source
+    )
+
+    // Cached tiles resource origin points and sizes texture (4 rows per slot)
+    gl.bindTexture(
+      gl.TEXTURE_2D,
+      this.cachedTilesResourceOriginPointsAndSizesTexture
+    )
+    gl.texSubImage2D(
+      gl.TEXTURE_2D,
+      0,
+      0,
+      slot * 4,
+      1,
+      4,
+      gl.RED_INTEGER,
+      gl.INT,
+      new Int32Array([region.x, region.y, region.width, region.height])
+    )
+
+    // Cached tiles scale factors texture (1 row per slot)
+    gl.bindTexture(gl.TEXTURE_2D, this.cachedTilesScaleFactorsTexture)
+    gl.texSubImage2D(
+      gl.TEXTURE_2D,
+      0,
+      0,
+      slot,
+      1,
+      1,
+      gl.RED_INTEGER,
+      gl.INT,
+      new Int32Array([cachedTile.fetchableTile.tile.tileZoomLevel.scaleFactor])
+    )
   }
 
   private updateCachedTilesForTextures() {
@@ -1226,7 +1319,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       }
     }
 
-    let cachedTilesForTextures = [
+    const cachedTilesForTextures = [
       ...cachedTiles,
       ...cachedTilesAtOtherScaleFactors,
       ...spriteCachedTiles,
@@ -1234,22 +1327,20 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     ]
 
     // Making tiles unique by tileUrl
-    const cachedTilesForTexturesByTileUrl: Map<
+    const cachedTilesForTextureByTileUrl: Map<
       string,
       CachedTile<ImageBitmap>
     > = new Map()
     cachedTilesForTextures.forEach((cachedTile) =>
-      cachedTilesForTexturesByTileUrl.set(
+      cachedTilesForTextureByTileUrl.set(
         cachedTile.fetchableTile.tileUrl,
         cachedTile
       )
     )
-    cachedTilesForTextures = [...cachedTilesForTexturesByTileUrl.values()]
 
-    this.previousCachedTilesForTexture = this.cachedTilesForTexture
-    this.cachedTilesForTexture = cachedTilesForTextures
-
-    return
+    this.previousCachedTilesForTextureByTileUrl =
+      this.cachedTilesForTextureByTileUrl
+    this.cachedTilesForTextureByTileUrl = cachedTilesForTextureByTileUrl
   }
 
   private getCachedTilesAtOtherScaleFactors(
