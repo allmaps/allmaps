@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/types",
-  "version": "1.0.0-beta.23",
+  "version": "1.0.0-beta.24",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -43,12 +43,12 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/stdlib",
-  "version": "1.0.0-beta.41",
+  "version": "1.0.0-beta.42",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -44,8 +44,8 @@
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
-    "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
     "@turf/rewind": "catalog:",
     "@types/lodash-es": "catalog:",
     "hex-rgb": "^5.0.0",
@@ -57,12 +57,12 @@
   "devDependencies": {
     "@allmaps/types": "workspace:^",
     "@types/svg-parser": "^2.0.3",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

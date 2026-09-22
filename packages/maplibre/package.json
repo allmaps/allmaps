@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/maplibre",
-  "version": "1.0.0-beta.43",
+  "version": "1.0.0-beta.44",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -58,12 +58,12 @@
   "devDependencies": {
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",

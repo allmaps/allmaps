@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/transform",
-  "version": "1.0.0-beta.52",
+  "version": "1.0.0-beta.53",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -51,12 +51,12 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@types/geojson": "^7946.0.10",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "prettier": "^3.6.2",
     "remark-api": "^1.1.0",
     "remark-cli": "^12.0.1",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "^4.0.4"

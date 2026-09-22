@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/api-live",
-  "version": "3.0.1-alpha.0",
+  "version": "3.0.1-alpha.1",
   "private": "true",
   "type": "module",
   "license": "AGPL-3.0-only",
@@ -45,9 +45,9 @@
     "@types/ramda": "^0.29.3",
     "@types/sharedb": "catalog:",
     "@types/ws": "^8.5.5",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

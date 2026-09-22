@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/db",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "private": true,
   "description": "Drizzle ORM schema, database connections, and migrations for Allmaps",
   "type": "module",
@@ -42,11 +42,11 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/sharedb": "catalog:",
+    "@typescript/native": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

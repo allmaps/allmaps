@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/project",
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.10",
   "contributors": [
     {
       "name": "Manuel Claeys Bouuaert",
@@ -42,13 +42,13 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@types/lodash-es": "catalog:",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "lodash-es": "catalog:",
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
