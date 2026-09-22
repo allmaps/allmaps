@@ -15,7 +15,7 @@
     "types": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],
       "outputs": [],
-      "dependsOn": ["^types"]
+      "dependsOn": ["^types", "^build"]
     },
     "lint": {
       "inputs": [
@@ -44,7 +44,7 @@
     "documentation": {
       "inputs": ["src/**", "package.json", "README.md"],
       "outputs": ["README.md"],
-      "dependsOn": ["^documentation"]
+      "dependsOn": ["build", "^documentation"]
     },
     "copy-between": {
       "inputs": ["src/WarpedMapLayer.ts", "../../scripts/copy-between.ts"],

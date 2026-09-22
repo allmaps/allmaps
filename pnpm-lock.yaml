@@ -244,6 +244,9 @@ catalogs:
       specifier: ^4.3.6
       version: 4.4.3
 
+overrides:
+  module-exports>typescript: npm:@typescript/typescript6@^6.0.2
+
 importers:
 
   .:
@@ -10449,11 +10452,6 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
@@ -17861,7 +17859,7 @@ snapshots:
       micromark-util-character: 2.1.1
       pluralize: 8.0.0
       prettier: 3.9.5
-      typescript: 5.9.3
+      typescript: '@typescript/typescript6@6.0.2'
       unist-util-remove-position: 5.0.0
       vfile-message: 4.0.3
       vfile-sort: 4.0.0
@@ -19695,8 +19693,6 @@ snapshots:
       - supports-color
 
   typescript@5.4.2: {}
-
-  typescript@5.9.3: {}
 
   typescript@6.0.3: {}
 
