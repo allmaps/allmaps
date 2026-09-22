@@ -13,7 +13,8 @@ import {
   nonWarpingTransformationTypes,
   ProjectionFunction,
   TransformationType,
-  TransformationTypeInputs
+  TransformationTypeInputs,
+  typeAndOrderToTransformationType
 } from '@allmaps/transform'
 
 import {
@@ -474,7 +475,9 @@ export class ProjectedGcpTransformer extends GcpTransformer {
     options?: Partial<ProjectedGcpTransformerOptions & TransformationTypeInputs>
   ): ProjectedGcpTransformer {
     const georeferencedMapInput = {
-      transformationType: georeferencedMap.transformation?.type,
+      transformationType: georeferencedMap.transformation
+        ? typeAndOrderToTransformationType(georeferencedMap.transformation)
+        : undefined,
       internalProjection: georeferencedMap.resourceCrs
     }
     options = mergeOptions(georeferencedMapInput, options)

@@ -109,17 +109,19 @@ export function typeAndOrderToTransformationType(transformation: {
   const type = transformation.type
   const order = transformation.options?.order
   let transformationType: TransformationType
-  if (type == 'polynomial1' || type === 'polynomial') {
-    transformationType = 'polynomial1'
-  } else if (type == 'polynomial2' || (type === 'polynomial' && order === 2)) {
+  if (type === 'polynomial2' || (type === 'polynomial' && order === 2)) {
     transformationType = 'polynomial2'
-  } else if (type == 'polynomial3' || (type === 'polynomial' && order === 3)) {
+  } else if (type === 'polynomial3' || (type === 'polynomial' && order === 3)) {
     transformationType = 'polynomial3'
+  } else if (type === 'polynomial1' || type === 'polynomial') {
+    transformationType = 'polynomial1'
   } else if (type === 'thinPlateSpline') {
     transformationType = type
   } else if (type === 'linear') {
     transformationType = type
   } else if (type === 'helmert') {
+    transformationType = type
+  } else if (type === 'straight') {
     transformationType = type
   } else if (type === 'projective') {
     transformationType = type
