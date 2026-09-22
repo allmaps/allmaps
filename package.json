@@ -23,8 +23,9 @@
     "reset": "pnpm run remove-tsbuildinfo && pnpm run remove-vite-timestamp && pnpm run remove-node-modules && pnpm run init",
     "prepare": "husky install",
     "version-prerelease": "lerna version prerelease",
-    "publish-beta": "lerna publish from-git --dist-tag beta",
-    "publish": "lerna publish from-git"
+    "publish-beta": "pnpm run publish --dist-tag beta",
+    "publish": "npm whoami && lerna publish from-git",
+    "publish-resume": "npm whoami && npm_lifecycle_event=publish lerna publish from-package"
   },
   "devDependencies": {
     "@lerna-lite/cli": "catalog:",
