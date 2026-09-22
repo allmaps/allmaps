@@ -4,6 +4,7 @@ import {
   squaredDistance,
   intersectBboxes,
   bboxToRectangle,
+  doBboxesIntersect,
   mergeOptions,
   mergePartialOptions
 } from '@allmaps/stdlib'
@@ -338,8 +339,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Partial<WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void
   setMapsOptions(
@@ -347,8 +347,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Partial<WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.setMapsOptions(
@@ -413,11 +412,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<WarpedMapListOptions<W>>,
+      Partial<WebGL2WarpedMapOptions> | Partial<WarpedMapListOptions<W>>,
     thirdArgument?:
-      | Partial<WarpedMapListOptions<W>>
-      | Partial<AnimationOptions>,
+      Partial<WarpedMapListOptions<W>> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void
   setMapsAndListOptions(
@@ -425,11 +422,9 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Partial<WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Partial<WebGL2WarpedMapOptions>
-      | Partial<WarpedMapListOptions<W>>,
+      Partial<WebGL2WarpedMapOptions> | Partial<WarpedMapListOptions<W>>,
     thirdArgument?:
-      | Partial<WarpedMapListOptions<W>>
-      | Partial<AnimationOptions>,
+      Partial<WarpedMapListOptions<W>> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.setMapsAndListOptions(
@@ -489,8 +484,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void
   resetMapsOptions(
@@ -498,8 +492,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | string[]
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     thirdArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.resetMapsOptions(
@@ -550,8 +543,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
     thirdArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void
   resetMapsAndListOptions(
@@ -560,8 +552,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       | ((mapId: string) => Array<keyof WebGL2WarpedMapOptions> | undefined),
     secondArgument?: Array<keyof WebGL2WarpedMapOptions>,
     thirdArgument?:
-      | Array<keyof WebGL2WarpedMapOptions>
-      | Partial<AnimationOptions>,
+      Array<keyof WebGL2WarpedMapOptions> | Partial<AnimationOptions>,
     fourthArgument?: Partial<AnimationOptions>
   ): void {
     this.warpedMapList.resetMapsAndListOptions(
@@ -644,28 +635,56 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     const fetchableTilesForViewport: FetchableTile[] = []
     const overviewFetchableTilesForViewport: FetchableTile[] = []
 
-    const mapsInViewportForRequest = this.findMapsInViewport(
-      this.options.anticipateInteraction
-        ? this.options.requestViewportBufferRatio
-        : 1
+    const anticipateInteraction = this.options.anticipateInteraction
+
+    const requestViewportBufferRatio = anticipateInteraction
+      ? this.options.requestViewportBufferRatio
+      : 1
+    const overviewRequestViewportBufferRatio = anticipateInteraction
+      ? this.options.overviewRequestViewportBufferRatio
+      : 1
+    const pruneViewportBufferRatio = anticipateInteraction
+      ? this.options.pruneViewportBufferRatio
+      : 1
+    const overviewPruneViewportBufferRatio = anticipateInteraction
+      ? this.options.overviewPruneViewportBufferRatio
+      : 1
+
+    // The buffer ratios must be in growing (or equal) order, so that each
+    // maps-in-viewport set is a superset of the smaller-ratio ones. This lets us
+    // derive each smaller set from a larger one by bbox filtering, instead of
+    // running a separate RTree query + distance sort per ratio.
+    const ratiosInGrowingOrder =
+      requestViewportBufferRatio <= overviewRequestViewportBufferRatio &&
+      overviewRequestViewportBufferRatio <= pruneViewportBufferRatio &&
+      pruneViewportBufferRatio <= overviewPruneViewportBufferRatio
+    if (!ratiosInGrowingOrder) {
+      throw new Error(
+        'Viewport buffer ratios must be in growing (or equal) order: requestViewportBufferRatio <= overviewRequestViewportBufferRatio <= pruneViewportBufferRatio <= overviewPruneViewportBufferRatio'
+      )
+    }
+
+    // Compute the largest (overview-prune) set once with an RTree query, then
+    // derive each smaller set from the next-larger superset by bbox filtering.
+    // (request derives from the pure prune set rather than overview-request,
+    // which has the anticipated maps unioned in.)
+    const mapsInViewportForOverviewPrune = this.findMapsInViewport(
+      overviewPruneViewportBufferRatio
+    )
+    const mapsInViewportForPrune = this.findMapsInViewport(
+      pruneViewportBufferRatio,
+      mapsInViewportForOverviewPrune
     )
     const mapsInViewportForOverviewRequest = new Set([
       ...this.findMapsInViewport(
-        this.options.anticipateInteraction
-          ? this.options.overviewRequestViewportBufferRatio
-          : 1
+        overviewRequestViewportBufferRatio,
+        mapsInViewportForPrune
       ),
       ...this.findMapsToAnticipate()
     ])
-    const mapsInViewportForPrune = this.findMapsInViewport(
-      this.options.anticipateInteraction
-        ? this.options.pruneViewportBufferRatio
-        : 1
-    )
-    const mapsInViewportForOverviewPrune = this.findMapsInViewport(
-      this.options.anticipateInteraction
-        ? this.options.overviewPruneViewportBufferRatio
-        : 1
+    const mapsInViewportForRequest = this.findMapsInViewport(
+      requestViewportBufferRatio,
+      mapsInViewportForOverviewRequest
     )
 
     // For all maps, reset properties for the current viewport: the (overview) zoomlevels, resource viewport ring and fetchable tiles
@@ -745,7 +764,19 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
     this.updateMapsForViewport(allFetchableTilesForViewport)
   }
 
-  protected findMapsInViewport(viewportBufferRatio?: number): Set<string> {
+  /**
+   * Find the maps whose full mask overlaps the viewport buffered by the given
+   * ratio, ordered by distance of their (applied mask) center to the viewport
+   * center.
+   *
+   * When a superset (a set computed at a larger buffer ratio) is passed, this
+   * ratio's set is derived from it by keeping only the maps whose full mask
+   * bbox still intersects the smaller buffered viewport.
+   */
+  protected findMapsInViewport(
+    viewportBufferRatio?: number,
+    superset?: Set<string>
+  ): Set<string> {
     if (!this.viewport) {
       return new Set()
     }
@@ -760,11 +791,31 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       this.viewport.getProjectedGeoBufferedRectangle(viewportBufferRatio)
     )
 
-    const mapsInViewport = new Set(
+    if (superset) {
+      const mapIds = new Set<string>()
+      for (const mapId of superset) {
+        const warpedMap = this.warpedMapList.getWarpedMap(mapId)
+        if (
+          warpedMap &&
+          doBboxesIntersect(
+            warpedMap.projectedGeoFullMaskBbox,
+            projectedGeoBufferedViewportRectangleBbox
+          )
+        ) {
+          mapIds.add(mapId)
+        }
+      }
+      return mapIds
+    }
+
+    // sorted: false skips the z-index sort in getWarpedMaps, since we sort by
+    // distance to the viewport center right after.
+    return new Set(
       this.warpedMapList
         .getWarpedMaps({
           projectedGeoBbox: projectedGeoBufferedViewportRectangleBbox,
-          applyMask: false
+          applyMask: false,
+          sorted: false
         })
         .map((warpedMap) => {
           return {
@@ -775,20 +826,13 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
             )
           }
         })
-        .sort((warpedMapAndDistanceA, warpedMapAndDistanceB) => {
-          if (warpedMapAndDistanceA && warpedMapAndDistanceB) {
-            return (
-              warpedMapAndDistanceA.projectedGeoSquaredDistanceToViewportCenter -
-              warpedMapAndDistanceB.projectedGeoSquaredDistanceToViewportCenter
-            )
-          } else {
-            return 0
-          }
-        })
+        .sort(
+          (warpedMapAndDistanceA, warpedMapAndDistanceB) =>
+            warpedMapAndDistanceA.projectedGeoSquaredDistanceToViewportCenter -
+            warpedMapAndDistanceB.projectedGeoSquaredDistanceToViewportCenter
+        )
         .map((warpedMapAndDistance) => warpedMapAndDistance.warpedMap.mapId)
     )
-
-    return mapsInViewport
   }
 
   protected findMapsToAnticipate(): Set<string> {
