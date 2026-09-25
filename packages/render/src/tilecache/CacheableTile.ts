@@ -87,6 +87,13 @@ export abstract class CacheableTile<D> extends EventTarget {
     }
   }
 
+  /**
+   * Release any native resources held by this tile's data (e.g. close an
+   * ImageBitmap, whose decoded pixels live outside the JS heap and are only
+   * reclaimed lazily by GC). Called when the tile is removed from the cache.
+   */
+  release(): void {}
+
   protected isAbortError(error: unknown) {
     return (
       typeof error === 'object' &&
@@ -109,7 +116,9 @@ export abstract class CacheableTile<D> extends EventTarget {
     const normalizedError =
       error instanceof Error ? error : new Error(String(error))
     const resourceFetchError =
-      normalizedError instanceof ResourceFetchError ? normalizedError : undefined
+      normalizedError instanceof ResourceFetchError
+        ? normalizedError
+        : undefined
     const errorLike = normalizedError as Partial<ResourceFetchError>
     const errorKind =
       resourceFetchError?.kind ??

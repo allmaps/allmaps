@@ -263,6 +263,7 @@ export class TileCache<D> extends EventTarget {
     for (const cacheableTile of this.getCacheableTiles()) {
       cacheableTile.abort()
       this.removeEventListenersFromCacheableTile(cacheableTile)
+      cacheableTile.release()
     }
 
     this.tilesByTileUrl = new Map()
@@ -385,6 +386,8 @@ export class TileCache<D> extends EventTarget {
       }
 
       this.tilesByTileUrl.delete(tileUrl)
+      this.removeEventListenersFromCacheableTile(cacheableTile)
+      cacheableTile.release()
     }
 
     this.dispatchEvent(
