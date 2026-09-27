@@ -37,7 +37,7 @@ uniform int u_scaleFactorForViewport;
 uniform int u_textureSlotCount;
 
 uniform lowp sampler2DArray u_cachedTilesTextureArray;
-uniform isampler2D u_cachedTilesResourceOriginPointsAndSizesTexture;
+uniform highp sampler2D u_cachedTilesResourceOriginPointsAndSizesTexture;
 uniform isampler2D u_cachedTilesScaleFactorsTexture;
 
 uniform float u_debugTriangles;
@@ -76,19 +76,23 @@ void main() {
   // Loop through all cached tiles
   for(int index = 0; index < textureSlotCount; index += 1) {
 
-    // Read the information of the tile
-    float cachedTileResourceOriginPointX = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4)), 0));
-    float cachedTileResourceOriginPointY = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4) + 1), 0));
-    float cachedTileDimensionWidth = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4) + 2), 0));
-    float cachedTileDimensionHeight = float(texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, (index * 4) + 3), 0));
-
-    int cachedTileScaleFactor = texelFetch(u_cachedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
+    // Read this tile's resource origin and size (x, y, width, height) in a
+    // single fetch from the RGBA32F lookup texture.
+    vec4 cachedTilesResourceOriginPointAndSize = texelFetch(u_cachedTilesResourceOriginPointsAndSizesTexture, ivec2(0, index), 0);
+    float cachedTileResourceOriginPointX = cachedTilesResourceOriginPointAndSize.x;
+    float cachedTileResourceOriginPointY = cachedTilesResourceOriginPointAndSize.y;
+    float cachedTileDimensionWidth = cachedTilesResourceOriginPointAndSize.z;
+    float cachedTileDimensionHeight = cachedTilesResourceOriginPointAndSize.w;
 
     // If the triangle point is inside the tile, consider to use the tile:
     if(resourceTrianglePointX >= cachedTileResourceOriginPointX &&
       resourceTrianglePointX < cachedTileResourceOriginPointX + cachedTileDimensionWidth &&
       resourceTrianglePointY >= cachedTileResourceOriginPointY &&
       resourceTrianglePointY < cachedTileResourceOriginPointY + cachedTileDimensionHeight) {
+
+      // Only now that the tile contains the point, read its scale factor (most
+      // tiles fail the containment test above, so this fetch is skipped for them).
+      int cachedTileScaleFactor = texelFetch(u_cachedTilesScaleFactorsTexture, ivec2(0, index), 0).r;
 
       // If the smallest scale factor currently known is not set yet,
       // or if the scale factor of this tile is smaller (more detailed) then the scale factor currently known
@@ -107,6 +111,15 @@ void main() {
         float cachedTilesTexturePointY = cachedTilePointY / float(cachedTilesTextureSize.y);
 
         cachedTilesTexturePoint = vec3(cachedTilesTexturePointX, cachedTilesTexturePointY, index);
+      }
+
+      // Early exit: once we hold a tile at least as detailed as the viewport's
+      // ideal scale factor, no remaining tile can improve the result — a coarser
+      // one is worse, a finer one would only supersample — so stop scanning.
+      // When only coarser (fallback) tiles are available we keep scanning, as
+      // before, to find the least-coarse one.
+      if(smallestScaleFactor > 0 && smallestScaleFactor <= u_scaleFactorForViewport) {
+        break;
       }
     }
   }
