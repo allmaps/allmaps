@@ -74,7 +74,7 @@ const THROTTLE_PREPARE_RENDER_OPTIONS = {
 // Tunable: higher fills faster but risks jank; lower is smoother but slower.
 // Needed since texture updates are no longer throttled (used to be 200ms)
 // but now update at the speed at which renderInternal is called (typically 50ms external throttle).
-const MAX_TILE_UPLOADS_PER_FRAME = 16
+const MAX_TILE_UPLOADS_PER_FRAME = 64
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
