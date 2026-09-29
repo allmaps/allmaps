@@ -68,13 +68,18 @@ const THROTTLE_PREPARE_RENDER_OPTIONS = {
   trailing: true
 }
 
-// Maximum number of tile uploads (texSubImage3D) performed per frame across all
-// maps, in #updateMapTextures. Bounds per-frame GPU upload cost so a burst of
-// arriving tiles streams in over a few frames instead of spiking one frame.
-// Tunable: higher fills faster but risks jank; lower is smoother but slower.
-// Needed since texture updates are no longer throttled (used to be 200ms)
-// but now update at the speed at which renderInternal is called (typically 50ms external throttle).
-const MAX_TILE_UPLOADS_PER_FRAME = 64
+// Per-frame wall-clock budget (ms) for uploading tile textures in
+// #updateMapTextures. texSubImage3D blocks the main thread (~0.7ms/tile at 5K),
+// and this runs inside the library's per-frame render loop, so uploads share one
+// displayed frame with the draw. Budget a fraction of the refresh interval
+// (100Hz -> 10ms; 120Hz -> 8.3ms), leaving the rest for drawing; 3ms suits high-
+// refresh displays. Raise if fill is slow and frames stay smooth; lower if it stutters.
+const MAX_TILE_UPLOAD_MS_PER_FRAME = 3
+
+// Hard ceiling on tile uploads per updateTextures call, as a safety net in case
+// the clock does not advance as expected. The time budget above is the real
+// bound; this just prevents a runaway loop.
+const MAX_TILE_UPLOADS_PER_UPDATE = 128
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
@@ -1278,19 +1283,20 @@ export class WebGL2Renderer
   }
 
   /**
-   * Upload pending tile textures for the dirty maps, bounded by a global
-   * per-frame budget (MAX_TILE_UPLOADS_PER_FRAME). Maps that still have a
-   * backlog afterwards (budget exhausted, or more tiles than the budget) stay
-   * marked dirty and a repaint is requested so they continue on later frames.
+   * Upload pending tile textures for the dirty maps, bounded by a per-frame
+   * wall-clock budget (MAX_TILE_UPLOAD_MS_PER_FRAME) shared across all maps via
+   * a common deadline. Maps that still have a backlog afterwards (deadline
+   * reached before they finished) stay marked dirty and a repaint is requested
+   * so they continue on later frames.
    */
   #updateMapTextures() {
     if (this.#mapsWithTextureToUpdate.size === 0) {
       return
     }
 
-    let budget = MAX_TILE_UPLOADS_PER_FRAME
+    const deadline = performance.now() + MAX_TILE_UPLOAD_MS_PER_FRAME
     for (const mapId of this.#mapsWithTextureToUpdate) {
-      if (budget <= 0) {
+      if (performance.now() >= deadline) {
         break
       }
       const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
@@ -1298,15 +1304,16 @@ export class WebGL2Renderer
         this.#mapsWithTextureToUpdate.delete(mapId)
         continue
       }
-      const { uploadsPerformed, backlog } =
-        webgl2WarpedMap.updateTextures(budget)
-      budget -= uploadsPerformed
+      const { backlog } = webgl2WarpedMap.updateTextures(
+        MAX_TILE_UPLOADS_PER_UPDATE,
+        deadline
+      )
       if (backlog <= 0) {
         this.#mapsWithTextureToUpdate.delete(mapId)
       }
     }
 
-    // Budget exhausted or maps still have a backlog: continue next frame.
+    // Deadline reached or maps still have a backlog: continue next frame.
     if (this.#mapsWithTextureToUpdate.size > 0) {
       this.#changed()
     }

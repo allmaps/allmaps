@@ -1014,18 +1014,25 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
    * Reconcile this map's resident texture slots with the tiles it currently
    * wants to show, uploading only what changed.
    *
-   * Uploads are bounded: at most `maxUploads` tile uploads are performed per
-   * call, across both swap-remove moves and new-tile additions. Any leftover is
-   * reported as `backlog` so the renderer can drain it over subsequent frames,
-   * keeping per-frame GPU upload cost bounded (and hence smooth). This is called
-   * from the renderer's per-frame flush, not on a per-map throttle.
+   * Uploads are bounded by two limits, whichever is hit first: a hard count cap
+   * (`maxUploads`, a safety net) and a wall-clock `deadline` (a
+   * `performance.now()` timestamp shared across all maps in the frame). Since
+   * texSubImage3D blocks the main thread, the deadline is what actually keeps a
+   * burst of arriving tiles from spiking the frame — it uploads as many as fit
+   * in the frame's spare time and defers the rest. Any leftover is reported as
+   * `backlog` so the renderer drains it over subsequent frames. Called from the
+   * renderer's per-frame flush, not on a per-map throttle.
    *
-   * @param maxUploads - Maximum number of tile uploads to perform this call
+   * @param maxUploads - Hard ceiling on uploads this call (safety net)
+   * @param deadline - performance.now() timestamp to stop uploading at
    * @returns the number of uploads performed and the number of tiles still
    *   waiting (removes + adds not yet processed); a non-zero backlog means this
    *   map should be flushed again on a later frame
    */
-  updateTextures(maxUploads: number): {
+  updateTextures(
+    maxUploads: number,
+    deadline: number
+  ): {
     uploadsPerformed: number
     backlog: number
   } {
@@ -1078,8 +1085,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     let budget = maxUploads
     let uploadsPerformed = 0
 
-    // Add newly-desired tiles first, appending them into free slots, bounded by
-    // the budget. Leftover additions are retried on a later frame.
+    // Add newly-desired tiles first, appending them into free slots, until the
+    // count cap or the deadline is hit. Leftover additions are retried later.
     //
     // Adds run before removes on purpose. The budget can split a map's work
     // across frames; if removes ran first they could evict the tiles covering a
@@ -1090,6 +1097,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // (below), guarantees the region stays covered throughout the transition.
     const cachedTilesToAddNow =
       budget > 0 ? cachedTilesToAdd.slice(0, budget) : []
+    let addsUploaded = 0
     if (cachedTilesToAddNow.length > 0) {
       const requiredDepth =
         this.cachedTilesByTextureSlot.size + cachedTilesToAddNow.length
@@ -1101,21 +1109,27 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         // uploaded) only in the loop below, so they are not yet in
         // cachedTilesByTextureSlot here and are not uploaded twice. Keep the
         // cachedTilesByTextureSlot.set() below this call to preserve that.
+        // (Growing for the whole batch even though the deadline may upload only
+        // part of it just leaves the rest as headroom, filled on later frames.)
         const depth =
           Math.ceil(requiredDepth / TEXTURE_ARRAY_DEPTH_GROWTH) *
           TEXTURE_ARRAY_DEPTH_GROWTH
         this.reallocateTextures(depth)
       }
       for (const cachedTile of cachedTilesToAddNow) {
+        if (performance.now() >= deadline) {
+          break
+        }
         const slot = this.cachedTilesByTextureSlot.size
         this.cachedTilesByTextureSlot.set(slot, cachedTile)
         this.textureSlotsByTileUrl.set(cachedTile.fetchableTile.tileUrl, slot)
         this.uploadTileToSlot(cachedTile, slot)
         budget -= 1
         uploadsPerformed += 1
+        addsUploaded += 1
       }
     }
-    const remainingAdds = cachedTilesToAdd.length - cachedTilesToAddNow.length
+    const remainingAdds = cachedTilesToAdd.length - addsUploaded
 
     // Remove no-longer-desired tiles, but only once every desired tile is
     // resident (no adds still pending). Until then the stale residents are kept
@@ -1129,7 +1143,7 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     if (remainingAdds === 0) {
       let removeIndex = 0
       for (; removeIndex < tileUrlsToRemove.length; removeIndex++) {
-        if (budget <= 0) {
+        if (budget <= 0 || performance.now() >= deadline) {
           break
         }
         const tileUrl = tileUrlsToRemove[removeIndex]
