@@ -22,6 +22,14 @@ const PRUNE_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 2
 
 const MAX_REMOVE_QUEUE_LENGTH = 100
 
+// After a tile fetch fails, don't re-request that URL for this long. Panning
+// back over a broken tile (404, CORS, offline) otherwise re-fetches it every
+// time it re-enters the viewport — each retry re-runs the fetch and rebuilds a
+// (costly) error on the workers. The cooldown lets a transient failure recover.
+const FAILED_TILE_RETRY_COOLDOWN_MS = 60_000
+// Bound on remembered failed URLs, so a long session can't grow it unboundedly.
+const MAX_FAILED_TILE_URLS = 5000
+
 /**
  * Class that fetches and caches IIIF tiles.
  */
@@ -33,6 +41,8 @@ export class TileCache<D> extends EventTarget {
   protected tilesByTileUrl: Map<string, CacheableTile<D>> = new Map()
   protected mapIdsByTileUrl: Map<string, Set<string>> = new Map()
   protected tileUrlsByMapId: Map<string, Set<string>> = new Map()
+
+  #failedTimestampsByTileUrl: Map<string, number> = new Map()
 
   protected tilesFetchingCount = 0
   protected tileRemoveQueue: {
@@ -269,7 +279,21 @@ export class TileCache<D> extends EventTarget {
     this.tilesByTileUrl = new Map()
     this.mapIdsByTileUrl = new Map()
     this.tileUrlsByMapId = new Map()
+    this.#failedTimestampsByTileUrl.clear()
     this.tilesFetchingCount = 0
+  }
+
+  // Record a failed tile URL (bounded, evicting the oldest entry when full).
+  // Re-inserting moves the entry to the most-recent position.
+  #rememberFailedTileUrl(tileUrl: string) {
+    this.#failedTimestampsByTileUrl.delete(tileUrl)
+    if (this.#failedTimestampsByTileUrl.size >= MAX_FAILED_TILE_URLS) {
+      const oldest = this.#failedTimestampsByTileUrl.keys().next().value
+      if (oldest !== undefined) {
+        this.#failedTimestampsByTileUrl.delete(oldest)
+      }
+    }
+    this.#failedTimestampsByTileUrl.set(tileUrl, Date.now())
   }
 
   destroy() {
@@ -281,6 +305,18 @@ export class TileCache<D> extends EventTarget {
     const tileUrl = fetchableTile.tileUrl
 
     if (!this.tilesByTileUrl.has(tileUrl)) {
+      // Skip tiles that failed to fetch recently. Without this, panning back
+      // over a broken tile re-creates and re-fetches it every time, re-failing
+      // and rebuilding a costly error on the workers. Retry only after the
+      // cooldown, in case the failure was transient.
+      const failedAt = this.#failedTimestampsByTileUrl.get(tileUrl)
+      if (failedAt !== undefined) {
+        if (Date.now() - failedAt < FAILED_TILE_RETRY_COOLDOWN_MS) {
+          return
+        }
+        this.#failedTimestampsByTileUrl.delete(tileUrl)
+      }
+
       const cacheableTile = this.cacheableTileFactory(
         fetchableTile,
         this.fetchFn
@@ -407,6 +443,8 @@ export class TileCache<D> extends EventTarget {
 
       this.updateTilesFetchingCount(-1)
 
+      this.#failedTimestampsByTileUrl.delete(tileUrl)
+
       for (const mapId of this.mapIdsByTileUrl.get(tileUrl) || []) {
         this.dispatchEvent(
           new WarpedMapEvent(WarpedMapEventType.MAPTILELOADED, {
@@ -447,6 +485,8 @@ export class TileCache<D> extends EventTarget {
       if (this.tilesByTileUrl.has(tileUrl)) {
         this.updateTilesFetchingCount(-1)
       }
+
+      this.#rememberFailedTileUrl(tileUrl)
 
       const mapIds = [
         ...new Set([
