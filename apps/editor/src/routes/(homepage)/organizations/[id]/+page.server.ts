@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit'
 
 import {
   fetchExampleOrganizationBySlug,
-  fetchUngeoreferencedImages,
+  fetchRandomOrganizationImages,
   imagesToExamples,
   ORGANIZATION_EXAMPLES_COUNT,
   shuffleImages
@@ -22,9 +22,10 @@ export const load: PageServerLoad = async ({ fetch, params, parent }) => {
     error(404, 'Not found')
   }
 
-  const images = await fetchUngeoreferencedImages(
+  const images = await fetchRandomOrganizationImages(
     fetch,
-    organization,
+    env.PUBLIC_REST_BASE_URL,
+    [organization],
     ORGANIZATION_EXAMPLES_COUNT
   )
 

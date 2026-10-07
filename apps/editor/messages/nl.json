@@ -234,5 +234,6 @@
   "parser_output": "Dit is de uitvoer van de Allmaps IIIF-parser:",
   "reload_editor": "Laad Allmaps Editor opnieuw",
   "reload_and_try_different_resource": "en probeer een andere IIIF-resource te laden.",
+  "manifest_contains_no_images": "Dit manifest bevat geen afbeeldingen.",
   "unknown_error": "Er is een onbekende fout opgetreden."
 }
