@@ -72,16 +72,12 @@ function getLabel(label: ApiLabel) {
     .find((value) => value.trim().length > 0)
 }
 
-function getImageTitle(image: ApiImage) {
-  const canvas = image.canvases.find((canvas) => getLabel(canvas.label))
-  const manifest = image.canvases
-    .flatMap((canvas) => canvas.manifests)
-    .find((manifest) => getLabel(manifest.label))
-
-  const labels = [
-    getLabel(manifest?.label ?? null),
-    getLabel(canvas?.label ?? null)
-  ]
+function getImageTitle(
+  image: ApiImage,
+  canvas: ApiCanvas,
+  manifest: ApiManifest
+) {
+  const labels = [getLabel(manifest.label), getLabel(canvas.label)]
     .filter((label) => label !== undefined)
     .filter((label, index, labels) => labels.indexOf(label) === index)
 
@@ -95,6 +91,33 @@ function normalizeDomain(domain: string) {
     ).hostname.toLowerCase()
   } catch {
     return domain.toLowerCase()
+  }
+}
+
+function getOrganizationManifest(
+  organization: ApiOrganization,
+  image: ApiImage
+): { canvas: ApiCanvas; manifest: ApiManifest } | undefined {
+  const organizationDomains = new Set(organization.domains.map(normalizeDomain))
+
+  for (const canvas of image.canvases) {
+    for (const manifest of canvas.manifests) {
+      let manifestUrl: URL
+
+      try {
+        manifestUrl = new URL(manifest.uri)
+      } catch {
+        continue
+      }
+
+      if (
+        (manifestUrl.protocol === 'http:' ||
+          manifestUrl.protocol === 'https:') &&
+        organizationDomains.has(manifestUrl.hostname.toLowerCase())
+      ) {
+        return { canvas, manifest }
+      }
+    }
   }
 }
 
@@ -160,6 +183,7 @@ export function getRandomOrganizationImagesUrl(
   }
 
   url.searchParams.set('limitPerOrganization', String(limitPerOrganization))
+  url.searchParams.set('requireOrganizationManifest', 'true')
 
   return url.toString()
 }
@@ -233,19 +257,27 @@ export async function fetchRandomOrganizationImages(
 }
 
 export function imageToExample(
-  organization: ApiOrganization | undefined,
+  organization: ApiOrganization,
   image: ApiImage
-): Example {
+): Example | undefined {
+  const selectedManifest = getOrganizationManifest(organization, image)
+
+  if (!selectedManifest) {
+    return
+  }
+
+  const { canvas, manifest } = selectedManifest
+
   return {
-    organizationId: organization?.id ?? image.organization?.id ?? '',
-    title: getImageTitle(image),
-    manifestId: image.canvases[0]?.manifests[0]?.uri,
+    organizationId: organization.id,
+    title: getImageTitle(image, canvas, manifest),
+    manifestId: manifest.uri,
     imageId: image.uri
   }
 }
 
 export function imagesToExamples(
-  organization: ApiOrganization | undefined,
+  organization: ApiOrganization,
   images: ApiImage[]
 ) {
   const seenImageIds = new Set<string>()
@@ -254,7 +286,7 @@ export function imagesToExamples(
   for (const image of images) {
     const example = imageToExample(organization, image)
 
-    if (!seenImageIds.has(example.imageId)) {
+    if (example && !seenImageIds.has(example.imageId)) {
       seenImageIds.add(example.imageId)
       examples.push(example)
     }
@@ -263,7 +295,10 @@ export function imagesToExamples(
   return examples
 }
 
-export function imagesToExamplesByOrganizationId(images: ApiImage[]) {
+export function imagesToExamplesByOrganizationId(
+  images: ApiImage[],
+  organizations: ApiOrganization[]
+) {
   const imagesByOrganizationId = new Map<string, ApiImage[]>()
 
   for (const image of images) {
@@ -278,13 +313,17 @@ export function imagesToExamplesByOrganizationId(images: ApiImage[]) {
   }
 
   return Object.fromEntries(
-    Array.from(
-      imagesByOrganizationId,
-      ([organizationId, organizationImages]) => [
+    organizations.map((organization) => {
+      const organizationId = getApiResourceId(organization.id)
+
+      return [
         organizationId,
-        imagesToExamples(undefined, organizationImages)
+        imagesToExamples(
+          organization,
+          imagesByOrganizationId.get(organizationId) ?? []
+        )
       ]
-    )
+    })
   ) satisfies ExamplesByOrganizationId
 }
 
