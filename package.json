@@ -45,10 +45,5 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@10.0.0",
-  "pnpm": {
-    "overrides": {
-      "module-exports>typescript": "npm:@typescript/typescript6@^6.0.2"
-    }
-  }
+  "packageManager": "pnpm@12.9.1"
 }

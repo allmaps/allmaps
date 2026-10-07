@@ -60,14 +60,7 @@ We're welcoming contributions! You can read more about the many ways you can con
 
 ## Installation
 
-Make sure you have Node.js (version 20.8 or higher) and [pnpm](https://pnpm.io/) installed.
-
-You can [install pnpm with Corepack](https://pnpm.io/installation#using-corepack):
-
-```sh
-corepack enable
-corepack use pnpm@8.10.0
-```
+Make sure you have Node.js (version 24 or higher) and [pnpm 12](https://pnpm.io/installation) installed. This repository pins its pnpm version in `package.json`.
 
 Then, clone this repository locally:
 
