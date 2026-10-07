@@ -77,7 +77,9 @@ async function renderTiledImage(
   for (const row of tiles) {
     const imageRow: string[] = []
     for (const tile of row) {
-      const imageUrl = parsedImage.getImageUrl(tile)
+      const imageUrl = parsedImage.getImageUrl(tile, {
+        preferredFormats: ['jpg']
+      })
       const imageSource = await getImageSource(cachedFetch, imageUrl)
       imageRow.push(imageSource)
     }
@@ -216,10 +218,15 @@ export async function generateHereCard(
   let tiles: ImageRequest[][] = []
 
   if (parsedImage.supportsAnyRegionAndSize) {
-    const imageUrl = parsedImage.getImageUrl({
-      region: crop.region,
-      size: maxSize
-    })
+    const imageUrl = parsedImage.getImageUrl(
+      {
+        region: crop.region,
+        size: maxSize
+      },
+      {
+        preferredFormats: ['jpg']
+      }
+    )
     imageSource = await getImageSource(cachedFetch, imageUrl)
   } else {
     const { tileZoomLevels } = parsedImage
