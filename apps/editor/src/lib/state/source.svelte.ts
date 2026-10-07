@@ -219,17 +219,19 @@ export class SourceState {
     })
 
     $effect(() => {
-      this.#fetchingInsideCollection = true
-
       const parsedIiif = this.#source?.parsedIiif
       if (
         parsedIiif &&
         parsedIiif.type === 'collection' &&
         'items' in parsedIiif
       ) {
+        this.#fetchingInsideCollection = true
         parsedIiif
           .fetchUntilPath(this.#urlState.params.path.map(({ index }) => index))
+          .catch((error) => (this.#errorState.error = error))
           .finally(() => (this.#fetchingInsideCollection = false))
+      } else {
+        this.#fetchingInsideCollection = false
       }
     })
   }
@@ -266,9 +268,7 @@ export class SourceState {
   }
 
   async #fetchIiif(url: string, sourceIiif: unknown) {
-    const parsedIiif = IIIF.parse(sourceIiif, {
-      keepSource: true
-    })
+    const parsedIiif = IIIF.parse(sourceIiif, { keepSource: true })
 
     const baseSource = {
       url,
