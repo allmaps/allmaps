@@ -34,7 +34,8 @@ const randomImagesQuerySchema = t.Object({
   georeferenced: t.Optional(t.Boolean()),
   limit: t.Optional(t.Number()),
   organizationId: t.Optional(t.Array(t.String())),
-  limitPerOrganization: t.Optional(t.Integer({ minimum: 1 }))
+  limitPerOrganization: t.Optional(t.Integer({ minimum: 1 })),
+  requireOrganizationManifest: t.Optional(t.Boolean())
 })
 
 const createImageBodySchema = t.Union([
@@ -113,6 +114,16 @@ export function createImagesRoutes(
           )
         }
 
+        if (
+          !hasOrganizations &&
+          query.requireOrganizationManifest !== undefined
+        ) {
+          throw new ResponseError(
+            'requireOrganizationManifest requires organizationId',
+            400
+          )
+        }
+
         const requestedLimitPerOrganization = query.limitPerOrganization ?? 1
         const requestedLimit = hasOrganizations
           ? organizationIds.length * requestedLimitPerOrganization
@@ -139,6 +150,7 @@ export function createImagesRoutes(
               organizationIds,
               georeferenced: query.georeferenced,
               limitPerOrganization,
+              requireOrganizationManifest: query.requireOrganizationManifest,
               userRole
             }
           )

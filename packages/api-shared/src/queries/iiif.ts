@@ -1,5 +1,5 @@
 import { and, eq, exists, gt, lte, notExists, sql } from 'drizzle-orm'
-import { unionAll } from 'drizzle-orm/pg-core'
+import { alias, unionAll } from 'drizzle-orm/pg-core'
 
 import { generateId, generateChecksum } from '@allmaps/id'
 import { generateRandomId } from '@allmaps/id/sync'
@@ -399,10 +399,18 @@ export async function queryRandomImagesByOrganizationIds(
     organizationIds: string[]
     georeferenced?: boolean
     limitPerOrganization: number
+    requireOrganizationManifest?: boolean
     userRole?: UserRole
   }
 ) {
-  const { images, organizationUrls, maps } = schema
+  const {
+    images,
+    organizationUrls,
+    maps,
+    canvasesToImages,
+    manifestsToCanvases,
+    manifests
+  } = schema
   const requestedValues = sql.join(
     params.organizationIds.map(
       (organizationId, organizationIndex) =>
@@ -436,6 +444,40 @@ export async function queryRandomImagesByOrganizationIds(
         ? exists(latestMaps)
         : notExists(latestMaps)
 
+  const manifestOrganizationUrls = alias(
+    organizationUrls,
+    'manifest_organization_url'
+  )
+  const organizationManifestFilter = params.requireOrganizationManifest
+    ? exists(
+        db
+          .select({ id: manifests.id })
+          .from(canvasesToImages)
+          .innerJoin(
+            manifestsToCanvases,
+            eq(manifestsToCanvases.canvasId, canvasesToImages.canvasId)
+          )
+          .innerJoin(
+            manifests,
+            eq(manifests.id, manifestsToCanvases.manifestId)
+          )
+          .innerJoin(
+            manifestOrganizationUrls,
+            eq(manifestOrganizationUrls.url, manifests.domain)
+          )
+          .where(
+            and(
+              eq(canvasesToImages.imageId, images.id),
+              eq(manifestOrganizationUrls.type, 'domain'),
+              eq(
+                manifestOrganizationUrls.organizationId,
+                requestedOrganizations.organizationId
+              )
+            )
+          )
+      )
+    : undefined
+
   function selectCandidateImages(wrap: 0 | 1) {
     return db
       .select({ id: images.id, wrap: sql<number>`${wrap}::integer`.as('wrap') })
@@ -450,7 +492,8 @@ export async function queryRandomImagesByOrganizationIds(
           wrap === 0
             ? gt(images.id, requestedOrganizations.randomId)
             : lte(images.id, requestedOrganizations.randomId),
-          georeferencedFilter
+          georeferencedFilter,
+          organizationManifestFilter
         )
       )
       .orderBy(images.id)
@@ -481,6 +524,10 @@ export async function queryRandomImagesByOrganizationIds(
   const imageIds = candidateRows.map(({ id }) => id)
 
   if (imageIds.length === 0) {
+    if (params.requireOrganizationManifest) {
+      return []
+    }
+
     throw new ResponseError('Images not found', 404)
   }
 
