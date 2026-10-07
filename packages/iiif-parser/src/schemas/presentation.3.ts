@@ -21,7 +21,8 @@ export const LanguageValue3Schema = z.record(
   SingleValue3Schema.array()
 )
 
-export const Summary3Schema = LanguageValue3Schema
+// Invalid summary values are intentionally treated as absent.
+export const Summary3Schema = parseIfValid(LanguageValue3Schema)
 
 export const HomepageItem3Schema = z.object({
   id: z.string().url(),

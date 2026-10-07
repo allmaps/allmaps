@@ -72,6 +72,38 @@ fs.readdirSync(inputDir)
   })
   .forEach(runTests)
 
+describe('Parsing summaries in Presentation 3 manifests', () => {
+  test.each([
+    { summary: [['dendermonde']], expectedSummary: undefined },
+    {
+      summary: { none: ['dendermonde'] },
+      expectedSummary: { none: ['dendermonde'] }
+    }
+  ])(
+    'should parse a manifest with summary $summary',
+    ({ summary, expectedSummary }) => {
+      const manifest = readJSONFile(
+        path.join(inputDir, 'manifest.3.jd-03909-006-4.json')
+      )
+      manifest.summary = summary
+      manifest.items[0].summary = summary
+
+      const parsedManifest = IIIF.parse(manifest)
+
+      if (parsedManifest.type !== 'manifest') {
+        throw new Error('Expected fixture to parse as manifest')
+      }
+
+      expect(parsedManifest.summary).to.deep.equal(expectedSummary)
+      expect(parsedManifest.canvases).to.have.length(manifest.items.length)
+      expect(parsedManifest.canvases[0].summary).to.deep.equal(expectedSummary)
+      expect(parsedManifest.canvases[0].image.uri).to.equal(
+        manifest.items[0].items[0].items[0].body.service[0].id
+      )
+    }
+  )
+})
+
 describe('Parsing georeference annotation pages in Presentation 3 manifests', () => {
   test('should preserve embedded and linked canvas annotation pages', () => {
     const embeddedManifest = IIIF.parse(
