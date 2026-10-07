@@ -8,6 +8,11 @@ packages:
 
 engineStrict: true
 
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+
 catalog:
   # Runtime and TypeScript
   '@types/node': ^24
