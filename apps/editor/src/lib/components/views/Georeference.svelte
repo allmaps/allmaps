@@ -108,12 +108,7 @@
   )
 
   const geoViewport = $derived(
-    viewportsState.getViewport({
-      imageId: mapsState.connectedImageId,
-      mapId: mapsState.activeMapId,
-      view: 'georeference',
-      pane: 'geo'
-    })
+    getGeoViewport(mapsState.connectedImageId, mapsState.activeMapId)
   )
 
   let currentDisplayImageId = $state<string>()
@@ -191,25 +186,12 @@
   }
 
   function getGeoViewport(
-    imageId: string,
-    mapId: string
+    imageId?: string,
+    mapId?: string
   ): Viewport | undefined {
     let stateGeoViewport: Viewport | undefined
-    let navPlaceGeoViewport: Viewport | undefined
-    let urlGeoViewport: Viewport | undefined
-
-    if (geoMap) {
-      navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
-      urlGeoViewport = getBboxViewport(urlState.params.bbox)
-
-      if (mapsState.activeMap?.gcps) {
-        // TODO: get viewport from data
-        //   dataGeoViewport = getBboxViewport(
-        //   geoMap,
-        //   mapsState.activeMap?.gcps
-        // )
-      }
-    }
+    const navPlaceGeoViewport = getNavPlaceViewport(sourceState.navPlace)
+    const urlGeoViewport = getBboxViewport(urlState.params.bbox)
 
     if (imageId) {
       stateGeoViewport = viewportsState.getViewport({
@@ -227,6 +209,21 @@
     })
 
     return geoViewports[0]
+  }
+
+  function applyGeoViewport(viewport: Viewport, duration = 0) {
+    if ('bounds' in viewport) {
+      geoMap?.fitBounds(viewport.bounds, {
+        duration,
+        padding: MAPLIBRE_PADDING
+      })
+    } else {
+      geoMap?.flyTo({
+        ...viewport,
+        duration,
+        padding: MAPLIBRE_PADDING
+      })
+    }
   }
 
   function saveViewport() {
@@ -950,11 +947,7 @@
     }
 
     if (geoViewport) {
-      geoMap?.flyTo({
-        ...geoViewport,
-        duration,
-        padding: MAPLIBRE_PADDING
-      })
+      applyGeoViewport(geoViewport, duration)
     } else if (preserveCurrentView && geoMap) {
       geoMap.flyTo({
         center: geoMap.getCenter(),
@@ -1033,6 +1026,12 @@
   $effect(() => {
     if (mapsState.activeGcpId) {
       makeGcpFeatureActive(mapsState.activeGcpId, true)
+    }
+  })
+
+  $effect(() => {
+    if (geoMap && !mapsState.activeMap && geoViewport) {
+      applyGeoViewport(geoViewport)
     }
   })
 
