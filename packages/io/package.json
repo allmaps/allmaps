@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/io",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "contributors": [
     {
       "name": "Bert Spaan",
@@ -53,12 +53,12 @@
   },
   "devDependencies": {
     "@types/stream-json": "catalog:",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

@@ -234,5 +234,6 @@
   "parser_output": "This is the output of the Allmaps IIIF parser:",
   "reload_editor": "Please reload Allmaps Editor",
   "reload_and_try_different_resource": "and try loading a different IIIF resource.",
+  "manifest_contains_no_images": "This manifest contains no images.",
   "unknown_error": "An unknown error occurred."
 }

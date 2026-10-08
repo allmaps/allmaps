@@ -6,6 +6,13 @@ packages:
   - 'test/*'
   - 'tools/*'
 
+engineStrict: true
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+
 catalog:
   # Runtime and TypeScript
   '@types/node': ^24
@@ -109,3 +116,4 @@ catalog:
 # Keep Elysia's optional Exact Mirror peer on the compatible release.
 overrides:
   exact-mirror: 0.2.7
+  module-exports>typescript: npm:@typescript/typescript6@^6.0.2

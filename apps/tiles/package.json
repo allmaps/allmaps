@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/tiles",
-  "version": "0.0.2-alpha.36",
+  "version": "0.0.2-alpha.37",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -26,10 +26,11 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
+    "@allmaps/basemap": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
-    "ol": "catalog:"
+    "maplibre-gl": "catalog:"
   },
   "devDependencies": {
     "@allmaps/types": "workspace:^",
@@ -40,6 +41,7 @@
     "@tailwindcss/vite": "catalog:",
     "@turf/length": "catalog:",
     "@types/lodash-es": "catalog:",
+    "@typescript/native": "catalog:",
     "@vitejs/plugin-basic-ssl": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
@@ -50,7 +52,6 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",

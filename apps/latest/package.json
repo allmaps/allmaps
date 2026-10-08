@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/latest",
-  "version": "1.0.0-beta.48",
+  "version": "1.0.0-beta.49",
   "author": {
     "name": "Bert Spaan",
     "email": "hello@bertspaan.nl",
@@ -70,6 +70,7 @@
     "@types/d3-geo": "catalog:",
     "@types/geojson": "catalog:",
     "@types/lodash-es": "catalog:",
+    "@typescript/native": "catalog:",
     "@vitejs/plugin-basic-ssl": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
@@ -81,7 +82,6 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",

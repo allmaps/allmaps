@@ -1,11 +1,12 @@
 import { png, webp } from 'itty-router'
 
-import { Viewport } from '@allmaps/render'
+import { Viewport, WarpedMapEventType, WarpedMapEvent } from '@allmaps/render'
 import { WasmRenderer } from '@allmaps/render/wasm'
 import { bboxToRectangle } from '@allmaps/stdlib'
 
 import { xyzTileToProjectedGeoBbox } from './geo.js'
 import { createCachedFetch } from './fetch.js'
+import { TileError } from './tile-error.js'
 
 import type { Bbox } from '@allmaps/types'
 import type { GeoreferencedMap } from '@allmaps/annotation'
@@ -43,6 +44,8 @@ export async function createWarpedTileResponseWasm(
     transformationType = options['transformation.type']
   }
 
+  if (georeferencedMaps.length === 0) throw new TileError('no-maps', 422)
+
   const cachedFetch = createCachedFetch(env)
 
   const renderer = new WasmRenderer(wasmModule, {
@@ -53,26 +56,65 @@ export async function createWarpedTileResponseWasm(
     interpolation: 'cubic'
   })
 
-  for (const georeferencedMap of georeferencedMaps) {
-    await renderer.addGeoreferencedMap(georeferencedMap)
+  let failure: TileError | undefined
+  function recordFailure(
+    code: 'source-image' | 'source-info' | 'render-failed',
+    event: Event
+  ) {
+    if (failure) return
+    failure = new TileError(code, code === 'render-failed' ? 500 : 502, {
+      cause: event instanceof WarpedMapEvent ? event.error : undefined
+    })
+    if (event instanceof WarpedMapEvent)
+      failure.upstreamStatus = event.data?.status
   }
-
-  const projectedGeoBbox: Bbox = xyzTileToProjectedGeoBbox({ x, y, z })
-  const projectedGeoRectangle = bboxToRectangle(projectedGeoBbox)
-
-  const viewport = Viewport.fromSizeAndProjectedGeoPolygon(
-    [TILE_WIDTH, TILE_WIDTH],
-    [projectedGeoRectangle],
-    { devicePixelRatio: resolution === 'retina' ? 2 : 1 }
+  renderer.tileCache.addEventListener(
+    WarpedMapEventType.TILEFETCHERROR,
+    (event) => {
+      recordFailure('source-image', event)
+    }
   )
+  renderer.warpedMapList.addEventListener(
+    WarpedMapEventType.IMAGEINFOFETCHERROR,
+    (event) => {
+      recordFailure('source-info', event)
+    }
+  )
+  renderer.addEventListener(WarpedMapEventType.ERROR, (event) => {
+    recordFailure('render-failed', event)
+  })
 
-  const imageBuffer = await renderer.render(viewport)
+  try {
+    for (const georeferencedMap of georeferencedMaps) {
+      try {
+        await renderer.addGeoreferencedMap(georeferencedMap)
+      } catch (cause) {
+        throw new TileError('invalid-data', 422, { cause })
+      }
+    }
 
-  if (format === 'webp') {
-    return webp(imageBuffer)
-  } else if (format === 'png') {
-    return png(imageBuffer)
+    const projectedGeoBbox: Bbox = xyzTileToProjectedGeoBbox({ x, y, z })
+    const projectedGeoRectangle = bboxToRectangle(projectedGeoBbox)
+
+    const viewport = Viewport.fromSizeAndProjectedGeoPolygon(
+      [TILE_WIDTH, TILE_WIDTH],
+      [projectedGeoRectangle],
+      { devicePixelRatio: resolution === 'retina' ? 2 : 1 }
+    )
+
+    const imageBuffer = await renderer.render(viewport)
+    if (failure) throw failure
+
+    if (format === 'webp') {
+      return webp(imageBuffer)
+    } else if (format === 'png') {
+      return png(imageBuffer)
+    }
+
+    throw new Error(`Unsupported tile output format: ${format}`)
+  } catch (cause) {
+    throw failure ?? cause
+  } finally {
+    renderer.destroy()
   }
-
-  throw new Error(`Unsupported tile output format: ${format}`)
 }

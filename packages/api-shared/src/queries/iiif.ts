@@ -1,4 +1,5 @@
-import { sql, eq } from 'drizzle-orm'
+import { and, eq, exists, gt, lte, notExists, sql } from 'drizzle-orm'
+import { alias, unionAll } from 'drizzle-orm/pg-core'
 
 import { generateId, generateChecksum } from '@allmaps/id'
 import { generateRandomId } from '@allmaps/id/sync'
@@ -398,10 +399,19 @@ export async function queryRandomImagesByOrganizationIds(
     organizationIds: string[]
     georeferenced?: boolean
     limitPerOrganization: number
+    requireOrganizationManifest?: boolean
     userRole?: UserRole
   }
 ) {
-  const requestedOrganizations = sql.join(
+  const {
+    images,
+    organizationUrls,
+    maps,
+    canvasesToImages,
+    manifestsToCanvases,
+    manifests
+  } = schema
+  const requestedValues = sql.join(
     params.organizationIds.map(
       (organizationId, organizationIndex) =>
         sql`(
@@ -412,74 +422,112 @@ export async function queryRandomImagesByOrganizationIds(
     ),
     sql`, `
   )
+  const requestedOrganizations = db.$with('requested_organizations').as(
+    db.select({
+      organizationId: sql<string>`organization_id`.as('organization_id'),
+      randomId: sql<string>`random_id`.as('random_id'),
+      organizationIndex: sql<number>`organization_index`.as(
+        'organization_index'
+      )
+    }).from(sql`(VALUES ${requestedValues}) AS requested_organization (
+        organization_id, random_id, organization_index
+      )`)
+  )
+  const latestMaps = db
+    .select({ id: maps.id })
+    .from(maps)
+    .where(and(eq(maps.imageId, images.id), eq(maps.latest, true)))
   const georeferencedFilter =
     params.georeferenced === undefined
-      ? sql``
+      ? undefined
       : params.georeferenced
-        ? sql`AND EXISTS (
-            SELECT 1
-            FROM ${schema.maps} AS map
-            WHERE map.image_id = image.id AND map.latest = true
-          )`
-        : sql`AND NOT EXISTS (
-            SELECT 1
-            FROM ${schema.maps} AS map
-            WHERE map.image_id = image.id AND map.latest = true
-          )`
+        ? exists(latestMaps)
+        : notExists(latestMaps)
 
-  const candidateResult = await db.execute<{ id: string }>(sql`
-    WITH requested_organizations (
-      organization_id,
-      random_id,
-      organization_index
-    ) AS (
-      VALUES ${requestedOrganizations}
+  const manifestOrganizationUrls = alias(
+    organizationUrls,
+    'manifest_organization_url'
+  )
+  const organizationManifestFilter = params.requireOrganizationManifest
+    ? exists(
+        db
+          .select({ id: manifests.id })
+          .from(canvasesToImages)
+          .innerJoin(
+            manifestsToCanvases,
+            eq(manifestsToCanvases.canvasId, canvasesToImages.canvasId)
+          )
+          .innerJoin(
+            manifests,
+            eq(manifests.id, manifestsToCanvases.manifestId)
+          )
+          .innerJoin(
+            manifestOrganizationUrls,
+            eq(manifestOrganizationUrls.url, manifests.domain)
+          )
+          .where(
+            and(
+              eq(canvasesToImages.imageId, images.id),
+              eq(manifestOrganizationUrls.type, 'domain'),
+              eq(
+                manifestOrganizationUrls.organizationId,
+                requestedOrganizations.organizationId
+              )
+            )
+          )
+      )
+    : undefined
+
+  function selectCandidateImages(wrap: 0 | 1) {
+    return db
+      .select({ id: images.id, wrap: sql<number>`${wrap}::integer`.as('wrap') })
+      .from(images)
+      .innerJoin(organizationUrls, eq(organizationUrls.url, images.domain))
+      .where(
+        and(
+          eq(
+            organizationUrls.organizationId,
+            requestedOrganizations.organizationId
+          ),
+          wrap === 0
+            ? gt(images.id, requestedOrganizations.randomId)
+            : lte(images.id, requestedOrganizations.randomId),
+          georeferencedFilter,
+          organizationManifestFilter
+        )
+      )
+      .orderBy(images.id)
+      .limit(params.limitPerOrganization)
+  }
+
+  // Keep both ID ranges ordered and limited before combining them for wraparound.
+  const candidates = unionAll(
+    selectCandidateImages(0),
+    selectCandidateImages(1)
+  ).as('candidate')
+  const randomImages = db
+    .select({ id: candidates.id, wrap: candidates.wrap })
+    .from(candidates)
+    .orderBy(candidates.wrap, candidates.id)
+    .limit(params.limitPerOrganization)
+    .as('random_image')
+  const candidateRows = await db
+    .with(requestedOrganizations)
+    .select({ id: randomImages.id })
+    .from(requestedOrganizations)
+    .crossJoinLateral(randomImages)
+    .orderBy(
+      requestedOrganizations.organizationIndex,
+      randomImages.wrap,
+      randomImages.id
     )
-    SELECT random_image.id
-    FROM requested_organizations AS requested_organization
-    CROSS JOIN LATERAL (
-      SELECT candidate.id, candidate.wrap
-      FROM (
-        (
-          SELECT image.id, 0 AS wrap
-          FROM ${schema.images} AS image
-          INNER JOIN ${schema.organizationUrls} AS organization_url
-            ON organization_url.url = image.domain
-          WHERE
-            organization_url.organization_id = requested_organization.organization_id
-            AND image.id > requested_organization.random_id
-            ${georeferencedFilter}
-          ORDER BY image.id
-          LIMIT ${params.limitPerOrganization}
-        )
-        UNION ALL
-        (
-          SELECT image.id, 1 AS wrap
-          FROM ${schema.images} AS image
-          INNER JOIN ${schema.organizationUrls} AS organization_url
-            ON organization_url.url = image.domain
-          WHERE
-            organization_url.organization_id = requested_organization.organization_id
-            AND image.id <= requested_organization.random_id
-            ${georeferencedFilter}
-          ORDER BY image.id
-          LIMIT ${params.limitPerOrganization}
-        )
-      ) AS candidate
-      ORDER BY candidate.wrap, candidate.id
-      LIMIT ${params.limitPerOrganization}
-    ) AS random_image
-    ORDER BY
-      requested_organization.organization_index,
-      random_image.wrap,
-      random_image.id
-  `)
-  const candidateRows = Array.isArray(candidateResult)
-    ? candidateResult
-    : candidateResult.rows
   const imageIds = candidateRows.map(({ id }) => id)
 
   if (imageIds.length === 0) {
+    if (params.requireOrganizationManifest) {
+      return []
+    }
+
     throw new ResponseError('Images not found', 404)
   }
 

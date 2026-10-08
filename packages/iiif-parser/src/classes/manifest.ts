@@ -85,6 +85,7 @@ export class EmbeddedManifest {
       this.metadata = parseVersion2Metadata(parsedManifest.metadata)
       this.navDate = parsedManifest.navDate
       this.navPlace = parsedManifest.navPlace
+      this.thumbnail = parseVersion2Thumbnail(parsedManifest.thumbnail)
     } else if ('type' in parsedManifest) {
       // IIIF Presentation API 3.0
       this.uri = parsedManifest.id
@@ -143,7 +144,6 @@ export class Manifest extends EmbeddedManifest {
       this.requiredStatement = parseVersion2Attribution(
         parsedManifest.attribution
       )
-      this.thumbnail = parseVersion2Thumbnail(parsedManifest.thumbnail)
       this.rendering = parseVersion2Rendering(parsedManifest.rendering)
       this.homepage = parseVersion2Related(parsedManifest.related)
       this.rights = parsedManifest.license?.[0]

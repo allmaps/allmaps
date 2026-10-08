@@ -11,6 +11,12 @@ export async function headers(
   request: Request,
   env: WorkerEnv
 ) {
+  if (response.headers.has('X-Allmaps-Error') || response.status >= 400) {
+    response.headers.set('Cache-Control', 'no-store')
+    response.headers.set('CDN-Cache-Control', 'no-store')
+    return response
+  }
+
   // Convert hours to seconds
   const browserCacheSeconds = env.BROWSER_CACHE_HOURS * 60 * 60
   const cloudflareCacheSeconds = env.CLOUDFLARE_CACHE_HOURS * 60 * 60
@@ -32,7 +38,7 @@ export async function headers(
 
 export async function put(response: Response, request: Request) {
   // Only cache HTTP 200 responses
-  if (response.status === 200) {
+  if (response.status === 200 && !response.headers.has('X-Allmaps-Error')) {
     await cache.put(request.url, response.clone())
   }
 

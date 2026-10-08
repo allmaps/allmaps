@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/api-rest",
-  "version": "3.0.1-alpha.0",
+  "version": "3.0.1-alpha.1",
   "private": "true",
   "module": "src/index.js",
   "license": "AGPL-3.0-only",
@@ -35,10 +35,10 @@
   "devDependencies": {
     "@types/geojson": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "drizzle-kit": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   }
 }

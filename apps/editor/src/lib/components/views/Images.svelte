@@ -194,5 +194,12 @@
         />
       </div>
     {/if}
+  {:else if sourceState.parsedManifest && !sourceState.fetching && !sourceState.fetchingInsideCollection}
+    <p
+      role="status"
+      class="rounded-lg bg-white/20 p-8 text-center text-blue-900"
+    >
+      {m.manifest_contains_no_images()}
+    </p>
   {/if}
 </div>

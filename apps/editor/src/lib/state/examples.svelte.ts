@@ -77,7 +77,10 @@ export class ExamplesState {
       organizations,
       count
     )
-    const examplesByOrganizationId = imagesToExamplesByOrganizationId(images)
+    const examplesByOrganizationId = imagesToExamplesByOrganizationId(
+      images,
+      organizations
+    )
 
     for (const organization of organizations) {
       const organizationId = getApiResourceId(organization.id)

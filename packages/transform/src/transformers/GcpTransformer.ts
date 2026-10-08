@@ -21,7 +21,8 @@ import {
   gcpToGeneralGcp,
   gcpToPointForToGeo,
   gcpToPointForToResource,
-  generalGcpToGcp
+  generalGcpToGcp,
+  typeAndOrderToTransformationType
 } from '../shared/conversion-functions.js'
 
 import type {
@@ -499,7 +500,10 @@ export class GcpTransformer extends BaseGcpTransformer {
   ): GcpTransformer {
     return new GcpTransformer(
       georeferencedMap.gcps,
-      options?.transformationType || georeferencedMap.transformation?.type,
+      options?.transformationType ||
+        (georeferencedMap.transformation
+          ? typeAndOrderToTransformationType(georeferencedMap.transformation)
+          : undefined),
       options
     )
   }

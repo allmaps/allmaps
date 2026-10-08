@@ -27,6 +27,7 @@
 
   function handleSubmit(event: Event) {
     event.preventDefault()
+    value = value.trim()
 
     if (value) {
       onsubmit(value)

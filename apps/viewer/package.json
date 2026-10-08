@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/viewer",
-  "version": "1.0.0-beta.88",
+  "version": "1.0.0-beta.89",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -58,6 +58,7 @@
     "@tailwindcss/vite": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "catalog:",
@@ -69,7 +70,6 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",

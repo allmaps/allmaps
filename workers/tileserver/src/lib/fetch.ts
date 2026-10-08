@@ -6,32 +6,40 @@ type RequestInitWithCf = RequestInit & {
 }
 
 export function createCachedFetch(env: WorkerEnv): FetchFn {
-  return (url, requestInit) => {
-    if (!env.USE_CACHE) {
-      return fetch(url, requestInit)
+  return async (url, requestInit) => {
+    let init = requestInit as RequestInitWithCf | undefined
+
+    if (env.USE_CACHE) {
+      const cf: Record<string, unknown> = { ...init?.cf }
+      // A blanket TTL would also cache upstream errors. Keep this policy last
+      // so caller options cannot accidentally re-enable caching for failures.
+      delete cf.cacheTtl
+      init = {
+        ...init,
+        cf: {
+          ...cf,
+          cacheEverything: true,
+          cacheTtlByStatus: {
+            '200-299': env.CLOUDFLARE_CACHE_HOURS * 60 * 60,
+            '300-599': -1
+          }
+        }
+      }
     }
 
-    const cacheTtl = env.CLOUDFLARE_CACHE_HOURS * 60 * 60
+    const response = await fetch(url, init)
 
-    if (requestInit instanceof Request) {
-      return fetch(url, {
-        ...requestInit,
-        cf: {
-          cacheTtl,
-          cacheEverything: true
-        }
+    if (!response.ok) {
+      const upstreamUrl = new URL(url instanceof Request ? url.url : url)
+      console.warn('Upstream request failed', {
+        url: `${upstreamUrl.origin}${upstreamUrl.pathname}`,
+        status: response.status,
+        retryAfter: response.headers.get('Retry-After'),
+        age: response.headers.get('Age'),
+        cfCacheStatus: response.headers.get('CF-Cache-Status')
       })
     }
 
-    const init = requestInit as RequestInitWithCf | undefined
-
-    return fetch(url, {
-      ...init,
-      cf: {
-        cacheTtl,
-        cacheEverything: true,
-        ...init?.cf
-      }
-    })
+    return response
   }
 }

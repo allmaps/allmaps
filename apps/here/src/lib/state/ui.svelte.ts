@@ -51,14 +51,28 @@ export class UiState {
     return this.#fromScreenCoordinates
   }
 
-  set fromScreenCoordinates(coordinates: Point) {
+  set fromScreenCoordinates(coordinates: Point | undefined) {
+    const previous = this.#fromScreenCoordinates
+    if (
+      previous?.[0] === coordinates?.[0] &&
+      previous?.[1] === coordinates?.[1]
+    ) {
+      return
+    }
     this.#fromScreenCoordinates = coordinates
   }
   get positionScreenCoordinates(): Point | undefined {
     return this.#positionScreenCoordinates
   }
 
-  set positionScreenCoordinates(coordinates: Point) {
+  set positionScreenCoordinates(coordinates: Point | undefined) {
+    const previous = this.#positionScreenCoordinates
+    if (
+      previous?.[0] === coordinates?.[0] &&
+      previous?.[1] === coordinates?.[1]
+    ) {
+      return
+    }
     this.#positionScreenCoordinates = coordinates
   }
 

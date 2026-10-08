@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { Image } from '../src/index.js'
+import { EmbeddedImage, Image } from '../src/index.js'
 
 import { readJson } from './lib/fs.js'
 
@@ -73,6 +73,22 @@ const preferredFormatTests = [
     preferredFormats: ['avif'],
     expectedUrl:
       'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/0,0,512,512/256,256/0/default.jpg'
+  },
+  {
+    filename: 'image.3.918ecd18c2592080851777620de9bcb5-gottingen.json',
+    region: { x: 0, y: 0, width: 512, height: 512 },
+    size: { width: 256, height: 256 },
+    preferredFormats: [],
+    expectedUrl:
+      'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/0,0,512,512/256,256/0/default.jpg'
+  },
+  // No preferredFormats specified: falls back to the first server's preferred format from the image JSON
+  {
+    filename: 'image.3.918ecd18c2592080851777620de9bcb5-gottingen.json',
+    region: { x: 0, y: 0, width: 512, height: 512 },
+    size: { width: 256, height: 256 },
+    expectedUrl:
+      'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen/0,0,512,512/256,256/0/default.webp'
   }
 ]
 
@@ -117,3 +133,54 @@ for (const {
     })
   })
 }
+
+describe('preferred formats for embedded image', () => {
+  const imageUrlBase =
+    'https://iiif.io/api/image/3.0/example/reference/918ecd18c2592080851777620de9bcb5-gottingen'
+  const imageRequest = {
+    region: { x: 0, y: 0, width: 512, height: 512 },
+    size: { width: 256, height: 256 }
+  }
+
+  const createEmbeddedImage = () => {
+    return new EmbeddedImage(
+      {
+        type: 'Image',
+        width: 4032,
+        height: 3024,
+        service: [
+          {
+            id: imageUrlBase,
+            type: 'ImageService3',
+            profile: 'level1',
+            extraFormats: ['jpg', 'png', 'webp'],
+            preferredFormats: ['webp', 'jpg']
+          }
+        ]
+      },
+      {
+        parsedCanvas: {
+          id: 'https://example.org/canvas/p1',
+          type: 'Canvas',
+          width: 4032,
+          height: 3024,
+          items: []
+        }
+      }
+    )
+  }
+
+  test('should use preferred format from the embedded image service', () => {
+    const embeddedImage = createEmbeddedImage()
+    const url = embeddedImage.getImageUrl(imageRequest)
+    expect(url).to.equal(`${imageUrlBase}/0,0,512,512/256,256/0/default.webp`)
+  })
+
+  test('should prefer explicitly passed formats over the embedded image service', () => {
+    const embeddedImage = createEmbeddedImage()
+    const url = embeddedImage.getImageUrl(imageRequest, {
+      preferredFormats: ['png']
+    })
+    expect(url).to.equal(`${imageUrlBase}/0,0,512,512/256,256/0/default.png`)
+  })
+})

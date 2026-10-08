@@ -201,6 +201,9 @@ export class EmbeddedImage {
         this.supportsAnyRegionAndSize = false
         this.supportedFormats = ['jpg']
       }
+      if ('preferredFormats' in imageService) {
+        this.preferredFormats = imageService.preferredFormats
+      }
 
       if (imageService.width) {
         width = imageService.width
@@ -370,7 +373,11 @@ export class EmbeddedImage {
     }
 
     const quality = this.majorVersion === 1 ? 'native' : 'default'
-    const format = getImageUrlFormat(this.supportedFormats, options)
+
+    const format = getImageUrlFormat(this.supportedFormats, {
+      ...options,
+      preferredFormats: options?.preferredFormats || this.preferredFormats
+    })
 
     return `${this.uri}/${urlRegion}/${urlSize}/0/${quality}.${format}`
   }

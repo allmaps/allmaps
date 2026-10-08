@@ -1,6 +1,6 @@
 {
   "name": "@allmaps/editor",
-  "version": "2.0.0-alpha.13",
+  "version": "2.0.0-alpha.14",
   "private": true,
   "author": {
     "name": "Bert Spaan",
@@ -74,6 +74,7 @@
     "@types/diff-match-patch": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/sharedb": "catalog:",
+    "@typescript/native": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "catalog:",
@@ -84,7 +85,6 @@
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
