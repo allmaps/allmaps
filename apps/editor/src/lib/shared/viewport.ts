@@ -1,4 +1,4 @@
-import { isGeojsonGeometry, computeBbox } from '@allmaps/stdlib'
+import { isGeojsonGeometry, computeBbox, combineBboxes } from '@allmaps/stdlib'
 
 import type { Bbox } from '@allmaps/types'
 
@@ -14,6 +14,27 @@ type Viewports = {
 export function getNavPlaceViewport(navPlace?: object): Viewport | undefined {
   if (isGeojsonGeometry(navPlace)) {
     const bbox = computeBbox(navPlace)
+    return getBboxViewport(bbox)
+  } else if (
+    navPlace &&
+    'type' in navPlace &&
+    navPlace.type === 'FeatureCollection' &&
+    'features' in navPlace &&
+    Array.isArray(navPlace.features)
+  ) {
+    const geometries = navPlace.features.flatMap((feature: unknown) => {
+      if (
+        typeof feature === 'object' &&
+        feature !== null &&
+        'geometry' in feature &&
+        isGeojsonGeometry(feature.geometry)
+      ) {
+        return [feature.geometry]
+      }
+
+      return []
+    })
+    const bbox = combineBboxes(...geometries.map(computeBbox))
     return getBboxViewport(bbox)
   }
 }
