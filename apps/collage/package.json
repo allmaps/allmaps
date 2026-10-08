@@ -1,0 +1,51 @@
+{
+  "name": "@allmaps/collage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "description": "Arrange georeferenced maps at a shared ground scale",
+  "scripts": {
+    "dev": "vite dev --mode localhost",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "types": "tsc --noEmit",
+    "test": "node --test test/*.test.ts",
+    "lint": "prettier --ignore-path ../../.gitignore --check . && eslint ."
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/maplibre": "workspace:^",
+    "@allmaps/project": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/ui": "workspace:^",
+    "maplibre-gl": "catalog:",
+    "@allmaps/background-color": "workspace:^",
+    "terra-draw": "^1.25.1",
+    "terra-draw-maplibre-gl-adapter": "^1.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@sveltejs/adapter-static": "catalog:",
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-svelte": "catalog:",
+    "globals": "catalog:",
+    "phosphor-svelte": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
+    "@allmaps/types": "workspace:^"
+  }
+}

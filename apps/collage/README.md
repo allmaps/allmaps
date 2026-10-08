@@ -1,0 +1,214 @@
+# Allmaps Collage
+
+A browser application for combining georeferenced maps on one zoomable canvas.
+Move and rotate maps freely while preserving comparable real-world scale around
+each map's original center. Arrange maps individually or in groups, change their
+appearance, edit their masks, and save the layout as a Georeference Annotation.
+
+Collage is an experimental application. Geometry, edited masks and layer order
+round-trip through annotations; appearance settings remain session-only.
+
+## Development
+
+From the monorepo root:
+
+```sh
+pnpm install
+pnpm --filter '@allmaps/maplibre...' build
+pnpm --filter @allmaps/background-color build
+pnpm --filter @allmaps/ui exec svelte-package
+pnpm --filter @allmaps/collage dev
+```
+
+Open [localhost:5517](http://localhost:5517). The app runs entirely in the browser; annotation and
+IIIF image URLs must allow browser requests. There is no upload or persistence
+service.
+
+```sh
+pnpm --filter @allmaps/collage test
+pnpm --filter @allmaps/collage check
+pnpm --filter @allmaps/collage lint
+pnpm --filter @allmaps/collage build
+```
+
+## Adding and opening maps
+
+- **Add maps** accepts an annotation URL, pasted JSON, or local annotation files.
+  It adds every map and leaves them unselected. Batches use largest-first spiral
+  packing, inspired by [Maps Exposé](https://observablehq.com/d/c3bb51b7e4a6e502):
+  padded bounding boxes move out from the center until they no longer overlap.
+  The layout follows the viewport aspect ratio, preserves annotation order,
+  and maintains each map's ground scale. **Try random maps** requests three maps
+  from `https://annotations.allmaps.org/maps/random` without opening a dialog.
+- **Open collage** restores coordinates and annotation order as supplied. It
+  never applies scale normalization or recenters individual maps. It replaces
+  the current canvas as an undoable action.
+- Drop annotation files or a URL on the canvas to add them. Drop into the Open
+  collage dialog to restore a saved layout instead.
+
+## Arranging maps
+
+- Click/drag a map to select/move it. Its controls use equal angular spacing on a
+  semicircle tilted toward the bottom right. Their anchors follow the current
+  mask center and rotate and move with the map. Saving an edited mask immediately
+  updates the tool positions. The arc contracts when zoomed out; when a map extends off screen,
+  the control arc smoothly docks toward the screen center based on the full map
+  size, without following clipped fragments. The entire arc is kept on screen,
+  with full slider rails included so changing a value does not shift the arc.
+  Repositioning eases smoothly after panning; direct manipulation stays immediate.
+  Drag the rotation control (Shift snaps to 15 degrees); double-click to reset.
+  Its angle is shown only while active or focused.
+  Arrow keys rotate a focused control by 1 degree (15 with Shift). Space-drag pans.
+- Shift/Cmd/Ctrl-click toggles maps in a selection. Cmd/Ctrl+A selects all.
+  Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
+  selected map to move the group; rotate uses one shared pivot and preserves
+  spacing and scale. Groups retain the full arc, with individual-map appearance
+  and mask buttons disabled. The central **Organize selected maps** button packs
+  the selection on a spiral while preserving scale, rotation and layer order.
+  Appearance, mask editing and original-orientation reset remain individual-map actions.
+  Group ordering keeps the selected maps' relative order; each gesture is one
+  undo step. Click empty canvas or press Escape to deselect.
+- **Duplicate map** copies the selection with its scale, rotation, mask and
+  appearance intact. Copies get new IDs, appear slightly down and to the right,
+  and become selected. A group duplicates together in one undo step.
+- The layer-order button brings maps to the front. Holding Alt/Option changes
+  its icon and sends them to the back. Both actions support multiple maps.
+- Double-clicking rotation fetches an existing `_allmaps.version` or `_allmaps.id`
+  reference and compares matching GCPs. If unavailable, the loaded map is the
+  baseline. Position, scale and mask do not change.
+
+## Appearance
+
+- Opacity and colorize are radial sliders: the inner end is zero and the outer
+  end is one. Knobs retain their values and positions after release and
+  reselection; faded rails remain visible. Opacity starts at one, outside the
+  other controls. Colorize shows its hexadecimal color value. Adjusting hue
+  enables colorization; double-click the knob or press Enter/Space while focused
+  to toggle it. Arrow keys change opacity by 5% or hue by 10°; Home/End choose
+  either endpoint. Saturation is a color/grayscale toggle. Appearance settings
+  remain session-only.
+- **Apply mask** toggles between the cropped map and full image. This is a
+  session-only display option, like opacity; the actual polygon remains intact.
+- The wand toggles automatic background removal, using Viewer's masked color
+  detection in a worker and the same threshold/hardness. Appearance changes
+  support undo/redo.
+- A failed image or tile request marks the affected mask in Allmaps red.
+  The outline returns to its normal color when the failed resources recover.
+- Map imagery always updates during gestures. An update exceeding 32 ms switches
+  that gesture to the outline fallback until release. This measures synchronous
+  update cost, not GPU frame time. There is no preview toggle.
+
+## Editing masks
+
+Select one map and choose **Edit mask**. Editing stays on the existing zoom
+surface, preserving the map's placement and orientation. The camera fits the
+full image, and other maps are temporarily hidden. The outline and handles
+follow Allmaps Editor styling; failed maps retain their red outline. The logo
+stays visible and the top actions are disabled. On small screens, the editing
+actions sit above the zoom controls.
+
+- Drag a vertex to move it, drag anywhere along an edge to add one, and
+  right-click a vertex to remove it. Dragged points stop at the image boundary,
+  including on rotated and warped maps.
+- Choose **Draw new mask** to replace the polygon. Click to place vertices,
+  then click the first vertex or press Enter to close it. Escape or the drawing
+  button cancels an unfinished replacement and restores the previous draft.
+- Use the editor's undo/redo controls for vertex edits, replacement polygons,
+  and individual points while drawing. **Done** is disabled until a new polygon
+  has been closed.
+- **Done** saves the draft as one collage undo step and updates the tool
+  positions. **Cancel** discards all edits. Both restore the other maps and
+  previous camera view. Escape cancels editing when no drawing is in progress.
+
+Masks must be simple polygons with at least three vertices inside the image.
+Edited masks are included in the standard annotation. Editing leaves map
+placements and GCPs unchanged.
+
+## Keyboard shortcuts
+
+| Shortcut                      | Action                                                           |
+| ----------------------------- | ---------------------------------------------------------------- |
+| Cmd/Ctrl+S                    | Save annotation, or finish mask editing                          |
+| Cmd/Ctrl+Z / Cmd/Ctrl+Shift+Z | Undo / redo in the active mode                                   |
+| Cmd/Ctrl+A                    | Select all maps                                                  |
+| Shift/Cmd/Ctrl-click          | Toggle a map in the selection                                    |
+| Shift-drag empty canvas       | Add maps to the selection with a rectangle                       |
+| Space-drag                    | Pan the canvas                                                   |
+| Shift while rotating          | Snap to 15-degree increments                                     |
+| Alt/Option                    | Change Bring to front into Send to back                          |
+| Delete                        | Remove selected maps                                             |
+| Escape                        | Cancel a gesture or drawing, exit mask editing, or deselect maps |
+
+Focused rotation and slider controls also accept arrow keys. Sliders support
+Home/End; Enter or Space toggles a focused colorize control.
+
+## Coordinates and scale
+
+MapLibre has an empty Mercator style, centered on Null Island, with pitch,
+camera rotation, and world copies disabled. Zoom can go beyond the world
+rectangle down to zoom −2; the empty canvas no longer has to fill the viewport
+with the world extent. Its transparent canvas sits over
+a full-screen dotted backdrop using the Allmaps green palette. The compact
+header follows the other apps: bold Allmaps and light Collage. Selection controls
+are individual circular buttons; explanatory copy stays out of the canvas.
+
+On **Add**, unwrap longitude across the antimeridian, find the original projected
+mask's bounding-box center, subtract that center from projected GCPs, then
+multiply by `cos(source latitude)`. This removes the local spherical Mercator
+scale factor once, while retaining the georeferencing warp up to a uniform
+similarity. Canvas units represent spherical ground meters around the source
+center, not exact ellipsoidal surveying distances. Scale distortion across
+large geographic extents remains; this is a local comparison model.
+
+Keep that normalized geometry in memory. Each gesture applies a rigid rotation
+and translation from this baseline, without repeatedly modifying the previous
+GCP result or recomputing scale at the artificial destination. Export converts
+the placed metric coordinates back to longitude/latitude near Null Island.
+
+**Open** is deliberately separate from **Add**: there is no metadata flag that
+can reliably identify a collage. Opening preserves the supplied geometry even
+if it is far from Null Island.
+
+## Annotation contract
+
+- Export an ordinary `AnnotationPage`. Its item order is the layer order, from
+  back to front.
+- Change the geographic side of each GCP. Preserve image coordinates, edited masks,
+  transformation type, image resource, and existing source metadata.
+- Give newly added maps fresh annotation IDs. Runtime instance IDs are separate,
+  so opening repeated IDs does not silently drop a map.
+- Preserve `_allmaps`. When possible, add only a missing source `id` reference
+  using the original annotation ID or a single-map source URL. Anonymous local
+  files need no metadata at all.
+- Do not export placements, angles, viewport, UI state, or a Collage extension.
+  Opacity, saturation, colorization, background removal and applying the mask
+  are session-only.
+  They reset when reopening an annotation; geometry and layer order are retained.
+- Reopening retains the loaded geometry as the source of truth. Resolving
+  original provenance is optional and only happens when resetting orientation.
+
+## Rendering and current scope
+
+The prototype uses the public `setMapGcps` API, at most once per animation frame,
+with interpolation disabled. This keeps the raster, masks, hit testing and tile
+selection consistent. A dedicated renderer matrix API is a possible later
+optimization; the prototype does not modify shared renderer code.
+
+The UI supports individual and group selection, spiral organization, duplication,
+appearance controls and in-place mask editing. Editable map labels, canvas
+snapshots and local autosave remain future work. Save annotations before closing
+or reloading the page to preserve the layout.
+
+Supported input transformations are first-order polynomial, Helmert, thin plate
+spline, projective and linear, in the renderer's default Web Mercator projection.
+Custom resource projections, straight transformations, higher-order polynomial
+annotations and Canvas targets are rejected explicitly rather than silently
+producing a different shape. Higher-order polynomials need the shared renderer
+to honor the annotation's polynomial order before Collage can round-trip them
+faithfully with Viewer.
+
+The tests cover latitude-dependent scale, rigid transforms, nonlinear sampled
+surfaces, original-orientation recovery, mask editing and control centers,
+duplication, selection, viewport-aware controls, image-loading failure recovery,
+metadata, ordering, empty files, antimeridian import, and repeated export/import
+without scale drift.

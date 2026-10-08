@@ -1,0 +1,559 @@
+@import 'tailwindcss';
+@config '../tailwind.config.ts';
+
+:root {
+  font-family: Geograph, system-ui, sans-serif;
+  color: #222;
+  background: #e0f2e8;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--accent, #ff56ba);
+  outline-offset: 4px;
+}
+.collage {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--canvas-color);
+}
+.collage .map-canvas {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px);
+  background-size: 22px 22px;
+}
+.maplibregl-canvas {
+  outline: none;
+}
+.outlines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.outlines polygon {
+  fill: transparent;
+  stroke: #22222230;
+  stroke-width: 2;
+  stroke-dasharray: 3 4;
+}
+.outlines polygon.selected {
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-dasharray: none;
+}
+.outlines polygon.failed {
+  stroke: var(--error-color);
+  fill: color-mix(in srgb, var(--error-color) 12%, transparent);
+  stroke-width: 4;
+  stroke-dasharray: none;
+}
+.selection-box {
+  fill: #ff56ba18;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 3;
+}
+.app-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px;
+  gap: 16px;
+  pointer-events: none;
+}
+.app-header > * {
+  pointer-events: auto;
+}
+.brand {
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.brand-mark {
+  width: 32px;
+}
+.brand-mark svg {
+  width: 100%;
+  height: auto;
+}
+.brand h1 {
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+.brand h1 > span {
+  margin-left: 4px;
+}
+.brand strong {
+  font-weight: 700;
+}
+nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quiet-button,
+.primary-button,
+.upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.quiet-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: #ffffffa8;
+}
+.quiet-button:hover:not(:disabled) {
+  background: #fff;
+}
+.primary-button {
+  background: #222;
+  color: #fff;
+}
+.primary-button:hover:not(:disabled) {
+  background: #414941;
+}
+.primary-button.small {
+  padding: 10px 16px;
+  font-size: 14px;
+}
+.empty-state {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: min(420px, calc(100% - 40px));
+}
+.paper-composition {
+  width: 210px;
+  height: 154px;
+  margin: 0 auto 24px;
+}
+.paper-composition svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.paper-one {
+  fill: #c1e6d2;
+  stroke: #509a72;
+  stroke-width: 1.2;
+}
+.paper-line {
+  fill: none;
+  stroke: #83cda5;
+  stroke-width: 1;
+}
+.paper-two {
+  fill: #fffaf0;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+}
+.paper-river {
+  fill: none;
+  stroke: #aeced0;
+  stroke-width: 4;
+}
+.paper-composition circle {
+  fill: #fff;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.example-button {
+  display: block;
+  border: 0;
+  background: none;
+  margin: 18px auto 0;
+  padding: 6px;
+  font-size: 15px;
+}
+.example-button:hover {
+  text-decoration: underline;
+}
+.example-button span {
+  margin-left: 6px;
+}
+.canvas-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  pointer-events: none;
+}
+.view-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+.view-controls button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: #ffffffa8;
+  border: 0;
+  border-radius: 50%;
+}
+.view-controls button:hover:not(:disabled) {
+  background: #fff;
+}
+.map-control {
+  position: absolute;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  transition:
+    left 220ms ease-out,
+    top 220ms ease-out;
+}
+.control-gesture .map-control {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-control {
+    transition: none;
+  }
+}
+.map-control.active {
+  z-index: 3;
+}
+.map-control-button {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: #fffafc;
+  color: #222;
+  transform: translate(-50%, -50%);
+  touch-action: none;
+  user-select: none;
+  box-shadow: 0 2px 6px #2222220a;
+}
+.map-control-button img {
+  width: 19px;
+  height: 19px;
+}
+.map-control-button:hover:not(:disabled),
+.map-control-button.pressed {
+  background: var(--accent);
+}
+.map-control-button[role='slider'],
+.map-control-button[aria-label^='Move'],
+.map-control-button[aria-label^='Rotate'] {
+  cursor: grab;
+}
+.active .map-control-button {
+  cursor: grabbing;
+  background: var(--accent);
+}
+.control-value {
+  visibility: hidden;
+  position: absolute;
+  top: 27px;
+  left: 0;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  background: #fffafc;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.active .control-value,
+.map-control:has(.map-control-button:focus-visible) .control-value {
+  visibility: visible;
+}
+.control-track {
+  position: absolute;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px #fffafc;
+  opacity: 0.3;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.active .control-track,
+.map-control:has(.map-control-button:focus-visible) .control-track {
+  opacity: 1;
+}
+.control-track.hue-track {
+  background: linear-gradient(
+    to right,
+    #f00,
+    #ff0,
+    #0f0,
+    #0ff,
+    #00f,
+    #f0f,
+    #f00
+  );
+}
+.hue-control .map-control-button {
+  border-color: var(--hue-color);
+}
+.hue-control .map-control-button.pressed,
+.hue-control .map-control-button:hover:not(:disabled),
+.hue-control.active .map-control-button {
+  background: var(--hue-color);
+  color: white;
+}
+.error-message {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(600px, calc(100% - 40px));
+  border: 1px solid #efbcb3;
+  border-radius: 10px;
+  padding: 12px 15px;
+  background: #fff5ef;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 6;
+}
+.error-message button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+}
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+.input-dialog {
+  margin: auto;
+  max-height: calc(100dvh - 48px);
+  border: 0;
+  background: #fffdfa;
+  width: min(440px, calc(100% - 32px));
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 20px 80px #22222220;
+}
+.input-dialog::backdrop {
+  background: #284d3925;
+  backdrop-filter: blur(3px);
+}
+.input-dialog h2 {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0 0 26px;
+}
+.input-dialog .dialog-error {
+  color: #9a362c;
+  background: #fff0e8;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+}
+.close-dialog {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  padding: 5px;
+}
+.input-dialog form label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 9px;
+}
+.input-dialog textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #d8d2c6;
+  border-radius: 8px;
+  background: #f9f7f3;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 105px;
+}
+.input-dialog textarea::placeholder {
+  color: #8b9589;
+}
+.input-dialog form .primary-button {
+  width: 100%;
+  margin-top: 14px;
+  justify-content: space-between;
+}
+.file-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0;
+  color: #809183;
+  font-size: 14px;
+}
+.file-divider::before,
+.file-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e0e6df;
+}
+.upload-button {
+  width: 100%;
+  background: none;
+  border: 1px dashed #adc9b6;
+}
+.upload-button:hover {
+  background: #e0f2e8;
+}
+.file-input {
+  display: none;
+}
+.drop-overlay {
+  position: absolute;
+  inset: 14px;
+  border: 2px dashed var(--accent);
+  background: #e0f2e8ed;
+  z-index: 10;
+  border-radius: 14px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+.drop-overlay strong {
+  font-size: 30px;
+  font-weight: 500;
+}
+@media (max-width: 600px) {
+  .app-header {
+    gap: 10px;
+  }
+  nav {
+    gap: 5px;
+  }
+  .quiet-button {
+    width: 36px;
+    height: 36px;
+  }
+  .primary-button.small {
+    padding: 10px;
+  }
+  .primary-button.small span {
+    display: none;
+  }
+  .canvas-footer {
+    bottom: 16px;
+    left: 16px;
+  }
+  .map-control-button {
+    width: 42px;
+    height: 42px;
+  }
+  .input-dialog {
+    padding: 26px;
+  }
+}
+@media (min-width: 768px) {
+  .app-header {
+    padding: 8px;
+  }
+}
+@media (max-height: 520px) {
+  .paper-composition {
+    display: none;
+  }
+}
+
+.map-control.disabled .control-track {
+  opacity: 0.12;
+}
+.mask-editor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.mask-editor-actions {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.mask-editor-actions h2 {
+  margin: 0;
+  padding: 8px 14px;
+  background: #ffffffd9;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.mask-editor .error-message {
+  pointer-events: auto;
+}
+@media (max-width: 760px) {
+  .mask-editor-actions {
+    bottom: 72px;
+  }
+  .mask-editor .canvas-footer {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 16px;
+  }
+}
