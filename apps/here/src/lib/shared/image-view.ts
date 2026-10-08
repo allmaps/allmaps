@@ -10,6 +10,10 @@ import {
 import type { Point } from '@allmaps/types'
 import type { MapWithImageInfo, CompassMode } from './types.js'
 
+const MAX_MERCATOR_LATITUDE = 85.0511287798066
+
+type ProjectLngLat = (coordinates: Point) => { x: number; y: number }
+
 export function createImageView({ map, imageInfo }: MapWithImageInfo) {
   const image = Image.parse(imageInfo)
   const annotation = generateFakeStraightAnnotation(
@@ -38,8 +42,64 @@ export function createImageView({ map, imageInfo }: MapWithImageInfo) {
   const positionZoom =
     coarsestImageZoom + (finestImageZoom - coarsestImageZoom) * 0.75
 
+  const imageCenter: Point = [image.width / 2, image.height / 2]
+  const toLngLat = (point: Point): Point => transformer.transformToGeo(point)
+
+  function toProjectableLngLat(point: Point): Point | undefined {
+    if (!point.every(Number.isFinite)) return
+
+    const coordinates = toLngLat(point)
+    if (
+      coordinates.every(Number.isFinite) &&
+      Math.abs(coordinates[1]) <= MAX_MERCATOR_LATITUDE
+    ) {
+      return coordinates
+    }
+  }
+
+  function toScreenCoordinates(
+    point: Point,
+    project: ProjectLngLat
+  ): Point | undefined {
+    if (!point.every(Number.isFinite)) return
+
+    const coordinates = toProjectableLngLat(point)
+    let screenCoordinates: Point
+    if (coordinates) {
+      const projected = project(coordinates)
+      screenCoordinates = [projected.x, projected.y]
+    } else {
+      // Off-image locations can exceed Mercator's latitude range. Extend the
+      // image's local screen axes to retain their direction without projecting
+      // invalid geographical coordinates. These axes follow camera rotation.
+      const center = project(toLngLat(imageCenter))
+      const horizontalReference = project(
+        toLngLat([imageCenter[0] + 1, imageCenter[1]])
+      )
+      const verticalReference = project(
+        toLngLat([imageCenter[0], imageCenter[1] + 1])
+      )
+      const horizontalOffset = point[0] - imageCenter[0]
+      const verticalOffset = point[1] - imageCenter[1]
+      screenCoordinates = [
+        center.x +
+          horizontalOffset * (horizontalReference.x - center.x) +
+          verticalOffset * (verticalReference.x - center.x),
+        center.y +
+          horizontalOffset * (horizontalReference.y - center.y) +
+          verticalOffset * (verticalReference.y - center.y)
+      ]
+    }
+
+    return screenCoordinates.every(Number.isFinite)
+      ? screenCoordinates
+      : undefined
+  }
+
   return {
-    toLngLat: (point: Point): Point => transformer.transformToGeo(point),
+    toLngLat,
+    toProjectableLngLat,
+    toScreenCoordinates,
     minZoom,
     maxZoom,
     positionZoom,
