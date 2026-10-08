@@ -29,8 +29,8 @@
   let editUserSlug = $derived(user.slug ?? '')
   let editUserEmail = $derived(user.email ?? '')
   let editUserBanned = $derived(user.banned ?? false)
-  let editUserRole = $derived<'user' | 'admin'>(
-    (user.role as 'user' | 'admin') ?? 'user'
+  let editUserRole = $derived<'user' | 'collaborator' | 'admin'>(
+    (user.role as 'user' | 'collaborator' | 'admin') ?? 'user'
   )
   let isChangingRole = $state(false)
   let selectedOrganizationId = $state('')

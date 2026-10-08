@@ -23,7 +23,7 @@ export const getUsers = query(userLimitSchema, async (limit) => {
   )
 })
 
-const userRoleSchema = z.enum(['user', 'admin'])
+const userRoleSchema = z.enum(['user', 'collaborator', 'admin'])
 const userSlugSchema = z
   .string()
   .trim()

@@ -27,6 +27,7 @@ import {
 } from '@allmaps/api-shared/db'
 import {
   ORGANIZATION_PLANS,
+  getUserLimitRole,
   needsElevatedLimitRole,
   normalizeOrganizationsQueryParams,
   setCacheControl
@@ -122,6 +123,7 @@ async function listOrganizationsForRequest({
 }) {
   const queryParams = normalizeOrganizationsQueryParams(request)
   const session = await auth.api.getSession({ headers: request.headers })
+  const userRole = getUserLimitRole(session?.user)
 
   if (session?.user.role === 'admin') {
     setCacheControl(set, 'private-no-store')
@@ -143,13 +145,20 @@ async function listOrganizationsForRequest({
         db,
         env.PUBLIC_REST_BASE_URL,
         organizationIds,
-        { ...queryParams, userRole: 'user' }
+        { ...queryParams, userRole }
       )
     }
   }
 
-  setCacheControl(set, 'public-medium')
-  return listOrganizations(db, env.PUBLIC_REST_BASE_URL, queryParams)
+  const limitRole = userRole === 'collaborator' ? userRole : 'public'
+  setCacheControl(
+    set,
+    limitRole === 'public' ? 'public-medium' : 'private-no-store'
+  )
+  return listOrganizations(db, env.PUBLIC_REST_BASE_URL, {
+    ...queryParams,
+    userRole: limitRole
+  })
 }
 
 function organizationsToGeojson(
@@ -299,7 +308,7 @@ export function createOrganizationsRoutes(
         body,
         status,
         set,
-        getOrganizationLimitRole
+        canImportOrganizationIiif
       }) => {
         setCacheControl(set, 'private-no-store')
 
@@ -313,11 +322,11 @@ export function createOrganizationsRoutes(
           return status(404, { error: 'Organization not found' })
         }
 
-        const userRole = await getOrganizationLimitRole({
+        const canImport = await canImportOrganizationIiif({
           id: params.organizationId
         })
 
-        if (userRole !== 'admin' && userRole !== 'organizationPlanMember') {
+        if (!canImport) {
           return status(403, { error: 'Forbidden' })
         }
 
@@ -413,7 +422,7 @@ export function createOrganizationsRoutes(
         body,
         status,
         set,
-        getOrganizationLimitRole
+        canImportOrganizationIiif
       }) => {
         setCacheControl(set, 'private-no-store')
 
@@ -427,11 +436,11 @@ export function createOrganizationsRoutes(
           return status(404, { error: 'Organization not found' })
         }
 
-        const userRole = await getOrganizationLimitRole({
+        const canImport = await canImportOrganizationIiif({
           id: params.organizationId
         })
 
-        if (userRole !== 'admin' && userRole !== 'organizationPlanMember') {
+        if (!canImport) {
           return status(403, { error: 'Forbidden' })
         }
 

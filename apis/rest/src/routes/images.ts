@@ -6,7 +6,7 @@ import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
-import { adminDetail } from '../openapi.js'
+import { iiifImportDetail } from '../openapi.js'
 import {
   queryImage,
   queryImages,
@@ -277,12 +277,12 @@ export function createImagesRoutes(
         return createImagesFromBody(db, body)
       },
       {
-        admin: true,
+        importIiif: true,
         body: createImageBodySchema,
         detail: {
           summary: 'Create a single IIIF Image from a IIIF URL',
           tags: ['Images'],
-          ...adminDetail
+          ...iiifImportDetail
         }
       }
     )

@@ -279,6 +279,12 @@
                   >
                     🛡️ Admin
                   </span>
+                {:else if user.role === 'collaborator'}
+                  <span
+                    class="rounded px-2 py-0.5 font-sans text-xs font-medium bg-blue-100 text-blue-700"
+                  >
+                    🤝 Collaborator
+                  </span>
                 {:else}
                   <span
                     class="rounded px-2 py-0.5 font-sans text-xs font-medium bg-gray-100 text-gray-600"

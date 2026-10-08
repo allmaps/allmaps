@@ -9,7 +9,9 @@ export {
 } from './shared/maps.js'
 
 export { ResponseError } from './shared/errors.js'
+export { getUserLimitRole } from './shared/permissions.js'
 export {
+  COLLABORATOR_MAX_LIMIT,
   DEFAULT_LIMIT,
   PUBLIC_MAX_LIMIT,
   USER_MAX_LIMIT,

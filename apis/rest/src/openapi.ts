@@ -10,3 +10,9 @@ export const authenticatedDetail = {
   security: [{ sessionCookie: [] }],
   'x-badges': [{ name: 'Authenticated', color: '#df0' }]
 }
+
+export const iiifImportDetail = {
+  description: 'Admins and collaborators only.',
+  security: [{ sessionCookie: [] }],
+  'x-badges': [{ name: 'IIIF import', color: '#df0' }]
+}

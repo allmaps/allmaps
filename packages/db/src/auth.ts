@@ -5,6 +5,7 @@ import type { BetterAuthEnv } from '@allmaps/env'
 import { generateRandomId } from '@allmaps/id/sync'
 
 import { anonymous, openAPI, admin, organization } from 'better-auth/plugins'
+import { defaultRoles, userAc } from 'better-auth/plugins/admin/access'
 
 import { getNeonHttpDb } from './db.js'
 import type { Db } from './db.js'
@@ -78,7 +79,10 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
     plugins: [
       anonymous(),
       openAPI(),
-      admin(),
+      admin({
+        roles: { ...defaultRoles, collaborator: userAc },
+        adminRoles: ['admin']
+      }),
       organization({
         allowUserToCreateOrganization: false,
         schema: {
