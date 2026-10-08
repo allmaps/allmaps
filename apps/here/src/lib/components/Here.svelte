@@ -90,21 +90,23 @@
   function updateScreenCoordinates() {
     // These reads must not become dependencies of the marker effects below.
     untrack(() => {
-      if (!map) {
+      const currentMap = map
+      if (!currentMap) {
         return
       }
 
+      const project = (coordinates: Point) => currentMap.project(coordinates)
       const fromPoint = fromCoordinates
-        ? map.project(imageView.toLngLat(fromCoordinates))
+        ? imageView.toScreenCoordinates(fromCoordinates, project)
         : undefined
       const positionPoint = positionCoordinates
-        ? map.project(imageView.toLngLat(positionCoordinates))
+        ? imageView.toScreenCoordinates(positionCoordinates, project)
         : undefined
       uiState.fromScreenCoordinates = fromPoint
-        ? [Math.round(fromPoint.x), Math.round(fromPoint.y)]
+        ? [Math.round(fromPoint[0]), Math.round(fromPoint[1])]
         : undefined
       uiState.positionScreenCoordinates = positionPoint
-        ? [Math.round(positionPoint.x), Math.round(positionPoint.y)]
+        ? [Math.round(positionPoint[0]), Math.round(positionPoint[1])]
         : undefined
     })
   }
@@ -306,9 +308,12 @@
         (resourceTransformerState.resourcePositionInsideResource
           ? positionCoordinates
           : undefined)
-      if (center) {
+      const centerCoordinates = center
+        ? imageView.toProjectableLngLat(center)
+        : undefined
+      if (centerCoordinates) {
         map?.jumpTo({
-          center: imageView.toLngLat(center),
+          center: centerCoordinates,
           zoom: imageView.positionZoom
         })
       }
@@ -378,8 +383,11 @@
       return
     }
 
-    if (positionCoordinates) {
-      positionMarker.setLngLat(imageView.toLngLat(positionCoordinates))
+    const coordinates = positionCoordinates
+      ? imageView.toProjectableLngLat(positionCoordinates)
+      : undefined
+    if (coordinates) {
+      positionMarker.setLngLat(coordinates)
       if (!positionMarkerAttached) {
         positionMarker.addTo(map)
         positionMarkerAttached = true
@@ -431,8 +439,10 @@
       return
     }
 
-    if (fromCoordinates) {
-      const coordinates = imageView.toLngLat(fromCoordinates)
+    const coordinates = fromCoordinates
+      ? imageView.toProjectableLngLat(fromCoordinates)
+      : undefined
+    if (coordinates) {
       fromShadowMarker.setLngLat(coordinates)
       fromMarker.setLngLat(coordinates)
       if (!fromMarkersAttached) {
