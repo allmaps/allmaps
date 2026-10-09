@@ -21,7 +21,6 @@ export type CollageMap = {
   sourceCenter: Point
   resourceMask: Point[]
   placement: Placement
-  resetRotation: number
   title: string
   appearance: {
     applyMask: boolean
@@ -172,11 +171,35 @@ function preserveSource(map: GeoreferencedMap, sourceUrl?: string) {
   if (originalAnnotationUrl(map)) return
   const url = isHttpUrl(map.id) ? map.id : sourceUrl
   if (!isHttpUrl(url)) return
-  // Reuse the existing provenance convention; no Collage-specific metadata.
+  // Keep provenance independent of the saved rotation.
   map._allmaps = {
     ...(map._allmaps && typeof map._allmaps === 'object' ? map._allmaps : {}),
     id: url
   }
+}
+
+/** Rotation is stored in counterclockwise degrees; old files start at zero. */
+function savedRotation(map: GeoreferencedMap): number {
+  const metadata = map._allmaps
+  if (!metadata || typeof metadata !== 'object' || !('rotation' in metadata))
+    return 0
+  return typeof metadata.rotation === 'number' &&
+    Number.isFinite(metadata.rotation)
+    ? (metadata.rotation / 180) * Math.PI
+    : 0
+}
+
+function localPoints(
+  baseline: GeoreferencedMap,
+  sourceCenter: Point,
+  points: Point[]
+): Point[] {
+  const rotation = savedRotation(baseline)
+  // Exported GCPs already contain the rotation. Factor it out of local geometry
+  // before restoring placement.rotation, including masks edited after loading.
+  return points.map((point) =>
+    rotate([point[0] - sourceCenter[0], point[1] - sourceCenter[1]], -rotation)
+  )
 }
 
 function makeItem(baseline: GeoreferencedMap): CollageMap {
@@ -189,19 +212,20 @@ function makeItem(baseline: GeoreferencedMap): CollageMap {
   return {
     instanceId: 'urn:uuid:' + crypto.randomUUID(),
     baseline,
-    localGcps: projected.map((p) => [p[0] - pivot[0], p[1] - pivot[1]]),
-    localMask: mask.map((p) => [p[0] - pivot[0], p[1] - pivot[1]]),
-    localFullMask: transformer(baseline)
-      .transformToProjectedGeo(
+    localGcps: localPoints(baseline, pivot, projected),
+    localMask: localPoints(baseline, pivot, mask),
+    localFullMask: localPoints(
+      baseline,
+      pivot,
+      transformer(baseline).transformToProjectedGeo(
         baseline.resource.width && baseline.resource.height
           ? fullResourceMask(baseline)
           : baseline.resourceMask
       )
-      .map((p) => [p[0] - pivot[0], p[1] - pivot[1]]),
+    ),
     sourceCenter: pivot,
     resourceMask: structuredClone(baseline.resourceMask),
-    placement: { position: pivot, rotation: 0 },
-    resetRotation: 0,
+    placement: { position: pivot, rotation: savedRotation(baseline) },
     title: label(baseline),
     appearance: {
       applyMask: true,
@@ -301,7 +325,18 @@ export function placedMap(item: CollageMap): GeoreferencedMap {
 
 export function exportCollage(items: CollageMap[]) {
   // Array order is the layer order, from back to front.
-  const annotation = generateAnnotation(items.map(placedMap))
+  const annotation = generateAnnotation(
+    items.map((item) => {
+      const map = placedMap(item)
+      map._allmaps = {
+        ...(map._allmaps && typeof map._allmaps === 'object'
+          ? map._allmaps
+          : {}),
+        rotation: (item.placement.rotation / Math.PI) * 180
+      }
+      return map
+    })
+  )
   if (annotation.type !== 'AnnotationPage')
     throw new Error('Expected an AnnotationPage.')
   return annotation
@@ -353,51 +388,6 @@ export function contains(point: Point, polygon: Point[]): boolean {
   return inside
 }
 
-/**
- * Fit only an angle between matching GCPs. Do not overwrite the loaded
- * collage's scale, shape, position, mask, or resource metadata.
- */
-export function resetRotationFromOriginal(
-  item: CollageMap,
-  original: GeoreferencedMap
-): number {
-  if (item.baseline.resource.id !== original.resource.id) {
-    throw new Error('The original annotation describes a different image.')
-  }
-  const normalized = normalizeMap(original)
-  const byResource = new Map(
-    normalized.gcps.map((gcp) => [
-      gcp.resource.join(','),
-      lonLatToWebMercator(gcp.geo)
-    ])
-  )
-  const pairs = item.baseline.gcps.flatMap((gcp, i) => {
-    const source = byResource.get(gcp.resource.join(','))
-    return source ? [{ source, target: item.localGcps[i] }] : []
-  })
-  if (pairs.length < 2)
-    throw new Error('The original annotation has no matching control points.')
-  const mean = (points: Point[]): Point => [
-    points.reduce((sum, p) => sum + p[0], 0) / points.length,
-    points.reduce((sum, p) => sum + p[1], 0) / points.length
-  ]
-  const a = mean(pairs.map((p) => p.source))
-  const b = mean(pairs.map((p) => p.target))
-  let dot = 0
-  let cross = 0
-  for (const { source, target } of pairs) {
-    const x = source[0] - a[0]
-    const y = source[1] - a[1]
-    const u = target[0] - b[0]
-    const v = target[1] - b[1]
-    dot += x * u + y * v
-    cross += x * v - y * u
-  }
-  if (Math.hypot(dot, cross) < 1e-10)
-    throw new Error('The original orientation is ambiguous.')
-  return -Math.atan2(cross, dot)
-}
-
 export function fullResourceMask(map: GeoreferencedMap): Point[] {
   const { width, height } = map.resource
   if (!width || !height)
@@ -419,9 +409,13 @@ export function resolveImageSize(
     ...item.baseline,
     resource: { ...item.baseline.resource, width, height }
   }
-  item.localFullMask = transformer(item.baseline)
-    .transformToProjectedGeo(fullResourceMask(item.baseline))
-    .map((p) => [p[0] - item.sourceCenter[0], p[1] - item.sourceCenter[1]])
+  item.localFullMask = localPoints(
+    item.baseline,
+    item.sourceCenter,
+    transformer(item.baseline).transformToProjectedGeo(
+      fullResourceMask(item.baseline)
+    )
+  )
 }
 
 /** Only selected placements change. Rotated/edited masks need their own bbox
@@ -459,12 +453,11 @@ export function setResourceMask(item: CollageMap, mask: Point[]) {
     item.baseline.resource.width!,
     item.baseline.resource.height!
   )
-  const localMask = transformer(item.baseline)
-    .transformToProjectedGeo(mask)
-    .map((p): Point => [
-      p[0] - item.sourceCenter[0],
-      p[1] - item.sourceCenter[1]
-    ])
+  const localMask = localPoints(
+    item.baseline,
+    item.sourceCenter,
+    transformer(item.baseline).transformToProjectedGeo(mask)
+  )
   center(localMask)
   item.resourceMask = structuredClone(mask)
   item.localMask = localMask

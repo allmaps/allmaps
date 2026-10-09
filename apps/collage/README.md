@@ -5,8 +5,8 @@ Move and rotate maps freely while preserving comparable real-world scale around
 each map's original center. Arrange maps individually or in groups, change their
 appearance, edit their masks, and save the layout as a Georeference Annotation.
 
-Collage is an experimental application. Geometry, edited masks and layer order
-round-trip through annotations; appearance settings remain session-only.
+Collage is an experimental application. Geometry, edited masks, layer order and
+rotation round-trip through annotations; appearance settings remain session-only.
 
 ## Development
 
@@ -73,9 +73,10 @@ pnpm --filter @allmaps/collage build
   and become selected. A group duplicates together in one undo step.
 - The layer-order button brings maps to the front. Holding Alt/Option changes
   its icon and sends them to the back. Both actions support multiple maps.
-- Double-clicking rotation fetches an existing `_allmaps.version` or `_allmaps.id`
-  reference and compares matching GCPs. If unavailable, the loaded map is the
-  baseline. Position, scale and mask do not change.
+- Double-clicking rotation resets the angle to zero without fetching the original
+  annotation. Export stores the angle in `_allmaps.rotation`, so resetting still
+  works after reopening a collage. Without valid rotation metadata, the loaded
+  orientation becomes zero. Position, scale and mask do not change.
 
 ## Appearance
 
@@ -177,15 +178,20 @@ if it is far from Null Island.
   transformation type, image resource, and existing source metadata.
 - Give newly added maps fresh annotation IDs. Runtime instance IDs are separate,
   so opening repeated IDs does not silently drop a map.
-- Preserve `_allmaps`. When possible, add only a missing source `id` reference
+- Preserve existing `_allmaps` properties. When possible, add a missing source `id` reference
   using the original annotation ID or a single-map source URL. Anonymous local
-  files need no metadata at all.
-- Do not export placements, angles, viewport, UI state, or a Collage extension.
+  files need no source reference.
+- Record `_allmaps.rotation` in degrees, counterclockwise in projected map
+  coordinates. The GCPs already include this rotation: loading factors it out of
+  the local geometry before restoring the angle, keeping the rendered layout
+  unchanged. Missing or invalid values default to zero. Resetting and exporting
+  writes zero over the previously saved angle.
+- Do not export placements, viewport, other UI state, or a Collage extension.
   Opacity, saturation, colorization, background removal and applying the mask
   are session-only.
   They reset when reopening an annotation; geometry and layer order are retained.
-- Reopening retains the loaded geometry as the source of truth. Resolving
-  original provenance is optional and only happens when resetting orientation.
+- Reopening retains the loaded geometry as the source of truth. Provenance is
+  preserved without fetching it to recover orientation.
 
 ## Rendering and current scope
 
@@ -208,7 +214,7 @@ to honor the annotation's polynomial order before Collage can round-trip them
 faithfully with Viewer.
 
 The tests cover latitude-dependent scale, rigid transforms, nonlinear sampled
-surfaces, original-orientation recovery, mask editing and control centers,
+surfaces, saved rotation and offline reset, mask editing and control centers,
 duplication, selection, viewport-aware controls, image-loading failure recovery,
 metadata, ordering, empty files, antimeridian import, and repeated export/import
 without scale drift.

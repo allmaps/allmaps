@@ -41,9 +41,6 @@
     outline,
     mapCenter,
     contains,
-    originalAnnotationUrl,
-    parseMaps,
-    resetRotationFromOriginal,
     rotatePlacement,
     arrangeMaps,
     duplicateMaps,
@@ -834,58 +831,23 @@
     refresh()
   }
 
-  async function resetOrientation() {
+  function resetOrientation() {
     const item = selected
     if (!item || busy) return
-    busy = true
     errorMessage = ''
-    let reset = item.resetRotation
-    const url = originalAnnotationUrl(item.baseline)
-    if (url) {
-      try {
-        const originals = parseMaps(await fetchJson(url))
-        const original =
-          originals.find(
-            (candidate) =>
-              candidate.id === url &&
-              candidate.resource.id === item.baseline.resource.id
-          ) ??
-          originals.find(
-            (candidate) =>
-              candidate.resource.id === item.baseline.resource.id &&
-              candidate.gcps.every((gcp) =>
-                item.baseline.gcps.some(
-                  (loaded) =>
-                    loaded.resource[0] === gcp.resource[0] &&
-                    loaded.resource[1] === gcp.resource[1]
-                )
-              )
-          )
-        if (!original) throw new Error('Original map not found.')
-        reset = resetRotationFromOriginal(item, original)
-        message = 'Original orientation restored.'
-      } catch {
-        message =
-          'Original annotation unavailable. Using the loaded orientation.'
-      }
-    } else {
-      message = 'Loaded orientation restored.'
+    const before = structuredClone(items)
+    const previous = item.placement.rotation
+    item.placement.rotation = 0
+    try {
+      updateRaster(item)
+      remember(before)
+      items = [...items]
+      refresh()
+      message = 'Rotation reset.'
+    } catch (error) {
+      item.placement.rotation = previous
+      fail(error)
     }
-    if (!disposed && items.includes(item)) {
-      const before = structuredClone(items)
-      const previous = item.placement.rotation
-      item.placement.rotation = reset
-      try {
-        updateRaster(item)
-        remember(before)
-        items = [...items]
-        refresh()
-      } catch (error) {
-        item.placement.rotation = previous
-        fail(error)
-      }
-    }
-    busy = false
   }
 
   function beginDrag(event: PointerEvent, item: CollageMap, mode: DragMode) {

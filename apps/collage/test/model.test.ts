@@ -11,7 +11,6 @@ import {
   place,
   normalizeMap,
   originalAnnotationUrl,
-  resetRotationFromOriginal,
   transformer,
   contains,
   outline,
@@ -164,6 +163,7 @@ test('export and reopen keep positions, orientation, masks, and annotation order
   const a = parseAnnotation(exported)
   const b = parseAnnotation(twice)
   for (let i = 0; i < a.length; i++) {
+    close(reopened[i].placement.rotation, items[i].placement.rotation)
     assert.deepEqual(a[i].resourceMask, b[i].resourceMask)
     a[i].gcps.forEach((gcp, j) =>
       close(distance(gcp.geo, b[i].gcps[j].geo), 0, 1e-10)
@@ -179,14 +179,16 @@ test('opening a high-latitude annotation does not normalize or relocate it', () 
   )
 })
 
-test('exports add no project metadata and preserve existing provenance', () => {
+test('exports record rotation while preserving provenance and omitting other UI state', () => {
   const source = fixture()
-  source._allmaps = {
+  const metadata = {
     id: source.id,
     version: source.id + '@1',
     unrelated: true
   }
+  source._allmaps = metadata
   const [item] = addMaps(generateAnnotation(source))
+  item.placement.rotation = Math.PI / 4
   item.appearance = {
     applyMask: false,
     opacity: 0.4,
@@ -197,7 +199,10 @@ test('exports add no project metadata and preserve existing provenance', () => {
     backgroundColor: '#eeeedd'
   }
   const exported = exportCollage([item])
-  assert.deepEqual(exported.items[0].body._allmaps, source._allmaps)
+  assert.deepEqual(exported.items[0].body._allmaps, {
+    ...metadata,
+    rotation: 45
+  })
   assert.deepEqual(Object.keys(exported).sort(), ['@context', 'items', 'type'])
   assert.equal(JSON.stringify(exported).includes('"collage"'), false)
   assert.equal(JSON.stringify(exported).includes('"appearance"'), false)
@@ -212,13 +217,13 @@ test('exports add no project metadata and preserve existing provenance', () => {
   assert.equal(originalAnnotationUrl(item.baseline), source.id + '@1')
 })
 
-test('anonymous files export without _allmaps metadata; a single source URL can retain provenance', () => {
+test('anonymous files only add rotation metadata; a single source URL can retain provenance', () => {
   const source = fixture()
   delete source.id
   const annotation = generateAnnotation(source)
   const [anonymous] = addMaps(annotation)
   const serialized = JSON.parse(JSON.stringify(exportCollage([anonymous])))
-  assert.equal('_allmaps' in serialized.items[0].body, false)
+  assert.deepEqual(serialized.items[0].body._allmaps, { rotation: 0 })
   const [linked] = addMaps(
     annotation,
     [0, 0],
@@ -230,28 +235,108 @@ test('anonymous files export without _allmaps metadata; a single source URL can 
   )
 })
 
-test('an unavailable original leaves the loaded orientation as the reset baseline', () => {
+test('legacy annotations without saved rotation use their loaded orientation as zero', () => {
   const [item] = addMaps(generateAnnotation(fixture()))
   item.placement.rotation = 1.2
-  const [loaded] = openCollage(exportCollage([item]))
-  assert.equal(loaded.resetRotation, 0)
+  const legacy = generateAnnotation(placedMap(item))
+  const [loaded] = openCollage(legacy)
   assert.equal(loaded.placement.rotation, 0)
+  const before = placedMap(loaded).gcps
+  loaded.placement.rotation = 0.7
+  loaded.placement.rotation = 0
+  assert.deepEqual(placedMap(loaded).gcps, before)
 })
 
-test('original GCPs recover orientation after reopening without changing placement or scale', () => {
+test('saved rotation restores zero orientation without an original annotation or changing scale', () => {
   const original = fixture()
+  delete original.id
   const [item] = addMaps(generateAnnotation(original))
   item.placement = { position: [4523, -9322], rotation: 1.2 }
   const [loaded] = openCollage(exportCollage([item]))
   const before = structuredClone(loaded.placement.position)
-  loaded.placement.rotation = resetRotationFromOriginal(loaded, original)
-  close(loaded.placement.rotation, -1.2)
+  close(loaded.placement.rotation, 1.2)
+  loaded.placement.rotation = 0
   assert.deepEqual(loaded.placement.position, before)
   const points = placedMap(loaded).gcps.map((gcp) =>
     lonLatToWebMercator(gcp.geo)
   )
   close(points[1][1] - points[0][1], 0)
   close(distance(points[0], points[1]), 1000, 0.001)
+  assert.deepEqual(exportCollage([loaded]).items[0].body._allmaps, {
+    rotation: 0
+  })
+  assert.equal(openCollage(exportCollage([loaded]))[0].placement.rotation, 0)
+})
+
+test('invalid saved rotation falls back to the loaded orientation without changing geometry', () => {
+  for (const rotation of ['45', null, {}, Number.NaN, Infinity]) {
+    const original = fixture()
+    original._allmaps = { rotation, unrelated: true }
+    const [item] = openCollage(generateAnnotation(original))
+    assert.equal(item.placement.rotation, 0)
+    placedMap(item).gcps.forEach((gcp, i) =>
+      close(distance(gcp.geo, original.gcps[i].geo), 0, 1e-10)
+    )
+  }
+})
+
+test('adding an exported map keeps its saved angle and does not apply rotation twice', () => {
+  const [item] = addMaps(generateAnnotation(fixture(0)))
+  item.placement = { position: [0, 0], rotation: -0.9 }
+  const exported = exportCollage([item])
+  const [added] = addMaps(exported)
+  close(added.placement.rotation, -0.9)
+  const expected = normalizeMap(placedMap(item))
+  const actual = placedMap(added)
+  // Adding relocates the map, but its orientation and relative GCPs stay intact.
+  const origin = lonLatToWebMercator(expected.gcps[0].geo)
+  const addedOrigin = lonLatToWebMercator(actual.gcps[0].geo)
+  actual.gcps.forEach((gcp, i) => {
+    const a = lonLatToWebMercator(gcp.geo)
+    const b = lonLatToWebMercator(expected.gcps[i].geo)
+    close(a[0] - addedOrigin[0], b[0] - origin[0])
+    close(a[1] - addedOrigin[1], b[1] - origin[1])
+  })
+})
+
+test('edited masks and newly resolved full images stay aligned after loading saved rotation', () => {
+  for (const type of ['polynomial', 'thinPlateSpline', 'projective'] as const) {
+    const source = fixture()
+    source.transformation = { type }
+    if (type !== 'polynomial') source.gcps[2].geo[0] += 0.001
+    const [item] = addMaps(generateAnnotation(source))
+    item.placement = { position: [5000, -3000], rotation: 1.3 }
+    delete item.baseline.resource.width
+    delete item.baseline.resource.height
+    const [loaded] = openCollage(exportCollage([item]))
+    const gcps = placedMap(loaded).gcps
+    resolveImageSize(loaded, 1000, 1000)
+    const mask: Point[] = [
+      [50, 80],
+      [900, 100],
+      [800, 950],
+      [150, 800]
+    ]
+    setResourceMask(loaded, mask)
+    assert.deepEqual(placedMap(loaded).gcps, gcps)
+    for (const applyMask of [true, false]) {
+      loaded.appearance.applyMask = applyMask
+      const expected = transformer(placedMap(loaded)).transformToProjectedGeo(
+        applyMask ? mask : source.resourceMask
+      )
+      outline(loaded).forEach((point, i) =>
+        close(distance(point, expected[i]), 0, 0.01)
+      )
+    }
+    loaded.placement.rotation = 0
+    const [reopened] = openCollage(exportCollage([loaded]))
+    const expected = transformer(placedMap(reopened)).transformToProjectedGeo(
+      mask
+    )
+    outline(reopened).forEach((point, i) =>
+      close(distance(point, expected[i]), 0, 0.01)
+    )
+  }
 })
 
 test('nonlinear TPS and projective rendering reproduce the rigidly transformed surface', () => {
@@ -298,6 +383,12 @@ test('repeated round trips do not accumulate scale drift', () => {
     lonLatToWebMercator(gcp.geo)
   )
   close(distance(final[0], final[1]), distance(initial[0], initial[1]), 1e-5)
+  close(items[0].placement.rotation, 30 * 0.37)
+  items[0].placement.rotation = 0
+  const reset = placedMap(items[0]).gcps.map((gcp) =>
+    lonLatToWebMercator(gcp.geo)
+  )
+  close(reset[1][1] - reset[0][1], initial[1][1] - initial[0][1])
 })
 
 test('a map crossing the antimeridian remains compact on import', () => {
