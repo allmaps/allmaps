@@ -68,7 +68,7 @@
       <p class="text-center text-black">
         {m.homepage_intro()}
       </p>
-      <URLInput onSubmit={handleInputSubmit} />
+      <URLInput onSubmit={handleInputSubmit} autofocus />
       <!-- TODO: enable when homepage is updated! -->
       <!-- <p>
         <a

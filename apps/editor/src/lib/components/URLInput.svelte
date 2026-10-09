@@ -8,13 +8,13 @@
 
   type Props = {
     onSubmit: (url: string) => void
-    // autofocus?: boolean
+    autofocus?: boolean
     placeholder?: string
   }
 
   let {
     onSubmit,
-    // autofocus = false,
+    autofocus = false,
     placeholder = m.open_iiif_resource_from_url()
   }: Props = $props()
 
@@ -45,9 +45,11 @@
     text-sm shadow-xs transition-all focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500"
 >
   <img src={iiifLogoBlack} class="size-4 opacity-75" alt="IIIF logo" />
+  <!-- svelte-ignore a11y_autofocus -->
   <input
     name="url"
     type="input"
+    {autofocus}
     bind:value
     bind:this={input}
     onfocus={() => input.select()}
