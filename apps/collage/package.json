@@ -46,6 +46,7 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "@allmaps/types": "workspace:^"
+    "@allmaps/types": "workspace:^",
+    "wrangler": "catalog:"
   }
 }
