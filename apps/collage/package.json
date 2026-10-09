@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite dev --mode localhost",
     "build": "vite build",
+    "build:deploy": "pnpm --dir ../.. exec turbo run build --filter=@allmaps/collage",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "types": "tsc --noEmit",
