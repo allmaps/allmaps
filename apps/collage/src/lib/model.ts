@@ -9,9 +9,17 @@ import {
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { TransformationType } from '@allmaps/transform'
 import type { Point } from '@allmaps/types'
-import { bounds, packBoxes } from './geometry.ts'
+import { bounds } from './geometry.ts'
+import { compactLayout } from './prism.ts'
+import { CANVAS_SCALE, MAX_COLLAGE_COORDINATE } from './coordinates.ts'
 
 export type Placement = { position: Point; rotation: number }
+export type Arrangement = 'compact' | 'geographic'
+export type GeographicReference = {
+  resource: Point
+  geo: Point
+  scale: number
+}
 export type CollageMap = {
   instanceId: string
   baseline: GeoreferencedMap
@@ -21,6 +29,7 @@ export type CollageMap = {
   sourceCenter: Point
   resourceMask: Point[]
   placement: Placement
+  geographicReference?: GeographicReference
   title: string
   appearance: {
     applyMask: boolean
@@ -33,8 +42,7 @@ export type CollageMap = {
   }
 }
 
-const MAX_LATITUDE = 85
-const MAX_COORDINATE = 20000000
+const MAX_LATITUDE = webMercatorToLonLat([0, MAX_COLLAGE_COORDINATE])[1]
 
 export function rotate(point: Point, angle: number): Point {
   const cos = Math.cos(angle)
@@ -126,7 +134,7 @@ function validateMap(map: GeoreferencedMap) {
     )
   ) {
     throw new Error(
-      'Ground control points must be finite and between 85°S and 85°N.'
+      'Ground control points must be finite and within the supported Mercator range.'
     )
   }
   // Solving and evaluating now catches underdetermined/invalid transformations
@@ -202,7 +210,47 @@ function localPoints(
   )
 }
 
-function makeItem(baseline: GeoreferencedMap): CollageMap {
+function readGeographicReference(
+  map: GeoreferencedMap
+): GeographicReference | undefined {
+  const metadata = map._allmaps
+  if (
+    !metadata ||
+    typeof metadata !== 'object' ||
+    !('geographicReference' in metadata)
+  )
+    return
+  const reference = metadata.geographicReference
+  if (!reference || typeof reference !== 'object') return
+  const isPoint = (value: unknown): value is Point =>
+    Array.isArray(value) &&
+    value.length === 2 &&
+    value.every(
+      (coordinate) =>
+        typeof coordinate === 'number' && Number.isFinite(coordinate)
+    )
+  if (
+    'geo' in reference &&
+    isPoint(reference.geo) &&
+    Math.abs(reference.geo[1]) <= MAX_LATITUDE &&
+    'resource' in reference &&
+    isPoint(reference.resource) &&
+    'scale' in reference &&
+    typeof reference.scale === 'number' &&
+    Number.isFinite(reference.scale) &&
+    reference.scale > 0
+  )
+    return {
+      geo: [...reference.geo],
+      resource: [...reference.resource],
+      scale: reference.scale
+    }
+}
+
+function makeItem(
+  baseline: GeoreferencedMap,
+  geographicReference = readGeographicReference(baseline)
+): CollageMap {
   validateMap(baseline)
   const projected = baseline.gcps.map(({ geo }) => lonLatToWebMercator(geo))
   const mask = transformer(baseline).transformToProjectedGeo(
@@ -226,6 +274,7 @@ function makeItem(baseline: GeoreferencedMap): CollageMap {
     sourceCenter: pivot,
     resourceMask: structuredClone(baseline.resourceMask),
     placement: { position: pivot, rotation: savedRotation(baseline) },
+    geographicReference,
     title: label(baseline),
     appearance: {
       applyMask: true,
@@ -247,7 +296,10 @@ export function parseMaps(input: unknown): GeoreferencedMap[] {
  * This keeps the original Web Mercator warp up to a uniform similarity.
  * Subsequent translation/rotation never recomputes this latitude correction.
  */
-export function normalizeMap(source: GeoreferencedMap): GeoreferencedMap {
+function normalizeSource(source: GeoreferencedMap): {
+  map: GeoreferencedMap
+  geographicReference: GeographicReference
+} {
   const map = structuredClone(source)
   if (!map.gcps.length)
     throw new Error('The annotation has no ground control points.')
@@ -261,11 +313,18 @@ export function normalizeMap(source: GeoreferencedMap): GeoreferencedMap {
     ]
   }))
   validateMap(map)
-  const pivot = center(
-    transformer(map).transformToProjectedGeo(map.resourceMask)
-  )
+  const transform = transformer(map)
+  const pivot = center(transform.transformToProjectedGeo(map.resourceMask))
   const latitude = webMercatorToLonLat(pivot)[1]
   const scale = Math.cos((latitude * Math.PI) / 180)
+  // Tie the original geography to a stable image point, so mask edits and
+  // export/reopen can change the placement pivot without losing the reference.
+  const resource = center(map.resourceMask)
+  const reference = readGeographicReference(source) ?? {
+    resource,
+    geo: webMercatorToLonLat(transform.transformToProjectedGeo(resource)),
+    scale: 1
+  }
   map.gcps = map.gcps.map(({ resource, geo }) => {
     const projected = lonLatToWebMercator(geo)
     return {
@@ -276,44 +335,77 @@ export function normalizeMap(source: GeoreferencedMap): GeoreferencedMap {
       ])
     }
   })
-  return map
+  return {
+    map,
+    geographicReference: { ...reference, scale: reference.scale * scale }
+  }
+}
+
+export function normalizeMap(source: GeoreferencedMap): GeoreferencedMap {
+  return normalizeSource(source).map
+}
+
+/** Normalize imports and seed their centers from geography before compaction. */
+export function prepareMaps(
+  input: unknown,
+  at: Point = [0, 0],
+  sourceUrl?: string
+): CollageMap[] {
+  const sources = parseMaps(input)
+  const items = sources.map((source) => {
+    preserveSource(source, sources.length === 1 ? sourceUrl : undefined)
+    const { map: baseline, geographicReference } = normalizeSource(source)
+    baseline.id = 'urn:uuid:' + crypto.randomUUID()
+    return makeItem(baseline, geographicReference)
+  })
+  if (items.length) {
+    items[0].placement.position = [...at]
+    const placements = geographicPlacements(items, items[0], true)
+    items.forEach((item, i) => {
+      item.placement = placements[i]
+    })
+  }
+  return items
 }
 
 export function addMaps(
   input: unknown,
   at: Point = [0, 0],
-  sourceUrl?: string,
-  aspect = 1
+  sourceUrl?: string
 ): CollageMap[] {
-  const sources = parseMaps(input)
-  const items = sources.map((source) => {
-    preserveSource(source, sources.length === 1 ? sourceUrl : undefined)
-    const baseline = normalizeMap(source)
-    baseline.id = 'urn:uuid:' + crypto.randomUUID()
-    return makeItem(baseline)
-  })
-  arrangeMaps(items, at, aspect)
+  const items = prepareMaps(input, at, sourceUrl)
+  arrangeMaps(items)
   return items
 }
 
 /** Opening never normalizes, recenters, sorts, or infers intent from location. */
 export function openCollage(input: unknown): CollageMap[] {
-  return parseMaps(input).map(makeItem)
+  return parseMaps(input).map((map) => makeItem(map))
 }
 
 export function placedMap(item: CollageMap): GeoreferencedMap {
+  return mapAtPlacement(item, 1)
+}
+
+/** Use the same drawing scale for every map; annotation export stays in meters. */
+export function renderedMap(item: CollageMap): GeoreferencedMap {
+  return mapAtPlacement(item, CANVAS_SCALE)
+}
+
+function mapAtPlacement(item: CollageMap, scale: number): GeoreferencedMap {
   const gcps = item.baseline.gcps.map((gcp, i) => {
     const point = place(item.localGcps[i], item.placement)
     if (
       point.some(
-        (value) => !Number.isFinite(value) || Math.abs(value) > MAX_COORDINATE
+        (value) =>
+          !Number.isFinite(value) || Math.abs(value) > MAX_COLLAGE_COORDINATE
       )
     ) {
-      throw new Error('Keep the collage within the MapLibre world extent.')
+      throw new Error('This placement exceeds the supported Mercator range.')
     }
     return {
       resource: [...gcp.resource] as Point,
-      geo: webMercatorToLonLat(point)
+      geo: webMercatorToLonLat([point[0] * scale, point[1] * scale] as Point)
     }
   })
   return {
@@ -332,7 +424,10 @@ export function exportCollage(items: CollageMap[]) {
         ...(map._allmaps && typeof map._allmaps === 'object'
           ? map._allmaps
           : {}),
-        rotation: (item.placement.rotation / Math.PI) * 180
+        rotation: (item.placement.rotation / Math.PI) * 180,
+        ...(item.geographicReference
+          ? { geographicReference: structuredClone(item.geographicReference) }
+          : {})
       }
       return map
     })
@@ -420,28 +515,93 @@ export function resolveImageSize(
 
 /** Only selected placements change. Rotated/edited masks need their own bbox
  * offsets; the placement pivot is deliberately never redefined by a mask edit. */
-export function arrangeMaps(items: CollageMap[], at: Point, aspect = 1) {
-  const rectangles = items.map((item) => bounds(outline(item)))
-  const positions = packBoxes(
-    rectangles.map(([left, bottom, right, top]) => [
-      right - left,
-      top - bottom
-    ]),
-    aspect
+export function arrangeMaps(items: CollageMap[], anchor = items[0]): boolean {
+  if (!items.length) return false
+  if (!items.includes(anchor))
+    throw new Error('The fixed map must be in the selection.')
+  const ordered = [anchor, ...items.filter((item) => item !== anchor)]
+  const rectangles = ordered.map((item) => bounds(outline(item)))
+  const { positions, fallback } = compactLayout(
+    rectangles.map(([left, bottom, right, top]) => ({
+      x: (left + right) / 2,
+      y: (bottom + top) / 2,
+      w: right - left,
+      h: top - bottom
+    }))
   )
-  items.forEach((item, i) => {
+  const placements = ordered.map((item, i): Placement => {
     const [left, bottom, right, top] = rectangles[i]
-    item.placement = {
+    if (item === anchor) return item.placement
+    return {
       ...item.placement,
       position: [
-        item.placement.position[0] +
-          at[0] +
-          positions[i][0] -
-          (left + right) / 2,
-        item.placement.position[1] +
-          at[1] +
-          positions[i][1] -
-          (bottom + top) / 2
+        item.placement.position[0] + positions[i][0] - (left + right) / 2,
+        item.placement.position[1] + positions[i][1] - (bottom + top) / 2
+      ]
+    }
+  })
+  ordered.forEach((item, i) => placedMap({ ...item, placement: placements[i] }))
+  ordered.forEach((item, i) => {
+    item.placement = placements[i]
+  })
+  return fallback
+}
+
+/** Keep the anchor fixed, matching the others' original geographic offsets and
+ * relative orientation. Each map retains its own normalized ground scale. */
+export function arrangeGeographically(items: CollageMap[], anchor = items[0]) {
+  if (!anchor || items.length < 2) return
+  const placements = geographicPlacements(items, anchor)
+  items.forEach((item, i) => placedMap({ ...item, placement: placements[i] }))
+  items.forEach((item, i) => {
+    item.placement = placements[i]
+  })
+}
+
+function geographicPlacements(
+  items: CollageMap[],
+  anchor: CollageMap,
+  preserveRotations = false
+): Placement[] {
+  if (!items.includes(anchor))
+    throw new Error('The fixed map must be in the selection.')
+  if (items.some((item) => !item.geographicReference))
+    throw new Error(
+      'Original geography is unavailable. Add the original annotations to use geographic arrangement.'
+    )
+  const localReference = (item: CollageMap) =>
+    localPoints(item.baseline, item.sourceCenter, [
+      transformer(item.baseline).transformToProjectedGeo(
+        item.geographicReference!.resource
+      )
+    ])[0]
+  const reference = anchor.geographicReference!
+  const origin = lonLatToWebMercator(reference.geo)
+  const fixed = place(localReference(anchor), anchor.placement)
+  const rotation = anchor.placement.rotation
+  return items.map((item): Placement => {
+    if (item === anchor) return item.placement
+    const geo = item.geographicReference!.geo
+    // Nearby maps on opposite sides of the antimeridian must stay nearby.
+    const longitude =
+      reference.geo[0] +
+      ((((geo[0] - reference.geo[0] + 180) % 360) + 360) % 360) -
+      180
+    const projected = lonLatToWebMercator([longitude, geo[1]])
+    const offset = rotate(
+      [
+        (projected[0] - origin[0]) * reference.scale,
+        (projected[1] - origin[1]) * reference.scale
+      ],
+      rotation
+    )
+    const mapRotation = preserveRotations ? item.placement.rotation : rotation
+    const local = rotate(localReference(item), mapRotation)
+    return {
+      rotation: mapRotation,
+      position: [
+        fixed[0] + offset[0] - local[0],
+        fixed[1] + offset[1] - local[1]
       ]
     }
   })

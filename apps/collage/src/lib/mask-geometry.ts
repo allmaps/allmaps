@@ -1,5 +1,5 @@
 import { lonLatToWebMercator, webMercatorToLonLat } from '@allmaps/project'
-import { placedMap, transformer } from './model.ts'
+import { placedMap, renderedMap, transformer } from './model.ts'
 import type { CollageMap } from './model.ts'
 import type { Point } from '@allmaps/types'
 
@@ -64,8 +64,8 @@ export function constrainToImage(
 }
 
 /** Match the placed raster, without changing the map's GCPs or orientation. */
-export function maskCoordinates(item: CollageMap) {
-  const transform = transformer(placedMap(item))
+export function maskCoordinates(item: CollageMap, canvas = false) {
+  const transform = transformer(canvas ? renderedMap(item) : placedMap(item))
   const known = new Map<string, Point>()
   const toGeo = (point: Point): Point => {
     const geo = webMercatorToLonLat(transform.transformToProjectedGeo(point))

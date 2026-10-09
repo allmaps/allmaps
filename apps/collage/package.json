@@ -17,22 +17,25 @@
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/background-color": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
     "@allmaps/ui": "workspace:^",
+    "d3-delaunay": "6.0.4",
     "maplibre-gl": "catalog:",
-    "@allmaps/background-color": "workspace:^",
     "terra-draw": "^1.25.1",
     "terra-draw-maplibre-gl-adapter": "^1.3.0"
   },
   "devDependencies": {
+    "@allmaps/types": "workspace:^",
     "@eslint/js": "catalog:",
     "@sveltejs/adapter-static": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@types/d3-delaunay": "6",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
@@ -47,7 +50,6 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "@allmaps/types": "workspace:^",
     "wrangler": "catalog:"
   }
 }

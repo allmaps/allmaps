@@ -1,0 +1,3631 @@
+{
+  "source": "https://annotations.allmaps.org/manifests/29c3e14995297431",
+  "maps": [
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00137",
+        "type": "ImageService2",
+        "width": 6793,
+        "height": 5348
+      },
+      "resourceMask": [
+        [621, 670],
+        [6060, 612],
+        [6145, 4556],
+        [665, 4571]
+      ],
+      "gcps": [
+        {
+          "resource": [4500, 2089],
+          "geo": [5.121917435115961, 52.09164668902216]
+        },
+        {
+          "resource": [2920, 3048],
+          "geo": [4.749230178473908, 52.63091185732401]
+        },
+        { "resource": [4818, 986], "geo": [5.6668471, 51.9683743] },
+        { "resource": [5554, 4278], "geo": [3.9827093, 51.8177943] },
+        {
+          "resource": [4399, 3388],
+          "geo": [4.492233927381591, 52.159099244994884]
+        },
+        {
+          "resource": [2546, 1993],
+          "geo": [5.289458825516249, 52.70374625782474]
+        },
+        { "resource": [847, 2532], "geo": [5.0671221, 53.295404] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00035",
+        "type": "ImageService2",
+        "width": 6848,
+        "height": 5365
+      },
+      "resourceMask": [
+        [654, 813],
+        [6205, 751],
+        [6268, 4566],
+        [685, 4604]
+      ],
+      "gcps": [
+        { "resource": [2370, 2016], "geo": [-103.8357244, 20.8812209] },
+        {
+          "resource": [2560, 2264],
+          "geo": [-103.18849569495005, 20.294942605691972]
+        },
+        { "resource": [2316, 3150], "geo": [-103.723958, 19.2416194] },
+        { "resource": [4832, 3386], "geo": [-99.2333208, 18.9226492] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00074",
+        "type": "ImageService2",
+        "width": 6823,
+        "height": 5380
+      },
+      "resourceMask": [
+        [3542, 399],
+        [6188, 385],
+        [6188, 2358],
+        [4494, 2375],
+        [3531, 2164]
+      ],
+      "gcps": [
+        { "resource": [4527, 2111], "geo": [-1.9337264, 42.3333695] },
+        { "resource": [4013, 725], "geo": [-2.3880303, 43.30707] },
+        { "resource": [4912, 602], "geo": [-1.9717032, 43.3189455] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00074",
+        "type": "ImageService2",
+        "width": 6823,
+        "height": 5380
+      },
+      "resourceMask": [
+        [629, 4878],
+        [634, 2435],
+        [2434, 2459],
+        [3417, 2160],
+        [4646, 2452],
+        [6179, 2468],
+        [6178, 4914]
+      ],
+      "gcps": [
+        { "resource": [1943, 4261], "geo": [-6.3174042, 36.5284247] },
+        { "resource": [2348, 2831], "geo": [-6.3581522, 36.6186283] },
+        { "resource": [3291, 2504], "geo": [-6.2205441, 36.6061504] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00074",
+        "type": "ImageService2",
+        "width": 6823,
+        "height": 5380
+      },
+      "resourceMask": [
+        [639, 363],
+        [3336, 377],
+        [3333, 2166],
+        [2324, 2406],
+        [636, 2361]
+      ],
+      "gcps": [
+        { "resource": [2280, 2275], "geo": [-3.6221045, 39.9023444] },
+        { "resource": [3058, 787], "geo": [-3.4365004, 40.2297931] },
+        { "resource": [694, 2050], "geo": [-4.0249996, 39.8575718] },
+        { "resource": [1538, 749], "geo": [-3.8965715, 40.1706254] },
+        { "resource": [3217, 1169], "geo": [-3.4225197, 40.1401739] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00296",
+        "type": "ImageService2",
+        "width": 6838,
+        "height": 5375
+      },
+      "resourceMask": [
+        [837, 748],
+        [824, 4550],
+        [5991, 4613],
+        [6024, 797]
+      ],
+      "gcps": [
+        { "resource": [4965, 3781], "geo": [135.50209542, 34.68765097] },
+        { "resource": [1608, 1572], "geo": [49.12401799, 55.78799625] },
+        { "resource": [1007, 2190], "geo": [49.83635858, 40.39570851] },
+        { "resource": [5913, 3831], "geo": [250.3823185129, 23.08003624132867] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00184",
+        "type": "ImageService2",
+        "width": 6835,
+        "height": 5412
+      },
+      "resourceMask": [
+        [712, 688],
+        [5884, 650],
+        [5852, 4632],
+        [703, 4647]
+      ],
+      "gcps": [
+        { "resource": [2685, 3563], "geo": [16.3125852, 49.0494639] },
+        { "resource": [1378, 3189], "geo": [15.590406, 49.3957049] },
+        { "resource": [3023, 1563], "geo": [16.91885, 49.7769819] },
+        { "resource": [5263, 1353], "geo": [18.2481533, 49.8107847] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00032",
+        "type": "ImageService2",
+        "width": 6665,
+        "height": 5338
+      },
+      "resourceMask": [
+        [639, 681],
+        [645, 4611],
+        [6061, 4637],
+        [6056, 620]
+      ],
+      "gcps": [
+        {
+          "resource": [5717, 2889],
+          "geo": [-34.940450970798935, -8.351421920166615]
+        },
+        {
+          "resource": [3142, 2096],
+          "geo": [-99.89169321139185, 16.86711169468353]
+        },
+        {
+          "resource": [4190, 4259],
+          "geo": [-68.63741310454166, -53.818779309420385]
+        },
+        {
+          "resource": [4786, 1661],
+          "geo": [-64.76057247707101, 32.30001487606428]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00266",
+        "type": "ImageService2",
+        "width": 6819,
+        "height": 5376
+      },
+      "resourceMask": [
+        [3564, 715],
+        [3594, 2476],
+        [6322, 2391],
+        [6282, 616]
+      ],
+      "gcps": [
+        {
+          "resource": [3767, 945],
+          "geo": [13.873188374620128, 45.70895657627739]
+        },
+        {
+          "resource": [6109, 2250],
+          "geo": [13.846251247487288, 44.87025387830178]
+        },
+        {
+          "resource": [4250, 793],
+          "geo": [14.365629157117953, 45.79402223411543]
+        },
+        {
+          "resource": [5768, 1196],
+          "geo": [14.441718185683015, 45.32967406929657]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00266",
+        "type": "ImageService2",
+        "width": 6819,
+        "height": 5376
+      },
+      "resourceMask": [
+        [3602, 2795],
+        [3646, 4585],
+        [6374, 4501],
+        [6329, 2711]
+      ],
+      "gcps": [
+        {
+          "resource": [3679, 4165],
+          "geo": [15.108568335694512, 44.34674469314132]
+        },
+        {
+          "resource": [4592, 4238],
+          "geo": [15.234763260174532, 44.12042071555214]
+        },
+        {
+          "resource": [6173, 3861],
+          "geo": [15.89755405451075, 43.733746070783894]
+        },
+        {
+          "resource": [5018, 3626],
+          "geo": [15.549305164906345, 44.1819027126497]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00266",
+        "type": "ImageService2",
+        "width": 6819,
+        "height": 5376
+      },
+      "resourceMask": [
+        [664, 781],
+        [750, 4654],
+        [3529, 4596],
+        [3439, 713]
+      ],
+      "gcps": [
+        {
+          "resource": [2733, 4520],
+          "geo": [13.533451238583467, 45.80517870508879]
+        },
+        {
+          "resource": [1075, 3074],
+          "geo": [13.499153296040731, 46.797432712827884]
+        },
+        {
+          "resource": [2241, 1818],
+          "geo": [14.169401618766301, 47.112457787879066]
+        },
+        {
+          "resource": [965, 1644],
+          "geo": [13.034644392562456, 47.80322551986529]
+        },
+        {
+          "resource": [3369, 2814],
+          "geo": [14.844545436862205, 46.83889539900187]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00263",
+        "type": "ImageService2",
+        "width": 6881,
+        "height": 5398
+      },
+      "resourceMask": [
+        [855, 657],
+        [6205, 761],
+        [6155, 4330],
+        [806, 4231]
+      ],
+      "gcps": [
+        { "resource": [888, 1719], "geo": [13.8476671, 46.6201839] },
+        { "resource": [3147, 4081], "geo": [15.2342761, 44.1162949] },
+        { "resource": [1586, 3154], "geo": [13.7752936, 45.6595946] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00281",
+        "type": "ImageService2",
+        "width": 6895,
+        "height": 5373
+      },
+      "resourceMask": [
+        [1145, 603],
+        [1096, 4633],
+        [5813, 4727],
+        [5866, 655]
+      ],
+      "gcps": [
+        {
+          "resource": [4564, 816],
+          "geo": [21.395127972197145, 55.7170458934764]
+        },
+        {
+          "resource": [3678, 2323],
+          "geo": [20.511377524618013, 54.710121147699276]
+        },
+        {
+          "resource": [5110, 4486],
+          "geo": [23.829379155691754, 53.67564327486946]
+        },
+        {
+          "resource": [1777, 2432],
+          "geo": [18.801973888726337, 54.60662153329685]
+        },
+        {
+          "resource": [1617, 4072],
+          "geo": [18.446851674744778, 53.40907132403933]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00302",
+        "type": "ImageService2",
+        "width": 6874,
+        "height": 5392
+      },
+      "resourceMask": [
+        [706, 623],
+        [699, 4407],
+        [6236, 4512],
+        [6247, 662]
+      ],
+      "gcps": [
+        {
+          "resource": [3555, 3959],
+          "geo": [117.42218710250114, -8.491934688903683]
+        },
+        {
+          "resource": [2693, 3384],
+          "geo": [103.8515694484321, 1.2915818749633985]
+        },
+        {
+          "resource": [4286, 1099],
+          "geo": [135.74993490766877, 34.94295414809237]
+        },
+        {
+          "resource": [1497, 2934],
+          "geo": [79.83515651388149, 7.206596166531255]
+        },
+        {
+          "resource": [1322, 2007],
+          "geo": [67.0119902613327, 24.858240837625246]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00311",
+        "type": "ImageService2",
+        "width": 6830,
+        "height": 5394
+      },
+      "resourceMask": [
+        [666, 560],
+        [659, 1086],
+        [580, 4660],
+        [6233, 4760],
+        [6301, 643]
+      ],
+      "gcps": [
+        {
+          "resource": [5847, 4231],
+          "geo": [34.46426428916914, 31.50515813003493]
+        },
+        {
+          "resource": [1011, 1171],
+          "geo": [36.237796451933605, 33.45853950331049]
+        },
+        {
+          "resource": [4142, 2906],
+          "geo": [35.46017206998914, 31.856060360433915]
+        },
+        {
+          "resource": [720, 2767],
+          "geo": [35.483447400967265, 33.893196793857186]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00317",
+        "type": "ImageService2",
+        "width": 6861,
+        "height": 5399
+      },
+      "resourceMask": [
+        [1057, 611],
+        [987, 4716],
+        [5821, 4713],
+        [5817, 621]
+      ],
+      "gcps": [
+        {
+          "resource": [1305, 2973],
+          "geo": [6.7295998685743825, 0.33789074049643375]
+        },
+        {
+          "resource": [4738, 2142],
+          "geo": [45.02966973316924, 12.78584317468085]
+        },
+        {
+          "resource": [3799, 756],
+          "geo": [35.223475608663904, 31.779972404450223]
+        },
+        {
+          "resource": [3942, 4272],
+          "geo": [40.733097313879966, -15.038844644246]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00320",
+        "type": "ImageService2",
+        "width": 6837,
+        "height": 5443
+      },
+      "resourceMask": [
+        [597, 951],
+        [560, 4340],
+        [6203, 4462],
+        [6247, 1007]
+      ],
+      "gcps": [
+        {
+          "resource": [3627, 2273],
+          "geo": [3.057565735663161, 36.77913957719785]
+        },
+        {
+          "resource": [1889, 1269],
+          "geo": [-9.13805020531646, 38.708103666353765]
+        },
+        {
+          "resource": [849, 3057],
+          "geo": [-14.00864310044139, 28.435072871121807]
+        },
+        {
+          "resource": [5581, 2993],
+          "geo": [13.17636729699109, 32.889296880004]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00056",
+        "type": "ImageService2",
+        "width": 6823,
+        "height": 5385
+      },
+      "resourceMask": [
+        [696, 820],
+        [5984, 707],
+        [6074, 4595],
+        [787, 4693]
+      ],
+      "gcps": [
+        { "resource": [4901, 3645], "geo": [-6.6677048, 55.1322629] },
+        { "resource": [3796, 1960], "geo": [-8.4783018, 54.2742642] },
+        { "resource": [1610, 3275], "geo": [-7.1183348, 52.2638892] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00038",
+        "type": "ImageService2",
+        "width": 6779,
+        "height": 5355
+      },
+      "resourceMask": [
+        [634, 2285],
+        [3670, 2292],
+        [3691, 2963],
+        [3741, 3112],
+        [6057, 3098],
+        [6093, 4624],
+        [584, 4631]
+      ],
+      "gcps": [
+        { "resource": [2200, 3802], "geo": [-78.3401008, 18.357919] },
+        { "resource": [6003, 4100], "geo": [-61.8750163, 17.0964559] },
+        { "resource": [1698, 3125], "geo": [-82.318701, 23.1105719] }
+      ],
+      "transformation": { "type": "helmert" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00038",
+        "type": "ImageService2",
+        "width": 6779,
+        "height": 5355
+      },
+      "resourceMask": [
+        [2767, 739],
+        [6126, 672],
+        [6080, 2817],
+        [3976, 2943],
+        [3994, 2036],
+        [3760, 1789]
+      ],
+      "gcps": [
+        {
+          "resource": [5361, 2207],
+          "geo": [-106.98855959010048, 23.944650471294565]
+        },
+        { "resource": [4843, 1759], "geo": [-107.2175166, 24.4244942] },
+        {
+          "resource": [3967, 1928],
+          "geo": [-109.71341277131907, 23.0060558372422]
+        },
+        { "resource": [4560, 1814], "geo": [-107.3930289, 24.8097072] }
+      ],
+      "transformation": { "type": "helmert" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00314",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5413
+      },
+      "resourceMask": [
+        [3595, 2847],
+        [3559, 4502],
+        [6204, 4509],
+        [6229, 2865]
+      ],
+      "gcps": [
+        {
+          "resource": [5171, 4438],
+          "geo": [10.135911193769488, 36.813981667179405]
+        },
+        {
+          "resource": [5100, 3767],
+          "geo": [10.30418389235561, 36.81561547315614]
+        },
+        {
+          "resource": [4677, 3161],
+          "geo": [9.870817907732487, 37.27768963885626]
+        },
+        {
+          "resource": [6037, 3064],
+          "geo": [11.999399136267698, 36.787082834969084]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00314",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5413
+      },
+      "resourceMask": [
+        [618, 762],
+        [572, 4368],
+        [3119, 4448],
+        [3178, 789]
+      ],
+      "gcps": [
+        {
+          "resource": [2812, 1524],
+          "geo": [35.83840767025788, 34.4368049623869]
+        },
+        {
+          "resource": [644, 4080],
+          "geo": [27.9178653624802, 43.20997776716476]
+        },
+        {
+          "resource": [2863, 4301],
+          "geo": [24.01795890235016, 35.51270618850093]
+        },
+        {
+          "resource": [853, 818],
+          "geo": [40.22311082264466, 40.255544413110584]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00314",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5413
+      },
+      "resourceMask": [
+        [3682, 799],
+        [3629, 2790],
+        [6175, 2788],
+        [6200, 805]
+      ],
+      "gcps": [
+        {
+          "resource": [6161, 997],
+          "geo": [33.804367211488, 31.133891211391457]
+        },
+        {
+          "resource": [3869, 1372],
+          "geo": [29.54720402789351, 30.898861248413596]
+        },
+        {
+          "resource": [5010, 2218],
+          "geo": [32.89747469468813, 24.09027529548402]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00308",
+        "type": "ImageService2",
+        "width": 6874,
+        "height": 5392
+      },
+      "resourceMask": [
+        [633, 542],
+        [609, 4780],
+        [6234, 4757],
+        [6243, 526]
+      ],
+      "gcps": [
+        {
+          "resource": [5325, 4625],
+          "geo": [53.85423456299736, 12.492363591235076]
+        },
+        {
+          "resource": [1373, 729],
+          "geo": [16.373043710493903, 48.209407930365785]
+        },
+        {
+          "resource": [682, 2532],
+          "geo": [10.87989634226679, 33.80592180330373]
+        },
+        {
+          "resource": [6151, 897],
+          "geo": [66.97134838537644, 39.655738563963496]
+        },
+        {
+          "resource": [3394, 1148],
+          "geo": [39.73069462618935, 41.005002039296215]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00305",
+        "type": "ImageService2",
+        "width": 6881,
+        "height": 5392
+      },
+      "resourceMask": [
+        [632, 747],
+        [609, 4688],
+        [6245, 4693],
+        [6252, 749]
+      ],
+      "gcps": [
+        {
+          "resource": [4736, 4521],
+          "geo": [72.99822711781704, 21.705114806118743]
+        },
+        {
+          "resource": [2726, 4189],
+          "geo": [58.385001744153726, 23.592750408305918]
+        },
+        {
+          "resource": [2070, 1747],
+          "geo": [49.58887169439976, 37.27914519055932]
+        },
+        {
+          "resource": [1397, 1425],
+          "geo": [48.99336229858599, 41.20780911530869]
+        },
+        {
+          "resource": [4721, 803],
+          "geo": [71.79499270072813, 40.37313635279767]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00299",
+        "type": "ImageService2",
+        "width": 6845,
+        "height": 5380
+      },
+      "resourceMask": [
+        [836, 592],
+        [711, 4481],
+        [5966, 4629],
+        [6101, 696]
+      ],
+      "gcps": [
+        {
+          "resource": [1209, 2024],
+          "geo": [106.57918114643894, 9.804766129645614]
+        },
+        {
+          "resource": [954, 3227],
+          "geo": [125.22678483097593, 7.690106751676594]
+        },
+        {
+          "resource": [2529, 3338],
+          "geo": [121.05387197319847, 23.86769974798993]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00293",
+        "type": "ImageService2",
+        "width": 6826,
+        "height": 5378
+      },
+      "resourceMask": [
+        [923, 547],
+        [890, 4682],
+        [5863, 4710],
+        [5908, 627]
+      ],
+      "gcps": [
+        {
+          "resource": [1528, 2543],
+          "geo": [32.04640969498453, 54.78279916250014]
+        },
+        {
+          "resource": [1083, 1775],
+          "geo": [28.21912780198994, 59.375395573709575]
+        },
+        {
+          "resource": [4855, 3981],
+          "geo": [66.97250302048221, 39.65660428322349]
+        },
+        {
+          "resource": [2567, 3264],
+          "geo": [48.03703997747735, 46.350838097531636]
+        },
+        {
+          "resource": [2978, 734],
+          "geo": [59.648272424215094, 70.00744538304133]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00290",
+        "type": "ImageService2",
+        "width": 6864,
+        "height": 5385
+      },
+      "resourceMask": [
+        [613, 552],
+        [614, 4765],
+        [6294, 4708],
+        [6262, 520]
+      ],
+      "gcps": [
+        {
+          "resource": [2633, 4556],
+          "geo": [-5.068807274093189, 50.15492127429545]
+        },
+        {
+          "resource": [5043, 2850],
+          "geo": [24.753187886693127, 59.43728244673133]
+        },
+        {
+          "resource": [2315, 2059],
+          "geo": [-17.999611868932845, 66.54446027727394]
+        },
+        {
+          "resource": [5521, 2244],
+          "geo": [30.128187477639297, 61.03816124470856]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00287",
+        "type": "ImageService2",
+        "width": 6844,
+        "height": 5379
+      },
+      "resourceMask": [
+        [586, 603],
+        [558, 4583],
+        [6186, 4675],
+        [6254, 598]
+      ],
+      "gcps": [
+        {
+          "resource": [5246, 4292],
+          "geo": [26.67085571914413, 40.41307752040231]
+        },
+        {
+          "resource": [1977, 4116],
+          "geo": [19.512203455096937, 42.06840936725874]
+        },
+        {
+          "resource": [1380, 3838],
+          "geo": [18.093640476232764, 42.64914044977999]
+        },
+        {
+          "resource": [5181, 1176],
+          "geo": [29.620281966650026, 46.83856671383094]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00284",
+        "type": "ImageService2",
+        "width": 6882,
+        "height": 5366
+      },
+      "resourceMask": [
+        [598, 429],
+        [590, 2159],
+        [6230, 2199],
+        [6258, 449]
+      ],
+      "gcps": [
+        {
+          "resource": [1959, 710],
+          "geo": [13.431221045730013, 54.41743974961245]
+        },
+        {
+          "resource": [5631, 988],
+          "geo": [18.65411680870841, 54.349000038811]
+        },
+        {
+          "resource": [5306, 2069],
+          "geo": [18.76175024699492, 53.4866809639602]
+        },
+        {
+          "resource": [2965, 1626],
+          "geo": [14.39120161999918, 53.208577315674006]
+        },
+        {
+          "resource": [629, 1359],
+          "geo": [11.465685562288598, 53.89265455930226]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00284",
+        "type": "ImageService2",
+        "width": 6882,
+        "height": 5366
+      },
+      "resourceMask": [
+        [3501, 2352],
+        [3472, 4859],
+        [6252, 4861],
+        [6266, 2356]
+      ],
+      "gcps": [
+        {
+          "resource": [5864, 2638],
+          "geo": [19.76630160186025, 50.03834623253937]
+        },
+        {
+          "resource": [3838, 3935],
+          "geo": [18.91709449212604, 49.72170281710888]
+        },
+        {
+          "resource": [3771, 2912],
+          "geo": [18.942648095297415, 49.977843316736426]
+        },
+        {
+          "resource": [6001, 3740],
+          "geo": [19.714828175921895, 49.84522362036134]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00284",
+        "type": "ImageService2",
+        "width": 6882,
+        "height": 5366
+      },
+      "resourceMask": [
+        [633, 2328],
+        [598, 4822],
+        [3252, 4850],
+        [3270, 2391]
+      ],
+      "gcps": [
+        {
+          "resource": [2570, 2508],
+          "geo": [28.192364115771568, 59.376689231708205]
+        },
+        {
+          "resource": [2554, 4369],
+          "geo": [26.522911980347462, 55.87247707971514]
+        },
+        {
+          "resource": [1661, 3977],
+          "geo": [21.96881819036102, 56.970923052638575]
+        },
+        {
+          "resource": [1352, 2702],
+          "geo": [24.941029304915844, 60.168852626803876]
+        },
+        {
+          "resource": [679, 3332],
+          "geo": [18.296554103263276, 57.637692273066456]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00278",
+        "type": "ImageService2",
+        "width": 6851,
+        "height": 5378
+      },
+      "resourceMask": [
+        [532, 505],
+        [530, 4685],
+        [6128, 4766],
+        [6108, 525]
+      ],
+      "gcps": [
+        {
+          "resource": [3065, 600],
+          "geo": [21.011211978688948, 56.50618888054395]
+        },
+        {
+          "resource": [614, 1542],
+          "geo": [14.55344927931884, 53.42952769849365]
+        },
+        {
+          "resource": [5455, 1162],
+          "geo": [28.51077940203339, 54.23646488247244]
+        },
+        {
+          "resource": [4010, 3357],
+          "geo": [26.251203762822485, 50.619401431510425]
+        },
+        {
+          "resource": [6052, 4527],
+          "geo": [31.946153538091608, 46.659362783827135]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00275",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5395
+      },
+      "resourceMask": [
+        [1018, 864],
+        [905, 4295],
+        [5799, 4401],
+        [5842, 917]
+      ],
+      "gcps": [
+        {
+          "resource": [1695, 2397],
+          "geo": [23.58848912908516, 46.76852323530147]
+        },
+        {
+          "resource": [2475, 3238],
+          "geo": [23.571214839179873, 46.06864775525514]
+        },
+        {
+          "resource": [4993, 3715],
+          "geo": [24.850397631368082, 44.853265683125585]
+        },
+        {
+          "resource": [3517, 2938],
+          "geo": [24.158002811379788, 45.79603265168481]
+        },
+        {
+          "resource": [5005, 2207],
+          "geo": [25.61124033660556, 45.6526869033097]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00272",
+        "type": "ImageService2",
+        "width": 6888,
+        "height": 5389
+      },
+      "resourceMask": [
+        [578, 753],
+        [656, 4583],
+        [6300, 4529],
+        [6256, 685]
+      ],
+      "gcps": [
+        {
+          "resource": [4202, 3777],
+          "geo": [20.459708066770048, 44.81969150268762]
+        },
+        {
+          "resource": [691, 1430],
+          "geo": [16.57218716269759, 48.56885058280025]
+        },
+        {
+          "resource": [5632, 2207],
+          "geo": [24.152601038610044, 45.796722357412875]
+        },
+        {
+          "resource": [1454, 3796],
+          "geo": [16.829984620643586, 46.16350135742309]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00269",
+        "type": "ImageService2",
+        "width": 6932,
+        "height": 5393
+      },
+      "resourceMask": [
+        [576, 966],
+        [602, 4690],
+        [6284, 4705],
+        [6229, 992]
+      ],
+      "gcps": [
+        {
+          "resource": [5863, 3325],
+          "geo": [22.66234400899998, 44.63020819096258]
+        },
+        {
+          "resource": [813, 1887],
+          "geo": [16.551717567632068, 48.20166150425271]
+        },
+        {
+          "resource": [4366, 3750],
+          "geo": [20.307748008329327, 45.205143400494364]
+        },
+        {
+          "resource": [3009, 2538],
+          "geo": [19.05414991103939, 47.494656696151]
+        },
+        {
+          "resource": [1849, 1523],
+          "geo": [18.442401287563285, 49.117457309960145]
+        }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00026",
+        "type": "ImageService2",
+        "width": 6772,
+        "height": 5347
+      },
+      "resourceMask": [
+        [562, 440],
+        [6079, 435],
+        [6085, 441],
+        [6085, 1190],
+        [6076, 1806],
+        [6088, 4685],
+        [648, 4685]
+      ],
+      "gcps": [
+        { "resource": [936, 1359], "geo": [31.4102453, 30.0615955] },
+        { "resource": [1565, 570], "geo": [33.9335744, 44.3698307] },
+        { "resource": [3954, 4305], "geo": [103.9984348, 1.2812908] },
+        { "resource": [2628, 3943], "geo": [77.4690932, 8.2792172] },
+        { "resource": [2240, 1971], "geo": [54.114948, 36.9769544] },
+        { "resource": [5500, 1499], "geo": [130.8692996, 33.9550628] },
+        { "resource": [4055, 4659], "geo": [106.8087417, -6.1299916] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00260",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5382
+      },
+      "resourceMask": [
+        [671, 652],
+        [6069, 566],
+        [6113, 4721],
+        [732, 4787]
+      ],
+      "gcps": [
+        { "resource": [1115, 2505], "geo": [13.7735091, 45.6578] },
+        { "resource": [4001, 689], "geo": [17.1615023, 46.6684851] },
+        { "resource": [1949, 3156], "geo": [14.4449722, 45.327281] },
+        { "resource": [4928, 4644], "geo": [16.4627827, 43.5144528] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00257",
+        "type": "ImageService2",
+        "width": 6930,
+        "height": 5351
+      },
+      "resourceMask": [
+        [646, 603],
+        [6432, 614],
+        [6431, 4694],
+        [677, 4677]
+      ],
+      "gcps": [
+        { "resource": [6239, 1042], "geo": [29.0181061, 41.0256263] },
+        { "resource": [5203, 4069], "geo": [25.8665678, 36.8291529] },
+        { "resource": [988, 669], "geo": [17.8093417, 43.3439496] },
+        { "resource": [2900, 3573], "geo": [21.7402479, 38.2415649] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [1661, 2482],
+        [2284, 2498],
+        [2280, 2929],
+        [2568, 2935],
+        [2564, 3347],
+        [2562, 3482],
+        [1648, 3462]
+      ],
+      "gcps": [
+        { "resource": [2026, 3024], "geo": [22.9847896, 36.2456624] },
+        { "resource": [1997, 3359], "geo": [22.9976765, 36.0947393] },
+        { "resource": [1878, 3105], "geo": [22.9886161, 36.1498537] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [5151, 2522],
+        [6153, 2515],
+        [6143, 3495],
+        [5132, 3494]
+      ],
+      "gcps": [
+        { "resource": [5441, 2667], "geo": [25.3436839, 36.459397] },
+        { "resource": [5491, 3099], "geo": [25.396514, 36.4045565] },
+        { "resource": [5971, 3305], "geo": [25.4862625, 36.361028] },
+        { "resource": [5370, 3310], "geo": [25.353957, 36.3578842] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [4323, 2534],
+        [5021, 2532],
+        [5005, 3492],
+        [4035, 3502],
+        [4037, 2964],
+        [4307, 2960]
+      ],
+      "gcps": [
+        { "resource": [4595, 3151], "geo": [25.3804996, 37.1023333] },
+        { "resource": [4827, 2948], "geo": [25.5509444, 37.1818965] },
+        { "resource": [4608, 2640], "geo": [25.8124712, 37.108286] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [2693, 2933],
+        [2693, 2927],
+        [3909, 2961],
+        [3900, 3499],
+        [2682, 3497]
+      ],
+      "gcps": [
+        { "resource": [3686, 3338], "geo": [27.1194963, 35.4783485] },
+        { "resource": [3447, 3223], "geo": [27.1236295, 35.5866829] },
+        { "resource": [3818, 3264], "geo": [26.9254062, 35.3973669] },
+        { "resource": [2892, 3287], "geo": [27.2211676, 35.8643895] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [4023, 3624],
+        [5010, 3615],
+        [5006, 4634],
+        [4013, 4635]
+      ],
+      "gcps": [
+        { "resource": [4653, 3980], "geo": [28.2299154, 36.4434087] },
+        { "resource": [4644, 4285], "geo": [28.085517, 36.0902513] },
+        { "resource": [4267, 4076], "geo": [27.7035633, 36.2751505] },
+        { "resource": [4459, 4431], "geo": [27.7682288, 35.9545919] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [562, 639],
+        [6167, 673],
+        [6151, 2404],
+        [540, 2338]
+      ],
+      "gcps": [
+        { "resource": [4402, 1925], "geo": [25.7435271, 35.0141818] },
+        { "resource": [5574, 1069], "geo": [26.3318761, 35.272203] },
+        { "resource": [2634, 970], "geo": [24.4712079, 35.3633465] },
+        { "resource": [1332, 789], "geo": [23.7373007, 35.6956434] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [1647, 3581],
+        [2564, 3609],
+        [2559, 4621],
+        [1630, 4599]
+      ],
+      "gcps": [
+        { "resource": [2084, 4415], "geo": [25.2273638, 39.7976283] },
+        { "resource": [2466, 4135], "geo": [25.4466151, 40.0341781] },
+        { "resource": [1871, 4130], "geo": [25.0505501, 39.8416757] },
+        { "resource": [2250, 3925], "geo": [25.1332232, 40.0179361] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [548, 2458],
+        [1538, 2482],
+        [1519, 3458],
+        [548, 3434],
+        [544, 2975]
+      ],
+      "gcps": [
+        { "resource": [890, 2996], "geo": [26.1977606, 39.3186266] },
+        { "resource": [1078, 2912], "geo": [26.2081517, 39.2334553] },
+        { "resource": [1318, 2606], "geo": [26.5545865, 39.1066434] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [2680, 3618],
+        [3908, 3626],
+        [3901, 4636],
+        [2674, 4621]
+      ],
+      "gcps": [
+        { "resource": [3619, 4485], "geo": [24.4219991, 38.0154941] },
+        { "resource": [3816, 4490], "geo": [24.6875868, 37.9550307] },
+        { "resource": [3149, 4129], "geo": [23.5893737, 38.4627859] },
+        { "resource": [2967, 3891], "geo": [22.9571239, 38.8840457] },
+        { "resource": [3721, 4354], "geo": [24.5516476, 38.7708958] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [546, 3555],
+        [1524, 3586],
+        [1518, 4590],
+        [526, 4574]
+      ],
+      "gcps": [
+        { "resource": [1055, 4323], "geo": [24.4727539, 36.6582393] },
+        { "resource": [1383, 3892], "geo": [24.5395856, 36.7360716] },
+        { "resource": [956, 3818], "geo": [24.394799, 36.735976] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00251",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5373
+      },
+      "resourceMask": [
+        [5133, 3619],
+        [6143, 3620],
+        [6147, 4643],
+        [5128, 4629]
+      ],
+      "gcps": [
+        { "resource": [5412, 4318], "geo": [25.8639413, 38.2435701] },
+        { "resource": [6015, 4044], "geo": [26.1827958, 38.543701] },
+        { "resource": [5672, 3760], "geo": [26.0620985, 38.5932167] },
+        { "resource": [5791, 4271], "geo": [26.1380343, 38.3696572] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00254",
+        "type": "ImageService2",
+        "width": 6879,
+        "height": 5406
+      },
+      "resourceMask": [
+        [569, 4809],
+        [4644, 4781],
+        [4644, 4781],
+        [4706, 3151],
+        [6343, 2117],
+        [6336, 679],
+        [576, 734]
+      ],
+      "gcps": [
+        { "resource": [3623, 2348], "geo": [33.3647738, 35.1710964] },
+        { "resource": [6138, 731], "geo": [34.5863597, 35.6940292] },
+        { "resource": [4782, 2356], "geo": [33.9496425, 35.1170095] },
+        { "resource": [2931, 1759], "geo": [32.9206092, 35.4038777] },
+        { "resource": [1548, 4039], "geo": [32.4208433, 34.775753] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00254",
+        "type": "ImageService2",
+        "width": 6879,
+        "height": 5406
+      },
+      "resourceMask": [
+        [4947, 3631],
+        [5309, 3505],
+        [5743, 3580],
+        [5930, 3738],
+        [5985, 4105],
+        [5784, 4347],
+        [5473, 4433],
+        [5212, 4418],
+        [4953, 4329],
+        [4798, 4108],
+        [4804, 3795]
+      ],
+      "gcps": [
+        { "resource": [4987, 4087], "geo": [25.063086, 39.8737973] },
+        { "resource": [5287, 4179], "geo": [25.1496022, 39.8650413] },
+        { "resource": [5543, 3829], "geo": [25.2988042, 39.9232642] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00248",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5360
+      },
+      "resourceMask": [
+        [2581, 3488],
+        [4023, 3506],
+        [4028, 4690],
+        [2574, 4659]
+      ],
+      "gcps": [
+        { "resource": [3178, 3610], "geo": [10.5281175, 42.922729] },
+        { "resource": [3138, 4531], "geo": [10.1689407, 42.7900311] },
+        { "resource": [2891, 4093], "geo": [10.3309858, 42.8148371] }
+      ],
+      "transformation": { "type": "helmert" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00248",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5360
+      },
+      "resourceMask": [
+        [695, 3446],
+        [2454, 3488],
+        [2456, 4667],
+        [699, 4625]
+      ],
+      "gcps": [
+        { "resource": [965, 4344], "geo": [10.7542329, 33.7289116] },
+        { "resource": [2108, 4374], "geo": [10.8869092, 33.6329137] },
+        { "resource": [1416, 3796], "geo": [10.8604183, 33.8839878] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00248",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5360
+      },
+      "resourceMask": [
+        [1944, 1227],
+        [4736, 1246],
+        [4728, 3373],
+        [1958, 3341]
+      ],
+      "gcps": [
+        { "resource": [4299, 1797], "geo": [15.240921, 38.2189007] },
+        { "resource": [2572, 2573], "geo": [12.4405718, 37.7997458] },
+        { "resource": [4320, 3105], "geo": [15.1390731, 36.909344] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00248",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5360
+      },
+      "resourceMask": [
+        [4148, 3507],
+        [5951, 3509],
+        [5967, 4612],
+        [4152, 4603]
+      ],
+      "gcps": [
+        { "resource": [5733, 3735], "geo": [14.5326137, 35.8777295] },
+        { "resource": [5669, 4133], "geo": [14.4846673, 35.8333154] },
+        { "resource": [4396, 3726], "geo": [14.335454, 36.0122234] },
+        { "resource": [5150, 4223], "geo": [14.3812817, 35.8606242] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00248",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5360
+      },
+      "resourceMask": [
+        [691, 652],
+        [1837, 655],
+        [1821, 3329],
+        [688, 3314]
+      ],
+      "gcps": [
+        { "resource": [1421, 2965], "geo": [9.1138906, 39.2169911] },
+        { "resource": [1002, 1889], "geo": [8.4034373, 40.8376618] },
+        { "resource": [884, 1108], "geo": [8.7382908, 41.9192314] },
+        { "resource": [1577, 1974], "geo": [9.5004927, 40.9242407] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00248",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5360
+      },
+      "resourceMask": [
+        [4866, 720],
+        [5979, 724],
+        [5975, 3301],
+        [4848, 3315]
+      ],
+      "gcps": [
+        { "resource": [5604, 2078], "geo": [19.9087029, 39.6187244] },
+        { "resource": [5633, 1562], "geo": [19.9204753, 39.788169] },
+        { "resource": [5841, 1127], "geo": [20.0041069, 39.8747835] },
+        { "resource": [5874, 2949], "geo": [20.2429081, 39.4084564] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00245",
+        "type": "ImageService2",
+        "width": 6867,
+        "height": 5376
+      },
+      "resourceMask": [
+        [669, 635],
+        [6242, 677],
+        [6254, 4707],
+        [663, 4665]
+      ],
+      "gcps": [
+        { "resource": [853, 1900], "geo": [13.5842646, 42.8544784] },
+        { "resource": [1922, 3429], "geo": [13.5716414, 41.2119601] },
+        { "resource": [1054, 3052], "geo": [13.0205791, 41.6905242] },
+        { "resource": [5663, 857], "geo": [18.3143091, 39.814264] },
+        { "resource": [5543, 4335], "geo": [15.6525474, 38.2667538] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00242",
+        "type": "ImageService2",
+        "width": 6911,
+        "height": 5382
+      },
+      "resourceMask": [
+        [3553, 838],
+        [6201, 821],
+        [6214, 2676],
+        [3550, 2689]
+      ],
+      "gcps": [
+        { "resource": [3823, 1353], "geo": [9.3542911, 42.9656006] },
+        { "resource": [5245, 2051], "geo": [8.7354791, 41.921923] },
+        { "resource": [5923, 1357], "geo": [9.1582986, 41.3873737] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00242",
+        "type": "ImageService2",
+        "width": 6911,
+        "height": 5382
+      },
+      "resourceMask": [
+        [608, 785],
+        [3389, 813],
+        [3391, 4653],
+        [629, 4620]
+      ],
+      "gcps": [
+        { "resource": [2453, 4014], "geo": [11.199802, 42.3987458] },
+        { "resource": [1576, 2865], "geo": [11.1170432, 42.7657552] },
+        { "resource": [3168, 1690], "geo": [11.9486299, 43.0151026] },
+        { "resource": [888, 949], "geo": [11.1947132, 43.3879445] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00242",
+        "type": "ImageService2",
+        "width": 6911,
+        "height": 5382
+      },
+      "resourceMask": [
+        [3554, 2871],
+        [6212, 2844],
+        [6242, 4592],
+        [3561, 4608]
+      ],
+      "gcps": [
+        { "resource": [3947, 3757], "geo": [13.584081, 42.8547708] },
+        { "resource": [5461, 3073], "geo": [12.9562564, 43.0740077] },
+        { "resource": [4967, 4314], "geo": [13.5164172, 43.6167718] },
+        { "resource": [6070, 4268], "geo": [12.7382924, 43.9636355] },
+        { "resource": [4581, 3929], "geo": [13.4539124, 43.2992052] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00239",
+        "type": "ImageService2",
+        "width": 6886,
+        "height": 5373
+      },
+      "resourceMask": [
+        [763, 885],
+        [6066, 836],
+        [6032, 4564],
+        [778, 4592]
+      ],
+      "gcps": [
+        { "resource": [1406, 1305], "geo": [11.9856989, 43.2753076] },
+        { "resource": [2906, 4501], "geo": [12.2775097, 42.9088867] },
+        { "resource": [4913, 3078], "geo": [12.6233684, 43.0665397] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00236",
+        "type": "ImageService2",
+        "width": 6956,
+        "height": 5364
+      },
+      "resourceMask": [
+        [677, 799],
+        [6263, 920],
+        [6190, 4491],
+        [614, 4353]
+      ],
+      "gcps": [
+        { "resource": [6043, 4415], "geo": [12.3108322, 41.7618669] },
+        { "resource": [3687, 1395], "geo": [11.9182325, 43.7688544] },
+        { "resource": [1602, 2040], "geo": [10.5022019, 43.8428433] },
+        { "resource": [2421, 3464], "geo": [10.5275647, 42.9236905] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00233",
+        "type": "ImageService2",
+        "width": 6796,
+        "height": 5391
+      },
+      "resourceMask": [
+        [610, 2554],
+        [3242, 2578],
+        [3214, 4695],
+        [579, 4664]
+      ],
+      "gcps": [
+        { "resource": [2496, 4360], "geo": [12.2810443, 41.7332145] },
+        { "resource": [683, 4420], "geo": [12.2695201, 42.0930254] },
+        { "resource": [1466, 2595], "geo": [12.8006346, 41.9620819] },
+        { "resource": [3191, 3829], "geo": [12.5492998, 41.6112067] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00233",
+        "type": "ImageService2",
+        "width": 6796,
+        "height": 5391
+      },
+      "resourceMask": [
+        [3341, 2569],
+        [5978, 2563],
+        [5991, 4681],
+        [3325, 4660]
+      ],
+      "gcps": [
+        { "resource": [4717, 2890], "geo": [13.3063956, 46.5066445] },
+        { "resource": [4789, 3988], "geo": [13.3669754, 45.7699007] },
+        { "resource": [5299, 4430], "geo": [13.6611359, 45.5368569] },
+        { "resource": [3618, 2904], "geo": [12.7076191, 46.4665394] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00233",
+        "type": "ImageService2",
+        "width": 6796,
+        "height": 5391
+      },
+      "resourceMask": [
+        [522, 819],
+        [6047, 826],
+        [6009, 2489],
+        [545, 2465]
+      ],
+      "gcps": [
+        { "resource": [4607, 1715], "geo": [9.3750459, 46.1372064] },
+        { "resource": [1103, 1518], "geo": [9.0814131, 45.8137237] },
+        { "resource": [3812, 1579], "geo": [9.3028437, 46.043923] },
+        { "resource": [2903, 2415], "geo": [9.3914196, 45.8529221] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00230",
+        "type": "ImageService2",
+        "width": 3574,
+        "height": 5350
+      },
+      "resourceMask": [
+        [387, 813],
+        [2888, 753],
+        [2925, 4351],
+        [402, 4406]
+      ],
+      "gcps": [
+        { "resource": [2036, 1007], "geo": [18.4857144, 40.1504705] },
+        { "resource": [747, 4236], "geo": [16.8705822, 41.0743834] },
+        { "resource": [1638, 3212], "geo": [17.2306376, 40.4755487] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00229",
+        "type": "ImageService2",
+        "width": 3523,
+        "height": 5364
+      },
+      "resourceMask": [
+        [615, 713],
+        [3123, 698],
+        [3135, 4278],
+        [642, 4271]
+      ],
+      "gcps": [
+        { "resource": [978, 3109], "geo": [12.0811508, 45.1372357] },
+        { "resource": [2484, 882], "geo": [11.5717414, 45.6005784] },
+        { "resource": [2791, 3788], "geo": [12.4116322, 45.4871124] },
+        { "resource": [1154, 1386], "geo": [11.6028554, 45.2171592] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00223",
+        "type": "ImageService2",
+        "width": 6867,
+        "height": 5370
+      },
+      "resourceMask": [
+        [3366, 899],
+        [5283, 893],
+        [5280, 2231],
+        [3349, 2262]
+      ],
+      "gcps": [
+        { "resource": [4290, 1009], "geo": [9.7050402, 45.5795096] },
+        { "resource": [5032, 1408], "geo": [9.783907, 45.3781444] },
+        { "resource": [3842, 2191], "geo": [9.4150782, 45.3022259] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00223",
+        "type": "ImageService2",
+        "width": 6867,
+        "height": 5370
+      },
+      "resourceMask": [
+        [638, 740],
+        [6277, 751],
+        [6230, 4662],
+        [609, 4608]
+      ],
+      "gcps": [
+        { "resource": [5213, 4550], "geo": [10.5162788, 44.8989941] },
+        { "resource": [1535, 1262], "geo": [9.8019754, 45.4687449] },
+        { "resource": [5702, 2382], "geo": [10.7204133, 45.1531205] },
+        { "resource": [1263, 2444], "geo": [9.7650684, 45.2956511] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00226",
+        "type": "ImageService2",
+        "width": 6887,
+        "height": 5398
+      },
+      "resourceMask": [
+        [6250, 4866],
+        [607, 4837],
+        [614, 606],
+        [6268, 635]
+      ],
+      "gcps": [
+        { "resource": [6152, 726], "geo": [9.1903091, 45.4641906] },
+        { "resource": [667, 4382], "geo": [7.4254059, 43.7390738] },
+        { "resource": [6181, 4694], "geo": [9.2184776, 44.3358945] },
+        { "resource": [1224, 782], "geo": [6.4726001, 45.2192274] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00220",
+        "type": "ImageService2",
+        "width": 6881,
+        "height": 5374
+      },
+      "resourceMask": [
+        [720, 688],
+        [6107, 671],
+        [6154, 4722],
+        [775, 4663]
+      ],
+      "gcps": [
+        { "resource": [1666, 1014], "geo": [7.2439958, 43.7831517] },
+        { "resource": [1365, 4607], "geo": [10.3998834, 43.7130237] },
+        { "resource": [5543, 1200], "geo": [7.6323542, 46.7608528] },
+        { "resource": [4792, 4510], "geo": [10.5360167, 45.8299019] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00217",
+        "type": "ImageService2",
+        "width": 7058,
+        "height": 5372
+      },
+      "resourceMask": [
+        [786, 783],
+        [6078, 810],
+        [6060, 4529],
+        [764, 4474]
+      ],
+      "gcps": [
+        { "resource": [2275, 3724], "geo": [10.841912, 45.8857256] },
+        { "resource": [4836, 884], "geo": [11.4649913, 45.2337923] },
+        { "resource": [4816, 3423], "geo": [10.6685043, 45.2524647] },
+        { "resource": [1434, 2897], "geo": [11.1211251, 46.0698193] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00214",
+        "type": "ImageService2",
+        "width": 6894,
+        "height": 5392
+      },
+      "resourceMask": [
+        [635, 627],
+        [6004, 732],
+        [5959, 4720],
+        [576, 4636]
+      ],
+      "gcps": [
+        { "resource": [2611, 2310], "geo": [13.140128, 46.2768898] },
+        { "resource": [707, 4230], "geo": [12.2420281, 45.4931949] },
+        { "resource": [5499, 4310], "geo": [13.8468815, 44.8701176] },
+        { "resource": [3407, 730], "geo": [13.8477931, 46.6150221] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00211",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5379
+      },
+      "resourceMask": [
+        [509, 684],
+        [6330, 624],
+        [6329, 4680],
+        [526, 4719]
+      ],
+      "gcps": [
+        { "resource": [1198, 1278], "geo": [8.8024004, 46.1714984] },
+        { "resource": [6148, 3048], "geo": [19.482963, 40.4680451] },
+        { "resource": [3287, 1122], "geo": [13.6405179, 45.0823162] },
+        { "resource": [1385, 4326], "geo": [8.4056033, 40.8381212] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00208",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5400
+      },
+      "resourceMask": [
+        [537, 688],
+        [3579, 684],
+        [3497, 4645],
+        [511, 4650]
+      ],
+      "gcps": [
+        { "resource": [2546, 4382], "geo": [10.9930268, 45.4389126] },
+        { "resource": [1251, 2681], "geo": [11.1697466, 46.6651623] },
+        { "resource": [970, 1515], "geo": [11.3166128, 47.6579626] },
+        { "resource": [3196, 1566], "geo": [12.8235881, 47.8498513] },
+        { "resource": [1090, 4367], "geo": [10.2320282, 45.5363169] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00208",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5400
+      },
+      "resourceMask": [
+        [3692, 1008],
+        [6308, 970],
+        [6298, 4598],
+        [3603, 4656]
+      ],
+      "gcps": [
+        { "resource": [4450, 3944], "geo": [13.6419156, 45.0823853] },
+        { "resource": [3828, 2110], "geo": [13.6228488, 45.9425968] },
+        { "resource": [5711, 1530], "geo": [15.4942483, 45.9587257] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00205",
+        "type": "ImageService2",
+        "width": 6879,
+        "height": 5387
+      },
+      "resourceMask": [
+        [921, 679],
+        [6060, 606],
+        [6089, 4622],
+        [932, 4675]
+      ],
+      "gcps": [
+        { "resource": [5586, 3252], "geo": [6.1424078, 46.2083671] },
+        { "resource": [1669, 3753], "geo": [9.7439752, 47.5030252] },
+        { "resource": [2746, 1126], "geo": [8.793163, 45.660558] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00202",
+        "type": "ImageService2",
+        "width": 6880,
+        "height": 5420
+      },
+      "resourceMask": [
+        [568, 4438],
+        [551, 846],
+        [3368, 854],
+        [3373, 4463]
+      ],
+      "gcps": [
+        { "resource": [889, 3848], "geo": [7.0716512, 48.012903] },
+        { "resource": [3065, 1007], "geo": [8.343099, 47.3509967] },
+        { "resource": [1914, 2586], "geo": [7.5692606, 47.6549293] },
+        { "resource": [1329, 1519], "geo": [8.0376834, 47.8001483] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00202",
+        "type": "ImageService2",
+        "width": 6880,
+        "height": 5420
+      },
+      "resourceMask": [
+        [3582, 839],
+        [6268, 816],
+        [6270, 4403],
+        [3580, 4426]
+      ],
+      "gcps": [
+        { "resource": [3776, 3992], "geo": [8.8539773, 47.1922847] },
+        { "resource": [6088, 3280], "geo": [10.8746577, 48.0515076] },
+        { "resource": [4950, 1235], "geo": [9.1465541, 49.3526736] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00199",
+        "type": "ImageService2",
+        "width": 6974,
+        "height": 5388
+      },
+      "resourceMask": [
+        [925, 451],
+        [5891, 421],
+        [5885, 4876],
+        [908, 4892]
+      ],
+      "gcps": [
+        { "resource": [5334, 1341], "geo": [9.7484671, 49.1130761] },
+        { "resource": [5030, 4290], "geo": [9.9895801, 48.3973025] },
+        { "resource": [1838, 4542], "geo": [8.5367342, 48.0637016] },
+        { "resource": [2842, 1158], "geo": [8.8127512, 49.0010708] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00196",
+        "type": "ImageService2",
+        "width": 6892,
+        "height": 5400
+      },
+      "resourceMask": [
+        [643, 968],
+        [3427, 939],
+        [3450, 3908],
+        [691, 3927]
+      ],
+      "gcps": [
+        { "resource": [786, 1520], "geo": [10.9880477, 49.8171542] },
+        { "resource": [3144, 3090], "geo": [12.5736956, 48.8822082] },
+        { "resource": [3384, 1244], "geo": [13.3775128, 49.7472977] },
+        { "resource": [1383, 3699], "geo": [11.2280943, 48.7976467] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00196",
+        "type": "ImageService2",
+        "width": 6892,
+        "height": 5400
+      },
+      "resourceMask": [
+        [6361, 4321],
+        [3535, 4349],
+        [3512, 826],
+        [6307, 799]
+      ],
+      "gcps": [
+        { "resource": [5690, 4102], "geo": [7.824803, 48.2945893] },
+        { "resource": [3802, 1677], "geo": [7.5714504, 48.7587242] },
+        { "resource": [5574, 1149], "geo": [8.0071395, 48.7531184] },
+        { "resource": [3765, 4225], "geo": [7.4174431, 48.3868137] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00193",
+        "type": "ImageService2",
+        "width": 6841,
+        "height": 5408
+      },
+      "resourceMask": [
+        [6170, 4880],
+        [666, 4903],
+        [610, 514],
+        [6118, 483]
+      ],
+      "gcps": [
+        { "resource": [890, 4595], "geo": [10.6999969, 47.5692668] },
+        { "resource": [3954, 962], "geo": [12.9160387, 49.2992184] },
+        { "resource": [1108, 870], "geo": [11.0213898, 49.3294667] },
+        { "resource": [4905, 4178], "geo": [13.6266695, 47.7122419] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00190",
+        "type": "ImageService2",
+        "width": 6835,
+        "height": 5412
+      },
+      "resourceMask": [
+        [867, 4541],
+        [5884, 4580],
+        [5910, 622],
+        [880, 631]
+      ],
+      "gcps": [
+        { "resource": [4498, 2465], "geo": [13.0124697, 47.880673] },
+        { "resource": [2504, 1610], "geo": [12.540328, 47.0011217] },
+        { "resource": [5481, 1898], "geo": [13.035306, 48.2578963] },
+        { "resource": [1628, 3946], "geo": [14.3082575, 46.6240872] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00187",
+        "type": "ImageService2",
+        "width": 6892,
+        "height": 5411
+      },
+      "resourceMask": [
+        [927, 818],
+        [5981, 799],
+        [5985, 4431],
+        [930, 4440]
+      ],
+      "gcps": [
+        { "resource": [4706, 4324], "geo": [15.6516344, 46.5584736] },
+        { "resource": [1062, 2047], "geo": [14.0256672, 48.3686323] },
+        { "resource": [5782, 1609], "geo": [17.1142148, 48.1452885] },
+        { "resource": [3153, 4185], "geo": [14.8432928, 46.840072] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00181",
+        "type": "ImageService2",
+        "width": 6892,
+        "height": 5412
+      },
+      "resourceMask": [
+        [1253, 1088],
+        [5556, 1021],
+        [5604, 4139],
+        [1286, 4195]
+      ],
+      "gcps": [
+        { "resource": [3737, 4096], "geo": [17.2510625, 49.5938539] },
+        { "resource": [1685, 1648], "geo": [14.7271188, 51.9543221] },
+        { "resource": [1931, 2552], "geo": [14.9326117, 51.0153735] },
+        { "resource": [5139, 2071], "geo": [19.6964025, 51.4078376] },
+        { "resource": [4041, 2843], "geo": [17.9260389, 50.6652796] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00178",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5361
+      },
+      "resourceMask": [
+        [527, 751],
+        [6407, 686],
+        [6408, 4509],
+        [563, 4565]
+      ],
+      "gcps": [
+        { "resource": [4638, 3378], "geo": [15.8820737, 49.2155638] },
+        { "resource": [5886, 1044], "geo": [16.6579482, 50.4367106] },
+        { "resource": [2577, 934], "geo": [14.0400569, 50.6600346] },
+        { "resource": [1048, 1542], "geo": [12.8663022, 50.2303585] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00175",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5386
+      },
+      "resourceMask": [
+        [356, 554],
+        [3230, 538],
+        [3281, 4784],
+        [378, 4811]
+      ],
+      "gcps": [
+        { "resource": [1553, 3299], "geo": [9.6863717, 50.0572322] },
+        { "resource": [1328, 4544], "geo": [8.9163896, 50.1354285] },
+        { "resource": [2791, 3791], "geo": [9.4750245, 49.4563521] },
+        { "resource": [2940, 636], "geo": [11.8568237, 49.4451829] },
+        { "resource": [1212, 1322], "geo": [11.3266226, 50.2436056] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00175",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5386
+      },
+      "resourceMask": [
+        [3394, 534],
+        [6255, 512],
+        [6316, 4742],
+        [3421, 4755]
+      ],
+      "gcps": [
+        { "resource": [4898, 1766], "geo": [7.2918114, 52.6909522] },
+        { "resource": [6100, 2221], "geo": [8.3693528, 52.609399] },
+        { "resource": [3452, 2654], "geo": [6.6149929, 51.8381344] },
+        { "resource": [5070, 4117], "geo": [7.9210927, 51.7109711] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00172",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5398
+      },
+      "resourceMask": [
+        [3572, 833],
+        [6088, 802],
+        [6059, 4342],
+        [3543, 4405]
+      ],
+      "gcps": [
+        { "resource": [5885, 3657], "geo": [9.2473013, 51.1386712] },
+        { "resource": [4391, 4105], "geo": [8.7165564, 50.9587243] },
+        { "resource": [5673, 1858], "geo": [9.1642897, 51.4662361] },
+        { "resource": [4017, 2081], "geo": [8.4664271, 51.3735446] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00172",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5398
+      },
+      "resourceMask": [
+        [776, 873],
+        [3254, 846],
+        [3245, 4342],
+        [776, 4329]
+      ],
+      "gcps": [
+        { "resource": [2725, 2409], "geo": [9.9878131, 50.409226] },
+        { "resource": [1891, 3757], "geo": [9.8376482, 50.1269155] },
+        { "resource": [3174, 1331], "geo": [10.0227742, 50.8264814] },
+        { "resource": [1018, 1513], "geo": [9.3009381, 50.5437912] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00169",
+        "type": "ImageService2",
+        "width": 3496,
+        "height": 5355
+      },
+      "resourceMask": [
+        [354, 939],
+        [2788, 900],
+        [2797, 4185],
+        [387, 4234]
+      ],
+      "gcps": [
+        { "resource": [713, 2798], "geo": [12.6477027, 51.8659112] },
+        { "resource": [1508, 3879], "geo": [11.0237839, 50.9773025] },
+        { "resource": [2747, 1605], "geo": [14.4207059, 50.0874359] },
+        { "resource": [623, 1457], "geo": [14.717391, 51.9514095] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00168",
+        "type": "ImageService2",
+        "width": 3523,
+        "height": 5343
+      },
+      "resourceMask": [
+        [709, 851],
+        [3005, 816],
+        [3060, 4088],
+        [781, 4096]
+      ],
+      "gcps": [
+        { "resource": [1360, 950], "geo": [11.9976308, 51.3560325] },
+        { "resource": [989, 2613], "geo": [10.8787576, 51.4466556] },
+        { "resource": [2343, 3446], "geo": [10.3229933, 50.9759881] },
+        { "resource": [2632, 1239], "geo": [11.8645247, 50.7348288] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00165",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5370
+      },
+      "resourceMask": [
+        [3559, 701],
+        [6323, 665],
+        [6327, 4447],
+        [3558, 4488]
+      ],
+      "gcps": [
+        { "resource": [5826, 1193], "geo": [11.7317187, 54.6682261] },
+        { "resource": [5113, 3806], "geo": [9.7018943, 53.4773098] },
+        { "resource": [4242, 1178], "geo": [8.8700501, 54.9361277] },
+        { "resource": [5777, 1805], "geo": [11.0704132, 54.4809796] },
+        { "resource": [4162, 2656], "geo": [9.0724205, 54.0888634] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00165",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5370
+      },
+      "resourceMask": [
+        [749, 4470],
+        [3424, 4489],
+        [3401, 698],
+        [704, 741]
+      ],
+      "gcps": [
+        { "resource": [2721, 4028], "geo": [8.9752011, 50.0443065] },
+        { "resource": [2441, 927], "geo": [9.9341869, 51.5330768] },
+        { "resource": [2077, 1530], "geo": [9.4979378, 51.3157084] },
+        { "resource": [1788, 3390], "geo": [8.5022072, 50.5561026] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00162",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5366
+      },
+      "resourceMask": [
+        [5734, 4906],
+        [938, 4906],
+        [916, 644],
+        [5720, 621]
+      ],
+      "gcps": [
+        { "resource": [1147, 662], "geo": [11.053363, 51.8057396] },
+        { "resource": [4748, 4517], "geo": [11.8045241, 51.3018291] },
+        { "resource": [4332, 729], "geo": [11.7371702, 51.7955244] },
+        { "resource": [2052, 4714], "geo": [11.0412308, 51.260142] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00159",
+        "type": "ImageService2",
+        "width": 6868,
+        "height": 5381
+      },
+      "resourceMask": [
+        [6218, 4652],
+        [619, 4646],
+        [668, 788],
+        [6213, 769]
+      ],
+      "gcps": [
+        { "resource": [5347, 1064], "geo": [14.6492088, 52.5900203] },
+        { "resource": [6102, 2977], "geo": [16.1619548, 51.208854] },
+        { "resource": [1144, 874], "geo": [9.954346, 52.1518447] },
+        { "resource": [1155, 2868], "geo": [10.5565231, 50.8977501] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00156",
+        "type": "ImageService2",
+        "width": 6804,
+        "height": 5363
+      },
+      "resourceMask": [
+        [611, 4596],
+        [589, 715],
+        [6225, 647],
+        [6245, 4598]
+      ],
+      "gcps": [
+        { "resource": [957, 4011], "geo": [7.2040247, 53.5960802] },
+        { "resource": [4601, 1407], "geo": [8.7545657, 51.7191773] },
+        { "resource": [6158, 3902], "geo": [6.7724686, 50.9374101] },
+        { "resource": [1783, 1079], "geo": [9.2281643, 52.9236383] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00153",
+        "type": "ImageService2",
+        "width": 3534,
+        "height": 5367
+      },
+      "resourceMask": [
+        [618, 808],
+        [2757, 778],
+        [2783, 4211],
+        [640, 4244]
+      ],
+      "gcps": [
+        { "resource": [1250, 3765], "geo": [13.0921887, 54.3153525] },
+        { "resource": [2062, 2841], "geo": [13.7745602, 54.0528466] },
+        { "resource": [2688, 998], "geo": [14.5579662, 53.425667] },
+        { "resource": [1520, 1234], "geo": [14.7689974, 53.9716356] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00152",
+        "type": "ImageService2",
+        "width": 3523,
+        "height": 5325
+      },
+      "resourceMask": [
+        [851, 795],
+        [3092, 768],
+        [3092, 4285],
+        [859, 4305]
+      ],
+      "gcps": [
+        { "resource": [1075, 2369], "geo": [8.8620769, 54.1313273] },
+        { "resource": [2003, 3995], "geo": [9.1370283, 53.8966423] },
+        { "resource": [2851, 1824], "geo": [9.3714596, 54.2365591] },
+        { "resource": [1829, 986], "geo": [9.0809397, 54.3447002] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00149",
+        "type": "ImageService2",
+        "width": 6918,
+        "height": 5380
+      },
+      "resourceMask": [
+        [671, 823],
+        [3354, 782],
+        [3388, 4479],
+        [695, 4457]
+      ],
+      "gcps": [
+        { "resource": [2613, 2933], "geo": [13.1544366, 55.3751028] },
+        { "resource": [812, 1086], "geo": [6.6629775, 58.2966461] },
+        { "resource": [1046, 3625], "geo": [9.4777075, 53.6019128] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00149",
+        "type": "ImageService2",
+        "width": 6918,
+        "height": 5380
+      },
+      "resourceMask": [
+        [3542, 790],
+        [6210, 777],
+        [6259, 4635],
+        [3566, 4652]
+      ],
+      "gcps": [
+        { "resource": [5612, 1406], "geo": [8.4210543, 53.5478402] },
+        { "resource": [3737, 1021], "geo": [7.9024635, 53.7887685] },
+        { "resource": [5397, 4185], "geo": [8.4323024, 52.8944772] },
+        { "resource": [3721, 3532], "geo": [7.8082009, 53.2188156] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00146",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5376
+      },
+      "resourceMask": [
+        [996, 1022],
+        [5949, 968],
+        [5902, 4471],
+        [3401, 4534],
+        [979, 4506]
+      ],
+      "gcps": [
+        { "resource": [1791, 2382], "geo": [6.8628808, 53.3827581] },
+        { "resource": [5663, 2139], "geo": [8.0241085, 53.701779] },
+        { "resource": [4362, 3974], "geo": [7.9259972, 53.2581063] },
+        { "resource": [1354, 3811], "geo": [7.0091583, 53.1557601] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00143",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5415
+      },
+      "resourceMask": [
+        [528, 626],
+        [6202, 485],
+        [6246, 2391],
+        [4448, 2427],
+        [4463, 4755],
+        [609, 4799]
+      ],
+      "gcps": [
+        { "resource": [2141, 879], "geo": [5.7721164, 53.4450684] },
+        { "resource": [5161, 1317], "geo": [6.9268488, 53.331555] },
+        { "resource": [773, 3864], "geo": [5.3588117, 52.8852719] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00143",
+        "type": "ImageService2",
+        "width": 6855,
+        "height": 5415
+      },
+      "resourceMask": [
+        [4600, 2558],
+        [6257, 2525],
+        [6308, 4724],
+        [4635, 4768]
+      ],
+      "gcps": [
+        { "resource": [5973, 3136], "geo": [6.5674376, 53.2186657] },
+        { "resource": [5652, 4544], "geo": [5.9721547, 51.6983641] },
+        { "resource": [4666, 4488], "geo": [4.1627769, 52.0024562] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00140",
+        "type": "ImageService2",
+        "width": 6824,
+        "height": 5357
+      },
+      "resourceMask": [
+        [511, 580],
+        [6368, 590],
+        [6377, 4597],
+        [484, 4550]
+      ],
+      "gcps": [
+        { "resource": [1051, 3993], "geo": [5.8338771, 52.4484825] },
+        { "resource": [963, 1487], "geo": [5.4487263, 53.1822118] },
+        { "resource": [5700, 1151], "geo": [7.783163, 53.5756642] },
+        { "resource": [4608, 3207], "geo": [7.2943415, 52.6929504] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00134",
+        "type": "ImageService2",
+        "width": 6843,
+        "height": 5381
+      },
+      "resourceMask": [
+        [728, 4674],
+        [6139, 4653],
+        [6055, 673],
+        [682, 787]
+      ],
+      "gcps": [
+        { "resource": [1069, 4491], "geo": [3.301629, 51.3130678] },
+        { "resource": [4893, 1177], "geo": [4.6853661, 51.8963556] },
+        { "resource": [4433, 4257], "geo": [4.4183179, 51.277359] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00131",
+        "type": "ImageService2",
+        "width": 6912,
+        "height": 5388
+      },
+      "resourceMask": [
+        [3394, 497],
+        [6153, 509],
+        [6247, 4875],
+        [552, 4863],
+        [617, 500]
+      ],
+      "gcps": [
+        { "resource": [1167, 2100], "geo": [2.1272441, 50.986788] },
+        { "resource": [4658, 1195], "geo": [3.6134108, 51.4998509] },
+        { "resource": [5089, 3249], "geo": [4.0409094, 50.9377978] },
+        { "resource": [2197, 4389], "geo": [2.8320102, 50.4289319] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00128",
+        "type": "ImageService2",
+        "width": 6873,
+        "height": 5384
+      },
+      "resourceMask": [
+        [671, 544],
+        [6101, 506],
+        [6149, 4876],
+        [723, 4876]
+      ],
+      "gcps": [
+        { "resource": [6000, 4704], "geo": [3.2126789, 50.0125004] },
+        { "resource": [1970, 810], "geo": [1.9541493, 50.9488603] },
+        { "resource": [5824, 1072], "geo": [3.2654703, 50.8274815] },
+        { "resource": [1895, 4250], "geo": [1.8336693, 50.1059994] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00125",
+        "type": "ImageService2",
+        "width": 6900,
+        "height": 5406
+      },
+      "resourceMask": [
+        [594, 618],
+        [6101, 543],
+        [6158, 4737],
+        [682, 4791]
+      ],
+      "gcps": [
+        { "resource": [686, 3233], "geo": [3.0815148, 50.3679315] },
+        { "resource": [5499, 3798], "geo": [4.5219081, 50.0947492] },
+        { "resource": [3363, 721], "geo": [3.8841381, 50.7716472] },
+        { "resource": [2326, 4707], "geo": [3.5355972, 50.0318714] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00041",
+        "type": "ImageService2",
+        "width": 6735,
+        "height": 5336
+      },
+      "resourceMask": [
+        [718, 678],
+        [3152, 736],
+        [3150, 744],
+        [3150, 927],
+        [3137, 2896],
+        [3126, 4431],
+        [702, 4450]
+      ],
+      "gcps": [
+        { "resource": [1356, 2759], "geo": [-79.0276407, -8.1122566] },
+        { "resource": [1860, 1103], "geo": [-79.5419873, 8.9542908] },
+        { "resource": [1660, 3637], "geo": [-72.7107417, -16.6250848] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00041",
+        "type": "ImageService2",
+        "width": 6735,
+        "height": 5336
+      },
+      "resourceMask": [
+        [3531, 749],
+        [3505, 2306],
+        [5865, 2280],
+        [5898, 723]
+      ],
+      "gcps": [
+        { "resource": [4491, 955], "geo": [-83.483059, 35.9640539] },
+        { "resource": [5471, 1861], "geo": [-80.5277236, 28.4562489] },
+        { "resource": [4314, 1734], "geo": [-90.0042468, 29.7501923] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00041",
+        "type": "ImageService2",
+        "width": 6735,
+        "height": 5336
+      },
+      "resourceMask": [
+        [3515, 2579],
+        [3520, 4382],
+        [5829, 4342],
+        [5821, 2595]
+      ],
+      "gcps": [
+        { "resource": [4058, 3504], "geo": [-98.9793577, 22.816906] },
+        { "resource": [5265, 3171], "geo": [-97.7564823, 24.4873733] },
+        { "resource": [5319, 3793], "geo": [-97.8630246, 22.2524093] }
+      ],
+      "transformation": { "type": "helmert" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00122",
+        "type": "ImageService2",
+        "width": 6869,
+        "height": 5380
+      },
+      "resourceMask": [
+        [499, 532],
+        [6260, 445],
+        [6293, 4861],
+        [489, 4946]
+      ],
+      "gcps": [
+        { "resource": [5943, 973], "geo": [5.3640542, 50.5575285] },
+        { "resource": [540, 1077], "geo": [4.311629, 50.555184] },
+        { "resource": [4811, 3711], "geo": [5.1004731, 50.258478] },
+        { "resource": [940, 4549], "geo": [4.4127771, 50.1692369] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00119",
+        "type": "ImageService2",
+        "width": 6781,
+        "height": 5375
+      },
+      "resourceMask": [
+        [593, 632],
+        [6238, 581],
+        [6238, 581],
+        [6284, 4745],
+        [594, 4742]
+      ],
+      "gcps": [
+        { "resource": [4837, 4050], "geo": [4.3247043, 50.5977763] },
+        { "resource": [863, 808], "geo": [6.2436797, 51.8323263] },
+        { "resource": [4412, 1530], "geo": [5.5733621, 50.6450473] },
+        { "resource": [991, 3855], "geo": [4.669417, 51.8153012] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00116",
+        "type": "ImageService2",
+        "width": 6831,
+        "height": 5362
+      },
+      "resourceMask": [
+        [595, 657],
+        [6076, 614],
+        [6147, 4810],
+        [653, 4805]
+      ],
+      "gcps": [
+        { "resource": [5664, 2719], "geo": [5.3414181, 49.7384942] },
+        { "resource": [4943, 4386], "geo": [4.7068531, 49.9939935] },
+        { "resource": [748, 2571], "geo": [5.9561208, 51.2354697] },
+        { "resource": [2126, 2101], "geo": [6.0838066, 50.7756638] },
+        { "resource": [1179, 4408], "geo": [4.9934454, 51.1629241] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00113",
+        "type": "ImageService2",
+        "width": 6849,
+        "height": 5375
+      },
+      "resourceMask": [
+        [574, 602],
+        [6164, 530],
+        [6210, 4710],
+        [643, 4739]
+      ],
+      "gcps": [
+        { "resource": [825, 1095], "geo": [7.0709867, 52.437787] },
+        { "resource": [5734, 560], "geo": [6.9056281, 50.830527] },
+        { "resource": [2751, 4294], "geo": [5.2251049, 51.9577511] },
+        { "resource": [5786, 3013], "geo": [5.6956491, 50.8518421] },
+        { "resource": [957, 3122], "geo": [5.9342399, 52.5640794] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00110",
+        "type": "ImageService2",
+        "width": 6937,
+        "height": 5353
+      },
+      "resourceMask": [
+        [714, 579],
+        [6242, 579],
+        [6251, 4833],
+        [727, 4851]
+      ],
+      "gcps": [
+        { "resource": [4796, 4615], "geo": [6.1774165, 49.127162] },
+        { "resource": [2225, 1130], "geo": [4.8981827, 50.273649] },
+        { "resource": [5662, 1109], "geo": [6.6611582, 50.2228266] },
+        { "resource": [1298, 2904], "geo": [4.4290004, 49.8677017] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00107",
+        "type": "ImageService2",
+        "width": 6844,
+        "height": 5414
+      },
+      "resourceMask": [
+        [2023, 768],
+        [5010, 807],
+        [6162, 2129],
+        [6211, 2793],
+        [5745, 3905],
+        [4972, 4442],
+        [3698, 4805],
+        [2778, 4813],
+        [1812, 4489],
+        [975, 3858],
+        [596, 3002],
+        [596, 2300],
+        [888, 1566],
+        [1531, 982]
+      ],
+      "gcps": [
+        { "resource": [5817, 3384], "geo": [7.3172061, 52.5223027] },
+        { "resource": [894, 1650], "geo": [1.0827692, 49.9230966] },
+        { "resource": [4861, 1791], "geo": [4.7984008, 52.7874179] },
+        { "resource": [2274, 3878], "geo": [4.7059712, 49.9943234] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00104",
+        "type": "ImageService2",
+        "width": 6828,
+        "height": 5404
+      },
+      "resourceMask": [
+        [508, 639],
+        [6113, 573],
+        [6240, 4715],
+        [556, 4753]
+      ],
+      "gcps": [
+        { "resource": [5630, 709], "geo": [18.8000199, 54.6088432] },
+        { "resource": [5609, 3706], "geo": [18.097533, 47.0206734] },
+        { "resource": [960, 1290], "geo": [1.2964326, 52.6285719] },
+        { "resource": [1066, 3012], "geo": [2.824829, 49.4190218] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00101",
+        "type": "ImageService2",
+        "width": 6804,
+        "height": 5398
+      },
+      "resourceMask": [
+        [752, 624],
+        [5786, 534],
+        [5876, 4703],
+        [830, 4738]
+      ],
+      "gcps": [
+        { "resource": [5053, 1367], "geo": [5.4378044, 47.5656296] },
+        { "resource": [1983, 2080], "geo": [3.8412623, 47.5311121] },
+        { "resource": [2122, 946], "geo": [4.0848403, 47.8477403] },
+        { "resource": [3112, 3495], "geo": [4.302271, 46.9514848] },
+        { "resource": [4498, 4331], "geo": [4.9128712, 46.5619347] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00098",
+        "type": "ImageService2",
+        "width": 6867,
+        "height": 5383
+      },
+      "resourceMask": [
+        [653, 584],
+        [6100, 530],
+        [6140, 4612],
+        [657, 4663]
+      ],
+      "gcps": [
+        { "resource": [4959, 1439], "geo": [6.1398444, 46.2047447] },
+        { "resource": [1883, 1650], "geo": [6.7979031, 47.5096202] },
+        { "resource": [2620, 2476], "geo": [6.0249607, 47.236664] },
+        { "resource": [2122, 3674], "geo": [5.5139883, 47.6163545] },
+        { "resource": [5565, 3832], "geo": [4.7188973, 45.991654] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00095",
+        "type": "ImageService2",
+        "width": 6798,
+        "height": 5394
+      },
+      "resourceMask": [
+        [638, 2362],
+        [3248, 2364],
+        [3227, 4655],
+        [653, 4624]
+      ],
+      "gcps": [
+        { "resource": [2758, 4418], "geo": [7.3604544, 45.1007829] },
+        { "resource": [960, 2403], "geo": [4.9125963, 46.562097] },
+        { "resource": [2439, 2729], "geo": [7.3593237, 46.2282404] },
+        { "resource": [916, 3829], "geo": [5.0522941, 45.0443862] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00095",
+        "type": "ImageService2",
+        "width": 6798,
+        "height": 5394
+      },
+      "resourceMask": [
+        [592, 611],
+        [3274, 586],
+        [3276, 2229],
+        [609, 2243]
+      ],
+      "gcps": [
+        { "resource": [3233, 1467], "geo": [5.3720285, 43.2974517] },
+        { "resource": [2394, 678], "geo": [4.6501337, 44.2589556] },
+        { "resource": [722, 1404], "geo": [2.4439036, 43.2096195] },
+        { "resource": [1306, 1497], "geo": [3.47061, 43.3124777] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00095",
+        "type": "ImageService2",
+        "width": 6798,
+        "height": 5394
+      },
+      "resourceMask": [
+        [3427, 608],
+        [5919, 565],
+        [5908, 4612],
+        [3394, 4606]
+      ],
+      "gcps": [
+        { "resource": [3785, 3930], "geo": [4.6518536, 43.804678] },
+        { "resource": [5623, 3479], "geo": [5.396356, 43.8763254] },
+        { "resource": [3612, 969], "geo": [4.7098414, 44.444184] },
+        { "resource": [4957, 843], "geo": [5.1907835, 44.3786714] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00092",
+        "type": "ImageService2",
+        "width": 6829,
+        "height": 5374
+      },
+      "resourceMask": [
+        [510, 787],
+        [6280, 754],
+        [6275, 4571],
+        [469, 4509]
+      ],
+      "gcps": [
+        { "resource": [5381, 4179], "geo": [3.6250676, 49.5643605] },
+        { "resource": [5393, 1989], "geo": [3.5443353, 50.1041184] },
+        { "resource": [792, 1119], "geo": [1.3819919, 50.0586661] },
+        { "resource": [2565, 3439], "geo": [2.3246664, 49.6663596] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00089",
+        "type": "ImageService2",
+        "width": 6879,
+        "height": 5364
+      },
+      "resourceMask": [
+        [3726, 691],
+        [6164, 645],
+        [6189, 4551],
+        [3726, 4589]
+      ],
+      "gcps": [
+        { "resource": [4276, 1231], "geo": [3.3785531, 49.5958259] },
+        { "resource": [5452, 811], "geo": [2.999639, 49.5813124] },
+        { "resource": [5622, 4296], "geo": [3.15864, 50.1669019] },
+        { "resource": [3911, 3562], "geo": [3.6246407, 49.9725438] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00089",
+        "type": "ImageService2",
+        "width": 6879,
+        "height": 5364
+      },
+      "resourceMask": [
+        [579, 716],
+        [3314, 706],
+        [3353, 4598],
+        [608, 4578]
+      ],
+      "gcps": [
+        { "resource": [1181, 3229], "geo": [1.5918887, 50.706] },
+        { "resource": [2638, 4577], "geo": [1.7642604, 50.4637578] },
+        { "resource": [1240, 1500], "geo": [1.7705626, 50.915379] },
+        { "resource": [2628, 861], "geo": [2.1270635, 50.9867359] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00086",
+        "type": "ImageService2",
+        "width": 6804,
+        "height": 5354
+      },
+      "resourceMask": [
+        [766, 643],
+        [6005, 584],
+        [6045, 4483],
+        [826, 4522]
+      ],
+      "gcps": [
+        { "resource": [1302, 1162], "geo": [-1.0487762, 47.8953861] },
+        { "resource": [5493, 3936], "geo": [0.1990373, 46.759131] },
+        { "resource": [4657, 859], "geo": [0.3488727, 47.6512707] },
+        { "resource": [1696, 3726], "geo": [-1.2670827, 47.337232] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00083",
+        "type": "ImageService2",
+        "width": 6816,
+        "height": 5388
+      },
+      "resourceMask": [
+        [648, 843],
+        [4248, 866],
+        [4207, 4455],
+        [625, 4408]
+      ],
+      "gcps": [
+        { "resource": [4051, 2476], "geo": [3.1590043, 46.987398] },
+        { "resource": [2887, 938], "geo": [2.6335947, 47.686339] },
+        { "resource": [1372, 1813], "geo": [1.7436926, 47.3586304] },
+        { "resource": [3316, 3883], "geo": [2.6053281, 46.3404025] },
+        { "resource": [836, 3145], "geo": [1.1738018, 46.9873073] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00083",
+        "type": "ImageService2",
+        "width": 6816,
+        "height": 5388
+      },
+      "resourceMask": [
+        [4479, 1582],
+        [6245, 1574],
+        [6225, 4471],
+        [4435, 4454]
+      ],
+      "gcps": [
+        { "resource": [6169, 2928], "geo": [3.5486108, 45.8574051] },
+        { "resource": [4641, 3416], "geo": [3.0860499, 45.7541469] },
+        { "resource": [5302, 1778], "geo": [3.3530294, 46.0131803] },
+        { "resource": [5019, 4046], "geo": [3.1690687, 45.7038877] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00080",
+        "type": "ImageService2",
+        "width": 6867,
+        "height": 5345
+      },
+      "resourceMask": [
+        [600, 533],
+        [6299, 467],
+        [6299, 4600],
+        [600, 4646]
+      ],
+      "gcps": [
+        { "resource": [1672, 2534], "geo": [-0.991913, 46.3100966] },
+        { "resource": [1322, 2861], "geo": [-1.1495367, 46.1563933] },
+        { "resource": [1242, 1275], "geo": [-1.8311605, 46.8914211] },
+        { "resource": [4194, 1807], "geo": [0.5459601, 46.8183155] },
+        { "resource": [5915, 3979], "geo": [1.7548851, 45.9537621] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00077",
+        "type": "ImageService2",
+        "width": 6805,
+        "height": 5349
+      },
+      "resourceMask": [
+        [520, 749],
+        [6147, 690],
+        [6163, 4433],
+        [583, 4422]
+      ],
+      "gcps": [
+        { "resource": [4737, 1112], "geo": [7.1052783, 50.7362633] },
+        { "resource": [5219, 3758], "geo": [8.9356922, 44.4096228] },
+        { "resource": [937, 1759], "geo": [-4.4861376, 48.3893448] },
+        { "resource": [1262, 3604], "geo": [-1.4751952, 43.4923782] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00071",
+        "type": "ImageService2",
+        "width": 6836,
+        "height": 5341
+      },
+      "resourceMask": [
+        [612, 725],
+        [6161, 689],
+        [6171, 4539],
+        [622, 4537]
+      ],
+      "gcps": [
+        { "resource": [954, 1065], "geo": [-1.1286839, 37.9840425] },
+        { "resource": [2520, 3344], "geo": [0.1103762, 38.842514] },
+        { "resource": [5577, 1123], "geo": [-1.1053229, 40.3431054] },
+        { "resource": [5988, 3233], "geo": [0.2226988, 40.6178396] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00068",
+        "type": "ImageService2",
+        "width": 6818,
+        "height": 5354
+      },
+      "resourceMask": [
+        [793, 690],
+        [5797, 621],
+        [5862, 4497],
+        [857, 4550]
+      ],
+      "gcps": [
+        { "resource": [3001, 1312], "geo": [-6.5596211, 37.8933223] },
+        { "resource": [1123, 3048], "geo": [-7.4060002, 37.2163804] },
+        { "resource": [2931, 4116], "geo": [-6.3603586, 36.6208936] },
+        { "resource": [5729, 1962], "geo": [-4.7740428, 37.8852056] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00065",
+        "type": "ImageService2",
+        "width": 6779,
+        "height": 5352
+      },
+      "resourceMask": [
+        [458, 554],
+        [6294, 621],
+        [6263, 4508],
+        [374, 4422]
+      ],
+      "gcps": [
+        { "resource": [720, 877], "geo": [-8.9388203, 37.0106422] },
+        { "resource": [5688, 2020], "geo": [-8.8231385, 41.6950672] },
+        { "resource": [811, 2007], "geo": [-7.5440709, 37.1578744] },
+        { "resource": [5378, 3920], "geo": [-6.7583762, 41.8074452] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00062",
+        "type": "ImageService2",
+        "width": 6804,
+        "height": 5349
+      },
+      "resourceMask": [
+        [650, 506],
+        [6173, 451],
+        [6195, 4680],
+        [660, 4691]
+      ],
+      "gcps": [
+        { "resource": [1177, 3730], "geo": [-8.674982, 37.1027795] },
+        { "resource": [3570, 3682], "geo": [-2.4643388, 36.8416867] },
+        { "resource": [1247, 958], "geo": [-8.2284436, 43.4864175] },
+        { "resource": [4952, 1735], "geo": [1.2506381, 41.1165749] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00059",
+        "type": "ImageService2",
+        "width": 6863,
+        "height": 5349
+      },
+      "resourceMask": [
+        [847, 873],
+        [5919, 820],
+        [5900, 4292],
+        [882, 4327]
+      ],
+      "gcps": [
+        { "resource": [3175, 2537], "geo": [-28.079712, 38.4027143] },
+        { "resource": [1020, 1814], "geo": [-31.2075801, 39.5132914] },
+        { "resource": [5623, 3177], "geo": [-25.1437386, 37.833496] },
+        { "resource": [5543, 3975], "geo": [-25.0164494, 36.929392] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00053",
+        "type": "ImageService2",
+        "width": 6875,
+        "height": 5411
+      },
+      "resourceMask": [
+        [709, 695],
+        [6135, 627],
+        [6135, 4655],
+        [717, 4625]
+      ],
+      "gcps": [
+        { "resource": [4656, 1363], "geo": [-2.8825806, 53.0783125] },
+        { "resource": [2537, 1023], "geo": [-4.6265469, 53.3070522] },
+        { "resource": [2043, 4150], "geo": [-4.9179353, 51.6766882] },
+        { "resource": [4690, 4187], "geo": [-2.7512859, 51.5890434] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00050",
+        "type": "ImageService2",
+        "width": 6810,
+        "height": 5374
+      },
+      "resourceMask": [
+        [778, 638],
+        [5987, 510],
+        [6032, 4826],
+        [868, 4879]
+      ],
+      "gcps": [
+        { "resource": [5556, 4300], "geo": [1.3859214, 51.3883728] },
+        { "resource": [3402, 1271], "geo": [-3.5864429, 54.5501487] },
+        { "resource": [4518, 1340], "geo": [-1.2033574, 54.6945786] },
+        { "resource": [1507, 4451], "geo": [-5.5524199, 50.1021664] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00029",
+        "type": "ImageService2",
+        "width": 6747,
+        "height": 5362
+      },
+      "resourceMask": [
+        [547, 504],
+        [2867, 527],
+        [3107, 518],
+        [3360, 489],
+        [3598, 500],
+        [4191, 494],
+        [6137, 441],
+        [6159, 4727],
+        [3729, 4802],
+        [3480, 4786],
+        [3413, 4766],
+        [3323, 4794],
+        [3182, 4815],
+        [563, 4799]
+      ],
+      "gcps": [
+        { "resource": [5423, 1999], "geo": [51.2084769, 11.7802061] },
+        { "resource": [3647, 4634], "geo": [19.8186773, -34.6282421] },
+        { "resource": [1817, 2172], "geo": [-13.0938929, 8.3676092] },
+        { "resource": [2537, 661], "geo": [-5.4913139, 35.8568257] },
+        { "resource": [4255, 1008], "geo": [31.2574641, 30.0539635] },
+        { "resource": [5522, 1143], "geo": [56.2584336, 25.9315438] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00047",
+        "type": "ImageService2",
+        "width": 6766,
+        "height": 5349
+      },
+      "resourceMask": [
+        [888, 642],
+        [6214, 710],
+        [6185, 4714],
+        [843, 4602]
+      ],
+      "gcps": [
+        { "resource": [3209, 1654], "geo": [-6.3371645, 57.001747] },
+        { "resource": [1862, 4440], "geo": [-1.7970757, 55.6796434] },
+        { "resource": [5969, 4516], "geo": [-2.4229528, 59.3718612] },
+        { "resource": [2025, 3197], "geo": [-4.2493428, 55.8589938] }
+      ],
+      "transformation": { "type": "thinPlateSpline" }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00044",
+        "type": "ImageService2",
+        "width": 6818,
+        "height": 5349
+      },
+      "resourceMask": [
+        [615, 732],
+        [6113, 650],
+        [6188, 4475],
+        [645, 4505]
+      ],
+      "gcps": [
+        { "resource": [1736, 4242], "geo": [1.178817, 51.0837209] },
+        { "resource": [1536, 1775], "geo": [-5.6822259, 50.1242909] },
+        { "resource": [3433, 1062], "geo": [-8.1042038, 54.6544514] },
+        { "resource": [5863, 2650], "geo": [-3.3495217, 59.0840396] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    },
+    {
+      "type": "GeoreferencedMap",
+      "resource": {
+        "id": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb00108957_00023",
+        "type": "ImageService2",
+        "width": 6732,
+        "height": 5352
+      },
+      "resourceMask": [
+        [764, 754],
+        [5887, 695],
+        [5968, 4465],
+        [808, 4531]
+      ],
+      "gcps": [
+        { "resource": [2145, 2574], "geo": [-0.1157414, 51.5111916] },
+        { "resource": [2438, 1514], "geo": [14.4016869, 67.2873717] },
+        { "resource": [4629, 4354], "geo": [31.2582688, 30.0449924] },
+        { "resource": [3921, 1721], "geo": [31.2799835, 58.5318942] },
+        { "resource": [1199, 3682], "geo": [-9.1404625, 38.7115875] },
+        { "resource": [1717, 1265], "geo": [-18.3391084, 64.8357834] }
+      ],
+      "transformation": { "type": "polynomial", "options": { "order": 1 } }
+    }
+  ]
+}

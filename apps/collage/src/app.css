@@ -525,7 +525,8 @@ nav {
   inset: 0;
   pointer-events: none;
 }
-.mask-editor-actions {
+.mask-editor-actions,
+.selection-actions {
   position: absolute;
   bottom: 20px;
   left: 50%;
@@ -535,8 +536,13 @@ nav {
   gap: 8px;
   white-space: nowrap;
   pointer-events: auto;
+  user-select: none;
 }
-.mask-editor-actions h2 {
+.mask-editor-actions h2,
+.selection-actions h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   padding: 8px 14px;
   background: #ffffffd9;
@@ -555,5 +561,27 @@ nav {
     left: 50%;
     transform: translateX(-50%);
     bottom: 16px;
+  }
+}
+
+.selection-actions {
+  z-index: 2;
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+@media (max-width: 900px) {
+  .selection-actions {
+    bottom: 78px;
   }
 }

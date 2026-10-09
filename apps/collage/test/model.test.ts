@@ -2,9 +2,11 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { generateAnnotation, parseAnnotation } from '@allmaps/annotation'
 import { lonLatToWebMercator, webMercatorToLonLat } from '@allmaps/project'
+import { solveLayout } from '../src/lib/layout-task.ts'
 import { maskCoordinates, constrainToImage } from '../src/lib/mask-geometry.ts'
 import {
   addMaps,
+  prepareMaps,
   openCollage,
   exportCollage,
   placedMap,
@@ -16,7 +18,9 @@ import {
   outline,
   mapCenter,
   rotatePlacement,
+  rotate,
   arrangeMaps,
+  arrangeGeographically,
   duplicateMaps,
   setResourceMask,
   validateResourceMask,
@@ -184,6 +188,7 @@ test('exports record rotation while preserving provenance and omitting other UI 
   const metadata = {
     id: source.id,
     version: source.id + '@1',
+    scale: 9.5,
     unrelated: true
   }
   source._allmaps = metadata
@@ -201,7 +206,8 @@ test('exports record rotation while preserving provenance and omitting other UI 
   const exported = exportCollage([item])
   assert.deepEqual(exported.items[0].body._allmaps, {
     ...metadata,
-    rotation: 45
+    rotation: 45,
+    geographicReference: item.geographicReference
   })
   assert.deepEqual(Object.keys(exported).sort(), ['@context', 'items', 'type'])
   assert.equal(JSON.stringify(exported).includes('"collage"'), false)
@@ -217,13 +223,16 @@ test('exports record rotation while preserving provenance and omitting other UI 
   assert.equal(originalAnnotationUrl(item.baseline), source.id + '@1')
 })
 
-test('anonymous files only add rotation metadata; a single source URL can retain provenance', () => {
+test('anonymous files retain rotation and geography without requiring source provenance', () => {
   const source = fixture()
   delete source.id
   const annotation = generateAnnotation(source)
   const [anonymous] = addMaps(annotation)
   const serialized = JSON.parse(JSON.stringify(exportCollage([anonymous])))
-  assert.deepEqual(serialized.items[0].body._allmaps, { rotation: 0 })
+  assert.deepEqual(serialized.items[0].body._allmaps, {
+    rotation: 0,
+    geographicReference: anonymous.geographicReference
+  })
   const [linked] = addMaps(
     annotation,
     [0, 0],
@@ -263,7 +272,8 @@ test('saved rotation restores zero orientation without an original annotation or
   close(points[1][1] - points[0][1], 0)
   close(distance(points[0], points[1]), 1000, 0.001)
   assert.deepEqual(exportCollage([loaded]).items[0].body._allmaps, {
-    rotation: 0
+    rotation: 0,
+    geographicReference: loaded.geographicReference
   })
   assert.equal(openCollage(exportCollage([loaded]))[0].placement.rotation, 0)
 })
@@ -484,7 +494,7 @@ test('organizing a rotated group preserves order, orientation, masks and scale',
     [500, 500]
   ])
   const before = structuredClone(items)
-  arrangeMaps(items.slice(0, 2), [3000, -2000], 1.7)
+  arrangeMaps(items.slice(0, 2), items[1])
   assert.deepEqual(items[2], before[2])
   items.forEach((item, i) => {
     assert.equal(item.instanceId, before[i].instanceId)
@@ -504,8 +514,7 @@ test('organizing a rotated group preserves order, orientation, masks and scale',
   const a = extent(items[0]),
     b = extent(items[1])
   assert.ok(a[0] > b[2] || a[2] < b[0] || a[1] > b[3] || a[3] < b[1])
-  close((Math.min(a[0], b[0]) + Math.max(a[2], b[2])) / 2, 3000)
-  close((Math.min(a[1], b[1]) + Math.max(a[3], b[3])) / 2, -2000)
+  assert.deepEqual(items[1].placement, before[1].placement)
 })
 
 test('mask validation rejects crossings, duplicates, zero area and vertices outside the image', () => {
@@ -672,4 +681,196 @@ test('the tool center follows edited masks and stays rigid through rotation with
   close(distance(mapCenter(item), pivot), distance(editedCenter, pivot))
   item.appearance.applyMask = false
   close(distance(mapCenter(item), pivot), 0, 0.001)
+})
+
+function geographicAnchor(item: ReturnType<typeof addMaps>[number]): Point {
+  return transformer(placedMap(item)).transformToProjectedGeo(
+    item.geographicReference!.resource
+  )
+}
+
+test('geographic arrangement overlaps maps of the same place and fixes the chosen anchor', () => {
+  const items = addMaps(generateAnnotation([fixture(), fixture()]))
+  items[0].placement = { position: [9000, -5000], rotation: -0.8 }
+  items[1].placement = { position: [-3000, 2000], rotation: 1.1 }
+  const fixed = structuredClone(items[1])
+  arrangeGeographically(items, items[1])
+  assert.deepEqual(items[1], fixed)
+  close(items[0].placement.rotation, fixed.placement.rotation)
+  outline(items[0]).forEach((point, i) =>
+    close(distance(point, outline(items[1])[i]), 0, 0.001)
+  )
+})
+
+test('geographic offsets follow the fixed map rotation and ground scale without changing map scales', () => {
+  const items = addMaps(
+    generateAnnotation([fixture(52, 5), fixture(52, 5.02), fixture(70, 5)])
+  )
+  items[1].placement = { position: [3000, 7000], rotation: 0.7 }
+  const before = structuredClone(items)
+  const ids = items.map((item) => item.instanceId)
+  arrangeGeographically(items.slice(0, 2), items[1])
+  assert.deepEqual(items[1], before[1])
+  assert.deepEqual(items[2], before[2])
+  assert.deepEqual(
+    items.map((item) => item.instanceId),
+    ids
+  )
+  const a = lonLatToWebMercator(items[0].geographicReference!.geo)
+  const b = lonLatToWebMercator(items[1].geographicReference!.geo)
+  const factor = items[1].geographicReference!.scale
+  const delta = rotate([(a[0] - b[0]) * factor, (a[1] - b[1]) * factor], 0.7)
+  const fixed = geographicAnchor(items[1])
+  close(
+    distance(geographicAnchor(items[0]), [
+      fixed[0] + delta[0],
+      fixed[1] + delta[1]
+    ]),
+    0,
+    0.001
+  )
+  items.forEach((item, i) => {
+    close(
+      distance(outline(item)[0], outline(item)[1]),
+      distance(outline(before[i])[0], outline(before[i])[1]),
+      0.001
+    )
+    assert.deepEqual(item.resourceMask, before[i].resourceMask)
+  })
+})
+
+test('geographic import seed keeps the first map at the requested location and preserves layer order', () => {
+  const source = generateAnnotation([fixture(), fixture()])
+  const compact = addMaps(source)
+  assert.ok(
+    distance(geographicAnchor(compact[0]), geographicAnchor(compact[1])) > 100
+  )
+  const geographic = prepareMaps(source, [4000, 5000])
+  assert.deepEqual(geographic[0].placement.position, [4000, 5000])
+  close(
+    distance(geographicAnchor(geographic[0]), geographicAnchor(geographic[1])),
+    0,
+    0.001
+  )
+  assert.deepEqual(
+    geographic.map((item) => item.title),
+    compact.map((item) => item.title)
+  )
+})
+
+test('geographic references survive mask edits, duplication, export and re-adding', () => {
+  const items = addMaps(generateAnnotation([fixture(), fixture(52, 5.02)]))
+  items[0].placement.rotation = 1.4
+  items[1].placement.rotation = -0.3
+  setResourceMask(items[0], [
+    [100, 100],
+    [450, 100],
+    [450, 700],
+    [100, 700]
+  ])
+  const reopened = openCollage(exportCollage(items))
+  assert.deepEqual(
+    reopened.map((item) => item.geographicReference),
+    items.map((item) => item.geographicReference)
+  )
+  const target = structuredClone(reopened)
+  arrangeGeographically(target)
+  const copies = duplicateMaps(reopened, [40, 50])
+  const restored = openCollage(exportCollage(reopened))
+  arrangeGeographically(restored)
+  restored.forEach((item, i) =>
+    outline(item).forEach((point, j) =>
+      close(distance(point, outline(target[i])[j]), 0, 0.001)
+    )
+  )
+  arrangeGeographically([reopened[0], copies[0]])
+  outline(copies[0]).forEach((point, i) =>
+    close(distance(point, outline(reopened[0])[i]), 0, 0.001)
+  )
+  const added = addMaps(exportCollage(items))
+  added.forEach((item, i) => {
+    assert.deepEqual(
+      item.geographicReference!.geo,
+      items[i].geographicReference!.geo
+    )
+    assert.deepEqual(
+      item.geographicReference!.resource,
+      items[i].geographicReference!.resource
+    )
+  })
+})
+
+test('geographic arrangement takes the short offset across the antimeridian', () => {
+  const items = prepareMaps(
+    generateAnnotation([fixture(30, 179.999), fixture(30, -179.999)])
+  )
+  close(
+    distance(geographicAnchor(items[0]), geographicAnchor(items[1])),
+    0.002 * radians * R * items[0].geographicReference!.scale,
+    0.01
+  )
+})
+
+test('missing or malformed geographic references cannot partially move a selection', () => {
+  const [known] = addMaps(generateAnnotation(fixture()))
+  const source = fixture()
+  for (const geographicReference of [
+    undefined,
+    { geo: [5, 52], resource: [500, 500], scale: 0 },
+    { geo: [5, 95], resource: [500, 500], scale: 1 },
+    { geo: ['5', 52], resource: [500, 500], scale: 1 }
+  ]) {
+    source._allmaps = { geographicReference }
+    const [legacy] = openCollage(generateAnnotation(source))
+    assert.equal(legacy.geographicReference, undefined)
+    const items = [known, legacy]
+    const before = structuredClone(items)
+    assert.throws(
+      () => arrangeGeographically(items),
+      /Original geography is unavailable/
+    )
+    assert.deepEqual(items, before)
+  }
+})
+
+test('worker layout preserves the input document and produces an atomic, exportable selection', () => {
+  const items = addMaps(generateAnnotation([fixture(), fixture(), fixture()]))
+  items.forEach((item, i) => {
+    item.placement.position = [100, 200]
+    item.placement.rotation = i * 0.2
+  })
+  const before = structuredClone(items)
+  const result = solveLayout({
+    type: 'arrange',
+    items: items.slice(0, 2),
+    arrangement: 'compact',
+    anchorId: items[1].instanceId
+  })
+  assert.equal(result.fallback, false)
+  assert.deepEqual(items, before)
+  assert.deepEqual(result.items[1], items[1])
+  assert.notDeepEqual(
+    result.items[0].placement.position,
+    items[0].placement.position
+  )
+  const reopened = openCollage(exportCollage(result.items))
+  result.items.forEach((item, i) =>
+    outline(item).forEach((p, j) =>
+      close(distance(p, outline(reopened[i])[j]), 0, 0.01)
+    )
+  )
+})
+
+test('worker import compacts geography, keeps every map and preserves saved rotations', () => {
+  const source = addMaps(generateAnnotation([fixture(), fixture(52, 5.1)]))
+  source[1].placement.rotation = 0.6
+  const input = exportCollage(source)
+  const before = structuredClone(input)
+  const result = solveLayout({ type: 'add', input, at: [400, 500] })
+  assert.equal(result.fallback, false)
+  assert.equal(result.items.length, 2)
+  assert.deepEqual(input, before)
+  assert.deepEqual(result.items[0].placement.position, [400, 500])
+  close(result.items[1].placement.rotation, 0.6)
+  assert.ok(distance(...(result.items.map(mapCenter) as [Point, Point])) < 8000)
 })

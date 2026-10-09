@@ -4,7 +4,6 @@ import {
   controlLayout,
   controlOrder,
   radiusForSize,
-  groupControlOrder,
   fitControlCenter,
   preferredControlCenter,
   controlRadius,
@@ -98,16 +97,6 @@ test('the arc faces bottom right and contracts with zoom without colliding butto
       ) > 42
     )
   }
-  const groupRadius = radiusForSize(30)
-  const group = controlLayout([0, 0], 0, { opacity: 0, hue: 0 }, groupRadius)
-  for (let i = 1; i < groupControlOrder.length; i++) {
-    assert.ok(
-      distance(
-        group[groupControlOrder[i - 1]].position,
-        group[groupControlOrder[i]].position
-      ) > 42
-    )
-  }
   close(radiusForSize(10000), controlRadius)
 })
 
@@ -134,18 +123,6 @@ test('clipped map controls and full slider rails stay on screen as one fixed arc
     ),
     fitted
   )
-})
-
-test('group selection retains all individual button anchors and adds organization in the center', () => {
-  const single = controlLayout([500, 300], 0.4, { hue: 0.3, opacity: 1 })
-  const group = controlLayout(
-    [500, 300],
-    0.4,
-    { hue: 0.3, opacity: 1 },
-    controlRadius
-  )
-  controlOrder.forEach((key) => assert.deepEqual(group[key], single[key]))
-  assert.deepEqual(group.organize.position, [500, 300])
 })
 
 test('large maps dock toward the screen center without following clipped fragments', () => {

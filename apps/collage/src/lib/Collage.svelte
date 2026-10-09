@@ -2,7 +2,7 @@
   import { onMount, tick } from 'svelte'
   import { Map as MapLibreMap, LngLat } from 'maplibre-gl'
   import { WarpedMapLayer } from '@allmaps/maplibre'
-  import { lonLatToWebMercator, webMercatorToLonLat } from '@allmaps/project'
+  import { toCanvasGeo, fromCanvasGeo, CANVAS_ZOOM_OFFSET } from './coordinates'
   import { Logo, BringMapsToFront, SendMapsToBack } from '@allmaps/ui'
   import { themeColors, shades } from '@allmaps/tailwind'
   import MapControl from './MapControl.svelte'
@@ -10,6 +10,9 @@
   import { updateLoadFailures } from './load-status'
   import type { LoadFailures } from './load-status'
   import BackgroundWorker from './background.worker.ts?worker'
+  import LayoutWorker from './layout.worker.ts?worker'
+  import { requestLayout } from './layout-client'
+  import type { LayoutRequest } from './layout-task'
   import type { BackgroundRequest } from './background.worker'
   import {
     Plus,
@@ -30,25 +33,25 @@
     MagicWand,
     Selection,
     Polygon,
-    Spiral,
+    SquaresFour,
+    CircleNotch,
+    MapTrifold,
     Copy
   } from 'phosphor-svelte'
   import {
-    addMaps,
     openCollage,
     exportCollage,
     placedMap,
+    renderedMap,
     outline,
     mapCenter,
     contains,
     rotatePlacement,
-    arrangeMaps,
     duplicateMaps,
     setResourceMask,
-    resolveImageSize,
-    center
+    resolveImageSize
   } from './model'
-  import type { CollageMap, Placement } from './model'
+  import type { Arrangement, CollageMap, Placement } from './model'
   import type { Point } from '@allmaps/types'
   import {
     controlLayout,
@@ -93,6 +96,7 @@
   let backgroundWorker: Worker | undefined
   let inputMode = $state<'add' | 'open'>()
   let inputText = $state('')
+  let layoutController = $state.raw<AbortController>()
   let errorMessage = $state('')
   let message = $state('All places. One scale.')
   let draggingOver = $state(false)
@@ -152,7 +156,7 @@
 
   function projectedOutline(item: CollageMap): Point[] {
     return outline(item).map((point) => {
-      const screen = map!.project(webMercatorToLonLat(point))
+      const screen = map!.project(toCanvasGeo(point))
       return [screen.x, screen.y]
     })
   }
@@ -189,11 +193,11 @@
       return
     }
     if (drag) {
-      const anchor = map.project(webMercatorToLonLat(drag.anchor))
+      const anchor = map.project(toCanvasGeo(drag.anchor))
       controlCenter = [anchor.x, anchor.y]
     } else {
       const pivot = selectionPivot(targets)
-      const screen = map.project(webMercatorToLonLat(pivot))
+      const screen = map.project(toCanvasGeo(pivot))
       const points = selectedPolygons.flat()
       // Only camera zoom and the full map size drive docking. Clipping does
       // not move the anchor around as different fragments enter the viewport.
@@ -214,12 +218,10 @@
       targets[0].appearance,
       controlRadius
     )
-    controlCenter = fitControlCenter(
-      controlCenter,
-      layout,
-      [viewport[2], viewport[3]],
-      targets.length > 1
-    )
+    controlCenter = fitControlCenter(controlCenter, layout, [
+      viewport[2],
+      viewport[3]
+    ])
     controls = controlLayout(
       controlCenter,
       targets[0].placement.rotation,
@@ -252,7 +254,7 @@
 
   function worldAt(screen: Point): Point {
     const point = map!.unproject(screen)
-    return lonLatToWebMercator([point.lng, point.lat])
+    return fromCanvasGeo([point.lng, point.lat])
   }
 
   function worldPoint(event: PointerEvent): Point {
@@ -261,18 +263,18 @@
       event.clientX - bounds.left,
       event.clientY - bounds.top
     ])
-    return lonLatToWebMercator([point.lng, point.lat])
+    return fromCanvasGeo([point.lng, point.lat])
   }
 
   function updateRaster(item: CollageMap) {
-    layer!.setMapGcps(item.instanceId, placedMap(item).gcps, { animate: false })
+    layer!.setMapGcps(item.instanceId, renderedMap(item).gcps, {
+      animate: false
+    })
   }
 
   function fit() {
     if (!map || !items.length) return
-    const points = items
-      .flatMap(outline)
-      .map((point) => webMercatorToLonLat(point))
+    const points = items.flatMap(outline).map((point) => toCanvasGeo(point))
     map.fitBounds(
       [
         [
@@ -286,7 +288,7 @@
       ],
       {
         padding: { top: 160, bottom: 100, left: 70, right: 70 },
-        maxZoom: 18,
+        maxZoom: 18 + CANVAS_ZOOM_OFFSET,
         duration: 350
       }
     )
@@ -313,7 +315,7 @@
   }
 
   function renderItem(item: CollageMap) {
-    layer!.addGeoreferencedMap({ ...placedMap(item), id: item.instanceId })
+    layer!.addGeoreferencedMap({ ...renderedMap(item), id: item.instanceId })
     updateAppearance(item)
   }
 
@@ -366,20 +368,59 @@
     }
   }
 
-  function organize() {
+  async function runLayout(request: LayoutRequest) {
+    const controller = new AbortController()
+    layoutController = controller
+    try {
+      return await requestLayout(new LayoutWorker(), request, controller.signal)
+    } finally {
+      if (layoutController === controller) layoutController = undefined
+    }
+  }
+
+  function layoutFailure(error: unknown) {
+    if (disposed) return
+    if (error instanceof DOMException && error.name === 'AbortError')
+      message = 'Arrangement cancelled.'
+    else fail(error)
+  }
+
+  async function organize(arrangement: Arrangement = 'compact') {
     if (selection.length < 2 || busy || drag) return
     const before = structuredClone(items)
-    const at = center(selection.flatMap(outline))
+    const anchorId = selectedIds.values().next().value!
+    busy = true
+    errorMessage = ''
+    let applying = false
     try {
-      arrangeMaps(selection, at, container.clientWidth / container.clientHeight)
-      selection.forEach(placedMap)
-      selection.forEach(updateRaster)
+      const result = await runLayout({
+        type: 'arrange',
+        items: selection,
+        arrangement,
+        anchorId
+      })
+      if (disposed) return
+      applying = true
+      result.items.forEach(updateRaster)
+      const arranged = new Map(
+        result.items.map((item) => [item.instanceId, item])
+      )
+      items = items.map((item) => arranged.get(item.instanceId) ?? item)
       remember(before)
-      items = [...items]
       refresh()
+      message =
+        arrangement === 'geographic'
+          ? 'Geographic positions restored. The first selected map stays fixed.'
+          : 'Selected maps arranged. The first selected map stays fixed.'
+      if (result.fallback)
+        fail(
+          'Compact arrangement could not converge. A simple packing was used instead.'
+        )
     } catch (error) {
-      restore(before)
-      fail(error)
+      if (applying && !disposed) restore(before)
+      layoutFailure(error)
+    } finally {
+      busy = false
     }
   }
 
@@ -554,16 +595,24 @@
     return response.json()
   }
 
-  function prepare(input: unknown, mode: 'add' | 'open', sourceUrl?: string) {
+  async function prepare(
+    input: unknown,
+    mode: 'add' | 'open',
+    sourceUrl?: string
+  ) {
+    if (mode === 'open') return openCollage(input)
     const center = map!.getCenter()
-    return mode === 'open'
-      ? openCollage(input)
-      : addMaps(
-          input,
-          lonLatToWebMercator([center.lng, center.lat] as Point),
-          sourceUrl,
-          container.clientWidth / container.clientHeight
-        )
+    const result = await runLayout({
+      type: 'add',
+      input,
+      sourceUrl,
+      at: fromCanvasGeo([center.lng, center.lat])
+    })
+    if (result.fallback)
+      fail(
+        'Compact arrangement could not converge. A simple packing was used instead.'
+      )
+    return result.items
   }
 
   async function submit(event?: SubmitEvent) {
@@ -577,12 +626,11 @@
       const isJson = value.startsWith('{') || value.startsWith('[')
       const input = isJson ? JSON.parse(value) : await fetchJson(value)
       if (disposed) return
-      install(
-        prepare(input, inputMode, isJson ? undefined : value),
-        inputMode === 'open'
-      )
+      const mode = inputMode
+      const next = await prepare(input, mode, isJson ? undefined : value)
+      if (!disposed) install(next, mode === 'open')
     } catch (error) {
-      fail(error)
+      layoutFailure(error)
     } finally {
       busy = false
     }
@@ -609,9 +657,10 @@
                 (input) => exportCollage(openCollage(input)).items
               )
             }
-      install(prepare(document, mode), mode === 'open')
+      const next = await prepare(document, mode)
+      if (!disposed) install(next, mode === 'open')
     } catch (error) {
-      fail(error)
+      layoutFailure(error)
     } finally {
       busy = false
     }
@@ -669,9 +718,10 @@
       const maps = documents.flatMap(
         (document) => exportCollage(openCollage(document)).items
       )
-      install(prepare({ type: 'AnnotationPage', items: maps }, 'add'), false)
+      const next = await prepare({ type: 'AnnotationPage', items: maps }, 'add')
+      if (!disposed) install(next, false)
     } catch (error) {
-      fail(error)
+      layoutFailure(error)
     } finally {
       busy = false
     }
@@ -1108,6 +1158,10 @@
     sendToBack = event.altKey
     if (editingMask) return
     if (event.key === 'Escape') {
+      if (layoutController) {
+        layoutController.abort()
+        return
+      }
       if (drag || marquee) finishDrag(undefined, true)
       else if (!busy) {
         inputMode = undefined
@@ -1178,10 +1232,10 @@
         container,
         style: { version: 8, sources: {}, layers: [] },
         center: [0, 0],
-        zoom: 13,
+        zoom: 13 + CANVAS_ZOOM_OFFSET,
         minZoom: -2,
         maxPitch: 0,
-        maxZoom: 22,
+        maxZoom: 22 + CANVAS_ZOOM_OFFSET,
         renderWorldCopies: false,
         // Keep a finite Mercator center while allowing the viewport to extend
         // beyond the world rectangle, instead of forcing it to fill the screen.
@@ -1190,7 +1244,7 @@
             Math.max(-180, Math.min(180, center.lng)),
             Math.max(-85.051129, Math.min(85.051129, center.lat))
           ),
-          zoom: Math.max(-2, Math.min(22, zoom))
+          zoom: Math.max(-2, Math.min(22 + CANVAS_ZOOM_OFFSET, zoom))
         }),
         attributionControl: false,
         dragRotate: false,
@@ -1233,6 +1287,7 @@
     }
     return () => {
       disposed = true
+      layoutController?.abort()
       backgroundWorker?.terminate()
       if (frame !== undefined) cancelAnimationFrame(frame)
       map?.getCanvas().removeEventListener('pointerdown', pointerDown, true)
@@ -1438,14 +1493,6 @@
       disabled={busy || selection.length > 1}
       onclick={editMask}><Polygon size={19} /></MapControl
     >
-    {#if selection.length > 1}
-      <MapControl
-        position={controls.organize.position}
-        label="Organize selected maps"
-        disabled={busy}
-        onclick={organize}><Spiral size={19} /></MapControl
-      >
-    {/if}
     <MapControl
       position={controls.front.position}
       label={sendToBack
@@ -1472,6 +1519,48 @@
       disabled={busy}
       onclick={removeSelected}><Trash size={19} /></MapControl
     >
+  {/if}
+
+  {#if !editingMask && !inputMode && (selection.length > 1 || layoutController)}
+    <div
+      class="selection-actions"
+      role="group"
+      aria-label="Arrange selected maps"
+    >
+      <h2>
+        {#if layoutController}
+          <CircleNotch class="spin" size={18} />Arranging…
+        {:else}
+          Edit layout
+        {/if}
+      </h2>
+      {#if layoutController}
+        <button
+          class="quiet-button"
+          aria-label="Cancel arrangement"
+          title="Cancel arrangement"
+          onclick={() => layoutController?.abort()}><X size={19} /></button
+        >
+      {:else}
+        <button
+          class="quiet-button"
+          aria-label="Arrange selected maps"
+          title="Arrange compactly · Keep first selected map fixed"
+          disabled={busy}
+          onclick={() => organize()}><SquaresFour size={20} /></button
+        >
+        <button
+          class="quiet-button"
+          aria-label="Arrange geographically"
+          title={selection.every((item) => item.geographicReference)
+            ? 'Restore geographic positions · Keep first selected map fixed'
+            : 'Geographic arrangement unavailable · Add original annotations'}
+          disabled={busy || selection.some((item) => !item.geographicReference)}
+          onclick={() => organize('geographic')}
+          ><MapTrifold size={20} /></button
+        >
+      {/if}
+    </div>
   {/if}
 
   {#if !editingMask}
@@ -1512,7 +1601,11 @@
   {/if}
 
   <div class="sr-only" role="status" aria-live="polite">
-    {busy ? 'Loading annotation…' : message}
+    {layoutController
+      ? 'Arranging maps…'
+      : busy
+        ? 'Loading annotation…'
+        : message}
   </div>
   {#if errorMessage && !inputMode && !editingMask}
     <div class="error-message" role="alert">
@@ -1531,14 +1624,18 @@
         aria-labelledby="input-title"
         oncancel={(event) => {
           event.preventDefault()
-          if (!busy) inputMode = undefined
+          if (layoutController) layoutController.abort()
+          else if (!busy) inputMode = undefined
         }}
       >
         <button
           class="close-dialog"
           aria-label="Close"
-          onclick={() => (inputMode = undefined)}
-          disabled={busy}><X size={22} /></button
+          onclick={() => {
+            layoutController?.abort()
+            inputMode = undefined
+          }}
+          disabled={busy && !layoutController}><X size={22} /></button
         >
         <h2 id="input-title">
           {inputMode === 'add' ? 'Add maps' : 'Open a collage'}
@@ -1556,11 +1653,13 @@
             class="primary-button"
             type="submit"
             disabled={busy || !inputText.trim()}
-            >{busy
-              ? 'Loading…'
-              : inputMode === 'add'
-                ? 'Add all maps'
-                : 'Open collage'}<Plus size={18} /></button
+            >{layoutController
+              ? 'Arranging…'
+              : busy
+                ? 'Loading…'
+                : inputMode === 'add'
+                  ? 'Add all maps'
+                  : 'Open collage'}<Plus size={18} /></button
           >
         </form>
         {#if errorMessage}<p class="dialog-error" role="alert">

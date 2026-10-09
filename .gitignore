@@ -31,3 +31,4 @@ vite.config.ts.timestamp-*
 .turbo
 .claude
 plans
+/experiments/

@@ -14,15 +14,12 @@ export const controlOrder = [
   'move',
   'rotate'
 ] as const
-export type Control = (typeof controlOrder)[number] | 'organize'
+export type Control = (typeof controlOrder)[number]
 export type Slider = 'opacity' | 'hue'
 export type Rail = { start: Point; end: Point }
 export type ControlPosition = { position: Point; rail?: Rail }
 export const controlRadius = 184
 export const sliderLength = 104
-// Group selection retains the same arc and adds organization in its center.
-export const groupControlOrder: Control[] = [...controlOrder, 'organize']
-
 export function radiusForSize(diameter: number): number {
   return Math.max(140, Math.min(controlRadius, diameter * 0.3))
 }
@@ -77,7 +74,6 @@ export function controlLayout(
       ]
     })
   ) as Record<Control, ControlPosition>
-  layout.organize = { position: center }
   return layout
 }
 
@@ -96,17 +92,14 @@ export function railValue(pointer: Point, rail: Rail): number {
 export function fitControlCenter(
   center: Point,
   layout: Record<Control, ControlPosition>,
-  viewport: Point,
-  group = false
+  viewport: Point
 ): Point {
-  const positions = (group ? groupControlOrder : controlOrder).flatMap(
-    (key) => {
-      const control = layout[key]
-      return control.rail
-        ? [control.rail.start, control.rail.end]
-        : [control.position]
-    }
-  )
+  const positions = controlOrder.flatMap((key) => {
+    const control = layout[key]
+    return control.rail
+      ? [control.rail.start, control.rail.end]
+      : [control.position]
+  })
   return center.map((value, axis) => {
     const minimum = Math.min(...positions.map((p) => p[axis]))
     const maximum = Math.max(...positions.map((p) => p[axis]))

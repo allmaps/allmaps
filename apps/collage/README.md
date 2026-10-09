@@ -34,12 +34,12 @@ pnpm --filter @allmaps/collage build
 ## Adding and opening maps
 
 - **Add maps** accepts an annotation URL, pasted JSON, or local annotation files.
-  It adds every map and leaves them unselected. Batches use largest-first spiral
-  packing, inspired by [Maps Exposé](https://observablehq.com/d/c3bb51b7e4a6e502):
-  padded bounding boxes move out from the center until they no longer overlap.
-  The layout follows the viewport aspect ratio, preserves annotation order,
-  and maintains each map's ground scale. **Try random maps** requests three maps
-  from `https://annotations.allmaps.org/maps/random` without opening a dialog.
+  It adds every map and leaves them unselected. Initial placement always uses
+  compact PRISM, seeded from original geographic positions, with the first map
+  at the current view center. There is no import layout chooser. It preserves
+  annotation order, each map's ground scale, mask and orientation.
+  **Try random maps** requests three maps from
+  `https://annotations.allmaps.org/maps/random` without opening a dialog.
 - **Open collage** restores coordinates and annotation order as supplied. It
   never applies scale normalization or recenters individual maps. It replaces
   the current canvas as an undoable action.
@@ -63,8 +63,15 @@ pnpm --filter @allmaps/collage build
   Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
   selected map to move the group; rotate uses one shared pivot and preserves
   spacing and scale. Groups retain the full arc, with individual-map appearance
-  and mask buttons disabled. The central **Organize selected maps** button packs
-  the selection on a spiral while preserving scale, rotation and layer order.
+  and mask buttons disabled. **Arrange** and **Geographic** appear as compact
+  icon buttons beside **Edit layout** at the bottom center, above the zoom controls
+  on smaller screens.
+  **Arrange** compacts the current positions with PRISM, keeping the first selected
+  map fixed and preserving scale, rotation, masks and layer order.
+  **Geographic** keeps the first selected map
+  fixed, including its rotation, and restores the others' geographic offsets and
+  relative orientation. Each map keeps its scale; unrelated maps and layer order
+  stay unchanged. Both arrangements are one undo step.
   Appearance, mask editing and original-orientation reset remain individual-map actions.
   Group ordering keeps the selected maps' relative order; each gesture is one
   undo step. Click empty canvas or press Escape to deselect.
@@ -77,6 +84,28 @@ pnpm --filter @allmaps/collage build
   annotation. Export stores the angle in `_allmaps.rotation`, so resetting still
   works after reopening a collage. Without valid rotation metadata, the loaded
   orientation becomes zero. Position, scale and mask do not change.
+
+### Layout computation
+
+Imports and group arrangements run in a dedicated Web Worker. Panning and zooming
+remain available; other document edits wait for the result. Cancel with Escape,
+close the import dialog, or use the dock's cancel button. Cancellation and failure
+leave the document unchanged. A successful arrangement is applied in one undo step.
+
+The local PRISM implementation follows
+[Gansner and Hu (2010)](https://doi.org/10.7155/jgaa.00198), using a Delaunay
+proximity graph and a sparse conjugate-gradient solver.
+The solver reuses its matrix-product buffer and uses indexed dot-product loops,
+matching the tested layout experiment without changing its results. A second
+PRISM pass compacts sparse layouts by compressing center distances toward 50%
+padded-box occupancy, without shrinking maps. It keeps that pass only when it
+converges, reduces area and satisfies all overlap/gap checks. Exact topology and
+geographic distances are not guaranteed.
+
+The previous spiral packer remains only as an internal recovery path if PRISM
+fails to converge, with a visible explanation. Workers have a 30-second deadline;
+timeout leaves the current document intact. Final placements must still satisfy
+the app's coordinate limits.
 
 ## Appearance
 
@@ -163,8 +192,18 @@ large geographic extents remains; this is a local comparison model.
 
 Keep that normalized geometry in memory. Each gesture applies a rigid rotation
 and translation from this baseline, without repeatedly modifying the previous
-GCP result or recomputing scale at the artificial destination. Export converts
-the placed metric coordinates back to longitude/latitude near Null Island.
+GCP result or recomputing scale at the artificial destination. Drawing uses a
+common 1:8 coordinate conversion for rasters, controls, pointer input and mask
+editing, giving large atlases room beyond the usual world rectangle. The initial
+and maximum zoom are offset by three levels to retain the same visible map sizes.
+This is only a canvas conversion: PRISM, saved placements and exported GCPs retain
+their ground-meter scale. No drawing-scale metadata is added to annotations.
+
+Export converts the placed metric coordinates back to longitude/latitude,
+including unwrapped longitudes outside ±180°. Coordinates are limited to
+±100,000,000 meters to avoid precision loss near the Mercator poles; this is
+separate from the ordinary world extent. The 146-map Ortelius atlas is covered
+by an offline import, rendering and export/reopen regression fixture.
 
 **Open** is deliberately separate from **Add**: there is no metadata flag that
 can reliably identify a collage. Opening preserves the supplied geometry even
@@ -186,6 +225,17 @@ if it is far from Null Island.
   the local geometry before restoring the angle, keeping the rendered layout
   unchanged. Missing or invalid values default to zero. Resetting and exporting
   writes zero over the previously saved angle.
+- Record `_allmaps.geographicReference` with a stable image point (`resource`),
+  its original longitude/latitude (`geo`), and the accumulated ground-scale
+  normalization factor (`scale`). This small reference survives moves, rotation,
+  mask edits, duplication and export/reopen without storing the original GCPs or
+  fetching source annotations. It does not overwrite the API's `_allmaps.scale`.
+  Geographic offsets use Mercator differences corrected by the fixed map's
+  normalization factor, with longitude wrapping at the antimeridian. As with map
+  scale, this is a local approximation: nearby plans align, while widely separated
+  latitudes have projection distortion. Each map's scale is preserved.
+  Older saved collages without this reference still open normally; re-add their
+  original annotations to enable geographic arrangement.
 - Do not export placements, viewport, other UI state, or a Collage extension.
   Opacity, saturation, colorization, background removal and applying the mask
   are session-only.
@@ -200,7 +250,7 @@ with interpolation disabled. This keeps the raster, masks, hit testing and tile
 selection consistent. A dedicated renderer matrix API is a possible later
 optimization; the prototype does not modify shared renderer code.
 
-The UI supports individual and group selection, spiral organization, duplication,
+The UI supports individual and group selection, compact PRISM organization, duplication,
 appearance controls and in-place mask editing. Editable map labels, canvas
 snapshots and local autosave remain future work. Save annotations before closing
 or reloading the page to preserve the layout.

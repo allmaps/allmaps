@@ -66,7 +66,7 @@
   let changing = false
   let edgeStart: { index: number; point: Point } | undefined
 
-  const { toGeo, toResource } = maskCoordinates(original)
+  const { toGeo, toResource } = maskCoordinates(original, true)
   const geometry = (mask: Point[]) => ({
     type: 'Polygon' as const,
     coordinates: [[...mask, mask[0]].map(toGeo)]
@@ -594,9 +594,11 @@
       onclick={oncancel}><X size={20} /></button
     >
     <button
-      class="primary-button small"
+      class="quiet-button"
+      aria-label="Done"
+      title="Done editing mask"
       disabled={!ready || drawingNewMask}
-      onclick={() => ondone(draft)}><Check size={18} />Done</button
+      onclick={() => ondone(draft)}><Check size={20} /></button
     >
   </div>
   <div class="canvas-footer">
