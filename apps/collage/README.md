@@ -75,6 +75,10 @@ pnpm --filter @allmaps/collage build
   double-click reset use the controls’ center as their pivot, including when the
   controls dock toward the screen center. That pivot stays fixed during a drag.
   Arrow keys rotate a focused control by 1 degree (15 with Shift). Space-drag pans.
+- On touch screens, a second finger switches to canvas pan/zoom and cancels any
+  in-progress map move, rotation or slider change without adding an undo step.
+  Map dragging stays disabled until all fingers lift, even if a pinch starts
+  with either finger over a map.
 - Shift/Cmd/Ctrl-click toggles maps in a selection. Cmd/Ctrl+A selects all.
   Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
   selected map to move the group; rotate uses one shared pivot and preserves
@@ -164,8 +168,9 @@ surface, preserving the map's placement, orientation and current camera view.
 The full image is shown and other maps are temporarily hidden. Use **Fit map**
 to zoom to the full image when needed. The outline and handles
 follow Allmaps Editor styling; failed maps retain their red outline. The logo
-stays visible and the top actions are disabled. On small screens, the editing
-actions sit above the zoom controls.
+stays visible and the top actions are disabled. On phones and tablets (up to
+960 pixels wide), editing actions sit above the zoom and undo controls so the
+groups stay separate, including with the longer pen-mode label.
 Warnings stack above these actions, including when the buttons wrap on phones.
 
 - Drag a vertex to move it, drag anywhere along an edge to add one, and

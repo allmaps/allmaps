@@ -597,7 +597,7 @@
       {
         padding: {
           top: 85,
-          bottom: map.getContainer().clientWidth <= 760 ? 145 : 85,
+          bottom: map.getContainer().clientWidth <= 960 ? 145 : 85,
           left: 55,
           right: 55
         },

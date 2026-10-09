@@ -14,6 +14,7 @@
   import MaskEditor from './MaskEditor.svelte'
   import { updateLoadFailures } from './load-status'
   import { loadRandomMaps } from './random-maps'
+  import { TouchNavigation } from './touch-navigation'
   import { generateAnnotation } from '@allmaps/annotation'
   import type { LoadFailures } from './load-status'
   import BackgroundWorker from './background.worker.ts?worker'
@@ -127,6 +128,7 @@
   let altDown = $state(false)
   let frame: number | undefined
   let latestPointer: PointerEvent | undefined
+  const touchNavigation = new TouchNavigation()
   let disposed = false
   let drag:
     | {
@@ -988,7 +990,15 @@
   }
 
   function beginDrag(event: PointerEvent, item: CollageMap, mode: DragMode) {
-    if (busy || drag || marquee || event.button !== 0 || !map) return
+    if (
+      busy ||
+      drag ||
+      marquee ||
+      touchNavigation.active ||
+      event.button !== 0 ||
+      !map
+    )
+      return
     event.preventDefault()
     event.stopPropagation()
     // Alt/Option-click aligns on release; it must not start a drag as well.
@@ -1068,6 +1078,7 @@
       busy ||
       drag ||
       marquee ||
+      touchNavigation.active ||
       spaceDown ||
       event.button !== 0 ||
       inputMode ||
@@ -1104,7 +1115,7 @@
   }
 
   function updateDrag(event: PointerEvent) {
-    if (!drag) return
+    if (!drag || touchNavigation.active) return
     const point = worldPoint(event)
     const screen = screenPoint(event)
     if (drag.mode === 'opacity' || drag.mode === 'hue') {
@@ -1236,6 +1247,7 @@
 
   function pointerMove(event: PointerEvent) {
     altDown = event.altKey
+    if (touchNavigation.active) return
     if (marquee?.pointerId === event.pointerId) {
       marquee = { ...marquee, end: screenPoint(event) }
       return
@@ -1322,6 +1334,17 @@
     refresh()
   }
 
+  function trackTouchStart(event: PointerEvent) {
+    // Capture before hit testing, including a first finger on empty canvas and
+    // a second on a map/control. Cancel rolls back edits and any queued frame,
+    // restores panning, and leaves MapLibre's touch events free to pan/zoom.
+    if (touchNavigation.start(event)) finishDrag(undefined, true)
+  }
+
+  function trackTouchEnd(event: PointerEvent) {
+    touchNavigation.end(event)
+  }
+
   function keyboard(event: KeyboardEvent) {
     altDown = event.altKey
     if (editingMask) return
@@ -1399,6 +1422,9 @@
   }
 
   onMount(() => {
+    window.addEventListener('pointerdown', trackTouchStart, true)
+    window.addEventListener('pointerup', trackTouchEnd, true)
+    window.addEventListener('pointercancel', trackTouchEnd, true)
     try {
       map = new MapLibreMap({
         container,
@@ -1460,6 +1486,10 @@
     }
     return () => {
       disposed = true
+      window.removeEventListener('pointerdown', trackTouchStart, true)
+      window.removeEventListener('pointerup', trackTouchEnd, true)
+      window.removeEventListener('pointercancel', trackTouchEnd, true)
+      touchNavigation.reset()
       exampleController?.abort()
       layoutController?.abort()
       backgroundWorker?.terminate()
@@ -1483,6 +1513,7 @@
   onblur={() => {
     spaceDown = false
     altDown = false
+    touchNavigation.reset()
     finishDrag(undefined, true)
   }}
   ondragover={(event) => {

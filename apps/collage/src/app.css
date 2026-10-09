@@ -603,7 +603,9 @@ nav {
     background: transparent;
   }
 }
-@media (max-width: 760px) {
+/* Stack before the centered tools reach the left-hand zoom/undo controls,
+   including the longer "Draw with pen" label. Match MaskEditor's fit padding. */
+@media (max-width: 960px) {
   .mask-editor-stack {
     bottom: 72px;
   }
