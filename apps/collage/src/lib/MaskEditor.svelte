@@ -26,6 +26,7 @@
   import { orthogonalizeMask } from './orthogonalize'
   import { simplifyMaskStroke } from './freehand-mask'
   import { suspendMapNavigation } from './map-navigation'
+  import { PenTouchGesture } from './pen-gesture'
   import {
     constrainToImage,
     maskCoordinates,
@@ -74,6 +75,8 @@
   let edgeStart: { index: number; point: Point } | undefined
   let restoreNavigation: (() => void) | undefined
   let penPointerType = 'mouse'
+  const penTouches = new PenTouchGesture()
+  let adapter: MaskMapAdapter | undefined
 
   const { toGeo, toResource } = maskCoordinates(original, true)
   const geometry = (mask: Point[]) => ({
@@ -113,6 +116,7 @@
 
   function showDraft() {
     if (!draw) return
+    penTouches.reset()
     changing = true
     try {
       draw.setMode('static')
@@ -148,6 +152,7 @@
     if (drawingMode === mode) return cancelNewMask()
     restoreNavigation?.()
     restoreNavigation = undefined
+    penTouches.reset()
     edgeStart = undefined
     draw.setMode('static')
     draw.clear()
@@ -272,6 +277,11 @@
   }
 
   class MaskMapAdapter extends TerraDrawMapLibreGLAdapter<MapLibreMap> {
+    resetPenGesture() {
+      this._dragState = 'not-dragging'
+      this._lastDrawEvent = undefined
+    }
+
     override setDraggability(enabled: boolean) {
       // Terra Draw normally re-enables dragging after every pointerup, including
       // a tap that did not finish a stroke. Keep the pen's navigation lock.
@@ -280,13 +290,36 @@
   }
 
   function penPointerDown(event: PointerEvent) {
-    if (drawingMode !== 'freehand' || !event.isPrimary) return
-    penPointerType = event.pointerType
+    if (drawingMode !== 'freehand') return
+    if (penTouches.start(event)) {
+      // Abandon only the unfinished stroke. Leave the previous mask/history and
+      // pen mode intact so a pinch never creates or edits a polygon.
+      draw!.setMode('static')
+      draw!.clear()
+      draw!.setMode('freehand')
+      adapter?.resetPenGesture()
+      error = ''
+    }
+    if (penTouches.pinching) event.stopImmediatePropagation()
+    else if (event.isPrimary) penPointerType = event.pointerType
     map.getCanvas().setPointerCapture(event.pointerId)
   }
 
+  function penPointerMove(event: PointerEvent) {
+    // MapLibre consumes touch events; block only Terra Draw's pointer events.
+    if (drawingMode === 'freehand' && penTouches.pinching)
+      event.stopImmediatePropagation()
+  }
+
+  function penPointerUp(event: PointerEvent) {
+    if (drawingMode === 'freehand' && penTouches.end(event))
+      event.stopImmediatePropagation()
+  }
+
   function penPointerCancel(event: PointerEvent) {
-    if (drawingMode === 'freehand' && event.isPrimary) cancelNewMask()
+    if (drawingMode !== 'freehand') return
+    if (penTouches.end(event)) event.stopImmediatePropagation()
+    else if (event.isPrimary) cancelNewMask()
   }
 
   function syncDraft(mask = draft) {
@@ -579,12 +612,13 @@
           coordinatePointOutlineWidth: 3
         }
       })
+      adapter = new MaskMapAdapter({
+        map,
+        coordinatePrecision: 32,
+        ignoreMismatchedPointerEvents: true
+      })
       draw = new TerraDraw({
-        adapter: new MaskMapAdapter({
-          map,
-          coordinatePrecision: 32,
-          ignoreMismatchedPointerEvents: true
-        }),
+        adapter,
         modes: [
           polygonMode,
           new MaskFreehandMode({
@@ -688,6 +722,8 @@
       )
       map.getCanvas().addEventListener('pointerdown', edgePointerDown, true)
       map.getCanvas().addEventListener('pointerdown', penPointerDown, true)
+      map.getCanvas().addEventListener('pointermove', penPointerMove, true)
+      map.getCanvas().addEventListener('pointerup', penPointerUp, true)
       map.getCanvas().addEventListener('pointercancel', penPointerCancel, true)
       ready = true
     } catch (problem) {
@@ -697,10 +733,13 @@
       ready = false
       map.getCanvas().removeEventListener('pointerdown', edgePointerDown, true)
       map.getCanvas().removeEventListener('pointerdown', penPointerDown, true)
+      map.getCanvas().removeEventListener('pointermove', penPointerMove, true)
+      map.getCanvas().removeEventListener('pointerup', penPointerUp, true)
       map
         .getCanvas()
         .removeEventListener('pointercancel', penPointerCancel, true)
       restoreNavigation?.()
+      penTouches.reset()
       draw?.stop()
       map.dragPan.enable()
       for (const other of visibility) {
@@ -813,19 +852,19 @@
       <button
         aria-label="Zoom in"
         title="Zoom in"
-        disabled={!ready || drawingMode === 'freehand'}
+        disabled={!ready}
         onclick={() => map.zoomIn()}><Plus size={19} /></button
       >
       <button
         aria-label="Zoom out"
         title="Zoom out"
-        disabled={!ready || drawingMode === 'freehand'}
+        disabled={!ready}
         onclick={() => map.zoomOut()}><Minus size={19} /></button
       >
       <button
         aria-label="Fit map"
         title="Fit map"
-        disabled={!ready || drawingMode === 'freehand'}
+        disabled={!ready}
         onclick={fit}><ArrowsOut size={19} /></button
       >
       <button

@@ -179,9 +179,10 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   Strokes stay inside the image and are simplified to a polygon using a two-pixel
   tolerance at the current zoom. The result can be edited with the vertex tools.
   Crossing or empty strokes leave the previous draft intact.
-  On touch screens, draw with one finger or a stylus. Pan, pinch zoom and the
-  zoom buttons are temporarily disabled while the pen is active; finishing,
-  cancelling or leaving mask mode restores navigation.
+  On touch screens, draw with one finger or a stylus and pinch with two fingers
+  to zoom. Scroll zoom and the zoom buttons also remain available. A pinch
+  discards an unfinished stroke without changing the mask and leaves the pen
+  selected. Panning is disabled until drawing finishes or is cancelled.
 - **Full image mask** replaces the draft with the image rectangle.
 - **Orthogonalize** straightens corners within 13° of a right angle and removes
   redundant vertices on nearly straight edges, preserving the mask's general
