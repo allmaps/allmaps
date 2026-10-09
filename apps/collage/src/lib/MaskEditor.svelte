@@ -25,6 +25,7 @@
   import { fullResourceMask, validateResourceMask } from './model'
   import { orthogonalizeMask } from './orthogonalize'
   import { simplifyMaskStroke } from './freehand-mask'
+  import { suspendMapNavigation } from './map-navigation'
   import {
     constrainToImage,
     maskCoordinates,
@@ -71,6 +72,8 @@
   let error = $state('')
   let changing = false
   let edgeStart: { index: number; point: Point } | undefined
+  let restoreNavigation: (() => void) | undefined
+  let penPointerType = 'mouse'
 
   const { toGeo, toResource } = maskCoordinates(original, true)
   const geometry = (mask: Point[]) => ({
@@ -126,7 +129,8 @@
         throw new Error(result[0]?.reason ?? 'This mask cannot be edited.')
       draw.setMode('select')
       draw.selectFeature(featureId)
-      map.dragPan.enable()
+      restoreNavigation?.()
+      restoreNavigation = undefined
     } finally {
       changing = false
     }
@@ -135,7 +139,6 @@
   function cancelNewMask() {
     drawingMode = undefined
     showDraft()
-    map.dragPan.enable()
     refreshDrawingHistory()
     error = ''
   }
@@ -143,13 +146,14 @@
   function drawNewMask(mode: 'polygon' | 'freehand') {
     if (!draw || !ready) return
     if (drawingMode === mode) return cancelNewMask()
+    restoreNavigation?.()
+    restoreNavigation = undefined
     edgeStart = undefined
     draw.setMode('static')
     draw.clear()
     drawingMode = mode
     draw.setMode(mode)
-    if (mode === 'freehand') map.dragPan.disable()
-    else map.dragPan.enable()
+    if (mode === 'freehand') restoreNavigation = suspendMapNavigation(map)
     refreshDrawingHistory()
     error = ''
   }
@@ -227,6 +231,8 @@
     }
 
     override onClick(event: TerraDrawMouseEvent) {
+      // A touch tap has no hover phase. Only a drag should start a touch stroke.
+      if (penPointerType !== 'mouse') return
       super.onClick(this.constrain(event))
     }
     override onMouseMove(event: TerraDrawMouseEvent) {
@@ -263,6 +269,24 @@
       }
       this.draggingStroke = false
     }
+  }
+
+  class MaskMapAdapter extends TerraDrawMapLibreGLAdapter<MapLibreMap> {
+    override setDraggability(enabled: boolean) {
+      // Terra Draw normally re-enables dragging after every pointerup, including
+      // a tap that did not finish a stroke. Keep the pen's navigation lock.
+      super.setDraggability(enabled && drawingMode !== 'freehand')
+    }
+  }
+
+  function penPointerDown(event: PointerEvent) {
+    if (drawingMode !== 'freehand' || !event.isPrimary) return
+    penPointerType = event.pointerType
+    map.getCanvas().setPointerCapture(event.pointerId)
+  }
+
+  function penPointerCancel(event: PointerEvent) {
+    if (drawingMode === 'freehand' && event.isPrimary) cancelNewMask()
   }
 
   function syncDraft(mask = draft) {
@@ -556,7 +580,7 @@
         }
       })
       draw = new TerraDraw({
-        adapter: new TerraDrawMapLibreGLAdapter({
+        adapter: new MaskMapAdapter({
           map,
           coordinatePrecision: 32,
           ignoreMismatchedPointerEvents: true
@@ -663,6 +687,8 @@
         })
       )
       map.getCanvas().addEventListener('pointerdown', edgePointerDown, true)
+      map.getCanvas().addEventListener('pointerdown', penPointerDown, true)
+      map.getCanvas().addEventListener('pointercancel', penPointerCancel, true)
       ready = true
     } catch (problem) {
       error = problem instanceof Error ? problem.message : String(problem)
@@ -670,6 +696,11 @@
     return () => {
       ready = false
       map.getCanvas().removeEventListener('pointerdown', edgePointerDown, true)
+      map.getCanvas().removeEventListener('pointerdown', penPointerDown, true)
+      map
+        .getCanvas()
+        .removeEventListener('pointercancel', penPointerCancel, true)
+      restoreNavigation?.()
       draw?.stop()
       map.dragPan.enable()
       for (const other of visibility) {
@@ -698,99 +729,103 @@
 
 <svelte:window onkeydown={keyboard} />
 <section class="mask-editor" aria-label="Mask editor">
-  <div class="mask-editor-actions">
-    <h2>
-      {drawingMode === 'freehand'
-        ? 'Draw with pen'
-        : drawingNewMask
-          ? 'Draw mask'
-          : 'Edit mask'}
-    </h2>
-    <button
-      class="quiet-button"
-      aria-label="Full image mask"
-      title="Use the full image as the mask"
-      disabled={!ready || drawingNewMask}
-      onclick={fullMask}><SelectionAll size={20} /></button
-    >
-    <button
-      class="quiet-button"
-      class:pressed={drawingMode === 'polygon'}
-      aria-pressed={drawingMode === 'polygon'}
-      aria-label={drawingMode === 'polygon'
-        ? 'Cancel new mask'
-        : 'Draw new mask'}
-      title={drawingMode === 'polygon'
-        ? 'Cancel new mask (Escape)'
-        : 'Draw new mask · Click points, then the first point or Enter to finish'}
-      disabled={!ready}
-      onclick={() => drawNewMask('polygon')}><Polygon size={20} /></button
-    >
-    <button
-      class="quiet-button"
-      class:pressed={drawingMode === 'freehand'}
-      aria-pressed={drawingMode === 'freehand'}
-      aria-label={drawingMode === 'freehand'
-        ? 'Cancel pen drawing'
-        : 'Draw mask with pen'}
-      title="Draw mask with pen · Drag and release, or click to start and finish"
-      disabled={!ready}
-      onclick={() => drawNewMask('freehand')}><PencilSimple size={20} /></button
-    >
-    <button
-      class="quiet-button"
-      aria-label="Orthogonalize mask"
-      title="Orthogonalize mask · Straighten near-right corners"
-      disabled={!ready || drawingNewMask}
-      onclick={orthogonalize}
-      ><svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
+  <div class="bottom-stack mask-editor-stack">
+    {#if error}<div class="error-message" role="alert">{error}</div>{/if}
+    <div class="mask-editor-actions">
+      <h2>
+        {drawingMode === 'freehand'
+          ? 'Draw with pen'
+          : drawingNewMask
+            ? 'Draw mask'
+            : 'Edit mask'}
+      </h2>
+      <button
+        class="quiet-button"
+        aria-label="Full image mask"
+        title="Use the full image as the mask"
+        disabled={!ready || drawingNewMask}
+        onclick={fullMask}><SelectionAll size={20} /></button
       >
-        <path d="M4 3h5v12h12v6H4Z" />
-        <path d="M6 7h3M6 11h3M13 18v3M17 18v3" />
-      </svg></button
-    >
-    <button
-      class="quiet-button"
-      title="Cancel mask editing (Escape)"
-      aria-label="Cancel mask editing"
-      onclick={oncancel}><X size={20} /></button
-    >
-    <button
-      class="quiet-button"
-      aria-label="Done"
-      title="Done editing mask (⌘/Ctrl Enter)"
-      aria-keyshortcuts="Meta+Enter Control+Enter"
-      disabled={!ready || drawingNewMask}
-      onclick={() => ondone(draft)}><Check size={20} /></button
-    >
+      <button
+        class="quiet-button"
+        class:pressed={drawingMode === 'polygon'}
+        aria-pressed={drawingMode === 'polygon'}
+        aria-label={drawingMode === 'polygon'
+          ? 'Cancel new mask'
+          : 'Draw new mask'}
+        title={drawingMode === 'polygon'
+          ? 'Cancel new mask (Escape)'
+          : 'Draw new mask · Click points, then the first point or Enter to finish'}
+        disabled={!ready}
+        onclick={() => drawNewMask('polygon')}><Polygon size={20} /></button
+      >
+      <button
+        class="quiet-button"
+        class:pressed={drawingMode === 'freehand'}
+        aria-pressed={drawingMode === 'freehand'}
+        aria-label={drawingMode === 'freehand'
+          ? 'Cancel pen drawing'
+          : 'Draw mask with pen'}
+        title="Draw mask with pen · Drag and release, or click to start and finish"
+        disabled={!ready}
+        onclick={() => drawNewMask('freehand')}
+        ><PencilSimple size={20} /></button
+      >
+      <button
+        class="quiet-button"
+        aria-label="Orthogonalize mask"
+        title="Orthogonalize mask · Straighten near-right corners"
+        disabled={!ready || drawingNewMask}
+        onclick={orthogonalize}
+        ><svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 3h5v12h12v6H4Z" />
+          <path d="M6 7h3M6 11h3M13 18v3M17 18v3" />
+        </svg></button
+      >
+      <button
+        class="quiet-button"
+        title="Cancel mask editing (Escape)"
+        aria-label="Cancel mask editing"
+        onclick={oncancel}><X size={20} /></button
+      >
+      <button
+        class="quiet-button"
+        aria-label="Done"
+        title="Done editing mask (⌘/Ctrl Enter)"
+        aria-keyshortcuts="Meta+Enter Control+Enter"
+        disabled={!ready || drawingNewMask}
+        onclick={() => ondone(draft)}><Check size={20} /></button
+      >
+    </div>
   </div>
   <div class="canvas-footer">
     <div class="view-controls">
       <button
         aria-label="Zoom in"
         title="Zoom in"
-        disabled={!ready}
+        disabled={!ready || drawingMode === 'freehand'}
         onclick={() => map.zoomIn()}><Plus size={19} /></button
       >
       <button
         aria-label="Zoom out"
         title="Zoom out"
-        disabled={!ready}
+        disabled={!ready || drawingMode === 'freehand'}
         onclick={() => map.zoomOut()}><Minus size={19} /></button
       >
       <button
         aria-label="Fit map"
         title="Fit map"
-        disabled={!ready}
+        disabled={!ready || drawingMode === 'freehand'}
         onclick={fit}><ArrowsOut size={19} /></button
       >
       <button
@@ -816,5 +851,4 @@
     image mask restores the image bounds. Orthogonalize straightens near-right
     corners. Escape cancels an unfinished drawing.
   </p>
-  {#if error}<div class="error-message" role="alert">{error}</div>{/if}
 </section>

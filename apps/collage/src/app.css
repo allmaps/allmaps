@@ -10,8 +10,14 @@
 * {
   box-sizing: border-box;
 }
+html,
 body {
   margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: pan-x pan-y;
 }
 button,
 input,
@@ -245,12 +251,16 @@ nav {
 }
 .map-control {
   position: absolute;
+  top: 0;
+  left: 0;
   z-index: 2;
   width: 0;
   height: 0;
-  transition:
-    left 220ms ease-out,
-    top 220ms ease-out;
+  --control-size: 38px;
+  /* Move the button and its SVG as one composited surface. Updating left/top
+     every frame can snap SVG layout independently of its button on iOS. */
+  will-change: transform;
+  transition: transform 220ms ease-out;
 }
 .control-gesture .map-control {
   transition: none;
@@ -264,20 +274,28 @@ nav {
   z-index: 3;
 }
 .map-control-button {
-  position: relative;
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  padding: 8px;
+  position: absolute;
+  left: calc(var(--control-size) / -2);
+  top: calc(var(--control-size) / -2);
+  width: var(--control-size);
+  height: var(--control-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border: 2px solid var(--accent);
   border-radius: 50%;
   background: #fffafc;
   color: #222;
-  transform: translate(-50%, -50%);
   touch-action: none;
   user-select: none;
   box-shadow: 0 2px 6px #2222220a;
+}
+.map-control-button > svg,
+.map-control-button > img {
+  display: block;
+  flex: none;
+  pointer-events: none;
 }
 .map-control-button img {
   width: 19px;
@@ -349,12 +367,29 @@ nav {
   background: var(--hue-color);
   color: white;
 }
-.error-message {
+.bottom-stack {
   position: absolute;
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);
-  max-width: min(600px, calc(100% - 40px));
+  width: max-content;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  pointer-events: none;
+  z-index: 6;
+}
+.selection-stack.has-actions,
+.mask-editor-stack {
+  bottom: 20px;
+}
+.error-message {
+  max-width: min(600px, 100%);
+  max-height: min(300px, 40dvh);
+  overflow: auto;
+  overflow-wrap: anywhere;
   border: 1px solid #efbcb3;
   border-radius: 10px;
   padding: 12px 15px;
@@ -363,13 +398,14 @@ nav {
   display: flex;
   align-items: center;
   gap: 16px;
-  z-index: 6;
+  pointer-events: auto;
 }
 .error-message button {
   display: grid;
   place-items: center;
   border: 0;
   background: none;
+  flex: none;
 }
 .modal-backdrop {
   position: absolute;
@@ -385,6 +421,7 @@ nav {
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 20px 80px #22222220;
+  touch-action: pan-y;
 }
 .input-dialog::backdrop {
   background: #284d3925;
@@ -424,7 +461,8 @@ nav {
   border-radius: 8px;
   background: #f9f7f3;
   padding: 12px;
-  font-size: 14px;
+  /* Keep iOS from zooming the whole page when this field gains focus. */
+  font-size: 16px;
   line-height: 1.6;
   min-height: 105px;
 }
@@ -501,9 +539,8 @@ nav {
     bottom: 16px;
     left: 16px;
   }
-  .map-control-button {
-    width: 42px;
-    height: 42px;
+  .map-control {
+    --control-size: 42px;
   }
   .input-dialog {
     padding: 26px;
@@ -530,10 +567,6 @@ nav {
 }
 .mask-editor-actions,
 .selection-actions {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -558,7 +591,7 @@ nav {
 }
 .mask-editor-actions {
   width: max-content;
-  max-width: calc(100% - 24px);
+  max-width: 100%;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -571,7 +604,7 @@ nav {
   }
 }
 @media (max-width: 760px) {
-  .mask-editor-actions {
+  .mask-editor-stack {
     bottom: 72px;
   }
   .mask-editor .canvas-footer {
@@ -581,11 +614,8 @@ nav {
   }
 }
 
-.selection-actions {
-  z-index: 2;
-}
 @media (max-width: 900px) {
-  .selection-actions {
+  .selection-stack.has-actions {
     bottom: 78px;
   }
 }

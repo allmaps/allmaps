@@ -1721,44 +1721,60 @@
     >
   {/if}
 
-  {#if !editingMask && !inputMode && (selection.length > 1 || layoutController)}
+  {#if !editingMask && !inputMode}
     <div
-      class="selection-actions"
-      role="group"
-      aria-label="Arrange selected maps"
+      class="bottom-stack selection-stack"
+      class:has-actions={selection.length > 1 || !!layoutController}
     >
-      <h2>
-        {#if layoutController}
-          <LoadingSmall />Arranging…
-        {:else}
-          Edit layout
-        {/if}
-      </h2>
-      {#if layoutController}
-        <button
-          class="quiet-button"
-          aria-label="Cancel arrangement"
-          title="Cancel arrangement"
-          onclick={() => layoutController?.abort()}><X size={19} /></button
-        >
-      {:else}
-        <button
-          class="quiet-button"
+      {#if errorMessage}
+        <div class="error-message" role="alert">
+          <span>{errorMessage}</span><button
+            aria-label="Dismiss error"
+            onclick={() => (errorMessage = '')}><X size={18} /></button
+          >
+        </div>
+      {/if}
+      {#if selection.length > 1 || layoutController}
+        <div
+          class="selection-actions"
+          role="group"
           aria-label="Arrange selected maps"
-          title="Arrange compactly · Keep first selected map fixed"
-          disabled={busy}
-          onclick={() => organize()}><SquaresFour size={20} /></button
         >
-        <button
-          class="quiet-button"
-          aria-label="Arrange geographically"
-          title={selection.every((item) => item.geographicReference)
-            ? 'Restore geographic positions · Keep first selected map fixed'
-            : 'Geographic arrangement unavailable · Add original annotations'}
-          disabled={busy || selection.some((item) => !item.geographicReference)}
-          onclick={() => organize('geographic')}
-          ><MapTrifold size={20} /></button
-        >
+          <h2>
+            {#if layoutController}
+              <LoadingSmall />Arranging…
+            {:else}
+              Edit layout
+            {/if}
+          </h2>
+          {#if layoutController}
+            <button
+              class="quiet-button"
+              aria-label="Cancel arrangement"
+              title="Cancel arrangement"
+              onclick={() => layoutController?.abort()}><X size={19} /></button
+            >
+          {:else}
+            <button
+              class="quiet-button"
+              aria-label="Arrange selected maps"
+              title="Arrange compactly · Keep first selected map fixed"
+              disabled={busy}
+              onclick={() => organize()}><SquaresFour size={20} /></button
+            >
+            <button
+              class="quiet-button"
+              aria-label="Arrange geographically"
+              title={selection.every((item) => item.geographicReference)
+                ? 'Restore geographic positions · Keep first selected map fixed'
+                : 'Geographic arrangement unavailable · Add original annotations'}
+              disabled={busy ||
+                selection.some((item) => !item.geographicReference)}
+              onclick={() => organize('geographic')}
+              ><MapTrifold size={20} /></button
+            >
+          {/if}
+        </div>
       {/if}
     </div>
   {/if}
@@ -1807,15 +1823,6 @@
         ? 'Loading annotation…'
         : message}
   </div>
-  {#if errorMessage && !inputMode && !editingMask}
-    <div class="error-message" role="alert">
-      <span>{errorMessage}</span><button
-        aria-label="Dismiss error"
-        onclick={() => (errorMessage = '')}><X size={18} /></button
-      >
-    </div>
-  {/if}
-
   {#if inputMode}
     <div class="modal-backdrop">
       <dialog

@@ -166,6 +166,7 @@ to zoom to the full image when needed. The outline and handles
 follow Allmaps Editor styling; failed maps retain their red outline. The logo
 stays visible and the top actions are disabled. On small screens, the editing
 actions sit above the zoom controls.
+Warnings stack above these actions, including when the buttons wrap on phones.
 
 - Drag a vertex to move it, drag anywhere along an edge to add one, and
   right-click a vertex to remove it. Dragged points stop at the image boundary,
@@ -178,6 +179,9 @@ actions sit above the zoom controls.
   Strokes stay inside the image and are simplified to a polygon using a two-pixel
   tolerance at the current zoom. The result can be edited with the vertex tools.
   Crossing or empty strokes leave the previous draft intact.
+  On touch screens, draw with one finger or a stylus. Pan, pinch zoom and the
+  zoom buttons are temporarily disabled while the pen is active; finishing,
+  cancelling or leaving mask mode restores navigation.
 - **Full image mask** replaces the draft with the image rectangle.
 - **Orthogonalize** straightens corners within 13° of a right angle and removes
   redundant vertices on nearly straight edges, preserving the mask's general

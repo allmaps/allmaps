@@ -40,8 +40,11 @@
   class="map-control"
   class:active
   class:hue-control={hueScale}
-  style:left={position[0] + 'px'}
-  style:top={position[1] + 'px'}
+  style:transform={'translate3d(' +
+    position[0] +
+    'px, ' +
+    position[1] +
+    'px, 0)'}
   class:disabled
   style:--hue-color={hueColor(sliderValue ?? 0)}
 >
