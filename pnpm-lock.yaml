@@ -639,6 +639,12 @@ importers:
       '@allmaps/background-color':
         specifier: workspace:^
         version: link:../../packages/background-color
+      '@allmaps/bearing':
+        specifier: workspace:^
+        version: link:../../packages/bearing
+      '@allmaps/iiif-parser':
+        specifier: workspace:^
+        version: link:../../packages/iiif-parser
       '@allmaps/maplibre':
         specifier: workspace:^
         version: link:../../packages/maplibre

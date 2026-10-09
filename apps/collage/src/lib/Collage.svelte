@@ -3,11 +3,18 @@
   import { Map as MapLibreMap, LngLat } from 'maplibre-gl'
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { toCanvasGeo, fromCanvasGeo, CANVAS_ZOOM_OFFSET } from './coordinates'
-  import { Logo, BringMapsToFront, SendMapsToBack } from '@allmaps/ui'
+  import {
+    Logo,
+    LoadingSmall,
+    BringMapsToFront,
+    SendMapsToBack
+  } from '@allmaps/ui'
   import { themeColors, shades } from '@allmaps/tailwind'
   import MapControl from './MapControl.svelte'
   import MaskEditor from './MaskEditor.svelte'
   import { updateLoadFailures } from './load-status'
+  import { loadRandomMaps } from './random-maps'
+  import { generateAnnotation } from '@allmaps/annotation'
   import type { LoadFailures } from './load-status'
   import BackgroundWorker from './background.worker.ts?worker'
   import LayoutWorker from './layout.worker.ts?worker'
@@ -31,10 +38,11 @@
     Palette,
     DropHalf,
     MagicWand,
-    Selection,
     Polygon,
+    ArrowUp,
+    FlipHorizontal,
+    FlipVertical,
     SquaresFour,
-    CircleNotch,
     MapTrifold,
     Copy
   } from 'phosphor-svelte'
@@ -49,9 +57,14 @@
     rotatePlacement,
     duplicateMaps,
     setResourceMask,
-    resolveImageSize
+    resolveImageSize,
+    bearingRotation,
+    alignBearings,
+    mirrorMap,
+    transformationType
   } from './model'
   import type { Arrangement, CollageMap, Placement } from './model'
+  import { snapRotation } from './rotation'
   import type { Point } from '@allmaps/types'
   import {
     controlLayout,
@@ -76,8 +89,15 @@
   const selection = $derived(
     items.filter((item) => selectedIds.has(item.instanceId))
   )
-  const selected = $derived(selection[0])
-  const selectedRotation = $derived(selection[0]?.placement.rotation ?? 0)
+  const selected = $derived(rotationAnchor(selection))
+  // Read through the changing selection array: selected's identity is stable
+  // while gestures replace its placement, since items use $state.raw.
+  const selectedRotation = $derived(
+    rotationAnchor(selection)?.placement.rotation ?? 0
+  )
+  const allMirrored = $derived(
+    selection.length > 0 && selection.every((item) => item.mirrored)
+  )
   let overlays = $state.raw<{ id: string; points: string }[]>([])
   let loadFailures = $state.raw<LoadFailures>({})
   type DragMode = 'move' | 'rotate' | Slider
@@ -97,13 +117,14 @@
   let inputMode = $state<'add' | 'open'>()
   let inputText = $state('')
   let layoutController = $state.raw<AbortController>()
+  let exampleController: AbortController | undefined
   let errorMessage = $state('')
   let message = $state('All places. One scale.')
   let draggingOver = $state(false)
   let past = $state.raw<CollageMap[][]>([])
   let future = $state.raw<CollageMap[][]>([])
   let spaceDown = false
-  let sendToBack = $state(false)
+  let altDown = $state(false)
   let frame: number | undefined
   let latestPointer: PointerEvent | undefined
   let disposed = false
@@ -118,12 +139,19 @@
         controlPivot: Point
         anchor: Point
         rotation: number
+        startRotation: number
+        bearing: number
+        rotated: boolean
         mode: DragMode
         rail?: Rail
         startRailValue: number
         pointer: Point
         angle: number
         before: CollageMap[]
+        duplicateOnMove: boolean
+        duplicated: boolean
+        selectionBefore: string[]
+        screen: Point
         outlineOnly: boolean
         pointerId: number
       }
@@ -214,19 +242,30 @@
     }
     const layout = controlLayout(
       controlCenter,
-      targets[0].placement.rotation,
+      rotationAnchor(targets)!.placement.rotation,
       targets[0].appearance,
       controlRadius
     )
-    controlCenter = fitControlCenter(controlCenter, layout, [
-      viewport[2],
-      viewport[3]
-    ])
+    // Freeze the visible arc center throughout rotation. Re-docking mid-drag
+    // would separate the controls from the pivot used to rotate the maps.
+    if (drag?.mode !== 'rotate')
+      controlCenter = fitControlCenter(controlCenter, layout, [
+        viewport[2],
+        viewport[3]
+      ])
     controls = controlLayout(
       controlCenter,
-      targets[0].placement.rotation,
+      rotationAnchor(targets)!.placement.rotation,
       targets[0].appearance,
       controlRadius
+    )
+  }
+
+  function rotationAnchor(targets: CollageMap[]) {
+    return (
+      targets.find(
+        (item) => item.instanceId === selectedIds.values().next().value
+      ) ?? targets[0]
     )
   }
 
@@ -240,6 +279,10 @@
         ],
         [0, 0]
       )
+  }
+
+  function rotationPivot(targets = selection): Point {
+    return controlCenter ? worldAt(controlCenter) : selectionPivot(targets)
   }
 
   function select(ids: string[] = []) {
@@ -267,14 +310,21 @@
   }
 
   function updateRaster(item: CollageMap) {
-    layer!.setMapGcps(item.instanceId, renderedMap(item).gcps, {
-      animate: false
-    })
+    layer!.setMapOptions(
+      item.instanceId,
+      {
+        gcps: renderedMap(item).gcps,
+        transformationType: transformationType(item.baseline)
+      },
+      {
+        animate: false
+      }
+    )
   }
 
-  function fit() {
-    if (!map || !items.length) return
-    const points = items.flatMap(outline).map((point) => toCanvasGeo(point))
+  function fit(targets = items) {
+    if (!map || !targets.length) return
+    const points = targets.flatMap(outline).map((point) => toCanvasGeo(point))
     map.fitBounds(
       [
         [
@@ -408,6 +458,7 @@
       items = items.map((item) => arranged.get(item.instanceId) ?? item)
       remember(before)
       refresh()
+      fit(result.items)
       message =
         arrangement === 'geographic'
           ? 'Geographic positions restored. The first selected map stays fixed.'
@@ -421,26 +472,6 @@
       layoutFailure(error)
     } finally {
       busy = false
-    }
-  }
-
-  function toggleMask() {
-    if (selection.length !== 1 || busy || drag) return
-    const item = selected!
-    const before = structuredClone(items)
-    try {
-      ensureImageSize(item)
-      item.appearance = {
-        ...item.appearance,
-        applyMask: !item.appearance.applyMask
-      }
-      updateAppearance(item)
-      remember(before)
-      items = [...items]
-      refresh()
-    } catch (error) {
-      restore(before)
-      fail(error)
     }
   }
 
@@ -708,21 +739,17 @@
     if (!ready || busy) return
     busy = true
     errorMessage = ''
+    const controller = new AbortController()
+    exampleController = controller
     try {
-      const documents = await Promise.all(
-        Array.from({ length: 3 }, () =>
-          fetchJson('https://annotations.allmaps.org/maps/random')
-        )
-      )
+      const maps = await loadRandomMaps({ signal: controller.signal })
       if (disposed) return
-      const maps = documents.flatMap(
-        (document) => exportCollage(openCollage(document)).items
-      )
-      const next = await prepare({ type: 'AnnotationPage', items: maps }, 'add')
+      const next = await prepare(generateAnnotation(maps), 'add')
       if (!disposed) install(next, false)
     } catch (error) {
       layoutFailure(error)
     } finally {
+      exampleController = undefined
       busy = false
     }
   }
@@ -820,6 +847,16 @@
 
   function controlKey(event: KeyboardEvent, mode: 'rotate' | Slider) {
     if (!selected || busy || drag) return
+    if (
+      mode === 'rotate' &&
+      event.altKey &&
+      ['Enter', ' '].includes(event.key)
+    ) {
+      event.preventDefault()
+      event.stopPropagation()
+      alignToBearing()
+      return
+    }
     if (mode === 'hue' && ['Enter', ' '].includes(event.key)) {
       event.preventDefault()
       event.stopPropagation()
@@ -839,7 +876,7 @@
     event.preventDefault()
     remember()
     if (mode === 'rotate') {
-      const pivot = selectionPivot()
+      const pivot = rotationPivot()
       const angle = (direction * (event.shiftKey ? 15 : 1) * Math.PI) / 180
       const previous = selection.map((item) => structuredClone(item.placement))
       try {
@@ -881,13 +918,63 @@
     refresh()
   }
 
+  function alignToBearing() {
+    if (!selection.length || busy || drag || editingMask) return
+    const before = structuredClone(items)
+    try {
+      const changed = structuredClone(selection)
+      alignBearings(changed)
+      changed.forEach(updateRaster)
+      const replacements = new Map(
+        changed.map((item) => [item.instanceId, item])
+      )
+      items = items.map((item) => replacements.get(item.instanceId) ?? item)
+      remember(before)
+      refresh()
+      message =
+        changed.length === 1
+          ? 'Map made upright.'
+          : 'Selected maps made upright.'
+    } catch (error) {
+      restore(before)
+      fail(error)
+    }
+  }
+
+  function mirrorSelected(event: MouseEvent) {
+    if (!selection.length || busy || drag || editingMask) return
+    const before = structuredClone(items)
+    try {
+      const changed = structuredClone(selection)
+      changed.forEach((item) =>
+        mirrorMap(item, event.altKey ? 'vertical' : 'horizontal')
+      )
+      changed.forEach(updateRaster)
+      const replacements = new Map(
+        changed.map((item) => [item.instanceId, item])
+      )
+      items = items.map((item) => replacements.get(item.instanceId) ?? item)
+      remember(before)
+      refresh()
+      message =
+        changed.length === 1 ? 'Map mirrored.' : 'Selected maps mirrored.'
+    } catch (error) {
+      restore(before)
+      fail(error)
+    }
+  }
+
   function resetOrientation() {
     const item = selected
     if (!item || busy) return
     errorMessage = ''
     const before = structuredClone(items)
-    const previous = item.placement.rotation
-    item.placement.rotation = 0
+    const previous = item.placement
+    item.placement = rotatePlacement(
+      previous,
+      rotationPivot(),
+      -previous.rotation
+    )
     try {
       updateRaster(item)
       remember(before)
@@ -895,7 +982,7 @@
       refresh()
       message = 'Rotation reset.'
     } catch (error) {
-      item.placement.rotation = previous
+      item.placement = previous
       fail(error)
     }
   }
@@ -904,15 +991,27 @@
     if (busy || drag || marquee || event.button !== 0 || !map) return
     event.preventDefault()
     event.stopPropagation()
+    // Alt/Option-click aligns on release; it must not start a drag as well.
+    if (mode === 'rotate' && event.altKey) return
     if (!selectedIds.has(item.instanceId)) select([item.instanceId])
     const targets = items.filter((candidate) =>
       selectedIds.has(candidate.instanceId)
     )
     const pointer = worldPoint(event)
     const screen = screenPoint(event)
-    const pivot = selectionPivot(targets)
-    const controlPivot = controlCenter ? worldAt(controlCenter) : pivot
+    const controlPivot = rotationPivot(targets)
+    const pivot = controlPivot
     const rail = controls?.[mode].rail
+    const anchor = rotationAnchor(targets)!
+    let bearing = 0
+    if (mode === 'rotate') {
+      try {
+        bearing = bearingRotation(anchor)
+      } catch (error) {
+        fail(error)
+        return
+      }
+    }
     drag = {
       targets: targets.map((item) => ({
         item,
@@ -923,6 +1022,9 @@
       controlPivot,
       anchor: controlPivot,
       rotation: 0,
+      startRotation: anchor.placement.rotation,
+      bearing,
+      rotated: false,
       mode,
       pointer,
       rail,
@@ -932,6 +1034,10 @@
         pointer[0] - controlPivot[0]
       ),
       before: structuredClone(items),
+      duplicateOnMove: mode === 'move' && event.altKey,
+      duplicated: false,
+      selectionBefore: [...selectedIds],
+      screen,
       outlineOnly: false,
       pointerId: event.pointerId
     }
@@ -939,6 +1045,21 @@
     map.dragPan.disable()
     map.getCanvas().style.cursor = mode === 'move' ? 'grabbing' : 'crosshair'
     ;(event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId)
+  }
+
+  function doubleClick(event: MouseEvent) {
+    if (!ready || busy || inputMode || editingMask || spaceDown || event.altKey)
+      return
+    const rect = map!.getCanvas().getBoundingClientRect()
+    const point = worldAt([event.clientX - rect.left, event.clientY - rect.top])
+    const item = [...items]
+      .reverse()
+      .find((item) => contains(point, outline(item)))
+    if (!item) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    select([item.instanceId])
+    editMask()
   }
 
   function pointerDown(event: PointerEvent) {
@@ -1013,6 +1134,40 @@
       structuredClone(item.placement)
     )
     if (gesture.mode === 'move') {
+      if (gesture.duplicateOnMove && !gesture.duplicated) {
+        if (
+          Math.hypot(
+            screen[0] - gesture.screen[0],
+            screen[1] - gesture.screen[1]
+          ) < 3
+        )
+          return
+        const added: CollageMap[] = []
+        try {
+          const copies = duplicateMaps(
+            gesture.targets.map(({ item }) => item),
+            [0, 0]
+          )
+          for (const copy of copies) {
+            added.push(copy)
+            renderItem(copy)
+          }
+          gesture.targets = copies.map((item) => ({
+            item,
+            start: structuredClone(item.placement),
+            appearance: structuredClone(item.appearance)
+          }))
+          gesture.duplicated = true
+          items = [...items, ...copies]
+          select(copies.map((item) => item.instanceId))
+        } catch (error) {
+          for (const copy of added)
+            layer!.removeGeoreferencedMapById(copy.instanceId)
+          finishDrag(undefined, true)
+          fail(error)
+          return
+        }
+      }
       const delta: Point = [
         point[0] - gesture.pointer[0],
         point[1] - gesture.pointer[1]
@@ -1032,18 +1187,20 @@
         point[1] - gesture.controlPivot[1],
         point[0] - gesture.controlPivot[0]
       )
-      gesture.rotation += Math.atan2(
+      const step = Math.atan2(
         Math.sin(angle - gesture.angle),
         Math.cos(angle - gesture.angle)
       )
+      gesture.rotation += step
+      gesture.rotated ||= Math.abs(step) > 1e-8
       gesture.angle = angle
-      const startAngle = gesture.targets[0].start.rotation
-      const delta = event.shiftKey
-        ? (Math.round((startAngle + gesture.rotation) / (Math.PI / 12)) *
-            Math.PI) /
-            12 -
-          startAngle
-        : gesture.rotation
+      if (!gesture.rotated) return
+      const delta =
+        snapRotation(
+          gesture.startRotation + gesture.rotation,
+          gesture.bearing,
+          event.shiftKey
+        ) - gesture.startRotation
       gesture.targets.forEach(({ item, start }) => {
         item.placement = rotatePlacement(start, gesture.pivot, delta)
       })
@@ -1078,7 +1235,7 @@
   }
 
   function pointerMove(event: PointerEvent) {
-    sendToBack = event.altKey
+    altDown = event.altKey
     if (marquee?.pointerId === event.pointerId) {
       marquee = { ...marquee, end: screenPoint(event) }
       return
@@ -1116,6 +1273,7 @@
     if (frame !== undefined) cancelAnimationFrame(frame)
     frame = undefined
     if (event && !cancel) updateDrag(event)
+    if (!drag) return
     const completed = drag
     drag = undefined
     activeControl = undefined
@@ -1125,27 +1283,37 @@
         item.placement = start
         item.appearance = appearance
       })
-    if (cancel) rollback()
+    if (cancel && completed.duplicated) {
+      restore(completed.before)
+      select(completed.selectionBefore)
+    } else if (cancel) rollback()
     try {
-      completed.targets.forEach(({ item }) => {
-        updateRaster(item)
-        updateAppearance(item)
-      })
+      if (!(cancel && completed.duplicated))
+        completed.targets.forEach(({ item }) => {
+          updateRaster(item)
+          updateAppearance(item)
+        })
       if (
         !cancel &&
-        completed.targets.some(
-          ({ item, start, appearance }) =>
-            JSON.stringify(start) !== JSON.stringify(item.placement) ||
-            JSON.stringify(appearance) !== JSON.stringify(item.appearance)
-        )
+        (completed.duplicated ||
+          completed.targets.some(
+            ({ item, start, appearance }) =>
+              JSON.stringify(start) !== JSON.stringify(item.placement) ||
+              JSON.stringify(appearance) !== JSON.stringify(item.appearance)
+          ))
       )
         remember(completed.before)
     } catch (error) {
-      rollback()
-      completed.targets.forEach(({ item }) => {
-        updateRaster(item)
-        updateAppearance(item)
-      })
+      if (completed.duplicated) {
+        restore(completed.before)
+        select(completed.selectionBefore)
+      } else {
+        rollback()
+        completed.targets.forEach(({ item }) => {
+          updateRaster(item)
+          updateAppearance(item)
+        })
+      }
       fail(error)
     }
     items = [...items]
@@ -1155,11 +1323,15 @@
   }
 
   function keyboard(event: KeyboardEvent) {
-    sendToBack = event.altKey
+    altDown = event.altKey
     if (editingMask) return
     if (event.key === 'Escape') {
       if (layoutController) {
         layoutController.abort()
+        return
+      }
+      if (exampleController) {
+        exampleController.abort()
         return
       }
       if (drag || marquee) finishDrag(undefined, true)
@@ -1282,15 +1454,18 @@
       map.on('resize', refresh)
       map.on('error', (event) => fail(event.error))
       map.getCanvas().addEventListener('pointerdown', pointerDown, true)
+      map.getCanvas().addEventListener('dblclick', doubleClick, true)
     } catch (error) {
       fail(error)
     }
     return () => {
       disposed = true
+      exampleController?.abort()
       layoutController?.abort()
       backgroundWorker?.terminate()
       if (frame !== undefined) cancelAnimationFrame(frame)
       map?.getCanvas().removeEventListener('pointerdown', pointerDown, true)
+      map?.getCanvas().removeEventListener('dblclick', doubleClick, true)
       map?.remove()
     }
   })
@@ -1302,12 +1477,12 @@
   onpointercancel={(event) => finishDrag(event, true)}
   onkeydown={keyboard}
   onkeyup={(event) => {
-    sendToBack = event.altKey
+    altDown = event.altKey
     if (event.code === 'Space') spaceDown = false
   }}
   onblur={() => {
     spaceDown = false
-    sendToBack = false
+    altDown = false
     finishDrag(undefined, true)
   }}
   ondragover={(event) => {
@@ -1382,7 +1557,9 @@
         aria-label="Add maps"
         onclick={() => showInput('add')}
         disabled={!ready || busy || !!editingMask}
-        ><Plus size={18} /><span>Add maps</span></button
+        >{#if busy}<LoadingSmall />{:else}<Plus size={18} />{/if}<span
+          >Add maps</span
+        ></button
       >
     </nav>
   </header>
@@ -1411,7 +1588,8 @@
       >
       <button class="example-button" onclick={example} disabled={!ready || busy}
         >{busy ? 'Loading maps…' : 'Try random maps'}
-        <span aria-hidden="true">↗</span></button
+        {#if busy}<LoadingSmall />{:else}<span aria-hidden="true">↗</span
+          >{/if}</button
       >
     </section>
   {/if}
@@ -1419,7 +1597,11 @@
   {#if selected && controls && appearances && !inputMode && !editingMask}
     <MapControl
       position={controls.move.position}
-      label={selection.length > 1 ? 'Move selected maps' : 'Move map'}
+      label={altDown
+        ? 'Duplicate and move · Release Alt/Option to move'
+        : selection.length > 1
+          ? 'Move selected maps · Alt/Option-drag to duplicate'
+          : 'Move map · Alt/Option-drag to duplicate'}
       disabled={busy}
       active={activeControl === 'move'}
       onpointerdown={(event) => beginDrag(event, selected!, 'move')}
@@ -1427,18 +1609,30 @@
     >
     <MapControl
       position={controls.rotate.position}
-      label={selection.length > 1
-        ? 'Rotate selected maps'
-        : 'Rotate map · Double-click to reset'}
+      label={altDown
+        ? (selection.length > 1
+            ? 'Make selected maps upright'
+            : 'Make map upright') + ' · Release Alt/Option to rotate'
+        : (selection.length > 1
+            ? 'Rotate selected maps'
+            : 'Rotate map · Double-click to reset') +
+          ' · Alt/Option-click to make upright'}
       disabled={busy}
       active={activeControl === 'rotate'}
       value={Math.round(
         (((selectedRotation * 180) / Math.PI + 540) % 360) - 180
       ) + '°'}
       onpointerdown={(event) => beginDrag(event, selected!, 'rotate')}
+      onclick={(event) => {
+        if (event.altKey) alignToBearing()
+      }}
       onkeydown={(event) => controlKey(event, 'rotate')}
-      ondblclick={selection.length === 1 ? resetOrientation : undefined}
-      ><ArrowClockwise size={19} /></MapControl
+      ondblclick={(event) => {
+        if (!event.altKey && selection.length === 1) resetOrientation()
+      }}
+      >{#if altDown}<ArrowUp size={19} />{:else}<ArrowClockwise
+          size={19}
+        />{/if}</MapControl
     >
     <MapControl
       position={controls.opacity.position}
@@ -1481,11 +1675,17 @@
       onclick={toggleBackground}><MagicWand size={19} /></MapControl
     >
     <MapControl
-      position={controls.mask.position}
-      label="Apply mask"
-      disabled={busy || selection.length > 1}
-      pressed={appearances.applyMask}
-      onclick={toggleMask}><Selection size={19} /></MapControl
+      position={controls.mirror.position}
+      label={(selection.length > 1 ? 'Mirror selected maps ' : 'Mirror map ') +
+        (altDown
+          ? 'vertically · Release Alt/Option for horizontal'
+          : 'horizontally · Hold Alt/Option for vertical')}
+      disabled={busy}
+      pressed={allMirrored}
+      onclick={mirrorSelected}
+      >{#if altDown}<FlipVertical size={19} />{:else}<FlipHorizontal
+          size={19}
+        />{/if}</MapControl
     >
     <MapControl
       position={controls.editMask.position}
@@ -1495,16 +1695,16 @@
     >
     <MapControl
       position={controls.front.position}
-      label={sendToBack
+      label={altDown
         ? 'Send to back · Release Alt/Option to bring to front'
         : 'Bring to front · Hold Alt/Option to send to back'}
       disabled={busy ||
-        (sendToBack
+        (altDown
           ? items.slice(0, selection.length)
           : items.slice(-selection.length)
         ).every((item) => selectedIds.has(item.instanceId))}
       onclick={(event) => changeOrder(!event.altKey)}
-      >{#if sendToBack}<SendMapsToBack />{:else}<BringMapsToFront
+      >{#if altDown}<SendMapsToBack />{:else}<BringMapsToFront
         />{/if}</MapControl
     >
     <MapControl
@@ -1529,7 +1729,7 @@
     >
       <h2>
         {#if layoutController}
-          <CircleNotch class="spin" size={18} />Arranging…
+          <LoadingSmall />Arranging…
         {:else}
           Edit layout
         {/if}
@@ -1581,7 +1781,7 @@
         <button
           title="Fit collage"
           aria-label="Fit collage"
-          onclick={fit}
+          onclick={() => fit()}
           disabled={!items.length}><ArrowsOut size={19} /></button
         >
         <button
@@ -1659,7 +1859,9 @@
                 ? 'Loading…'
                 : inputMode === 'add'
                   ? 'Add all maps'
-                  : 'Open collage'}<Plus size={18} /></button
+                  : 'Open collage'}{#if busy}<LoadingSmall />{:else}<Plus
+                size={18}
+              />{/if}</button
           >
         </form>
         {#if errorMessage}<p class="dialog-error" role="alert">

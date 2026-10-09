@@ -155,6 +155,9 @@ nav {
 .primary-button:hover:not(:disabled) {
   background: #414941;
 }
+.primary-button [role='status'] {
+  filter: brightness(0) invert(1);
+}
 .primary-button.small {
   padding: 10px 16px;
   font-size: 14px;
@@ -203,7 +206,10 @@ nav {
   stroke-width: 2;
 }
 .example-button {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: 0;
   background: none;
   margin: 18px auto 0;
@@ -212,9 +218,6 @@ nav {
 }
 .example-button:hover {
   text-decoration: underline;
-}
-.example-button span {
-  margin-left: 6px;
 }
 .canvas-footer {
   position: absolute;
@@ -553,6 +556,20 @@ nav {
 .mask-editor .error-message {
   pointer-events: auto;
 }
+.mask-editor-actions {
+  width: max-content;
+  max-width: calc(100% - 24px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+@media (max-width: 440px) {
+  .mask-editor-actions h2 {
+    flex-basis: 100%;
+    justify-content: center;
+    padding: 4px 8px;
+    background: transparent;
+  }
+}
 @media (max-width: 760px) {
   .mask-editor-actions {
     bottom: 72px;
@@ -566,19 +583,6 @@ nav {
 
 .selection-actions {
   z-index: 2;
-}
-.spin {
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .spin {
-    animation: none;
-  }
 }
 @media (max-width: 900px) {
   .selection-actions {

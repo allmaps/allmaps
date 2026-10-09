@@ -1,4 +1,5 @@
 import { generateAnnotation, parseAnnotation } from '@allmaps/annotation'
+import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
 import {
   ProjectedGcpTransformer,
   isEqualProjection,
@@ -12,6 +13,7 @@ import type { Point } from '@allmaps/types'
 import { bounds } from './geometry.ts'
 import { compactLayout } from './prism.ts'
 import { CANVAS_SCALE, MAX_COLLAGE_COORDINATE } from './coordinates.ts'
+import { nearestRotation } from './rotation.ts'
 
 export type Placement = { position: Point; rotation: number }
 export type Arrangement = 'compact' | 'geographic'
@@ -27,6 +29,7 @@ export type CollageMap = {
   localMask: Point[]
   localFullMask: Point[]
   sourceCenter: Point
+  mirrored: boolean
   resourceMask: Point[]
   placement: Placement
   geographicReference?: GeographicReference
@@ -85,7 +88,7 @@ export function center(points: Point[]): Point {
   ]
 }
 
-function transformationType(map: GeoreferencedMap): TransformationType {
+export function transformationType(map: GeoreferencedMap): TransformationType {
   const type = map.transformation?.type ?? 'polynomial'
   if (type === 'straight') {
     throw new Error(
@@ -139,7 +142,9 @@ function validateMap(map: GeoreferencedMap) {
   }
   // Solving and evaluating now catches underdetermined/invalid transformations
   // before replacing a document or handing its maps to the renderer.
-  center(transformer(map).transformToProjectedGeo(map.resourceMask))
+  const transform = transformer(map)
+  center(transform.transformToProjectedGeo(map.resourceMask))
+  return transform
 }
 
 function label(map: GeoreferencedMap): string {
@@ -251,11 +256,9 @@ function makeItem(
   baseline: GeoreferencedMap,
   geographicReference = readGeographicReference(baseline)
 ): CollageMap {
-  validateMap(baseline)
+  const transform = validateMap(baseline)
   const projected = baseline.gcps.map(({ geo }) => lonLatToWebMercator(geo))
-  const mask = transformer(baseline).transformToProjectedGeo(
-    baseline.resourceMask
-  )
+  const mask = transform.transformToProjectedGeo(baseline.resourceMask)
   const pivot = center(mask)
   return {
     instanceId: 'urn:uuid:' + crypto.randomUUID(),
@@ -265,13 +268,14 @@ function makeItem(
     localFullMask: localPoints(
       baseline,
       pivot,
-      transformer(baseline).transformToProjectedGeo(
+      transform.transformToProjectedGeo(
         baseline.resource.width && baseline.resource.height
           ? fullResourceMask(baseline)
           : baseline.resourceMask
       )
     ),
     sourceCenter: pivot,
+    mirrored: transformAxes(transform, baseline.resourceMask).mirrored,
     resourceMask: structuredClone(baseline.resourceMask),
     placement: { position: pivot, rotation: savedRotation(baseline) },
     geographicReference,
@@ -293,7 +297,8 @@ export function parseMaps(input: unknown): GeoreferencedMap[] {
 
 /**
  * Normalize once at the source mask's center, in spherical ground meters.
- * This keeps the original Web Mercator warp up to a uniform similarity.
+ * Fit Helmert once, then encode it with three non-collinear GCPs so mirroring
+ * can also use an affine transformation without losing the fitted scale.
  * Subsequent translation/rotation never recomputes this latitude correction.
  */
 function normalizeSource(source: GeoreferencedMap): {
@@ -312,8 +317,9 @@ function normalizeSource(source: GeoreferencedMap): {
       gcp.geo[1]
     ]
   }))
-  validateMap(map)
-  const transform = transformer(map)
+  // Fit every original GCP before reducing to retain the whole map's scale.
+  map.transformation = { type: 'helmert' }
+  const transform = validateMap(map)
   const pivot = center(transform.transformToProjectedGeo(map.resourceMask))
   const latitude = webMercatorToLonLat(pivot)[1]
   const scale = Math.cos((latitude * Math.PI) / 180)
@@ -325,8 +331,13 @@ function normalizeSource(source: GeoreferencedMap): {
     geo: webMercatorToLonLat(transform.transformToProjectedGeo(resource)),
     scale: 1
   }
-  map.gcps = map.gcps.map(({ resource, geo }) => {
-    const projected = lonLatToWebMercator(geo)
+  const [left, top, right, bottom] = bounds(map.resourceMask)
+  const radius = Math.min(right - left, bottom - top) / 2
+  if (!Number.isFinite(radius) || radius <= 0)
+    throw new Error('The annotation does not produce a valid map outline.')
+  const samples = resourceBasis(map.resourceMask)
+  map.gcps = samples.map((resource) => {
+    const projected = transform.transformToProjectedGeo(resource)
     return {
       resource,
       geo: webMercatorToLonLat([
@@ -453,6 +464,119 @@ export function duplicateMaps(
     placedMap(copy)
     return copy
   })
+}
+
+function resourceBasis(mask: Point[]): Point[] {
+  const [, , right, bottom] = bounds(mask)
+  const origin = center(mask)
+  return [origin, [right, origin[1]], [origin[0], bottom]]
+}
+
+function transformAxes(transform: ProjectedGcpTransformer, mask: Point[]) {
+  const samples = resourceBasis(mask)
+  const [origin, right, bottom] = transform.transformToProjectedGeo(samples)
+  const x = [
+    (right[0] - origin[0]) / (samples[1][0] - samples[0][0]),
+    (right[1] - origin[1]) / (samples[1][0] - samples[0][0])
+  ]
+  const y = [
+    (bottom[0] - origin[0]) / (samples[2][1] - samples[0][1]),
+    (bottom[1] - origin[1]) / (samples[2][1] - samples[0][1])
+  ]
+  const xx = x[0] ** 2 + x[1] ** 2
+  const yy = y[0] ** 2 + y[1] ** 2
+  return {
+    // Resource Y points down: a normal map has a negative determinant.
+    mirrored: x[0] * y[1] - x[1] * y[0] > 0,
+    similarity:
+      Math.abs(xx - yy) <= Math.max(xx, yy) * 1e-8 &&
+      Math.abs(x[0] * y[0] + x[1] * y[1]) <= Math.max(xx, yy) * 1e-8
+  }
+}
+
+/** Reflect an image axis, preserving its crop and visible center. Helmert cannot
+ * encode a reflection, so mirrored similarities use three affine GCPs. The
+ * determinant carries mirror state through ordinary annotations, no metadata. */
+export function mirrorMap(
+  item: CollageMap,
+  direction: 'horizontal' | 'vertical' = 'horizontal'
+) {
+  const beforeCenter = mapCenter(item)
+  const mask = item.appearance.applyMask
+    ? item.resourceMask
+    : fullResourceMask(item.baseline)
+  const samples = resourceBasis(mask)
+  const axis = direction === 'horizontal' ? 0 : 1
+  const origin = samples[0][axis]
+  const original = transformer(item.baseline)
+  const helmert = transformationType(item.baseline) === 'helmert'
+  const gcps = helmert
+    ? samples.map((resource) => ({
+        resource,
+        geo: webMercatorToLonLat(original.transformToProjectedGeo(resource))
+      }))
+    : item.baseline.gcps
+  const baseline: GeoreferencedMap = {
+    ...structuredClone(item.baseline),
+    gcps: gcps.map(({ resource, geo }) => ({
+      resource: resource.map((value, i) =>
+        i === axis ? 2 * origin - value : value
+      ) as Point,
+      geo: [...geo]
+    })),
+    ...(helmert
+      ? { transformation: { type: 'polynomial', options: { order: 1 } } }
+      : {})
+  }
+  let transform = validateMap(baseline)
+  const axes = transformAxes(transform, mask)
+  // Mirroring a similarity back restores its Helmert representation.
+  if (
+    transformationType(baseline) === 'polynomial1' &&
+    !axes.mirrored &&
+    axes.similarity
+  ) {
+    baseline.gcps = samples.map((resource) => ({
+      resource,
+      geo: webMercatorToLonLat(transform.transformToProjectedGeo(resource))
+    }))
+    baseline.transformation = { type: 'helmert' }
+    transform = validateMap(baseline)
+  }
+  const next = {
+    ...item,
+    baseline,
+    mirrored: axes.mirrored,
+    localGcps: localPoints(
+      baseline,
+      item.sourceCenter,
+      baseline.gcps.map(({ geo }) => lonLatToWebMercator(geo))
+    ),
+    localMask: localPoints(
+      baseline,
+      item.sourceCenter,
+      transform.transformToProjectedGeo(item.resourceMask)
+    ),
+    localFullMask: localPoints(
+      baseline,
+      item.sourceCenter,
+      transform.transformToProjectedGeo(
+        baseline.resource.width && baseline.resource.height
+          ? fullResourceMask(baseline)
+          : item.resourceMask
+      )
+    )
+  }
+  const afterCenter = mapCenter(next)
+  next.placement = {
+    ...item.placement,
+    position: [
+      item.placement.position[0] + beforeCenter[0] - afterCenter[0],
+      item.placement.position[1] + beforeCenter[1] - afterCenter[1]
+    ]
+  }
+  placedMap(next)
+  Object.assign(item, next)
 }
 
 export function outline(item: CollageMap): Point[] {
@@ -621,6 +745,40 @@ export function setResourceMask(item: CollageMap, mask: Point[]) {
   center(localMask)
   item.resourceMask = structuredClone(mask)
   item.localMask = localMask
+}
+
+/** Absolute placement rotation that makes the image upright. Baseline GCPs
+ * include a saved rotation, which local geometry has factored out. Compute
+ * this once per gesture, never by rebuilding a transformer on every frame. */
+export function bearingRotation(item: CollageMap): number {
+  const bearing = computeGeoreferencedMapBearing(
+    { ...item.baseline, resourceMask: item.resourceMask },
+    {
+      transformationType: transformationType(item.baseline),
+      applyMask: item.appearance.applyMask,
+      // Reflections reverse the horizontal axis. Align image-up instead of
+      // averaging opposing axes, whose angular mean would be ambiguous.
+      ...(item.mirrored ? { orientation: 'vertical' as const } : {})
+    }
+  )
+  return savedRotation(item.baseline) + (bearing * Math.PI) / 180
+}
+
+/** Align each image around its current visible center. Validate the complete
+ * selection before applying anything so the action can be one undo step. */
+export function alignBearings(items: CollageMap[]) {
+  const placements = items.map((item) =>
+    rotatePlacement(
+      item.placement,
+      mapCenter(item),
+      nearestRotation(item.placement.rotation, bearingRotation(item)) -
+        item.placement.rotation
+    )
+  )
+  items.forEach((item, i) => placedMap({ ...item, placement: placements[i] }))
+  items.forEach((item, i) => {
+    item.placement = placements[i]
+  })
 }
 
 export function validateResourceMask(

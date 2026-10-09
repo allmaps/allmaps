@@ -18,6 +18,8 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/background-color": "workspace:^",
+    "@allmaps/bearing": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/tailwind": "workspace:^",

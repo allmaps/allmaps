@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { generateAnnotation, parseAnnotation } from '@allmaps/annotation'
+import { computeGeoreferencedMapBearing } from '@allmaps/bearing'
+import { snapRotation } from '../src/lib/rotation.ts'
 import { lonLatToWebMercator, webMercatorToLonLat } from '@allmaps/project'
 import { solveLayout } from '../src/lib/layout-task.ts'
 import { maskCoordinates, constrainToImage } from '../src/lib/mask-geometry.ts'
@@ -19,6 +21,10 @@ import {
   mapCenter,
   rotatePlacement,
   rotate,
+  center,
+  bearingRotation,
+  alignBearings,
+  mirrorMap,
   arrangeMaps,
   arrangeGeographically,
   duplicateMaps,
@@ -64,6 +70,333 @@ function fixture(latitude = 52, longitude = 5): GeoreferencedMap {
     transformation: { type: 'polynomial', options: { order: 1 } }
   }
 }
+
+function affineFixture(): GeoreferencedMap {
+  const map = fixture()
+  const origin = lonLatToWebMercator([5, 52])
+  map.gcps = Array.from({ length: 30 }, (_, i) => {
+    const resource: Point = [(i % 6) * 200, Math.floor(i / 6) * 250]
+    const [x, y] = resource
+    return {
+      resource,
+      geo: webMercatorToLonLat([
+        origin[0] + 2.4 * x + 0.35 * y + Math.sin(i) * 4,
+        origin[1] + 0.2 * x - 1.8 * y + Math.cos(i) * 5
+      ])
+    }
+  })
+  return map
+}
+
+test('three synthetic GCPs preserve the full least-squares Helmert fit at ground scale', () => {
+  const source = affineFixture()
+  const before = structuredClone(source)
+  const fitted = transformer({ ...source, transformation: { type: 'helmert' } })
+  const pivot = center(fitted.transformToProjectedGeo(source.resourceMask))
+  const scale = Math.cos(webMercatorToLonLat(pivot)[1] * radians)
+  const map = normalizeMap(source)
+  assert.equal(map.gcps.length, 3)
+  assert.equal(map.transformation?.type, 'helmert')
+  assert.deepEqual(
+    map.gcps.map((gcp) => gcp.resource),
+    [
+      [500, 500],
+      [1000, 500],
+      [500, 1000]
+    ]
+  )
+  assert.deepEqual(source, before)
+  const reduced = transformer(map)
+  for (let x = 0; x <= 1000; x += 125)
+    for (let y = 0; y <= 1000; y += 125) {
+      const original = fitted.transformToProjectedGeo([x, y])
+      close(
+        distance(reduced.transformToProjectedGeo([x, y]), [
+          (original[0] - pivot[0]) * scale,
+          (original[1] - pivot[1]) * scale
+        ]),
+        0
+      )
+    }
+  const origin = reduced.transformToProjectedGeo([500, 500])
+  close(
+    distance(origin, reduced.transformToProjectedGeo([600, 500])),
+    distance(origin, reduced.transformToProjectedGeo([500, 600]))
+  )
+})
+
+test('two-point sources and narrow crops retain stable, well-separated samples', () => {
+  const source = fixture(0)
+  source.gcps = source.gcps.slice(0, 2)
+  source.transformation = { type: 'helmert' }
+  source.resourceMask = [
+    [490, 0],
+    [510, 0],
+    [510, 1000],
+    [490, 1000]
+  ]
+  const [item] = addMaps(generateAnnotation(source))
+  assert.deepEqual(
+    item.baseline.gcps.map((gcp) => gcp.resource),
+    [
+      [500, 500],
+      [510, 500],
+      [500, 1000]
+    ]
+  )
+  const transform = transformer(placedMap(item))
+  close(
+    distance(
+      transform.transformToProjectedGeo([500, 0]),
+      transform.transformToProjectedGeo([500, 1000])
+    ),
+    1000,
+    0.001
+  )
+  const [reopened] = openCollage(exportCollage([item]))
+  assert.equal(reopened.baseline.gcps.length, 3)
+  outline(item).forEach((point, i) =>
+    close(distance(point, outline(reopened)[i]), 0)
+  )
+})
+
+function bearingFixture(degrees: number, longitude = 5): GeoreferencedMap {
+  const map = fixture(52, longitude)
+  const pivot = lonLatToWebMercator([longitude, 52])
+  map.gcps = map.gcps.map((gcp) => {
+    const projected = lonLatToWebMercator(gcp.geo)
+    const offset = rotate(
+      [projected[0] - pivot[0], projected[1] - pivot[1]],
+      degrees * radians
+    )
+    return {
+      ...gcp,
+      geo: webMercatorToLonLat([pivot[0] + offset[0], pivot[1] + offset[1]])
+    }
+  })
+  return map
+}
+
+test('bearing alignment makes each selected map upright around its own visible center', () => {
+  const items = addMaps(
+    generateAnnotation([
+      bearingFixture(35),
+      bearingFixture(-70, 5.1),
+      bearingFixture(140, 5.2)
+    ])
+  )
+  items.forEach((item, i) => {
+    item.placement.rotation = 2 * Math.PI + i * 0.7
+    setResourceMask(item, [
+      [50, 80],
+      [600, 100],
+      [570, 700],
+      [100, 580]
+    ])
+  })
+  const before = structuredClone(items)
+  alignBearings([items[0], items[2]])
+  assert.deepEqual(items[1], before[1])
+  for (const index of [0, 2]) {
+    const item = items[index]
+    close(computeGeoreferencedMapBearing(placedMap(item)), 0)
+    close(distance(mapCenter(item), mapCenter(before[index])), 0)
+    close(
+      distance(outline(item)[0], outline(item)[1]),
+      distance(outline(before[index])[0], outline(before[index])[1])
+    )
+    assert.deepEqual(item.baseline, before[index].baseline)
+    assert.deepEqual(item.resourceMask, before[index].resourceMask)
+    assert.deepEqual(
+      item.geographicReference,
+      before[index].geographicReference
+    )
+  }
+})
+
+test('bearing alignment survives export/reopen and full turns without reversing its sign', () => {
+  for (const angle of [-179, -35, 0, 42, 179]) {
+    const [original] = addMaps(generateAnnotation(bearingFixture(angle)))
+    original.placement.rotation = 4 * Math.PI + 1.3
+    original.placement.position = [7300, -1200]
+    const [item] = openCollage(exportCollage([original]))
+    close(Math.sin(bearingRotation(item)), Math.sin(-angle * radians))
+    const pivot = mapCenter(item)
+    const rotation = item.placement.rotation
+    alignBearings([item])
+    close(computeGeoreferencedMapBearing(placedMap(item)), 0)
+    close(distance(mapCenter(item), pivot), 0)
+    assert.ok(Math.abs(rotation - item.placement.rotation) <= Math.PI)
+    const [reopened] = openCollage(exportCollage([item]))
+    close(computeGeoreferencedMapBearing(placedMap(reopened)), 0)
+    outline(reopened).forEach((point, i) =>
+      close(distance(point, outline(item)[i]), 0)
+    )
+  }
+})
+
+test('bearing snapping rotates a group rigidly using its anchor, without aligning members individually', () => {
+  const items = addMaps(
+    generateAnnotation([bearingFixture(35), bearingFixture(-70, 5.1)])
+  )
+  const pivot: Point = [250, -160]
+  const before = items.map((item) => structuredClone(item.placement))
+  const centers = items.map(mapCenter)
+  const target = bearingRotation(items[0])
+  const snapped = snapRotation(target + 2 * radians, target)
+  const delta = snapped - items[0].placement.rotation
+  items.forEach((item, i) => {
+    item.placement = rotatePlacement(before[i], pivot, delta)
+  })
+  close(computeGeoreferencedMapBearing(placedMap(items[0])), 0)
+  close(
+    distance(mapCenter(items[0]), mapCenter(items[1])),
+    distance(centers[0], centers[1])
+  )
+  close(
+    items[0].placement.rotation - items[1].placement.rotation,
+    before[0].rotation - before[1].rotation
+  )
+  assert.ok(Math.abs(computeGeoreferencedMapBearing(placedMap(items[1]))) > 90)
+})
+
+test('Mirror reflects image X rather than rotating it, retaining center, scale and crop', () => {
+  const [item] = addMaps(generateAnnotation(bearingFixture(37)))
+  item.placement = { position: [5800, -9200], rotation: 0.6 }
+  const before = structuredClone(item)
+  const original = transformer(placedMap(item))
+  mirrorMap(item)
+  assert.equal(item.mirrored, true)
+  assert.equal(item.baseline.transformation?.type, 'polynomial')
+  assert.equal(item.baseline.gcps.length, 3)
+  assert.deepEqual(item.resourceMask, before.resourceMask)
+  close(distance(mapCenter(item), mapCenter(before)), 0)
+  const reflected = transformer(placedMap(item))
+  for (const point of [
+    [0, 0],
+    [500, 500],
+    [123, 456],
+    [1000, 1000]
+  ] as Point[]) {
+    close(
+      distance(
+        reflected.transformToProjectedGeo(point),
+        original.transformToProjectedGeo([1000 - point[0], point[1]])
+      ),
+      0
+    )
+  }
+  close(
+    distance(outline(item)[0], outline(item)[1]),
+    distance(outline(before)[0], outline(before)[1])
+  )
+  mirrorMap(item)
+  assert.equal(item.mirrored, false)
+  assert.equal(item.baseline.transformation?.type, 'helmert')
+  assert.equal(item.baseline.gcps.length, 3)
+  outline(item).forEach((point, i) =>
+    close(distance(point, outline(before)[i]), 0)
+  )
+})
+
+test('mirrored geometry survives movement, export/reopen, mask editing, and bearing alignment', () => {
+  const [item] = addMaps(generateAnnotation(bearingFixture(-28)))
+  mirrorMap(item)
+  item.placement = { position: [7000, -8000], rotation: 1.4 }
+  const exported = exportCollage([item])
+  assert.equal(JSON.stringify(exported).includes('"mirrored"'), false)
+  const [loaded] = openCollage(exported)
+  assert.equal(loaded.mirrored, true)
+  outline(loaded).forEach((point, i) =>
+    close(distance(point, outline(item)[i]), 0)
+  )
+  setResourceMask(loaded, [
+    [50, 50],
+    [700, 70],
+    [660, 650],
+    [100, 600]
+  ])
+  const mask = maskCoordinates(loaded)
+  close(
+    distance(
+      maskCoordinates(loaded).toResource(mask.toGeo([230, 340])),
+      [230, 340]
+    ),
+    0
+  )
+  const centerBefore = mapCenter(loaded)
+  alignBearings([loaded])
+  close(distance(mapCenter(loaded), centerBefore), 0)
+  close(
+    computeGeoreferencedMapBearing(placedMap(loaded), {
+      orientation: 'vertical'
+    }),
+    0
+  )
+  const [reopened] = openCollage(exportCollage([loaded]))
+  assert.equal(reopened.mirrored, true)
+  outline(loaded).forEach((point, i) =>
+    close(distance(point, outline(reopened)[i]), 0)
+  )
+})
+
+test('mirroring a selection preserves each edited crop center and leaves other maps alone', () => {
+  const items = addMaps(
+    generateAnnotation([bearingFixture(25), fixture(), bearingFixture(-70)])
+  )
+  items.forEach((item, i) => {
+    item.placement.rotation = 0.7 * i
+    setResourceMask(item, [
+      [40, 100],
+      [850, 180],
+      [750, 900],
+      [400, 500]
+    ])
+  })
+  const before = structuredClone(items)
+  ;[items[0], items[2]].forEach((item) => mirrorMap(item))
+  assert.deepEqual(items[1], before[1])
+  for (const i of [0, 2]) {
+    close(distance(mapCenter(items[i]), mapCenter(before[i])), 0)
+    assert.deepEqual(
+      items[i].geographicReference,
+      before[i].geographicReference
+    )
+    mirrorMap(items[i])
+    outline(items[i]).forEach((point, j) =>
+      close(distance(point, outline(before[i])[j]), 0)
+    )
+  }
+})
+
+test('mirroring an opened nonlinear map retains its warp and can be reversed', () => {
+  const source = fixture()
+  source.transformation = { type: 'thinPlateSpline' }
+  source.gcps[2].geo[0] += 0.001
+  const [item] = openCollage(generateAnnotation(source))
+  const before = structuredClone(item)
+  const original = transformer(placedMap(item))
+  mirrorMap(item)
+  assert.equal(item.baseline.transformation?.type, 'thinPlateSpline')
+  const actual = transformer(placedMap(item))
+  for (const point of [
+    [50, 50],
+    [830, 210],
+    [900, 920]
+  ] as Point[])
+    close(
+      distance(
+        actual.transformToProjectedGeo(point),
+        original.transformToProjectedGeo([1000 - point[0], point[1]])
+      ),
+      0,
+      0.01
+    )
+  mirrorMap(item)
+  outline(item).forEach((point, i) =>
+    close(distance(point, outline(before)[i]), 0, 0.01)
+  )
+})
 
 test('equal ground distances near 0°, 52°, and 70° have equal canvas scale', () => {
   for (const latitude of [0, 52, 70]) {
@@ -148,8 +481,9 @@ test('translation and rotation are rigid and never mutate source GCPs or masks',
   assert.deepEqual(exported.resourceMask, source.resourceMask)
   assert.deepEqual(
     exported.gcps.map((gcp) => gcp.resource),
-    source.gcps.map((gcp) => gcp.resource)
+    item.baseline.gcps.map((gcp) => gcp.resource)
   )
+  assert.equal(exported.gcps.length, 3)
 })
 
 test('export and reopen keep positions, orientation, masks, and annotation order', () => {
@@ -266,9 +600,10 @@ test('saved rotation restores zero orientation without an original annotation or
   close(loaded.placement.rotation, 1.2)
   loaded.placement.rotation = 0
   assert.deepEqual(loaded.placement.position, before)
-  const points = placedMap(loaded).gcps.map((gcp) =>
-    lonLatToWebMercator(gcp.geo)
-  )
+  const points = transformer(placedMap(loaded)).transformToProjectedGeo([
+    [0, 0],
+    [1000, 0]
+  ] as Point[])
   close(points[1][1] - points[0][1], 0)
   close(distance(points[0], points[1]), 1000, 0.001)
   assert.deepEqual(exportCollage([loaded]).items[0].body._allmaps, {
@@ -349,12 +684,13 @@ test('edited masks and newly resolved full images stay aligned after loading sav
   }
 })
 
-test('nonlinear TPS and projective rendering reproduce the rigidly transformed surface', () => {
+test('converted TPS and projective imports reproduce the rigidly transformed Helmert surface', () => {
   for (const type of ['thinPlateSpline', 'projective', 'helmert'] as const) {
     const source = fixture()
     source.transformation = { type }
     if (type !== 'helmert') source.gcps[2].geo[0] += 0.001
     const [item] = addMaps(generateAnnotation(source))
+    assert.equal(item.baseline.transformation?.type, 'helmert')
     const before = transformer(placedMap(item))
     const probes: Point[] = [
       [100, 200],
@@ -408,7 +744,7 @@ test('a map crossing the antimeridian remains compact on import', () => {
     geo: [gcp.geo[0] > 180 ? gcp.geo[0] - 360 : gcp.geo[0], gcp.geo[1]]
   }))
   const [item] = addMaps(generateAnnotation(source))
-  close(distance(item.localGcps[0], item.localGcps[1]), 1000, 0.001)
+  close(distance(outline(item)[0], outline(item)[1]), 1000, 0.001)
 })
 
 test('selection uses the moved mask and allows overlapping maps to be checked in reverse order', () => {
@@ -424,7 +760,7 @@ test('empty collages round trip as empty annotation pages', () => {
   assert.deepEqual(openCollage(exported), [])
 })
 
-test('unsupported projections and unrepresentable rotations fail explicitly', () => {
+test('custom projections fail; adding approximates transformations that opening cannot preserve', () => {
   const custom = fixture()
   custom.resourceCrs = { definition: 'EPSG:4326' }
   assert.throws(
@@ -434,15 +770,20 @@ test('unsupported projections and unrepresentable rotations fail explicitly', ()
   const straight = fixture()
   straight.transformation = { type: 'straight' }
   assert.throws(
-    () => addMaps(generateAnnotation(straight)),
+    () => openCollage(generateAnnotation(straight)),
     /cannot encode rotation/
   )
   const higherOrder = fixture()
   higherOrder.transformation = { type: 'polynomial', options: { order: 2 } }
   assert.throws(
-    () => addMaps(generateAnnotation(higherOrder)),
+    () => openCollage(generateAnnotation(higherOrder)),
     /Higher-order polynomial/
   )
+  for (const source of [straight, higherOrder]) {
+    const [item] = addMaps(generateAnnotation(source))
+    assert.equal(item.baseline.transformation?.type, 'helmert')
+    assert.equal(item.baseline.gcps.length, 3)
+  }
 })
 
 test('mask editing changes the exported polygon without changing placement, GCPs, scale or source', () => {
@@ -873,4 +1214,41 @@ test('worker import compacts geography, keeps every map and preserves saved rota
   assert.deepEqual(result.items[0].placement.position, [400, 500])
   close(result.items[1].placement.rotation, 0.6)
   assert.ok(distance(...(result.items.map(mapCenter) as [Point, Point])) < 8000)
+})
+
+test('vertical mirror reflects image Y and survives export, reversal and horizontal composition', () => {
+  const [item] = addMaps(generateAnnotation(bearingFixture(37)))
+  item.placement = { position: [5000, -6000], rotation: 0.8 }
+  const before = structuredClone(item)
+  const original = transformer(placedMap(item))
+  mirrorMap(item, 'vertical')
+  close(distance(mapCenter(item), mapCenter(before)), 0)
+  const reflected = transformer(placedMap(item))
+  for (const p of [
+    [0, 0],
+    [123, 456],
+    [1000, 1000]
+  ] as Point[]) {
+    close(
+      distance(
+        reflected.transformToProjectedGeo(p),
+        original.transformToProjectedGeo([p[0], 1000 - p[1]])
+      ),
+      0
+    )
+  }
+  const [loaded] = openCollage(exportCollage([item]))
+  mirrorMap(loaded, 'vertical')
+  outline(loaded).forEach((p, i) => close(distance(p, outline(before)[i]), 0))
+  mirrorMap(item, 'horizontal')
+  const both = transformer(placedMap(item))
+  close(
+    distance(
+      both.transformToProjectedGeo([123, 456]),
+      original.transformToProjectedGeo([877, 544])
+    ),
+    0
+  )
+  assert.equal(item.baseline.transformation?.type, 'helmert')
+  assert.deepEqual(item.resourceMask, before.resourceMask)
 })

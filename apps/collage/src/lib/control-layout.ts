@@ -9,8 +9,8 @@ export const controlOrder = [
   'saturation',
   'hue',
   'opacity',
-  'mask',
   'editMask',
+  'mirror',
   'move',
   'rotate'
 ] as const
@@ -21,7 +21,9 @@ export type ControlPosition = { position: Point; rail?: Rail }
 export const controlRadius = 184
 export const sliderLength = 104
 export function radiusForSize(diameter: number): number {
-  return Math.max(140, Math.min(controlRadius, diameter * 0.3))
+  // Leave room for 42px touch controls when the arc contracts.
+  const minimum = 22 / Math.sin(Math.PI / (2 * (controlOrder.length - 1)))
+  return Math.max(minimum, Math.min(controlRadius, diameter * 0.3))
 }
 
 /** Blend toward the screen center based on size, never the clipped polygon's
@@ -58,15 +60,17 @@ export function controlLayout(
         center[1] + Math.sin(angle) * radius
       ]
       const isSlider = kind === 'opacity' || kind === 'hue'
+      // Opacity increases inward; hue keeps its outward color scale.
+      const value = kind === 'opacity' ? 1 - values.opacity : values.hue
       return [
         kind,
         {
-          position: at(radius + (isSlider ? values[kind] * sliderLength : 0)),
+          position: at(radius + (isSlider ? value * sliderLength : 0)),
           ...(isSlider
             ? {
                 rail: {
-                  start: at(radius),
-                  end: at(radius + sliderLength)
+                  start: at(radius + (kind === 'opacity' ? sliderLength : 0)),
+                  end: at(radius + (kind === 'opacity' ? 0 : sliderLength))
                 }
               }
             : {})

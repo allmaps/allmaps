@@ -5,6 +5,7 @@
   import {
     TerraDraw,
     TerraDrawPolygonMode,
+    TerraDrawFreehandMode,
     TerraDrawSelectMode
   } from 'terra-draw'
   import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter'
@@ -16,10 +17,14 @@
     ArrowUUpLeft,
     ArrowUUpRight,
     Polygon,
+    PencilSimple,
+    SelectionAll,
     Check,
     X
   } from 'phosphor-svelte'
   import { fullResourceMask, validateResourceMask } from './model'
+  import { orthogonalizeMask } from './orthogonalize'
+  import { simplifyMaskStroke } from './freehand-mask'
   import {
     constrainToImage,
     maskCoordinates,
@@ -55,7 +60,8 @@
   const featureId = crypto.randomUUID()
   let draw = $state.raw<TerraDraw>()
   let polygonMode: TerraDrawPolygonMode | undefined
-  let drawingNewMask = $state(false)
+  let drawingMode = $state<'polygon' | 'freehand'>()
+  const drawingNewMask = $derived(drawingMode !== undefined)
   let drawingUndoCount = $state(0)
   let drawingRedoCount = $state(0)
   let draft = $state.raw<Point[]>(structuredClone(original.resourceMask))
@@ -83,6 +89,9 @@
         snappingPointOutlineColor: color
       }
     })
+    draw.updateModeOptions<typeof TerraDrawFreehandMode>('freehand', {
+      styles: { outlineColor: color, closingPointOutlineColor: color }
+    })
     draw.updateModeOptions<typeof TerraDrawSelectMode>('select', {
       styles: {
         selectedPolygonOutlineColor: color,
@@ -93,8 +102,10 @@
   })
 
   function refreshDrawingHistory() {
-    drawingUndoCount = polygonMode?.undoSize() ?? 0
-    drawingRedoCount = polygonMode?.redoSize() ?? 0
+    drawingUndoCount =
+      drawingMode === 'freehand' ? 1 : (polygonMode?.undoSize() ?? 0)
+    drawingRedoCount =
+      drawingMode === 'freehand' ? 0 : (polygonMode?.redoSize() ?? 0)
   }
 
   function showDraft() {
@@ -115,26 +126,30 @@
         throw new Error(result[0]?.reason ?? 'This mask cannot be edited.')
       draw.setMode('select')
       draw.selectFeature(featureId)
+      map.dragPan.enable()
     } finally {
       changing = false
     }
   }
 
   function cancelNewMask() {
-    drawingNewMask = false
+    drawingMode = undefined
     showDraft()
+    map.dragPan.enable()
     refreshDrawingHistory()
     error = ''
   }
 
-  function drawNewMask() {
+  function drawNewMask(mode: 'polygon' | 'freehand') {
     if (!draw || !ready) return
-    if (drawingNewMask) return cancelNewMask()
+    if (drawingMode === mode) return cancelNewMask()
     edgeStart = undefined
     draw.setMode('static')
     draw.clear()
-    drawingNewMask = true
-    draw.setMode('polygon')
+    drawingMode = mode
+    draw.setMode(mode)
+    if (mode === 'freehand') map.dragPan.disable()
+    else map.dragPan.enable()
     refreshDrawingHistory()
     error = ''
   }
@@ -144,19 +159,109 @@
     const feature = draw?.getSnapshotFeature(id)
     if (feature?.geometry.type !== 'Polygon') return
     try {
-      const next = feature.geometry.coordinates[0]
+      let next = feature.geometry.coordinates[0]
         .slice(0, -1)
         .map((p) => toResource(p as Point))
+      if (drawingMode === 'freehand')
+        next = simplifyMaskStroke(next, width, height, (p) => {
+          const screen = map.project(toGeo(p))
+          return [screen.x, screen.y]
+        })
       validateResourceMask(next, width, height)
       past = [...past.slice(-39), draft]
       future = []
       draft = next
-      drawingNewMask = false
+      drawingMode = undefined
       showDraft()
       error = ''
     } catch (problem) {
       cancelNewMask()
       error = problem instanceof Error ? problem.message : String(problem)
+    }
+  }
+
+  function replaceDraft(next: Point[]) {
+    validateResourceMask(next, width, height)
+    if (JSON.stringify(next) === JSON.stringify(draft)) return
+    past = [...past.slice(-39), draft]
+    future = []
+    draft = next
+    syncDraft()
+    error = ''
+  }
+
+  function fullMask() {
+    if (!ready || drawingNewMask) return
+    replaceDraft(fullResourceMask(original.baseline))
+  }
+
+  function orthogonalize() {
+    if (!ready || drawingNewMask) return
+    try {
+      replaceDraft(orthogonalizeMask(draft, width, height))
+    } catch (problem) {
+      error = problem instanceof Error ? problem.message : String(problem)
+    }
+  }
+
+  // Terra Draw handles pen gestures and polygon creation; keep input inside the
+  // image just like vertex dragging. Simplify in screen pixels on completion.
+  class MaskFreehandMode extends TerraDrawFreehandMode {
+    private from: Point = [width / 2, height / 2]
+    private draggingStroke = false
+
+    private constrain(event: TerraDrawMouseEvent): TerraDrawMouseEvent {
+      try {
+        this.from = constrainToImage(
+          this.from,
+          toResource([event.lng, event.lat], this.from),
+          width,
+          height
+        )
+      } catch {
+        /* Keep the last invertible point on nonlinear maps. */
+      }
+      const [lng, lat] = toGeo(this.from)
+      const screen = map.project([lng, lat])
+      return { ...event, lng, lat, containerX: screen.x, containerY: screen.y }
+    }
+
+    override onClick(event: TerraDrawMouseEvent) {
+      super.onClick(this.constrain(event))
+    }
+    override onMouseMove(event: TerraDrawMouseEvent) {
+      super.onMouseMove(this.constrain(event))
+    }
+    override onDragStart(
+      event: TerraDrawMouseEvent,
+      setDraggability: (enabled: boolean) => void
+    ) {
+      this.draggingStroke = this.state !== 'drawing'
+      setDraggability(false)
+      if (this.draggingStroke) this.from = [width / 2, height / 2]
+      super.onDragStart(this.constrain(event), setDraggability)
+    }
+    override onDrag(
+      event: TerraDrawMouseEvent,
+      setDraggability: (enabled: boolean) => void
+    ) {
+      const constrained = this.constrain(event)
+      if (this.draggingStroke) super.onDrag(constrained, setDraggability)
+      else super.onMouseMove(constrained)
+    }
+
+    override onDragEnd(
+      event: TerraDrawMouseEvent,
+      setDraggability: (enabled: boolean) => void
+    ) {
+      super.onDragEnd(event, setDraggability)
+      // Terra Draw leaves an invalid, too-short stroke unfinished. Restore the
+      // previous draft instead of trapping the user in a completed gesture.
+      if (this.draggingStroke && this.state === 'drawing') {
+        cancelNewMask()
+        error = 'Draw a closed area with the pen.'
+      }
+      this.draggingStroke = false
     }
   }
 
@@ -271,6 +376,7 @@
 
   function undo() {
     if (drawingNewMask) {
+      if (drawingMode === 'freehand') return cancelNewMask()
       polygonMode?.undo()
       refreshDrawingHistory()
       return
@@ -348,9 +454,10 @@
       else undo()
     } else if (
       (event.ctrlKey || event.metaKey) &&
-      event.key.toLowerCase() === 's'
+      (event.key.toLowerCase() === 's' || event.key === 'Enter')
     ) {
       event.preventDefault()
+      event.stopPropagation()
       if (ready && !drawingNewMask) ondone(draft)
     }
   }
@@ -456,6 +563,23 @@
         }),
         modes: [
           polygonMode,
+          new MaskFreehandMode({
+            drawInteraction: 'click-move-or-drag',
+            keyEvents: { cancel: null, finish: 'Enter' },
+            minDistance: 4,
+            smoothing: 0,
+            preventPointsNearClose: true,
+            styles: {
+              fillColor: '#ffffff',
+              fillOpacity: 0.15,
+              outlineColor: themeColors.pink,
+              outlineWidth: 5,
+              closingPointColor: '#ffffff',
+              closingPointOutlineColor: themeColors.pink,
+              closingPointWidth: 4,
+              closingPointOutlineWidth: 3
+            }
+          }),
           new MaskSelectMode({
             pointerDistance: 12,
             allowManualDeselection: false,
@@ -539,7 +663,6 @@
         })
       )
       map.getCanvas().addEventListener('pointerdown', edgePointerDown, true)
-      fit()
       ready = true
     } catch (problem) {
       error = problem instanceof Error ? problem.message : String(problem)
@@ -548,6 +671,7 @@
       ready = false
       map.getCanvas().removeEventListener('pointerdown', edgePointerDown, true)
       draw?.stop()
+      map.dragPan.enable()
       for (const other of visibility) {
         layer.setMapOptions(
           other.id,
@@ -575,17 +699,64 @@
 <svelte:window onkeydown={keyboard} />
 <section class="mask-editor" aria-label="Mask editor">
   <div class="mask-editor-actions">
-    <h2>{drawingNewMask ? 'Draw mask' : 'Edit mask'}</h2>
+    <h2>
+      {drawingMode === 'freehand'
+        ? 'Draw with pen'
+        : drawingNewMask
+          ? 'Draw mask'
+          : 'Edit mask'}
+    </h2>
     <button
       class="quiet-button"
-      class:pressed={drawingNewMask}
-      aria-pressed={drawingNewMask}
-      aria-label={drawingNewMask ? 'Cancel new mask' : 'Draw new mask'}
-      title={drawingNewMask
+      aria-label="Full image mask"
+      title="Use the full image as the mask"
+      disabled={!ready || drawingNewMask}
+      onclick={fullMask}><SelectionAll size={20} /></button
+    >
+    <button
+      class="quiet-button"
+      class:pressed={drawingMode === 'polygon'}
+      aria-pressed={drawingMode === 'polygon'}
+      aria-label={drawingMode === 'polygon'
+        ? 'Cancel new mask'
+        : 'Draw new mask'}
+      title={drawingMode === 'polygon'
         ? 'Cancel new mask (Escape)'
         : 'Draw new mask · Click points, then the first point or Enter to finish'}
       disabled={!ready}
-      onclick={drawNewMask}><Polygon size={20} /></button
+      onclick={() => drawNewMask('polygon')}><Polygon size={20} /></button
+    >
+    <button
+      class="quiet-button"
+      class:pressed={drawingMode === 'freehand'}
+      aria-pressed={drawingMode === 'freehand'}
+      aria-label={drawingMode === 'freehand'
+        ? 'Cancel pen drawing'
+        : 'Draw mask with pen'}
+      title="Draw mask with pen · Drag and release, or click to start and finish"
+      disabled={!ready}
+      onclick={() => drawNewMask('freehand')}><PencilSimple size={20} /></button
+    >
+    <button
+      class="quiet-button"
+      aria-label="Orthogonalize mask"
+      title="Orthogonalize mask · Straighten near-right corners"
+      disabled={!ready || drawingNewMask}
+      onclick={orthogonalize}
+      ><svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 3h5v12h12v6H4Z" />
+        <path d="M6 7h3M6 11h3M13 18v3M17 18v3" />
+      </svg></button
     >
     <button
       class="quiet-button"
@@ -596,7 +767,8 @@
     <button
       class="quiet-button"
       aria-label="Done"
-      title="Done editing mask"
+      title="Done editing mask (⌘/Ctrl Enter)"
+      aria-keyshortcuts="Meta+Enter Control+Enter"
       disabled={!ready || drawingNewMask}
       onclick={() => ondone(draft)}><Check size={20} /></button
     >
@@ -637,9 +809,12 @@
   </div>
   <p class="sr-only">
     Drag vertices to edit. Drag any mask edge to add a vertex. Right-click a
-    vertex to remove it. Vertices stop at the image boundary. Done saves; Escape
-    cancels. Draw new mask replaces the polygon after you click its first point
-    or press Enter. Escape cancels an unfinished drawing.
+    vertex to remove it. Vertices stop at the image boundary. Done or ⌘/Ctrl
+    Enter saves; Escape cancels. Draw new mask replaces the polygon after you
+    click its first point or press Enter. The pen draws a freehand polygon and
+    simplifies the stroke. Release to finish, or click to start and finish. Full
+    image mask restores the image bounds. Orthogonalize straightens near-right
+    corners. Escape cancels an unfinished drawing.
   </p>
   {#if error}<div class="error-message" role="alert">{error}</div>{/if}
 </section>

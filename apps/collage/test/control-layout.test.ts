@@ -19,7 +19,7 @@ function close(a: number, b: number) {
 }
 
 test('buttons have equal spacing on a semicircle with one layer-order control', () => {
-  const layout = controlLayout([0, 0], 0, { opacity: 0, hue: 0 })
+  const layout = controlLayout([0, 0], 0, { opacity: 1, hue: 0 })
   const spacing = distance(layout.remove.position, layout.front.position)
   controlOrder.forEach((kind, index) => {
     close(distance([0, 0], layout[kind].position), controlRadius)
@@ -75,6 +75,18 @@ test('radial slider values survive recomputing layout and ignore perpendicular m
   }
 })
 
+test('opacity increases toward the map while hue increases away from it', () => {
+  for (const rotation of [0, 0.8, Math.PI]) {
+    const center: Point = [200, 400]
+    const zero = controlLayout(center, rotation, { opacity: 0, hue: 0 })
+    const one = controlLayout(center, rotation, { opacity: 1, hue: 1 })
+    close(distance(one.opacity.position, center), controlRadius)
+    close(distance(zero.opacity.position, center), controlRadius + sliderLength)
+    close(distance(zero.hue.position, center), controlRadius)
+    close(distance(one.hue.position, center), controlRadius + sliderLength)
+  }
+})
+
 test('hue colors match the complete slider spectrum', () => {
   assert.equal(hueColor(0), '#ff0000')
   assert.equal(hueColor(1 / 3), '#00ff00')
@@ -85,7 +97,7 @@ test('hue colors match the complete slider spectrum', () => {
 test('the arc faces bottom right and contracts with zoom without colliding buttons', () => {
   const radius = radiusForSize(30)
   assert.ok(radius < controlRadius)
-  const layout = controlLayout([0, 0], 0, { opacity: 0, hue: 0 }, radius)
+  const layout = controlLayout([0, 0], 0, { opacity: 1, hue: 0 }, radius)
   assert.ok(
     layout.saturation.position[0] > 0 && layout.saturation.position[1] > 0
   )
