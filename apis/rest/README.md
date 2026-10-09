@@ -36,6 +36,18 @@ as an ordinary user's. Imports bypass the session cookie cache, so revoking
 the role immediately removes general import access. Query limits can take up
 to five minutes to reflect a role change because of the existing session cache.
 
+## Organization mutations
+
+Organization PATCH requests update only explicitly supplied fields. Omitted
+fields retain their existing values, including the plan. Explicit `null` clears
+nullable fields, `false` disables collection display, and an empty `domains`
+array clears domains. An empty PATCH is a no-op for an existing organization.
+
+Organization creation defaults the plan to `contributor` only when omitted;
+explicit `null` creates an organization without a plan. Adding an organization
+member defaults an omitted role to `member`. Updating a member's role requires
+an explicit valid role.
+
 ## Validation
 
 Run `pnpm --filter @allmaps/api-rest test` for deterministic role, limit, and

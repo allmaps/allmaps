@@ -16,7 +16,11 @@ import {
 } from '@allmaps/api-shared/db'
 import type { RestEnv } from '@allmaps/env/rest'
 
-const Role = t.UnionEnum(['admin', 'member', 'owner'])
+const Role = t.Union([
+  t.Literal('admin'),
+  t.Literal('member'),
+  t.Literal('owner')
+])
 
 export function createAuthRoutes(
   env: RestEnv,

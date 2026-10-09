@@ -36,12 +36,17 @@ import {
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 
+// Mutation schemas must not add defaults to omitted fields.
+const OrganizationPlan = t.Union(
+  ORGANIZATION_PLANS.map((plan) => t.Literal(plan))
+)
+
 const OrganizationBody = t.Object({
   name: t.String(),
   slug: t.String(),
   logo: t.Optional(t.Nullable(t.String())),
   homepage: t.Optional(t.Nullable(t.String())),
-  plan: t.Optional(t.Nullable(t.UnionEnum(ORGANIZATION_PLANS))),
+  plan: t.Optional(t.Nullable(OrganizationPlan)),
   displayCollections: t.Optional(t.Boolean()),
   location: t.Optional(
     t.Nullable(
@@ -59,7 +64,7 @@ const UpdateOrganizationBody = t.Object({
   slug: t.Optional(t.String()),
   logo: t.Optional(t.Nullable(t.String())),
   homepage: t.Optional(t.Nullable(t.String())),
-  plan: t.Optional(t.Nullable(t.UnionEnum(ORGANIZATION_PLANS))),
+  plan: t.Optional(t.Nullable(OrganizationPlan)),
   displayCollections: t.Optional(t.Boolean()),
   location: t.Optional(
     t.Nullable(
@@ -92,7 +97,7 @@ const organizationMutationDetail = {
 const organizationsQuerySchema = t.Object({
   id: t.Optional(t.Array(t.String())),
   limit: t.Optional(t.Number()),
-  plan: t.Optional(t.Array(t.UnionEnum(ORGANIZATION_PLANS))),
+  plan: t.Optional(t.Array(OrganizationPlan)),
   displayCollections: t.Optional(t.Boolean()),
   slug: t.Optional(t.Array(t.String()))
 })
@@ -510,6 +515,7 @@ export function createOrganizationsRoutes(
           env.PUBLIC_REST_BASE_URL,
           {
             ...body,
+            plan: body.plan === undefined ? 'contributor' : body.plan,
             homepage: validHomepage,
             location: validLocation,
             slug: validSlug,
