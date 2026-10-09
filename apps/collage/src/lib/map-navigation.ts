@@ -12,7 +12,7 @@ type MapNavigation = {
   Handler
 >
 
-/** Block competing drawing gestures while leaving scroll and pinch zoom alone. */
+/** Lock navigation for an active stroke; wheel zoom stays available. */
 export function suspendMapNavigation(map: MapNavigation): () => void {
   const handlers = [
     map.dragPan,

@@ -169,7 +169,7 @@ actions sit above the zoom controls.
 Warnings stack above these actions, including when the buttons wrap on phones.
 
 - Drag a vertex to move it, drag anywhere along an edge to add one, and
-  right-click a vertex to remove it. Dragged points stop at the image boundary,
+  right-click or double-tap a vertex to remove it. Dragged points stop at the image boundary,
   including on rotated and warped maps.
 - Choose **Draw new mask** to replace the polygon. Click to place vertices,
   then click the first vertex or press Enter to close it. Escape or the drawing
@@ -179,10 +179,13 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   Strokes stay inside the image and are simplified to a polygon using a two-pixel
   tolerance at the current zoom. The result can be edited with the vertex tools.
   Crossing or empty strokes leave the previous draft intact.
-  On touch screens, draw with one finger or a stylus and pinch with two fingers
-  to zoom. Scroll zoom and the zoom buttons also remain available. A pinch
-  discards an unfinished stroke without changing the mask and leaves the pen
-  selected. Panning is disabled until drawing finishes or is cancelled.
+  On touch screens, draw with one finger or a stylus. Adding a second finger
+  pauses the stroke and zooms around the current pen point; moving both fingers
+  pans while keeping that point under the drawing finger. Lift the second finger
+  to continue the same stroke, then lift the drawing finger to finish it.
+  Two-finger gestures started before drawing use normal pan and zoom. Scroll
+  zoom and the zoom buttons remain available; navigation is only locked while
+  drawing, not just because Pen is selected.
 - **Full image mask** replaces the draft with the image rectangle.
 - **Orthogonalize** straightens corners within 13° of a right angle and removes
   redundant vertices on nearly straight edges, preserving the mask's general

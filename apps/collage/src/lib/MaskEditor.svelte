@@ -27,6 +27,7 @@
   import { simplifyMaskStroke } from './freehand-mask'
   import { suspendMapNavigation } from './map-navigation'
   import { PenTouchGesture } from './pen-gesture'
+  import { MaskVertexTaps } from './mask-tap'
   import {
     constrainToImage,
     maskCoordinates,
@@ -62,6 +63,7 @@
   const featureId = crypto.randomUUID()
   let draw = $state.raw<TerraDraw>()
   let polygonMode: TerraDrawPolygonMode | undefined
+  let freehandMode: MaskFreehandMode | undefined
   let drawingMode = $state<'polygon' | 'freehand'>()
   const drawingNewMask = $derived(drawingMode !== undefined)
   let drawingUndoCount = $state(0)
@@ -76,6 +78,8 @@
   let restoreNavigation: (() => void) | undefined
   let penPointerType = 'mouse'
   const penTouches = new PenTouchGesture()
+  const vertexTaps = new MaskVertexTaps()
+  let penAnchor: Point | undefined
   let adapter: MaskMapAdapter | undefined
 
   const { toGeo, toResource } = maskCoordinates(original, true)
@@ -117,6 +121,8 @@
   function showDraft() {
     if (!draw) return
     penTouches.reset()
+    vertexTaps.reset()
+    penAnchor = undefined
     changing = true
     try {
       draw.setMode('static')
@@ -133,8 +139,7 @@
         throw new Error(result[0]?.reason ?? 'This mask cannot be edited.')
       draw.setMode('select')
       draw.selectFeature(featureId)
-      restoreNavigation?.()
-      restoreNavigation = undefined
+      releaseNavigation()
     } finally {
       changing = false
     }
@@ -150,15 +155,15 @@
   function drawNewMask(mode: 'polygon' | 'freehand') {
     if (!draw || !ready) return
     if (drawingMode === mode) return cancelNewMask()
-    restoreNavigation?.()
-    restoreNavigation = undefined
+    releaseNavigation()
     penTouches.reset()
+    vertexTaps.reset()
+    penAnchor = undefined
     edgeStart = undefined
     draw.setMode('static')
     draw.clear()
     drawingMode = mode
     draw.setMode(mode)
-    if (mode === 'freehand') restoreNavigation = suspendMapNavigation(map)
     refreshDrawingHistory()
     error = ''
   }
@@ -219,6 +224,10 @@
     private from: Point = [width / 2, height / 2]
     private draggingStroke = false
 
+    get penPosition(): Point {
+      return toGeo(this.from)
+    }
+
     private constrain(event: TerraDrawMouseEvent): TerraDrawMouseEvent {
       try {
         this.from = constrainToImage(
@@ -238,6 +247,7 @@
     override onClick(event: TerraDrawMouseEvent) {
       // A touch tap has no hover phase. Only a drag should start a touch stroke.
       if (penPointerType !== 'mouse') return
+      restoreNavigation ??= suspendMapNavigation(map)
       super.onClick(this.constrain(event))
     }
     override onMouseMove(event: TerraDrawMouseEvent) {
@@ -277,49 +287,148 @@
   }
 
   class MaskMapAdapter extends TerraDrawMapLibreGLAdapter<MapLibreMap> {
+    preparePointer(event: PointerEvent) {
+      // Allow finger jitter before a tap becomes a drag, or a second finger
+      // starts native navigation instead of accidentally starting a stroke.
+      const distance = event.pointerType === 'touch' ? 8 : 1
+      this._minPixelDragDistanceSelecting = distance
+      this._minPixelDragDistance = distance
+    }
+
     resetPenGesture() {
       this._dragState = 'not-dragging'
       this._lastDrawEvent = undefined
     }
 
     override setDraggability(enabled: boolean) {
-      // Terra Draw normally re-enables dragging after every pointerup, including
-      // a tap that did not finish a stroke. Keep the pen's navigation lock.
-      super.setDraggability(enabled && drawingMode !== 'freehand')
+      // Keep the lock only during a stroke, including its paused pinch phase.
+      super.setDraggability(enabled && !restoreNavigation)
     }
   }
 
+  function releaseNavigation() {
+    const restore = restoreNavigation
+    restoreNavigation = undefined
+    restore?.()
+  }
+
   function penPointerDown(event: PointerEvent) {
-    if (drawingMode !== 'freehand') return
-    if (penTouches.start(event)) {
-      // Abandon only the unfinished stroke. Leave the previous mask/history and
-      // pen mode intact so a pinch never creates or edits a polygon.
-      draw!.setMode('static')
-      draw!.clear()
-      draw!.setMode('freehand')
+    if (drawingMode !== 'freehand' || event.button !== 0) return
+    const transition = penTouches.start(
+      event,
+      freehandMode?.state === 'drawing'
+    )
+    if (transition === 'pinch') penAnchor = freehandMode!.penPosition
+    if (transition === 'navigate') {
+      // No stroke yet: let MapLibre handle normal two-finger panning/zooming.
       adapter?.resetPenGesture()
-      error = ''
+      releaseNavigation()
     }
-    if (penTouches.pinching) event.stopImmediatePropagation()
-    else if (event.isPrimary) penPointerType = event.pointerType
+    if (penTouches.pinching || penTouches.navigating) {
+      event.stopImmediatePropagation()
+    } else if (event.isPrimary) {
+      penPointerType = event.pointerType
+      adapter?.preparePointer(event)
+      // Acquire before the first touchstart/mousedown reaches MapLibre, so the
+      // map cannot pan under a new stroke. Merely selecting Pen does not lock it.
+      restoreNavigation ??= suspendMapNavigation(map)
+    }
     map.getCanvas().setPointerCapture(event.pointerId)
   }
 
   function penPointerMove(event: PointerEvent) {
-    // MapLibre consumes touch events; block only Terra Draw's pointer events.
-    if (drawingMode === 'freehand' && penTouches.pinching)
+    if (drawingMode !== 'freehand') return
+    const change = penTouches.move(event)
+    if (change && penAnchor) {
+      map.zoomTo(map.getZoom() + change.zoomDelta, {
+        around: penAnchor,
+        duration: 0
+      })
+      // Keep the last drawn point under the drawing finger when both fingers
+      // move, so resuming does not insert a jump into the outline.
+      if (change.pan[0] || change.pan[1]) map.panBy(change.pan, { duration: 0 })
+    }
+    if (penTouches.pinching || penTouches.navigating)
       event.stopImmediatePropagation()
   }
 
   function penPointerUp(event: PointerEvent) {
-    if (drawingMode === 'freehand' && penTouches.end(event))
-      event.stopImmediatePropagation()
+    if (drawingMode !== 'freehand') return
+    if (penTouches.end(event)) event.stopImmediatePropagation()
+    if (!penTouches.pinching) penAnchor = undefined
+    // Terra Draw finishes the original pointer's stroke after this capture
+    // listener. A tap or the last navigation finger should release the lock too.
+    queueMicrotask(() => {
+      if (!penTouches.hasPointers && freehandMode?.state !== 'drawing')
+        releaseNavigation()
+    })
   }
 
   function penPointerCancel(event: PointerEvent) {
     if (drawingMode !== 'freehand') return
-    if (penTouches.end(event)) event.stopImmediatePropagation()
-    else if (event.isPrimary) cancelNewMask()
+    const suppress = penTouches.end(event)
+    event.stopImmediatePropagation()
+    if (!penTouches.pinching) penAnchor = undefined
+    if (!suppress) {
+      adapter?.resetPenGesture()
+      cancelNewMask()
+    }
+  }
+
+  function penTouch(event: TouchEvent) {
+    if (drawingMode !== 'freehand' || freehandMode?.state !== 'drawing') return
+    // MapLibre consumes TouchEvents, independently of Terra Draw's PointerEvents.
+    // During a stroke our pinch uses the pen point, not the fingers' midpoint.
+    // Between strokes the normal MapLibre handlers receive these events.
+    if (event.cancelable) event.preventDefault()
+    event.stopImmediatePropagation()
+  }
+
+  function vertexAt(event: PointerEvent) {
+    const rect = map.getCanvas().getBoundingClientRect()
+    const x = event.clientX - rect.left,
+      y = event.clientY - rect.top
+    let closest: number | undefined
+    let distance = 20
+    draft.forEach((point, index) => {
+      const screen = map.project(toGeo(point))
+      const next = Math.hypot(x - screen.x, y - screen.y)
+      if (next <= distance) {
+        closest = index
+        distance = next
+      }
+    })
+    return closest
+  }
+
+  function vertexPointerDown(event: PointerEvent) {
+    if (!drawingNewMask) {
+      adapter?.preparePointer(event)
+      vertexTaps.start(event, vertexAt(event))
+    }
+  }
+
+  function vertexPointerMove(event: PointerEvent) {
+    vertexTaps.move(event)
+  }
+
+  function vertexPointerUp(event: PointerEvent) {
+    if (drawingNewMask) return
+    const index = vertexTaps.end(event, vertexAt(event))
+    if (index === undefined) return
+    event.stopImmediatePropagation()
+    edgeStart = undefined
+    adapter?.resetPenGesture()
+    adapter?.setDraggability(true)
+    try {
+      replaceDraft(draft.filter((_, i) => i !== index))
+    } catch (problem) {
+      error = problem instanceof Error ? problem.message : String(problem)
+    }
+  }
+
+  function vertexPointerCancel() {
+    vertexTaps.reset()
   }
 
   function syncDraft(mask = draft) {
@@ -383,6 +492,7 @@
       event: TerraDrawMouseEvent,
       setDraggability: (enabled: boolean) => void
     ) {
+      vertexTaps.reset()
       const edge = edgeStart
       edgeStart = undefined
       if (edge) {
@@ -617,27 +727,28 @@
         coordinatePrecision: 32,
         ignoreMismatchedPointerEvents: true
       })
+      freehandMode = new MaskFreehandMode({
+        drawInteraction: 'click-move-or-drag',
+        keyEvents: { cancel: null, finish: 'Enter' },
+        minDistance: 4,
+        smoothing: 0,
+        preventPointsNearClose: true,
+        styles: {
+          fillColor: '#ffffff',
+          fillOpacity: 0.15,
+          outlineColor: themeColors.pink,
+          outlineWidth: 5,
+          closingPointColor: '#ffffff',
+          closingPointOutlineColor: themeColors.pink,
+          closingPointWidth: 4,
+          closingPointOutlineWidth: 3
+        }
+      })
       draw = new TerraDraw({
         adapter,
         modes: [
           polygonMode,
-          new MaskFreehandMode({
-            drawInteraction: 'click-move-or-drag',
-            keyEvents: { cancel: null, finish: 'Enter' },
-            minDistance: 4,
-            smoothing: 0,
-            preventPointsNearClose: true,
-            styles: {
-              fillColor: '#ffffff',
-              fillOpacity: 0.15,
-              outlineColor: themeColors.pink,
-              outlineWidth: 5,
-              closingPointColor: '#ffffff',
-              closingPointOutlineColor: themeColors.pink,
-              closingPointWidth: 4,
-              closingPointOutlineWidth: 3
-            }
-          }),
+          freehandMode,
           new MaskSelectMode({
             pointerDistance: 12,
             allowManualDeselection: false,
@@ -720,6 +831,16 @@
           if (ready) refreshDrawingHistory()
         })
       )
+      const canvas = map.getCanvas()
+      canvas.addEventListener('pointerdown', vertexPointerDown, true)
+      canvas.addEventListener('pointermove', vertexPointerMove, true)
+      canvas.addEventListener('pointerup', vertexPointerUp, true)
+      canvas.addEventListener('pointercancel', vertexPointerCancel, true)
+      for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
+        canvas.addEventListener(type, penTouch as EventListener, {
+          capture: true,
+          passive: false
+        })
       map.getCanvas().addEventListener('pointerdown', edgePointerDown, true)
       map.getCanvas().addEventListener('pointerdown', penPointerDown, true)
       map.getCanvas().addEventListener('pointermove', penPointerMove, true)
@@ -731,6 +852,13 @@
     }
     return () => {
       ready = false
+      const canvas = map.getCanvas()
+      canvas.removeEventListener('pointerdown', vertexPointerDown, true)
+      canvas.removeEventListener('pointermove', vertexPointerMove, true)
+      canvas.removeEventListener('pointerup', vertexPointerUp, true)
+      canvas.removeEventListener('pointercancel', vertexPointerCancel, true)
+      for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
+        canvas.removeEventListener(type, penTouch as EventListener, true)
       map.getCanvas().removeEventListener('pointerdown', edgePointerDown, true)
       map.getCanvas().removeEventListener('pointerdown', penPointerDown, true)
       map.getCanvas().removeEventListener('pointermove', penPointerMove, true)
@@ -738,8 +866,9 @@
       map
         .getCanvas()
         .removeEventListener('pointercancel', penPointerCancel, true)
-      restoreNavigation?.()
+      releaseNavigation()
       penTouches.reset()
+      vertexTaps.reset()
       draw?.stop()
       map.dragPan.enable()
       for (const other of visibility) {
@@ -883,11 +1012,12 @@
   </div>
   <p class="sr-only">
     Drag vertices to edit. Drag any mask edge to add a vertex. Right-click a
-    vertex to remove it. Vertices stop at the image boundary. Done or ⌘/Ctrl
-    Enter saves; Escape cancels. Draw new mask replaces the polygon after you
-    click its first point or press Enter. The pen draws a freehand polygon and
-    simplifies the stroke. Release to finish, or click to start and finish. Full
-    image mask restores the image bounds. Orthogonalize straightens near-right
-    corners. Escape cancels an unfinished drawing.
+    vertex or double-tap it on touch screens to remove it. Vertices stop at the
+    image boundary. Done or ⌘/Ctrl Enter saves; Escape cancels. Draw new mask
+    replaces the polygon after you click its first point or press Enter. The pen
+    draws a freehand polygon and simplifies the stroke. Release to finish, or
+    click to start and finish. Full image mask restores the image bounds.
+    Orthogonalize straightens near-right corners. Escape cancels an unfinished
+    drawing.
   </p>
 </section>
