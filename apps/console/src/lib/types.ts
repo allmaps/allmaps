@@ -26,6 +26,7 @@ export type Organization = {
 }
 
 export type ConsoleUser = {
+  isAnonymous?: boolean | null
   id: string
   name?: string | null
   slug?: string | null

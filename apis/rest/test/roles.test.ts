@@ -19,8 +19,9 @@ describe('query limits', () => {
   test.each([
     [null, 'public', 200],
     ['user', 'user', 400],
-    ['collaborator', 'collaborator', 1000],
+    ['collaborator', 'collaborator', 600],
     ['admin', 'admin', 600],
+    ['owner', 'user', 400],
     ['unrecognized', 'user', 400]
   ] as const)(
     '%s resolves to %s with a maximum of %i',
@@ -31,15 +32,15 @@ describe('query limits', () => {
     }
   )
 
-  test.each([1, 200, 400, 999, 1000, 1001])(
+  test.each([1, 200, 400, 599, 600, 601, 1000])(
     'clamps requested collaborator limit %i',
     (limit) => {
-      expect(clampLimit(limit, 'collaborator')).toBe(Math.min(limit, 1000))
+      expect(clampLimit(limit, 'collaborator')).toBe(Math.min(limit, 600))
     }
   )
 
   test('keeps the default and organization-plan maximum', () => {
-    expect(COLLABORATOR_MAX_LIMIT).toBe(1000)
+    expect(COLLABORATOR_MAX_LIMIT).toBe(600)
     expect(clampLimit(undefined, 'collaborator')).toBe(50)
     expect(clampLimit(1000, 'organizationPlanMember')).toBe(600)
   })
@@ -62,8 +63,11 @@ function createPermissionApp(
     .get('/organization-limit', async ({ getOrganizationLimitRole }) =>
       getOrganizationLimitRole({ id: 'organization-id' })
     )
-    .get('/organization-import', async ({ canImportOrganizationIiif }) =>
-      canImportOrganizationIiif({ id: 'organization-id' })
+    .get(
+      '/organization-import',
+      async ({ getOrganizationIiifImportAccess }) =>
+        (await getOrganizationIiifImportAccess({ id: 'organization-id' }))
+          .canImport
     )
     .post('/import', () => 'Imported', { importIiif: true })
     .post('/admin', () => 'Admin', { admin: true })
@@ -104,11 +108,11 @@ test('collaborators are refused administrator access', async () => {
 test.each([
   [null, null, 'public', false],
   ['user', null, 'user', false],
-  ['user', 'contributor', 'organizationPlanMember', true],
-  ['collaborator', null, 'collaborator', false],
+  ['user', 'contributor', 'organizationPlanMember', false],
+  ['collaborator', null, 'collaborator', true],
   ['collaborator', 'supporter', 'collaborator', true],
   ['collaborator', 'innovator', 'collaborator', true],
-  ['collaborator', 'unrecognized', 'collaborator', false],
+  ['collaborator', 'unrecognized', 'collaborator', true],
   ['admin', null, 'admin', true]
 ] as const)(
   'organization policy for %s with plan %s',
@@ -125,9 +129,7 @@ test.each([
       ).json()
     ).toBe(canImport)
 
-    expect(db.query.limit).toHaveBeenCalledTimes(
-      role === 'user' ? 2 : role === 'collaborator' ? 1 : 0
-    )
+    expect(db.query.limit).toHaveBeenCalledTimes(role === 'user' ? 2 : 0)
   }
 )
 
@@ -189,5 +191,41 @@ test('production Better Auth registers Collaborator with no administration permi
   for (const action of ['list', 'revoke', 'delete'] as const) {
     expect(collaborator.authorize({ session: [action] }).success).toBe(false)
   }
-  expect(admin.authorize({ user: ['set-role'] }).success).toBe(true)
+  expect(admin.authorize({ user: ['set-role'] }).success).toBe(false)
+})
+
+test('production Better Auth gives organization owners management permissions without deletion', () => {
+  const { auth } = createAuth({
+    DATABASE_URL: 'postgresql://test:test@database.example/allmaps',
+    BETTER_AUTH_URL: 'https://api.example',
+    BETTER_AUTH_SECRET: 'test-secret-with-at-least-thirty-two-characters',
+    BETTER_AUTH_COOKIE_PREFIX: 'test',
+    GITHUB_CLIENT_ID: 'test',
+    GITHUB_CLIENT_SECRET: 'test'
+  })
+  const plugin = auth.options.plugins?.find(
+    (plugin) => plugin.id === 'organization'
+  )
+  const roles = plugin?.options.roles
+  const owner = roles?.owner
+  if (!owner) throw new Error('Missing organization owner role')
+  expect(roles).not.toHaveProperty('admin')
+  expect(plugin?.options.creatorRole).toBe('owner')
+  expect(plugin?.options.disableOrganizationDeletion).toBe(true)
+  expect(owner.authorize({ organization: ['update'] }).success).toBe(true)
+  expect(owner.authorize({ organization: ['delete'] }).success).toBe(false)
+  for (const action of ['create', 'update', 'delete'] as const) {
+    expect(owner.authorize({ member: [action] }).success).toBe(true)
+  }
+})
+
+test('revoking Allmaps admin in the database immediately removes admin access', async () => {
+  const { app, getSession } = createPermissionApp('admin', null, 'user')
+  const response = await app.handle(
+    new Request('http://localhost/admin', { method: 'POST' })
+  )
+  expect(response.status).toBe(401)
+  expect(getSession).toHaveBeenCalledWith(
+    expect.objectContaining({ query: { disableCookieCache: true } })
+  )
 })

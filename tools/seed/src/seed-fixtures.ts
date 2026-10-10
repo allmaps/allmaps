@@ -155,7 +155,7 @@ export async function createSeedFixtures(fixturePort = ports.iiif) {
   const memberships = await Promise.all(
     [
       { user: users[0], organization: organizations[0], role: 'owner' },
-      { user: users[1], organization: organizations[0], role: 'admin' },
+      { user: users[1], organization: organizations[0], role: 'owner' },
       { user: users[2], organization: organizations[0], role: 'member' },
       { user: users[2], organization: organizations[1], role: 'owner' }
     ].map(async (membership) => ({

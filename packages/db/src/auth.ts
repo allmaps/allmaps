@@ -5,7 +5,11 @@ import type { BetterAuthEnv } from '@allmaps/env'
 import { generateRandomId } from '@allmaps/id/sync'
 
 import { anonymous, openAPI, admin, organization } from 'better-auth/plugins'
-import { defaultRoles, userAc } from 'better-auth/plugins/admin/access'
+import { adminAc, defaultAc, userAc } from 'better-auth/plugins/admin/access'
+import {
+  adminAc as organizationOwnerAc,
+  memberAc
+} from 'better-auth/plugins/organization/access'
 
 import { getNeonHttpDb } from './db.js'
 import type { Db } from './db.js'
@@ -25,6 +29,20 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
     baseURL,
     secret: env.BETTER_AUTH_SECRET,
     basePath: '/auth',
+    // Organization writes use the REST API's shared authorization and validation.
+    disabledPaths: [
+      '/admin/set-role',
+      '/organization/create',
+      '/organization/update',
+      '/organization/delete',
+      '/organization/update-member-role',
+      '/organization/remove-member',
+      '/organization/leave',
+      '/organization/invite-member',
+      '/organization/cancel-invitation',
+      '/organization/accept-invitation',
+      '/organization/reject-invitation'
+    ],
     database: drizzleAdapter(db, {
       provider: 'pg',
       schema: authSchema,
@@ -80,11 +98,25 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
       anonymous(),
       openAPI(),
       admin({
-        roles: { ...defaultRoles, collaborator: userAc },
+        roles: {
+          user: userAc,
+          collaborator: userAc,
+          // Role writes use the REST policy; account deletion requires database cleanup.
+          admin: defaultAc.newRole({
+            ...adminAc.statements,
+            user: adminAc.statements.user.filter(
+              (action) => action !== 'set-role' && action !== 'delete'
+            )
+          })
+        },
         adminRoles: ['admin']
       }),
       organization({
         allowUserToCreateOrganization: false,
+        disableOrganizationDeletion: true,
+        creatorRole: 'owner',
+        // Owners manage their organization; only Allmaps admins can delete it.
+        roles: { owner: organizationOwnerAc, member: memberAc },
         schema: {
           organization: {
             additionalFields: {
@@ -96,7 +128,7 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
               plan: {
                 type: 'string',
                 required: false,
-                input: true
+                input: false
               },
               displayCollections: {
                 type: 'boolean',

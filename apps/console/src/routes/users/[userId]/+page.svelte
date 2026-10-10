@@ -13,7 +13,7 @@
     addOrganizationMember,
     removeOrganizationMember
   } from '../../organizations/organizations.remote.js'
-  import { setUserRole, updateUserForm } from '../users.remote.js'
+  import { updateUserForm, updateUserRole } from '../users.remote.js'
 
   import type { PageProps } from './$types'
 
@@ -32,10 +32,10 @@
   let editUserRole = $derived<'user' | 'collaborator' | 'admin'>(
     (user.role as 'user' | 'collaborator' | 'admin') ?? 'user'
   )
-  let isChangingRole = $state(false)
+  let isUpdatingRole = $state(false)
   let selectedOrganizationId = $state('')
   let organizationSearchValue = $state('')
-  let selectedOrganizationRole = $state<'admin' | 'member'>('member')
+  let selectedOrganizationRole = $state<'owner' | 'member'>('member')
   let isAddingToOrganization = $state(false)
   let removingOrganizationId = $state<string | null>(null)
   let error = $state<string | null>(null)
@@ -76,38 +76,13 @@
     selectedOrganizationId = ''
     organizationSearchValue = ''
     selectedOrganizationRole = 'member'
-    isChangingRole = false
     isAddingToOrganization = false
     removingOrganizationId = null
     error = null
   })
 
-  async function changeRole() {
-    if (!data.isAdmin) {
-      return
-    }
-    if (!userId) {
-      return
-    }
-
-    isChangingRole = true
-    error = null
-
-    try {
-      await setUserRole({
-        userId,
-        role: editUserRole
-      })
-      await invalidateAll()
-    } catch (err) {
-      error = err instanceof Error ? err.message : 'Failed to change role'
-    } finally {
-      isChangingRole = false
-    }
-  }
-
   async function addToOrganization() {
-    if (!selectedOrganizationId || !data.isAdmin) {
+    if (!selectedOrganizationId || !data.canManageOrganizations) {
       return
     }
 
@@ -147,7 +122,7 @@
     organizationIdOrUrl: string,
     organizationName: string
   ) {
-    if (!data.isAdmin || !userId) {
+    if (!data.canManageOrganizations || !userId) {
       return
     }
 
@@ -177,6 +152,20 @@
     }
   }
 
+  async function saveRole() {
+    if (editUserRole === 'admin') return
+    isUpdatingRole = true
+    error = null
+    try {
+      await updateUserRole({ userId, role: editUserRole })
+      await invalidateAll()
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Failed to update role'
+    } finally {
+      isUpdatingRole = false
+    }
+  }
+
   function cancel() {
     void goto(data.isCurrentUser ? routes.home() : routes.users())
   }
@@ -185,7 +174,11 @@
 <div class="max-w-3xl mx-auto px-4 py-8">
   <div class="mb-8">
     <h1 class="text-3xl font-bold">
-      {data.isCurrentUser ? 'My Profile' : 'Edit User'}
+      {data.isCurrentUser
+        ? 'My Profile'
+        : data.isAdmin
+          ? 'Edit User'
+          : 'User Profile'}
     </h1>
   </div>
 
@@ -214,6 +207,7 @@
           id="userName"
           type="text"
           name="name"
+          disabled={!data.canEditProfile}
           bind:value={editUserName}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="John Doe"
@@ -231,6 +225,7 @@
           id="userEmail"
           type="email"
           name="email"
+          disabled={!data.isAdmin}
           bind:value={editUserEmail}
           required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -250,7 +245,7 @@
           type="text"
           name="slug"
           bind:value={editUserSlug}
-          disabled={!data.isAdmin}
+          disabled={!data.canEditProfile}
           pattern={slugPattern}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="username"
@@ -264,27 +259,26 @@
         >
           Role
         </label>
-        <div class="flex gap-2">
-          <AppSelect
-            id="userRole"
-            bind:value={editUserRole}
-            items={userRoleItems}
-            disabled={!data.isAdmin}
-          />
-          {#if data.isAdmin}
-            <button
-              type="button"
-              onclick={changeRole}
-              disabled={isChangingRole ||
-                editUserRole === (user.role || 'user')}
-              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
-            >
-              {isChangingRole ? 'Saving…' : 'Save'}
-            </button>
-          {/if}
-        </div>
+        <AppSelect
+          id="userRole"
+          bind:value={editUserRole}
+          items={data.isAdmin && user.role !== 'admin'
+            ? userRoleItems.filter((item) => item.value !== 'admin')
+            : userRoleItems}
+          disabled={!data.isAdmin || user.role === 'admin' || isUpdatingRole}
+        />
       </div>
 
+      {#if data.isAdmin && user.role !== 'admin'}
+        <button
+          type="button"
+          class="text-sm text-blue-600 hover:underline disabled:opacity-50"
+          disabled={isUpdatingRole || editUserRole === (user.role ?? 'user')}
+          onclick={saveRole}
+        >
+          {isUpdatingRole ? 'Saving role...' : 'Save role'}
+        </button>
+      {/if}
       <div class="flex items-center">
         <input
           id="userBanned"
@@ -335,27 +329,35 @@
               <div
                 class="flex items-center justify-between px-3 py-2 rounded border border-gray-200 hover:bg-gray-50 transition"
               >
-                <a
-                  href={routes.organization(membershipOrganizationId)}
-                  class="min-w-0"
-                >
-                  <span class="block text-sm font-medium">
-                    {membership.organization.name}
-                  </span>
-                  {#if membership.createdAt}
-                    <span class="block text-xs text-gray-500">
-                      Added {new Date(
-                        membership.createdAt
-                      ).toLocaleDateString()}
+                {#if data.canManageOrganizations || data.isCurrentUser}
+                  <a
+                    href={routes.organization(membershipOrganizationId)}
+                    class="min-w-0"
+                  >
+                    <span class="block text-sm font-medium">
+                      {membership.organization.name}
                     </span>
-                  {/if}
-                </a>
+                    {#if membership.createdAt}
+                      <span class="block text-xs text-gray-500">
+                        Added {new Date(
+                          membership.createdAt
+                        ).toLocaleDateString()}
+                      </span>
+                    {/if}
+                  </a>
+                {:else}
+                  <span class="text-sm font-medium"
+                    >{membership.organization.name}</span
+                  >
+                {/if}
                 <div class="flex items-center gap-2">
                   <span
                     class="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600"
-                    >{membership.userRole}</span
+                    >{orgMemberRoleItems.find(
+                      (item) => item.value === membership.userRole
+                    )?.label ?? membership.userRole}</span
                   >
-                  {#if data.isAdmin}
+                  {#if data.canManageOrganizations}
                     <button
                       type="button"
                       onclick={() =>
@@ -379,7 +381,7 @@
         {/if}
       </div>
 
-      {#if data.isAdmin}
+      {#if data.canManageOrganizations}
         <div class="border-t pt-6">
           <h3 class="text-lg font-semibold mb-4">Add to Organization</h3>
           <div class="space-y-4">
@@ -481,7 +483,7 @@
       {/if}
     </div>
 
-    {#if data.isAdmin}
+    {#if data.canEditProfile}
       <div class="flex gap-3 justify-end mt-8 pt-6 border-t">
         <button
           type="button"

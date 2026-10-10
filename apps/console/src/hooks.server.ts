@@ -16,19 +16,24 @@ export const handle: Handle = async ({ event, resolve }) => {
   const isProfileRoute = routeId?.startsWith('/profile')
   const isOrganizationRoute = routeId?.startsWith('/organizations')
   const isUserIndexRoute = routeId === '/users'
+  const isUserRoute = routeId?.startsWith('/users')
 
-  if (isProfileRoute || isOrganizationRoute || isUserIndexRoute) {
+  if (isProfileRoute || isOrganizationRoute || isUserRoute) {
     const session = await event.locals.getConsoleSession()
 
-    if (isProfileRoute && !session?.user?.id) {
+    if (!session?.user?.id) {
       redirect(302, '/')
     }
 
+    if (routeId === '/organizations/new' && session?.user?.role !== 'admin') {
+      error(403, 'Allmaps admin access required')
+    }
     if (
-      (isOrganizationRoute || isUserIndexRoute) &&
-      session?.user?.role !== 'admin'
+      isUserIndexRoute &&
+      session?.user?.role !== 'admin' &&
+      session?.user?.role !== 'collaborator'
     ) {
-      error(403, 'Administrator access required')
+      error(403, 'Admin or collaborator access required')
     }
   }
 

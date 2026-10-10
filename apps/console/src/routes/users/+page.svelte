@@ -277,7 +277,7 @@
                   <span
                     class="rounded px-2 py-0.5 font-sans text-xs font-medium bg-pink-100 text-pink-700"
                   >
-                    🛡️ Admin
+                    🛡️ Allmaps admin
                   </span>
                 {:else if user.role === 'collaborator'}
                   <span

@@ -5,7 +5,7 @@ import type { RestEnv } from '@allmaps/env/rest'
 
 export function sessionForRole(role: string) {
   return {
-    user: { id: 'user-id', role, slug: 'collaborator' },
+    user: { id: 'user-id', role, slug: 'collaborator', isAnonymous: false },
     session: { id: 'session-id' }
   }
 }
@@ -27,12 +27,17 @@ export function createTestAuth(
   }
 }
 
-export function createMembershipDb(plan: string | null = null) {
+export function createMembershipDb(
+  plan: string | null = null,
+  memberRole = 'member'
+) {
   const query = {
     from: vi.fn(() => query),
     innerJoin: vi.fn(() => query),
     where: vi.fn(() => query),
-    limit: vi.fn(async () => (plan === null ? [] : [{ plan }])),
+    limit: vi.fn(async () =>
+      plan === null ? [] : [{ plan, role: memberRole }]
+    ),
     images: {
       findMany: vi.fn(async (_options: { limit: number }) => [] as unknown[])
     }

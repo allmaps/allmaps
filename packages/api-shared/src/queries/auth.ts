@@ -1,6 +1,8 @@
-import { eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray, isNull, ne, or } from 'drizzle-orm'
 
 import * as authSchema from '@allmaps/db/schema/auth'
+
+import { ResponseError } from '../shared/errors.js'
 
 import { clampLimit } from '../shared/limits.js'
 
@@ -403,4 +405,33 @@ export async function queryUsers(
     .limit(clampLimit(limit, userRole))
 
   return users.map((user) => fromDbUser(restBaseUrl, user))
+}
+
+// Keep Admin assignment and removal database-only, including concurrent promotions.
+export async function setUserRole(
+  db: Db,
+  userId: string,
+  role: 'user' | 'collaborator'
+) {
+  const [user] = await db
+    .update(authSchema.users)
+    .set({ role, updatedAt: new Date() })
+    .where(
+      and(
+        eq(authSchema.users.id, userId),
+        eq(authSchema.users.isAnonymous, false),
+        or(isNull(authSchema.users.role), ne(authSchema.users.role, 'admin'))
+      )
+    )
+    .returning({ id: authSchema.users.id, role: authSchema.users.role })
+  if (user) return user
+  const existing = await db.query.users.findFirst({
+    columns: { id: true },
+    where: { id: { eq: userId } }
+  })
+  if (!existing) throw new ResponseError('User not found', 404)
+  throw new ResponseError(
+    'Admin roles and anonymous accounts cannot be changed here',
+    403
+  )
 }

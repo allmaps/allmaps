@@ -2,6 +2,7 @@ import { Elysia } from 'elysia'
 import { describe, expect, test, vi } from 'vitest'
 
 import type { Db } from '@allmaps/db'
+import { changeOrganizationMember } from '@allmaps/api-shared/db'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 
 import { createAuthRoutes } from '../src/routes/auth.js'
@@ -10,7 +11,9 @@ import { createTestAuth, env, request, sessionForRole } from './helpers.js'
 vi.mock('@allmaps/api-shared/db', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@allmaps/api-shared/db')>()),
   queryAdminOrganizationById: vi.fn(async () => ({ id: 'organization-id' })),
-  queryOrganizationMemberByUserId: vi.fn(async () => ({ id: 'member-id' })),
+  changeOrganizationMember: vi.fn(
+    async (_db, _organizationId, _userId, role) => ({ role })
+  ),
   queryUserByEmail: vi.fn(async () => ({ id: 'user-id' }))
 }))
 
@@ -59,29 +62,8 @@ describe('adding organization members', () => {
     expect(await response.json()).toMatchObject({ role: 'member' })
   })
 
-  test.each(
-    ['admin', 'member', 'owner', ['admin', 'member']].map((role) => ({ role }))
-  )('preserves the explicitly supplied role %j', async ({ role }) => {
-    const { app, addMember } = setup()
-    const response = await app.handle(
-      request('/organizations/organization-id/users', {
-        email: 'user@example.org',
-        role
-      })
-    )
-
-    expect(response.status).toBe(200)
-    expect(addMember).toHaveBeenCalledWith({
-      body: {
-        userId: 'user-id',
-        organizationId: 'organization-id',
-        role
-      }
-    })
-  })
-
-  test.each([null, 'invalid', ['member', 'invalid']].map((role) => ({ role })))(
-    'rejects invalid role %j before calling Better Auth',
+  test.each(['owner', 'member'].map((role) => ({ role })))(
+    'preserves the explicitly supplied role %j',
     async ({ role }) => {
       const { app, addMember } = setup()
       const response = await app.handle(
@@ -91,14 +73,37 @@ describe('adding organization members', () => {
         })
       )
 
-      expect(response.status).toBe(422)
-      expect(addMember).not.toHaveBeenCalled()
+      expect(response.status).toBe(200)
+      expect(addMember).toHaveBeenCalledWith({
+        body: {
+          userId: 'user-id',
+          organizationId: 'organization-id',
+          role
+        }
+      })
     }
   )
+
+  test.each(
+    [null, 'invalid', 'admin', ['owner', 'member'], ['member', 'invalid']].map(
+      (role) => ({ role })
+    )
+  )('rejects invalid role %j before calling Better Auth', async ({ role }) => {
+    const { app, addMember } = setup()
+    const response = await app.handle(
+      request('/organizations/organization-id/users', {
+        email: 'user@example.org',
+        role
+      })
+    )
+
+    expect(response.status).toBe(422)
+    expect(addMember).not.toHaveBeenCalled()
+  })
 })
 
 describe('updating organization member roles', () => {
-  test.each([{}, { role: null }, { role: 'invalid' }])(
+  test.each([{}, { role: null }, { role: 'invalid' }, { role: 'admin' }])(
     'rejects missing or invalid roles: %j',
     async (body) => {
       const { app, updateMemberRole } = setup()
@@ -111,7 +116,7 @@ describe('updating organization member roles', () => {
     }
   )
 
-  test.each(['admin', 'member', 'owner'])(
+  test.each(['owner', 'member'])(
     'preserves the explicitly supplied role %s',
     async (role) => {
       const { app, updateMemberRole } = setup()
@@ -124,14 +129,14 @@ describe('updating organization member roles', () => {
       )
 
       expect(response.status).toBe(200)
-      expect(updateMemberRole).toHaveBeenCalledWith({
-        body: {
-          memberId: 'member-id',
-          organizationId: 'organization-id',
-          role
-        },
-        headers: expect.any(Headers)
-      })
+      expect(changeOrganizationMember).toHaveBeenCalledWith(
+        expect.anything(),
+        'organization-id',
+        'user-id',
+        role,
+        sessionForRole('admin').user
+      )
+      expect(updateMemberRole).not.toHaveBeenCalled()
     }
   )
 })

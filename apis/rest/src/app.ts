@@ -46,10 +46,6 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     name: 'app'
   })
     .use(betterAuthPlugin)
-    .derive(({ request }) => ({
-      getOptionalSession: () =>
-        betterAuth.auth.api.getSession({ headers: request.headers })
-    }))
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)

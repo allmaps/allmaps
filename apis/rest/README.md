@@ -3,38 +3,92 @@
 ## User roles and limits
 
 Authenticated accounts have the `user`, `collaborator`, or `admin` role.
-Administrators can assign and revoke Collaborator status in the console's user
-details using the existing `/auth/admin/set-role` endpoint. No database migration
-is needed because the existing `users.role` column stores text.
+Assigning or removing Admin requires updating `users.role` directly in the database.
+Admins can assign or remove Collaborator in the Console using
+`PATCH /users/:userId/role`, which accepts only `user` or `collaborator` and cannot
+change an Admin account. The built-in `/auth/admin/set-role` endpoint remains
+disabled, and Better Auth user creation/update endpoints cannot write roles.
+Account deletion through Better Auth is also disabled: its cascading membership
+deletes would bypass last-owner protection. Account deletion requires transferring
+any sole ownership and cleaning up related data in the database.
 
 | Request context                                     | Maximum results per request |
 | --------------------------------------------------- | --------------------------: |
 | Public                                              |                         200 |
 | User                                                |                         400 |
-| Collaborator                                        |                       1,000 |
+| Collaborator                                        |                         600 |
 | Organization-plan member querying that organization |                         600 |
 | Admin                                               |                         600 |
 
-Collaborator limits also apply to public data within organization queries.
-Membership and visibility rules still determine which organization details a
-user can access. Existing endpoint default limits are unchanged. Requests using
-elevated limits are not cached publicly.
+Contributor, Supporter, and Innovator have identical import and query-limit
+permissions. Ownership does not independently raise query limits. Existing endpoint
+default limits are unchanged. Elevated limits and private account data are not
+cached publicly.
 
-## IIIF imports
+## Imports
 
 Admins and collaborators can use `POST /manifests` and `POST /images` to import
 IIIF resources from any institution. Both accept `{ "url": "…" }` or an array
 of those objects. Importing an existing resource refreshes its stored IIIF data.
 
-Organization import endpoints require an admin or membership in the target
-organization with a qualifying organization plan, and retain their domain
-restrictions. Collaborator status alone does not grant that membership.
+Organization import endpoints accept admins and collaborators for any organization,
+regardless of membership, plan, or domains. Owners can import only into their own
+organization with a Contributor, Supporter, or Innovator plan, and only from its
+configured domains. Owners without a plan and regular organization members cannot
+import. Owners cannot change domains or plans to expand their import rights.
 
-Collaborators cannot administer users or organizations, assign roles, or modify
-other users' lists. Their Better Auth administration permissions are the same
-as an ordinary user's. Imports bypass the session cookie cache, so revoking
-the role immediately removes general import access. Query limits can take up
-to five minutes to reflect a role change because of the existing session cache.
+Georeference-data imports through `POST /maps` and `PATCH /maps/:mapId` require an
+Admin. This is separate from normal collaborative georeferencing in the Editor.
+
+Session loading delegates to Better Auth, sharing reads within each request.
+Imports and management operations use fresh sessions, so database role revocations
+take effect immediately. Query limits can take up to five minutes to reflect a role
+change because of the session cookie cache.
+
+## Console and organization permissions
+
+Global roles and organization membership are independent. A user may be a `member`
+or `owner` of multiple organizations; global Admin and Collaborator permissions
+apply across all organizations.
+
+| Action                                           | User          | Member        | Owner         | Collaborator  | Admin         |
+| ------------------------------------------------ | ------------- | ------------- | ------------- | ------------- | ------------- |
+| View/edit own basic profile                      | Yes           | Yes           | Yes           | Yes           | Yes           |
+| View organization settings and members           | No            | Own           | Own           | All           | All           |
+| View other user profiles                         | No            | No            | No            | Yes           | Yes           |
+| Edit other user profiles                         | No            | No            | No            | No            | Yes           |
+| Edit organization name, logo, homepage, location | No            | No            | Own           | All           | All           |
+| Edit slug, domains, collection display           | No            | No            | No            | Yes           | Yes           |
+| Change organization plan                         | No            | No            | No            | No            | Yes           |
+| Add/remove regular members                       | No            | No            | Own           | All           | All           |
+| Assign, demote, or remove owners                 | No            | No            | No            | Yes           | Yes           |
+| Create/delete organizations                      | No            | No            | No            | No            | Yes           |
+| Assign/remove Collaborator                       | No            | No            | No            | No            | Yes           |
+| Assign/remove Admin                              | Database only | Database only | Database only | Database only | Database only |
+
+Anonymous sessions cannot access Console profiles or management. Signed-in users
+without memberships see their own profile. Members see their own organizations
+read-only. Members and owners can see their organization member lists but cannot
+open other users' profiles. Personal lists remain restricted to their account owner.
+
+Adding a member requires an existing account; invitations to unregistered people
+are not supported. Owners cannot promote, demote, or remove any owner, including
+themselves. Admins and collaborators cannot remove or demote the last owner.
+Membership updates/removals lock the organization and recheck permissions before
+writing, protecting against concurrent last-owner removal and membership revocation.
+Member additions use Better Auth’s organization API. Updates and removals use the
+locked transaction because Better Auth requires the actor to be an organization
+member, while Allmaps also permits global managers without membership.
+
+Organization writes use the REST endpoints. Duplicate built-in auth write endpoints,
+including invitation writes and leaving an organization, remain disabled.
+`GET /organizations/:organizationId/permissions` separates view, edit, membership,
+owner-assignment, field-specific, and deletion permissions for Console controls.
+
+Apply the `20261021000000_normalize-organization-roles` migration with this change.
+It converts legacy organization admin memberships and pending admin invitations to
+owner, and collapses legacy combined roles to owner or member. Global roles are
+unchanged. The refined permissions require no additional database migration.
 
 ## Organization mutations
 

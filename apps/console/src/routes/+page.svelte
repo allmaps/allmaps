@@ -35,6 +35,9 @@
     data.session?.user ? toBasicUser(data.session.user) : undefined
   )
   const isAdmin = $derived(user?.role === 'admin')
+  const canManageOrganizations = $derived(
+    isAdmin || user?.role === 'collaborator'
+  )
 
   function getInitials(value: string) {
     return value
@@ -88,7 +91,7 @@
                 ? 'bg-pink-100 text-pink-700'
                 : 'bg-gray-100 text-gray-600'}"
             >
-              {user.role || 'user'}
+              {isAdmin ? 'Allmaps admin' : user.role || 'user'}
             </span>
             <span class="text-gray-300 transition group-hover:text-blue-400"
               >→</span
@@ -97,17 +100,18 @@
         </div>
       </a>
 
-      {#if isAdmin}
-        <!-- Admin section -->
+      {#if canManageOrganizations}
         <div class="rounded-xl border border-gray-200 bg-white overflow-hidden">
           <div
             class="flex items-center gap-3 border-b border-gray-100 px-5 py-4"
           >
-            <h2 class="font-sans font-medium text-black">Admin</h2>
+            <h2 class="font-sans font-medium text-black">
+              Allmaps administration
+            </h2>
             <span
               class="rounded bg-pink-100 px-2 py-0.5 font-sans text-xs font-medium uppercase tracking-wide text-pink-700"
             >
-              admin only
+              {isAdmin ? 'Allmaps admin' : 'Collaborator'}
             </span>
           </div>
 
@@ -121,7 +125,9 @@
               <div>
                 <h3 class="font-sans font-medium text-black">Users</h3>
                 <p class="mt-1 text-sm text-gray-500 font-sans">
-                  Manage accounts, roles, and profiles.
+                  {isAdmin
+                    ? 'Manage accounts and profiles.'
+                    : 'View accounts and profiles.'}
                 </p>
               </div>
               <span
@@ -137,7 +143,9 @@
               <div>
                 <h3 class="font-sans font-medium text-black">Organizations</h3>
                 <p class="mt-1 text-sm text-gray-500 font-sans">
-                  Edit settings, plans, and memberships.
+                  {isAdmin
+                    ? 'Edit settings, plans, and memberships.'
+                    : 'Edit organization settings and memberships.'}
                 </p>
               </div>
               <span
@@ -147,6 +155,16 @@
             </a>
           </div>
         </div>
+      {:else if data.hasOrganizations}
+        <a
+          href={routes.organizations()}
+          class="block rounded-xl border border-gray-200 bg-white p-5 transition hover:border-blue-400 hover:shadow-md"
+        >
+          <h2 class="font-sans font-medium text-black">Your organizations</h2>
+          <p class="mt-1 text-sm text-gray-500">
+            View your organizations, their settings, and members.
+          </p>
+        </a>
       {/if}
     </div>
   {/if}

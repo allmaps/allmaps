@@ -28,13 +28,14 @@ import {
 import {
   ORGANIZATION_PLANS,
   getUserLimitRole,
+  isOrganizationManager,
   needsElevatedLimitRole,
   normalizeOrganizationsQueryParams,
   setCacheControl
 } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
-import { adminDetail } from '../openapi.js'
+import { adminDetail, organizationOwnerDetail } from '../openapi.js'
 
 // Mutation schemas must not add defaults to omitted fields.
 const OrganizationPlan = t.Union(
@@ -91,7 +92,11 @@ type CreateIiifBody = { url: string } | { url: string }[]
 
 const organizationMutationDetail = {
   security: [{ sessionCookie: [] }],
-  'x-badges': [{ name: 'Admin or organization plan member', color: '#df0' }]
+  description:
+    'Admins and collaborators may import regardless of plan or domains. Owners need Contributor, Supporter, or Innovator and matching organization domains.',
+  'x-badges': [
+    { name: 'Admin, collaborator, or qualifying owner', color: '#df0' }
+  ]
 }
 
 const organizationsQuerySchema = t.Object({
@@ -114,31 +119,30 @@ async function createIiifFromBody<T>(
 }
 
 async function listOrganizationsForRequest({
-  auth,
+  session,
   db,
   env,
   request,
   set
 }: {
-  auth: BetterAuthContext['auth']
+  session: BetterAuthContext['auth']['$Infer']['Session'] | null
   db: Db
   env: RestEnv
   request: Request
   set: { headers: Record<string, string | number> }
 }) {
   const queryParams = normalizeOrganizationsQueryParams(request)
-  const session = await auth.api.getSession({ headers: request.headers })
   const userRole = getUserLimitRole(session?.user)
 
-  if (session?.user.role === 'admin') {
+  if (session && isOrganizationManager(session.user.role)) {
     setCacheControl(set, 'private-no-store')
     return listOrganizationsWithUsers(db, env.PUBLIC_REST_BASE_URL, {
       ...queryParams,
-      userRole: 'admin'
+      userRole
     })
   }
 
-  if (session?.user.id) {
+  if (session) {
     const organizationIds = await queryOrganizationIdsByUserId(
       db,
       session.user.id
@@ -155,15 +159,8 @@ async function listOrganizationsForRequest({
     }
   }
 
-  const limitRole = userRole === 'collaborator' ? userRole : 'public'
-  setCacheControl(
-    set,
-    limitRole === 'public' ? 'public-medium' : 'private-no-store'
-  )
-  return listOrganizations(db, env.PUBLIC_REST_BASE_URL, {
-    ...queryParams,
-    userRole: limitRole
-  })
+  setCacheControl(set, 'public-medium')
+  return listOrganizations(db, env.PUBLIC_REST_BASE_URL, queryParams)
 }
 
 function organizationsToGeojson(
@@ -187,16 +184,20 @@ export function createOrganizationsRoutes(
   env: RestEnv,
   betterAuth: BetterAuthContext = createAuth(env)
 ) {
-  const { auth } = betterAuth
-
   return createElysia({
     name: 'organizations-routes'
   })
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/organizations',
-      async ({ db, env, request, set }) =>
-        listOrganizationsForRequest({ auth, db, env, request, set }),
+      async ({ db, env, request, set, getCurrentSession }) =>
+        listOrganizationsForRequest({
+          session: await getCurrentSession(),
+          db,
+          env,
+          request,
+          set
+        }),
       {
         query: organizationsQuerySchema,
         detail: { summary: 'Get all organizations', tags: ['Organizations'] }
@@ -204,9 +205,15 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations.geojson',
-      async ({ db, env, request, set }) =>
+      async ({ db, env, request, set, getCurrentSession }) =>
         organizationsToGeojson(
-          await listOrganizationsForRequest({ auth, db, env, request, set })
+          await listOrganizationsForRequest({
+            session: await getCurrentSession(),
+            db,
+            env,
+            request,
+            set
+          })
         ),
       {
         query: organizationsQuerySchema,
@@ -218,18 +225,18 @@ export function createOrganizationsRoutes(
     )
     .get(
       '/organizations/:organizationId',
-      async ({ db, env, params, status, request, set }) => {
-        const session = await auth.api.getSession({ headers: request.headers })
+      async ({ db, env, params, status, getCurrentSession, set }) => {
+        const session = await getCurrentSession()
         let organization
 
-        if (session?.user.role === 'admin') {
+        if (session && isOrganizationManager(session.user.role)) {
           setCacheControl(set, 'private-no-store')
           organization = await queryOrganizationByIdWithUsers(
             db,
             env.PUBLIC_REST_BASE_URL,
             params.organizationId
           )
-        } else if (session?.user.id) {
+        } else if (session) {
           const member = await queryOrganizationMemberByUserId(
             db,
             params.organizationId,
@@ -269,6 +276,25 @@ export function createOrganizationsRoutes(
       {
         params: t.Object({ organizationId: t.String() }),
         detail: { summary: 'Get an organization', tags: ['Organizations'] }
+      }
+    )
+    .get(
+      '/organizations/:organizationId/permissions',
+      async ({ params, set, getOrganizationAccess }) => {
+        setCacheControl(set, 'private-no-store')
+        const { permissions } = await getOrganizationAccess(
+          params.organizationId
+        )
+        return permissions
+      },
+      {
+        auth: true,
+        params: t.Object({ organizationId: t.String() }),
+        detail: {
+          summary: 'Get current user permissions for an organization',
+          tags: ['Organizations'],
+          security: [{ sessionCookie: [] }]
+        }
       }
     )
     .get(
@@ -313,7 +339,7 @@ export function createOrganizationsRoutes(
         body,
         status,
         set,
-        canImportOrganizationIiif
+        getOrganizationIiifImportAccess
       }) => {
         setCacheControl(set, 'private-no-store')
 
@@ -327,9 +353,10 @@ export function createOrganizationsRoutes(
           return status(404, { error: 'Organization not found' })
         }
 
-        const canImport = await canImportOrganizationIiif({
-          id: params.organizationId
-        })
+        const { canImport, restrictDomains } =
+          await getOrganizationIiifImportAccess({
+            id: params.organizationId
+          })
 
         if (!canImport) {
           return status(403, { error: 'Forbidden' })
@@ -337,7 +364,12 @@ export function createOrganizationsRoutes(
 
         return createIiifFromBody(body, (url) =>
           createManifestFromUrl(db, url, {
-            allowedUrlDomains: organization.domains
+            allowedUrlDomains: restrictDomains
+              ? organization.domains
+              : undefined,
+            allowedParsedUriDomains: restrictDomains
+              ? organization.domains
+              : undefined
           })
         )
       },
@@ -427,7 +459,7 @@ export function createOrganizationsRoutes(
         body,
         status,
         set,
-        canImportOrganizationIiif
+        getOrganizationIiifImportAccess
       }) => {
         setCacheControl(set, 'private-no-store')
 
@@ -441,9 +473,10 @@ export function createOrganizationsRoutes(
           return status(404, { error: 'Organization not found' })
         }
 
-        const canImport = await canImportOrganizationIiif({
-          id: params.organizationId
-        })
+        const { canImport, restrictDomains } =
+          await getOrganizationIiifImportAccess({
+            id: params.organizationId
+          })
 
         if (!canImport) {
           return status(403, { error: 'Forbidden' })
@@ -451,8 +484,12 @@ export function createOrganizationsRoutes(
 
         return createIiifFromBody(body, (url) =>
           createImageFromUrl(db, url, {
-            allowedUrlDomains: organization.domains,
-            allowedParsedUriDomains: organization.domains
+            allowedUrlDomains: restrictDomains
+              ? organization.domains
+              : undefined,
+            allowedParsedUriDomains: restrictDomains
+              ? organization.domains
+              : undefined
           })
         )
       },
@@ -541,8 +578,21 @@ export function createOrganizationsRoutes(
     )
     .patch(
       '/organizations/:organizationId',
-      async ({ db, env, params, body, status, set }) => {
+      async ({ db, env, params, body, status, set, getOrganizationAccess }) => {
         setCacheControl(set, 'private-no-store')
+        const { permissions } = await getOrganizationAccess(
+          params.organizationId
+        )
+        if (
+          !permissions.canUpdate ||
+          (body.plan !== undefined && !permissions.canChangePlan) ||
+          (body.domains !== undefined && !permissions.canChangeDomains) ||
+          (body.slug !== undefined && !permissions.canChangeSlug) ||
+          (body.displayCollections !== undefined &&
+            !permissions.canChangeDisplayCollections)
+        ) {
+          return status(403, { error: 'Forbidden' })
+        }
         const validSlug =
           body.slug === undefined
             ? undefined
@@ -606,13 +656,13 @@ export function createOrganizationsRoutes(
         return organization
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({ organizationId: t.String() }),
         body: UpdateOrganizationBody,
         detail: {
           summary: 'Update an organization',
           tags: ['Organizations'],
-          ...adminDetail
+          ...organizationOwnerDetail
         }
       }
     )

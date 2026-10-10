@@ -12,7 +12,12 @@ import { createTestAuth, env, request, sessionForRole } from './helpers.js'
 type Organization = typeof authSchema.organizations.$inferSelect
 type OrganizationUrl = typeof organizationsSchema.organizationUrls.$inferSelect
 
-function setup(plan: string | null = 'supporter', exists = true) {
+function setup(
+  plan: string | null = 'supporter',
+  exists = true,
+  userRole = 'admin',
+  memberRole?: string
+) {
   const state: {
     organization: Organization | undefined
     urls: OrganizationUrl[]
@@ -56,6 +61,15 @@ function setup(plan: string | null = 'supporter', exists = true) {
     state.urls = []
   })
   const db = {
+    query: {
+      members: {
+        findFirst: vi.fn(async ({ where }) =>
+          where.organizationId.eq === 'organization-id' && memberRole
+            ? { role: memberRole }
+            : undefined
+        )
+      }
+    },
     transaction: async <T>(callback: (transaction: unknown) => Promise<T>) =>
       callback(db),
     select: () => ({
@@ -81,7 +95,7 @@ function setup(plan: string | null = 'supporter', exists = true) {
       }
     })
   }
-  const { betterAuth } = createTestAuth(sessionForRole('admin'))
+  const { betterAuth } = createTestAuth(sessionForRole(userRole))
   const app = new Elysia()
     .decorate('db', db as unknown as Db)
     .decorate('env', env)
@@ -282,3 +296,185 @@ describe('organization creation', () => {
     }
   )
 })
+
+describe('organization management permissions', () => {
+  test.each([
+    ['user', 'owner', 403],
+    ['collaborator', 'owner', 200],
+    ['admin', undefined, 200],
+    ['user', 'member', 403],
+    ['user', 'admin', 403],
+    ['user', undefined, 403],
+    ['collaborator', undefined, 200]
+  ] as const)(
+    '%s with membership %s can change slug: %i',
+    async (userRole, memberRole, status) => {
+      const { app, update } = setup('supporter', true, userRole, memberRole)
+      const response = await app.handle(
+        request('/organizations/organization-id', { slug: 'new-slug' }, 'PATCH')
+      )
+      expect(response.status).toBe(status)
+      expect(update).toHaveBeenCalledTimes(status === 200 ? 1 : 0)
+    }
+  )
+
+  test.each([
+    { plan: 'innovator' },
+    { plan: null },
+    { domains: ['other.example.org'] },
+    { domains: [] },
+    { slug: 'other-slug' },
+    { displayCollections: true },
+    { displayCollections: false }
+  ])('organization owners cannot write restricted fields: %j', async (body) => {
+    const { app, state, update, deleteUrls } = setup(
+      'supporter',
+      true,
+      'user',
+      'owner'
+    )
+    const before = structuredClone(state)
+    const response = await app.handle(
+      request(
+        '/organizations/organization-id',
+        { name: 'Changed', ...body },
+        'PATCH'
+      )
+    )
+    expect(response.status).toBe(403)
+    expect(state).toEqual(before)
+    expect(update).not.toHaveBeenCalled()
+    expect(deleteUrls).not.toHaveBeenCalled()
+  })
+
+  test('an organization owner cannot manage a different organization', async () => {
+    const { app, update } = setup('supporter', true, 'user', 'owner')
+    const response = await app.handle(
+      request(
+        '/organizations/another-organization',
+        { slug: 'new-slug' },
+        'PATCH'
+      )
+    )
+    expect(response.status).toBe(403)
+    expect(update).not.toHaveBeenCalled()
+  })
+
+  test.each(['admin', 'member', 'owner'])(
+    'organization %s cannot delete the organization',
+    async (memberRole) => {
+      const { app, deleteUrls } = setup('supporter', true, 'user', memberRole)
+      const response = await app.handle(
+        request('/organizations/organization-id', undefined, 'DELETE')
+      )
+      expect(response.status).toBe(401)
+      expect(deleteUrls).not.toHaveBeenCalled()
+    }
+  )
+
+  test('Allmaps admins can delete without organization membership', async () => {
+    const { app, deleteUrls } = setup()
+    const response = await app.handle(
+      request('/organizations/organization-id', undefined, 'DELETE')
+    )
+    expect(response.status).toBe(200)
+    expect(deleteUrls).toHaveBeenCalled()
+  })
+
+  test('permissions expose controls appropriate to the current organization', async () => {
+    const { app } = setup('supporter', true, 'user', 'owner')
+    const response = await app.handle(
+      request('/organizations/organization-id/permissions', undefined, 'GET')
+    )
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toContain('no-store')
+    expect(await response.json()).toEqual({
+      canUpdate: true,
+      canManageMembers: true,
+      canView: true,
+      canAssignOwner: false,
+      canChangeDisplayCollections: false,
+      canChangeSlug: false,
+      canChangePlan: false,
+      canChangeDomains: false,
+      canDelete: false
+    })
+  })
+})
+
+for (const role of ['admin', 'collaborator', 'user']) {
+  test.each(['name', 'logo', 'homepage', 'location'])(
+    `${role} owner can edit ordinary field %s`,
+    async (field) => {
+      const { app } = setup('contributor', true, role, 'owner')
+      const values = {
+        name: 'Changed',
+        logo: 'https://example.org/logo.png',
+        homepage: 'https://example.org/',
+        location: null
+      }
+      expect(
+        (
+          await app.handle(
+            request(
+              '/organizations/organization-id',
+              { [field]: values[field as keyof typeof values] },
+              'PATCH'
+            )
+          )
+        ).status
+      ).toBe(200)
+    }
+  )
+}
+test.each([
+  [{ plan: 'innovator' }, 403],
+  [{ plan: null }, 403],
+  [{ domains: ['new.example.org'] }, 200],
+  [{ displayCollections: false }, 200]
+])('collaborator field permissions: %j', async (body, status) => {
+  const { app } = setup(null, true, 'collaborator')
+  expect(
+    (await app.handle(request('/organizations/organization-id', body, 'PATCH')))
+      .status
+  ).toBe(status)
+})
+test('regular members have a read-only organization view', async () => {
+  const { app, update } = setup('contributor', true, 'user', 'member')
+  const response = await app.handle(
+    request('/organizations/organization-id/permissions', undefined, 'GET')
+  )
+  expect(await response.json()).toMatchObject({
+    canView: true,
+    canUpdate: false,
+    canManageMembers: false,
+    canAssignOwner: false
+  })
+  expect(
+    (
+      await app.handle(
+        request('/organizations/organization-id', { name: 'Changed' }, 'PATCH')
+      )
+    ).status
+  ).toBe(403)
+  expect(update).not.toHaveBeenCalled()
+})
+test.each(['POST', 'DELETE'])(
+  'collaborators cannot create or delete organizations (%s)',
+  async (method) => {
+    const { app } = setup(null, true, 'collaborator')
+    expect(
+      (
+        await app.handle(
+          request(
+            method === 'POST'
+              ? '/organizations'
+              : '/organizations/organization-id',
+            method === 'POST' ? { name: 'New', slug: 'new' } : undefined,
+            method
+          )
+        )
+      ).status
+    ).toBe(401)
+  }
+)

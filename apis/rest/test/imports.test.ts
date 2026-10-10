@@ -8,6 +8,7 @@ import {
   queryOrganizationById,
   queryOrganizationIdsByUserId,
   listOrganizations,
+  listOrganizationsWithUsers,
   listOrganizationsWithUsersByOrganizationIds,
   queryUserWithOrganizationsById,
   queryUsers,
@@ -78,8 +79,12 @@ vi.mock('@allmaps/api-shared/db', () => ({
 
 beforeEach(() => vi.clearAllMocks())
 
-function setup(role: string | null, plan: string | null = null) {
-  const db = createMembershipDb(plan)
+function setup(
+  role: string | null,
+  plan: string | null = null,
+  memberRole = 'member'
+) {
+  const db = createMembershipDb(plan, memberRole)
   const { betterAuth, getSession } = createTestAuth(
     role === null ? null : sessionForRole(role)
   )
@@ -128,8 +133,8 @@ describe.each([
     expect(create).not.toHaveBeenCalled()
   })
 
-  test('collaborator organization membership preserves domain restrictions', async () => {
-    const { app, db, getSession } = setup('collaborator', 'supporter')
+  test('owners with a qualifying plan must use organization domains', async () => {
+    const { app, db, getSession } = setup('user', 'supporter', 'owner')
     const url = 'https://iiif.example/resource'
     const response = await app.handle(
       request(`/organizations/organization-id/${resource}`, { url })
@@ -137,41 +142,58 @@ describe.each([
     expect(response.status).toBe(200)
     expect(create).toHaveBeenCalledWith(db, url, {
       allowedUrlDomains: ['iiif.example'],
-      ...(resource === 'images'
-        ? { allowedParsedUriDomains: ['iiif.example'] }
-        : {})
+      allowedParsedUriDomains: ['iiif.example']
     })
     expect(getSession).toHaveBeenCalledWith(
       expect.objectContaining({ query: { disableCookieCache: true } })
     )
   })
 
-  test('collaborator without a qualifying membership cannot use organization import', async () => {
-    const { app } = setup('collaborator')
-    expect(
-      (
-        await app.handle(
-          request(`/organizations/organization-id/${resource}`, {
-            url: 'https://iiif.example/resource'
-          })
-        )
-      ).status
-    ).toBe(403)
-    expect(create).not.toHaveBeenCalled()
-  })
+  test.each(['admin', 'collaborator'])(
+    '%s imports for any organization without membership or a plan',
+    async (role) => {
+      const { app, db } = setup(role)
+      const url = 'https://another-institution.example/resource'
+      expect(
+        (
+          await app.handle(
+            request(`/organizations/organization-id/${resource}`, { url })
+          )
+        ).status
+      ).toBe(200)
+      expect(create).toHaveBeenCalledWith(
+        db,
+        url,
+        expect.objectContaining({ allowedUrlDomains: undefined })
+      )
+    }
+  )
 
-  test('ordinary organization-plan members retain import access', async () => {
-    const { app } = setup('user', 'contributor')
-    expect(
-      (
-        await app.handle(
-          request(`/organizations/organization-id/${resource}`, {
-            url: 'https://iiif.example/resource'
-          })
-        )
-      ).status
-    ).toBe(200)
-  })
+  test.each([
+    ['contributor', 'owner', 200],
+    ['supporter', 'owner', 200],
+    ['innovator', 'owner', 200],
+    [null, 'owner', 403],
+    ['invalid', 'owner', 403],
+    ['contributor', 'member', 403],
+    ['supporter', 'member', 403],
+    ['innovator', 'member', 403]
+  ] as const)(
+    'organization plan %s role %s imports: %i',
+    async (plan, memberRole, status) => {
+      const { app } = setup('user', plan, memberRole)
+      expect(
+        (
+          await app.handle(
+            request(`/organizations/organization-id/${resource}`, {
+              url: 'https://iiif.example/resource'
+            })
+          )
+        ).status
+      ).toBe(status)
+      expect(create).toHaveBeenCalledTimes(status === 200 ? 1 : 0)
+    }
+  )
 
   test('missing organizations return 404', async () => {
     vi.mocked(queryOrganizationById).mockResolvedValueOnce(undefined)
@@ -189,7 +211,7 @@ describe.each([
   })
 })
 
-test('a 1,000-result collaborator request returns a complete private response', async () => {
+test('an oversized collaborator request is capped at 600 results in a private response', async () => {
   const { queryImages: actualQueryImages } = await vi.importActual<
     typeof import('../../../packages/api-shared/src/queries/iiif.js')
   >('../../../packages/api-shared/src/queries/iiif.js')
@@ -217,10 +239,10 @@ test('a 1,000-result collaborator request returns a complete private response', 
   expect(response.status).toBe(200)
   expect(response.headers.get('Cache-Control')).toBe('private, no-store')
   const data = (await response.json()) as { id: string }[]
-  expect(data).toHaveLength(1000)
-  expect(data.at(-1)?.id).toBe(`${env.PUBLIC_REST_BASE_URL}/images/image-999`)
+  expect(data).toHaveLength(600)
+  expect(data.at(-1)?.id).toBe(`${env.PUBLIC_REST_BASE_URL}/images/image-599`)
   expect(db.query.images.findMany).toHaveBeenCalledWith(
-    expect.objectContaining({ limit: 1000 })
+    expect.objectContaining({ limit: 600 })
   )
   expect(queryImages).toHaveBeenCalledWith(
     env.PUBLIC_REST_BASE_URL,
@@ -230,51 +252,33 @@ test('a 1,000-result collaborator request returns a complete private response', 
   )
 })
 
-test('collaborator limits retain organization visibility filtering', async () => {
-  vi.mocked(queryOrganizationIdsByUserId).mockResolvedValueOnce([
-    'organization-id'
-  ])
+test('collaborators can see every organization with their higher limit', async () => {
   const { app } = setup('collaborator')
   const response = await app.handle(
-    new Request('http://localhost/organizations?limit=1000')
-  )
-  expect(response.status).toBe(200)
-  expect(listOrganizationsWithUsersByOrganizationIds).toHaveBeenCalledWith(
-    expect.anything(),
-    env.PUBLIC_REST_BASE_URL,
-    ['organization-id'],
-    expect.objectContaining({ userRole: 'collaborator', limit: 1000 })
-  )
-  expect(listOrganizations).not.toHaveBeenCalled()
-})
-
-test('collaborators without memberships can list public organizations at their higher limit', async () => {
-  const { app } = setup('collaborator')
-  const response = await app.handle(
-    new Request('http://localhost/organizations?limit=1000')
+    new Request('http://localhost/organizations?limit=600')
   )
   expect(response.status).toBe(200)
   expect(response.headers.get('Cache-Control')).toBe('private, no-store')
-  expect(listOrganizations).toHaveBeenCalledWith(
+  expect(listOrganizationsWithUsers).toHaveBeenCalledWith(
     expect.anything(),
     env.PUBLIC_REST_BASE_URL,
-    expect.objectContaining({ userRole: 'collaborator', limit: 1000 })
+    expect.objectContaining({ userRole: 'collaborator', limit: 600 })
   )
+  expect(queryOrganizationIdsByUserId).not.toHaveBeenCalled()
+  expect(listOrganizationsWithUsersByOrganizationIds).not.toHaveBeenCalled()
+  expect(listOrganizations).not.toHaveBeenCalled()
 })
 
-test('collaborators cannot list users or access other users details', async () => {
+test('collaborators can list users and view other user profiles', async () => {
   const { app } = setup('collaborator')
   expect((await app.handle(new Request('http://localhost/users'))).status).toBe(
-    401
+    200
   )
   expect(
     (await app.handle(new Request('http://localhost/users/other-user'))).status
-  ).toBe(401)
-  expect(queryUsers).not.toHaveBeenCalled()
-  expect(queryUserWithOrganizationsById).not.toHaveBeenCalled()
-  expect(
-    (await app.handle(new Request('http://localhost/users/user-id'))).status
   ).toBe(200)
+  expect(queryUsers).toHaveBeenCalled()
+  expect(queryUserWithOrganizationsById).toHaveBeenCalled()
 })
 
 test('collaborators cannot administer organizations', async () => {

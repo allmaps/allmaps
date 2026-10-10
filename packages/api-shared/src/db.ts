@@ -43,7 +43,8 @@ export {
   queryOrganizationMembersById,
   queryUserById,
   queryUserByEmail,
-  queryUsers
+  queryUsers,
+  setUserRole
 } from './queries/auth.js'
 
 export {
@@ -67,3 +68,5 @@ export {
   updateOrganization,
   deleteOrganization
 } from './queries/organizations.js'
+
+export { changeOrganizationMember } from './queries/members.js'

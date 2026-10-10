@@ -46,7 +46,7 @@
 
   let showAddMemberModal = $state(false)
   let newMemberEmail = $state('')
-  let newMemberRole = $state<'admin' | 'member' | 'owner'>('member')
+  let newMemberRole = $state<'owner' | 'member'>('member')
   let memberSearchValue = $state('')
   let users = $state<ConsoleUser[]>([])
   let isLoadingUsers = $state(false)
@@ -192,7 +192,7 @@
 
   function openAddMemberModal() {
     showAddMemberModal = true
-    void loadUsers()
+    if (data.canViewUsers) void loadUsers()
   }
 
   function resetAddMemberModal() {
@@ -246,10 +246,7 @@
     }
   }
 
-  async function updateMemberRole(
-    userId: string,
-    role: 'admin' | 'member' | 'owner'
-  ) {
+  async function updateMemberRole(userId: string, role: 'owner' | 'member') {
     updatingRoleId = userId
     error = null
     try {
@@ -286,7 +283,9 @@
     class="bg-white rounded-lg shadow p-6"
   >
     <input type="hidden" name="organizationId" value={organizationId} />
-    <input type="hidden" name="domains" value={editDomains.join('\n')} />
+    {#if data.permissions.canChangeDomains}
+      <input type="hidden" name="domains" value={editDomains.join('\n')} />
+    {/if}
     <div class="space-y-6">
       <div>
         <label
@@ -299,6 +298,7 @@
           id="orgName"
           type="text"
           name="name"
+          disabled={!data.permissions.canUpdate}
           bind:value={editOrgName}
           required
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -317,6 +317,7 @@
           id="orgSlug"
           type="text"
           name="slug"
+          disabled={!data.permissions.canChangeSlug}
           bind:value={editOrgSlug}
           required
           pattern={slugPattern}
@@ -336,6 +337,7 @@
           id="orgHomepage"
           type="url"
           name="homepage"
+          disabled={!data.permissions.canUpdate}
           bind:value={editHomepage}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="https://example.com"
@@ -353,6 +355,7 @@
           id="orgLogo"
           type="url"
           name="logo"
+          disabled={!data.permissions.canUpdate}
           bind:value={editLogo}
           pattern="https?://.*"
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -390,14 +393,28 @@
         >
           Plan
         </label>
-        <AppSelect bind:value={editPlan} items={organizationPlanItems} />
-        <input type="hidden" name="plan" value={editPlan} />
+        {#if data.permissions.canChangePlan}
+          <AppSelect bind:value={editPlan} items={organizationPlanItems} />
+          <input type="hidden" name="plan" value={editPlan} />
+        {:else}
+          <p>
+            {organizationPlanItems.find((item) => item.value === editPlan)
+              ?.label ?? 'No plan'}
+          </p>
+        {/if}
       </div>
 
+      {#if data.permissions.canChangeDisplayCollections}
+        <input
+          type="hidden"
+          name="displayCollections"
+          value={String(editDisplayCollections)}
+        />
+      {/if}
       <label class="flex items-start gap-3">
         <input
           type="checkbox"
-          name="displayCollections"
+          disabled={!data.permissions.canChangeDisplayCollections}
           bind:checked={editDisplayCollections}
           class="mt-1 size-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
         />
@@ -423,6 +440,7 @@
           type="text"
           inputmode="decimal"
           name="location"
+          disabled={!data.permissions.canUpdate}
           bind:value={editLocation}
           class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Latitude, longitude"
@@ -431,66 +449,74 @@
 
       <div>
         <p class="block text-sm font-medium text-gray-700 mb-2">Domains</p>
-        <div class="space-y-2">
-          {#each editDomains as editDomain, i (editDomain)}
-            <div class="flex gap-2">
-              <input
-                type="text"
-                bind:value={editDomains[i]}
-                class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="example.com"
-              />
-              <button
-                type="button"
-                onclick={() =>
-                  (editDomains = editDomains.filter((_, j) => j !== i))}
-                class="px-3 py-2 text-red-600 hover:text-red-800 cursor-pointer"
-              >
-                Remove
-              </button>
-            </div>
-          {/each}
-          <button
-            type="button"
-            onclick={() => (editDomains = [...editDomains, ''])}
-            class="text-sm text-blue-600 hover:underline cursor-pointer"
-          >
-            + Add domain
-          </button>
-        </div>
+        {#if data.permissions.canChangeDomains}
+          <div class="space-y-2">
+            {#each editDomains as editDomain, i (editDomain)}
+              <div class="flex gap-2">
+                <input
+                  type="text"
+                  bind:value={editDomains[i]}
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="example.com"
+                />
+                <button
+                  type="button"
+                  onclick={() =>
+                    (editDomains = editDomains.filter((_, j) => j !== i))}
+                  class="px-3 py-2 text-red-600 hover:text-red-800 cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
+            {/each}
+            <button
+              type="button"
+              onclick={() => (editDomains = [...editDomains, ''])}
+              class="text-sm text-blue-600 hover:underline cursor-pointer"
+            >
+              + Add domain
+            </button>
+          </div>
+        {:else}
+          <p>{organization.domains.join(', ') || 'No domains'}</p>
+        {/if}
       </div>
 
-      <div class="flex gap-3 justify-between mt-8 pt-6 border-t">
-        <button
-          type="button"
-          onclick={() => (showDeleteModal = true)}
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition cursor-pointer"
-          disabled={!!updateOrganizationForm.pending}
-        >
-          Delete Organization
-        </button>
-        <div class="flex gap-3">
-          <button
-            type="button"
-            onclick={cancel}
-            class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
-            disabled={!!updateOrganizationForm.pending}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
-            disabled={!editOrgName ||
-              !editOrgSlug ||
-              !!updateOrganizationForm.pending}
-          >
-            {updateOrganizationForm.pending
-              ? 'Updating...'
-              : 'Update Organization'}
-          </button>
+      {#if data.permissions.canUpdate}
+        <div class="flex gap-3 justify-between mt-8 pt-6 border-t">
+          {#if data.permissions.canDelete}
+            <button
+              type="button"
+              onclick={() => (showDeleteModal = true)}
+              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition cursor-pointer"
+              disabled={!!updateOrganizationForm.pending}
+            >
+              Delete Organization
+            </button>
+          {/if}
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick={cancel}
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition cursor-pointer"
+              disabled={!!updateOrganizationForm.pending}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 cursor-pointer"
+              disabled={!editOrgName ||
+                !editOrgSlug ||
+                !!updateOrganizationForm.pending}
+            >
+              {updateOrganizationForm.pending
+                ? 'Updating...'
+                : 'Update Organization'}
+            </button>
+          </div>
         </div>
-      </div>
+      {/if}
     </div>
   </form>
 
@@ -529,12 +555,14 @@
     <div class="border-t pt-6">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">Members ({members.length})</h3>
-        <button
-          onclick={openAddMemberModal}
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
-        >
-          Add Member
-        </button>
+        {#if data.permissions.canManageMembers}
+          <button
+            onclick={openAddMemberModal}
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer"
+          >
+            Add Member
+          </button>
+        {/if}
       </div>
 
       {#if members.length === 0}
@@ -570,43 +598,55 @@
               {#each members as member (member.user.id)}
                 <tr class="hover:bg-gray-50">
                   <td class="px-4 py-3 text-sm">
-                    <a
-                      href={routes.user(getUserId(member.user.id))}
-                      class="text-blue-600 hover:underline"
-                      >{member.user.name || '—'}</a
-                    >
+                    {#if data.canViewUsers}
+                      <a
+                        href={routes.user(getUserId(member.user.id))}
+                        class="text-blue-600 hover:underline"
+                        >{member.user.name || '—'}</a
+                      >
+                    {:else}
+                      <span>{member.user.name || '—'}</span>
+                    {/if}
                   </td>
                   <td class="px-4 py-3 text-sm">{member.user.email}</td>
                   <td class="px-4 py-3 text-sm">
-                    <AppSelect
-                      value={member.role}
-                      items={orgMemberRoleItems}
-                      disabled={updatingRoleId === getUserId(member.user.id)}
-                      onchange={(role) =>
-                        updateMemberRole(
-                          getUserId(member.user.id),
-                          role as 'admin' | 'member' | 'owner'
-                        )}
-                      class="min-w-36"
-                    />
+                    {#if data.permissions.canAssignOwner}
+                      <AppSelect
+                        value={member.role}
+                        items={orgMemberRoleItems}
+                        disabled={updatingRoleId === getUserId(member.user.id)}
+                        onchange={(role) =>
+                          updateMemberRole(
+                            getUserId(member.user.id),
+                            role as 'owner' | 'member'
+                          )}
+                        class="min-w-36"
+                      />
+                    {:else}
+                      {orgMemberRoleItems.find(
+                        (item) => item.value === member.role
+                      )?.label ?? member.role}
+                    {/if}
                   </td>
                   <td class="px-4 py-3 text-sm text-gray-600">
                     {new Date(member.createdAt).toLocaleDateString()}
                   </td>
                   <td class="px-4 py-3 text-sm text-right">
-                    <button
-                      onclick={() =>
-                        removeMember(
-                          getUserId(member.user.id),
-                          member.user.email
-                        )}
-                      class="text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
-                      disabled={removingMemberId === member.user.email}
-                    >
-                      {removingMemberId === member.user.email
-                        ? 'Removing...'
-                        : 'Remove'}
-                    </button>
+                    {#if data.permissions.canManageMembers && (member.role !== 'owner' || data.permissions.canAssignOwner)}
+                      <button
+                        onclick={() =>
+                          removeMember(
+                            getUserId(member.user.id),
+                            member.user.email
+                          )}
+                        class="text-red-600 hover:text-red-800 cursor-pointer disabled:opacity-50"
+                        disabled={removingMemberId === member.user.email}
+                      >
+                        {removingMemberId === member.user.email
+                          ? 'Removing...'
+                          : 'Remove'}
+                      </button>
+                    {/if}
                   </td>
                 </tr>
               {/each}
@@ -618,7 +658,7 @@
   </div>
 </div>
 
-{#if showDeleteModal}
+{#if showDeleteModal && data.permissions.canDelete}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
@@ -666,7 +706,7 @@
   </div>
 {/if}
 
-{#if showAddMemberModal}
+{#if showAddMemberModal && data.permissions.canManageMembers}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
@@ -686,81 +726,93 @@
           >
             User
           </label>
-          <Combobox.Root
-            type="single"
-            bind:value={newMemberEmail}
-            items={userItems}
-            onOpenChangeComplete={(open) => {
-              if (!open) memberSearchValue = ''
-            }}
-          >
-            <div class="relative">
-              <Combobox.Input
-                autocomplete="off"
-                id="memberUser"
-                oninput={(event) =>
-                  (memberSearchValue = event.currentTarget.value)}
-                class="w-full px-3 py-2 pr-9 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder={isLoadingUsers
-                  ? 'Loading users...'
-                  : 'Search users by name or email'}
-                disabled={isLoadingUsers}
-                aria-label="Search users"
-              />
-              <Combobox.Trigger
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs disabled:opacity-50 cursor-pointer"
-                disabled={isLoadingUsers}
-                aria-label="Show users"
-              >
-                ▾
-              </Combobox.Trigger>
-            </div>
-            <Combobox.Portal>
-              <Combobox.Content
-                class="z-50 w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)] rounded-xl border border-gray-200 bg-white shadow-lg py-1 outline-none"
-                sideOffset={4}
-              >
-                <Combobox.Viewport class="max-h-72 overflow-y-auto">
-                  {#if usersLoadError}
-                    <div class="px-3 py-2 text-sm text-red-600">
-                      Failed to load users.
-                    </div>
-                  {:else if filteredUserItems.length === 0}
-                    <div class="px-3 py-2 text-sm text-gray-500">
-                      No users found.
-                    </div>
-                  {:else}
-                    {#each filteredUserItems as user (user.value)}
-                      <Combobox.Item
-                        value={user.value}
-                        label={user.label}
-                        disabled={user.isMember}
-                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 cursor-pointer select-none outline-none hover:bg-gray-50 data-[highlighted]:bg-gray-50 data-[state=checked]:text-blue-600 data-[state=checked]:font-medium data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:bg-white"
-                      >
-                        {#snippet children({ selected })}
-                          <div class="min-w-0 flex-1">
-                            <div class="truncate font-medium">{user.name}</div>
-                            <div class="truncate text-xs text-gray-500">
-                              {user.email}
+          {#if data.canViewUsers}
+            <Combobox.Root
+              type="single"
+              bind:value={newMemberEmail}
+              items={userItems}
+              onOpenChangeComplete={(open) => {
+                if (!open) memberSearchValue = ''
+              }}
+            >
+              <div class="relative">
+                <Combobox.Input
+                  autocomplete="off"
+                  id="memberUser"
+                  oninput={(event) =>
+                    (memberSearchValue = event.currentTarget.value)}
+                  class="w-full px-3 py-2 pr-9 border border-gray-300 rounded bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder={isLoadingUsers
+                    ? 'Loading users...'
+                    : 'Search users by name or email'}
+                  disabled={isLoadingUsers}
+                  aria-label="Search users"
+                />
+                <Combobox.Trigger
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs disabled:opacity-50 cursor-pointer"
+                  disabled={isLoadingUsers}
+                  aria-label="Show users"
+                >
+                  ▾
+                </Combobox.Trigger>
+              </div>
+              <Combobox.Portal>
+                <Combobox.Content
+                  class="z-50 w-[var(--bits-combobox-anchor-width)] min-w-[var(--bits-combobox-anchor-width)] rounded-xl border border-gray-200 bg-white shadow-lg py-1 outline-none"
+                  sideOffset={4}
+                >
+                  <Combobox.Viewport class="max-h-72 overflow-y-auto">
+                    {#if usersLoadError}
+                      <div class="px-3 py-2 text-sm text-red-600">
+                        Failed to load users.
+                      </div>
+                    {:else if filteredUserItems.length === 0}
+                      <div class="px-3 py-2 text-sm text-gray-500">
+                        No users found.
+                      </div>
+                    {:else}
+                      {#each filteredUserItems as user (user.value)}
+                        <Combobox.Item
+                          value={user.value}
+                          label={user.label}
+                          disabled={user.isMember}
+                          class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 cursor-pointer select-none outline-none hover:bg-gray-50 data-[highlighted]:bg-gray-50 data-[state=checked]:text-blue-600 data-[state=checked]:font-medium data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:bg-white"
+                        >
+                          {#snippet children({ selected })}
+                            <div class="min-w-0 flex-1">
+                              <div class="truncate font-medium">
+                                {user.name}
+                              </div>
+                              <div class="truncate text-xs text-gray-500">
+                                {user.email}
+                              </div>
                             </div>
-                          </div>
-                          {#if user.isMember}
-                            <span class="shrink-0 text-xs text-gray-400">
-                              Member
-                            </span>
-                          {:else if selected}
-                            <span class="shrink-0 text-xs text-blue-600">
-                              Selected
-                            </span>
-                          {/if}
-                        {/snippet}
-                      </Combobox.Item>
-                    {/each}
-                  {/if}
-                </Combobox.Viewport>
-              </Combobox.Content>
-            </Combobox.Portal>
-          </Combobox.Root>
+                            {#if user.isMember}
+                              <span class="shrink-0 text-xs text-gray-400">
+                                Member
+                              </span>
+                            {:else if selected}
+                              <span class="shrink-0 text-xs text-blue-600">
+                                Selected
+                              </span>
+                            {/if}
+                          {/snippet}
+                        </Combobox.Item>
+                      {/each}
+                    {/if}
+                  </Combobox.Viewport>
+                </Combobox.Content>
+              </Combobox.Portal>
+            </Combobox.Root>
+          {:else}
+            <input
+              id="memberUser"
+              type="email"
+              bind:value={newMemberEmail}
+              placeholder="Email address of an existing Allmaps user"
+              class="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+            />
+          {/if}
         </div>
 
         <div>
@@ -770,7 +822,13 @@
           >
             Role
           </label>
-          <AppSelect bind:value={newMemberRole} items={orgMemberRoleItems} />
+          <AppSelect
+            bind:value={newMemberRole}
+            items={data.permissions.canAssignOwner
+              ? orgMemberRoleItems
+              : orgMemberRoleItems.filter((item) => item.value === 'member')}
+            disabled={!data.permissions.canAssignOwner}
+          />
         </div>
       </div>
 

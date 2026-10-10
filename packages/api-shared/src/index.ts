@@ -9,7 +9,12 @@ export {
 } from './shared/maps.js'
 
 export { ResponseError } from './shared/errors.js'
-export { getUserLimitRole } from './shared/permissions.js'
+export {
+  getUserLimitRole,
+  isSignedInUser,
+  isOrganizationManager
+} from './shared/permissions.js'
+export type { OrganizationPermissions } from './shared/permissions.js'
 export {
   COLLABORATOR_MAX_LIMIT,
   DEFAULT_LIMIT,
