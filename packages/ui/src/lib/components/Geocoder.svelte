@@ -122,7 +122,7 @@
 
   <Combobox.Portal>
     <Combobox.Content
-      class="border border-gray-100 bg-white shadow-lg p-1
+      class="border border-gray-100 bg-white shadow-lg p-1 overflow-x-hidden overflow-y-auto
       outline-hidden z-50 max-h-[var(--bits-combobox-content-available-height)] w-[var(--bits-combobox-anchor-width)]
       min-w-[var(--bits-combobox-anchor-width)] select-none rounded-lg data-[side=bottom]:translate-y-1
       data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1"
@@ -138,22 +138,23 @@
         {:else}
           {#each features as feature (feature.properties.id)}
             <Combobox.Item
-              class="flex items-center justify-between h-10 w-full select-none rounded-md p-1 text-sm
-            cursor-pointer truncate outline-none data-[highlighted]:bg-gray-100"
+              class="flex items-center justify-between min-h-10 w-full select-none rounded-md p-2 text-sm leading-5
+            cursor-pointer whitespace-normal outline-none data-[highlighted]:bg-gray-100"
               value={feature.properties.id}
               label={feature.properties.data.label}
             >
-              <div>
+              <div class="min-w-0 flex-1 [overflow-wrap:anywhere]">
                 {feature.properties.data.label}
                 {#if feature.properties.data.alt}
-                  <span
-                    class="text-gray before:content-['〜'] before:ml-1 before:mr-1"
-                    >{feature.properties.data.alt}</span
-                  >
+                  <span class="block text-gray">
+                    {feature.properties.data.alt}
+                  </span>
                 {/if}
               </div>
               {#if showProviderUrls && feature.properties.data.url}
-                <a href={feature.properties.data.url} class="p-2 text-gray-500"
+                <a
+                  href={feature.properties.data.url}
+                  class="shrink-0 p-2 text-gray-500"
                   ><ArrowSquareOutIcon class="size-4" /></a
                 >
               {/if}
