@@ -642,6 +642,9 @@ importers:
       '@allmaps/bearing':
         specifier: workspace:^
         version: link:../../packages/bearing
+      '@allmaps/env':
+        specifier: workspace:^
+        version: link:../../packages/env
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser

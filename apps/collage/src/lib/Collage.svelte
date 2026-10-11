@@ -13,7 +13,7 @@
   import MapControl from './MapControl.svelte'
   import { buttonTooltips } from './button-tooltips'
   import MaskEditor from './MaskEditor.svelte'
-  import * as env from '$env/static/public'
+  import { env as publicEnv } from './env'
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import { updateLoadFailures } from './load-status'
   import { loadRandomMaps } from './random-maps'
@@ -86,7 +86,6 @@
   import { bounds, clipPolygon, visibleCenter } from './geometry'
   import type { Control, ControlPosition, Rail, Slider } from './control-layout'
 
-  const publicEnv: Record<string, string> = env
   let container: HTMLDivElement
   let fileInput = $state<HTMLInputElement>()
   let textInput = $state<HTMLTextAreaElement>()

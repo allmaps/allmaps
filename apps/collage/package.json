@@ -19,6 +19,7 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/background-color": "workspace:^",
     "@allmaps/bearing": "workspace:^",
+    "@allmaps/env": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/project": "workspace:^",

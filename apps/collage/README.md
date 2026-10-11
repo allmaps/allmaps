@@ -27,9 +27,17 @@ service.
 Place search uses the same Geocode Earth key as Editor. For local development,
 set `PUBLIC_GEOCODE_EARTH_KEY` in the monorepo root's `.env.localhost.local`
 (ignored by Git), then restart Vite. Production builds read `.env.production`
-and deployment environment variables. The key is public browser configuration;
-configure its allowed origins in Geocode Earth. Map searches use the public
-Allmaps annotations API, like the random-map importer.
+and deployment environment variables. Collage reads these values through
+`$env/static/public` and validates the geocoding key and optional viewer URL
+with the shared `@allmaps/env` schema. Without a key, coordinate search remains
+available.
+
+In Cloudflare Workers Builds, configure `PUBLIC_GEOCODE_EARTH_KEY` in the
+Worker's **Build variables and secrets**, then rebuild and deploy. A runtime
+Worker secret alone does not make the key available to this static app, and
+changing the build secret requires a new build. The key is public browser
+configuration; configure its allowed origins in Geocode Earth. Map searches
+use the public Allmaps annotations API, like the random-map importer.
 
 ```sh
 pnpm --filter @allmaps/collage test
