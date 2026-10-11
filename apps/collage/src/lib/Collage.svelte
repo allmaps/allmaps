@@ -1539,6 +1539,7 @@
         touchZoomRotate: true,
         pitchWithRotate: false
       })
+      map.keyboard.disableRotation()
       map.touchZoomRotate.disableRotation()
       map.on('load', () => {
         layer = new WarpedMapLayer()
