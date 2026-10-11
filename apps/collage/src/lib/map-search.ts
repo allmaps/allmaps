@@ -200,6 +200,26 @@ export function cropMap(
 const sourceId = (source: GeoreferencedMap) =>
   source.id ?? JSON.stringify([source.resource.id, source.gcps])
 
+/** A refinement starts from a known, usable map. Keep it first as results arrive,
+ * even if its original geographic mask falls outside the new search bounds. */
+export function retainSearchResult(
+  results: SearchResults,
+  current?: SearchResult
+): SearchResults {
+  if (!current) return results
+  return {
+    ...results,
+    maps: [
+      current,
+      ...results.maps.filter((result) => result.id !== current.id)
+    ],
+    sources: [
+      current.original,
+      ...results.sources.filter((source) => sourceId(source) !== current.id)
+    ]
+  }
+}
+
 /** Reuse checked images and fitted inverses while the radius slider is moving. */
 export function resizeResults(
   results: SearchResults,

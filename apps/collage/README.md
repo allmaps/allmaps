@@ -73,8 +73,9 @@ radius. Pan, scroll or pinch to move and scale the original map beneath it. The
 camera is constrained to keep the circle inside the image; the ground radius
 stays within 10 m–50 km. **Refine search** queries maps for the center and radius
 currently inside the circle. It sits in the button row and is enabled only after
-the view changes. It retains chosen maps, including their crops. Routine loading
-and skipped-map messages are omitted; the Allmaps spinner indicates progress.
+the view changes. It retains chosen maps, including their crops, and keeps the
+current map and camera in place while other results refresh. Routine loading and
+skipped-map messages are omitted; the Allmaps spinner indicates progress.
 
 Search queries up to 100 source annotations whose geographic masks intersect the
 circle's bounds. Four concurrent `info.json` checks skip unavailable image

@@ -34,6 +34,7 @@
   import {
     cropMap,
     findMaps,
+    retainSearchResult,
     resolvePlace,
     searchArea,
     importSearchMap
@@ -317,6 +318,10 @@
   async function start(saved: RecentSearch, refine = false) {
     map.stop()
     settleCamera()
+    const retained =
+      refine && current
+        ? { ...current, map: selectedMap(current) ?? current.map }
+        : undefined
     controller?.abort()
     const request = new AbortController()
     controller = request
@@ -330,14 +335,25 @@
       chosenSources.clear()
       drafts.clear()
       importMask = saved.importMask ?? 'circle'
+    } else {
+      // New candidates start at the refined area; the visible map keeps its view.
+      drafts.clear()
+      if (retained) drafts.set(retained.id, view)
     }
     navigating = false
-    previews.retain(chosen.keys())
+    previews.retain([retained?.id, ...chosen.keys()])
+    const visible = retained && previews.get(retained.id)
     for (const instance of previews.values())
-      layer.setMapOptions(instance, { visible: false }, { animate: false })
-    constrainedSource = undefined
-    currentId = ''
-    results = { maps: [], sources: [], skipped: 0, excluded: 0, limited: false }
+      if (instance !== visible)
+        layer.setMapOptions(instance, { visible: false }, { animate: false })
+    if (!retained) {
+      constrainedSource = undefined
+      currentId = ''
+    }
+    results = retainSearchResult(
+      { maps: [], sources: [], skipped: 0, excluded: 0, limited: false },
+      retained
+    )
     if (!active) {
       for (const item of items)
         layer.setMapOptions(
@@ -348,7 +364,7 @@
       active = true
     }
     updateClip()
-    setView(queryCircle())
+    if (!retained) setView(queryCircle())
     const wanted = saved.current
     persist()
     try {
@@ -359,12 +375,14 @@
           signal: request.signal,
           base: annotationsBase,
           onprogress: (next) => {
-            if (!request.signal.aborted) receive(next, wanted)
+            if (!request.signal.aborted)
+              receive(retainSearchResult(next, retained), wanted)
           }
         }))
       if (request.signal.aborted) return
-      receive(found, wanted)
-      cacheSearch(saved, found)
+      const next = retainSearchResult(found, retained)
+      receive(next, wanted)
+      cacheSearch(saved, next)
       persist()
     } catch (problem) {
       if (!request.signal.aborted)
@@ -379,8 +397,6 @@
     map.stop()
     settleCamera()
     const circle = view
-    // New candidates begin at the refined area. Keep chosen annotation snapshots.
-    drafts.clear()
     void start(
       {
         ...entry,

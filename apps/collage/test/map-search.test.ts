@@ -14,6 +14,7 @@ import {
   bufferToRange,
   cropMap,
   findMaps,
+  retainSearchResult,
   mapsSearchUrl,
   resolvePlace,
   searchArea,
@@ -21,7 +22,7 @@ import {
   selectionMaps,
   importSearchMap
 } from '../src/lib/map-search.ts'
-import type { SearchPlace } from '../src/lib/map-search.ts'
+import type { SearchPlace, SearchResults } from '../src/lib/map-search.ts'
 import {
   coordinateFeature,
   SearchGeocoderProvider
@@ -114,6 +115,48 @@ function circle(radius = 250) {
   p.feature.geometry.coordinates = webMercatorToLonLat([500, -500])
   return searchArea(p, radius)
 }
+
+test('refinement keeps the current result through empty and partial responses without duplicates', () => {
+  const original = source('current')
+  const current = {
+    id: original.id!,
+    original,
+    map: cropMap(original, circle(100))!
+  }
+  const other = source('other')
+  const next = { id: other.id!, original: other, map: other }
+  const empty: SearchResults = {
+    maps: [],
+    sources: [],
+    skipped: 0,
+    excluded: 0,
+    limited: false
+  }
+  assert.equal(retainSearchResult(empty), empty)
+  for (const response of [
+    empty,
+    { ...empty, maps: [next], sources: [other] },
+    {
+      ...empty,
+      maps: [next, { ...current, map: original }],
+      sources: [other, structuredClone(original)]
+    }
+  ]) {
+    const before = structuredClone(response)
+    const kept = retainSearchResult(response, current)
+    assert.equal(kept.maps[0], current)
+    assert.equal(kept.sources[0], original)
+    assert.equal(kept.maps.filter((map) => map.id === current.id).length, 1)
+    assert.equal(kept.sources.filter((map) => map.id === current.id).length, 1)
+    assert.deepEqual(
+      response,
+      before,
+      'streamed/cached responses are not mutated'
+    )
+    assert.deepEqual(retainSearchResult(kept, current), kept)
+    if (response.maps.length) assert.equal(kept.maps[1], next)
+  }
+})
 
 test('place search uses only its point, ignoring provider bounds and legacy geometry', () => {
   const p = place()
