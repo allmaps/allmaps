@@ -240,6 +240,10 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   including on rotated and warped maps.
 - Open **Drawing tools** for a fan of labeled options: Edit points, Polygon,
   Pen, Circle and Rectangle. The menu supports arrow keys and Escape.
+- Tablet styluses (including Apple Pencil) use captured pointer input for all
+  drawing and editing tools. Tap for polygon vertices, or drag and lift for
+  freehand, circles, rectangles and vertex edits. Browser touch gestures do not
+  take over a Pencil stroke; interrupted strokes restore the previous draft.
 - Choose **Polygon** to replace the polygon. Click to place vertices,
   then click the first vertex or press Enter to close it. Escape or the drawing
   button cancels an unfinished replacement and restores the previous draft.

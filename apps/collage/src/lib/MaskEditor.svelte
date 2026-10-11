@@ -40,6 +40,7 @@
   import { suspendMapNavigation } from './map-navigation'
   import { PenTouchGesture } from './pen-gesture'
   import { MaskVertexTaps } from './mask-tap'
+  import { bindMaskStylus } from './mask-stylus'
   import {
     constrainToImage,
     maskCoordinates,
@@ -314,6 +315,9 @@
       event: TerraDrawMouseEvent,
       setDraggability: (enabled: boolean) => void
     ) {
+      // Some tablets deliver the final pen position only with pointerup.
+      if (this.draggingStroke)
+        super.onDrag(this.constrain(event), setDraggability)
       super.onDragEnd(event, setDraggability)
       // Terra Draw leaves an invalid, too-short stroke unfinished. Restore the
       // previous draft instead of trapping the user in a completed gesture.
@@ -329,9 +333,14 @@
     preparePointer(event: PointerEvent) {
       // Allow finger jitter before a tap becomes a drag, or a second finger
       // starts native navigation instead of accidentally starting a stroke.
-      const distance = event.pointerType === 'touch' ? 8 : 1
+      const distance =
+        event.pointerType === 'touch' ||
+        (event.pointerType === 'pen' && drawingMode === 'polygon')
+          ? 8
+          : 1
       this._minPixelDragDistanceSelecting = distance
       this._minPixelDragDistance = distance
+      this._minPixelDragDistanceDrawing = Math.max(8, distance)
     }
 
     resetPenGesture() {
@@ -888,6 +897,27 @@
     }))
     const doubleClickZoom = map.doubleClickZoom.isEnabled()
     const canvas = map.getCanvas()
+    // Establish touch-action before contact: changing it midway through a
+    // Pencil stroke is too late to stop the browser taking over that gesture.
+    const touchAction = canvas.style.touchAction
+    canvas.style.touchAction = 'none'
+    const unbindStylus = bindMaskStylus(canvas, window, {
+      start: (event) => {
+        adapter?.preparePointer(event)
+        restoreNavigation ??= suspendMapNavigation(map)
+      },
+      end: releaseNavigation,
+      cancel: () => {
+        adapter?.resetPenGesture()
+        edgeStart = undefined
+        if (drawingNewMask) cancelNewMask()
+        else {
+          abortMaskGesture()
+          showDraft()
+        }
+      },
+      allowTouch: () => drawingMode === 'freehand'
+    })
     try {
       map.stop()
       map.doubleClickZoom.disable()
@@ -1114,6 +1144,7 @@
     }
     return () => {
       ready = false
+      unbindStylus()
       canvas.removeEventListener('pointerdown', maskPointerDown, true)
       canvas.removeEventListener('pointermove', maskPointerMove, true)
       canvas.removeEventListener('pointerup', maskPointerUp, true)
@@ -1136,6 +1167,7 @@
         .getCanvas()
         .removeEventListener('pointercancel', penPointerCancel, true)
       releaseNavigation()
+      canvas.style.touchAction = touchAction
       penTouches.reset()
       vertexTaps.reset()
       draw?.stop()
