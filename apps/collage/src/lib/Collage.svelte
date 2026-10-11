@@ -11,12 +11,16 @@
   } from '@allmaps/ui'
   import { themeColors, shades } from '@allmaps/tailwind'
   import MapControl from './MapControl.svelte'
+  import { buttonTooltips } from './button-tooltips'
   import MaskEditor from './MaskEditor.svelte'
+  import * as env from '$env/static/public'
+  import type { GeoreferencedMap } from '@allmaps/annotation'
   import { updateLoadFailures } from './load-status'
   import { loadRandomMaps } from './random-maps'
   import { TouchNavigation } from './touch-navigation'
   import { generateAnnotation } from '@allmaps/annotation'
   import type { LoadFailures } from './load-status'
+  import type { AdoptSearchPreviews } from './search-previews'
   import BackgroundWorker from './background.worker.ts?worker'
   import LayoutWorker from './layout.worker.ts?worker'
   import { requestLayout } from './layout-client'
@@ -45,10 +49,14 @@
     FlipVertical,
     SquaresFour,
     MapTrifold,
+    MagnifyingGlass,
+    ArrowSquareOut,
     Copy
   } from 'phosphor-svelte'
   import {
     openCollage,
+    originalAnnotationUrl,
+    viewerUrl,
     exportCollage,
     placedMap,
     renderedMap,
@@ -78,6 +86,7 @@
   import { bounds, clipPolygon, visibleCenter } from './geometry'
   import type { Control, ControlPosition, Rail, Slider } from './control-layout'
 
+  const publicEnv: Record<string, string> = env
   let container: HTMLDivElement
   let fileInput = $state<HTMLInputElement>()
   let textInput = $state<HTMLTextAreaElement>()
@@ -91,6 +100,11 @@
     items.filter((item) => selectedIds.has(item.instanceId))
   )
   const selected = $derived(rotationAnchor(selection))
+  const viewerLink = $derived(
+    selection.length === 1 && selected
+      ? viewerUrl(selected, publicEnv.PUBLIC_VIEWER_BASE_URL || undefined)
+      : undefined
+  )
   // Read through the changing selection array: selected's identity is stable
   // while gestures replace its placement, since items use $state.raw.
   const selectedRotation = $derived(
@@ -108,6 +122,8 @@
   let controlCenter: Point | undefined
   let controlRadius = 184
   let editingMask = $state.raw<CollageMap>()
+  let searching = $state(false)
+  let searchOrigin: Point = [0, 0]
   let marquee = $state.raw<{
     start: Point
     end: Point
@@ -585,10 +601,14 @@
     }
   }
 
-  function install(next: CollageMap[], replace: boolean) {
+  function install(
+    next: CollageMap[],
+    replace: boolean,
+    { render = true }: { render?: boolean } = {}
+  ) {
     const added: CollageMap[] = []
     try {
-      for (const item of next) {
+      for (const item of render ? next : []) {
         renderItem(item)
         added.push(item)
       }
@@ -603,6 +623,7 @@
         layer!.removeGeoreferencedMapById(item.instanceId)
     }
     items = replace ? next : [...items, ...next]
+    if (!render) layer!.bringMapsToFront(next.map((item) => item.instanceId))
     select()
     inputMode = undefined
     fit()
@@ -633,7 +654,7 @@
     mode: 'add' | 'open',
     sourceUrl?: string
   ) {
-    if (mode === 'open') return openCollage(input)
+    if (mode === 'open') return openCollage(input, sourceUrl)
     const center = map!.getCenter()
     const result = await runLayout({
       type: 'add',
@@ -646,6 +667,69 @@
         'Compact arrangement could not converge. A simple packing was used instead.'
       )
     return result.items
+  }
+
+  function search() {
+    if (!map || busy || editingMask || drag) return
+    const center = map.getCenter()
+    searchOrigin = fromCanvasGeo([center.lng, center.lat])
+    errorMessage = ''
+    searching = true
+  }
+
+  function constrainCollage(center: LngLat, zoom: number) {
+    return {
+      center: new LngLat(
+        Math.max(-180, Math.min(180, center.lng)),
+        Math.max(-85.051129, Math.min(85.051129, center.lat))
+      ),
+      zoom: Math.max(-2, Math.min(22 + CANVAS_ZOOM_OFFSET, zoom))
+    }
+  }
+
+  async function addSearchMaps(
+    maps: GeoreferencedMap[],
+    originalMasks: Point[][],
+    adopt: AdoptSearchPreviews
+  ) {
+    busy = true
+    try {
+      const result = await runLayout({
+        type: 'add',
+        input: generateAnnotation(maps),
+        at: searchOrigin
+      })
+      result.items.forEach((item, i) => {
+        item.originalResourceMask = structuredClone(originalMasks[i])
+        item.sourceUrl = originalAnnotationUrl(maps[i]) ?? maps[i].id
+      })
+      if (disposed) return
+      adopt(result.items, (item) => {
+        layer!.setMapOptions(
+          item.instanceId,
+          {
+            gcps: renderedMap(item).gcps,
+            transformationType: transformationType(item.baseline),
+            resourceMask: item.resourceMask,
+            visible: true
+          },
+          { animate: false }
+        )
+        updateAppearance(item)
+      })
+      // Search cleanup removes only unselected previews and restores the camera.
+      // The imported maps keep their renderer instances and tile-cache identities.
+      searching = false
+      await tick()
+      install(result.items, false, { render: false })
+      if (result.fallback)
+        fail('Compact arrangement used a simple packing fallback.')
+    } catch (error) {
+      if (searching) throw error
+      fail(error)
+    } finally {
+      busy = false
+    }
   }
 
   async function submit(event?: SubmitEvent) {
@@ -747,6 +831,9 @@
       const maps = await loadRandomMaps({ signal: controller.signal })
       if (disposed) return
       const next = await prepare(generateAnnotation(maps), 'add')
+      next.forEach((item, i) => {
+        item.sourceUrl = originalAnnotationUrl(maps[i]) ?? maps[i].id
+      })
       if (!disposed) install(next, false)
     } catch (error) {
       layoutFailure(error)
@@ -921,7 +1008,7 @@
   }
 
   function alignToBearing() {
-    if (!selection.length || busy || drag || editingMask) return
+    if (!selection.length || busy || drag || editingMask || searching) return
     const before = structuredClone(items)
     try {
       const changed = structuredClone(selection)
@@ -944,7 +1031,7 @@
   }
 
   function mirrorSelected(event: MouseEvent) {
-    if (!selection.length || busy || drag || editingMask) return
+    if (!selection.length || busy || drag || editingMask || searching) return
     const before = structuredClone(items)
     try {
       const changed = structuredClone(selection)
@@ -1058,7 +1145,15 @@
   }
 
   function doubleClick(event: MouseEvent) {
-    if (!ready || busy || inputMode || editingMask || spaceDown || event.altKey)
+    if (
+      !ready ||
+      busy ||
+      inputMode ||
+      editingMask ||
+      searching ||
+      spaceDown ||
+      event.altKey
+    )
       return
     const rect = map!.getCanvas().getBoundingClientRect()
     const point = worldAt([event.clientX - rect.left, event.clientY - rect.top])
@@ -1082,7 +1177,8 @@
       spaceDown ||
       event.button !== 0 ||
       inputMode ||
-      editingMask
+      editingMask ||
+      searching
     )
       return
     const point = worldPoint(event)
@@ -1347,7 +1443,7 @@
 
   function keyboard(event: KeyboardEvent) {
     altDown = event.altKey
-    if (editingMask) return
+    if (editingMask || searching) return
     if (event.key === 'Escape') {
       if (layoutController) {
         layoutController.abort()
@@ -1404,7 +1500,7 @@
   async function drop(event: DragEvent) {
     event.preventDefault()
     draggingOver = false
-    if (busy || !ready || drag || editingMask) return
+    if (busy || !ready || drag || editingMask || searching) return
     const droppedFiles = Array.from(event.dataTransfer?.files ?? [])
     if (droppedFiles.length) await files(droppedFiles, inputMode ?? 'add')
     else {
@@ -1437,13 +1533,7 @@
         renderWorldCopies: false,
         // Keep a finite Mercator center while allowing the viewport to extend
         // beyond the world rectangle, instead of forcing it to fill the screen.
-        transformConstrain: (center, zoom) => ({
-          center: new LngLat(
-            Math.max(-180, Math.min(180, center.lng)),
-            Math.max(-85.051129, Math.min(85.051129, center.lat))
-          ),
-          zoom: Math.max(-2, Math.min(22 + CANVAS_ZOOM_OFFSET, zoom))
-        }),
+        transformConstrain: constrainCollage,
         attributionControl: false,
         dragRotate: false,
         touchZoomRotate: true,
@@ -1518,7 +1608,7 @@
   }}
   ondragover={(event) => {
     event.preventDefault()
-    if (!editingMask) draggingOver = true
+    if (!editingMask && !searching) draggingOver = true
   }}
   ondragleave={(event) => {
     if (!event.relatedTarget) draggingOver = false
@@ -1528,6 +1618,7 @@
 
 <main
   class="collage"
+  use:buttonTooltips
   class:control-gesture={activeControl !== undefined}
   style:--canvas-color={shades.green[0]}
   style:--dot-color={themeColors.green}
@@ -1539,7 +1630,7 @@
     class="map-canvas"
     aria-label="Collage canvas"
   ></div>
-  {#if !editingMask}
+  {#if !editingMask && !searching}
     <svg class="outlines" aria-hidden="true">
       {#each overlays as item (item.id)}
         <polygon
@@ -1569,25 +1660,34 @@
     <nav aria-label="Collage actions">
       <button
         class="quiet-button"
-        title="Open collage"
+        data-tooltip="Find maps"
+        aria-label="Find maps by place"
+        onclick={search}
+        disabled={!ready || busy || !!editingMask || searching || !!inputMode}
+      >
+        <MagnifyingGlass size={20} />
+      </button>
+      <button
+        class="quiet-button"
+        data-tooltip="Open collage"
         aria-label="Open collage"
         onclick={() => showInput('open')}
-        disabled={!ready || busy || !!editingMask}
+        disabled={!ready || busy || !!editingMask || searching}
         ><FolderOpen size={20} /></button
       >
       <button
         class="quiet-button"
-        title="Save annotation"
+        data-tooltip="Save annotation"
         aria-label="Save annotation"
         onclick={save}
-        disabled={!ready || busy || !!editingMask}
+        disabled={!ready || busy || !!editingMask || searching}
         ><DownloadSimple size={20} /></button
       >
       <button
         class="primary-button small"
         aria-label="Add maps"
         onclick={() => showInput('add')}
-        disabled={!ready || busy || !!editingMask}
+        disabled={!ready || busy || !!editingMask || searching}
         >{#if busy}<LoadingSmall />{:else}<Plus size={18} />{/if}<span
           >Add maps</span
         ></button
@@ -1595,7 +1695,7 @@
     </nav>
   </header>
 
-  {#if !items.length && !inputMode}
+  {#if !items.length && !inputMode && !searching}
     <section class="empty-state">
       <div class="paper-composition" aria-hidden="true">
         <svg viewBox="0 0 250 180">
@@ -1625,14 +1725,14 @@
     </section>
   {/if}
 
-  {#if selected && controls && appearances && !inputMode && !editingMask}
+  {#if selected && controls && appearances && !inputMode && !editingMask && !searching}
     <MapControl
       position={controls.move.position}
       label={altDown
-        ? 'Duplicate and move · Release Alt/Option to move'
+        ? 'Duplicate and move'
         : selection.length > 1
-          ? 'Move selected maps · Alt/Option-drag to duplicate'
-          : 'Move map · Alt/Option-drag to duplicate'}
+          ? 'Move selected maps'
+          : 'Move map'}
       disabled={busy}
       active={activeControl === 'move'}
       onpointerdown={(event) => beginDrag(event, selected!, 'move')}
@@ -1641,13 +1741,10 @@
     <MapControl
       position={controls.rotate.position}
       label={altDown
-        ? (selection.length > 1
-            ? 'Make selected maps upright'
-            : 'Make map upright') + ' · Release Alt/Option to rotate'
-        : (selection.length > 1
-            ? 'Rotate selected maps'
-            : 'Rotate map · Double-click to reset') +
-          ' · Alt/Option-click to make upright'}
+        ? 'Make upright'
+        : selection.length > 1
+          ? 'Rotate selected maps'
+          : 'Rotate map'}
       disabled={busy}
       active={activeControl === 'rotate'}
       value={Math.round(
@@ -1681,7 +1778,7 @@
       position={controls.hue.position}
       rail={controls.hue.rail}
       hueScale
-      label="Colorize · Double-click to toggle"
+      label="Colorize"
       disabled={busy || selection.length > 1}
       pressed={appearances.colorize}
       active={activeControl === 'hue'}
@@ -1707,10 +1804,7 @@
     >
     <MapControl
       position={controls.mirror.position}
-      label={(selection.length > 1 ? 'Mirror selected maps ' : 'Mirror map ') +
-        (altDown
-          ? 'vertically · Release Alt/Option for horizontal'
-          : 'horizontally · Hold Alt/Option for vertical')}
+      label={altDown ? 'Mirror vertically' : 'Mirror horizontally'}
       disabled={busy}
       pressed={allMirrored}
       onclick={mirrorSelected}
@@ -1726,9 +1820,7 @@
     >
     <MapControl
       position={controls.front.position}
-      label={altDown
-        ? 'Send to back · Release Alt/Option to bring to front'
-        : 'Bring to front · Hold Alt/Option to send to back'}
+      label={altDown ? 'Send to back' : 'Bring to front'}
       disabled={busy ||
         (altDown
           ? items.slice(0, selection.length)
@@ -1745,6 +1837,14 @@
       onclick={duplicate}><Copy size={19} /></MapControl
     >
     <MapControl
+      position={controls.openIn.position}
+      label="Open in Viewer"
+      disabled={busy || !viewerLink}
+      onclick={() => {
+        if (viewerLink) window.open(viewerLink, '_blank', 'noopener,noreferrer')
+      }}><ArrowSquareOut size={19} /></MapControl
+    >
+    <MapControl
       position={controls.remove.position}
       label={selection.length > 1 ? 'Remove selected maps' : 'Remove map'}
       disabled={busy}
@@ -1752,7 +1852,7 @@
     >
   {/if}
 
-  {#if !editingMask && !inputMode}
+  {#if !editingMask && !inputMode && !searching}
     <div
       class="bottom-stack selection-stack"
       class:has-actions={selection.length > 1 || !!layoutController}
@@ -1782,23 +1882,21 @@
             <button
               class="quiet-button"
               aria-label="Cancel arrangement"
-              title="Cancel arrangement"
+              data-tooltip="Cancel arrangement"
               onclick={() => layoutController?.abort()}><X size={19} /></button
             >
           {:else}
             <button
               class="quiet-button"
               aria-label="Arrange selected maps"
-              title="Arrange compactly · Keep first selected map fixed"
+              data-tooltip="Arrange compactly"
               disabled={busy}
               onclick={() => organize()}><SquaresFour size={20} /></button
             >
             <button
               class="quiet-button"
               aria-label="Arrange geographically"
-              title={selection.every((item) => item.geographicReference)
-                ? 'Restore geographic positions · Keep first selected map fixed'
-                : 'Geographic arrangement unavailable · Add original annotations'}
+              data-tooltip="Arrange geographically"
               disabled={busy ||
                 selection.some((item) => !item.geographicReference)}
               onclick={() => organize('geographic')}
@@ -1810,35 +1908,35 @@
     </div>
   {/if}
 
-  {#if !editingMask}
+  {#if !editingMask && !searching}
     <footer class="canvas-footer">
       <div class="view-controls">
         <button
-          title="Zoom in"
+          data-tooltip="Zoom in"
           aria-label="Zoom in"
           onclick={() => map?.zoomIn()}
           disabled={!ready}><Plus size={19} /></button
         >
         <button
-          title="Zoom out"
+          data-tooltip="Zoom out"
           aria-label="Zoom out"
           onclick={() => map?.zoomOut()}
           disabled={!ready}><Minus size={19} /></button
         >
         <button
-          title="Fit collage"
+          data-tooltip="Fit collage"
           aria-label="Fit collage"
           onclick={() => fit()}
           disabled={!items.length}><ArrowsOut size={19} /></button
         >
         <button
-          title="Undo (⌘/Ctrl Z)"
+          data-tooltip="Undo"
           aria-label="Undo"
           onclick={undo}
           disabled={!past.length || busy}><ArrowUUpLeft size={19} /></button
         >
         <button
-          title="Redo (⌘/Ctrl Shift Z)"
+          data-tooltip="Redo"
           aria-label="Redo"
           onclick={redo}
           disabled={!future.length || busy}><ArrowUUpRight size={19} /></button
@@ -1930,6 +2028,33 @@
   {#if draggingOver}<div class="drop-overlay">
       <UploadSimple size={42} /><strong>Drop maps</strong>
     </div>{/if}
+
+  {#if searching && map && layer}
+    {#await import('./SearchMaps.svelte')}
+      <div class="bottom-stack" role="status" aria-label="Loading search">
+        <LoadingSmall />
+      </div>
+    {:then search}
+      <search.default
+        {map}
+        {layer}
+        {items}
+        apiKey={publicEnv.PUBLIC_GEOCODE_EARTH_KEY ?? ''}
+        restoreConstrain={constrainCollage}
+        onadd={addSearchMaps}
+        onclose={() => (searching = false)}
+      />
+    {:catch}
+      <div class="bottom-stack">
+        <div class="error-message" role="alert">
+          Search could not be loaded. Please try again.
+          <button aria-label="Close search" onclick={() => (searching = false)}
+            ><X size={18} /></button
+          >
+        </div>
+      </div>
+    {/await}
+  {/if}
 
   {#if editingMask && map && layer}
     <MaskEditor

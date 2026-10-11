@@ -24,6 +24,13 @@ Open [localhost:5517](http://localhost:5517). The app runs entirely in the brows
 IIIF image URLs must allow browser requests. There is no upload or persistence
 service.
 
+Place search uses the same Geocode Earth key as Editor. For local development,
+set `PUBLIC_GEOCODE_EARTH_KEY` in the monorepo root's `.env.localhost.local`
+(ignored by Git), then restart Vite. Production builds read `.env.production`
+and deployment environment variables. The key is public browser configuration;
+configure its allowed origins in Geocode Earth. Map searches use the public
+Allmaps annotations API, like the random-map importer.
+
 ```sh
 pnpm --filter @allmaps/collage test
 pnpm --filter @allmaps/collage check
@@ -52,6 +59,56 @@ pnpm --filter @allmaps/collage build
   the current canvas as an undoable action.
 - Drop annotation files or a URL on the canvas to add them. Drop into the Open
   collage dialog to restore a saved layout instead.
+
+## Finding maps by place
+
+The search icon opens the shared Allmaps geocoder, including venues and landmarks.
+Choose a place or enter decimal coordinates in **latitude, longitude** order
+(for example, `52.01, 4.36`). Brackets and whitespace-separated pairs use the same
+order. Coordinate entry works locally, including without a Geocode Earth key.
+Only the chosen point is used: no boundary or geometry request is made.
+
+Results appear beneath a fixed circle, initially covering a 250 ground metre
+radius. Pan, scroll or pinch to move and scale the original map beneath it. The
+camera is constrained to keep the circle inside the image; the ground radius
+stays within 10 m–50 km. **Refine search** queries maps for the center and radius
+currently inside the circle. It sits in the button row and is enabled only after
+the view changes. It retains chosen maps, including their crops. Routine loading
+and skipped-map messages are omitted; the Allmaps spinner indicates progress.
+
+Search queries up to 100 source annotations whose geographic masks intersect the
+circle's bounds. Four concurrent `info.json` checks skip unavailable image
+services; there is no sample-image preflight. Available results appear directly
+on the canvas as they arrive. Previous/next start at the query's center and scale,
+remembering adjustments to each map while browsing. **+ Add / − Remove** changes
+the selection; the checkmark confirms it and
+imports the maps with compact PRISM as one undo step. Left/right arrows, Space,
+and Command/Ctrl Enter provide the corresponding shortcuts. Closing search
+restores the previous collage and camera without adding anything.
+
+The circle replaces the original resource mask rather than intersecting it, so
+it cannot become a collection of partial segments. Sources whose image bounds do
+not cover the entire circle are excluded. This guarantees coverage by the image,
+not that every pixel contains cartographic content or that every tile server is
+available. The **Import shape** fan offers Circle, Original mask and Full image
+for all selected maps. This setting affects only the imported masks; the preview
+stays circular. The canvas is clipped while navigating and resource masks are
+created when selecting maps, avoiding transformer rebuilds on every gesture.
+Masks remain editable and export as ordinary resource masks; no search metadata
+is added to annotations.
+
+Addition mode shares the collage's MapLibre map and Allmaps layer. Selected
+previews become collage maps by updating their GCPs and masks in place, keeping
+their instance IDs and the renderer's existing image/tile cache. Only the current
+result, neighboring results and selected maps remain in the layer during search;
+unused previews are removed when leaving it. Cancelling removes every preview
+and restores the existing collage. Normal renderer cache pruning still applies.
+
+The last eight searches remember their point, radius, current result and import
+shape in `sessionStorage`. Responses are cached in memory for quick revisits;
+after a page reload, the app refetches maps. Reopening a search always starts with
+an empty selection. Use the × next to a recent search to remove it and its cached
+response. This is per-tab search history, not an autosave of the collage.
 
 ## Arranging maps
 
@@ -96,6 +153,11 @@ pnpm --filter @allmaps/collage build
   Appearance, mask editing and original-orientation reset remain individual-map actions.
   Group ordering keeps the selected maps' relative order; each gesture is one
   undo step. Click empty canvas or press Escape to deselect.
+- **Open in Viewer** opens the imported annotation URL in a new tab. URL imports
+  retain the exact URL, including for annotations containing multiple maps.
+  Search and random maps use their original annotation URL. The button is
+  disabled for pasted JSON, local files and multiple selected maps. The URL is
+  kept through duplication and undo, without adding metadata to exports.
 - **Duplicate map** copies the selection with its scale, rotation, mask and
   appearance intact. Copies get new IDs, appear slightly down and to the right,
   and become selected. A group duplicates together in one undo step.
@@ -176,7 +238,9 @@ Warnings stack above these actions, including when the buttons wrap on phones.
 - Drag a vertex to move it, drag anywhere along an edge to add one, and
   right-click or double-tap a vertex to remove it. Dragged points stop at the image boundary,
   including on rotated and warped maps.
-- Choose **Draw new mask** to replace the polygon. Click to place vertices,
+- Open **Drawing tools** for a fan of labeled options: Edit points, Polygon,
+  Pen, Circle and Rectangle. The menu supports arrow keys and Escape.
+- Choose **Polygon** to replace the polygon. Click to place vertices,
   then click the first vertex or press Enter to close it. Escape or the drawing
   button cancels an unfinished replacement and restores the previous draft.
 - **Pen** draws a freehand mask using Terra Draw's existing freehand polygon mode.
@@ -191,6 +255,15 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   Two-finger gestures started before drawing use normal pan and zoom. Scroll
   zoom and the zoom buttons remain available; navigation is only locked while
   drawing, not just because Pen is selected.
+- **Circle** draws from center to edge; **Rectangle** draws between opposite
+  corners, aligned with the current view. Drag to draw and release to finish.
+  Shapes stay within the image bounds and become ordinary editable polygons.
+- Drag inside an existing mask to move it without changing its shape. Its edges
+  stop at the image boundary. Drag outside to pan the map; adding a second finger
+  cancels the mask drag and hands control to normal map navigation.
+- **Reset mask** restores the source mask from the current import, including the
+  original mask before a circular search crop. That source mask is kept in memory;
+  reopening an exported collage uses the loaded mask as the new source of truth.
 - **Full image mask** replaces the draft with the image rectangle.
 - **Orthogonalize** straightens corners within 13° of a right angle and removes
   redundant vertices on nearly straight edges, preserving the mask's general
@@ -199,8 +272,9 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   by iD Contributors under the ISC license. The copyright and full license are
   retained in the source and [distributed notices](static/third-party-notices.txt).
 - Use the editor's undo/redo controls for vertex edits, replacement polygons,
-  and individual points while polygon drawing. Pen strokes, full-mask replacement
-  and orthogonalization each form one undo step. Undo during pen drawing
+  and individual points while polygon drawing. Drawing a shape, moving a mask,
+  resetting it, pen strokes, full-mask replacement and orthogonalization each
+  form one undo step. Undo during pen drawing
   cancels the unfinished stroke. **Done** is disabled until a new polygon
   has been closed.
 - **Done** (Cmd+Enter on Mac, Ctrl+Enter on Windows/Linux) saves the draft as one collage undo step and updates the tool

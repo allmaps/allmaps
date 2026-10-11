@@ -24,6 +24,7 @@ export type GeographicReference = {
 }
 export type CollageMap = {
   instanceId: string
+  sourceUrl?: string
   baseline: GeoreferencedMap
   localGcps: Point[]
   localMask: Point[]
@@ -31,6 +32,7 @@ export type CollageMap = {
   sourceCenter: Point
   mirrored: boolean
   resourceMask: Point[]
+  originalResourceMask?: Point[]
   placement: Placement
   geographicReference?: GeographicReference
   title: string
@@ -147,7 +149,7 @@ function validateMap(map: GeoreferencedMap) {
   return transform
 }
 
-function label(map: GeoreferencedMap): string {
+export function label(map: GeoreferencedMap): string {
   const parts = [...(map.resource.partOf ?? [])]
   while (parts.length) {
     const part = parts.shift()!
@@ -178,6 +180,17 @@ export function originalAnnotationUrl(
   if ('version' in metadata && isHttpUrl(metadata.version))
     return metadata.version
   if ('id' in metadata && isHttpUrl(metadata.id)) return metadata.id
+}
+
+/** Only an actual URL import enables Viewer; IDs in pasted JSON do not. */
+export function viewerUrl(
+  item: CollageMap,
+  baseUrl = 'https://viewer.allmaps.org'
+): string | undefined {
+  if (!isHttpUrl(item.sourceUrl)) return
+  const url = new URL(baseUrl)
+  url.searchParams.set('url', item.sourceUrl)
+  return url.href
 }
 
 function preserveSource(map: GeoreferencedMap, sourceUrl?: string) {
@@ -367,7 +380,10 @@ export function prepareMaps(
     preserveSource(source, sources.length === 1 ? sourceUrl : undefined)
     const { map: baseline, geographicReference } = normalizeSource(source)
     baseline.id = 'urn:uuid:' + crypto.randomUUID()
-    return makeItem(baseline, geographicReference)
+    return {
+      ...makeItem(baseline, geographicReference),
+      sourceUrl: isHttpUrl(sourceUrl) ? sourceUrl : undefined
+    }
   })
   if (items.length) {
     items[0].placement.position = [...at]
@@ -390,8 +406,11 @@ export function addMaps(
 }
 
 /** Opening never normalizes, recenters, sorts, or infers intent from location. */
-export function openCollage(input: unknown): CollageMap[] {
-  return parseMaps(input).map((map) => makeItem(map))
+export function openCollage(input: unknown, sourceUrl?: string): CollageMap[] {
+  return parseMaps(input).map((map) => ({
+    ...makeItem(map),
+    sourceUrl: isHttpUrl(sourceUrl) ? sourceUrl : undefined
+  }))
 }
 
 export function placedMap(item: CollageMap): GeoreferencedMap {

@@ -7,6 +7,7 @@ const config = {
     postcss: true
   }),
   kit: {
+    env: { dir: '../..' },
     adapter: adapter({
       pages: 'build',
       assets: 'build',

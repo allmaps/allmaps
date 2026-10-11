@@ -67,7 +67,7 @@
   <button
     class="map-control-button"
     class:pressed
-    title={label}
+    data-tooltip={label}
     aria-label={label}
     aria-pressed={sliderValue === undefined ? pressed : undefined}
     role={sliderValue !== undefined ? 'slider' : undefined}

@@ -5,6 +5,7 @@ export const controlOrder = [
   'remove',
   'front',
   'duplicate',
+  'openIn',
   'background',
   'saturation',
   'hue',

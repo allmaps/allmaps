@@ -15,6 +15,7 @@ import {
   place,
   normalizeMap,
   originalAnnotationUrl,
+  viewerUrl,
   transformer,
   contains,
   outline,
@@ -515,6 +516,51 @@ test('opening a high-latitude annotation does not normalize or relocate it', () 
   placedMap(item).gcps.forEach((gcp, i) =>
     close(distance(gcp.geo, original.gcps[i].geo), 0, 1e-10)
   )
+})
+
+test('Viewer uses the exact imported URL for every map and retains it through duplication', () => {
+  const source = fixture()
+  source._allmaps = { id: 'https://example.org/another-annotation' }
+  const annotation = generateAnnotation([source, fixture(53)])
+  const sourceUrl =
+    'https://example.org/annotations?collection=city&version=2#maps'
+  const items = solveLayout({
+    type: 'add',
+    input: annotation,
+    at: [0, 0],
+    sourceUrl
+  }).items
+  for (const item of [
+    ...items,
+    ...duplicateMaps(items, [10, 10]),
+    ...openCollage(annotation, sourceUrl)
+  ]) {
+    const url = new URL(viewerUrl(item)!)
+    assert.equal(url.origin, 'https://viewer.allmaps.org')
+    assert.equal(url.searchParams.get('url'), sourceUrl)
+  }
+  const custom = new URL(viewerUrl(items[0], 'http://localhost:5500/')!)
+  assert.equal(custom.origin, 'http://localhost:5500')
+  assert.equal(custom.searchParams.get('url'), sourceUrl)
+  assert.equal(
+    JSON.stringify(exportCollage(items)).includes('sourceUrl'),
+    false
+  )
+})
+
+test('Viewer stays disabled for text imports even when annotations contain URLs', () => {
+  const source = fixture()
+  source._allmaps = { id: source.id, version: source.id + '@1' }
+  const annotation = generateAnnotation(source)
+  const items = [...prepareMaps(annotation), ...openCollage(annotation)]
+  for (const item of items) {
+    assert.equal(viewerUrl(item), undefined)
+    item.sourceUrl = 'javascript:alert(1)'
+    assert.equal(viewerUrl(item), undefined)
+    item.sourceUrl = 'file:///tmp/map.json'
+    assert.equal(viewerUrl(item), undefined)
+  }
+  assert.equal(viewerUrl(openCollage(exportCollage(items))[0]), undefined)
 })
 
 test('exports record rotation while preserving provenance and omitting other UI state', () => {

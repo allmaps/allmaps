@@ -79,6 +79,18 @@ textarea:focus-visible {
   stroke-width: 4;
   stroke-dasharray: none;
 }
+.search-aperture circle {
+  fill: none;
+  stroke: #22222260;
+  stroke-width: 2;
+}
+.search-aperture circle.selected {
+  stroke: var(--accent);
+  stroke-width: 4;
+}
+.search-aperture circle.original-mask {
+  stroke-dasharray: 4 5;
+}
 .selection-box {
   fill: #ff56ba18;
   stroke: var(--accent);
@@ -332,6 +344,27 @@ nav {
 .map-control:has(.map-control-button:focus-visible) .control-value {
   visibility: visible;
 }
+.map-control:has(.map-control-button[data-tooltip-visible]) .control-value {
+  visibility: hidden;
+}
+.button-tooltip {
+  position: fixed;
+  inset: auto;
+  z-index: 1000;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 16px));
+  margin: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #fffafc;
+  color: #222;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
 .control-track {
   position: absolute;
   height: 4px;
@@ -565,6 +598,193 @@ nav {
   inset: 0;
   pointer-events: none;
 }
+.collage:has(.mask-editor.drawing-shape) .maplibregl-canvas {
+  /* Match Terra Draw's drawing cursor while our shapes use its static mode.
+     Override its inline cursor only for the duration of these modes. */
+  cursor: crosshair !important;
+}
+
+.search-dialog {
+  overflow: visible;
+}
+.search-dialog input {
+  font-size: 16px;
+}
+.search-dialog input[role='combobox']:focus-visible {
+  outline: none;
+}
+.recent-searches {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 35dvh;
+  overflow: auto;
+  margin-top: 16px;
+}
+.recent-searches button {
+  text-align: left;
+  border: 0;
+  border-radius: 8px;
+  background: #f1f5f1;
+  padding: 10px 12px;
+}
+.recent-searches button:hover {
+  background: #e5eee5;
+}
+.recent-searches button span {
+  display: block;
+}
+.recent-searches button span + span {
+  margin-top: 3px;
+  color: #667166;
+  font-size: 13px;
+}
+.recent-search-row {
+  display: flex;
+  gap: 4px;
+}
+.recent-search-row > button:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.recent-searches .remove-search {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  padding: 8px;
+}
+.geocoder-credit {
+  display: block;
+  margin-top: 18px;
+  font-size: 12px;
+  color: #667166;
+}
+.search-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.search-caption {
+  position: absolute;
+  transform: translateY(-100%);
+  background: #fffafcf2;
+  border-radius: 12px 12px 12px 3px;
+  padding: 6px 10px;
+  pointer-events: none;
+}
+.search-caption h2,
+.search-caption p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+.search-caption h2,
+.search-map-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-caption p {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #556255;
+}
+.search-result-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 64px;
+  height: 36px;
+  font-size: 13px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.search-stack {
+  bottom: 20px;
+}
+.search-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.search-control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-actions .quiet-button {
+  height: 36px;
+  width: 36px;
+}
+.search-actions .search-text-button {
+  width: auto;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+.search-select {
+  min-width: 102px;
+}
+.search-select.chosen {
+  background: var(--accent);
+}
+.search-confirm {
+  position: relative;
+}
+.search-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 12px;
+  background: var(--accent);
+  font-size: 11px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.search-notice {
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: #ffffffe8;
+  max-width: 550px;
+  font-size: 13px;
+  text-align: center;
+  pointer-events: auto;
+}
+@media (max-width: 960px) {
+  .search-stack {
+    bottom: 72px;
+  }
+  .search-footer {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 16px;
+  }
+}
+@media (max-width: 520px) {
+  .search-stack .search-actions h2 {
+    flex-basis: 100%;
+    justify-content: center;
+    background: transparent;
+    padding: 0;
+  }
+  .app-header nav {
+    gap: 4px;
+  }
+  .app-header .primary-button.small {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+  .app-header .primary-button.small span {
+    display: none;
+  }
+}
 .mask-editor-actions,
 .selection-actions {
   display: flex;
@@ -619,5 +839,84 @@ nav {
 @media (max-width: 900px) {
   .selection-stack.has-actions {
     bottom: 78px;
+  }
+}
+
+/* A short upward fan keeps drawing and import choices beside their trigger. */
+.fan-menu {
+  position: relative;
+  flex: none;
+  pointer-events: auto;
+}
+.fan-menu:has(.fan-options) {
+  z-index: 20;
+}
+.fan-options {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}
+.fan-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translateX(var(--fan-shift));
+}
+.fan-menu.labels-right .fan-option {
+  transform: translateX(calc(-1 * var(--fan-shift)));
+}
+.fan-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 10px #2222;
+  flex: none;
+}
+.fan-label {
+  position: absolute;
+  right: calc(100% + 9px);
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 8px;
+  background: #fffffff2;
+  box-shadow: 0 2px 10px #2221;
+}
+.fan-menu.labels-right .fan-label {
+  right: auto;
+  left: calc(100% + 9px);
+}
+.fan-option.chosen .fan-icon {
+  background: var(--accent);
+}
+.fan-option:hover .fan-icon {
+  outline: 2px solid #2224;
+}
+.fan-option:focus-visible {
+  outline: none;
+}
+.fan-option:focus-visible .fan-icon {
+  outline: 2px solid #222;
+  outline-offset: 3px;
+}
+.search-error {
+  color: var(--red, #e34133);
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 520px) {
+  .fan-options {
+    bottom: calc(100% + 46px);
   }
 }

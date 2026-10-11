@@ -25,7 +25,7 @@ type Options = {
 
 /** Check browser-readable IIIF metadata, optionally fetching and decoding a
  * sample image too. CORS errors and invalid metadata are always skipped. */
-async function checkImage(
+export async function checkImage(
   map: GeoreferencedMap,
   fetchFn: typeof fetch,
   decodeImage: (blob: Blob) => Promise<DecodedImage>,

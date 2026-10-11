@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte'
+  import { SvelteSet } from 'svelte/reactivity'
   import type { Map as MapLibreMap } from 'maplibre-gl'
   import type { WarpedMapLayer } from '@allmaps/maplibre'
   import {
@@ -19,9 +20,20 @@
     Polygon,
     PencilSimple,
     SelectionAll,
+    Circle,
+    Rectangle,
+    Cursor,
+    ArrowCounterClockwise,
     Check,
     X
   } from 'phosphor-svelte'
+  import FanMenu from './FanMenu.svelte'
+  import {
+    drawMaskCircle,
+    drawMaskRectangle,
+    moveMask,
+    maskContains
+  } from './mask-shapes'
   import { fullResourceMask, validateResourceMask } from './model'
   import { orthogonalizeMask } from './orthogonalize'
   import { simplifyMaskStroke } from './freehand-mask'
@@ -64,7 +76,15 @@
   let draw = $state.raw<TerraDraw>()
   let polygonMode: TerraDrawPolygonMode | undefined
   let freehandMode: MaskFreehandMode | undefined
-  let drawingMode = $state<'polygon' | 'freehand'>()
+  type DrawingMode = 'polygon' | 'freehand' | 'circle' | 'rectangle'
+  let drawingMode = $state<DrawingMode>()
+  const drawingOptions = [
+    { value: 'edit', label: 'Edit points', icon: Cursor },
+    { value: 'polygon', label: 'Polygon', icon: Polygon },
+    { value: 'freehand', label: 'Pen', icon: PencilSimple },
+    { value: 'circle', label: 'Circle', icon: Circle },
+    { value: 'rectangle', label: 'Rectangle', icon: Rectangle }
+  ]
   const drawingNewMask = $derived(drawingMode !== undefined)
   let drawingUndoCount = $state(0)
   let drawingRedoCount = $state(0)
@@ -113,9 +133,9 @@
 
   function refreshDrawingHistory() {
     drawingUndoCount =
-      drawingMode === 'freehand' ? 1 : (polygonMode?.undoSize() ?? 0)
+      drawingMode === 'polygon' ? (polygonMode?.undoSize() ?? 0) : 1
     drawingRedoCount =
-      drawingMode === 'freehand' ? 0 : (polygonMode?.redoSize() ?? 0)
+      drawingMode === 'polygon' ? (polygonMode?.redoSize() ?? 0) : 0
   }
 
   function showDraft() {
@@ -146,15 +166,17 @@
   }
 
   function cancelNewMask() {
+    abortMaskGesture()
     drawingMode = undefined
     showDraft()
     refreshDrawingHistory()
     error = ''
   }
 
-  function drawNewMask(mode: 'polygon' | 'freehand') {
+  function drawNewMask(mode: DrawingMode) {
     if (!draw || !ready) return
     if (drawingMode === mode) return cancelNewMask()
+    abortMaskGesture()
     releaseNavigation()
     penTouches.reset()
     vertexTaps.reset()
@@ -163,9 +185,24 @@
     draw.setMode('static')
     draw.clear()
     drawingMode = mode
-    draw.setMode(mode)
+    draw.setMode(mode === 'circle' || mode === 'rectangle' ? 'static' : mode)
     refreshDrawingHistory()
     error = ''
+  }
+
+  function chooseDrawingTool(value: string) {
+    if (value === 'edit') cancelNewMask()
+    else drawNewMask(value as DrawingMode)
+  }
+
+  function resetMask() {
+    if (!ready || drawingNewMask) return
+    abortMaskGesture()
+    replaceDraft(
+      structuredClone(
+        original.originalResourceMask ?? original.baseline.resourceMask
+      )
+    )
   }
 
   function finished(id: string | number) {
@@ -206,11 +243,13 @@
 
   function fullMask() {
     if (!ready || drawingNewMask) return
+    abortMaskGesture()
     replaceDraft(fullResourceMask(original.baseline))
   }
 
   function orthogonalize() {
     if (!ready || drawingNewMask) return
+    abortMaskGesture()
     try {
       replaceDraft(orthogonalizeMask(draft, width, height))
     } catch (problem) {
@@ -310,6 +349,199 @@
     const restore = restoreNavigation
     restoreNavigation = undefined
     restore?.()
+  }
+
+  // Masks are stored in image coordinates; rectangles are drawn in the view's
+  // orientation. Terra Draw renders outlines and edits the resulting vertices.
+  type MaskGesture = {
+    kind: 'circle' | 'rectangle' | 'move'
+    pointer: number
+    anchor: Point
+    screen: Point
+    mask: Point[]
+    next?: Point[]
+  }
+  let maskGesture: MaskGesture | undefined
+  const maskTouches = new SvelteSet<number>()
+  let navigatingTouches = false
+  let suppressMaskClick = false
+
+  function pointerScreen(event: PointerEvent): Point {
+    const rect = map.getCanvas().getBoundingClientRect()
+    return [event.clientX - rect.left, event.clientY - rect.top]
+  }
+
+  function screenResource(point: Point): Point {
+    const geo = map.unproject(point)
+    return toResource([geo.lng, geo.lat])
+  }
+
+  function resourceScreen(point: Point): Point {
+    const screen = map.project(toGeo(point))
+    return [screen.x, screen.y]
+  }
+
+  function pointerResource(event: PointerEvent): Point {
+    return screenResource(pointerScreen(event))
+  }
+
+  function abortMaskGesture() {
+    if (!maskGesture) return
+    maskGesture = undefined
+    releaseNavigation()
+    adapter?.resetPenGesture()
+    showDraft()
+  }
+
+  function cancelMaskNavigation() {
+    abortMaskGesture()
+    maskTouches.clear()
+    navigatingTouches = false
+  }
+
+  function maskPointerDown(event: PointerEvent) {
+    suppressMaskClick = false
+    if (drawingMode === 'polygon' || drawingMode === 'freehand') return
+    if (event.pointerType === 'touch') {
+      maskTouches.add(event.pointerId)
+      if (maskTouches.size > 1) {
+        navigatingTouches = true
+        abortMaskGesture()
+      }
+    }
+    if (navigatingTouches) {
+      event.stopImmediatePropagation()
+      return
+    }
+    if (!ready || event.button !== 0) return
+    try {
+      const anchor = pointerResource(event)
+      const shape = drawingMode === 'circle' || drawingMode === 'rectangle'
+      if (!shape) {
+        const rect = map.getCanvas().getBoundingClientRect()
+        if (
+          vertexAt(event) !== undefined ||
+          edgeAt([event.clientX - rect.left, event.clientY - rect.top]) ||
+          !maskContains(draft, anchor)
+        )
+          return
+      }
+      maskGesture = {
+        kind: shape ? (drawingMode as 'circle' | 'rectangle') : 'move',
+        pointer: event.pointerId,
+        anchor: [
+          Math.max(0, Math.min(width, anchor[0])),
+          Math.max(0, Math.min(height, anchor[1]))
+        ],
+        screen: [event.clientX, event.clientY],
+        mask: structuredClone(draft)
+      }
+      edgeStart = undefined
+      vertexTaps.reset()
+      adapter?.resetPenGesture()
+      restoreNavigation ??= suspendMapNavigation(map)
+      draw!.setMode('static')
+      if (shape) draw!.clear()
+      map.getCanvas().setPointerCapture(event.pointerId)
+      suppressMaskClick = true
+      event.preventDefault()
+      event.stopImmediatePropagation()
+    } catch (problem) {
+      error = problem instanceof Error ? problem.message : String(problem)
+    }
+  }
+
+  function maskPointerMove(event: PointerEvent) {
+    if (navigatingTouches) {
+      event.stopImmediatePropagation()
+      return
+    }
+    const gesture = maskGesture
+    if (!gesture || gesture.pointer !== event.pointerId) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    if (
+      Math.hypot(
+        event.clientX - gesture.screen[0],
+        event.clientY - gesture.screen[1]
+      ) < (event.pointerType === 'touch' ? 8 : 2)
+    )
+      return
+    try {
+      const point = pointerResource(event)
+      const next =
+        gesture.kind === 'move'
+          ? moveMask(
+              gesture.mask,
+              [point[0] - gesture.anchor[0], point[1] - gesture.anchor[1]],
+              width,
+              height
+            )
+          : gesture.kind === 'rectangle'
+            ? drawMaskRectangle(
+                resourceScreen(gesture.anchor),
+                pointerScreen(event),
+                width,
+                height,
+                screenResource
+              )
+            : drawMaskCircle(gesture.anchor, point, width, height)
+      validateResourceMask(next, width, height)
+      gesture.next = next
+      if (draw!.getSnapshotFeature(featureId))
+        draw!.updateFeatureGeometry(featureId, geometry(next))
+      else
+        draw!.addFeatures([
+          {
+            type: 'Feature',
+            id: featureId,
+            geometry: geometry(next),
+            properties: { mode: 'polygon' }
+          }
+        ])
+    } catch {
+      // A zero-size starting shape is unfinished, not an invalid edit.
+    }
+  }
+
+  function maskPointerUp(event: PointerEvent) {
+    const wasNavigating = navigatingTouches
+    maskTouches.delete(event.pointerId)
+    if (!maskTouches.size) navigatingTouches = false
+    if (wasNavigating) {
+      event.stopImmediatePropagation()
+      return
+    }
+    const gesture = maskGesture
+    if (!gesture || gesture.pointer !== event.pointerId) return
+    maskPointerMove(event)
+    maskGesture = undefined
+    releaseNavigation()
+    adapter?.resetPenGesture()
+    drawingMode = undefined
+    showDraft()
+    if (gesture.next) replaceDraft(gesture.next)
+    event.preventDefault()
+    event.stopImmediatePropagation()
+  }
+
+  function maskPointerCancel(event: PointerEvent) {
+    maskTouches.delete(event.pointerId)
+    if (!maskTouches.size) navigatingTouches = false
+    abortMaskGesture()
+  }
+
+  function maskTouch(event: TouchEvent) {
+    if (!maskGesture) return
+    if (event.cancelable) event.preventDefault()
+    event.stopImmediatePropagation()
+  }
+
+  function maskClick(event: MouseEvent) {
+    if (suppressMaskClick) {
+      suppressMaskClick = false
+      event.stopImmediatePropagation()
+    }
   }
 
   function penPointerDown(event: PointerEvent) {
@@ -486,6 +718,23 @@
       super.onMouseMove(event)
       if (edgeAt([event.containerX, event.containerY]))
         map.getCanvas().style.cursor = 'copy'
+      else {
+        try {
+          const nearVertex = draft.some((point) => {
+            const p = map.project(toGeo(point))
+            return (
+              Math.hypot(p.x - event.containerX, p.y - event.containerY) <= 12
+            )
+          })
+          if (
+            !nearVertex &&
+            maskContains(draft, toResource([event.lng, event.lat]))
+          )
+            map.getCanvas().style.cursor = 'move'
+        } catch {
+          /* Folded surfaces have no usable inverse here. */
+        }
+      }
     }
 
     override onDragStart(
@@ -542,8 +791,9 @@
   }
 
   function undo() {
+    abortMaskGesture()
     if (drawingNewMask) {
-      if (drawingMode === 'freehand') return cancelNewMask()
+      if (drawingMode !== 'polygon') return cancelNewMask()
       polygonMode?.undo()
       refreshDrawingHistory()
       return
@@ -557,6 +807,7 @@
   }
 
   function redo() {
+    abortMaskGesture()
     if (drawingNewMask) {
       polygonMode?.redo()
       refreshDrawingHistory()
@@ -636,6 +887,7 @@
       visible: layer.getWarpedMap(other.instanceId)?.visible ?? true
     }))
     const doubleClickZoom = map.doubleClickZoom.isEnabled()
+    const canvas = map.getCanvas()
     try {
       map.stop()
       map.doubleClickZoom.disable()
@@ -831,7 +1083,17 @@
           if (ready) refreshDrawingHistory()
         })
       )
-      const canvas = map.getCanvas()
+      canvas.addEventListener('pointerdown', maskPointerDown, true)
+      canvas.addEventListener('pointermove', maskPointerMove, true)
+      canvas.addEventListener('pointerup', maskPointerUp, true)
+      canvas.addEventListener('pointercancel', maskPointerCancel, true)
+      canvas.addEventListener('click', maskClick, true)
+      window.addEventListener('blur', cancelMaskNavigation)
+      for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
+        canvas.addEventListener(type, maskTouch as EventListener, {
+          capture: true,
+          passive: false
+        })
       canvas.addEventListener('pointerdown', vertexPointerDown, true)
       canvas.addEventListener('pointermove', vertexPointerMove, true)
       canvas.addEventListener('pointerup', vertexPointerUp, true)
@@ -852,7 +1114,14 @@
     }
     return () => {
       ready = false
-      const canvas = map.getCanvas()
+      canvas.removeEventListener('pointerdown', maskPointerDown, true)
+      canvas.removeEventListener('pointermove', maskPointerMove, true)
+      canvas.removeEventListener('pointerup', maskPointerUp, true)
+      canvas.removeEventListener('pointercancel', maskPointerCancel, true)
+      canvas.removeEventListener('click', maskClick, true)
+      window.removeEventListener('blur', cancelMaskNavigation)
+      for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
+        canvas.removeEventListener(type, maskTouch as EventListener, true)
       canvas.removeEventListener('pointerdown', vertexPointerDown, true)
       canvas.removeEventListener('pointermove', vertexPointerMove, true)
       canvas.removeEventListener('pointerup', vertexPointerUp, true)
@@ -896,53 +1165,50 @@
 </script>
 
 <svelte:window onkeydown={keyboard} />
-<section class="mask-editor" aria-label="Mask editor">
+<section
+  class="mask-editor"
+  class:drawing-shape={drawingMode === 'circle' || drawingMode === 'rectangle'}
+  aria-label="Mask editor"
+>
   <div class="bottom-stack mask-editor-stack">
     {#if error}<div class="error-message" role="alert">{error}</div>{/if}
     <div class="mask-editor-actions">
       <h2>
         {drawingMode === 'freehand'
           ? 'Draw with pen'
-          : drawingNewMask
-            ? 'Draw mask'
-            : 'Edit mask'}
+          : drawingMode === 'circle'
+            ? 'Draw circle'
+            : drawingMode === 'rectangle'
+              ? 'Draw rectangle'
+              : drawingNewMask
+                ? 'Draw mask'
+                : 'Edit mask'}
       </h2>
       <button
         class="quiet-button"
         aria-label="Full image mask"
-        title="Use the full image as the mask"
+        data-tooltip="Full image mask"
         disabled={!ready || drawingNewMask}
         onclick={fullMask}><SelectionAll size={20} /></button
       >
+      <FanMenu
+        label="Drawing tools"
+        value={drawingMode ?? 'edit'}
+        options={drawingOptions}
+        disabled={!ready}
+        onselect={chooseDrawingTool}
+      />
       <button
         class="quiet-button"
-        class:pressed={drawingMode === 'polygon'}
-        aria-pressed={drawingMode === 'polygon'}
-        aria-label={drawingMode === 'polygon'
-          ? 'Cancel new mask'
-          : 'Draw new mask'}
-        title={drawingMode === 'polygon'
-          ? 'Cancel new mask (Escape)'
-          : 'Draw new mask · Click points, then the first point or Enter to finish'}
-        disabled={!ready}
-        onclick={() => drawNewMask('polygon')}><Polygon size={20} /></button
-      >
-      <button
-        class="quiet-button"
-        class:pressed={drawingMode === 'freehand'}
-        aria-pressed={drawingMode === 'freehand'}
-        aria-label={drawingMode === 'freehand'
-          ? 'Cancel pen drawing'
-          : 'Draw mask with pen'}
-        title="Draw mask with pen · Drag and release, or click to start and finish"
-        disabled={!ready}
-        onclick={() => drawNewMask('freehand')}
-        ><PencilSimple size={20} /></button
+        aria-label="Reset mask"
+        data-tooltip="Reset mask"
+        disabled={!ready || drawingNewMask}
+        onclick={resetMask}><ArrowCounterClockwise size={20} /></button
       >
       <button
         class="quiet-button"
         aria-label="Orthogonalize mask"
-        title="Orthogonalize mask · Straighten near-right corners"
+        data-tooltip="Orthogonalize mask"
         disabled={!ready || drawingNewMask}
         onclick={orthogonalize}
         ><svg
@@ -962,14 +1228,14 @@
       >
       <button
         class="quiet-button"
-        title="Cancel mask editing (Escape)"
+        data-tooltip="Cancel"
         aria-label="Cancel mask editing"
         onclick={oncancel}><X size={20} /></button
       >
       <button
         class="quiet-button"
         aria-label="Done"
-        title="Done editing mask (⌘/Ctrl Enter)"
+        data-tooltip="Done"
         aria-keyshortcuts="Meta+Enter Control+Enter"
         disabled={!ready || drawingNewMask}
         onclick={() => ondone(draft)}><Check size={20} /></button
@@ -980,44 +1246,46 @@
     <div class="view-controls">
       <button
         aria-label="Zoom in"
-        title="Zoom in"
+        data-tooltip="Zoom in"
         disabled={!ready}
         onclick={() => map.zoomIn()}><Plus size={19} /></button
       >
       <button
         aria-label="Zoom out"
-        title="Zoom out"
+        data-tooltip="Zoom out"
         disabled={!ready}
         onclick={() => map.zoomOut()}><Minus size={19} /></button
       >
       <button
         aria-label="Fit map"
-        title="Fit map"
+        data-tooltip="Fit map"
         disabled={!ready}
         onclick={fit}><ArrowsOut size={19} /></button
       >
       <button
         aria-label="Undo mask edit"
-        title="Undo mask edit (⌘/Ctrl Z)"
+        data-tooltip="Undo"
         disabled={drawingNewMask ? !drawingUndoCount : !past.length}
         onclick={undo}><ArrowUUpLeft size={19} /></button
       >
       <button
         aria-label="Redo mask edit"
-        title="Redo mask edit (⌘/Ctrl Shift Z)"
+        data-tooltip="Redo"
         disabled={drawingNewMask ? !drawingRedoCount : !future.length}
         onclick={redo}><ArrowUUpRight size={19} /></button
       >
     </div>
   </div>
   <p class="sr-only">
-    Drag vertices to edit. Drag any mask edge to add a vertex. Right-click a
-    vertex or double-tap it on touch screens to remove it. Vertices stop at the
-    image boundary. Done or ⌘/Ctrl Enter saves; Escape cancels. Draw new mask
-    replaces the polygon after you click its first point or press Enter. The pen
-    draws a freehand polygon and simplifies the stroke. Release to finish, or
-    click to start and finish. Full image mask restores the image bounds.
-    Orthogonalize straightens near-right corners. Escape cancels an unfinished
-    drawing.
+    Drag inside the mask to move it. Drag vertices to edit. Drag any mask edge
+    to add a vertex. Right-click a vertex or double-tap it on touch screens to
+    remove it. Vertices stop at the image boundary. Done or ⌘/Ctrl Enter saves;
+    Escape cancels. Draw new mask replaces the polygon after you click its first
+    point or press Enter. The pen draws a freehand polygon and simplifies the
+    stroke. Release to finish, or click to start and finish. Full image mask
+    restores the image bounds. Reset mask restores the imported original mask.
+    Circle draws from its center; rectangle draws from corner to corner aligned
+    with the current view. Both stop at the image edges. Orthogonalize
+    straightens near-right corners. Escape cancels an unfinished drawing.
   </p>
 </section>
