@@ -6,6 +6,7 @@
   } from 'phosphor-svelte'
 
   import { debounce } from 'lodash-es'
+  import { onDestroy, untrack } from 'svelte'
 
   import type {
     GeocoderGeoJsonFeature,
@@ -26,18 +27,25 @@
     providers: GeocoderProvider[]
     onselect?: (event: CustomEvent<GeocoderGeoJsonFeature>) => void
     showProviderUrls?: boolean
+    inputValue?: string
+    portalTarget?: HTMLElement
+    placeholder?: string
   }
 
   let {
     providers,
     onselect,
     showProviderUrls = false,
-    open = $bindable(false)
+    open = $bindable(false),
+    inputValue = $bindable(''),
+    portalTarget,
+    placeholder = 'Search location'
   }: Props = $props()
 
   let value = $state('')
-  let inputValue = $state('')
-  let fetching = $state(true)
+  let fetching = $state(false)
+  let fetchFailed = $state(false)
+  let request = 0
   let customAnchor = $state.raw<HTMLElement>(null!)
 
   let featuresByProvider = $state<GeocoderGeoJsonFeaturesByProvider>([])
@@ -74,23 +82,59 @@
   )
 
   async function fetchFeatures(input: string) {
+    const current = ++request
     fetching = true
-    featuresByProvider = await Promise.all(
+    const result = await Promise.allSettled(
       providers.map((provider) => provider.fetchFeatures(input))
     )
+    if (current !== request) return
+    featuresByProvider = result.map((result) =>
+      result.status === 'fulfilled' ? result.value : []
+    )
+    fetchFailed = result.some((result) => result.status === 'rejected')
     fetching = false
   }
 
   function handleInput(event: InputEvent) {
-    const value = event?.currentTarget.value
-    debouncedFetchFeatures(value)
+    request++
+    value = ''
+    fetching = true
+    fetchFailed = false
+    const text = event?.currentTarget.value
+    debouncedFetchFeatures(text)
   }
+
+  function handleKeyDown(
+    event: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    if (event.key !== 'Enter' || event.isComposing) return
+    const highlighted = event.currentTarget.getAttribute(
+      'aria-activedescendant'
+    )
+    if (
+      open &&
+      !fetching &&
+      highlighted &&
+      event.currentTarget.ownerDocument.getElementById(highlighted)
+    )
+      return
+
+    // Bits closes on Enter even without a result to select. Keep the list open
+    // while searching, and skip the remaining debounce delay when submitting.
+    event.preventDefault()
+    open = true
+    void debouncedFetchFeatures.flush()
+  }
+
+  onDestroy(() => {
+    request++
+    debouncedFetchFeatures.cancel()
+  })
 
   $effect(() => {
     if (feature) {
-      onselect?.(
-        new CustomEvent('select', { detail: $state.snapshot(feature) })
-      )
+      const selected = $state.snapshot(feature)
+      untrack(() => onselect?.(new CustomEvent('select', { detail: selected })))
     }
   })
 </script>
@@ -106,13 +150,14 @@
     <Combobox.Input
       class="h-9 text-sm truncate rounded-lg
         focus:outline-none w-full bg-transparent"
-      placeholder="Search location"
-      aria-label="Search location"
+      {placeholder}
+      aria-label={placeholder}
       spellcheck="false"
       autocomplete="off"
       type="search"
       autofocus
       oninput={handleInput}
+      onkeydown={handleKeyDown}
     >
       {#snippet child({ props })}
         <input {...props} bind:value={inputValue} />
@@ -120,7 +165,7 @@
     </Combobox.Input>
   </div>
 
-  <Combobox.Portal>
+  <Combobox.Portal to={portalTarget}>
     <Combobox.Content
       class="border border-gray-100 bg-white shadow-lg p-1
       outline-hidden z-50 max-h-[var(--bits-combobox-content-available-height)] w-[var(--bits-combobox-anchor-width)]
@@ -160,7 +205,9 @@
             </Combobox.Item>
           {:else}
             <span class="flex items-center p-2 text-sm text-gray">
-              {#if inputValue}
+              {#if fetchFailed}
+                Place search is unavailable. Check the connection and API key.
+              {:else if inputValue}
                 No results found
               {:else}
                 Start typing to search locations

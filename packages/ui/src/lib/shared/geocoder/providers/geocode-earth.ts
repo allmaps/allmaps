@@ -10,17 +10,17 @@ type GeoJsonFeatureGeocodeEarth = {
 }
 
 export class GeocodeEarthGeocoderProvider extends GeocoderProvider {
-  constructor(apiKey: string) {
+  constructor(
+    apiKey: string,
+    private options: { includeVenues?: boolean } = {}
+  ) {
     super('ge', 'Geocode.Earth', apiKey)
   }
 
   getFetchFeaturesUrl(text: string) {
-    return (
-      `https://api.geocode.earth/v1/autocomplete` +
-      `?api_key=${this.apiKey}` +
-      `&layers=-venue` +
-      `&text=${text}`
-    )
+    const params = new URLSearchParams({ api_key: this.apiKey!, text })
+    if (!this.options.includeVenues) params.set('layers', '-venue')
+    return `https://api.geocode.earth/v1/autocomplete?${params}`
   }
 
   transformFeatures(features: unknown[]) {
