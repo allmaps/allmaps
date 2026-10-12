@@ -1162,7 +1162,7 @@ export abstract class BaseRenderer<W extends WarpedMap, D> extends EventTarget {
       Array.from(this.mapsInViewport)
     )
 
-    for (const mapId of mapsInListLeaving) {
+    for (const mapId of mapsWithFetchableTilesForViewportLeaving) {
       this.clearMap(mapId)
     }
 
