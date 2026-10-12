@@ -21,7 +21,7 @@ export class Projective extends BaseTransformation {
   weightsArrays?: number[][]
 
   constructor(sourcePoints: Point[], destinationPoints: Point[]) {
-    super(sourcePoints, destinationPoints, 'projective', 4)
+    super(sourcePoints, destinationPoints, 'projective', 8)
 
     // Construct two Nx9 Matrix projectiveCoefsMatrix
     // −x0 −y0 −1  0   0   0  x'0x0 x'0y0 x'0

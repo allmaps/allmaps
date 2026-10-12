@@ -182,9 +182,9 @@ describe('Polynomial transformation, order 3', async () => {
 })
 
 describe('Projective transformation', async () => {
-  const transformer = new GcpTransformer(gcps6, 'projective')
+  const transformer = new GcpTransformer(gcps10, 'projective')
   const resourcePoint: Point = [1000, 1000]
-  const geoPoint = [4.3996721825549265, 51.957630080558445] // TODO: Check this in a reference implementation
+  const geoPoint = [-12.34458421820119, 57.94927274621239] // TODO: Check this in a reference implementation
 
   test(`should have the same output as (TODO: check reference)`, () => {
     expectToBeCloseToArray(transformer.transformToGeo(resourcePoint), geoPoint)
