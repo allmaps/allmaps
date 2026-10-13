@@ -1046,6 +1046,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     // Reconcile the resident texture slots with the desired set of tiles,
     // uploading only what changed instead of re-uploading every tile.
 
+    // TODO: Refresh existing texture slots when a URL is fetched into a new
+    // tile object. Released tiles can otherwise suppress uploads after context
+    // restoration. Verify in a browser and add regression coverage; replacement
+    // uploads should respect the per-frame budget.
     // Desired tiles not yet resident (to add).
     const cachedTilesToAdd = [
       ...this.cachedTilesForTextureByTileUrl.values()
