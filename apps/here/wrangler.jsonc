@@ -4,6 +4,9 @@
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2025-01-01",
   "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
+  "vars": {
+    "PUBLIC_STATS_WEBSITE_ID": "2ccc091c-9b47-435b-bd41-3b7bf1ae1b03"
+  },
   "observability": {
     "logs": {
       "enabled": false
@@ -11,7 +14,10 @@
   },
   "env": {
     "dev": {
-      "name": "here-develop"
+      "name": "here-develop",
+      "vars": {
+        "PUBLIC_STATS_WEBSITE_ID": ""
+      }
     }
   }
 }

@@ -3,6 +3,8 @@
   import { page } from '$app/state'
   import { onNavigate, afterNavigate } from '$app/navigation'
 
+  import { Stats } from '@allmaps/ui'
+
   import { setUrlState } from '$lib/state/url.svelte.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
 
@@ -52,6 +54,7 @@
 </script>
 
 <RootHead />
+<Stats statsWebsiteId={data.env.PUBLIC_STATS_WEBSITE_ID || ''} />
 
 {#if page.error}
   <View>

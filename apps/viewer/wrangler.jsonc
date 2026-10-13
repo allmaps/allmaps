@@ -5,6 +5,9 @@
   "compatibility_date": "2026-02-18",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
+  "vars": {
+    "PUBLIC_STATS_WEBSITE_ID": "2e422970-a7c2-4f9b-ab3b-0454e8b051d5"
+  },
   "observability": {
     "logs": {
       "enabled": false
@@ -12,7 +15,10 @@
   },
   "env": {
     "dev": {
-      "name": "viewer-develop"
+      "name": "viewer-develop",
+      "vars": {
+        "PUBLIC_STATS_WEBSITE_ID": ""
+      }
     }
   }
 }
