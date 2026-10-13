@@ -45,6 +45,11 @@ export class CacheableImageBitmapTile extends CacheableTile<ImageBitmap> {
     return this.data
   }
 
+  release() {
+    this.data?.close()
+    this.data = undefined
+  }
+
   async applySprites() {
     // TODO
     return

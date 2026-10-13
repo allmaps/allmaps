@@ -29,9 +29,6 @@ export const WarpedMapEventType = {
   REQUESTEDTILESLOADING: 'requestedtilesloading',
   ALLREQUESTEDTILESLOADED: 'allrequestedtilesloaded',
 
-  // WebGL2WarpedMap > WebGL2Renderer
-  TEXTURESUPDATED: 'texturesupdated',
-
   // WarpedMapList > ...
   CLEARED: 'cleared',
   PREPARECHANGE: 'preparechange',

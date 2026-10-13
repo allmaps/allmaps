@@ -56,7 +56,7 @@ export abstract class CacheableTile<D> extends EventTarget {
 
   abstract applySprites(): Promise<void>
   abstract spritesDataToCachedTiles(
-    clippedImageDatas: ImageData[],
+    clippedTilesData: D[],
     spritesInfo: SpritesInfo,
     warpedMapsByResourceId: Map<string, WarpedMapWithImage[]>
   ): CachedTile<D>[]
@@ -86,6 +86,13 @@ export abstract class CacheableTile<D> extends EventTarget {
       this.abortController.abort()
     }
   }
+
+  /**
+   * Release any native resources held by this tile's data (e.g. close an
+   * ImageBitmap, whose decoded pixels live outside the JS heap and are only
+   * reclaimed lazily by GC). Called when the tile is removed from the cache.
+   */
+  release(): void {}
 
   protected isAbortError(error: unknown) {
     return (

@@ -52,7 +52,10 @@ import type {
   WebGL2WarpedMapOptions
 } from '../shared/types.js'
 
-const DEFAULT_SELECTION_OPTIONS: SelectionOptions = { applyMask: true }
+const DEFAULT_SELECTION_OPTIONS: SelectionOptions = {
+  applyMask: true,
+  sorted: true
+}
 export const DEFAULT_ANIMATION_OPTIONS: AnimationOptions = {
   animate: true,
   duration: 300
@@ -530,10 +533,12 @@ export class WarpedMapList<W extends WarpedMap> extends EventTarget {
       }
     }
 
-    // Sort by Z-index
-    warpedMaps.sort((map0, map1) =>
-      this.orderMapIdsByZIndex(map0.mapId, map1.mapId)
-    )
+    // Sort by Z-index, unless the caller opted out with sorted: false
+    if (options.sorted !== false) {
+      warpedMaps.sort((map0, map1) =>
+        this.orderMapIdsByZIndex(map0.mapId, map1.mapId)
+      )
+    }
 
     return warpedMaps
   }

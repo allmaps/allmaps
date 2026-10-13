@@ -1,5 +1,4 @@
 import { throttle } from 'lodash-es'
-import { wrap as comlinkWrap } from 'comlink'
 
 // TODO: convert colors to fractional rgb
 // when setting options, not every render call
@@ -12,7 +11,7 @@ import {
   createWebGL2WarpedMapFactory
 } from '../maps/WebGL2WarpedMap.js'
 import { DEFAULT_ANIMATION_OPTIONS } from '../maps/WarpedMapList.js'
-import { CacheableWorkerImageDataTile } from '../tilecache/CacheableWorkerImageDataTile.js'
+import { CacheableWorkerImageBitmapTile } from '../tilecache/CacheableWorkerImageBitmapTile.js'
 import {
   WarpedMapErrorEvent,
   WarpedMapEvent,
@@ -41,16 +40,14 @@ import pointsFragmentShaderSource from '../shaders/points/fragment-shader.glsl'
 // See https://vite.dev/guide/features.html#import-with-constructors -
 // leads to import errors when publising on platforms like jsdelivr.
 // Using the inline query parameter solves this.
-import FetchAndGetImageDataWorker from '../workers/fetch-and-get-image-data.js?worker&inline'
-import ApplySpritesImageDataWorker from '../workers/apply-sprites-image-data.js?worker&inline'
-import { ApplySpritesImageDataWorkerType } from '../workers/apply-sprites-image-data.js'
+import FetchAndGetImageBitmapWorker from '../workers/fetch-and-get-image-bitmap.js?worker&inline'
 import { WorkerPool } from '../workers/PoolWorkers.js'
 
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { FetchableTile } from '../tilecache/FetchableTile.js'
 
-import type { FetchAndGetImageDataWorkerType } from '../workers/fetch-and-get-image-data.js'
+import type { FetchAndGetImageBitmapWorkerType } from '../workers/fetch-and-get-image-bitmap.js'
 
 import type {
   AnimationOptions,
@@ -71,24 +68,33 @@ const THROTTLE_PREPARE_RENDER_OPTIONS = {
   trailing: true
 }
 
-const THROTTLE_CHANGED_WAIT_MS = 50
-const THROTTLE_CHANGED_OPTIONS = {
-  leading: true,
-  trailing: true
-}
+// Per-frame wall-clock budget (ms) for uploading tile textures in
+// #updateMapTextures. texSubImage3D blocks the main thread (~0.7ms/tile at 5K),
+// and this runs inside the library's per-frame render loop, so uploads share one
+// displayed frame with the draw. Budget a fraction of the refresh interval
+// (100Hz -> 10ms; 120Hz -> 8.3ms), leaving the rest for drawing; 3ms suits high-
+// refresh displays. Raise if fill is slow and frames stay smooth; lower if it stutters.
+const MAX_TILE_UPLOAD_MS_PER_FRAME = 3
+
+// Hard ceiling on tile uploads per updateTextures call, as a safety net in case
+// the clock does not advance as expected. The time budget above is the real
+// bound; this just prevents a runaway loop.
+const MAX_TILE_UPLOADS_PER_UPDATE = 128
 
 const SIGNIFICANT_VIEWPORT_EPSILON = 100 * Number.EPSILON
 const SIGNIFICANT_VIEWPORT_DISTANCE = 5
+
+// The map-program uniforms that come from the map's (rarely changing) options.
+type MapAppearanceUniforms = Partial<WebGL2WarpedMapOptions>
 
 /**
  * Class that renders WarpedMaps to a WebGL 2 context
  */
 export class WebGL2Renderer
-  extends BaseRenderer<WebGL2WarpedMap, ImageData>
+  extends BaseRenderer<WebGL2WarpedMap, ImageBitmap>
   implements Renderer
 {
-  #workerPool: WorkerPool<FetchAndGetImageDataWorkerType>
-  #spritesWorker: Worker
+  #workerPool: WorkerPool<FetchAndGetImageBitmapWorkerType>
 
   DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS: SpecificWebGL2RenderOptions
 
@@ -102,6 +108,13 @@ export class WebGL2Renderer
 
   #uniformCache: Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>
 
+  // Last appearance-uniform values set on the map program. These come from the
+  // map's options and are usually identical across maps and stable across
+  // frames; since uniforms are program-global they stay set, so each appearance
+  // uniform is only re-set when its value changed. Reset (to {}) on program
+  // (re)creation so they're all re-set afterwards.
+  #lastMapAppearance: MapAppearanceUniforms = {}
+
   previousSignificantViewport: Viewport | undefined
 
   lastAnimationFrameRequestId: number | undefined
@@ -112,8 +125,11 @@ export class WebGL2Renderer
   disableRender = false
 
   #throttledPrepareRenderInternal: DebouncedFunc<() => void>
-  #throttledChanged: DebouncedFunc<() => void>
-  #boundThrottledChangedByMapId: Map<string, EventListener>
+
+  // Maps whose tile set changed and whose textures still need (re)uploading.
+  // Drained under a per-frame budget in #updateMapTextures, so GPU uploads stay
+  // bounded and frame-aligned instead of running on a per-map throttle.
+  #mapsWithTextureToUpdate: Set<string> = new Set()
 
   /**
    * Creates an instance of WebGL2Renderer.
@@ -171,14 +187,13 @@ export class WebGL2Renderer
       pointsFragmentShader
     )
 
-    const workerPool = new WorkerPool<FetchAndGetImageDataWorkerType>(
-      FetchAndGetImageDataWorker,
+    // All tiles are decoded to ImageBitmaps and uploaded directly to the
+    // texture array (no getImageData readback). Sprite tiles are clipped from
+    // their atlas ImageBitmap in CacheableWorkerImageBitmapTile.applySprites.
+    const workerPool = new WorkerPool<FetchAndGetImageBitmapWorkerType>(
+      FetchAndGetImageBitmapWorker,
       POOL_SIZE
     )
-
-    const spritesWorker = new ApplySpritesImageDataWorker()
-    const wrappedSpritesWorker =
-      comlinkWrap<ApplySpritesImageDataWorkerType>(spritesWorker)
 
     const warpedMapFactory = createWebGL2WarpedMapFactory(
       gl,
@@ -193,17 +208,12 @@ export class WebGL2Renderer
     }
 
     super(
-      CacheableWorkerImageDataTile.createFactory(
-        workerPool,
-        wrappedSpritesWorker
-      ),
+      CacheableWorkerImageBitmapTile.createFactory(workerPool),
       mergeOptions(defaultSpecificWebGL2RenderOptions, options)
     )
 
     this.#workerPool = workerPool
-    this.#spritesWorker = spritesWorker
     this.gl = gl
-    this.#boundThrottledChangedByMapId = new Map()
 
     this.DEFAULT_SPECIFIC_WEBGL2_RENDER_OPTIONS =
       defaultSpecificWebGL2RenderOptions
@@ -213,6 +223,7 @@ export class WebGL2Renderer
     this.pointsProgram = pointsProgram
 
     this.#uniformCache = new Map()
+    this.#lastMapAppearance = {}
 
     // Unclear how to remove shaders, possibly already after linking to program, see:
     // https://stackoverflow.com/questions/9113154/proper-way-to-delete-glsl-shader
@@ -232,12 +243,6 @@ export class WebGL2Renderer
       this.#prepareRenderInternal.bind(this),
       THROTTLE_PREPARE_RENDER_WAIT_MS,
       THROTTLE_PREPARE_RENDER_OPTIONS
-    )
-
-    this.#throttledChanged = throttle(
-      this.#changed.bind(this),
-      THROTTLE_CHANGED_WAIT_MS,
-      THROTTLE_CHANGED_OPTIONS
     )
 
     this.warpedMapList.updateWarpedMapsUsingFactory()
@@ -297,6 +302,7 @@ export class WebGL2Renderer
     this.pointsProgram = pointsProgram
 
     this.#uniformCache = new Map()
+    this.#lastMapAppearance = {}
 
     gl.disable(gl.DEPTH_TEST)
 
@@ -357,21 +363,17 @@ export class WebGL2Renderer
     this.warpedMapList.clear()
     this.mapsInViewport = new Set()
     this.mapsWithFetchableTilesForViewport = new Set()
+    this.#mapsWithTextureToUpdate.clear()
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT)
     this.tileCache.clear()
   }
 
   cancelThrottledFunctions() {
     this.#throttledPrepareRenderInternal.cancel()
-    this.#throttledChanged.cancel()
   }
 
   destroy() {
     this.cancelThrottledFunctions()
-
-    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
-      this.#removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap)
-    }
 
     this.removeEventListeners()
 
@@ -382,7 +384,6 @@ export class WebGL2Renderer
     this.gl.deleteProgram(this.pointsProgram)
 
     this.#workerPool.destroy()
-    this.#spritesWorker.terminate()
     // Can't delete context, see:
     // https://stackoverflow.com/questions/14970206/deleting-webgl-contexts
   }
@@ -513,6 +514,10 @@ export class WebGL2Renderer
     if (!this.viewport) {
       return
     }
+
+    // Upload any pending tile textures (bounded per frame) before drawing, so
+    // freshly arrived tiles show this frame without spiking upload cost.
+    this.#updateMapTextures()
 
     const gl = this.gl
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
@@ -672,171 +677,230 @@ export class WebGL2Renderer
       webgl2WarpedMap.previousApplyMaskOpacity
     )
 
+    // As the renderer is running this function for every webgl2WarpedMap,
+    // the appearance uniforms are often the same for consecutive maps.
+    // We check this and if so don't set the uniforms again.
+    const options = webgl2WarpedMap.options
+    const distortionMeasure = webgl2WarpedMap.distortionMeasure
+    const lastMapAppearance = this.#lastMapAppearance
+
     // Opacity
-    const opacityLocation = this.#getUniformLocation(gl, program, 'u_opacity')
-    gl.uniform1f(opacityLocation, webgl2WarpedMap.options.opacity)
+    if (lastMapAppearance.opacity !== options.opacity) {
+      const opacityLocation = this.#getUniformLocation(gl, program, 'u_opacity')
+      gl.uniform1f(opacityLocation, options.opacity)
+      lastMapAppearance.opacity = options.opacity
+    }
 
     // Saturation
-    const saturationLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_saturation'
-    )
-    gl.uniform1f(saturationLocation, webgl2WarpedMap.options.saturation)
+    if (lastMapAppearance.saturation !== options.saturation) {
+      const saturationLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_saturation'
+      )
+      gl.uniform1f(saturationLocation, options.saturation)
+      lastMapAppearance.saturation = options.saturation
+    }
 
     // Remove color
-    const removeColorLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColor'
-    )
-    gl.uniform1f(
-      removeColorLocation,
-      webgl2WarpedMap.options.removeColor ? 1 : 0
-    )
+    if (lastMapAppearance.removeColor !== options.removeColor) {
+      const removeColorLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColor'
+      )
+      gl.uniform1f(removeColorLocation, options.removeColor ? 1 : 0)
+      lastMapAppearance.removeColor = options.removeColor
+    }
 
-    const removeColorColorLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColorColor'
-    )
-    gl.uniform3fv(
-      removeColorColorLocation,
-      getCachedFractionalRgb(webgl2WarpedMap.options.removeColorColor)
-    )
+    if (lastMapAppearance.removeColorColor !== options.removeColorColor) {
+      const removeColorColorLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColorColor'
+      )
+      gl.uniform3fv(
+        removeColorColorLocation,
+        getCachedFractionalRgb(options.removeColorColor)
+      )
+      lastMapAppearance.removeColorColor = options.removeColorColor
+    }
 
-    const removeColorThresholdLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColorThreshold'
-    )
-    gl.uniform1f(
-      removeColorThresholdLocation,
-      webgl2WarpedMap.options.removeColorThreshold
-    )
+    if (
+      lastMapAppearance.removeColorThreshold !== options.removeColorThreshold
+    ) {
+      const removeColorThresholdLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColorThreshold'
+      )
+      gl.uniform1f(removeColorThresholdLocation, options.removeColorThreshold)
+      lastMapAppearance.removeColorThreshold = options.removeColorThreshold
+    }
 
-    const removeColorHardnessLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_removeColorHardness'
-    )
-    gl.uniform1f(
-      removeColorHardnessLocation,
-      webgl2WarpedMap.options.removeColorHardness
-    )
+    if (lastMapAppearance.removeColorHardness !== options.removeColorHardness) {
+      const removeColorHardnessLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_removeColorHardness'
+      )
+      gl.uniform1f(removeColorHardnessLocation, options.removeColorHardness)
+      lastMapAppearance.removeColorHardness = options.removeColorHardness
+    }
 
     // Colorize
-    const colorizeLocation = this.#getUniformLocation(gl, program, 'u_colorize')
-    gl.uniform1f(colorizeLocation, webgl2WarpedMap.options.colorize ? 1 : 0)
+    if (lastMapAppearance.colorize !== options.colorize) {
+      const colorizeLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_colorize'
+      )
+      gl.uniform1f(colorizeLocation, options.colorize ? 1 : 0)
+      lastMapAppearance.colorize = options.colorize
+    }
 
-    const colorizeColorLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_colorizeColor'
-    )
-    gl.uniform3fv(
-      colorizeColorLocation,
-      getCachedFractionalRgb(webgl2WarpedMap.options.colorizeColor)
-    )
+    if (lastMapAppearance.colorizeColor !== options.colorizeColor) {
+      const colorizeColorLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_colorizeColor'
+      )
+      gl.uniform3fv(
+        colorizeColorLocation,
+        getCachedFractionalRgb(options.colorizeColor)
+      )
+      lastMapAppearance.colorizeColor = options.colorizeColor
+    }
 
     // Grid
-    const gridLocation = this.#getUniformLocation(gl, program, 'u_renderGrid')
-    gl.uniform1f(gridLocation, webgl2WarpedMap.options.renderGrid ? 1 : 0)
+    if (lastMapAppearance.renderGrid !== options.renderGrid) {
+      const gridLocation = this.#getUniformLocation(gl, program, 'u_renderGrid')
+      gl.uniform1f(gridLocation, options.renderGrid ? 1 : 0)
+      lastMapAppearance.renderGrid = options.renderGrid
+    }
 
-    const colorGrid = this.#getUniformLocation(gl, program, 'u_renderGridColor')
-    gl.uniform4fv(
-      colorGrid,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.renderGridColor)
-    )
+    if (lastMapAppearance.renderGridColor !== options.renderGridColor) {
+      const colorGrid = this.#getUniformLocation(
+        gl,
+        program,
+        'u_renderGridColor'
+      )
+      gl.uniform4fv(
+        colorGrid,
+        getCachedFractionalOpaqueRgba(options.renderGridColor)
+      )
+      lastMapAppearance.renderGridColor = options.renderGridColor
+    }
 
-    // Distortion
-    const distortionLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortion'
-    )
-    gl.uniform1f(distortionLocation, webgl2WarpedMap.distortionMeasure ? 1 : 0)
+    // Distortion (drives both u_distortion and u_distortionMeasure)
+    if (lastMapAppearance.distortionMeasure !== distortionMeasure) {
+      const distortionLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortion'
+      )
+      gl.uniform1f(distortionLocation, distortionMeasure ? 1 : 0)
 
-    const distortionMeasureLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionMeasure'
-    )
-    gl.uniform1i(
-      distortionMeasureLocation,
-      webgl2WarpedMap.distortionMeasure
-        ? supportedDistortionMeasures.indexOf(webgl2WarpedMap.distortionMeasure)
-        : 0
-    )
+      const distortionMeasureLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionMeasure'
+      )
+      gl.uniform1i(
+        distortionMeasureLocation,
+        distortionMeasure
+          ? supportedDistortionMeasures.indexOf(distortionMeasure)
+          : 0
+      )
+      lastMapAppearance.distortionMeasure = distortionMeasure
+    }
 
-    const distortionColor00Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor00'
-    )
-    gl.uniform4fv(
-      distortionColor00Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor00)
-    )
+    if (lastMapAppearance.distortionColor00 !== options.distortionColor00) {
+      const distortionColor00Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor00'
+      )
+      gl.uniform4fv(
+        distortionColor00Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor00)
+      )
+      lastMapAppearance.distortionColor00 = options.distortionColor00
+    }
 
-    const distortionColor01Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor01'
-    )
-    gl.uniform4fv(
-      distortionColor01Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor01)
-    )
+    if (lastMapAppearance.distortionColor01 !== options.distortionColor01) {
+      const distortionColor01Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor01'
+      )
+      gl.uniform4fv(
+        distortionColor01Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor01)
+      )
+      lastMapAppearance.distortionColor01 = options.distortionColor01
+    }
 
-    const distortionColor1Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor1'
-    )
-    gl.uniform4fv(
-      distortionColor1Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor1)
-    )
+    if (lastMapAppearance.distortionColor1 !== options.distortionColor1) {
+      const distortionColor1Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor1'
+      )
+      gl.uniform4fv(
+        distortionColor1Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor1)
+      )
+      lastMapAppearance.distortionColor1 = options.distortionColor1
+    }
 
-    const distortionColor2Location = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor2'
-    )
-    gl.uniform4fv(
-      distortionColor2Location,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor2)
-    )
+    if (lastMapAppearance.distortionColor2 !== options.distortionColor2) {
+      const distortionColor2Location = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor2'
+      )
+      gl.uniform4fv(
+        distortionColor2Location,
+        getCachedFractionalOpaqueRgba(options.distortionColor2)
+      )
+      lastMapAppearance.distortionColor2 = options.distortionColor2
+    }
 
-    const distortionColorLocation3 = this.#getUniformLocation(
-      gl,
-      program,
-      'u_distortionColor3'
-    )
-    gl.uniform4fv(
-      distortionColorLocation3,
-      getCachedFractionalOpaqueRgba(webgl2WarpedMap.options.distortionColor3)
-    )
+    if (lastMapAppearance.distortionColor3 !== options.distortionColor3) {
+      const distortionColorLocation3 = this.#getUniformLocation(
+        gl,
+        program,
+        'u_distortionColor3'
+      )
+      gl.uniform4fv(
+        distortionColorLocation3,
+        getCachedFractionalOpaqueRgba(options.distortionColor3)
+      )
+      lastMapAppearance.distortionColor3 = options.distortionColor3
+    }
 
     // Debug Triangles
-    const debugTrianglesLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_debugTriangles'
-    )
-    gl.uniform1f(
-      debugTrianglesLocation,
-      webgl2WarpedMap.options.debugTriangles ? 1 : 0
-    )
+    if (lastMapAppearance.debugTriangles !== options.debugTriangles) {
+      const debugTrianglesLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_debugTriangles'
+      )
+      gl.uniform1f(debugTrianglesLocation, options.debugTriangles ? 1 : 0)
+      lastMapAppearance.debugTriangles = options.debugTriangles
+    }
 
     // Debug Tiles
-    const debugTilesLocation = this.#getUniformLocation(
-      gl,
-      program,
-      'u_debugTiles'
-    )
-    gl.uniform1f(debugTilesLocation, webgl2WarpedMap.options.debugTiles ? 1 : 0)
+    if (lastMapAppearance.debugTiles !== options.debugTiles) {
+      const debugTilesLocation = this.#getUniformLocation(
+        gl,
+        program,
+        'u_debugTiles'
+      )
+      gl.uniform1f(debugTilesLocation, options.debugTiles ? 1 : 0)
+      lastMapAppearance.debugTiles = options.debugTiles
+    }
 
     // Best scale factor
     const scaleFactorForViewportLocation = this.#getUniformLocation(
@@ -848,6 +912,16 @@ export class WebGL2Renderer
       ? webgl2WarpedMap.tileZoomLevelForViewport.scaleFactor
       : 1
     gl.uniform1i(scaleFactorForViewportLocation, scaleFactorForViewport)
+
+    // Number of resident tiles / texture slots (bounds the fragment shader's
+    // loop; the texture array is allocated with headroom, so this is not its
+    // depth)
+    const textureSlotCountLocation = this.#getUniformLocation(
+      gl,
+      program,
+      'u_textureSlotCount'
+    )
+    gl.uniform1i(textureSlotCountLocation, webgl2WarpedMap.textureSlotCount)
 
     // Cached tiles texture array
     const cachedTilesTextureArrayLocation = this.#getUniformLocation(
@@ -1136,7 +1210,8 @@ export class WebGL2Renderer
         return
       }
 
-      webgl2WarpedMap.addCachedTileAndUpdateTextures(tile)
+      webgl2WarpedMap.addCachedTile(tile)
+      this.#markMapWithTextureToUpdate(mapId)
     }
   }
 
@@ -1153,20 +1228,8 @@ export class WebGL2Renderer
         return
       }
 
-      webgl2WarpedMap.removeCachedTileAndUpdateTextures(tileUrl)
-    }
-  }
-
-  protected warpedMapAdded(event: Event) {
-    if (event instanceof WarpedMapEvent) {
-      if (!event.data?.mapIds) {
-        throw new Error('Event data missing')
-      }
-      const { mapIds } = event.data
-      const mapId = mapIds[0]
-      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
-      if (webgl2WarpedMap) {
-        this.#addEventListenersToWebGL2WarpedMap(webgl2WarpedMap)
+      if (webgl2WarpedMap.removeCachedTile(tileUrl)) {
+        this.#markMapWithTextureToUpdate(mapId)
       }
     }
   }
@@ -1207,20 +1270,52 @@ export class WebGL2Renderer
     }
   }
 
-  #addEventListenersToWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    const bound = this.#throttledChanged.bind(this)
-    this.#boundThrottledChangedByMapId.set(webgl2WarpedMap.mapId, bound)
-    webgl2WarpedMap.addEventListener(WarpedMapEventType.TEXTURESUPDATED, bound)
+  /**
+   * Mark a map's textures as needing an upload and request a repaint. The
+   * actual (bounded) upload happens in #updateMapTextures at the start of the
+   * next render. Tiles arrive as separate async worker messages and
+   * triggerRepaint is cheap and coalesced by the map library to one repaint per
+   * frame, so requesting one per arrival is fine.
+   */
+  #markMapWithTextureToUpdate(mapId: string) {
+    this.#mapsWithTextureToUpdate.add(mapId)
+    this.#changed()
   }
 
-  #removeEventListenersFromWebGL2WarpedMap(webgl2WarpedMap: WebGL2WarpedMap) {
-    const bound = this.#boundThrottledChangedByMapId.get(webgl2WarpedMap.mapId)
-    if (bound) {
-      webgl2WarpedMap.removeEventListener(
-        WarpedMapEventType.TEXTURESUPDATED,
-        bound
+  /**
+   * Upload pending tile textures for the dirty maps, bounded by a per-frame
+   * wall-clock budget (MAX_TILE_UPLOAD_MS_PER_FRAME) shared across all maps via
+   * a common deadline. Maps that still have a backlog afterwards (deadline
+   * reached before they finished) stay marked dirty and a repaint is requested
+   * so they continue on later frames.
+   */
+  #updateMapTextures() {
+    if (this.#mapsWithTextureToUpdate.size === 0) {
+      return
+    }
+
+    const deadline = performance.now() + MAX_TILE_UPLOAD_MS_PER_FRAME
+    for (const mapId of this.#mapsWithTextureToUpdate) {
+      if (performance.now() >= deadline) {
+        break
+      }
+      const webgl2WarpedMap = this.warpedMapList.getWarpedMap(mapId)
+      if (!webgl2WarpedMap) {
+        this.#mapsWithTextureToUpdate.delete(mapId)
+        continue
+      }
+      const { backlog } = webgl2WarpedMap.updateTextures(
+        MAX_TILE_UPLOADS_PER_UPDATE,
+        deadline
       )
-      this.#boundThrottledChangedByMapId.delete(webgl2WarpedMap.mapId)
+      if (backlog <= 0) {
+        this.#mapsWithTextureToUpdate.delete(mapId)
+      }
+    }
+
+    // Deadline reached or maps still have a backlog: continue next frame.
+    if (this.#mapsWithTextureToUpdate.size > 0) {
+      this.#changed()
     }
   }
 
@@ -1228,9 +1323,9 @@ export class WebGL2Renderer
     this.disableRender = true
 
     this.cancelThrottledFunctions()
-    for (const webgl2WarpedMap of this.warpedMapList.getWarpedMaps()) {
-      webgl2WarpedMap.cancelThrottledFunctions()
-    }
+
+    // The textures are gone with the context; drop any pending upload work.
+    this.#mapsWithTextureToUpdate.clear()
 
     this.tileCache.clear()
   }

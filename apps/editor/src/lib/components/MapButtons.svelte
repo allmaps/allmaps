@@ -53,6 +53,7 @@
 
   {#if geocodeEarthKey}
     <Popover
+      contentsWidth={420}
       disabled={!geocoderEnabled}
       bind:open={uiState.popoverOpen.geocoder}
     >
