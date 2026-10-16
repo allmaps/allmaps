@@ -2,21 +2,30 @@
   import { onDestroy, tick } from 'svelte'
   import { flip } from 'svelte/animate'
   import { prefersReducedMotion } from 'svelte/motion'
-  import { DotsSixVertical, X } from 'phosphor-svelte'
+  import { DotsSixVertical, Plus, X } from 'phosphor-svelte'
   import ToolIcon from './ToolIcon.svelte'
-  import { defaultToolSettings, toolLabels, reorderTool } from './tool-settings'
-  import type { ToolSetting } from './tool-settings'
-  import type { Control } from './control-layout'
+  import {
+    defaultToolSettings,
+    toolLabels,
+    reorderTool,
+    parseDoubleTapMode
+  } from './tool-settings'
+  import type { ToolSetting, DoubleTapMode } from './tool-settings'
+  import type { RingControl } from './control-layout'
   import type { ImportTransformation } from './model'
   let {
     settings,
     importTransformation,
+    doubleTapMode,
+    ondoubletapchange,
     onchange,
     onimportchange,
     onclose
   }: {
     settings: ToolSetting[]
     importTransformation: ImportTransformation
+    doubleTapMode: DoubleTapMode
+    ondoubletapchange: (value: DoubleTapMode) => void
     onchange: (settings: ToolSetting[]) => void
     onimportchange: (value: ImportTransformation) => void
     onclose: () => void
@@ -24,10 +33,10 @@
   let list: HTMLOListElement
   let scroll: HTMLDivElement
   let dialog: HTMLDialogElement
-  let dragging = $state<Control>()
+  let dragging = $state<RingControl>()
   let gesture:
     | {
-        tool: Control
+        tool: RingControl
         pointer: number
         startY: number
         y: number
@@ -59,7 +68,7 @@
     }
     frame = requestAnimationFrame(autoScroll)
   }
-  function start(event: PointerEvent, tool: Control) {
+  function start(event: PointerEvent, tool: RingControl) {
     if (event.button !== 0 || gesture) return
     // On touchscreens, leave labels available for scrolling; drag the grip.
     if (
@@ -100,7 +109,7 @@
     if (frame !== undefined) cancelAnimationFrame(frame)
     frame = undefined
   }
-  function reorderKey(event: KeyboardEvent, tool: Control) {
+  function reorderKey(event: KeyboardEvent, tool: RingControl) {
     const index = settings.findIndex((entry) => entry.tool === tool)
     const next =
       event.key === 'ArrowUp'
@@ -184,41 +193,64 @@
     <h2 id="settings-title">Settings</h2>
     <div class="settings-scroll" bind:this={scroll}>
       <h3 id="tools-title">Tools</h3>
+      <p class="tool-section-label">Always visible</p>
       <ol class="tool-settings" aria-labelledby="tools-title" bind:this={list}>
         {#each settings as entry (entry.tool)}
           <li
             data-tool={entry.tool}
             class:reordering={dragging === entry.tool}
+            class:tool-divider={entry.tool === 'more'}
             animate:flip={{ duration: prefersReducedMotion.current ? 0 : 120 }}
           >
             <button
               class="tool-drag-handle"
-              aria-label={'Reorder ' + toolLabels[entry.tool]}
+              aria-label={entry.tool === 'more'
+                ? 'Move more tools divider'
+                : 'Reorder ' + toolLabels[entry.tool]}
               aria-keyshortcuts="ArrowUp ArrowDown Home End"
               onpointerdown={(event) => start(event, entry.tool)}
               onkeydown={(event) => reorderKey(event, entry.tool)}
             >
-              <span class="tool-grip"><DotsSixVertical size={16} /></span
-              ><ToolIcon tool={entry.tool} /><span
-                >{toolLabels[entry.tool]}</span
-              >
+              <span class="tool-grip"><DotsSixVertical size={16} /></span>
+              {#if entry.tool === 'more'}
+                <span class="tool-icon"><Plus size={18} /></span>
+                <span>More tools</span><span class="tool-divider-line"></span>
+              {:else}
+                <ToolIcon tool={entry.tool} /><span
+                  >{toolLabels[entry.tool]}</span
+                >
+              {/if}
             </button>
-            <input
-              type="checkbox"
-              aria-label={toolLabels[entry.tool]}
-              checked={entry.enabled}
-              onchange={(event) =>
-                onchange(
-                  settings.map((setting) =>
-                    setting.tool === entry.tool
-                      ? { ...setting, enabled: event.currentTarget.checked }
-                      : setting
-                  )
-                )}
-            />
+            {#if entry.tool !== 'more'}
+              <input
+                type="checkbox"
+                aria-label={toolLabels[entry.tool]}
+                checked={entry.enabled}
+                onchange={(event) =>
+                  onchange(
+                    settings.map((setting) =>
+                      setting.tool !== 'more' && setting.tool === entry.tool
+                        ? { ...setting, enabled: event.currentTarget.checked }
+                        : setting
+                    )
+                  )}
+              />
+            {/if}
           </li>
         {/each}
       </ol>
+      <div class="import-setting">
+        <label for="double-tap-mode">Double-tap / click opens</label>
+        <select
+          id="double-tap-mode"
+          value={doubleTapMode}
+          onchange={(event) =>
+            ondoubletapchange(parseDoubleTapMode(event.currentTarget.value))}
+        >
+          <option value="mask">Edit mask</option>
+          <option value="transform">Transform</option>
+        </select>
+      </div>
       <div class="import-setting">
         <label for="import-transformation">Import maps as</label>
         <select
@@ -243,6 +275,7 @@
         onclick={() => {
           onchange(defaultToolSettings())
           onimportchange('helmert')
+          ondoubletapchange('mask')
         }}>Reset</button
       >
       <button class="primary-button" onclick={close}>Done</button>

@@ -1,7 +1,9 @@
 import { controlOrder } from './control-layout.ts'
-import type { Control } from './control-layout.ts'
+import type { Control, RingControl } from './control-layout.ts'
 
-export type ToolSetting = { tool: Control; enabled: boolean }
+export type ToolSetting =
+  { tool: Control; enabled: boolean } | { tool: 'more'; enabled?: never }
+const primaryTools: readonly Control[] = ['move', 'rotate', 'remove']
 export const toolSettingsKey = 'allmaps-collage-tools'
 export const toolLabels: Record<Control, string> = {
   remove: 'Remove',
@@ -10,7 +12,6 @@ export const toolLabels: Record<Control, string> = {
   openIn: 'Open in Viewer',
   background: 'Remove background',
   saturation: 'Saturation',
-  lock: 'Lock',
   hue: 'Colorize',
   opacity: 'Opacity',
   editMask: 'Edit mask',
@@ -20,10 +21,13 @@ export const toolLabels: Record<Control, string> = {
   rotate: 'Rotate'
 }
 export function defaultToolSettings(): ToolSetting[] {
-  return controlOrder.map((tool) => ({
-    tool,
-    enabled: tool !== 'mirror'
-  }))
+  return [
+    ...primaryTools.map((tool) => ({ tool, enabled: true })),
+    { tool: 'more' },
+    ...controlOrder
+      .filter((tool) => !primaryTools.includes(tool))
+      .map((tool) => ({ tool, enabled: tool !== 'mirror' }))
+  ]
 }
 /** Keep saved ordering, ignore obsolete/duplicate tools, and append new ones. */
 export function parseToolSettings(value: unknown): ToolSetting[] {
@@ -31,31 +35,58 @@ export function parseToolSettings(value: unknown): ToolSetting[] {
   if (!Array.isArray(value)) return defaults
   const result: ToolSetting[] = []
   for (const entry of value) {
+    if (entry?.tool === 'more' && !result.some(({ tool }) => tool === 'more')) {
+      result.push({ tool: 'more' })
+      continue
+    }
     if (
       entry &&
-      defaults.some(({ tool }) => tool === entry.tool) &&
+      controlOrder.some((tool) => tool === entry.tool) &&
       typeof entry.enabled === 'boolean' &&
       !result.some(({ tool }) => tool === entry.tool)
     )
       result.push({ tool: entry.tool, enabled: entry.enabled })
   }
-  return [
+  const complete = [
     ...result,
     ...defaults.filter(
-      ({ tool }) => !result.some((entry) => entry.tool === tool)
+      ({ tool }) =>
+        tool !== 'more' && !result.some((entry) => entry.tool === tool)
     )
   ]
+  if (result.some(({ tool }) => tool === 'more')) return complete
+  // Older preferences had a single list. Preserve each tool's enabled state
+  // and relative order, and introduce the default compact/expanded split.
+  return [
+    ...complete.filter(({ tool }) => primaryTools.includes(tool as Control)),
+    { tool: 'more' },
+    ...complete.filter(({ tool }) => !primaryTools.includes(tool as Control))
+  ]
 }
-export function enabledTools(
+export function enabledTools(settings: ToolSetting[]): Control[] {
+  return settings.flatMap((entry) =>
+    entry.tool !== 'more' && entry.enabled ? [entry.tool] : []
+  )
+}
+
+/** The divider is also the toggle at the end of the visible ring. */
+export function visibleTools(
   settings: ToolSetting[],
-  locked = false
-): Control[] {
-  const tools = settings
-    .filter(({ enabled }) => enabled)
-    .map(({ tool }) => tool)
-  // A hidden lock tool must never make an already locked map impossible to unlock.
-  if (locked && !tools.includes('lock')) tools.push('lock')
-  return tools
+  expanded: boolean
+): RingControl[] {
+  const divider = settings.findIndex(({ tool }) => tool === 'more')
+  if (divider < 0) return enabledTools(settings)
+  const primary = enabledTools(settings.slice(0, divider))
+  const secondary = enabledTools(settings.slice(divider + 1))
+  return secondary.length
+    ? [...primary, ...(expanded ? secondary : []), 'more']
+    : primary
+}
+
+export type DoubleTapMode = 'mask' | 'transform'
+export const doubleTapModeKey = 'allmaps-collage-double-tap'
+export function parseDoubleTapMode(value: unknown): DoubleTapMode {
+  return value === 'transform' ? 'transform' : 'mask'
 }
 
 export const importTransformationKey = 'allmaps-collage-import-transformation'
@@ -64,7 +95,7 @@ export function parseImportTransformation(value: unknown) {
 }
 export function reorderTool(
   settings: ToolSetting[],
-  tool: Control,
+  tool: RingControl,
   index: number
 ): ToolSetting[] {
   const entry = settings.find((entry) => entry.tool === tool)

@@ -60,6 +60,15 @@ export function selectionLocked(items: CollageMap[]) {
   return items.some((item) => item.locked)
 }
 
+/** Layout edits may rearrange group members only inside their group editor. */
+export function canEditLayout(items: CollageMap[], editingGroup?: string) {
+  return (
+    items.length > 1 &&
+    !selectionLocked(items) &&
+    items.every((item) => !item.groupId || item.groupId === editingGroup)
+  )
+}
+
 export function singleGroup(items: CollageMap[]) {
   const id = items[0]?.groupId
   return !!id && items.every((item) => item.groupId === id)

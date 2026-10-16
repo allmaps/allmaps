@@ -45,6 +45,7 @@
   import { suspendMapNavigation } from './map-navigation'
   import { PenTouchGesture } from './pen-gesture'
   import { MaskVertexTaps } from './mask-tap'
+  import { TouchDoubleTap } from './double-tap'
   import { bindMaskStylus } from './mask-stylus'
   import {
     constrainToImage,
@@ -112,6 +113,8 @@
   let penPointerType = 'mouse'
   const penTouches = new PenTouchGesture()
   const vertexTaps = new MaskVertexTaps()
+  const outsideTaps = new TouchDoubleTap<boolean>()
+  let ignoreOutsideDoubleClickUntil = 0
   let penAnchor: Point | undefined
   let adapter: MaskMapAdapter | undefined
 
@@ -388,7 +391,9 @@
   let navigatingTouches = false
   let suppressMaskClick = false
 
-  function pointerScreen(event: PointerEvent): Point {
+  function pointerScreen(
+    event: Pick<MouseEvent, 'clientX' | 'clientY'>
+  ): Point {
     const rect = map.getCanvas().getBoundingClientRect()
     return [event.clientX - rect.left, event.clientY - rect.top]
   }
@@ -403,7 +408,9 @@
     return [screen.x, screen.y]
   }
 
-  function pointerResource(event: PointerEvent): Point {
+  function pointerResource(
+    event: Pick<MouseEvent, 'clientX' | 'clientY'>
+  ): Point {
     return screenResource(pointerScreen(event))
   }
 
@@ -640,7 +647,7 @@
     event.stopImmediatePropagation()
   }
 
-  function vertexAt(event: PointerEvent) {
+  function vertexAt(event: Pick<MouseEvent, 'clientX' | 'clientY'>) {
     const rect = map.getCanvas().getBoundingClientRect()
     const x = event.clientX - rect.left,
       y = event.clientY - rect.top
@@ -655,6 +662,49 @@
       }
     })
     return closest
+  }
+
+  function outsideMask(event: MouseEvent | PointerEvent) {
+    if (!ready || drawingNewMask || maskGesture || navigatingTouches)
+      return false
+    // Leave the vertex/edge hit areas to editing, even just outside the polygon.
+    if (vertexAt(event) !== undefined || edgeAt(pointerScreen(event)))
+      return false
+    try {
+      return !maskContains(draft, pointerResource(event))
+    } catch {
+      return false
+    }
+  }
+
+  function outsideDoubleClick(event: MouseEvent) {
+    // Touch browsers can emit dblclick after the second pointerup. A vertex
+    // just removed may now be outside the new polygon; do not close for it.
+    if (performance.now() < ignoreOutsideDoubleClickUntil) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return
+    }
+    if (!outsideMask(event)) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    ondone(draft)
+  }
+
+  function outsidePointerDown(event: PointerEvent) {
+    outsideTaps.start(event, outsideMask(event) ? true : undefined)
+  }
+  function outsidePointerMove(event: PointerEvent) {
+    outsideTaps.move(event)
+  }
+  function outsidePointerUp(event: PointerEvent) {
+    if (!outsideTaps.end(event, outsideMask(event) ? true : undefined)) return
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    ondone(draft)
+  }
+  function resetOutsideTaps() {
+    outsideTaps.reset()
   }
 
   function vertexPointerDown(event: PointerEvent) {
@@ -672,6 +722,7 @@
     if (drawingNewMask) return
     const index = vertexTaps.end(event, vertexAt(event))
     if (index === undefined) return
+    ignoreOutsideDoubleClickUntil = performance.now() + 500
     event.stopImmediatePropagation()
     edgeStart = undefined
     adapter?.resetPenGesture()
@@ -1124,6 +1175,13 @@
           if (ready) refreshDrawingHistory()
         })
       )
+      canvas.addEventListener('dblclick', outsideDoubleClick, true)
+      canvas.addEventListener('pointerdown', outsidePointerDown, true)
+      canvas.addEventListener('pointermove', outsidePointerMove, true)
+      canvas.addEventListener('pointerup', outsidePointerUp, true)
+      canvas.addEventListener('pointercancel', resetOutsideTaps, true)
+      window.addEventListener('blur', resetOutsideTaps)
+      map.on('movestart', resetOutsideTaps)
       canvas.addEventListener('pointerdown', maskPointerDown, true)
       canvas.addEventListener('pointermove', maskPointerMove, true)
       canvas.addEventListener('pointerup', maskPointerUp, true)
@@ -1156,6 +1214,14 @@
     return () => {
       ready = false
       unbindStylus()
+      canvas.removeEventListener('dblclick', outsideDoubleClick, true)
+      canvas.removeEventListener('pointerdown', outsidePointerDown, true)
+      canvas.removeEventListener('pointermove', outsidePointerMove, true)
+      canvas.removeEventListener('pointerup', outsidePointerUp, true)
+      canvas.removeEventListener('pointercancel', resetOutsideTaps, true)
+      window.removeEventListener('blur', resetOutsideTaps)
+      map.off('movestart', resetOutsideTaps)
+      resetOutsideTaps()
       canvas.removeEventListener('pointerdown', maskPointerDown, true)
       canvas.removeEventListener('pointermove', maskPointerMove, true)
       canvas.removeEventListener('pointerup', maskPointerUp, true)

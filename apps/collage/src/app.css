@@ -98,6 +98,13 @@ textarea:focus-visible {
 .search-aperture circle.original-mask {
   stroke-dasharray: 4 5;
 }
+.box-selecting .maplibregl-canvas {
+  cursor: crosshair;
+}
+.selection-icon {
+  /* Put the plus at top right and balance its extra visual weight. */
+  transform: translate(-0.5px, 0.5px) scaleY(-1);
+}
 .selection-box {
   fill: #ff56ba18;
   stroke: var(--accent);
@@ -288,10 +295,9 @@ nav {
 .map-control.folding {
   transition: none;
 }
-.map-control.folded {
+.map-control[inert] {
   pointer-events: none;
 }
-.map-control.folded .control-track,
 .map-control.folding .control-track {
   visibility: hidden;
 }
@@ -299,6 +305,22 @@ nav {
   .map-control {
     transition: none;
   }
+}
+.locked-map-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  color: #2229;
+}
+.locked-map-indicator svg {
+  display: block;
+  box-sizing: content-box;
+  padding: 8px;
+  border-radius: 50%;
+  background: #ffffffb3;
+  transform: translate(-50%, -50%);
 }
 .map-control.active {
   z-index: 3;
@@ -812,6 +834,9 @@ nav {
   pointer-events: auto;
   user-select: none;
 }
+.selection-actions .quiet-button[aria-pressed='true'] {
+  background: var(--accent);
+}
 .mask-editor-actions h2,
 .selection-actions h2 {
   display: flex;
@@ -868,7 +893,9 @@ nav {
   }
 }
 
-@media (max-width: 960px) {
+/* Selection includes grouping and locking, so stack before its longer row reaches
+   the zoom and undo controls. */
+@media (max-width: 1120px) {
   .selection-stack.has-actions {
     bottom: 78px;
   }
@@ -1060,6 +1087,22 @@ nav {
   padding: 0;
   margin: 0 0 16px;
 }
+.tool-section-label {
+  margin: 0 0 4px 34px;
+  font-size: 12px;
+  color: #2229;
+}
+.tool-settings li.tool-divider {
+  margin: 6px 0;
+}
+.tool-divider .tool-drag-handle {
+  color: #222a;
+  font-size: 12px;
+}
+.tool-divider-line {
+  flex: 1;
+  border-top: 1px dashed #2223;
+}
 .tool-settings li {
   display: flex;
   align-items: center;
@@ -1119,6 +1162,7 @@ nav {
   flex: none;
 }
 .import-setting {
+  margin-top: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;

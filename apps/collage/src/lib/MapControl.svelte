@@ -1,9 +1,14 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
   import { untrack } from 'svelte'
-  import { Tween, prefersReducedMotion } from 'svelte/motion'
+  import type { Snippet } from 'svelte'
+  import type { TransitionConfig } from 'svelte/transition'
+  import { prefersReducedMotion } from 'svelte/motion'
   import { cubicInOut } from 'svelte/easing'
-  import { hueColor, foldControl } from './control-layout'
+  import {
+    hueColor,
+    foldControl,
+    TOOL_RING_ANIMATION_MS
+  } from './control-layout'
   import type { Rail } from './control-layout'
   import type { Point } from '@allmaps/types'
 
@@ -13,12 +18,12 @@
     children,
     active = false,
     pressed,
+    expanded,
     disabled = false,
     value,
     sliderValue,
     rail,
     hueScale = false,
-    folded = false,
     fold,
     onpointerdown,
     onclick,
@@ -30,12 +35,12 @@
     children: Snippet
     active?: boolean
     pressed?: boolean
+    expanded?: boolean
     disabled?: boolean
     value?: string
     sliderValue?: number
     rail?: Rail
     hueScale?: boolean
-    folded?: boolean
     fold?: { center: Point; target: Point }
     onpointerdown?: (event: PointerEvent) => void
     onclick?: (event: MouseEvent) => void
@@ -43,36 +48,45 @@
     onkeydown?: (event: KeyboardEvent) => void
   } = $props()
 
-  const progress = new Tween(
-    untrack(() => (folded ? 1 : 0)),
-    { easing: cubicInOut }
-  )
+  // Capture the last live geometry: Svelte pauses the component's reactive
+  // effects during outro, while the selection in its parent can already change.
+  let layout = untrack(() => ({ position, fold }))
   $effect(() => {
-    void progress.set(folded ? 1 : 0, {
-      duration: prefersReducedMotion.current ? 0 : 420
-    })
+    layout = { position, fold }
   })
-  const displayed = $derived(
-    fold
-      ? foldControl(position, fold.center, fold.target, progress.current)
-      : position
-  )
+  const orbit: (node: Element) => TransitionConfig = () => {
+    const { position, fold } = layout
+    return {
+      duration: prefersReducedMotion.current ? 0 : TOOL_RING_ANIMATION_MS,
+      easing: cubicInOut,
+      css: (t) => {
+        const p = fold
+          ? foldControl(position, fold.center, fold.target, 1 - t)
+          : position
+        return `transition: none; opacity: ${1 - (1 - t) ** 3}; transform: translate3d(${p[0]}px, ${p[1]}px, 0)`
+      }
+    }
+  }
+  function animation(event: Event, active: boolean, closing = false) {
+    const node = event.currentTarget as HTMLElement
+    node.classList.toggle('folding', active)
+    if (closing) node.setAttribute('aria-hidden', 'true')
+    else node.removeAttribute('aria-hidden')
+  }
 </script>
 
 <div
   class="map-control"
   class:active
-  class:folding={progress.current > 0 && progress.current < 1}
-  class:folded
-  aria-hidden={folded || undefined}
-  inert={folded}
-  style:visibility={progress.current === 1 ? 'hidden' : undefined}
-  style:opacity={1 - progress.current ** 3}
+  transition:orbit|global
+  onintrostart={(event) => animation(event, true)}
+  onintroend={(event) => animation(event, false)}
+  onoutrostart={(event) => animation(event, true, true)}
   class:hue-control={hueScale}
   style:transform={'translate3d(' +
-    displayed[0] +
+    position[0] +
     'px, ' +
-    displayed[1] +
+    position[1] +
     'px, 0)'}
   class:disabled
   style:--hue-color={hueColor(sliderValue ?? 0)}
@@ -99,6 +113,7 @@
     data-tooltip={label}
     aria-label={label}
     aria-pressed={sliderValue === undefined ? pressed : undefined}
+    aria-expanded={expanded}
     role={sliderValue !== undefined ? 'slider' : undefined}
     aria-valuemin={sliderValue !== undefined ? 0 : undefined}
     aria-valuemax={sliderValue !== undefined ? 1 : undefined}

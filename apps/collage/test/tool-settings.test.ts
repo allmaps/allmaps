@@ -4,8 +4,10 @@ import {
   defaultToolSettings,
   parseToolSettings,
   enabledTools,
+  visibleTools,
   reorderTool,
-  parseImportTransformation
+  parseImportTransformation,
+  parseDoubleTapMode
 } from '../src/lib/tool-settings.ts'
 import {
   controlLayout,
@@ -16,12 +18,14 @@ import {
 test('tool preferences default to hidden mirror and retain order through storage', () => {
   const defaults = defaultToolSettings()
   assert.deepEqual(
-    defaults.filter((tool) => !tool.enabled).map((tool) => tool.tool),
+    defaults.filter((tool) => tool.enabled === false).map((tool) => tool.tool),
     ['mirror']
   )
   const changed = defaults
     .toReversed()
-    .map((entry) => ({ ...entry, enabled: !entry.enabled }))
+    .map((entry) =>
+      entry.tool === 'more' ? entry : { ...entry, enabled: !entry.enabled }
+    )
   assert.deepEqual(
     parseToolSettings(JSON.parse(JSON.stringify(changed))),
     changed
@@ -33,7 +37,10 @@ test('tool preferences default to hidden mirror and retain order through storage
     { tool: 'unknown', enabled: true }
   ])
   assert.equal(recovered.length, defaults.length)
-  assert.deepEqual(recovered[0], { tool: 'transform', enabled: true })
+  assert.deepEqual(
+    recovered.find(({ tool }) => tool === 'transform'),
+    { tool: 'transform', enabled: true }
+  )
   const legacy = parseToolSettings([{ tool: 'skew', enabled: true }])
   assert.equal(
     legacy.some(({ tool }) => String(tool) === 'skew'),
@@ -41,38 +48,102 @@ test('tool preferences default to hidden mirror and retain order through storage
   )
   assert.equal(legacy.find(({ tool }) => tool === 'transform')?.enabled, true)
   assert.deepEqual(
-    enabledTools(defaults.map((entry) => ({ ...entry, enabled: false }))),
+    enabledTools(
+      defaults.map((entry) =>
+        entry.tool === 'more' ? entry : { ...entry, enabled: false }
+      )
+    ),
     []
   )
-  assert.deepEqual(
-    enabledTools(
-      defaults.map((entry) => ({ ...entry, enabled: false })),
-      true
+  assert.equal(
+    parseToolSettings([{ tool: 'lock', enabled: true }]).some(
+      ({ tool }) => String(tool) === 'lock'
     ),
-    ['lock']
+    false
+  )
+})
+
+test('compact tools, divider position and enabled states survive storage and reordering', () => {
+  const defaults = defaultToolSettings()
+  assert.deepEqual(visibleTools(defaults, false), [
+    'move',
+    'rotate',
+    'remove',
+    'more'
+  ])
+  assert.deepEqual(visibleTools(defaults, true), [
+    ...enabledTools(defaults),
+    'more'
+  ])
+  const changed = reorderTool(defaults, 'opacity', 1)
+  assert.deepEqual(visibleTools(changed, false), [
+    'move',
+    'opacity',
+    'rotate',
+    'remove',
+    'more'
+  ])
+  assert.deepEqual(
+    parseToolSettings(JSON.parse(JSON.stringify(changed))),
+    changed
+  )
+  const onlyToggle = reorderTool(changed, 'more', 0)
+  assert.deepEqual(visibleTools(onlyToggle, false), ['more'])
+  assert.deepEqual(visibleTools(onlyToggle, true), [
+    ...enabledTools(onlyToggle),
+    'more'
+  ])
+  const allVisible = reorderTool(changed, 'more', 100)
+  assert.deepEqual(visibleTools(allVisible, false), enabledTools(allVisible))
+  assert.deepEqual(visibleTools(allVisible, true), enabledTools(allVisible))
+  const allDisabled = defaults.map((entry) =>
+    entry.tool === 'more' ? entry : { ...entry, enabled: false }
+  )
+  assert.deepEqual(visibleTools(allDisabled, false), [])
+  assert.deepEqual(visibleTools(allDisabled, true), [])
+  assert.deepEqual(parseToolSettings([...changed, { tool: 'more' }]), changed)
+})
+
+test('legacy preferences migrate to a compact ring without re-enabling tools', () => {
+  const legacy = [
+    { tool: 'opacity', enabled: true },
+    { tool: 'rotate', enabled: false },
+    { tool: 'remove', enabled: true },
+    { tool: 'move', enabled: true }
+  ]
+  const migrated = parseToolSettings(legacy)
+  assert.deepEqual(visibleTools(migrated, false), ['remove', 'move', 'more'])
+  assert.equal(migrated.find(({ tool }) => tool === 'rotate')?.enabled, false)
+  assert.equal(
+    migrated[migrated.findIndex(({ tool }) => tool === 'more') + 1].tool,
+    'opacity'
+  )
+  assert.deepEqual(
+    parseToolSettings(JSON.parse(JSON.stringify(migrated))),
+    migrated
   )
 })
 
 test('custom ring order has no gaps and handles a single tool or an empty ring', () => {
   const layout = controlLayout([300, 300], 0, { opacity: 1, hue: 0 }, 150, [
     'rotate',
-    'lock',
+    'opacity',
     'move'
   ])
-  assert.deepEqual(Object.keys(layout), ['rotate', 'lock', 'move'])
+  assert.deepEqual(Object.keys(layout), ['rotate', 'opacity', 'move'])
   const distance = (a: number[], b: number[]) =>
     Math.hypot(a[0] - b[0], a[1] - b[1])
   assert.ok(
     Math.abs(
-      distance(layout.rotate.position, layout.lock.position) -
-        distance(layout.lock.position, layout.move.position)
+      distance(layout.rotate.position, layout.opacity.position) -
+        distance(layout.opacity.position, layout.move.position)
     ) < 1e-8
   )
   assert.ok(radiusForSize(0, 3) < radiusForSize(0, 12))
   const single = controlLayout([300, 300], 0, { opacity: 1, hue: 0 }, 100, [
-    'lock'
+    'opacity'
   ])
-  assert.ok(single.lock.position.every(Number.isFinite))
+  assert.ok(single.opacity.position.every(Number.isFinite))
   const empty = controlLayout([300, 300], 0, { opacity: 1, hue: 0 }, 100, [])
   assert.deepEqual(fitControlCenter([300, 300], empty, [600, 600]), [300, 300])
 })
@@ -93,4 +164,10 @@ test('drag ordering moves a tool without changing other settings and clamps list
   assert.equal(parseImportTransformation('polynomial'), 'polynomial')
   for (const value of [undefined, null, 'bad', {}, 'helmert'])
     assert.equal(parseImportTransformation(value), 'helmert')
+})
+
+test('double tap defaults to mask and accepts only supported editor modes', () => {
+  assert.equal(parseDoubleTapMode('transform'), 'transform')
+  for (const value of [undefined, null, 'mask', 'invalid', {}, []])
+    assert.equal(parseDoubleTapMode(value), 'mask')
 })

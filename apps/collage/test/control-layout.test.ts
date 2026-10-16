@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
   controlLayout,
+  controlFold,
   foldControl,
   controlOrder,
   radiusForSize,
@@ -19,13 +20,14 @@ function close(a: number, b: number) {
   assert.ok(Math.abs(a - b) < 1e-8, `${a} ≠ ${b}`)
 }
 
-test('locking travels along the arc toward the lock, including across angle wrapping', () => {
+test('opening and closing travel along the arc toward its end, including across angle wrapping', () => {
   for (const rotation of [0, Math.PI, -Math.PI / 2, 8]) {
     const center: Point = [300, 300]
     const layout = controlLayout(center, rotation, { opacity: 0.3, hue: 0.8 })
     for (const kind of controlOrder) {
       const start = layout[kind].position
-      const target = layout.lock.position
+      const target = controlFold(center, rotation, controlRadius).target
+      assert.deepEqual(target, layout.rotate.position)
       assert.deepEqual(foldControl(start, center, target, 0), start)
       assert.deepEqual(foldControl(start, center, target, 1), target)
       const middle = foldControl(start, center, target, 0.5)
@@ -33,8 +35,58 @@ test('locking travels along the arc toward the lock, including across angle wrap
         distance(middle, center),
         (distance(start, center) + controlRadius) / 2
       )
-      if (kind !== 'lock')
+      if (distance(start, target) > 1e-8)
         assert.ok(distance(middle, target) < distance(start, target))
+    }
+  }
+})
+
+test('the toggle anchors one end for compact and expanded rings, and folding stays on the same arc', () => {
+  const center: Point = [300, 300]
+  const compact = ['move', 'rotate', 'remove', 'more'] as const
+  const expanded = [...controlOrder, 'more'] as const
+  for (const rotation of [0, Math.PI, -Math.PI / 2, 8]) {
+    const small = controlLayout(
+      center,
+      rotation,
+      { opacity: 1, hue: 0 },
+      controlRadius,
+      compact
+    )
+    const large = controlLayout(
+      center,
+      rotation,
+      { opacity: 1, hue: 0 },
+      controlRadius,
+      expanded
+    )
+    assert.deepEqual(small.more.position, large.more.position)
+    for (const order of [compact, expanded]) {
+      const layout = controlLayout(
+        center,
+        rotation,
+        { opacity: 1, hue: 0 },
+        controlRadius,
+        order
+      )
+      assert.deepEqual(
+        controlFold(center, rotation, controlRadius, order).target,
+        layout.more.position
+      )
+      const first = layout[order[0]].position
+      const last = layout.more.position
+      const middle = foldControl(first, center, last, 0.5)
+      // The expanded arc is centered at 45° minus the map rotation.
+      if (order === expanded) {
+        close(
+          middle[0],
+          center[0] + Math.cos(Math.PI / 4 - rotation) * controlRadius
+        )
+        close(
+          middle[1],
+          center[1] + Math.sin(Math.PI / 4 - rotation) * controlRadius
+        )
+      }
     }
   }
 })
@@ -131,6 +183,34 @@ test('the arc faces bottom right and contracts with zoom without colliding butto
     )
   }
   close(radiusForSize(10000), controlRadius)
+})
+
+test('sparse rings keep adjacent buttons close on large maps without losing their curve', () => {
+  for (const order of [
+    ['move', 'rotate'],
+    ['move', 'rotate', 'remove'],
+    ['move', 'rotate', 'remove', 'more'],
+    ['move', 'rotate', 'remove', 'front', 'more']
+  ] as const) {
+    for (const diameter of [20, 500, 10000]) {
+      const radius = radiusForSize(diameter, order.length)
+      const layout = controlLayout(
+        [0, 0],
+        0,
+        { opacity: 1, hue: 0 },
+        radius,
+        order
+      )
+      for (let i = 1; i < order.length; i++) {
+        const gap = distance(
+          layout[order[i - 1]].position,
+          layout[order[i]].position
+        )
+        assert.ok(gap >= 44 && gap <= 56 + 1e-8)
+      }
+      assert.ok(radius >= 72 && radius < 74)
+    }
+  }
 })
 
 test('clipped map controls and full slider rails stay on screen as one fixed arc', () => {

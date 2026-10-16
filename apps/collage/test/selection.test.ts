@@ -10,6 +10,7 @@ import {
   selectionScope,
   toggleSelection,
   selectionLocked,
+  canEditLayout,
   singleGroup,
   setAppearance
 } from '../src/lib/selection.ts'
@@ -105,6 +106,24 @@ test('a locked member blocks edits and regrouping of the selection', () => {
   items[1].locked = false
   assert.equal(selectionLocked(items), false)
   assert.equal(ungroupMaps(items), true)
+})
+
+test('layout tools exclude selections containing groups except inside that group editor', () => {
+  const items = fixture()
+  assert.equal(canEditLayout(items), true)
+  assert.equal(canEditLayout([]), false)
+  assert.equal(canEditLayout(items.slice(0, 1)), false)
+  groupMaps(items.slice(0, 2))
+  const group = items[0].groupId!
+  assert.equal(canEditLayout(items), false)
+  assert.equal(canEditLayout(items.slice(0, 2)), false)
+  assert.equal(canEditLayout(items.slice(0, 2), group), true)
+  assert.equal(canEditLayout(items.slice(0, 2), 'another-group'), false)
+  items[0].locked = true
+  assert.equal(canEditLayout(items.slice(0, 2), group), false)
+  items[0].locked = false
+  ungroupMaps(items)
+  assert.equal(canEditLayout(items), true)
 })
 
 test('duplicated groups stay together without joining the original group', () => {

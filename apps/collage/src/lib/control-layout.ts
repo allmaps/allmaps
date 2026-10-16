@@ -1,6 +1,6 @@
 import type { Point } from '@allmaps/types'
 
-// Equal angular intervals on a semicircle tilted 45 degrees from vertical.
+// Equal angular intervals on an arc facing bottom right.
 export const controlOrder = [
   'remove',
   'front',
@@ -8,7 +8,6 @@ export const controlOrder = [
   'openIn',
   'background',
   'saturation',
-  'lock',
   'hue',
   'opacity',
   'editMask',
@@ -18,11 +17,12 @@ export const controlOrder = [
   'rotate'
 ] as const
 export type Control = (typeof controlOrder)[number]
+export type RingControl = Control | 'more'
 export type Slider = 'opacity' | 'hue'
 export type Rail = { start: Point; end: Point }
 export type ControlPosition = { position: Point; rail?: Rail }
 
-/** Follow the controls' circle toward the lock, bringing sliders inward too. */
+/** Follow the controls' circle toward one end, bringing sliders inward too. */
 export function foldControl(
   position: Point,
   center: Point,
@@ -33,8 +33,11 @@ export function foldControl(
   if (progress >= 1) return target
   const start = Math.atan2(position[1] - center[1], position[0] - center[0])
   const end = Math.atan2(target[1] - center[1], target[0] - center[0])
-  const angle =
-    start + Math.atan2(Math.sin(end - start), Math.cos(end - start)) * progress
+  let sweep = Math.atan2(Math.sin(end - start), Math.cos(end - start))
+  // Opposite endpoints must take the same half-circle as the other tools,
+  // even when floating-point error makes the wrapped difference −π.
+  if (Math.abs(Math.abs(sweep) - Math.PI) < 1e-8) sweep = Math.PI
+  const angle = start + sweep * progress
   const radius =
     Math.hypot(position[0] - center[0], position[1] - center[1]) *
       (1 - progress) +
@@ -44,15 +47,53 @@ export function foldControl(
     center[1] + Math.sin(angle) * radius
   ]
 }
+// Shared opening/closing duration for every tool ring (milliseconds).
+export const TOOL_RING_ANIMATION_MS = 180
+
+export function controlFold(
+  center: Point,
+  rotation: number,
+  radius: number,
+  order: readonly RingControl[] = controlOrder
+) {
+  const angle = endAngle(order) - rotation
+  return {
+    center,
+    target: [
+      center[0] + Math.cos(angle) * radius,
+      center[1] + Math.sin(angle) * radius
+    ] as Point
+  }
+}
 export const controlRadius = 184
 export const sliderLength = 104
+
+function angularStep(count: number): number {
+  // Sparse tool sets occupy a shorter arc, rather than opposing ends of a
+  // diameter. Five or more tools fill the usual tilted semicircle.
+  return Math.PI / Math.max(4, count - 1)
+}
+
+function endAngle(order: readonly RingControl[]): number {
+  // Keep the +/− end anchored as the ring expands. Without a toggle, center
+  // sparse tool sets on the usual short arc.
+  return order.includes('more')
+    ? (3 * Math.PI) / 4
+    : Math.PI / 4 +
+        (angularStep(order.length) * Math.max(0, order.length - 1)) / 2
+}
+
 export function radiusForSize(
   diameter: number,
   count: number = controlOrder.length
 ): number {
-  // Leave room for 42px touch controls when the arc contracts.
-  const minimum = 22 / Math.sin(Math.PI / (2 * Math.max(1, count - 1)))
-  return Math.max(minimum, Math.min(controlRadius, diameter * 0.3))
+  // Retain a visible curve for small sets, and leave room for 42px touch
+  // controls using the same angular spacing as the layout.
+  const minimum = Math.max(72, 22 / Math.sin(angularStep(count) / 2))
+  // Keep adjacent buttons at most 56px apart, even on a large map. Sparse
+  // rings retain their curve without spreading a few tools across the map.
+  const compact = 28 / Math.sin(angularStep(count) / 2)
+  return Math.max(minimum, Math.min(controlRadius, compact, diameter * 0.3))
 }
 
 /** Blend toward the screen center based on size, never the clipped polygon's
@@ -78,15 +119,14 @@ export function controlLayout(
   rotation: number,
   values: { opacity: number; hue: number },
   radius = controlRadius,
-  order: readonly Control[] = controlOrder
-): Record<Control, ControlPosition> {
+  order: readonly RingControl[] = controlOrder
+): Record<RingControl, ControlPosition> {
+  const step = angularStep(order.length)
+  const span = step * Math.max(0, order.length - 1)
   const layout = Object.fromEntries(
     order.map((kind, index) => {
       // Screen Y points down; map rotation is counterclockwise in world space.
-      const angle =
-        -Math.PI / 4 +
-        (index * Math.PI) / Math.max(1, order.length - 1) -
-        rotation
+      const angle = endAngle(order) - span + index * step - rotation
       const at = (radius: number): Point => [
         center[0] + Math.cos(angle) * radius,
         center[1] + Math.sin(angle) * radius
@@ -109,7 +149,7 @@ export function controlLayout(
         }
       ]
     })
-  ) as Record<Control, ControlPosition>
+  ) as Record<RingControl, ControlPosition>
   return layout
 }
 
@@ -127,7 +167,7 @@ export function railValue(pointer: Point, rail: Rail): number {
 // move the arc. Keep each button in place relative to the other controls.
 export function fitControlCenter(
   center: Point,
-  layout: Record<Control, ControlPosition>,
+  layout: Record<RingControl, ControlPosition>,
   viewport: Point
 ): Point {
   const positions = Object.values(layout).flatMap((control) => {
