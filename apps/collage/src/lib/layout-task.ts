@@ -1,15 +1,20 @@
 import { arrangeMaps, arrangeGeographically, prepareMaps } from './model.ts'
-import type { Arrangement, CollageMap, ImportTransformation } from './model.ts'
+import type {
+  Arrangement,
+  CollageMap,
+  ImportTransformation,
+  MapImportOptions
+} from './model.ts'
 import type { Point } from '@allmaps/types'
 
 export type LayoutRequest =
-  | {
+  | ({
       type: 'add'
       input: unknown
       at: Point
       sourceUrl?: string
       importTransformation?: ImportTransformation
-    }
+    } & MapImportOptions)
   | {
       type: 'arrange'
       items: CollageMap[]
@@ -29,7 +34,8 @@ export function solveLayout(request: LayoutRequest): LayoutResult {
           request.input,
           request.at,
           request.sourceUrl,
-          request.importTransformation
+          request.importTransformation,
+          request
         )
       : structuredClone(request.items)
   const anchor =

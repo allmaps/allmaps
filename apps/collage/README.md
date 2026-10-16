@@ -373,6 +373,12 @@ selections to the front. Alt/Option reverses the action.
 
 Grouped maps use blue outlines, distinct from the pink individual selection.
 
+Adding an annotation containing multiple maps groups them automatically. Each
+URL or file gets its own group, including files dropped together; single-map
+imports stay ungrouped. Saved group structures are preserved, with fresh group
+IDs for each imported document. Opening a collage restores its groups as saved.
+Random maps and place-search results remain independent maps.
+
 **Lock** folds the map controls along their circle toward the lock button,
 leaving **Unlock** available. Locked maps remain selectable and the canvas can
 still pan/zoom, but dragging, duplication, deletion, arrangement and setting

@@ -33,6 +33,10 @@ import {
 export type Placement = { position: Point; rotation: number }
 export type Arrangement = 'compact' | 'geographic'
 export type ImportTransformation = 'helmert' | 'polynomial'
+export type MapImportOptions = {
+  additionalInputs?: unknown[]
+  groupImportedMaps?: boolean
+}
 export type GeographicReference = {
   resource: Point
   geo: Point
@@ -435,25 +439,39 @@ export function prepareMaps(
   input: unknown,
   at: Point = [0, 0],
   sourceUrl?: string,
-  importTransformation: ImportTransformation = 'helmert'
+  importTransformation: ImportTransformation = 'helmert',
+  { additionalInputs = [], groupImportedMaps = true }: MapImportOptions = {}
 ): CollageMap[] {
-  const sources = parseMaps(input)
-  const groups = new Map<string, string>()
-  const items = sources.map((source) => {
-    preserveSource(source, sources.length === 1 ? sourceUrl : undefined)
-    const { map: baseline, geographicReference } = normalizeSource(
-      source,
-      importTransformation
-    )
-    baseline.id = 'urn:uuid:' + crypto.randomUUID()
-    const item = makeItem(baseline, geographicReference, false)
-    if (item.groupId) {
-      if (!groups.has(item.groupId))
-        groups.set(item.groupId, crypto.randomUUID())
-      item.groupId = groups.get(item.groupId)
+  const items = [input, ...additionalInputs].flatMap((input) => {
+    const sources = parseMaps(input)
+    const groups = new Map<string, string>()
+    const documentItems = sources.map((source) => {
+      preserveSource(source, sources.length === 1 ? sourceUrl : undefined)
+      const { map: baseline, geographicReference } = normalizeSource(
+        source,
+        importTransformation
+      )
+      baseline.id = 'urn:uuid:' + crypto.randomUUID()
+      const item = makeItem(baseline, geographicReference, false)
+      if (item.groupId) {
+        if (!groups.has(item.groupId))
+          groups.set(item.groupId, crypto.randomUUID())
+        item.groupId = groups.get(item.groupId)
+      }
+      if (isHttpUrl(sourceUrl)) item.sourceUrl = sourceUrl
+      return item
+    })
+    // Respect a saved collage's group structure; otherwise group each source
+    // document independently, including when several files are dropped at once.
+    if (
+      groupImportedMaps &&
+      documentItems.length > 1 &&
+      !documentItems.some((item) => item.groupId)
+    ) {
+      const groupId = crypto.randomUUID()
+      for (const item of documentItems) item.groupId = groupId
     }
-    if (isHttpUrl(sourceUrl)) item.sourceUrl = sourceUrl
-    return item
+    return documentItems
   })
   if (items.length) {
     items[0].placement.position = [...at]

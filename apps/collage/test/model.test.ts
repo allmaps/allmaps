@@ -1483,6 +1483,78 @@ test('polynomial imports preserve the full affine fit and initialize scales and 
   )
 })
 
+test('multi-map annotation imports receive a fresh group without changing individual settings', () => {
+  const sources = [fixture(), fixture(53)]
+  sources[0]._allmaps = {
+    collage: { version: 1, locked: true, appearance: { opacity: 0.25 } }
+  }
+  sources[1]._allmaps = {
+    collage: { version: 1, appearance: { saturation: 0 } }
+  }
+  const input = generateAnnotation(sources)
+  const before = structuredClone(input)
+  const items = prepareMaps(input)
+  assert.ok(items[0].groupId)
+  assert.equal(items[0].groupId, items[1].groupId)
+  assert.notEqual(prepareMaps(input)[0].groupId, items[0].groupId)
+  assert.equal(items[0].locked, true)
+  assert.equal(items[0].appearance.opacity, 0.25)
+  assert.equal(items[1].appearance.saturation, 0)
+  assert.equal(
+    prepareMaps(generateAnnotation(sources[0]))[0].groupId,
+    undefined
+  )
+  assert.ok(openCollage(input).every((item) => !item.groupId))
+  assert.deepEqual(input, before)
+})
+
+test('a multi-file worker import groups each document separately and leaves single maps ungrouped', () => {
+  const input = generateAnnotation([fixture(), fixture(52, 5.1)])
+  const additionalInputs = [input, generateAnnotation(fixture(52, 5.2))]
+  const before = structuredClone({ input, additionalInputs })
+  const { items } = solveLayout({
+    type: 'add',
+    input,
+    additionalInputs,
+    at: [0, 0]
+  })
+  assert.equal(items.length, 5)
+  assert.ok(items[0].groupId)
+  assert.equal(items[0].groupId, items[1].groupId)
+  assert.equal(items[2].groupId, items[3].groupId)
+  assert.notEqual(items[0].groupId, items[2].groupId)
+  assert.equal(items[4].groupId, undefined)
+  assert.deepEqual({ input, additionalInputs }, before)
+})
+
+test('saved group structure survives adding annotations and never joins another imported document', () => {
+  const sources = [fixture(), fixture(), fixture(), fixture()]
+  for (const [i, groupId] of ['a', 'a', 'b'].entries())
+    sources[i]._allmaps = { collage: { version: 1, groupId } }
+  const input = generateAnnotation(sources)
+  const items = prepareMaps(input, [0, 0], undefined, 'helmert', {
+    additionalInputs: [input]
+  })
+  assert.equal(items[0].groupId, items[1].groupId)
+  assert.notEqual(items[0].groupId, 'a')
+  assert.ok(items[2].groupId)
+  assert.notEqual(items[2].groupId, items[0].groupId)
+  assert.equal(items[3].groupId, undefined)
+  assert.notEqual(items[0].groupId, items[4].groupId)
+  assert.equal(items[4].groupId, items[5].groupId)
+  assert.equal(items[7].groupId, undefined)
+})
+
+test('synthetic random and search batches can opt out of automatic grouping', () => {
+  const { items } = solveLayout({
+    type: 'add',
+    input: generateAnnotation([fixture(), fixture(53)]),
+    at: [0, 0],
+    groupImportedMaps: false
+  })
+  assert.ok(items.every((item) => !item.groupId))
+})
+
 test('annotation round-trips retain distinct settings, groups, locks, reset masks and skew reset', () => {
   const items = prepareMaps(generateAnnotation([fixture(), fixture(53)]))
   items.forEach((item) => {

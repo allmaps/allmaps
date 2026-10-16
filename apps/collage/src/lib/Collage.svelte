@@ -105,7 +105,8 @@
     Arrangement,
     CollageMap,
     Placement,
-    ImportTransformation
+    ImportTransformation,
+    MapImportOptions
   } from './model'
   import { snapRotation } from './rotation'
   import { alignMaps, distributeMaps } from './alignment'
@@ -919,11 +920,13 @@
   async function prepare(
     input: unknown,
     mode: 'add' | 'open',
-    sourceUrl?: string
+    sourceUrl?: string,
+    options: MapImportOptions = {}
   ) {
     if (mode === 'open') return openCollage(input, sourceUrl)
     const center = map!.getCenter()
     const result = await runLayout({
+      ...options,
       type: 'add',
       importTransformation,
       input,
@@ -965,6 +968,7 @@
     try {
       const result = await runLayout({
         type: 'add',
+        groupImportedMaps: false,
         importTransformation,
         input: generateAnnotation(maps),
         at: searchOrigin
@@ -1034,17 +1038,10 @@
         files.map(async (file) => JSON.parse(await file.text()))
       )
       if (disposed) return
-      // Flatten files into a single batch so all their maps are placed together.
-      const document =
-        inputs.length === 1
-          ? inputs[0]
-          : {
-              type: 'AnnotationPage',
-              items: inputs.flatMap(
-                (input) => exportCollage(openCollage(input)).items
-              )
-            }
-      const next = await prepare(document, mode)
+      // Keep file boundaries for grouping, but arrange all imports in one batch.
+      const next = await prepare(inputs[0], mode, undefined, {
+        additionalInputs: inputs.slice(1)
+      })
       if (!disposed) install(next, mode === 'open')
     } catch (error) {
       layoutFailure(error)
@@ -1101,7 +1098,9 @@
     try {
       const maps = await loadRandomMaps({ signal: controller.signal })
       if (disposed) return
-      const next = await prepare(generateAnnotation(maps), 'add')
+      const next = await prepare(generateAnnotation(maps), 'add', undefined, {
+        groupImportedMaps: false
+      })
       next.forEach((item, i) => {
         item.sourceUrl = originalAnnotationUrl(maps[i]) ?? maps[i].id
       })
