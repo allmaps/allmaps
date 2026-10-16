@@ -122,7 +122,7 @@ response. This is per-tab search history, not an autosave of the collage.
 
 ## Arranging maps
 
-- Click/drag a map to select/move it. Double-click a map to edit its group, or its mask when ungrouped.
+- Click/drag a map to select/move it. Double-tap/click a map to edit its group, or open the editor chosen in Settings when ungrouped (Edit mask by default).
   Hold Alt/Option while starting a move to drag a duplicate; this also works
   with the move control and multi-map selections. Copies appear after three
   pixels of movement. Escape cancels them; duplication and movement are one
@@ -134,7 +134,8 @@ response. This is per-tab search history, not an autosave of the collage.
   size, without following clipped fragments. The entire arc is kept on screen,
   with full slider rails included so changing a value does not shift the arc.
   Repositioning eases smoothly after panning; direct manipulation stays immediate.
-  Drag the rotation control to rotate freely. Within 4° of the map's natural
+  Drag the rotation control using the configured **Snap rotation** angle step,
+  or freely when it is off. In free rotation, within 4° of the map's natural
   bearing, it snaps to make the image upright; Shift retains 15° increments
   elsewhere. A group rotates rigidly and snaps using its first selected map.
   Double-click resets rotation; a group rotates rigidly using its first selected map.
@@ -149,10 +150,11 @@ response. This is per-tab search history, not an autosave of the collage.
 - Shift/Cmd/Ctrl-click toggles maps in a selection. Cmd/Ctrl+A selects all.
   Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
   selected map to move the group; rotate uses one shared pivot and preserves
-  spacing and scale. Groups retain the full arc and share appearance controls; individual mask
+  spacing and scale. Groups share appearance controls; individual mask
   editing is available inside group editing mode. **Arrange**, **Geographic**, **Align** and **Distribute** appear as compact
   icon buttons beside **Edit layout** at the bottom center, above the zoom controls
-  on smaller screens.
+  on smaller screens. These layout tools are available for ungrouped maps or
+  selected members inside **Edit group**.
   **Arrange** compacts the current positions with PRISM, keeping the first selected
   map fixed and preserving scale, rotation, masks and layer order.
   **Geographic** keeps the first selected map
@@ -162,13 +164,12 @@ response. This is per-tab search history, not an autosave of the collage.
   bounds of just the arranged selection.
   **Align** opens a fan for top, bottom, left, right, horizontal-center and
   vertical-center alignment, using the visible masks and the selection's bounds.
-  Groups move as one object; inside **Edit group**, members align individually.
+  Inside **Edit group**, members align individually.
   Alignment preserves scale, rotation and appearance, is one undo step, and fits
   the selected maps in view.
   **Distribute** spaces three or more selected objects with equal horizontal or
   vertical gaps between their visible bounds, keeping the outer objects fixed.
-  Groups count as one object, except inside **Edit group**. Crowded selections
-  can retain overlap. Distribution preserves shapes, settings and layer order,
+  Crowded selections can retain overlap. Distribution preserves shapes, settings and layer order,
   fits the selection in view, and is one undo step.
   **Space horizontally** and **Space vertically** instead create a positive gap
   equal to 10% of the objects' average width or height, keeping the selection
@@ -249,8 +250,8 @@ the app's coordinate limits.
 
 ## Editing masks
 
-Double-click an ungrouped map or a member inside **Edit group**, or select one
-and choose **Edit mask**. Editing stays on the existing zoom
+Select a map and choose **Edit mask**, or double-tap/click an ungrouped map
+or a member inside **Edit group** with the default double-tap setting. Editing stays on the existing zoom
 surface, preserving the map's placement, orientation and current camera view.
 The full image is shown and other maps are temporarily hidden. Use **Fit map**
 to zoom to the full image when needed. The outline and handles
@@ -260,6 +261,8 @@ stays visible and the top actions are disabled. On phones and tablets (up to
 groups stay separate, including with the longer pen-mode label.
 Warnings stack above these actions, including when the buttons wrap on phones.
 
+- Double-tap/click outside the mask to save and close, like **Done**. Vertex and
+  edge hit areas are excluded, and this shortcut is suspended while drawing a new mask.
 - Drag a vertex to move it, drag anywhere along an edge to add one, and
   right-click or double-tap a vertex to remove it. Dragged points stop at the image boundary,
   including on rotated and warped maps.
@@ -324,10 +327,48 @@ placements and GCPs unchanged.
 
 **Settings** at the top right lets you show or hide tools and change their order
 by dragging the icon rows (use the grip on touchscreens so labels still scroll).
+Move, Rotate and Remove are always visible by default. **+** expands the ring
+and **−** contracts it. Drag the **More tools** divider, or move rows across it,
+to choose which enabled tools stay visible and which appear after expanding.
+Selecting a different map starts with the compact ring again.
+Sparse rings keep their buttons close together, including on large maps.
 Focused rows also accept Up/Down or Home/End for keyboard reordering.
 Preferences are stored in this browser. Mirror is hidden by default; Transform
-is enabled. Reset restores the default tools and ordering.
-Locked maps always retain an Unlock button, even if Lock is hidden in settings.
+is enabled. **Double-tap / click opens** chooses **Edit mask** (default) or
+**Transform** for individual maps. A grouped map still opens **Edit group** first.
+Reset restores the default tools, ordering, import, snapping and double-tap settings.
+Lock/Unlock is always available in selection mode, independently of ring settings.
+
+The tool ring opens and closes from one end of its circle in 180 ms, including
+expanding, contracting, changing selection or entering an editor. Adjust
+`TOOL_RING_ANIMATION_MS` in `src/lib/control-layout.ts` to change both directions
+together. Reduced-motion preferences disable this animation.
+
+**Snapping** is off by default. **Snap to grid** aligns the center of the moved
+selection's bounds to a grid anchored at the collage origin. Set its spacing in
+metres, kilometres or feet; these are ground distances, independent of zoom.
+When enabled, the backdrop shows this grid with stronger lines every five
+divisions. It follows panning and zooming; at distant zooms only larger divisions
+are drawn. Disabling grid snapping restores the decorative dots. The grid stays
+behind the maps and is not included in exports.
+**Snap to axes** keeps movement exactly horizontal or vertical when dragging
+close to either axis through the starting position. Move away from the axis to
+release it. During a move, faint guides cross the selection's starting bounds
+center; the snapped axis is highlighted. Returning near the starting position
+snaps back to it and highlights both axes, even when the start is off-grid.
+Guides disappear on release or cancel
+and are not included in exports. With both enabled, the grid snaps along the
+active axis while the other coordinate stays fixed. Groups and multiple selections move together,
+preserving their spacing. These settings also apply to the Move control,
+Alt/Option-drag duplicates and dragging inside the Transform selector. They
+are remembered in this browser.
+
+**Snap rotation** snaps drags to a configurable angle step (15° by default),
+using the rotation tool or the Transform selector, including groups and multiple
+selections. Decimal steps are supported. This takes priority over natural bearing
+snapping and Shift. With it off, rotation still attracts to the natural bearing,
+and Shift temporarily snaps in 15° steps. Keyboard rotation retains its 1°/15°
+increments for fine adjustments.
 
 **Import maps as** defaults to Helmert. Polynomial fits a first-order affine
 transformation to all original GCPs, retaining unequal axis scales and shear,
@@ -341,28 +382,36 @@ or group gets one shared frame: every sheet and the spaces between sheets receiv
 the same affine transform, preserving their arrangement and shared boundaries.
 Individual masks, appearance, groups and imported reset values are retained.
 Enter Edit group first to transform just one group member.
-Drag corner handles to scale both axes, or midpoint handles
-to scale X or Y. Hold Shift at a corner to retain proportions. Drag the sides
+**Lock proportions** is enabled each time Transform opens. Corner and midpoint
+handles scale both axes together, preserving the current proportions of the map
+or selection. Unlock it to scale axes independently; holding Shift temporarily
+retains proportions while unlocked. This also applies to keyboard adjustments.
+Drag the sides
 between handles to skew along those edges. The opposite corner or edge stays
 fixed. Mouse, touch and pen use the same handles; arrow keys adjust a focused
 handle. Drag inside the frame to move the map, or just outside a corner to rotate
 around the frame's center. A rotation cursor appears outside the corners.
-Rotation snaps to the map's bearing; Shift snaps in
-15-degree steps. Pan outside the frame; wheel and pinch zoom remain available.
-Other maps are shown by default in Transform mode and hidden by default in mask
-mode. Both modes have a visibility button; within Edit group it only shows the
+Rotation follows **Snap rotation** when enabled; otherwise it snaps to the map's
+bearing, with Shift snapping in 15-degree steps. Pan outside the frame; wheel
+and pinch zoom remain available.
+Other maps are hidden by default in both Transform and mask mode.
+Both modes have a visibility button; within Edit group it only shows the
 other group members. Leaving either mode restores the previous visibility.
 
 **Isometric** opens a fan with **Tilt left** and **Tilt right**. Both create a
-30-degree plane preserving the current area and center; a selection is projected
-as one plane. Alt/Option-click applies the opposite of the last chosen tilt.
+30-degree plane preserving the current area; a selection is projected as one
+plane. For mixed selections, it first removes existing skew and unequal axis
+scales from each map while preserving its area, reflection and relative neutral
+orientation. Existing shared distortion is replaced, so repeated tilts do not
+accumulate skew. Alt/Option-click applies the opposite of the last chosen tilt.
 It aligns with the current view and is a single undo step within Transform mode.
 
-**Reset** restores the imported scale and skew for one map. For a selection it
-restores the scale, skew and relative spacing from before its shared transformation,
-retaining the selection's current position and rotation. The selector remembers
-its deformation across Transform sessions, including after saving and reopening
-the collage. Individual shape edits start a new shared reference. For polynomial imports,
+**Reset** restores each selected map's imported scale and skew, including mixed
+selections with individually transformed maps. If the maps share a transformation,
+it also restores their relative spacing, retaining subsequent movement and rotation.
+The selector remembers its deformation across Transform sessions, including after
+saving and reopening the collage. Individual shape edits start a new shared reference.
+When any selected map was imported as polynomial,
 **Reset to zero** removes both shears and returns to uniform scale at the original
 area-equivalent ground scale. Rotation, position, masks and appearance are retained.
 The imported values use a polar rotation and uniform scale as their reference;
@@ -378,6 +427,9 @@ selections to the front. Alt/Option reverses the action.
 ## Locks and groups
 
 Grouped maps use blue outlines, distinct from the pink individual selection.
+Grouping uses a folder icon. Layout controls (arrange, align and distribute) are
+hidden whenever a group is included in the selection. Inside **Edit group**,
+they remain available for rearranging the selected members.
 
 Adding an annotation containing multiple maps groups them automatically. Each
 URL or file gets its own group, including files dropped together; single-map
@@ -385,20 +437,21 @@ imports stay ungrouped. Saved group structures are preserved, with fresh group
 IDs for each imported document. Opening a collage restores its groups as saved.
 Random maps and place-search results remain independent maps.
 
-**Lock** folds the map controls along their circle toward the lock button,
-leaving **Unlock** available. Locked maps remain selectable and the canvas can
-still pan/zoom, but dragging, duplication, deletion, arrangement and setting
-changes are blocked. Locking a group locks every member. If a mixed selection
-contains a locked map, unlock it before editing the selection. Reduced-motion
-preferences disable the folding animation.
+Use **Lock** or **Unlock** in the **Select maps** action row. A locked selection
+shows a subtle lock badge instead of tools in normal mode. Locked maps remain
+selectable and the canvas can still pan/zoom, but dragging, duplication, deletion,
+arrangement and setting changes are blocked. Locking a group locks every member.
+If a mixed selection contains a locked map, **Unlock** unlocks the whole selection.
 
-Select multiple maps and choose **Group** in the bottom action row, or press
-Cmd/Ctrl+G. Clicking any member then selects the entire group; Shift/Cmd/Ctrl-click
+Enter **Select maps**, select multiple maps and choose **Group** in its bottom
+action row, or press Cmd/Ctrl+G. Clicking any member then selects the entire group;
+Shift/Cmd/Ctrl-click
 and marquee selection also treat groups as units. Move and rotate them together.
 Grouping preserves each member's mask, appearance and placement. Adjusting opacity,
 color, saturation or background removal applies only that setting to every member;
 background removal still detects each image's own paper color. Duplicated groups are independent.
-Use **Ungroup** (Cmd/Ctrl+Shift+G) to separate the members permanently.
+Use **Ungroup** in selection mode (Cmd/Ctrl+Shift+G) to separate the members
+permanently. Both shortcuts also work outside selection mode.
 Lock, group and ungroup operations are undoable. Annotations preserve locks and
 group membership in `_allmaps.collage`; adding a saved collage remaps group IDs
 so separate imports do not merge into existing groups.
@@ -407,8 +460,8 @@ Double-click an unlocked grouped map to enter **Edit group**. Other maps and the
 outlines are hidden on the same canvas without changing the view or clearing the
 tile cache. Click, Shift-click, marquee and Cmd/Ctrl+A now select only individual
 members of that group. Move, rotate, change settings, duplicate or remove members
-individually; duplicates stay in the group. Double-click a member again, or use
-**Edit mask**, to edit its mask and then return to the isolated group.
+individually; duplicates stay in the group. Double-tap/click a member again to
+open the editor chosen in Settings, then return to the isolated group.
 
 **Done**, Escape or Cmd/Ctrl+Enter returns to the full collage with the group
 selected. Edits take effect immediately and retain their normal undo steps.
@@ -420,35 +473,46 @@ are disabled during group editing. **Fit group** frames only the group's members
 
 ## Keyboard shortcuts
 
-| Shortcut                              | Action                                                                    |
-| ------------------------------------- | ------------------------------------------------------------------------- |
-| Cmd/Ctrl+S                            | Save annotation, or finish mask/group editing                             |
-| Cmd/Ctrl+Enter                        | Finish mask/group editing or selection                                    |
-| Cmd/Ctrl+Z / Cmd/Ctrl+Shift+Z         | Undo / redo in the active mode                                            |
-| Cmd/Ctrl+G / Cmd/Ctrl+Shift+G         | Group / ungroup selected maps                                             |
-| Cmd/Ctrl+A                            | Select all maps                                                           |
-| Shift/Cmd/Ctrl-click                  | Toggle a map in the selection                                             |
-| Shift-drag empty canvas               | Add maps to the selection with a rectangle                                |
-| Double-click a map                    | Edit its group, or its mask inside a group / when ungrouped               |
-| Alt/Option-drag a map or move control | Duplicate and move the selection                                          |
-| Alt/Option-click mirror               | Mirror vertically                                                         |
-| Space-drag                            | Pan the canvas                                                            |
-| Shift while rotating                  | Snap to 15-degree increments, with natural bearing taking priority nearby |
-| Alt/Option-click rotation             | Make each selected map upright around its own center                      |
-| Alt/Option                            | Change Bring to front into Send to back                                   |
-| Delete                                | Remove selected maps                                                      |
+| Shortcut                              | Action                                                                             |
+| ------------------------------------- | ---------------------------------------------------------------------------------- |
+| Cmd/Ctrl+S                            | Save annotation, or finish mask/group editing                                      |
+| Cmd/Ctrl+Enter                        | Finish mask/group editing or selection                                             |
+| Cmd/Ctrl+Z / Cmd/Ctrl+Shift+Z         | Undo / redo in the active mode                                                     |
+| Cmd/Ctrl+G / Cmd/Ctrl+Shift+G         | Group / ungroup selected maps                                                      |
+| Cmd/Ctrl+A                            | Select all maps                                                                    |
+| Shift/Cmd/Ctrl-click                  | Toggle a map in the selection                                                      |
+| Shift-drag empty canvas               | Add maps to the selection with a rectangle                                         |
+| Double-click a map                    | Edit its group, or the editor chosen in Settings for individual maps               |
+| Alt/Option-drag a map or move control | Duplicate and move the selection                                                   |
+| Alt/Option-click mirror               | Mirror vertically                                                                  |
+| Space-drag                            | Pan the canvas                                                                     |
+| Shift while rotating                  | Snap to 15-degree increments when Snap rotation is off                             |
+| Alt/Option-click rotation             | Make each selected map upright around its own center                               |
+| Alt/Option                            | Change Bring to front into Send to back                                            |
+| Delete                                | Remove selected maps                                                               |
 | Escape                                | Cancel a gesture or drawing, finish selection, exit mask editing, or deselect maps |
 
 The **Select maps** button beside the zoom/fit controls enables tap selection on
 phones, tablets and desktop. It keeps the current selection and replaces the
-tool ring with **Select all**, **Clear** and **Done**. Tap maps to toggle them;
-tapping empty canvas leaves the selection intact. Drag anywhere to pan, including
+tool ring with **Tap**, **Box**, **Select all**, **Clear**, **Group**/**Ungroup**
+and **Done**. Grouping stays in selection mode so you can continue choosing maps.
+Tap maps to toggle them; tapping empty canvas leaves the selection intact. In Tap mode,
+drag anywhere to pan, including
 over maps, and pinch or scroll to zoom. Movement or a second finger cancels the
 pending tap until all fingers lift. Double-tapping does not enter an editor or
 zoom while selecting. Groups toggle together; inside **Edit group**, members
 toggle individually. Locked maps can also be selected. **Done**, Escape or
 Cmd/Ctrl+Enter restores the tools with the selection intact, without adding an
 undo step. Cmd/Ctrl+A selects all maps in the current group or collage.
+
+**Box** lets a finger, pen or mouse draw a selection rectangle, including when
+starting over a map. Intersecting maps are highlighted while dragging and added
+to the current selection on release. Taps still toggle maps. A second finger
+cancels the box and restores the previous selection, then pans or pinches normally
+until all fingers lift. Wheel zoom also cancels an unfinished box. On desktop,
+hold Space to pan. Escape cancels a box first; press it again to finish selecting.
+Switch back to **Tap** for one-finger panning. Groups and Edit group use the same
+selection rules in both modes. The existing Shift-drag shortcut remains available.
 
 Focused rotation and slider controls also accept arrow keys. Sliders support
 Home/End; Enter or Space toggles a focused colorize control.
@@ -566,8 +630,14 @@ where masks are disabled), keeping the view's orientation. Margin adds a percent
 of the shorter side on each edge; zero gives a tight frame. Preset and custom
 width-to-height proportions expand the frame without cropping maps.
 Both image and SVG export default to a 10% margin. SVG always frames the entire
-collage or selection with its original proportions. Overlapping unselected maps
-are excluded from both image and SVG exports. Export is disabled for empty collages.
+collage or selection with its original proportions. With **Selected maps**, choose
+**Area → Entire collage** to retain all maps' bounds while rendering only the
+selection. This choice is remembered between exports. Separate PNGs or SVGs then
+share the same frame and positions, so they can be composited without realigning;
+keep the same margin, orientation and, for images, proportion, scale and DPI.
+Unselected maps remain transparent in PNG and SVG, or use the chosen JPG background.
+Overlapping unselected maps are excluded from both image and SVG exports.
+Export is disabled for empty collages.
 
 Image export offers transparent PNG or JPG with a selectable background (Allmaps
 colors, white, black, or a custom color), DPI, and a
