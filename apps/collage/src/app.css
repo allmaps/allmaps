@@ -52,6 +52,9 @@ textarea:focus-visible {
   background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px);
   background-size: 22px 22px;
 }
+.collage .map-canvas.has-snap-grid {
+  background-image: none;
+}
 .maplibregl-canvas {
   outline: none;
 }
@@ -1154,7 +1157,8 @@ nav {
   width: 20px;
   height: 20px;
 }
-.tool-settings input[type='checkbox'] {
+.tool-settings input[type='checkbox'],
+.snap-settings input[type='checkbox'] {
   width: 16px;
   height: 16px;
   accent-color: var(--accent);
@@ -1171,12 +1175,45 @@ nav {
   padding-top: 12px;
   font-size: 14px;
 }
-.import-setting select {
+.import-setting select,
+.snap-spacing select,
+.snap-spacing input {
   border: 1px solid #2222;
   border-radius: 8px;
   padding: 6px 10px;
   background: white;
   font-size: 16px;
+}
+.snap-settings {
+  border-top: 1px solid #2221;
+  padding-top: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.snap-toggle,
+.snap-spacing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+}
+.snap-toggle {
+  justify-content: space-between;
+  padding-right: 8px;
+  cursor: pointer;
+}
+.snap-spacing {
+  margin: 4px 0 8px;
+}
+.snap-spacing label {
+  flex: 1;
+}
+.snap-spacing input {
+  min-width: 0;
+  width: 100px;
+}
+.snap-spacing :disabled {
+  opacity: 0.45;
 }
 .tools-dialog .export-actions .quiet-button {
   width: auto;

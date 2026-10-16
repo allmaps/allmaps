@@ -13,21 +13,27 @@
   import type { ToolSetting, DoubleTapMode } from './tool-settings'
   import type { RingControl } from './control-layout'
   import type { ImportTransformation } from './model'
+  import { defaultSnapSettings, snapUnits } from './move-snapping'
+  import type { SnapSettings, SnapUnit } from './move-snapping'
   let {
     settings,
     importTransformation,
     doubleTapMode,
     ondoubletapchange,
+    snapping,
     onchange,
     onimportchange,
+    onsnapchange,
     onclose
   }: {
     settings: ToolSetting[]
     importTransformation: ImportTransformation
     doubleTapMode: DoubleTapMode
     ondoubletapchange: (value: DoubleTapMode) => void
+    snapping: SnapSettings
     onchange: (settings: ToolSetting[]) => void
     onimportchange: (value: ImportTransformation) => void
+    onsnapchange: (value: SnapSettings) => void
     onclose: () => void
   } = $props()
   let list: HTMLOListElement
@@ -239,6 +245,91 @@
           </li>
         {/each}
       </ol>
+      <section class="snap-settings" aria-labelledby="snapping-title">
+        <h3 id="snapping-title">Snapping</h3>
+        <label class="snap-toggle">
+          <span>Snap to grid</span>
+          <input
+            type="checkbox"
+            checked={snapping.grid}
+            onchange={(event) =>
+              onsnapchange({ ...snapping, grid: event.currentTarget.checked })}
+          />
+        </label>
+        <div class="snap-spacing">
+          <label for="grid-spacing">Spacing</label>
+          <input
+            id="grid-spacing"
+            type="number"
+            inputmode="decimal"
+            min="0.001"
+            max={100_000_000 / snapUnits[snapping.unit]}
+            step="any"
+            value={snapping.spacing}
+            disabled={!snapping.grid}
+            onchange={(event) => {
+              const input = event.currentTarget
+              if (input.value && input.validity.valid)
+                onsnapchange({ ...snapping, spacing: input.valueAsNumber })
+              else input.value = String(snapping.spacing)
+            }}
+          />
+          <select
+            aria-label="Grid unit"
+            value={snapping.unit}
+            disabled={!snapping.grid}
+            onchange={(event) =>
+              onsnapchange({
+                ...snapping,
+                unit: event.currentTarget.value as SnapUnit
+              })}
+          >
+            <option value="m">m</option>
+            <option value="km">km</option>
+            <option value="ft">ft</option>
+          </select>
+        </div>
+        <label class="snap-toggle">
+          <span>Snap to axes</span>
+          <input
+            type="checkbox"
+            checked={snapping.axes}
+            onchange={(event) =>
+              onsnapchange({ ...snapping, axes: event.currentTarget.checked })}
+          />
+        </label>
+        <label class="snap-toggle">
+          <span>Snap rotation</span>
+          <input
+            type="checkbox"
+            checked={snapping.rotation}
+            onchange={(event) =>
+              onsnapchange({
+                ...snapping,
+                rotation: event.currentTarget.checked
+              })}
+          />
+        </label>
+        <div class="snap-spacing">
+          <label for="rotation-step">Angle step (°)</label>
+          <input
+            id="rotation-step"
+            type="number"
+            inputmode="decimal"
+            min="0.1"
+            max="360"
+            step="any"
+            value={snapping.rotationStep}
+            disabled={!snapping.rotation}
+            onchange={(event) => {
+              const input = event.currentTarget
+              if (input.value && input.validity.valid)
+                onsnapchange({ ...snapping, rotationStep: input.valueAsNumber })
+              else input.value = String(snapping.rotationStep)
+            }}
+          />
+        </div>
+      </section>
       <div class="import-setting">
         <label for="double-tap-mode">Double-tap / click opens</label>
         <select
@@ -276,6 +367,7 @@
           onchange(defaultToolSettings())
           onimportchange('helmert')
           ondoubletapchange('mask')
+          onsnapchange(defaultSnapSettings())
         }}>Reset</button
       >
       <button class="primary-button" onclick={close}>Done</button>

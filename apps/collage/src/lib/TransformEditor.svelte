@@ -22,6 +22,7 @@
     LinkSimpleBreak
   } from 'phosphor-svelte'
   import { bounds } from './geometry'
+  import { exportView } from './export-view'
   import { toCanvasGeo, fromCanvasGeo, CANVAS_ZOOM_OFFSET } from './coordinates'
   import {
     applyMatrix,
@@ -45,6 +46,9 @@
   import { suspendMapNavigation } from './map-navigation'
   import { TouchNavigation } from './touch-navigation'
   import { snapRotation } from './rotation'
+  import { createMoveSnapper } from './move-snapping'
+  import type { SnapSettings, AxisGuide } from './move-snapping'
+  import SnapAxes from './SnapAxes.svelte'
   import { modeVisibility } from './mode-visibility'
   import FanMenu from './FanMenu.svelte'
 
@@ -53,6 +57,7 @@
     map,
     layer,
     items,
+    snapping,
     onpreview,
     ondone,
     oncancel
@@ -61,6 +66,7 @@
     map: MapLibreMap
     layer: WarpedMapLayer
     items: CollageMap[]
+    snapping: SnapSettings
     onpreview: (draft: CollageMap[]) => void
     ondone: (draft: CollageMap[]) => void
     oncancel: () => void
@@ -81,6 +87,7 @@
   let error = $state('')
   let active = $state(false)
   let activeKind = $state<Kind>()
+  let moveGuide = $state.raw<AxisGuide>()
   let isometricAlternate = false
   const isometricOptions = [
     { value: 'left', label: 'Tilt left', icon: ArrowDownLeft },
@@ -146,6 +153,7 @@
         target: HTMLElement
         before: CollageMap
         start: Point
+        snapMove?: ReturnType<typeof createMoveSnapper>
         inverse: ReturnType<typeof invertMatrix>
         direction: Point
         kind: Kind
@@ -232,6 +240,14 @@
       target: event.currentTarget as HTMLElement,
       before: structuredClone(draft),
       start: pointer,
+      snapMove:
+        kind === 'move' && (snapping.grid || snapping.axes)
+          ? createMoveSnapper(
+              session.apply(draft).flatMap(outline),
+              snapping,
+              exportView(map).metersPerPixel
+            )
+          : undefined,
       inverse: invertMatrix([
         [b[0] - a[0], b[1] - a[1]],
         [d[0] - a[0], d[1] - a[1]]
@@ -250,6 +266,7 @@
     gesture.target.setPointerCapture(event.pointerId)
     active = true
     activeKind = kind
+    moveGuide = gesture.snapMove?.guide
   }
   function update(event: PointerEvent) {
     if (!gesture || event.pointerId !== gesture.pointer || touches.active)
@@ -262,9 +279,15 @@
     try {
       const next = structuredClone(gesture.before)
       if (gesture.kind === 'move') {
+        const movement: Point = [
+          current[0] - gesture.start[0],
+          current[1] - gesture.start[1]
+        ]
+        const move = gesture.snapMove?.(movement) ?? movement
+        moveGuide = gesture.snapMove?.guide
         next.placement.position = [
-          next.placement.position[0] + current[0] - gesture.start[0],
-          next.placement.position[1] + current[1] - gesture.start[1]
+          next.placement.position[0] + move[0],
+          next.placement.position[1] + move[1]
         ]
         placedMap(next)
         preview(next)
@@ -286,7 +309,8 @@
         const rotation = snapRotation(
           gesture.rotation,
           gesture.bearing,
-          event.shiftKey
+          event.shiftKey,
+          snapping.rotation ? snapping.rotationStep : undefined
         )
         next.placement = rotatePlacement(
           next.placement,
@@ -342,6 +366,7 @@
     latest = undefined
     active = false
     activeKind = undefined
+    moveGuide = undefined
     restoreNavigation?.()
     restoreNavigation = undefined
     if (completed.target.hasPointerCapture(completed.pointer))
@@ -542,6 +567,9 @@
 
 <svelte:window onkeydown={keyboard} />
 <section class="mask-editor transform-editor" aria-label="Transform editor">
+  {#if moveGuide}
+    <SnapAxes {map} guide={moveGuide} />
+  {/if}
   <div
     class="transform-surface"
     class:rotating={activeKind === 'rotate'}
@@ -711,7 +739,8 @@
     Proportions are locked by default for corner and midpoint scale handles.
     Unlock proportions to scale axes independently, or hold Shift to temporarily
     retain proportions while unlocked. Drag edges to skew. Drag inside to move,
-    or outside a corner to rotate. Hold Shift to rotate in 15-degree steps.
+    or outside a corner to rotate. Rotation snapping uses the angle step in
+    Settings when enabled. Otherwise, hold Shift to rotate in 15-degree steps.
     Isometric aligns the selection to a 30-degree plane while keeping its area.
     Alt or Option chooses the opposite isometric direction. Reset restores
     imported scale and skew for one map, or the layout before the shared

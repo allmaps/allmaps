@@ -29,3 +29,31 @@ test('natural bearing wins over Shift steps nearby; the 15-degree grid applies e
   close(snapRotation(8 * radians, 23 * radians, true), 15 * radians)
   close(snapRotation(-8 * radians, 23 * radians, true), -15 * radians)
 })
+
+test('configured angle steps override bearing attraction and the temporary Shift grid', () => {
+  for (const shift of [false, true]) {
+    close(snapRotation(21 * radians, 23 * radians, shift, 30), 30 * radians)
+    close(snapRotation(-21 * radians, 23 * radians, shift, 30), -30 * radians)
+    close(snapRotation(20 * radians, 23 * radians, shift, 7.5), 22.5 * radians)
+    close(snapRotation(23.04 * radians, 23 * radians, shift, 0.1), 23 * radians)
+    close(
+      snapRotation(23.06 * radians, 23 * radians, shift, 0.1),
+      23.1 * radians
+    )
+  }
+})
+
+test('custom steps preserve accumulated turns and include zero for uneven angle divisions', () => {
+  for (const [angle, step, expected] of [
+    [181, 45, 180],
+    [743, 30, 750],
+    [-743, 30, -750],
+    [340, 100, 360],
+    [-20, 100, 0],
+    [-80, 100, -60],
+    [380, 100, 360],
+    [665, 100, 660],
+    [359, 360, 360]
+  ])
+    close(snapRotation(angle * radians, 0, false, step), expected * radians)
+})

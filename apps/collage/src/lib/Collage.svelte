@@ -2,9 +2,12 @@
   import { onMount, tick } from 'svelte'
   import { Map as MapLibreMap, LngLat } from 'maplibre-gl'
   import { ExportableMapLayer } from './export-layer'
+  import { exportView } from './export-view'
   import ExportMenu from './ExportMenu.svelte'
   import FanMenu from './FanMenu.svelte'
   import ToolSettings from './ToolSettings.svelte'
+  import SnapGrid from './SnapGrid.svelte'
+  import SnapAxes from './SnapAxes.svelte'
   import TransformEditor from './TransformEditor.svelte'
   import {
     defaultToolSettings,
@@ -17,6 +20,14 @@
     parseDoubleTapMode
   } from './tool-settings'
   import type { ToolSetting, DoubleTapMode } from './tool-settings'
+  import {
+    createMoveSnapper,
+    defaultSnapSettings,
+    parseSnapSettings,
+    snapSettingsKey,
+    snapUnits
+  } from './move-snapping'
+  import type { SnapSettings, AxisGuide } from './move-snapping'
   import { toCanvasGeo, fromCanvasGeo, CANVAS_ZOOM_OFFSET } from './coordinates'
   import {
     Logo,
@@ -163,6 +174,7 @@
   let ignoreDoubleClickUntil = 0
   let altDown = $state(false)
   let toolSettings = $state.raw<ToolSetting[]>(defaultToolSettings())
+  let snapping = $state.raw<SnapSettings>(defaultSnapSettings())
   let ready = $state(false)
   let busy = $state(false)
   let items = $state.raw<CollageMap[]>([])
@@ -237,6 +249,14 @@
     altDown = event.altKey
     refresh()
   }
+  function changeSnapping(value: SnapSettings) {
+    snapping = parseSnapSettings(value)
+    try {
+      localStorage.setItem(snapSettingsKey, JSON.stringify(snapping))
+    } catch {
+      /* Use these settings for the session if storage is unavailable. */
+    }
+  }
   const viewerLink = $derived(
     selection.length === 1 && selected
       ? viewerUrl(selected, publicEnv.PUBLIC_VIEWER_BASE_URL || undefined)
@@ -257,6 +277,7 @@
   type DragMode = 'move' | 'rotate' | Slider
   let controls = $state.raw<Record<RingControl, ControlPosition>>()
   let activeControl = $state<DragMode>()
+  let moveGuide = $state.raw<AxisGuide>()
   const appearances = $derived(selection[0]?.appearance)
   let controlCenter = $state.raw<Point>()
   let controlRadius = $state(184)
@@ -312,6 +333,7 @@
         rail?: Rail
         startRailValue: number
         pointer: Point
+        snapMove?: ReturnType<typeof createMoveSnapper>
         angle: number
         before: CollageMap[]
         duplicateOnMove: boolean
@@ -1538,6 +1560,14 @@
       rotated: false,
       mode,
       pointer,
+      snapMove:
+        mode === 'move' && (snapping.grid || snapping.axes)
+          ? createMoveSnapper(
+              targets.flatMap(outline),
+              snapping,
+              exportView(map).metersPerPixel
+            )
+          : undefined,
       rail,
       startRailValue: rail ? railValue(screen, rail) : 0,
       angle: Math.atan2(
@@ -1553,6 +1583,7 @@
       pointerId: event.pointerId
     }
     activeControl = mode
+    moveGuide = drag.snapMove?.guide
     map.dragPan.disable()
     map.getCanvas().style.cursor = mode === 'move' ? 'grabbing' : 'crosshair'
     ;(event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId)
@@ -1758,10 +1789,12 @@
           return
         }
       }
-      const delta: Point = [
+      const movement: Point = [
         point[0] - gesture.pointer[0],
         point[1] - gesture.pointer[1]
       ]
+      const delta = gesture.snapMove?.(movement) ?? movement
+      moveGuide = gesture.snapMove?.guide
       gesture.targets.forEach(({ item, start }) => {
         item.placement = {
           ...start,
@@ -1789,7 +1822,8 @@
         snapRotation(
           gesture.startRotation + gesture.rotation,
           gesture.bearing,
-          event.shiftKey
+          event.shiftKey,
+          snapping.rotation ? snapping.rotationStep : undefined
         ) - gesture.startRotation
       gesture.targets.forEach(({ item, start }) => {
         item.placement = rotatePlacement(start, gesture.pivot, delta)
@@ -1863,6 +1897,7 @@
     const completed = drag
     drag = undefined
     activeControl = undefined
+    moveGuide = undefined
     latestPointer = undefined
     const rollback = () =>
       completed.targets.forEach(({ item, start, appearance }) => {
@@ -2110,6 +2145,13 @@
     } catch {
       /* Use the default when storage is unavailable. */
     }
+    try {
+      snapping = parseSnapSettings(
+        JSON.parse(localStorage.getItem(snapSettingsKey) ?? 'null')
+      )
+    } catch {
+      /* Ignore invalid stored settings independently of tool preferences. */
+    }
     window.addEventListener('pointerdown', trackTouchStart, true)
     window.addEventListener('pointerup', trackTouchEnd, true)
     window.addEventListener('pointercancel', trackTouchEnd, true)
@@ -2238,9 +2280,13 @@
   style:--error-color={themeColors.red}
   style:--group-color={themeColors.darkblue}
 >
+  {#if map && snapping.grid && !searching}
+    <SnapGrid {map} spacing={snapping.spacing * snapUnits[snapping.unit]} />
+  {/if}
   <div
     bind:this={container}
     class="map-canvas"
+    class:has-snap-grid={snapping.grid && !searching}
     aria-label="Collage canvas"
   ></div>
   {#if !editingMask && !editingTransform && !searching}
@@ -2266,13 +2312,19 @@
     </svg>
   {/if}
 
+  {#if map && moveGuide}
+    <SnapAxes {map} guide={moveGuide} />
+  {/if}
+
   {#if settingsOpen}
     <ToolSettings
       settings={toolSettings}
       {importTransformation}
       {doubleTapMode}
       ondoubletapchange={changeDoubleTap}
+      {snapping}
       onimportchange={changeImport}
+      onsnapchange={changeSnapping}
       onchange={changeTools}
       onclose={() => (settingsOpen = false)}
     />
@@ -2974,6 +3026,7 @@
   {#if editingTransform && map && layer}
     <TransformEditor
       selection={editingTransform}
+      {snapping}
       {map}
       {layer}
       {items}
