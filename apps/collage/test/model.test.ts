@@ -26,6 +26,10 @@ import {
   bearingRotation,
   alignBearings,
   mirrorMap,
+  setMapTransform,
+  resetMapTransform,
+  makeIsometric,
+  ensureMapTransform,
   arrangeMaps,
   arrangeGeographically,
   duplicateMaps,
@@ -35,6 +39,7 @@ import {
 } from '../src/lib/model.ts'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Point } from '@allmaps/types'
+import type { CollageMap } from '../src/lib/model.ts'
 
 const R = 6378137
 const radians = Math.PI / 180
@@ -87,6 +92,15 @@ function affineFixture(): GeoreferencedMap {
     }
   })
   return map
+}
+
+function setSkew(item: CollageMap, horizontal: number, vertical: number) {
+  setMapTransform(item, {
+    scaleX: 1,
+    scaleY: 1,
+    skewX: horizontal,
+    skewY: vertical
+  })
 }
 
 test('three synthetic GCPs preserve the full least-squares Helmert fit at ground scale', () => {
@@ -542,10 +556,7 @@ test('Viewer uses the exact imported URL for every map and retains it through du
   const custom = new URL(viewerUrl(items[0], 'http://localhost:5500/')!)
   assert.equal(custom.origin, 'http://localhost:5500')
   assert.equal(custom.searchParams.get('url'), sourceUrl)
-  assert.equal(
-    JSON.stringify(exportCollage(items)).includes('sourceUrl'),
-    false
-  )
+  assert.equal(JSON.stringify(exportCollage(items)).includes('sourceUrl'), true)
 })
 
 test('Viewer stays disabled for text imports even when annotations contain URLs', () => {
@@ -563,7 +574,7 @@ test('Viewer stays disabled for text imports even when annotations contain URLs'
   assert.equal(viewerUrl(openCollage(exportCollage(items))[0]), undefined)
 })
 
-test('exports record rotation while preserving provenance and omitting other UI state', () => {
+test('exports preserve individual appearance and rotation without changing provenance', () => {
   const source = fixture()
   const metadata = {
     id: source.id,
@@ -587,19 +598,11 @@ test('exports record rotation while preserving provenance and omitting other UI 
   assert.deepEqual(exported.items[0].body._allmaps, {
     ...metadata,
     rotation: 45,
-    geographicReference: item.geographicReference
+    geographicReference: item.geographicReference,
+    collage: { version: 1, appearance: item.appearance }
   })
   assert.deepEqual(Object.keys(exported).sort(), ['@context', 'items', 'type'])
-  assert.equal(JSON.stringify(exported).includes('"collage"'), false)
-  assert.equal(JSON.stringify(exported).includes('"appearance"'), false)
-  assert.deepEqual(openCollage(exported)[0].appearance, {
-    applyMask: true,
-    opacity: 1,
-    saturation: 1,
-    colorize: false,
-    hue: 0,
-    removeBackground: false
-  })
+  assert.deepEqual(openCollage(exported)[0].appearance, item.appearance)
   assert.equal(originalAnnotationUrl(item.baseline), source.id + '@1')
 })
 
@@ -721,8 +724,9 @@ test('edited masks and newly resolved full images stay aligned after loading sav
     }
     loaded.placement.rotation = 0
     const [reopened] = openCollage(exportCollage([loaded]))
+    assert.equal(reopened.appearance.applyMask, false)
     const expected = transformer(placedMap(reopened)).transformToProjectedGeo(
-      mask
+      source.resourceMask
     )
     outline(reopened).forEach((point, i) =>
       close(distance(point, expected[i]), 0, 0.01)
@@ -1297,4 +1301,425 @@ test('vertical mirror reflects image Y and survives export, reversal and horizon
   )
   assert.equal(item.baseline.transformation?.type, 'helmert')
   assert.deepEqual(item.resourceMask, before.resourceMask)
+})
+
+function polygonArea(points: Point[]) {
+  return (
+    Math.abs(
+      points.reduce((sum, point, index) => {
+        const next = points[(index + 1) % points.length]
+        return sum + point[0] * next[1] - next[0] * point[1]
+      }, 0)
+    ) / 2
+  )
+}
+
+test('skew uses three affine GCPs, preserves area and center, and resets exactly to Helmert', () => {
+  const [item] = addMaps(generateAnnotation(fixture()))
+  item.placement.rotation = 0.7
+  item.placement.position = [12000, -4000]
+  const initial = structuredClone(item)
+  const initialOutline = outline(item)
+  for (const [horizontal, vertical] of [
+    [0.6, 0],
+    [0, -0.8],
+    [1, 1],
+    [-1, -1],
+    [0.5, -0.4]
+  ]) {
+    setSkew(item, horizontal, vertical)
+    assert.equal(item.baseline.gcps.length, 3)
+    assert.equal(item.baseline.transformation?.type, 'polynomial')
+    close(distance(mapCenter(item), mapCenter(initial)), 0)
+    close(polygonArea(outline(item)) / polygonArea(initialOutline), 1)
+    const rendered = transformer(placedMap(item)).transformToProjectedGeo(
+      item.resourceMask
+    )
+    rendered.forEach((point, i) => close(distance(point, outline(item)[i]), 0))
+  }
+  setSkew(item, 0, 0)
+  assert.equal(item.baseline.transformation?.type, 'helmert')
+  assert.deepEqual(item.baseline.gcps, initial.baseline.gcps)
+  outline(item).forEach((point, i) =>
+    close(distance(point, initialOutline[i]), 0)
+  )
+  close(item.placement.rotation, initial.placement.rotation)
+  assert.deepEqual(item.affine?.values, {
+    scaleX: 1,
+    scaleY: 1,
+    skewX: 0,
+    skewY: 0
+  })
+})
+
+test('skew survives mask edits, duplication, annotation export/reopen and mirroring', () => {
+  const [item] = addMaps(generateAnnotation(fixture()))
+  const original = structuredClone(item)
+  const crop: Point[] = [
+    [100, 100],
+    [700, 200],
+    [800, 600],
+    [200, 900]
+  ]
+  setSkew(item, 0.5, -0.3)
+  setResourceMask(item, crop)
+  const [copy] = duplicateMaps([item], [250, 100])
+  assert.deepEqual(copy.affine, item.affine)
+  const copyId = copy.baseline.id
+  setSkew(copy, 0, 0)
+  assert.equal(copy.baseline.id, copyId)
+  assert.notEqual(copy.baseline.id, item.baseline.id)
+  const [reopened] = openCollage(exportCollage([item]))
+  outline(reopened).forEach((point, i) =>
+    close(distance(point, outline(item)[i]), 0)
+  )
+  assert.equal(reopened.affine?.values.skewX, 0.5)
+  assert.equal(reopened.affine?.values.skewY, -0.3)
+  mirrorMap(item)
+  assert.equal(item.mirrored, true)
+  setSkew(item, 0, 0)
+  assert.equal(item.mirrored, true)
+  setResourceMask(original, crop)
+  mirrorMap(original)
+  // A mask edit changes the visible pivot. Reset retains that pivot and shape.
+  const a = outline(item),
+    b = outline(original)
+  a.forEach((point, i) =>
+    close(
+      distance(
+        [point[0] - a[0][0], point[1] - a[0][1]],
+        [b[i][0] - b[0][0], b[i][1] - b[0][1]]
+      ),
+      0
+    )
+  )
+  mirrorMap(item)
+  assert.equal(item.baseline.transformation?.type, 'helmert')
+  assert.throws(() => setSkew(item, NaN, 0), /transformation/)
+})
+
+test('mirroring a skewed map reflects its existing shape, and double reflection restores it', () => {
+  const [source] = addMaps(generateAnnotation(fixture()))
+  setSkew(source, 0.6, -0.4)
+  const before = transformer(placedMap(source))
+  for (const direction of ['horizontal', 'vertical'] as const) {
+    const item = structuredClone(source)
+    mirrorMap(item, direction)
+    const after = transformer(placedMap(item))
+    for (const resource of [
+      [200, 300],
+      [700, 100],
+      [450, 900]
+    ] as Point[]) {
+      const reflected: Point =
+        direction === 'horizontal'
+          ? [1000 - resource[0], resource[1]]
+          : [resource[0], 1000 - resource[1]]
+      close(
+        distance(
+          after.transformToProjectedGeo(resource),
+          before.transformToProjectedGeo(reflected)
+        ),
+        0
+      )
+    }
+    mirrorMap(item, direction)
+    outline(item).forEach((point, i) =>
+      close(distance(point, outline(source)[i]), 0)
+    )
+  }
+})
+
+test('polynomial imports preserve the full affine fit and initialize scales and both skew factors', () => {
+  const source = affineFixture()
+  const fit = transformer(source)
+  const pivot = center(fit.transformToProjectedGeo(source.resourceMask))
+  const groundScale = Math.cos(webMercatorToLonLat(pivot)[1] * radians)
+  const [item] = prepareMaps(
+    generateAnnotation(source),
+    [0, 0],
+    undefined,
+    'polynomial'
+  )
+  assert.equal(item.baseline.transformation?.type, 'polynomial')
+  assert.equal(item.baseline.gcps.length, 3)
+  assert.ok(Math.abs(item.affine!.values.skewX) > 0.01)
+  const actual = transformer(item.baseline)
+  for (const resource of [
+    [0, 0],
+    [1000, 1000],
+    [127, 632]
+  ] as Point[]) {
+    const original = fit.transformToProjectedGeo(resource)
+    close(
+      distance(actual.transformToProjectedGeo(resource), [
+        (original[0] - pivot[0]) * groundScale,
+        (original[1] - pivot[1]) * groundScale
+      ]),
+      0
+    )
+  }
+  setSkew(item, 0, 0)
+  const unskewed = transformer(item.baseline)
+  const [c, x, y] = unskewed.transformToProjectedGeo([
+    [0, 0],
+    [100, 0],
+    [0, 100]
+  ] as Point[])
+  close(
+    ((x[0] - c[0]) * (y[0] - c[0]) + (x[1] - c[1]) * (y[1] - c[1])) /
+      (distance(x, c) * distance(y, c)),
+    0
+  )
+  assert.equal(
+    prepareMaps(generateAnnotation(source))[0].baseline.transformation?.type,
+    'helmert'
+  )
+  source.gcps = source.gcps.slice(0, 2)
+  assert.equal(
+    prepareMaps(generateAnnotation(source), [0, 0], undefined, 'polynomial')[0]
+      .baseline.transformation?.type,
+    'helmert'
+  )
+})
+
+test('annotation round-trips retain distinct settings, groups, locks, reset masks and skew reset', () => {
+  const items = prepareMaps(generateAnnotation([fixture(), fixture(53)]))
+  items.forEach((item) => {
+    item.groupId = 'test-group'
+    item.locked = true
+  })
+  items[0].appearance.opacity = 0.25
+  items[1].appearance.colorize = true
+  items[1].appearance.hue = 0.8
+  items[0].title = 'My map'
+  items[0].sourceUrl = 'https://example.org/import.json'
+  const before = structuredClone(items[0])
+  setSkew(items[0], 1.5, -0.3)
+  setResourceMask(items[0], [
+    [100, 100],
+    [700, 100],
+    [700, 800],
+    [100, 800]
+  ])
+  const exported = exportCollage(items)
+  const loaded = openCollage(JSON.parse(JSON.stringify(exported)))
+  loaded.forEach((item, i) => {
+    assert.equal(item.groupId, items[i].groupId)
+    assert.equal(item.locked, true)
+    assert.deepEqual(item.appearance, items[i].appearance)
+    outline(item).forEach((point, j) =>
+      close(distance(point, outline(items[i])[j]), 0)
+    )
+  })
+  assert.equal(loaded[0].title, 'My map')
+  assert.equal(loaded[0].sourceUrl, items[0].sourceUrl)
+  assert.deepEqual(loaded[0].originalResourceMask, before.resourceMask)
+  assert.equal(loaded[0].affine?.values.skewX, 1.5)
+  setSkew(loaded[0], 0, 0)
+  assert.equal(loaded[0].baseline.transformation?.type, 'helmert')
+  const restored = transformer(placedMap(loaded[0]))
+  const original = transformer(placedMap(before))
+  const a = restored.transformToProjectedGeo([
+    [0, 0],
+    [100, 0]
+  ] as Point[])
+  const b = original.transformToProjectedGeo([
+    [0, 0],
+    [100, 0]
+  ] as Point[])
+  close(distance(a[0], a[1]), distance(b[0], b[1]))
+  const imported = prepareMaps(exported)
+  const importedAgain = prepareMaps(exported)
+  assert.equal(imported[0].groupId, imported[1].groupId)
+  assert.notEqual(imported[0].groupId, items[0].groupId)
+  assert.notEqual(imported[0].groupId, importedAgain[0].groupId)
+  loaded.forEach((item) => {
+    delete item.groupId
+    item.locked = false
+  })
+  openCollage(exportCollage(loaded)).forEach((item) => {
+    assert.equal(item.groupId, undefined)
+    assert.equal(item.locked, undefined)
+  })
+})
+
+test('malformed optional collage metadata does not corrupt legacy geometry or defaults', () => {
+  const map = fixture()
+  map._allmaps = {
+    collage: {
+      version: 1,
+      appearance: {
+        opacity: '0.4',
+        hue: -1,
+        saturation: 9,
+        colorize: 'yes',
+        backgroundColor: 'url(bad)'
+      },
+      locked: 'true',
+      groupId: {},
+      originalResourceMask: [
+        [0, 0],
+        [1, 1],
+        [0, 1],
+        [1, 0]
+      ],
+      sourceUrl: 'javascript:alert(1)',
+      transform: {
+        values: { scaleX: 1, scaleY: 1, skewX: 1e300, skewY: 1e300 },
+        imported: { scaleX: 1, scaleY: 1, skewX: 0, skewY: 0 },
+        polynomial: true
+      }
+    }
+  }
+  const [item] = openCollage(generateAnnotation(map))
+  assert.equal(item.appearance.opacity, 1)
+  assert.equal(item.appearance.hue, 0)
+  assert.equal(item.appearance.colorize, false)
+  assert.equal(item.appearance.backgroundColor, undefined)
+  assert.equal(item.locked, undefined)
+  assert.equal(item.groupId, undefined)
+  assert.equal(item.originalResourceMask, undefined)
+  assert.equal(item.sourceUrl, undefined)
+  close(item.affine!.values.scaleX, 1)
+  close(item.affine!.values.scaleY, 1)
+  close(item.affine!.values.skewX, 0)
+  close(item.affine!.values.skewY, 0)
+})
+
+test('transform resets preserve imported affine values, location, orientation and export state', () => {
+  const [item] = prepareMaps(
+    generateAnnotation(affineFixture()),
+    [2000, -8000],
+    undefined,
+    'polynomial'
+  )
+  item.placement.rotation = 0.8
+  const imported = structuredClone(ensureMapTransform(item).values)
+  assert.ok(Math.abs(imported.skewX) > 0.01)
+  assert.ok(Math.abs(imported.skewY) > 0.01)
+  assert.ok(Math.abs(imported.scaleX - 1) > 0.01)
+  const originalOutline = outline(item)
+  const pivot = mapCenter(item)
+  setMapTransform(item, { scaleX: 1.8, scaleY: 0.65, skewX: 0.2, skewY: -0.3 })
+  close(distance(mapCenter(item), pivot), 0)
+  const [reopened] = openCollage(exportCollage([item]))
+  assert.deepEqual(reopened.affine!.imported, imported)
+  assert.deepEqual(reopened.affine!.values, item.affine!.values)
+  resetMapTransform(reopened)
+  outline(reopened).forEach((point, i) =>
+    close(distance(point, originalOutline[i]), 0)
+  )
+  resetMapTransform(reopened, true)
+  assert.equal(reopened.baseline.transformation?.type, 'helmert')
+  close(polygonArea(outline(reopened)) / polygonArea(originalOutline), 1)
+  close(distance(mapCenter(reopened), pivot), 0)
+  close(reopened.placement.rotation, 0.8)
+  resetMapTransform(reopened)
+  outline(reopened).forEach((point, i) =>
+    close(distance(point, originalOutline[i]), 0)
+  )
+})
+
+test('transform scale and skew keep the opposite resource anchor fixed, including after reflection and mask edits', () => {
+  const [item] = prepareMaps(generateAnnotation(fixture()))
+  mirrorMap(item)
+  assert.equal(ensureMapTransform(item).polynomial, false)
+  item.placement.rotation = 1.1
+  setResourceMask(item, [
+    [100, 200],
+    [800, 200],
+    [800, 900],
+    [100, 900]
+  ])
+  const anchor: Point = [100, 900]
+  const fixed = transformer(placedMap(item)).transformToProjectedGeo(anchor)
+  const initialArea = polygonArea(outline(item))
+  setMapTransform(
+    item,
+    { scaleX: 1.6, scaleY: 0.7, skewX: 0.4, skewY: -0.25 },
+    anchor
+  )
+  close(
+    distance(
+      transformer(placedMap(item)).transformToProjectedGeo(anchor),
+      fixed
+    ),
+    0
+  )
+  close(polygonArea(outline(item)) / initialArea, 1.6 * 0.7)
+  assert.equal(item.mirrored, true)
+  const before = structuredClone(item)
+  assert.throws(() =>
+    setMapTransform(item, { scaleX: 0, scaleY: 1, skewX: 0, skewY: 0 })
+  )
+  assert.deepEqual(item, before)
+  mirrorMap(item)
+  resetMapTransform(item)
+  assert.equal(item.mirrored, false)
+})
+
+test('isometric maps have equal axis scale and 30-degree edges, preserving area, center and reflection', () => {
+  for (const alternate of [false, true])
+    for (const mirrored of [false, true]) {
+      for (const importType of ['helmert', 'polynomial'] as const) {
+        const [item] = prepareMaps(
+          generateAnnotation(affineFixture()),
+          [2000, -8000],
+          undefined,
+          importType
+        )
+        if (mirrored) mirrorMap(item)
+        item.placement.rotation = 2.1
+        setResourceMask(item, [
+          [80, 110],
+          [930, 150],
+          [800, 900],
+          [130, 750]
+        ])
+        setMapTransform(item, {
+          scaleX: 1.8,
+          scaleY: 0.7,
+          skewX: 0.5,
+          skewY: -0.2
+        })
+        const before = structuredClone(item)
+        const area = polygonArea(outline(item))
+        const pivot = mapCenter(item)
+        const viewAngle = 0.4
+        makeIsometric(item, viewAngle, alternate)
+        close(polygonArea(outline(item)) / area, 1)
+        close(distance(mapCenter(item), pivot), 0)
+        assert.equal(item.mirrored, mirrored)
+        assert.deepEqual(item.affine!.imported, before.affine!.imported)
+        const [origin, px, py] = transformer(
+          placedMap(item)
+        ).transformToProjectedGeo([
+          [0, 0],
+          [100, 0],
+          [0, 100]
+        ] as Point[])
+        const x: Point = [px[0] - origin[0], px[1] - origin[1]]
+        const y: Point = [py[0] - origin[0], py[1] - origin[1]]
+        close(Math.hypot(...x) / Math.hypot(...y), 1)
+        close(
+          (x[0] * y[0] + x[1] * y[1]) / (Math.hypot(...x) * Math.hypot(...y)),
+          alternate ? 0.5 : -0.5
+        )
+        close(
+          Math.atan2(x[1], x[0]),
+          viewAngle +
+            ((alternate ? 1 : -1) * ((mirrored ? 5 : 1) * Math.PI)) / 6
+        )
+        const first = outline(item)
+        makeIsometric(item, viewAngle, alternate)
+        outline(item).forEach((point, i) => close(distance(point, first[i]), 0))
+        const [reopened] = openCollage(exportCollage([item]))
+        outline(reopened).forEach((point, i) =>
+          close(distance(point, first[i]), 0)
+        )
+        resetMapTransform(reopened)
+        assert.deepEqual(reopened.affine!.values, before.affine!.imported)
+      }
+    }
 })

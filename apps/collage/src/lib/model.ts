@@ -11,12 +11,28 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { TransformationType } from '@allmaps/transform'
 import type { Point } from '@allmaps/types'
 import { bounds } from './geometry.ts'
+import {
+  applyMatrix,
+  invertMatrix,
+  matrixValues,
+  multiplyMatrices,
+  transformMatrix,
+  decomposeTransform,
+  neutralTransform,
+  reflectedValues
+} from './affine-transform.ts'
+import type { Matrix, TransformValues } from './affine-transform.ts'
 import { compactLayout } from './prism.ts'
 import { CANVAS_SCALE, MAX_COLLAGE_COORDINATE } from './coordinates.ts'
 import { nearestRotation } from './rotation.ts'
+import {
+  readCollageSettings,
+  exportCollageSettings
+} from './annotation-state.ts'
 
 export type Placement = { position: Point; rotation: number }
 export type Arrangement = 'compact' | 'geographic'
+export type ImportTransformation = 'helmert' | 'polynomial'
 export type GeographicReference = {
   resource: Point
   geo: Point
@@ -24,7 +40,24 @@ export type GeographicReference = {
 }
 export type CollageMap = {
   instanceId: string
+  // Optional editing state is stored in the annotation’s _allmaps.collage field.
+  groupId?: string
+  locked?: boolean
   sourceUrl?: string
+  // Shared selector shape, retained across Transform sessions. Member rotation
+  // lets the selector follow subsequent rigid rotations of the selection.
+  selectionTransform?: {
+    id: string
+    values: TransformValues
+    rotation: number
+    mapRotation: number
+  }
+  affine?: {
+    values: TransformValues
+    imported: TransformValues
+    polynomial: boolean
+    reference: GeoreferencedMap
+  }
   baseline: GeoreferencedMap
   localGcps: Point[]
   localMask: Point[]
@@ -267,13 +300,15 @@ function readGeographicReference(
 
 function makeItem(
   baseline: GeoreferencedMap,
-  geographicReference = readGeographicReference(baseline)
+  geographicReference = readGeographicReference(baseline),
+  restoreTransform = true
 ): CollageMap {
   const transform = validateMap(baseline)
   const projected = baseline.gcps.map(({ geo }) => lonLatToWebMercator(geo))
   const mask = transform.transformToProjectedGeo(baseline.resourceMask)
   const pivot = center(mask)
-  return {
+  const saved = readCollageSettings(baseline)
+  const item: CollageMap = {
     instanceId: 'urn:uuid:' + crypto.randomUUID(),
     baseline,
     localGcps: localPoints(baseline, pivot, projected),
@@ -292,16 +327,33 @@ function makeItem(
     resourceMask: structuredClone(baseline.resourceMask),
     placement: { position: pivot, rotation: savedRotation(baseline) },
     geographicReference,
-    title: label(baseline),
-    appearance: {
-      applyMask: true,
-      opacity: 1,
-      saturation: 1,
-      colorize: false,
-      hue: 0,
-      removeBackground: false
+    title: saved.title ?? label(baseline),
+    appearance: saved.appearance,
+    ...(saved.groupId ? { groupId: saved.groupId } : {}),
+    ...(saved.locked !== undefined ? { locked: saved.locked } : {}),
+    sourceUrl: saved.sourceUrl
+  }
+  if (saved.originalResourceMask) {
+    try {
+      validateResourceMask(
+        saved.originalResourceMask,
+        baseline.resource.width ?? Infinity,
+        baseline.resource.height ?? Infinity
+      )
+      item.originalResourceMask = saved.originalResourceMask
+    } catch {
+      /* Ignore invalid optional reset masks. */
     }
   }
+  try {
+    initializeMapTransform(item, restoreTransform ? saved.transform : undefined)
+  } catch {
+    // Optional reset metadata must never prevent opening valid map geometry.
+    if (restoreTransform && saved.transform) initializeMapTransform(item)
+  }
+  if (restoreTransform && saved.selectionTransform)
+    item.selectionTransform = saved.selectionTransform
+  return item
 }
 
 export function parseMaps(input: unknown): GeoreferencedMap[] {
@@ -314,7 +366,10 @@ export function parseMaps(input: unknown): GeoreferencedMap[] {
  * can also use an affine transformation without losing the fitted scale.
  * Subsequent translation/rotation never recomputes this latitude correction.
  */
-function normalizeSource(source: GeoreferencedMap): {
+function normalizeSource(
+  source: GeoreferencedMap,
+  importTransformation: ImportTransformation = 'helmert'
+): {
   map: GeoreferencedMap
   geographicReference: GeographicReference
 } {
@@ -331,7 +386,10 @@ function normalizeSource(source: GeoreferencedMap): {
     ]
   }))
   // Fit every original GCP before reducing to retain the whole map's scale.
-  map.transformation = { type: 'helmert' }
+  map.transformation =
+    importTransformation === 'polynomial' && map.gcps.length >= 3
+      ? { type: 'polynomial', options: { order: 1 } }
+      : { type: 'helmert' }
   const transform = validateMap(map)
   const pivot = center(transform.transformToProjectedGeo(map.resourceMask))
   const latitude = webMercatorToLonLat(pivot)[1]
@@ -365,25 +423,37 @@ function normalizeSource(source: GeoreferencedMap): {
   }
 }
 
-export function normalizeMap(source: GeoreferencedMap): GeoreferencedMap {
-  return normalizeSource(source).map
+export function normalizeMap(
+  source: GeoreferencedMap,
+  importTransformation: ImportTransformation = 'helmert'
+): GeoreferencedMap {
+  return normalizeSource(source, importTransformation).map
 }
 
 /** Normalize imports and seed their centers from geography before compaction. */
 export function prepareMaps(
   input: unknown,
   at: Point = [0, 0],
-  sourceUrl?: string
+  sourceUrl?: string,
+  importTransformation: ImportTransformation = 'helmert'
 ): CollageMap[] {
   const sources = parseMaps(input)
+  const groups = new Map<string, string>()
   const items = sources.map((source) => {
     preserveSource(source, sources.length === 1 ? sourceUrl : undefined)
-    const { map: baseline, geographicReference } = normalizeSource(source)
+    const { map: baseline, geographicReference } = normalizeSource(
+      source,
+      importTransformation
+    )
     baseline.id = 'urn:uuid:' + crypto.randomUUID()
-    return {
-      ...makeItem(baseline, geographicReference),
-      sourceUrl: isHttpUrl(sourceUrl) ? sourceUrl : undefined
+    const item = makeItem(baseline, geographicReference, false)
+    if (item.groupId) {
+      if (!groups.has(item.groupId))
+        groups.set(item.groupId, crypto.randomUUID())
+      item.groupId = groups.get(item.groupId)
     }
+    if (isHttpUrl(sourceUrl)) item.sourceUrl = sourceUrl
+    return item
   })
   if (items.length) {
     items[0].placement.position = [...at]
@@ -398,19 +468,21 @@ export function prepareMaps(
 export function addMaps(
   input: unknown,
   at: Point = [0, 0],
-  sourceUrl?: string
+  sourceUrl?: string,
+  importTransformation: ImportTransformation = 'helmert'
 ): CollageMap[] {
-  const items = prepareMaps(input, at, sourceUrl)
+  const items = prepareMaps(input, at, sourceUrl, importTransformation)
   arrangeMaps(items)
   return items
 }
 
 /** Opening never normalizes, recenters, sorts, or infers intent from location. */
 export function openCollage(input: unknown, sourceUrl?: string): CollageMap[] {
-  return parseMaps(input).map((map) => ({
-    ...makeItem(map),
-    sourceUrl: isHttpUrl(sourceUrl) ? sourceUrl : undefined
-  }))
+  return parseMaps(input).map((map) => {
+    const item = makeItem(map)
+    item.sourceUrl ??= isHttpUrl(sourceUrl) ? sourceUrl : undefined
+    return item
+  })
 }
 
 export function placedMap(item: CollageMap): GeoreferencedMap {
@@ -450,10 +522,16 @@ export function exportCollage(items: CollageMap[]) {
   const annotation = generateAnnotation(
     items.map((item) => {
       const map = placedMap(item)
-      map._allmaps = {
+      const metadata: Record<string, unknown> = {
         ...(map._allmaps && typeof map._allmaps === 'object'
           ? map._allmaps
-          : {}),
+          : {})
+      }
+      delete metadata.collage
+      const settings = exportCollageSettings(item, label(item.baseline))
+      if (settings) metadata.collage = settings
+      map._allmaps = {
+        ...metadata,
         rotation: (item.placement.rotation / Math.PI) * 180,
         ...(item.geographicReference
           ? { geographicReference: structuredClone(item.geographicReference) }
@@ -469,10 +547,18 @@ export function exportCollage(items: CollageMap[]) {
 
 export function duplicateMaps(
   items: CollageMap[],
-  offset: Point
+  offset: Point,
+  { editingGroup }: { editingGroup?: string } = {}
 ): CollageMap[] {
+  const groups = new Map<string, string>()
   return items.map((item) => {
     const copy = structuredClone(item)
+    if (editingGroup) copy.groupId = editingGroup
+    else if (copy.groupId) {
+      if (!groups.has(copy.groupId))
+        groups.set(copy.groupId, crypto.randomUUID())
+      copy.groupId = groups.get(copy.groupId)
+    }
     copy.instanceId = 'urn:uuid:' + crypto.randomUUID()
     copy.baseline.id = 'urn:uuid:' + crypto.randomUUID()
     copy.placement.position = [
@@ -505,11 +591,457 @@ function transformAxes(transform: ProjectedGcpTransformer, mask: Point[]) {
   const xx = x[0] ** 2 + x[1] ** 2
   const yy = y[0] ** 2 + y[1] ** 2
   return {
+    x,
+    y,
     // Resource Y points down: a normal map has a negative determinant.
     mirrored: x[0] * y[1] - x[1] * y[0] > 0,
     similarity:
       Math.abs(xx - yy) <= Math.max(xx, yy) * 1e-8 &&
       Math.abs(x[0] * y[0] + x[1] * y[1]) <= Math.max(xx, yy) * 1e-8
+  }
+}
+
+/** Recover a uniform-scale reference from the affine fit, or saved editing
+ * values. Only small numeric settings are serialized; the GCPs carry geometry. */
+function initializeMapTransform(
+  item: CollageMap,
+  saved?: Pick<
+    NonNullable<CollageMap['affine']>,
+    'values' | 'imported' | 'polynomial'
+  >
+) {
+  const type = transformationType(item.baseline)
+  if (type !== 'polynomial1' && type !== 'helmert') return
+  if (type === 'helmert' && !saved) return
+  const transform = transformer(item.baseline)
+  const { x, y } = transformAxes(transform, item.resourceMask)
+  const values =
+    saved?.values ?? decomposeTransform(x as Point, y as Point).values
+  const inverse = invertMatrix(transformMatrix(values))
+  const origin = center(item.resourceMask)
+  const reference = structuredClone(item.baseline)
+  reference.gcps = resourceBasis(item.resourceMask).map((resource) => {
+    const delta = applyMatrix(inverse, [
+      resource[0] - origin[0],
+      resource[1] - origin[1]
+    ])
+    return {
+      resource,
+      geo: webMercatorToLonLat(
+        transform.transformToProjectedGeo([
+          origin[0] + delta[0],
+          origin[1] + delta[1]
+        ])
+      )
+    }
+  })
+  const axes = transformAxes(validateMap(reference), item.resourceMask)
+  if (axes.similarity && !axes.mirrored)
+    reference.transformation = { type: 'helmert' }
+  // A malformed reset value cannot make valid annotation geometry unusable.
+  const imported = saved?.imported ?? values
+  transformMatrix(imported)
+  item.affine = {
+    values: { ...values },
+    imported: { ...imported },
+    reference,
+    polynomial: saved?.polynomial ?? type === 'polynomial1'
+  }
+}
+
+export function ensureMapTransform(item: CollageMap) {
+  if (!['helmert', 'polynomial1'].includes(transformationType(item.baseline)))
+    throw new Error(
+      'Transform mode supports Helmert and first-order polynomial maps.'
+    )
+  if (!item.affine) {
+    initializeMapTransform(item)
+    item.affine ??= {
+      values: { ...neutralTransform },
+      imported: { ...neutralTransform },
+      polynomial: false,
+      reference: structuredClone(item.baseline)
+    }
+  }
+  return item.affine
+}
+
+export function resourceWorldPoint(item: CollageMap, resource: Point): Point {
+  return transformer(placedMap(item)).transformToProjectedGeo(resource)
+}
+
+/** Apply scales and sequential shears in the reference's resource axes. */
+export function setMapTransform(
+  item: CollageMap,
+  values: TransformValues,
+  anchor?: Point
+) {
+  const matrix = transformMatrix(values)
+  const state = ensureMapTransform(item)
+  const fixed = anchor ? resourceWorldPoint(item, anchor) : undefined
+  const reference = structuredClone(state.reference)
+  reference.resource = structuredClone(item.baseline.resource)
+  reference.id = item.baseline.id
+  const baseline = structuredClone(reference)
+  if (
+    Object.keys(neutralTransform).some(
+      (key) =>
+        values[key as keyof TransformValues] !==
+        neutralTransform[key as keyof TransformValues]
+    )
+  ) {
+    const transform = transformer(reference)
+    const origin = center(item.resourceMask)
+    baseline.gcps = resourceBasis(item.resourceMask).map((resource) => {
+      const delta = applyMatrix(matrix, [
+        resource[0] - origin[0],
+        resource[1] - origin[1]
+      ])
+      return {
+        resource,
+        geo: webMercatorToLonLat(
+          transform.transformToProjectedGeo([
+            origin[0] + delta[0],
+            origin[1] + delta[1]
+          ])
+        )
+      }
+    })
+    baseline.transformation = { type: 'polynomial', options: { order: 1 } }
+  }
+  // Validate on a draft so an excessive drag cannot corrupt the active map.
+  const next = structuredClone(item)
+  replaceGeometry(next, baseline)
+  next.affine = { ...structuredClone(state), values: { ...values } }
+  if (anchor && fixed) {
+    const after = resourceWorldPoint(next, anchor)
+    next.placement.position = [
+      next.placement.position[0] + fixed[0] - after[0],
+      next.placement.position[1] + fixed[1] - after[1]
+    ]
+    placedMap(next)
+  }
+  Object.assign(item, next)
+  delete item.selectionTransform
+}
+
+export function resetMapTransform(item: CollageMap, zero = false) {
+  const state = ensureMapTransform(item)
+  setMapTransform(item, zero ? neutralTransform : state.imported)
+}
+
+/** A 30-degree isometric plane with equal scale on both image axes. Preserve
+ * the current area and handedness; orientation is the view's world X angle. */
+export function makeIsometric(
+  item: CollageMap,
+  orientation = 0,
+  alternate = false
+) {
+  const next = structuredClone(item)
+  const state = ensureMapTransform(next)
+  const scale = Math.sqrt(
+    (state.values.scaleX * state.values.scaleY) / Math.sin(Math.PI / 3)
+  )
+  const x = Math.cos(Math.PI / 6) * scale
+  const y = Math.sin(Math.PI / 6) * scale
+  setMapTransform(
+    next,
+    matrixValues([
+      [x, alternate ? -y : y],
+      [alternate ? x : -x, y]
+    ])
+  )
+  const axes = transformAxes(transformer(placedMap(next)), next.resourceMask)
+  const angle = Math.atan2(axes.x[1], axes.x[0])
+  const target =
+    orientation +
+    ((alternate ? 1 : -1) * ((next.mirrored ? 5 : 1) * Math.PI)) / 6
+  next.placement = rotatePlacement(
+    next.placement,
+    mapCenter(next),
+    nearestRotation(angle, target) - angle
+  )
+  placedMap(next)
+  Object.assign(item, next)
+}
+
+function worldReference(item: CollageMap): Matrix {
+  const axes = transformAxes(
+    transformer(item.affine!.reference),
+    item.resourceMask
+  )
+  return [
+    rotate(
+      axes.x as Point,
+      item.placement.rotation - savedRotation(item.baseline)
+    ),
+    rotate(
+      axes.y as Point,
+      item.placement.rotation - savedRotation(item.baseline)
+    )
+  ]
+}
+
+/** Older collages have per-map transform values but no shared selector state.
+ * Recover a common deformation only when every member agrees in world space. */
+function inferSelectionTransform(items: CollageMap[]) {
+  if (
+    items.some((item) => item.selectionTransform) ||
+    items.every(
+      (item) =>
+        JSON.stringify(item.affine!.values) ===
+        JSON.stringify(item.affine!.imported)
+    )
+  )
+    return
+  try {
+    const matrices = items.map((item) => {
+      const reference = worldReference(item)
+      const state = item.affine!
+      return multiplyMatrices(
+        multiplyMatrices(reference, transformMatrix(state.values)),
+        invertMatrix(
+          multiplyMatrices(reference, transformMatrix(state.imported))
+        )
+      )
+    })
+    const matrix = matrices[0]
+    const tolerance = 1e-7 * Math.max(1, ...matrix.flat().map(Math.abs))
+    if (
+      !matrices.every((other) =>
+        other.every((column, i) =>
+          column.every(
+            (value, j) => Math.abs(value - matrix[i][j]) <= tolerance
+          )
+        )
+      )
+    )
+      return
+    // Convert world Y-up into the selector's resource Y-down axes.
+    const values = matrixValues([
+      [matrix[0][0], -matrix[0][1]],
+      [-matrix[1][0], matrix[1][1]]
+    ])
+    return { id: crypto.randomUUID(), values, rotation: 0 }
+  } catch {
+    // Unrelated individual distortions do not define a shared reset reference.
+    return
+  }
+}
+
+/** Only reuse a shared selector while all members still share its shape and
+ * rotation. Moving/cropping members is fine; individual shape edits invalidate it. */
+function sharedSelectionTransform(items: CollageMap[]) {
+  const saved = items[0].selectionTransform
+  if (!saved) return inferSelectionTransform(items)
+  const rotation =
+    saved.rotation + items[0].placement.rotation - saved.mapRotation
+  if (
+    items.every((item) => {
+      const state = item.selectionTransform
+      if (!state || state.id !== saved.id) return false
+      const angle =
+        state.rotation + item.placement.rotation - state.mapRotation - rotation
+      return (
+        Math.abs(Math.atan2(Math.sin(angle), Math.cos(angle))) < 1e-8 &&
+        JSON.stringify(state.values) === JSON.stringify(saved.values)
+      )
+    })
+  )
+    return { ...saved, rotation }
+}
+
+/** A virtual map is the shared selector. It never enters the renderer or export.
+ * Cache each map's neutral world basis once, so a drag only composes matrices
+ * and updates its existing local geometry. All maps receive the same world
+ * affine transform, including their spacing and any shared sheet boundaries. */
+export function createSelectionTransform(items: CollageMap[]) {
+  if (!items.length || items.some((item) => item.locked))
+    throw new Error('Select unlocked maps to transform.')
+  const originals = structuredClone(items)
+  originals.forEach(ensureMapTransform)
+  if (originals.length === 1)
+    return {
+      frame: structuredClone(originals[0]),
+      apply: (frame: CollageMap) => [structuredClone(frame)]
+    }
+
+  const shared = sharedSelectionTransform(originals)
+  const values = shared?.values ?? neutralTransform
+  const rotation = shared?.rotation ?? 0
+  const shape = transformMatrix(values)
+  const basis: Matrix = shape.map(([x, y]) =>
+    rotate([x, -y], rotation)
+  ) as Matrix
+  const inverse = invertMatrix(basis)
+  // Measure bounds in the saved selector's axes, not a new world-aligned box.
+  // This preserves its deformation and reset reference without saving geometry.
+  const [left, top, right, bottom] = bounds(
+    originals.flatMap(outline).map((point) => applyMatrix(inverse, point))
+  )
+  const width = right - left,
+    height = bottom - top
+  const origin = applyMatrix(basis, [(left + right) / 2, (top + bottom) / 2])
+  const resourceMask: Point[] = [
+    [0, 0],
+    [width, 0],
+    [width, height],
+    [0, height]
+  ]
+  const frame = makeItem({
+    type: 'GeoreferencedMap',
+    resource: {
+      id: 'urn:allmaps:transform-frame',
+      type: 'ImageService2',
+      width,
+      height
+    },
+    resourceMask,
+    gcps: [
+      {
+        resource: [0, 0],
+        geo: webMercatorToLonLat([
+          origin[0] - width / 2,
+          origin[1] + height / 2
+        ])
+      },
+      {
+        resource: [width, 0],
+        geo: webMercatorToLonLat([
+          origin[0] + width / 2,
+          origin[1] + height / 2
+        ])
+      },
+      {
+        resource: [0, height],
+        geo: webMercatorToLonLat([
+          origin[0] - width / 2,
+          origin[1] - height / 2
+        ])
+      }
+    ],
+    transformation: { type: 'helmert' }
+  })
+  ensureMapTransform(frame)
+  if (shared) {
+    setMapTransform(frame, values)
+    frame.placement.rotation = rotation
+  }
+  const fittedFrame = transformer(placedMap(frame))
+  const frameOrigin = fittedFrame.transformToProjectedGeo([0, 0])
+  const frameAxes = transformAxes(fittedFrame, frame.resourceMask)
+  const frameInverse = invertMatrix([
+    frameAxes.x as Point,
+    frameAxes.y as Point
+  ])
+  const selectionId = shared?.id ?? crypto.randomUUID()
+  const cached = originals.map((item) => {
+    const fitted = transformer(item.baseline)
+    item.baseline.gcps = resourceBasis(item.resourceMask).map((resource) => ({
+      resource,
+      geo: webMercatorToLonLat(fitted.transformToProjectedGeo(resource))
+    }))
+    item.localGcps = localPoints(
+      item.baseline,
+      item.sourceCenter,
+      item.baseline.gcps.map(({ geo }) => lonLatToWebMercator(geo))
+    )
+    const reference = worldReference(item)
+    return { item, reference, inverse: invertMatrix(reference) }
+  })
+  return {
+    frame,
+    apply: (draft: CollageMap): CollageMap[] => {
+      if (JSON.stringify(frame) === JSON.stringify(draft))
+        return structuredClone(originals)
+      const transform = transformer(placedMap(draft))
+      const origin = transform.transformToProjectedGeo([0, 0])
+      const axes = transformAxes(transform, draft.resourceMask)
+      const matrix = multiplyMatrices(
+        [axes.x as Point, axes.y as Point],
+        frameInverse
+      )
+      const mapPoint = (point: Point): Point => {
+        const delta = applyMatrix(matrix, [
+          point[0] - frameOrigin[0],
+          point[1] - frameOrigin[1]
+        ])
+        return [origin[0] + delta[0], origin[1] + delta[1]]
+      }
+      const rotation = draft.placement.rotation - frame.placement.rotation
+      // Construct and validate the whole batch before updating any renderer.
+      return cached.map(({ item, reference, inverse }) => {
+        const next = structuredClone(item)
+        let delta = rotation
+        const rotatedMatrix = (angle: number): Matrix => [
+          rotate(matrix[0], -angle),
+          rotate(matrix[1], -angle)
+        ]
+        const relative = (angle: number) =>
+          multiplyMatrices(
+            multiplyMatrices(
+              inverse,
+              multiplyMatrices(rotatedMatrix(angle), reference)
+            ),
+            transformMatrix(item.affine!.values)
+          )
+        let residual = relative(delta)
+        if (residual[0][0] <= 0) {
+          // A large shear in another map's axes can cross the LU chart. Move
+          // its polar rotation into placement, keeping scales positive.
+          const total = relative(0)
+          const { basis } = decomposeTransform(total[0], total[1])
+          const sign = Math.sign(
+            reference[0][0] * reference[1][1] -
+              reference[0][1] * reference[1][0]
+          )
+          delta = sign * Math.atan2(basis[0][1], basis[0][0])
+          residual = relative(delta)
+        }
+        next.affine!.values = matrixValues(residual)
+        next.placement = {
+          position: mapPoint(item.placement.position),
+          rotation: item.placement.rotation + delta
+        }
+        const local = (point: Point) =>
+          rotate(
+            applyMatrix(matrix, rotate(point, item.placement.rotation)),
+            -next.placement.rotation
+          )
+        next.localGcps = item.localGcps.map(local)
+        next.localMask = item.localMask.map(local)
+        next.localFullMask = item.localFullMask.map(local)
+        next.baseline.gcps = item.baseline.gcps.map((gcp, i) => {
+          const point = rotate(next.localGcps[i], savedRotation(item.baseline))
+          return {
+            resource: [...gcp.resource] as Point,
+            geo: webMercatorToLonLat([
+              point[0] + item.sourceCenter[0],
+              point[1] + item.sourceCenter[1]
+            ])
+          }
+        })
+        // Nonuniform scales and shears require the three-point affine fit.
+        // Pure movement/rotation can keep the original transformation type.
+        const [x, y] = matrix
+        if (
+          Math.abs(x[0] ** 2 + x[1] ** 2 - y[0] ** 2 - y[1] ** 2) > 1e-8 ||
+          Math.abs(x[0] * y[0] + x[1] * y[1]) > 1e-8
+        )
+          next.baseline.transformation = {
+            type: 'polynomial',
+            options: { order: 1 }
+          }
+        next.selectionTransform = {
+          id: selectionId,
+          values: { ...draft.affine!.values },
+          rotation: draft.placement.rotation,
+          mapRotation: next.placement.rotation
+        }
+        placedMap(next)
+        return next
+      })
+    }
   }
 }
 
@@ -520,23 +1052,42 @@ export function mirrorMap(
   item: CollageMap,
   direction: 'horizontal' | 'vertical' = 'horizontal'
 ) {
-  const beforeCenter = mapCenter(item)
+  // Reflection needs polynomial GCPs, but does not make a Helmert import an
+  // originally distorted map with a separate neutral-reset action.
+  if (transformationType(item.baseline) === 'helmert') ensureMapTransform(item)
   const mask = item.appearance.applyMask
     ? item.resourceMask
     : fullResourceMask(item.baseline)
+  const affine = item.affine
+  replaceGeometry(item, mirrorBaseline(item.baseline, mask, direction))
+  if (affine)
+    item.affine = {
+      ...affine,
+      reference: mirrorBaseline(affine.reference, mask, direction),
+      values: reflectedValues(affine.values),
+      imported: reflectedValues(affine.imported)
+    }
+  delete item.selectionTransform
+}
+
+function mirrorBaseline(
+  source: GeoreferencedMap,
+  mask: Point[],
+  direction: 'horizontal' | 'vertical'
+) {
   const samples = resourceBasis(mask)
   const axis = direction === 'horizontal' ? 0 : 1
   const origin = samples[0][axis]
-  const original = transformer(item.baseline)
-  const helmert = transformationType(item.baseline) === 'helmert'
+  const original = transformer(source)
+  const helmert = transformationType(source) === 'helmert'
   const gcps = helmert
     ? samples.map((resource) => ({
         resource,
         geo: webMercatorToLonLat(original.transformToProjectedGeo(resource))
       }))
-    : item.baseline.gcps
+    : source.gcps
   const baseline: GeoreferencedMap = {
-    ...structuredClone(item.baseline),
+    ...structuredClone(source),
     gcps: gcps.map(({ resource, geo }) => ({
       resource: resource.map((value, i) =>
         i === axis ? 2 * origin - value : value
@@ -547,7 +1098,7 @@ export function mirrorMap(
       ? { transformation: { type: 'polynomial', options: { order: 1 } } }
       : {})
   }
-  let transform = validateMap(baseline)
+  const transform = validateMap(baseline)
   const axes = transformAxes(transform, mask)
   // Mirroring a similarity back restores its Helmert representation.
   if (
@@ -560,12 +1111,18 @@ export function mirrorMap(
       geo: webMercatorToLonLat(transform.transformToProjectedGeo(resource))
     }))
     baseline.transformation = { type: 'helmert' }
-    transform = validateMap(baseline)
   }
+  return baseline
+}
+
+/** Rebuild local geometry without moving the currently visible map center. */
+function replaceGeometry(item: CollageMap, baseline: GeoreferencedMap) {
+  const beforeCenter = mapCenter(item)
+  const transform = validateMap(baseline)
   const next = {
     ...item,
     baseline,
-    mirrored: axes.mirrored,
+    mirrored: transformAxes(transform, item.resourceMask).mirrored,
     localGcps: localPoints(
       baseline,
       item.sourceCenter,
