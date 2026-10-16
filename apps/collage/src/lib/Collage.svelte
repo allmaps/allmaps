@@ -69,6 +69,10 @@
     AlignRight,
     AlignCenterHorizontal,
     AlignCenterVertical,
+    Columns,
+    Rows,
+    ArrowsOutLineHorizontal,
+    ArrowsOutLineVertical,
     MagnifyingGlass,
     ArrowSquareOut,
     Copy,
@@ -104,11 +108,12 @@
     ImportTransformation
   } from './model'
   import { snapRotation } from './rotation'
-  import { alignMaps } from './alignment'
-  import type { Alignment } from './alignment'
+  import { alignMaps, distributeMaps } from './alignment'
+  import type { Alignment, Distribution } from './alignment'
   import {
     selectionIds,
     selectionScope,
+    selectionObjects,
     toggleSelection,
     selectionLocked,
     singleGroup,
@@ -150,6 +155,9 @@
   const selected = $derived(rotationAnchor(selection))
   const locked = $derived(selectionLocked(selection))
   const grouped = $derived(singleGroup(selection))
+  const selectedObjectCount = $derived(
+    selectionObjects(selection, editingGroup).length
+  )
   const ringTools = $derived(enabledTools(toolSettings, locked))
   const atFront = $derived(
     selection.length > 0 &&
@@ -670,17 +678,25 @@
   }
 
   function align(alignment: Alignment) {
+    editLayout((next) => alignMaps(next, alignment, editingGroup))
+  }
+
+  function distribute(direction: Distribution) {
+    editLayout((next) => distributeMaps(next, direction, editingGroup))
+  }
+
+  function editLayout(apply: (next: CollageMap[]) => boolean) {
     if (selection.length < 2 || locked || busy || drag) return
     const before = structuredClone(items)
     const next = structuredClone(selection)
     let applying = false
     try {
-      if (!alignMaps(next, alignment, editingGroup)) return
+      if (!apply(next)) return
       errorMessage = ''
       applying = true
       next.forEach(updateRaster)
-      const aligned = new Map(next.map((item) => [item.instanceId, item]))
-      items = items.map((item) => aligned.get(item.instanceId) ?? item)
+      const updated = new Map(next.map((item) => [item.instanceId, item]))
+      items = items.map((item) => updated.get(item.instanceId) ?? item)
       remember(before)
       refresh()
       fit(next)
@@ -2402,7 +2418,7 @@
               <FanMenu
                 label="Align"
                 icon={AlignLeft}
-                disabled={busy || (grouped && !editingGroup)}
+                disabled={busy || selectedObjectCount < 2}
                 options={[
                   { value: 'top', label: 'Top', icon: AlignTop },
                   { value: 'bottom', label: 'Bottom', icon: AlignBottom },
@@ -2420,6 +2436,36 @@
                   }
                 ]}
                 onselect={(value) => align(value as Alignment)}
+              />
+              <FanMenu
+                label="Distribute"
+                icon={Columns}
+                disabled={busy || selectedObjectCount < 2}
+                options={[
+                  {
+                    value: 'horizontal',
+                    label: 'Horizontally',
+                    icon: Columns,
+                    disabled: selectedObjectCount < 3
+                  },
+                  {
+                    value: 'vertical',
+                    label: 'Vertically',
+                    icon: Rows,
+                    disabled: selectedObjectCount < 3
+                  },
+                  {
+                    value: 'space-horizontal',
+                    label: 'Space horizontally',
+                    icon: ArrowsOutLineHorizontal
+                  },
+                  {
+                    value: 'space-vertical',
+                    label: 'Space vertically',
+                    icon: ArrowsOutLineVertical
+                  }
+                ]}
+                onselect={(value) => distribute(value as Distribution)}
               />
               {#if !editingGroup && !grouped}
                 <button

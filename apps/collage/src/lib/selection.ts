@@ -6,6 +6,21 @@ export function selectionScope(items: CollageMap[], editingGroup?: string) {
     : items
 }
 
+/** Groups act as one object, except while editing their individual members. */
+export function selectionObjects(items: CollageMap[], editingGroup?: string) {
+  const objects = new Map<string, CollageMap[]>()
+  for (const item of selectionScope(items, editingGroup)) {
+    const key =
+      item.groupId && !editingGroup
+        ? `group:${item.groupId}`
+        : `map:${item.instanceId}`
+    const members = objects.get(key) ?? []
+    members.push(item)
+    objects.set(key, members)
+  }
+  return [...objects.values()]
+}
+
 /** Outside group editing, expand groups while retaining the clicked anchor. */
 export function selectionIds(
   items: CollageMap[],

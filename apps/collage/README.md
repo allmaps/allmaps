@@ -150,7 +150,7 @@ response. This is per-tab search history, not an autosave of the collage.
   Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
   selected map to move the group; rotate uses one shared pivot and preserves
   spacing and scale. Groups retain the full arc and share appearance controls; individual mask
-  editing is available inside group editing mode. **Arrange**, **Geographic** and **Align** appear as compact
+  editing is available inside group editing mode. **Arrange**, **Geographic**, **Align** and **Distribute** appear as compact
   icon buttons beside **Edit layout** at the bottom center, above the zoom controls
   on smaller screens.
   **Arrange** compacts the current positions with PRISM, keeping the first selected
@@ -165,6 +165,15 @@ response. This is per-tab search history, not an autosave of the collage.
   Groups move as one object; inside **Edit group**, members align individually.
   Alignment preserves scale, rotation and appearance, is one undo step, and fits
   the selected maps in view.
+  **Distribute** spaces three or more selected objects with equal horizontal or
+  vertical gaps between their visible bounds, keeping the outer objects fixed.
+  Groups count as one object, except inside **Edit group**. Crowded selections
+  can retain overlap. Distribution preserves shapes, settings and layer order,
+  fits the selection in view, and is one undo step.
+  **Space horizontally** and **Space vertically** instead create a positive gap
+  equal to 10% of the objects' average width or height, keeping the selection
+  centered. These options work with two or more objects and can expand or compact
+  the selection without resizing any maps.
   Mask editing remains an individual-map action.
   Group ordering keeps the selected maps' relative order; each gesture is one
   undo step. Click empty canvas or press Escape to deselect.

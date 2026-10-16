@@ -18,7 +18,12 @@
     value?: string
     icon?: typeof Polygon
     direction?: 'up' | 'down'
-    options: { value: string; label: string; icon: typeof Polygon }[]
+    options: {
+      value: string
+      label: string
+      icon: typeof Polygon
+      disabled?: boolean
+    }[]
     disabled?: boolean
     onaltclick?: () => void
     onselect: (value: string) => void
@@ -61,13 +66,17 @@
       onaltclick()
       return
     }
-    labelsRight = root.getBoundingClientRect().left < 200
+    labelsRight = root.getBoundingClientRect().left < window.innerWidth / 2
     open = !open
     if (open) {
       await tick()
       const first =
-        root.querySelector<HTMLButtonElement>('[aria-checked="true"]') ??
-        root.querySelector<HTMLButtonElement>('[role="menuitem"]')
+        root.querySelector<HTMLButtonElement>(
+          '[aria-checked="true"]:not(:disabled)'
+        ) ??
+        root.querySelector<HTMLButtonElement>(
+          '[role="menuitem"]:not(:disabled)'
+        )
       first?.focus()
     }
   }
@@ -94,9 +103,10 @@
         event.stopImmediatePropagation()
         const buttons = [
           ...root.querySelectorAll<HTMLButtonElement>(
-            '[role="menuitemradio"], [role="menuitem"]'
+            '[role="menuitemradio"]:not(:disabled), [role="menuitem"]:not(:disabled)'
           )
         ]
+        if (!buttons.length) return
         const current = buttons.indexOf(
           document.activeElement as HTMLButtonElement
         )
@@ -115,7 +125,7 @@
       } else if (event.key === 'Tab') open = false
     }
     const resize = () => {
-      labelsRight = root.getBoundingClientRect().left < 200
+      labelsRight = root.getBoundingClientRect().left < window.innerWidth / 2
     }
     window.addEventListener('resize', resize)
     window.addEventListener('pointerdown', outside, true)
@@ -163,6 +173,7 @@
             ? undefined
             : option.value === value}
           aria-label={option.label}
+          disabled={option.disabled}
           style={`--fan-shift:${i * i * 2}px`}
           transition:fan|global={i}
           onclick={() => choose(option.value)}
