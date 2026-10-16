@@ -7,14 +7,20 @@
   let {
     label,
     value,
+    icon,
+    direction = 'up',
     options,
     disabled = false,
+    onaltclick,
     onselect
   }: {
     label: string
-    value: string
+    value?: string
+    icon?: typeof Polygon
+    direction?: 'up' | 'down'
     options: { value: string; label: string; icon: typeof Polygon }[]
     disabled?: boolean
+    onaltclick?: () => void
     onselect: (value: string) => void
   } = $props()
   let open = $state(false)
@@ -24,7 +30,7 @@
   const selected = $derived(
     options.find((option) => option.value === value) ?? options[0]
   )
-  const Icon = $derived(selected.icon)
+  const Icon = $derived(icon ?? selected.icon)
 
   function fan(node: HTMLElement, index: number) {
     if (prefersReducedMotion.current) return { duration: 0 }
@@ -49,19 +55,27 @@
     })
   }
 
-  async function toggle() {
+  async function toggle(event: MouseEvent) {
+    if (event.altKey && onaltclick) {
+      open = false
+      onaltclick()
+      return
+    }
     labelsRight = root.getBoundingClientRect().left < 200
     open = !open
     if (open) {
       await tick()
-      root.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus()
+      const first =
+        root.querySelector<HTMLButtonElement>('[aria-checked="true"]') ??
+        root.querySelector<HTMLButtonElement>('[role="menuitem"]')
+      first?.focus()
     }
   }
 
   function choose(next: string) {
     open = false
-    onselect(next)
     trigger.focus()
+    onselect(next)
   }
 
   onMount(() => {
@@ -79,7 +93,9 @@
         event.preventDefault()
         event.stopImmediatePropagation()
         const buttons = [
-          ...root.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]')
+          ...root.querySelectorAll<HTMLButtonElement>(
+            '[role="menuitemradio"], [role="menuitem"]'
+          )
         ]
         const current = buttons.indexOf(
           document.activeElement as HTMLButtonElement
@@ -90,7 +106,9 @@
             : event.key === 'End'
               ? buttons.length - 1
               : (current +
-                  (event.key === 'ArrowUp' ? 1 : -1) +
+                  (event.key === (direction === 'up' ? 'ArrowUp' : 'ArrowDown')
+                    ? 1
+                    : -1) +
                   buttons.length) %
                 buttons.length
         buttons[index]?.focus()
@@ -110,7 +128,12 @@
   })
 </script>
 
-<div class="fan-menu" class:labels-right={labelsRight} bind:this={root}>
+<div
+  class="fan-menu"
+  class:labels-right={labelsRight}
+  class:down={direction === 'down'}
+  bind:this={root}
+>
   <button
     class="quiet-button"
     class:pressed={open}
@@ -135,8 +158,10 @@
         <button
           class="fan-option"
           class:chosen={option.value === value}
-          role="menuitemradio"
-          aria-checked={option.value === value}
+          role={value === undefined ? 'menuitem' : 'menuitemradio'}
+          aria-checked={value === undefined
+            ? undefined
+            : option.value === value}
           aria-label={option.label}
           style={`--fan-shift:${i * i * 2}px`}
           transition:fan|global={i}

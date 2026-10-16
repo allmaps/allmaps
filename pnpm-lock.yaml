@@ -654,6 +654,9 @@ importers:
       '@allmaps/project':
         specifier: workspace:^
         version: link:../../packages/project
+      '@allmaps/render':
+        specifier: workspace:^
+        version: link:../../packages/render
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
@@ -663,6 +666,9 @@ importers:
       '@allmaps/ui':
         specifier: workspace:^
         version: link:../../packages/ui
+      changedpi:
+        specifier: 1.0.4
+        version: 1.0.4
       d3-delaunay:
         specifier: 6.0.4
         version: 6.0.4
@@ -6365,6 +6371,9 @@ packages:
   chalk@5.6.2:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+
+  changedpi@1.0.4:
+    resolution: {integrity: sha512-9r6MNQrbg+cFURvEy10wo9Q35PD5GVj2GvXCbUYv8mU0Uf/NbkR7KlzMrjT4Ycd8a2nxApFJXQX2lTOPRFyG2g==}
 
   character-entities-html4@2.1.0:
     resolution: {integrity: sha512-1v7fgQRj6hnSwFpq1Eu0ynr/CDEw0rXo2B61qXrLNdHZmPKgb7fqS1a2JwF0rISo9q77jDI8VMEHoApn8qDoZA==}
@@ -13364,6 +13373,8 @@ snapshots:
   chai@6.2.2: {}
 
   chalk@5.6.2: {}
+
+  changedpi@1.0.4: {}
 
   character-entities-html4@2.1.0: {}
 
