@@ -52,12 +52,20 @@
   } = $props()
   let mode = $state<'annotation' | 'image' | 'svg'>()
   let selectedOnly = $state(false)
+  let keepCollageBounds = $state(false)
   const selection = $derived(
     items.filter((item) => selectedIds.has(item.instanceId))
   )
   const exportItems = $derived(selectedOnly ? selection : items)
   let view = $state.raw<ExportView>()
   let area = $state<'view' | 'collage'>('collage')
+  const exportArea = $derived(
+    mode === 'image' && area === 'view'
+      ? 'view'
+      : selectedOnly && !keepCollageBounds
+        ? 'selection'
+        : 'collage'
+  )
   let margin = $state(10)
   let proportion = $state('original')
   let proportionWidth = $state(1)
@@ -113,7 +121,7 @@
         throw new Error('Enter a width and height greater than zero.')
       const points =
         mode === 'svg' || area === 'collage'
-          ? exportItems
+          ? (keepCollageBounds ? items : exportItems)
               .flatMap(outline)
               .map(([x, y]): Point => [x * CANVAS_SCALE, y * CANVAS_SCALE])
           : undefined
@@ -152,6 +160,14 @@
 
   function resetScale() {
     if (frame.view) scale = defaultExportScale(frame.view)
+  }
+
+  function changeArea(event: Event & { currentTarget: HTMLSelectElement }) {
+    const value = event.currentTarget.value
+    area = value === 'view' ? 'view' : 'collage'
+    if (selectedOnly && value !== 'view')
+      keepCollageBounds = value === 'collage'
+    resetScale()
   }
 
   function choose(value: string) {
@@ -332,8 +348,11 @@
           <label for="export-maps">Maps</label>
           <select
             id="export-maps"
-            bind:value={selectedOnly}
-            onchange={resetScale}
+            value={selectedOnly}
+            onchange={(event) => {
+              selectedOnly = event.currentTarget.value === 'true'
+              resetScale()
+            }}
           >
             <option value={false}>All maps</option>
             <option value={true} disabled={!selection.length}
@@ -341,15 +360,16 @@
             >
           </select>
           {#if mode !== 'annotation'}
-            {#if mode === 'image'}
+            {#if mode === 'image' || selectedOnly}
               <label for="export-area">Area</label>
-              <select id="export-area" bind:value={area} onchange={resetScale}>
-                <option value="view">Current view</option>
-                <option value="collage"
-                  >{selectedOnly
-                    ? 'Entire selection'
-                    : 'Entire collage'}</option
-                >
+              <select id="export-area" value={exportArea} onchange={changeArea}>
+                {#if mode === 'image'}
+                  <option value="view">Current view</option>
+                {/if}
+                {#if selectedOnly}
+                  <option value="selection">Entire selection</option>
+                {/if}
+                <option value="collage">Entire collage</option>
               </select>
             {/if}
             <label for="export-margin">Margin</label>
