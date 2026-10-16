@@ -285,7 +285,13 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   zoom and the zoom buttons remain available; navigation is only locked while
   drawing, not just because Pen is selected.
 - **Circle** draws from center to edge; **Rectangle** draws between opposite
-  corners, aligned with the current view. Drag to draw and release to finish.
+  corners. **Shape orientation** appears beside Drawing tools for both shapes.
+  **Follow view** (the default) keeps circles round and rectangles aligned with
+  the screen, even on skewed or mirrored maps. **Follow map** draws in the
+  original image's coordinates: circles become ellipses on skewed maps, and
+  rectangles follow the map's rotation, unequal scale and shear. The choice
+  applies to both tools for the current mask editing session and does not change
+  an existing mask. Drag to draw and release to finish.
   Shapes stay within the image bounds and become ordinary editable polygons.
 - Drag inside an existing mask to move it without changing its shape. Its edges
   stop at the image boundary. Drag outside to pan the map; adding a second finger

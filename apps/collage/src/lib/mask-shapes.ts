@@ -1,39 +1,41 @@
 import type { Point } from '@allmaps/types'
 import { bounds } from './geometry.ts'
 
-/** Keep the whole circle inside the image when the drag reaches its edge. */
+/** Draw a circle in the chosen plane (view or image), then store it in image
+ * coordinates. An image-space circle follows the map's scale and shear. */
 export function drawMaskCircle(
   start: Point,
   end: Point,
   width: number,
-  height: number
+  height: number,
+  toResource?: (point: Point) => Point
 ): Point[] {
-  const a: Point = [
-    Math.max(0, Math.min(width, start[0])),
-    Math.max(0, Math.min(height, start[1]))
-  ]
-  const radius = Math.min(
-    Math.hypot(end[0] - a[0], end[1] - a[1]),
-    a[0],
-    a[1],
-    width - a[0],
-    height - a[1]
-  )
-  return Array.from({ length: 128 }, (_, i): Point => {
+  if (!toResource) {
+    start = [
+      Math.max(0, Math.min(width, start[0])),
+      Math.max(0, Math.min(height, start[1]))
+    ]
+  }
+  const project = toResource ?? ((point: Point) => point)
+  const radius = Math.hypot(end[0] - start[0], end[1] - start[1])
+  const mask = Array.from({ length: 128 }, (_, i): Point => {
     const angle = (i * 2 * Math.PI) / 128
-    return [a[0] + radius * Math.cos(angle), a[1] + radius * Math.sin(angle)]
+    return project([
+      start[0] + radius * Math.cos(angle),
+      start[1] + radius * Math.sin(angle)
+    ])
   })
+  return fitMaskToImage(mask, project(start), width, height)
 }
 
-/** Draw between view coordinates, then store the corners in image coordinates.
- * Collage's affine transforms let us shrink around the anchor at the first
- * image boundary without skewing the rectangle or changing its orientation. */
+/** Draw a rectangle in the chosen plane, then store its corners in the image.
+ * Omitting the projection aligns its sides with the original image's axes. */
 export function drawMaskRectangle(
   start: Point,
   end: Point,
   width: number,
   height: number,
-  toResource: (point: Point) => Point
+  toResource: (point: Point) => Point = (point) => point
 ): Point[] {
   const [left, top, right, bottom] = bounds([start, end])
   const corners: Point[] = [
@@ -42,8 +44,22 @@ export function drawMaskRectangle(
     [right, bottom],
     [left, bottom]
   ]
-  const anchor = toResource(start)
-  const mask = corners.map(toResource)
+  return fitMaskToImage(
+    corners.map(toResource),
+    toResource(start),
+    width,
+    height
+  )
+}
+
+/** Affine transforms let us shrink the entire shape at the first image boundary
+ * without changing its shape in either plane. The anchor must be in the image. */
+function fitMaskToImage(
+  mask: Point[],
+  anchor: Point,
+  width: number,
+  height: number
+): Point[] {
   let fraction = 1
   for (const point of mask) {
     for (const [axis, limit] of [width, height].entries()) {

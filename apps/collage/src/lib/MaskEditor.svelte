@@ -22,6 +22,8 @@
     SelectionAll,
     Circle,
     Rectangle,
+    FrameCorners,
+    Parallelogram,
     Cursor,
     ArrowCounterClockwise,
     Check,
@@ -82,6 +84,11 @@
   let freehandMode: MaskFreehandMode | undefined
   type DrawingMode = 'polygon' | 'freehand' | 'circle' | 'rectangle'
   let drawingMode = $state<DrawingMode>()
+  type ShapeOrientation = 'view' | 'map'
+  let shapeOrientation = $state<ShapeOrientation>('view')
+  const drawingShape = $derived(
+    drawingMode === 'circle' || drawingMode === 'rectangle'
+  )
   const drawingOptions = [
     { value: 'edit', label: 'Edit points', icon: Cursor },
     { value: 'polygon', label: 'Polygon', icon: Polygon },
@@ -365,10 +372,11 @@
     restore?.()
   }
 
-  // Masks are stored in image coordinates; rectangles are drawn in the view's
-  // orientation. Terra Draw renders outlines and edits the resulting vertices.
+  // Both shapes use the chosen drawing plane, but masks are always stored in
+  // image coordinates. Terra Draw renders and edits the resulting vertices.
   type MaskGesture = {
     kind: 'circle' | 'rectangle' | 'move'
+    orientation: ShapeOrientation
     pointer: number
     anchor: Point
     screen: Point
@@ -442,6 +450,7 @@
       }
       maskGesture = {
         kind: shape ? (drawingMode as 'circle' | 'rectangle') : 'move',
+        orientation: shapeOrientation,
         pointer: event.pointerId,
         anchor: [
           Math.max(0, Math.min(width, anchor[0])),
@@ -483,6 +492,9 @@
       return
     try {
       const point = pointerResource(event)
+      const drawShape =
+        gesture.kind === 'rectangle' ? drawMaskRectangle : drawMaskCircle
+      const followMap = gesture.orientation === 'map'
       const next =
         gesture.kind === 'move'
           ? moveMask(
@@ -491,15 +503,13 @@
               width,
               height
             )
-          : gesture.kind === 'rectangle'
-            ? drawMaskRectangle(
-                resourceScreen(gesture.anchor),
-                pointerScreen(event),
-                width,
-                height,
-                screenResource
-              )
-            : drawMaskCircle(gesture.anchor, point, width, height)
+          : drawShape(
+              followMap ? gesture.anchor : resourceScreen(gesture.anchor),
+              followMap ? point : pointerScreen(event),
+              width,
+              height,
+              followMap ? undefined : screenResource
+            )
       validateResourceMask(next, width, height)
       gesture.next = next
       if (draw!.getSnapshotFeature(featureId))
@@ -862,7 +872,10 @@
       {
         padding: {
           top: 85,
-          bottom: map.getContainer().clientWidth <= 960 ? 145 : 85,
+          bottom:
+            map.getContainer().clientWidth <= (drawingShape ? 1024 : 960)
+              ? 145
+              : 85,
           left: 55,
           right: 55
         },
@@ -1191,7 +1204,7 @@
 <svelte:window onkeydown={keyboard} />
 <section
   class="mask-editor"
-  class:drawing-shape={drawingMode === 'circle' || drawingMode === 'rectangle'}
+  class:drawing-shape={drawingShape}
   aria-label="Mask editor"
 >
   <div class="bottom-stack mask-editor-stack">
@@ -1236,6 +1249,18 @@
         disabled={!ready}
         onselect={chooseDrawingTool}
       />
+      {#if drawingShape}
+        <FanMenu
+          label="Shape orientation"
+          value={shapeOrientation}
+          options={[
+            { value: 'view', label: 'Follow view', icon: FrameCorners },
+            { value: 'map', label: 'Follow map', icon: Parallelogram }
+          ]}
+          disabled={!ready}
+          onselect={(value) => (shapeOrientation = value as ShapeOrientation)}
+        />
+      {/if}
       <button
         class="quiet-button"
         aria-label="Reset mask"
@@ -1322,8 +1347,9 @@
     point or press Enter. The pen draws a freehand polygon and simplifies the
     stroke. Release to finish, or click to start and finish. Full image mask
     restores the image bounds. Reset mask restores the imported original mask.
-    Circle draws from its center; rectangle draws from corner to corner aligned
-    with the current view. Both stop at the image edges. Orthogonalize
-    straightens near-right corners. Escape cancels an unfinished drawing.
+    Circle draws from its center; rectangle draws from corner to corner. Shape
+    orientation lets both follow the current view or the map's rotation and
+    skew. Both stop at the image edges. Orthogonalize straightens near-right
+    corners. Escape cancels an unfinished drawing.
   </p>
 </section>

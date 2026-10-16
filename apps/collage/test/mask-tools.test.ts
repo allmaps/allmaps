@@ -200,6 +200,99 @@ test('rectangles stay aligned with the view on rotated and mirrored images, incl
   }
 })
 
+// A view with rotation, unequal axis scales and shear, optionally mirrored.
+function skewedView(mirror: number) {
+  const a = 1.6 * mirror,
+    b = 0.8,
+    c = 0.6 * mirror,
+    d = 1.2
+  const determinant = a * d - b * c
+  const toView = ([x, y]: Point): Point => [
+    a * (x - 250) + b * (y - 200),
+    c * (x - 250) + d * (y - 200)
+  ]
+  const toResource = ([x, y]: Point): Point => [
+    250 + (d * x - b * y) / determinant,
+    200 + (a * y - c * x) / determinant
+  ]
+  return { toView, toResource }
+}
+
+for (const mirror of [1, -1]) {
+  test(`view circles stay round on skewed maps, including at image edges (mirror ${mirror})`, () => {
+    const { toView, toResource } = skewedView(mirror)
+    for (const distance of [50, 2000]) {
+      const circle = drawMaskCircle([0, 0], [distance, 0], 500, 400, toResource)
+      validateResourceMask(circle, 500, 400)
+      const view = circle.map(toView)
+      const radius = Math.hypot(...view[0])
+      view.forEach((point) => closeToZero(Math.hypot(...point) - radius))
+      if (distance === 50) closeToZero(radius - distance)
+      else {
+        assert.ok(radius < distance)
+        assert.ok(
+          circle.some(([x, y]) => Math.min(x, y, 500 - x, 400 - y) < 1e-8)
+        )
+      }
+      // Opposite vertices retain the chosen screen center after constraining.
+      for (let i = 0; i < 64; i++) {
+        closeToZero(view[i][0] + view[i + 64][0])
+        closeToZero(view[i][1] + view[i + 64][1])
+      }
+    }
+  })
+
+  test(`view rectangles keep right angles and screen axes despite shear (mirror ${mirror})`, () => {
+    const { toView, toResource } = skewedView(mirror)
+    for (const end of [
+      [60, 40],
+      [800, 600],
+      [-800, 600],
+      [800, -600],
+      [-800, -600]
+    ] as Point[]) {
+      const rectangle = drawMaskRectangle([0, 0], end, 500, 400, toResource)
+      validateResourceMask(rectangle, 500, 400)
+      const view = rectangle.map(toView)
+      view.forEach((_, i) => closeToZero(dot(view, i)))
+      closeToZero(view[0][1] - view[1][1])
+      closeToZero(view[1][0] - view[2][0])
+      assert.ok(view.some(([x, y]) => Math.hypot(x, y) < 1e-8))
+    }
+  })
+
+  test(`map shapes follow the original image axes and distort with the map (mirror ${mirror})`, () => {
+    const { toView } = skewedView(mirror)
+    const circle = drawMaskCircle([250, 200], [300, 200], 500, 400)
+    circle.forEach(([x, y]) => closeToZero(Math.hypot(x - 250, y - 200) - 50))
+    const radii = circle.map((p) => Math.hypot(...toView(p)))
+    assert.ok(
+      Math.max(...radii) > Math.min(...radii) * 2,
+      'circle renders as an ellipse'
+    )
+    const rectangle = drawMaskRectangle([250, 200], [350, 280], 500, 400)
+    assert.deepEqual(rectangle, [
+      [250, 200],
+      [350, 200],
+      [350, 280],
+      [250, 280]
+    ])
+    const view = rectangle.map(toView)
+    assert.ok(
+      Math.abs(dot(view, 0)) > 0.5,
+      'rectangle renders as a skewed parallelogram'
+    )
+    const [origin, x, , y] = view
+    const imageOrigin = toView([0, 0]),
+      imageX = toView([100, 0]),
+      imageY = toView([0, 80])
+    for (const axis of [0, 1]) {
+      closeToZero(x[axis] - origin[axis] - (imageX[axis] - imageOrigin[axis]))
+      closeToZero(y[axis] - origin[axis] - (imageY[axis] - imageOrigin[axis]))
+    }
+  })
+}
+
 function closeToZero(n: number) {
   assert.ok(Math.abs(n) < 1e-8)
 }

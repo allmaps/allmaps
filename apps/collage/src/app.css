@@ -856,6 +856,18 @@ nav {
   }
 }
 
+/* The extra orientation control needs more room beside navigation. */
+@media (max-width: 1024px) {
+  .mask-editor.drawing-shape .mask-editor-stack {
+    bottom: 72px;
+  }
+  .mask-editor.drawing-shape .canvas-footer {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 16px;
+  }
+}
+
 @media (max-width: 960px) {
   .selection-stack.has-actions {
     bottom: 78px;
