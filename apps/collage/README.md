@@ -417,7 +417,7 @@ are disabled during group editing. **Fit group** frames only the group's members
 | Shortcut                              | Action                                                                    |
 | ------------------------------------- | ------------------------------------------------------------------------- |
 | Cmd/Ctrl+S                            | Save annotation, or finish mask/group editing                             |
-| Cmd/Ctrl+Enter                        | Finish mask/group editing                                                 |
+| Cmd/Ctrl+Enter                        | Finish mask/group editing or selection                                    |
 | Cmd/Ctrl+Z / Cmd/Ctrl+Shift+Z         | Undo / redo in the active mode                                            |
 | Cmd/Ctrl+G / Cmd/Ctrl+Shift+G         | Group / ungroup selected maps                                             |
 | Cmd/Ctrl+A                            | Select all maps                                                           |
@@ -431,7 +431,18 @@ are disabled during group editing. **Fit group** frames only the group's members
 | Alt/Option-click rotation             | Make each selected map upright around its own center                      |
 | Alt/Option                            | Change Bring to front into Send to back                                   |
 | Delete                                | Remove selected maps                                                      |
-| Escape                                | Cancel a gesture or drawing, exit mask editing, or deselect maps          |
+| Escape                                | Cancel a gesture or drawing, finish selection, exit mask editing, or deselect maps |
+
+The **Select maps** button beside the zoom/fit controls enables tap selection on
+phones, tablets and desktop. It keeps the current selection and replaces the
+tool ring with **Select all**, **Clear** and **Done**. Tap maps to toggle them;
+tapping empty canvas leaves the selection intact. Drag anywhere to pan, including
+over maps, and pinch or scroll to zoom. Movement or a second finger cancels the
+pending tap until all fingers lift. Double-tapping does not enter an editor or
+zoom while selecting. Groups toggle together; inside **Edit group**, members
+toggle individually. Locked maps can also be selected. **Done**, Escape or
+Cmd/Ctrl+Enter restores the tools with the selection intact, without adding an
+undo step. Cmd/Ctrl+A selects all maps in the current group or collage.
 
 Focused rotation and slider controls also accept arrow keys. Sliders support
 Home/End; Enter or Space toggles a focused colorize control.

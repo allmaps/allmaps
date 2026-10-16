@@ -31,6 +31,7 @@
   import { updateLoadFailures } from './load-status'
   import { loadRandomMaps } from './random-maps'
   import { TouchNavigation } from './touch-navigation'
+  import { TapSelection } from './tap-selection'
   import { generateAnnotation } from '@allmaps/annotation'
   import type { LoadFailures } from './load-status'
   import type { AdoptSearchPreviews } from './search-previews'
@@ -78,6 +79,7 @@
     Copy,
     LockSimple,
     LockSimpleOpen,
+    SelectionPlus,
     SelectionAll,
     SelectionSlash,
     Check
@@ -148,6 +150,10 @@
   let busy = $state(false)
   let items = $state.raw<CollageMap[]>([])
   let selectedIds = $state.raw<Set<string>>(new Set())
+  let selecting = $state(false)
+  let selectButton = $state<HTMLButtonElement>()
+  let selectionDoneButton = $state<HTMLButtonElement>()
+  let restoreDoubleClickZoom = false
   let editingGroup = $state<string>()
   const visibleItems = $derived(selectionScope(items, editingGroup))
   const selection = $derived(
@@ -243,6 +249,7 @@
   let frame: number | undefined
   let latestPointer: PointerEvent | undefined
   const touchNavigation = new TouchNavigation()
+  const tapSelection = new TapSelection()
   let disposed = false
   let drag:
     | {
@@ -407,7 +414,47 @@
 
   function select(ids: string[] = []) {
     selectedIds = selectionIds(items, ids, editingGroup)
+    if (selecting)
+      message = `${selectedIds.size} ${selectedIds.size === 1 ? 'map' : 'maps'} selected.`
     refresh()
+  }
+
+  async function startSelecting() {
+    if (
+      !map ||
+      !ready ||
+      busy ||
+      drag ||
+      marquee ||
+      !visibleItems.length ||
+      editingMask ||
+      editingTransform ||
+      inputMode ||
+      searching ||
+      exportOpen ||
+      settingsOpen
+    )
+      return
+    map.stop()
+    tapSelection.cancel()
+    restoreDoubleClickZoom = map.doubleClickZoom.isEnabled()
+    map.doubleClickZoom.disable()
+    selecting = true
+    message = 'Select maps. Tap a map to add or remove it from the selection.'
+    await tick()
+    selectionDoneButton?.focus({ preventScroll: true })
+  }
+
+  function finishSelecting() {
+    tapSelection.cancel()
+    selecting = false
+    if (restoreDoubleClickZoom) map?.doubleClickZoom.enable()
+    restoreDoubleClickZoom = false
+    selectButton?.focus({ preventScroll: true })
+  }
+
+  function cancelTapSelection() {
+    tapSelection.cancel()
   }
 
   function updateGroupVisibility() {
@@ -424,6 +471,7 @@
   function editGroup(item: CollageMap) {
     if (
       !item.groupId ||
+      selecting ||
       busy ||
       drag ||
       editingMask ||
@@ -709,6 +757,7 @@
 
   function editTransform() {
     if (
+      selecting ||
       !selection.length ||
       locked ||
       busy ||
@@ -745,7 +794,7 @@
   }
 
   function editMask() {
-    if (selection.length !== 1 || locked || busy || drag) return
+    if (selecting || selection.length !== 1 || locked || busy || drag) return
     errorMessage = ''
     try {
       ensureImageSize(selected!)
@@ -941,7 +990,15 @@
   }
 
   function search() {
-    if (!map || busy || editingMask || editingTransform || editingGroup || drag)
+    if (
+      !map ||
+      selecting ||
+      busy ||
+      editingMask ||
+      editingTransform ||
+      editingGroup ||
+      drag
+    )
       return
     const center = map.getCenter()
     searchOrigin = fromCanvasGeo([center.lng, center.lat])
@@ -1051,7 +1108,7 @@
   }
 
   async function showInput(mode: 'add' | 'open') {
-    if (editingGroup) return
+    if (editingGroup || selecting) return
     inputMode = mode
     inputText = ''
     errorMessage = ''
@@ -1370,6 +1427,7 @@
 
   function beginDrag(event: PointerEvent, item: CollageMap, mode: DragMode) {
     if (
+      selecting ||
       busy ||
       drag ||
       marquee ||
@@ -1439,6 +1497,7 @@
 
   function doubleClick(event: MouseEvent) {
     if (
+      selecting ||
       !ready ||
       busy ||
       inputMode ||
@@ -1479,10 +1538,17 @@
       searching
     )
       return
+    // Stop camera inertia before hit testing. Panning and pinching still belong
+    // to MapLibre; their movement cancels this pending tap.
+    if (selecting) map!.stop()
     const point = worldPoint(event)
     const item = [...visibleItems]
       .reverse()
       .find((item) => contains(point, outline(item)))
+    if (selecting) {
+      tapSelection.start(event, item?.instanceId)
+      return
+    }
     const additive = event.shiftKey || event.metaKey || event.ctrlKey
     if (item) {
       if (additive) {
@@ -1648,6 +1714,7 @@
 
   function pointerMove(event: PointerEvent) {
     modifier(event)
+    tapSelection.move(event)
     if (touchNavigation.active) return
     if (marquee?.pointerId === event.pointerId) {
       marquee = { ...marquee, end: screenPoint(event) }
@@ -1739,7 +1806,18 @@
     // Capture before hit testing, including a first finger on empty canvas and
     // a second on a map/control. Cancel rolls back edits and any queued frame,
     // restores panning, and leaves MapLibre's touch events free to pan/zoom.
-    if (touchNavigation.start(event)) finishDrag(undefined, true)
+    if (touchNavigation.start(event)) {
+      tapSelection.cancel()
+      finishDrag(undefined, true)
+    }
+  }
+
+  function finishPointer(event: PointerEvent, cancel = false) {
+    if (cancel) tapSelection.cancel()
+    const id = tapSelection.end(event)
+    if (selecting && id && !touchNavigation.active)
+      select([...toggleSelection(items, selectedIds, id, editingGroup)])
+    finishDrag(event, cancel)
   }
 
   function trackTouchEnd(event: PointerEvent) {
@@ -1756,6 +1834,22 @@
       settingsOpen
     )
       return
+    if (selecting) {
+      const command = event.metaKey || event.ctrlKey
+      if (event.key === 'Escape' || (command && event.key === 'Enter')) {
+        event.preventDefault()
+        finishSelecting()
+      } else if (command && event.key.toLowerCase() === 'a') {
+        event.preventDefault()
+        select(visibleItems.map((item) => item.instanceId))
+      } else if (
+        (command && ['z', 's', 'g'].includes(event.key.toLowerCase())) ||
+        event.key === 'Backspace' ||
+        event.key === 'Delete'
+      )
+        event.preventDefault()
+      return
+    }
     if (event.key === 'Escape') {
       if (layoutController) {
         layoutController.abort()
@@ -1831,6 +1925,7 @@
     event.preventDefault()
     draggingOver = false
     if (
+      selecting ||
       busy ||
       !ready ||
       drag ||
@@ -1918,6 +2013,7 @@
         ready = true
       })
       map.on('move', refresh)
+      map.on('movestart', cancelTapSelection)
       map.on('resize', refresh)
       map.on('error', (event) => fail(event.error))
       map.getCanvas().addEventListener('pointerdown', pointerDown, true)
@@ -1931,6 +2027,7 @@
       window.removeEventListener('pointerup', trackTouchEnd, true)
       window.removeEventListener('pointercancel', trackTouchEnd, true)
       touchNavigation.reset()
+      tapSelection.cancel()
       exampleController?.abort()
       layoutController?.abort()
       backgroundWorker?.terminate()
@@ -1944,8 +2041,8 @@
 
 <svelte:window
   onpointermove={pointerMove}
-  onpointerup={(event) => finishDrag(event)}
-  onpointercancel={(event) => finishDrag(event, true)}
+  onpointerup={(event) => finishPointer(event)}
+  onpointercancel={(event) => finishPointer(event, true)}
   onkeydown={keyboard}
   onkeyup={(event) => {
     modifier(event)
@@ -1955,11 +2052,18 @@
     spaceDown = false
     altDown = false
     touchNavigation.reset()
+    tapSelection.cancel()
     finishDrag(undefined, true)
   }}
   ondragover={(event) => {
     event.preventDefault()
-    if (!editingMask && !editingTransform && !editingGroup && !searching)
+    if (
+      !selecting &&
+      !editingMask &&
+      !editingTransform &&
+      !editingGroup &&
+      !searching
+    )
       draggingOver = true
   }}
   ondragleave={(event) => {
@@ -2027,7 +2131,8 @@
         data-tooltip="Find maps"
         aria-label="Find maps by place"
         onclick={search}
-        disabled={!ready ||
+        disabled={selecting ||
+          !ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
@@ -2042,7 +2147,8 @@
         data-tooltip="Open collage"
         aria-label="Open collage"
         onclick={() => showInput('open')}
-        disabled={!ready ||
+        disabled={selecting ||
+          !ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
@@ -2054,7 +2160,8 @@
         {layer}
         {items}
         {selectedIds}
-        disabled={!items.length ||
+        disabled={selecting ||
+          !items.length ||
           !ready ||
           busy ||
           !!editingMask ||
@@ -2069,7 +2176,8 @@
         class="quiet-button"
         data-tooltip="Settings"
         aria-label="Settings"
-        disabled={busy ||
+        disabled={selecting ||
+          busy ||
           !!activeControl ||
           !!editingMask ||
           !!editingTransform ||
@@ -2081,7 +2189,8 @@
         class="primary-button small"
         aria-label="Add maps"
         onclick={() => showInput('add')}
-        disabled={!ready ||
+        disabled={selecting ||
+          !ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
@@ -2124,7 +2233,7 @@
     </section>
   {/if}
 
-  {#if selected && controls && appearances && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
+  {#if selected && controls && appearances && !selecting && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
     {#key selection.map((item) => item.instanceId).join(',')}
       {#each ringTools as tool (tool)}
         {#if tool === 'move'}
@@ -2364,7 +2473,8 @@
   {#if !editingMask && !editingTransform && !inputMode && !searching}
     <div
       class="bottom-stack selection-stack"
-      class:has-actions={!!editingGroup ||
+      class:has-actions={selecting ||
+        !!editingGroup ||
         (selection.length > 1 && !locked) ||
         !!layoutController}
     >
@@ -2376,7 +2486,35 @@
           >
         </div>
       {/if}
-      {#if editingGroup || (selection.length > 1 && !locked) || layoutController}
+      {#if selecting}
+        <div class="selection-actions" role="group" aria-label="Select maps">
+          <h2>Select maps</h2>
+          <button
+            class="quiet-button"
+            aria-label="Select all maps"
+            data-tooltip="Select all"
+            aria-keyshortcuts="Meta+A Control+A"
+            disabled={selectedIds.size === visibleItems.length}
+            onclick={() => select(visibleItems.map((item) => item.instanceId))}
+            ><SelectionAll size={20} /></button
+          >
+          <button
+            class="quiet-button"
+            aria-label="Clear selection"
+            data-tooltip="Clear"
+            disabled={!selectedIds.size}
+            onclick={() => select()}><X size={20} /></button
+          >
+          <button
+            bind:this={selectionDoneButton}
+            class="quiet-button"
+            aria-label="Done selecting"
+            data-tooltip="Done"
+            aria-keyshortcuts="Meta+Enter Control+Enter Escape"
+            onclick={finishSelecting}><Check size={20} /></button
+          >
+        </div>
+      {:else if editingGroup || (selection.length > 1 && !locked) || layoutController}
         <div
           class="selection-actions"
           role="group"
@@ -2537,16 +2675,33 @@
           disabled={!items.length}><ArrowsOut size={19} /></button
         >
         <button
+          bind:this={selectButton}
+          data-tooltip="Select maps"
+          aria-label="Select maps"
+          aria-pressed={selecting}
+          onclick={() => (selecting ? finishSelecting() : startSelecting())}
+          disabled={!ready ||
+            !visibleItems.length ||
+            busy ||
+            !!activeControl ||
+            !!marquee ||
+            !!inputMode ||
+            settingsOpen ||
+            exportOpen}><SelectionPlus size={19} /></button
+        >
+        <button
           data-tooltip="Undo"
           aria-label="Undo"
           onclick={undo}
-          disabled={!past.length || busy}><ArrowUUpLeft size={19} /></button
+          disabled={!past.length || busy || selecting}
+          ><ArrowUUpLeft size={19} /></button
         >
         <button
           data-tooltip="Redo"
           aria-label="Redo"
           onclick={redo}
-          disabled={!future.length || busy}><ArrowUUpRight size={19} /></button
+          disabled={!future.length || busy || selecting}
+          ><ArrowUUpRight size={19} /></button
         >
       </div>
     </footer>
