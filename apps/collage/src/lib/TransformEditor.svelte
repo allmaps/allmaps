@@ -13,11 +13,13 @@
     ArrowsOut,
     ArrowUUpLeft,
     ArrowUUpRight,
-    Diamond,
+    Cube,
     ArrowDownLeft,
     ArrowDownRight,
     Eye,
-    EyeSlash
+    EyeSlash,
+    LinkSimple,
+    LinkSimpleBreak
   } from 'phosphor-svelte'
   import { bounds } from './geometry'
   import { toCanvasGeo, fromCanvasGeo, CANVAS_ZOOM_OFFSET } from './coordinates'
@@ -25,13 +27,13 @@
     applyMatrix,
     invertMatrix,
     dragTransform,
-    neutralTransform
+    snapTransform
   } from './affine-transform'
   import {
     createSelectionTransform,
     setMapTransform,
-    resetMapTransform,
-    makeIsometric,
+    resetSelectionTransform,
+    makeSelectionIsometric,
     rotatePlacement,
     bearingRotation,
     fullResourceMask,
@@ -64,12 +66,18 @@
     oncancel: () => void
   } = $props()
   const original = untrack(() => structuredClone(selection))
-  const session = createSelectionTransform(original)
-  const initial = session.frame
+  type Session = ReturnType<typeof createSelectionTransform>
+  type Snapshot = { session: Session; draft: CollageMap }
+  const initialSession = createSelectionTransform(original)
+  const initial = initialSession.frame
+  const hasPolynomial = initialSession
+    .apply(initial)
+    .some((item) => item.affine!.polynomial)
+  let session = $state.raw(initialSession)
   let draft = $state.raw(initial)
   let revision = $state(0)
-  let past = $state.raw<CollageMap[]>([])
-  let future = $state.raw<CollageMap[]>([])
+  let past = $state.raw<Snapshot[]>([])
+  let future = $state.raw<Snapshot[]>([])
   let error = $state('')
   let active = $state(false)
   let activeKind = $state<Kind>()
@@ -78,7 +86,8 @@
     { value: 'left', label: 'Tilt left', icon: ArrowDownLeft },
     { value: 'right', label: 'Tilt right', icon: ArrowDownRight }
   ]
-  let showOthers = $state(true)
+  let showOthers = $state(false)
+  let lockProportions = $state(true)
   let visibility: ReturnType<typeof modeVisibility> | undefined
   let accepted = false
   let restoreNavigation: (() => void) | undefined
@@ -145,6 +154,7 @@
         pivot: Point
         angle: number
         rotation: number
+        rotated: boolean
         bearing: number
       }
     | undefined
@@ -187,15 +197,27 @@
       (top + bottom) / 2 - (direction[1] * (bottom - top)) / 2
     ]
   }
-  function remember(before: CollageMap) {
-    if (JSON.stringify(before) === JSON.stringify(draft)) return
-    past = [...past.slice(-39), before]
-    future = []
-  }
-  function preview(next: CollageMap) {
-    onpreview(session.apply(next))
+  function preview(next: CollageMap, nextSession = session) {
+    onpreview(nextSession.apply(next))
+    session = nextSession
     draft = next
     error = ''
+  }
+  function remember(before: CollageMap, beforeSession = session) {
+    if (
+      beforeSession === session &&
+      JSON.stringify(before) === JSON.stringify(draft)
+    )
+      return
+    past = [...past.slice(-39), { session: beforeSession, draft: before }]
+    future = []
+  }
+  function preset(next: CollageMap[]) {
+    const before = draft
+    const beforeSession = session
+    const nextSession = createSelectionTransform(next)
+    preview(nextSession.frame, nextSession)
+    remember(before, beforeSession)
   }
   function start(event: PointerEvent, direction: Point, kind: Kind) {
     if (event.button !== 0 || gesture || touches.active) return
@@ -221,6 +243,7 @@
       pivot: origin,
       angle: Math.atan2(pointer[1] - origin[1], pointer[0] - origin[0]),
       rotation: draft.placement.rotation,
+      rotated: false,
       bearing: kind === 'rotate' ? bearingRotation(draft) : 0
     }
     restoreNavigation = suspendMapNavigation(map)
@@ -252,11 +275,14 @@
           current[1] - gesture.pivot[1],
           current[0] - gesture.pivot[0]
         )
-        gesture.rotation += Math.atan2(
+        const step = Math.atan2(
           Math.sin(angle - gesture.angle),
           Math.cos(angle - gesture.angle)
         )
+        gesture.rotation += step
+        gesture.rotated ||= Math.abs(step) > 1e-8
         gesture.angle = angle
+        if (!gesture.rotated) return
         const rotation = snapRotation(
           gesture.rotation,
           gesture.bearing,
@@ -271,23 +297,26 @@
         preview(next)
         return
       }
+      const proportional = lockProportions || event.shiftKey
       const values = dragTransform(
         next.affine!.values,
         gesture.size,
         delta,
         gesture.direction,
         gesture.kind,
-        event.shiftKey
+        proportional
       )
-      // Small detents at imported and neutral values make exact resets reachable.
-      for (const key of Object.keys(values) as (keyof typeof values)[]) {
-        for (const target of [
-          neutralTransform[key],
-          next.affine!.imported[key]
-        ])
-          if (Math.abs(values[key] - target) < 0.008) values[key] = target
-      }
-      setMapTransform(next, values, gesture.anchor)
+      setMapTransform(
+        next,
+        snapTransform(
+          values,
+          next.affine!.values,
+          next.affine!.imported,
+          gesture.kind,
+          proportional
+        ),
+        gesture.anchor
+      )
       preview(next)
     } catch (problem) {
       // Keep the last valid frame rather than crossing a degenerate matrix.
@@ -323,11 +352,7 @@
   function reset(zero = false) {
     finish()
     try {
-      const before = structuredClone(draft)
-      const next = structuredClone(draft)
-      resetMapTransform(next, zero)
-      preview(next)
-      remember(before)
+      preset(resetSelectionTransform(session.apply(draft), zero))
     } catch (problem) {
       error = problem instanceof Error ? problem.message : String(problem)
     }
@@ -335,14 +360,16 @@
   function isometric(alternate = false) {
     finish()
     try {
-      const before = structuredClone(draft)
-      const next = structuredClone(draft)
       const center = position([0, 0])
       const a = worldPoint(center)
       const b = worldPoint([center[0] + 100, center[1]])
-      makeIsometric(next, Math.atan2(b[1] - a[1], b[0] - a[0]), alternate)
-      preview(next)
-      remember(before)
+      preset(
+        makeSelectionIsometric(
+          session.apply(draft),
+          Math.atan2(b[1] - a[1], b[0] - a[0]),
+          alternate
+        )
+      )
       isometricAlternate = alternate
     } catch (problem) {
       error = problem instanceof Error ? problem.message : String(problem)
@@ -358,19 +385,20 @@
     if (!stack.length) return
     const next = stack.at(-1)!
     if (redo) {
-      past = [...past, draft]
+      past = [...past, { session, draft }]
       future = future.slice(0, -1)
     } else {
-      future = [...future, draft]
+      future = [...future, { session, draft }]
       past = past.slice(0, -1)
     }
-    preview(next)
+    preview(next.draft, next.session)
   }
   function done() {
     finish()
     accepted = true
     ondone(
-      JSON.stringify(draft) === JSON.stringify(initial)
+      session === initialSession &&
+        JSON.stringify(draft) === JSON.stringify(initial)
         ? original
         : session.apply(draft)
     )
@@ -414,7 +442,14 @@
       } else
         setMapTransform(
           next,
-          dragTransform(values, frame.size, delta, direction, kind),
+          dragTransform(
+            values,
+            frame.size,
+            delta,
+            direction,
+            kind,
+            lockProportions || event.shiftKey
+          ),
           anchorFor(direction)
         )
       preview(next)
@@ -594,9 +629,22 @@
             size={20}
           />{/if}</button
       >
+      <button
+        class="quiet-button proportions-lock"
+        aria-label="Lock proportions"
+        data-tooltip={lockProportions
+          ? 'Unlock proportions'
+          : 'Lock proportions'}
+        aria-pressed={lockProportions}
+        disabled={active}
+        onclick={() => (lockProportions = !lockProportions)}
+        >{#if lockProportions}<LinkSimple size={20} />{:else}<LinkSimpleBreak
+            size={20}
+          />{/if}</button
+      >
       <FanMenu
         label="Isometric"
-        icon={Diamond}
+        icon={Cube}
         options={isometricOptions}
         onselect={(value) => isometric(value === 'right')}
         onaltclick={() => isometric(!isometricAlternate)}
@@ -607,7 +655,7 @@
         data-tooltip="Reset"
         onclick={() => reset()}><ArrowCounterClockwise size={20} /></button
       >
-      {#if draft.affine!.polynomial}
+      {#if hasPolynomial}
         <button
           class="quiet-button"
           aria-label="Reset transform to zero"
@@ -660,11 +708,12 @@
     </div>
   </div>
   <p class="sr-only">
-    Drag corners to scale both axes, or edge handles to scale one axis. Hold
-    Shift at a corner to keep proportions. Drag edges to skew. Drag inside to
-    move, or outside a corner to rotate. Hold Shift to rotate in 15-degree
-    steps. Isometric aligns the selection to a 30-degree plane while keeping its
-    area. Alt or Option chooses the opposite isometric direction. Reset restores
+    Proportions are locked by default for corner and midpoint scale handles.
+    Unlock proportions to scale axes independently, or hold Shift to temporarily
+    retain proportions while unlocked. Drag edges to skew. Drag inside to move,
+    or outside a corner to rotate. Hold Shift to rotate in 15-degree steps.
+    Isometric aligns the selection to a 30-degree plane while keeping its area.
+    Alt or Option chooses the opposite isometric direction. Reset restores
     imported scale and skew for one map, or the layout before the shared
     transformation for a selection, including after reopening Transform mode.
     Reset to zero removes skew and restores uniform scale while preserving area.
@@ -673,6 +722,9 @@
 </section>
 
 <style>
+  .proportions-lock[aria-pressed='true'] {
+    background: var(--accent);
+  }
   .transform-surface {
     --rotation-cursor:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 12a10 10 0 0 1 18 0M7 12V5m0 7h7M25 20a10 10 0 0 1-18 0m18 0v7m0-7h-7'/%3E%3C/g%3E%3Cg fill='none' stroke='%23222' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 12a10 10 0 0 1 18 0M7 12V5m0 7h7M25 20a10 10 0 0 1-18 0m18 0v7m0-7h-7'/%3E%3C/g%3E%3C/svg%3E")

@@ -1063,6 +1063,72 @@ export function createSelectionTransform(items: CollageMap[]) {
   }
 }
 
+/** Presets first remove the shared distortion (including sheet spacing), then
+ * normalize each member. A neutral selector alone cannot reset a mixed selection.
+ * Keep an explicit shared reference so subsequent presets and reopened sessions
+ * do not mistake independent per-map scales for a shared scale of the layout. */
+function prepareSelectionPreset(
+  items: CollageMap[],
+  preserveArea: boolean,
+  zero = false
+) {
+  const session = createSelectionTransform(items)
+  const frame = structuredClone(session.frame)
+  if (preserveArea) {
+    const { scaleX, scaleY } = frame.affine!.values
+    const scale = Math.sqrt(scaleX * scaleY)
+    setMapTransform(frame, {
+      ...neutralTransform,
+      scaleX: scale,
+      scaleY: scale
+    })
+  } else resetMapTransform(frame)
+  const result = session.apply(frame)
+  const id = crypto.randomUUID()
+  for (const item of result) {
+    if (preserveArea) {
+      const { scaleX, scaleY } = item.affine!.values
+      const scale = Math.sqrt(scaleX * scaleY)
+      setMapTransform(item, {
+        ...neutralTransform,
+        scaleX: scale,
+        scaleY: scale
+      })
+    } else resetMapTransform(item, zero)
+    if (result.length > 1)
+      item.selectionTransform = {
+        id,
+        values: { ...frame.affine!.values },
+        rotation: frame.placement.rotation,
+        mapRotation: item.placement.rotation
+      }
+  }
+  return result
+}
+
+/** Restore each map's imported (or neutral) shape, even when the selection has
+ * no common transform. Existing shared transforms also restore sheet spacing. */
+export function resetSelectionTransform(items: CollageMap[], zero = false) {
+  return prepareSelectionPreset(items, false, zero)
+}
+
+/** Replace existing shear/unequal scales before tilting the selection as one
+ * plane. Preserve each map's area, handedness and relative neutral orientation. */
+export function makeSelectionIsometric(
+  items: CollageMap[],
+  orientation = 0,
+  alternate = false
+) {
+  const normalized =
+    items.length > 1
+      ? prepareSelectionPreset(items, true)
+      : structuredClone(items)
+  const session = createSelectionTransform(normalized)
+  const frame = structuredClone(session.frame)
+  makeIsometric(frame, orientation, alternate)
+  return session.apply(frame)
+}
+
 /** Reflect an image axis, preserving its crop and visible center. Helmert cannot
  * encode a reflection, so mirrored similarities use three affine GCPs. The
  * determinant carries mirror state through ordinary annotations, no metadata. */

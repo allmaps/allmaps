@@ -87,7 +87,8 @@ export function dragTransform(
   if (kind === 'scale') {
     let x = handle[0] ? Math.max(0.02, 1 + handle[0] * delta[0]) : 1
     let y = handle[1] ? Math.max(0.02, 1 + handle[1] * delta[1]) : 1
-    if (proportional && handle[0] && handle[1]) x = y = (x + y) / 2
+    if (proportional)
+      x = y = handle[0] && handle[1] ? (x + y) / 2 : handle[0] ? x : y
     return { ...start, scaleX: start.scaleX * x, scaleY: start.scaleY * y }
   }
   const [x, y] = transformMatrix(start)
@@ -97,4 +98,47 @@ export function dragTransform(
   }
   const k = (delta[1] * handle[0] * size[1]) / size[0]
   return matrixValues([[x[0] + k * y[0], x[1] + k * y[1]], y])
+}
+
+/** Small detents at imported/neutral values, without changing proportions or
+ * shear during a scale gesture. Proportional scaling snaps one shared factor. */
+export function snapTransform(
+  values: TransformValues,
+  start: TransformValues,
+  imported: TransformValues,
+  kind: 'scale' | 'skew',
+  proportional = false
+): TransformValues {
+  const result = { ...values }
+  const scaleKeys = ['scaleX', 'scaleY'] as const
+  if (kind === 'scale' && proportional) {
+    const factor = values.scaleX / start.scaleX
+    let snapped = factor
+    let nearest = 0.008 / Math.max(start.scaleX, start.scaleY)
+    const targets = [
+      1,
+      ...scaleKeys.flatMap((key) => [
+        1 / start[key],
+        imported[key] / start[key]
+      ])
+    ]
+    for (const target of targets) {
+      const distance = Math.abs(factor - target)
+      if (distance < nearest) {
+        nearest = distance
+        snapped = target
+      }
+    }
+    result.scaleX = start.scaleX * snapped
+    result.scaleY = start.scaleY * snapped
+  } else {
+    const keys =
+      kind === 'scale'
+        ? scaleKeys
+        : (Object.keys(values) as (keyof TransformValues)[])
+    for (const key of keys)
+      for (const target of [neutralTransform[key], imported[key]])
+        if (Math.abs(values[key] - target) < 0.008) result[key] = target
+  }
+  return result
 }

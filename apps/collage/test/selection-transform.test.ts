@@ -18,7 +18,10 @@ import {
   resetMapTransform,
   setMapTransform,
   makeIsometric,
-  ensureMapTransform
+  makeSelectionIsometric,
+  resetSelectionTransform,
+  ensureMapTransform,
+  setResourceMask
 } from '../src/lib/model.ts'
 import { bounds } from '../src/lib/geometry.ts'
 
@@ -369,4 +372,186 @@ test('invalid optional selector metadata is ignored when opening a collage', () 
   loaded.forEach((item, i) =>
     outline(item).forEach((point, j) => close(point, outline(items[i])[j]))
   )
+})
+
+function compareMaps(
+  actual: ReturnType<typeof series>,
+  expected: ReturnType<typeof series>
+) {
+  actual.forEach((item, i) =>
+    outline(item).forEach((point, j) => close(point, outline(expected[i])[j]))
+  )
+}
+function mixedSelection() {
+  const items = series()
+  setMapTransform(items[0], {
+    scaleX: 1.4,
+    scaleY: 0.6,
+    skewX: 0.4,
+    skewY: -0.6
+  })
+  setMapTransform(items[1], {
+    scaleX: 0.8,
+    scaleY: 1.7,
+    skewX: -0.3,
+    skewY: 0.2
+  })
+  mirrorMap(items[3])
+  items.forEach((item, i) => {
+    item.groupId = 'mixed'
+    item.appearance.opacity = (i + 1) / 4
+  })
+  return items
+}
+
+test('Reset restores each mixed member, even without a shared selector deformation', () => {
+  const items = mixedSelection()
+  items[1].placement.rotation = 0.7
+  const before = structuredClone(items)
+  const expected = structuredClone(items)
+  expected.forEach((item) => resetMapTransform(item))
+  const result = resetSelectionTransform(items)
+  compareMaps(result, expected)
+  result.forEach((item, i) => {
+    close(mapCenter(item), mapCenter(items[i]))
+    assert.equal(item.placement.rotation, items[i].placement.rotation)
+    assert.equal(item.mirrored, items[i].mirrored)
+    assert.deepEqual(item.affine!.values, item.affine!.imported)
+    assert.deepEqual(item.resourceMask, items[i].resourceMask)
+    assert.deepEqual(item.appearance, items[i].appearance)
+    assert.equal(item.groupId, items[i].groupId)
+  })
+  compareMaps(resetSelectionTransform(result), result)
+  compareMaps(
+    resetSelectionTransform(openCollage(exportCollage(result))),
+    result
+  )
+  assert.deepEqual(items, before)
+})
+
+for (const alternate of [false, true]) {
+  for (const orientation of [0, 0.4]) {
+    test(`mixed Isometric replaces distortion and is stable across repeats/reopening (${alternate}, ${orientation})`, () => {
+      const items = mixedSelection()
+      const before = structuredClone(items)
+      const result = makeSelectionIsometric(items, orientation, alternate)
+      result.forEach((item, i) => {
+        const [origin, px, py] = transformer(
+          placedMap(item)
+        ).transformToProjectedGeo([
+          [0, 0],
+          [100, 0],
+          [0, 100]
+        ] as Point[])
+        const x: Point = [px[0] - origin[0], px[1] - origin[1]]
+        const y: Point = [py[0] - origin[0], py[1] - origin[1]]
+        close(
+          [
+            Math.hypot(...x) / Math.hypot(...y),
+            area(outline(item)) / area(outline(items[i]))
+          ],
+          [1, 1]
+        )
+        const expectedAngle =
+          orientation +
+          ((alternate ? 1 : -1) * Math.PI) / 6 +
+          (item.mirrored ? Math.PI : 0)
+        close(x.map((v) => v / Math.hypot(...x)) as Point, [
+          Math.cos(expectedAngle),
+          Math.sin(expectedAngle)
+        ])
+        assert.equal(item.mirrored, items[i].mirrored)
+        assert.deepEqual(item.appearance, items[i].appearance)
+        assert.equal(item.groupId, items[i].groupId)
+      })
+      for (const input of [result, openCollage(exportCollage(result))]) {
+        compareMaps(
+          makeSelectionIsometric(input, orientation, alternate),
+          result
+        )
+        compareMaps(
+          makeSelectionIsometric(input, orientation, !alternate),
+          makeSelectionIsometric(items, orientation, !alternate)
+        )
+        const reset = resetSelectionTransform(input)
+        reset.forEach((item) =>
+          assert.deepEqual(item.affine!.values, item.affine!.imported)
+        )
+        compareMaps(resetSelectionTransform(reset), reset)
+      }
+      assert.deepEqual(items, before)
+    })
+  }
+}
+
+test('selection presets preserve adjoining boundaries, restore spacing and retain later movement', () => {
+  const items = series()
+  const result = makeSelectionIsometric(items)
+  const direct = createSelectionTransform(items)
+  const frame = structuredClone(direct.frame)
+  makeIsometric(frame)
+  compareMaps(result, direct.apply(frame))
+  const pivot = mapCenter(frame)
+  const expected = structuredClone(items)
+  for (const maps of [result, expected])
+    maps.forEach((item) => {
+      item.placement = rotatePlacement(item.placement, pivot, 0.7)
+      item.placement.position[0] += 3000
+      item.placement.position[1] -= 2000
+    })
+  compareMaps(resetSelectionTransform(result), expected)
+})
+
+test('mixed polynomial presets retain imported resets and expose a distinct neutral reset', () => {
+  const source = mixedSelection()
+  // Treat the fitted shapes as original polynomial imports, without Collage metadata.
+  const maps = source.map((item) => {
+    const map = placedMap(item)
+    delete map._allmaps
+    return map
+  })
+  const items = openCollage(generateAnnotation(maps))
+  const tilted = makeSelectionIsometric(items)
+  const restored = resetSelectionTransform(openCollage(exportCollage(tilted)))
+  compareMaps(restored, items)
+  const neutral = resetSelectionTransform(tilted, true)
+  neutral.forEach((item, i) => {
+    close(mapCenter(item), mapCenter(items[i]))
+    assert.deepEqual(item.affine!.values, {
+      scaleX: 1,
+      scaleY: 1,
+      skewX: 0,
+      skewY: 0
+    })
+  })
+  compareMaps(
+    resetSelectionTransform(openCollage(exportCollage(neutral)), true),
+    neutral
+  )
+  compareMaps(resetSelectionTransform(neutral), items)
+})
+
+test('replacing an existing tilt in a mixed selection preserves areas, crops and orientations on repeated presets', () => {
+  const items = mixedSelection()
+  makeIsometric(items[0], 0.3, true)
+  items[1].placement.rotation = 1.9
+  items[2].placement.rotation = -2.4
+  setResourceMask(items[1], [
+    [100, 50],
+    [950, 200],
+    [800, 900],
+    [50, 600]
+  ])
+  const result = makeSelectionIsometric(items, 0.4)
+  for (const input of [result, openCollage(exportCollage(result))]) {
+    compareMaps(makeSelectionIsometric(input, 0.4), result)
+    compareMaps(
+      makeSelectionIsometric(input, 0.4, true),
+      makeSelectionIsometric(items, 0.4, true)
+    )
+  }
+  result.forEach((item, i) => {
+    close([area(outline(item)) / area(outline(items[i])), 0], [1, 0])
+    assert.deepEqual(item.resourceMask, items[i].resourceMask)
+  })
 })
