@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
   controlLayout,
+  foldControl,
   controlOrder,
   radiusForSize,
   fitControlCenter,
@@ -17,6 +18,26 @@ const distance = (a: Point, b: Point) => Math.hypot(a[0] - b[0], a[1] - b[1])
 function close(a: number, b: number) {
   assert.ok(Math.abs(a - b) < 1e-8, `${a} ≠ ${b}`)
 }
+
+test('locking travels along the arc toward the lock, including across angle wrapping', () => {
+  for (const rotation of [0, Math.PI, -Math.PI / 2, 8]) {
+    const center: Point = [300, 300]
+    const layout = controlLayout(center, rotation, { opacity: 0.3, hue: 0.8 })
+    for (const kind of controlOrder) {
+      const start = layout[kind].position
+      const target = layout.lock.position
+      assert.deepEqual(foldControl(start, center, target, 0), start)
+      assert.deepEqual(foldControl(start, center, target, 1), target)
+      const middle = foldControl(start, center, target, 0.5)
+      close(
+        distance(middle, center),
+        (distance(start, center) + controlRadius) / 2
+      )
+      if (kind !== 'lock')
+        assert.ok(distance(middle, target) < distance(start, target))
+    }
+  }
+})
 
 test('buttons have equal spacing on a semicircle with one layer-order control', () => {
   const layout = controlLayout([0, 0], 0, { opacity: 1, hue: 0 })

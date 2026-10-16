@@ -8,10 +8,12 @@ export const controlOrder = [
   'openIn',
   'background',
   'saturation',
+  'lock',
   'hue',
   'opacity',
   'editMask',
   'mirror',
+  'transform',
   'move',
   'rotate'
 ] as const
@@ -19,11 +21,37 @@ export type Control = (typeof controlOrder)[number]
 export type Slider = 'opacity' | 'hue'
 export type Rail = { start: Point; end: Point }
 export type ControlPosition = { position: Point; rail?: Rail }
+
+/** Follow the controls' circle toward the lock, bringing sliders inward too. */
+export function foldControl(
+  position: Point,
+  center: Point,
+  target: Point,
+  progress: number
+): Point {
+  if (progress <= 0) return position
+  if (progress >= 1) return target
+  const start = Math.atan2(position[1] - center[1], position[0] - center[0])
+  const end = Math.atan2(target[1] - center[1], target[0] - center[0])
+  const angle =
+    start + Math.atan2(Math.sin(end - start), Math.cos(end - start)) * progress
+  const radius =
+    Math.hypot(position[0] - center[0], position[1] - center[1]) *
+      (1 - progress) +
+    Math.hypot(target[0] - center[0], target[1] - center[1]) * progress
+  return [
+    center[0] + Math.cos(angle) * radius,
+    center[1] + Math.sin(angle) * radius
+  ]
+}
 export const controlRadius = 184
 export const sliderLength = 104
-export function radiusForSize(diameter: number): number {
+export function radiusForSize(
+  diameter: number,
+  count: number = controlOrder.length
+): number {
   // Leave room for 42px touch controls when the arc contracts.
-  const minimum = 22 / Math.sin(Math.PI / (2 * (controlOrder.length - 1)))
+  const minimum = 22 / Math.sin(Math.PI / (2 * Math.max(1, count - 1)))
   return Math.max(minimum, Math.min(controlRadius, diameter * 0.3))
 }
 
@@ -48,14 +76,17 @@ export function preferredControlCenter(
 export function controlLayout(
   center: Point,
   rotation: number,
-  values: Record<Slider, number>,
-  radius = controlRadius
+  values: { opacity: number; hue: number },
+  radius = controlRadius,
+  order: readonly Control[] = controlOrder
 ): Record<Control, ControlPosition> {
   const layout = Object.fromEntries(
-    controlOrder.map((kind, index) => {
+    order.map((kind, index) => {
       // Screen Y points down; map rotation is counterclockwise in world space.
       const angle =
-        -Math.PI / 4 + (index * Math.PI) / (controlOrder.length - 1) - rotation
+        -Math.PI / 4 +
+        (index * Math.PI) / Math.max(1, order.length - 1) -
+        rotation
       const at = (radius: number): Point => [
         center[0] + Math.cos(angle) * radius,
         center[1] + Math.sin(angle) * radius
@@ -99,16 +130,16 @@ export function fitControlCenter(
   layout: Record<Control, ControlPosition>,
   viewport: Point
 ): Point {
-  const positions = controlOrder.flatMap((key) => {
-    const control = layout[key]
+  const positions = Object.values(layout).flatMap((control) => {
     return control.rail
       ? [control.rail.start, control.rail.end]
       : [control.position]
   })
+  if (!positions.length) return center
   return center.map((value, axis) => {
     const minimum = Math.min(...positions.map((p) => p[axis]))
     const maximum = Math.max(...positions.map((p) => p[axis]))
-    const lower = (axis === 1 ? 70 : 24) - minimum
+    const lower = (axis === 1 ? (viewport[0] <= 440 ? 110 : 70) : 24) - minimum
     const upper = viewport[axis] - 24 - maximum
     return (
       value +

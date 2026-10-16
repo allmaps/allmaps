@@ -1,7 +1,11 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
-  import { hueColor } from './control-layout'
+  import { untrack } from 'svelte'
+  import { Tween, prefersReducedMotion } from 'svelte/motion'
+  import { cubicInOut } from 'svelte/easing'
+  import { hueColor, foldControl } from './control-layout'
   import type { Rail } from './control-layout'
+  import type { Point } from '@allmaps/types'
 
   let {
     position,
@@ -14,6 +18,8 @@
     sliderValue,
     rail,
     hueScale = false,
+    folded = false,
+    fold,
     onpointerdown,
     onclick,
     ondblclick,
@@ -29,21 +35,44 @@
     sliderValue?: number
     rail?: Rail
     hueScale?: boolean
+    folded?: boolean
+    fold?: { center: Point; target: Point }
     onpointerdown?: (event: PointerEvent) => void
     onclick?: (event: MouseEvent) => void
     ondblclick?: (event: MouseEvent) => void
     onkeydown?: (event: KeyboardEvent) => void
   } = $props()
+
+  const progress = new Tween(
+    untrack(() => (folded ? 1 : 0)),
+    { easing: cubicInOut }
+  )
+  $effect(() => {
+    void progress.set(folded ? 1 : 0, {
+      duration: prefersReducedMotion.current ? 0 : 420
+    })
+  })
+  const displayed = $derived(
+    fold
+      ? foldControl(position, fold.center, fold.target, progress.current)
+      : position
+  )
 </script>
 
 <div
   class="map-control"
   class:active
+  class:folding={progress.current > 0 && progress.current < 1}
+  class:folded
+  aria-hidden={folded || undefined}
+  inert={folded}
+  style:visibility={progress.current === 1 ? 'hidden' : undefined}
+  style:opacity={1 - progress.current ** 3}
   class:hue-control={hueScale}
   style:transform={'translate3d(' +
-    position[0] +
+    displayed[0] +
     'px, ' +
-    position[1] +
+    displayed[1] +
     'px, 0)'}
   class:disabled
   style:--hue-color={hueColor(sliderValue ?? 0)}

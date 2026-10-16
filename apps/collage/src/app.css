@@ -73,7 +73,14 @@ textarea:focus-visible {
   stroke-width: 4;
   stroke-dasharray: none;
 }
-.outlines polygon.failed {
+.outlines polygon.grouped {
+  stroke: color-mix(in srgb, var(--group-color) 55%, transparent);
+}
+.outlines polygon.grouped.selected {
+  stroke: var(--group-color);
+}
+.outlines polygon.failed,
+.outlines polygon.grouped.failed {
   stroke: var(--error-color);
   fill: color-mix(in srgb, var(--error-color) 12%, transparent);
   stroke-width: 4;
@@ -274,8 +281,16 @@ nav {
   will-change: transform;
   transition: transform 220ms ease-out;
 }
-.control-gesture .map-control {
+.control-gesture .map-control,
+.map-control.folding {
   transition: none;
+}
+.map-control.folded {
+  pointer-events: none;
+}
+.map-control.folded .control-track,
+.map-control.folding .control-track {
+  visibility: hidden;
 }
 @media (prefers-reduced-motion: reduce) {
   .map-control {
@@ -809,14 +824,16 @@ nav {
 .mask-editor .error-message {
   pointer-events: auto;
 }
-.mask-editor-actions {
+.mask-editor-actions,
+.selection-actions {
   width: max-content;
   max-width: 100%;
   flex-wrap: wrap;
   justify-content: center;
 }
 @media (max-width: 440px) {
-  .mask-editor-actions h2 {
+  .mask-editor-actions h2,
+  .selection-actions h2 {
     flex-basis: 100%;
     justify-content: center;
     padding: 4px 8px;
@@ -918,5 +935,225 @@ nav {
 @media (max-width: 520px) {
   .fan-options {
     bottom: calc(100% + 46px);
+  }
+}
+
+.fan-menu.down .fan-options {
+  top: calc(100% + 14px);
+  bottom: auto;
+  flex-direction: column;
+}
+.export-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.export-dialog {
+  width: min(380px, calc(100vw - 32px));
+}
+.export-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.export-dialog .export-dimensions {
+  margin: 0;
+}
+.export-fields {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.65fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.export-fields input,
+.export-fields select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #2223;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 16px;
+  background: white;
+}
+.export-scale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-dimensions {
+  color: #555;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+.export-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.export-actions .quiet-button {
+  width: auto;
+  padding: 8px 12px;
+}
+.export-dialog form .primary-button {
+  width: auto;
+  margin-top: 0;
+  justify-content: center;
+}
+.export-dialog form label {
+  margin-bottom: 0;
+}
+
+.tools-dialog {
+  width: min(420px, calc(100% - 32px));
+  overflow: hidden;
+  padding: 26px;
+}
+.tools-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.tools-dialog h2 {
+  margin-bottom: 16px;
+}
+.settings-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+  margin: 0 -10px 14px;
+  padding: 0 10px;
+}
+.settings-scroll::-webkit-scrollbar {
+  display: none;
+}
+.settings-scroll h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2229;
+  margin: 0 0 8px;
+}
+.tool-settings {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+.tool-settings li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 0 0;
+  border-radius: 8px;
+}
+.tool-settings li:hover {
+  background: #22222206;
+}
+.tool-settings li.reordering {
+  background: var(--canvas-color);
+  box-shadow: 0 2px 12px #2222;
+}
+.tool-drag-handle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+  flex: 1;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.tool-grip {
+  display: inline-flex;
+  touch-action: none;
+  opacity: 0.3;
+  flex: none;
+}
+.reordering .tool-drag-handle {
+  cursor: grabbing;
+}
+.tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.tool-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.tool-settings input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex: none;
+}
+.import-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #2221;
+  padding-top: 12px;
+  font-size: 14px;
+}
+.import-setting select {
+  border: 1px solid #2222;
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: white;
+  font-size: 16px;
+}
+.tools-dialog .export-actions .quiet-button {
+  width: auto;
+  padding: 8px 14px;
+}
+.tools-dialog .export-actions .primary-button {
+  padding: 8px 20px;
+}
+
+@media (pointer: coarse) {
+  .tool-drag-handle {
+    min-height: 42px;
+  }
+}
+.export-background {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.export-background select {
+  min-width: 0;
+  flex: 1;
+}
+.export-background input[type='color'] {
+  width: 38px;
+  height: 38px;
+  padding: 3px;
+  flex: none;
+}
+
+@media (max-width: 440px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .app-header nav {
+    margin-left: auto;
   }
 }

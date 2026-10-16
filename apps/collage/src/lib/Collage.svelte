@@ -1,7 +1,20 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte'
   import { Map as MapLibreMap, LngLat } from 'maplibre-gl'
-  import { WarpedMapLayer } from '@allmaps/maplibre'
+  import { ExportableMapLayer } from './export-layer'
+  import ExportMenu from './ExportMenu.svelte'
+  import FanMenu from './FanMenu.svelte'
+  import ToolSettings from './ToolSettings.svelte'
+  import TransformEditor from './TransformEditor.svelte'
+  import {
+    defaultToolSettings,
+    parseToolSettings,
+    enabledTools,
+    importTransformationKey,
+    parseImportTransformation,
+    toolSettingsKey
+  } from './tool-settings'
+  import type { ToolSetting } from './tool-settings'
   import { toCanvasGeo, fromCanvasGeo, CANVAS_ZOOM_OFFSET } from './coordinates'
   import {
     Logo,
@@ -27,10 +40,10 @@
   import type { LayoutRequest } from './layout-task'
   import type { BackgroundRequest } from './background.worker'
   import {
+    GearSix,
     Plus,
     Minus,
     FolderOpen,
-    DownloadSimple,
     ArrowsOut,
     ArrowsOutCardinal,
     ArrowClockwise,
@@ -44,14 +57,26 @@
     DropHalf,
     MagicWand,
     Polygon,
+    BoundingBox,
     ArrowUp,
     FlipHorizontal,
     FlipVertical,
     SquaresFour,
     MapTrifold,
+    AlignTop,
+    AlignBottom,
+    AlignLeft,
+    AlignRight,
+    AlignCenterHorizontal,
+    AlignCenterVertical,
     MagnifyingGlass,
     ArrowSquareOut,
-    Copy
+    Copy,
+    LockSimple,
+    LockSimpleOpen,
+    SelectionAll,
+    SelectionSlash,
+    Check
   } from 'phosphor-svelte'
   import {
     openCollage,
@@ -72,8 +97,25 @@
     mirrorMap,
     transformationType
   } from './model'
-  import type { Arrangement, CollageMap, Placement } from './model'
+  import type {
+    Arrangement,
+    CollageMap,
+    Placement,
+    ImportTransformation
+  } from './model'
   import { snapRotation } from './rotation'
+  import { alignMaps } from './alignment'
+  import type { Alignment } from './alignment'
+  import {
+    selectionIds,
+    selectionScope,
+    toggleSelection,
+    selectionLocked,
+    singleGroup,
+    groupMaps,
+    ungroupMaps,
+    setAppearance
+  } from './selection'
   import type { Point } from '@allmaps/types'
   import {
     controlLayout,
@@ -90,15 +132,61 @@
   let fileInput = $state<HTMLInputElement>()
   let textInput = $state<HTMLTextAreaElement>()
   let map = $state.raw<MapLibreMap>()
-  let layer = $state.raw<WarpedMapLayer>()
+  let layer = $state.raw<ExportableMapLayer>()
+  let exportOpen = $state(false)
+  let settingsOpen = $state(false)
+  let importTransformation = $state<ImportTransformation>('helmert')
+  let altDown = $state(false)
+  let toolSettings = $state.raw<ToolSetting[]>(defaultToolSettings())
   let ready = $state(false)
   let busy = $state(false)
   let items = $state.raw<CollageMap[]>([])
   let selectedIds = $state.raw<Set<string>>(new Set())
+  let editingGroup = $state<string>()
+  const visibleItems = $derived(selectionScope(items, editingGroup))
   const selection = $derived(
     items.filter((item) => selectedIds.has(item.instanceId))
   )
   const selected = $derived(rotationAnchor(selection))
+  const locked = $derived(selectionLocked(selection))
+  const grouped = $derived(singleGroup(selection))
+  const ringTools = $derived(enabledTools(toolSettings, locked))
+  const atFront = $derived(
+    selection.length > 0 &&
+      items
+        .slice(-selection.length)
+        .every((item) => selectedIds.has(item.instanceId))
+  )
+  const toFront = $derived(altDown ? atFront : !atFront)
+  const orderUnchanged = $derived(
+    (toFront
+      ? items.slice(-selection.length)
+      : items.slice(0, selection.length)
+    ).every((item) => selectedIds.has(item.instanceId))
+  )
+
+  function changeTools(settings: ToolSetting[]) {
+    toolSettings = settings
+    try {
+      localStorage.setItem(toolSettingsKey, JSON.stringify(settings))
+    } catch {
+      /* Storage can be unavailable in private browsers. */
+    }
+    refresh()
+  }
+  function changeImport(value: ImportTransformation) {
+    importTransformation = value
+    try {
+      localStorage.setItem(importTransformationKey, value)
+    } catch {
+      /* Use the selection for this session if storage is unavailable. */
+    }
+  }
+  function modifier(event: { altKey: boolean }) {
+    if (altDown === event.altKey) return
+    altDown = event.altKey
+    refresh()
+  }
   const viewerLink = $derived(
     selection.length === 1 && selected
       ? viewerUrl(selected, publicEnv.PUBLIC_VIEWER_BASE_URL || undefined)
@@ -112,15 +200,18 @@
   const allMirrored = $derived(
     selection.length > 0 && selection.every((item) => item.mirrored)
   )
-  let overlays = $state.raw<{ id: string; points: string }[]>([])
+  let overlays = $state.raw<{ id: string; points: string; grouped: boolean }[]>(
+    []
+  )
   let loadFailures = $state.raw<LoadFailures>({})
   type DragMode = 'move' | 'rotate' | Slider
   let controls = $state.raw<Record<Control, ControlPosition>>()
   let activeControl = $state<DragMode>()
   const appearances = $derived(selection[0]?.appearance)
-  let controlCenter: Point | undefined
+  let controlCenter = $state.raw<Point>()
   let controlRadius = 184
   let editingMask = $state.raw<CollageMap>()
+  let editingTransform = $state.raw<CollageMap[]>()
   let searching = $state(false)
   let searchOrigin: Point = [0, 0]
   let marquee = $state.raw<{
@@ -140,7 +231,6 @@
   let past = $state.raw<CollageMap[][]>([])
   let future = $state.raw<CollageMap[][]>([])
   let spaceDown = false
-  let altDown = $state(false)
   let frame: number | undefined
   let latestPointer: PointerEvent | undefined
   const touchNavigation = new TouchNavigation()
@@ -208,12 +298,14 @@
 
   function refresh() {
     if (!map) return
-    const polygons = items.map((item) => ({
+    const polygons = visibleItems.map((item) => ({
       id: item.instanceId,
+      grouped: !!item.groupId,
       points: projectedOutline(item)
     }))
-    overlays = polygons.map(({ id, points }) => ({
+    overlays = polygons.map(({ id, points, grouped }) => ({
       id,
+      grouped,
       points: points.map((p) => p.join(',')).join(' ')
     }))
     const targets = items.filter((item) => selectedIds.has(item.instanceId))
@@ -251,7 +343,7 @@
         Math.max(
           ...points.map(([x, y]) => Math.hypot(x - screen.x, y - screen.y))
         )
-      controlRadius = radiusForSize(diameter)
+      controlRadius = radiusForSize(diameter, ringTools.length)
       controlCenter = preferredControlCenter([screen.x, screen.y], diameter, [
         viewport[2],
         viewport[3]
@@ -261,7 +353,8 @@
       controlCenter,
       rotationAnchor(targets)!.placement.rotation,
       targets[0].appearance,
-      controlRadius
+      controlRadius,
+      ringTools
     )
     // Freeze the visible arc center throughout rotation. Re-docking mid-drag
     // would separate the controls from the pivot used to rotate the maps.
@@ -274,7 +367,8 @@
       controlCenter,
       rotationAnchor(targets)!.placement.rotation,
       targets[0].appearance,
-      controlRadius
+      controlRadius,
+      ringTools
     )
   }
 
@@ -303,8 +397,85 @@
   }
 
   function select(ids: string[] = []) {
-    selectedIds = new Set(ids)
+    selectedIds = selectionIds(items, ids, editingGroup)
     refresh()
+  }
+
+  function updateGroupVisibility() {
+    // Undo or deleting the final member can remove the group being edited.
+    if (editingGroup && !items.some((item) => item.groupId === editingGroup))
+      editingGroup = undefined
+    for (const item of items) {
+      const visible = !editingGroup || item.groupId === editingGroup
+      if (layer?.getWarpedMap(item.instanceId)?.visible !== visible)
+        layer?.setMapOptions(item.instanceId, { visible }, { animate: false })
+    }
+  }
+
+  function editGroup(item: CollageMap) {
+    if (
+      !item.groupId ||
+      busy ||
+      drag ||
+      editingMask ||
+      editingTransform ||
+      editingGroup
+    )
+      return
+    const members = selectionScope(items, item.groupId)
+    if (selectionLocked(members)) return
+    map?.stop()
+    editingGroup = item.groupId
+    updateGroupVisibility()
+    select([item.instanceId])
+  }
+
+  function finishGroupEdit() {
+    if (
+      !editingGroup ||
+      busy ||
+      drag ||
+      marquee ||
+      editingMask ||
+      editingTransform
+    )
+      return
+    const ids = visibleItems.map((item) => item.instanceId)
+    editingGroup = undefined
+    updateGroupVisibility()
+    select(ids)
+  }
+
+  function toggleLock() {
+    if (!selection.length || busy || drag) return
+    remember()
+    const next = !locked
+    for (const item of selection) item.locked = next
+    items = [...items]
+    refresh()
+  }
+
+  function changeGroup(ungroup = false) {
+    if (
+      busy ||
+      drag ||
+      marquee ||
+      editingMask ||
+      editingTransform ||
+      (editingGroup && !ungroup)
+    )
+      return
+    const targets = editingGroup ? visibleItems : selection
+    if (selectionLocked(targets)) return
+    const before = structuredClone(items)
+    if (!(ungroup ? ungroupMaps(targets) : groupMaps(targets))) return
+    remember(before)
+    items = [...items]
+    if (editingGroup) {
+      editingGroup = undefined
+      updateGroupVisibility()
+      select(targets.map((item) => item.instanceId))
+    } else refresh()
   }
 
   function screenPoint(event: PointerEvent): Point {
@@ -339,7 +510,7 @@
     )
   }
 
-  function fit(targets = items) {
+  function fit(targets = visibleItems) {
     if (!map || !targets.length) return
     const points = targets.flatMap(outline).map((point) => toCanvasGeo(point))
     map.fitBounds(
@@ -383,11 +554,16 @@
 
   function renderItem(item: CollageMap) {
     layer!.addGeoreferencedMap({ ...renderedMap(item), id: item.instanceId })
+    layer!.setMapOptions(
+      item.instanceId,
+      { visible: !editingGroup || item.groupId === editingGroup },
+      { animate: false }
+    )
     updateAppearance(item)
   }
 
   function changeOrder(toFront: boolean) {
-    if (!selection.length || busy || drag) return
+    if (!selection.length || locked || busy || drag) return
     const rest = items.filter((item) => !selectedIds.has(item.instanceId))
     const next = toFront ? [...rest, ...selection] : [...selection, ...rest]
     if (next.every((item, i) => item === items[i])) return
@@ -398,7 +574,7 @@
   }
 
   function duplicate() {
-    if (!selection.length || busy || drag || !map) return
+    if (!selection.length || locked || busy || drag || !map) return
     const added: CollageMap[] = []
     try {
       const from = worldAt([
@@ -415,10 +591,11 @@
         1,
         limit / Math.hypot(to[0] - from[0], to[1] - from[1])
       )
-      const copies = duplicateMaps(selection, [
-        (to[0] - from[0]) * factor,
-        (to[1] - from[1]) * factor
-      ])
+      const copies = duplicateMaps(
+        selection,
+        [(to[0] - from[0]) * factor, (to[1] - from[1]) * factor],
+        { editingGroup }
+      )
       for (const copy of copies) {
         added.push(copy)
         renderItem(copy)
@@ -453,7 +630,7 @@
   }
 
   async function organize(arrangement: Arrangement = 'compact') {
-    if (selection.length < 2 || busy || drag) return
+    if (selection.length < 2 || locked || busy || drag) return
     const before = structuredClone(items)
     const anchorId = selectedIds.values().next().value!
     busy = true
@@ -492,8 +669,66 @@
     }
   }
 
+  function align(alignment: Alignment) {
+    if (selection.length < 2 || locked || busy || drag) return
+    const before = structuredClone(items)
+    const next = structuredClone(selection)
+    let applying = false
+    try {
+      if (!alignMaps(next, alignment, editingGroup)) return
+      errorMessage = ''
+      applying = true
+      next.forEach(updateRaster)
+      const aligned = new Map(next.map((item) => [item.instanceId, item]))
+      items = items.map((item) => aligned.get(item.instanceId) ?? item)
+      remember(before)
+      refresh()
+      fit(next)
+    } catch (error) {
+      if (applying) restore(before)
+      fail(error)
+    }
+  }
+
+  function editTransform() {
+    if (
+      !selection.length ||
+      locked ||
+      busy ||
+      drag ||
+      selection.some(
+        (item) =>
+          !['helmert', 'polynomial1'].includes(
+            transformationType(item.baseline)
+          )
+      )
+    )
+      return
+    errorMessage = ''
+    map?.stop()
+    editingTransform = selection
+  }
+
+  function saveTransform(draft: CollageMap[]) {
+    const before = structuredClone(items)
+    try {
+      draft.forEach(updateRaster)
+      if (JSON.stringify(draft) !== JSON.stringify(editingTransform)) {
+        remember(before)
+        const updates = new Map(draft.map((item) => [item.instanceId, item]))
+        items = items.map((item) => updates.get(item.instanceId) ?? item)
+      }
+      editingTransform = undefined
+      refresh()
+    } catch (error) {
+      editingTransform = undefined
+      restore(before)
+      fail(error)
+    }
+  }
+
   function editMask() {
-    if (selection.length !== 1 || busy || drag) return
+    if (selection.length !== 1 || locked || busy || drag) return
     errorMessage = ''
     try {
       ensureImageSize(selected!)
@@ -536,62 +771,79 @@
     }
   }
 
+  async function backgroundColor(item: CollageMap) {
+    let color = item.appearance.backgroundColor
+    if (!color) {
+      const image = layer!.getWarpedMap(item.instanceId)?.image
+      if (!image)
+        throw new Error('The image is still loading. Try again in a moment.')
+      const request = image.getImageRequest({ width: 512, height: 512 })
+      const rows = (Array.isArray(request) ? request : [[request]]).map((row) =>
+        row.map((tile) => ({
+          url: image.getImageUrl(tile, {
+            preferredFormats: ['webp', 'jpg']
+          })
+        }))
+      )
+      const worker = new BackgroundWorker()
+      backgroundWorker = worker
+      try {
+        color = await new Promise<string>((resolve, reject) => {
+          const timeout = setTimeout(
+            () => reject(new Error('Background detection timed out.')),
+            20000
+          )
+          worker.onmessage = ({ data }) => {
+            clearTimeout(timeout)
+            if (data.error) reject(new Error(data.error))
+            else resolve(data.color)
+          }
+          worker.onerror = () => {
+            clearTimeout(timeout)
+            reject(new Error('Could not detect the map background.'))
+          }
+          worker.postMessage({
+            resourceSize: [image.width, image.height],
+            mask: item.resourceMask,
+            rows
+          } satisfies BackgroundRequest)
+        })
+      } finally {
+        worker.terminate()
+        backgroundWorker = undefined
+      }
+    }
+    return color
+  }
+
   async function toggleBackground() {
-    const item = selected
-    if (!item || busy || drag) return
+    if (!selection.length || locked || busy || drag) return
+    const targets = [...selection]
+    const enabled = !targets.every((item) => item.appearance.removeBackground)
     busy = true
     errorMessage = ''
     try {
-      let color = item.appearance.backgroundColor
-      if (!color) {
-        const image = layer!.getWarpedMap(item.instanceId)?.image
-        if (!image)
-          throw new Error('The image is still loading. Try again in a moment.')
-        const request = image.getImageRequest({ width: 512, height: 512 })
-        const rows = (Array.isArray(request) ? request : [[request]]).map(
-          (row) =>
-            row.map((tile) => ({
-              url: image.getImageUrl(tile, {
-                preferredFormats: ['webp', 'jpg']
-              })
-            }))
+      // Detect each paper color separately; a group shares the setting, not
+      // its members' paper colors. Apply only once every detection succeeds.
+      const colors: (string | undefined)[] = []
+      for (const item of targets) {
+        colors.push(
+          enabled
+            ? await backgroundColor(item)
+            : item.appearance.backgroundColor
         )
-        const worker = new BackgroundWorker()
-        backgroundWorker = worker
-        try {
-          color = await new Promise<string>((resolve, reject) => {
-            const timeout = setTimeout(
-              () => reject(new Error('Background detection timed out.')),
-              20000
-            )
-            worker.onmessage = ({ data }) => {
-              clearTimeout(timeout)
-              if (data.error) reject(new Error(data.error))
-              else resolve(data.color)
-            }
-            worker.onerror = () => {
-              clearTimeout(timeout)
-              reject(new Error('Could not detect the map background.'))
-            }
-            worker.postMessage({
-              resourceSize: [image.width, image.height],
-              mask: item.resourceMask,
-              rows
-            } satisfies BackgroundRequest)
-          })
-        } finally {
-          worker.terminate()
-          backgroundWorker = undefined
-        }
+        if (disposed) return
       }
-      if (disposed || !items.includes(item)) return
+      if (targets.some((item) => !items.includes(item))) return
       remember()
-      item.appearance = {
-        ...item.appearance,
-        backgroundColor: color,
-        removeBackground: !item.appearance.removeBackground
-      }
-      updateAppearance(item)
+      targets.forEach((item, index) => {
+        item.appearance = {
+          ...item.appearance,
+          backgroundColor: colors[index],
+          removeBackground: enabled
+        }
+        updateAppearance(item)
+      })
       items = [...items]
     } catch (error) {
       fail(error)
@@ -657,6 +909,7 @@
     const center = map!.getCenter()
     const result = await runLayout({
       type: 'add',
+      importTransformation,
       input,
       sourceUrl,
       at: fromCanvasGeo([center.lng, center.lat])
@@ -669,7 +922,8 @@
   }
 
   function search() {
-    if (!map || busy || editingMask || drag) return
+    if (!map || busy || editingMask || editingTransform || editingGroup || drag)
+      return
     const center = map.getCenter()
     searchOrigin = fromCanvasGeo([center.lng, center.lat])
     errorMessage = ''
@@ -695,6 +949,7 @@
     try {
       const result = await runLayout({
         type: 'add',
+        importTransformation,
         input: generateAnnotation(maps),
         at: searchOrigin
       })
@@ -783,6 +1038,7 @@
   }
 
   async function showInput(mode: 'add' | 'open') {
+    if (editingGroup) return
     inputMode = mode
     inputText = ''
     errorMessage = ''
@@ -842,9 +1098,10 @@
     }
   }
 
-  function save() {
+  function save(targets = items) {
+    if (!targets.length) return
     try {
-      const data = JSON.stringify(exportCollage(items), null, 2)
+      const data = JSON.stringify(exportCollage(targets), null, 2)
       const url = URL.createObjectURL(
         new Blob([data], { type: 'application/ld+json' })
       )
@@ -879,6 +1136,7 @@
     }
     layer!.bringMapsToFront(next.map((item) => item.instanceId))
     items = next
+    updateGroupVisibility()
     select(
       items
         .filter((item) => selectedIds.has(item.instanceId))
@@ -903,38 +1161,43 @@
   }
 
   function removeSelected() {
-    if (!selection.length || drag || busy) return
+    if (!selection.length || locked || drag || busy) return
     remember()
     for (const item of selection)
       layer!.removeGeoreferencedMapById(item.instanceId)
     items = items.filter((item) => !selectedIds.has(item.instanceId))
+    updateGroupVisibility()
     select()
   }
 
-  function toggleSaturation() {
-    if (!selected || busy || drag) return
+  function changeAppearance(patch: Partial<CollageMap['appearance']>) {
+    if (!selection.length || locked || busy || drag) return
     remember()
-    selected.appearance = {
-      ...selected.appearance,
-      saturation: selected.appearance.saturation ? 0 : 1
-    }
-    updateAppearance(selected)
+    setAppearance(selection, patch)
+    selection.forEach(updateAppearance)
     items = [...items]
+    refresh()
+  }
+
+  function toggleSaturation() {
+    changeAppearance({
+      saturation: selection.every((item) => item.appearance.saturation === 1)
+        ? 0
+        : 1
+    })
   }
 
   function toggleColorize() {
-    if (!selected || busy || drag) return
-    remember()
-    selected.appearance = {
-      ...selected.appearance,
-      colorize: !selected.appearance.colorize
-    }
-    updateAppearance(selected)
-    items = [...items]
+    changeAppearance({
+      colorize: !selection.every((item) => item.appearance.colorize)
+    })
   }
 
-  function controlKey(event: KeyboardEvent, mode: 'rotate' | Slider) {
-    if (!selected || busy || drag) return
+  function controlKey(
+    event: KeyboardEvent,
+    mode: 'rotate' | 'opacity' | 'hue'
+  ) {
+    if (!selected || locked || busy || drag) return
     if (
       mode === 'rotate' &&
       event.altKey &&
@@ -991,23 +1254,31 @@
                 0,
                 Math.min(
                   1,
-                  selected.appearance[mode] +
+                  appearances![mode] +
                     direction * (mode === 'hue' ? 1 / 36 : 0.05)
                 )
               )
-      selected.appearance = {
-        ...selected.appearance,
+      setAppearance(selection, {
         [mode]: value,
         ...(mode === 'hue' ? { colorize: true } : {})
-      }
-      updateAppearance(selected)
+      })
+      selection.forEach(updateAppearance)
     }
     items = [...items]
     refresh()
   }
 
   function alignToBearing() {
-    if (!selection.length || busy || drag || editingMask || searching) return
+    if (
+      !selection.length ||
+      locked ||
+      busy ||
+      drag ||
+      editingMask ||
+      editingTransform ||
+      searching
+    )
+      return
     const before = structuredClone(items)
     try {
       const changed = structuredClone(selection)
@@ -1030,7 +1301,16 @@
   }
 
   function mirrorSelected(event: MouseEvent) {
-    if (!selection.length || busy || drag || editingMask || searching) return
+    if (
+      !selection.length ||
+      locked ||
+      busy ||
+      drag ||
+      editingMask ||
+      editingTransform ||
+      searching
+    )
+      return
     const before = structuredClone(items)
     try {
       const changed = structuredClone(selection)
@@ -1053,24 +1333,22 @@
   }
 
   function resetOrientation() {
-    const item = selected
-    if (!item || busy) return
+    if (!selected || locked || busy || drag) return
     errorMessage = ''
     const before = structuredClone(items)
-    const previous = item.placement
-    item.placement = rotatePlacement(
-      previous,
-      rotationPivot(),
-      -previous.rotation
-    )
+    const angle = -selected.placement.rotation
+    const pivot = rotationPivot()
     try {
-      updateRaster(item)
+      selection.forEach((item) => {
+        item.placement = rotatePlacement(item.placement, pivot, angle)
+      })
+      selection.forEach(placedMap)
+      selection.forEach(updateRaster)
       remember(before)
       items = [...items]
       refresh()
-      message = 'Rotation reset.'
     } catch (error) {
-      item.placement = previous
+      restore(before)
       fail(error)
     }
   }
@@ -1085,11 +1363,12 @@
       !map
     )
       return
+    if (!selectedIds.has(item.instanceId)) select([item.instanceId])
+    if (locked) return
     event.preventDefault()
     event.stopPropagation()
     // Alt/Option-click aligns on release; it must not start a drag as well.
     if (mode === 'rotate' && event.altKey) return
-    if (!selectedIds.has(item.instanceId)) select([item.instanceId])
     const targets = items.filter((candidate) =>
       selectedIds.has(candidate.instanceId)
     )
@@ -1097,7 +1376,7 @@
     const screen = screenPoint(event)
     const controlPivot = rotationPivot(targets)
     const pivot = controlPivot
-    const rail = controls?.[mode].rail
+    const rail = controls?.[mode]?.rail
     const anchor = rotationAnchor(targets)!
     let bearing = 0
     if (mode === 'rotate') {
@@ -1149,6 +1428,7 @@
       busy ||
       inputMode ||
       editingMask ||
+      editingTransform ||
       searching ||
       spaceDown ||
       event.altKey
@@ -1156,14 +1436,17 @@
       return
     const rect = map!.getCanvas().getBoundingClientRect()
     const point = worldAt([event.clientX - rect.left, event.clientY - rect.top])
-    const item = [...items]
+    const item = [...visibleItems]
       .reverse()
       .find((item) => contains(point, outline(item)))
     if (!item) return
     event.preventDefault()
     event.stopImmediatePropagation()
-    select([item.instanceId])
-    editMask()
+    if (item.groupId && !editingGroup) editGroup(item)
+    else {
+      select([item.instanceId])
+      editMask()
+    }
   }
 
   function pointerDown(event: PointerEvent) {
@@ -1177,11 +1460,12 @@
       event.button !== 0 ||
       inputMode ||
       editingMask ||
+      editingTransform ||
       searching
     )
       return
     const point = worldPoint(event)
-    const item = [...items]
+    const item = [...visibleItems]
       .reverse()
       .find((item) => contains(point, outline(item)))
     const additive = event.shiftKey || event.metaKey || event.ctrlKey
@@ -1189,10 +1473,9 @@
       if (additive) {
         event.preventDefault()
         event.stopPropagation()
-        const ids = new Set(selectedIds)
-        if (ids.has(item.instanceId)) ids.delete(item.instanceId)
-        else ids.add(item.instanceId)
-        select([...ids])
+        select([
+          ...toggleSelection(items, selectedIds, item.instanceId, editingGroup)
+        ])
       } else beginDrag(event, item, 'move')
     } else if (additive) {
       event.preventDefault()
@@ -1214,7 +1497,7 @@
     const point = worldPoint(event)
     const screen = screenPoint(event)
     if (drag.mode === 'opacity' || drag.mode === 'hue') {
-      const { item, appearance } = drag.targets[0]
+      const { appearance } = drag.targets[0]
       const value = Math.max(
         0,
         Math.min(
@@ -1225,12 +1508,19 @@
         )
       )
       const changed = Math.abs(value - appearance[drag.mode]) > 0.0001
-      item.appearance = {
-        ...item.appearance,
-        [drag.mode]: value,
-        ...(drag.mode === 'hue' && changed ? { colorize: true } : {})
+      // A click alone must not flatten mixed settings in a group.
+      const targets = drag.targets.map(({ item }) => item)
+      if (changed) {
+        setAppearance(targets, {
+          [drag.mode]: value,
+          ...(drag.mode === 'hue' ? { colorize: true } : {})
+        })
+      } else {
+        drag.targets.forEach(({ item, appearance }) => {
+          item.appearance = appearance
+        })
       }
-      updateAppearance(item)
+      targets.forEach(updateAppearance)
       items = [...items]
       refresh()
       return
@@ -1252,7 +1542,8 @@
         try {
           const copies = duplicateMaps(
             gesture.targets.map(({ item }) => item),
-            [0, 0]
+            [0, 0],
+            { editingGroup }
           )
           for (const copy of copies) {
             added.push(copy)
@@ -1341,7 +1632,7 @@
   }
 
   function pointerMove(event: PointerEvent) {
-    altDown = event.altKey
+    modifier(event)
     if (touchNavigation.active) return
     if (marquee?.pointerId === event.pointerId) {
       marquee = { ...marquee, end: screenPoint(event) }
@@ -1365,7 +1656,7 @@
         ])
         const ids = new Set(marquee.before)
         if (rect[2] - rect[0] > 3 || rect[3] - rect[1] > 3) {
-          for (const item of items) {
+          for (const item of visibleItems) {
             if (clipPolygon(projectedOutline(item), rect).length >= 3)
               ids.add(item.instanceId)
           }
@@ -1441,8 +1732,15 @@
   }
 
   function keyboard(event: KeyboardEvent) {
-    altDown = event.altKey
-    if (editingMask || searching) return
+    modifier(event)
+    if (
+      editingMask ||
+      editingTransform ||
+      searching ||
+      exportOpen ||
+      settingsOpen
+    )
+      return
     if (event.key === 'Escape') {
       if (layoutController) {
         layoutController.abort()
@@ -1455,7 +1753,8 @@
       if (drag || marquee) finishDrag(undefined, true)
       else if (!busy) {
         inputMode = undefined
-        select()
+        if (editingGroup) finishGroupEdit()
+        else select()
       }
       return
     }
@@ -1473,10 +1772,20 @@
       spaceDown = true
       event.preventDefault()
     }
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'a') {
+    if (
+      editingGroup &&
+      (event.metaKey || event.ctrlKey) &&
+      event.key === 'Enter'
+    ) {
+      event.preventDefault()
+      finishGroupEdit()
+    } else if (
+      (event.metaKey || event.ctrlKey) &&
+      event.key.toLowerCase() === 'a'
+    ) {
       event.preventDefault()
       if (!drag && !marquee && !busy)
-        select(items.map((item) => item.instanceId))
+        select(visibleItems.map((item) => item.instanceId))
     } else if (
       (event.metaKey || event.ctrlKey) &&
       event.key.toLowerCase() === 'z'
@@ -1489,7 +1798,14 @@
       event.key.toLowerCase() === 's'
     ) {
       event.preventDefault()
-      save()
+      if (editingGroup) finishGroupEdit()
+      else save()
+    } else if (
+      (event.metaKey || event.ctrlKey) &&
+      event.key.toLowerCase() === 'g'
+    ) {
+      event.preventDefault()
+      changeGroup(event.shiftKey)
     } else if (event.key === 'Backspace' || event.key === 'Delete') {
       event.preventDefault()
       removeSelected()
@@ -1499,7 +1815,16 @@
   async function drop(event: DragEvent) {
     event.preventDefault()
     draggingOver = false
-    if (busy || !ready || drag || editingMask || searching) return
+    if (
+      busy ||
+      !ready ||
+      drag ||
+      editingMask ||
+      editingTransform ||
+      editingGroup ||
+      searching
+    )
+      return
     const droppedFiles = Array.from(event.dataTransfer?.files ?? [])
     if (droppedFiles.length) await files(droppedFiles, inputMode ?? 'add')
     else {
@@ -1517,6 +1842,16 @@
   }
 
   onMount(() => {
+    try {
+      importTransformation = parseImportTransformation(
+        localStorage.getItem(importTransformationKey)
+      )
+      toolSettings = parseToolSettings(
+        JSON.parse(localStorage.getItem(toolSettingsKey) ?? 'null')
+      )
+    } catch {
+      /* Use defaults when storage is unavailable. */
+    }
     window.addEventListener('pointerdown', trackTouchStart, true)
     window.addEventListener('pointerup', trackTouchEnd, true)
     window.addEventListener('pointercancel', trackTouchEnd, true)
@@ -1528,6 +1863,7 @@
         zoom: 13 + CANVAS_ZOOM_OFFSET,
         minZoom: -2,
         maxPitch: 0,
+        maxCanvasSize: [8192, 8192],
         maxZoom: 22 + CANVAS_ZOOM_OFFSET,
         renderWorldCopies: false,
         // Keep a finite Mercator center while allowing the viewport to extend
@@ -1541,7 +1877,7 @@
       map.keyboard.disableRotation()
       map.touchZoomRotate.disableRotation()
       map.on('load', () => {
-        layer = new WarpedMapLayer()
+        layer = new ExportableMapLayer()
         map!.addLayer(layer)
         layer.renderer?.addEventListener('imageinfofetcherror', (event) => {
           trackLoad(event, true, 'image')
@@ -1597,7 +1933,7 @@
   onpointercancel={(event) => finishDrag(event, true)}
   onkeydown={keyboard}
   onkeyup={(event) => {
-    altDown = event.altKey
+    modifier(event)
     if (event.code === 'Space') spaceDown = false
   }}
   onblur={() => {
@@ -1608,7 +1944,8 @@
   }}
   ondragover={(event) => {
     event.preventDefault()
-    if (!editingMask && !searching) draggingOver = true
+    if (!editingMask && !editingTransform && !editingGroup && !searching)
+      draggingOver = true
   }}
   ondragleave={(event) => {
     if (!event.relatedTarget) draggingOver = false
@@ -1624,18 +1961,20 @@
   style:--dot-color={themeColors.green}
   style:--accent={themeColors.pink}
   style:--error-color={themeColors.red}
+  style:--group-color={themeColors.darkblue}
 >
   <div
     bind:this={container}
     class="map-canvas"
     aria-label="Collage canvas"
   ></div>
-  {#if !editingMask && !searching}
+  {#if !editingMask && !editingTransform && !searching}
     <svg class="outlines" aria-hidden="true">
       {#each overlays as item (item.id)}
         <polygon
           points={item.points}
           class:selected={selectedIds.has(item.id)}
+          class:grouped={item.grouped}
           class:failed={!!loadFailures[item.id]?.length}
         />
       {/each}
@@ -1652,6 +1991,16 @@
     </svg>
   {/if}
 
+  {#if settingsOpen}
+    <ToolSettings
+      settings={toolSettings}
+      {importTransformation}
+      onimportchange={changeImport}
+      onchange={changeTools}
+      onclose={() => (settingsOpen = false)}
+    />
+  {/if}
+
   <header class="app-header">
     <div class="brand">
       <div class="brand-mark"><Logo /></div>
@@ -1663,7 +2012,13 @@
         data-tooltip="Find maps"
         aria-label="Find maps by place"
         onclick={search}
-        disabled={!ready || busy || !!editingMask || searching || !!inputMode}
+        disabled={!ready ||
+          busy ||
+          !!editingMask ||
+          !!editingTransform ||
+          !!editingGroup ||
+          searching ||
+          !!inputMode}
       >
         <MagnifyingGlass size={20} />
       </button>
@@ -1672,22 +2027,51 @@
         data-tooltip="Open collage"
         aria-label="Open collage"
         onclick={() => showInput('open')}
-        disabled={!ready || busy || !!editingMask || searching}
-        ><FolderOpen size={20} /></button
+        disabled={!ready ||
+          busy ||
+          !!editingMask ||
+          !!editingTransform ||
+          !!editingGroup ||
+          searching}><FolderOpen size={20} /></button
       >
+      <ExportMenu
+        {map}
+        {layer}
+        {items}
+        {selectedIds}
+        disabled={!items.length ||
+          !ready ||
+          busy ||
+          !!editingMask ||
+          !!editingTransform ||
+          !!editingGroup ||
+          searching ||
+          !!inputMode}
+        onsave={save}
+        onopen={(open) => (exportOpen = open)}
+      />
       <button
         class="quiet-button"
-        data-tooltip="Save annotation"
-        aria-label="Save annotation"
-        onclick={save}
-        disabled={!ready || busy || !!editingMask || searching}
-        ><DownloadSimple size={20} /></button
+        data-tooltip="Settings"
+        aria-label="Settings"
+        disabled={busy ||
+          !!activeControl ||
+          !!editingMask ||
+          !!editingTransform ||
+          searching ||
+          !!inputMode}
+        onclick={() => (settingsOpen = true)}><GearSix size={20} /></button
       >
       <button
         class="primary-button small"
         aria-label="Add maps"
         onclick={() => showInput('add')}
-        disabled={!ready || busy || !!editingMask || searching}
+        disabled={!ready ||
+          busy ||
+          !!editingMask ||
+          !!editingTransform ||
+          !!editingGroup ||
+          searching}
         >{#if busy}<LoadingSmall />{:else}<Plus size={18} />{/if}<span
           >Add maps</span
         ></button
@@ -1725,137 +2109,249 @@
     </section>
   {/if}
 
-  {#if selected && controls && appearances && !inputMode && !editingMask && !searching}
-    <MapControl
-      position={controls.move.position}
-      label={altDown
-        ? 'Duplicate and move'
-        : selection.length > 1
-          ? 'Move selected maps'
-          : 'Move map'}
-      disabled={busy}
-      active={activeControl === 'move'}
-      onpointerdown={(event) => beginDrag(event, selected!, 'move')}
-      ><ArrowsOutCardinal size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.rotate.position}
-      label={altDown
-        ? 'Make upright'
-        : selection.length > 1
-          ? 'Rotate selected maps'
-          : 'Rotate map'}
-      disabled={busy}
-      active={activeControl === 'rotate'}
-      value={Math.round(
-        (((selectedRotation * 180) / Math.PI + 540) % 360) - 180
-      ) + '°'}
-      onpointerdown={(event) => beginDrag(event, selected!, 'rotate')}
-      onclick={(event) => {
-        if (event.altKey) alignToBearing()
-      }}
-      onkeydown={(event) => controlKey(event, 'rotate')}
-      ondblclick={(event) => {
-        if (!event.altKey && selection.length === 1) resetOrientation()
-      }}
-      >{#if altDown}<ArrowUp size={19} />{:else}<ArrowClockwise
-          size={19}
-        />{/if}</MapControl
-    >
-    <MapControl
-      position={controls.opacity.position}
-      label="Opacity"
-      disabled={busy || selection.length > 1}
-      active={activeControl === 'opacity'}
-      sliderValue={appearances.opacity}
-      rail={controls.opacity.rail}
-      value={Math.round(appearances.opacity * 100) + '%'}
-      onpointerdown={(event) => beginDrag(event, selected!, 'opacity')}
-      onkeydown={(event) => controlKey(event, 'opacity')}
-      ><CircleHalf size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.hue.position}
-      rail={controls.hue.rail}
-      hueScale
-      label="Colorize"
-      disabled={busy || selection.length > 1}
-      pressed={appearances.colorize}
-      active={activeControl === 'hue'}
-      sliderValue={appearances.hue}
-      value={hueColor(appearances.hue).toUpperCase()}
-      onpointerdown={(event) => beginDrag(event, selected!, 'hue')}
-      onkeydown={(event) => controlKey(event, 'hue')}
-      ondblclick={toggleColorize}><Palette size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.saturation.position}
-      label="Saturation"
-      disabled={busy || selection.length > 1}
-      pressed={appearances.saturation === 1}
-      onclick={toggleSaturation}><DropHalf size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.background.position}
-      label="Remove background"
-      disabled={busy || selection.length > 1}
-      pressed={appearances.removeBackground}
-      onclick={toggleBackground}><MagicWand size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.mirror.position}
-      label={altDown ? 'Mirror vertically' : 'Mirror horizontally'}
-      disabled={busy}
-      pressed={allMirrored}
-      onclick={mirrorSelected}
-      >{#if altDown}<FlipVertical size={19} />{:else}<FlipHorizontal
-          size={19}
-        />{/if}</MapControl
-    >
-    <MapControl
-      position={controls.editMask.position}
-      label="Edit mask"
-      disabled={busy || selection.length > 1}
-      onclick={editMask}><Polygon size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.front.position}
-      label={altDown ? 'Send to back' : 'Bring to front'}
-      disabled={busy ||
-        (altDown
-          ? items.slice(0, selection.length)
-          : items.slice(-selection.length)
-        ).every((item) => selectedIds.has(item.instanceId))}
-      onclick={(event) => changeOrder(!event.altKey)}
-      >{#if altDown}<SendMapsToBack />{:else}<BringMapsToFront
-        />{/if}</MapControl
-    >
-    <MapControl
-      position={controls.duplicate.position}
-      label={selection.length > 1 ? 'Duplicate selected maps' : 'Duplicate map'}
-      disabled={busy}
-      onclick={duplicate}><Copy size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.openIn.position}
-      label="Open in Viewer"
-      disabled={busy || !viewerLink}
-      onclick={() => {
-        if (viewerLink) window.open(viewerLink, '_blank', 'noopener,noreferrer')
-      }}><ArrowSquareOut size={19} /></MapControl
-    >
-    <MapControl
-      position={controls.remove.position}
-      label={selection.length > 1 ? 'Remove selected maps' : 'Remove map'}
-      disabled={busy}
-      onclick={removeSelected}><Trash size={19} /></MapControl
-    >
+  {#if selected && controls && appearances && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
+    {#key selection.map((item) => item.instanceId).join(',')}
+      {#each ringTools as tool (tool)}
+        {#if tool === 'move'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.move.position}
+            label={altDown
+              ? 'Duplicate and move'
+              : selection.length > 1
+                ? 'Move selected maps'
+                : 'Move map'}
+            disabled={busy || locked}
+            active={activeControl === 'move'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'move')}
+            ><ArrowsOutCardinal size={19} /></MapControl
+          >
+        {:else if tool === 'rotate'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.rotate.position}
+            label={altDown
+              ? 'Make upright'
+              : selection.length > 1
+                ? 'Rotate selected maps'
+                : 'Rotate map'}
+            disabled={busy || locked}
+            active={activeControl === 'rotate'}
+            value={Math.round(
+              (((selectedRotation * 180) / Math.PI + 540) % 360) - 180
+            ) + '°'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'rotate')}
+            onclick={(event) => {
+              if (event.altKey) alignToBearing()
+            }}
+            onkeydown={(event) => controlKey(event, 'rotate')}
+            ondblclick={(event) => {
+              if (!event.altKey) resetOrientation()
+            }}
+            >{#if altDown}<ArrowUp size={19} />{:else}<ArrowClockwise
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'opacity'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.opacity.position}
+            label="Opacity"
+            disabled={busy || locked}
+            active={activeControl === 'opacity'}
+            sliderValue={appearances.opacity}
+            rail={controls.opacity.rail}
+            value={Math.round(appearances.opacity * 100) + '%'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'opacity')}
+            onkeydown={(event) => controlKey(event, 'opacity')}
+            ><CircleHalf size={19} /></MapControl
+          >
+        {:else if tool === 'hue'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.hue.position}
+            rail={controls.hue.rail}
+            hueScale
+            label="Colorize"
+            disabled={busy || locked}
+            pressed={selection.every((item) => item.appearance.colorize)}
+            active={activeControl === 'hue'}
+            sliderValue={appearances.hue}
+            value={hueColor(appearances.hue).toUpperCase()}
+            onpointerdown={(event) => beginDrag(event, selected!, 'hue')}
+            onkeydown={(event) => controlKey(event, 'hue')}
+            ondblclick={toggleColorize}><Palette size={19} /></MapControl
+          >
+        {:else if tool === 'saturation'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.saturation.position}
+            label="Saturation"
+            disabled={busy || locked}
+            pressed={selection.every(
+              (item) => item.appearance.saturation === 1
+            )}
+            onclick={toggleSaturation}><DropHalf size={19} /></MapControl
+          >
+        {:else if tool === 'background'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.background.position}
+            label="Remove background"
+            disabled={busy || locked}
+            pressed={selection.every(
+              (item) => item.appearance.removeBackground
+            )}
+            onclick={toggleBackground}><MagicWand size={19} /></MapControl
+          >
+        {:else if tool === 'mirror'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.mirror.position}
+            label={altDown ? 'Mirror vertically' : 'Mirror horizontally'}
+            disabled={busy || locked}
+            pressed={allMirrored}
+            onclick={mirrorSelected}
+            >{#if altDown}<FlipVertical size={19} />{:else}<FlipHorizontal
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'editMask'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.editMask.position}
+            label="Edit mask"
+            disabled={busy || locked || selection.length > 1}
+            onclick={editMask}><Polygon size={19} /></MapControl
+          >
+        {:else if tool === 'front'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.front.position}
+            label={toFront ? 'Bring to front' : 'Send to back'}
+            disabled={busy || locked || orderUnchanged}
+            onclick={() => changeOrder(toFront)}
+            >{#if toFront}<BringMapsToFront />{:else}<SendMapsToBack
+              />{/if}</MapControl
+          >
+        {:else if tool === 'duplicate'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.duplicate.position}
+            label={selection.length > 1
+              ? 'Duplicate selected maps'
+              : 'Duplicate map'}
+            disabled={busy || locked}
+            onclick={duplicate}><Copy size={19} /></MapControl
+          >
+        {:else if tool === 'openIn'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.openIn.position}
+            label="Open in Viewer"
+            disabled={busy || locked || !viewerLink}
+            onclick={() => {
+              if (viewerLink)
+                window.open(viewerLink, '_blank', 'noopener,noreferrer')
+            }}><ArrowSquareOut size={19} /></MapControl
+          >
+        {:else if tool === 'remove'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.remove.position}
+            label={selection.length > 1 ? 'Remove selected maps' : 'Remove map'}
+            disabled={busy || locked}
+            onclick={removeSelected}><Trash size={19} /></MapControl
+          >
+        {:else if tool === 'lock'}
+          <MapControl
+            position={controls.lock.position}
+            label={locked ? 'Unlock' : 'Lock'}
+            pressed={locked}
+            disabled={busy || !!activeControl}
+            onclick={toggleLock}
+            >{#if locked}<LockSimple size={19} />{:else}<LockSimpleOpen
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'transform'}
+          <MapControl
+            folded={locked}
+            fold={{
+              center: controlCenter!,
+              target: controls.lock?.position ?? controlCenter!
+            }}
+            position={controls.transform.position}
+            label="Transform"
+            disabled={busy ||
+              locked ||
+              selection.some(
+                (item) =>
+                  !['helmert', 'polynomial1'].includes(
+                    transformationType(item.baseline)
+                  )
+              )}
+            onclick={editTransform}><BoundingBox size={20} /></MapControl
+          >
+        {/if}
+      {/each}
+    {/key}
   {/if}
 
-  {#if !editingMask && !inputMode && !searching}
+  {#if !editingMask && !editingTransform && !inputMode && !searching}
     <div
       class="bottom-stack selection-stack"
-      class:has-actions={selection.length > 1 || !!layoutController}
+      class:has-actions={!!editingGroup ||
+        (selection.length > 1 && !locked) ||
+        !!layoutController}
     >
       {#if errorMessage}
         <div class="error-message" role="alert">
@@ -1865,17 +2361,17 @@
           >
         </div>
       {/if}
-      {#if selection.length > 1 || layoutController}
+      {#if editingGroup || (selection.length > 1 && !locked) || layoutController}
         <div
           class="selection-actions"
           role="group"
-          aria-label="Arrange selected maps"
+          aria-label={editingGroup ? 'Edit group' : 'Arrange selected maps'}
         >
           <h2>
             {#if layoutController}
               <LoadingSmall />Arranging…
             {:else}
-              Edit layout
+              {editingGroup ? 'Edit group' : 'Edit layout'}
             {/if}
           </h2>
           {#if layoutController}
@@ -1886,29 +2382,95 @@
               onclick={() => layoutController?.abort()}><X size={19} /></button
             >
           {:else}
-            <button
-              class="quiet-button"
-              aria-label="Arrange selected maps"
-              data-tooltip="Arrange compactly"
-              disabled={busy}
-              onclick={() => organize()}><SquaresFour size={20} /></button
-            >
-            <button
-              class="quiet-button"
-              aria-label="Arrange geographically"
-              data-tooltip="Arrange geographically"
-              disabled={busy ||
-                selection.some((item) => !item.geographicReference)}
-              onclick={() => organize('geographic')}
-              ><MapTrifold size={20} /></button
-            >
+            {#if selection.length > 1 && !locked}
+              <button
+                class="quiet-button"
+                aria-label="Arrange selected maps"
+                data-tooltip="Arrange compactly"
+                disabled={busy}
+                onclick={() => organize()}><SquaresFour size={20} /></button
+              >
+              <button
+                class="quiet-button"
+                aria-label="Arrange geographically"
+                data-tooltip="Arrange geographically"
+                disabled={busy ||
+                  selection.some((item) => !item.geographicReference)}
+                onclick={() => organize('geographic')}
+                ><MapTrifold size={20} /></button
+              >
+              <FanMenu
+                label="Align"
+                icon={AlignLeft}
+                disabled={busy || (grouped && !editingGroup)}
+                options={[
+                  { value: 'top', label: 'Top', icon: AlignTop },
+                  { value: 'bottom', label: 'Bottom', icon: AlignBottom },
+                  { value: 'left', label: 'Left', icon: AlignLeft },
+                  { value: 'right', label: 'Right', icon: AlignRight },
+                  {
+                    value: 'horizontal',
+                    label: 'Horizontal center',
+                    icon: AlignCenterHorizontal
+                  },
+                  {
+                    value: 'vertical',
+                    label: 'Vertical center',
+                    icon: AlignCenterVertical
+                  }
+                ]}
+                onselect={(value) => align(value as Alignment)}
+              />
+              {#if !editingGroup && !grouped}
+                <button
+                  class="quiet-button"
+                  aria-label="Group"
+                  data-tooltip="Group"
+                  disabled={busy}
+                  onclick={() => changeGroup()}
+                  ><SelectionAll size={20} /></button
+                >
+              {/if}
+              {#if !editingGroup && selection.some((item) => item.groupId)}
+                <button
+                  class="quiet-button"
+                  aria-label="Ungroup"
+                  data-tooltip="Ungroup"
+                  disabled={busy}
+                  onclick={() => changeGroup(true)}
+                  ><SelectionSlash size={20} /></button
+                >
+              {/if}
+            {/if}
+            {#if editingGroup}
+              <button
+                class="quiet-button"
+                aria-label="Ungroup"
+                data-tooltip="Ungroup"
+                aria-keyshortcuts="Meta+Shift+G Control+Shift+G"
+                disabled={busy ||
+                  !!activeControl ||
+                  !!marquee ||
+                  selectionLocked(visibleItems)}
+                onclick={() => changeGroup(true)}
+                ><SelectionSlash size={20} /></button
+              >
+              <button
+                class="quiet-button"
+                aria-label="Done editing group"
+                data-tooltip="Done"
+                aria-keyshortcuts="Meta+Enter Control+Enter"
+                disabled={busy || !!activeControl}
+                onclick={finishGroupEdit}><Check size={20} /></button
+              >
+            {/if}
           {/if}
         </div>
       {/if}
     </div>
   {/if}
 
-  {#if !editingMask && !searching}
+  {#if !editingMask && !editingTransform && !searching}
     <footer class="canvas-footer">
       <div class="view-controls">
         <button
@@ -1924,8 +2486,8 @@
           disabled={!ready}><Minus size={19} /></button
         >
         <button
-          data-tooltip="Fit collage"
-          aria-label="Fit collage"
+          data-tooltip={editingGroup ? 'Fit group' : 'Fit collage'}
+          aria-label={editingGroup ? 'Fit group' : 'Fit collage'}
           onclick={() => fit()}
           disabled={!items.length}><ArrowsOut size={19} /></button
         >
@@ -2054,6 +2616,21 @@
         </div>
       </div>
     {/await}
+  {/if}
+
+  {#if editingTransform && map && layer}
+    <TransformEditor
+      selection={editingTransform}
+      {map}
+      {layer}
+      {items}
+      onpreview={(draft) => draft.forEach(updateRaster)}
+      ondone={saveTransform}
+      oncancel={() => {
+        editingTransform = undefined
+        refresh()
+      }}
+    />
   {/if}
 
   {#if editingMask && map && layer}

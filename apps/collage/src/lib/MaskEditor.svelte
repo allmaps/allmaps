@@ -25,9 +25,12 @@
     Cursor,
     ArrowCounterClockwise,
     Check,
+    Eye,
+    EyeSlash,
     X
   } from 'phosphor-svelte'
   import FanMenu from './FanMenu.svelte'
+  import { modeVisibility } from './mode-visibility'
   import {
     drawMaskCircle,
     drawMaskRectangle,
@@ -93,6 +96,8 @@
   let past = $state.raw<Point[][]>([])
   let future = $state.raw<Point[][]>([])
   let ready = $state(false)
+  let showOthers = $state(false)
+  let visibility: ReturnType<typeof modeVisibility> | undefined
   let error = $state('')
   let changing = false
   let edgeStart: { index: number; point: Point } | undefined
@@ -891,10 +896,11 @@
 
   onMount(() => {
     const camera = { center: map.getCenter(), zoom: map.getZoom() }
-    const visibility = items.map((other) => ({
-      id: other.instanceId,
-      visible: layer.getWarpedMap(other.instanceId)?.visible ?? true
-    }))
+    visibility = modeVisibility(
+      layer,
+      items.map((other) => other.instanceId),
+      original.instanceId
+    )
     const doubleClickZoom = map.doubleClickZoom.isEnabled()
     const canvas = map.getCanvas()
     // Establish touch-action before contact: changing it midway through a
@@ -921,15 +927,7 @@
     try {
       map.stop()
       map.doubleClickZoom.disable()
-      for (const other of items) {
-        layer.setMapOptions(
-          other.instanceId,
-          {
-            visible: other.instanceId === original.instanceId
-          },
-          { animate: false }
-        )
-      }
+      visibility.showOthers(showOthers)
       layer.setMapOptions(
         original.instanceId,
         {
@@ -1172,13 +1170,7 @@
       vertexTaps.reset()
       draw?.stop()
       map.dragPan.enable()
-      for (const other of visibility) {
-        layer.setMapOptions(
-          other.id,
-          { visible: other.visible },
-          { animate: false }
-        )
-      }
+      visibility?.restore()
       layer.setMapOptions(
         original.instanceId,
         {
@@ -1216,6 +1208,20 @@
                 ? 'Draw mask'
                 : 'Edit mask'}
       </h2>
+      <button
+        class="quiet-button"
+        aria-label={showOthers ? 'Hide other maps' : 'Show other maps'}
+        data-tooltip={showOthers ? 'Hide other maps' : 'Show other maps'}
+        aria-pressed={!showOthers}
+        disabled={!ready}
+        onclick={() => {
+          showOthers = !showOthers
+          visibility?.showOthers(showOthers)
+        }}
+        >{#if showOthers}<Eye size={20} />{:else}<EyeSlash
+            size={20}
+          />{/if}</button
+      >
       <button
         class="quiet-button"
         aria-label="Full image mask"

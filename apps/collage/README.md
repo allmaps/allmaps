@@ -6,7 +6,8 @@ each map's original center. Arrange maps individually or in groups, change their
 appearance, edit their masks, and save the layout as a Georeference Annotation.
 
 Collage is an experimental application. Geometry, edited masks, layer order and
-rotation round-trip through annotations; appearance settings remain session-only.
+rotation round-trip through annotations, along with individual appearance, groups
+and locks in optional `_allmaps.collage` metadata.
 
 ## Development
 
@@ -121,7 +122,7 @@ response. This is per-tab search history, not an autosave of the collage.
 
 ## Arranging maps
 
-- Click/drag a map to select/move it. Double-click a map to edit its mask.
+- Click/drag a map to select/move it. Double-click a map to edit its group, or its mask when ungrouped.
   Hold Alt/Option while starting a move to drag a duplicate; this also works
   with the move control and multi-map selections. Copies appear after three
   pixels of movement. Escape cancels them; duplication and movement are one
@@ -136,7 +137,7 @@ response. This is per-tab search history, not an autosave of the collage.
   Drag the rotation control to rotate freely. Within 4° of the map's natural
   bearing, it snaps to make the image upright; Shift retains 15° increments
   elsewhere. A group rotates rigidly and snaps using its first selected map.
-  Double-click resets an individual map to its loaded orientation.
+  Double-click resets rotation; a group rotates rigidly using its first selected map.
   Its angle updates live while active or focused. Dragging, keyboard rotation and
   double-click reset use the controls’ center as their pivot, including when the
   controls dock toward the screen center. That pivot stays fixed during a drag.
@@ -148,8 +149,8 @@ response. This is per-tab search history, not an autosave of the collage.
 - Shift/Cmd/Ctrl-click toggles maps in a selection. Cmd/Ctrl+A selects all.
   Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
   selected map to move the group; rotate uses one shared pivot and preserves
-  spacing and scale. Groups retain the full arc, with individual-map appearance
-  and mask buttons disabled. **Arrange** and **Geographic** appear as compact
+  spacing and scale. Groups retain the full arc and share appearance controls; individual mask
+  editing is available inside group editing mode. **Arrange**, **Geographic** and **Align** appear as compact
   icon buttons beside **Edit layout** at the bottom center, above the zoom controls
   on smaller screens.
   **Arrange** compacts the current positions with PRISM, keeping the first selected
@@ -159,7 +160,12 @@ response. This is per-tab search history, not an autosave of the collage.
   relative orientation. Each map keeps its scale; unrelated maps and layer order
   stay unchanged. Both arrangements are one undo step and fly the camera to the
   bounds of just the arranged selection.
-  Appearance, mask editing and original-orientation reset remain individual-map actions.
+  **Align** opens a fan for top, bottom, left, right, horizontal-center and
+  vertical-center alignment, using the visible masks and the selection's bounds.
+  Groups move as one object; inside **Edit group**, members align individually.
+  Alignment preserves scale, rotation and appearance, is one undo step, and fits
+  the selected maps in view.
+  Mask editing remains an individual-map action.
   Group ordering keeps the selected maps' relative order; each gesture is one
   undo step. Click empty canvas or press Escape to deselect.
 - **Open in Viewer** opens the imported annotation URL in a new tab. URL imports
@@ -222,7 +228,7 @@ the app's coordinate limits.
   enables colorization; double-click the knob or press Enter/Space while focused
   to toggle it. Arrow keys change opacity by 5% or hue by 10°; Home/End choose
   either endpoint. Saturation is a color/grayscale toggle. Appearance settings
-  remain session-only.
+  are restored when reopening a saved annotation in Collage.
 - The wand toggles automatic background removal, using Viewer's masked color
   detection in a worker and the same threshold/hardness. Appearance changes
   support undo/redo.
@@ -234,7 +240,8 @@ the app's coordinate limits.
 
 ## Editing masks
 
-Double-click a map, or select one and choose **Edit mask**. Editing stays on the existing zoom
+Double-click an ungrouped map or a member inside **Edit group**, or select one
+and choose **Edit mask**. Editing stays on the existing zoom
 surface, preserving the map's placement, orientation and current camera view.
 The full image is shown and other maps are temporarily hidden. Use **Fit map**
 to zoom to the full image when needed. The outline and handles
@@ -298,17 +305,110 @@ Masks must be simple polygons with at least three vertices inside the image.
 Edited masks are included in the standard annotation. Editing leaves map
 placements and GCPs unchanged.
 
+## Tool ring settings
+
+**Settings** at the top right lets you show or hide tools and change their order
+by dragging the icon rows (use the grip on touchscreens so labels still scroll).
+Focused rows also accept Up/Down or Home/End for keyboard reordering.
+Preferences are stored in this browser. Mirror is hidden by default; Transform
+is enabled. Reset restores the default tools and ordering.
+Locked maps always retain an Unlock button, even if Lock is hidden in settings.
+
+**Import maps as** defaults to Helmert. Polynomial fits a first-order affine
+transformation to all original GCPs, retaining unequal axis scales and shear,
+then reduces it to three control points. Two-point sources fall back to Helmert.
+The Transform frame follows the fitted geometry, including both skew directions
+and unequal axis scales. This option applies to URL, file, random, and place-search
+imports; opening a collage always preserves its saved geometry.
+
+**Transform** opens a separate mode for one or more unlocked maps. A selection
+or group gets one shared frame: every sheet and the spaces between sheets receive
+the same affine transform, preserving their arrangement and shared boundaries.
+Individual masks, appearance, groups and imported reset values are retained.
+Enter Edit group first to transform just one group member.
+Drag corner handles to scale both axes, or midpoint handles
+to scale X or Y. Hold Shift at a corner to retain proportions. Drag the sides
+between handles to skew along those edges. The opposite corner or edge stays
+fixed. Mouse, touch and pen use the same handles; arrow keys adjust a focused
+handle. Drag inside the frame to move the map, or just outside a corner to rotate
+around the frame's center. A rotation cursor appears outside the corners.
+Rotation snaps to the map's bearing; Shift snaps in
+15-degree steps. Pan outside the frame; wheel and pinch zoom remain available.
+Other maps are shown by default in Transform mode and hidden by default in mask
+mode. Both modes have a visibility button; within Edit group it only shows the
+other group members. Leaving either mode restores the previous visibility.
+
+**Isometric** opens a fan with **Tilt left** and **Tilt right**. Both create a
+30-degree plane preserving the current area and center; a selection is projected
+as one plane. Alt/Option-click applies the opposite of the last chosen tilt.
+It aligns with the current view and is a single undo step within Transform mode.
+
+**Reset** restores the imported scale and skew for one map. For a selection it
+restores the scale, skew and relative spacing from before its shared transformation,
+retaining the selection's current position and rotation. The selector remembers
+its deformation across Transform sessions, including after saving and reopening
+the collage. Individual shape edits start a new shared reference. For polynomial imports,
+**Reset to zero** removes both shears and returns to uniform scale at the original
+area-equivalent ground scale. Rotation, position, masks and appearance are retained.
+The imported values use a polar rotation and uniform scale as their reference;
+the remaining affine matrix supplies independent scales and two sequential shears.
+The frame is a rectangle at zero skew and follows the map as a parallelogram when
+skewed. Undo/redo work within the mode. Done (or Command/Ctrl Enter) commits one
+collage undo step; Cancel or Escape discards the draft. Saved annotations retain
+current and imported transform values, so both resets also work after reopening.
+
+The layer-order button sends a frontmost selection to the back, and brings other
+selections to the front. Alt/Option reverses the action.
+
+## Locks and groups
+
+Grouped maps use blue outlines, distinct from the pink individual selection.
+
+**Lock** folds the map controls along their circle toward the lock button,
+leaving **Unlock** available. Locked maps remain selectable and the canvas can
+still pan/zoom, but dragging, duplication, deletion, arrangement and setting
+changes are blocked. Locking a group locks every member. If a mixed selection
+contains a locked map, unlock it before editing the selection. Reduced-motion
+preferences disable the folding animation.
+
+Select multiple maps and choose **Group** in the bottom action row, or press
+Cmd/Ctrl+G. Clicking any member then selects the entire group; Shift/Cmd/Ctrl-click
+and marquee selection also treat groups as units. Move and rotate them together.
+Grouping preserves each member's mask, appearance and placement. Adjusting opacity,
+color, saturation or background removal applies only that setting to every member;
+background removal still detects each image's own paper color. Duplicated groups are independent.
+Use **Ungroup** (Cmd/Ctrl+Shift+G) to separate the members permanently.
+Lock, group and ungroup operations are undoable. Annotations preserve locks and
+group membership in `_allmaps.collage`; adding a saved collage remaps group IDs
+so separate imports do not merge into existing groups.
+
+Double-click an unlocked grouped map to enter **Edit group**. Other maps and their
+outlines are hidden on the same canvas without changing the view or clearing the
+tile cache. Click, Shift-click, marquee and Cmd/Ctrl+A now select only individual
+members of that group. Move, rotate, change settings, duplicate or remove members
+individually; duplicates stay in the group. Double-click a member again, or use
+**Edit mask**, to edit its mask and then return to the isolated group.
+
+**Done**, Escape or Cmd/Ctrl+Enter returns to the full collage with the group
+selected. Edits take effect immediately and retain their normal undo steps.
+**Ungroup** in this mode (also Cmd/Ctrl+Shift+G) dissolves the entire group and
+returns to the full collage with its former members selected, as one undo step.
+Undo/redo preserves isolation while the group exists; deleting its last member
+or undoing its creation returns to the full collage. Import, search and export
+are disabled during group editing. **Fit group** frames only the group's members.
+
 ## Keyboard shortcuts
 
 | Shortcut                              | Action                                                                    |
 | ------------------------------------- | ------------------------------------------------------------------------- |
-| Cmd/Ctrl+S                            | Save annotation, or finish mask editing                                   |
-| Cmd/Ctrl+Enter                        | Save the mask and exit mask editing                                       |
+| Cmd/Ctrl+S                            | Save annotation, or finish mask/group editing                             |
+| Cmd/Ctrl+Enter                        | Finish mask/group editing                                                 |
 | Cmd/Ctrl+Z / Cmd/Ctrl+Shift+Z         | Undo / redo in the active mode                                            |
+| Cmd/Ctrl+G / Cmd/Ctrl+Shift+G         | Group / ungroup selected maps                                             |
 | Cmd/Ctrl+A                            | Select all maps                                                           |
 | Shift/Cmd/Ctrl-click                  | Toggle a map in the selection                                             |
 | Shift-drag empty canvas               | Add maps to the selection with a rectangle                                |
-| Double-click a map                    | Edit its mask                                                             |
+| Double-click a map                    | Edit its group, or its mask inside a group / when ungrouped               |
 | Alt/Option-drag a map or move control | Duplicate and move the selection                                          |
 | Alt/Option-click mirror               | Mirror vertically                                                         |
 | Space-drag                            | Pan the canvas                                                            |
@@ -331,18 +431,18 @@ a full-screen dotted backdrop using the Allmaps green palette. The compact
 header follows the other apps: bold Allmaps and light Collage. Selection controls
 are individual circular buttons; explanatory copy stays out of the canvas.
 
-On **Add**, unwrap longitude across the antimeridian and fit Helmert using all
-original GCPs. Sample that fit at the crop center and two perpendicular side
-points. Subtract the projected mask's bounding-box center, then multiply by
+On **Add**, unwrap longitude across the antimeridian and fit the selected
+transformation (Helmert by default) using all original GCPs. Sample that fit at
+the crop center and two perpendicular side points. Subtract the projected mask's bounding-box center, then multiply by
 `cos(source latitude)`. These three non-collinear GCPs preserve the fitted
-similarity and allow affine reflections while reducing the work needed to
+transformation and allow affine edits while reducing the work needed to
 rebuild transformers during drags. Sampling the fitted surface retains
 information from the whole source fit.
 
-All newly added maps use Helmert; mirroring uses an affine reflection. Nonlinear and affine source warps become
-similarity approximations, prioritizing comparable ground scale. There is no
-transformation switch. Opening older collages still preserves their saved
-geometry and transformation.
+New maps default to Helmert, approximating source warps at a comparable ground
+scale. Optional polynomial import retains the first-order affine fit instead.
+Mirroring and skew also use affine transformations. The preference affects future
+imports; opening older collages preserves their saved geometry and transformation.
 
 The latitude correction removes the local spherical Mercator scale factor once.
 Canvas units represent spherical ground meters around the source
@@ -398,10 +498,14 @@ if it is far from Null Island.
   latitudes have projection distortion. Each map's scale is preserved.
   Older saved collages without this reference still open normally; re-add their
   original annotations to enable geographic arrangement.
-- Do not export placements, viewport, other UI state, or a Collage extension.
-  Opacity, saturation, colorization, background removal and applying the mask
-  are session-only.
-  They reset when reopening an annotation; geometry and layer order are retained.
+- `_allmaps.collage` version 1 preserves non-default appearance (opacity,
+  saturation, hue/colorization, background removal/color, and mask application),
+  groups, locks, custom titles, original import URLs, original masks for reset,
+  and current/imported transform values. Appearance defaults are omitted. Unknown versions and malformed optional
+  values are ignored. Removing a group or lock clears its old saved value.
+  Geometry and layer order stay in standard GCPs, masks and annotation order;
+  clients that ignore the optional metadata can still render those maps.
+  Viewport, undo history and browser preferences are not exported.
 - Reopening retains the loaded geometry as the source of truth. Provenance is
   preserved without fetching it to recover orientation.
 
@@ -414,11 +518,66 @@ selection consistent. A dedicated renderer matrix API is a possible later
 optimization; the prototype does not modify shared renderer code.
 
 The UI supports individual and group selection, compact PRISM organization, duplication,
-appearance controls and in-place mask editing. Editable map labels, canvas
-snapshots and local autosave remain future work. Save annotations before closing
+appearance controls, Transform mode, in-place mask editing and canvas exports. Editable map labels
+and local autosave remain future work. Save annotations before closing
 or reloading the page to preserve the layout.
 
-Adding fits Helmert to the original GCPs regardless of the source transformation. Opening preserves supported
+### Exports
+
+The export fan offers AnnotationPage, Image and SVG. Each dialog offers **All maps**
+or **Selected maps**; the latter is disabled when nothing is selected. Selection
+exports preserve layer order, map settings, groups and locks. AnnotationPage saves
+only the chosen maps. Image defaults to the entire collage (or entire selection)
+and can also export the current view, without controls
+or the dotted backdrop. Entire collage fits the visible masks (or full images
+where masks are disabled), keeping the view's orientation. Margin adds a percentage
+of the shorter side on each edge; zero gives a tight frame. Preset and custom
+width-to-height proportions expand the frame without cropping maps.
+Both image and SVG export default to a 10% margin. SVG always frames the entire
+collage or selection with its original proportions. Overlapping unselected maps
+are excluded from both image and SVG exports. Export is disabled for empty collages.
+
+Image export offers transparent PNG or JPG with a selectable background (Allmaps
+colors, white, black, or a custom color), DPI, and a
+printed map scale such as 1:10,000. Scale uses Collage's normalized ground meters,
+including its internal canvas coordinate factor. Dimensions are rounded to the
+nearest pixel; source image detail still limits how much detail can be printed.
+
+Raster export retains the existing MapLibre instance, Allmaps renderer and tile
+cache. A frozen canvas covers the map while an export viewport requests tiles
+at the output resolution. Only the backing buffer changes size, so a different
+aspect ratio does not change the camera, CSS canvas or control positions.
+It waits for tile preparation and the
+`allrequestedtilesloaded` event, verifies that required tiles actually succeeded,
+captures inside MapLibre's render event, then restores the display resolution.
+Cancellation, failure and timeouts also restore the view. The
+[changedpi](https://github.com/shutterstock/changeDPI) Blob API writes PNG pHYs and
+JPEG JFIF density metadata without re-encoding pixels or making a base64 copy.
+Output is limited to 32 megapixels and 8,192 pixels per side (or lower device
+limits); oversized exports are rejected rather than silently changing scale.
+
+SVG follows the native matrix and resource-coordinate clipping approach in the
+[Allmaps SVG warping notebook](https://observablehq.com/@allmaps/svg-warping).
+Its settings dialog offers a single maximum source-image dimension (default
+2,048 px on the longest side) and linked or embedded images. Images fit inside these limits
+without changing their aspect ratio, respecting declared service limits and
+available sizes. These limits affect source detail, not the SVG's layout.
+Embedding first tries decoded ImageData tiles from the existing renderer cache.
+Only complete source coverage at the requested detail is reused; partial or
+lower-resolution caches fall back to a bounded full-image request. This requires
+the service to allow cross-origin fetching. Cached pixels are assembled as PNG;
+downloaded JPEG/PNG files keep their encoding. Duplicate sources are embedded
+once and referenced by each map. Source images are limited to 32 megapixels,
+8,192 px per side, and 100 MB of encoded data per SVG. Tile-only services without
+a complete suitable cache or a full-image rendition are rejected.
+Helmert and first-order polynomial transforms, including mirrored maps, are
+supported, along with masks, opacity, saturation and colorization. Automatic
+background removal and non-affine transformations require Image export. Linked
+images must remain accessible when the SVG is opened; applications that block
+external SVG images may need those links enabled.
+
+Adding fits Helmert by default, or a first-order polynomial when selected in
+Settings, to the original GCPs. Opening preserves supported
 loaded transformations (first-order polynomial, Helmert, thin plate spline,
 projective and linear), coordinates and GCP counts. Custom resource projections
 and Canvas targets remain unsupported. Opening straight or higher-order
