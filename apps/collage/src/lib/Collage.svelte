@@ -52,6 +52,7 @@
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import { updateLoadFailures } from './load-status'
   import { loadRandomMaps } from './random-maps'
+  import { renderImport } from './render-import'
   import { TouchNavigation } from './touch-navigation'
   import { TapSelection } from './tap-selection'
   import { TouchDoubleTap } from './double-tap'
@@ -1071,19 +1072,21 @@
   function install(
     next: CollageMap[],
     replace: boolean,
-    { render = true }: { render?: boolean } = {}
+    {
+      render = true,
+      skipInvalid = false
+    }: { render?: boolean; skipInvalid?: boolean } = {}
   ) {
-    const added: CollageMap[] = []
-    try {
-      for (const item of render ? next : []) {
-        renderItem(item)
-        added.push(item)
-      }
-    } catch (error) {
-      for (const item of added)
-        layer!.removeGeoreferencedMapById(item.instanceId)
-      throw error
-    }
+    if (render)
+      next = renderImport(
+        next,
+        renderItem,
+        (item) => {
+          if (layer!.getWarpedMap(item.instanceId))
+            layer!.removeGeoreferencedMapById(item.instanceId)
+        },
+        skipInvalid
+      )
     remember()
     if (replace) {
       for (const item of items)
@@ -1305,7 +1308,7 @@
       next.forEach((item, i) => {
         item.sourceUrl = originalAnnotationUrl(maps[i]) ?? maps[i].id
       })
-      if (!disposed) install(next, false)
+      if (!disposed) install(next, false, { skipInvalid: true })
     } catch (error) {
       layoutFailure(error)
     } finally {
