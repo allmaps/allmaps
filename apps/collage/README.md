@@ -548,7 +548,9 @@ available layout controls. Locked selections can be selected but cannot be
 changed. Groups toggle together; inside **Edit group**, members toggle individually.
 
 Select and Drag select keep the tool ring visible and usable. Tapping empty
-canvas clears the selection; taps on maps toggle them. Panning from empty canvas
+canvas clears the selection; taps on maps toggle them. Holding a map still for
+half a second toggles it while pressed, using the same selection handling;
+releasing it does not toggle it again. Panning from empty canvas
 or cancelling a selection rectangle preserves the selection. Movement or a second finger cancels a pending
 tap, and double-tapping does not enter an editor or zoom. Scroll and pinch zoom
 remain available. Escape or Cmd/Ctrl+Enter returns to Pointer with the selection

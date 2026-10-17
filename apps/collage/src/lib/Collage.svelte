@@ -1759,7 +1759,7 @@
       !additive && !event.altKey ? item?.instanceId : undefined
     )
     if (selecting) {
-      tapSelection.start(event, item?.instanceId)
+      tapSelection.start(event, item?.instanceId, selectHeldMap)
       if (pointerMode === 'box') startMarquee(event)
       return
     }
@@ -1773,6 +1773,33 @@
       } else beginDrag(event, item, 'move')
     } else if (additive) startMarquee(event)
     else select()
+  }
+
+  function selectHeldMap(id: string) {
+    if (
+      !selecting ||
+      busy ||
+      inputMode ||
+      editingMask ||
+      editingTransform ||
+      searching ||
+      settingsOpen ||
+      exportOpen ||
+      touchNavigation.active
+    ) {
+      tapSelection.cancel()
+      return
+    }
+    // End the stationary rectangle gesture before toggling, so release or a
+    // second finger cannot restore the selection from before the long press.
+    if (marquee) finishDrag(undefined, true)
+    editorTaps.reset()
+    ignoreDoubleClickUntil = performance.now() + 500
+    select([...toggleSelection(items, selectedIds, id, editingGroup)])
+  }
+
+  function contextMenu(event: MouseEvent) {
+    if (selecting && tapSelection.active) event.preventDefault()
   }
 
   function startMarquee(event: PointerEvent) {
@@ -2064,8 +2091,15 @@
       tapSelection.cancel()
       editorTaps.reset()
     }
+    const held = tapSelection.isHeld(event)
     const id = tapSelection.end(event)
     finishDrag(event, cancel)
+    if (held) {
+      editorTaps.reset()
+      ignoreDoubleClickUntil = performance.now() + 500
+      event.preventDefault()
+      return
+    }
     if (
       !cancel &&
       ready &&
@@ -2315,6 +2349,7 @@
       map.on('error', (event) => fail(event.error))
       map.getCanvas().addEventListener('pointerdown', pointerDown, true)
       map.getCanvas().addEventListener('dblclick', doubleClick, true)
+      map.getCanvas().addEventListener('contextmenu', contextMenu, true)
       map
         .getCanvas()
         .addEventListener('lostpointercapture', cancelMarqueeCapture)
@@ -2335,6 +2370,7 @@
       if (frame !== undefined) cancelAnimationFrame(frame)
       map?.getCanvas().removeEventListener('pointerdown', pointerDown, true)
       map?.getCanvas().removeEventListener('dblclick', doubleClick, true)
+      map?.getCanvas().removeEventListener('contextmenu', contextMenu, true)
       map
         ?.getCanvas()
         .removeEventListener('lostpointercapture', cancelMarqueeCapture)

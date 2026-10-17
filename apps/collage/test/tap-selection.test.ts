@@ -35,13 +35,83 @@ test('release checks movement even if no pointermove was delivered', () => {
   assert.equal(tap.end(pointer({ clientY: 109, timeStamp: 200 })), undefined)
 })
 
-test('long presses cancel while an empty-canvas tap clears the selection', () => {
+for (const pointerType of ['touch', 'pen', 'mouse']) {
+  test(`${pointerType} long press selects while holding, without selecting again on release`, (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] })
+    const tap = new TapSelection()
+    const onHold = t.mock.fn()
+    const event = pointer({ pointerType })
+    tap.start(event, 'map', onHold)
+    tap.move(pointer({ clientX: 103, timeStamp: 200 }))
+    t.mock.timers.tick(499)
+    assert.equal(onHold.mock.callCount(), 0)
+    t.mock.timers.tick(1)
+    assert.deepEqual(
+      onHold.mock.calls.map((call) => call.arguments),
+      [['map']]
+    )
+    assert.equal(tap.isHeld(event), true)
+    t.mock.timers.tick(1500)
+    assert.equal(onHold.mock.callCount(), 1)
+    assert.equal(tap.end(pointer({ pointerId: 2 })), undefined)
+    assert.equal(tap.isHeld(event), true)
+    assert.equal(tap.end(event), undefined)
+    assert.equal(tap.active, false)
+  })
+}
+
+test('a short tap clears its hold timer and still selects on release', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
   const tap = new TapSelection()
-  tap.start(pointer(), 'map')
-  assert.equal(tap.end(pointer({ timeStamp: 800 })), undefined)
+  const onHold = t.mock.fn()
+  tap.start(pointer(), 'map', onHold)
+  t.mock.timers.tick(100)
+  assert.equal(tap.end(pointer()), 'map')
+  t.mock.timers.tick(1000)
+  assert.equal(onHold.mock.callCount(), 0)
+})
+
+test('movement or cancellation prevents selection during a hold', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  const tap = new TapSelection()
+  const onHold = t.mock.fn()
+  tap.start(pointer(), 'map', onHold)
+  tap.move(pointer({ clientX: 120 }))
+  tap.move(pointer())
+  t.mock.timers.tick(600)
+  assert.equal(onHold.mock.callCount(), 0)
+  assert.equal(tap.end(pointer()), undefined)
+  tap.start(pointer(), 'map', onHold)
+  tap.cancel()
+  t.mock.timers.tick(600)
+  assert.equal(onHold.mock.callCount(), 0)
+  assert.equal(tap.active, false)
+})
+
+test('starting a new press cancels the previous timer; empty canvas does not activate on hold', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  const tap = new TapSelection()
+  const onHold = t.mock.fn()
+  tap.start(pointer(), 'map', onHold)
+  t.mock.timers.tick(300)
+  tap.start(pointer(), undefined, onHold)
+  t.mock.timers.tick(1000)
+  assert.equal(onHold.mock.callCount(), 0)
+  assert.equal(tap.end(pointer()), null)
+})
+
+test('an empty-canvas tap clears the selection', () => {
+  const tap = new TapSelection()
   tap.start(pointer(), 'map')
   tap.start(pointer())
   assert.equal(tap.end(pointer({ timeStamp: 200 })), null)
+})
+
+test('movement still cancels selection after a long hold', () => {
+  const tap = new TapSelection()
+  tap.start(pointer(), 'map')
+  tap.move(pointer({ clientX: 120, timeStamp: 800 }))
+  assert.equal(tap.end(pointer({ timeStamp: 1800 })), undefined)
 })
 
 test('panning from empty canvas does not clear the selection on release', () => {
@@ -75,13 +145,17 @@ for (const order of [
   [1, 2],
   [2, 1]
 ]) {
-  test(`pinching cancels selection until every finger lifts (${order})`, () => {
+  test(`pinching cancels selection until every finger lifts (${order})`, (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] })
     const tap = new TapSelection()
+    const onHold = t.mock.fn()
     const navigation = new TouchNavigation()
     navigation.start(pointer())
-    tap.start(pointer(), 'map')
+    tap.start(pointer(), 'map', onHold)
     const second = pointer({ pointerId: 2, isPrimary: false })
     if (navigation.start(second)) tap.cancel()
+    t.mock.timers.tick(1000)
+    assert.equal(onHold.mock.callCount(), 0)
     for (const pointerId of order) {
       const end = pointer({ pointerId, timeStamp: 200 })
       // Window capture cleans navigation up before the pointerup selection handler.

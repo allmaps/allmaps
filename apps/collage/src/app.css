@@ -58,6 +58,10 @@ textarea:focus-visible {
 .maplibregl-canvas {
   outline: none;
 }
+.select-pointer .maplibregl-canvas,
+.box-selecting .maplibregl-canvas {
+  -webkit-touch-callout: none;
+}
 .outlines {
   position: absolute;
   inset: 0;
