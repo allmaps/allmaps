@@ -13,6 +13,7 @@ export const controlOrder = [
   'editMask',
   'mirror',
   'transform',
+  'reset',
   'lock',
   'move',
   'rotate'
@@ -66,7 +67,7 @@ export function controlFold(
     ] as Point
   }
 }
-export const controlRadius = 184
+export const controlRadius = 200
 export const sliderLength = 104
 
 function angularStep(count: number): number {

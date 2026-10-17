@@ -24,7 +24,9 @@
     parseImportTransformation,
     toolSettingsKey,
     doubleTapModeKey,
-    parseDoubleTapMode
+    parseDoubleTapMode,
+    resetModeKey,
+    parseResetMode
   } from './tool-settings'
   import type { ToolSetting, DoubleTapMode } from './tool-settings'
   import {
@@ -72,6 +74,7 @@
     ArrowsOut,
     ArrowsOutCardinal,
     ArrowClockwise,
+    Eraser,
     X,
     UploadSimple,
     ArrowUUpLeft,
@@ -127,6 +130,7 @@
     bearingRotation,
     alignBearings,
     mirrorMap,
+    resetMapOptions,
     transformationType
   } from './model'
   import type {
@@ -134,7 +138,8 @@
     CollageMap,
     Placement,
     ImportTransformation,
-    MapImportOptions
+    MapImportOptions,
+    ResetMode
   } from './model'
   import { snapRotation } from './rotation'
   import { alignMaps, distributeMaps } from './alignment'
@@ -181,6 +186,7 @@
   let importTransformation = $state<ImportTransformation>('helmert')
   let importLayout = $state<Arrangement>('compact')
   let doubleTapMode = $state<DoubleTapMode>('mask')
+  let resetMode = $state<ResetMode>('appearance')
   const editorTaps = new TouchDoubleTap<string>()
   let ignoreDoubleClickUntil = 0
   let altDown = $state(false)
@@ -270,6 +276,14 @@
     doubleTapMode = value
     try {
       localStorage.setItem(doubleTapModeKey, value)
+    } catch {
+      /* Use the preference for this session if storage is unavailable. */
+    }
+  }
+  function changeResetMode(value: ResetMode) {
+    resetMode = value
+    try {
+      localStorage.setItem(resetModeKey, value)
     } catch {
       /* Use the preference for this session if storage is unavailable. */
     }
@@ -1381,6 +1395,37 @@
     refresh()
   }
 
+  function resetSelected() {
+    if (!selection.length || locked || busy || drag || marquee) return
+    const before = structuredClone(items)
+    try {
+      const changed = structuredClone(selection)
+      for (const item of changed) {
+        resetMapOptions(item, resetMode)
+        if (resetMode === 'all')
+          layer!.setMapOptions(
+            item.instanceId,
+            {
+              gcps: renderedMap(item).gcps,
+              resourceMask: item.resourceMask,
+              transformationType: transformationType(item.baseline)
+            },
+            { animate: false }
+          )
+        updateAppearance(item)
+      }
+      const replacements = new Map(
+        changed.map((item) => [item.instanceId, item])
+      )
+      items = items.map((item) => replacements.get(item.instanceId) ?? item)
+      remember(before)
+      refresh()
+    } catch (error) {
+      restore(before)
+      fail(error)
+    }
+  }
+
   function toggleSaturation() {
     changeAppearance({
       saturation: selection.every((item) => item.appearance.saturation === 1)
@@ -2184,6 +2229,11 @@
       /* Use the default when storage is unavailable. */
     }
     try {
+      resetMode = parseResetMode(localStorage.getItem(resetModeKey))
+    } catch {
+      /* Use the default when storage is unavailable. */
+    }
+    try {
       snapping = parseSnapSettings(
         JSON.parse(localStorage.getItem(snapSettingsKey) ?? 'null')
       )
@@ -2361,6 +2411,8 @@
       onimportlayoutchange={changeImportLayout}
       {doubleTapMode}
       ondoubletapchange={changeDoubleTap}
+      {resetMode}
+      onresetmodechange={changeResetMode}
       {snapping}
       onimportchange={changeImport}
       onsnapchange={changeSnapping}
@@ -2506,6 +2558,14 @@
               >{#if locked}<LockSimple size={19} />{:else}<LockSimpleOpen
                   size={19}
                 />{/if}</MapControl
+            >
+          {:else if tool === 'reset'}
+            <MapControl
+              fold={ringFold}
+              position={controls.reset.position}
+              label="Reset"
+              disabled={busy || locked || !!activeControl}
+              onclick={resetSelected}><Eraser size={19} /></MapControl
             >
           {:else if tool === 'move'}
             <MapControl

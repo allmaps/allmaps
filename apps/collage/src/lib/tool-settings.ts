@@ -1,5 +1,6 @@
 import { controlOrder } from './control-layout.ts'
 import type { Control, RingControl } from './control-layout.ts'
+import type { ResetMode } from './model.ts'
 
 export type ToolSetting =
   { tool: Control; enabled: boolean } | { tool: 'more'; enabled?: never }
@@ -17,6 +18,7 @@ export const toolLabels: Record<Control, string> = {
   editMask: 'Edit mask',
   mirror: 'Mirror',
   transform: 'Transform',
+  reset: 'Reset',
   move: 'Move',
   rotate: 'Rotate',
   lock: 'Lock'
@@ -86,6 +88,10 @@ export function visibleTools(
 
 export type DoubleTapMode = 'mask' | 'transform'
 export const doubleTapModeKey = 'allmaps-collage-double-tap'
+export const resetModeKey = 'allmaps-collage-reset-mode'
+export function parseResetMode(value: unknown): ResetMode {
+  return value === 'all' ? 'all' : 'appearance'
+}
 export function parseDoubleTapMode(value: unknown): DoubleTapMode {
   return value === 'transform' ? 'transform' : 'mask'
 }

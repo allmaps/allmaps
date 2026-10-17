@@ -28,6 +28,7 @@ import {
   mirrorMap,
   setMapTransform,
   resetMapTransform,
+  resetMapOptions,
   makeIsometric,
   ensureMapTransform,
   arrangeMaps,
@@ -93,6 +94,105 @@ function affineFixture(): GeoreferencedMap {
   })
   return map
 }
+
+test('ring reset defaults to each map’s imported appearance, preserving edits and metadata', () => {
+  const [source] = addMaps(generateAnnotation(fixture()))
+  source.appearance.opacity = 0.65
+  source.appearance.hue = 0.3
+  source.appearance.colorize = true
+  const [item] = openCollage(exportCollage([source]))
+  const initial = structuredClone(item.initialOptions)
+  item.groupId = 'group'
+  item.title = 'Edited title'
+  item.appearance.opacity = 0.1
+  item.appearance.saturation = 0
+  item.appearance.hue = 0.8
+  item.appearance.colorize = false
+  item.appearance.removeBackground = true
+  item.appearance.backgroundColor = '#abcdef'
+  mirrorMap(item)
+  setResourceMask(item, [
+    [100, 200],
+    [800, 200],
+    [800, 700],
+    [100, 700]
+  ])
+  item.placement.rotation += 0.5
+  const geometry = placedMap(item)
+  resetMapOptions(item)
+  assert.deepEqual(item.appearance, source.appearance)
+  assert.deepEqual(placedMap(item), geometry)
+  assert.equal(item.groupId, 'group')
+  assert.equal(item.title, 'Edited title')
+  assert.deepEqual(item.initialOptions, initial)
+})
+
+test('full ring reset restores the imported geometry, including mirrors, at the current center', () => {
+  for (const importType of ['helmert', 'polynomial'] as const) {
+    const [item] = prepareMaps(
+      generateAnnotation(affineFixture()),
+      [100, 200],
+      undefined,
+      importType
+    )
+    const original = structuredClone(item)
+    item.groupId = 'group'
+    setMapTransform(item, { scaleX: 1.5, scaleY: 0.8, skewX: 0.3, skewY: -0.2 })
+    mirrorMap(item, 'vertical')
+    setResourceMask(item, [
+      [100, 100],
+      [700, 100],
+      [700, 900],
+      [100, 900]
+    ])
+    item.placement.position = [5000, -6000]
+    item.placement.rotation += 1.2
+    item.appearance.opacity = 0.25
+    const currentCenter = mapCenter(item)
+    resetMapOptions(item, 'all')
+    close(distance(mapCenter(item), currentCenter), 0)
+    assert.equal(item.instanceId, original.instanceId)
+    assert.equal(item.groupId, 'group')
+    assert.equal(item.mirrored, original.mirrored)
+    assert.deepEqual(item.affine, original.affine)
+    assert.deepEqual(item.resourceMask, original.resourceMask)
+    assert.deepEqual(item.appearance, original.appearance)
+    assert.equal(item.placement.rotation, original.placement.rotation)
+    const before = transformer(placedMap(original))
+    const after = transformer(placedMap(item))
+    for (const point of original.resourceMask) {
+      const a = before.transformToProjectedGeo(point)
+      const b = after.transformToProjectedGeo(point)
+      close(b[0] - currentCenter[0], a[0] - mapCenter(original)[0])
+      close(b[1] - currentCenter[1], a[1] - mapCenter(original)[1])
+    }
+  }
+})
+
+test('opening a collage establishes new initial options without exporting reset snapshots', () => {
+  const [item] = addMaps(generateAnnotation(fixture()))
+  setMapTransform(item, { scaleX: 1.3, scaleY: 0.9, skewX: 0.25, skewY: 0 })
+  mirrorMap(item)
+  item.placement.rotation = 0.8
+  item.appearance.opacity = 0.6
+  const annotation = exportCollage([item])
+  assert.equal(JSON.stringify(annotation).includes('initialOptions'), false)
+  const [opened] = openCollage(annotation)
+  const initial = structuredClone(opened)
+  mirrorMap(opened)
+  opened.placement.rotation = 1.6
+  opened.appearance.opacity = 0.2
+  resetMapOptions(opened, 'all')
+  assert.deepEqual(opened.appearance, initial.appearance)
+  assert.deepEqual(opened.affine, initial.affine)
+  assert.equal(opened.mirrored, initial.mirrored)
+  assert.equal(opened.placement.rotation, initial.placement.rotation)
+  close(distance(mapCenter(opened), mapCenter(initial)), 0)
+  placedMap(opened).gcps.forEach((gcp, i) => {
+    const expected = placedMap(initial).gcps[i]
+    close(distance(gcp.geo, expected.geo), 0)
+  })
+})
 
 function setSkew(item: CollageMap, horizontal: number, vertical: number) {
   setMapTransform(item, {

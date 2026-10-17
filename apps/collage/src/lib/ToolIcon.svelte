@@ -12,6 +12,7 @@
     FlipHorizontal,
     ArrowsOutCardinal,
     ArrowClockwise,
+    Eraser,
     LockSimpleOpen
   } from 'phosphor-svelte'
   import { BringMapsToFront } from '@allmaps/ui'
@@ -30,6 +31,7 @@
     mirror: FlipHorizontal,
     move: ArrowsOutCardinal,
     rotate: ArrowClockwise,
+    reset: Eraser,
     lock: LockSimpleOpen
   }
 </script>

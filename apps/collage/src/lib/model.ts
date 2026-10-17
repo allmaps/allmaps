@@ -33,6 +33,7 @@ import {
 export type Placement = { position: Point; rotation: number }
 export type Arrangement = 'compact' | 'geographic'
 export type ImportTransformation = 'helmert' | 'polynomial'
+export type ResetMode = 'appearance' | 'all'
 export type MapImportOptions = {
   additionalInputs?: unknown[]
   groupImportedMaps?: boolean
@@ -44,6 +45,13 @@ export type GeographicReference = {
 }
 export type CollageMap = {
   instanceId: string
+  // Session-local reset source. Opening an annotation establishes initial state;
+  // this snapshot is not serialized into exported annotations.
+  initialOptions?: {
+    baseline: GeoreferencedMap
+    appearance: CollageMap['appearance']
+    affine?: CollageMap['affine']
+  }
   // Optional editing state is stored in the annotation’s _allmaps.collage field.
   groupId?: string
   locked?: boolean
@@ -357,7 +365,61 @@ function makeItem(
   }
   if (restoreTransform && saved.selectionTransform)
     item.selectionTransform = saved.selectionTransform
+  item.initialOptions = structuredClone({
+    baseline: item.baseline,
+    appearance: item.appearance,
+    affine: item.affine
+  })
   return item
+}
+
+/** Restore each map's own imported options, keeping its identity and placement.
+ * Geometry reset keeps the current visible center, even after a crop or mirror. */
+export function resetMapOptions(
+  item: CollageMap,
+  mode: ResetMode = 'appearance'
+) {
+  const initial = item.initialOptions ?? {
+    baseline: item.baseline,
+    appearance: readCollageSettings(item.baseline).appearance,
+    affine: item.affine
+  }
+  const appearance = structuredClone(initial.appearance)
+  if (mode === 'appearance') {
+    item.appearance = appearance
+    return
+  }
+  const before = mapCenter(item)
+  const reset = makeItem(
+    {
+      ...structuredClone(initial.baseline),
+      id: item.baseline.id,
+      // Dimensions may only have become available after the import.
+      resource: structuredClone(item.baseline.resource)
+    },
+    item.geographicReference,
+    false
+  )
+  reset.appearance = appearance
+  const after = mapCenter(reset)
+  reset.placement.position = [
+    reset.placement.position[0] + before[0] - after[0],
+    reset.placement.position[1] + before[1] - after[1]
+  ]
+  placedMap(reset)
+  Object.assign(item, {
+    baseline: reset.baseline,
+    localGcps: reset.localGcps,
+    localMask: reset.localMask,
+    localFullMask: reset.localFullMask,
+    sourceCenter: reset.sourceCenter,
+    mirrored: reset.mirrored,
+    resourceMask: reset.resourceMask,
+    placement: reset.placement,
+    affine: structuredClone(initial.affine),
+    appearance
+  })
+  delete item.selectionTransform
 }
 
 export function parseMaps(input: unknown): GeoreferencedMap[] {

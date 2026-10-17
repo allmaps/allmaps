@@ -8,13 +8,29 @@ import {
   reorderTool,
   parseImportTransformation,
   parseImportLayout,
-  parseDoubleTapMode
+  parseDoubleTapMode,
+  parseResetMode
 } from '../src/lib/tool-settings.ts'
 import {
   controlLayout,
   fitControlCenter,
   radiusForSize
 } from '../src/lib/control-layout.ts'
+
+test('reset defaults to visual settings and is added to existing tool preferences', () => {
+  assert.equal(parseResetMode('all'), 'all')
+  for (const value of [null, undefined, 'appearance', 'invalid', true])
+    assert.equal(parseResetMode(value), 'appearance')
+  const old = defaultToolSettings().filter(({ tool }) => tool !== 'reset')
+  assert.equal(
+    visibleTools(parseToolSettings(old), true).includes('reset'),
+    true
+  )
+  assert.equal(
+    visibleTools(parseToolSettings(old), false).includes('reset'),
+    false
+  )
+})
 
 test('tool preferences default to hidden mirror and retain order through storage', () => {
   const defaults = defaultToolSettings()

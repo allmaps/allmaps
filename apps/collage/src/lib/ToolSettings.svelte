@@ -9,11 +9,12 @@
     toolLabels,
     reorderTool,
     parseDoubleTapMode,
+    parseResetMode,
     parseImportLayout
   } from './tool-settings'
   import type { ToolSetting, DoubleTapMode } from './tool-settings'
   import type { RingControl } from './control-layout'
-  import type { ImportTransformation, Arrangement } from './model'
+  import type { ImportTransformation, Arrangement, ResetMode } from './model'
   import { defaultSnapSettings, snapUnits } from './move-snapping'
   import type { SnapSettings, SnapUnit } from './move-snapping'
   let {
@@ -23,6 +24,8 @@
     onimportlayoutchange,
     doubleTapMode,
     ondoubletapchange,
+    resetMode,
+    onresetmodechange,
     snapping,
     onchange,
     onimportchange,
@@ -35,6 +38,8 @@
     onimportlayoutchange: (value: Arrangement) => void
     doubleTapMode: DoubleTapMode
     ondoubletapchange: (value: DoubleTapMode) => void
+    resetMode: ResetMode
+    onresetmodechange: (value: ResetMode) => void
     snapping: SnapSettings
     onchange: (settings: ToolSetting[]) => void
     onimportchange: (value: ImportTransformation) => void
@@ -340,6 +345,18 @@
         {/if}
       </section>
       <div class="import-setting">
+        <label for="reset-mode">Reset restores</label>
+        <select
+          id="reset-mode"
+          value={resetMode}
+          onchange={(event) =>
+            onresetmodechange(parseResetMode(event.currentTarget.value))}
+        >
+          <option value="appearance">Visual settings</option>
+          <option value="all">Visual settings, mask and transforms</option>
+        </select>
+      </div>
+      <div class="import-setting">
         <label for="double-tap-mode">Double-tap / click opens</label>
         <select
           id="double-tap-mode"
@@ -389,6 +406,7 @@
           onimportchange('helmert')
           onimportlayoutchange('compact')
           ondoubletapchange('mask')
+          onresetmodechange('appearance')
           onsnapchange(defaultSnapSettings())
         }}>Reset</button
       >
