@@ -1081,6 +1081,8 @@ nav {
 }
 .settings-scroll {
   min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
   overscroll-behavior: contain;
@@ -1179,12 +1181,17 @@ nav {
 .import-setting {
   margin-top: 12px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  gap: 6px;
   border-top: 1px solid #2221;
   padding-top: 12px;
   font-size: 14px;
+}
+.import-setting select {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .import-setting select,
 .snap-spacing select,

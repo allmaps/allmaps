@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte'
+  import type { Snippet } from 'svelte'
   import { prefersReducedMotion } from 'svelte/motion'
   import { fly } from 'svelte/transition'
   import type { Polygon } from 'phosphor-svelte'
@@ -9,6 +10,8 @@
     value,
     icon,
     direction = 'up',
+    primary = false,
+    triggerContent,
     options,
     disabled = false,
     onaltclick,
@@ -18,6 +21,8 @@
     value?: string
     icon?: typeof Polygon
     direction?: 'up' | 'down'
+    primary?: boolean
+    triggerContent?: Snippet
     options: {
       value: string
       label: string
@@ -145,7 +150,7 @@
   bind:this={root}
 >
   <button
-    class="quiet-button"
+    class={primary ? 'primary-button small' : 'quiet-button'}
     class:pressed={open}
     aria-label={label}
     data-tooltip={label}
@@ -153,8 +158,10 @@
     aria-expanded={open}
     {disabled}
     bind:this={trigger}
-    onclick={toggle}><Icon size={20} /></button
+    onclick={toggle}
   >
+    {#if triggerContent}{@render triggerContent()}{:else}<Icon size={20} />{/if}
+  </button>
   {#if open}
     <div
       class="fan-options"

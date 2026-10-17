@@ -49,7 +49,7 @@ pnpm --filter @allmaps/collage build
 
 ## Adding and opening maps
 
-- **Add maps** accepts an annotation URL, pasted JSON, or local annotation files.
+- **Add maps → Add annotation** accepts an annotation URL, pasted JSON, or local annotation files.
   It adds every map and leaves them unselected. **Import layout** in Settings
   chooses **Compact** (PRISM, the default) or **Geographic**. Both start with
   the first map at the current view center. Compact removes overlaps; Geographic
@@ -73,7 +73,7 @@ pnpm --filter @allmaps/collage build
 
 ## Finding maps by place
 
-The search icon opens the shared Allmaps geocoder, including venues and landmarks.
+**Add maps → Find maps** opens the shared Allmaps geocoder, including venues and landmarks.
 Choose a place or enter decimal coordinates in **latitude, longitude** order
 (for example, `52.01, 4.36`). Brackets and whitespace-separated pairs use the same
 order. Coordinate entry works locally, including without a Geocode Earth key.
@@ -333,7 +333,8 @@ by dragging the icon rows (use the grip on touchscreens so labels still scroll).
 Move, Rotate and Remove are always visible by default. **+** expands the ring
 and **−** contracts it. Drag the **More tools** divider, or move rows across it,
 to choose which enabled tools stay visible and which appear after expanding.
-Selecting a different map starts with the compact ring again.
+Changing selection preserves the expanded or compact ring and smoothly moves its
+buttons to the new selection. Clearing the selection resets it to compact.
 Sparse rings keep their buttons close together, including on large maps.
 Focused rows also accept Up/Down or Home/End for keyboard reordering.
 Preferences are stored in this browser. Mirror is hidden by default; Transform
@@ -351,7 +352,8 @@ come from the current import or opened collage, and the reset snapshot stays
 local to this session rather than adding annotation metadata.
 
 The tool ring opens and closes from one end of its circle in 180 ms, including
-expanding, contracting, changing selection or entering an editor. Adjust
+expanding, contracting or entering an editor. Changing selection only animates
+the buttons' positions. Adjust
 `TOOL_RING_ANIMATION_MS` in `src/lib/control-layout.ts` to change both directions
 together. Reduced-motion preferences disable this animation. An already locked
 selection's Unlock button appears and disappears without animating.
@@ -510,7 +512,8 @@ are disabled during group editing. **Fit group** frames only the group's members
 | Escape                                | Cancel a gesture or drawing, finish selection, exit mask editing, or deselect maps |
 
 The **Pointer tool** button beside the zoom/fit controls opens a fan with four
-choices. **Pointer** selects and moves maps normally. **Pan** clears the selection
+choices. Touch devices default to **Select**; devices with a mouse as their primary
+pointer default to **Pointer**. **Pointer** selects and moves maps normally. **Pan** clears the selection
 and moves the canvas without selecting or moving maps. **Select** toggles maps with a tap or click;
 dragging pans the canvas, including over maps. **Drag select** draws a rectangle
 with a finger, pen or mouse, including when starting over a map.

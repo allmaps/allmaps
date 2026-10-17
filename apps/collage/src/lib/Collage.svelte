@@ -552,11 +552,7 @@
       pointerMode === 'pan' ? [] : ids,
       editingGroup
     )
-    if (
-      next.size !== selectedIds.size ||
-      [...next].some((id) => !selectedIds.has(id))
-    )
-      ringExpanded = false
+    if (!next.size) ringExpanded = false
     selectedIds = next
     if (selecting)
       message = `${selectedIds.size} ${selectedIds.size === 1 ? 'map' : 'maps'} selected.`
@@ -1676,7 +1672,9 @@
       outlineOnly: false,
       pointerId: event.pointerId
     }
-    activeControl = mode
+    // A tap can change selection without moving a map. Keep position
+    // transitions enabled until the movement threshold starts the drag.
+    activeControl = mode === 'move' ? undefined : mode
     moveGuide = drag.snapMove?.guide
     map.dragPan.disable()
     map.getCanvas().style.cursor = mode === 'move' ? 'grabbing' : 'crosshair'
@@ -1960,7 +1958,7 @@
     }
     if (!drag || drag.pointerId !== event.pointerId) return
     // Latch this before batching frames, including an out-and-back movement.
-    drag.moveThreshold?.update(event)
+    if (drag.moveThreshold?.update(event)) activeControl = 'move'
     latestPointer = event
     if (frame !== undefined) return
     frame = requestAnimationFrame(() => {
@@ -2292,6 +2290,9 @@
           trackLoad(event, false, 'tile')
         )
         ready = true
+        // Use the primary pointer, so touch-capable laptops keep mouse behavior.
+        if (window.matchMedia('(pointer: coarse)').matches)
+          changePointer('select')
       })
       map.on('move', refresh)
       map.on('movestart', cancelSelectionGesture)
@@ -2432,21 +2433,6 @@
     <nav aria-label="Collage actions">
       <button
         class="quiet-button"
-        data-tooltip="Find maps"
-        aria-label="Find maps by place"
-        onclick={search}
-        disabled={!ready ||
-          busy ||
-          !!editingMask ||
-          !!editingTransform ||
-          !!editingGroup ||
-          searching ||
-          !!inputMode}
-      >
-        <MagnifyingGlass size={20} />
-      </button>
-      <button
-        class="quiet-button"
         data-tooltip="Open collage"
         aria-label="Open collage"
         onclick={() => showInput('open')}
@@ -2485,20 +2471,33 @@
           !!inputMode}
         onclick={() => (settingsOpen = true)}><GearSix size={20} /></button
       >
-      <button
-        class="primary-button small"
-        aria-label="Add maps"
-        onclick={() => showInput('add')}
+      <FanMenu
+        label="Add maps"
+        primary
+        direction="down"
+        icon={Plus}
+        options={[
+          { value: 'annotation', label: 'Add annotation', icon: Plus },
+          { value: 'search', label: 'Find maps', icon: MagnifyingGlass }
+        ]}
+        onselect={(value) => {
+          if (value === 'search') search()
+          else showInput('add')
+        }}
         disabled={!ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
           !!editingGroup ||
-          searching}
-        >{#if busy}<LoadingSmall />{:else}<Plus size={18} />{/if}<span
-          >Add maps</span
-        ></button
+          searching ||
+          !!inputMode}
       >
+        {#snippet triggerContent()}
+          {#if busy}<LoadingSmall />{:else}<Plus size={18} />{/if}<span
+            >Add maps</span
+          >
+        {/snippet}
+      </FanMenu>
     </nav>
   </header>
 
@@ -2533,215 +2532,211 @@
   {/if}
 
   {#if selected && controls && appearances && pointerMode !== 'pan' && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
-    {#key selection.map((item) => item.instanceId).join(',')}
-      {#each allRingTools as tool (tool)}
-        {#if locked ? tool === 'lock' : ringTools.includes(tool)}
-          {#if tool === 'more'}
-            <MapControl
-              fold={ringFold}
-              position={controls.more.position}
-              label={ringExpanded ? 'Fewer tools' : 'More tools'}
-              expanded={ringExpanded}
-              disabled={busy || !!activeControl}
-              onclick={toggleRing}
-              >{#if ringExpanded}<Minus size={19} />{:else}<Plus
-                  size={19}
-                />{/if}</MapControl
-            >
-          {:else if tool === 'lock'}
-            <MapControl
-              fold={ringFold}
-              position={locked ? controlCenter! : controls.lock.position}
-              animate={!locked}
-              motionDuration={TOOL_RING_ANIMATION_MS}
-              label={locked ? 'Unlock' : 'Lock'}
-              pressed={locked}
-              disabled={busy || lockTransition || !!activeControl}
-              onclick={toggleLock}
-              >{#if locked}<LockSimple size={19} />{:else}<LockSimpleOpen
-                  size={19}
-                />{/if}</MapControl
-            >
-          {:else if tool === 'reset'}
-            <MapControl
-              fold={ringFold}
-              position={controls.reset.position}
-              label="Reset"
-              disabled={busy || locked || !!activeControl}
-              onclick={resetSelected}><Eraser size={19} /></MapControl
-            >
-          {:else if tool === 'move'}
-            <MapControl
-              fold={ringFold}
-              position={controls.move.position}
-              label={altDown
-                ? 'Duplicate and move'
-                : selection.length > 1
-                  ? 'Move selected maps'
-                  : 'Move map'}
-              disabled={busy || locked}
-              active={activeControl === 'move'}
-              onpointerdown={(event) => beginDrag(event, selected!, 'move')}
-              ><ArrowsOutCardinal size={19} /></MapControl
-            >
-          {:else if tool === 'rotate'}
-            <MapControl
-              fold={ringFold}
-              position={controls.rotate.position}
-              label={altDown
-                ? 'Make upright'
-                : selection.length > 1
-                  ? 'Rotate selected maps'
-                  : 'Rotate map'}
-              disabled={busy || locked}
-              active={activeControl === 'rotate'}
-              value={Math.round(
-                (((selectedRotation * 180) / Math.PI + 540) % 360) - 180
-              ) + '°'}
-              onpointerdown={(event) => beginDrag(event, selected!, 'rotate')}
-              onclick={(event) => {
-                if (event.altKey) alignToBearing()
-              }}
-              onkeydown={(event) => controlKey(event, 'rotate')}
-              ondblclick={(event) => {
-                if (!event.altKey) resetOrientation()
-              }}
-              >{#if altDown}<ArrowUp size={19} />{:else}<ArrowClockwise
-                  size={19}
-                />{/if}</MapControl
-            >
-          {:else if tool === 'opacity'}
-            <MapControl
-              fold={ringFold}
-              position={controls.opacity.position}
-              label="Opacity"
-              disabled={busy || locked}
-              active={activeControl === 'opacity'}
-              sliderValue={appearances.opacity}
-              rail={controls.opacity.rail}
-              value={Math.round(appearances.opacity * 100) + '%'}
-              onpointerdown={(event) => beginDrag(event, selected!, 'opacity')}
-              onkeydown={(event) => controlKey(event, 'opacity')}
-              ><CircleHalf size={19} /></MapControl
-            >
-          {:else if tool === 'hue'}
-            <MapControl
-              fold={ringFold}
-              position={controls.hue.position}
-              rail={controls.hue.rail}
-              hueScale
-              label="Colorize"
-              disabled={busy || locked}
-              pressed={selection.every((item) => item.appearance.colorize)}
-              active={activeControl === 'hue'}
-              sliderValue={appearances.hue}
-              value={hueColor(appearances.hue).toUpperCase()}
-              onpointerdown={(event) => beginDrag(event, selected!, 'hue')}
-              onkeydown={(event) => controlKey(event, 'hue')}
-              ondblclick={toggleColorize}><Palette size={19} /></MapControl
-            >
-          {:else if tool === 'saturation'}
-            <MapControl
-              fold={ringFold}
-              position={controls.saturation.position}
-              label="Saturation"
-              disabled={busy || locked}
-              pressed={selection.every(
-                (item) => item.appearance.saturation === 1
+    {#each allRingTools as tool (tool)}
+      {#if locked ? tool === 'lock' : ringTools.includes(tool)}
+        {#if tool === 'more'}
+          <MapControl
+            fold={ringFold}
+            position={controls.more.position}
+            label={ringExpanded ? 'Fewer tools' : 'More tools'}
+            expanded={ringExpanded}
+            disabled={busy || !!activeControl}
+            onclick={toggleRing}
+            >{#if ringExpanded}<Minus size={19} />{:else}<Plus
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'lock'}
+          <MapControl
+            fold={ringFold}
+            position={locked ? controlCenter! : controls.lock.position}
+            animate={!locked}
+            motionDuration={TOOL_RING_ANIMATION_MS}
+            label={locked ? 'Unlock' : 'Lock'}
+            pressed={locked}
+            disabled={busy || lockTransition || !!activeControl}
+            onclick={toggleLock}
+            >{#if locked}<LockSimple size={19} />{:else}<LockSimpleOpen
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'reset'}
+          <MapControl
+            fold={ringFold}
+            position={controls.reset.position}
+            label="Reset"
+            disabled={busy || locked || !!activeControl}
+            onclick={resetSelected}><Eraser size={19} /></MapControl
+          >
+        {:else if tool === 'move'}
+          <MapControl
+            fold={ringFold}
+            position={controls.move.position}
+            label={altDown
+              ? 'Duplicate and move'
+              : selection.length > 1
+                ? 'Move selected maps'
+                : 'Move map'}
+            disabled={busy || locked}
+            active={activeControl === 'move'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'move')}
+            ><ArrowsOutCardinal size={19} /></MapControl
+          >
+        {:else if tool === 'rotate'}
+          <MapControl
+            fold={ringFold}
+            position={controls.rotate.position}
+            label={altDown
+              ? 'Make upright'
+              : selection.length > 1
+                ? 'Rotate selected maps'
+                : 'Rotate map'}
+            disabled={busy || locked}
+            active={activeControl === 'rotate'}
+            value={Math.round(
+              (((selectedRotation * 180) / Math.PI + 540) % 360) - 180
+            ) + '°'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'rotate')}
+            onclick={(event) => {
+              if (event.altKey) alignToBearing()
+            }}
+            onkeydown={(event) => controlKey(event, 'rotate')}
+            ondblclick={(event) => {
+              if (!event.altKey) resetOrientation()
+            }}
+            >{#if altDown}<ArrowUp size={19} />{:else}<ArrowClockwise
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'opacity'}
+          <MapControl
+            fold={ringFold}
+            position={controls.opacity.position}
+            label="Opacity"
+            disabled={busy || locked}
+            active={activeControl === 'opacity'}
+            sliderValue={appearances.opacity}
+            rail={controls.opacity.rail}
+            value={Math.round(appearances.opacity * 100) + '%'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'opacity')}
+            onkeydown={(event) => controlKey(event, 'opacity')}
+            ><CircleHalf size={19} /></MapControl
+          >
+        {:else if tool === 'hue'}
+          <MapControl
+            fold={ringFold}
+            position={controls.hue.position}
+            rail={controls.hue.rail}
+            hueScale
+            label="Colorize"
+            disabled={busy || locked}
+            pressed={selection.every((item) => item.appearance.colorize)}
+            active={activeControl === 'hue'}
+            sliderValue={appearances.hue}
+            value={hueColor(appearances.hue).toUpperCase()}
+            onpointerdown={(event) => beginDrag(event, selected!, 'hue')}
+            onkeydown={(event) => controlKey(event, 'hue')}
+            ondblclick={toggleColorize}><Palette size={19} /></MapControl
+          >
+        {:else if tool === 'saturation'}
+          <MapControl
+            fold={ringFold}
+            position={controls.saturation.position}
+            label="Saturation"
+            disabled={busy || locked}
+            pressed={selection.every(
+              (item) => item.appearance.saturation === 1
+            )}
+            onclick={toggleSaturation}><DropHalf size={19} /></MapControl
+          >
+        {:else if tool === 'background'}
+          <MapControl
+            fold={ringFold}
+            position={controls.background.position}
+            label="Remove background"
+            disabled={busy || locked}
+            pressed={selection.every(
+              (item) => item.appearance.removeBackground
+            )}
+            onclick={toggleBackground}><MagicWand size={19} /></MapControl
+          >
+        {:else if tool === 'mirror'}
+          <MapControl
+            fold={ringFold}
+            position={controls.mirror.position}
+            label={altDown ? 'Mirror vertically' : 'Mirror horizontally'}
+            disabled={busy || locked}
+            pressed={allMirrored}
+            onclick={mirrorSelected}
+            >{#if altDown}<FlipVertical size={19} />{:else}<FlipHorizontal
+                size={19}
+              />{/if}</MapControl
+          >
+        {:else if tool === 'editMask'}
+          <MapControl
+            fold={ringFold}
+            position={controls.editMask.position}
+            label="Edit mask"
+            disabled={busy || locked || selection.length > 1}
+            onclick={editMask}><Polygon size={19} /></MapControl
+          >
+        {:else if tool === 'front'}
+          <MapControl
+            fold={ringFold}
+            position={controls.front.position}
+            label={toFront ? 'Bring to front' : 'Send to back'}
+            disabled={busy || locked || orderUnchanged}
+            onclick={() => changeOrder(toFront)}
+            >{#if toFront}<BringMapsToFront />{:else}<SendMapsToBack
+              />{/if}</MapControl
+          >
+        {:else if tool === 'duplicate'}
+          <MapControl
+            fold={ringFold}
+            position={controls.duplicate.position}
+            label={selection.length > 1
+              ? 'Duplicate selected maps'
+              : 'Duplicate map'}
+            disabled={busy || locked}
+            onclick={duplicate}><Copy size={19} /></MapControl
+          >
+        {:else if tool === 'openIn'}
+          <MapControl
+            fold={ringFold}
+            position={controls.openIn.position}
+            label="Open in Viewer"
+            disabled={busy || locked || !viewerLink}
+            onclick={() => {
+              if (viewerLink)
+                window.open(viewerLink, '_blank', 'noopener,noreferrer')
+            }}><ArrowSquareOut size={19} /></MapControl
+          >
+        {:else if tool === 'remove'}
+          <MapControl
+            fold={ringFold}
+            position={controls.remove.position}
+            label={selection.length > 1 ? 'Remove selected maps' : 'Remove map'}
+            disabled={busy || locked}
+            onclick={removeSelected}><Trash size={19} /></MapControl
+          >
+        {:else if tool === 'transform'}
+          <MapControl
+            fold={ringFold}
+            position={controls.transform.position}
+            label="Transform"
+            disabled={busy ||
+              locked ||
+              selection.some(
+                (item) =>
+                  !['helmert', 'polynomial1'].includes(
+                    transformationType(item.baseline)
+                  )
               )}
-              onclick={toggleSaturation}><DropHalf size={19} /></MapControl
-            >
-          {:else if tool === 'background'}
-            <MapControl
-              fold={ringFold}
-              position={controls.background.position}
-              label="Remove background"
-              disabled={busy || locked}
-              pressed={selection.every(
-                (item) => item.appearance.removeBackground
-              )}
-              onclick={toggleBackground}><MagicWand size={19} /></MapControl
-            >
-          {:else if tool === 'mirror'}
-            <MapControl
-              fold={ringFold}
-              position={controls.mirror.position}
-              label={altDown ? 'Mirror vertically' : 'Mirror horizontally'}
-              disabled={busy || locked}
-              pressed={allMirrored}
-              onclick={mirrorSelected}
-              >{#if altDown}<FlipVertical size={19} />{:else}<FlipHorizontal
-                  size={19}
-                />{/if}</MapControl
-            >
-          {:else if tool === 'editMask'}
-            <MapControl
-              fold={ringFold}
-              position={controls.editMask.position}
-              label="Edit mask"
-              disabled={busy || locked || selection.length > 1}
-              onclick={editMask}><Polygon size={19} /></MapControl
-            >
-          {:else if tool === 'front'}
-            <MapControl
-              fold={ringFold}
-              position={controls.front.position}
-              label={toFront ? 'Bring to front' : 'Send to back'}
-              disabled={busy || locked || orderUnchanged}
-              onclick={() => changeOrder(toFront)}
-              >{#if toFront}<BringMapsToFront />{:else}<SendMapsToBack
-                />{/if}</MapControl
-            >
-          {:else if tool === 'duplicate'}
-            <MapControl
-              fold={ringFold}
-              position={controls.duplicate.position}
-              label={selection.length > 1
-                ? 'Duplicate selected maps'
-                : 'Duplicate map'}
-              disabled={busy || locked}
-              onclick={duplicate}><Copy size={19} /></MapControl
-            >
-          {:else if tool === 'openIn'}
-            <MapControl
-              fold={ringFold}
-              position={controls.openIn.position}
-              label="Open in Viewer"
-              disabled={busy || locked || !viewerLink}
-              onclick={() => {
-                if (viewerLink)
-                  window.open(viewerLink, '_blank', 'noopener,noreferrer')
-              }}><ArrowSquareOut size={19} /></MapControl
-            >
-          {:else if tool === 'remove'}
-            <MapControl
-              fold={ringFold}
-              position={controls.remove.position}
-              label={selection.length > 1
-                ? 'Remove selected maps'
-                : 'Remove map'}
-              disabled={busy || locked}
-              onclick={removeSelected}><Trash size={19} /></MapControl
-            >
-          {:else if tool === 'transform'}
-            <MapControl
-              fold={ringFold}
-              position={controls.transform.position}
-              label="Transform"
-              disabled={busy ||
-                locked ||
-                selection.some(
-                  (item) =>
-                    !['helmert', 'polynomial1'].includes(
-                      transformationType(item.baseline)
-                    )
-                )}
-              onclick={editTransform}><BoundingBox size={20} /></MapControl
-            >
-          {/if}
+            onclick={editTransform}><BoundingBox size={20} /></MapControl
+          >
         {/if}
-      {/each}
-    {/key}
+      {/if}
+    {/each}
   {/if}
 
   {#if !editingMask && !editingTransform && !inputMode && !searching}
