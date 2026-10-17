@@ -40,7 +40,6 @@
     maskContains
   } from './mask-shapes'
   import { fullResourceMask, validateResourceMask } from './model'
-  import { orthogonalizeMask } from './orthogonalize'
   import { simplifyMaskStroke } from './freehand-mask'
   import { suspendMapNavigation } from './map-navigation'
   import { PenTouchGesture } from './pen-gesture'
@@ -261,16 +260,6 @@
     if (!ready || drawingNewMask) return
     abortMaskGesture()
     replaceDraft(fullResourceMask(original.baseline))
-  }
-
-  function orthogonalize() {
-    if (!ready || drawingNewMask) return
-    abortMaskGesture()
-    try {
-      replaceDraft(orthogonalizeMask(draft, width, height))
-    } catch (problem) {
-      error = problem instanceof Error ? problem.message : String(problem)
-    }
   }
 
   // Terra Draw handles pen gestures and polygon creation; keep input inside the
@@ -1336,27 +1325,6 @@
       >
       <button
         class="quiet-button"
-        aria-label="Orthogonalize mask"
-        data-tooltip="Orthogonalize mask"
-        disabled={!ready || drawingNewMask}
-        onclick={orthogonalize}
-        ><svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M4 3h5v12h12v6H4Z" />
-          <path d="M6 7h3M6 11h3M13 18v3M17 18v3" />
-        </svg></button
-      >
-      <button
-        class="quiet-button"
         data-tooltip="Cancel"
         aria-label="Cancel mask editing"
         onclick={oncancel}><X size={20} /></button
@@ -1415,7 +1383,6 @@
     restores the image bounds. Reset mask restores the imported original mask.
     Circle draws from its center; rectangle draws from corner to corner. Shape
     orientation lets both follow the current view or the map's rotation and
-    skew. Both stop at the image edges. Orthogonalize straightens near-right
-    corners. Escape cancels an unfinished drawing.
+    skew. Both stop at the image edges. Escape cancels an unfinished drawing.
   </p>
 </section>

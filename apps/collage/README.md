@@ -306,15 +306,9 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   original mask before a circular search crop. That source mask is kept in memory;
   reopening an exported collage uses the loaded mask as the new source of truth.
 - **Full image mask** replaces the draft with the image rectangle.
-- **Orthogonalize** straightens corners within 13° of a right angle and removes
-  redundant vertices on nearly straight edges, preserving the mask's general
-  orientation. A uniform fit keeps the result inside the image; invalid results
-  leave the draft intact. This adapts the [iD orthogonalize action](https://github.com/openstreetmap/iD/blob/b08827e5e87a977587f49239fb734a126ac9ea69/modules/actions/orthogonalize.ts)
-  by iD Contributors under the ISC license. The copyright and full license are
-  retained in the source and [distributed notices](static/third-party-notices.txt).
 - Use the editor's undo/redo controls for vertex edits, replacement polygons,
   and individual points while polygon drawing. Drawing a shape, moving a mask,
-  resetting it, pen strokes, full-mask replacement and orthogonalization each
+  resetting it, pen strokes, full-mask replacement each
   form one undo step. Undo during pen drawing
   cancels the unfinished stroke. **Done** is disabled until a new polygon
   has been closed.
