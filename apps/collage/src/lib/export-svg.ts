@@ -5,6 +5,8 @@ import type { CollageMap } from './model.ts'
 import { hueColor } from './control-layout.ts'
 import { projectedToScreen } from './export-view.ts'
 import type { ExportView } from './export-view.ts'
+import { exportAppearance } from './export-effects.ts'
+import type { ExportEffects } from './export-effects.ts'
 
 export const DEFAULT_SVG_SIZE = { width: 2048, height: 2048 }
 
@@ -58,7 +60,7 @@ export function svgImageRequest(
     .sort((a, b) => b.width - a.width)[0]
   if (!available)
     throw new Error(
-      'This image service does not offer a full-image link for SVG. Use Image export instead.'
+      'This image service does not offer a full-image link at the requested size. Use Image export instead.'
     )
   return { size: available }
 }
@@ -70,8 +72,20 @@ export function linkedImageUrl(
   const request = svgImageRequest(image, maximum)
   const url = image.getImageUrl(request, { preferredFormats: ['jpg', 'png'] })
   if (!['https:', 'http:'].includes(new URL(url).protocol))
-    throw new Error('SVG requires an HTTP image service.')
+    throw new Error('This image service must use an HTTP or HTTPS URL.')
   return url
+}
+
+/** Fixed-size services can only link their declared full-image renditions. */
+export function linkedImageNotice(image: Image, maximum = DEFAULT_SVG_SIZE) {
+  if (image.supportsAnyRegionAndSize) return
+  try {
+    const size = svgImageRequest(image, maximum).size!
+    if (size.width < image.width || size.height < image.height)
+      return `This IIIF service limits the linked thumbnail to ${size.width.toLocaleString()} × ${size.height.toLocaleString()} px.`
+  } catch {
+    // The normal export error offers omission if no rendition fits at all.
+  }
 }
 
 const escapeXml = (text: string) =>
@@ -119,10 +133,6 @@ export function svgMatrix(item: CollageMap, view: ExportView): number[] {
 export function validateSvgItems(items: CollageMap[], view: ExportView) {
   for (const item of items) {
     svgMatrix(item, view)
-    if (item.appearance.removeBackground && item.appearance.backgroundColor)
-      throw new Error(
-        'SVG cannot preserve automatic background removal. Turn it off or use Image export.'
-      )
   }
 }
 
@@ -131,7 +141,11 @@ export function exportSvg(
   items: CollageMap[],
   images: Map<string, Image>,
   view: ExportView,
-  options: { maximum?: SizeObject; sources?: Map<string, string> } = {}
+  options: {
+    maximum?: SizeObject
+    sources?: Map<string, string>
+    effects?: ExportEffects
+  } = {}
 ): string {
   validateSvgItems(items, view)
   const defs: string[] = []
@@ -146,7 +160,10 @@ export function exportSvg(
       throw new Error('The SVG image source is invalid.')
     const url = escapeXml(source)
     const matrix = svgMatrix(item, view).map(number).join(' ')
-    const { applyMask, opacity, saturation, colorize, hue } = item.appearance
+    const { applyMask, opacity, saturation, colorize, hue } = exportAppearance(
+      item,
+      options.effects
+    )
     if (applyMask)
       defs.push(
         `<clipPath id="mask-${i}" clipPathUnits="userSpaceOnUse"><polygon points="${item.resourceMask.map((point) => point.map(number).join(',')).join(' ')}"/></clipPath>`

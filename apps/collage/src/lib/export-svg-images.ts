@@ -3,6 +3,11 @@ import type { ImageRequest, Region, SizeObject } from '@allmaps/types'
 import type { ExportableMapLayer } from './export-layer.ts'
 import { abortable } from './export-image.ts'
 import { linkedImageUrl, svgImageSize } from './export-svg.ts'
+import {
+  MapExportError,
+  imageHttpError,
+  imageNetworkMessage
+} from './export-errors.ts'
 
 type CachedPixels = {
   data: ImageData
@@ -73,7 +78,8 @@ function blobDataUrl(blob: Blob, signal: AbortSignal): Promise<string> {
       reject(signal.reason)
     }
     reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(new Error('Could not embed this image.'))
+    reader.onerror = () =>
+      reject(new Error('The browser could not read the downloaded image.'))
     reader.onloadend = () => signal.removeEventListener('abort', abort)
     signal.addEventListener('abort', abort, { once: true })
     if (signal.aborted) abort()
@@ -88,7 +94,11 @@ async function canvasBlob(canvas: HTMLCanvasElement, signal: AbortSignal) {
         (blob) =>
           blob
             ? resolve(blob)
-            : reject(new Error('Could not encode the embedded image.')),
+            : reject(
+                new Error(
+                  'The browser could not encode the image. Reduce the export resolution.'
+                )
+              ),
         'image/png'
       )
     }),
@@ -115,23 +125,34 @@ async function embedImage(
       const tileContext = tileCanvas.getContext('2d')
       if (!context || !tileContext)
         throw new Error(
-          'Could not prepare embedded images. Try smaller dimensions.'
+          'The browser could not allocate memory for this image. Reduce the export resolution.'
         )
       for (const { pixels, region, size: tileSize } of pieces) {
         tileCanvas.width = pixels.width
         tileCanvas.height = pixels.height
         tileContext.putImageData(pixels, 0, 0)
-        context.drawImage(
-          tileCanvas,
-          0,
-          0,
-          tileSize.width,
-          tileSize.height,
-          (region.x * size.width) / image.width,
-          (region.y * size.height) / image.height,
-          (region.width * size.width) / image.width,
-          (region.height * size.height) / image.height
+        // Shared edges must land on the same output pixel. Fractional tile
+        // rectangles otherwise antialias against transparency and leave seams.
+        const left = Math.round((region.x * size.width) / image.width)
+        const top = Math.round((region.y * size.height) / image.height)
+        const right = Math.round(
+          ((region.x + region.width) * size.width) / image.width
         )
+        const bottom = Math.round(
+          ((region.y + region.height) * size.height) / image.height
+        )
+        if (right > left && bottom > top)
+          context.drawImage(
+            tileCanvas,
+            0,
+            0,
+            tileSize.width,
+            tileSize.height,
+            left,
+            top,
+            right - left,
+            bottom - top
+          )
       }
       return await blobDataUrl(await canvasBlob(canvas, signal), signal)
     } finally {
@@ -141,21 +162,48 @@ async function embedImage(
   // Partial or lower-detail caches cannot supply a complete editable image.
   // Fetch a bounded full rendition rather than embedding transparent gaps.
   const url = linkedImageUrl(image, maximum)
-  let response: Response
+  // A per-image timeout identifies the failed map and leaves time to offer
+  // omission before the overall export deadline.
+  const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(30_000)])
+  let blob: Blob
   try {
-    response = await fetch(url, { signal })
-  } catch {
+    let response: Response
+    try {
+      response = await fetch(url, { signal: requestSignal })
+    } catch (cause) {
+      signal.throwIfAborted()
+      requestSignal.throwIfAborted()
+      throw new Error(imageNetworkMessage, { cause })
+    }
+    if (!response.ok) throw imageHttpError(response.status)
+    try {
+      blob = await response.blob()
+    } catch (cause) {
+      signal.throwIfAborted()
+      requestSignal.throwIfAborted()
+      throw new Error('The image download was interrupted. Try again.', {
+        cause
+      })
+    }
+  } catch (cause) {
+    signal.throwIfAborted()
+    if (requestSignal.reason?.name === 'TimeoutError')
+      throw new Error(
+        'The image service took too long to return this image. Try again later.',
+        { cause }
+      )
+    throw cause
+  }
+  let bitmap: ImageBitmap
+  try {
+    bitmap = await createImageBitmap(blob)
+  } catch (cause) {
     signal.throwIfAborted()
     throw new Error(
-      'Could not fetch an image for embedding. Try linked images instead.'
+      'The image service returned an unreadable image. Try again or check the service.',
+      { cause }
     )
   }
-  if (!response.ok)
-    throw new Error(
-      `Could not embed an image (${response.status}). Try linked images instead.`
-    )
-  const blob = await response.blob()
-  const bitmap = await createImageBitmap(blob)
   try {
     signal.throwIfAborted()
     if (
@@ -164,7 +212,7 @@ async function embedImage(
       bitmap.width * bitmap.height > 32_000_000
     )
       throw new Error(
-        'An image service exceeded the selected dimensions. Try linked images or smaller dimensions.'
+        'The image service returned an image larger than the requested dimensions. Reduce the export resolution or use Image export.'
       )
     if (['image/jpeg', 'image/png'].includes(blob.type))
       return await blobDataUrl(blob, signal)
@@ -173,7 +221,10 @@ async function embedImage(
     canvas.height = bitmap.height
     try {
       const context = canvas.getContext('2d')
-      if (!context) throw new Error('Could not prepare embedded images.')
+      if (!context)
+        throw new Error(
+          'The browser could not allocate memory for this image. Reduce the export resolution.'
+        )
       context.drawImage(bitmap, 0, 0)
       return await blobDataUrl(await canvasBlob(canvas, signal), signal)
     } finally {
@@ -190,7 +241,8 @@ export async function embeddedSvgSources(
   layer: ExportableMapLayer,
   images: Map<string, Image>,
   maximum: SizeObject,
-  signal: AbortSignal
+  signal: AbortSignal,
+  cache?: Map<string, string>
 ): Promise<Map<string, string>> {
   const sources = new Map<string, string>()
   const byImage = new Map<string, string>()
@@ -202,11 +254,33 @@ export async function embeddedSvgSources(
       const tiles = [...images]
         .filter(([, candidate]) => candidate.uri === image.uri)
         .flatMap(([id]) => layer.renderer!.tileCache.getMapCachedTiles(id))
-      source = await embedImage(image, maximum, [...new Set(tiles)], signal)
+      const key = JSON.stringify([image.uri, maximum.width, maximum.height])
+      source = cache?.get(key)
+      if (!source) {
+        try {
+          source = await embedImage(image, maximum, [...new Set(tiles)], signal)
+        } catch (cause) {
+          signal.throwIfAborted()
+          throw new MapExportError(
+            [...images]
+              .filter(([, copy]) => copy.uri === image.uri)
+              .map(([id]) => id),
+            cause
+          )
+        }
+        // Bound retained sources across retries as well as a single attempt.
+        if (
+          cache &&
+          [...cache.values()].reduce((sum, value) => sum + value.length, 0) +
+            source.length <=
+            100_000_000
+        )
+          cache.set(key, source)
+      }
       bytes += source.length
       if (bytes > 100_000_000)
         throw new Error(
-          'Embedded images exceed 100 MB. Choose smaller dimensions or linked images.'
+          'Embedded images exceed 100 MB. Reduce the export resolution.'
         )
       byImage.set(image.uri, source)
     }

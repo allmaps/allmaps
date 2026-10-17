@@ -22,7 +22,8 @@ import {
   exportSvg,
   linkedImageUrl,
   svgMatrix,
-  svgImageSize
+  svgImageSize,
+  linkedImageNotice
 } from '../src/lib/export-svg.ts'
 import { cachedImagePieces } from '../src/lib/export-svg-images.ts'
 
@@ -297,4 +298,42 @@ test('SVG image links honor service limits and declared sizes, rejecting tile-on
     /\/full\/250,\//
   )
   assert.throws(() => linkedImageUrl(image('level0')), /full-image link/)
+})
+
+test('SVG export omits unsupported background removal and supports independent effect choices', () => {
+  const [item] = openCollage(generateAnnotation(source))
+  Object.assign(item.appearance, {
+    opacity: 0.4,
+    saturation: 0,
+    colorize: true,
+    removeBackground: true,
+    backgroundColor: '#ffffff'
+  })
+  const images = new Map([[item.instanceId, image()]])
+  const original = structuredClone(item)
+  const enabled = exportSvg([item], images, view)
+  assert.match(enabled, /opacity="0.4"/)
+  assert.match(enabled, /feColorMatrix/)
+  assert.match(enabled, /feComponentTransfer/)
+  const disabled = exportSvg([item], images, view, {
+    effects: {
+      opacity: false,
+      saturation: false,
+      colorize: false,
+      removeBackground: false
+    }
+  })
+  assert.match(disabled, /opacity="1"/)
+  assert.doesNotMatch(disabled, /<filter|feColorMatrix|feComponentTransfer/)
+  assert.match(disabled, /clip-path=/)
+  assert.equal(svgMatrix(item, view).length, 6)
+  assert.deepEqual(item, original)
+})
+
+test('linked fixed-size image notices identify the actual rendition without blocking export', () => {
+  const fixed = image('level0', { sizes: [{ width: 250, height: 200 }] })
+  assert.match(linkedImageNotice(fixed)!, /250 × 200 px/)
+  assert.match(linkedImageUrl(fixed), /250,/)
+  assert.equal(linkedImageNotice(image()), undefined)
+  assert.equal(linkedImageNotice(fixed, { width: 100, height: 100 }), undefined)
 })

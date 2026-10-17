@@ -1003,6 +1003,18 @@ nav {
   flex-direction: column;
   gap: 20px;
 }
+.export-failure {
+  overflow-wrap: anywhere;
+}
+.export-failure .dialog-error {
+  margin: 8px 0 0;
+}
+.export-failure .quiet-button {
+  width: auto;
+  padding: 8px 0 0;
+  font-size: 14px;
+  text-decoration: underline;
+}
 .export-dialog .export-dimensions {
   margin: 0;
 }
@@ -1252,4 +1264,35 @@ nav {
   .app-header nav {
     margin-left: auto;
   }
+}
+
+.export-effects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.export-effects legend {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.export-dialog .export-effects label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.export-dialog .export-effects input {
+  accent-color: #222;
+}
+.export-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #2221;
+  color: #444;
+  font-size: 14px;
+  line-height: 1.5;
 }

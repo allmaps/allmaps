@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, test } from 'node:test'
+import { WarpedMapErrorEvent } from '@allmaps/render'
+import { MapExportError } from '../src/lib/export-errors.ts'
 import type { TestContext } from 'node:test'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import type { ExportableMapLayer } from '../src/lib/export-layer.ts'
@@ -55,6 +57,7 @@ function harness(
     cancel = false,
     selected = false,
     loadFailure = false,
+    pending = false,
     encoded = jpeg,
     dpi = 254
   } = {}
@@ -76,8 +79,8 @@ function harness(
     },
     hasImage() {
       assert.equal(
-        mapId,
-        'selected',
+        mapId === 'selected' || mapId === 'pending',
+        true,
         'Unselected image services must not be loaded'
       )
       return !loadFailure
@@ -85,9 +88,12 @@ function harness(
     async loadImage() {
       throw new Error('Info failed')
     },
-    fetchableTilesForViewport: [{ tileUrl: 'tile' }]
+    fetchableTilesForViewport: [
+      { tileUrl: mapId === 'pending' ? 'pending' : 'tile' }
+    ]
   })
   const maps = empty ? [] : [makeMap('selected', true)]
+  if (pending) maps.unshift(makeMap('pending', true))
   if (selected) maps.push(makeMap('unselected', true), makeMap('hidden', false))
   const originalVisibility = maps.map(({ visible }) => visible)
   const capturedMaps: string[][] = []
@@ -206,8 +212,18 @@ function harness(
             controller.abort(new DOMException('Cancelled', 'AbortError'))
           setTimeout(() => {
             cached = !failed
-            finished = true
-            tileCache.dispatchEvent(new Event('allrequestedtilesloaded'))
+            if (pending) {
+              tileCache.dispatchEvent(
+                new WarpedMapErrorEvent(
+                  new Error('Unavailable'),
+                  { mapIds: ['selected'], tileUrl: 'tile', status: 503 },
+                  'tilefetcherror'
+                )
+              )
+            } else {
+              finished = true
+              tileCache.dispatchEvent(new Event('allrequestedtilesloaded'))
+            }
           }, 5)
         }
         events.dispatchEvent(new Event('render'))
@@ -428,4 +444,65 @@ test('JPEG export records the selected DPI and preserves encoded pixels', async 
   const original = Buffer.from(await jpeg.arrayBuffer())
   assert.deepEqual(data.subarray(0, 13), original.subarray(0, 13))
   assert.deepEqual(data.subarray(18), original.subarray(18))
+})
+
+test('a failed tile interrupts export while other maps are still loading, with the correct map and HTTP cause', async (t) => {
+  const h = harness(t, { failed: true, pending: true })
+  await assert.rejects(h.run(), (error: unknown) => {
+    assert.ok(error instanceof MapExportError)
+    assert.deepEqual(error.mapIds, ['selected'])
+    assert.match(error.message, /HTTP 503/)
+    assert.doesNotMatch(error.message, /DPI/)
+    assert.equal(error.retryable, false)
+    return true
+  })
+  assert.equal(h.captures(), 0)
+  h.restored()
+})
+
+test('unreported worker failures time out as skippable incomplete maps and restore the canvas', async (t) => {
+  const timeout = AbortSignal.timeout.bind(AbortSignal)
+  t.mock.method(AbortSignal, 'timeout', (milliseconds: number) =>
+    milliseconds === 30_000
+      ? AbortSignal.abort(new DOMException('Timeout', 'TimeoutError'))
+      : timeout(milliseconds)
+  )
+  const h = harness(t, { failed: true })
+  await assert.rejects(h.run(), (error: unknown) => {
+    assert.ok(error instanceof MapExportError)
+    assert.deepEqual(error.mapIds, ['selected'])
+    assert.match(error.message, /did not finish loading within 30 seconds/)
+    assert.doesNotMatch(error.message, /DPI/)
+    return true
+  })
+  h.restored()
+})
+
+test('info.json failures identify the incomplete map and preserve HTTP status', async () => {
+  const layer = {
+    renderer: {
+      warpedMapList: {
+        getWarpedMaps: () => [
+          {
+            mapId: 'missing',
+            shouldRenderMap: () => true,
+            hasImage: () => false,
+            loadImage: async () => {
+              throw Object.assign(new Error('Missing'), { status: 404 })
+            }
+          }
+        ]
+      }
+    }
+  } as unknown as ExportableMapLayer
+  await assert.rejects(
+    loadExportImages(layer, view, new AbortController().signal),
+    (error: unknown) => {
+      assert.ok(error instanceof MapExportError)
+      assert.deepEqual(error.mapIds, ['missing'])
+      assert.match(error.message, /info.json.*HTTP 404/)
+      assert.equal(error.retryable, false)
+      return true
+    }
+  )
 })

@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {
+    backgroundRemovalThreshold,
+    backgroundRemovalHardness
+  } from './export-effects'
   import { onMount, tick } from 'svelte'
   import { Map as MapLibreMap, LngLat } from 'maplibre-gl'
   import { ExportableMapLayer } from './export-layer'
@@ -686,8 +690,10 @@
         removeColor:
           appearance.removeBackground && !!appearance.backgroundColor,
         removeColorColor: appearance.backgroundColor ?? '#ffffff',
-        removeColorHardness: 0.1,
-        removeColorThreshold: appearance.removeBackground ? 1 / 3 : 0
+        removeColorHardness: backgroundRemovalHardness,
+        removeColorThreshold: appearance.removeBackground
+          ? backgroundRemovalThreshold
+          : 0
       },
       { animate: false }
     )

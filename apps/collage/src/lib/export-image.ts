@@ -1,4 +1,4 @@
-import { Viewport } from '@allmaps/render'
+import { Viewport, WarpedMapEvent } from '@allmaps/render'
 import { changeDpiBlob } from 'changedpi'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import { CANVAS_SCALE } from './coordinates.ts'
@@ -6,6 +6,12 @@ import type { ExportableMapLayer } from './export-layer.ts'
 import { imageDimensions, validateImageSize } from './export-view.ts'
 import type { ExportView } from './export-view.ts'
 import { modeVisibility } from './mode-visibility.ts'
+import {
+  MapExportError,
+  imageInfoError,
+  imageHttpError,
+  imageNetworkMessage
+} from './export-errors.ts'
 
 export function printViewport(view: ExportView, ratio = 1) {
   return new Viewport(
@@ -82,26 +88,34 @@ export async function loadExportImages(
   const maps = visibleExportMaps(layer, view, mapIds)
   await Promise.all(
     maps.map(async (map) => {
-      // WebGL maps declare their eventual image type. Widen this type guard to
-      // a boolean so TypeScript also permits loading their initial empty state.
-      const hasImage = (): boolean => map.hasImage()
-      if (map.fetchingImageInfo) {
-        await untilEvent(
-          map,
-          ['imageloaded', 'imageinfofetcherror'],
-          () => !!map.imageInfoError || map.hasImage(),
-          signal
-        )
+      const requestSignal = AbortSignal.any([
+        signal,
+        AbortSignal.timeout(30_000)
+      ])
+      try {
+        // WebGL maps declare their eventual image type, even before loading.
+        const hasImage = (): boolean => map.hasImage()
+        if (map.fetchingImageInfo) {
+          await untilEvent(
+            map,
+            ['imageloaded', 'imageinfofetcherror'],
+            () => !!map.imageInfoError || map.hasImage(),
+            requestSignal
+          )
+        }
+        if (!hasImage())
+          await abortable(
+            map.loadImage(layer.renderer!.warpedMapList.imagesById),
+            requestSignal
+          )
+        if (!hasImage())
+          throw map.imageInfoError ?? new Error('Missing image information.')
+      } catch (cause) {
+        signal.throwIfAborted()
+        // The renderer retains info.json errors. A new export cannot retry
+        // these without resetting the map itself.
+        throw new MapExportError([map.mapId], imageInfoError(cause), false)
       }
-      if (!hasImage())
-        await abortable(
-          map.loadImage(layer.renderer!.warpedMapList.imagesById),
-          signal
-        )
-      if (!hasImage())
-        throw new Error(
-          'An image service could not be loaded. Try again when the maps have loaded.'
-        )
     })
   )
   return maps
@@ -148,6 +162,13 @@ export async function exportImage(
     scale: number
     backgroundColor?: string
     mapIds?: ReadonlySet<string>
+    renderOptions?: {
+      opacity: number
+      saturation: number
+      colorize: boolean
+      removeColor: boolean
+      applyMask: boolean
+    }
   },
   signal: AbortSignal
 ): Promise<Blob> {
@@ -184,6 +205,13 @@ export async function exportImage(
     throw new Error('Could not allocate the export image. Try a smaller size.')
   let changed = false
   let visibility: ReturnType<typeof modeVisibility> | undefined
+  const restoreAppearance: (() => void)[] = []
+  const tileErrors = new Map<string, WarpedMapEvent>()
+  const tileFailed = (event: Event) => {
+    if (event instanceof WarpedMapEvent && event.data?.tileUrl)
+      tileErrors.set(event.data.tileUrl, event)
+  }
+  renderer.tileCache.addEventListener('tilefetcherror', tileFailed)
   try {
     map.stop()
     await renderedFrame(map, signal, () => coverContext.drawImage(canvas, 0, 0))
@@ -201,6 +229,22 @@ export async function exportImage(
       visibility.showOthers(false)
     }
     const maps = await loadExportImages(layer, view, signal, options.mapIds)
+    if (options.renderOptions) {
+      for (const item of maps) {
+        const original = Object.fromEntries(
+          Object.keys(options.renderOptions).map((key) => [
+            key,
+            item.mapOptions[key as keyof typeof options.renderOptions]
+          ])
+        )
+        restoreAppearance.push(() =>
+          layer.setMapOptions(item.mapId, original, { animate: false })
+        )
+        layer.setMapOptions(item.mapId, options.renderOptions, {
+          animate: false
+        })
+      }
+    }
     const viewport = printViewport(
       { ...view, width: width / ratio, height: height / ratio },
       ratio
@@ -228,26 +272,65 @@ export async function exportImage(
     while (maps.length && renderer.previousSignificantViewport !== viewport) {
       await renderedFrame(map, signal)
     }
+    let tilesTimedOut = false
     if (maps.length) {
-      await untilEvent(
-        renderer.tileCache,
-        ['allrequestedtilesloaded'],
-        () => renderer.tileCache.finished,
-        signal
-      )
+      const tileSignal = AbortSignal.any([signal, AbortSignal.timeout(30_000)])
+      try {
+        await untilEvent(
+          renderer.tileCache,
+          ['allrequestedtilesloaded', 'maptileloaded', 'tilefetcherror'],
+          () =>
+            renderer.tileCache.finished ||
+            maps.every((item) =>
+              item.fetchableTilesForViewport.every((tile) =>
+                renderer.tileCache
+                  .getCacheableTile(tile.tileUrl)
+                  ?.isCachedTile()
+              )
+            ) ||
+            maps.some((item) =>
+              item.fetchableTilesForViewport.some((tile) =>
+                tileErrors.has(tile.tileUrl)
+              )
+            ),
+          tileSignal
+        )
+      } catch (cause) {
+        signal.throwIfAborted()
+        if (tileSignal.reason?.name !== 'TimeoutError') throw cause
+        // Some renderer workers only log failed downloads. Bound that wait,
+        // identify the incomplete map, and allow it to be omitted as well.
+        tilesTimedOut = true
+      }
     }
     // That event also fires after failed requests. Require every requested
     // detail tile to be cached, including failures left over from earlier views.
-    for (const warpedMap of visibleExportMaps(layer, view, options.mapIds)) {
-      if (
-        warpedMap.fetchableTilesForViewport.some(
+    // An explicit failure wins over other maps whose downloads are still in
+    // flight. Once all requests finish, also catch previously cached failures.
+    const exportMaps = visibleExportMaps(layer, view, options.mapIds)
+    for (const reportedOnly of [true, false]) {
+      for (const warpedMap of exportMaps) {
+        const missing = warpedMap.fetchableTilesForViewport.find(
           (tile) =>
+            (!reportedOnly || tileErrors.has(tile.tileUrl)) &&
             !renderer.tileCache.getCacheableTile(tile.tileUrl)?.isCachedTile()
         )
-      ) {
-        throw new Error(
-          'Some image tiles could not be loaded. The image was not exported; try again or use a lower DPI.'
-        )
+        if (missing) {
+          const detail = tileErrors.get(missing.tileUrl)?.data
+          const message = detail?.status
+            ? imageHttpError(detail.status).message
+            : detail?.errorKind === 'network-or-cors'
+              ? imageNetworkMessage
+              : tilesTimedOut
+                ? 'This map did not finish loading within 30 seconds. The service may be slow or unavailable.'
+                : 'Check the service or export without this map.'
+          throw new MapExportError(
+            [warpedMap.mapId],
+            new Error(`Some image tiles could not be loaded. ${message}`),
+            // Failed tiles remain in the renderer cache until pruned.
+            false
+          )
+        }
       }
     }
     await renderedFrame(map, signal, () => {
@@ -261,10 +344,12 @@ export async function exportImage(
     output.width = output.height = 0
     throw error
   } finally {
+    renderer.tileCache.removeEventListener('tilefetcherror', tileFailed)
     if (changed) {
       layer.exportViewport = undefined
       renderer.previousSignificantViewport = undefined
       try {
+        restoreAppearance.forEach((restore) => restore())
         visibility?.restore()
         map.setPixelRatio(originalRatio)
         await renderedFrame(map, AbortSignal.timeout(2000))
