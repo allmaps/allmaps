@@ -50,9 +50,10 @@ pnpm --filter @allmaps/collage build
 ## Adding and opening maps
 
 - **Add maps** accepts an annotation URL, pasted JSON, or local annotation files.
-  It adds every map and leaves them unselected. Initial placement always uses
-  compact PRISM, seeded from original geographic positions, with the first map
-  at the current view center. There is no import layout chooser. It preserves
+  It adds every map and leaves them unselected. **Import layout** in Settings
+  chooses **Compact** (PRISM, the default) or **Geographic**. Both start with
+  the first map at the current view center. Compact removes overlaps; Geographic
+  preserves relative geographic positions, so maps of the same area overlap. Both preserve
   annotation order, each map's approximate ground scale and mask. Added maps use
   Helmert (translation, rotation and uniform scaling), encoded by three non-collinear GCPs.
   **Try random maps** requests 12 candidates from
@@ -62,7 +63,8 @@ pnpm --filter @allmaps/collage build
   Duplicate or unsupported maps are skipped, as are services whose `info.json`
   cannot be fetched and parsed in the browser. Sample image fetching and decoding
   remain available through the loader's `checkImageData` option, disabled by
-  default. Maps that pass these checks are added; Escape cancels loading.
+  default. Maps that fail renderer triangulation are also skipped, keeping the
+  rest of the batch. Escape cancels loading.
 - **Open collage** restores coordinates and annotation order as supplied. It
   never applies scale normalization or recenters individual maps. It replaces
   the current canvas as an undoable action.
@@ -92,7 +94,7 @@ services; there is no sample-image preflight. Available results appear directly
 on the canvas as they arrive. Previous/next start at the query's center and scale,
 remembering adjustments to each map while browsing. **+ Add / − Remove** changes
 the selection; the checkmark confirms it and
-imports the maps with compact PRISM as one undo step. Left/right arrows, Space,
+imports the maps using the saved import layout as one undo step. Left/right arrows, Space,
 and Command/Ctrl Enter provide the corresponding shortcuts. Closing search
 restores the previous collage and camera without adding anything.
 
@@ -151,11 +153,12 @@ response. This is per-tab search history, not an autosave of the collage.
   Shift-drag empty canvas adds maps intersecting a selection rectangle. Drag any
   selected map to move the group; rotate uses one shared pivot and preserves
   spacing and scale. Groups share appearance controls; individual mask
-  editing is available inside group editing mode. **Arrange**, **Geographic**, **Align** and **Distribute** appear as compact
-  icon buttons beside **Edit layout** at the bottom center, above the zoom controls
+  editing is available inside group editing mode. **Layout**, **Align** and **Distribute** appear as compact
+  icon buttons beside **Edit selection** at the bottom center, above the zoom controls
   on smaller screens. These layout tools are available for ungrouped maps or
   selected members inside **Edit group**.
-  **Arrange** compacts the current positions with PRISM, keeping the first selected
+  **Layout** opens a fan with **Compact** and **Geographic**. Compact removes
+  overlaps from the current positions with PRISM, keeping the first selected
   map fixed and preserving scale, rotation, masks and layer order.
   **Geographic** keeps the first selected map
   fixed, including its rotation, and restores the others' geographic offsets and
@@ -336,15 +339,26 @@ Focused rows also accept Up/Down or Home/End for keyboard reordering.
 Preferences are stored in this browser. Mirror is hidden by default; Transform
 is enabled. **Double-tap / click opens** chooses **Edit mask** (default) or
 **Transform** for individual maps. A grouped map still opens **Edit group** first.
-Reset restores the default tools, ordering, import, snapping and double-tap settings.
-Lock/Unlock is always available in selection mode, independently of ring settings.
+The Settings dialog's Reset restores the default preferences.
+Lock is enabled in the expanded ring by default. A locked selection always shows
+Unlock, even when Lock is hidden in the tool settings.
+
+The ring's **Reset** restores each selected map's initial visual settings by
+default. **Reset restores** in Settings can also include the initial mask,
+rotation, scale, skew and mirroring. Full reset keeps each map's current center;
+groups, titles and layer order are retained. Reset is undoable. Initial options
+come from the current import or opened collage, and the reset snapshot stays
+local to this session rather than adding annotation metadata.
 
 The tool ring opens and closes from one end of its circle in 180 ms, including
 expanding, contracting, changing selection or entering an editor. Adjust
 `TOOL_RING_ANIMATION_MS` in `src/lib/control-layout.ts` to change both directions
-together. Reduced-motion preferences disable this animation.
+together. Reduced-motion preferences disable this animation. An already locked
+selection's Unlock button appears and disappears without animating.
 
-**Snapping** is off by default. **Snap to grid** aligns the center of the moved
+**Snapping** is off by default. Grid spacing/unit and rotation angle settings
+appear only when their corresponding snapping toggle is enabled.
+**Snap to grid** aligns the center of the moved
 selection's bounds to a grid anchored at the collage origin. Set its spacing in
 metres, kilometres or feet; these are ground distances, independent of zoom.
 When enabled, the backdrop shows this grid with stronger lines every five
@@ -437,26 +451,29 @@ imports stay ungrouped. Saved group structures are preserved, with fresh group
 IDs for each imported document. Opening a collage restores its groups as saved.
 Random maps and place-search results remain independent maps.
 
-Use **Lock** or **Unlock** in the **Select maps** action row. A locked selection
-shows a subtle lock badge instead of tools in normal mode. Locked maps remain
+Use **Lock** in the tool ring. The other tools animate toward it and disappear
+while the lock moves to the center of the ring. Click **Unlock** there to restore
+the tools and resume editing. Locked maps have orange outlines, including when
+unselected; failed image loads still take priority with a red outline. Locked maps remain
 selectable and the canvas can still pan/zoom, but dragging, duplication, deletion,
 arrangement and setting changes are blocked. Locking a group locks every member.
 If a mixed selection contains a locked map, **Unlock** unlocks the whole selection.
 
-Enter **Select maps**, select multiple maps and choose **Group** in its bottom
-action row, or press Cmd/Ctrl+G. Clicking any member then selects the entire group;
+Select multiple maps and choose **Group** in the **Edit selection** action row,
+or press Cmd/Ctrl+G. Clicking any member then selects the entire group;
 Shift/Cmd/Ctrl-click
 and marquee selection also treat groups as units. Move and rotate them together.
 Grouping preserves each member's mask, appearance and placement. Adjusting opacity,
 color, saturation or background removal applies only that setting to every member;
 background removal still detects each image's own paper color. Duplicated groups are independent.
-Use **Ungroup** in selection mode (Cmd/Ctrl+Shift+G) to separate the members
-permanently. Both shortcuts also work outside selection mode.
+Use **Ungroup** in **Edit selection** (Cmd/Ctrl+Shift+G) to separate the members
+permanently. Both shortcuts work with Pointer, Select and Drag select.
 Lock, group and ungroup operations are undoable. Annotations preserve locks and
 group membership in `_allmaps.collage`; adding a saved collage remaps group IDs
 so separate imports do not merge into existing groups.
 
-Double-click an unlocked grouped map to enter **Edit group**. Other maps and their
+Double-tap/click an unlocked grouped map to enter **Edit group**, including in
+Select and Drag select modes. Other maps and their
 outlines are hidden on the same canvas without changing the view or clearing the
 tile cache. Click, Shift-click, marquee and Cmd/Ctrl+A now select only individual
 members of that group. Move, rotate, change settings, duplicate or remove members
@@ -492,27 +509,31 @@ are disabled during group editing. **Fit group** frames only the group's members
 | Delete                                | Remove selected maps                                                               |
 | Escape                                | Cancel a gesture or drawing, finish selection, exit mask editing, or deselect maps |
 
-The **Select maps** button beside the zoom/fit controls enables tap selection on
-phones, tablets and desktop. It keeps the current selection and replaces the
-tool ring with **Tap**, **Box**, **Select all**, **Clear**, **Group**/**Ungroup**
-and **Done**. Grouping stays in selection mode so you can continue choosing maps.
-Tap maps to toggle them; tapping empty canvas leaves the selection intact. In Tap mode,
-drag anywhere to pan, including
-over maps, and pinch or scroll to zoom. Movement or a second finger cancels the
-pending tap until all fingers lift. Double-tapping does not enter an editor or
-zoom while selecting. Groups toggle together; inside **Edit group**, members
-toggle individually. Locked maps can also be selected. **Done**, Escape or
-Cmd/Ctrl+Enter restores the tools with the selection intact, without adding an
-undo step. Cmd/Ctrl+A selects all maps in the current group or collage.
+The **Pointer tool** button beside the zoom/fit controls opens a fan with four
+choices. **Pointer** selects and moves maps normally. **Pan** clears the selection
+and moves the canvas without selecting or moving maps. **Select** toggles maps with a tap or click;
+dragging pans the canvas, including over maps. **Drag select** draws a rectangle
+with a finger, pen or mouse, including when starting over a map.
 
-**Box** lets a finger, pen or mouse draw a selection rectangle, including when
-starting over a map. Intersecting maps are highlighted while dragging and added
-to the current selection on release. Taps still toggle maps. A second finger
-cancels the box and restores the previous selection, then pans or pinches normally
-until all fingers lift. Wheel zoom also cancels an unfinished box. On desktop,
-hold Space to pan. Escape cancels a box first; press it again to finish selecting.
-Switch back to **Tap** for one-finger panning. Groups and Edit group use the same
-selection rules in both modes. The existing Shift-drag shortcut remains available.
+**Edit selection** appears for multiple selected maps, or while using Select or
+Drag select. It contains **Select all**, **Clear**, **Group**/**Ungroup** and the
+available layout controls. Locked selections can be selected but cannot be
+changed. Groups toggle together; inside **Edit group**, members toggle individually.
+
+Select and Drag select keep the tool ring visible and usable. Tapping empty
+canvas clears the selection; taps on maps toggle them. Panning from empty canvas
+or cancelling a selection rectangle preserves the selection. Movement or a second finger cancels a pending
+tap, and double-tapping does not enter an editor or zoom. Scroll and pinch zoom
+remain available. Escape or Cmd/Ctrl+Enter returns to Pointer with the selection
+intact, without adding an undo step. Cmd/Ctrl+A selects all maps in the current
+group or collage.
+
+A selection rectangle highlights intersecting maps while dragging and adds them
+on release. A second finger cancels the rectangle and restores the previous
+selection, then pans or pinches normally until all fingers lift. Wheel zoom also
+cancels an unfinished rectangle. Hold Space to pan. Escape cancels a rectangle
+first; press it again to return to Pointer. The existing Shift-drag shortcut
+remains available in Pointer mode.
 
 Focused rotation and slider controls also accept arrow keys. Sliders support
 Home/End; Enter or Space toggles a focused colorize control.
@@ -620,7 +641,7 @@ or reloading the page to preserve the layout.
 
 ### Exports
 
-The export fan offers AnnotationPage, Image and SVG. Each dialog offers **All maps**
+The export fan offers AnnotationPage, Image, SVG and PDF. Each dialog offers **All maps**
 or **Selected maps**; the latter is disabled when nothing is selected. Selection
 exports preserve layer order, map settings, groups and locks. AnnotationPage saves
 only the chosen maps. Image defaults to the entire collage (or entire selection)
@@ -673,10 +694,79 @@ once and referenced by each map. Source images are limited to 32 megapixels,
 8,192 px per side, and 100 MB of encoded data per SVG. Tile-only services without
 a complete suitable cache or a full-image rendition are rejected.
 Helmert and first-order polynomial transforms, including mirrored maps, are
-supported, along with masks, opacity, saturation and colorization. Automatic
-background removal and non-affine transformations require Image export. Linked
+supported, along with masks, opacity, saturation and colorization. SVG omits
+automatic background removal with a notice; this does not block export.
+Non-affine transformations still require Image or PDF export. Linked images
+from fixed-size (usually level-0) services show a notice with the available
+thumbnail dimensions when these are smaller than the original image. Linked
 images must remain accessible when the SVG is opened; applications that block
 external SVG images may need those links enabled.
+
+PDF is a single-page client-side prototype using [PDFKit](https://pdfkit.org/),
+loaded only when exporting. Choose A0–A5, Letter, Legal, Tabloid, or custom
+dimensions in millimetres, with portrait/landscape for standard sizes. **Fit to
+page** centers the collage inside the margins and shows its printed ground scale.
+**Exact scale** preserves the specified 1:N scale; if it does not fit, export is
+blocked rather than silently cropping or shrinking. Page dimensions are limited
+to 10–5,000 mm. PDF margins default to 10% of the shorter page side on every edge.
+The dialog also offers DPI and a background color, including Allmaps colors.
+All/selected maps, current view and selection-with-full-collage-bounds work as
+in image export. Retain the same page settings when exporting separate selections
+that need matching placement.
+
+For affine maps, PDF embeds separate JPEG/PNG images with native transformation
+matrices, vector clipping masks and opacity. Rotations, mirrors and skew remain
+geometric operations; a large page does not require one giant canvas. Source
+detail is chosen from the print size and DPI, using the existing tile cache when
+it covers the full image, otherwise a full-image IIIF request. Duplicate sources
+share one embedded image. Per-image limits match embedded SVG (8,192 px per side,
+32 megapixels), and source availability can limit effective resolution. Encoded
+sources are capped at 100 MB and the completed PDF at 150 MB.
+
+Every map remains a separate PDF image object in stacking order. For affine
+maps, color effects are applied to the **complete source image**, before any
+geometry or masking. Saturation, colorization and background removal alter
+embedded pixels, but the resource-coordinate clipping mask, opacity and full
+affine matrix remain native PDF operations. Removing a clipping mask reveals
+the rest of the image; skew, reflection, rotation and scale do not resample the
+embedded pixels. These are separate image objects, not named Illustrator layers.
+
+Both SVG and PDF dialogs offer individual switches for opacity, saturation
+and colorization. PDF also offers background removal; SVG omits that option. They affect only the export. Turning off
+color effects preserves the original source rendition (or assembled cache
+pixels); masks and placement stay unchanged. SVG stores its supported color
+effects as editable filters. PDF uses pixels for these color operations because
+PDFKit has no equivalent of the renderer's color filters. Its blend modes do not
+faithfully reproduce the same calculations. PDF opacity remains separate even
+when color effects are enabled.
+
+Maps with an imported annotation URL, or a preserved original annotation URL,
+receive an invisible PDF link annotation to Allmaps Viewer. Link rectangles are
+bounded by each map's visible footprint and the export area, in stacking order.
+PDF readers can follow these links; editor support for retaining annotations
+varies. Maps without a source URL are exported without a link.
+
+Non-affine maps still require an individual warped rendering, but it covers the
+full image and keeps the vector mask and opacity separate. The existing renderer
+and tile cache are reused, with temporary appearance settings restored after
+success, failure or cancellation. Raster limits (32 megapixels and the device's
+maximum canvas size) apply per rendered map. PDF page dimensions and scale stay
+exact regardless of DPI. Physical size is stored directly in PDF points, so
+`changedpi` is not needed for PDF metadata. Tile-only services without a usable
+full-image cache or rendition remain unsupported by the affine-image path.
+Multipage/poster tiling is not part of this prototype.
+
+Export errors identify the failed map and distinguish HTTP/service failures,
+network or CORS problems, unreadable images, and resolution/memory limits.
+Image, SVG and PDF exports can explicitly **Continue without this map**. Direct
+image downloads can also retry; errors retained by the renderer require changing
+settings or reloading the map.
+A failed shared image can omit several copies together. Skipped maps remain in
+the collage; page size, scale and the original export bounds stay unchanged.
+Successful embedded image downloads are retained during retries. Cancelling or
+changing settings clears this temporary cache and the skipped-map list. Global
+document-size limits cannot be skipped, and an export with no remaining visible
+maps is rejected.
 
 Adding fits Helmert by default, or a first-order polynomial when selected in
 Settings, to the original GCPs. Opening preserves supported
