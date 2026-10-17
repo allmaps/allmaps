@@ -1694,6 +1694,8 @@ test('annotation round-trips retain distinct settings, groups, locks, reset mask
     item.locked = true
   })
   items[0].appearance.opacity = 0.25
+  items[0].appearance.saturation = 1.5
+  items[1].appearance.saturation = 2
   items[1].appearance.colorize = true
   items[1].appearance.hue = 0.8
   items[0].title = 'My map'
@@ -1779,6 +1781,7 @@ test('malformed optional collage metadata does not corrupt legacy geometry or de
   const [item] = openCollage(generateAnnotation(map))
   assert.equal(item.appearance.opacity, 1)
   assert.equal(item.appearance.hue, 0)
+  assert.equal(item.appearance.saturation, 1)
   assert.equal(item.appearance.colorize, false)
   assert.equal(item.appearance.backgroundColor, undefined)
   assert.equal(item.locked, undefined)

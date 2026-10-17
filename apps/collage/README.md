@@ -233,14 +233,19 @@ the app's coordinate limits.
 
 ## Appearance
 
-- Opacity and colorize are radial sliders. Opacity is one (fully opaque) at the
-  inner end and zero at the outer end; colorize increases outward from zero to
-  one. Knobs retain their values and positions after release and reselection;
-  faded rails remain visible. Opacity starts alongside the other controls.
+- Opacity, saturation and colorize are radial sliders. Opacity is one (fully
+  opaque) on the ring and zero (transparent) at the outer end. Saturation is
+  100% (original color) on the ring, 0% (grayscale) at the outer end and 200%
+  at the inner end, snapping to 100% while dragging near the ring. Double-tap or double-click
+  either the opacity or saturation knob to reset it to 100% on the ring.
+  Colorize increases outward from zero to one.
+  Knobs retain their values and positions after release and reselection;
+  faded rails remain visible. Opacity and saturation start alongside the other controls.
   Colorize shows its hexadecimal color value. Adjusting hue
-  enables colorization; double-click the knob or press Enter/Space while focused
-  to toggle it. Arrow keys change opacity by 5% or hue by 10°; Home/End choose
-  either endpoint. Saturation is a color/grayscale toggle. Appearance settings
+  enables colorization; double-tap or double-click the knob to reset its position
+  and turn colorization off. Enter/Space while focused toggles colorization.
+  Arrow keys change opacity or saturation by 5% or hue by 10°;
+  Home/End choose either endpoint. Appearance settings
   are restored when reopening a saved annotation in Collage.
 - The wand toggles automatic background removal, using Viewer's masked color
   detection in a worker and the same threshold/hardness. Appearance changes
@@ -330,6 +335,9 @@ to choose which enabled tools stay visible and which appear after expanding.
 Changing selection preserves the expanded or compact ring and smoothly moves its
 buttons to the new selection. Clearing the selection resets it to compact.
 Sparse rings keep their buttons close together, including on large maps.
+On smaller screens, crowded rings wrap beyond a semicircle toward a full circle
+with a smaller radius. Buttons retain their touch spacing, and slider rails
+shorten when needed. The layout stays fixed throughout a drag or rotation.
 Focused rows also accept Up/Down or Home/End for keyboard reordering.
 Preferences are stored in this browser. Mirror is hidden by default; Transform
 is enabled. **Double-tap / click opens** chooses **Edit mask** (default) or
@@ -512,8 +520,8 @@ and moves the canvas without selecting or moving maps. **Select** toggles maps w
 dragging pans the canvas, including over maps. **Drag select** draws a rectangle
 with a finger, pen or mouse, including when starting over a map.
 
-**Edit selection** appears for multiple selected maps, or while using Select or
-Drag select. It contains **Select all**, **Clear**, **Group**/**Ungroup** and the
+**Edit selection** appears only when two or more maps are selected, including in
+Select and Drag select modes. It contains **Select all**, **Clear**, **Group**/**Ungroup** and the
 available layout controls. Locked selections can be selected but cannot be
 changed. Groups toggle together; inside **Edit group**, members toggle individually.
 

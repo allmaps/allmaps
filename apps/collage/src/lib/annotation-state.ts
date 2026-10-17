@@ -54,7 +54,7 @@ export function readCollageSettings(map: GeoreferencedMap): SavedSettings {
       typeof value === 'number' &&
       Number.isFinite(value) &&
       value >= 0 &&
-      value <= 1
+      value <= (key === 'saturation' ? 2 : 1)
     )
       appearance[key] = value
   }

@@ -142,11 +142,13 @@ test('legacy preferences migrate to a compact ring without re-enabling tools', (
 })
 
 test('custom ring order has no gaps and handles a single tool or an empty ring', () => {
-  const layout = controlLayout([300, 300], 0, { opacity: 1, hue: 0 }, 150, [
-    'rotate',
-    'opacity',
-    'move'
-  ])
+  const layout = controlLayout(
+    [300, 300],
+    0,
+    { saturation: 1, opacity: 1, hue: 0 },
+    150,
+    ['rotate', 'opacity', 'move']
+  )
   assert.deepEqual(Object.keys(layout), ['rotate', 'opacity', 'move'])
   const distance = (a: number[], b: number[]) =>
     Math.hypot(a[0] - b[0], a[1] - b[1])
@@ -157,11 +159,21 @@ test('custom ring order has no gaps and handles a single tool or an empty ring',
     ) < 1e-8
   )
   assert.ok(radiusForSize(0, 3) < radiusForSize(0, 12))
-  const single = controlLayout([300, 300], 0, { opacity: 1, hue: 0 }, 100, [
-    'opacity'
-  ])
+  const single = controlLayout(
+    [300, 300],
+    0,
+    { saturation: 1, opacity: 1, hue: 0 },
+    100,
+    ['opacity']
+  )
   assert.ok(single.opacity.position.every(Number.isFinite))
-  const empty = controlLayout([300, 300], 0, { opacity: 1, hue: 0 }, 100, [])
+  const empty = controlLayout(
+    [300, 300],
+    0,
+    { saturation: 1, opacity: 1, hue: 0 },
+    100,
+    []
+  )
   assert.deepEqual(fitControlCenter([300, 300], empty, [600, 600]), [300, 300])
 })
 

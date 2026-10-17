@@ -163,8 +163,9 @@
     TOOL_RING_ANIMATION_MS,
     controlFold,
     railValue,
+    snapSaturation,
     hueColor,
-    radiusForSize,
+    fitControlGeometry,
     fitControlCenter,
     preferredControlCenter
   } from './control-layout'
@@ -325,12 +326,18 @@
   let moveGuide = $state.raw<AxisGuide>()
   const appearances = $derived(selection[0]?.appearance)
   let controlCenter = $state.raw<Point>()
-  let controlRadius = $state(184)
+  let controlGeometry = $state.raw(fitControlGeometry(0, [], [1280, 720]))
   const ringFold = $derived(
     controlCenter
       ? (lockTransition || locked) && controls?.lock
         ? { center: controlCenter, target: controls.lock.position }
-        : controlFold(controlCenter, selectedRotation, controlRadius, ringTools)
+        : controlFold(
+            controlCenter,
+            selectedRotation,
+            controlGeometry.radius,
+            ringTools,
+            controlGeometry.arc
+          )
       : undefined
   )
   let editingMask = $state.raw<CollageMap>()
@@ -473,6 +480,16 @@
       controlCenter = undefined
       return
     }
+    const controlViewport: Point = [
+      viewport[2],
+      selectionActions
+        ? Math.min(
+            viewport[3],
+            selectionActions.getBoundingClientRect().top -
+              container.getBoundingClientRect().top
+          )
+        : viewport[3]
+    ]
     if (drag) {
       const anchor = map.project(toCanvasGeo(drag.anchor))
       controlCenter = [anchor.x, anchor.y]
@@ -487,7 +504,7 @@
         Math.max(
           ...points.map(([x, y]) => Math.hypot(x - screen.x, y - screen.y))
         )
-      controlRadius = radiusForSize(diameter, ringTools.length)
+      controlGeometry = fitControlGeometry(diameter, ringTools, controlViewport)
       controlCenter = preferredControlCenter([screen.x, screen.y], diameter, [
         viewport[2],
         viewport[3]
@@ -497,28 +514,28 @@
       controlCenter,
       rotationAnchor(targets)!.placement.rotation,
       targets[0].appearance,
-      controlRadius,
-      ringTools
+      controlGeometry.radius,
+      ringTools,
+      controlGeometry.arc,
+      controlGeometry.sliderLength
     )
     // Freeze the visible arc center throughout rotation. Re-docking mid-drag
     // would separate the controls from the pivot used to rotate the maps.
     if (drag?.mode !== 'rotate')
-      controlCenter = fitControlCenter(controlCenter, layout, [
-        viewport[2],
-        selectionActions
-          ? Math.min(
-              viewport[3],
-              selectionActions.getBoundingClientRect().top -
-                container.getBoundingClientRect().top
-            )
-          : viewport[3]
-      ])
+      controlCenter = fitControlCenter(
+        controlCenter,
+        layout,
+        controlViewport,
+        controlGeometry.arc > Math.PI
+      )
     controls = controlLayout(
       controlCenter,
       rotationAnchor(targets)!.placement.rotation,
       targets[0].appearance,
-      controlRadius,
-      ringTools
+      controlGeometry.radius,
+      ringTools,
+      controlGeometry.arc,
+      controlGeometry.sliderLength
     )
   }
 
@@ -1425,24 +1442,13 @@
     }
   }
 
-  function toggleSaturation() {
-    changeAppearance({
-      saturation: selection.every((item) => item.appearance.saturation === 1)
-        ? 0
-        : 1
-    })
-  }
-
   function toggleColorize() {
     changeAppearance({
       colorize: !selection.every((item) => item.appearance.colorize)
     })
   }
 
-  function controlKey(
-    event: KeyboardEvent,
-    mode: 'rotate' | 'opacity' | 'hue'
-  ) {
+  function controlKey(event: KeyboardEvent, mode: 'rotate' | Slider) {
     if (!selected || locked || busy || drag) return
     if (
       mode === 'rotate' &&
@@ -1491,15 +1497,16 @@
         fail(error)
       }
     } else {
+      const maximum = mode === 'saturation' ? 2 : 1
       const value =
         event.key === 'Home'
           ? 0
           : event.key === 'End'
-            ? 1
+            ? maximum
             : Math.max(
                 0,
                 Math.min(
-                  1,
+                  maximum,
                   appearances![mode] +
                     direction * (mode === 'hue' ? 1 / 36 : 0.05)
                 )
@@ -1816,15 +1823,19 @@
     if (drag.mode === 'move' && !drag.moveThreshold?.started) return
     const point = worldPoint(event)
     const screen = screenPoint(event)
-    if (drag.mode === 'opacity' || drag.mode === 'hue') {
+    if (
+      drag.mode === 'opacity' ||
+      drag.mode === 'hue' ||
+      drag.mode === 'saturation'
+    ) {
       const { appearance } = drag.targets[0]
+      const maximum = drag.mode === 'saturation' ? 2 : 1
       const value = Math.max(
         0,
         Math.min(
-          1,
+          maximum,
           appearance[drag.mode] +
-            railValue(screen, drag.rail!) -
-            drag.startRailValue
+            (railValue(screen, drag.rail!) - drag.startRailValue) * maximum
         )
       )
       const changed = Math.abs(value - appearance[drag.mode]) > 0.0001
@@ -1832,7 +1843,10 @@
       const targets = drag.targets.map(({ item }) => item)
       if (changed) {
         setAppearance(targets, {
-          [drag.mode]: value,
+          [drag.mode]:
+            drag.mode === 'saturation'
+              ? snapSaturation(value, drag.rail!)
+              : value,
           ...(drag.mode === 'hue' ? { colorize: true } : {})
         })
       } else {
@@ -2106,7 +2120,8 @@
           !editingGroup))
     ) {
       event.preventDefault()
-      if (marquee) cancelSelectionGesture()
+      if (drag && event.key === 'Escape') finishDrag(undefined, true)
+      else if (marquee) cancelSelectionGesture()
       else changePointer('pointer')
       return
     }
@@ -2620,6 +2635,7 @@
             value={Math.round(appearances.opacity * 100) + '%'}
             onpointerdown={(event) => beginDrag(event, selected!, 'opacity')}
             onkeydown={(event) => controlKey(event, 'opacity')}
+            ondblclick={() => changeAppearance({ opacity: 1 })}
             ><CircleHalf size={19} /></MapControl
           >
         {:else if tool === 'hue'}
@@ -2636,7 +2652,8 @@
             value={hueColor(appearances.hue).toUpperCase()}
             onpointerdown={(event) => beginDrag(event, selected!, 'hue')}
             onkeydown={(event) => controlKey(event, 'hue')}
-            ondblclick={toggleColorize}><Palette size={19} /></MapControl
+            ondblclick={() => changeAppearance({ hue: 0, colorize: false })}
+            ><Palette size={19} /></MapControl
           >
         {:else if tool === 'saturation'}
           <MapControl
@@ -2644,10 +2661,15 @@
             position={controls.saturation.position}
             label="Saturation"
             disabled={busy || locked}
-            pressed={selection.every(
-              (item) => item.appearance.saturation === 1
-            )}
-            onclick={toggleSaturation}><DropHalf size={19} /></MapControl
+            active={activeControl === 'saturation'}
+            sliderValue={appearances.saturation}
+            sliderMax={2}
+            rail={controls.saturation.rail}
+            value={Math.round(appearances.saturation * 100) + '%'}
+            onpointerdown={(event) => beginDrag(event, selected!, 'saturation')}
+            onkeydown={(event) => controlKey(event, 'saturation')}
+            ondblclick={() => changeAppearance({ saturation: 1 })}
+            ><DropHalf size={19} /></MapControl
           >
         {:else if tool === 'background'}
           <MapControl
@@ -2742,8 +2764,7 @@
   {#if !editingMask && !editingTransform && !inputMode && !searching}
     <div
       class="bottom-stack selection-stack"
-      class:has-actions={selecting ||
-        !!editingGroup ||
+      class:has-actions={!!editingGroup ||
         selection.length > 1 ||
         !!layoutController}
     >
@@ -2755,7 +2776,7 @@
           >
         </div>
       {/if}
-      {#if selecting || editingGroup || selection.length > 1 || layoutController}
+      {#if editingGroup || selection.length > 1 || layoutController}
         <div
           class="selection-actions"
           use:reserveSelectionSpace
