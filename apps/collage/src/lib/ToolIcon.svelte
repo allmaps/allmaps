@@ -11,7 +11,8 @@
     BoundingBox,
     FlipHorizontal,
     ArrowsOutCardinal,
-    ArrowClockwise
+    ArrowClockwise,
+    LockSimpleOpen
   } from 'phosphor-svelte'
   import { BringMapsToFront } from '@allmaps/ui'
   import type { Control } from './control-layout'
@@ -28,7 +29,8 @@
     transform: BoundingBox,
     mirror: FlipHorizontal,
     move: ArrowsOutCardinal,
-    rotate: ArrowClockwise
+    rotate: ArrowClockwise,
+    lock: LockSimpleOpen
   }
 </script>
 

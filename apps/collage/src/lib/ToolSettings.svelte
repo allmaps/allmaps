@@ -8,16 +8,19 @@
     defaultToolSettings,
     toolLabels,
     reorderTool,
-    parseDoubleTapMode
+    parseDoubleTapMode,
+    parseImportLayout
   } from './tool-settings'
   import type { ToolSetting, DoubleTapMode } from './tool-settings'
   import type { RingControl } from './control-layout'
-  import type { ImportTransformation } from './model'
+  import type { ImportTransformation, Arrangement } from './model'
   import { defaultSnapSettings, snapUnits } from './move-snapping'
   import type { SnapSettings, SnapUnit } from './move-snapping'
   let {
     settings,
     importTransformation,
+    importLayout,
+    onimportlayoutchange,
     doubleTapMode,
     ondoubletapchange,
     snapping,
@@ -28,6 +31,8 @@
   }: {
     settings: ToolSetting[]
     importTransformation: ImportTransformation
+    importLayout: Arrangement
+    onimportlayoutchange: (value: Arrangement) => void
     doubleTapMode: DoubleTapMode
     ondoubletapchange: (value: DoubleTapMode) => void
     snapping: SnapSettings
@@ -256,39 +261,39 @@
               onsnapchange({ ...snapping, grid: event.currentTarget.checked })}
           />
         </label>
-        <div class="snap-spacing">
-          <label for="grid-spacing">Spacing</label>
-          <input
-            id="grid-spacing"
-            type="number"
-            inputmode="decimal"
-            min="0.001"
-            max={100_000_000 / snapUnits[snapping.unit]}
-            step="any"
-            value={snapping.spacing}
-            disabled={!snapping.grid}
-            onchange={(event) => {
-              const input = event.currentTarget
-              if (input.value && input.validity.valid)
-                onsnapchange({ ...snapping, spacing: input.valueAsNumber })
-              else input.value = String(snapping.spacing)
-            }}
-          />
-          <select
-            aria-label="Grid unit"
-            value={snapping.unit}
-            disabled={!snapping.grid}
-            onchange={(event) =>
-              onsnapchange({
-                ...snapping,
-                unit: event.currentTarget.value as SnapUnit
-              })}
-          >
-            <option value="m">m</option>
-            <option value="km">km</option>
-            <option value="ft">ft</option>
-          </select>
-        </div>
+        {#if snapping.grid}
+          <div class="snap-spacing">
+            <label for="grid-spacing">Spacing</label>
+            <input
+              id="grid-spacing"
+              type="number"
+              inputmode="decimal"
+              min="0.001"
+              max={100_000_000 / snapUnits[snapping.unit]}
+              step="any"
+              value={snapping.spacing}
+              onchange={(event) => {
+                const input = event.currentTarget
+                if (input.value && input.validity.valid)
+                  onsnapchange({ ...snapping, spacing: input.valueAsNumber })
+                else input.value = String(snapping.spacing)
+              }}
+            />
+            <select
+              aria-label="Grid unit"
+              value={snapping.unit}
+              onchange={(event) =>
+                onsnapchange({
+                  ...snapping,
+                  unit: event.currentTarget.value as SnapUnit
+                })}
+            >
+              <option value="m">m</option>
+              <option value="km">km</option>
+              <option value="ft">ft</option>
+            </select>
+          </div>
+        {/if}
         <label class="snap-toggle">
           <span>Snap to axes</span>
           <input
@@ -310,25 +315,29 @@
               })}
           />
         </label>
-        <div class="snap-spacing">
-          <label for="rotation-step">Angle step (°)</label>
-          <input
-            id="rotation-step"
-            type="number"
-            inputmode="decimal"
-            min="0.1"
-            max="360"
-            step="any"
-            value={snapping.rotationStep}
-            disabled={!snapping.rotation}
-            onchange={(event) => {
-              const input = event.currentTarget
-              if (input.value && input.validity.valid)
-                onsnapchange({ ...snapping, rotationStep: input.valueAsNumber })
-              else input.value = String(snapping.rotationStep)
-            }}
-          />
-        </div>
+        {#if snapping.rotation}
+          <div class="snap-spacing">
+            <label for="rotation-step">Angle step (°)</label>
+            <input
+              id="rotation-step"
+              type="number"
+              inputmode="decimal"
+              min="0.1"
+              max="360"
+              step="any"
+              value={snapping.rotationStep}
+              onchange={(event) => {
+                const input = event.currentTarget
+                if (input.value && input.validity.valid)
+                  onsnapchange({
+                    ...snapping,
+                    rotationStep: input.valueAsNumber
+                  })
+                else input.value = String(snapping.rotationStep)
+              }}
+            />
+          </div>
+        {/if}
       </section>
       <div class="import-setting">
         <label for="double-tap-mode">Double-tap / click opens</label>
@@ -340,6 +349,18 @@
         >
           <option value="mask">Edit mask</option>
           <option value="transform">Transform</option>
+        </select>
+      </div>
+      <div class="import-setting">
+        <label for="import-layout">Import layout</label>
+        <select
+          id="import-layout"
+          value={importLayout}
+          onchange={(event) =>
+            onimportlayoutchange(parseImportLayout(event.currentTarget.value))}
+        >
+          <option value="compact">Compact</option>
+          <option value="geographic">Geographic</option>
         </select>
       </div>
       <div class="import-setting">
@@ -366,6 +387,7 @@
         onclick={() => {
           onchange(defaultToolSettings())
           onimportchange('helmert')
+          onimportlayoutchange('compact')
           ondoubletapchange('mask')
           onsnapchange(defaultSnapSettings())
         }}>Reset</button

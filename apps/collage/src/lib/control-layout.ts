@@ -13,6 +13,7 @@ export const controlOrder = [
   'editMask',
   'mirror',
   'transform',
+  'lock',
   'move',
   'rotate'
 ] as const

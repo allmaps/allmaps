@@ -1266,6 +1266,38 @@ test('worker import compacts geography, keeps every map and preserves saved rota
   assert.ok(distance(...(result.items.map(mapCenter) as [Point, Point])) < 8000)
 })
 
+test('geographic worker import preserves offsets, scale, grouping and its first anchor', () => {
+  const input = generateAnnotation([fixture(), fixture(), fixture(52, 5.02)])
+  const before = structuredClone(input)
+  const request = { type: 'add' as const, input, at: [400, 500] as Point }
+  const compact = solveLayout(request)
+  const geographic = solveLayout({ ...request, arrangement: 'geographic' })
+  assert.equal(geographic.fallback, false)
+  assert.equal(geographic.items.length, 3)
+  assert.deepEqual(input, before)
+  assert.deepEqual(geographic.items[0].placement.position, request.at)
+  close(
+    distance(mapCenter(geographic.items[0]), mapCenter(geographic.items[1])),
+    0
+  )
+  assert.ok(
+    distance(mapCenter(compact.items[0]), mapCenter(compact.items[1])) > 100
+  )
+  assert.ok(geographic.items[2].placement.position[0] > request.at[0] + 1000)
+  assert.ok(geographic.items[0].groupId)
+  for (const item of geographic.items) {
+    assert.equal(item.groupId, geographic.items[0].groupId)
+    const polygon = outline(item)
+    close(distance(polygon[0], polygon[1]), 1000, 1)
+  }
+  const search = solveLayout({
+    ...request,
+    arrangement: 'geographic',
+    groupImportedMaps: false
+  })
+  assert.ok(search.items.every((item) => !item.groupId))
+})
+
 test('vertical mirror reflects image Y and survives export, reversal and horizontal composition', () => {
   const [item] = addMaps(generateAnnotation(bearingFixture(37)))
   item.placement = { position: [5000, -6000], rotation: 0.8 }

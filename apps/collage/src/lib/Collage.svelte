@@ -9,6 +9,7 @@
   import { exportView } from './export-view'
   import ExportMenu from './ExportMenu.svelte'
   import FanMenu from './FanMenu.svelte'
+  import { DragThreshold } from './drag-threshold'
   import ToolSettings from './ToolSettings.svelte'
   import SnapGrid from './SnapGrid.svelte'
   import SnapAxes from './SnapAxes.svelte'
@@ -18,6 +19,8 @@
     parseToolSettings,
     visibleTools,
     importTransformationKey,
+    importLayoutKey,
+    parseImportLayout,
     parseImportTransformation,
     toolSettingsKey,
     doubleTapModeKey,
@@ -100,9 +103,10 @@
     Copy,
     LockSimple,
     LockSimpleOpen,
-    SelectionPlus,
     Selection,
-    HandTap,
+    Cursor,
+    Hand,
+    CursorClick,
     SelectionAll,
     Check
   } from 'phosphor-svelte'
@@ -150,6 +154,7 @@
   import type { Point } from '@allmaps/types'
   import {
     controlLayout,
+    TOOL_RING_ANIMATION_MS,
     controlFold,
     railValue,
     hueColor,
@@ -166,6 +171,7 @@
   } from './control-layout'
 
   let container: HTMLDivElement
+  let selectionActions: HTMLDivElement | undefined
   let fileInput = $state<HTMLInputElement>()
   let textInput = $state<HTMLTextAreaElement>()
   let map = $state.raw<MapLibreMap>()
@@ -173,6 +179,7 @@
   let exportOpen = $state(false)
   let settingsOpen = $state(false)
   let importTransformation = $state<ImportTransformation>('helmert')
+  let importLayout = $state<Arrangement>('compact')
   let doubleTapMode = $state<DoubleTapMode>('mask')
   const editorTaps = new TouchDoubleTap<string>()
   let ignoreDoubleClickUntil = 0
@@ -183,10 +190,9 @@
   let busy = $state(false)
   let items = $state.raw<CollageMap[]>([])
   let selectedIds = $state.raw<Set<string>>(new Set())
-  let selecting = $state(false)
-  let selectionMode = $state<'tap' | 'box'>('tap')
-  let selectButton = $state<HTMLButtonElement>()
-  let selectionDoneButton = $state<HTMLButtonElement>()
+  type PointerMode = 'pointer' | 'pan' | 'select' | 'box'
+  let pointerMode = $state<PointerMode>('pointer')
+  const selecting = $derived(pointerMode === 'select' || pointerMode === 'box')
   let restoreDoubleClickZoom = false
   let editingGroup = $state<string>()
   const visibleItems = $derived(selectionScope(items, editingGroup))
@@ -201,9 +207,21 @@
     selectionObjects(selection, editingGroup).length
   )
   let ringExpanded = $state(false)
+  let lockTransition = $state(false)
+  let lockTimer: ReturnType<typeof setTimeout> | undefined
   // Keep keyed rows stable; their children own reversible expand/collapse transitions.
-  const allRingTools = $derived(visibleTools(toolSettings, true))
-  const ringTools = $derived(visibleTools(toolSettings, ringExpanded))
+  const allRingTools = $derived([
+    ...new Set<RingControl>([
+      ...visibleTools(toolSettings, true),
+      ...(locked ? ['lock' as const] : [])
+    ])
+  ])
+  const ringTools = $derived([
+    ...new Set<RingControl>([
+      ...visibleTools(toolSettings, ringExpanded),
+      ...(locked ? ['lock' as const] : [])
+    ])
+  ])
   const atFront = $derived(
     selection.length > 0 &&
       items
@@ -240,6 +258,14 @@
       /* Use the selection for this session if storage is unavailable. */
     }
   }
+  function changeImportLayout(value: Arrangement) {
+    importLayout = value
+    try {
+      localStorage.setItem(importLayoutKey, value)
+    } catch {
+      /* Use this preference for the session if storage is unavailable. */
+    }
+  }
   function changeDoubleTap(value: DoubleTapMode) {
     doubleTapMode = value
     try {
@@ -274,9 +300,9 @@
   const allMirrored = $derived(
     selection.length > 0 && selection.every((item) => item.mirrored)
   )
-  let overlays = $state.raw<{ id: string; points: string; grouped: boolean }[]>(
-    []
-  )
+  let overlays = $state.raw<
+    { id: string; points: string; grouped: boolean; locked: boolean }[]
+  >([])
   let loadFailures = $state.raw<LoadFailures>({})
   type DragMode = 'move' | 'rotate' | Slider
   let controls = $state.raw<Record<RingControl, ControlPosition>>()
@@ -287,7 +313,9 @@
   let controlRadius = $state(184)
   const ringFold = $derived(
     controlCenter
-      ? controlFold(controlCenter, selectedRotation, controlRadius, ringTools)
+      ? (lockTransition || locked) && controls?.lock
+        ? { center: controlCenter, target: controls.lock.position }
+        : controlFold(controlCenter, selectedRotation, controlRadius, ringTools)
       : undefined
   )
   let editingMask = $state.raw<CollageMap>()
@@ -343,7 +371,7 @@
         duplicateOnMove: boolean
         duplicated: boolean
         selectionBefore: string[]
-        screen: Point
+        moveThreshold?: DragThreshold
         outlineOnly: boolean
         pointerId: number
       }
@@ -381,16 +409,32 @@
     })
   }
 
+  function reserveSelectionSpace(node: HTMLDivElement) {
+    selectionActions = node
+    const observer = new ResizeObserver(() => refresh())
+    observer.observe(node)
+    refresh()
+    return {
+      destroy() {
+        observer.disconnect()
+        selectionActions = undefined
+        refresh()
+      }
+    }
+  }
+
   function refresh() {
     if (!map) return
     const polygons = visibleItems.map((item) => ({
       id: item.instanceId,
       grouped: !!item.groupId,
+      locked: !!item.locked,
       points: projectedOutline(item)
     }))
-    overlays = polygons.map(({ id, points, grouped }) => ({
+    overlays = polygons.map(({ id, points, grouped, locked }) => ({
       id,
       grouped,
+      locked,
       points: points.map((p) => p.join(',')).join(' ')
     }))
     const targets = items.filter((item) => selectedIds.has(item.instanceId))
@@ -446,7 +490,13 @@
     if (drag?.mode !== 'rotate')
       controlCenter = fitControlCenter(controlCenter, layout, [
         viewport[2],
-        viewport[3]
+        selectionActions
+          ? Math.min(
+              viewport[3],
+              selectionActions.getBoundingClientRect().top -
+                container.getBoundingClientRect().top
+            )
+          : viewport[3]
       ])
     controls = controlLayout(
       controlCenter,
@@ -482,7 +532,11 @@
   }
 
   function select(ids: string[] = []) {
-    const next = selectionIds(items, ids, editingGroup)
+    const next = selectionIds(
+      items,
+      pointerMode === 'pan' ? [] : ids,
+      editingGroup
+    )
     if (
       next.size !== selectedIds.size ||
       [...next].some((id) => !selectedIds.has(id))
@@ -494,14 +548,13 @@
     refresh()
   }
 
-  async function startSelecting() {
+  function changePointer(mode: PointerMode) {
     if (
       !map ||
       !ready ||
       busy ||
       drag ||
       marquee ||
-      !visibleItems.length ||
       editingMask ||
       editingTransform ||
       inputMode ||
@@ -510,39 +563,26 @@
       settingsOpen
     )
       return
+    cancelSelectionGesture()
     map.stop()
     editorTaps.reset()
-    tapSelection.cancel()
-    restoreDoubleClickZoom = map.doubleClickZoom.isEnabled()
-    map.doubleClickZoom.disable()
-    selecting = true
-    selectionMode = 'tap'
-    message = 'Select maps. Tap a map to add or remove it from the selection.'
-    await tick()
-    selectionDoneButton?.focus({ preventScroll: true })
-  }
-
-  function finishSelecting() {
-    cancelSelectionGesture()
-    selecting = false
+    const willSelect = mode === 'select' || mode === 'box'
+    if (!selecting && willSelect) {
+      restoreDoubleClickZoom = map.doubleClickZoom.isEnabled()
+      map.doubleClickZoom.disable()
+    } else if (selecting && !willSelect) {
+      if (restoreDoubleClickZoom) map.doubleClickZoom.enable()
+      restoreDoubleClickZoom = false
+    }
+    pointerMode = mode
     spaceDown = false
-    if (restoreDoubleClickZoom) map?.doubleClickZoom.enable()
-    restoreDoubleClickZoom = false
-    selectButton?.focus({ preventScroll: true })
+    if (mode === 'pan') select()
+    else refresh()
   }
 
   function cancelSelectionGesture() {
     tapSelection.cancel()
     if (marquee) finishDrag(undefined, true)
-  }
-
-  function changeSelectionMode(mode: 'tap' | 'box') {
-    cancelSelectionGesture()
-    selectionMode = mode
-    message =
-      mode === 'box'
-        ? 'Drag a box to add maps. Use two fingers to pan or zoom.'
-        : 'Tap a map to add or remove it from the selection.'
   }
 
   function updateGroupVisibility() {
@@ -559,7 +599,6 @@
   function editGroup(item: CollageMap) {
     if (
       !item.groupId ||
-      selecting ||
       busy ||
       drag ||
       editingMask ||
@@ -591,13 +630,20 @@
     select(ids)
   }
 
-  function toggleLock() {
-    if (!selecting || !selection.length || busy || drag || marquee) return
+  async function toggleLock() {
+    if (!selection.length || busy || drag || marquee || lockTransition) return
+    // Let the live controls capture the lock's arc position before their outro.
+    lockTransition = true
+    await tick()
     remember()
     const next = !locked
     for (const item of selection) item.locked = next
     items = [...items]
     refresh()
+    clearTimeout(lockTimer)
+    lockTimer = setTimeout(() => {
+      lockTransition = false
+    }, TOOL_RING_ANIMATION_MS)
   }
 
   function changeGroup(ungroup = false) {
@@ -777,7 +823,7 @@
   }
 
   async function organize(arrangement: Arrangement = 'compact') {
-    if (!layoutAvailable || busy || drag) return
+    if (!layoutAvailable || busy || drag || marquee) return
     const before = structuredClone(items)
     const anchorId = selectedIds.values().next().value!
     busy = true
@@ -825,7 +871,7 @@
   }
 
   function editLayout(apply: (next: CollageMap[]) => boolean) {
-    if (!layoutAvailable || busy || drag) return
+    if (!layoutAvailable || busy || drag || marquee) return
     const before = structuredClone(items)
     const next = structuredClone(selection)
     let applying = false
@@ -847,7 +893,6 @@
 
   function editTransform() {
     if (
-      selecting ||
       !selection.length ||
       locked ||
       busy ||
@@ -884,7 +929,7 @@
   }
 
   function editMask() {
-    if (selecting || selection.length !== 1 || locked || busy || drag) return
+    if (selection.length !== 1 || locked || busy || drag) return
     errorMessage = ''
     try {
       ensureImageSize(selected!)
@@ -1069,6 +1114,7 @@
       ...options,
       type: 'add',
       importTransformation,
+      arrangement: importLayout,
       input,
       sourceUrl,
       at: fromCanvasGeo([center.lng, center.lat])
@@ -1081,15 +1127,7 @@
   }
 
   function search() {
-    if (
-      !map ||
-      selecting ||
-      busy ||
-      editingMask ||
-      editingTransform ||
-      editingGroup ||
-      drag
-    )
+    if (!map || busy || editingMask || editingTransform || editingGroup || drag)
       return
     const center = map.getCenter()
     searchOrigin = fromCanvasGeo([center.lng, center.lat])
@@ -1118,6 +1156,7 @@
         type: 'add',
         groupImportedMaps: false,
         importTransformation,
+        arrangement: importLayout,
         input: generateAnnotation(maps),
         at: searchOrigin
       })
@@ -1199,7 +1238,7 @@
   }
 
   async function showInput(mode: 'add' | 'open') {
-    if (editingGroup || selecting) return
+    if (editingGroup) return
     inputMode = mode
     inputText = ''
     errorMessage = ''
@@ -1517,8 +1556,8 @@
   }
 
   function beginDrag(event: PointerEvent, item: CollageMap, mode: DragMode) {
+    if (pointerMode === 'pan') return
     if (
-      selecting ||
       busy ||
       drag ||
       marquee ||
@@ -1533,6 +1572,7 @@
     event.stopPropagation()
     // Alt/Option-click aligns on release; it must not start a drag as well.
     if (mode === 'rotate' && event.altKey) return
+    map.stop()
     const targets = items.filter((candidate) =>
       selectedIds.has(candidate.instanceId)
     )
@@ -1584,7 +1624,7 @@
       duplicateOnMove: mode === 'move' && event.altKey,
       duplicated: false,
       selectionBefore: [...selectedIds],
-      screen,
+      moveThreshold: mode === 'move' ? new DragThreshold(event) : undefined,
       outlineOnly: false,
       pointerId: event.pointerId
     }
@@ -1613,13 +1653,13 @@
   }
 
   function doubleClick(event: MouseEvent) {
+    if (pointerMode === 'pan') return
     if (performance.now() < ignoreDoubleClickUntil) {
       event.preventDefault()
       event.stopImmediatePropagation()
       return
     }
     if (
-      selecting ||
       !ready ||
       busy ||
       inputMode ||
@@ -1638,6 +1678,7 @@
   }
 
   function pointerDown(event: PointerEvent) {
+    if (pointerMode === 'pan') return
     if (
       !ready ||
       busy ||
@@ -1659,16 +1700,16 @@
     const item = [...visibleItems]
       .reverse()
       .find((item) => contains(point, outline(item)))
-    if (selecting) {
-      tapSelection.start(event, item?.instanceId)
-      if (selectionMode === 'box') startMarquee(event)
-      return
-    }
     const additive = event.shiftKey || event.metaKey || event.ctrlKey
     editorTaps.start(
       event,
       !additive && !event.altKey ? item?.instanceId : undefined
     )
+    if (selecting) {
+      tapSelection.start(event, item?.instanceId)
+      if (pointerMode === 'box') startMarquee(event)
+      return
+    }
     if (item) {
       if (additive) {
         event.preventDefault()
@@ -1724,6 +1765,9 @@
 
   function updateDrag(event: PointerEvent) {
     if (!drag || touchNavigation.active) return
+    // Pointer-up can have a slightly different position too. Only actual
+    // pointer movement beyond the tap tolerance may begin moving a map.
+    if (drag.mode === 'move' && !drag.moveThreshold?.started) return
     const point = worldPoint(event)
     const screen = screenPoint(event)
     if (drag.mode === 'opacity' || drag.mode === 'hue') {
@@ -1761,13 +1805,6 @@
     )
     if (gesture.mode === 'move') {
       if (gesture.duplicateOnMove && !gesture.duplicated) {
-        if (
-          Math.hypot(
-            screen[0] - gesture.screen[0],
-            screen[1] - gesture.screen[1]
-          ) < 3
-        )
-          return
         const added: CollageMap[] = []
         try {
           const copies = duplicateMaps(
@@ -1874,6 +1911,8 @@
       return
     }
     if (!drag || drag.pointerId !== event.pointerId) return
+    // Latch this before batching frames, including an out-and-back movement.
+    drag.moveThreshold?.update(event)
     latestPointer = event
     if (frame !== undefined) return
     frame = requestAnimationFrame(() => {
@@ -1975,7 +2014,7 @@
       !inputMode &&
       !searching &&
       !settingsOpen &&
-      !selecting &&
+      pointerMode !== 'pan' &&
       !editingMask &&
       !editingTransform &&
       !touchNavigation.active &&
@@ -1986,10 +2025,15 @@
       if (item) {
         ignoreDoubleClickUntil = performance.now() + 500
         openMapEditor(item)
+        // The editor owns the new selection; don't toggle this tap again.
+        return
       }
     }
-    if (selecting && id && !touchNavigation.active)
-      select([...toggleSelection(items, selectedIds, id, editingGroup)])
+    if (selecting && !touchNavigation.active) {
+      if (id === null) select()
+      else if (id)
+        select([...toggleSelection(items, selectedIds, id, editingGroup)])
+    }
   }
 
   function trackTouchEnd(event: PointerEvent) {
@@ -2006,32 +2050,18 @@
       settingsOpen
     )
       return
-    if (selecting) {
-      const command = event.metaKey || event.ctrlKey
-      if (event.key === 'Escape' || (command && event.key === 'Enter')) {
-        event.preventDefault()
-        if (event.key === 'Escape' && marquee) cancelSelectionGesture()
-        else finishSelecting()
-      } else if (command && event.key.toLowerCase() === 'a') {
-        event.preventDefault()
-        cancelSelectionGesture()
-        select(visibleItems.map((item) => item.instanceId))
-      } else if (command && event.key.toLowerCase() === 'g') {
-        event.preventDefault()
-        changeGroup(event.shiftKey)
-      } else if (
-        event.code === 'Space' &&
-        !(event.target as HTMLElement)?.closest('button')
-      ) {
-        event.preventDefault()
-        cancelSelectionGesture()
-        spaceDown = true
-      } else if (
-        (command && ['z', 's'].includes(event.key.toLowerCase())) ||
-        event.key === 'Backspace' ||
-        event.key === 'Delete'
-      )
-        event.preventDefault()
+    if (
+      pointerMode !== 'pointer' &&
+      !inputMode &&
+      !busy &&
+      (event.key === 'Escape' ||
+        ((event.metaKey || event.ctrlKey) &&
+          event.key === 'Enter' &&
+          !editingGroup))
+    ) {
+      event.preventDefault()
+      if (marquee) cancelSelectionGesture()
+      else changePointer('pointer')
       return
     }
     if (event.key === 'Escape') {
@@ -2062,6 +2092,7 @@
       event.code === 'Space' &&
       !(event.target as HTMLElement)?.closest('button')
     ) {
+      cancelSelectionGesture()
       spaceDown = true
       event.preventDefault()
     }
@@ -2077,6 +2108,7 @@
       event.key.toLowerCase() === 'a'
     ) {
       event.preventDefault()
+      cancelSelectionGesture()
       if (!drag && !marquee && !busy)
         select(visibleItems.map((item) => item.instanceId))
     } else if (
@@ -2109,7 +2141,6 @@
     event.preventDefault()
     draggingOver = false
     if (
-      selecting ||
       busy ||
       !ready ||
       drag ||
@@ -2137,6 +2168,7 @@
 
   onMount(() => {
     try {
+      importLayout = parseImportLayout(localStorage.getItem(importLayoutKey))
       importTransformation = parseImportTransformation(
         localStorage.getItem(importTransformationKey)
       )
@@ -2222,6 +2254,7 @@
     }
     return () => {
       disposed = true
+      clearTimeout(lockTimer)
       window.removeEventListener('pointerdown', trackTouchStart, true)
       window.removeEventListener('pointerup', trackTouchEnd, true)
       window.removeEventListener('pointercancel', trackTouchEnd, true)
@@ -2260,13 +2293,7 @@
   }}
   ondragover={(event) => {
     event.preventDefault()
-    if (
-      !selecting &&
-      !editingMask &&
-      !editingTransform &&
-      !editingGroup &&
-      !searching
-    )
+    if (!editingMask && !editingTransform && !editingGroup && !searching)
       draggingOver = true
   }}
   ondragleave={(event) => {
@@ -2279,12 +2306,15 @@
   class="collage"
   use:buttonTooltips
   class:control-gesture={activeControl !== undefined}
-  class:box-selecting={selecting && selectionMode === 'box' && !spaceDown}
+  class:box-selecting={pointerMode === 'box' && !spaceDown}
+  class:pan-pointer={pointerMode === 'pan' || spaceDown}
+  class:select-pointer={pointerMode === 'select' && !spaceDown}
   style:--canvas-color={shades.green[0]}
   style:--dot-color={themeColors.green}
   style:--accent={themeColors.pink}
   style:--error-color={themeColors.red}
   style:--group-color={themeColors.darkblue}
+  style:--locked-color={themeColors.orange}
 >
   {#if map && snapping.grid && !searching}
     <SnapGrid {map} spacing={snapping.spacing * snapUnits[snapping.unit]} />
@@ -2302,6 +2332,7 @@
           points={item.points}
           class:selected={selectedIds.has(item.id)}
           class:grouped={item.grouped}
+          class:locked={item.locked}
           class:failed={!!loadFailures[item.id]?.length}
         />
       {/each}
@@ -2326,6 +2357,8 @@
     <ToolSettings
       settings={toolSettings}
       {importTransformation}
+      {importLayout}
+      onimportlayoutchange={changeImportLayout}
       {doubleTapMode}
       ondoubletapchange={changeDoubleTap}
       {snapping}
@@ -2347,8 +2380,7 @@
         data-tooltip="Find maps"
         aria-label="Find maps by place"
         onclick={search}
-        disabled={selecting ||
-          !ready ||
+        disabled={!ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
@@ -2363,8 +2395,7 @@
         data-tooltip="Open collage"
         aria-label="Open collage"
         onclick={() => showInput('open')}
-        disabled={selecting ||
-          !ready ||
+        disabled={!ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
@@ -2376,8 +2407,7 @@
         {layer}
         {items}
         {selectedIds}
-        disabled={selecting ||
-          !items.length ||
+        disabled={!items.length ||
           !ready ||
           busy ||
           !!editingMask ||
@@ -2392,8 +2422,7 @@
         class="quiet-button"
         data-tooltip="Settings"
         aria-label="Settings"
-        disabled={selecting ||
-          busy ||
+        disabled={busy ||
           !!activeControl ||
           !!editingMask ||
           !!editingTransform ||
@@ -2405,8 +2434,7 @@
         class="primary-button small"
         aria-label="Add maps"
         onclick={() => showInput('add')}
-        disabled={selecting ||
-          !ready ||
+        disabled={!ready ||
           busy ||
           !!editingMask ||
           !!editingTransform ||
@@ -2449,10 +2477,10 @@
     </section>
   {/if}
 
-  {#if selected && controls && appearances && !locked && !selecting && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
+  {#if selected && controls && appearances && pointerMode !== 'pan' && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
     {#key selection.map((item) => item.instanceId).join(',')}
       {#each allRingTools as tool (tool)}
-        {#if ringTools.includes(tool)}
+        {#if locked ? tool === 'lock' : ringTools.includes(tool)}
           {#if tool === 'more'}
             <MapControl
               fold={ringFold}
@@ -2462,6 +2490,20 @@
               disabled={busy || !!activeControl}
               onclick={toggleRing}
               >{#if ringExpanded}<Minus size={19} />{:else}<Plus
+                  size={19}
+                />{/if}</MapControl
+            >
+          {:else if tool === 'lock'}
+            <MapControl
+              fold={ringFold}
+              position={locked ? controlCenter! : controls.lock.position}
+              animate={!locked}
+              motionDuration={TOOL_RING_ANIMATION_MS}
+              label={locked ? 'Unlock' : 'Lock'}
+              pressed={locked}
+              disabled={busy || lockTransition || !!activeControl}
+              onclick={toggleLock}
+              >{#if locked}<LockSimple size={19} />{:else}<LockSimpleOpen
                   size={19}
                 />{/if}</MapControl
             >
@@ -2639,23 +2681,12 @@
     {/key}
   {/if}
 
-  {#if locked && controlCenter && !selecting && !inputMode && !editingMask && !editingTransform && !searching && !settingsOpen}
-    <div
-      class="locked-map-indicator"
-      role="img"
-      aria-label="Locked"
-      style:transform={`translate3d(${controlCenter[0]}px, ${controlCenter[1]}px, 0)`}
-    >
-      <LockSimple size={18} />
-    </div>
-  {/if}
-
   {#if !editingMask && !editingTransform && !inputMode && !searching}
     <div
       class="bottom-stack selection-stack"
       class:has-actions={selecting ||
         !!editingGroup ||
-        (selection.length > 1 && !locked) ||
+        selection.length > 1 ||
         !!layoutController}
     >
       {#if errorMessage}
@@ -2666,95 +2697,18 @@
           >
         </div>
       {/if}
-      {#if selecting}
-        <div class="selection-actions" role="group" aria-label="Select maps">
-          <h2>Select maps</h2>
-          <button
-            class="quiet-button"
-            aria-label="Tap selection"
-            data-tooltip="Tap"
-            aria-pressed={selectionMode === 'tap'}
-            onclick={() => changeSelectionMode('tap')}
-            ><HandTap size={20} /></button
-          >
-          <button
-            class="quiet-button"
-            aria-label="Box selection"
-            data-tooltip="Box"
-            aria-pressed={selectionMode === 'box'}
-            onclick={() => changeSelectionMode('box')}
-            ><Selection size={20} /></button
-          >
-          <button
-            class="quiet-button"
-            aria-label="Select all maps"
-            data-tooltip="Select all"
-            aria-keyshortcuts="Meta+A Control+A"
-            disabled={selectedIds.size === visibleItems.length}
-            onclick={() => select(visibleItems.map((item) => item.instanceId))}
-            ><SelectionAll size={20} /></button
-          >
-          <button
-            class="quiet-button"
-            aria-label="Clear selection"
-            data-tooltip="Clear"
-            disabled={!selectedIds.size}
-            onclick={() => select()}><X size={20} /></button
-          >
-          {#if !editingGroup && !grouped}
-            <button
-              class="quiet-button"
-              aria-label="Group"
-              data-tooltip="Group"
-              aria-keyshortcuts="Meta+G Control+G"
-              disabled={busy || locked || selectedObjectCount < 2 || !!marquee}
-              onclick={() => changeGroup()}><FolderSimple size={20} /></button
-            >
-          {/if}
-          {#if editingGroup || selection.some((item) => item.groupId)}
-            <button
-              class="quiet-button"
-              aria-label="Ungroup"
-              data-tooltip="Ungroup"
-              aria-keyshortcuts="Meta+Shift+G Control+Shift+G"
-              disabled={busy ||
-                !!marquee ||
-                selectionLocked(editingGroup ? visibleItems : selection)}
-              onclick={() => changeGroup(true)}
-              ><FolderSimpleMinus size={20} /></button
-            >
-          {/if}
-          <button
-            class="quiet-button"
-            aria-label={locked ? 'Unlock' : 'Lock'}
-            data-tooltip={locked ? 'Unlock' : 'Lock'}
-            aria-pressed={locked}
-            disabled={!selection.length || busy || !!activeControl || !!marquee}
-            onclick={toggleLock}
-            >{#if locked}<LockSimple size={20} />{:else}<LockSimpleOpen
-                size={20}
-              />{/if}</button
-          >
-          <button
-            bind:this={selectionDoneButton}
-            class="quiet-button"
-            aria-label="Done selecting"
-            data-tooltip="Done"
-            aria-keyshortcuts="Meta+Enter Control+Enter Escape"
-            onclick={finishSelecting}><Check size={20} /></button
-          >
-        </div>
-      {:else if editingGroup || layoutAvailable || layoutController}
+      {#if selecting || editingGroup || selection.length > 1 || layoutController}
         <div
           class="selection-actions"
+          use:reserveSelectionSpace
           role="group"
-          aria-label={editingGroup ? 'Edit group' : 'Arrange selected maps'}
+          aria-label={editingGroup ? 'Edit group' : 'Edit selection'}
         >
           <h2>
             {#if layoutController}
               <LoadingSmall />Arranging…
             {:else}
-              {editingGroup ? 'Edit group' : 'Edit layout'}
+              {editingGroup ? 'Edit group' : 'Edit selection'}
             {/if}
           </h2>
           {#if layoutController}
@@ -2766,22 +2720,23 @@
             >
           {:else}
             {#if layoutAvailable}
-              <button
-                class="quiet-button"
-                aria-label="Arrange selected maps"
-                data-tooltip="Arrange compactly"
-                disabled={busy}
-                onclick={() => organize()}><SquaresFour size={20} /></button
-              >
-              <button
-                class="quiet-button"
-                aria-label="Arrange geographically"
-                data-tooltip="Arrange geographically"
-                disabled={busy ||
-                  selection.some((item) => !item.geographicReference)}
-                onclick={() => organize('geographic')}
-                ><MapTrifold size={20} /></button
-              >
+              <FanMenu
+                label="Layout"
+                icon={SquaresFour}
+                disabled={busy || !!marquee}
+                options={[
+                  { value: 'compact', label: 'Compact', icon: SquaresFour },
+                  {
+                    value: 'geographic',
+                    label: 'Geographic',
+                    icon: MapTrifold,
+                    disabled: selection.some(
+                      (item) => !item.geographicReference
+                    )
+                  }
+                ]}
+                onselect={(value) => organize(value as Arrangement)}
+              />
               <FanMenu
                 label="Align"
                 icon={AlignLeft}
@@ -2835,19 +2790,53 @@
                 onselect={(value) => distribute(value as Distribution)}
               />
             {/if}
-            {#if editingGroup}
+            <button
+              class="quiet-button"
+              aria-label="Select all maps"
+              data-tooltip="Select all"
+              aria-keyshortcuts="Meta+A Control+A"
+              disabled={busy ||
+                pointerMode === 'pan' ||
+                !!marquee ||
+                selectedIds.size === visibleItems.length}
+              onclick={() =>
+                select(visibleItems.map((item) => item.instanceId))}
+              ><SelectionAll size={20} /></button
+            >
+            <button
+              class="quiet-button"
+              aria-label="Clear selection"
+              data-tooltip="Clear"
+              disabled={busy || !!marquee || !selectedIds.size}
+              onclick={() => select()}><X size={20} /></button
+            >
+            {#if !editingGroup && !grouped && selectedObjectCount > 1}
+              <button
+                class="quiet-button"
+                aria-label="Group"
+                data-tooltip="Group"
+                aria-keyshortcuts="Meta+G Control+G"
+                disabled={busy ||
+                  locked ||
+                  selectedObjectCount < 2 ||
+                  !!marquee}
+                onclick={() => changeGroup()}><FolderSimple size={20} /></button
+              >
+            {/if}
+            {#if editingGroup || selection.some((item) => item.groupId)}
               <button
                 class="quiet-button"
                 aria-label="Ungroup"
                 data-tooltip="Ungroup"
                 aria-keyshortcuts="Meta+Shift+G Control+Shift+G"
                 disabled={busy ||
-                  !!activeControl ||
                   !!marquee ||
-                  selectionLocked(visibleItems)}
+                  selectionLocked(editingGroup ? visibleItems : selection)}
                 onclick={() => changeGroup(true)}
                 ><FolderSimpleMinus size={20} /></button
               >
+            {/if}
+            {#if editingGroup}
               <button
                 class="quiet-button"
                 aria-label="Done editing group"
@@ -2884,35 +2873,35 @@
           onclick={() => fit()}
           disabled={!items.length}><ArrowsOut size={19} /></button
         >
-        <button
-          bind:this={selectButton}
-          data-tooltip="Select maps"
-          aria-label="Select maps"
-          aria-pressed={selecting}
-          onclick={() => (selecting ? finishSelecting() : startSelecting())}
+        <FanMenu
+          label="Pointer tool"
+          value={pointerMode}
           disabled={!ready ||
-            !visibleItems.length ||
             busy ||
             !!activeControl ||
             !!marquee ||
             !!inputMode ||
             settingsOpen ||
             exportOpen}
-          ><SelectionPlus size={19} class="selection-icon" /></button
-        >
+          options={[
+            { value: 'pointer', label: 'Pointer', icon: Cursor },
+            { value: 'pan', label: 'Pan', icon: Hand },
+            { value: 'select', label: 'Select', icon: CursorClick },
+            { value: 'box', label: 'Drag select', icon: Selection }
+          ]}
+          onselect={(value) => changePointer(value as PointerMode)}
+        />
         <button
           data-tooltip="Undo"
           aria-label="Undo"
           onclick={undo}
-          disabled={!past.length || busy || selecting}
-          ><ArrowUUpLeft size={19} /></button
+          disabled={!past.length || busy}><ArrowUUpLeft size={19} /></button
         >
         <button
           data-tooltip="Redo"
           aria-label="Redo"
           onclick={redo}
-          disabled={!future.length || busy || selecting}
-          ><ArrowUUpRight size={19} /></button
+          disabled={!future.length || busy}><ArrowUUpRight size={19} /></button
         >
       </div>
     </footer>

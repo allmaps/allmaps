@@ -82,8 +82,15 @@ textarea:focus-visible {
 .outlines polygon.grouped.selected {
   stroke: var(--group-color);
 }
+.outlines polygon.locked {
+  stroke: color-mix(in srgb, var(--locked-color) 55%, transparent);
+}
+.outlines polygon.locked.selected {
+  stroke: var(--locked-color);
+}
 .outlines polygon.failed,
-.outlines polygon.grouped.failed {
+.outlines polygon.grouped.failed,
+.outlines polygon.locked.failed {
   stroke: var(--error-color);
   fill: color-mix(in srgb, var(--error-color) 12%, transparent);
   stroke-width: 4;
@@ -104,9 +111,14 @@ textarea:focus-visible {
 .box-selecting .maplibregl-canvas {
   cursor: crosshair;
 }
-.selection-icon {
-  /* Put the plus at top right and balance its extra visual weight. */
-  transform: translate(-0.5px, 0.5px) scaleY(-1);
+.pan-pointer .maplibregl-canvas {
+  cursor: grab;
+}
+.pan-pointer .maplibregl-canvas:active {
+  cursor: grabbing;
+}
+.select-pointer .maplibregl-canvas {
+  cursor: pointer;
 }
 .selection-box {
   fill: #ff56ba18;
@@ -266,7 +278,8 @@ nav {
   gap: 8px;
   pointer-events: auto;
 }
-.view-controls button {
+.view-controls > button,
+.view-controls .fan-menu > button {
   width: 36px;
   height: 36px;
   display: grid;
@@ -275,10 +288,12 @@ nav {
   border: 0;
   border-radius: 50%;
 }
-.view-controls button:hover:not(:disabled) {
+.view-controls > button:hover:not(:disabled),
+.view-controls .fan-menu > button:hover:not(:disabled) {
   background: #fff;
 }
-.view-controls button[aria-pressed='true'] {
+.view-controls > button[aria-pressed='true'],
+.view-controls .fan-menu > button[aria-expanded='true'] {
   background: var(--accent);
 }
 .map-control {
@@ -292,7 +307,7 @@ nav {
   /* Move the button and its SVG as one composited surface. Updating left/top
      every frame can snap SVG layout independently of its button on iOS. */
   will-change: transform;
-  transition: transform 220ms ease-out;
+  transition: transform var(--control-move-duration, 220ms) ease-out;
 }
 .control-gesture .map-control,
 .map-control.folding {
@@ -308,22 +323,6 @@ nav {
   .map-control {
     transition: none;
   }
-}
-.locked-map-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  pointer-events: none;
-  color: #2229;
-}
-.locked-map-indicator svg {
-  display: block;
-  box-sizing: content-box;
-  padding: 8px;
-  border-radius: 50%;
-  background: #ffffffb3;
-  transform: translate(-50%, -50%);
 }
 .map-control.active {
   z-index: 3;
@@ -896,7 +895,7 @@ nav {
   }
 }
 
-/* Selection includes grouping and locking, so stack before its longer row reaches
+/* Selection includes layout and grouping, so stack before its longer row reaches
    the zoom and undo controls. */
 @media (max-width: 1120px) {
   .selection-stack.has-actions {

@@ -7,6 +7,7 @@ import {
   visibleTools,
   reorderTool,
   parseImportTransformation,
+  parseImportLayout,
   parseDoubleTapMode
 } from '../src/lib/tool-settings.ts'
 import {
@@ -59,7 +60,7 @@ test('tool preferences default to hidden mirror and retain order through storage
     parseToolSettings([{ tool: 'lock', enabled: true }]).some(
       ({ tool }) => String(tool) === 'lock'
     ),
-    false
+    true
   )
 })
 
@@ -170,4 +171,10 @@ test('double tap defaults to mask and accepts only supported editor modes', () =
   assert.equal(parseDoubleTapMode('transform'), 'transform')
   for (const value of [undefined, null, 'mask', 'invalid', {}, []])
     assert.equal(parseDoubleTapMode(value), 'mask')
+})
+
+test('import layout defaults to compact and accepts geographic placement', () => {
+  assert.equal(parseImportLayout('geographic'), 'geographic')
+  for (const value of [undefined, null, 'compact', 'invalid', {}, []])
+    assert.equal(parseImportLayout(value), 'compact')
 })

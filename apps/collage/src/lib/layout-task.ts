@@ -14,6 +14,7 @@ export type LayoutRequest =
       at: Point
       sourceUrl?: string
       importTransformation?: ImportTransformation
+      arrangement?: Arrangement
     } & MapImportOptions)
   | {
       type: 'arrange'
@@ -44,7 +45,7 @@ export function solveLayout(request: LayoutRequest): LayoutResult {
       : items.find((item) => item.instanceId === request.anchorId)
   if (items.length && !anchor)
     throw new Error('The fixed map is no longer selected.')
-  if (request.type === 'arrange' && request.arrangement === 'geographic') {
+  if (request.arrangement === 'geographic') {
     arrangeGeographically(items, anchor)
     return { items, fallback: false }
   }

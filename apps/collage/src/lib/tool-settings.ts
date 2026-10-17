@@ -18,7 +18,8 @@ export const toolLabels: Record<Control, string> = {
   mirror: 'Mirror',
   transform: 'Transform',
   move: 'Move',
-  rotate: 'Rotate'
+  rotate: 'Rotate',
+  lock: 'Lock'
 }
 export function defaultToolSettings(): ToolSetting[] {
   return [
@@ -103,4 +104,9 @@ export function reorderTool(
   const next = settings.filter((entry) => entry.tool !== tool)
   next.splice(Math.max(0, Math.min(next.length, index)), 0, entry)
   return next
+}
+
+export const importLayoutKey = 'allmaps-collage-import-layout'
+export function parseImportLayout(value: unknown) {
+  return value === 'geographic' ? 'geographic' : 'compact'
 }

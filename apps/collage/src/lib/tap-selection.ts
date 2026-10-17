@@ -5,18 +5,16 @@ type Pointer = Pick<
 
 /** Select on release without taking pointer events away from navigation. */
 export class TapSelection {
-  private pending?: Pointer & { id: string }
+  private pending?: Pointer & { id: string | null }
 
   start(event: Pointer, id?: string) {
-    this.pending = id
-      ? {
-          id,
-          pointerId: event.pointerId,
-          clientX: event.clientX,
-          clientY: event.clientY,
-          timeStamp: event.timeStamp
-        }
-      : undefined
+    this.pending = {
+      id: id ?? null,
+      pointerId: event.pointerId,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      timeStamp: event.timeStamp
+    }
   }
 
   move(event: Pointer) {
@@ -29,7 +27,8 @@ export class TapSelection {
       this.cancel()
   }
 
-  end(event: Pointer): string | undefined {
+  /** null is a tap on empty canvas; undefined means no completed tap. */
+  end(event: Pointer): string | null | undefined {
     if (this.pending?.pointerId !== event.pointerId) return
     this.move(event)
     const start = this.pending

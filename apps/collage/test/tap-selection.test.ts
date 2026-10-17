@@ -35,12 +35,22 @@ test('release checks movement even if no pointermove was delivered', () => {
   assert.equal(tap.end(pointer({ clientY: 109, timeStamp: 200 })), undefined)
 })
 
-test('long presses and empty canvas do not select maps', () => {
+test('long presses cancel while an empty-canvas tap clears the selection', () => {
   const tap = new TapSelection()
   tap.start(pointer(), 'map')
   assert.equal(tap.end(pointer({ timeStamp: 800 })), undefined)
   tap.start(pointer(), 'map')
   tap.start(pointer())
+  assert.equal(tap.end(pointer({ timeStamp: 200 })), null)
+})
+
+test('panning from empty canvas does not clear the selection on release', () => {
+  const tap = new TapSelection()
+  tap.start(pointer())
+  tap.move(pointer({ clientX: 120 }))
+  assert.equal(tap.end(pointer({ timeStamp: 200 })), undefined)
+  tap.start(pointer())
+  tap.cancel()
   assert.equal(tap.end(pointer({ timeStamp: 200 })), undefined)
 })
 
