@@ -7,7 +7,6 @@
     DropHalf,
     Palette,
     CircleHalf,
-    Polygon,
     BoundingBox,
     FlipHorizontal,
     ArrowsOutCardinal,
@@ -16,6 +15,7 @@
     LockSimpleOpen
   } from 'phosphor-svelte'
   import { BringMapsToFront } from '@allmaps/ui'
+  import MaskIcon from './MaskIcon.svelte'
   import type { Control } from './control-layout'
   let { tool }: { tool: Control } = $props()
   const icons = {
@@ -26,7 +26,7 @@
     saturation: DropHalf,
     hue: Palette,
     opacity: CircleHalf,
-    editMask: Polygon,
+    editMask: MaskIcon,
     transform: BoundingBox,
     mirror: FlipHorizontal,
     move: ArrowsOutCardinal,

@@ -63,6 +63,33 @@ export function constrainToImage(
   ) as Point
 }
 
+/** Move selected vertices as one unit, stopping all of them at the first image
+ * boundary. An edge is just its two endpoint indices, including the closing edge. */
+export function moveMaskPoints(
+  mask: Point[],
+  indices: readonly number[],
+  delta: Point,
+  width: number,
+  height: number
+): Point[] {
+  const selected = new Set(indices)
+  let fraction = 1
+  mask.forEach((point, index) => {
+    if (!selected.has(index)) return
+    for (const [axis, limit] of [width, height].entries()) {
+      const next = point[axis] + delta[axis]
+      if (next < 0) fraction = Math.min(fraction, -point[axis] / delta[axis])
+      else if (next > limit)
+        fraction = Math.min(fraction, (limit - point[axis]) / delta[axis])
+    }
+  })
+  return mask.map(([x, y], index) =>
+    selected.has(index)
+      ? [x + delta[0] * fraction, y + delta[1] * fraction]
+      : [x, y]
+  )
+}
+
 /** Match the placed raster, without changing the map's GCPs or orientation. */
 export function maskCoordinates(item: CollageMap, canvas = false) {
   const transform = transformer(canvas ? renderedMap(item) : placedMap(item))

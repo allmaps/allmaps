@@ -8,6 +8,7 @@ import {
   maskContains
 } from '../src/lib/mask-shapes.ts'
 import { validateResourceMask } from '../src/lib/model.ts'
+import { moveMaskPoints } from '../src/lib/mask-geometry.ts'
 import type { Point } from '@allmaps/types'
 
 function dot(points: Point[], i: number) {
@@ -20,6 +21,66 @@ function dot(points: Point[], i: number) {
       Math.hypot(b[0] - p[0], b[1] - p[1]))
   )
 }
+
+test('moving selected mask points preserves their offsets and leaves other vertices untouched', () => {
+  const mask: Point[] = [
+    [20, 20],
+    [80, 20],
+    [80, 80],
+    [20, 80]
+  ]
+  const before = structuredClone(mask)
+  assert.deepEqual(moveMaskPoints(mask, [0, 1], [5, 10], 100, 100), [
+    [25, 30],
+    [85, 30],
+    [80, 80],
+    [20, 80]
+  ])
+  assert.deepEqual(moveMaskPoints(mask, [1], [-10, 15], 100, 100), [
+    [20, 20],
+    [70, 35],
+    [80, 80],
+    [20, 80]
+  ])
+  assert.deepEqual(moveMaskPoints(mask, [], [30, 40], 100, 100), mask)
+  assert.deepEqual(mask, before)
+})
+
+test('point and edge drags stop as a unit at the first image boundary', () => {
+  const mask: Point[] = [
+    [20, 20],
+    [80, 20],
+    [80, 80],
+    [20, 80]
+  ]
+  const moved = moveMaskPoints(mask, [0, 1], [40, -20], 100, 100)
+  assert.deepEqual(moved, [
+    [40, 10],
+    [100, 10],
+    [80, 80],
+    [20, 80]
+  ])
+  // The closing edge moves both the final and first point, without inserting one.
+  const closing = moveMaskPoints(mask, [3, 0], [-40, 20], 100, 100)
+  assert.deepEqual(closing, [
+    [0, 30],
+    [80, 20],
+    [80, 80],
+    [0, 90]
+  ])
+  assert.equal(closing.length, mask.length)
+  validateResourceMask(moved, 100, 100)
+  validateResourceMask(closing, 100, 100)
+  assert.throws(
+    () =>
+      validateResourceMask(
+        moveMaskPoints(mask, [0], [75, 55], 100, 100),
+        100,
+        100
+      ),
+    'Crossing other mask edges must be rejected before committing a draft'
+  )
+})
 
 test('pen strokes become small editable polygons at the current screen resolution', () => {
   const stroke: Point[] = []

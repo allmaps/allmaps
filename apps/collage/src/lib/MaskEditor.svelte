@@ -25,13 +25,26 @@
     FrameCorners,
     Parallelogram,
     Cursor,
-    ArrowCounterClockwise,
+    LineSegment,
+    ArrowsOutCardinal,
+    Trash,
+    Eraser,
     Check,
     Eye,
     EyeSlash,
     X
   } from 'phosphor-svelte'
   import FanMenu from './FanMenu.svelte'
+  import MapControl from './MapControl.svelte'
+  import { bounds } from './geometry'
+  import {
+    controlLayout,
+    controlFold,
+    fitControlCenter
+  } from './control-layout'
+  import { DragThreshold } from './drag-threshold'
+  import { createMaskSnapper } from './mask-snapping'
+  import type { MaskSnapGuide, MaskSnapper } from './mask-snapping'
   import { modeVisibility } from './mode-visibility'
   import {
     drawMaskCircle,
@@ -48,6 +61,7 @@
   import { bindMaskStylus } from './mask-stylus'
   import {
     constrainToImage,
+    moveMaskPoints,
     maskCoordinates,
     maskEdgeAt
   } from './mask-geometry'
@@ -58,6 +72,7 @@
   let {
     item,
     failed = false,
+    snapping = true,
     map,
     layer,
     items,
@@ -66,6 +81,7 @@
   }: {
     item: CollageMap
     failed?: boolean
+    snapping?: boolean
     map: MapLibreMap
     layer: WarpedMapLayer
     items: CollageMap[]
@@ -79,24 +95,41 @@
   const width = original.baseline.resource.width!
   const height = original.baseline.resource.height!
   const featureId = crypto.randomUUID()
+  const drawPrefix = 'collage-mask'
   let draw = $state.raw<TerraDraw>()
   let polygonMode: TerraDrawPolygonMode | undefined
   let freehandMode: MaskFreehandMode | undefined
   type DrawingMode = 'polygon' | 'freehand' | 'circle' | 'rectangle'
   let drawingMode = $state<DrawingMode>()
+  let editingMode = $state<'points' | 'edges'>('points')
+  let selectedVertices = $state.raw<number[]>([])
+  let selectedEdge = $state<number>()
+  let previewPoints = $state.raw<Point[]>([])
+  let edgeHandles = $state.raw<Point[]>([])
+  let snapGuides = $state.raw<MaskSnapGuide[]>([])
+  let guidePaths = $state.raw<{ path: string; active: boolean }[]>([])
+  let snappedOrigin = $state.raw<Point>()
+  let pointControls = $state.raw<ReturnType<typeof controlLayout>>()
+  let pointFold = $state.raw<ReturnType<typeof controlFold>>()
+  let movingPoints = $state(false)
+  let actions = $state<HTMLDivElement>()
   type ShapeOrientation = 'view' | 'map'
-  let shapeOrientation = $state<ShapeOrientation>('view')
+  let shapeOrientation = $state<ShapeOrientation>('map')
   const drawingShape = $derived(
     drawingMode === 'circle' || drawingMode === 'rectangle'
   )
   const drawingOptions = [
     { value: 'edit', label: 'Edit points', icon: Cursor },
+    { value: 'edges', label: 'Edit lines', icon: LineSegment },
     { value: 'polygon', label: 'Polygon', icon: Polygon },
     { value: 'freehand', label: 'Pen', icon: PencilSimple },
     { value: 'circle', label: 'Circle', icon: Circle },
     { value: 'rectangle', label: 'Rectangle', icon: Rectangle }
   ]
   const drawingNewMask = $derived(drawingMode !== undefined)
+  const drawingWithTerraDraw = $derived(
+    drawingMode === 'polygon' || drawingMode === 'freehand'
+  )
   let drawingUndoCount = $state(0)
   let drawingRedoCount = $state(0)
   let draft = $state.raw<Point[]>(structuredClone(original.resourceMask))
@@ -108,6 +141,8 @@
   let error = $state('')
   let changing = false
   let edgeStart: { index: number; point: Point } | undefined
+  let insertedPoint:
+    { index: number; mask: Point[]; snap: MaskSnapper } | undefined
   let restoreNavigation: (() => void) | undefined
   let penPointerType = 'mouse'
   const penTouches = new PenTouchGesture()
@@ -146,6 +181,29 @@
     })
   })
 
+  // Keep editing geometry and its selected fill in the same SVG frame. Terra
+  // Draw's GeoJSON renderer goes through a worker and cannot stay in sync with
+  // separate HTML/SVG handles. It still renders freehand and polygon drawing.
+  $effect(() => {
+    if (!ready) return
+    const visibility = drawingWithTerraDraw ? 'visible' : 'none'
+    for (const suffix of [
+      'point',
+      'point-marker',
+      'linestring',
+      'polygon',
+      'polygon-outline'
+    ]) {
+      const id = `${drawPrefix}-${suffix}`
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', visibility)
+    }
+  })
+
+  function clearSelection() {
+    selectedVertices = []
+    selectedEdge = undefined
+  }
+
   function refreshDrawingHistory() {
     drawingUndoCount =
       drawingMode === 'polygon' ? (polygonMode?.undoSize() ?? 0) : 1
@@ -172,8 +230,10 @@
       ])
       if (!result[0]?.valid)
         throw new Error(result[0]?.reason ?? 'This mask cannot be edited.')
-      draw.setMode('select')
-      draw.selectFeature(featureId)
+      if (editingMode === 'points') {
+        draw.setMode('select')
+        draw.selectFeature(featureId)
+      }
       releaseNavigation()
     } finally {
       changing = false
@@ -192,6 +252,7 @@
     if (!draw || !ready) return
     if (drawingMode === mode) return cancelNewMask()
     abortMaskGesture()
+    clearSelection()
     releaseNavigation()
     penTouches.reset()
     vertexTaps.reset()
@@ -206,8 +267,11 @@
   }
 
   function chooseDrawingTool(value: string) {
-    if (value === 'edit') cancelNewMask()
-    else drawNewMask(value as DrawingMode)
+    if (value === 'edit' || value === 'edges') {
+      editingMode = value === 'edges' ? 'edges' : 'points'
+      clearSelection()
+      cancelNewMask()
+    } else drawNewMask(value as DrawingMode)
   }
 
   function resetMask() {
@@ -238,6 +302,7 @@
       future = []
       draft = next
       drawingMode = undefined
+      clearSelection()
       showDraft()
       error = ''
     } catch (problem) {
@@ -246,12 +311,13 @@
     }
   }
 
-  function replaceDraft(next: Point[]) {
+  function replaceDraft(next: Point[], keepSelection = false) {
     validateResourceMask(next, width, height)
     if (JSON.stringify(next) === JSON.stringify(draft)) return
     past = [...past.slice(-39), draft]
     future = []
     draft = next
+    if (!keepSelection) clearSelection()
     syncDraft()
     error = ''
   }
@@ -367,15 +433,22 @@
   // Both shapes use the chosen drawing plane, but masks are always stored in
   // image coordinates. Terra Draw renders and edits the resulting vertices.
   type MaskGesture = {
-    kind: 'circle' | 'rectangle' | 'move'
+    kind: 'circle' | 'rectangle' | 'move' | 'points' | 'edge'
     orientation: ShapeOrientation
     pointer: number
+    target: HTMLElement
     anchor: Point
-    screen: Point
+    threshold: DragThreshold
     mask: Point[]
+    indices?: number[]
+    vertex?: number
+    additive?: boolean
+    fromTool?: boolean
+    snap?: MaskSnapper
+    started: boolean
     next?: Point[]
   }
-  let maskGesture: MaskGesture | undefined
+  let maskGesture = $state.raw<MaskGesture>()
   const maskTouches = new SvelteSet<number>()
   let navigatingTouches = false
   let suppressMaskClick = false
@@ -397,6 +470,122 @@
     return [screen.x, screen.y]
   }
 
+  function guidePath(line: [Point, Point]) {
+    const [a, b] = line.map(resourceScreen)
+    const size = Math.hypot(
+      map.getCanvas().clientWidth,
+      map.getCanvas().clientHeight
+    )
+    const scale = (size * 2) / Math.hypot(b[0] - a[0], b[1] - a[1])
+    const dx = (b[0] - a[0]) * scale,
+      dy = (b[1] - a[1]) * scale
+    return `M ${a[0] - dx},${a[1] - dy} L ${a[0] + dx},${a[1] + dy}`
+  }
+
+  function showSnap(
+    snap: MaskSnapper | undefined,
+    mask: Point[],
+    indices: number[]
+  ) {
+    snapGuides = snap?.guides ?? []
+    snappedOrigin = snap?.origin
+      ? resourceScreen(
+          indices.reduce<Point>(
+            (sum, index) => [
+              sum[0] + mask[index][0] / indices.length,
+              sum[1] + mask[index][1] / indices.length
+            ],
+            [0, 0]
+          )
+        )
+      : undefined
+  }
+
+  function refreshPointControls() {
+    guidePaths = snapGuides.map(({ line, active }) => ({
+      path: guidePath(line),
+      active
+    }))
+    const mask = maskGesture?.next ?? draft
+    let projected =
+      ready && !drawingWithTerraDraw && (!drawingNewMask || maskGesture?.next)
+        ? mask.map(resourceScreen)
+        : []
+    // New vertices inserted by Terra Draw are not committed to draft until
+    // release. Read its synchronous store so they share this same preview.
+    if (ready && !drawingNewMask && !maskGesture?.next) {
+      const feature = draw?.getSnapshotFeature(featureId)
+      if (feature?.geometry.type === 'Polygon')
+        projected = feature.geometry.coordinates[0].slice(0, -1).map((geo) => {
+          const point = map.project(geo as Point)
+          return [point.x, point.y]
+        })
+    }
+    previewPoints = projected
+    edgeHandles =
+      ready && !drawingNewMask && editingMode === 'edges'
+        ? projected.map((point, index) => {
+            const end = projected[(index + 1) % projected.length]
+            return [(point[0] + end[0]) / 2, (point[1] + end[1]) / 2]
+          })
+        : []
+    if (!ready || drawingNewMask) {
+      pointControls = undefined
+      pointFold = undefined
+      return
+    }
+    const indices =
+      editingMode === 'edges'
+        ? selectedEdge === undefined
+          ? []
+          : [selectedEdge, (selectedEdge + 1) % mask.length]
+        : selectedVertices
+    const points = indices
+      .filter((index) => index < projected.length)
+      .map((index) => projected[index])
+    if (!points.length) {
+      pointControls = undefined
+      pointFold = undefined
+      return
+    }
+    const box = bounds(points)
+    const center: Point = [(box[0] + box[2]) / 2, (box[1] + box[3]) / 2]
+    const order =
+      editingMode === 'edges'
+        ? (['move'] as const)
+        : (['move', 'remove'] as const)
+    const at = (center: Point) =>
+      controlLayout(center, 0, { opacity: 1, saturation: 1, hue: 0 }, 72, order)
+    const rect = map.getContainer().getBoundingClientRect()
+    const bottom = actions?.getBoundingClientRect().top ?? rect.bottom
+    const fitted = fitControlCenter(center, at(center), [
+      rect.width,
+      Math.min(rect.height, bottom - rect.top)
+    ])
+    pointControls = at(fitted)
+    pointFold = controlFold(fitted, 0, 72, order)
+  }
+
+  $effect(() => {
+    refreshPointControls()
+  })
+
+  function removeVertices(indices = selectedVertices) {
+    if (!ready || drawingNewMask || !indices.length) return
+    abortMaskGesture()
+    try {
+      const selected = new Set(indices)
+      replaceDraft(draft.filter((_, index) => !selected.has(index)))
+    } catch (problem) {
+      error = problem instanceof Error ? problem.message : String(problem)
+    }
+  }
+
+  function releaseMaskCapture(gesture: MaskGesture) {
+    if (gesture.target.hasPointerCapture(gesture.pointer))
+      gesture.target.releasePointerCapture(gesture.pointer)
+  }
+
   function pointerResource(
     event: Pick<MouseEvent, 'clientX' | 'clientY'>
   ): Point {
@@ -404,8 +593,14 @@
   }
 
   function abortMaskGesture() {
+    insertedPoint = undefined
+    snapGuides = []
+    snappedOrigin = undefined
     if (!maskGesture) return
+    const previous = maskGesture
     maskGesture = undefined
+    movingPoints = false
+    releaseMaskCapture(previous)
     releaseNavigation()
     adapter?.resetPenGesture()
     showDraft()
@@ -413,6 +608,7 @@
 
   function cancelMaskNavigation() {
     abortMaskGesture()
+    vertexTaps.reset()
     maskTouches.clear()
     navigatingTouches = false
   }
@@ -432,35 +628,70 @@
       return
     }
     if (!ready || event.button !== 0) return
+    if (!drawingNewMask) adapter?.preparePointer(event)
     try {
       const anchor = pointerResource(event)
       const shape = drawingMode === 'circle' || drawingMode === 'rectangle'
+      const vertex = shape ? undefined : vertexAt(event)
+      const edge = shape ? undefined : edgeAt(pointerScreen(event))
+      if (editingMode !== 'points' || vertex === undefined) vertexTaps.reset()
+      let kind: MaskGesture['kind'] = shape
+        ? (drawingMode as 'circle' | 'rectangle')
+        : 'move'
+      let indices: number[] | undefined
+      const additive =
+        event.pointerType === 'touch' ||
+        event.shiftKey ||
+        event.metaKey ||
+        event.ctrlKey
       if (!shape) {
-        const rect = map.getCanvas().getBoundingClientRect()
-        if (
-          vertexAt(event) !== undefined ||
-          edgeAt([event.clientX - rect.left, event.clientY - rect.top]) ||
+        if (editingMode === 'points' && vertex !== undefined) {
+          kind = 'points'
+          indices = selectedVertices.includes(vertex)
+            ? [...selectedVertices]
+            : additive
+              ? [...selectedVertices, vertex]
+              : [vertex]
+        } else if (editingMode === 'edges' && edge) {
+          kind = 'edge'
+          indices = [edge.index, (edge.index + 1) % draft.length]
+          selectedEdge = edge.index
+        } else if (
+          edge ||
+          vertex !== undefined ||
           !maskContains(draft, anchor)
-        )
+        ) {
+          if (vertex === undefined) clearSelection()
           return
+        }
       }
       maskGesture = {
-        kind: shape ? (drawingMode as 'circle' | 'rectangle') : 'move',
+        kind,
         orientation: shapeOrientation,
         pointer: event.pointerId,
-        anchor: [
-          Math.max(0, Math.min(width, anchor[0])),
-          Math.max(0, Math.min(height, anchor[1]))
-        ],
-        screen: [event.clientX, event.clientY],
-        mask: structuredClone(draft)
+        target: map.getCanvas(),
+        anchor: shape
+          ? [
+              Math.max(0, Math.min(width, anchor[0])),
+              Math.max(0, Math.min(height, anchor[1]))
+            ]
+          : anchor,
+        threshold: new DragThreshold(event),
+        mask: structuredClone(draft),
+        indices,
+        snap:
+          snapping && indices
+            ? createMaskSnapper(draft, indices, resourceScreen)
+            : undefined,
+        vertex: kind === 'points' ? vertex : undefined,
+        additive,
+        started: false
       }
       edgeStart = undefined
-      vertexTaps.reset()
+      if (kind === 'points') vertexTaps.start(event, vertex)
+      else vertexTaps.reset()
       adapter?.resetPenGesture()
       restoreNavigation ??= suspendMapNavigation(map)
-      draw!.setMode('static')
-      if (shape) draw!.clear()
       map.getCanvas().setPointerCapture(event.pointerId)
       suppressMaskClick = true
       event.preventDefault()
@@ -476,23 +707,40 @@
       return
     }
     const gesture = maskGesture
-    if (!gesture || gesture.pointer !== event.pointerId) return
+    if (!gesture || gesture.pointer !== event.pointerId) {
+      if (!drawingNewMask && editingMode === 'edges')
+        map.getCanvas().style.cursor = edgeAt(pointerScreen(event))
+          ? 'move'
+          : ''
+      return
+    }
+    vertexTaps.move(event)
     event.preventDefault()
     event.stopImmediatePropagation()
-    if (
-      Math.hypot(
-        event.clientX - gesture.screen[0],
-        event.clientY - gesture.screen[1]
-      ) < (event.pointerType === 'touch' ? 8 : 2)
-    )
-      return
+    if (!gesture.threshold.update(event)) return
+    if (!gesture.started) {
+      gesture.started = true
+      movingPoints = gesture.kind === 'points' || gesture.kind === 'edge'
+      vertexTaps.reset()
+      if (gesture.kind === 'points') selectedVertices = gesture.indices!
+      else if (gesture.kind !== 'edge') clearSelection()
+      draw!.setMode('static')
+      if (gesture.kind === 'circle' || gesture.kind === 'rectangle')
+        draw!.clear()
+    }
     try {
       const point = pointerResource(event)
       const drawShape =
         gesture.kind === 'rectangle' ? drawMaskRectangle : drawMaskCircle
       const followMap = gesture.orientation === 'map'
-      const next =
-        gesture.kind === 'move'
+      const movement: Point = [
+        point[0] - gesture.anchor[0],
+        point[1] - gesture.anchor[1]
+      ]
+      const delta = gesture.snap?.(movement) ?? movement
+      const next = gesture.indices
+        ? moveMaskPoints(gesture.mask, gesture.indices, delta, width, height)
+        : gesture.kind === 'move'
           ? moveMask(
               gesture.mask,
               [point[0] - gesture.anchor[0], point[1] - gesture.anchor[1]],
@@ -508,6 +756,7 @@
             )
       validateResourceMask(next, width, height)
       gesture.next = next
+      showSnap(gesture.snap, gesture.mask, gesture.indices ?? [])
       if (draw!.getSnapshotFeature(featureId))
         draw!.updateFeatureGeometry(featureId, geometry(next))
       else
@@ -519,6 +768,7 @@
             properties: { mode: 'polygon' }
           }
         ])
+      refreshPointControls()
     } catch {
       // A zero-size starting shape is unfinished, not an invalid edit.
     }
@@ -536,19 +786,141 @@
     if (!gesture || gesture.pointer !== event.pointerId) return
     maskPointerMove(event)
     maskGesture = undefined
+    movingPoints = false
+    snapGuides = []
+    snappedOrigin = undefined
+    releaseMaskCapture(gesture)
     releaseNavigation()
     adapter?.resetPenGesture()
-    drawingMode = undefined
-    showDraft()
-    if (gesture.next) replaceDraft(gesture.next)
+    if (!gesture.started && gesture.vertex !== undefined) {
+      const index = vertexTaps.end(event, vertexAt(event))
+      if (index !== undefined) {
+        ignoreOutsideDoubleClickUntil = performance.now() + 500
+        removeVertices([index])
+      } else if (gesture.additive) {
+        selectedVertices = selectedVertices.includes(gesture.vertex)
+          ? selectedVertices.filter((index) => index !== gesture.vertex)
+          : [...selectedVertices, gesture.vertex]
+      } else selectedVertices = [gesture.vertex]
+    } else if (gesture.started) {
+      drawingMode = undefined
+      showDraft()
+      if (gesture.next)
+        replaceDraft(
+          gesture.next,
+          gesture.kind === 'points' || gesture.kind === 'edge'
+        )
+    } else if (!gesture.fromTool && gesture.kind !== 'edge') clearSelection()
+    refreshPointControls()
     event.preventDefault()
     event.stopImmediatePropagation()
   }
 
   function maskPointerCancel(event: PointerEvent) {
+    vertexTaps.reset()
     maskTouches.delete(event.pointerId)
     if (!maskTouches.size) navigatingTouches = false
     abortMaskGesture()
+  }
+
+  function moveSelectedVertices(event: PointerEvent) {
+    if (editingMode === 'edges' && selectedEdge !== undefined)
+      startMaskHandle(event, 'edge', [
+        selectedEdge,
+        (selectedEdge + 1) % draft.length
+      ])
+    else startMaskHandle(event, 'points', selectedVertices)
+  }
+
+  function startMaskHandle(
+    event: PointerEvent,
+    kind: 'points' | 'edge',
+    indices: number[]
+  ) {
+    if (
+      !ready ||
+      drawingNewMask ||
+      maskGesture ||
+      event.button !== 0 ||
+      !indices.length
+    )
+      return
+    let anchor: Point
+    try {
+      anchor = pointerResource(event)
+    } catch (problem) {
+      error = problem instanceof Error ? problem.message : String(problem)
+      return
+    }
+    if (event.pointerType === 'touch') maskTouches.add(event.pointerId)
+    if (navigatingTouches || maskTouches.size > 1) return
+    if (kind === 'edge') selectedEdge = indices[0]
+    const target = event.currentTarget as HTMLElement
+    maskGesture = {
+      kind,
+      orientation: shapeOrientation,
+      pointer: event.pointerId,
+      target,
+      anchor,
+      threshold: new DragThreshold(event),
+      mask: structuredClone(draft),
+      indices: [...indices],
+      snap: snapping
+        ? createMaskSnapper(draft, indices, resourceScreen)
+        : undefined,
+      fromTool: true,
+      started: false
+    }
+    vertexTaps.reset()
+    restoreNavigation ??= suspendMapNavigation(map)
+    target.setPointerCapture(event.pointerId)
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  function pointToolMove(event: PointerEvent) {
+    if (maskGesture?.fromTool) maskPointerMove(event)
+  }
+  function pointToolUp(event: PointerEvent) {
+    if (maskGesture?.fromTool) maskPointerUp(event)
+  }
+  function pointToolCancel(event: PointerEvent) {
+    if (maskGesture?.fromTool) maskPointerCancel(event)
+  }
+
+  function edgeHandleKey(event: KeyboardEvent, index: number) {
+    const direction: Record<string, Point> = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1]
+    }
+    const step = direction[event.key]
+    if (!step || maskGesture) return
+    event.preventDefault()
+    event.stopPropagation()
+    const screen = edgeHandles[index]
+    const distance = event.shiftKey ? 10 : 1
+    try {
+      selectedEdge = index
+      const from = screenResource(screen)
+      const to = screenResource([
+        screen[0] + step[0] * distance,
+        screen[1] + step[1] * distance
+      ])
+      replaceDraft(
+        moveMaskPoints(
+          draft,
+          [index, (index + 1) % draft.length],
+          [to[0] - from[0], to[1] - from[1]],
+          width,
+          height
+        ),
+        true
+      )
+    } catch (problem) {
+      error = problem instanceof Error ? problem.message : String(problem)
+    }
   }
 
   function maskTouch(event: TouchEvent) {
@@ -696,44 +1068,13 @@
     outsideTaps.reset()
   }
 
-  function vertexPointerDown(event: PointerEvent) {
-    if (!drawingNewMask) {
-      adapter?.preparePointer(event)
-      vertexTaps.start(event, vertexAt(event))
-    }
-  }
-
-  function vertexPointerMove(event: PointerEvent) {
-    vertexTaps.move(event)
-  }
-
-  function vertexPointerUp(event: PointerEvent) {
-    if (drawingNewMask) return
-    const index = vertexTaps.end(event, vertexAt(event))
-    if (index === undefined) return
-    ignoreOutsideDoubleClickUntil = performance.now() + 500
-    event.stopImmediatePropagation()
-    edgeStart = undefined
-    adapter?.resetPenGesture()
-    adapter?.setDraggability(true)
-    try {
-      replaceDraft(draft.filter((_, i) => i !== index))
-    } catch (problem) {
-      error = problem instanceof Error ? problem.message : String(problem)
-    }
-  }
-
-  function vertexPointerCancel() {
-    vertexTaps.reset()
-  }
-
   function syncDraft(mask = draft) {
     if (!draw) return
     changing = true
     try {
-      draw.deselectFeature(featureId)
+      if (editingMode === 'points') draw.deselectFeature(featureId)
       draw.updateFeatureGeometry(featureId, geometry(mask))
-      draw.selectFeature(featureId)
+      if (editingMode === 'points') draw.selectFeature(featureId)
     } finally {
       changing = false
     }
@@ -751,7 +1092,8 @@
 
   function edgePointerDown(event: PointerEvent) {
     edgeStart = undefined
-    if (event.button !== 0 || drawingNewMask) return
+    insertedPoint = undefined
+    if (event.button !== 0 || drawingNewMask || editingMode !== 'points') return
     const rect = map.getCanvas().getBoundingClientRect()
     const edge = edgeAt([event.clientX - rect.left, event.clientY - rect.top])
     if (!edge) return
@@ -816,6 +1158,13 @@
           // Insert only once a drag starts. Leave draft/history unchanged until
           // Terra Draw finishes dragging the new vertex: one gesture, one undo.
           syncDraft(next)
+          insertedPoint = snapping
+            ? {
+                index: edge.index,
+                mask: next,
+                snap: createMaskSnapper(next, [edge.index], resourceScreen)
+              }
+            : undefined
           const [lng, lat] = toGeo(edge.point)
           const screen = map.project([lng, lat])
           super.onDragStart(
@@ -825,6 +1174,9 @@
           super.onDrag(event, setDraggability)
           return
         } catch (problem) {
+          insertedPoint = undefined
+          snapGuides = []
+          snappedOrigin = undefined
           error = problem instanceof Error ? problem.message : String(problem)
           syncDraft()
         }
@@ -834,6 +1186,9 @@
   }
 
   function edited() {
+    insertedPoint = undefined
+    snapGuides = []
+    snappedOrigin = undefined
     if (!draw || changing) return
     const feature = draw.getSnapshotFeature(featureId)
     if (feature?.geometry.type !== 'Polygon') return
@@ -846,6 +1201,8 @@
         past = [...past.slice(-39), draft]
         future = []
         draft = next
+        clearSelection()
+        vertexTaps.reset()
       }
       error = ''
     } catch (problem) {
@@ -865,6 +1222,7 @@
     if (!past.length) return
     future = [...future, draft]
     draft = past.at(-1)!
+    clearSelection()
     past = past.slice(0, -1)
     syncDraft()
     error = ''
@@ -880,6 +1238,7 @@
     if (!future.length) return
     past = [...past, draft]
     draft = future.at(-1)!
+    clearSelection()
     future = future.slice(0, -1)
     syncDraft()
     error = ''
@@ -925,10 +1284,35 @@
   }
 
   function keyboard(event: KeyboardEvent) {
+    if (
+      event.target instanceof HTMLElement &&
+      event.target.closest('input, textarea, select, [contenteditable="true"]')
+    )
+      return
     if (event.key === 'Escape') {
       event.preventDefault()
-      if (drawingNewMask) cancelNewMask()
+      if (maskGesture) abortMaskGesture()
+      else if (drawingNewMask) cancelNewMask()
+      else if (selectedVertices.length || selectedEdge !== undefined)
+        clearSelection()
       else oncancel()
+    } else if (
+      !drawingNewMask &&
+      editingMode === 'points' &&
+      (event.ctrlKey || event.metaKey) &&
+      event.key.toLowerCase() === 'a'
+    ) {
+      event.preventDefault()
+      event.stopPropagation()
+      selectedVertices = draft.map((_, index) => index)
+    } else if (
+      !drawingNewMask &&
+      selectedVertices.length &&
+      ['Backspace', 'Delete'].includes(event.key)
+    ) {
+      event.preventDefault()
+      event.stopPropagation()
+      removeVertices()
     } else if (
       (event.ctrlKey || event.metaKey) &&
       event.key.toLowerCase() === 'z'
@@ -956,6 +1340,10 @@
     )
     const doubleClickZoom = map.doubleClickZoom.isEnabled()
     const canvas = map.getCanvas()
+    const resize = new ResizeObserver(refreshPointControls)
+    if (actions) resize.observe(actions)
+    map.on('move', refreshPointControls)
+    map.on('resize', refreshPointControls)
     // Establish touch-action before contact: changing it midway through a
     // Pencil stroke is too late to stop the browser taking over that gesture.
     const touchAction = canvas.style.touchAction
@@ -1057,6 +1445,7 @@
       })
       adapter = new MaskMapAdapter({
         map,
+        prefixId: drawPrefix,
         coordinatePrecision: 32,
         ignoreMismatchedPointerEvents: true
       })
@@ -1112,6 +1501,23 @@
                         try {
                           const from = toResource(current)
                           const next = toResource([event.lng, event.lat], from)
+                          if (insertedPoint) {
+                            const { mask, index, snap } = insertedPoint
+                            const start = mask[index]
+                            const delta = snap([
+                              next[0] - start[0],
+                              next[1] - start[1]
+                            ])
+                            const moved = moveMaskPoints(
+                              mask,
+                              [index],
+                              delta,
+                              width,
+                              height
+                            )
+                            showSnap(snap, mask, [index])
+                            return toGeo(moved[index])
+                          }
                           return toGeo(
                             constrainToImage(from, next, width, height)
                           )
@@ -1161,7 +1567,10 @@
       draw.on('finish', finished)
       draw.on('change', () =>
         queueMicrotask(() => {
-          if (ready) refreshDrawingHistory()
+          if (ready) {
+            refreshDrawingHistory()
+            refreshPointControls()
+          }
         })
       )
       canvas.addEventListener('dblclick', outsideDoubleClick, true)
@@ -1182,10 +1591,6 @@
           capture: true,
           passive: false
         })
-      canvas.addEventListener('pointerdown', vertexPointerDown, true)
-      canvas.addEventListener('pointermove', vertexPointerMove, true)
-      canvas.addEventListener('pointerup', vertexPointerUp, true)
-      canvas.addEventListener('pointercancel', vertexPointerCancel, true)
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
         canvas.addEventListener(type, penTouch as EventListener, {
           capture: true,
@@ -1202,6 +1607,10 @@
     }
     return () => {
       ready = false
+      resize.disconnect()
+      map.off('move', refreshPointControls)
+      map.off('resize', refreshPointControls)
+      if (maskGesture) releaseMaskCapture(maskGesture)
       unbindStylus()
       canvas.removeEventListener('dblclick', outsideDoubleClick, true)
       canvas.removeEventListener('pointerdown', outsidePointerDown, true)
@@ -1219,10 +1628,6 @@
       window.removeEventListener('blur', cancelMaskNavigation)
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
         canvas.removeEventListener(type, maskTouch as EventListener, true)
-      canvas.removeEventListener('pointerdown', vertexPointerDown, true)
-      canvas.removeEventListener('pointermove', vertexPointerMove, true)
-      canvas.removeEventListener('pointerup', vertexPointerUp, true)
-      canvas.removeEventListener('pointercancel', vertexPointerCancel, true)
       for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel'])
         canvas.removeEventListener(type, penTouch as EventListener, true)
       map.getCanvas().removeEventListener('pointerdown', edgePointerDown, true)
@@ -1256,15 +1661,106 @@
   })
 </script>
 
-<svelte:window onkeydown={keyboard} />
+<svelte:window
+  onkeydown={keyboard}
+  onpointermove={pointToolMove}
+  onpointerup={pointToolUp}
+  onpointercancel={pointToolCancel}
+/>
 <section
   class="mask-editor"
   class:drawing-shape={drawingShape}
+  class:control-gesture={movingPoints}
   aria-label="Mask editor"
+  style:--mask-accent={failed ? themeColors.red : themeColors.pink}
 >
+  {#if previewPoints.length}
+    <svg class="mask-preview" aria-hidden="true">
+      <polygon
+        points={previewPoints.map((point) => point.join(',')).join(' ')}
+      />
+      {#if !drawingNewMask && editingMode === 'points'}
+        <g class="mask-point-handles">
+          {#each previewPoints as point, index (index)}
+            {#if !selectedVertices.includes(index)}
+              <circle cx={point[0]} cy={point[1]} r="4" />
+            {/if}
+            {@const next = previewPoints[(index + 1) % previewPoints.length]}
+            <circle
+              class="mask-midpoint"
+              cx={(point[0] + next[0]) / 2}
+              cy={(point[1] + next[1]) / 2}
+              r="3"
+            />
+          {/each}
+        </g>
+        <g class="mask-point-selection">
+          {#each previewPoints as point, index (index)}
+            {#if selectedVertices.includes(index)}
+              <circle
+                data-mask-vertex={index}
+                cx={point[0]}
+                cy={point[1]}
+                r="6"
+                fill={failed ? themeColors.red : themeColors.pink}
+              />
+            {/if}
+          {/each}
+        </g>
+      {/if}
+    </svg>
+  {/if}
+  {#if guidePaths.length || snappedOrigin}
+    <svg class="mask-snap-guides" aria-hidden="true">
+      {#each guidePaths as guide, index (index)}
+        <path d={guide.path} class:snapped={guide.active} />
+      {/each}
+      {#if snappedOrigin}
+        <circle
+          class="snap-origin"
+          cx={snappedOrigin[0]}
+          cy={snappedOrigin[1]}
+          r="10"
+        />
+      {/if}
+    </svg>
+  {/if}
+  {#each edgeHandles as point, index (index)}
+    <button
+      class="mask-edge-handle"
+      class:selected={selectedEdge === index}
+      aria-label={`Move edge ${index + 1}`}
+      aria-pressed={selectedEdge === index}
+      data-tooltip="Move edge"
+      style:left={`${point[0]}px`}
+      style:top={`${point[1]}px`}
+      onpointerdown={(event) =>
+        startMaskHandle(event, 'edge', [index, (index + 1) % draft.length])}
+      onkeydown={(event) => edgeHandleKey(event, index)}
+    ></button>
+  {/each}
+  {#if pointControls}
+    <MapControl
+      fold={pointFold}
+      position={pointControls.move.position}
+      label={editingMode === 'edges' ? 'Move edge' : 'Move points'}
+      active={movingPoints}
+      onpointerdown={moveSelectedVertices}
+      ><ArrowsOutCardinal size={19} /></MapControl
+    >
+    {#if editingMode === 'points'}
+      <MapControl
+        fold={pointFold}
+        position={pointControls.remove.position}
+        label="Delete points"
+        disabled={draft.length - selectedVertices.length < 3}
+        onclick={() => removeVertices()}><Trash size={19} /></MapControl
+      >
+    {/if}
+  {/if}
   <div class="bottom-stack mask-editor-stack">
     {#if error}<div class="error-message" role="alert">{error}</div>{/if}
-    <div class="mask-editor-actions">
+    <div class="mask-editor-actions" bind:this={actions}>
       <h2>
         {drawingMode === 'freehand'
           ? 'Draw with pen'
@@ -1274,7 +1770,9 @@
               ? 'Draw rectangle'
               : drawingNewMask
                 ? 'Draw mask'
-                : 'Edit mask'}
+                : editingMode === 'edges'
+                  ? 'Edit lines'
+                  : 'Edit mask'}
       </h2>
       <button
         class="quiet-button"
@@ -1299,7 +1797,7 @@
       >
       <FanMenu
         label="Drawing tools"
-        value={drawingMode ?? 'edit'}
+        value={drawingMode ?? (editingMode === 'edges' ? 'edges' : 'edit')}
         options={drawingOptions}
         disabled={!ready}
         onselect={chooseDrawingTool}
@@ -1309,8 +1807,8 @@
           label="Shape orientation"
           value={shapeOrientation}
           options={[
-            { value: 'view', label: 'Follow view', icon: FrameCorners },
-            { value: 'map', label: 'Follow map', icon: Parallelogram }
+            { value: 'map', label: 'Follow image', icon: Parallelogram },
+            { value: 'view', label: 'Follow view', icon: FrameCorners }
           ]}
           disabled={!ready}
           onselect={(value) => (shapeOrientation = value as ShapeOrientation)}
@@ -1321,7 +1819,7 @@
         aria-label="Reset mask"
         data-tooltip="Reset mask"
         disabled={!ready || drawingNewMask}
-        onclick={resetMask}><ArrowCounterClockwise size={20} /></button
+        onclick={resetMask}><Eraser size={20} /></button
       >
       <button
         class="quiet-button"
@@ -1374,14 +1872,18 @@
     </div>
   </div>
   <p class="sr-only">
-    Drag inside the mask to move it. Drag vertices to edit. Drag any mask edge
-    to add a vertex. Right-click a vertex or double-tap it on touch screens to
-    remove it. Vertices stop at the image boundary. Done or ⌘/Ctrl Enter saves;
-    Escape cancels. Draw new mask replaces the polygon after you click its first
-    point or press Enter. The pen draws a freehand polygon and simplifies the
-    stroke. Release to finish, or click to start and finish. Full image mask
-    restores the image bounds. Reset mask restores the imported original mask.
-    Circle draws from its center; rectangle draws from corner to corner. Shape
+    Drag inside the mask to move it. Click points to select; Shift, Cmd or Ctrl
+    adds or removes points. Touch taps toggle points. Use the point ring to move
+    or delete the selection. Cmd/Ctrl A selects all points; Delete removes them.
+    Drag vertices to edit. In Edit points, drag any mask edge to add a vertex.
+    In Edit lines, drag an edge to move both endpoints without adding a point.
+    Right-click a vertex or double-tap it on touch screens to remove it.
+    Vertices stop at the image boundary. Done or ⌘/Ctrl Enter saves; Escape
+    cancels. Draw new mask replaces the polygon after you click its first point
+    or press Enter. The pen draws a freehand polygon and simplifies the stroke.
+    Release to finish, or click to start and finish. Full image mask restores
+    the image bounds. Reset mask restores the imported original mask. Circle
+    draws from its center; rectangle draws from corner to corner. Shape
     orientation lets both follow the current view or the map's rotation and
     skew. Both stop at the image edges. Escape cancels an unfinished drawing.
   </p>

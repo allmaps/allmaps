@@ -7,6 +7,7 @@ export type SnapUnit = keyof typeof snapUnits
 export type AxisGuide = { origin: Point; axis?: 0 | 1 | 'both' }
 export type MoveSnapper = ((delta: Point) => Point) & { guide?: AxisGuide }
 export type SnapSettings = {
+  mask: boolean
   grid: boolean
   axes: boolean
   rotation: boolean
@@ -17,6 +18,7 @@ export type SnapSettings = {
 
 export function defaultSnapSettings(): SnapSettings {
   return {
+    mask: true,
     grid: false,
     axes: false,
     rotation: false,
@@ -42,6 +44,7 @@ export function parseSnapSettings(value: unknown): SnapSettings {
       ? input.spacing
       : defaults.spacing
   return {
+    mask: typeof input.mask === 'boolean' ? input.mask : defaults.mask,
     grid: input.grid === true,
     axes: input.axes === true,
     rotation: input.rotation === true,

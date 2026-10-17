@@ -48,6 +48,7 @@
   import MapControl from './MapControl.svelte'
   import { buttonTooltips } from './button-tooltips'
   import MaskEditor from './MaskEditor.svelte'
+  import MaskIcon from './MaskIcon.svelte'
   import { env as publicEnv } from './env'
   import type { GeoreferencedMap } from '@allmaps/annotation'
   import { updateLoadFailures } from './load-status'
@@ -85,7 +86,6 @@
     Palette,
     DropHalf,
     MagicWand,
-    Polygon,
     BoundingBox,
     ArrowUp,
     FlipHorizontal,
@@ -2700,7 +2700,7 @@
             position={controls.editMask.position}
             label="Edit mask"
             disabled={busy || locked || selection.length > 1}
-            onclick={editMask}><Polygon size={19} /></MapControl
+            onclick={editMask}><MaskIcon size={19} /></MapControl
           >
         {:else if tool === 'front'}
           <MapControl
@@ -3116,6 +3116,7 @@
   {#if editingMask && map && layer}
     <MaskEditor
       item={editingMask}
+      snapping={snapping.mask}
       failed={!!loadFailures[editingMask.instanceId]?.length}
       {map}
       {layer}

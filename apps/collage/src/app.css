@@ -640,6 +640,80 @@ nav {
   inset: 0;
   pointer-events: none;
 }
+.mask-preview,
+.mask-snap-guides {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.mask-preview polygon {
+  fill: #ffffff;
+  fill-opacity: 0.15;
+  stroke: var(--mask-accent);
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+.mask-point-handles circle {
+  fill: white;
+  stroke: var(--mask-accent);
+  stroke-width: 3;
+}
+.mask-point-handles circle.mask-midpoint {
+  stroke-width: 2;
+  opacity: 0.65;
+}
+.mask-snap-guides {
+  stroke: var(--mask-accent);
+  fill: none;
+  stroke-width: 1.5;
+}
+.mask-snap-guides path {
+  stroke-dasharray: 5 5;
+  opacity: 0.3;
+}
+.mask-snap-guides path.snapped {
+  opacity: 1;
+}
+.mask-edge-handle {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: move;
+}
+.mask-edge-handle::after {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: auto;
+  border: 2px solid var(--mask-accent);
+  border-radius: 3px;
+  background: white;
+  box-shadow: 0 1px 4px #0002;
+}
+.mask-edge-handle:hover::after,
+.mask-edge-handle:focus-visible::after,
+.mask-edge-handle.selected::after,
+.mask-edge-handle:active::after {
+  background: var(--mask-accent);
+}
+@media (pointer: coarse) {
+  .mask-edge-handle {
+    width: 44px;
+    height: 44px;
+  }
+}
+.mask-editor .map-control-button {
+  pointer-events: auto;
+}
 .collage:has(.mask-editor.drawing-shape) .maplibregl-canvas {
   /* Match Terra Draw's drawing cursor while our shapes use its static mode.
      Override its inline cursor only for the duration of these modes. */

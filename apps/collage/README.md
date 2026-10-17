@@ -274,7 +274,21 @@ Warnings stack above these actions, including when the buttons wrap on phones.
 - Drag a vertex to move it, drag anywhere along an edge to add one, and
   right-click or double-tap a vertex to remove it. Dragged points stop at the image boundary,
   including on rotated and warped maps.
-- Open **Drawing tools** for a fan of labeled options: Edit points, Polygon,
+- Click a point to select it; Shift/Cmd/Ctrl-click toggles additional points.
+  On touch screens, tap points to toggle them. Selected points have a small
+  **Move points** / **Delete points** ring. Drag its Move handle or a selected
+  point to move the selection together. Delete/Backspace removes selected points;
+  Cmd/Ctrl+A selects all. A mask must retain at least three points.
+  Escape clears the point selection before cancelling the editor.
+- **Edit lines** lets you drag an edge and move both endpoints together without
+  creating a point. Each edge has a rectangular midpoint handle like the Transform
+  selector. Selecting an edge shows a ring with only **Move edge**;
+  arrow keys nudge a focused handle by one screen pixel (ten with Shift).
+  Switch back to **Edit points** to add points by dragging edges.
+- Point and edge drags snap along the original connected-edge extensions, with
+  highlighted guides, and snap exactly back to their starting position. Selected
+  points move together. Disable this in Settings → Snapping if needed.
+- Open **Drawing tools** for a fan of labeled options: Edit points, Edit lines, Polygon,
   Pen, Circle and Rectangle. The menu supports arrow keys and Escape.
 - Tablet styluses (including Apple Pencil) use captured pointer input for all
   drawing and editing tools. Tap for polygon vertices, or drag and lift for
@@ -297,10 +311,10 @@ Warnings stack above these actions, including when the buttons wrap on phones.
   drawing, not just because Pen is selected.
 - **Circle** draws from center to edge; **Rectangle** draws between opposite
   corners. **Shape orientation** appears beside Drawing tools for both shapes.
-  **Follow view** (the default) keeps circles round and rectangles aligned with
-  the screen, even on skewed or mirrored maps. **Follow map** draws in the
-  original image's coordinates: circles become ellipses on skewed maps, and
-  rectangles follow the map's rotation, unequal scale and shear. The choice
+  **Follow image** (the default) draws in the original image's coordinates:
+  circles become ellipses on skewed maps, and rectangles follow the map's
+  rotation, unequal scale and shear. **Follow view** keeps circles round and
+  rectangles aligned with the screen, even on skewed or mirrored maps. The choice
   applies to both tools for the current mask editing session and does not change
   an existing mask. Drag to draw and release to finish.
   Shapes stay within the image bounds and become ordinary editable polygons.
@@ -313,7 +327,8 @@ Warnings stack above these actions, including when the buttons wrap on phones.
 - **Full image mask** replaces the draft with the image rectangle.
 - Use the editor's undo/redo controls for vertex edits, replacement polygons,
   and individual points while polygon drawing. Drawing a shape, moving a mask,
-  resetting it, pen strokes, full-mask replacement each
+  moving selected points or an edge, deleting points, resetting it, pen strokes,
+  full-mask replacement each
   form one undo step. Undo during pen drawing
   cancels the unfinished stroke. **Done** is disabled until a new polygon
   has been closed.
@@ -380,6 +395,13 @@ active axis while the other coordinate stays fixed. Groups and multiple selectio
 preserving their spacing. These settings also apply to the Move control,
 Alt/Option-drag duplicates and dragging inside the Transform selector. They
 are remembered in this browser.
+
+**Snap mask points and lines** is enabled by default, including for existing
+saved settings. It attracts edited points and edges to the extensions of their
+connected edges, preserving those directions, or back to their drag origin.
+Tolerance follows screen pixels through zoom, rotation and skew. Faint guides
+show the connected edges; active guides brighten. Guides are temporary and do
+not appear in exports. Disabling this preference is remembered in this browser.
 
 **Snap rotation** snaps drags to a configurable angle step (15° by default),
 using the rotation tool or the Transform selector, including groups and multiple

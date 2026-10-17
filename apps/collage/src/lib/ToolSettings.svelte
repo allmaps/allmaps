@@ -258,6 +258,15 @@
       <section class="snap-settings" aria-labelledby="snapping-title">
         <h3 id="snapping-title">Snapping</h3>
         <label class="snap-toggle">
+          <span>Snap mask points and lines</span>
+          <input
+            type="checkbox"
+            checked={snapping.mask}
+            onchange={(event) =>
+              onsnapchange({ ...snapping, mask: event.currentTarget.checked })}
+          />
+        </label>
+        <label class="snap-toggle">
           <span>Snap to grid</span>
           <input
             type="checkbox"

@@ -18,8 +18,9 @@ const close = (actual: Point, expected: Point) =>
     assert.ok(Math.abs(value - expected[i]) < 1e-8, `${actual} != ${expected}`)
   )
 
-test('snapping is opt-in, persists units and recovers invalid stored settings', () => {
+test('map snapping is opt-in, mask snapping defaults on, and settings persist safely', () => {
   assert.deepEqual(defaults, {
+    mask: true,
     grid: false,
     axes: false,
     rotation: false,
@@ -30,6 +31,7 @@ test('snapping is opt-in, persists units and recovers invalid stored settings', 
   for (const invalid of [null, undefined, 'bad', []])
     assert.deepEqual(parseSnapSettings(invalid), defaults)
   const settings = {
+    mask: false,
     grid: true,
     axes: true,
     rotation: true,
@@ -54,6 +56,8 @@ test('snapping is opt-in, persists units and recovers invalid stored settings', 
     { ...defaults, grid: true, spacing: 0.5, unit: 'km' }
   )
   assert.equal(parseSnapSettings({ rotation: 'true' }).rotation, false)
+  assert.equal(parseSnapSettings({ axes: true }).mask, true)
+  assert.equal(parseSnapSettings({ mask: 'false' }).mask, true)
 })
 
 test('disabled snapping preserves even subpixel movements exactly', () => {

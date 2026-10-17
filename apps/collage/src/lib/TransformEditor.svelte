@@ -6,7 +6,7 @@
   import {
     Check,
     X,
-    ArrowCounterClockwise,
+    Eraser,
     Rectangle,
     Plus,
     Minus,
@@ -681,7 +681,7 @@
         class="quiet-button"
         aria-label="Reset transform"
         data-tooltip="Reset"
-        onclick={() => reset()}><ArrowCounterClockwise size={20} /></button
+        onclick={() => reset()}><Eraser size={20} /></button
       >
       {#if hasPolynomial}
         <button
