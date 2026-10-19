@@ -9,7 +9,8 @@ import {
   NavDateSchema,
   filterValidItems,
   oneOrMany,
-  parseIfValid
+  parseIfValid,
+  optionalValue
 } from '../schemas/shared.js'
 
 export const SingleValue2Schema = z
@@ -23,8 +24,8 @@ export const Value2Schema = z.union([
 
 export const RelatedItem2Schema = z.object({
   '@id': z.string().url(),
-  format: z.string().optional(),
-  label: Value2Schema.optional()
+  format: optionalValue(z.string()),
+  label: optionalValue(Value2Schema)
 })
 
 export const Related2Schema = z.union([
@@ -38,10 +39,10 @@ export const ThumbnailItem2Schema = z.union([
   z.string(),
   z.object({
     '@id': z.string(),
-    '@type': z.string().optional(),
-    format: z.string().optional(),
-    height: z.number().optional(),
-    width: z.number().optional()
+    '@type': optionalValue(z.string()),
+    format: optionalValue(z.string()),
+    height: optionalValue(z.number()),
+    width: optionalValue(z.number())
   })
 ])
 
@@ -49,9 +50,9 @@ export const Thumbnail2Schema = oneOrMany(ThumbnailItem2Schema)
 
 export const RenderingItem2Schema = z.object({
   '@id': z.string().url(),
-  '@type': z.string().optional(),
-  label: Value2Schema.optional(),
-  format: z.string().optional()
+  '@type': optionalValue(z.string()),
+  label: optionalValue(Value2Schema),
+  format: optionalValue(z.string())
 })
 
 export const Rendering2Schema = oneOrMany(RenderingItem2Schema)
@@ -60,9 +61,12 @@ export const License2Schema = oneOrMany(z.string())
 
 const ValidLanguageValue2Schema = z
   .union([
-    z.object({ '@value': Value2Schema, '@language': z.string().optional() }),
+    z.object({
+      '@value': Value2Schema,
+      '@language': optionalValue(z.string())
+    }),
     // This is invalid but some IIIF manifests use this incorrect format
-    z.object({ value: Value2Schema, language: z.string().optional() })
+    z.object({ value: Value2Schema, language: optionalValue(z.string()) })
   ])
   .transform((val) => {
     if ('value' in val) {
@@ -89,8 +93,8 @@ export const Attribution2Schema = z.union([
 ])
 
 const ValidMetadataItem2Schema = z.object({
-  label: PossibleLanguageValue2Schema.optional(),
-  value: PossibleLanguageValue2Schema.optional()
+  label: optionalValue(PossibleLanguageValue2Schema),
+  value: optionalValue(PossibleLanguageValue2Schema)
 })
 
 // Invalid metadata items are intentionally skipped.
@@ -99,8 +103,8 @@ export const MetadataItem2Schema = parseIfValid(ValidMetadataItem2Schema)
 export const Metadata2Schema = filterValidItems(ValidMetadataItem2Schema)
 
 export const ImageResource2Schema = z.object({
-  width: z.number().int().optional(),
-  height: z.number().int().optional(),
+  width: optionalValue(z.number().int()),
+  height: optionalValue(z.number().int()),
   service: ImageServiceSchema
 })
 
@@ -110,20 +114,20 @@ export const Annotation2Schema = z.object({
 
 export const Canvas2Schema = z.object({
   '@id': z.string().url(),
-  '@type': z.literal('sc:Canvas').optional(),
+  '@type': optionalValue(z.literal('sc:Canvas')),
   width: z.number().int(),
   height: z.number().int(),
   images: Annotation2Schema.array().length(1),
-  label: PossibleLanguageValue2Schema.optional(),
-  description: PossibleLanguageValue2Schema.optional(),
-  related: Related2Schema.optional(),
-  attribution: Attribution2Schema.optional(),
-  license: License2Schema.optional(),
-  thumbnail: Thumbnail2Schema.optional(),
-  rendering: Rendering2Schema.optional(),
-  metadata: Metadata2Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional()
+  label: optionalValue(PossibleLanguageValue2Schema),
+  description: optionalValue(PossibleLanguageValue2Schema),
+  related: optionalValue(Related2Schema),
+  attribution: optionalValue(Attribution2Schema),
+  license: optionalValue(License2Schema),
+  thumbnail: optionalValue(Thumbnail2Schema),
+  rendering: optionalValue(Rendering2Schema),
+  metadata: optionalValue(Metadata2Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema)
 })
 
 const ManifestCanvas2Schema = Canvas2Schema.extend({
@@ -145,84 +149,84 @@ export const Manifest2Schema = z.object({
   '@id': z.string().url(),
   '@type': z.literal('sc:Manifest'),
   sequences: Sequence2Schema.array().length(1),
-  label: PossibleLanguageValue2Schema.optional(),
-  description: PossibleLanguageValue2Schema.optional(),
-  metadata: Metadata2Schema.optional(),
-  related: Related2Schema.optional(),
-  attribution: Attribution2Schema.optional(),
-  license: License2Schema.optional(),
-  rendering: Rendering2Schema.optional(),
-  thumbnail: Thumbnail2Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional()
+  label: optionalValue(PossibleLanguageValue2Schema),
+  description: optionalValue(PossibleLanguageValue2Schema),
+  metadata: optionalValue(Metadata2Schema),
+  related: optionalValue(Related2Schema),
+  attribution: optionalValue(Attribution2Schema),
+  license: optionalValue(License2Schema),
+  rendering: optionalValue(Rendering2Schema),
+  thumbnail: optionalValue(Thumbnail2Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema)
 })
 
 export const EmbeddedManifest2Schema = z.object({
   '@id': z.string().url(),
   '@type': z.literal('sc:Manifest'),
-  label: PossibleLanguageValue2Schema.optional(),
-  description: PossibleLanguageValue2Schema.optional(),
-  metadata: Metadata2Schema.optional(),
-  thumbnail: Thumbnail2Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional()
+  label: optionalValue(PossibleLanguageValue2Schema),
+  description: optionalValue(PossibleLanguageValue2Schema),
+  metadata: optionalValue(Metadata2Schema),
+  thumbnail: optionalValue(Thumbnail2Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema)
 })
 
 export const EmbeddedCollection2Schema = z.object({
   '@id': z.string().url(),
   '@type': z.literal('sc:Collection'),
-  label: PossibleLanguageValue2Schema.optional(),
-  description: PossibleLanguageValue2Schema.optional(),
-  metadata: Metadata2Schema.optional(),
-  thumbnail: Thumbnail2Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional()
+  label: optionalValue(PossibleLanguageValue2Schema),
+  description: optionalValue(PossibleLanguageValue2Schema),
+  metadata: optionalValue(Metadata2Schema),
+  thumbnail: optionalValue(Thumbnail2Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema)
 })
 
 export const Collection2Schema = z.object({
   '@id': z.string().url(),
   '@type': z.literal('sc:Collection'),
   get manifests() {
-    return z
-      .array(
+    return optionalValue(
+      z.array(
         z.union([
           EmbeddedManifest2Schema,
           Collection2Schema,
           EmbeddedCollection2Schema
         ])
       )
-      .optional()
+    )
   },
   get collections() {
-    return z
-      .array(
+    return optionalValue(
+      z.array(
         z.union([
           EmbeddedManifest2Schema,
           Collection2Schema,
           EmbeddedCollection2Schema
         ])
       )
-      .optional()
+    )
   },
   get members() {
-    return z
-      .array(
+    return optionalValue(
+      z.array(
         z.union([
           EmbeddedManifest2Schema,
           Collection2Schema,
           EmbeddedCollection2Schema
         ])
       )
-      .optional()
+    )
   },
-  label: PossibleLanguageValue2Schema.optional(),
-  description: PossibleLanguageValue2Schema.optional(),
-  metadata: Metadata2Schema.optional(),
-  thumbnail: Thumbnail2Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional(),
-  related: Related2Schema.optional(),
-  attribution: Attribution2Schema.optional(),
-  license: License2Schema.optional(),
-  rendering: Rendering2Schema.optional()
+  label: optionalValue(PossibleLanguageValue2Schema),
+  description: optionalValue(PossibleLanguageValue2Schema),
+  metadata: optionalValue(Metadata2Schema),
+  thumbnail: optionalValue(Thumbnail2Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema),
+  related: optionalValue(Related2Schema),
+  attribution: optionalValue(Attribution2Schema),
+  license: optionalValue(License2Schema),
+  rendering: optionalValue(Rendering2Schema)
 })
