@@ -143,11 +143,25 @@ describe('Polynomial transformation, order 1', async () => {
   })
 })
 
-describe('Polynomial transformation, order 1, roundtrip', async () => {
+describe('Polynomial transformation, order 1, 3 GCPs, roundtrip', async () => {
   const transformer = new GcpTransformer(gcps3, 'polynomial')
   const resourcePoint: Point = [100, 100]
 
-  test(`should have the same output as running GDAL's gdaltransform`, () => {
+  test(`should do a roundtrip since polynomial1 and 3 GCPs`, () => {
+    expectToBeCloseToArray(
+      transformer.transformToResource(
+        transformer.transformToGeo(resourcePoint)
+      ),
+      resourcePoint
+    )
+  })
+})
+
+describe('Polynomial transformation, order 1, 6 GCPs, roundtrip', async () => {
+  const transformer = new GcpTransformer(gcps6, 'polynomial1')
+  const resourcePoint: Point = [1000, 1000]
+
+  test(`should do a roundtrip since exact inverse for polynomial1`, () => {
     expectToBeCloseToArray(
       transformer.transformToResource(
         transformer.transformToGeo(resourcePoint)
