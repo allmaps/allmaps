@@ -2,6 +2,7 @@
 // https://iiif.io/api/image/1.1/#image-information
 
 import { z } from 'zod'
+import { optionalValue } from './shared.js'
 
 export const image1ProfileUriRegex =
   /^https?:\/\/library.stanford.edu\/iiif\/image-api\/1.1\/compliance.html#level(?<level>[012])$/
@@ -22,10 +23,10 @@ export const Image1Context = z.literal(Image1ContextString)
 export const Image1Schema = z.object({
   '@context': Image1Context,
   '@id': z.string().url(),
-  profile: Image1ProfileUri.optional(),
+  profile: optionalValue(Image1ProfileUri),
   width: z.number().int(),
   height: z.number().int(),
-  scale_factors: z.number().array().optional(),
-  tile_width: z.number().optional(),
-  tile_height: z.number().optional()
+  scale_factors: optionalValue(z.number().array()),
+  tile_width: optionalValue(z.number()),
+  tile_height: optionalValue(z.number())
 })
