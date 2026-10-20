@@ -61,15 +61,18 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
         }
       }
     },
-    socialProviders: {
-      github: {
-        clientId: env.GITHUB_CLIENT_ID,
-        clientSecret: env.GITHUB_CLIENT_SECRET,
-        mapProfileToUser: (profile) => ({
-          slug: profile.login.toLowerCase()
-        })
-      }
-    },
+    socialProviders:
+      env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+        ? {
+            github: {
+              clientId: env.GITHUB_CLIENT_ID,
+              clientSecret: env.GITHUB_CLIENT_SECRET,
+              mapProfileToUser: (profile) => ({
+                slug: profile.login.toLowerCase()
+              })
+            }
+          }
+        : {},
     trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
     // experimental: { joins: true },
     plugins: [

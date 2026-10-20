@@ -137,6 +137,8 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
       '/login/github',
       async ({ set, query }) => {
         setCacheControl(set, 'private-no-store')
+        if (!auth.options.socialProviders.github)
+          throw new ResponseError('GitHub login is not configured', 404)
         const callbackURL = query.returnTo ?? '/'
 
         const result = await auth.handler(
