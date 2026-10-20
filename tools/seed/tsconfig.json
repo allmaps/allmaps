@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2024",
+    "composite": false,
+    "declaration": false,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "module": "esnext",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "paths": {}
+  },
+  "include": ["src/**/*.ts", "../../apis/live/src/*.d.ts"]
+}
