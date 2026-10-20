@@ -8,9 +8,11 @@ import { defineConfig } from 'drizzle-kit'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '../..')
 
-for (const name of ['.env.localhost.local', '.env.localhost']) {
-  const path = resolve(root, name)
-  if (existsSync(path)) loadEnvFile(path)
+if (process.env.CI !== 'true') {
+  for (const name of ['.env.localhost.local', '.env.localhost']) {
+    const path = resolve(root, name)
+    if (existsSync(path)) loadEnvFile(path)
+  }
 }
 
 // Supply a direct connection as DATABASE_URL for administrative commands
@@ -19,7 +21,7 @@ const databaseUrl = process.env.DATABASE_URL
 
 if (!databaseUrl) {
   throw new Error(
-    'Missing DATABASE_URL. Make sure .env.localhost.local exists with DATABASE_URL set.'
+    'Missing DATABASE_URL. Set it explicitly in CI, or in .env.localhost.local for local commands.'
   )
 }
 

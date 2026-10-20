@@ -1,9 +1,15 @@
 import { temporaryDirectory } from './helpers/context.ts'
-import { mkdir, writeFile, rm, stat } from 'node:fs/promises'
+import { mkdir, writeFile, rm, stat, rename } from 'node:fs/promises'
 import { join } from 'node:path'
 import { PGlite } from '@electric-sql/pglite'
 import { postgis } from '@electric-sql/pglite-postgis'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { drizzle } from 'drizzle-orm/pglite'
+import {
+  ciDatabaseUrl,
+  loadMigrations,
+  migrateDatabase
+} from '@allmaps/db/migrations'
 import {
   checkMigrations,
   initializePglite,
@@ -263,4 +269,203 @@ it('only sends read queries through the PostgreSQL adapter, for empty and migrat
   expect(
     (await client.query("SELECT to_regclass('example') AS name")).rows
   ).toEqual([{ name: 'example' }])
+})
+
+const migrateCi = () => migrateDatabase(drizzle({ client }), directory)
+
+it('CI validates legacy history before Drizzle upgrades it, migrates and safely repeats', async () => {
+  await migration(first, 'CREATE TABLE example (value int);')
+  await initialize()
+  await client.exec(`
+    INSERT INTO example VALUES (42);
+    ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN name;
+    ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN applied_at;
+  `)
+  await migration(second, 'ALTER TABLE example ADD COLUMN note text;')
+  expect(await migrateCi()).toEqual([second])
+  expect((await client.query('SELECT * FROM example')).rows).toEqual([
+    { value: 42, note: null }
+  ])
+  expect(await migrateCi()).toEqual([])
+  await check()
+})
+
+it('CI refuses invalid history before invoking Drizzle or upgrading metadata', async () => {
+  await migration(first, 'CREATE TABLE example (value int);')
+  await initialize()
+  await client.exec('ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN name')
+  await migration(first, 'DROP TABLE example;')
+  await expect(migrateCi()).rejects.toThrow('changed')
+  expect(
+    (
+      await client.query(`
+    SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'drizzle' AND column_name = 'name'
+  `)
+    ).rows
+  ).toEqual([])
+})
+
+it('CI rolls back failed migrations and can retry after correcting pending SQL', async () => {
+  await migration(first, 'CREATE TABLE example (value int);')
+  await initialize()
+  await client.exec('INSERT INTO example VALUES (42)')
+  await migration(second, 'UPDATE example SET value = 99;')
+  await migration('20260103000000_third', 'SELECT nonexistent_column;')
+  await expect(migrateCi()).rejects.toThrow()
+  expect((await client.query('SELECT * FROM example')).rows).toEqual([
+    { value: 42 }
+  ])
+  await rm(join(directory, '20260103000000_third'), { recursive: true })
+  expect(await migrateCi()).toEqual([second])
+})
+
+it('CI requires existing migration metadata and PostGIS before invoking Drizzle', async () => {
+  await migration(first, 'CREATE TABLE example (value int);')
+  await expect(migrateCi()).rejects.toThrow('no Drizzle migration history')
+  await initialize()
+  await client.exec('DROP EXTENSION postgis')
+  await migration(second, 'ALTER TABLE example ADD COLUMN note text;')
+  await expect(migrateCi()).rejects.toThrow('PostGIS must be installed')
+})
+
+it('rejects duplicate and reordered applied history before invoking Drizzle', async () => {
+  await migration(first, 'CREATE TABLE example (value int);')
+  await migration(second, 'ALTER TABLE example ADD COLUMN note text;')
+  await initialize()
+  await client.exec(`
+    INSERT INTO drizzle.__drizzle_migrations (hash, created_at, name)
+    SELECT hash, created_at, name FROM drizzle.__drizzle_migrations WHERE id = 1;
+  `)
+  await expect(migrateCi()).rejects.toThrow('duplicated')
+  await client.exec(`
+    DELETE FROM drizzle.__drizzle_migrations WHERE id = 3;
+    UPDATE drizzle.__drizzle_migrations SET id = 3 WHERE id = 1;
+  `)
+  await expect(migrateCi()).rejects.toThrow('out of order')
+})
+
+it('rejects incomplete folders and duplicate migration timestamps', async () => {
+  await migration(first, 'SELECT 1;')
+  await rm(join(directory, first, 'snapshot.json'))
+  expect(() => loadMigrations(directory)).toThrow()
+  await migration(first, 'SELECT 1;')
+  await rm(join(directory, first, 'migration.sql'))
+  expect(() => loadMigrations(directory)).toThrow()
+  await mkdir(join(directory, first, 'migration.sql'))
+  expect(() => loadMigrations(directory)).toThrow('Missing migration SQL file')
+  await rm(join(directory, first, 'migration.sql'), { recursive: true })
+  await migration(first, 'SELECT 1;')
+  await migration('20260101000000_same_timestamp', 'SELECT 2;')
+  expect(() => loadMigrations(directory)).toThrow(
+    'duplicate migration timestamp'
+  )
+})
+
+it('CI requires an explicit direct PostgreSQL URL without loading local environment files', () => {
+  const url = 'postgresql://test:unused@database.invalid/test'
+  expect(ciDatabaseUrl({ CI: 'true', DATABASE_URL: url })).toBe(url)
+  expect(() => ciDatabaseUrl({ DATABASE_URL: url })).toThrow('CI=true')
+  expect(() => ciDatabaseUrl({ CI: 'true' })).toThrow('direct PostgreSQL')
+  for (const value of [
+    'file:///tmp/db',
+    'not-a-url',
+    'postgresql://test:unused@ep-test-pooler.eu.neon.tech/db'
+  ])
+    expect(() => ciDatabaseUrl({ CI: 'true', DATABASE_URL: value })).toThrow(
+      'direct PostgreSQL'
+    )
+})
+
+it('keeps the advisory lock, metadata upgrade, SQL and verification in one transaction', async () => {
+  await migration(first, 'CREATE TABLE example (value int);')
+  await initialize()
+  await client.exec(`
+    INSERT INTO example VALUES (42);
+    ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN name;
+    ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN applied_at;
+  `)
+  await migration(second, 'UPDATE example SET value = 99;')
+  // Simulate a migrator that runs SQL but fails to retain its history entry.
+  await client.exec(`
+    CREATE RULE skip_migration_history AS ON INSERT TO drizzle.__drizzle_migrations
+      DO INSTEAD NOTHING;
+  `)
+  await expect(migrateCi()).rejects.toThrow('pending migrations remain')
+  expect((await client.query('SELECT * FROM example')).rows).toEqual([
+    { value: 42 }
+  ])
+  expect(
+    (
+      await client.query(`
+    SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'drizzle' AND column_name IN ('name', 'applied_at')
+  `)
+    ).rows
+  ).toEqual([])
+  await client.exec(
+    'DROP RULE skip_migration_history ON drizzle.__drizzle_migrations'
+  )
+  expect(await migrateCi()).toEqual([second])
+  expect((await client.query('SELECT * FROM example')).rows).toEqual([
+    { value: 99 }
+  ])
+  expect(await migrateCi()).toEqual([])
+})
+
+it.each([false, true])(
+  'rejects changed applied folder timestamps (legacy metadata: %s)',
+  async (legacy) => {
+    await migration(first, 'CREATE TABLE example (value int);')
+    await initialize()
+    if (legacy)
+      await client.exec(`
+        ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN name;
+        ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN applied_at;
+      `)
+    const history = (
+      await client.query('SELECT * FROM drizzle.__drizzle_migrations')
+    ).rows
+    await rename(join(directory, first), join(directory, second))
+    await expect(migrateCi()).rejects.toThrow('changed')
+    expect(
+      (await client.query('SELECT * FROM drizzle.__drizzle_migrations')).rows
+    ).toEqual(history)
+  }
+)
+
+it('matches legacy timestamps at second precision even when SQL hashes repeat', async () => {
+  await migration(first, 'SELECT 1;')
+  await migration(second, 'SELECT 1;')
+  await initialize()
+  await client.exec(`
+    ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN name;
+    ALTER TABLE drizzle.__drizzle_migrations DROP COLUMN applied_at;
+    UPDATE drizzle.__drizzle_migrations SET created_at = created_at + 123;
+  `)
+  expect(await migrateCi()).toEqual([])
+  const third = '20260103000000_third'
+  await migration(third, 'CREATE TABLE example (value int);')
+  expect(await migrateCi()).toEqual([third])
+  expect(
+    (
+      await client.query(
+        'SELECT name FROM drizzle.__drizzle_migrations ORDER BY id'
+      )
+    ).rows
+  ).toEqual([{ name: first }, { name: second }, { name: third }])
+  expect(await migrateCi()).toEqual([])
+})
+
+it('stops before validation or migration when the advisory lock is unavailable', async () => {
+  const execute = vi.fn(async () => ({ rows: [{ acquired: false }] }))
+  const transaction = vi.fn(async (run) => run({ execute }))
+  const database = { transaction } as unknown as Parameters<
+    typeof migrateDatabase
+  >[0]
+  await expect(migrateDatabase(database, directory)).rejects.toThrow(
+    'Another Allmaps migration is running'
+  )
+  expect(transaction).toHaveBeenCalledTimes(1)
+  expect(execute).toHaveBeenCalledTimes(1)
 })
