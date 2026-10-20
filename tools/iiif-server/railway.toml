@@ -2,9 +2,9 @@
 
 [build]
 builder = "RAILPACK"
-buildCommand = "pnpm turbo run build --filter=@allmaps/test-iiif-server..."
+buildCommand = "pnpm turbo run build --filter=@allmaps/tools-iiif-server..."
 watchPatterns = [
-  "test/server/**",
+  "tools/iiif-server/**",
   "packages/annotation/**",
   "packages/iiif-parser/**",
   "packages/id/**",
@@ -20,7 +20,7 @@ watchPatterns = [
 ]
 
 [deploy]
-startCommand = "pnpm --filter @allmaps/test-iiif-server start"
+startCommand = "pnpm --filter @allmaps/tools-iiif-server start"
 healthcheckPath = "/"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10

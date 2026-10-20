@@ -111,6 +111,8 @@ catalog:
   upng-js: ^2.1.0
 
   # General utilities
+  commander: ^13.0.0
+  '@commander-js/extra-typings': ^13.0.0
   '@types/lodash-es': ^4.17
   lodash-es: ^4.17
 

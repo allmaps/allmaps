@@ -1,9 +1,16 @@
-# Test IIIF Server
+# IIIF fixture server
 
-Small SvelteKit-powered IIIF fixture server for local tests.
+SvelteKit-powered IIIF fixture server and catalog for development and tests.
+This workspace owns the images, metadata, response handlers, importer, and
+fixture-server tests. The API runner and demo seed use its exported handler
+through `@allmaps/tools-iiif-server`, without starting this SvelteKit app.
+
+`getIiifFixtureResponse(uri)` and `getIiifFixtureJson(uri)` read fixtures directly
+without network access. `handleFixtureRequest` also remains available for callers
+that already have parsed route parameters.
 
 ```sh
-pnpm --filter @allmaps/test-iiif-server dev
+pnpm --filter @allmaps/tools-iiif-server dev
 ```
 
 Vite serves the fixture endpoints on port `5506`, using the `iiif` entry in
@@ -15,15 +22,17 @@ variant sends permissive CORS headers, while `/no-cors` omits them.
 ## Railway deployment
 
 This app uses `@sveltejs/adapter-node` and can be deployed on Railway with the
-root `railway.toml` config-as-code file.
+`tools/iiif-server/railway.toml` config-as-code file.
 
-When creating the Railway service from this monorepo, use `/railway.toml` as the
-service config file if Railway does not pick it up automatically. The config
+When creating the Railway service from this monorepo, use `/tools/iiif-server/railway.toml` as the
+service config file. Existing services pointing at `/test/server/railway.toml`
+need that setting updated after the move; keep the build root at the repository
+root. The config
 uses Railpack and runs:
 
 ```sh
-pnpm turbo run build --filter=@allmaps/test-iiif-server...
-pnpm --filter @allmaps/test-iiif-server start
+pnpm turbo run build --filter=@allmaps/tools-iiif-server...
+pnpm --filter @allmaps/tools-iiif-server start
 ```
 
 Railway provides the `PORT` environment variable, which the SvelteKit node
@@ -144,7 +153,7 @@ Import an Allmaps georeference annotation into
 `static/iiif/images/:imageId`:
 
 ```sh
-pnpm --filter @allmaps/test-iiif-server import -- https://annotations.allmaps.org/images/3cb37d72bcca2b80
+pnpm --filter @allmaps/tools-iiif-server run import https://annotations.allmaps.org/images/3cb37d72bcca2b80
 ```
 
 The importer:
@@ -164,7 +173,7 @@ The importer:
 Optional overrides:
 
 ```sh
-pnpm --filter @allmaps/test-iiif-server import -- ./annotation.json --id my-map --label "My map"
+pnpm --filter @allmaps/tools-iiif-server run import ./annotation.json --id my-map --label "My map"
 ```
 
 ## Fixture provenance
