@@ -1,0 +1,39 @@
+{
+  "name": "@allmaps/tools-apis",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "dev:apis": "pnpm -w build:apis && node src/cli.ts",
+    "db:migrate": "node src/cli.ts migrate",
+    "seed:pglite": "node src/cli.ts seed --db=pglite",
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src && eslint src"
+  },
+  "dependencies": {
+    "@allmaps/api-shared": "workspace:^",
+    "@allmaps/db": "workspace:^",
+    "@allmaps/env": "workspace:^",
+    "@electric-sql/pglite": "catalog:",
+    "@electric-sql/pglite-postgis": "catalog:",
+    "better-call": "^1.3.7",
+    "drizzle-orm": "catalog:",
+    "@elysia/node": "catalog:",
+    "elysia": "catalog:",
+    "postgres": "catalog:",
+    "@allmaps/api-live": "workspace:*",
+    "@allmaps/api-rest": "workspace:*",
+    "@allmaps/api-annotations": "workspace:*",
+    "@allmaps/tools-seed": "workspace:*",
+    "@allmaps/tools-setup": "workspace:*",
+    "@allmaps/tools-iiif-server": "workspace:*",
+    "commander": "catalog:",
+    "@commander-js/extra-typings": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:"
+  }
+}

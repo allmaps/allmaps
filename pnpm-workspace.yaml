@@ -67,6 +67,7 @@ catalog:
   wrangler: ^4.97.0
 
   # APIs, authentication, databases and collaboration
+  '@elysia/node': 1.4.6
   '@elysiajs/cors': ^1.4
   '@elysiajs/openapi': ^1.4
   '@neondatabase/serverless': ^1.0
@@ -75,6 +76,7 @@ catalog:
   '@types/sharedb': ^3.3.12
   better-auth: ^1.5.0
   '@electric-sql/pglite': 0.5.8
+  '@electric-sql/pglite-postgis': 0.2.8
   drizzle-kit: ^1.0.0-beta.17
   drizzle-orm: ^1.0.0-beta.17
   elysia: ^1.4
