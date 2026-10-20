@@ -11,9 +11,7 @@ functions as the API:
 
 ## Environment
 
-- `DATABASE_URL`: Postgres connection string
-- `DIRECT_DATABASE_URL`: direct Postgres connection string, preferred over
-  `DATABASE_URL` when set
+- `DATABASE_URL`: Postgres connection string for this export job
 - `ANNOTATIONS_BASE_URL`: base URL for annotation/map links, defaults to
   `https://annotations.allmaps.org`
 - `DATA_EXPORT_OUTPUT_DIR`: output directory, defaults to `./data`
