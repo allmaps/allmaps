@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export type ImageFixtureMetadata = {
   id?: string
@@ -42,9 +43,17 @@ const builtFixturesDirectory = join(
   'images'
 )
 
-export const fixturesDirectory = existsSync(sourceFixturesDirectory)
-  ? sourceFixturesDirectory
-  : builtFixturesDirectory
+// Also support calling the fixture handlers from another workspace's tests.
+const moduleFixturesDirectory = fileURLToPath(
+  new URL('../../static/iiif/images/', import.meta.url)
+)
+
+export const fixturesDirectory =
+  [
+    sourceFixturesDirectory,
+    moduleFixturesDirectory,
+    builtFixturesDirectory
+  ].find((directory) => existsSync(directory)) ?? builtFixturesDirectory
 
 export function getFixtureDirectory(imageId: string) {
   return join(fixturesDirectory, imageId)

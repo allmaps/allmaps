@@ -106,7 +106,6 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@turf/rewind": "catalog:",
-    "better-auth": "catalog:",
     "bits-ui": "catalog:",
     "d3-geo": "catalog:",
     "flatbush": "^4.4.0",

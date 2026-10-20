@@ -16,8 +16,8 @@ import type { XYZTile, TransformationOptions, TileResolution } from './types.js'
 // Import WASM initialization and module for Cloudflare Workers
 import wasmInit, * as wasmModule from '@allmaps/render-wasm'
 
-// THe worker wants the direct path to the WASM file, so we import it as a URL
-import wasmFile from '../../../../packages/render-wasm/pkg/allmaps_render_wasm_bg.wasm'
+// Wrangler bundles the package's WASM export as a compiled module.
+import wasmFile from '@allmaps/render-wasm/wasm'
 
 // Initialize WASM module (Cloudflare Workers support top-level await)
 // Use new wasm-bindgen initialization API with module_or_path parameter

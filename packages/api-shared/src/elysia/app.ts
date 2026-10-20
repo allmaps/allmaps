@@ -1,4 +1,4 @@
-import { Elysia } from 'elysia'
+import { Elysia, ElysiaCustomStatusResponse } from 'elysia'
 
 import type { SingletonBase, ElysiaConfig } from 'elysia'
 
@@ -18,6 +18,7 @@ export function createElysia<TEnv, const BasePath extends string = ''>(
     ({ response, set }) => {
       if (
         response instanceof Response ||
+        response instanceof ElysiaCustomStatusResponse ||
         response === undefined ||
         response === null ||
         typeof response !== 'object'

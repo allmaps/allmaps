@@ -10,7 +10,8 @@
     "paths": {
       "json0-ot-diff": ["./src/json0-ot-diff.d.ts"],
       "@teamwork/websocket-json-stream": ["./src/websocket-json-stream.d.ts"]
-    }
+    },
+    "rewriteRelativeImportExtensions": true
   },
   "references": [
     { "path": "../../packages/api-shared" },

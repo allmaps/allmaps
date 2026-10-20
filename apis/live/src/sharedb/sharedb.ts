@@ -5,6 +5,7 @@ import jsondiff from 'json0-ot-diff'
 import diffMatchPatch from 'diff-match-patch'
 import { groupBy } from 'ramda'
 import { debounce } from 'lodash-es'
+import { debuglog } from 'node:util'
 
 import { sql, eq, and } from 'drizzle-orm'
 
@@ -18,8 +19,8 @@ import {
   getProjectionByDbId
 } from '@allmaps/api-shared/projections'
 
-import { isGcpsValid, isResourceMaskValid } from '../shared/validate.js'
-import ShareDbPostgresDb from './postgres.js'
+import { isGcpsValid, isResourceMaskValid } from '../shared/validate.ts'
+import ShareDbPostgresDb from './postgres.ts'
 
 import { DbMap3Schema, DbMapsSchema } from '@allmaps/db/maps'
 
@@ -28,12 +29,13 @@ import type { WebSocket } from 'ws'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { DebouncedFunc } from 'lodash-es'
 
-import type { DbMaps, DbMaps3, PostgresContext } from '@allmaps/db'
+import type { Db, DbMaps, DbMaps3 } from '@allmaps/db'
 import type { Callback } from '@allmaps/api-shared/types'
 
 ShareDB.types.register(json1.type)
 
 const projectionsByDbId = getProjectionsByDbId()
+const debug = debuglog('allmaps:sharedb')
 
 type PersistEntry = {
   debouncedPersist: DebouncedFunc<() => Promise<void>>
@@ -41,7 +43,7 @@ type PersistEntry = {
 }
 
 export default class AllmapsShareDB {
-  db: PostgresContext['db']
+  db: Db
   shareDb: ShareDB
   connection: ReturnType<ShareDB['connect']>
   latestSnapshotByImageId = new Map<string, ShareDB.Snapshot>()
@@ -49,6 +51,7 @@ export default class AllmapsShareDB {
   commitsReceived = 0
   persistExecutions = 0
   persistErrors = 0
+  pendingSubmissions = new Set<unknown>()
 
   // - SNAPSHOT_DEBOUNCE_MS: how long to wait after the latest commit before persisting.
   //     - New commits reset this timer.
@@ -64,13 +67,21 @@ export default class AllmapsShareDB {
   readonly SNAPSHOT_MAX_WAIT_MS = 10 /* seconds */ * 1000
   readonly SNAPSHOT_IDLE_TTL_MS = 2 /* minutes */ * 60 * 1000
 
-  constructor(postgresContext: PostgresContext) {
+  constructor(postgresContext: { db: Db }) {
     this.db = postgresContext.db
 
     const shareDbPostgresDb = new ShareDbPostgresDb(postgresContext)
 
     this.shareDb = new ShareDB({ db: shareDbPostgresDb })
     this.connection = this.shareDb.connect()
+
+    this.shareDb.use('submit', (context, callback) => {
+      this.pendingSubmissions.add(context)
+      callback()
+    })
+    this.shareDb.on('submitRequestEnd', (_error, request) => {
+      this.pendingSubmissions.delete(request)
+    })
 
     this.shareDb.use(
       'commit',
@@ -191,6 +202,13 @@ export default class AllmapsShareDB {
   }
 
   async close() {
+    // The runner first stops HTTP and WebSocket input. Finish submissions that
+    // were already accepted before flushing their debounced SQL snapshots.
+    while (this.pendingSubmissions.size) {
+      await new Promise<void>((resolve) => {
+        this.shareDb.once('submitRequestEnd', () => resolve())
+      })
+    }
     await this.flushPendingSnapshots()
 
     await new Promise<void>((resolve, reject) => {
@@ -210,7 +228,7 @@ export default class AllmapsShareDB {
       return
     }
 
-    console.log('ShareDB snapshot persistence metrics', {
+    debug('ShareDB snapshot persistence metrics', {
       commitsReceived: this.commitsReceived,
       persistExecutions: this.persistExecutions,
       persistErrors: this.persistErrors,

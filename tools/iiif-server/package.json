@@ -1,8 +1,12 @@
 {
-  "name": "@allmaps/test-iiif-server",
+  "name": "@allmaps/tools-iiif-server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./import": "./scripts/import.ts"
+  },
   "scripts": {
     "dev": "vite --port $(../../port.js iiif) --host",
     "build": "vite build",
@@ -23,7 +27,9 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "phosphor-svelte": "catalog:",
-    "sharp": "catalog:"
+    "sharp": "catalog:",
+    "commander": "catalog:",
+    "@commander-js/extra-typings": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",

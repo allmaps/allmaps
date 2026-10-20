@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { Command, CommanderError } from '@commander-js/extra-typings'
 
 import sharp from 'sharp'
 
@@ -37,39 +39,19 @@ const targetWidth = 2500
 const minimumTargetHeight = 1000
 const maximumWebpDimension = 16_383
 
-function parseArguments(args: string[]): ImportOptions {
-  const options: Partial<ImportOptions> = {}
-
-  for (let index = 0; index < args.length; index += 1) {
-    const argument = args[index]
-
-    if (argument === '--id') {
-      options.id = args[index + 1]
-      index += 1
-    } else if (argument === '--label') {
-      options.label = args[index + 1]
-      index += 1
-    } else if (!options.input) {
-      options.input = argument
-    } else {
-      throw new Error(`Unknown argument: ${argument}`)
-    }
-  }
-
-  if (!options.input) {
-    throw new Error(
-      [
-        'Usage:',
-        '  pnpm --filter @allmaps/test-iiif-server import -- <annotation-url-or-file>',
-        '',
-        'Options:',
-        '  --id <image-id>       Override the fixture directory/id',
-        '  --label <label>       Override the fixture label'
-      ].join('\n')
+export function createImportCommand(importFixture = importAnnotation) {
+  return new Command()
+    .name('pnpm --filter @allmaps/tools-iiif-server run import')
+    .description(
+      'Import an annotation and its IIIF image into the local fixtures'
     )
-  }
-
-  return options as ImportOptions
+    .exitOverride()
+    .argument('<annotation-url-or-file>', 'Annotation URL or local JSON file')
+    .option('--id <image-id>', 'Override the fixture directory/id')
+    .option('--label <label>', 'Override the fixture label')
+    .action(async (input, options) => {
+      await importFixture({ input, ...options })
+    })
 }
 
 function isUrl(value: string) {
@@ -657,8 +639,7 @@ async function downloadManifest(manifestUrl: string | undefined) {
   return undefined
 }
 
-async function importAnnotation() {
-  const options = parseArguments(process.argv.slice(2))
+async function importAnnotation(options: ImportOptions) {
   const annotation = await readInputJson(options.input)
   const maps = getMaps(annotation)
   const map = maps[0]
@@ -767,9 +748,16 @@ async function importAnnotation() {
   }
 }
 
-try {
-  await importAnnotation()
-} catch (error) {
-  console.error(error instanceof Error ? error.message : String(error))
-  process.exitCode = 1
-}
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+)
+  void createImportCommand()
+    .parseAsync(process.argv)
+    .catch((error) => {
+      if (error instanceof CommanderError) process.exitCode = error.exitCode
+      else {
+        console.error(error instanceof Error ? error.message : String(error))
+        process.exitCode = 1
+      }
+    })

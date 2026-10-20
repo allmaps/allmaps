@@ -7,20 +7,22 @@ import { generateRandomId } from '@allmaps/id/sync'
 import { anonymous, openAPI, admin, organization } from 'better-auth/plugins'
 
 import { getNeonHttpDb } from './db.js'
+import type { Db } from './db.js'
 import * as authSchema from './schema/auth.js'
 import { lists as listsSchema } from './schema/lists.js'
 
-export function createAuth(env: BetterAuthEnv) {
+export function createAuth(env: BetterAuthEnv, database?: Db) {
   const baseURL = env.BETTER_AUTH_URL
 
   const hostname = new URL(baseURL).hostname
   const isLocalhost = hostname === 'localhost'
   const useAllmapsCookieDomain = hostname.endsWith('.allmaps.org')
 
-  const db = getNeonHttpDb(env.DATABASE_URL, isLocalhost)
+  const db = database ?? getNeonHttpDb(env.DATABASE_URL, isLocalhost)
 
   const auth = betterAuth({
     baseURL,
+    secret: env.BETTER_AUTH_SECRET,
     basePath: '/auth',
     database: drizzleAdapter(db, {
       provider: 'pg',
@@ -59,15 +61,18 @@ export function createAuth(env: BetterAuthEnv) {
         }
       }
     },
-    socialProviders: {
-      github: {
-        clientId: env.GITHUB_CLIENT_ID,
-        clientSecret: env.GITHUB_CLIENT_SECRET,
-        mapProfileToUser: (profile) => ({
-          slug: profile.login.toLowerCase()
-        })
-      }
-    },
+    socialProviders:
+      env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+        ? {
+            github: {
+              clientId: env.GITHUB_CLIENT_ID,
+              clientSecret: env.GITHUB_CLIENT_SECRET,
+              mapProfileToUser: (profile) => ({
+                slug: profile.login.toLowerCase()
+              })
+            }
+          }
+        : {},
     trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
     // experimental: { joins: true },
     plugins: [

@@ -20,7 +20,7 @@
     "types": "tsc --noEmit",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "db:up": "drizzle-kit up",
-    "db:generate": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate --config drizzle.generate.config.ts",
     "auth:generate": "pnpx auth generate --config ./src/auth-for-cli.ts --output ./src/schema/auth.ts",
     "auth:info": " pnpx auth info --config ./src/auth-for-cli.ts",
     "db:migrate": "drizzle-kit migrate",
@@ -40,6 +40,7 @@
     "drizzle-orm": "catalog:"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "catalog:",
     "@types/node": "catalog:",
     "@types/sharedb": "catalog:",
     "@typescript/native": "catalog:",
