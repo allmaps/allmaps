@@ -1,0 +1,21 @@
+{
+  "name": "@allmaps/tools-setup",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src && eslint src",
+    "setup:env": "node src/setup.ts"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:"
+  },
+  "dependencies": {
+    "commander": "catalog:",
+    "@commander-js/extra-typings": "catalog:"
+  }
+}

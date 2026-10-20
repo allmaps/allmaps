@@ -25,7 +25,8 @@
     "version-prerelease": "lerna version prerelease",
     "publish-beta": "pnpm run publish --dist-tag beta",
     "publish": "npm whoami && lerna publish from-git",
-    "publish-resume": "npm whoami && npm_lifecycle_event=publish lerna publish from-package"
+    "publish-resume": "npm whoami && npm_lifecycle_event=publish lerna publish from-package",
+    "setup:env": "node tools/setup/src/setup.ts"
   },
   "devDependencies": {
     "@lerna-lite/cli": "catalog:",
