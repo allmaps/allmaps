@@ -93,6 +93,10 @@ migrations with `pnpm db:migrate --db=pglite`. Run `pnpm setup:env` (or
 `pnpm setup:env --db=postgres`) to configure missing local settings while preserving
 existing values. GitHub login is optional.
 
+For automatic Neon migrations and coordinated API deployments on `develop` and
+`main`, see [API migrations and releases](.github/API_RELEASES.md), including the
+one-time setup and separate release enable switches.
+
 Development tools are grouped by responsibility: [API runner](tools/apis/README.md),
 [demo seed](tools/seed/README.md), [environment setup](tools/setup/README.md), and
 [IIIF fixture server](tools/iiif-server/README.md). Integration tests remain in

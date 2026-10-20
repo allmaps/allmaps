@@ -9,7 +9,8 @@
     "./schema": "./dist/schema.js",
     "./schema/*": "./dist/schema/*.js",
     "./maps": "./dist/maps.js",
-    "./auth": "./dist/auth.js"
+    "./auth": "./dist/auth.js",
+    "./migrations": "./dist/migrations.js"
   },
   "files": [
     "dist"
@@ -24,6 +25,7 @@
     "auth:generate": "pnpx auth generate --config ./src/auth-for-cli.ts --output ./src/schema/auth.ts",
     "auth:info": " pnpx auth info --config ./src/auth-for-cli.ts",
     "db:migrate": "drizzle-kit migrate",
+    "db:migrate:ci": "node src/migrate-ci.ts",
     "db:studio": "drizzle-kit studio"
   },
   "license": "AGPL-3.0-only",

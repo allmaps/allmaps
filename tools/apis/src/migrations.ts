@@ -1,29 +1,15 @@
-import { readdirSync, readFileSync } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { join } from 'node:path'
-import { readMigrationFiles } from 'drizzle-orm/migrator'
 import { PGlite } from '@electric-sql/pglite'
 import type { Transaction } from '@electric-sql/pglite'
 import { postgis } from '@electric-sql/pglite-postgis'
-import type { Sql } from 'postgres'
-import { migrationsDirectory } from './paths.ts'
+import { loadMigrations, migrationHistory } from '@allmaps/db/migrations'
+import type { MigrationConnection } from '@allmaps/db/migrations'
 
-export function loadMigrations(directory = migrationsDirectory) {
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !/^\d{14}_/.test(entry.name)) continue
-    // Generation writes SQL and the snapshot separately. Never apply half a folder.
-    JSON.parse(
-      readFileSync(join(directory, entry.name, 'snapshot.json'), 'utf8')
-    )
-    readFileSync(join(directory, entry.name, 'migration.sql'), 'utf8')
-  }
-  return readMigrationFiles({ migrationsFolder: directory })
-}
+export { loadMigrations, postgresMigrations } from '@allmaps/db/migrations'
+export type { MigrationConnection } from '@allmaps/db/migrations'
 
 export const migrations = loadMigrations()
-export type MigrationConnection = {
-  query: (sql: string, values?: unknown[]) => Promise<Record<string, unknown>[]>
-}
 
 export function pgliteMigrations(
   client: PGlite | Transaction
@@ -32,64 +18,6 @@ export function pgliteMigrations(
     query: async (sql, values) =>
       (await client.query<Record<string, unknown>>(sql, values)).rows
   }
-}
-
-export function postgresMigrations(client: Sql): MigrationConnection {
-  return {
-    query: async (sql, values = []) =>
-      Array.from(await client.unsafe(sql, values as never[]))
-  }
-}
-
-async function migrationHistory(
-  connection: MigrationConnection,
-  directory?: string
-) {
-  const local = loadMigrations(directory)
-  const [table] = await connection.query(
-    "SELECT to_regclass('drizzle.__drizzle_migrations') AS name"
-  )
-  const applied = table.name
-    ? await connection.query(
-        'SELECT to_jsonb(m) AS migration FROM drizzle.__drizzle_migrations m ORDER BY id'
-      )
-    : []
-  const seen = new Set<string>()
-  let latest = 0
-  for (const row of applied) {
-    const entry = row.migration as {
-      id: unknown
-      name?: string
-      hash: string
-      created_at?: number
-    }
-    const matches = local.filter((migration) =>
-      entry.name ? migration.name === entry.name : migration.hash === entry.hash
-    )
-    const migration =
-      matches.length === 1
-        ? matches[0]
-        : matches.find(
-            (candidate) => candidate.folderMillis === Number(entry.created_at)
-          )
-    if (
-      !migration ||
-      migration.hash !== entry.hash ||
-      seen.has(migration.name!)
-    ) {
-      throw new Error(
-        `Applied migration changed, missing, or duplicated: ${entry.name ?? entry.created_at ?? entry.id}`
-      )
-    }
-    seen.add(migration.name!)
-    latest = Math.max(latest, migration.folderMillis)
-  }
-  const pending = local.filter((migration) => !seen.has(migration.name!))
-  if (pending.some((migration) => migration.folderMillis <= latest))
-    throw new Error(
-      'Migration history diverged: a pending migration precedes an applied migration'
-    )
-  return { pending, recorded: Boolean(table.name) }
 }
 
 export async function checkMigrations(

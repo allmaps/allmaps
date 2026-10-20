@@ -145,8 +145,9 @@ apply anything.
 To start over instead, select a new empty `PGLITE_DATA_DIR` and retain the old
 database. `db:migrate` requires an explicit `--db=pglite`; omitting the selector
 or choosing PostgreSQL fails before opening a database. It ignores PostgreSQL connection
-URLs. PostgreSQL migrations belong in GitHub Actions, including for feature branches;
-this tool never applies them. This change does not add or alter GitHub Actions.
+URLs. PostgreSQL migrations for `develop` and `main` belong in the
+[API release workflow](../../.github/API_RELEASES.md); this local tool never
+applies them. Feature branches only run CI checks.
 
 ## PostgreSQL, including Neon
 
@@ -190,7 +191,7 @@ Changing the URL requires restarting the runner and refreshing the apps.
 The database must already have PostGIS and the project's migrations applied.
 Startup checks migration compatibility using read queries; it never initializes,
 seeds, migrates, or deletes a PostgreSQL database. Apply PostgreSQL migrations
-through GitHub Actions. This tooling does not add or change those actions.
+through the [API release workflow](../../.github/API_RELEASES.md).
 
 All APIs and authentication share the same PostgreSQL connection helper.
 PostgreSQL mode allows normal API data writes. Auth secrets are explicit, and

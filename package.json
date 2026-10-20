@@ -31,6 +31,9 @@
     "db:migrate": "node tools/apis/src/cli.ts migrate",
     "build:apis": "turbo run build --filter=@allmaps/api-rest... --filter=@allmaps/api-annotations... --filter=@allmaps/api-live...",
     "test:apis": "pnpm --filter @allmaps/test-apis test",
+    "test:release": "node --test scripts/api-release.test.ts",
+    "types:apis": "pnpm --filter @allmaps/db --filter @allmaps/api-shared --filter @allmaps/api-rest --filter @allmaps/api-annotations --filter @allmaps/api-live --filter @allmaps/tools-apis --filter @allmaps/test-apis run types",
+    "types:release": "pnpm --filter @allmaps/db exec tsc --project ../../scripts/tsconfig.release.json",
     "setup:env": "node tools/setup/src/setup.ts"
   },
   "devDependencies": {
