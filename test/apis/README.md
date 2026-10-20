@@ -35,6 +35,15 @@ migration compatibility checks use PGlite as their only backend. No test uses a
 real PostgreSQL database or credentials.
 Manual migration tests use temporary PGlite databases and verify existing data,
 transaction rollback, history validation, and persistence after reopening.
+CI migration tests exercise the shared validation and pinned Drizzle migrator
+against PGlite, including legacy metadata upgrades, rejected history, transaction
+rollback and verification after migration. PostgreSQL-specific transport and
+advisory locking require the separate Neon rehearsal documented in
+[API releases](../../.github/API_RELEASES.md).
+
+`pnpm test:release` separately tests release routing, stale commits, credentials,
+deployment failures, Railway completion and health checks with fake commands and
+HTTP responses. It never calls the hosting platforms.
 
 The shared demo dataset is defined and seeded by `tools/seed/src/seed-fixtures.ts`
 and `seed.ts`. Small assertion-specific data lives in `test/fixtures`. IIIF

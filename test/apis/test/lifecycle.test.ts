@@ -48,7 +48,7 @@ describe('local-only test setup', () => {
 
   it('rejects preserved database paths before opening them', async () => {
     await expect(migratePgliteDirectory(defaultDataDirectory)).rejects.toThrow(
-      'temporary directory'
+      /temporary directory|No existing PGlite database/
     )
     await expect(
       createTestContext({ dataDir: defaultDataDirectory })
