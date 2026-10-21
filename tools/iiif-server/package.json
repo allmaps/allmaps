@@ -1,0 +1,57 @@
+{
+  "name": "@allmaps/tools-iiif-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./import": "./scripts/import.ts"
+  },
+  "scripts": {
+    "dev": "vite --port $(../../port.js iiif) --host",
+    "build": "vite build",
+    "start": "node build",
+    "import": "node scripts/import.ts",
+    "test": "vitest run",
+    "types": "svelte-kit sync && tsc --noEmit",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
+    "format": "prettier --ignore-path ../../.gitignore --write ."
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/transform": "workspace:^",
+    "@allmaps/ui": "workspace:^",
+    "phosphor-svelte": "catalog:",
+    "sharp": "catalog:",
+    "commander": "catalog:",
+    "@commander-js/extra-typings": "catalog:"
+  },
+  "devDependencies": {
+    "@eslint/js": "catalog:",
+    "@sveltejs/adapter-node": "catalog:",
+    "@sveltejs/kit": "catalog:",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-svelte": "catalog:",
+    "globals": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
+    "prettier-plugin-tailwindcss": "catalog:",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "tailwindcss": "catalog:",
+    "@typescript/native": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

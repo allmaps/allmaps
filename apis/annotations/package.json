@@ -3,6 +3,8 @@
   "version": "3.0.1-alpha.1",
   "private": "true",
   "module": "src/index.js",
+  "type": "module",
+  "exports": "./dist/app.js",
   "license": "AGPL-3.0-only",
   "scripts": {
     "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",

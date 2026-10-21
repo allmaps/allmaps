@@ -6,13 +6,9 @@
   import favicon from '$lib/assets/favicon.png'
 
   import { Header } from '@allmaps/ui'
-  import { setAuthContext } from '@allmaps/ui/auth'
-  import type { AllmapsAuthClient } from '@allmaps/ui/auth'
 
   import ConsoleUserMenu from '$lib/components/ConsoleUserMenu.svelte'
   import DotsPattern from '$lib/components/DotsPattern.svelte'
-
-  import { authClient } from '$lib/auth-client.js'
 
   import type { Snippet } from 'svelte'
 
@@ -29,13 +25,6 @@
   }
 
   let { children: pageChildren }: Props = $props()
-
-  const apiBaseURL = page.data.env.PUBLIC_REST_BASE_URL
-
-  setAuthContext({
-    client: authClient as unknown as AllmapsAuthClient,
-    apiBaseURL
-  })
 
   onNavigate((navigation) => {
     if (

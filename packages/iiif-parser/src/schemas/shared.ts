@@ -7,7 +7,7 @@ export const SizeSchema = z.object({
 
 export const TilesetSchema = z.object({
   width: z.number().int(),
-  height: z.number().int().optional(),
+  height: optionalValue(z.number().int()),
   scaleFactors: z.array(z.number().int())
 })
 
@@ -18,6 +18,14 @@ const imageServiceTypes = [
 ] as const
 
 export const ImageServiceTypesSchema = z.enum(imageServiceTypes)
+
+// JSON-LD null values have the same meaning as absent properties.
+export function optionalValue<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess(
+    (value) => (value === null ? undefined : value),
+    schema.optional()
+  )
+}
 
 export function oneOrMany<T extends z.ZodTypeAny>(schema: T) {
   return z
@@ -49,7 +57,7 @@ export function filterValidItems<T extends z.ZodTypeAny>(schema: T) {
 const ValidNavDateSchema = z.coerce.date()
 
 // Invalid navDate values are intentionally treated as absent.
-export const NavDateSchema = parseIfValid(ValidNavDateSchema)
+export const NavDateSchema = optionalValue(parseIfValid(ValidNavDateSchema))
 
 // For now, Allmaps does not parse GeoJSON values
 // This is left to clients consuming this data

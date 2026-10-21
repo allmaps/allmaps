@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { Image2ProfileSchema } from './image.2.js'
-import { ImageServiceTypesSchema } from './shared.js'
+import { ImageServiceTypesSchema, optionalValue } from './shared.js'
 
 export const complianceLevels = ['level0', 'level1', 'level2'] as const
 
@@ -9,15 +9,15 @@ export const Presentation3ImageService2Schema = z.union([
   z.object({
     id: z.string().url(),
     type: z.literal('ImageService2'),
-    width: z.number().int().optional(),
-    height: z.number().int().optional(),
+    width: optionalValue(z.number().int()),
+    height: optionalValue(z.number().int()),
     profile: Image2ProfileSchema
   }),
   z.object({
     '@id': z.string().url(),
     '@type': z.literal('ImageService2'),
-    width: z.number().int().optional(),
-    height: z.number().int().optional(),
+    width: optionalValue(z.number().int()),
+    height: optionalValue(z.number().int()),
     profile: Image2ProfileSchema
   })
 ])
@@ -25,11 +25,11 @@ export const Presentation3ImageService2Schema = z.union([
 export const Presentation3ImageService3Schema = z.object({
   id: z.string().url(),
   type: ImageServiceTypesSchema,
-  width: z.number().int().optional(),
-  height: z.number().int().optional(),
+  width: optionalValue(z.number().int()),
+  height: optionalValue(z.number().int()),
   profile: z.enum(complianceLevels).catch('level0'),
-  extraFormats: z.string().array().optional(),
-  preferredFormats: z.string().array().optional()
+  extraFormats: optionalValue(z.string().array()),
+  preferredFormats: optionalValue(z.string().array())
 })
 
 export const ImageService3Schema = z.union([

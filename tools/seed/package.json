@@ -1,0 +1,27 @@
+{
+  "name": "@allmaps/tools-seed",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src && eslint src"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:"
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/api-shared": "workspace:^",
+    "@allmaps/db": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@electric-sql/pglite": "catalog:",
+    "drizzle-orm": "catalog:",
+    "@allmaps/api-live": "workspace:*",
+    "@allmaps/tools-iiif-server": "workspace:*"
+  }
+}

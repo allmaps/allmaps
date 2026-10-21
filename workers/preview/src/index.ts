@@ -15,7 +15,7 @@ import type { Size } from '@allmaps/types'
 
 // Initialize WASM module at worker startup
 import wasmInit from '@allmaps/render-wasm'
-import wasmFile from '../../../packages/render-wasm/pkg/allmaps_render_wasm_bg.wasm'
+import wasmFile from '@allmaps/render-wasm/wasm'
 
 // Top-level await (Cloudflare Workers supports this)
 // Use new wasm-bindgen initialization API with module_or_path parameter

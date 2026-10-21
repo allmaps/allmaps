@@ -96,8 +96,12 @@ export const maps = pgTable(
       .on(table.imageId)
       .where(sql`${table.latest} = true`),
     index().on(table.latest),
-    index().on(table.updatedAt),
-    index().using('GIST', table.geoMask)
+    index('maps_latest_georeferenced_updated_at_idx')
+      .on(table.updatedAt.desc().nullsFirst())
+      .where(sql`${table.latest} = true AND ${table.geoMask} IS NOT NULL`),
+    index('maps_latest_georeferenced_geo_mask_idx')
+      .using('gist', table.geoMask)
+      .where(sql`${table.latest} = true AND ${table.geoMask} IS NOT NULL`)
   ]
 )
 

@@ -2,8 +2,12 @@
 // https://iiif.io/api/image/2.1/#image-information
 
 import { z } from 'zod'
-import { TilesetSchema, SizeSchema } from './shared.js'
-import { filterValidItems } from './shared.js'
+import {
+  TilesetSchema,
+  SizeSchema,
+  optionalValue,
+  filterValidItems
+} from './shared.js'
 
 // The following compliance levels URIs are valid in the IIIF Image API 2.1:
 //  - "http://iiif.io/api/image/2/level0.json"
@@ -23,12 +27,12 @@ export const image2ProfileUriRegex =
 export const Image2ProfileUri = z.string().regex(image2ProfileUriRegex)
 
 export const Image2ProfileDescriptionSchema = z.object({
-  formats: z.string().array().optional(),
-  maxArea: z.number().int().optional(),
-  maxHeight: z.number().int().optional(),
-  maxWidth: z.number().int().optional(),
-  qualities: z.string().array().optional(),
-  supports: z.string().array().optional()
+  formats: optionalValue(z.string().array()),
+  maxArea: optionalValue(z.number().int()),
+  maxHeight: optionalValue(z.number().int()),
+  maxWidth: optionalValue(z.number().int()),
+  qualities: optionalValue(z.string().array()),
+  supports: optionalValue(z.string().array())
 })
 
 const ValidImage2ProfileArrayItemSchema = z.union([
@@ -83,12 +87,12 @@ export const Image2Context = z.union([
 
 export const Image2Schema = z.object({
   '@id': z.string().url(),
-  '@type': z.enum(['iiif:Image', 'ImageService2']).optional(),
+  '@type': optionalValue(z.enum(['iiif:Image', 'ImageService2'])),
   '@context': Image2Context,
   protocol: z.literal('http://iiif.io/api/image'),
   width: z.number().int(),
   height: z.number().int(),
   profile: Image2ProfileSchema,
-  sizes: SizeSchema.array().optional(),
-  tiles: TilesetSchema.array().optional()
+  sizes: optionalValue(SizeSchema.array()),
+  tiles: optionalValue(TilesetSchema.array())
 })

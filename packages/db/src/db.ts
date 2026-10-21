@@ -6,6 +6,8 @@ import { neon, neonConfig } from '@neondatabase/serverless'
 import { drizzle as neonHttpDrizzle } from 'drizzle-orm/neon-http'
 import { drizzle as neonServerlessDrizzle } from 'drizzle-orm/neon-serverless'
 
+import type { PgliteDatabase } from 'drizzle-orm/pglite'
+
 import { relations } from './schema.js'
 
 class InterpolatedQueryLogger implements Logger {
@@ -77,9 +79,11 @@ export type NeonDb = ReturnType<typeof getNeonDb>
 export type NeonHttpDb = ReturnType<typeof getNeonHttpDb>
 export type PostgresDb = ReturnType<typeof getPostgresDb>
 export type PostgresContext = ReturnType<typeof getPostgresContext>
-export type Db = PostgresDb | NeonHttpDb | NeonDb
+export type PgliteDb = PgliteDatabase<typeof relations>
+export type Db = PostgresDb | NeonHttpDb | NeonDb | PgliteDb
 
 export type DbTransaction =
+  | Parameters<Parameters<PgliteDb['transaction']>[0]>[0]
   | Parameters<Parameters<PostgresDb['transaction']>[0]>[0]
   | Parameters<Parameters<NeonDb['transaction']>[0]>[0]
   | Parameters<Parameters<NeonHttpDb['transaction']>[0]>[0]

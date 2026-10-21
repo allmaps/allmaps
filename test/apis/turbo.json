@@ -1,0 +1,18 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/tools/apis/src/**",
+        "$TURBO_ROOT$/tools/seed/src/**",
+        "$TURBO_ROOT$/tools/setup/src/**",
+        "$TURBO_ROOT$/tools/iiif-server/src/**",
+        "$TURBO_ROOT$/tools/iiif-server/static/iiif/**",
+        "$TURBO_ROOT$/packages/db/drizzle/**",
+        "$TURBO_ROOT$/apis/*/dist/**",
+        "$TURBO_ROOT$/packages/*/dist/**"
+      ]
+    }
+  }
+}

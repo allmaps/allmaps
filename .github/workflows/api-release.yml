@@ -1,0 +1,95 @@
+name: APIs
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HUSKY: '0'
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  checks:
+    name: API checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:apis
+      - run: pnpm test:apis
+      - run: pnpm test:release
+      - run: pnpm types:apis
+      - run: pnpm types:release
+      - name: Check Worker bundles without deploying
+        run: |
+          pnpm --filter @allmaps/api-rest exec wrangler deploy --dry-run --env ''
+          pnpm --filter @allmaps/api-annotations exec wrangler deploy --dry-run --env ''
+
+  release:
+    name: Migrate and deploy APIs
+    needs: checks
+    # Keep releases off until each environment's hosting cutover is complete.
+    if: >-
+      github.event_name != 'pull_request' &&
+      ((github.ref == 'refs/heads/develop' && vars.API_RELEASE_DEVELOP_ENABLED == 'true') ||
+       (github.ref == 'refs/heads/main' && vars.API_RELEASE_MAIN_ENABLED == 'true'))
+    environment:
+      name: ${{ github.ref == 'refs/heads/develop' && 'development' || 'production' }}
+    concurrency:
+      group: api-release-${{ github.ref }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:apis
+      - name: Prepare pinned Railway CLI
+        run: pnpm dlx @railway/cli@5.71.0 --version
+      - name: Verify targets and reject stale releases
+        run: node scripts/api-release.ts preflight
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Apply and verify migrations
+        run: pnpm --filter @allmaps/db run db:migrate:ci
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Deploy and check API health
+        run: node scripts/api-release.ts deploy
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
