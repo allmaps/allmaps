@@ -8,7 +8,8 @@
   "rules": [
     {
       "type": "CompiledWasm",
-      "globs": ["**/*.wasm"],
+      // Wrangler matches the import specifier before resolving package exports.
+      "globs": ["**/*.wasm", "@allmaps/render-wasm/wasm"],
       "fallthrough": true
     }
   ],
