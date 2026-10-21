@@ -64,7 +64,9 @@ catalog:
 
   # Cloudflare and deployment
   '@cloudflare/kv-asset-handler': ^0.3.1
-  wrangler: ^4.97.0
+  # Pin the tested release: it deploys with per-Worker tokens without needing
+  # account-wide subdomain access (cloudflare/workers-sdk#15678).
+  wrangler: 4.151.1
 
   # APIs, authentication, databases and collaboration
   '@elysia/node': 1.4.6
