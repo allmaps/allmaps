@@ -59,6 +59,14 @@ TypeScript rewrites Live's relative `.ts` imports to `.js` during the build.
 These standalone commands retain their configured PostgreSQL connection; use
 `pnpm dev:apis` for the shared PGlite database.
 
+## Georeference HTTP imports
+
+To enable HTTP map imports locally, set a separate, random `LIVE_IMPORT_SECRET`
+of at least 32 characters in `.env.localhost.local`. The runner shares it between
+REST and Live. REST still requires a signed-in admin. If the variable is absent
+or empty, HTTP imports return 503; WebSocket editing and database seeding continue
+to work. See the [Live API documentation](../../apis/live/README.md).
+
 ## Configure the environment
 
 PGlite works without database credentials. To configure missing local settings:

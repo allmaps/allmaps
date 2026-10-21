@@ -1,4 +1,7 @@
 import express from 'express'
+import type { RequestHandler } from 'express'
+import { timingSafeEqual } from 'node:crypto'
+import type { LiveEnv } from '@allmaps/env/live'
 import http from 'node:http'
 import cors from 'cors'
 import { WebSocketServer } from 'ws'
@@ -10,10 +13,39 @@ import packageJson from '../package.json' with { type: 'json' }
 
 export { AllmapsShareDB }
 
-export function createLiveServer(shareDb: AllmapsShareDB) {
+export function createLiveServer(
+  shareDb: AllmapsShareDB,
+  env: Pick<LiveEnv, 'LIVE_IMPORT_SECRET'> = {}
+) {
+  const expectedAuthorization = env.LIVE_IMPORT_SECRET
+    ? Buffer.from(`Bearer ${env.LIVE_IMPORT_SECRET}`)
+    : undefined
+  const requireImportSecret: RequestHandler = (request, response, next) => {
+    response.set('Cache-Control', 'private, no-store')
+    if (!expectedAuthorization) {
+      response
+        .status(503)
+        .json({ error: 'Georeference imports are not configured' })
+      return
+    }
+
+    const authorization = Buffer.from(request.get('authorization') ?? '')
+    if (
+      authorization.length !== expectedAuthorization.length ||
+      !timingSafeEqual(authorization, expectedAuthorization)
+    ) {
+      response.status(401).json({ error: 'Unauthorized' })
+      return
+    }
+
+    next()
+  }
+
   const app = express()
   app.use(cors())
-  app.use(express.json())
+  // Authenticate HTTP imports before parsing their bodies. WebSocket upgrades
+  // are handled separately by the WebSocket server below.
+  app.use('/maps', requireImportSecret, express.json())
   app.set('json spaces', 2)
 
   app.get('/', (_req, res) => {

@@ -39,6 +39,9 @@ import. Owners cannot change domains or plans to expand their import rights.
 
 Georeference-data imports through `POST /maps` and `PATCH /maps/:mapId` require an
 Admin. This is separate from normal collaborative georeferencing in the Editor.
+REST forwards these imports using the server-only `LIVE_IMPORT_SECRET`; Live
+requires the same credential. Missing configuration disables imports with HTTP 503. User sessions are not forwarded, and redirects are rejected. See the
+[Live setup instructions](../live/README.md#configure-the-shared-secret).
 
 Session loading delegates to Better Auth, sharing reads within each request.
 Imports and management operations use fresh sessions, so database role revocations
@@ -107,3 +110,9 @@ an explicit valid role.
 Run `pnpm --filter @allmaps/api-rest test` for deterministic role, limit, and
 import authorization tests. Tests resolve workspace packages to their sources
 and require no package build or running development server.
+
+Browser requests with credentials and browser mutations are accepted from the
+REST API's own origin and `https://console.allmaps.org`. When the REST API is
+running on localhost, HTTP localhost origins are also accepted. Public reads
+remain available cross-origin without credentials. Server-side and CLI requests
+without an Origin header remain supported.

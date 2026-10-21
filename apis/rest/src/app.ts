@@ -42,6 +42,20 @@ const tagsSorter = createTagsSorter(openApiTags)
 
 export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
   const betterAuthPlugin = createBetterAuthPlugin(betterAuth)
+  const restOrigin = new URL(env.PUBLIC_REST_BASE_URL).origin
+  const isLocal = new URL(restOrigin).hostname === 'localhost'
+  const isTrustedBrowserOrigin = (origin: string) => {
+    if (origin === restOrigin || origin === 'https://console.allmaps.org') {
+      return true
+    }
+    if (!isLocal) return false
+    try {
+      const url = new URL(origin)
+      return url.protocol === 'http:' && url.hostname === 'localhost'
+    } catch {
+      return false
+    }
+  }
   return createElysia({
     name: 'app'
   })
@@ -49,7 +63,23 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)
-    .use(cors())
+    .onRequest(({ request, set, status }) => {
+      const origin = request.headers.get('origin')
+      const trusted = origin !== null && isTrustedBrowserOrigin(origin)
+      if (trusted) set.headers['access-control-allow-credentials'] = 'true'
+
+      // Browser mutations must come from an explicitly trusted origin. Requests
+      // without an Origin remain available to server-side and CLI clients.
+      if (
+        !['GET', 'HEAD', 'OPTIONS'].includes(request.method) &&
+        ((origin !== null && !trusted) ||
+          (origin === null &&
+            request.headers.get('sec-fetch-site') === 'cross-site'))
+      ) {
+        return status(403, { error: 'Untrusted origin' })
+      }
+    })
+    .use(cors({ credentials: false }))
     .use(
       openapi({
         path: 'docs',

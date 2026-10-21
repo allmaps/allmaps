@@ -7,9 +7,15 @@ import {
   setCacheControl
 } from '@allmaps/api-shared'
 
-import { RegExpRoute, createElysia, createBetterAuthPlugin } from '../elysia.js'
+import {
+  RegExpRoute,
+  createElysia,
+  createBetterAuthPlugin,
+  error
+} from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 import type { BetterAuthContext } from '@allmaps/db/auth'
+import type { RestEnv } from '@allmaps/env/rest'
 
 const mapsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
@@ -34,12 +40,39 @@ const mapRoute = new RegExpRoute<{
   /^(?<mapId>[0-9a-f]{16})(@(?<version>[0-9a-f]{16}))?(\.(?<ext>geojson))?$/
 )
 
-async function callLive(liveBaseUrl: string, path: string, body: unknown) {
-  const response = await fetch(`${liveBaseUrl}${path}`, {
+async function callLive(env: RestEnv, path: string, body: unknown) {
+  if (!env.LIVE_IMPORT_SECRET) {
+    return error(503, 'Georeference imports are not configured')
+  }
+
+  const url = new URL(`${env.PUBLIC_LIVE_BASE_URL}${path}`)
+  const localHttp =
+    url.protocol === 'http:' &&
+    ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
+  if (
+    (url.protocol !== 'https:' && !localHttp) ||
+    url.username ||
+    url.password
+  ) {
+    return error(503, 'Live imports require HTTPS or local HTTP')
+  }
+
+  const response = await fetch(url, {
     method: path.includes('/maps/') ? 'PATCH' : 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${env.LIVE_IMPORT_SECRET}`
+    },
+    redirect: 'error',
     body: JSON.stringify(body)
   })
+
+  if (response.status === 401 || response.status === 403) {
+    return error(502, 'Live import authentication failed')
+  }
+  if (response.status === 503) {
+    return error(503, 'Georeference imports are unavailable')
+  }
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}))
@@ -105,7 +138,7 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
       '/maps',
       async ({ env, body, set }) => {
         setCacheControl(set, 'private-no-store')
-        return callLive(env.PUBLIC_LIVE_BASE_URL, '/maps', body)
+        return callLive(env, '/maps', body)
       },
       {
         admin: true,
@@ -157,7 +190,7 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
       '/maps/:mapId',
       async ({ env, params, body, set }) => {
         setCacheControl(set, 'private-no-store')
-        return callLive(env.PUBLIC_LIVE_BASE_URL, `/maps/${params.mapId}`, body)
+        return callLive(env, `/maps/${encodeURIComponent(params.mapId)}`, body)
       },
       {
         admin: true,

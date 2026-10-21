@@ -78,7 +78,8 @@ const varArgs: string[] = []
 for (const [key, value] of Object.entries(mergedEnv).sort(([a], [b]) =>
   a.localeCompare(b)
 )) {
-  if (value === '') {
+  // Provision this server-only credential with Wrangler secrets, never --var.
+  if (value === '' || key === 'LIVE_IMPORT_SECRET') {
     continue
   }
 

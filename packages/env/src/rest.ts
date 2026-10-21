@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { authApiEnvSchema } from './fragments.js'
+import { authApiEnvSchema, liveImportEnvSchema } from './fragments.js'
 import { parseEnvSchema } from './shared.js'
 
-export const restEnvSchema = authApiEnvSchema
+export const restEnvSchema = authApiEnvSchema.and(liveImportEnvSchema)
 
 export type RestEnv = z.infer<typeof restEnvSchema>
 

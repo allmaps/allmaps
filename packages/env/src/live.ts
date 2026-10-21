@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { apiEnvSchema } from './fragments.js'
+import { apiEnvSchema, liveImportEnvSchema } from './fragments.js'
 import { parseEnvSchema } from './shared.js'
 
-export const liveEnvSchema = apiEnvSchema
+export const liveEnvSchema = apiEnvSchema.and(liveImportEnvSchema)
 
 export type LiveEnv = z.infer<typeof liveEnvSchema>
 

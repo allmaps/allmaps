@@ -16,6 +16,11 @@ export async function restFetch<T>(
   const event = getRequestEvent()
   const headers = new Headers(options.headers)
   const cookie = event.request.headers.get('cookie')
+  // Better Auth requires a trusted Origin for cookie-authenticated writes.
+  // These requests originate on the Console server, after SvelteKit's CSRF check.
+  if (path.startsWith('/auth/')) {
+    headers.set('origin', new URL(consoleEnv.PUBLIC_REST_BASE_URL).origin)
+  }
 
   if (cookie) {
     headers.set('cookie', cookie)

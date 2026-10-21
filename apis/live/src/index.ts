@@ -13,7 +13,7 @@ if (!env.DATABASE_URL) {
 const postgresContext = getPostgresContext(env.DATABASE_URL)
 const shareDb = new AllmapsShareDB(postgresContext)
 
-const { server, wss } = createLiveServer(shareDb)
+const { server, wss } = createLiveServer(shareDb, env)
 
 console.log(`⚡ Allmaps Live API starting...`)
 
