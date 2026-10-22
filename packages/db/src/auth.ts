@@ -40,7 +40,12 @@ function buildAuth(env: AuthSettings, db: Db) {
   const baseURL = env.BETTER_AUTH_URL
 
   const hostname = new URL(baseURL).hostname
-  const useAllmapsCookieDomain = hostname.endsWith('.allmaps.org')
+  const cookieDomain =
+    env.BETTER_AUTH_COOKIE_DOMAIN ||
+    (hostname.endsWith('.allmaps.org') ? 'allmaps.org' : undefined)
+  const trustedOrigins = env.BETTER_AUTH_TRUSTED_ORIGINS
+    ? env.BETTER_AUTH_TRUSTED_ORIGINS.split(',').map((origin) => origin.trim())
+    : ['https://*.allmaps.org', 'http://localhost:*']
 
   const auth = betterAuth({
     baseURL,
@@ -74,10 +79,10 @@ function buildAuth(env: AuthSettings, db: Db) {
     },
     advanced: {
       cookiePrefix: env.BETTER_AUTH_COOKIE_PREFIX,
-      crossSubDomainCookies: useAllmapsCookieDomain
-        ? { enabled: true, domain: 'allmaps.org' }
+      crossSubDomainCookies: cookieDomain
+        ? { enabled: true, domain: cookieDomain }
         : { enabled: false },
-      trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
+      trustedOrigins,
       database: {
         generateId: (options) => {
           if (
@@ -119,7 +124,7 @@ function buildAuth(env: AuthSettings, db: Db) {
           }
         : {})
     },
-    trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
+    trustedOrigins,
     // experimental: { joins: true },
     plugins: [
       anonymous(),
