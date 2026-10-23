@@ -11,9 +11,7 @@
   const uiState = getUiState()
   const urlState = getUrlState()
 
-  let basemapPresetId = $state<BasemapPresetId>(
-    uiState.basemapPreset.value || 'protomaps'
-  )
+  let basemapPresetId = $state<BasemapPresetId>(uiState.basemapPreset.value)
 
   let backgroundGeoreferenceAnnotationUrl = $state(
     urlState.params.backgroundGeoreferenceAnnotationUrl

@@ -122,3 +122,100 @@ export function removeTerrain(map: Map) {
   map.removeSource('contour-source')
   map.removeSource('terrain')
 }
+
+export type BasemapPresetId =
+  'protomaps' | 'esri-world-topo' | 'esri-world-imagery' | 'osm'
+
+export type BasemapProtomapsPreset = {
+  type: 'protomaps'
+  attribution?: string
+}
+
+export type BasemapRasterPreset = {
+  url: string
+  type: 'raster'
+  attribution?: string
+  // Highest zoom level the tile server has; MapLibre scales tiles up beyond it
+  maxzoom?: number
+}
+
+export type BasemapPreset = BasemapProtomapsPreset | BasemapRasterPreset
+
+export type BasemapPresetItem = {
+  label: string
+  value: BasemapPresetId
+} & BasemapPreset
+
+export const basemapPresets: BasemapPresetItem[] = [
+  {
+    label: 'Protomaps',
+    value: 'protomaps',
+    type: 'protomaps',
+    attribution:
+      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+  },
+  {
+    label: 'ESRI World Topo',
+    value: 'esri-world-topo',
+    type: 'raster',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution:
+      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+  },
+
+  {
+    label: 'Esri World Imagery',
+    value: 'esri-world-imagery',
+    type: 'raster',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    // TODO: also add https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/12/1340/2108
+    attribution:
+      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  },
+  {
+    label: 'OpenStreetMap',
+    value: 'osm',
+    type: 'raster',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxzoom: 19
+  }
+]
+
+// The preset with this ID, or Protomaps
+export function getBasemapPreset(id?: string): BasemapPresetItem {
+  return (
+    basemapPresets.find((preset) => preset.value === id) ?? basemapPresets[0]
+  )
+}
+
+export function rasterBasemapStyle(
+  basemap: BasemapRasterPreset,
+  glyphs?: string
+): StyleSpecification {
+  return {
+    version: 8 as const,
+    glyphs:
+      glyphs || 'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf',
+    sources: {
+      xyz: {
+        type: 'raster' as const,
+        tiles: [basemap.url],
+        tileSize: 256,
+        maxzoom: basemap.maxzoom ?? 22,
+        attribution: basemap.attribution || ''
+      }
+    },
+    layers: [
+      {
+        id: 'xyz',
+        type: 'raster' as const,
+        source: 'xyz',
+        paint: {
+          'raster-opacity': 1
+        }
+      }
+    ]
+  }
+}

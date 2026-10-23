@@ -108,26 +108,13 @@ export type AllmapsPluginItem = {
   value: AllmapsPluginId
 }
 
-export type BasemapPresetId =
-  'protomaps' | 'esri-world-topo' | 'esri-world-imagery' | 'osm'
-
-export type BasemapProtomapsPreset = {
-  type: 'protomaps'
-  attribution?: string
-}
-
-export type BasemapRasterPreset = {
-  url: string
-  type: 'raster'
-  attribution?: string
-}
-
-export type BasemapPreset = BasemapProtomapsPreset | BasemapRasterPreset
-
-export type BasemapPresetItem = {
-  label: string
-  value: BasemapPresetId
-} & BasemapPreset
+export type {
+  BasemapPresetId,
+  BasemapProtomapsPreset,
+  BasemapRasterPreset,
+  BasemapPreset,
+  BasemapPresetItem
+} from '@allmaps/basemap'
 
 export type ClickedItem =
   { type: 'map'; mapId: string } | { type: 'gcp'; mapId: string; gcpId: string }
