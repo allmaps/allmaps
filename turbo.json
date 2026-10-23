@@ -9,7 +9,7 @@
         "vite.config.ts",
         "svelte.config.js"
       ],
-      "outputs": ["dist/**", "build/**"],
+      "outputs": ["dist/**", "build/**", "tsconfig.tsbuildinfo"],
       "dependsOn": ["^build", "copy-between"]
     },
     "types": {
