@@ -75,6 +75,7 @@ services:
           - live.${DOMAIN:-allmaps.localhost}
           - tiles.${DOMAIN:-allmaps.localhost}
           - preview.${DOMAIN:-allmaps.localhost}
+          - iiif.${DOMAIN:-allmaps.localhost}
     restart: unless-stopped
 
   postgres:
@@ -156,6 +157,14 @@ services:
     <<: *service
     build: { context: ., target: workerd, args: { APP_DIR: workers/preview } }
 
+  # IIIF image server: serves the files in the iiif-images volume
+  iiif:
+    build: { context: ., target: cantaloupe }
+    volumes:
+      - iiif-images:/images
+    restart: unless-stopped
+
 volumes:
   postgres:
+  iiif-images:
   caddy:

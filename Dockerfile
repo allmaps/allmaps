@@ -60,6 +60,26 @@ COPY --from=workerd-deploy /out .
 USER ubuntu
 ENTRYPOINT ["/app/workerd", "serve", "/app/config.capnp"]
 
+# IIIF image server for the files in /images
+FROM runtime AS cantaloupe
+ARG CANTALOUPE_VERSION=5.0.7
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openjdk-21-jre-headless curl unzip \
+  && curl -sSfL -o /tmp/cantaloupe.zip \
+    https://github.com/cantaloupe-project/cantaloupe/releases/download/v$CANTALOUPE_VERSION/cantaloupe-$CANTALOUPE_VERSION.zip \
+  && unzip -q /tmp/cantaloupe.zip -d /opt \
+  && mv /opt/cantaloupe-$CANTALOUPE_VERSION /opt/cantaloupe \
+  && mv /opt/cantaloupe/cantaloupe-$CANTALOUPE_VERSION.jar /opt/cantaloupe/cantaloupe.jar \
+  && sed -e 's|^http.port = .*|http.port = 8080|' \
+    -e 's|^FilesystemSource.BasicLookupStrategy.path_prefix = .*|FilesystemSource.BasicLookupStrategy.path_prefix = /images/|' \
+    -e 's|^log.application.level = .*|log.application.level = info|' \
+    /opt/cantaloupe/cantaloupe.properties.sample > /opt/cantaloupe/cantaloupe.properties \
+  && apt-get purge -y curl unzip && apt-get autoremove -y \
+  && rm -rf /tmp/cantaloupe.zip /var/lib/apt/lists/* \
+  && mkdir /images && chown ubuntu /images
+USER ubuntu
+CMD ["java", "-Dcantaloupe.config=/opt/cantaloupe/cantaloupe.properties", "-jar", "/opt/cantaloupe/cantaloupe.jar"]
+
 FROM postgres:17-bookworm AS postgres
 RUN apt-get update \
   && apt-get install -y --no-install-recommends postgresql-17-postgis-3 \
