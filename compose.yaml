@@ -1,6 +1,7 @@
 name: allmaps
 
 # Deployment: docker compose -f compose.yaml up --build
+# Development: docker compose up (adds compose.override.yaml)
 
 x-env: &env
   ADAPTER: node

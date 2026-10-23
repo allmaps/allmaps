@@ -3,7 +3,8 @@
 # Builds every self-hostable service from the monorepo. Pick one with --target
 # and APP_DIR; compose.yaml shows each combination.
 
-# Node, pnpm, Rust and wasm-pack
+# Node, pnpm, Rust and wasm-pack; compose.override.yaml runs this with the
+# source mounted for development
 FROM node:24-bookworm AS toolchain
 ENV CI=true HUSKY=0 PATH=/root/.cargo/bin:$PATH
 RUN curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal \

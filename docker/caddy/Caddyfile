@@ -36,3 +36,6 @@ import {$TLS:off} annotations annotations
 import {$TLS:off} live live
 import {$TLS:off} tiles tileserver
 import {$TLS:off} preview preview
+
+# Extra sites, mounted in development
+import /etc/caddy-dev/*.caddy
