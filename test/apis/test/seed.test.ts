@@ -65,9 +65,9 @@ describe('Connected demo seed data', () => {
     expect(await getSeedSummary(context.client, catalog)).toMatchObject({
       users: 4,
       organizations: 2,
-      manifests: 4,
-      canvases: 4,
-      images: 4,
+      manifests: 6,
+      canvases: 6,
+      images: 6,
       maps: 3,
       map_versions: 6,
       snapshots: 3,
@@ -82,12 +82,12 @@ describe('Connected demo seed data', () => {
        WHERE ou.organization_id = ANY($1::text[])`,
       [catalog.organizations.map((organization) => organization.id)]
     )
-    expect(relationships.rows[0].count).toBe(4)
+    expect(relationships.rows[0].count).toBe(6)
     const members = await context.db.select().from(schema.members)
     expect(members).toHaveLength(4)
   })
 
-  it.each([0, 1, 2, 3])(
+  it.each([0, 1, 2, 3, 4, 5])(
     'reads the complete IIIF tree for manifest %i',
     async (index) => {
       const manifest = catalog.manifests[index]
@@ -111,7 +111,7 @@ describe('Connected demo seed data', () => {
     }
   )
 
-  it.each([0, 1, 2, 3])(
+  it.each([0, 1, 2, 3, 4, 5])(
     'serves real IIIF metadata and image bytes for seeded image %i',
     async (index) => {
       const resource = catalog.images[index]
@@ -149,13 +149,18 @@ describe('Connected demo seed data', () => {
     }
   )
 
-  it('includes an unmapped image for georeferenced filters', async () => {
+  it('includes unmapped images for georeferenced filters', async () => {
     const response = await rest('/images?georeferenced=false')
     expect(response.status).toBe(200)
     const images = await response.json()
-    expect(images).toHaveLength(1)
-    expect(images[0].uri).toBe(catalog.images[3].uri)
-    expect(images[0].maps).toEqual([])
+    expect(images).toHaveLength(3)
+    expect(images.map((image: { uri: string }) => image.uri).sort()).toEqual(
+      catalog.images
+        .slice(3)
+        .map((image) => image.uri)
+        .sort()
+    )
+    for (const image of images) expect(image.maps).toEqual([])
     const mapped = await rest('/images?georeferenced=true')
     expect(mapped.status).toBe(200)
     expect(await mapped.json()).toHaveLength(3)
@@ -165,7 +170,7 @@ describe('Connected demo seed data', () => {
     const organization = catalog.organizations[0]
     const resources = await rest(`/organizations/${organization.id}/images`)
     expect(resources.status).toBe(200)
-    expect(await resources.json()).toHaveLength(2)
+    expect(await resources.json()).toHaveLength(3)
     const maps = await rest(`/manifests/${catalog.manifests[0].id}/maps`)
     expect(maps.status).toBe(200)
     expect(await maps.json()).toHaveLength(1)

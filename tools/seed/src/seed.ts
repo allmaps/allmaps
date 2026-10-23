@@ -2,8 +2,7 @@ import { eq } from 'drizzle-orm'
 import { generateChecksum } from '@allmaps/id'
 import { Image, Manifest } from '@allmaps/iiif-parser'
 import { schema } from '@allmaps/db/schema'
-import type { PgliteDb } from '@allmaps/db'
-import type { PGlite } from '@electric-sql/pglite'
+import type { Db, PgliteDb } from '@allmaps/db'
 import type { AllmapsShareDB } from '@allmaps/api-live'
 
 import {
@@ -15,9 +14,16 @@ import {
   type SeedFixtures
 } from './seed-fixtures.ts'
 
-type SeedContext = { client: PGlite; db: PgliteDb; shareDb: AllmapsShareDB }
+// PGlite's client, or an equivalent for another driver
+export type SeedClient = {
+  query<T>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>
+  exec(sql: string): Promise<unknown>
+}
 
-async function seedRecords(db: PgliteDb, fixtures: SeedFixtures) {
+type SeedDb = PgliteDb | Db
+type SeedContext = { client: SeedClient; db: SeedDb; shareDb: AllmapsShareDB }
+
+async function seedRecords(db: SeedDb, fixtures: SeedFixtures) {
   // Insert the connected relational data atomically. Stable IDs and conflict
   // handling also make recovery from interrupted first-time seeding safe.
   await db.transaction(async (transaction) => {
@@ -44,7 +50,7 @@ async function seedRecords(db: PgliteDb, fixtures: SeedFixtures) {
           id: organization.id,
           name: organization.name,
           slug: organization.slug,
-          homepage: `http://${organization.domain}:5506/`,
+          homepage: `${organization.origin}/`,
           plan: organization.plan,
           displayCollections: true,
           createdAt: seedCreatedAt,
@@ -176,7 +182,7 @@ async function seedMapHistory(context: SeedContext, fixtures: SeedFixtures) {
   }
 }
 
-async function seedListItems(db: PgliteDb, fixtures: SeedFixtures) {
+async function seedListItems(db: SeedDb, fixtures: SeedFixtures) {
   const amsterdamList = fixtures.lists.find(
     (list) => list.key === 'amsterdam-research'
   )!
@@ -211,9 +217,10 @@ async function seedListItems(db: PgliteDb, fixtures: SeedFixtures) {
 
 export async function seedDemoData(
   context: SeedContext,
-  fixturePort?: number
+  fixturePort?: number,
+  fixtureOrigins?: string[]
 ): Promise<SeedCatalog> {
-  const fixtures = await createSeedFixtures(fixturePort)
+  const fixtures = await createSeedFixtures(fixturePort, fixtureOrigins)
   const catalog = createSeedCatalog(fixtures)
   await context.client.exec(`
     CREATE TABLE IF NOT EXISTS drizzle.__allmaps_seeds (
@@ -242,7 +249,7 @@ export async function seedDemoData(
   return catalog
 }
 
-export async function getSeedSummary(client: PGlite, catalog: SeedCatalog) {
+export async function getSeedSummary(client: SeedClient, catalog: SeedCatalog) {
   const result = await client.query<{
     maps: number
     map_versions: number
