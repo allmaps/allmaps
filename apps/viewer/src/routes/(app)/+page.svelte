@@ -204,7 +204,11 @@
     <DotsPattern color={green} opacity={0.3}>
       <div class="pb-16">
         <PageSection>
-          <Examples previewUrl={data.env.PUBLIC_PREVIEW_BASE_URL} />
+          <Examples
+            previewUrl={data.env.PUBLIC_PREVIEW_BASE_URL}
+            annotationsUrl={data.env.PUBLIC_ANNOTATIONS_BASE_URL}
+            restUrl={data.env.PUBLIC_REST_BASE_URL}
+          />
         </PageSection>
       </div>
     </DotsPattern>

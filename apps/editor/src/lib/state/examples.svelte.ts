@@ -22,7 +22,7 @@ export class ExamplesState {
   #restBaseUrl: string
 
   #organizations = $state<ApiOrganization[]>([])
-  #organizationsFetched = false
+  #organizationsFetched = $state(false)
   #organizationsPromise: Promise<ApiOrganization[]> | undefined
 
   #examplesByOrganizationId = $state<SvelteMap<string, Example[]>>(
@@ -71,6 +71,11 @@ export class ExamplesState {
     organizations: ApiOrganization[],
     count: number
   ) {
+    // The REST API rejects a request without organizations
+    if (organizations.length === 0) {
+      return
+    }
+
     const images = await fetchRandomOrganizationImages(
       fetch,
       this.#restBaseUrl,
