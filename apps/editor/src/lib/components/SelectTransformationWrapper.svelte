@@ -13,16 +13,24 @@
 
   const mapsState = getMapsState()
 
-  let value = $state<DbTransformation>(map.transformation || 'polynomial1')
+  // Read from and write to the shared map. A local copy goes stale when
+  // someone else changes the transformation, and writing it back would undo
+  // their change; with two editors open, each would keep undoing the other.
+  function getTransformation(): DbTransformation {
+    return map.transformation || 'polynomial1'
+  }
 
-  $effect(() => {
-    if (value !== map.transformation) {
+  function setTransformation(transformation: DbTransformation) {
+    if (transformation !== getTransformation()) {
       mapsState.setTransformation({
         mapId: map.id,
-        transformation: value
+        transformation
       })
     }
-  })
+  }
 </script>
 
-<SelectTransformation bind:value {...restProps} />
+<SelectTransformation
+  bind:value={getTransformation, setTransformation}
+  {...restProps}
+/>
