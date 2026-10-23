@@ -432,11 +432,19 @@
       <div>
         <p class="block text-sm font-medium text-gray-700 mb-2">Domains</p>
         <div class="space-y-2">
-          {#each editDomains as editDomain, i (editDomain)}
+          <!-- Replace editDomains rather than change an element: a $derived
+               array isn't deeply reactive, so the hidden field wouldn't update -->
+          {#each editDomains as editDomain, i (i)}
             <div class="flex gap-2">
               <input
                 type="text"
-                bind:value={editDomains[i]}
+                value={editDomain}
+                oninput={(event) => {
+                  const domain = event.currentTarget.value
+                  editDomains = editDomains.map((d, j) =>
+                    j === i ? domain : d
+                  )
+                }}
                 class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="example.com"
               />
