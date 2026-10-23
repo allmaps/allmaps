@@ -15,7 +15,8 @@
         ".screenshots/manifest.json",
         "tsconfig.tsbuildinfo"
       ],
-      "dependsOn": ["^build", "copy-between"]
+      "dependsOn": ["^build", "copy-between"],
+      "env": ["ADAPTER"]
     },
     "types": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],

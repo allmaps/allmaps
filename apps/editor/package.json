@@ -67,6 +67,7 @@
     "@inlang/plugin-m-function-matcher": "^2.2.6",
     "@inlang/plugin-message-format": "^4.4.0",
     "@sveltejs/adapter-cloudflare": "catalog:",
+    "@sveltejs/adapter-node": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
