@@ -515,9 +515,6 @@ importers:
       postgres:
         specifier: 'catalog:'
         version: 3.4.9
-      wrangler:
-        specifier: 'catalog:'
-        version: 4.151.1(@types/node@24.13.3)
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -543,6 +540,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
+      wrangler:
+        specifier: 'catalog:'
+        version: 4.151.1(@types/node@24.13.3)
 
   apis/live:
     dependencies:
@@ -691,9 +691,6 @@ importers:
       postgres:
         specifier: 'catalog:'
         version: 3.4.9
-      wrangler:
-        specifier: 'catalog:'
-        version: 4.151.1(@types/node@24.13.3)
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -719,6 +716,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
+      wrangler:
+        specifier: 'catalog:'
+        version: 4.151.1(@types/node@24.13.3)
 
   apps/cli:
     dependencies:
