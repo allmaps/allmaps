@@ -36,9 +36,17 @@ export async function headers(
   return response
 }
 
-export async function put(response: Response, request: Request) {
+export async function put(
+  response: Response,
+  request: Request,
+  env: WorkerEnv
+) {
   // Only cache HTTP 200 responses
-  if (response.status === 200 && !response.headers.has('X-Allmaps-Error')) {
+  if (
+    env.USE_CACHE &&
+    response.status === 200 &&
+    !response.headers.has('X-Allmaps-Error')
+  ) {
     await cache.put(request.url, response.clone())
   }
 
