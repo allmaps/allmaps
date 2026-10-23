@@ -1,0 +1,38 @@
+{
+	http_port {$HTTP_PORT:5490}
+	https_port {$HTTPS_PORT:5443}
+	import {$TLS:off}.global*
+}
+
+# One snippet per TLS mode; see docker/README.md
+(off) {
+	http://{args[0]}.{$DOMAIN:allmaps.localhost} {
+		reverse_proxy {args[1]}:8080
+	}
+}
+
+(proxy) {
+	import off {args[0]} {args[1]}
+}
+
+(auto) {
+	{args[0]}.{$DOMAIN:allmaps.localhost} {
+		reverse_proxy {args[1]}:8080
+	}
+}
+
+(files) {
+	{args[0]}.{$DOMAIN:allmaps.localhost} {
+		tls /etc/caddy/certs/cert.pem /etc/caddy/certs/key.pem
+		reverse_proxy {args[1]}:8080
+	}
+}
+
+import {$TLS:off} editor editor
+import {$TLS:off} viewer viewer
+import {$TLS:off} console console
+import {$TLS:off} api rest
+import {$TLS:off} annotations annotations
+import {$TLS:off} live live
+import {$TLS:off} tiles tileserver
+import {$TLS:off} preview preview

@@ -5,3 +5,8 @@
 **/dist
 **/node_modules
 **/*.tsbuildinfo
+**/.env.*.local
+**/.svelte-kit
+**/build
+**/target
+packages/render-wasm/pkg*

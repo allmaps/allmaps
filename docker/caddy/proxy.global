@@ -1,0 +1,3 @@
+servers {
+	trusted_proxies static {$TRUSTED_PROXIES:set-TRUSTED_PROXIES}
+}

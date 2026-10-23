@@ -1,0 +1,160 @@
+name: allmaps
+
+# Deployment: docker compose -f compose.yaml up --build
+
+x-env: &env
+  ADAPTER: node
+  PORT: 8080
+  NODE_VERSION: 24
+  DATABASE_URL: postgres://allmaps:allmaps@postgres:5432/allmaps
+  PUBLIC_REST_BASE_URL: ${SCHEME:-http}://api.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_ANNOTATIONS_BASE_URL: ${SCHEME:-http}://annotations.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_LIVE_BASE_URL: ${SCHEME:-http}://live.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_VIEWER_BASE_URL: ${SCHEME:-http}://viewer.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_TILE_SERVER_BASE_URL: ${SCHEME:-http}://tiles.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_TILE_VIEWER_BASE_URL: ${SCHEME:-http}://tiles.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_PREVIEW_BASE_URL: ${SCHEME:-http}://preview.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  PUBLIC_STATS_WEBSITE_ID: ''
+  PUBLIC_GEOCODE_EARTH_KEY: ${GEOCODE_EARTH_KEY:-}
+  PUBLIC_BASEMAP: ${BASEMAP:-osm}
+  PUBLIC_BANNER_ENABLED: 'false'
+  PUBLIC_BANNER_TEXT: ''
+  BETTER_AUTH_URL: ${SCHEME:-http}://api.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  # Required in deployment: the REST and Annotations APIs refuse to start without it.
+  # Development mode supplies a local value (docker/dev-run.sh).
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
+  BETTER_AUTH_COOKIE_PREFIX: allmaps
+  BETTER_AUTH_COOKIE_DOMAIN: ${DOMAIN:-allmaps.localhost}
+  BETTER_AUTH_TRUSTED_ORIGINS: ${SCHEME:-http}://*.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+  GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+  GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+  USE_CACHE: 'false'
+  BROWSER_CACHE_HOURS: 1
+  CLOUDFLARE_CACHE_HOURS: 1
+
+x-service: &service
+  environment: *env
+  restart: unless-stopped
+
+x-rest-build: &rest-build
+  context: .
+  target: node
+  args: { APP_DIR: apis/rest }
+
+x-after-migrate: &after-migrate
+  migrate:
+    condition: service_completed_successfully
+
+services:
+  # Routes <service>.$DOMAIN to each service. The aliases send server-side
+  # requests to those hostnames through the proxy too.
+  proxy:
+    image: caddy:2
+    ports:
+      - ${HTTP_PORT:-5490}:${HTTP_PORT:-5490}
+      - ${HTTPS_PORT:-5443}:${HTTPS_PORT:-5443}
+    environment:
+      DOMAIN: ${DOMAIN:-allmaps.localhost}
+      TLS: ${TLS:-off}
+      HTTP_PORT: ${HTTP_PORT:-5490}
+      HTTPS_PORT: ${HTTPS_PORT:-5443}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+    volumes:
+      - ./docker/caddy:/etc/caddy:ro
+      - ${TLS_CERTS_DIR:-./docker/caddy/certs}:/etc/caddy/certs:ro
+      - caddy:/data
+    networks:
+      default:
+        aliases:
+          - editor.${DOMAIN:-allmaps.localhost}
+          - viewer.${DOMAIN:-allmaps.localhost}
+          - console.${DOMAIN:-allmaps.localhost}
+          - api.${DOMAIN:-allmaps.localhost}
+          - annotations.${DOMAIN:-allmaps.localhost}
+          - live.${DOMAIN:-allmaps.localhost}
+          - tiles.${DOMAIN:-allmaps.localhost}
+          - preview.${DOMAIN:-allmaps.localhost}
+    restart: unless-stopped
+
+  postgres:
+    build: { context: ., target: postgres }
+    environment:
+      POSTGRES_USER: allmaps
+      POSTGRES_PASSWORD: allmaps
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      # TCP, not the socket: during initdb a temporary server listens on the
+      # socket only, and migrate connects over TCP.
+      test: pg_isready -h 127.0.0.1 -U allmaps
+      interval: 2s
+    restart: unless-stopped
+
+  migrate:
+    <<: *service
+    image: allmaps-rest
+    build: *rest-build
+    command: node node_modules/@allmaps/db/dist/migrate.js
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  rest:
+    <<: *service
+    image: allmaps-rest
+    build: *rest-build
+    command: node dist/node.js
+    depends_on: *after-migrate
+
+  annotations:
+    <<: *service
+    build: { context: ., target: node, args: { APP_DIR: apis/annotations } }
+    command: node dist/node.js
+    depends_on: *after-migrate
+
+  live:
+    <<: *service
+    build: { context: ., target: node, args: { APP_DIR: apis/live } }
+    command: node dist/index.js
+    depends_on: *after-migrate
+
+  # adapter-node assumes https unless ORIGIN says otherwise, and SvelteKit
+  # rejects form posts whose origin doesn't match
+  editor:
+    <<: *service
+    build: { context: ., target: node, args: { APP_DIR: apps/editor } }
+    environment:
+      <<: *env
+      ORIGIN: ${SCHEME:-http}://editor.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+    command: node build
+
+  viewer:
+    <<: *service
+    build: { context: ., target: node, args: { APP_DIR: apps/viewer } }
+    environment:
+      <<: *env
+      ORIGIN: ${SCHEME:-http}://viewer.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+      NODE_OPTIONS: --max-http-header-size=32768
+    command: node build
+
+  console:
+    <<: *service
+    build: { context: ., target: node, args: { APP_DIR: apps/console } }
+    environment:
+      <<: *env
+      ORIGIN: ${SCHEME:-http}://console.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+    command: node build
+
+  tileserver:
+    <<: *service
+    build:
+      { context: ., target: workerd, args: { APP_DIR: workers/tileserver } }
+
+  preview:
+    <<: *service
+    build: { context: ., target: workerd, args: { APP_DIR: workers/preview } }
+
+volumes:
+  postgres:
+  caddy:
