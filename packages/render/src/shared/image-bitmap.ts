@@ -21,13 +21,15 @@ export async function createTileImageBitmap(
     return imageBitmap
   }
 
-  const croppedImageBitmap = await createImageBitmap(
-    imageBitmap,
-    0,
-    0,
-    Math.min(imageBitmap.width, maxWidth),
-    Math.min(imageBitmap.height, maxHeight)
-  )
-  imageBitmap.close()
-  return croppedImageBitmap
+  try {
+    return await createImageBitmap(
+      imageBitmap,
+      0,
+      0,
+      Math.min(imageBitmap.width, maxWidth),
+      Math.min(imageBitmap.height, maxHeight)
+    )
+  } finally {
+    imageBitmap.close()
+  }
 }
