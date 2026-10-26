@@ -78,3 +78,62 @@ for (const { filename, thumbnailSize, mode, expectedUrl } of tests) {
     })
   })
 }
+
+test('Welsh library thumbnails respect limits despite oversized advertised sizes', () => {
+  // Metadata from https://iiif.llyfrgell.cymru/iiif/4997844/info.json
+  const image = Image.parse({
+    '@context': 'http://iiif.io/api/image/2/context.json',
+    '@id': 'https://iiif.llyfrgell.cymru/iiif/04/997/04997844.jp2',
+    protocol: 'http://iiif.io/api/image',
+    width: 21391,
+    height: 19075,
+    sizes: [
+      { width: 167, height: 149 },
+      { width: 334, height: 298 },
+      { width: 668, height: 596 },
+      { width: 1336, height: 1192 },
+      { width: 2673, height: 2384 }
+    ],
+    profile: [
+      'http://iiif.io/api/image/2/level1.json',
+      { maxWidth: 1200, maxHeight: 1200 }
+    ]
+  })
+
+  const request = image.getImageRequest({ width: 1200, height: 1200 })
+  assertSingleImageRequest(request)
+  expect(request.size).toEqual({ width: 1200, height: 1070 })
+  expect(image.getImageUrl(request)).toBe(
+    'https://iiif.llyfrgell.cymru/iiif/04/997/04997844.jp2/full/1200,/0/default.jpg'
+  )
+})
+
+test.each([{ maxWidth: 1000 }, { maxHeight: 1000 }, { maxArea: 1000000 }])(
+  'advertised sizes respect %o',
+  (limits) => {
+    const image = Image.parse({
+      '@context': 'http://iiif.io/api/image/2/context.json',
+      '@id': 'https://example.org/image',
+      protocol: 'http://iiif.io/api/image',
+      width: 4000,
+      height: 4000,
+      sizes: [
+        { width: 1100, height: 1100 },
+        { width: 900, height: 900 }
+      ],
+      profile: ['http://iiif.io/api/image/2/level1.json', limits]
+    })
+
+    const request = image.getImageRequest({ width: 1000, height: 1000 })
+    assertSingleImageRequest(request)
+    expect(request.size).toEqual({ width: 900, height: 900 })
+    expect(() => image.getImageUrl(request)).not.toThrow()
+  }
+)
+
+function assertSingleImageRequest(
+  request: ReturnType<Image['getImageRequest']>
+): asserts request is Exclude<typeof request, unknown[]> {
+  expect(Array.isArray(request)).toBe(false)
+  if (Array.isArray(request)) throw new Error('Expected a single image request')
+}
