@@ -21,6 +21,7 @@ import type { searchParams } from '$lib/shared/params'
 
 const UI_KEY = Symbol('ui')
 const FIRST_USE_KEY = `${String(UI_KEY)}-first-use`
+const MAP_GUIDE_OPEN_KEY = `${String(UI_KEY)}-map-guide-open`
 
 type Modal =
   | 'command'
@@ -105,6 +106,7 @@ export class UiState extends UiEventTarget {
   #urlState: UrlState<typeof searchParams>
 
   #firstUse = $state(true)
+  #mapGuideOpen = $state(true)
 
   #sourceUrl = $state<string>()
 
@@ -197,6 +199,7 @@ export class UiState extends UiEventTarget {
     if (browser) {
       try {
         this.#firstUse = localStorage.getItem(FIRST_USE_KEY) !== 'false'
+        this.#mapGuideOpen = localStorage.getItem(MAP_GUIDE_OPEN_KEY) !== 'false'
       } catch {
         console.warn('Error reading from localStorage')
       }
@@ -289,6 +292,22 @@ export class UiState extends UiEventTarget {
 
   get firstUse() {
     return this.#firstUse
+  }
+
+  get mapGuideOpen() {
+    return this.#mapGuideOpen
+  }
+
+  set mapGuideOpen(open: boolean) {
+    this.#mapGuideOpen = open
+
+    if (browser) {
+      try {
+        localStorage.setItem(MAP_GUIDE_OPEN_KEY, String(open))
+      } catch {
+        console.warn('Error writing to localStorage')
+      }
+    }
   }
 
   completeFirstUse() {
