@@ -1,5 +1,5 @@
-import { command, form, query } from '$app/server'
-import { redirect } from '@sveltejs/kit'
+import { command, form, query, getRequestEvent } from '$app/server'
+import { error, redirect } from '@sveltejs/kit'
 
 import { routes } from '$lib/routes.js'
 import { restFetch } from '$lib/server/rest.js'
@@ -23,7 +23,6 @@ export const getUsers = query(userLimitSchema, async (limit) => {
   )
 })
 
-const userRoleSchema = z.enum(['user', 'admin'])
 const userSlugSchema = z
   .string()
   .trim()
@@ -35,21 +34,26 @@ const updateUserFormSchema = z.object({
   userId: userIdSchema,
   name: z.string(),
   slug: userSlugSchema,
-  email: z.string().email(),
+  email: z.string().email().optional(),
   banned: z
     .union([z.literal('true'), z.literal('on'), z.literal(true)])
     .optional()
     .transform(Boolean)
 })
 
-const setUserRoleSchema = z.object({
-  userId: userIdSchema,
-  role: userRoleSchema
-})
-
 export const updateUserForm = form(
   updateUserFormSchema,
   async ({ userId, name, slug, email, banned }) => {
+    const session = await getRequestEvent().locals.getConsoleSession()
+    const isAdmin = session?.user?.role === 'admin'
+    if (!isAdmin && session?.user?.id !== userId) error(403, 'Forbidden')
+    if (!isAdmin) {
+      await restFetch('/auth/update-user', {
+        method: 'POST',
+        json: { name, slug }
+      })
+      redirect(303, routes.user(userId))
+    }
     await restFetch<{ user: ConsoleUser }>('/auth/admin/update-user', {
       method: 'POST',
       json: {
@@ -67,16 +71,12 @@ export const updateUserForm = form(
   }
 )
 
-export const setUserRole = command<
-  typeof setUserRoleSchema,
-  Promise<ConsoleUser>
->(setUserRoleSchema, async (body) => {
-  const result = await restFetch<{ user: ConsoleUser }>(
-    '/auth/admin/set-role',
-    {
-      method: 'POST',
-      json: body
-    }
-  )
-  return result.user
-})
+export const updateUserRole = command(
+  z.object({ userId: z.string(), role: z.enum(['user', 'collaborator']) }),
+  async ({ userId, role }) => {
+    await restFetch(`/users/${encodeURIComponent(userId)}/role`, {
+      method: 'PATCH',
+      json: { role }
+    })
+  }
+)

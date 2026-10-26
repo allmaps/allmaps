@@ -16,19 +16,6 @@ import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { authenticatedDetail } from '../openapi.js'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 
-function getUserId(user: unknown): string {
-  if (
-    !user ||
-    typeof user !== 'object' ||
-    !('id' in user) ||
-    typeof user.id !== 'string'
-  ) {
-    throw new Error('Invalid authenticated user')
-  }
-
-  return user.id
-}
-
 export function createListsRoutes(betterAuth: BetterAuthContext) {
   return createElysia({
     name: 'lists-routes'
@@ -38,7 +25,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists',
       ({ db, user, set }) => {
         setCacheControl(set, 'private-no-store')
-        return queryUserLists(db, getUserId(user))
+        return queryUserLists(db, user.id)
       },
       {
         auth: true,
@@ -53,7 +40,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists',
       ({ db, user, body, set }) => {
         setCacheControl(set, 'private-no-store')
-        return createUserList(db, getUserId(user), body.name)
+        return createUserList(db, user.id, body.name)
       },
       {
         auth: true,
@@ -71,11 +58,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId',
       async ({ db, user, params, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const result = await queryListWithItems(
-          db,
-          getUserId(user),
-          params.listId
-        )
+        const result = await queryListWithItems(db, user.id, params.listId)
 
         if (!result) {
           return status(404, { error: 'List not found' })
@@ -102,12 +85,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
           return status(400, { error: 'Name is required' })
         }
 
-        const list = await updateUserListName(
-          db,
-          getUserId(user),
-          params.listId,
-          name
-        )
+        const list = await updateUserListName(db, user.id, params.listId, name)
         if (!list) {
           return status(404, { error: 'List not found' })
         }
@@ -129,7 +107,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId/items',
       async ({ db, user, params, body, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const userId = getUserId(user)
+        const userId = user.id
         const list = await queryListWithItems(db, userId, params.listId)
 
         if (!list) {
@@ -163,7 +141,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId/items/url',
       async ({ db, user, params, body, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const userId = getUserId(user)
+        const userId = user.id
         const list = await queryListWithItems(db, userId, params.listId)
 
         if (!list) {
@@ -196,7 +174,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId/items',
       async ({ db, user, params, query, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const userId = getUserId(user)
+        const userId = user.id
         const list = await queryListWithItems(db, userId, params.listId)
 
         if (!list) {
@@ -233,7 +211,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId',
       async ({ db, user, params, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const result = await deleteUserList(db, getUserId(user), params.listId)
+        const result = await deleteUserList(db, user.id, params.listId)
         if (!result.success) {
           return status(result.status, { error: result.error })
         }

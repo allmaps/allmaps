@@ -1,10 +1,13 @@
 import { Elysia, ElysiaCustomStatusResponse } from 'elysia'
 
-import type { SingletonBase, ElysiaConfig } from 'elysia'
+import type { ElysiaConfig } from 'elysia'
 
 import type { Db } from '@allmaps/db'
 
-export type DecoratedElysia<TEnv> = SingletonBase & {
+export type DecoratedElysia<TEnv> = {
+  store: Record<never, never>
+  derive: Record<never, never>
+  resolve: Record<never, never>
   decorator: {
     db: Db
     env: TEnv

@@ -8,7 +8,7 @@ import { z } from 'zod'
 
 import type { Organization } from '$lib/types.js'
 
-type OrganizationRole = 'admin' | 'member' | 'owner'
+type OrganizationRole = 'owner' | 'member'
 
 type CreateOrganizationInput = {
   name: string
@@ -51,7 +51,7 @@ const slugSchema = z
   .string()
   .trim()
   .regex(/^[a-z](?:[a-z0-9-]*[a-z0-9])?$/, 'Invalid slug')
-const organizationRoleSchema = z.enum(['admin', 'member', 'owner'])
+const organizationRoleSchema = z.enum(['owner', 'member'])
 
 const createOrganizationSchema = z.object({
   name: z.string().trim().min(1),
@@ -97,23 +97,27 @@ function parseLocationInput(value: string) {
 const updateOrganizationFormSchema = z.object({
   organizationId: organizationIdSchema,
   name: z.string().trim().min(1),
-  slug: slugSchema,
+  slug: slugSchema.optional(),
   logo: httpUrlSchema,
   homepage: httpUrlSchema,
   plan: z
     .union([z.enum(ORGANIZATION_PLANS), z.literal('')])
-    .transform((value) => value || null),
+    .transform((value) => value || null)
+    .optional(),
   displayCollections: z
-    .union([z.literal('true'), z.literal('on'), z.literal(true)])
-    .optional()
-    .transform(Boolean),
+    .enum(['true', 'false'])
+    .transform((value) => value === 'true')
+    .optional(),
   location: z.string().transform(parseLocationInput),
-  domains: z.string().transform((value) =>
-    value
-      .split('\n')
-      .map((domain) => domain.trim())
-      .filter(Boolean)
-  )
+  domains: z
+    .string()
+    .transform((value) =>
+      value
+        .split('\n')
+        .map((domain) => domain.trim())
+        .filter(Boolean)
+    )
+    .optional()
 })
 
 const addOrganizationMemberSchema = z.object({

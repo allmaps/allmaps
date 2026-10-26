@@ -90,7 +90,7 @@ export async function openServers(
   reuseFixture = false
 ) {
   const servers: NodeServer[] = []
-  const live = createLiveServer(context.shareDb)
+  const live = createLiveServer(context.shareDb, context.env)
   let closing: Promise<void> | undefined
   function close() {
     return (closing ??= (async () => {

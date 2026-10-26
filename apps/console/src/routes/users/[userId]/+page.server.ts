@@ -13,17 +13,18 @@ export const load: PageServerLoad = async ({ locals, params }) => {
   const session = await locals.getConsoleSession()
   const sessionUser = session?.user
   const isAdmin = sessionUser?.role === 'admin'
+  const canManageOrganizations = isAdmin || sessionUser?.role === 'collaborator'
   const isCurrentUser = sessionUser
     ? getUserId(sessionUser.id) === userId
     : false
 
-  if (!isAdmin && !isCurrentUser) {
+  if (!canManageOrganizations && !isCurrentUser) {
     error(403, 'You do not have access to this user')
   }
 
   const [user, organizations, lists] = await Promise.all([
     restFetch<ConsoleUser>(`/users/${encodeURIComponent(userId)}`),
-    isAdmin
+    canManageOrganizations
       ? restFetch<Organization[]>(`/organizations?limit=${CONSOLE_LIST_LIMIT}`)
       : Promise.resolve([]),
     isCurrentUser ? restFetch<ListSummary[]>('/lists') : Promise.resolve([])
@@ -32,6 +33,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
   return {
     userId,
     isAdmin,
+    canManageOrganizations,
+    canEditProfile: isAdmin || isCurrentUser,
     isCurrentUser,
     user,
     organizations,

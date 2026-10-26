@@ -14,7 +14,8 @@
     "build": "tsc --noCheck",
     "lerna-build": "lerna run build --scope @allmaps/api-rest --include-dependencies",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
-    "types": "pnpm run cf-typegen && tsc --noEmit"
+    "types": "pnpm run cf-typegen && tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
@@ -41,6 +42,7 @@
     "drizzle-kit": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

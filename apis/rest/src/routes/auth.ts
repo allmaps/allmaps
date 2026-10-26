@@ -1,22 +1,26 @@
 import { t } from 'elysia'
 
-import { setCacheControl } from '@allmaps/api-shared'
+import { setCacheControl, isOrganizationManager } from '@allmaps/api-shared'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import { createAuth } from '@allmaps/db/auth'
 import { createElysia, createBetterAuthPlugin, error } from '../elysia.js'
-import { adminDetail } from '../openapi.js'
+import {
+  adminDetail,
+  organizationManagerDetail,
+  organizationOwnerDetail
+} from '../openapi.js'
 import {
   queryAdminOrganizationById,
   queryUserWithOrganizationsById,
-  queryOrganizationMemberByUserId,
+  changeOrganizationMember,
   queryOrganizationMembersById,
-  queryUserById,
   queryUserByEmail,
-  queryUsers
+  queryUsers,
+  setUserRole
 } from '@allmaps/api-shared/db'
 import type { RestEnv } from '@allmaps/env/rest'
 
-const Role = t.UnionEnum(['admin', 'member', 'owner'])
+const Role = t.Union([t.Literal('owner'), t.Literal('member')])
 
 export function createAuthRoutes(
   env: RestEnv,
@@ -30,34 +34,35 @@ export function createAuthRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/users',
-      ({ db, env, query, set }) => {
+      async ({ db, env, query, set, getLimitRole }) => {
         setCacheControl(set, 'private-no-store')
         return queryUsers(
           db,
           env.PUBLIC_REST_BASE_URL,
           query.limit,
           true,
-          'admin'
+          await getLimitRole()
         )
       },
       {
-        admin: true,
+        organizationManager: true,
         query: t.Object({ limit: t.Optional(t.Number()) }),
         detail: {
           summary: 'Get all users',
           tags: ['Authentication'],
-          ...adminDetail
+          ...organizationManagerDetail
         }
       }
     )
     .get(
       '/users/:userId',
-      async ({ db, env, params, request, set, status }) => {
-        const session = await auth.api.getSession({ headers: request.headers })
+      async ({ db, env, params, getCurrentSession, set, status }) => {
+        const session = await getCurrentSession()
 
         if (
           !session ||
-          (session.user.role !== 'admin' && session.user.id !== params.userId)
+          (!isOrganizationManager(session.user.role) &&
+            session.user.id !== params.userId)
         ) {
           return status(401, { error: 'Unauthorized' })
         }
@@ -83,10 +88,34 @@ export function createAuthRoutes(
         }
       }
     )
+    .patch(
+      '/users/:userId/role',
+      async ({ db, params, body, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return setUserRole(db, params.userId, body.role)
+      },
+      {
+        admin: true,
+        params: t.Object({ userId: t.String() }),
+        body: t.Object({
+          role: t.Union([t.Literal('user'), t.Literal('collaborator')])
+        }),
+        detail: {
+          summary:
+            'Assign or remove Collaborator; Admin changes require the database',
+          tags: ['Authentication'],
+          ...adminDetail
+        }
+      }
+    )
     .get(
       '/organizations/:organizationId/users',
-      ({ db, env, params, set }) => {
+      async ({ db, env, params, set, status, getOrganizationAccess }) => {
         setCacheControl(set, 'private-no-store')
+        const { permissions } = await getOrganizationAccess(
+          params.organizationId
+        )
+        if (!permissions.canView) return status(403, { error: 'Forbidden' })
         return queryOrganizationMembersById(
           db,
           env.PUBLIC_REST_BASE_URL,
@@ -94,32 +123,42 @@ export function createAuthRoutes(
         )
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({ organizationId: t.String() }),
         detail: {
           summary: 'Get users for a single organization',
           tags: ['Authentication'],
-          ...adminDetail
+          ...organizationOwnerDetail
         }
       }
     )
     .post(
       '/organizations/:organizationId/users',
-      async ({ db, body, params, set }) => {
+      async ({ db, body, params, set, status, getOrganizationAccess }) => {
         setCacheControl(set, 'private-no-store')
+        const { permissions } = await getOrganizationAccess(
+          params.organizationId
+        )
+        if (!permissions.canManageMembers)
+          return status(403, { error: 'Forbidden' })
         const { email, role } = body
+        if (role === 'owner' && !permissions.canAssignOwner) {
+          return status(403, {
+            error: 'Only Allmaps admins and collaborators can assign owners'
+          })
+        }
 
         const organization = await queryAdminOrganizationById(
           db,
           params.organizationId
         )
         if (!organization) {
-          throw new Error(`Organization not found: ${params.organizationId}`)
+          return status(404, { error: 'Organization not found' })
         }
 
         const user = await queryUserByEmail(db, email)
         if (!user) {
-          throw new Error(`User not found`)
+          return status(404, { error: 'User not found' })
         }
 
         return auth.api.addMember({
@@ -131,92 +170,55 @@ export function createAuthRoutes(
         })
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({ organizationId: t.String() }),
         body: t.Object({
           email: t.String(),
-          role: t.Optional(t.Union([Role, t.Array(Role)]))
+          role: t.Optional(Role)
         }),
         detail: {
           summary: 'Add a user to a single organization',
           tags: ['Authentication'],
-          ...adminDetail
+          ...organizationOwnerDetail
         }
       }
     )
     .delete(
       '/organizations/:organizationId/users/:userId',
-      async ({ db, env, params, request, set }) => {
+      async ({ db, params, set, user }) => {
         setCacheControl(set, 'private-no-store')
-        const { organizationId, userId } = params
-
-        const organization = await queryAdminOrganizationById(
+        return changeOrganizationMember(
           db,
-          organizationId
+          params.organizationId,
+          params.userId,
+          null,
+          user
         )
-        if (!organization) {
-          throw new Error(`Organization not found: ${organizationId}`)
-        }
-
-        const user = await queryUserById(db, env.PUBLIC_REST_BASE_URL, userId)
-        if (!user) {
-          throw new Error(`User not found`)
-        }
-
-        return auth.api.removeMember({
-          body: {
-            memberIdOrEmail: user.email,
-            organizationId: organization.id
-          },
-          headers: request.headers
-        })
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({ organizationId: t.String(), userId: t.String() }),
         detail: {
           summary: 'Remove a user from a single organization',
           tags: ['Authentication'],
-          ...adminDetail
+          ...organizationOwnerDetail
         }
       }
     )
     .patch(
       '/organizations/:organizationId/users/:userId',
-      async ({ db, body, params, request, set }) => {
+      async ({ db, body, params, set, user }) => {
         setCacheControl(set, 'private-no-store')
-        const { organizationId, userId } = params
-        const { role } = body
-
-        const organization = await queryAdminOrganizationById(
+        return changeOrganizationMember(
           db,
-          organizationId
+          params.organizationId,
+          params.userId,
+          body.role,
+          user
         )
-        if (!organization) {
-          throw new Error(`Organization not found: ${organizationId}`)
-        }
-
-        const member = await queryOrganizationMemberByUserId(
-          db,
-          organizationId,
-          userId
-        )
-
-        if (!member) {
-          throw new Error(`Organization user not found`)
-        }
-
-        return auth.api.updateMemberRole({
-          body: {
-            memberId: member.id,
-            role,
-            organizationId: organization.id
-          },
-          headers: request.headers
-        })
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({ organizationId: t.String(), userId: t.String() }),
         body: t.Object({
           role: Role
@@ -224,7 +226,7 @@ export function createAuthRoutes(
         detail: {
           summary: 'Update a user role in a single organization',
           tags: ['Authentication'],
-          ...adminDetail
+          ...organizationOwnerDetail
         }
       }
     )

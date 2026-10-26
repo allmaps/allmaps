@@ -6,7 +6,7 @@ import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
-import { adminDetail } from '../openapi.js'
+import { iiifImportDetail } from '../openapi.js'
 import {
   queryManifests,
   createManifest,
@@ -199,12 +199,12 @@ export function createManifestsRoutes(
         return createManifestsFromBody(db, body)
       },
       {
-        admin: true,
+        importIiif: true,
         body: createManifestBodySchema,
         detail: {
           summary: 'Create a IIIF Manifest from a IIIF URL',
           tags: ['Manifests'],
-          ...adminDetail
+          ...iiifImportDetail
         }
       }
     )

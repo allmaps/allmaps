@@ -9,11 +9,23 @@ import { createElysia } from './app.js'
 import { setCacheControl } from './cache.js'
 import { redirect } from './response.js'
 import {
+  canImportIiif,
+  isSignedInUser,
+  isOrganizationManager,
+  getUserLimitRole,
+  getOrganizationPermissions
+} from '../shared/permissions.js'
+import {
   isOrganizationPlan,
   ORGANIZATION_PLANS_WITH_ELEVATED_LIMITS
 } from '../shared/tiers.js'
 
 import type { UserRole } from '../shared/limits.js'
+
+type OrganizationReference = {
+  id?: string
+  slug?: string
+}
 
 function copySetCookieHeader(
   response: Response,
@@ -31,95 +43,156 @@ export function createBetterAuthPlugin<TEnv = Record<string, unknown>>(
   const { auth } = betterAuth
 
   return createElysia<TEnv>({ name: 'better-auth' })
+    .derive({ as: 'global' }, ({ db, request: { headers } }) => {
+      const readSession = (disableCookieCache = false) =>
+        auth.api.getSession({ headers, query: { disableCookieCache } })
+      let cachedSession: ReturnType<typeof readSession> | undefined
+      let currentSession: ReturnType<typeof readSession> | undefined
+
+      // Share reads within this request only. A fresh result takes precedence
+      // over cookie cache, including when the session has been revoked.
+      const getOptionalSession = () =>
+        currentSession ?? (cachedSession ??= readSession())
+      const getCurrentSession = async () => {
+        const session = await (currentSession ??= readSession(true))
+        return isSignedInUser(session?.user) ? session : null
+      }
+
+      const hasOrganizationPlanMembership = async (
+        userId: string,
+        organization: OrganizationReference,
+        ownerOnly = false
+      ): Promise<boolean> => {
+        if (!organization.id && !organization.slug) {
+          return false
+        }
+
+        const [membership] = await db
+          .select({
+            plan: authSchema.organizations.plan,
+            role: authSchema.members.role
+          })
+          .from(authSchema.members)
+          .innerJoin(
+            authSchema.organizations,
+            eq(authSchema.members.organizationId, authSchema.organizations.id)
+          )
+          .where(
+            and(
+              eq(authSchema.members.userId, userId),
+              organization.id
+                ? eq(authSchema.organizations.id, organization.id)
+                : eq(authSchema.organizations.slug, organization.slug!)
+            )
+          )
+          .limit(1)
+
+        return Boolean(
+          (!ownerOnly || membership?.role === 'owner') &&
+          membership?.plan &&
+          isOrganizationPlan(membership.plan) &&
+          ORGANIZATION_PLANS_WITH_ELEVATED_LIMITS.has(membership.plan)
+        )
+      }
+
+      return {
+        getOptionalSession,
+        getCurrentSession,
+        getOrganizationAccess: async (organizationId: string) => {
+          const session = await getCurrentSession()
+          const member =
+            session?.user.id && !isOrganizationManager(session.user.role)
+              ? await db.query.members.findFirst({
+                  columns: { role: true },
+                  where: {
+                    organizationId: { eq: organizationId },
+                    userId: { eq: session.user.id }
+                  }
+                })
+              : undefined
+
+          return {
+            session,
+            permissions: getOrganizationPermissions(
+              session?.user.role,
+              member?.role
+            )
+          }
+        },
+        getLimitRole: async (): Promise<UserRole> => {
+          const session = await getOptionalSession()
+          return getUserLimitRole(session?.user)
+        },
+        getOrganizationLimitRole: async (
+          organization: OrganizationReference
+        ): Promise<UserRole> => {
+          const session = await getOptionalSession()
+          const userRole = getUserLimitRole(session?.user)
+
+          if (userRole === 'admin' || userRole === 'collaborator') {
+            return userRole
+          }
+
+          if (
+            !session ||
+            !isSignedInUser(session.user) ||
+            (!organization.id && !organization.slug)
+          ) {
+            return 'public'
+          }
+
+          return (await hasOrganizationPlanMembership(
+            session.user.id,
+            organization
+          ))
+            ? 'organizationPlanMember'
+            : 'user'
+        },
+        getOrganizationIiifImportAccess: async (
+          organization: OrganizationReference
+        ) => {
+          const session = await getCurrentSession()
+
+          const unrestricted = canImportIiif(session?.user)
+          return {
+            canImport:
+              unrestricted ||
+              Boolean(
+                session &&
+                (await hasOrganizationPlanMembership(
+                  session.user.id,
+                  organization,
+                  true
+                ))
+              ),
+            restrictDomains: !unrestricted
+          }
+        }
+      }
+    })
     .macro({
       auth: {
-        async resolve({ status, request: { headers } }) {
-          const session = await auth.api.getSession({ headers })
-
-          if (!session) {
-            return status(401, { error: 'Unauthorized' })
-          }
-
-          return session
-        }
-      },
-      admin: {
-        async resolve({ status, request: { headers } }) {
-          const session = await auth.api.getSession({ headers })
-
-          if (!session || session.user.role !== 'admin') {
-            return status(401, { error: 'Unauthorized' })
-          }
-
+        async resolve({ getCurrentSession, status }) {
+          const session = await getCurrentSession()
+          if (!session) return status(401, { error: 'Unauthorized' })
           return session
         }
       }
     })
-    .derive(({ db, request: { headers } }) => {
-      const getOptionalSession = async () => auth.api.getSession({ headers })
-
-      return {
-        getOptionalSession,
-        getLimitRole: async (): Promise<UserRole> => {
-          const session = await getOptionalSession()
-
-          return session?.user.role === 'admin'
-            ? 'admin'
-            : session?.user.id
-              ? 'user'
-              : 'public'
-        },
-        getSession: async () => {
-          const session = await getOptionalSession()
-
-          if (!session) {
-            throw new ResponseError('Unauthorized', 401)
-          }
-
-          return session
-        },
-        getOrganizationLimitRole: async (organization: {
-          id?: string
-          slug?: string
-        }): Promise<UserRole> => {
-          const session = await getOptionalSession()
-
-          if (session?.user.role === 'admin') {
-            return 'admin'
-          }
-
-          if (!session?.user.id || (!organization.id && !organization.slug)) {
-            return 'public'
-          }
-
-          const [membership] = await db
-            .select({
-              plan: authSchema.organizations.plan
-            })
-            .from(authSchema.members)
-            .innerJoin(
-              authSchema.organizations,
-              eq(authSchema.members.organizationId, authSchema.organizations.id)
-            )
-            .where(
-              and(
-                eq(authSchema.members.userId, session.user.id),
-                organization.id
-                  ? eq(authSchema.organizations.id, organization.id)
-                  : eq(authSchema.organizations.slug, organization.slug!)
-              )
-            )
-            .limit(1)
-
-          if (
-            membership?.plan &&
-            isOrganizationPlan(membership.plan) &&
-            ORGANIZATION_PLANS_WITH_ELEVATED_LIMITS.has(membership.plan)
-          ) {
-            return 'organizationPlanMember'
-          }
-
-          return 'user'
+    .macro('organizationManager', {
+      auth: true,
+      beforeHandle({ user, status }) {
+        if (!isOrganizationManager(user.role)) {
+          return status(403, { error: 'Forbidden' })
+        }
+      }
+    })
+    .macro('importIiif', { organizationManager: true })
+    .macro('admin', {
+      auth: true,
+      beforeHandle({ user, status }) {
+        if (user.role !== 'admin') {
+          return status(401, { error: 'Unauthorized' })
         }
       }
     })
@@ -141,6 +214,7 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
           throw new ResponseError('GitHub login is not configured', 404)
         const callbackURL = query.returnTo ?? '/'
 
+        // Keep Better Auth's callback URL validation for OAuth redirects.
         const result = await auth.handler(
           new Request(`${baseURL}/auth/sign-in/social`, {
             method: 'POST',
@@ -179,12 +253,12 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
         setCacheControl(set, 'private-no-store')
         const callbackURL = query.returnTo ?? '/'
 
-        const signOutResult = await auth.handler(
-          new Request(`${baseURL}/auth/sign-out`, {
-            method: 'POST',
-            headers: request.headers
-          })
-        )
+        // GET links may have no Origin or Referer; use the server API.
+        const signOutResult = await auth.api.signOut({
+          headers: request.headers,
+          asResponse: true
+        })
+        if (!signOutResult.ok) return signOutResult
 
         copySetCookieHeader(signOutResult, set)
         return redirect(callbackURL)

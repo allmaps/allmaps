@@ -848,6 +848,16 @@ async function createParsedManifest(
       getHttpUrlDomain(newParsedManifest.uri),
       options.allowedParsedUriDomains
     )
+    for (const canvas of newParsedManifest.canvases) {
+      assertAllowedDomain(
+        getHttpUrlDomain(canvas.uri),
+        options.allowedParsedUriDomains
+      )
+      assertAllowedDomain(
+        getHttpUrlDomain(canvas.image.uri),
+        options.allowedParsedUriDomains
+      )
+    }
   }
 
   if (expectedManifestId && newManifestId !== expectedManifestId) {

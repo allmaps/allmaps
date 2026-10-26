@@ -522,11 +522,15 @@ export async function updateOrganization(
       return
     }
 
-    const [organization] = await tx
-      .update(authSchema.organizations)
-      .set(patch)
-      .where(eq(authSchema.organizations.id, organizationId))
-      .returning()
+    let organization = existing
+    if (Object.values(patch).some((value) => value !== undefined)) {
+      const [updatedOrganization] = await tx
+        .update(authSchema.organizations)
+        .set(patch)
+        .where(eq(authSchema.organizations.id, organizationId))
+        .returning()
+      organization = updatedOrganization
+    }
 
     if (domains !== undefined) {
       await replaceOrganizationUrls(tx, organizationId, domains)

@@ -17,7 +17,7 @@ export async function fetchConsoleSession(
   }
 
   const response = await event.fetch(
-    `${consoleEnv.PUBLIC_REST_BASE_URL}/auth/get-session`,
+    `${consoleEnv.PUBLIC_REST_BASE_URL}/auth/get-session?disableCookieCache=true`,
     {
       credentials: 'include',
       headers,
@@ -25,5 +25,8 @@ export async function fetchConsoleSession(
     }
   )
 
-  return response.ok ? ((await response.json()) as ConsoleSessionData) : null
+  const session = response.ok
+    ? ((await response.json()) as ConsoleSessionData)
+    : null
+  return session?.user?.isAnonymous ? null : session
 }

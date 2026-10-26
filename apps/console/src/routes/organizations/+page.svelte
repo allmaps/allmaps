@@ -165,12 +165,14 @@
         Manage Organizations
       </h1>
     </div>
-    <a
-      href={routes.newOrganization()}
-      class="px-4 py-2 bg-blue-500 text-white rounded-lg font-sans text-sm hover:bg-blue-600 transition"
-    >
-      Create Organization
-    </a>
+    {#if data.isAllmapsAdmin}
+      <a
+        href={routes.newOrganization()}
+        class="px-4 py-2 bg-blue-500 text-white rounded-lg font-sans text-sm hover:bg-blue-600 transition"
+      >
+        Create Organization
+      </a>
+    {/if}
   </div>
 
   <div class="mb-4">
@@ -360,12 +362,16 @@
               <td class="px-3 py-2 @lg:px-4 @lg:py-3">
                 <div class="flex flex-wrap gap-1">
                   {#each organization.users ?? [] as member (member.user.id)}
-                    <a
-                      href={routes.user(getUserId(member.user.id))}
-                      class="rounded px-2 py-0.5 font-sans text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
-                    >
-                      {member.user.name || member.user.id}
-                    </a>
+                    {#if data.canViewUsers}
+                      <a
+                        href={routes.user(getUserId(member.user.id))}
+                        class="rounded px-2 py-0.5 font-sans text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                      >
+                        {member.user.name || member.user.id}
+                      </a>
+                    {:else}
+                      <span>{member.user.name || member.user.email}</span>
+                    {/if}
                   {/each}
                 </div>
               </td>
