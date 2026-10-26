@@ -79,6 +79,15 @@ export function getImageRequest(
   if (sizes) {
     let matchingSize
     for (const size of sizes) {
+      // Advertised sizes can exceed the service's request limits.
+      if (
+        (maxWidth !== undefined && size.width > maxWidth) ||
+        (maxHeight !== undefined && size.height > maxHeight) ||
+        (maxArea !== undefined && size.width * size.height > maxArea)
+      ) {
+        continue
+      }
+
       const scaleFactor = size.width / width
       if (
         scaleFactor >= maxThumbnailDownscale &&
