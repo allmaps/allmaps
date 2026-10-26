@@ -1,57 +1,56 @@
 <script lang="ts">
-  import { page } from '$app/state'
+  /* eslint-disable svelte/no-navigation-without-resolve -- sign-in URL is external */
   import { UserCircle as UserCircleIcon } from 'phosphor-svelte'
 
-  import Popover from '$lib/components/Popover.svelte'
-
-  import { getAuthContext } from './context.js'
-  import type { AuthSessionState } from './context.js'
-  import type { Readable } from 'svelte/store'
-
-  const { client, apiBaseURL } = getAuthContext()
-  const session = client.useSession() as Readable<AuthSessionState>
-
-  let signInURL = $derived(
-    `${apiBaseURL}/login/github?returnTo=${encodeURIComponent(page.url.href)}`
-  )
-
-  async function signOut() {
-    await client.signOut({ callbackURL: page.url.href })
+  type Props = {
+    user?: {
+      name?: string | null
+      email?: string | null
+      image?: string | null
+    } | null
+    signInURL?: string
+    onSignOut: () => void | Promise<void>
   }
+
+  let { user, signInURL, onSignOut }: Props = $props()
 </script>
 
-{#if $session.isPending}
-  <div class="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
-{:else if $session.data?.user}
-  {@const user = $session.data.user}
-  <Popover>
-    {#snippet button()}
+{#if user}
+  <details class="relative">
+    <summary
+      class="list-none cursor-pointer rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+      aria-label="User menu"
+    >
       {#if user.image}
         <img
           src={user.image}
-          alt={user.name ?? user.email}
-          class="size-7 cursor-pointer rounded-full"
+          alt={user.name ?? user.email ?? 'User'}
+          class="size-7 rounded-full"
         />
       {:else}
         <div
-          class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white"
+          class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white"
         >
-          {(user.name ?? user.email)[0].toUpperCase()}
+          {(user.name ?? user.email ?? 'U')[0].toUpperCase()}
         </div>
       {/if}
-    {/snippet}
-    {#snippet contents()}
+    </summary>
+    <div
+      class="absolute right-0 top-10 z-50 min-w-44 rounded border border-gray-200 bg-white p-3 shadow-lg"
+    >
       <div class="text-sm font-medium">{user.name ?? 'User'}</div>
-      <div class="mb-3 text-xs text-gray-500">{user.email}</div>
+      {#if user.email}
+        <div class="mb-3 text-xs text-gray-500">{user.email}</div>
+      {/if}
       <button
-        onclick={signOut}
+        onclick={onSignOut}
         class="cursor-pointer text-sm text-red-600 hover:text-red-800"
       >
         Sign out
       </button>
-    {/snippet}
-  </Popover>
-{:else}
+    </div>
+  </details>
+{:else if signInURL}
   <a
     href={signInURL}
     class="rounded border border-gray-300 p-1.5 text-sm hover:bg-gray-50"

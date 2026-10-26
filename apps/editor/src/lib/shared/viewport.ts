@@ -11,32 +11,63 @@ type Viewports = {
   data: Viewport
 }
 
+function normalizeCoordinates(coordinates: unknown): unknown {
+  if (Array.isArray(coordinates)) {
+    return coordinates.map(normalizeCoordinates)
+  }
+  const coordinate =
+    typeof coordinates === 'string' && coordinates.trim() !== ''
+      ? Number(coordinates)
+      : coordinates
+  return typeof coordinate === 'number' && Number.isFinite(coordinate)
+    ? coordinate
+    : undefined
+}
+
+function getNavPlaceBbox(geometry: unknown): Bbox | undefined {
+  if (!isGeojsonGeometry(geometry)) return
+
+  // Some IIIF providers serialize navPlace coordinates as numeric strings.
+  const normalizedGeometry = {
+    ...geometry,
+    coordinates: normalizeCoordinates(geometry.coordinates)
+  }
+  if (!isGeojsonGeometry(normalizedGeometry)) return
+
+  try {
+    const bbox = computeBbox(normalizedGeometry)
+    return bbox.every(Number.isFinite) ? bbox : undefined
+  } catch {
+    // Optional location metadata must not prevent opening an image.
+    return undefined
+  }
+}
+
 export function getNavPlaceViewport(navPlace?: object): Viewport | undefined {
-  if (isGeojsonGeometry(navPlace)) {
-    const bbox = computeBbox(navPlace)
-    return getBboxViewport(bbox)
-  } else if (
+  if (
     navPlace &&
     'type' in navPlace &&
     navPlace.type === 'FeatureCollection' &&
     'features' in navPlace &&
     Array.isArray(navPlace.features)
   ) {
-    const geometries = navPlace.features.flatMap((feature: unknown) => {
+    const bboxes = navPlace.features.flatMap((feature: unknown) => {
       if (
         typeof feature === 'object' &&
         feature !== null &&
-        'geometry' in feature &&
-        isGeojsonGeometry(feature.geometry)
+        'geometry' in feature
       ) {
-        return [feature.geometry]
+        const bbox = getNavPlaceBbox(feature.geometry)
+        return bbox ? [bbox] : []
       }
 
       return []
     })
-    const bbox = combineBboxes(...geometries.map(computeBbox))
+    const bbox = combineBboxes(...bboxes)
     return getBboxViewport(bbox)
   }
+
+  return getBboxViewport(getNavPlaceBbox(navPlace))
 }
 
 export function getBboxViewport(bbox?: Bbox): Viewport | undefined {

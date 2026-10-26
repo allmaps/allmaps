@@ -67,6 +67,87 @@ test('navPlace combines the extents of its features', () => {
   )
 })
 
+test('Stanford navPlace numeric strings supply bounds without mutating metadata', () => {
+  // https://purl.stanford.edu/kr300cg3360/iiif3/manifest
+  const navPlace = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              ['-10.483333', '44.233333'],
+              ['3.533333', '44.233333'],
+              ['3.533333', '35.0'],
+              ['-10.483333', '35.0'],
+              ['-10.483333', '44.233333']
+            ]
+          ]
+        }
+      }
+    ]
+  }
+  const original = structuredClone(navPlace)
+
+  assert.deepEqual(getNavPlaceViewport(navPlace), {
+    bounds: [-10.483333, 35, 3.533333, 44.233333]
+  })
+  assert.deepEqual(navPlace, original)
+  assert.deepEqual(
+    getNavPlaceViewport({ type: 'Point', coordinates: ['9.938', '51.533'] }),
+    { bounds: [9.938, 51.533, 9.938, 51.533] }
+  )
+})
+
+test('invalid navPlace geometries are skipped while valid features still set bounds', () => {
+  const invalidGeometries = [
+    null,
+    { type: 'Point', coordinates: ['', '51'] },
+    { type: 'Point', coordinates: [' ', '51'] },
+    { type: 'Point', coordinates: [null, 51] },
+    { type: 'Point', coordinates: [true, 51] },
+    { type: 'Point', coordinates: ['west', 'north'] },
+    { type: 'Point', coordinates: ['Infinity', '51'] },
+    { type: 'Point', coordinates: [NaN, 51] },
+    { type: 'Point', coordinates: [Infinity, 51] },
+    { type: 'Polygon', coordinates: [] },
+    { type: 'Polygon', coordinates: [[[]]] },
+    { type: 'Polygon', coordinates: [1, 2] },
+    {
+      type: 'LineString',
+      coordinates: [
+        [6, 48],
+        [NaN, 51]
+      ]
+    },
+    { type: 'Unsupported', coordinates: [1, 2] }
+  ]
+
+  for (const geometry of invalidGeometries) {
+    if (geometry) assert.equal(getNavPlaceViewport(geometry), undefined)
+  }
+  const features = invalidGeometries.map((geometry) => ({
+    type: 'Feature',
+    geometry
+  }))
+  assert.equal(
+    getNavPlaceViewport({ type: 'FeatureCollection', features }),
+    undefined
+  )
+  assert.deepEqual(
+    getNavPlaceViewport({
+      type: 'FeatureCollection',
+      features: [
+        ...features,
+        { type: 'Feature', geometry: { type: 'Point', coordinates: [6, 48] } }
+      ]
+    }),
+    { bounds: [6, 48, 6, 48] }
+  )
+})
+
 test('empty or referenced navPlace collections have no viewport', () => {
   assert.equal(getNavPlaceViewport(undefined), undefined)
   assert.equal(

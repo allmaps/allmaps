@@ -14,6 +14,7 @@ export type {
   DbOrTx,
   DbTransaction,
   PostgresDb,
+  PgliteDb,
   PostgresContext,
   NeonHttpDb,
   NeonDb

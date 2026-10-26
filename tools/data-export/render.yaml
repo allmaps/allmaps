@@ -9,8 +9,6 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false
-      - key: DIRECT_DATABASE_URL
-        sync: false
       - key: RCLONE_CONFIG_R2_ACCESS_KEY_ID
         sync: false
       - key: RCLONE_CONFIG_R2_SECRET_ACCESS_KEY

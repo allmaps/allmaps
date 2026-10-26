@@ -9,7 +9,8 @@ import {
   NavPlaceSchema,
   filterValidItems,
   oneOrMany,
-  parseIfValid
+  parseIfValid,
+  optionalValue
 } from '../schemas/shared.js'
 
 export const SingleValue3Schema = z
@@ -26,17 +27,17 @@ export const Summary3Schema = parseIfValid(LanguageValue3Schema)
 
 export const HomepageItem3Schema = z.object({
   id: z.string().url(),
-  type: z.string().optional(),
+  type: optionalValue(z.string()),
   label: LanguageValue3Schema,
-  format: z.string().optional(),
-  language: z.union([z.string(), z.array(z.string())]).optional()
+  format: optionalValue(z.string()),
+  language: optionalValue(z.union([z.string(), z.array(z.string())]))
 })
 
 export const Rendering3ItemSchema = z.object({
   id: z.string().url(),
-  type: z.string().optional(),
+  type: optionalValue(z.string()),
   label: LanguageValue3Schema,
-  format: z.string().optional()
+  format: optionalValue(z.string())
 })
 
 export const Rendering3Schema = oneOrMany(Rendering3ItemSchema)
@@ -45,19 +46,19 @@ export const Homepage3Schema = oneOrMany(HomepageItem3Schema)
 
 export const ThumbnailItem3Schema = z.object({
   id: z.string(),
-  type: z.string().optional(),
-  format: z.string().optional(),
-  width: z.number().int().optional(),
-  height: z.number().int().optional()
+  type: optionalValue(z.string()),
+  format: optionalValue(z.string()),
+  width: optionalValue(z.number().int()),
+  height: optionalValue(z.number().int())
 })
 
 export const Thumbnail3Schema = oneOrMany(ThumbnailItem3Schema)
 
 export const SeeAlsoItem3Schema = z.object({
   id: z.string().url(),
-  type: z.string().optional(),
-  format: z.string().optional(),
-  profile: z.string().optional()
+  type: optionalValue(z.string()),
+  format: optionalValue(z.string()),
+  profile: optionalValue(z.string())
 })
 
 export const SeeAlso3Schema = oneOrMany(SeeAlsoItem3Schema)
@@ -66,7 +67,7 @@ export const NonPaintingAnnotations3 = z
   .object({
     id: z.string().url(),
     type: z.literal('AnnotationPage'),
-    items: z.array(z.looseObject({})).optional()
+    items: optionalValue(z.array(z.looseObject({})))
   })
   .array()
 
@@ -88,18 +89,18 @@ export const Rights3Schema = z.string()
 export const Agent3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Agent'),
-  label: LanguageValue3Schema.optional(),
-  homepage: Homepage3Schema.optional(),
-  logo: Thumbnail3Schema.optional(),
-  seeAlso: SeeAlso3Schema.optional()
+  label: optionalValue(LanguageValue3Schema),
+  homepage: optionalValue(Homepage3Schema),
+  logo: optionalValue(Thumbnail3Schema),
+  seeAlso: optionalValue(SeeAlso3Schema)
 })
 
 export const Provider3Schema = Agent3Schema.array()
 
 export const AnnotationImageBody3Schema = z.object({
   type: z.literal('Image'),
-  width: z.number().int().optional(),
-  height: z.number().int().optional(),
+  width: optionalValue(z.number().int()),
+  height: optionalValue(z.number().int()),
   service: ImageServiceSchema.array()
 })
 
@@ -142,62 +143,62 @@ export const Canvas3Schema = z.object({
   width: z.number().int(),
   height: z.number().int(),
   items: AnnotationPage3Schema.array(),
-  label: LanguageValue3Schema.optional(),
-  description: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional(),
-  homepage: Homepage3Schema.optional(),
-  thumbnail: Thumbnail3Schema.optional(),
-  rendering: Rendering3Schema.optional(),
-  seeAlso: SeeAlso3Schema.optional(),
-  summary: Summary3Schema.optional(),
-  requiredStatement: RequiredStatement3Schema.optional(),
-  rights: Rights3Schema.optional(),
-  provider: Provider3Schema.optional(),
-  annotations: NonPaintingAnnotations3.optional()
+  label: optionalValue(LanguageValue3Schema),
+  description: optionalValue(LanguageValue3Schema),
+  metadata: optionalValue(Metadata3Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema),
+  homepage: optionalValue(Homepage3Schema),
+  thumbnail: optionalValue(Thumbnail3Schema),
+  rendering: optionalValue(Rendering3Schema),
+  seeAlso: optionalValue(SeeAlso3Schema),
+  summary: optionalValue(Summary3Schema),
+  requiredStatement: optionalValue(RequiredStatement3Schema),
+  rights: optionalValue(Rights3Schema),
+  provider: optionalValue(Provider3Schema),
+  annotations: optionalValue(NonPaintingAnnotations3)
 })
 
 export const Manifest3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Manifest'),
   items: Canvas3Schema.array(),
-  label: LanguageValue3Schema.optional(),
-  description: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional(),
-  homepage: Homepage3Schema.optional(),
-  thumbnail: Thumbnail3Schema.optional(),
-  rendering: Rendering3Schema.optional(),
-  seeAlso: SeeAlso3Schema.optional(),
-  summary: Summary3Schema.optional(),
-  rights: Rights3Schema.optional(),
-  provider: Provider3Schema.optional(),
-  requiredStatement: RequiredStatement3Schema.optional(),
-  annotations: NonPaintingAnnotations3.optional()
+  label: optionalValue(LanguageValue3Schema),
+  description: optionalValue(LanguageValue3Schema),
+  metadata: optionalValue(Metadata3Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema),
+  homepage: optionalValue(Homepage3Schema),
+  thumbnail: optionalValue(Thumbnail3Schema),
+  rendering: optionalValue(Rendering3Schema),
+  seeAlso: optionalValue(SeeAlso3Schema),
+  summary: optionalValue(Summary3Schema),
+  rights: optionalValue(Rights3Schema),
+  provider: optionalValue(Provider3Schema),
+  requiredStatement: optionalValue(RequiredStatement3Schema),
+  annotations: optionalValue(NonPaintingAnnotations3)
 })
 
 export const EmbeddedManifest3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Manifest'),
-  label: LanguageValue3Schema.optional(),
-  description: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional(),
-  thumbnail: Thumbnail3Schema.optional()
+  label: optionalValue(LanguageValue3Schema),
+  description: optionalValue(LanguageValue3Schema),
+  metadata: optionalValue(Metadata3Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema),
+  thumbnail: optionalValue(Thumbnail3Schema)
 })
 
 export const EmbeddedCollection3Schema = z.object({
   id: z.string().url(),
   type: z.literal('Collection'),
-  label: LanguageValue3Schema.optional(),
-  description: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional(),
-  thumbnail: Thumbnail3Schema.optional()
+  label: optionalValue(LanguageValue3Schema),
+  description: optionalValue(LanguageValue3Schema),
+  metadata: optionalValue(Metadata3Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema),
+  thumbnail: optionalValue(Thumbnail3Schema)
 })
 
 export const Collection3Schema = z.object({
@@ -212,18 +213,18 @@ export const Collection3Schema = z.object({
       ])
     )
   },
-  label: LanguageValue3Schema.optional(),
-  description: LanguageValue3Schema.optional(),
-  metadata: Metadata3Schema.optional(),
-  navDate: NavDateSchema.optional(),
-  navPlace: NavPlaceSchema.optional(),
-  thumbnail: Thumbnail3Schema.optional(),
-  homepage: Homepage3Schema.optional(),
-  rendering: Rendering3Schema.optional(),
-  seeAlso: SeeAlso3Schema.optional(),
-  summary: Summary3Schema.optional(),
-  rights: Rights3Schema.optional(),
-  provider: Provider3Schema.optional(),
-  requiredStatement: RequiredStatement3Schema.optional(),
-  annotations: NonPaintingAnnotations3.optional()
+  label: optionalValue(LanguageValue3Schema),
+  description: optionalValue(LanguageValue3Schema),
+  metadata: optionalValue(Metadata3Schema),
+  navDate: optionalValue(NavDateSchema),
+  navPlace: optionalValue(NavPlaceSchema),
+  thumbnail: optionalValue(Thumbnail3Schema),
+  homepage: optionalValue(Homepage3Schema),
+  rendering: optionalValue(Rendering3Schema),
+  seeAlso: optionalValue(SeeAlso3Schema),
+  summary: optionalValue(Summary3Schema),
+  rights: optionalValue(Rights3Schema),
+  provider: optionalValue(Provider3Schema),
+  requiredStatement: optionalValue(RequiredStatement3Schema),
+  annotations: optionalValue(NonPaintingAnnotations3)
 })

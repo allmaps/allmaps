@@ -118,9 +118,10 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
           name: 'Allmaps REST API',
           version: packageJson.version,
           docs: `${env.PUBLIC_REST_BASE_URL}/docs`,
-          login: session
-            ? undefined
-            : `${env.PUBLIC_REST_BASE_URL}/login/github`,
+          login:
+            !session && betterAuth.auth.options.socialProviders.github
+              ? `${env.PUBLIC_REST_BASE_URL}/login/github`
+              : undefined,
           logout: session ? `${env.PUBLIC_REST_BASE_URL}/logout` : undefined,
           user
         }

@@ -84,6 +84,24 @@ The `init` script is a shorthand for the following commands:
 
 If things stop working later on, you can always run the `init` script again.
 
+For local API development with PGlite or PostgreSQL, see the
+[local API workflow](tools/apis/README.md). `pnpm dev:apis` defaults to the local
+PGlite database; use `--db=postgres` to connect through `DATABASE_URL`, including
+to Neon. Supply a development database URL, never the main or production URL.
+The workflow also includes offline migration generation and manual local
+migrations with `pnpm db:migrate --db=pglite`. Run `pnpm setup:env` (or
+`pnpm setup:env --db=postgres`) to configure missing local settings while preserving
+existing values. GitHub login is optional.
+
+For automatic Neon migrations and coordinated API deployments on `develop` and
+`main`, see [API migrations and releases](.github/API_RELEASES.md), including the
+one-time setup and separate release enable switches.
+
+Development tools are grouped by responsibility: [API runner](tools/apis/README.md),
+[demo seed](tools/seed/README.md), [environment setup](tools/setup/README.md), and
+[IIIF fixture server](tools/iiif-server/README.md). Integration tests remain in
+[test/apis](test/apis/README.md), using temporary PGlite databases and local fixtures.
+
 ### Running a single app locally
 
 To run the `dev` script for a single app, you need to run the `watch` scripts of all packages in one terminal window:

@@ -820,7 +820,7 @@
 <div
   bind:this={metadataListElement}
   onscroll={handleScroll}
-  class="max-h-[60vh] overflow-auto space-y-2"
+  class="relative max-h-[60vh] overflow-auto overscroll-contain space-y-2"
 >
   {#if sourceState.source}
     <SourceSummary source={sourceState.source} />

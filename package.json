@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "watch": "turbo watch build --filter \"./packages/**\"",
+    "watch": "turbo watch build --filter \"./packages/**\" --filter \"./apis/**\"",
     "init": "pnpm install --recursive && pnpm run build:packages && pnpm run check && pnpm run build:apps",
     "types": "turbo run types",
     "types:packages": "turbo run types --filter \"./packages/**\"",
@@ -25,7 +25,16 @@
     "version-prerelease": "lerna version prerelease",
     "publish-beta": "pnpm run publish --dist-tag beta",
     "publish": "npm whoami && lerna publish from-git",
-    "publish-resume": "npm whoami && npm_lifecycle_event=publish lerna publish from-package"
+    "publish-resume": "npm whoami && npm_lifecycle_event=publish lerna publish from-package",
+    "dev:apis": "pnpm build:apis && node tools/apis/src/cli.ts",
+    "db:generate": "pnpm --filter @allmaps/db run db:generate",
+    "db:migrate": "node tools/apis/src/cli.ts migrate",
+    "build:apis": "turbo run build --filter=@allmaps/api-rest... --filter=@allmaps/api-annotations... --filter=@allmaps/api-live...",
+    "test:apis": "pnpm --filter @allmaps/test-apis test",
+    "test:release": "node --test scripts/api-release.test.ts",
+    "types:apis": "pnpm --filter @allmaps/db --filter @allmaps/api-shared --filter @allmaps/api-rest --filter @allmaps/api-annotations --filter @allmaps/api-live --filter @allmaps/tools-apis --filter @allmaps/test-apis run types",
+    "types:release": "pnpm --filter @allmaps/db exec tsc --project ../../scripts/tsconfig.release.json",
+    "setup:env": "node tools/setup/src/setup.ts"
   },
   "devDependencies": {
     "@lerna-lite/cli": "catalog:",

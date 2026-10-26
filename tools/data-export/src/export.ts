@@ -22,7 +22,7 @@ export async function exportData(env: DataExportEnv) {
   try {
     await streamMaps({
       batchSize: env.DATA_EXPORT_BATCH_SIZE,
-      databaseUrl: env.DIRECT_DATABASE_URL ?? env.DATABASE_URL,
+      databaseUrl: env.DATABASE_URL,
       async onRow(row) {
         try {
           const map = fromDbRow(row, env.ANNOTATIONS_BASE_URL)

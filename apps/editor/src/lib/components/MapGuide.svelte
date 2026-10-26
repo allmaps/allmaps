@@ -13,6 +13,7 @@
 
   import { MapMonster } from '@allmaps/ui'
 
+  import { getUiState } from '$lib/state/ui.svelte.js'
   import { m } from '$lib/paraglide/messages.js'
 
   import type { MapMonsterColor, MapMonsterMood } from '@allmaps/ui'
@@ -42,6 +43,7 @@
 
   const POPOVER_TRANSITION_DURATION = 75
   const messagesHeadingId = $props.id()
+  const uiState = getUiState()
 
   let {
     state: guideState,
@@ -59,9 +61,8 @@
     !largeScreen.current && Boolean(smallScreenPopoverContainer)
   )
 
-  let popoverOpen = $state(true)
-  let expandedContentVisible = $state(true)
-  let hasMinimized = $state(false)
+  let expandedContentVisible = $state(uiState.mapGuideOpen)
+  let hasMinimized = $state(!uiState.mapGuideOpen)
   let messagesOpen = $state(false)
   let messagesDialog = $state<HTMLDialogElement>()
 
@@ -104,7 +105,7 @@
   const monsterColor = $derived(color || settings.color)
   const monsterMood = $derived(mood || settings.mood)
   const monsterButtonLabel = $derived(
-    popoverOpen
+    uiState.mapGuideOpen
       ? m.mapguide_minimize()
       : guideState.hasUnseenMessages
         ? m.mapguide_show_new_message()
@@ -114,13 +115,13 @@
   const hasModalMessages = $derived(messages.length > 0)
   const showMinimizedNotification = $derived(
     hasMinimized &&
-      !popoverOpen &&
+      !uiState.mapGuideOpen &&
       !expandedContentVisible &&
       guideState.hasUnseenMessages
   )
 
   $effect(() => {
-    if (popoverOpen) {
+    if (uiState.mapGuideOpen) {
       expandedContentVisible = true
       return
     }
@@ -135,7 +136,7 @@
   $effect(() => {
     const message = guideState.currentMessage
 
-    if (guideState.visible && popoverOpen && message) {
+    if (guideState.visible && uiState.mapGuideOpen && message) {
       guideState.markSeen(message.key)
     }
   })
@@ -169,7 +170,7 @@
     action: MapGuideDisplayAction
   ) {
     messagesOpen = false
-    popoverOpen = !action.closeOnRun
+    uiState.mapGuideOpen = !action.closeOnRun
     guideState.runAction(item.key, action.id)
   }
 
@@ -178,7 +179,7 @@
       hasMinimized = true
     }
 
-    popoverOpen = open
+    uiState.mapGuideOpen = open
   }
 
   function openMessages() {
@@ -205,7 +206,7 @@
 </script>
 
 {#if guideState.visible}
-  <Popover.Root bind:open={() => popoverOpen, setPopoverOpen}>
+  <Popover.Root bind:open={() => uiState.mapGuideOpen, setPopoverOpen}>
     <section
       class="flex min-w-0 max-w-full items-end gap-3 rounded-lg"
       aria-label={m.mapguide_messages()}
@@ -226,7 +227,7 @@
             'relative flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-md drop-shadow-black transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue/40'
           ]}
           aria-label={m.mapguide_show_new_message()}
-          onclick={() => (popoverOpen = true)}
+          onclick={() => (uiState.mapGuideOpen = true)}
         >
           <span
             class={[

@@ -1,0 +1,37 @@
+{
+  "name": "@allmaps/test-apis",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "pnpm --filter @allmaps/tools-iiif-server exec svelte-kit sync && vitest run",
+    "types": "tsc --noEmit",
+    "test:watch": "pnpm --filter @allmaps/tools-iiif-server exec svelte-kit sync && vitest",
+    "lint": "prettier --check test *.ts && eslint test"
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/api-shared": "workspace:^",
+    "@allmaps/db": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@electric-sql/pglite": "catalog:",
+    "@electric-sql/pglite-postgis": "catalog:",
+    "drizzle-orm": "catalog:",
+    "@allmaps/tools-apis": "workspace:*",
+    "@allmaps/env": "workspace:^",
+    "@allmaps/api-rest": "workspace:*",
+    "@allmaps/tools-seed": "workspace:*",
+    "@allmaps/tools-setup": "workspace:*",
+    "@allmaps/tools-iiif-server": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
+    "vitest": "catalog:",
+    "@types/ws": "^8.5.5",
+    "ws": "^8.13.0",
+    "commander": "catalog:",
+    "@commander-js/extra-typings": "catalog:"
+  }
+}

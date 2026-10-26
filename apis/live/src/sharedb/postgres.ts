@@ -1,11 +1,11 @@
 import ShareDB from 'sharedb'
 
-import { InferModel } from 'drizzle-orm'
+import { sql, type InferModel } from 'drizzle-orm'
 
 import { schema } from '@allmaps/db/schema'
 
 import type { Callback } from '@allmaps/api-shared/types'
-import type { Operation, PostgresContext } from '@allmaps/db'
+import type { Db, Operation } from '@allmaps/db'
 
 const DB = ShareDB.DB
 
@@ -19,14 +19,15 @@ function parseJsonColumn<T>(value: unknown): T {
   return value as T
 }
 
+function queryRows<Row>(result: Row[] | { rows: Row[] }): Row[] {
+  return Array.isArray(result) ? result : result.rows
+}
+
 export default class PostgresDB extends DB {
-  sqlClient: PostgresContext['sql']
-  db: PostgresContext['db']
+  db: Db
 
-  constructor(postgresContext: PostgresContext) {
+  constructor(postgresContext: { db: Db }) {
     super()
-
-    this.sqlClient = postgresContext.sql
     this.db = postgresContext.db
   }
 
@@ -70,7 +71,7 @@ export default class PostgresDB extends DB {
      * Casting is required as postgres thinks that collection and doc_id are
      * not varchar
      */
-    const query = this.sqlClient`WITH snapshot_id AS (
+    const query = this.db.execute<{ version: number }>(sql`WITH snapshot_id AS (
         INSERT INTO snapshots (collection, doc_id, doc_type, version, data)
         SELECT ${collection}::varchar collection, ${id}::varchar doc_id, ${snapshot.type} doc_type, ${snapshot.v} v, ${serializedSnapshotData}::jsonb d
         WHERE ${snapshot.v} = (
@@ -102,11 +103,11 @@ export default class PostgresDB extends DB {
           WHERE collection = ${collection} AND doc_id = ${id}
         )
       ) AND EXISTS (SELECT 1 FROM snapshot_id)
-      RETURNING version`
+      RETURNING version`)
 
     query
       .then((res) => {
-        if (res.length === 0) {
+        if (queryRows(res).length === 0) {
           callback(null, false)
         } else {
           callback(null, true)
@@ -125,14 +126,19 @@ export default class PostgresDB extends DB {
     options: unknown,
     callback: Callback<ShareDB.Snapshot>
   ) {
-    const query = this.sqlClient`SELECT version, data, doc_type
+    const query = this.db.execute<{
+      version: number
+      data: unknown
+      doc_type: string
+    }>(sql`SELECT version, data, doc_type
       FROM snapshots
-      WHERE collection = ${collection} AND doc_id = ${id} LIMIT 1`
+      WHERE collection = ${collection} AND doc_id = ${id} LIMIT 1`)
 
     query
       .then((res) => {
-        if (res.length) {
-          const row = res[0]
+        const rows = queryRows(res)
+        if (rows.length) {
+          const row = rows[0]
           const snapshot: ShareDB.Snapshot = {
             id,
             v: row.version,
@@ -174,19 +180,17 @@ export default class PostgresDB extends DB {
     options: unknown,
     callback: Callback<Operation[]>
   ) {
-    const sql = this.sqlClient
-
-    const query = sql<OpsRow[]>`SELECT version, operation
+    const query = this.db.execute<OpsRow>(sql`SELECT version, operation
       FROM ops
       WHERE collection = ${collection} AND doc_id = ${id} AND version > ${from}
       ${to || to === 0 ? sql`AND version <= ${to}` : sql``}
-      ORDER BY version`
+      ORDER BY version`)
 
     query
       .then((res) => {
         callback(
           null,
-          res.map((row) => parseJsonColumn<Operation>(row.operation))
+          queryRows(res).map((row) => parseJsonColumn<Operation>(row.operation))
         )
       })
       .catch((err) => callback(err))
