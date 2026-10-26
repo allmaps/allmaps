@@ -67,7 +67,9 @@ export class SourceState {
 
   // #manifestImageIdsDontMatch = $state(false)
 
-  #editSource = $derived.by<ManifestSource | ImageSource | undefined>(() => {
+  #editSource = $derived.by<
+    (Source & (ManifestSource | ImageSource)) | undefined
+  >(() => {
     const sourceType = this.#source?.type
     if (sourceType === 'manifest' || sourceType === 'image') {
       return this.#source
@@ -407,6 +409,11 @@ export class SourceState {
   get source() {
     return this.#source
   }
+
+  get editSource() {
+    return this.#editSource
+  }
+
   get parsedIiif() {
     return this.#source?.parsedIiif
   }

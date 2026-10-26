@@ -43,9 +43,9 @@ export class ScopeState {
   )
 
   #allmapsId = $derived.by(() => {
-    if (this.#scope === 'images' && this.#sourceState.source) {
-      // TODO: Collections are not stored in database!
-      return `${this.#sourceState.source?.type}s/${this.#sourceState.source?.allmapsId}`
+    if (this.#scope === 'images' && this.#sourceState.editSource) {
+      const source = this.#sourceState.editSource
+      return `${source.type}s/${source.allmapsId}`
     } else if (
       this.#scope === 'image' &&
       this.#sourceState.activeImageAllmapsId
