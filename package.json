@@ -4,7 +4,13 @@
   "private": true,
   "scripts": {
     "watch": "turbo watch build --filter \"./packages/**\" --filter \"./apis/**\"",
+    "watch:apps": "turbo watch build --filter \"{./apps/**}^...\"",
+    "watch:packages": "turbo watch build --filter \"./packages/**\"",
     "init": "pnpm install --recursive && pnpm run build:packages && pnpm run check && pnpm run build:apps",
+    "init:apps": "pnpm install --recursive && turbo run build --filter \"{./apps/**}^...\" && turbo run check --filter \"./apps/**\"",
+    "init:packages": "pnpm install --recursive && pnpm run build:packages && turbo run check --filter \"./packages/**\"",
+    "dev:apps": "pnpm --parallel --filter \"./apps/**\" run dev",
+    "dev:packages": "pnpm --parallel --filter \"./packages/**\" run dev",
     "types": "turbo run types",
     "types:packages": "turbo run types --filter \"./packages/**\"",
     "types:packages:force": "turbo run types --force --filter \"./packages/**\"",
