@@ -13,8 +13,7 @@ import {
   error,
   redirect,
   handleApiError,
-  createBetterAuthRoutes,
-  createTagsSorter
+  createBetterAuthRoutes
 } from './elysia.js'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
@@ -29,6 +28,9 @@ import { createListsRoutes } from './routes/lists.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
+const apiDocsUrl = 'https://docs.allmaps.org/api'
+const termsUrl = 'https://allmaps.org/terms#hosted-allmaps-services'
+
 const openApiTags = [
   { name: 'API' },
   { name: 'Maps' },
@@ -39,7 +41,6 @@ const openApiTags = [
   { name: 'Lists' },
   { name: 'Authentication' }
 ]
-const tagsSorter = createTagsSorter(openApiTags)
 
 export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
   return createElysia({ name: 'app' })
@@ -50,12 +51,15 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
     .use(cors())
     .use(
       openapi({
-        path: 'docs',
+        provider: null,
         specPath: 'openapi.json',
         documentation: {
+          servers: [{ url: env.PUBLIC_ANNOTATIONS_BASE_URL }],
           info: {
             title: 'Allmaps Annotations API Documentation',
-            description: 'API documentation for the Allmaps Annotations API',
+            description:
+              'API documentation for the Allmaps Annotations API. Use of this Allmaps-hosted service is free for non-commercial use. Commercial use requires a paid agreement with Allmaps.',
+            termsOfService: termsUrl,
             version: packageJson.version
           },
           components: {
@@ -73,12 +77,6 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
         },
         exclude: {
           staticFile: false
-        },
-        scalar: {
-          tagsSorter,
-          agent: {
-            disabled: true
-          }
         }
       })
     )
@@ -116,7 +114,8 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
         return {
           name: 'Allmaps Annotations API',
           version: packageJson.version,
-          docs: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/docs`,
+          docs: apiDocsUrl,
+          terms: termsUrl,
           login: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/login/github`,
           logout: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/logout`
         }
