@@ -2,6 +2,29 @@ name: APIs
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/api-release.yml'
+      - 'apis/**'
+      # Include shared packages conservatively as API dependencies evolve.
+      - 'packages/**'
+      - 'tools/apis/**'
+      - 'tools/iiif-server/**'
+      - 'tools/seed/**'
+      - 'tools/setup/**'
+      - 'test/apis/**'
+      - 'scripts/api-release*'
+      - 'scripts/tsconfig.release.json'
+      # Installation covers the whole workspace, including app manifests.
+      - '**/package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.npmrc'
+      - '.pnpmfile.cjs'
+      - 'patches/**'
+      - 'tsconfig*.json'
+      - 'turbo.json'
+      - 'ports.json'
+      - 'port.js'
   push:
     branches: [develop, main]
   workflow_dispatch:
