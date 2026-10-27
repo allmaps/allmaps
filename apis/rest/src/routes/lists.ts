@@ -16,6 +16,13 @@ import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { authenticatedDetail } from '../openapi.js'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 
+const deleteListItemQuerySchema = t.Object({
+  mapId: t.Optional(t.String()),
+  imageId: t.Optional(t.String()),
+  canvasId: t.Optional(t.String()),
+  manifestId: t.Optional(t.String())
+})
+
 function getUserId(user: unknown): string {
   if (
     !user ||
@@ -214,14 +221,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       {
         auth: true,
         params: t.Object({ listId: t.String() }),
-        query: t.Partial(
-          t.Object({
-            mapId: t.String(),
-            imageId: t.String(),
-            canvasId: t.String(),
-            manifestId: t.String()
-          })
-        ),
+        query: deleteListItemQuerySchema,
         detail: {
           summary: 'Remove an item from a list',
           tags: ['Lists'],

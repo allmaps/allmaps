@@ -9,8 +9,7 @@ import {
   redirect,
   handleApiError,
   createBetterAuthPlugin,
-  createBetterAuthRoutes as createSharedBetterAuthRoutes,
-  createTagsSorter
+  createBetterAuthRoutes as createSharedBetterAuthRoutes
 } from './elysia.js'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
@@ -27,6 +26,9 @@ import { projections } from './routes/projections.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
+const apiDocsUrl = 'https://docs.allmaps.org/api'
+const termsUrl = 'https://allmaps.org/terms#hosted-allmaps-services'
+
 const openApiTags = [
   { name: 'API' },
   { name: 'Maps' },
@@ -38,7 +40,6 @@ const openApiTags = [
   { name: 'Projections' },
   { name: 'Authentication' }
 ]
-const tagsSorter = createTagsSorter(openApiTags)
 
 export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
   const betterAuthPlugin = createBetterAuthPlugin(betterAuth)
@@ -56,12 +57,15 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .use(cors())
     .use(
       openapi({
-        path: 'docs',
+        provider: null,
         specPath: 'openapi.json',
         documentation: {
+          servers: [{ url: env.PUBLIC_REST_BASE_URL }],
           info: {
             title: 'Allmaps API Documentation',
-            description: 'API documentation for the Allmaps REST API',
+            description:
+              'API documentation for the Allmaps REST API. Use of this Allmaps-hosted service is free for non-commercial use. Commercial use requires a paid agreement with Allmaps.',
+            termsOfService: termsUrl,
             version: packageJson.version
           },
           components: {
@@ -79,12 +83,6 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
         },
         exclude: {
           staticFile: false
-        },
-        scalar: {
-          tagsSorter,
-          agent: {
-            disabled: true
-          }
         }
       })
     )
@@ -117,7 +115,8 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
         return {
           name: 'Allmaps REST API',
           version: packageJson.version,
-          docs: `${env.PUBLIC_REST_BASE_URL}/docs`,
+          docs: apiDocsUrl,
+          terms: termsUrl,
           login:
             !session && betterAuth.auth.options.socialProviders.github
               ? `${env.PUBLIC_REST_BASE_URL}/login/github`
