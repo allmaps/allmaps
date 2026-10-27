@@ -15,6 +15,7 @@
     { "path": "../annotation" },
     { "path": "../bearing" },
     { "path": "../iiif-parser" },
+    { "path": "../id" },
     { "path": "../project" },
     { "path": "../render" },
     { "path": "../stdlib" },

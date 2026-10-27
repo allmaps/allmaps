@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUiState } from '$lib/latest/state/ui.svelte.js'
 
   const uiState = getUiState()
 </script>

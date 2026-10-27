@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Item from '$lib/components/Item.svelte'
+  import Item from '$lib/latest/components/Item.svelte'
 
-  import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUiState } from '$lib/latest/state/ui.svelte.js'
 
   type Props = {
     apiMaps: unknown[]

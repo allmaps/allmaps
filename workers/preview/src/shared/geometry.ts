@@ -10,7 +10,7 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { Size } from '@allmaps/types'
 
 // TODO: move to shared library?
-// These functions are used in @allmaps/latest as well
+// These functions are used in @allmaps/ui/latest as well
 
 const mercator = geoProjection((x, y) => [
   x,

@@ -1,6 +1,6 @@
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
-import type { Properties } from '$lib/shared/types.js'
+import type { Properties } from '$lib/latest/shared/types.js'
 
 const formatter = new Intl.RelativeTimeFormat(undefined, {
   numeric: 'auto'

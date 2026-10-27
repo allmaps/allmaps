@@ -40,7 +40,12 @@
     },
     "./geocoder": "./dist/geocoder.js",
     "./projections": "./dist/projections.js",
-    "./css/*": "./dist/css/*"
+    "./css/*": "./dist/css/*",
+    "./latest": {
+      "types": "./dist/latest.d.ts",
+      "svelte": "./dist/latest.js",
+      "default": "./dist/latest.js"
+    }
   },
   "files": [
     "dist",
@@ -76,6 +81,7 @@
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@types/d3-geo": "catalog:",
+    "@types/geojson": "catalog:",
     "@types/lodash-es": "catalog:",
     "@typescript/native": "catalog:",
     "eslint": "catalog:",
@@ -99,6 +105,7 @@
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",

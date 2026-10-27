@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { Collection } from '@allmaps/ui'
+  import Collection from '$lib/components/Collection.svelte'
 
-  import Header from '$lib/components/Header.svelte'
-  import Loading from '$lib/components/Loading.svelte'
-  import Items from '$lib/components/Items.svelte'
+  import Header from '$lib/latest/components/Header.svelte'
+  import Loading from '$lib/latest/components/Loading.svelte'
+  import Items from '$lib/latest/components/Items.svelte'
 
-  import { setUiState } from '$lib/state/ui.svelte.js'
+  import { setUiState } from '$lib/latest/state/ui.svelte.js'
 
   type Props = {
     count?: number
