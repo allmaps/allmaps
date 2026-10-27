@@ -8,13 +8,13 @@ import {
   getProperties,
   getHostname,
   getTimeAgo
-} from '$lib/shared/properties.js'
+} from '$lib/latest/shared/properties.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
-import type { DisplayMap } from '$lib/shared/types.js'
+import type { DisplayMap } from '$lib/latest/shared/types.js'
 
-export function parseGeoreferencedMap(apiMap: unknown) {
+export function parseGeoreferencedMap(apiMap: unknown): GeoreferencedMap {
   try {
     const mapOrMaps = validateGeoreferencedMap(apiMap)
     return Array.isArray(mapOrMaps) ? mapOrMaps[0] : mapOrMaps

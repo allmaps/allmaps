@@ -1,7 +1,6 @@
 {
   "files": [],
   "references": [
-    { "path": "./apps/latest" },
     { "path": "./packages/analyze" },
     { "path": "./packages/annotation" },
     { "path": "./packages/api-shared" },

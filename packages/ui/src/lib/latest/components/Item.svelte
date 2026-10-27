@@ -1,18 +1,21 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { MapMonster } from '@allmaps/ui'
+  import MapMonster from '$lib/components/MapMonster.svelte'
 
-  import { parseGeoreferencedMap, getDisplayMap } from '$lib/shared/map.js'
+  import {
+    parseGeoreferencedMap,
+    getDisplayMap
+  } from '$lib/latest/shared/map.js'
 
-  import { geometryToPath } from '$lib/shared/geometry.js'
-  import { getUrls } from '$lib/shared/urls.js'
+  import { geometryToPath } from '$lib/latest/shared/geometry.js'
+  import { getUrls } from '$lib/latest/shared/urls.js'
 
-  import { getUiState } from '$lib/state/ui.svelte.js'
+  import { getUiState } from '$lib/latest/state/ui.svelte.js'
 
   import type { GeoreferencedMap } from '@allmaps/annotation'
 
-  import type { DisplayMap, Urls } from '$lib/shared/types.js'
+  import type { DisplayMap, Urls } from '$lib/latest/shared/types.js'
 
   const uiState = getUiState()
 

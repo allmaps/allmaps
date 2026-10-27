@@ -41,7 +41,6 @@
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
-    "@allmaps/latest": "workspace:^",
     "@allmaps/maplibre": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/stdlib": "workspace:^",

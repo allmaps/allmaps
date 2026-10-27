@@ -1306,9 +1306,6 @@ importers:
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
-      '@allmaps/latest':
-        specifier: workspace:^
-        version: link:../latest
       '@allmaps/maplibre':
         specifier: workspace:^
         version: link:../../packages/maplibre
@@ -1400,33 +1397,12 @@ importers:
 
   apps/latest:
     dependencies:
-      '@allmaps/annotation':
-        specifier: workspace:^
-        version: link:../../packages/annotation
-      '@allmaps/id':
-        specifier: workspace:^
-        version: link:../../packages/id
-      '@allmaps/project':
-        specifier: workspace:^
-        version: link:../../packages/project
-      '@allmaps/stdlib':
-        specifier: workspace:^
-        version: link:../../packages/stdlib
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
-      '@allmaps/types':
-        specifier: workspace:^
-        version: link:../../packages/types
       '@allmaps/ui':
         specifier: workspace:^
         version: link:../../packages/ui
-      '@turf/rewind':
-        specifier: 'catalog:'
-        version: 7.3.5
-      d3-geo:
-        specifier: 'catalog:'
-        version: 3.1.1
     devDependencies:
       '@eslint/js':
         specifier: 'catalog:'
@@ -1437,33 +1413,15 @@ importers:
       '@sveltejs/kit':
         specifier: 'catalog:'
         version: 2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4(@typescript-eslint/types@8.63.0))(vite@8.0.16(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)))(@typescript/typescript6@6.0.2)(svelte@5.56.4(@typescript-eslint/types@8.63.0))(vite@8.0.16(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
-      '@sveltejs/package':
-        specifier: 'catalog:'
-        version: 2.5.8(@typescript/typescript6@6.0.2)(svelte@5.56.4(@typescript-eslint/types@8.63.0))
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
         version: 7.2.0(svelte@5.56.4(@typescript-eslint/types@8.63.0))(vite@8.0.16(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.3.2(vite@8.0.16(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
-      '@turf/length':
-        specifier: 'catalog:'
-        version: 7.3.5
-      '@types/d3-geo':
-        specifier: 'catalog:'
-        version: 3.1.0
-      '@types/geojson':
-        specifier: 'catalog:'
-        version: 7946.0.16
-      '@types/lodash-es':
-        specifier: 'catalog:'
-        version: 4.17.12
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
-      '@vitejs/plugin-basic-ssl':
-        specifier: 'catalog:'
-        version: 1.2.0(vite@8.0.16(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
       eslint:
         specifier: 'catalog:'
         version: 10.7.0(jiti@2.7.0)(supports-color@10.2.2)
@@ -1482,9 +1440,6 @@ importers:
       prettier-plugin-svelte:
         specifier: 'catalog:'
         version: 4.1.1(prettier@3.9.5)(svelte@5.56.4(@typescript-eslint/types@8.63.0))
-      publint:
-        specifier: 'catalog:'
-        version: 0.3.21
       svelte:
         specifier: 'catalog:'
         version: 5.56.4(@typescript-eslint/types@8.63.0)
@@ -2933,6 +2888,9 @@ importers:
       '@allmaps/annotation':
         specifier: workspace:^
         version: link:../annotation
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../iiif-parser
@@ -2994,6 +2952,9 @@ importers:
       '@types/d3-geo':
         specifier: 'catalog:'
         version: 3.1.0
+      '@types/geojson':
+        specifier: 'catalog:'
+        version: 7946.0.16
       '@types/lodash-es':
         specifier: 'catalog:'
         version: 4.17.12

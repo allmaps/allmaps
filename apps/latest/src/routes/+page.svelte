@@ -3,7 +3,7 @@
 
   import { Stats } from '@allmaps/ui'
 
-  import Latest from '$lib/components/Latest.svelte'
+  import { Latest } from '@allmaps/ui/latest'
 
   const DEFAULT_LIMIT = 100
 
