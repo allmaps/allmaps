@@ -437,7 +437,7 @@ export class Image extends EmbeddedImage {
   }
 
   /**
-   * Parses a IIIF image and returns a [Image](#image) containing the parsed version
+   * Parses a IIIF image and returns an [Image](#new-imageparsedimage-options) containing the parsed version
    * @param iiifImage - Source data of IIIF Image
    * @param majorVersion - IIIF API version of Image. If not provided, it will be determined automatically
    * @returns Parsed IIIF Image

@@ -1,0 +1,88 @@
+---
+title: IDs in Allmaps
+description: How Allmaps turns IIIF identifiers into short IDs using SHA-1
+---
+
+import IdExample from '../../../components/IdExample.svelte'
+
+Allmaps uses short IDs to refer to IIIF resources. An ID for a IIIF image,
+Canvas, Manifest, or Collection is computed from its **IIIF ID**: the URL in
+the resource’s `id` field (`@id` in IIIF 2).
+
+IIIF URLs can be long and vary widely between institutions. Hashing gives
+Allmaps a compact, consistent format for links and database references. It
+also lets different tools independently arrive at the same ID for a resource,
+without a central service having to assign one. The original IIIF ID remains
+the reference to the source resource.
+
+The calculation has two steps: compute the **SHA-1 hash** of that string,
+then take its **first 16 hexadecimal characters**. The same IIIF ID always
+produces the same Allmaps ID, so you can compute it yourself without asking
+the Allmaps API.
+
+## Try it
+
+Choose one of the maps from the [viewing guide](/guides/viewing-maps), or enter
+your own IIIF URL. A Manifest contains several IDs: its own ID, the IDs of its
+Canvases, and the image service IDs. Select one to follow the calculation.
+
+<div class="not-content">
+  <IdExample client:load />
+</div>
+
+## Which URL gets hashed?
+
+Allmaps hashes the identifier **inside the IIIF document**, which may differ
+from the URL you used to fetch it. For an image, this is the image service’s
+ID, without the `/info.json` suffix or an image request such as
+`/full/max/0/default.jpg`.
+
+The exact string matters: `http` and `https`, uppercase and lowercase letters,
+and a trailing slash all affect the hash. The hash is computed from the URL’s
+UTF-8 bytes; Allmaps does not normalize the URL before hashing it. Changes to
+metadata or image content do not change this ID if the IIIF ID stays the same.
+
+## Use an ID
+
+Use an image or Manifest’s Allmaps ID to retrieve its Georeference Annotations:
+
+<div class="full-width-table overflow-x-auto">
+
+| Resource | Annotation URL |
+| --- | --- |
+| Image | `https://annotations.allmaps.org/images/{imageId}` |
+| Manifest | `https://annotations.allmaps.org/manifests/{manifestId}` |
+
+</div>
+
+Replace `{imageId}` or `{manifestId}` with the resource’s Allmaps ID.
+
+Computing an ID does not add the resource to Allmaps or mean that it has been
+georeferenced. Map IDs identify individual maps drawn on an image and are
+separate from the image’s ID. One image can contain several maps.
+
+To compute an ID in JavaScript, use [`@allmaps/id`](/packages/id):
+
+```js
+import { generateId } from '@allmaps/id'
+
+const iiifId = 'https://gallica.bnf.fr/iiif/ark:/12148/btv1b530297676/f1'
+const allmapsId = await generateId(iiifId)
+```
+
+You can also use the [Allmaps CLI](https://github.com/allmaps/allmaps/tree/main/apps/cli):
+
+```sh
+allmaps id 'https://gallica.bnf.fr/iiif/ark:/12148/btv1b530297676/f1'
+```
+
+In Python, use the built-in `hashlib` module to hash the IIIF ID’s UTF-8
+bytes and take the first 16 hexadecimal characters:
+
+```python
+import hashlib
+
+iiif_id = 'https://gallica.bnf.fr/iiif/ark:/12148/btv1b530297676/f1'
+allmaps_id = hashlib.sha1(iiif_id.encode('utf-8')).hexdigest()[:16]
+print(allmaps_id)  # ed90c4244dbb9361
+```
