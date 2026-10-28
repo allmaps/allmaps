@@ -127,14 +127,6 @@
   color: black;
 }
 
-/* Reserve a gutter for heading icons while keeping all content aligned. */
-.content-panel {
-  padding-inline-start: max(
-    var(--sl-content-pad-x),
-    calc(0.8 * var(--sl-text-h1) + 0.7rem)
-  );
-}
-
 .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
   position: relative;
 }
@@ -209,4 +201,11 @@
 .sl-markdown-content .sl-heading-wrapper:hover .sl-anchor-link,
 .sl-markdown-content .sl-anchor-link:focus-visible {
   opacity: 1;
+}
+
+@media (width < 50rem) {
+  .sl-markdown-content .heading-anchor,
+  .sl-markdown-content .sl-anchor-link {
+    display: none;
+  }
 }
