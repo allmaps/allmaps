@@ -1,6 +1,9 @@
 <script lang="ts">
-  /* eslint-disable svelte/no-navigation-without-resolve -- sign-in URL is external */
-  import { UserCircle as UserCircleIcon } from 'phosphor-svelte'
+  import {
+    UserCircle as UserCircleIcon,
+    GithubLogo,
+    GoogleLogo
+  } from 'phosphor-svelte'
 
   type Props = {
     user?: {
@@ -9,10 +12,14 @@
       image?: string | null
     } | null
     signInURL?: string
+    signInProviders?: Array<{
+      provider: 'github' | 'google'
+      url: string
+    }>
     onSignOut: () => void | Promise<void>
   }
 
-  let { user, signInURL, onSignOut }: Props = $props()
+  let { user, signInURL, signInProviders = [], onSignOut }: Props = $props()
 </script>
 
 {#if user}
@@ -48,6 +55,34 @@
       >
         Sign out
       </button>
+    </div>
+  </details>
+{:else if signInProviders.length}
+  <details class="relative">
+    <summary
+      class="list-none cursor-pointer rounded border border-gray-300 p-1.5 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      aria-label="Sign in"
+      title="Sign in"
+    >
+      <UserCircleIcon class="size-5" />
+    </summary>
+    <div
+      class="absolute right-0 top-10 z-50 w-56 max-w-[calc(100vw-2rem)] rounded border border-gray-200 bg-white p-1 shadow-lg"
+    >
+      {#each signInProviders as { provider, url } (provider)}
+        <a
+          href={url}
+          class="flex items-center gap-2 rounded px-3 py-2 text-sm text-gray-900 hover:bg-gray-100 focus-visible:outline focus-visible:outline-2"
+        >
+          {#if provider === 'google'}
+            <GoogleLogo class="size-5 shrink-0" />
+            Continue with Google
+          {:else}
+            <GithubLogo class="size-5 shrink-0" />
+            Continue with GitHub
+          {/if}
+        </a>
+      {/each}
     </div>
   </details>
 {:else if signInURL}

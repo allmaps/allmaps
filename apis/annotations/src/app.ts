@@ -7,6 +7,7 @@ import { IIIF } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
 import { generateId } from '@allmaps/id'
 import { setCacheControl } from '@allmaps/api-shared'
+import { getLoginProviders } from '@allmaps/api-shared/elysia'
 
 import {
   createElysia,
@@ -116,7 +117,13 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           version: packageJson.version,
           docs: apiDocsUrl,
           terms: termsUrl,
-          login: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/login/github`,
+          login: betterAuth.auth.options.socialProviders.github
+            ? `${env.PUBLIC_ANNOTATIONS_BASE_URL}/login/github`
+            : undefined,
+          loginProviders: getLoginProviders(
+            betterAuth,
+            env.PUBLIC_ANNOTATIONS_BASE_URL
+          ),
           logout: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/logout`
         }
       },

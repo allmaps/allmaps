@@ -29,6 +29,17 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
       schema: authSchema,
       usePlural: true
     }),
+    account: {
+      accountLinking: {
+        enabled: true,
+        disableImplicitLinking: false,
+        // Require provider-verified emails instead of bypassing verification.
+        trustedProviders: [],
+        allowDifferentEmails: false,
+        allowUnlinkingAll: false,
+        updateUserInfoOnLink: false
+      }
+    },
     user: {
       fields: {
         name: 'fullName'
@@ -61,8 +72,8 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
         }
       }
     },
-    socialProviders:
-      env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+    socialProviders: {
+      ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
         ? {
             github: {
               clientId: env.GITHUB_CLIENT_ID,
@@ -72,7 +83,20 @@ export function createAuth(env: BetterAuthEnv, database?: Db) {
               })
             }
           }
-        : {},
+        : {}),
+      ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? {
+            google: {
+              clientId: env.GOOGLE_CLIENT_ID,
+              clientSecret: env.GOOGLE_CLIENT_SECRET,
+              // Google has no username. Use an opaque, valid Allmaps slug.
+              mapProfileToUser: () => ({
+                slug: `user-${generateRandomId(32)}`
+              })
+            }
+          }
+        : {})
+    },
     trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
     // experimental: { joins: true },
     plugins: [
