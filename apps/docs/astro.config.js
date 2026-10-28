@@ -11,7 +11,7 @@ import headingLinks from './src/plugins/heading-links'
 import { liveCodeTheme } from './src/plugins/live-code-theme.mjs'
 import { mapExampleDependencies } from './src/plugins/map-example-dependencies.mjs'
 
-const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
+const STATS_WEBSITE_ID = process.env.PUBLIC_STATS_WEBSITE_ID
 
 const site = process.env.PUBLIC_DOCS_BASE_URL || 'https://docs.allmaps.org'
 const isDevelop =

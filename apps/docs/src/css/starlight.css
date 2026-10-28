@@ -134,14 +134,6 @@
   color: black;
 }
 
-/* Reserve a gutter for heading icons while keeping all content aligned. */
-.content-panel {
-  padding-inline-start: max(
-    var(--sl-content-pad-x),
-    calc(0.8 * var(--sl-text-h1) + 0.7rem)
-  );
-}
-
 .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
   position: relative;
 }
@@ -189,12 +181,13 @@
 
 .sl-markdown-content .heading-anchor,
 .sl-markdown-content .sl-anchor-link {
+  --heading-anchor-size: min(0.8em, 1rem);
   position: absolute;
   display: block;
   inset-inline-end: 100%;
-  top: calc((1lh - 0.8em) / 2);
-  width: 0.8em;
-  height: 0.8em;
+  top: calc((1lh - var(--heading-anchor-size)) / 2);
+  width: var(--heading-anchor-size);
+  height: var(--heading-anchor-size);
   margin-inline-end: 0.35rem;
   margin-inline-start: 0;
   color: #df1783;
@@ -216,4 +209,12 @@
 .sl-markdown-content .sl-heading-wrapper:hover .sl-anchor-link,
 .sl-markdown-content .sl-anchor-link:focus-visible {
   opacity: 1;
+}
+
+/* Wait until Starlight's wider content padding can contain the outside icon. */
+@media (width < 72rem) {
+  .sl-markdown-content .heading-anchor,
+  .sl-markdown-content .sl-anchor-link {
+    display: none;
+  }
 }
