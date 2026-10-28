@@ -898,12 +898,21 @@ importers:
 
   apps/docs:
     dependencies:
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../../packages/annotation
       '@allmaps/id':
         specifier: workspace:^
         version: link:../../packages/id
       '@allmaps/iiif-parser':
         specifier: workspace:^
         version: link:../../packages/iiif-parser
+      '@allmaps/render':
+        specifier: workspace:^
+        version: link:../../packages/render
+      '@allmaps/render-wasm':
+        specifier: workspace:^
+        version: link:../../packages/render-wasm
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
@@ -2988,9 +2997,6 @@ importers:
       '@allmaps/render':
         specifier: workspace:^
         version: link:../render
-      '@allmaps/render-wasm':
-        specifier: workspace:^
-        version: link:../render-wasm
       '@allmaps/stdlib':
         specifier: workspace:^
         version: link:../stdlib

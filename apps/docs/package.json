@@ -41,11 +41,14 @@
     "preview": "astro preview",
     "astro": "astro",
     "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs test/*.test.ts"
   },
   "dependencies": {
+    "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "@astrojs/check": "^0.9.9",

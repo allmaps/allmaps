@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import {
-  imageExampleSource,
-  validateImageSettings
-} from '../src/lib/examples/image.ts'
+import { imageExampleSource, validateImageSettings } from '../src/lib/image.ts'
 
 const settings = {
   annotationUrl: 'https://annotations.allmaps.org/maps/example',
@@ -103,10 +100,7 @@ test('WASM rendering produces actual PNG, JPEG, and lossless WebP image bytes', 
   const { generateAnnotation } = await import('@allmaps/annotation')
   await wasm.default({
     module_or_path: await readFile(
-      new URL(
-        '../../render-wasm/pkg/allmaps_render_wasm_bg.wasm',
-        import.meta.url
-      )
+      new URL(import.meta.resolve('@allmaps/render-wasm/wasm'), import.meta.url)
     )
   })
   const pixels = new Uint8Array(64 * 64 * 4)
