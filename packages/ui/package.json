@@ -88,6 +88,10 @@
       "types": "./dist/code/renderer.d.ts",
       "default": "./dist/code/renderer.js"
     },
+    "./examples/data": {
+      "types": "./dist/examples/data.d.ts",
+      "default": "./dist/examples/data.js"
+    },
     "./examples/source": {
       "types": "./dist/examples/source.d.ts",
       "default": "./dist/examples/source.js"
@@ -161,7 +165,6 @@
     "@allmaps/openlayers": "workspace:^",
     "@allmaps/project": "workspace:^",
     "@allmaps/render": "workspace:^",
-    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",

@@ -1,4 +1,4 @@
-import { validateAnnotationUrl } from './source.ts'
+import { validateAnnotationUrl } from '@allmaps/ui/examples/source'
 
 export type ImageSettings = {
   annotationUrl: string

@@ -13,12 +13,15 @@ import { mapExampleDependencies } from './src/plugins/map-example-dependencies.m
 
 const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
 
-const isDevelop = import.meta.env.DEV
+const site = process.env.PUBLIC_DOCS_BASE_URL || 'https://docs.allmaps.org'
+const isDevelop =
+  site === 'https://dev.docs.allmaps.org' ||
+  process.env.NODE_ENV === 'development'
 const branch = isDevelop ? 'develop' : 'main'
 const editLinkBaseUrl = `https://github.com/allmaps/allmaps/tree/${branch}/apps/docs/`
 
 export default defineConfig({
-  site: 'https://docs.allmaps.org',
+  site,
   server: { port: ports.docs, host: true },
   devToolbar: {
     enabled: false

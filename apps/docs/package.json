@@ -37,15 +37,20 @@
     "start": "astro dev --mode localhost",
     "check": "astro check",
     "build": "pnpm run copy-readmes && astro build",
+    "build:dev": "pnpm run copy-readmes && PUBLIC_DOCS_BASE_URL=https://dev.docs.allmaps.org astro build --mode dev",
+    "deploy:dev": "wrangler deploy",
     "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
     "preview": "astro preview",
     "astro": "astro",
     "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs test/*.test.ts"
   },
   "dependencies": {
+    "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "@astrojs/check": "^0.9.9",
@@ -69,6 +74,7 @@
     "@allmaps/types": "workspace:^",
     "remark": "15.0.1",
     "remark-gfm": "4.0.1",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "wrangler": "catalog:"
   }
 }

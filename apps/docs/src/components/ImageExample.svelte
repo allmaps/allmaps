@@ -1,19 +1,13 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { fade } from 'svelte/transition'
-  import * as Select from '../ui/select/index.js'
-  import CodeBlock from '../CodeBlock.svelte'
-  import LoadingSmall from '../LoadingSmall.svelte'
-  import { annotationExamples } from '../../examples/annotations.js'
-  import {
-    validateImageSettings,
-    imageExampleSource
-  } from '../../examples/image.js'
-  import type {
-    ImageSettings,
-    ImageWorkerResponse
-  } from '../../examples/image.js'
-  import type { CodeThemeConfig } from '../../code/types.js'
+  import * as Select from '@allmaps/ui/select'
+  import { CodeBlock } from '@allmaps/ui/code'
+  import { LoadingSmall } from '@allmaps/ui'
+  import { annotationExamples } from '@allmaps/ui/examples/data'
+  import { validateImageSettings, imageExampleSource } from '../lib/image.ts'
+  import type { ImageSettings, ImageWorkerResponse } from '../lib/image.ts'
+  import type { CodeThemeConfig } from '@allmaps/ui/code'
 
   let { codeTheme }: { codeTheme?: CodeThemeConfig } = $props()
   const id = $props.id()
@@ -86,7 +80,7 @@
     try {
       // No worker, renderer, WASM, or IIIF requests until this button is clicked.
       worker ??= new Worker(
-        new URL('../../examples/image-render.worker.js', import.meta.url),
+        new URL('../lib/image-render.worker.ts', import.meta.url),
         { type: 'module' }
       )
       const activeWorker = worker

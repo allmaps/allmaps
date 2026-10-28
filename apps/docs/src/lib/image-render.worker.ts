@@ -1,4 +1,4 @@
-import type { ImageSettings, ImageWorkerResponse } from './image.js'
+import type { ImageSettings, ImageWorkerResponse } from './image.ts'
 
 function report(message: ImageWorkerResponse) {
   self.postMessage(message)
@@ -31,8 +31,8 @@ self.onmessage = async (event: MessageEvent<ImageSettings>) => {
       { validateImageSettings }
     ] = await Promise.all([
       runtime,
-      import('./annotation.js'),
-      import('./image.js')
+      import('@allmaps/ui/examples/data'),
+      import('./image.ts')
     ])
     const settings = validateImageSettings(event.data)
     report({ type: 'progress', message: 'Loading annotation…' })
