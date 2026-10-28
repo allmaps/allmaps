@@ -17,6 +17,7 @@ import Loading from '$lib/components/Loading.svelte'
 import LoadingSmall from '$lib/components/LoadingSmall.svelte'
 import Logo from '$lib/components/Logo.svelte'
 import MapMonster from '$lib/components/MapMonster.svelte'
+import Screenshot from '$lib/components/Screenshot.svelte'
 import Modal from '$lib/components/Modal.svelte'
 import MovingMapsBackground from '$lib/components/MovingMapsBackground.svelte'
 import NorthArrow from './components/NorthArrow.svelte'
@@ -61,6 +62,7 @@ export {
   LoadingSmall,
   Logo,
   MapMonster,
+  Screenshot,
   Modal,
   MovingMapsBackground,
   NorthArrow,
@@ -92,4 +94,11 @@ export {
 }
 
 export type { MapMonsterColor, MapMonsterMood } from '$lib/shared/types.js'
+export type {
+  ScreenshotOptions,
+  ScreenshotDefinition,
+  ScreenshotStep,
+  ScreenshotBounds,
+  ScreenshotGeometry
+} from './screenshots.js'
 export type { SelectBaseItem, ComboboxBaseItem } from '$lib/shared/types.js'
