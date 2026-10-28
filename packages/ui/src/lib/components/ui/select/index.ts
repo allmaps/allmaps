@@ -1,6 +1,3 @@
-import '../../../css/ui.css'
-import './select.css'
-
 import Content from './select-content.svelte'
 import GroupHeading from './select-group-heading.svelte'
 import Group from './select-group.svelte'
