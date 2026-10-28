@@ -2,6 +2,7 @@ import { fetchUrl } from '@allmaps/stdlib'
 
 import { FetchableTile } from './FetchableTile.js'
 import { CacheableTile } from './CacheableTile.js'
+import { createTileImageBitmap } from '../shared/image-bitmap.js'
 
 import type { FetchFn } from '@allmaps/types'
 
@@ -24,10 +25,8 @@ export class CacheableImageBitmapTile extends CacheableTile<ImageBitmap> {
       )
 
       const blob = await response.blob()
-      this.data = await createImageBitmap(
+      this.data = await createTileImageBitmap(
         blob,
-        0,
-        0,
         this.fetchableTile.tile.tileZoomLevel.width,
         this.fetchableTile.tile.tileZoomLevel.height
       )
