@@ -1,12 +1,32 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { createElysia } from '@allmaps/api-shared/elysia'
+import { parseRestEnv } from '@allmaps/env/rest'
 
 import { createApp as createRestApp } from '../../../apis/rest/src/app.ts'
 import { createApp as createAnnotationsApp } from '../../../apis/annotations/src/app.ts'
 import { nodeAdapter } from '../../../tools/apis/src/node-adapter.ts'
 import { createTestContext, type TestContext } from './helpers/context.ts'
 
-describe('API references hosted on the docs site', () => {
+describe.each([
+  {
+    environment: 'development',
+    docsBaseUrl: 'https://dev.docs.allmaps.org',
+    homepageBaseUrl: 'https://dev.allmaps.org'
+  },
+  {
+    environment: 'production',
+    docsBaseUrl: 'https://docs.allmaps.org',
+    homepageBaseUrl: 'https://allmaps.org'
+  },
+  {
+    environment: 'localhost',
+    docsBaseUrl: 'http://localhost:5517/',
+    homepageBaseUrl: 'http://localhost:5511/'
+  }
+])('API references in $environment', ({ docsBaseUrl, homepageBaseUrl }) => {
+  const apiDocsUrl = new URL('/api', docsBaseUrl).href
+  const termsUrl = new URL('/terms#hosted-allmaps-services', homepageBaseUrl)
+    .href
   let context: TestContext
   let references: Array<{
     name: string
@@ -19,7 +39,12 @@ describe('API references hosted on the docs site', () => {
       throw new Error('OpenAPI tests must not make network requests')
     })
     context = await createTestContext()
-    const { db, env, betterAuth } = context
+    const { db, betterAuth } = context
+    const env = parseRestEnv({
+      ...context.env,
+      PUBLIC_DOCS_BASE_URL: docsBaseUrl,
+      PUBLIC_HOMEPAGE_BASE_URL: homepageBaseUrl
+    })
     // Import the API sources so these checks cannot pass against stale dist files.
     references = [
       {
@@ -64,9 +89,7 @@ describe('API references hosted on the docs site', () => {
       )
       const spec = await response.json()
       expect(spec.servers).toEqual([{ url: reference.baseUrl }])
-      expect(spec.info.termsOfService).toBe(
-        'https://allmaps.org/terms#hosted-allmaps-services'
-      )
+      expect(spec.info.termsOfService).toBe(termsUrl)
       expect(spec.paths['/maps']).toBeDefined()
 
       if (name === 'REST') {
@@ -93,8 +116,8 @@ describe('API references hosted on the docs site', () => {
       const response = await reference.handle(new Request(reference.baseUrl))
       expect(response.status).toBe(200)
       expect(await response.json()).toMatchObject({
-        docs: 'https://docs.allmaps.org/api',
-        terms: 'https://allmaps.org/terms#hosted-allmaps-services'
+        docs: apiDocsUrl,
+        terms: termsUrl
       })
       const oldDocs = await reference.handle(
         new Request(`${reference.baseUrl}/docs`)

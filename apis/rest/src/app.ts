@@ -26,9 +26,6 @@ import { projections } from './routes/projections.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
-const apiDocsUrl = 'https://docs.allmaps.org/api'
-const termsUrl = 'https://allmaps.org/terms#hosted-allmaps-services'
-
 const openApiTags = [
   { name: 'API' },
   { name: 'Maps' },
@@ -42,6 +39,12 @@ const openApiTags = [
 ]
 
 export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
+  const apiDocsUrl = new URL('/api', env.PUBLIC_DOCS_BASE_URL).href
+  const termsUrl = new URL(
+    '/terms#hosted-allmaps-services',
+    env.PUBLIC_HOMEPAGE_BASE_URL
+  ).href
+
   const betterAuthPlugin = createBetterAuthPlugin(betterAuth)
   return createElysia({
     name: 'app'
