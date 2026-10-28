@@ -174,12 +174,13 @@
 
 .sl-markdown-content .heading-anchor,
 .sl-markdown-content .sl-anchor-link {
+  --heading-anchor-size: min(0.8em, 1rem);
   position: absolute;
   display: block;
   inset-inline-end: 100%;
-  top: calc((1lh - 0.8em) / 2);
-  width: 0.8em;
-  height: 0.8em;
+  top: calc((1lh - var(--heading-anchor-size)) / 2);
+  width: var(--heading-anchor-size);
+  height: var(--heading-anchor-size);
   margin-inline-end: 0.35rem;
   margin-inline-start: 0;
   color: #df1783;
@@ -203,7 +204,8 @@
   opacity: 1;
 }
 
-@media (width < 50rem) {
+/* Wait until Starlight's wider content padding can contain the outside icon. */
+@media (width < 72rem) {
   .sl-markdown-content .heading-anchor,
   .sl-markdown-content .sl-anchor-link {
     display: none;
