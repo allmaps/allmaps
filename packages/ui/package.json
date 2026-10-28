@@ -53,6 +53,44 @@
     "./screenshots": {
       "types": "./dist/screenshots.d.ts",
       "default": "./dist/screenshots.js"
+    },
+    "./examples": {
+      "types": "./dist/examples/index.d.ts",
+      "svelte": "./dist/examples/index.js",
+      "default": "./dist/examples/index.js"
+    },
+    "./examples/maplibre": {
+      "types": "./dist/examples/maplibre.d.ts",
+      "svelte": "./dist/examples/maplibre.js",
+      "default": "./dist/examples/maplibre.js"
+    },
+    "./examples/leaflet": {
+      "types": "./dist/examples/leaflet.d.ts",
+      "svelte": "./dist/examples/leaflet.js",
+      "default": "./dist/examples/leaflet.js"
+    },
+    "./examples/openlayers": {
+      "types": "./dist/examples/openlayers.d.ts",
+      "svelte": "./dist/examples/openlayers.js",
+      "default": "./dist/examples/openlayers.js"
+    },
+    "./select": {
+      "types": "./dist/select.d.ts",
+      "svelte": "./dist/select.js",
+      "default": "./dist/select.js"
+    },
+    "./code": {
+      "types": "./dist/code.d.ts",
+      "svelte": "./dist/code.js",
+      "default": "./dist/code.js"
+    },
+    "./code/renderer": {
+      "types": "./dist/code/renderer.d.ts",
+      "default": "./dist/code/renderer.js"
+    },
+    "./examples/source": {
+      "types": "./dist/examples/source.d.ts",
+      "default": "./dist/examples/source.js"
     }
   },
   "files": [
@@ -91,6 +129,7 @@
     "@tailwindcss/vite": "catalog:",
     "@types/d3-geo": "catalog:",
     "@types/geojson": "catalog:",
+    "@types/leaflet": "catalog:",
     "@types/lodash-es": "catalog:",
     "@typescript/native": "catalog:",
     "eslint": "catalog:",
@@ -116,7 +155,13 @@
     "@allmaps/annotation": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/io": "workspace:^",
+    "@allmaps/leaflet": "workspace:^",
+    "@allmaps/maplibre": "workspace:^",
+    "@allmaps/openlayers": "workspace:^",
     "@allmaps/project": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
     "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/transform": "workspace:^",
@@ -126,7 +171,11 @@
     "d3-geo": "catalog:",
     "flatbush": "^4.4.0",
     "fuse.js": "^7.1.0",
+    "leaflet": "catalog:",
     "lodash-es": "catalog:",
-    "phosphor-svelte": "catalog:"
+    "maplibre-gl": "catalog:",
+    "ol": "catalog:",
+    "phosphor-svelte": "catalog:",
+    "shiki": "4.4.3"
   }
 }

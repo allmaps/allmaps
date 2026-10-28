@@ -1,0 +1,98 @@
+/* Shared theme for the new shadcn-based Allmaps components. No global reset. */
+@layer theme {
+  :root {
+    --allmaps-ui-font-sans: 'Geograph', system-ui, sans-serif;
+    --allmaps-ui-font-mono: 'DM Mono', ui-monospace, monospace;
+    --allmaps-ui-font-size: 0.875rem;
+    --allmaps-ui-font-weight: 400;
+    --allmaps-ui-control-height: 2.5rem;
+    --allmaps-ui-control-height-sm: 2rem;
+    --allmaps-ui-radius: 0.375rem;
+    --allmaps-ui-background: #ffffff;
+    --allmaps-ui-foreground: #182a2f;
+    --allmaps-ui-card: #ffffff;
+    --allmaps-ui-card-foreground: #182a2f;
+    --allmaps-ui-popover: #ffffff;
+    --allmaps-ui-popover-foreground: #182a2f;
+    --allmaps-ui-primary: #ff56ba;
+    --allmaps-ui-primary-foreground: #182a2f;
+    --allmaps-ui-secondary: #e7eff2;
+    --allmaps-ui-secondary-foreground: #182a2f;
+    --allmaps-ui-muted: #f3f7f9;
+    --allmaps-ui-muted-foreground: #495c62;
+    --allmaps-ui-accent: color-mix(
+      in srgb,
+      var(--allmaps-ui-primary) 10%,
+      var(--allmaps-ui-background)
+    );
+    --allmaps-ui-accent-foreground: #182a2f;
+    --allmaps-ui-destructive: #c02e46;
+    --allmaps-ui-border: #bac4c8;
+    --allmaps-ui-input: #bac4c8;
+    --allmaps-ui-ring: var(--allmaps-ui-primary);
+    --allmaps-ui-shadow: 0 4px 16px rgb(24 42 47 / 12%);
+  }
+
+  :root:is(.dark, [data-theme='dark']) {
+    --allmaps-ui-background: #121a1c;
+    --allmaps-ui-foreground: #e7eff2;
+    --allmaps-ui-card: #182a2f;
+    --allmaps-ui-card-foreground: #e7eff2;
+    --allmaps-ui-popover: #182a2f;
+    --allmaps-ui-popover-foreground: #e7eff2;
+    --allmaps-ui-secondary: #2a3b41;
+    --allmaps-ui-secondary-foreground: #e7eff2;
+    --allmaps-ui-muted: #182a2f;
+    --allmaps-ui-muted-foreground: #bac4c8;
+    --allmaps-ui-accent: color-mix(
+      in srgb,
+      var(--allmaps-ui-primary) 15%,
+      var(--allmaps-ui-popover)
+    );
+    --allmaps-ui-accent-foreground: #e7eff2;
+    --allmaps-ui-destructive: #ff8b9d;
+    --allmaps-ui-border: #495c62;
+    --allmaps-ui-input: #495c62;
+    --allmaps-ui-shadow: 0 4px 16px rgb(0 0 0 / 30%);
+  }
+}
+
+/* The usual shadcn utility names resolve to the same Allmaps theme. */
+@theme inline {
+  --font-allmaps-ui: var(--allmaps-ui-font-sans);
+  --font-allmaps-ui-mono: var(--allmaps-ui-font-mono);
+  --color-background: var(--allmaps-ui-background);
+  --color-foreground: var(--allmaps-ui-foreground);
+  --color-card: var(--allmaps-ui-card);
+  --color-card-foreground: var(--allmaps-ui-card-foreground);
+  --color-popover: var(--allmaps-ui-popover);
+  --color-popover-foreground: var(--allmaps-ui-popover-foreground);
+  --color-primary: var(--allmaps-ui-primary);
+  --color-primary-foreground: var(--allmaps-ui-primary-foreground);
+  --color-secondary: var(--allmaps-ui-secondary);
+  --color-secondary-foreground: var(--allmaps-ui-secondary-foreground);
+  --color-muted: var(--allmaps-ui-muted);
+  --color-muted-foreground: var(--allmaps-ui-muted-foreground);
+  --color-accent: var(--allmaps-ui-accent);
+  --color-accent-foreground: var(--allmaps-ui-accent-foreground);
+  --color-destructive: var(--allmaps-ui-destructive);
+  --color-border: var(--allmaps-ui-border);
+  --color-input: var(--allmaps-ui-input);
+  --color-ring: var(--allmaps-ui-ring);
+  --radius-ui: var(--allmaps-ui-radius);
+  --radius-sm: calc(var(--allmaps-ui-radius) - 2px);
+  --radius-md: var(--allmaps-ui-radius);
+  --radius-lg: calc(var(--allmaps-ui-radius) + 2px);
+  --radius-xl: calc(var(--allmaps-ui-radius) + 0.375rem);
+}
+
+@layer components {
+  .allmaps-ui {
+    box-sizing: border-box;
+    font-family: var(--allmaps-ui-font-sans);
+    font-size: var(--allmaps-ui-font-size);
+    font-weight: var(--allmaps-ui-font-weight);
+    line-height: 1.5;
+    letter-spacing: normal;
+  }
+}
