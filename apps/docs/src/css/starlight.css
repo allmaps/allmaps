@@ -67,6 +67,13 @@
     0 3px 0 var(--kbd-shadow-color);
 }
 
+.api-examples,
+.full-width-table {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .api-examples table,
 .full-width-table table {
   display: table;
