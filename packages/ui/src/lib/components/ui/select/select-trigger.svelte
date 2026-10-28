@@ -1,4 +1,6 @@
 <script lang="ts">
+  import '../../../css/ui.css'
+  import './select.css'
   import { Select as SelectPrimitive } from 'bits-ui'
   import { CaretDown as Icon } from 'phosphor-svelte'
   import { type WithoutChild } from '../types.js'

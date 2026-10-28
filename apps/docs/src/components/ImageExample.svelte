@@ -286,12 +286,9 @@
             : result.settings.format.toUpperCase()}</button
         >
       </div>
-      <div
-        class="preview"
-        class:opaque={result.settings.format === 'jpeg'}
-        style:max-width={`${(30 * result.settings.width) / result.settings.height}rem`}
-      >
+      <div class="preview">
         <img
+          style:max-width={`${(30 * result.settings.width) / result.settings.height}rem`}
           src={result.url}
           width={result.settings.width}
           height={result.settings.height}
@@ -499,13 +496,11 @@
     );
     background-size: 20px 20px;
   }
-  .preview.opaque {
-    background-image: none;
-  }
   .preview img {
     display: block;
     width: 100%;
     height: auto;
+    margin-inline: auto;
   }
   .code {
     padding: 1.25rem;
