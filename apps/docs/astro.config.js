@@ -32,6 +32,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Allmaps Docs',
+      description:
+        'Guides, examples, and API reference for georeferencing historical maps and building with Allmaps.',
+      routeMiddleware: './src/route-data.ts',
       markdown: {
         headingLinks: false
       },
