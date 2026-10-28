@@ -39,6 +39,8 @@
     "build": "pnpm run copy-readmes && astro build",
     "build:dev": "pnpm run copy-readmes && PUBLIC_DOCS_BASE_URL=https://dev.docs.allmaps.org astro build --mode dev",
     "deploy:dev": "wrangler deploy",
+    "build:production": "pnpm run copy-readmes && PUBLIC_DOCS_BASE_URL=https://docs.allmaps.org astro build --mode production",
+    "deploy:production": "wrangler deploy --env production",
     "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
     "preview": "astro preview",
     "astro": "astro",
