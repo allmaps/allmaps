@@ -5,7 +5,7 @@ Uses the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) algorithm to generate IDs 
 Allmaps uses this module to create IDs from IIIF URIs. For example:
 
 * Given the following manifest URL: https://digital.zlb.de/viewer/api/v1/records/34231682/manifest/,
-* The output of the [`generateId`](#generateid) function will be: `6f5a7b547c8f6fbe`,
+* The output of the [`generateId`](#generateidstr-length) function will be: `6f5a7b547c8f6fbe`,
 * We can use this ID to lookup the [Georeference Annotation](https://iiif.io/api/extension/georef/) for the georeferenced maps in this manifest using Allmaps API:
   https://annotations.allmaps.org/manifests/6f5a7b547c8f6fbe.
 
