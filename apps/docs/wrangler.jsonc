@@ -13,5 +13,16 @@
       "pattern": "dev.docs.allmaps.org",
       "custom_domain": true
     }
-  ]
+  ],
+  "env": {
+    "production": {
+      "name": "docs",
+      "routes": [
+        {
+          "pattern": "docs.allmaps.org",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }

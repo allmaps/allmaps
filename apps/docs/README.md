@@ -20,6 +20,9 @@ The Astro configuration reads it from the build process environment; a runtime
 Worker variable or an entry in an `.env` file alone does not enable tracking.
 When it is unset, no tracking script is included.
 
+`PUBLIC_DOCS_BASE_URL` sets the canonical docs URL and social-image URL. The
+`build:dev` and `build:production` commands set it explicitly for each deployment.
+
 ## Development deployment
 
 The `docs-develop` Cloudflare Worker serves static files from `dist` at
@@ -41,6 +44,31 @@ for canonical links, and points editing links to `develop`.
 Cloudflare Git builds can use the repository root, the two build commands above,
 and `pnpm --filter @allmaps/docs run deploy:dev` as the deploy command. Configure
 Node 24, the repository's pnpm version, and the Rust/WASM build tools.
+
+## Production deployment
+
+The `production` Wrangler environment deploys the `docs` Worker at
+https://docs.allmaps.org. The default environment continues to deploy
+`docs-develop` at https://dev.docs.allmaps.org.
+
+Deploy from a clean checkout of `main`, using the same Node, pnpm, and Rust/WASM
+build tools as the development deployment:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec turbo run build --filter '@allmaps/docs^...'
+pnpm --filter @allmaps/docs run build:production
+pnpm --filter @allmaps/docs run deploy:production
+```
+
+For Cloudflare Git builds, connect the `docs` Worker to `main`, use the repository
+root, and use the two build commands above followed by the production deploy
+command. Set `PUBLIC_STATS_WEBSITE_ID` in that Worker's build variables to enable
+analytics. The production build loads `.env.production` and uses
+`https://docs.allmaps.org` for canonical and social-image URLs.
+
+The build mode and Wrangler environment are selected separately: always pair
+`build:production` with `deploy:production`, and `build:dev` with `deploy:dev`.
 
 ## Social previews
 
