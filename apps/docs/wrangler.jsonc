@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "docs-develop",
+  "compatibility_date": "2026-10-28",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    {
+      "pattern": "dev.docs.allmaps.org",
+      "custom_domain": true
+    }
+  ],
+  "env": {
+    "production": {
+      "name": "docs",
+      "routes": [
+        {
+          "pattern": "docs.allmaps.org",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
+}

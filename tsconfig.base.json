@@ -36,8 +36,6 @@
       "@allmaps/iiif-inspector/*": ["./packages/iiif-inspector/src/*"],
       "@allmaps/iiif-parser": ["./packages/iiif-parser/src"],
       "@allmaps/iiif-parser/*": ["./packages/iiif-parser/src/*"],
-      "@allmaps/latest": ["./apps/latest/src"],
-      "@allmaps/latest/*": ["./apps/latest/src/*"],
       "@allmaps/leaflet": ["./packages/leaflet/src"],
       "@allmaps/leaflet/*": ["./packages/leaflet/src/*"],
       "@allmaps/maplibre": ["./packages/maplibre/src"],

@@ -7,7 +7,6 @@
     "url": "https://bertspaan.nl"
   },
   "description": "The latest maps georeferenced with Allmaps Editor",
-  "svelte": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/allmaps/allmaps.git",
@@ -15,22 +14,10 @@
   },
   "license": "GPL-3.0-or-later",
   "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "svelte": "./dist/index.js"
-    }
-  },
   "scripts": {
     "dev": "vite dev --mode localhost",
-    "watch": "svelte-package --watch",
-    "build": "vite build && pnpm run package",
-    "package": "svelte-kit sync && svelte-package && publint",
+    "build": "vite build",
     "prepare": "svelte-kit sync || echo ''",
-    "prepublishOnly": "pnpm run package",
     "lerna-build": "lerna run build --scope @allmaps/latest --include-dependencies",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -39,46 +26,23 @@
     "format": "prettier --ignore-path ../../.gitignore --write src",
     "types": "tsc --noEmit"
   },
-  "files": [
-    "dist",
-    "!dist/**/*.test.*",
-    "!dist/**/*.spec.*"
-  ],
-  "peerDependencies": {
-    "svelte": "catalog:"
-  },
   "dependencies": {
-    "@allmaps/annotation": "workspace:^",
-    "@allmaps/id": "workspace:^",
-    "@allmaps/project": "workspace:^",
-    "@allmaps/stdlib": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
-    "@allmaps/types": "workspace:^",
-    "@allmaps/ui": "workspace:^",
-    "@turf/rewind": "catalog:",
-    "d3-geo": "catalog:"
+    "@allmaps/ui": "workspace:^"
   },
   "devDependencies": {
-    "@allmaps/types": "workspace:^",
     "@eslint/js": "catalog:",
     "@sveltejs/adapter-static": "catalog:",
     "@sveltejs/kit": "catalog:",
-    "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
-    "@turf/length": "catalog:",
-    "@types/d3-geo": "catalog:",
-    "@types/geojson": "catalog:",
-    "@types/lodash-es": "catalog:",
     "@typescript/native": "catalog:",
-    "@vitejs/plugin-basic-ssl": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "catalog:",
     "globals": "catalog:",
     "prettier": "catalog:",
     "prettier-plugin-svelte": "catalog:",
-    "publint": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
     "tailwindcss": "catalog:",
@@ -86,5 +50,6 @@
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
     "vite-plugin-devtools-json": "catalog:"
-  }
+  },
+  "private": true
 }

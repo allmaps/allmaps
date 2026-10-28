@@ -1,0 +1,94 @@
+---
+title: Discover maps in Allmaps
+description: Discover maps already georeferenced with Allmaps and open them in Allmaps Viewer
+---
+
+import { Screenshot } from '@allmaps/ui'
+import latestScreenshot from '../../../images/allmaps-latest.png'
+import hereScreenshot from '../../../images/allmaps-here.png'
+
+Discover maps that people have already georeferenced with Allmaps. Browse recent
+contributions or find historical maps around you.
+
+## Recent contributions
+
+[Allmaps Latest](https://latest.allmaps.org/) shows the latest maps georeferenced
+with Allmaps. It is a useful starting point for discovering maps from different
+collections and seeing what other people are working on.
+
+<div class="not-content">
+  <a href="https://latest.allmaps.org/">
+    <Screenshot
+      url="https://latest.allmaps.org/"
+      slug="allmaps-latest"
+      src={latestScreenshot.src}
+      viewport={{
+        width: latestScreenshot.width,
+        height: latestScreenshot.height
+      }}
+      alt="Allmaps Latest showing recent map contributions with links to Allmaps Viewer and Allmaps Editor."
+    />
+  </a>
+</div>
+
+Browse the map previews and open a map in
+[Allmaps Viewer](https://viewer.allmaps.org/). You can also open it in
+[Allmaps Editor](https://editor.allmaps.org/) to inspect or improve the
+georeferencing.
+
+## Maps around you
+
+[Allmaps Here](https://here.allmaps.org/) finds georeferenced maps around your
+current location.
+
+<div class="not-content">
+  <a href="https://here.allmaps.org/">
+    <Screenshot
+      url="https://here.allmaps.org/?position=52.01,4.36"
+      slug="allmaps-here"
+      src={hereScreenshot.src}
+      viewport={{
+        width: hereScreenshot.width,
+        height: hereScreenshot.height
+      }}
+      alt="Allmaps Here showing historical maps around Delft."
+    />
+  </a>
+</div>
+
+1. Open Allmaps Here and allow your browser to access your location.
+2. Browse the available maps for that location.
+3. Open a map's information panel and follow the **Allmaps Viewer** link to
+   explore it on a modern basemap.
+
+The available maps depend on what people have georeferenced in that area.
+
+## Explore a map
+
+Once you have found a map, the [viewing guide](/guides/viewing-maps) explains how
+to compare it with a modern basemap, inspect the original image, and share it
+with others. It also covers displaying georeferenced maps on your own website.
+
+## Find maps through the API
+
+Use the [Annotations API](/api/annotations) to find maps by location,
+institution, and other properties. These example URLs return Annotation Pages
+containing [Georeference Annotations](/georeference-annotations):
+
+<div class="api-examples">
+
+| Example | API URL |
+| --- | --- |
+| Recently updated maps | <a href="https://annotations.allmaps.org/maps?limit=10">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"?limit=10"}</a> |
+| Maps covering a point in Delft | <a href="https://annotations.allmaps.org/maps?intersects=52.01,4.36&amp;limit=10">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"?intersects=52.01,4.36"}<wbr />{"&limit=10"}</a> |
+| Maps from the Bibliothèque nationale de France | <a href="https://annotations.allmaps.org/organizations/bnf?limit=10">{"https://annotations.allmaps.org"}<wbr />{"/organizations"}<wbr />{"/bnf"}<wbr />{"?limit=10"}</a> |
+
+</div>
+
+The `limit=10` parameter requests up to ten maps. In the location example,
+`intersects=52.01,4.36` specifies a point as **latitude, longitude**. Replace
+these coordinates to find maps covering another location. See the
+[Annotations API reference](/api/annotations) for the full documentation and
+all available query parameters.
+
+To georeference a map yourself, see [Find maps to georeference](/guides/find-maps-to-georeference).

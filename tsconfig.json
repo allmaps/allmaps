@@ -1,7 +1,6 @@
 {
   "files": [],
   "references": [
-    { "path": "./apps/latest" },
     { "path": "./packages/analyze" },
     { "path": "./packages/annotation" },
     { "path": "./packages/api-shared" },
@@ -9,7 +8,6 @@
     { "path": "./packages/background-color" },
     { "path": "./packages/basemap" },
     { "path": "./packages/bearing" },
-    { "path": "./packages/components" },
     { "path": "./packages/db" },
     { "path": "./packages/env" },
     { "path": "./packages/frame" },

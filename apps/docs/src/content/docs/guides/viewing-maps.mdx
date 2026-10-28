@@ -1,0 +1,173 @@
+---
+title: Viewing Maps
+description: View georeferenced maps in Allmaps Viewer or add them to your own website with Allmaps plugins
+---
+
+import { Screenshot } from '@allmaps/ui'
+import EditorExportScreenshot from '../../../components/EditorExportScreenshot.svelte'
+import MapExample from '../../../components/MapExample.astro'
+import viewerScreenshot from '../../../images/viewer-saigon.webp'
+import editorExportImage from '../../../images/screenshots/editor-export-version.png'
+
+Use [Allmaps Viewer](https://viewer.allmaps.org/) to explore georeferenced maps
+in your browser, or add them to your own website with an Allmaps plugin for
+MapLibre, Leaflet, or OpenLayers.
+
+Both use [Georeference Annotations](/georeference-annotations) to position the
+original IIIF images on a modern basemap. The images are warped in your browser
+as you zoom and pan.
+
+## Using Allmaps Viewer
+
+Allmaps Viewer lets you compare historical maps with a modern basemap and
+inspect their original IIIF images. It fetches IIIF image tiles directly from
+the institutions that host them and uses WebGL to warp and display them in
+your browser.
+
+Try it with this [map of Saigon from the Bibliothèque nationale de France](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F1bfb1eb4198e7240%40c83337fa4b8051c9),
+also used in the Georeference Annotations guide.
+
+<div class="not-content p-8">
+  <a href="https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F1bfb1eb4198e7240%40c83337fa4b8051c9">
+    <Screenshot
+      url="https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F1bfb1eb4198e7240%40c83337fa4b8051c9"
+      slug="viewer-saigon"
+      src={viewerScreenshot.src}
+      viewport={{
+        width: viewerScreenshot.width,
+        height: viewerScreenshot.height
+      }}
+      waitForRender={true}
+      shadow={true}
+      alt="Allmaps Viewer showing the BnF map of Saigon over a modern basemap, with Map and Image controls."
+    />
+  </a>
+</div>
+
+### Open a map
+
+1. Open [Allmaps Viewer](https://viewer.allmaps.org/).
+2. Paste the URL of a **Georeference Annotation**, **Annotation Page**, or
+   **IIIF Manifest** into the input field and press <kbd>Enter</kbd>.
+3. Allmaps Viewer loads the georeferenced maps and zooms to their location.
+
+When you open a IIIF Manifest, Allmaps Viewer loads its embedded Georeference
+Annotations and looks for associated maps in the Allmaps database.
+
+You can also paste the complete JSON contents of an annotation or Manifest,
+or drag and drop a JSON file onto the input field.
+
+If a map has not been georeferenced yet, follow the
+[georeferencing guide](/guides/georeferencing-maps) to get started in Allmaps
+Editor.
+
+### Compare the map and original image
+
+Use **Map** to see the historical map warped into its geographic position over
+a modern basemap. Zoom and pan to explore how streets, buildings, and other
+features have changed.
+
+Adjust the opacity to make the historical map more transparent and compare it
+with the basemap underneath.
+
+Use **Image** to inspect the original IIIF image without warping, including
+margins, legends, and other details outside the map mask. Switch back to **Map**
+to see it in its geographic context.
+
+### View multiple maps
+
+An Annotation Page or IIIF Manifest can contain georeferencing data for several
+maps. Allmaps Viewer displays them together in **Map** view, so you can explore
+maps made up of multiple sheets or compare maps covering the same area.
+
+Use the previous and next map buttons to select a map. Switch to **Image** to
+inspect the original IIIF image of the selected map.
+
+You can also use <kbd>[</kbd> and <kbd>]</kbd> to select the previous or next map.
+
+### Share a map
+
+Copy the Allmaps Viewer URL from your browser's address bar to share the maps
+you have opened.
+
+When sharing from Allmaps Editor, open the **Export** panel and choose
+which maps to share. Then choose how the link should handle future edits:
+
+- **Latest version** creates a link that uses the latest georeferencing data.
+  Anyone opening or reloading the link sees changes made in Allmaps Editor.
+- **Current version** creates a link fixed to the georeferencing data as it is
+  now. Later edits do not change what the link displays.
+
+Copy the **View in Allmaps Viewer** link to share it. **Current version** is
+available when sharing a single map or the maps on one image. When sharing all
+images in a Manifest or Collection, links use the latest version.
+
+<div class="not-content p-8">
+  <EditorExportScreenshot src={editorExportImage.src} />
+</div>
+
+Versioned links preserve the georeferencing data, including ground control
+points and masks. The original IIIF images are still loaded from the institution
+that hosts them. See [Versions and shared edits](/guides/georeferencing-maps#versions-and-shared-edits)
+for an example of a versioned annotation URL.
+
+## On your own website
+
+Use an Allmaps plugin to add georeferenced maps to your own website. Plugins
+are available for **MapLibre GL JS**, **Leaflet**, and **OpenLayers**. Choose
+the plugin for the mapping library your website uses.
+
+<div class="full-width-table overflow-x-auto">
+
+| Mapping library | Package | Documentation |
+| --- | --- | --- |
+| [MapLibre GL JS](https://maplibre.org/) | `@allmaps/maplibre` | [MapLibre plugin](/packages/maplibre) |
+| [Leaflet](https://leafletjs.com/) | `@allmaps/leaflet` | [Leaflet plugin](/packages/leaflet) |
+| [OpenLayers](https://openlayers.org/) | `@allmaps/openlayers` | [OpenLayers plugin](/packages/openlayers) |
+
+</div>
+
+Like Allmaps Viewer, the plugins fetch original IIIF images directly from the
+institutions that host them and warp them in the browser. Georeference
+Annotations describe how to position each map over your basemap.
+
+### Try the plugins
+
+Each plugin provides a `WarpedMapLayer` TypeScript class. Add this layer to
+your web map, then load a Georeference Annotation or Annotation Page from a
+URL or its JSON contents. A single layer can display multiple georeferenced
+maps.
+
+Try the plugins below. Switch between **MapLibre**, **Leaflet**, and
+**OpenLayers**, choose an example map, or enter your own annotation URL.
+Zoom and pan to explore the map, and adjust its opacity or transformation.
+Your settings are preserved when switching libraries.
+
+The code and installation command update to match your choices. Copy them
+to use the selected plugin on your own website.
+
+There are several ways to initialize the map and set its starting position
+and zoom level. Use **Initial view** to try these approaches and compare the
+code they require:
+
+- **Fit after loading:** load the annotation, then zoom to the map's extent.
+  This is the simplest approach and a good starting point. The map's position
+  changes once the annotation has loaded.
+- **Known bounds:** create the map with a predefined geographic extent, then
+  load the annotation. The map starts in the right place, but you need to know
+  the bounds beforehand and update them if you display different maps.
+- **WarpedMapList:** load the annotation and calculate its extent before
+  creating the map and layer. This gives you the right initial view without
+  hardcoding bounds or zooming after loading. It's the most flexible approach,
+  but requires a little more code and delays creating the map until the
+  annotation has loaded.
+
+By default, each map uses the transformation specified in its annotation.
+
+<div class="not-content">
+  <MapExample annotationUrl="https://annotations.allmaps.org/maps/1bfb1eb4198e7240@c83337fa4b8051c9" />
+</div>
+
+For installation instructions and more options, see the
+[MapLibre](/packages/maplibre), [Leaflet](/packages/leaflet), or
+[OpenLayers](/packages/openlayers) plugin documentation.

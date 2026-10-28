@@ -690,7 +690,7 @@ unknown
 
 ### `Collection.parse(iiifCollection, options)`
 
-Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
+Parses a IIIF Collection and returns a [Collection](#new-collectionparsedcollection-options) containing the parsed version
 
 ###### Parameters
 
@@ -800,7 +800,7 @@ string
 
 ### `EmbeddedCollection.parse(iiifCollection, options)`
 
-Parses a IIIF Collection and returns a [Collection](#collection) containing the parsed version
+Parses a IIIF Collection and returns a [Collection](#new-collectionparsedcollection-options) containing the parsed version
 
 ###### Parameters
 
@@ -1156,7 +1156,7 @@ Array<TileZoomLevel>
 
 ### `Image.parse(iiifImage, parseOptions)`
 
-Parses a IIIF image and returns a [Image](#image) containing the parsed version
+Parses a IIIF image and returns an [Image](#new-imageparsedimage-options) containing the parsed version
 
 ###### Parameters
 
@@ -1347,7 +1347,7 @@ unknown
 
 ### `Manifest.parse(iiifManifest, options)`
 
-Parses a IIIF resource and returns a [Manifest](#manifest) containing the parsed version
+Parses a IIIF resource and returns a [Manifest](#new-manifestparsedmanifest-options) containing the parsed version
 
 ###### Parameters
 

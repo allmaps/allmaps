@@ -1,0 +1,87 @@
+---
+title: Find maps to georeference
+description: Find maps in digital collections and open their IIIF resources in Allmaps Editor
+---
+
+import iiifLogo from '../../../images/iiif.svg'
+
+Find historical maps in the digital collections of libraries, archives, and
+museums, and bring them into Allmaps Editor.
+
+## Browse collections
+
+These collection portals from partner institutions are good places to
+start:
+
+{/* Includes all supporter and innovator organizations as of 2026-10-27. */}
+
+- [Bibliothèque nationale de France — Gallica](https://gallica.bnf.fr/)
+- [Bodleian Libraries — Maps and Atlases](https://digital.bodleian.ox.ac.uk/collections/maps/)
+- [Eesti Rahvusraamatukogu (National Library of Estonia) — DIGAR](https://www.digar.ee/arhiiv/en)
+- [Indiana University Libraries — Digital Collections](https://digitalcollections.iu.edu/)
+- [Leiden University Libraries — Digital Collections](https://digitalcollections.universiteitleiden.nl/)
+- [Leventhal Map & Education Center — Digital Collections](https://collections.leventhalmap.org/)
+- [National Library of Wales — Maps](https://www.library.wales/discover-learn/digital-exhibitions/maps)
+- [New York Public Library — Maps](https://digitalcollections.nypl.org/search/index?filters%5Btype%5D=cartographic)
+- [Stanford Libraries — Scanned Maps](https://earthworks.stanford.edu/catalog?featured=scanned_maps)
+- [Texas A&M University Libraries — Digital Collections](https://digitalcollections.library.tamu.edu/)
+- [TU Delft Library — Map Room](https://heritage.tudelft.nl/en/collections/b1ca53b7-10ae-4647-9964-e142ea848453)
+- [Universiteitsbibliotheek van Amsterdam — Maps](https://uvaerfgoed.nl/viewer/search/-/-/1/RELEVANCE/MD_WHAT%3ASingleMap/)
+- [University of Chicago Library — Mapping Chicagoland](https://www.lib.uchicago.edu/collex/collections/mapping-chicagoland-collection/)
+- [Universitätsbibliothek Wien — Digital Collections](https://goobi-viewer.univie.ac.at/viewer/)
+- [Vrije Universiteit Amsterdam — Geoplaza historical maps](https://geoplaza.vu.nl/cms/oude-kaarten/)
+- [Yale University Library — Maps](https://collections.library.yale.edu/catalog?f%5Bgenre_ssim%5D%5B%5D=Maps)
+
+You can also use maps from other institutions that publish their images through
+[IIIF](/iiif).
+
+## Find the IIIF URL
+
+Open a map's record in the collection portal and look for a IIIF link, often
+shown with the <img class="inline-iiif-logo" src={iiifLogo.src} alt="" /> IIIF logo or in a sharing menu. Copy the **IIIF Manifest URL** or
+the **IIIF Image Service URL**, rather than the address of the collection's
+web page.
+
+The [IIIF resource guides](https://guides.iiif.io/finding_resources/) explain
+where to find Manifest URLs in many collection portals.
+
+You can also use [detektIIIF](https://seige.digital/en/detektiiif/), a browser
+extension for Chrome and Firefox that detects IIIF resources on web pages.
+It can help you find a map's IIIF Manifest URL while browsing a collection.
+
+Once you have the URL, open [Allmaps Editor](https://editor.allmaps.org/) and
+paste it into the input field. Follow the
+[georeferencing guide](/guides/georeferencing-maps) to draw a mask and add
+control points.
+
+## Find maps through the API
+
+Allmaps ingests the map collections of partner institutions, recording their
+IIIF resources so you can find them through the [REST API](/api/rest). The
+images themselves remain hosted by the institutions.
+
+Use `georeferenced=false` to find images that have not yet been georeferenced
+in Allmaps. You can search across the images in Allmaps or within a single
+institution's collection:
+
+<div class="api-examples">
+
+| Example | API URL |
+| --- | --- |
+| Images that have not been georeferenced | <a href="https://api.allmaps.org/images?georeferenced=false&amp;limit=10">{"https://api.allmaps.org"}<wbr />{"/images"}<wbr />{"?georeferenced=false"}<wbr />{"&limit=10"}</a> |
+| Images from the Bibliothèque nationale de France that have not been georeferenced | <a href="https://api.allmaps.org/organizations/669272abb8d042cf/images?georeferenced=false&amp;limit=10">{"https://api.allmaps.org"}<wbr />{"/organizations"}<wbr />{"/669272abb8d042cf"}<wbr />{"/images"}<wbr />{"?georeferenced=false"}<wbr />{"&limit=10"}</a> |
+
+</div>
+
+The `limit=10` parameter requests up to ten images. To find images from another
+institution, look it up in the
+[list of partner organizations](https://api.allmaps.org/organizations?plan=supporter&plan=innovator)
+and add `?georeferenced=false&limit=10` to its `images` URL. See the
+[REST API reference](/api/rest) for the full documentation and all available
+query parameters.
+
+Each image's `uri` field contains its IIIF Image Service URL. Copy this URL
+into [Allmaps Editor](https://editor.allmaps.org/) to start georeferencing.
+
+To discover maps that people have already georeferenced with Allmaps, see
+[Discover maps in Allmaps](/guides/discover-maps).

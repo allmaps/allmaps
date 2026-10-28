@@ -40,9 +40,7 @@ export function generateTilesHtml(
   tileViewerBaseUrl: string,
   resolution: TileResolution = 'normal'
 ): Response {
-  const searchValue = `%7Bz%7D/%7Bx%7D/%7By%7D${
-    resolution === 'retina' ? '@2x' : ''
-  }.png`
+  const searchValue = /%7Bz%7D\/%7Bx%7D\/%7By%7D(?:@2x)?\.(?:png|webp)(?=\?|$)/i
   const replaceValue = `tiles${resolution === 'retina' ? '@2x' : ''}.json`
   const tileJsonUrl = req.url.replace(searchValue, replaceValue)
 

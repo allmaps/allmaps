@@ -1,0 +1,82 @@
+{
+  "name": "@allmaps/docs",
+  "description": "Allmaps Documentation",
+  "version": "1.0.0-beta.32",
+  "private": true,
+  "contributors": [
+    {
+      "name": "Bert Spaan",
+      "email": "hello@bertspaan.nl",
+      "url": "https://bertspaan.nl"
+    },
+    {
+      "name": "Jules Schoonman",
+      "email": "J.A.Schoonman@tudelft.nl"
+    },
+    {
+      "name": "Manuel Claeys Bouuaert",
+      "email": "manuel.claeys.b@gmail.com",
+      "url": "https://manuelclaeysbouuaert.be"
+    }
+  ],
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allmaps/allmaps.git",
+    "directory": "apps/docs"
+  },
+  "homepage": "https://docs.allmaps.org",
+  "keywords": [
+    "allmaps",
+    "documentation",
+    "docs"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "astro dev --mode localhost",
+    "start": "astro dev --mode localhost",
+    "check": "astro check",
+    "build": "pnpm run copy-readmes && astro build",
+    "build:dev": "pnpm run copy-readmes && PUBLIC_DOCS_BASE_URL=https://dev.docs.allmaps.org astro build --mode dev",
+    "deploy:dev": "wrangler deploy",
+    "build:production": "pnpm run copy-readmes && PUBLIC_DOCS_BASE_URL=https://docs.allmaps.org astro build --mode production",
+    "deploy:production": "wrangler deploy --env production",
+    "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
+    "preview": "astro preview",
+    "astro": "astro",
+    "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts",
+    "test": "node --test test/*.test.mjs test/*.test.ts"
+  },
+  "dependencies": {
+    "@allmaps/annotation": "workspace:^",
+    "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
+    "@allmaps/render": "workspace:^",
+    "@allmaps/render-wasm": "workspace:^",
+    "@allmaps/tailwind": "workspace:^",
+    "@allmaps/ui": "workspace:^",
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/markdown-remark": "^7.3.1",
+    "@astrojs/markdown-satteri": "^0.4.2",
+    "@astrojs/starlight": "^0.42.4",
+    "@astrojs/starlight-tailwind": "^4.0.0",
+    "@astrojs/svelte": "^9.0.1",
+    "@scalar/starlight": "^0.2.8",
+    "@tailwindcss/vite": "catalog:",
+    "astro": "^7.3.5",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
+    "svelte": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@allmaps/types": "workspace:^",
+    "remark": "15.0.1",
+    "remark-gfm": "4.0.1",
+    "vite": "catalog:",
+    "wrangler": "catalog:"
+  }
+}

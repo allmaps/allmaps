@@ -69,7 +69,33 @@ git clone https://github.com/allmaps/allmaps.git
 cd allmaps
 ```
 
-Finally, initialize the repository:
+For app development, initialize the apps and their dependencies:
+
+```sh
+pnpm run init:apps
+```
+
+This installs workspace dependencies, builds only the workspaces the apps depend
+on, and runs app checks (including SvelteKit initialization). The current apps do
+not depend on `@allmaps/render-wasm`, so this workflow does not require Rust or
+wasm-pack. It does not build every app for production; dependencies that also
+contain an app or demo still run their existing build scripts.
+
+### Package development and full setup
+
+Building all packages requires [Rust and Cargo](https://rust-lang.org/tools/install/)
+and [wasm-pack](https://wasm-bindgen.github.io/wasm-pack/installer/) in addition to
+Node.js and pnpm. These compile `@allmaps/render-wasm`, which is used by the preview
+and tileserver workers. Install Rust using rustup, then install wasm-pack using
+its installer or `cargo install wasm-pack`.
+
+To install dependencies, build all packages, and run package checks:
+
+```sh
+pnpm run init:packages
+```
+
+For the existing full setup, including production app builds:
 
 ```sh
 pnpm run init
@@ -78,11 +104,13 @@ pnpm run init
 The `init` script is a shorthand for the following commands:
 
 1. `pnpm install --recursive`: install all dependencies for all packages and apps.
-2. `pnpm run build:packages`: build all packages to ensure all JavaScript exports are created from TypeScript files.
-3. `pnpm run check`: initialize SvelteKit apps.
-4. `pnpm run build:apps`: build SvelteKit apps.
+2. `pnpm run build:packages`: build all packages, including TypeScript, Svelte, and Rust/WASM outputs.
+3. `pnpm run check`: run workspace checks and initialize SvelteKit apps.
+4. `pnpm run build:apps`: build apps and their dependencies.
 
-If things stop working later on, you can always run the `init` script again.
+If things stop working later on, rerun the initialization script for your workflow.
+
+### API development
 
 For local API development with PGlite or PostgreSQL, see the
 [local API workflow](tools/apis/README.md). `pnpm dev:apis` defaults to the local
@@ -102,40 +130,69 @@ Development tools are grouped by responsibility: [API runner](tools/apis/README.
 [IIIF fixture server](tools/iiif-server/README.md). Integration tests remain in
 [test/apis](test/apis/README.md), using temporary PGlite databases and local fixtures.
 
-### Running a single app locally
+### App development
 
-To run the `dev` script for a single app, you need to run the `watch` scripts of all packages in one terminal window:
+After `pnpm run init:apps`, watch and rebuild app dependencies in one terminal:
 
 ```sh
-pnpm run watch
+pnpm run watch:apps
 ```
 
-And then run the `dev` script of the app in another:
+Start the app you are working on in another terminal:
 
 ```sh
 pnpm --filter "@allmaps/viewer" run dev
 ```
 
-You can also run the `dev` script from the app's directory instead:
+You can also run `pnpm run dev` from the app's directory. To deliberately start all
+app development servers, use `pnpm run dev:apps`. To build apps and their
+dependencies for production, use `pnpm run build:apps`.
+
+To prepare only one app instead of all apps, select its dependency graph:
 
 ```sh
-cd apps/viewer
-pnpm run dev
+pnpm install --recursive
+pnpm exec turbo run build --filter "@allmaps/viewer^..."
+pnpm exec turbo run check --filter "@allmaps/viewer"
 ```
 
-### Running all packages and apps locally
+Then use `pnpm exec turbo watch build --filter "@allmaps/viewer^..."` in the first
+terminal and the app's `dev` command in the second. The `^...` selector includes
+dependencies without selecting the app itself.
 
-To run the `watch` and `dev` scripts for all packages and apps, run the following in one terminal window:
+### Package development
+
+After `pnpm run init:packages`, watch and rebuild all packages in one terminal:
 
 ```sh
-pnpm run watch
+pnpm run watch:packages
 ```
 
-And this in another:
+To run package demos and playgrounds, start their development servers in another:
 
 ```sh
-pnpm run dev
+pnpm run dev:packages
 ```
+
+Only packages with a `dev` script start a server. You can also start one playground
+with, for example, `pnpm --filter "@allmaps/render" run dev`. Use
+`pnpm run build:packages` for a one-time build of all packages.
+
+For a single package, build and watch just that package and its dependencies:
+
+```sh
+pnpm install --recursive
+pnpm exec turbo run build --filter "@allmaps/transform..."
+pnpm exec turbo watch build --filter "@allmaps/transform..."
+```
+
+The trailing `...` includes the selected package and its dependencies. This example
+does not require Rust because `@allmaps/transform` does not depend on
+`@allmaps/render-wasm`.
+
+The existing root commands remain available: `pnpm run init` performs the full
+setup described above, `pnpm run build` builds all workspaces, and `pnpm run watch`
+watches packages and APIs. Prefer the scoped workflows for app or package work.
 
 ## Troubleshooting
 

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "slug": "editor-export-version",
+  "version": 5,
+  "imageSha256": "c97ff97a5f1a3362b6ae8b3fdee9cf8fcbe6f6878b6b672523622377507d36e2",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "targets": {
+    "export": {
+      "height": 476,
+      "width": 399.2265625,
+      "x": 864,
+      "y": 83
+    }
+  }
+}

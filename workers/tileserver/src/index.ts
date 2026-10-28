@@ -122,7 +122,7 @@ router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D@2x.webp', (req, env) => {
   return generateTilesHtml(req, tileViewerBaseUrl, 'retina')
 })
 
-router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.png', (req, env) => {
+router.get('/maps/:mapId/%7Bz%7D/%7Bx%7D/%7By%7D.webp', (req, env) => {
   const tileViewerBaseUrl = env.PUBLIC_TILE_VIEWER_BASE_URL
   return generateTilesHtml(req, tileViewerBaseUrl)
 })

@@ -1,0 +1,33 @@
+{
+  "name": "@allmaps/screenshots",
+  "version": "1.0.0-beta.0",
+  "private": true,
+  "description": "Collect and capture screenshots declared in Allmaps Svelte components",
+  "type": "module",
+  "exports": {
+    "./astro": "./src/astro.ts",
+    "./vite": "./src/vite.ts",
+    "./geometry": "./src/geometry.ts"
+  },
+  "scripts": {
+    "capture": "node src/cli.ts",
+    "types": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "prettier --check src test README.md package.json tsconfig.json"
+  },
+  "dependencies": {
+    "@allmaps/render": "workspace:^",
+    "@allmaps/ui": "workspace:^",
+    "@commander-js/extra-typings": "catalog:",
+    "commander": "catalog:",
+    "playwright": "^1.63.0",
+    "sharp": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

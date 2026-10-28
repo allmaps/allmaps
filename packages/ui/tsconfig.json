@@ -7,6 +7,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "rewriteRelativeImportExtensions": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true
@@ -15,6 +16,8 @@
     { "path": "../annotation" },
     { "path": "../bearing" },
     { "path": "../iiif-parser" },
+    { "path": "../id" },
+    { "path": "../io" },
     { "path": "../project" },
     { "path": "../render" },
     { "path": "../stdlib" },

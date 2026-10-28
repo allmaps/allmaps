@@ -1,0 +1,99 @@
+{
+  "id": "https://annotations.allmaps.org/maps/1bfb1eb4198e7240",
+  "type": "Annotation",
+  "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "created": "2026-10-06T10:20:33.764Z",
+  "modified": "2026-10-06T10:20:33.764Z",
+  "motivation": "georeferencing",
+  "target": {
+    "type": "SpecificResource",
+
+    "source": {
+      "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b530297676/f1",
+      "type": "ImageService3",
+      "height": 14859,
+      "width": 16267
+    },
+
+    "selector": {
+      "type": "SvgSelector",
+      "value": "<svg width=\"16267\" height=\"14859\"><polygon points=\"681,647 687,14255 13688,14181 13980,14304 14484,14304 15323,14183 15647,14183 15639,787 8166,765\" /></svg>"
+    }
+  },
+  "body": {
+    "type": "FeatureCollection",
+
+    "transformation": {
+      "type": "polynomial",
+      "options": {
+        "order": 1
+      }
+    },
+
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [7279, 6817]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [106.6974, 10.7791]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [3626, 2403]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [106.6861488, 10.792507]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [10202, 2743]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [106.7064, 10.7917]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [10840, 12239]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [106.7084, 10.7626]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [6817, 5667]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [106.6959, 10.7826]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [8833, 8026]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [106.7021, 10.7755]
+        }
+      }
+    ]
+  }
+}

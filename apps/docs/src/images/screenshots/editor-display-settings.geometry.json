@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "slug": "editor-display-settings",
+  "version": 3,
+  "imageSha256": "d8402e35149bdd9dfbe74928a42cf0fe6cd6ec5424e2b4b771480b6334b2b2c1",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "targets": {
+    "settings": {
+      "x": 1132,
+      "y": 117,
+      "width": 291.015625,
+      "height": 506
+    }
+  }
+}

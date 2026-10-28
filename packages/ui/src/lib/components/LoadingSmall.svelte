@@ -1,5 +1,5 @@
 <script lang="ts">
-  import loadingSmall from '$lib/images/loading-small.webp'
+  import loadingSmall from '$lib/images/loading-small.webp?url'
 </script>
 
 <div role="status">

@@ -1,0 +1,85 @@
+---
+title: Georeference Annotations
+description: An open standard for storing georeference data as a Web Annotation
+---
+
+import { Code } from '@astrojs/starlight/components'
+import exampleAnnotation from '../../data/georeference-annotation-example.json?raw'
+
+Georeference Annotations are small JSON documents that describe how pixel coordinates on a digitized map relate to geographic coordinates. They contain the information that Allmaps needs to fetch an image through [IIIF](/iiif), select the map within that image, and display it on a world map.
+
+The image stays on the institution's IIIF server. The annotation stores the georeference data separately, so you can share or update that data without downloading the original image or saving a warped copy.
+
+Georeference Annotations follow the [IIIF Georeference Extension](https://iiif.io/api/extension/georef/), an open standard based on the [Web Annotation Data Model](https://www.w3.org/TR/annotation-model/). Anyone can build software to create or use them.
+
+## What does an annotation contain?
+
+A Georeference Annotation describes how one map relates to geographic coordinates. It contains:
+
+- **IIIF resource:** the Canvas or Image Service containing the map.
+- **Ground control points (GCPs):** pairs of image coordinates and geographic coordinates identifying the same locations.
+- **Map mask:** an optional region selecting the map within the resource, for example to exclude borders or separate an inset map.
+- **Transformation:** an optional preferred algorithm for calculating the relationship between image coordinates and geographic coordinates from the control points.
+
+The resource and any mask are described in the annotation's `target`. The control points and optional transformation are stored in its `body`.
+
+The example below targets a IIIF Image Service and uses a polygon mask to select the map within the image.
+
+## Example: a map of Saigon
+
+This example uses a map of Saigon from the Bibliothèque nationale de France (BnF), with six ground control points. You can [view the georeferenced map in Allmaps Viewer](https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F1bfb1eb4198e7240%40c83337fa4b8051c9).
+
+<div class="georeference-annotation-example">
+  <Code
+    code={exampleAnnotation}
+    lang="json"
+    wrap={true}
+    title="georeference-annotation.json"
+    mark={[
+      { range: '13-19', label: 'IIIF source image' },
+      { range: '20-24', label: 'Map mask' },
+      { range: '28-34', label: 'Transformation' },
+      { range: '35-97', label: 'Ground control points (GCPs)' }
+    ]}
+  />
+</div>
+
+### IIIF source image
+
+`target.source` identifies the IIIF Image Service that serves the original image. Its `width` and `height` describe the full image in pixels: 16267 × 14859. Allmaps uses this service to request the image regions it needs at the appropriate resolution.
+
+### Map mask
+
+`target.selector` selects the map within the image. The `SvgSelector` contains an SVG polygon whose vertices are pixel coordinates in the original image. Allmaps uses this polygon as a mask when rendering the map, excluding the parts of the image outside it.
+
+### Transformation
+
+`body.transformation` specifies an algorithm for transforming pixel coordinates into geographic coordinates. Here, `polynomial` with `order: 1` selects a first-order polynomial transformation. Changing this setting can produce a different fit from the same control points.
+
+Thin plate spline (`thinPlateSpline`), also called _rubber sheeting_, smoothly bends the image so each control point lands on its geographic location. It can account for local distortions in a historical map, and may introduce more stretching between control points.
+
+### Ground control points (GCPs)
+
+The `body` is a GeoJSON `FeatureCollection`. Each feature represents one ground control point:
+
+- `properties.resourceCoords` stores pixel coordinates in `[x, y]` order, measured from the image's top-left corner, with `x` increasing to the right and `y` increasing downwards.
+- `geometry.coordinates` stores the corresponding geographic coordinates in `[longitude, latitude]` order, in WGS84.
+
+The first control point pairs pixel `[7279, 6817]` with longitude `106.6974`, latitude `10.7791`. The other five features use the same structure. Together, the control points allow Allmaps to calculate where the rest of the map belongs.
+
+The annotation's `@context` identifies the vocabularies used to interpret the document, and `motivation: "georeferencing"` describes its purpose.
+
+## Multiple maps
+
+A single image can contain several maps, such as a main map and an inset. Each map can have its own Georeference Annotation, with a separate mask and control points.
+
+Multiple annotations can be grouped in an **Annotation Page**: a JSON document with `type: "AnnotationPage"` and an `items` array containing the annotations. Allmaps uses this to share several maps together, including maps from different images in a IIIF Manifest.
+
+## Working with annotations
+
+[Allmaps Editor](https://editor.allmaps.org/) creates Georeference Annotations as you draw masks and add control points. You can export them and open them in [Allmaps Viewer](https://viewer.allmaps.org/), use them with Allmaps' mapping library plugins, or retrieve them through the [Annotations API](/api/annotations).
+
+- Follow the [georeferencing guide](/guides/georeferencing-maps) to create an annotation.
+- Follow the [viewing guide](/guides/viewing-maps) to display georeferenced maps.
+- Read about [using maps in other tools](/guides/using-maps) to reuse your work.
+- Consult the [IIIF Georeference Extension specification](https://iiif.io/api/extension/georef/) for the complete format.
