@@ -14,6 +14,12 @@ The docs use the repository root's environment files. `pnpm dev` loads
 links: `http://localhost:5511` locally, `https://dev.allmaps.org` in dev, and
 `https://allmaps.org` in production.
 
+`PUBLIC_STATS_WEBSITE_ID` enables visitor tracking with `stats.allmaps.org`.
+Set it in Cloudflare's **Build Variables and Secrets**, then rebuild and deploy.
+The Astro configuration reads it from the build process environment; a runtime
+Worker variable or an entry in an `.env` file alone does not enable tracking.
+When it is unset, no tracking script is included.
+
 ## Development deployment
 
 The `docs-develop` Cloudflare Worker serves static files from `dist` at
