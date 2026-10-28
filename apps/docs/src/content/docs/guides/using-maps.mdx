@@ -1,0 +1,158 @@
+---
+title: Using maps in other tools
+description: 'Use georeferenced maps in other tools with XYZ map tiles, GeoTIFFs, PNG, JPEG, and WebP images, and GeoJSON'
+---
+
+import GeotiffExample from '../../../components/GeotiffExample.astro'
+import ImageExample from '../../../components/ImageExample.astro'
+
+Use your georeferenced maps in GIS software and other mapping tools. Allmaps
+provides several ways to do this: load maps as an XYZ tile layer, create GeoTIFF
+files, render PNG, JPEG, or WebP images, or retrieve map footprints as GeoJSON.
+
+The best option depends on what you want to do and which formats your tool
+supports. This guide explains when to use each format and how to get started.
+
+### XYZ map tiles
+
+XYZ tiles let you display georeferenced maps in GIS software and other tools
+that support tile layers, such as QGIS. Your tool loads small image tiles as
+you zoom and pan.
+
+The **Allmaps Tile Server** creates these tiles on demand. It fetches the
+original IIIF images from the institutions that host them and warps them using
+the Georeference Annotations.
+
+To add a map to another tool:
+
+1. Open the map in **Allmaps Editor**.
+2. Open the **Export** panel and select the maps you want to use.
+3. Copy the **XYZ map tiles** URL.
+4. Add this URL as an XYZ tile layer in your tool.
+
+Keep the `{z}`, `{x}`, and `{y}` placeholders in the URL. Your tool replaces
+them with the zoom level and tile coordinates when requesting tiles.
+
+You can also construct a tile URL from an Allmaps annotation URL: replace
+`annotations.allmaps.org` with `allmaps.xyz` and append `/{z}/{x}/{y}.webp`.
+This works for a single map, all maps on an image, or all maps in a IIIF Manifest:
+
+<div class="api-examples">
+
+| Annotation URL | XYZ tile URL |
+| --- | --- |
+| <a href="https://annotations.allmaps.org/maps/135dfd2d58dc26ec">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"/135dfd2d58dc26ec"}</a> | <a href="https://allmaps.xyz/maps/135dfd2d58dc26ec/%7Bz%7D/%7Bx%7D/%7By%7D.webp">{"https://allmaps.xyz"}<wbr />{"/maps"}<wbr />{"/135dfd2d58dc26ec"}<wbr />{"/{z}/{x}/{y}.webp"}</a> |
+| <a href="https://annotations.allmaps.org/images/f6033bee94f7763e">{"https://annotations.allmaps.org"}<wbr />{"/images"}<wbr />{"/f6033bee94f7763e"}</a> | <a href="https://allmaps.xyz/images/f6033bee94f7763e/%7Bz%7D/%7Bx%7D/%7By%7D.webp">{"https://allmaps.xyz"}<wbr />{"/images"}<wbr />{"/f6033bee94f7763e"}<wbr />{"/{z}/{x}/{y}.webp"}</a> |
+| <a href="https://annotations.allmaps.org/manifests/23379602e8187445">{"https://annotations.allmaps.org"}<wbr />{"/manifests"}<wbr />{"/23379602e8187445"}</a> | <a href="https://allmaps.xyz/manifests/23379602e8187445/%7Bz%7D/%7Bx%7D/%7By%7D.webp">{"https://allmaps.xyz"}<wbr />{"/manifests"}<wbr />{"/23379602e8187445"}<wbr />{"/{z}/{x}/{y}.webp"}</a> |
+
+</div>
+
+Click an XYZ tile URL to preview its maps in the viewer from `tiles.allmaps.org`.
+For more URL options, including TileJSON and double-resolution tiles, see the
+[Allmaps Tile Server README](https://github.com/allmaps/allmaps/blob/develop/workers/tileserver/README.md#api).
+
+This lets you use the maps without downloading and processing a complete image
+first. Loading tiles requires an internet connection and access to the original
+IIIF images.
+
+:::caution[About the hosted tile service]
+Allmaps Tile Server runs on Cloudflare Workers. It fetches IIIF tiles and warps
+them with our Rust-based WebAssembly renderer,
+[`@allmaps/render-wasm`](https://github.com/allmaps/allmaps/tree/develop/packages/render-wasm).
+This costs money, currently covered by the
+[OpenHistoricalMap project](https://www.openhistoricalmap.org/).
+
+The hosted service is subject to fair use, and we cannot guarantee that it will
+remain free of charge. The
+[tile server is open source](https://github.com/allmaps/allmaps/tree/develop/workers/tileserver),
+so you can also host it yourself.
+
+Where possible, we strongly recommend using our
+[Leaflet, MapLibre, or OpenLayers plugins](/guides/viewing-maps#on-your-own-website).
+They warp images in your browser, avoiding the tile server's rendering costs.
+:::
+
+### GeoTIFF
+
+Create GeoTIFF files to use your georeferenced maps in GIS software or work
+with them offline. The example below generates a Bash script using the same
+`@allmaps/io` generator as the Allmaps Command Line Interface. The script uses
+GDAL to warp the images, crop them to their masks, and write Cloud Optimized
+GeoTIFFs.
+
+Choose an example or paste a Georeference Annotation or Annotation Page URL,
+then select **Generate script**. Copy the script or download it as
+`allmaps-geotiff.sh`.
+
+<GeotiffExample />
+
+To run the script, install **GDAL** and **jq**, and download the original,
+full-resolution images as JPEGs. Expand **Required source images** for their
+filenames and dimensions, and save them in the same directory as the script.
+The generated script does not download the images for you.
+
+From that directory, run:
+
+```bash
+bash allmaps-geotiff.sh
+```
+
+You can also install the
+[Allmaps CLI](https://github.com/allmaps/allmaps/tree/develop/apps/cli#installation)
+and use `allmaps script geotiff` to generate the GDAL script from a Georeference
+Annotation or Annotation Page in your terminal. For usage examples,
+image-download commands, custom filenames, and more options, see the
+[Allmaps CLI GeoTIFF documentation](https://github.com/allmaps/allmaps/tree/develop/apps/cli#create-geotiffs-using-gdal).
+
+### PNG, JPEG, and WebP
+
+Create PNG, JPEG, or WebP images of your georeferenced maps for presentations,
+publications, or other applications. Allmaps fetches the original IIIF images
+and warps them directly in your browser. These are ordinary image files; use
+[GeoTIFF](#geotiff) when you need embedded georeferencing information.
+
+Choose an example or paste a Georeference Annotation or Annotation Page URL,
+select a format and image dimensions, then select **Render image**. All maps
+in the annotation are fitted into the image without stretching them. Areas
+outside the maps' masks are transparent in PNG and WebP images. WebP uses
+lossless compression. JPEG images use a white background.
+
+<ImageExample />
+
+Download the result or use the code example to generate an image with
+[`@allmaps/render`](https://github.com/allmaps/allmaps/tree/develop/packages/render) and
+[`@allmaps/render-wasm`](https://github.com/allmaps/allmaps/tree/develop/packages/render-wasm).
+See the [render package README](https://github.com/allmaps/allmaps/blob/develop/packages/render/README.md)
+for more rendering options and examples.
+Rendering happens in your browser, without using the hosted Allmaps Tile Server.
+
+### GeoJSON
+
+Use GeoJSON to display map footprints in GIS software or on a web map. Each
+footprint represents a map's mask transformed into geographic coordinates.
+This is useful for showing which areas your maps cover. The GeoJSON contains
+the footprints and map metadata, but not the map images.
+
+The **Allmaps Annotations API** can return GeoJSON for a single map, all
+georeferenced maps on an image, or a search result:
+
+<div class="api-examples">
+
+| Maps | GeoJSON | Preview |
+| --- | --- | --- |
+| A single map | <a href="https://annotations.allmaps.org/maps/135dfd2d58dc26ec.geojson">/maps/<wbr />135dfd2d58dc26ec.geojson</a> | [View in geojson.io](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F135dfd2d58dc26ec.geojson) |
+| Maps on an image | <a href="https://annotations.allmaps.org/images/f6033bee94f7763e.geojson">/images/<wbr />f6033bee94f7763e.geojson</a> | [View in geojson.io](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fannotations.allmaps.org%2Fimages%2Ff6033bee94f7763e.geojson) |
+| Maps covering a location | <a href="https://annotations.allmaps.org/maps.geojson?intersects=52.01,4.36&limit=10">/maps.geojson<wbr />?intersects=52.01,4.36<wbr />&amp;limit=10</a> | [View in geojson.io](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fannotations.allmaps.org%2Fmaps.geojson%3Fintersects%3D52.01%2C4.36%26limit%3D10) |
+
+</div>
+
+A single map returns a GeoJSON **Feature**; multiple maps return a
+**FeatureCollection**. Download the GeoJSON or load its URL directly into a
+tool that supports it. Select **View in geojson.io** to explore the footprints
+on an interactive map.
+
+See the [Annotations API documentation](/api/annotations) for available filters
+and query parameters.
+
+To add georeferenced maps to your own website with Leaflet, MapLibre, or
+OpenLayers, see [Viewing maps](/guides/viewing-maps#on-your-own-website).

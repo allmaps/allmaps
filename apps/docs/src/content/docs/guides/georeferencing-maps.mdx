@@ -3,122 +3,314 @@ title: Georeferencing Maps
 description: 'Guide for georeferencing maps using Allmaps Editor'
 ---
 
-This guide describes the process of georeferencing a IIIF resource in [Allmaps Editor](https://editor.allmaps.org). It presumes you already have a URL to a IIIF Resource that can be opened in Allmaps. For more information on how to obtain such a URL, please consult the [guide on finding maps](/guides/finding-maps)._
+import EditorSettingsScreenshot from '../../../components/EditorSettingsScreenshot.svelte'
+import editorSettingsImage from '../../../images/screenshots/editor-display-settings.webp'
+
+export const homepageBaseUrl = import.meta.env.PUBLIC_HOMEPAGE_BASE_URL || 'https://allmaps.org'
+
+Use [Allmaps Editor](https://editor.allmaps.org/) to georeference historical maps
+in your browser. This guide takes you through opening a map, drawing a mask,
+adding control points, and viewing the result.
+
+To get started, you’ll need the URL of a IIIF resource containing a map. See
+[Find maps to georeference](/guides/find-maps-to-georeference) for collection
+links and help finding a IIIF URL.
 
 ### What is georeferencing?
 
-Georeferencing an image means relating specific pixels of the image `[x, y]` to corresponding geographic coordinates `[longitude, latitude]`. A pair of corresponding points is called a Ground Control Point or GCP. With at least 2 or 3 GCPs, correspondences can be computed between any other pixel in the image and the world map. If all pixels are transformed, it is possible to render the original image on top of a world map. Depending on the algorithm used, the image is warped in a different way to suite the given set of GCPs as well as possible.
+Georeferencing connects places on a historical map to their geographic
+locations. You identify matching points on the map image and a modern reference
+map—for example, a church, a road junction, or a bridge. Each pair is called a
+**ground control point (GCP)**.
 
-Georeferencing is not a new thing. Classical GIS tools like QGIS and ArcGIS have allowed this for a long time. Traditionally, this means saving a warped copy of the original image as a GeoTIFF, or generating an accompanying ‘world’ file. In both cases, the original raster image and its copies needed to be stored on the user’s device. This creates a lot of extra data and does not allow for easy updates to the georeferencing data.
+Allmaps uses these control points to calculate a transformation that positions
+and warps the image so it can be displayed over a modern basemap.
 
-Allmaps takes a different approach: it works with IIIF resources which are hosted primarily on institutional servers rather than personal devices. The only thing Allmaps requires is a so-called Georeference Annotation, a light-weight standardized document that includes all the information needed to georeference a resource. Allmaps automatically keeps a copy for all maps georeferenced in Allmaps Editor, thereby creating a collective open dataset of georeferenced maps around the world. No derivatives are stored: the original image is warped in the browser. This is very fast and can immediately reflect changes to the source data.
+The original image stays on the institution’s IIIF server. Allmaps stores your
+control points, map mask, and transformation settings in a
+[Georeference Annotation](/georeference-annotations). This allows Allmaps to
+display the georeferenced map in your browser without creating a separate image
+file.
 
-### Step 1: Opening a IIIF resource
+### Step 1: Open a IIIF resource
 
-- Open [Allmaps Editor](https://editor.allmaps.org)
-- Paste the URL to a IIIF resource in the input field and press enter. You can also pick a map from one of the partner institutions listed further down the page.
+1. Open [Allmaps Editor](https://editor.allmaps.org/).
+2. Paste a IIIF resource URL into the input field and press <kbd>Enter</kbd>. You can
+   also choose one of the example maps on the Allmaps Editor homepage.
+3. In the **Images** tab, select the image you want to georeference. A resource
+   may contain a single image or several images, such as the pages of an atlas.
+
+The navigation at the top takes you through four steps: **Images**, **Draw
+mask**, **Georeference**, and **Results**. You can move between them as you work.
+
+If the image already has a mask or control points, someone has started
+georeferencing it. You can review and improve their work.
 
 :::note[Supported resources]
-Allmaps Editor currently supports the following IIIF resources:
+Allmaps Editor supports:
 
-- [IIIF Manifest](https://iiif.io/api/presentation/3.0/#52-manifest) (version 2 or 3). A IIIF resource containing canvases with painting annotations.
-- [IIIF Collection](https://iiif.io/api/presentation/3.0/#51-collection) (version 2 or 3). This is a special type of manifest containing references to other IIIF Collections or Manifests.
-- [IIIF Image](https://iiif.io/api/image/3.0/) (version 1, 2 or 3). When loading a IIIF Image URL directly you might need to append `/info.json` to the URL. Please note that no metadata will be available when loading images.
-- Georeference Annotation URLs served by Allmaps. These start with `https://annotations.allmaps.org`.
-  :::
+- **IIIF Manifests** containing one or more images.
+- **IIIF Collections** containing Manifests or other Collections.
+- **IIIF Image Services** for individual images.
+- **Georeference Annotation URLs** from the Allmaps Annotations API.
 
-- At the top you now see four tabs: **Images**, **Draw mask**, **Georeference** and **Results**. You can always go back and forth between them. If instead you receive an error message, double check if you copied the correct link.
-
-:::caution[Dealing with error messages]
-Sometimes opening a valid IIIF Manifest URL might still throw an error. This could be caused by various issues, such as:
-
-- The IIIF Manifest is not (yet) supported by Allmaps. For example, a Manifest containing a `choice` property will not be loaded.
-- The IIIF Manifest is invalid. In this case, the parser will indicate which properties fail to follow the IIIF specifications.
-- The IIIF Manifest cannot be loaded due to [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing) restrictions (i.e. the server hosting the Manifest has not allowed other domains, in this case Allmaps Editor, to load the resource). Some manifests that fail to load in Allmaps might still load in other IIIF Viewers.
-
-If you think Allmaps should support the Manifest, please [file an issue here](https://github.com/allmaps/allmaps), or contact us by email or through the [IIIF Slack](https://iiif.io/community/). If you think the loaded Manifest is incorrect, contact the content provider and aks them to improve their services. If the error message is unclear, contact us for a more detailed explanation.
+See the [IIIF guide](/iiif) for an introduction to these resources.
 :::
 
-- Select an image under the Images tab (often there's only a single image to select).
-- There could be one or two icons beneath the map, indicating whether a map has already been georeferenced. A green map icon indicates that one or more maps have been georeferenced for that image. If the georeferencing process was not completed, this is indicated by a yellow warning symbol; this means you can improve and complete the work!
-- Notice the address bar at the top of the window. It shows the type of resource loaded, its title and URL. Click on it to view the metadata contained in the IIIF Manifest (this is loaded directly from the institution and can vary between different content providers). If you have opened an IIIF Image, no metadata will be available.
+:::note[If a resource won’t open]
+First, check that you copied a IIIF resource URL rather than the address of a
+collection’s web page.
 
-### Step 2: Drawing the mask
+A resource may fail to load if its server is unavailable, its IIIF data is
+invalid or unsupported, or its server prevents other websites from accessing
+it through cross-origin restrictions (CORS).
 
-- Click the **Draw mask** tab. The mask specifies the cartographic part of the image. It will later be used to crop the map in the results tab and Allmaps Viewer. Draw a mask around the part of the image where the map is located. Start by zooming in and clicking on the image. Don’t worry if you made a mistake: you can correct the mask later.
-
-:::note[Which mask?]
-Some maps have clear frames, others not so much. Try to include as much cartographic information as possible within the boundaries of the mask, including labels, but remove non-cartographic elements such as ornamentation, rims or legends. In the end, there is no "correct" mask and where you draw it depends on your interests and how you want to use the map. Fortunately, you can always go back and change the mask in Allmaps, or even create multiple masks for the same image, in case it contains additional inset maps, for example.
+If you need help, [report an issue](https://github.com/allmaps/allmaps/issues)
+and include the resource URL and the error message.
 :::
 
-- Finish the mask by clicking the Finish button or its start point. You can also remove the mask by clicking Cancel or pressing `esc`.
-- After finishing the mask, you can move points around or add new points to the mask by clicking and dragging points or lines. You can also remove a point by right clicking it.
-- If you want to remove a mask and start over, click the **Maps** button on the bottom right of the window. This opens up a panel listing all masks; click the bin to remove the mask.
+### Step 2: Draw a mask
+
+A **map mask** outlines the part of the image you want to georeference. It
+determines which area is displayed in the results and in Allmaps Viewer.
+
+1. Open the **Draw mask** tab.
+2. Zoom in and click around the edge of the map to draw its outline.
+3. Click **Finish** or the starting point to close the mask. To cancel an
+   unfinished mask, click **Cancel**.
+
+You can adjust the mask after drawing it.
+
+:::note[What should the mask include?]
+Include the map area you want to display, usually leaving out borders, legends,
+and decorative elements. The outline depends on the map and how you want to
+use it.
+
+If an image contains several maps, such as a main map and smaller inset maps,
+you can draw a separate mask for each. Each map can then have its own control
+points.
+:::
+
+#### Edit a mask
+
+You can refine the outline in the **Draw mask** tab:
+
+- Drag a point to move it.
+- Click and drag an edge to add a point.
+- Right-click a point to remove it.
+
+If the image contains several maps, open the **Maps** panel and select the map
+you want to edit. Its mask is highlighted with a thicker outline.
+
+To delete a map, click its trash icon in the **Maps** panel and confirm. This
+removes the map, including its mask and control points.
 
 :::caution[Your data in Allmaps]
-Edits in Allmaps Editor are automatically stored in the Allmaps database. They are licensed [CC0](https://creativecommons.org/public-domain/cc0/) and published daily as an open dataset on the Allmaps homepage.
+Allmaps Editor saves your edits automatically. Your masks, control points, and
+transformation settings are published as open data under
+[CC0](https://creativecommons.org/public-domain/cc0/). They are also published
+daily as an open dataset on the
+<a href={new URL('/data', homepageBaseUrl).href}>Allmaps homepage’s data page</a>.
 
-Other users opening the same map in Allmaps Editor will see the same edits, and will be able to alter and (hopefully!) improve them. Although Allmaps already stores individual edits in the database, you cannot yet easily pin a version or restore a previous version (undo). These functionalities will be added in future versions of Allmaps Editor.
+Georeferencing is shared: anyone opening the same map can see and edit this
+data. Changes you make also affect what other people see.
 
-It is therefore wise to save a copy of your data yourself if you want to keep this specific version.
+To keep a copy of your work at a particular moment, save its Georeference
+Annotation. See [Share and export your map](#share-and-export-your-map)
+for details.
 :::
 
-- It’s possible to draw multiple masks since an image can depict multiple maps, such as inset map). The active mask can be selected from the **Maps** menu by clicking the shape. After selecting, it will be highlighted with a thicker border, also in the next step.
+### Step 3: Add ground control points
 
-:::note[Existing work]
-If you already see a mask, someone else has previously georeferenced the map. Please check their work and consider improving it. You can also select another map to georeference.
-:::
+Ground control points (GCPs) connect locations on the historical map to the same
+places on a modern reference map.
 
-### Step 3: Adding Ground Control Points
+1. Open the **Georeference** tab. The map image appears on the left and the
+   reference map on the right.
+2. Find the area shown on the historical map. You can zoom and pan the reference
+   map or use the search button to find a place.
+3. Choose a recognizable feature, such as a church, road junction, or bridge.
+   Click its location on both sides to create a ground control point. Matching
+   numbers identify the pair.
+4. Add at least three ground control points. Ideally, they are spread out over
+   the map and do not lie on a straight line.
 
-- Now go to the **Georeference** tab. On the left you see the selected image, on the right a world map. Zoom to the relevant region on the world map. You can easily zoom to a region by holding shift and drawing a box, or by searching for a location by clicking the magnifying glass button. Click a point you recognize on both maps which has remained the same over time, such as a church tower or a road crossing. Add the point on both sides by clicking on the image and map; a number will indicate that they are paired. Add at least three of these points (they are called _control points_). Ideally, they are spread out over the map and do not lay on a straight line.
+Choose features whose locations have stayed the same over time. Adding more
+well-placed ground control points can help improve the alignment.
+
+Allmaps uses a **polynomial transformation** by default, which requires at least
+three ground control points and works well for most maps. You usually don’t
+need to change it.
+
+After adding three ground control points, the transformed mask appears on the
+reference map. Open the **Results** tab to see the historical map overlaid on
+the reference map.
 
 :::note[navPlace]
 If the loaded IIIF Manifest contains a [navPlace](https://iiif.io/api/extension/navplace/) property, this will be used to initiate the map view.
 :::
 
-- Open the Maps menu to obtain an overview of your masks and their control points. You can remove points if needed. You can also select another mask and start adding control points for that one. The ordering might change after reloading the page.
-- You can rotate the image and map by holding `crtl` and dragging the respective views.
-- Once you have added three points, the warped mask will be rendered in the map view. You can customize this behavior through the settings menu (click the cogwheel icon in the map view). The first options set the visibility of the mask and opacity of the warped map for the Georeference and Results tabs. Below that you can customize the reference map and load a custom XYZ tile source or another Georeference Annotation.
+#### Edit ground control points
 
-### Step 4: Viewing and exporting results
+In the **Georeference** tab, drag a ground control point on either the image or
+the reference map to adjust its position.
 
-- After creating three or more points, click the **Results** tab. The image is now cropped and rendered on top of the world map. You can zoom and pan this view and use `space` to toggle between image and map. In the menu at the bottom center you can choose to show only the current map, all maps of the current image or all maps in the current resource (which could have multiple images).
-- Open the Maps panel the mask and control points. Next to the map, there’s a dropdown menu with the name Polynomial. This refers to the transformation algorithm used to convert between pixels and geospatial coordinates. You can try changing it to Helmert or Thin plate spline to see if this gives a more satisfactory result.
+Open the **Maps** panel to see the ground control points for the selected map.
+Select a ground control point in the list to locate it in both views. To remove
+it, click its trash icon and confirm.
 
-:::note[Transformation algorithms]
-Polynomial uses a homogenous transformation to fit the image on the map (by moving, scaling, rotating and skewing it). This means that the control points might not be rendered in their exact geographical position. Helmert does the same without skewing the image. Thin plate spline respects the location of each control point and will transform the map between those points. This can result in a more distorted image.
+If the image contains several maps, select the map you want to work on in the
+**Maps** panel. Each map has its own ground control points.
+
+#### Navigate the image and reference map
+
+Zoom and pan either view to position your ground control points precisely. Use
+the search button to find a place on the reference map.
+
+To rotate the image or reference map, hold <kbd>Ctrl</kbd> and drag with the
+left mouse button.
+
+#### Adjust the display
+
+Click the cogwheel icon in the map view to open the display settings.
+
+The **Georeference** and **Results** tabs have separate settings for map opacity
+and mask visibility. By default, the **Georeference** tab shows the transformed
+mask. Increase its opacity setting to also display the warped map image while
+placing ground control points.
+
+You can also choose a different background map, enter a custom XYZ tile URL,
+or load a Georeference Annotation to use another georeferenced map as a
+reference.
+
+<figure class="not-content">
+  <div class="p-8">
+    <a href={editorSettingsImage.src} aria-label="View the Editor settings screenshot at full size">
+      <EditorSettingsScreenshot src={editorSettingsImage.src} />
+    </a>
+  </div>
+  <figcaption class="mt-3 text-sm text-[var(--sl-color-gray-2)]">
+    The display settings panel controls opacity, mask visibility, and the
+    background map. Four saved ground control points link the historical map to
+    the reference map. Historical map: Nicolaes &amp; Jacob Kruikius,
+    <em>’t Hooge Heemraedschap van Delflant</em> (1712),
+    Hoogheemraadschap van Delfland / TU Delft Library.
+  </figcaption>
+</figure>
+
+#### Import existing georeferencing data
+
+If you already have a mask or ground control points for an image, you can import
+them into Allmaps Editor instead of drawing them again.
+
+1. Open the image and select the map you want to update. If it doesn't have a
+   mask yet, draw a temporary mask with at least three points.
+2. Open the **Maps** panel.
+3. Choose **Edit or import mask…** or **Edit or import GCPs…** for the selected
+   map.
+4. Paste your data into the text field, or use **Upload** to read it from a file.
+   The dialog lists the supported formats and checks your data.
+5. Click **Save**, then check the imported mask or ground control points on the
+   map.
+
+Masks can be imported as a list of image pixel coordinates, a JSON array, or an
+SVG polygon. Ground control points can be imported from formats used by QGIS,
+GDAL, and ESRI. Image coordinates must correspond to the original IIIF image's
+dimensions.
+
+### Step 4: View and export results
+
+Open the **Results** tab to see your georeferenced map overlaid on the reference
+map. The image is cropped to the mask you drew.
+
+Zoom and pan to check how well recognizable features line up. Hold
+<kbd>Space</kbd> to temporarily hide the historical map and see the reference
+map underneath. Release it to show the historical map again.
+
+If the alignment needs improvement, return to the **Georeference** tab to
+adjust or add ground control points.
+
+Use the **Show** menu at the bottom to choose which maps to display:
+
+- **Current map:** the selected map.
+- **Current image:** all maps in the selected image.
+- **All images:** all maps across the loaded resource.
+
+The available options depend on the resource you opened.
+
+#### Choose a transformation
+
+A transformation determines how Allmaps positions and warps the historical map
+using your ground control points. The default, **Polynomial**, works well for
+most maps. You usually don’t need to change it.
+
+To try another transformation, open the **Maps** panel, select a map, and use
+the **Transformation** menu:
+
+- **Polynomial** moves, rotates, scales, and skews the image to fit the ground
+  control points.
+- **Helmert** moves, rotates, and scales the image uniformly, preserving its
+  shapes and proportions.
+- **Thin plate spline** bends the image to pass through each ground control
+  point. It can accommodate local differences, but may introduce distortion
+  between points.
+
+Polynomial and Helmert find an overall fit, so individual ground control points
+may not align exactly. Before changing the transformation, check that your
+ground control points are accurate and spread across the map.
+
+#### Share and export your map
+
+Click **Export** to open the export panel. Under **Export options for**, choose
+**Current map**, **Current image**, or **All images**. The available options
+depend on the resource you opened.
+
+The panel provides links you can open or copy:
+
+- **View in Allmaps Viewer:** explore and share the selected maps. Choose
+  **Latest version** to include future edits, or **Current version** to keep
+  the link fixed to the current georeferencing. See
+  [Share a map](/guides/viewing-maps#share-a-map) for details.
+- **Georeference Annotation:** access the georeferencing data for your selection.
+  Multiple maps are returned together in an Annotation Page. Use **Code** to
+  inspect the annotation.
+- **XYZ map tiles:** use the georeferenced maps as a tile layer in GIS software
+  or a web map.
+
+Select **Show more export options** for GeoJSON, web mapping code examples, and
+instructions for creating a GeoTIFF.
+
+See [Georeference Annotations](/georeference-annotations) for details about the
+data format, or [Using maps in other tools](/guides/using-maps)
+for more ways to use your work.
+
+### Versions and shared edits
+
+Anyone can edit a map in Allmaps Editor, including maps you have georeferenced.
+Allmaps keeps a history of the georeferencing data, so you can refer to a
+specific version even after further edits.
+
+An annotation URL without a version returns the latest georeferencing data.
+A versioned URL adds `@` followed by a version identifier:
+
+<div class="api-examples">
+
+| Version | Annotation URL |
+| --- | --- |
+| Latest | <a href="https://annotations.allmaps.org/maps/1bfb1eb4198e7240">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"/1bfb1eb4198e7240"}</a> |
+| Specific version | <a href="https://annotations.allmaps.org/maps/1bfb1eb4198e7240@c83337fa4b8051c9">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"/1bfb1eb4198e7240"}<wbr />{"@c83337fa4b8051c9"}</a> |
+
+</div>
+
+Each annotation includes its versioned URL in `body._allmaps.version`. Copy
+this URL when you want to share or use a particular version. You can also open
+it in [Allmaps Viewer](https://viewer.allmaps.org/).
+
+Use the unversioned URL to follow ongoing improvements, or the versioned URL
+to keep the georeferencing fixed for a publication or project.
+
+:::note[Planned improvements]
+We’re planning a more advanced version management system for maps. Users will
+be able to log in, keep track of their contributions, and retain access to
+their own work even as others continue editing the same maps.
 :::
-
-- Click the Export button on the top right to inspect the data you have created in the previous steps.
-
-:::note[Georeference Annotation]
-This JSON-LD document contains one or more Georeference Annotations. These conform to the specifications of the [Georeference Extension](https://iiif.io/api/extension/georef/), an official extension to the IIIF Presentation API and contain the following parts:
-
-- A reference to the IIIF Resource that has been annotated under target \> source.
-- The mask that indicates the location of the map under target \> selector.
-- The control points and chosen transformation algorithm under body.
-
-Multiple annotations will be exported as an [Annotation Page](https://www.w3.org/TR/annotation-model/#annotation-page), which contains a list of Georeference Annotations.
-:::
-
-- A IIIF Manifest (with multiple images) or a single IIIF Image can contain multiple maps. When viewing or exporting the results, different options are available for exporting annotations of the currently selected map (or mask), the current image, or the entire manifest. The following options can be selected under **Export options for**:
-	- Current map: refers to the current selected mask (and related control points). This selection can be changed in the Maps menu.
-	- Current image: refers to all the masks (and related control points) of the currently selected IIIF Image (or Canvas)
-  - All images: refers to all the masks (and related control points) of all the images in the current IIIF Manifest (see the Images tab). This option won’t be visible when opening a single IIIF Image.
-- The export panel contains various options to export your work. An overview of the options:
-  - View in Allmaps Viewer: opens the Georeference Annotation in Allmaps Viewer, which has more advanced options to view maps. Clicking this link loads the annotation directly from the Allmaps database. This means that new edits in the Editor will become visible in the Viewer after refreshing the page. You can leave both tabs open to improve your work.
-  - Georeference Annotation: opens the Georeference Annotation (or an Annotation Page with multiple annotations, depending on your selection) in a new window.
-  - XYZ map tiles: Opens a preview of the map loaded through an XYZ tile proxy, or copies the XYZ template URL. This can be used to load the map in GIS-applications.
-
-### Managing annotations
-
-Allmaps plans to release a tool for keeping track of your georeference maps and managing crowd-sourcing projects. Until this becomes available it's a good idea to keep track of all the images you georeferenced and the georeference annotations they resulted in, especially when working with groups. This could be for example a sheet with the following columns:
-
-- Title
-- Resource URI
-- Georeferencing status: (todo, in progress, to verify, done, …)
-- Georeference Annotation URI
-- Georeference Annotation JSON or name and location of downloaded JSON file
-- Notes
-

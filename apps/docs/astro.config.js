@@ -3,8 +3,13 @@ import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 import tailwindcss from '@tailwindcss/vite'
 import svelte from '@astrojs/svelte'
+import { scalarStarlight } from '@scalar/starlight'
+import { satteri } from '@astrojs/markdown-satteri'
 
 import ports from '../../ports.json' with { type: 'json' }
+import headingLinks from './src/plugins/heading-links'
+import { liveCodeTheme } from './src/plugins/live-code-theme.mjs'
+import { mapExampleDependencies } from './src/plugins/map-example-dependencies.mjs'
 
 const STATS_WEBSITE_ID = import.meta.env.VITE_STATS_WEBSITE_ID
 
@@ -18,9 +23,15 @@ export default defineConfig({
   devToolbar: {
     enabled: false
   },
+  markdown: {
+    processor: satteri({ hastPlugins: headingLinks })
+  },
   integrations: [
     starlight({
       title: 'Allmaps Docs',
+      markdown: {
+        headingLinks: false
+      },
       defaultLocale: 'en',
       logo: {
         src: './src/images/allmaps-logo.svg'
@@ -48,6 +59,57 @@ export default defineConfig({
       editLink: {
         baseUrl: editLinkBaseUrl
       },
+      components: {
+        Search: './src/components/StarlightSearch.astro'
+      },
+      plugins: [
+        scalarStarlight({
+          pathname: '/api/rest',
+          label: 'REST API',
+          title: 'Allmaps REST API',
+          configuration: {
+            agent: { disabled: true },
+            sources: [
+              {
+                title: 'Allmaps REST API',
+                // slug: 'allmaps-api',
+                url: 'https://api.allmaps.org/openapi.json'
+              }
+            ]
+          }
+        }),
+        scalarStarlight({
+          pathname: '/api/annotations',
+          label: 'Annotations API',
+          title: 'Allmaps Annotations API',
+          configuration: {
+            agent: { disabled: true },
+            sources: [
+              {
+                title: 'Allmaps Annotations API',
+                // slug: 'allmaps-annotations-api',
+                url: 'https://annotations.allmaps.org/openapi.json'
+              }
+            ]
+          }
+        }),
+        {
+          name: 'allmaps-api-sidebar',
+          hooks: {
+            'config:setup': ({ config, updateConfig }) => {
+              // Scalar appends top-level links; these live under Reference → API.
+              updateConfig({
+                sidebar: config.sidebar?.filter(
+                  (item) =>
+                    typeof item !== 'object' ||
+                    !('link' in item) ||
+                    !['/api/rest', '/api/annotations'].includes(item.link)
+                )
+              })
+            }
+          }
+        }
+      ],
       sidebar: [
         {
           label: 'Getting started',
@@ -60,51 +122,60 @@ export default defineConfig({
               label: 'IIIF',
               link: '/iiif'
             },
-            // {
-            //   label: 'Core Principles',
-            //   link: '/core-principles'
-            // },
-            // {
-            //   label: 'FAQ',
-            //   link: '/faq'
-            // },
-            // {
-            //   label: 'Timeline',
-            //   link: '/timeline'
-            // }
+            {
+              label: 'Georeference Annotations',
+              link: '/georeference-annotations'
+            }
           ]
         },
         {
           label: 'Guides',
           items: [
             {
-              label: 'Finding maps',
-              link: '/guides/finding-maps'
+              label: 'Find maps to georeference',
+              link: '/guides/find-maps-to-georeference'
             },
             {
               label: 'Georeferencing maps',
               link: '/guides/georeferencing-maps'
             },
             {
+              label: 'Discover maps in Allmaps',
+              link: '/guides/discover-maps'
+            },
+            {
               label: 'Viewing maps',
               link: '/guides/viewing-maps'
             },
             {
-              label: 'Importing and exporting maps',
-              link: '/guides/importing-and-exporting-maps'
+              label: 'Using maps in other tools',
+              link: '/guides/using-maps'
+            },
+            {
+              label: 'IDs in Allmaps',
+              link: '/guides/ids-in-allmaps'
             }
           ]
-        },
-        {
-          label: 'Examples',
-          items: [{ autogenerate: { directory: 'examples' } }]
         },
         {
           label: 'Reference',
           items: [
             {
               label: 'API',
-              items: [{ autogenerate: { directory: 'api' } }]
+              items: [
+                {
+                  label: 'Overview',
+                  link: '/api'
+                },
+                {
+                  label: 'Annotations API',
+                  link: '/api/annotations'
+                },
+                {
+                  label: 'REST API',
+                  link: '/api/rest'
+                }
+              ]
             },
             {
               label: 'Packages',
@@ -116,12 +187,16 @@ export default defineConfig({
       customCss: [
         './src/css/tailwind.css',
         './src/css/fonts.css',
-        './src/css/starlight.css'
+        './src/css/starlight.css',
+        './src/css/scalar.css'
       ]
     }),
-    svelte()
+    svelte(),
+    mapExampleDependencies()
   ],
   vite: {
-    plugins: [tailwindcss()]
+    worker: { format: 'es' },
+    envDir: '../..',
+    plugins: [tailwindcss(), liveCodeTheme(new URL('.', import.meta.url))]
   }
 })

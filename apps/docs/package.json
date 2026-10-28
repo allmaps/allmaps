@@ -33,34 +33,42 @@
   ],
   "license": "MIT",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
+    "dev": "astro dev --mode localhost",
+    "start": "astro dev --mode localhost",
     "check": "astro check",
     "build": "pnpm run copy-readmes && astro build",
     "lerna-build": "lerna run build --scope @allmaps/docs --include-dependencies",
     "preview": "astro preview",
     "astro": "astro",
-    "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts"
+    "copy-readmes": "node --experimental-strip-types ./scripts/copy-readmes.ts",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@allmaps/id": "workspace:^",
+    "@allmaps/iiif-parser": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
+    "@allmaps/ui": "workspace:^",
     "@astrojs/check": "^0.9.9",
-    "@astrojs/markdown-satteri": "^0.2.0",
-    "@astrojs/starlight": "^0.40.0",
+    "@astrojs/markdown-remark": "^7.3.1",
+    "@astrojs/markdown-satteri": "^0.4.2",
+    "@astrojs/starlight": "^0.42.4",
     "@astrojs/starlight-tailwind": "^4.0.0",
-    "@astrojs/svelte": "^8.1.2",
-    "@tailwindcss/vite": "^4.1.17",
-    "astro": "^6.4.7",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-svelte": "^3.4.0",
+    "@astrojs/svelte": "^9.0.1",
+    "@scalar/starlight": "^0.2.8",
+    "@tailwindcss/vite": "catalog:",
+    "astro": "^7.3.5",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "prettier": "catalog:",
+    "prettier-plugin-svelte": "catalog:",
     "svelte": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },
   "devDependencies": {
-    "@allmaps/types": "workspace:^"
+    "@allmaps/types": "workspace:^",
+    "remark": "15.0.1",
+    "remark-gfm": "4.0.1",
+    "vite": "catalog:"
   }
 }

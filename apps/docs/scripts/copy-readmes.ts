@@ -1,10 +1,12 @@
 import url from 'url'
 import path from 'path'
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
+import { rewriteReadmeLinks } from './readme-links.ts'
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const packagesDir = path.join(__dirname, '../../../packages')
+const repositoryRoot = path.join(__dirname, '../../..')
 const outputDir = path.join(__dirname, '../src/content/docs/packages')
 
 /**
@@ -44,6 +46,8 @@ function removeFirstLine(lines: string) {
 
 await mkdir(outputDir, { recursive: true })
 
+const readmes = new Map<string, { readme: string; readmePath: string }>()
+
 for (const packageName of await getDirectories(packagesDir)) {
   const readmePath = path.join(packagesDir, packageName, 'README.md')
 
@@ -59,11 +63,18 @@ for (const packageName of await getDirectories(packagesDir)) {
     continue
   }
 
+  readmes.set(packageName, { readme, readmePath })
+}
+
+// Resolve package links only after knowing which READMEs will be published.
+const packageNames = new Set(readmes.keys())
+
+for (const [packageName, { readme, readmePath }] of readmes) {
   let description
   try {
     const packageFilename = path.join(packagesDir, packageName, 'package.json')
     const packageModule = await import(packageFilename, {
-      assert: { type: 'json' }
+      with: { type: 'json' }
     })
     description = packageModule.default.description
   } catch (err) {
@@ -76,7 +87,12 @@ for (const packageName of await getDirectories(packagesDir)) {
     `---
 title: '@allmaps/${packageName}'
 description: ${JSON.stringify(description ?? '')}
----\n` + removeFirstLine(readme)
+---\n` +
+    rewriteReadmeLinks(removeFirstLine(readme), {
+      repositoryRoot,
+      readmePath,
+      packageNames
+    })
 
   const outputPath = path.join(outputDir, `${packageName}.md`)
 

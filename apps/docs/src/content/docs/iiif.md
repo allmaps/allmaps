@@ -3,39 +3,147 @@ title: What is IIIF?
 description: 'Explanation of the open standards used by Allmaps'
 ---
 
-Allmaps is based on the [International Image Interoperability Framework](https://iiif.io/) (IIIF, pronounced as "Triple-Eye-Eff"), a set of standards that have been implemented by libraries, archives and museums around the world to open up their digital collections for reuse.
+IIIF—the [International Image Interoperability Framework](https://iiif.io/),
+pronounced “Triple-Eye-Eff”—provides open standards for sharing digital
+collections. Libraries, archives, and museums use IIIF to make images and
+information about their collections available through a common set of APIs.
 
-While each institution maintains its own digital infrastructure, IIIF offers Application Programming Interfaces (APIs) for accessing complex digital objects such as books, journals and maps across institutions. These APIs provide details about the structure of objects, their metadata and digital assets.
+This lets applications such as Allmaps work with maps from many institutions.
+Each institution hosts its own images, while IIIF provides a shared way to
+access them.
 
-IIIF allows developers to make software that can be used to interact with numerous digital collections all at once–without the need to study the technical documentation or request permission for every individual institution. For example, the vast digital collections of the Library of Congress, Bibliothèque Nationale de France and Staatsbibliothek Berlin can all be accessed through the same protocols.
+You don’t need to understand the technical details to use Allmaps, but two
+IIIF APIs and a few terms are useful to know.
 
-When using Allmaps, you don't need to know the specifics of IIIF, but it can be useful to learn about its terminology, which is described concisely below, with links to the respective documentation.
+## IIIF Presentation API
 
-<!-- The standards of IIIF are maintained by an active international consortium.  -->
+The Presentation API describes digital objects and how their parts fit together:
 
-### IIIF Presentation API
+- A **Manifest** is a JSON document describing an object, such as a map or an
+  atlas. It includes descriptive information and an ordered sequence of Canvases.
+- A **Canvas** is a virtual surface representing a page or view of that object.
+  A single-sheet map might have one Canvas; an atlas might have one for each page.
+- An **Annotation** connects content to a Canvas. A *painting annotation*
+  specifies the image to display on it. Other annotations can add information,
+  such as comments or transcriptions.
 
-A IIIF Presentation Manifest is a [JSON-LD](https://json-ld.org/) document that describes a compound digital object. Following Linked Open Data principles, it has a unique identifier (usually the URL where it can be found on the web) and a “context” that explains how to read the document.
+See the [IIIF Presentation API documentation](https://iiif.io/api/presentation/3.0/)
+for more detail.
 
-A IIIF Manifest is composed of one or more Canvasses. Not unlike a painterly canvas, this is defined as a rectangular surface with fixed dimensions on which other elements are added. These elements are called Annotations. A book, for example, consists of an ordered list of Canvases, on each of which the digitized page is “annotated”.
+## IIIF Image API
 
-Annotations are broadly used within IIIF and have different reasons or _motivations_. While image annotations have a “painting” motivation, other motivations include “describing”, “transcribing”, “commenting”, and, importantly in this context, “georeferencing”. Each of the non-painting motivations add additional information to the canvas (and, by extension, to the image painted on the canvas). This can be transcribed text, information about who is depicted in a photograph or personal comments about a work.
+The Image API lets applications request an entire image or a region of it at
+a particular size, rotation, quality, and format. This makes it possible to
+explore large images without downloading the full-resolution image at once.
 
-For more information, please consult the [documentation](https://iiif.io/api/presentation/3.0/) of the IIIF Presentation API.
+Image requests follow this pattern:
 
-### IIIF Image API
+`[image service base URL]/[region]/[size]/[rotation]/[quality].[format]`
 
-While images painted on a canvas can be simple, static images (with a fixed size), this does not work well for high resolution images that are too large to download all at once. For this purpose the IIIF Image API was developed. It offers a URL-scheme to request specific regions of images at various sizes, rotations and qualities. Take a look at these examples to become familiar with the scheme:
+The examples below use a [map of Delfland](https://annotations.allmaps.org/images/2aa3bde6bcae3817). Click a URL suffix to open the requested image.
 
-- Base URL: https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236
-- Full image at 1000px: [/full/1000,/0/default.jpg](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/full/1000,/0/default.jpg)
-- Part of the image: [/4316,4389,1557,890/1557,890/0/default.jpg](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/4316,4389,1557,890/1557,890/0/default.jpg)
-- Upper left corner of the image: [/0,0,1000,1000/500,500/0/default.jpg](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/0,0,1000,1000/500,500/0/default.jpg)
-- Rotated image: [/0,0,1000,1000/500,500/90/default.jpg](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/0,0,1000,1000/500,500/90/default.jpg)
-- Full image (8662 x 7519 pixels): [/full/full/0/default.jpg](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/full/full/0/default.jpg)
-- URL scheme: \[base url\]/\[region\]/\[size\]/\[rotation\]/\[quality\].\[format\]
-- Not all IIIF-servers support the same functionalities\! The level of support is described in an [info.json](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/info.json) file.
+<div class="not-content overflow-x-auto border border-[var(--sl-color-gray-5)]">
+  <table class="w-full table-fixed border-collapse text-left text-sm">
+    <thead class="border-b border-[var(--sl-color-gray-5)] bg-[var(--sl-color-bg-sidebar)]">
+      <tr>
+        <th scope="col" class="w-24 px-3 py-2 font-semibold sm:w-40">Preview</th>
+        <th scope="col" class="px-3 py-2 font-semibold">Request</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-[var(--sl-color-gray-5)] last:border-b-0">
+        <td class="w-24 p-3 align-top sm:w-40">
+          <img
+            class="m-0 h-auto w-20 max-w-full sm:w-32"
+            src="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/full/400,/0/default.jpg"
+            alt="Full historical map of Delfland"
+            width="400"
+            height="347"
+            loading="lazy"
+          />
+        </td>
+        <td class="p-3 align-top">
+          <div class="flex flex-col gap-3 leading-snug">
+            <strong class="block text-base">Full map</strong>
+            <p class="m-0">The entire image, scaled to 400 pixels wide.</p>
+            <a class="block break-words text-[var(--sl-color-text-accent)] underline underline-offset-2" href="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/full/400,/0/default.jpg">
+              <code class="text-xs">/full/<wbr>400,/<wbr>0/<wbr>default.jpg</code>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr class="border-b border-[var(--sl-color-gray-5)] last:border-b-0">
+        <td class="w-24 p-3 align-top sm:w-40">
+          <img
+            class="m-0 h-auto w-20 max-w-full sm:w-32"
+            src="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/4316,4389,1557,1557/400,/0/default.jpg"
+            alt="Detail of the Delfland map"
+            width="400"
+            height="400"
+            loading="lazy"
+          />
+        </td>
+        <td class="p-3 align-top">
+          <div class="flex flex-col gap-3 leading-snug">
+            <strong class="block text-base">Map detail</strong>
+            <p class="m-0">A 1557 × 1557 pixel region starting at (4316, 4389), scaled to 400 pixels wide.</p>
+            <a class="block break-words text-[var(--sl-color-text-accent)] underline underline-offset-2" href="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/4316,4389,1557,1557/400,/0/default.jpg">
+              <code class="text-xs">/4316,4389,1557,1557/<wbr>400,/<wbr>0/<wbr>default.jpg</code>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr class="border-b border-[var(--sl-color-gray-5)] last:border-b-0">
+        <td class="w-24 p-3 align-top sm:w-40">
+          <img
+            class="m-0 h-auto w-20 max-w-full sm:w-32"
+            src="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/0,0,1000,1000/200,/0/default.jpg"
+            alt="Upper-left corner of the Delfland map"
+            width="200"
+            height="200"
+            loading="lazy"
+          />
+        </td>
+        <td class="p-3 align-top">
+          <div class="flex flex-col gap-3 leading-snug">
+            <strong class="block text-base">Upper-left corner</strong>
+            <p class="m-0">A 1000 × 1000 pixel region starting at (0, 0), scaled to 200 pixels wide.</p>
+            <a class="block break-words text-[var(--sl-color-text-accent)] underline underline-offset-2" href="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/0,0,1000,1000/200,/0/default.jpg">
+              <code class="text-xs">/0,0,1000,1000/<wbr>200,/<wbr>0/<wbr>default.jpg</code>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr class="border-b border-[var(--sl-color-gray-5)] last:border-b-0">
+        <td class="w-24 p-3 align-top sm:w-40">
+          <img
+            class="m-0 h-auto w-20 max-w-full sm:w-32"
+            src="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/0,0,1000,1000/200,/90/default.jpg"
+            alt="Upper-left corner of the Delfland map rotated 90 degrees clockwise"
+            width="200"
+            height="200"
+            loading="lazy"
+          />
+        </td>
+        <td class="p-3 align-top">
+          <div class="flex flex-col gap-3 leading-snug">
+            <strong class="block text-base">Rotated corner</strong>
+            <p class="m-0">The same region and size, rotated 90° clockwise.</p>
+            <a class="block break-words text-[var(--sl-color-text-accent)] underline underline-offset-2" href="https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/0,0,1000,1000/200,/90/default.jpg">
+              <code class="text-xs">/0,0,1000,1000/<wbr>200,/<wbr>90/<wbr>default.jpg</code>
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-Servers often cache or pregenerate tiles at various zoom levels. An interactive demonstration of these tile sets can be found in [this Notebook](https://observablehq.com/d/31f4cd9ccc223a57).
+Each image service also provides an
+[`info.json`](https://dlc.services/iiif-img/7/4/0b0af56c-d836-4fe4-a9da-7ed66ea7a236/info.json)
+document describing the image’s dimensions and the service’s capabilities,
+including available tile sizes and scale factors. Supported features vary
+between services.
 
-For more information, please consult the documentation of the [IIIF Image API](https://iiif.io/api/image/3.0/).
+See the [IIIF Image API documentation](https://iiif.io/api/image/3.0/)
+for more detail.

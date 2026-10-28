@@ -1,0 +1,55 @@
+/* The client mount is present before Scalar loads and only on API references. */
+:root:has([data-scalar-client]) {
+  --scalar-custom-header-height: var(--sl-nav-height);
+  --scalar-sidebar-width: var(--sl-sidebar-width);
+  --scalar-content-max-width: 100%;
+
+  /* Preserve the skip-link target without displaying a second page heading. */
+  .main-pane > main > .content-panel:has(#_top) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .content-panel:has([data-scalar-client]) {
+    padding: 0;
+    border: 0;
+
+    > .sl-container {
+      max-width: none;
+      margin: 0;
+    }
+
+    > .sl-container > footer {
+      padding: 1.5rem var(--sl-content-pad-x);
+    }
+  }
+
+  .scalar-api-reference {
+    margin-top: 0;
+
+    .section-container {
+      padding-inline: 0;
+    }
+
+    .section {
+      padding-inline: var(--sl-content-pad-x);
+    }
+  }
+
+  /* Let Scalar dropdowns extend beyond Starlight's scrollable tables. */
+  .scalar-client table {
+    overflow: visible;
+  }
+
+  /* Scalar switches from its mobile menu to a sidebar at 1000px. */
+  @media (min-width: 1000px) {
+    .content-panel:has([data-scalar-client]) > .sl-container > footer {
+      margin-inline-start: var(--sl-sidebar-width);
+    }
+  }
+}

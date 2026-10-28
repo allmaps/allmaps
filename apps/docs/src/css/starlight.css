@@ -17,7 +17,7 @@
   --sl-color-gray-6: #182a2f;
   --sl-color-black: #121a1c;
 
-  --sl-color-bg-inline-code: rgba(128, 128, 128, 0.15);
+  --sl-color-bg-inline-code: #1a3034;
 }
 /* Light mode colors. */
 :root[data-theme='light'] {
@@ -34,5 +34,179 @@
   --sl-color-gray-7: #f3f7f9;
   --sl-color-black: #ffffff;
 
-  --sl-color-bg-inline-code: rgba(128, 128, 128, 0.15);
+  --sl-color-bg-inline-code: #ecfbfc;
+}
+
+.sl-markdown-content code:not(:where(pre *, .not-content *)) {
+  background-color: var(--sl-color-bg-inline-code);
+  border: 0;
+  border-radius: 4px;
+  padding: 0.12em 0.35em;
+  color: inherit;
+  font-size: 0.87em;
+  font-weight: 400;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.sl-markdown-content a:has(code):not(:where(pre *, .not-content *)),
+.sl-markdown-content code a:not(:where(pre *, .not-content *)) {
+  color: var(--sl-color-accent-high);
+}
+
+.sl-markdown-content kbd:not(:where(.not-content *)) {
+  --kbd-shadow-color: color-mix(in srgb, var(--sl-color-white) 10%, transparent);
+  padding: 0.1875em 0.375em;
+  border-radius: 0.3125rem;
+  color: var(--sl-color-white);
+  font-family: inherit;
+  font-size: 0.875em;
+  font-weight: 500;
+  box-shadow:
+    0 0 0 1px var(--kbd-shadow-color),
+    0 3px 0 var(--kbd-shadow-color);
+}
+
+.api-examples table,
+.full-width-table table {
+  display: table;
+  width: 100%;
+  table-layout: auto;
+}
+
+.api-examples a {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.sl-markdown-content img.inline-iiif-logo {
+  display: inline-block;
+  width: 1.2em;
+  height: auto;
+  margin: 0 0.15em;
+  vertical-align: -0.15em;
+}
+
+/* Annotate the example with margin rules and lightly emphasized labels. */
+.georeference-annotation-example {
+  --annotation-marker-color: #ff85cb;
+  --annotation-label-background: #ff56ba1a;
+}
+
+:root[data-theme='light'] .georeference-annotation-example {
+  --annotation-marker-color: var(--sl-color-accent);
+  --annotation-label-background: #ff56ba14;
+}
+
+.georeference-annotation-example .expressive-code .ec-line.mark {
+  background: transparent;
+}
+
+.georeference-annotation-example .expressive-code .ec-line.mark .code {
+  --ecLineBrdCol: var(--annotation-marker-color);
+  --ecGtrBrdWd: 2px;
+}
+
+.georeference-annotation-example
+  .expressive-code
+  .ec-line.tm-label
+  .code::before {
+  background: var(--annotation-label-background);
+  color: var(--annotation-marker-color);
+  border-radius: 0 4px 4px 0;
+  padding-inline: 0.5em;
+  font-family: var(--sl-font);
+  font-weight: 600;
+}
+
+.site-title {
+  color: var(--sl-color-white);
+}
+
+:root[data-theme='light'] .site-title {
+  color: black;
+}
+
+/* Reserve a gutter for heading icons while keeping all content aligned. */
+.content-panel {
+  padding-inline-start: max(
+    var(--sl-content-pad-x),
+    calc(0.8 * var(--sl-text-h1) + 0.7rem)
+  );
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+
+.sl-markdown-content .sl-heading-wrapper {
+  position: relative;
+  display: block;
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h1 {
+  font-size: var(--sl-text-h1);
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h2 {
+  font-size: var(--sl-text-h2);
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h3 {
+  font-size: var(--sl-text-h3);
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h4 {
+  font-size: var(--sl-text-h4);
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h5 {
+  font-size: var(--sl-text-h5);
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h6 {
+  font-size: var(--sl-text-h6);
+}
+
+.sl-markdown-content .sl-heading-wrapper {
+  line-height: var(--sl-line-height-headings);
+}
+
+.sl-markdown-content .sl-heading-wrapper > :is(h1, h2, h3, h4, h5, h6) {
+  display: block;
+  padding-inline-end: 0;
+}
+
+.sl-markdown-content .heading-anchor,
+.sl-markdown-content .sl-anchor-link {
+  position: absolute;
+  display: block;
+  inset-inline-end: 100%;
+  top: calc((1lh - 0.8em) / 2);
+  width: 0.8em;
+  height: 0.8em;
+  margin-inline-end: 0.35rem;
+  margin-inline-start: 0;
+  color: #df1783;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.sl-markdown-content .heading-anchor-icon,
+.sl-markdown-content .sl-anchor-icon > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor,
+.sl-markdown-content .heading-anchor:focus-visible,
+.sl-markdown-content .sl-heading-wrapper:hover .sl-anchor-link,
+.sl-markdown-content .sl-anchor-link:focus-visible {
+  opacity: 1;
 }

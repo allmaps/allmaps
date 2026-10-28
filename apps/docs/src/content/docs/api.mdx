@@ -1,0 +1,30 @@
+---
+title: API Reference
+description: Explore the Allmaps REST and Annotations APIs and their interactive references.
+tableOfContents: false
+---
+
+import { Aside } from '@astrojs/starlight/components'
+
+export const homepageBaseUrl = import.meta.env.PUBLIC_HOMEPAGE_BASE_URL || 'https://allmaps.org'
+
+Allmaps provides two APIs for working with digitized maps and their georeferencing data.
+
+<Aside title="Hosted API terms" type="caution">
+  Use of APIs hosted by Allmaps is free for non-commercial use. Commercial use
+  requires a paid agreement with Allmaps. These terms apply to the hosted
+  services, not to the open source API software or the public CC0 georeference
+  data. Read the <a href={new URL('/terms#hosted-allmaps-services', homepageBaseUrl).href}>Terms &amp; Usage</a>.
+</Aside>
+
+## Annotations API
+
+Use the Annotations API to retrieve [Georeference Annotations](/georeference-annotations) for maps, IIIF images, canvases, manifests, organizations, and lists. These annotations describe how maps are georeferenced and can be used in Allmaps Viewer, mapping libraries, and other tools that support the format.
+
+[View API documentation](/api/annotations)
+
+## REST API
+
+Use the REST API to query maps, manage organizations and import and update IIIF resources. This API requires authentication for most endpoints.
+
+[View API documentation](/api/rest)

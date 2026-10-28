@@ -1,0 +1,48 @@
+---
+title: Allmaps Docs
+description: Examples, API documentation, and package documentation for Allmaps
+---
+
+import { Aside } from '@astrojs/starlight/components'
+
+export const homepageBaseUrl = import.meta.env.PUBLIC_HOMEPAGE_BASE_URL || 'https://allmaps.org'
+
+<Aside title="Looking for the homepage?" type="note">
+  This is the Allmaps documentation site. Go to <a href={homepageBaseUrl}>allmaps.org</a> to visit the project's homepage.
+</Aside>
+
+## Introduction
+
+Allmaps helps you georeference, explore, and use digitized historical maps. Its
+web applications, APIs, and open source libraries connect maps from libraries,
+archives, and museums to modern mapping tools.
+
+The map images remain with the institutions that publish them and are accessed
+through [IIIF](/iiif). Allmaps does not store digitized map images or derived
+images like GeoTIFFs or map tiles. It stores georeferencing data separately as
+[Georeference Annotations](/georeference-annotations). These small JSON documents
+describe how a map's image coordinates relate to geographic coordinates, so the
+map can be placed on a modern map.
+
+You can use Allmaps in your browser, integrate georeferenced maps into your own
+website, or build applications with its TypeScript libraries. Allmaps is built
+around open source software, open standards, and open data, making it easier to
+share your work and use it with other tools.
+
+## Where to start
+
+- [Find maps to georeference](/guides/find-maps-to-georeference) in digital collections published through IIIF.
+- [Georeference a map](/guides/georeferencing-maps) with Allmaps Editor.
+- [Discover maps in Allmaps](/guides/discover-maps) contributed
+  by the Allmaps community.
+- [View and use georeferenced maps](/guides/viewing-maps) in Allmaps Viewer and
+  your own website.
+- [Use maps in other tools](/guides/using-maps) with XYZ map tiles,
+  GeoTIFFs, and GeoJSON.
+- Explore the [API reference](/api) and [TypeScript packages](/packages) to build
+  with Allmaps.
+
+## Get in touch
+
+Have a question, found something unclear, or want to contribute?
+<a href={new URL('/contact', homepageBaseUrl).href}>Contact us</a>.

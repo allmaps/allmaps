@@ -1,0 +1,8 @@
+---
+import Search from '@astrojs/starlight/components/Search.astro'
+
+const pathname = Astro.url.pathname.replace(/\/$/, '')
+const isApiReference = ['/api/rest', '/api/annotations'].includes(pathname)
+---
+
+{!isApiReference && <Search {...Astro.props} />}
