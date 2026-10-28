@@ -30,7 +30,7 @@
   let selectedIndex = $state(0)
   let loading = $state(true)
   let error = $state('')
-  let copiedId = $state('')
+  let copiedValue = $state('')
   let copyError = $state('')
   const selectedResource = $derived(resources[selectedIndex])
   const annotationUrl = $derived.by(() => {
@@ -59,15 +59,13 @@
     })
   })
 
-  async function copyId() {
-    const id = selectedResource?.allmapsId
-    if (!id) return
+  async function copyValue(value: string) {
     copyError = ''
     try {
-      await navigator.clipboard.writeText(id)
-      copiedId = id
+      await navigator.clipboard.writeText(value)
+      copiedValue = value
     } catch {
-      copyError = 'Could not copy. Select the ID below to copy it manually.'
+      copyError = 'Could not copy. Select the value to copy it manually.'
     }
   }
 
@@ -86,7 +84,7 @@
     error = ''
     resources = []
     selectedIndex = 0
-    copiedId = ''
+    copiedValue = ''
     copyError = ''
 
     async function fetchIds() {
@@ -137,6 +135,29 @@
     }
   })
 </script>
+
+{#snippet copyButton(value: string, label: string)}
+  <button
+    type="button"
+    class="copy-button"
+    aria-label={copiedValue === value ? `${label} copied` : `Copy ${label}`}
+    onclick={() => copyValue(value)}
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      aria-hidden="true"
+    >
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+    </svg>
+    {copiedValue === value ? 'Copied' : 'Copy'}
+  </button>
+{/snippet}
 
 {#snippet exampleLabel(label: string)}
   {@const separator = label.indexOf(' — ')}
@@ -239,7 +260,7 @@
         onValueChange={(value) => {
           if (!value) return
           selectedIndex = Number(value)
-          copiedId = ''
+          copiedValue = ''
           copyError = ''
         }}
       >
@@ -280,58 +301,42 @@
               </div>
               <code class="hash"
                 ><mark>{selectedResource.allmapsId}</mark
-                >{selectedResource.hash.slice(16)}</code
+                ><span class="hash-remainder"
+                  >{selectedResource.hash.slice(16)}</span
+                ></code
               >
               <p class="hint">
-                Keep the <span class="retained-label">first 16 characters</span
-                >.
+                The <span class="retained-label">first 16 characters</span> form
+                the Allmaps ID.
               </p>
             </div>
           </li>
-          <li>
+          <li class="result-step">
             <span class="step-number" aria-hidden="true">3</span>
             <div class="step-content">
               <div class="step-heading"><h3>Allmaps ID</h3></div>
               <div class="result-row">
                 <code class="result">{selectedResource.allmapsId}</code>
-                <button
-                  type="button"
-                  class="copy-button"
-                  aria-label="Copy Allmaps ID"
-                  onclick={copyId}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    aria-hidden="true"
-                  >
-                    <rect x="8" y="8" width="12" height="12" rx="2" />
-                    <path
-                      d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"
-                    />
-                  </svg>
-                  {copiedId === selectedResource.allmapsId ? 'Copied' : 'Copy'}
-                </button>
+                {@render copyButton(selectedResource.allmapsId, 'Allmaps ID')}
               </div>
             </div>
           </li>
-          <li class="final-step">
+          <li class="result-step">
             <span class="step-number" aria-hidden="true">4</span>
             <div class="step-content">
               <div class="step-heading"><h3>Annotation URL</h3></div>
               {#if annotationUrl}
-                <a
-                  class="annotation-url"
-                  href={annotationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <code>{annotationUrl}</code>
-                </a>
+                <div class="result-row">
+                  <a
+                    class="annotation-url"
+                    href={annotationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <code class="result">{annotationUrl}</code>
+                  </a>
+                  {@render copyButton(annotationUrl, 'annotation URL')}
+                </div>
               {:else}
                 <p class="hint">
                   Collections do not have an annotation endpoint. Select a
@@ -343,9 +348,6 @@
         </ol>
       </div>
       {#if copyError}<p role="alert">{copyError}</p>{/if}
-      <p class="footnote">
-        IDs in this document only. Image IDs identify IIIF image services.
-      </p>
     {/if}
   </div>
 </section>
@@ -359,7 +361,7 @@
     );
     --accent-fill: color-mix(
       in srgb,
-      var(--sl-color-accent) 13%,
+      var(--sl-color-accent) 6%,
       var(--sl-color-bg)
     );
     --accent-border: color-mix(
@@ -450,8 +452,7 @@
     font-weight: 400;
     opacity: 0.75;
   }
-  .hint,
-  .footnote {
+  .hint {
     font-size: 0.75rem;
     color: var(--sl-color-gray-2);
     margin: 0.5rem 0 0;
@@ -549,27 +550,40 @@
     border-radius: 0.375rem;
     background: var(--panel-fill);
   }
+  .hash {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--sl-color-gray-5);
+    user-select: all;
+  }
   mark {
-    color: var(--sl-color-text);
-    background: color-mix(in srgb, var(--sl-color-accent) 26%, transparent);
-    border-radius: 0.125rem;
-    padding-block: 0.15rem;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
+    color: var(--sl-color-accent);
+    background: var(--accent-fill);
+    border: 1px solid var(--accent-border);
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    white-space: nowrap;
+  }
+  .hash-remainder {
+    color: var(--sl-color-gray-2);
+    min-width: 0;
   }
   .retained-label {
     color: var(--sl-color-text);
-    border-bottom: 2px solid var(--accent-border);
+    font-weight: 500;
   }
-  .final-step .step-number {
+  .result-step .step-number {
     background: var(--accent-fill);
     border-color: var(--accent-border);
-    color: var(--sl-color-text);
+    color: var(--sl-color-accent);
   }
   .result-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
     gap: 0.75rem;
     padding: 0.75rem;
     background: var(--accent-fill);
@@ -577,24 +591,19 @@
     border-radius: 0.375rem;
   }
   .result {
-    font-size: 1rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: var(--sl-color-text);
+    min-width: 0;
+    font-weight: 400;
+    color: var(--sl-color-accent);
     user-select: all;
   }
   .annotation-url {
-    display: block;
-    padding: 0.75rem;
-    border: 1px solid var(--accent-border);
-    border-radius: 0.375rem;
-    background: var(--accent-fill);
-    color: var(--sl-color-text);
+    min-width: 0;
+    color: var(--sl-color-accent);
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
   .annotation-url:hover {
-    border-color: var(--sl-color-accent);
+    text-decoration-thickness: 2px;
   }
   .annotation-url:focus-visible {
     outline: 2px solid var(--sl-color-accent);
@@ -603,22 +612,23 @@
   .copy-button {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.375rem;
+    min-width: 5rem;
     min-height: 2rem;
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
-    color: var(--sl-color-text);
-    background: var(--sl-color-bg);
+    color: var(--sl-color-accent);
+    background: var(--accent-fill);
     border: 1px solid var(--accent-border);
     border-radius: 0.25rem;
   }
   .copy-button:hover {
-    background: var(--accent-fill);
-  }
-  .footnote {
-    margin-top: 1.25rem;
-    padding-top: 0.875rem;
-    border-top: 1px solid var(--sl-color-gray-5);
+    background: color-mix(
+      in srgb,
+      var(--sl-color-accent) 12%,
+      var(--sl-color-bg)
+    );
   }
   @media (max-width: 40rem) {
     .source-controls,
@@ -627,9 +637,6 @@
     }
     .url-input {
       flex-direction: column;
-    }
-    .result-row {
-      flex-wrap: wrap;
     }
     .step-heading {
       flex-wrap: wrap;
