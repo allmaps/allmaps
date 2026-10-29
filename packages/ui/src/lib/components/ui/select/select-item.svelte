@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Select as SelectPrimitive } from 'bits-ui'
-  import { Check as Icon } from 'phosphor-svelte'
+  import Icon from 'phosphor-svelte/lib/CheckIcon'
   import { type WithoutChild } from '../types.js'
 
   let {

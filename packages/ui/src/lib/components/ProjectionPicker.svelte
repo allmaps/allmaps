@@ -1,7 +1,7 @@
 <script lang="ts">
   import Combobox from '$lib/components/Combobox.svelte'
 
-  import { Globe as GlobeIcon } from 'phosphor-svelte'
+  import GlobeIcon from 'phosphor-svelte/lib/GlobeIcon'
 
   import type { Bbox } from '@allmaps/types'
 

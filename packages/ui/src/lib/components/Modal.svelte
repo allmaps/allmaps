@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
 
-  import { X as XIcon } from 'phosphor-svelte'
+  import XIcon from 'phosphor-svelte/lib/XIcon'
 
   import type { Snippet } from 'svelte'
 
