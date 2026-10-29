@@ -1,9 +1,7 @@
 <script lang="ts">
-  import {
-    UserCircle as UserCircleIcon,
-    GithubLogo,
-    GoogleLogo
-  } from 'phosphor-svelte'
+  import UserCircleIcon from 'phosphor-svelte/lib/UserCircleIcon'
+  import GithubLogo from 'phosphor-svelte/lib/GithubLogoIcon'
+  import GoogleLogo from 'phosphor-svelte/lib/GoogleLogoIcon'
 
   type Props = {
     user?: {
