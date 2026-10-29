@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
+  import { getMapQueryCredentials } from '@allmaps/stdlib'
+
   import Collection from '$lib/components/Collection.svelte'
 
   import Header from '$lib/latest/components/Header.svelte'
@@ -11,6 +13,7 @@
 
   type Props = {
     count?: number
+    mapsApiBaseUrl?: string
     showHeader?: boolean
     showProperties?: boolean
     showUrls?: boolean
@@ -18,6 +21,7 @@
 
   let {
     count = 100,
+    mapsApiBaseUrl = 'https://api.allmaps.org',
     showHeader = false,
     showProperties = true,
     showUrls = true
@@ -33,10 +37,12 @@
   // - hide errors
 
   onMount(async () => {
-    const mapsUrl = `https://api.allmaps.org/maps?limit=${count}`
+    const mapsUrl = `${mapsApiBaseUrl}/maps?limit=${count}`
 
     try {
-      const response = await fetch(mapsUrl, { credentials: 'include' })
+      const response = await fetch(mapsUrl, {
+        credentials: getMapQueryCredentials(count)
+      })
       apiMaps = await response.json()
 
       if (!Array.isArray(apiMaps)) {

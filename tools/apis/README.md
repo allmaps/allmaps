@@ -166,7 +166,7 @@ pnpm dev:apis --db=postgres
 
 `DATABASE_URL` is the only connection selector. It supports `postgres://` and
 `postgresql://` URLs with a host and database. Connection parameters such as
-`sslmode=require` are passed unchanged to the existing PostgreSQL driver.
+`sslmode=require` are passed unchanged to the `pg` driver.
 No Neon CLI or `NEON_*` settings are needed to start the APIs. `pnpm setup:env --db=postgres` can collect the URL and
 generate the authentication secret.
 
@@ -208,7 +208,10 @@ Startup checks migration compatibility using read queries; it never initializes,
 seeds, migrates, or deletes a PostgreSQL database. Apply PostgreSQL migrations
 through the [API release workflow](../../.github/API_RELEASES.md).
 
-All APIs and authentication share the same PostgreSQL connection helper.
+REST, Annotations, Live and authentication share one `pg.Pool` and Drizzle
+instance in PostgreSQL mode. The migration-history check uses that pool too.
+Shutdown flushes pending Live writes before closing the pool. The same `pg`
+helper is used by deployed APIs; PGlite mode retains its embedded driver.
 PostgreSQL mode allows normal API data writes. Auth secrets are explicit, and
 cookies are separated by the selected connection URL. Demo seeding and
 seeded-user login are PGlite-only.

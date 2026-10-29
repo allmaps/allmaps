@@ -56,3 +56,5 @@ export function createTypedElysiaHelpers<TEnv>() {
     }
   }
 }
+
+export { createCachePolicy } from './elysia/cache-policy.js'

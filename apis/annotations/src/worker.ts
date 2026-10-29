@@ -1,28 +1,51 @@
+import { fetchWithPublicCache } from '@allmaps/api-shared/response-cache'
 import { Elysia } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 import { env as cfEnv } from 'cloudflare:workers'
 
-import { getNeonDb } from '@allmaps/db'
+import { getPgContext, type PgDb } from '@allmaps/db'
 import { createAuth } from '@allmaps/db/auth'
+import { createRequestDatabase } from '@allmaps/db/request'
 import { parseAnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createApp } from './app.js'
 import { handleApiError } from './elysia.js'
 
-console.log('📍 Allmaps Annotations API starting...')
-
 const env = parseAnnotationsEnv(cfEnv)
-const betterAuth = createAuth(env)
-const elysia = new Elysia({
-  adapter: CloudflareAdapter
-})
+const database = createRequestDatabase<PgDb>()
+const betterAuth = createAuth(env, database.db)
+// Elysia must compile at startup: Workers forbid runtime code generation.
+const app = new Elysia({ adapter: CloudflareAdapter })
   .decorate('env', env)
-  .derive(() => ({ db: getNeonDb(env.DATABASE_URL, env.LOG_QUERIES) }))
+  .derive(() => ({ db: database.db }))
   .onError(handleApiError)
   .use(createApp(env, betterAuth))
-  // This is required to make Elysia work on Cloudflare Worker
   .compile()
 
 export default {
-  fetch: elysia.fetch.bind(elysia)
-} satisfies ExportedHandler
+  async fetch(request, bindings, executionContext) {
+    return fetchWithPublicCache(
+      request,
+      {
+        cache: caches.default,
+        namespace: 'annotations-v2',
+        waitUntil: (promise) => executionContext.waitUntil(promise)
+      },
+      async () => {
+        const { db, close } = getPgContext(
+          bindings.HYPERDRIVE.connectionString,
+          { logger: env.LOG_QUERIES, maxConnections: 5 }
+        )
+        try {
+          return await database.run(db, () => app.fetch(request))
+        } finally {
+          executionContext.waitUntil(
+            close().catch(() => {
+              console.warn('Failed to close Hyperdrive client')
+            })
+          )
+        }
+      }
+    )
+  }
+} satisfies ExportedHandler<Env>

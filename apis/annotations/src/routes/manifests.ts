@@ -2,7 +2,6 @@ import { t } from 'elysia'
 
 import { queryMaps } from '@allmaps/api-shared/db'
 import { setCacheControl } from '@allmaps/api-shared'
-import { createAuth } from '@allmaps/db/auth'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
@@ -11,7 +10,7 @@ import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 
 export function createManifestsRoutes(
   env: AnnotationsEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({ name: 'manifests' })
     .use(createBetterAuthPlugin(betterAuth))

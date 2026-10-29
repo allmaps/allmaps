@@ -1,7 +1,11 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { basename, resolve } from 'node:path'
 import { parseEnv } from 'node:util'
+import {
+  hyperdriveTarget,
+  readWorkerConfiguration
+} from './hyperdrive-config.ts'
 
 function takeFlag(args: string[], flag: string): string | undefined {
   const index = args.indexOf(flag)
@@ -51,7 +55,14 @@ if (!cwd) {
 const wranglerEnv = takeFlag(args, '--wrangler-env')
 const envFiles = takeAllFlags(args, '--dotenv-file')
 
-// console.log('daslkdjasoidjaso', envFiles)
+// These APIs use Hyperdrive exclusively. The checked-in zero IDs are local-only.
+const usesHyperdrive = ['rest', 'annotations'].includes(basename(resolve(cwd)))
+if (usesHyperdrive) {
+  hyperdriveTarget(
+    readWorkerConfiguration(resolve(cwd, 'wrangler.jsonc')),
+    wranglerEnv
+  )
+}
 
 if (envFiles.length === 0) {
   throw new Error('Provide at least one --env-file')
@@ -78,7 +89,11 @@ const varArgs: string[] = []
 for (const [key, value] of Object.entries(mergedEnv).sort(([a], [b]) =>
   a.localeCompare(b)
 )) {
-  if (value === '') {
+  if (
+    value === '' ||
+    (usesHyperdrive &&
+      (key === 'DATABASE_URL' || key.startsWith('CLOUDFLARE_HYPERDRIVE_')))
+  ) {
     continue
   }
 

@@ -3,7 +3,9 @@
   "name": "annotations",
   "main": "./src/worker.ts",
   "compatibility_date": "2025-06-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "observability": {
     "enabled": false
   },
@@ -13,11 +15,23 @@
       "vars": {
         "PUBLIC_DOCS_BASE_URL": "https://dev.docs.allmaps.org",
         "PUBLIC_HOMEPAGE_BASE_URL": "https://dev.allmaps.org"
-      }
+      },
+      "hyperdrive": [
+        {
+          "binding": "HYPERDRIVE",
+          "id": "d0b30a925f434ccfbd8c15279e7071df"
+        }
+      ]
     }
   },
   "vars": {
     "PUBLIC_DOCS_BASE_URL": "https://docs.allmaps.org",
     "PUBLIC_HOMEPAGE_BASE_URL": "https://allmaps.org"
-  }
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "00000000000000000000000000000000"
+    }
+  ]
 }

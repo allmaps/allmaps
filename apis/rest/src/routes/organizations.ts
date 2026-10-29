@@ -1,7 +1,6 @@
 import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
-import { createAuth } from '@allmaps/db/auth'
 import type { Db } from '@allmaps/db'
 import type { RestEnv } from '@allmaps/env/rest'
 import {
@@ -171,7 +170,7 @@ function organizationsToGeojson(
 
 export function createOrganizationsRoutes(
   env: RestEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   const { auth } = betterAuth
 

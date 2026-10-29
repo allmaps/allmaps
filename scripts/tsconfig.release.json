@@ -6,5 +6,11 @@
     "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["api-release.ts", "api-release.test.ts"]
+  "include": [
+    "api-release.ts",
+    "api-release.test.ts",
+    "hyperdrive-config.ts",
+    "hyperdrive-config.test.ts",
+    "wrangler-deploy.ts"
+  ]
 }

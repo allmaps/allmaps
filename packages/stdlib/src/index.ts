@@ -1,4 +1,8 @@
-export { fetchAnnotationsFromApi } from './api.js'
+export {
+  fetchAnnotationsFromApi,
+  getMapQueryCredentials,
+  PUBLIC_API_MAX_LIMIT
+} from './api.js'
 
 // export {
 //   getImageData,

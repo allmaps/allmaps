@@ -1,3 +1,5 @@
+import { PUBLIC_API_MAX_LIMIT } from '@allmaps/stdlib'
+
 export const ORGANIZATION_PLANS = [
   'contributor',
   'supporter',
@@ -13,7 +15,7 @@ export type UserRole = 'public' | 'user' | 'organizationPlanMember' | 'admin'
 
 export const DEFAULT_LIMIT = 50
 
-export const PUBLIC_MAX_LIMIT = 200
+export const PUBLIC_MAX_LIMIT = PUBLIC_API_MAX_LIMIT
 export const USER_MAX_LIMIT = 400
 export const ORGANIZATION_PLAN_MEMBER_MAX_LIMIT = 600
 export const ADMIN_MAX_LIMIT = 600

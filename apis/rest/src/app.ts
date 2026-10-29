@@ -2,7 +2,10 @@ import { cors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 
 import { setCacheControl } from '@allmaps/api-shared'
-import { getLoginProviders } from '@allmaps/api-shared/elysia'
+import {
+  createCachePolicy,
+  getLoginProviders
+} from '@allmaps/api-shared/elysia'
 
 import {
   createElysia,
@@ -58,7 +61,8 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)
-    .use(cors())
+    .use(cors({ origin: () => true }))
+    .use(createCachePolicy())
     .use(
       openapi({
         provider: null,

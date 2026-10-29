@@ -1,12 +1,24 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 import { setTimeout } from 'node:timers/promises'
+import {
+  hyperdriveTarget,
+  readWorkerConfiguration,
+  verifyHyperdriveTargets
+} from './hyperdrive-config.ts'
 
 const railwayCli = ['--reporter=silent', 'dlx', '@railway/cli@5.71.0']
 const railwayApi = 'https://backboard.railway.com/graphql/v2'
 type Environment = Record<string, string | undefined>
 type Command = (args: string[], environment: Environment) => Promise<string>
 type Request = typeof fetch
+type WorkerConfigReader = (
+  api: 'rest' | 'annotations'
+) => ReturnType<typeof readWorkerConfiguration>
+const readConfig: WorkerConfigReader = (api) =>
+  readWorkerConfiguration(
+    new URL(`../apis/${api}/wrangler.jsonc`, import.meta.url)
+  )
 
 function required(environment: Environment, name: string) {
   const value = environment[name]?.trim()
@@ -42,9 +54,27 @@ export function releaseTarget(environment: Environment) {
   }
 }
 
-function releaseConfiguration(environment: Environment) {
+function releaseConfiguration(
+  environment: Environment,
+  configuration: WorkerConfigReader
+) {
+  const target = releaseTarget(environment)
+  const workers = (['rest', 'annotations'] as const).map((api, index) => {
+    const worker = hyperdriveTarget(
+      configuration(api),
+      target.branch === 'develop' ? 'dev' : undefined
+    )
+    if (worker.workerName !== target.workers[index]) {
+      throw new Error(
+        'Configured Worker name does not match the release environment.'
+      )
+    }
+    return worker
+  })
   return {
-    target: releaseTarget(environment),
+    target,
+    workers,
+    databaseUrl: required(environment, 'DATABASE_URL'),
     cloudflareAccountId: required(environment, 'CLOUDFLARE_ACCOUNT_ID'),
     cloudflareApiToken: required(environment, 'CLOUDFLARE_API_TOKEN'),
     railwayProjectId: required(environment, 'RAILWAY_PROJECT_ID'),
@@ -87,15 +117,25 @@ async function railwayQuery(
 
 export async function preflight(
   environment: Environment,
-  request: Request = fetch
+  request: Request = fetch,
+  workerConfig: WorkerConfigReader = readConfig
 ) {
-  const configuration = releaseConfiguration(environment)
+  const configuration = releaseConfiguration(environment, workerConfig)
   const { target } = configuration
-  required(environment, 'DATABASE_URL')
   const githubToken = required(environment, 'GITHUB_TOKEN')
   const repository = required(environment, 'GITHUB_REPOSITORY')
   if (!/^[\w.-]+\/[\w.-]+$/.test(repository))
     throw new Error('Invalid GITHUB_REPOSITORY')
+
+  await verifyHyperdriveTargets(
+    configuration.workers,
+    {
+      accountId: configuration.cloudflareAccountId,
+      token: configuration.cloudflareApiToken,
+      databaseUrl: configuration.databaseUrl
+    },
+    request
+  )
 
   const token = await railwayQuery(
     configuration.railwayToken,
@@ -134,15 +174,11 @@ export async function preflight(
       ),
       'Cloudflare'
     )
-    if (
-      !settings.success ||
-      !settings.result?.bindings?.some(
-        (binding: { name: string }) => binding.name === 'DATABASE_URL'
-      )
-    )
-      throw new Error(
-        `Worker ${worker} must have a runtime DATABASE_URL before release`
-      )
+    if (!settings.success || !settings.result) {
+      throw new Error(`Worker ${worker} must exist before release`)
+    }
+    // Its currently deployed bindings may still use the old driver. The checked-in
+    // Hyperdrive bindings verified above are what Wrangler will deploy.
   }
 
   // Check last, immediately before migration, after waiting for the release lock.
@@ -235,10 +271,21 @@ export async function deploy(
   environment: Environment,
   command: Command = runCommand,
   request: Request = fetch,
-  sleep: (milliseconds: number) => Promise<unknown> = setTimeout
+  sleep: (milliseconds: number) => Promise<unknown> = setTimeout,
+  workerConfig: WorkerConfigReader = readConfig
 ) {
-  const configuration = releaseConfiguration(environment)
+  const configuration = releaseConfiguration(environment, workerConfig)
   const { target } = configuration
+  // Recheck immediately before any deployment, including direct CLI invocation.
+  await verifyHyperdriveTargets(
+    configuration.workers,
+    {
+      accountId: configuration.cloudflareAccountId,
+      token: configuration.cloudflareApiToken,
+      databaseUrl: configuration.databaseUrl
+    },
+    request
+  )
   for (const api of ['rest', 'annotations']) {
     console.log(
       await command(

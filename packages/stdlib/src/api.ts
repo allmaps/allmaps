@@ -7,6 +7,21 @@ import type {
   Collection
 } from '@allmaps/iiif-parser'
 
+/** Maximum number of maps available without authentication in the Allmaps APIs. */
+export const PUBLIC_API_MAX_LIMIT = 200
+
+/**
+ * Choose credentials for a public map search. Larger requests still need the
+ * signed-in user's tier; ordinary searches can use the shared response cache.
+ * @param limit - Requested number of maps
+ * @returns Fetch credentials mode
+ */
+export function getMapQueryCredentials(limit: number): RequestCredentials {
+  return Number.isInteger(limit) && limit > 0 && limit <= PUBLIC_API_MAX_LIMIT
+    ? 'omit'
+    : 'include'
+}
+
 type Hash = string
 
 type AllmapsId = `manifests/${Hash}` | `images/${Hash}`
@@ -17,8 +32,8 @@ function fetchAnnotationsByAllmapsId(
   fetch = globalThis.fetch
 ) {
   // TODO: move base URLs to env/config file
-  return fetch(`${restBaseUrl}/${allmapsId}`).then((response) =>
-    response.json()
+  return fetch(`${restBaseUrl}/${allmapsId}`, { credentials: 'omit' }).then(
+    (response) => response.json()
   )
 }
 

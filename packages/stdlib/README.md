@@ -8,6 +8,10 @@ MIT
 
 ## API
 
+### `PUBLIC_API_MAX_LIMIT`
+
+Maximum number of maps available without authentication in the Allmaps APIs (`200`).
+
 ### `angle(line)`
 
 ###### Parameters
@@ -503,15 +507,18 @@ MIT
 
 `Array<GeojsonPolygon>`.
 
-### `fetchAnnotationsFromApi(parsedIiif)`
+### `fetchAnnotationsFromApi(restBaseUrl, parsedIiif, fetch)`
 
 ###### Parameters
 
-* `parsedIiif` (`Image | Manifest | Collection`)
+* `restBaseUrl` (`string`)
+* `parsedIiif` (`Collection | Image | Manifest`)
+* `fetch?` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+    | undefined`)
 
 ###### Returns
 
-`Promise<Array<unknown>>`.
+`Promise<any>`.
 
 ### `fetchImageBitmap(input, init, fetchFn)`
 
@@ -580,6 +587,20 @@ MIT
 ###### Returns
 
 `[number, number]`.
+
+### `getMapQueryCredentials(limit)`
+
+Choose credentials for a public map search. Larger requests still need the
+signed-in user's tier; ordinary searches can use the shared response cache.
+
+###### Parameters
+
+* `limit` (`number`)
+  * Requested number of maps
+
+###### Returns
+
+Fetch credentials mode (`'include' | 'omit' | 'same-origin'`).
 
 ### `geojsonFeatureCollectionToGeojsonGeometries(geojsonFeatureCollection)`
 

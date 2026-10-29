@@ -7,7 +7,10 @@ import { IIIF } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
 import { generateId } from '@allmaps/id'
 import { setCacheControl } from '@allmaps/api-shared'
-import { getLoginProviders } from '@allmaps/api-shared/elysia'
+import {
+  createCachePolicy,
+  getLoginProviders
+} from '@allmaps/api-shared/elysia'
 
 import {
   createElysia,
@@ -48,11 +51,12 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
   ).href
 
   return createElysia({ name: 'app' })
-    .use(createBetterAuthRoutes(betterAuth))
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)
-    .use(cors())
+    .use(cors({ origin: () => true }))
+    .use(createCachePolicy())
+    .use(createBetterAuthRoutes(betterAuth))
     .use(
       openapi({
         provider: null,
