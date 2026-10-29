@@ -3,12 +3,10 @@
 
   import { Combobox } from 'bits-ui'
 
-  import {
-    // CaretUpDown as CaretUpDownIcon,
-    // Check as CheckIcon,
-    CaretDoubleUp as CaretDoubleUpIcon,
-    CaretDoubleDown as CaretDoubleDownIcon
-  } from 'phosphor-svelte'
+  // import CaretUpDownIcon from 'phosphor-svelte/lib/CaretUpDownIcon'
+  // import CheckIcon from 'phosphor-svelte/lib/CheckIcon'
+  import CaretDoubleUpIcon from 'phosphor-svelte/lib/CaretDoubleUpIcon'
+  import CaretDoubleDownIcon from 'phosphor-svelte/lib/CaretDoubleDownIcon'
 
   import LoadingSmall from '$lib/components/LoadingSmall.svelte'
 

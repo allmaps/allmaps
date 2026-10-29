@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { ArrowCounterClockwise } from 'phosphor-svelte'
+  import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwiseIcon'
   import * as Select from '../ui/select/index.js'
   import LoadingSmall from '../LoadingSmall.svelte'
 

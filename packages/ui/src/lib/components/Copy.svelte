@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { Tooltip } from 'bits-ui'
-  import { Check as CheckIcon, Copy as CopyIcon } from 'phosphor-svelte'
+  import CheckIcon from 'phosphor-svelte/lib/CheckIcon'
+  import CopyIcon from 'phosphor-svelte/lib/CopyIcon'
 
   type Props = {
     string: string

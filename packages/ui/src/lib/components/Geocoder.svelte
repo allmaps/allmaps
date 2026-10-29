@@ -1,9 +1,7 @@
 <script lang="ts">
   import { Combobox } from 'bits-ui'
-  import {
-    MagnifyingGlass as MagnifyingGlassIcon,
-    ArrowSquareOut as ArrowSquareOutIcon
-  } from 'phosphor-svelte'
+  import MagnifyingGlassIcon from 'phosphor-svelte/lib/MagnifyingGlassIcon'
+  import ArrowSquareOutIcon from 'phosphor-svelte/lib/ArrowSquareOutIcon'
 
   import { debounce } from 'lodash-es'
 

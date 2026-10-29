@@ -1,6 +1,6 @@
 <script lang="ts">
   /* eslint-disable svelte/no-navigation-without-resolve -- sign-in URL is external */
-  import { UserCircle as UserCircleIcon } from 'phosphor-svelte'
+  import UserCircleIcon from 'phosphor-svelte/lib/UserCircleIcon'
 
   type Props = {
     user?: {
