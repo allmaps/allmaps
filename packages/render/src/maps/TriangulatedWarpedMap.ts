@@ -10,7 +10,8 @@ import {
   computeBbox,
   bboxToPolygon,
   combineBboxes,
-  bufferBbox
+  bufferBbox,
+  bboxToDiameter
 } from '@allmaps/stdlib'
 
 import { WarpedMap } from './WarpedMap.js'
@@ -382,11 +383,19 @@ export class TriangulatedWarpedMap extends WarpedMap {
     }
 
     // Get resolution from transform
-    const resourceResolution =
-      this.options.resourceResolution ||
+    let resourceTransformationResolution =
       this.projectedTransformer.getToProjectedGeoTransformationResolution(
         this.resourceMaskBbox
       )
+    // Rescale resolution full mask to avoid computing too many triangles
+    // when mask diameter is much smaller then full mask diameter (i.e. for inset maps)
+    resourceTransformationResolution = resourceTransformationResolution
+      ? (resourceTransformationResolution *
+          bboxToDiameter(this.resourceFullMaskBbox)) /
+        bboxToDiameter(this.resourceMaskBbox)
+      : undefined
+    const resourceResolution =
+      this.options.resourceResolution || resourceTransformationResolution
 
     // Adapt resolution from previous
     let refinePrevious = false
