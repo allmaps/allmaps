@@ -2,6 +2,7 @@ import { cors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 
 import { setCacheControl } from '@allmaps/api-shared'
+import { getLoginProviders } from '@allmaps/api-shared/elysia'
 
 import {
   createElysia,
@@ -124,6 +125,9 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
             !session && betterAuth.auth.options.socialProviders.github
               ? `${env.PUBLIC_REST_BASE_URL}/login/github`
               : undefined,
+          loginProviders: !session
+            ? getLoginProviders(betterAuth, env.PUBLIC_REST_BASE_URL)
+            : [],
           logout: session ? `${env.PUBLIC_REST_BASE_URL}/logout` : undefined,
           user
         }
