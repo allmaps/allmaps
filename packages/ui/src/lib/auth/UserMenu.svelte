@@ -1,4 +1,5 @@
 <script lang="ts">
+  /* eslint-disable svelte/no-navigation-without-resolve -- sign-in URL is external */
   import UserCircleIcon from 'phosphor-svelte/lib/UserCircleIcon'
   import GithubLogo from 'phosphor-svelte/lib/GithubLogoIcon'
   import GoogleLogo from 'phosphor-svelte/lib/GoogleLogoIcon'
