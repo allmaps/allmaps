@@ -267,6 +267,10 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
     return {
       type: 'helmert' as const
     }
+  } else if (transformation === 'projective') {
+    return {
+      type: 'projective' as const
+    }
   }
 
   // TODO: add other tranformation types
