@@ -28,7 +28,7 @@ export default {
       request,
       {
         cache: caches.default,
-        namespace: 'rest-v2',
+        namespace: 'rest-v3',
         waitUntil: (promise) => executionContext.waitUntil(promise)
       },
       async () => {
