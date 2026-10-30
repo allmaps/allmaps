@@ -58,9 +58,60 @@ describe('public Worker response cache', () => {
     const storedHeaders = [...h.entries.values()][0].headers
     expect(second.headers.get('Date')).toBe(storedHeaders.get('Date'))
     expect(storedHeaders.has('X-Allmaps-Cache-Stored-At')).toBe(false)
-    expect(storedHeaders.has('X-Allmaps-Cache-Policy')).toBe(false)
+    expect(storedHeaders.get('X-Allmaps-Cache-Policy')).toBe(
+      first.headers.get('Cache-Control')
+    )
+    expect(first.headers.has('X-Allmaps-Cache-Policy')).toBe(false)
+    expect(second.headers.has('X-Allmaps-Cache-Policy')).toBe(false)
     expect(await second.text()).toBe(await first.text())
     expect(h.handle).toHaveBeenCalledTimes(1)
+  })
+
+  it.each([
+    ['public, max-age=30, s-maxage=30', 29],
+    ['public, max-age=60, s-maxage=300', 299]
+  ] as const)(
+    'restores %s when Cloudflare raises the cached browser TTL',
+    async (policy, age) => {
+      const h = harness()
+      h.handle.mockImplementation(async () =>
+        Response.json({ version: 1 }, { headers: { 'Cache-Control': policy } })
+      )
+      const first = await h.read()
+      const storedHeaders = [...h.entries.values()][0].headers
+      // Cloudflare can apply the zone's Browser Cache TTL to stored responses.
+      storedHeaders.set(
+        'Cache-Control',
+        policy.replace(/max-age=\d+/, 'max-age=14400')
+      )
+      h.advance(age)
+      const cached = await h.read()
+      expect(cached.headers.get('X-Allmaps-Cache')).toBe('HIT')
+      expect(cached.headers.get('Cache-Control')).toBe(policy)
+      expect(cached.headers.get('Age')).toBe(String(age))
+      expect(cached.headers.get('Date')).toBe(storedHeaders.get('Date'))
+      expect(cached.headers.has('X-Allmaps-Cache-Policy')).toBe(false)
+      expect(first.headers.has('X-Allmaps-Cache-Policy')).toBe(false)
+      expect(await cached.text()).toBe(await first.text())
+      expect(h.handle).toHaveBeenCalledTimes(1)
+      h.advance(1)
+      expect((await h.read()).headers.get('X-Allmaps-Cache')).toBe('MISS')
+    }
+  )
+
+  it('refreshes entries without an original cache policy', async () => {
+    const h = harness()
+    await h.read()
+    const storedHeaders = [...h.entries.values()][0].headers
+    storedHeaders.delete('X-Allmaps-Cache-Policy')
+    storedHeaders.set('Cache-Control', 'public, max-age=14400, s-maxage=30')
+    const response = await h.read()
+    expect(response.headers.get('X-Allmaps-Cache')).toBe('MISS')
+    expect(response.headers.get('Cache-Control')).toBe(
+      'public, max-age=30, s-maxage=30'
+    )
+    expect(h.handle).toHaveBeenCalledTimes(2)
+    expect((await h.read()).headers.get('X-Allmaps-Cache')).toBe('HIT')
   })
 
   it('expires at the TTL boundary and does not extend freshness on a hit', async () => {

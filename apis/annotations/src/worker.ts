@@ -28,7 +28,7 @@ export default {
       request,
       {
         cache: caches.default,
-        namespace: 'annotations-v2',
+        namespace: 'annotations-v3',
         waitUntil: (promise) => executionContext.waitUntil(promise)
       },
       async () => {

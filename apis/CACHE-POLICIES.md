@@ -82,15 +82,21 @@ headers, errors, and request cache-bypass directives also prevent shared reuse.
 
 Cache keys preserve the exact path and complete query string, representation,
 Origin, Accept and Accept-Encoding headers, host, and API/version namespace. The namespaces are
-`rest-v2` and `annotations-v2`; bump them if response semantics or visibility
+`rest-v3` and `annotations-v3`; bump them if response semantics or visibility
 rules change. Cache failures fall back to the handler. Writes and socket cleanup
 run through `waitUntil`. Responses report `X-Allmaps-Cache: HIT|MISS|BYPASS`.
 
 Search/list responses have a strict 30-second shared freshness window. Individual
 resources and organizations have a five-minute window. No stale-while-revalidate
 is applied to these mutable reads. Cache API enforces the route's `s-maxage`;
-hits preserve the original browser cache policy and Date/Age headers without
-renewing freshness. Cache API storage is local to each Cloudflare location;
+hits restore the original browser cache policy and preserve Date/Age headers
+without renewing freshness. The stored response keeps the route's policy in an
+internal `X-Allmaps-Cache-Policy` header, which is stripped from client responses.
+This prevents Cloudflare's Browser Cache TTL from leaking an increased `max-age`
+from the cached copy into the response. Entries without the original policy are
+treated as misses; the v3 namespaces also exclude older entries. Existing browser
+cache entries are not purged by a Worker deployment.
+Cache API storage is local to each Cloudflare location;
 a new location can still miss.
 Writes do not purge these public responses immediately. Credentialed reads and
 explicit no-cache requests go to the database, without storing their response.

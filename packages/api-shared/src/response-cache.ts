@@ -10,6 +10,7 @@ type CacheOptions = {
   waitUntil: (promise: Promise<unknown>) => void
 }
 
+const cachePolicyHeader = 'X-Allmaps-Cache-Policy'
 const representationHeaders = ['origin', 'accept', 'accept-encoding']
 const supportedVary = new Set([
   ...representationHeaders,
@@ -75,8 +76,14 @@ function isPublicResponse(response: Response) {
   return value !== undefined && Number(value.split('=')[1]) > 0
 }
 
-function withStatus(response: Response, status: 'HIT' | 'MISS' | 'BYPASS') {
+function withStatus(
+  response: Response,
+  status: 'HIT' | 'MISS' | 'BYPASS',
+  cacheControl?: string
+) {
   const headers = new Headers(response.headers)
+  if (cacheControl) headers.set('Cache-Control', cacheControl)
+  headers.delete(cachePolicyHeader)
   headers.set('X-Allmaps-Cache', status)
   return new Response(response.body, {
     status: response.status,
@@ -96,7 +103,9 @@ export async function fetchWithPublicCache(
 
   try {
     const cached = await options.cache.match(key)
-    if (cached) return withStatus(cached, 'HIT')
+    const policy = cached?.headers.get(cachePolicyHeader)
+    // Ignore entries whose original browser policy cannot be recovered.
+    if (cached && policy) return withStatus(cached, 'HIT', policy)
   } catch {
     // Cache availability must not determine API availability.
     console.warn('Public response cache lookup failed')
@@ -107,7 +116,10 @@ export async function fetchWithPublicCache(
 
   const stored = response.clone()
   const headers = new Headers(stored.headers)
-  // Cache API enforces s-maxage. Preserve Date/Age for downstream freshness.
+  // Cloudflare can raise max-age to the zone's Browser Cache TTL. Keep the
+  // route policy separately so hits restore it without changing Date or Age.
+  headers.set(cachePolicyHeader, headers.get('Cache-Control')!)
+  // Cache API still enforces s-maxage for edge expiry.
   if (!headers.has('Date')) headers.set('Date', new Date().toUTCString())
   headers.delete('Server-Timing')
   options.waitUntil(
