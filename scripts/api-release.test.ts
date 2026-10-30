@@ -2,11 +2,15 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { delimiter, join } from 'node:path'
 import {
   checkHealth,
   deploy as deployRelease,
   preflight as preflightRelease,
   releaseTarget,
+  runCommand,
   waitForRailway
 } from './api-release.ts'
 
@@ -70,6 +74,56 @@ test('CI migration runs directly from TypeScript and fails before connecting wit
     result.stderr,
     /ERR_MODULE_NOT_FOUND|ERR_UNKNOWN_FILE_EXTENSION/
   )
+})
+
+test('deployment subprocesses never inherit the migration database URL', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'allmaps-release-command-'))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
+  // Execute the real subprocess boundary with an offline pnpm stand-in.
+  writeFileSync(
+    join(directory, 'pnpm'),
+    `#!/usr/bin/env node
+console.log(JSON.stringify({
+  hasDatabaseUrl: Object.hasOwn(process.env, 'DATABASE_URL'),
+  inherited: process.env.ALLMAPS_RELEASE_TEST_INHERITED,
+  override: process.env.ALLMAPS_RELEASE_TEST_OVERRIDE,
+  args: process.argv.slice(2)
+}))
+`,
+    { mode: 0o755 }
+  )
+  const inherited = {
+    DATABASE_URL: 'postgresql://migration:unused@database.invalid/test',
+    ALLMAPS_RELEASE_TEST_INHERITED: 'preserved',
+    ALLMAPS_RELEASE_TEST_OVERRIDE: 'parent'
+  }
+  const original = Object.fromEntries(
+    Object.keys(inherited).map((name) => [name, process.env[name]])
+  )
+  t.after(() => {
+    for (const [name, value] of Object.entries(original)) {
+      if (value === undefined) delete process.env[name]
+      else process.env[name] = value
+    }
+  })
+  Object.assign(process.env, inherited)
+  const args = ['exec', 'wrangler', 'deploy']
+  for (const supplied of [{}, { DATABASE_URL: 'explicit-migration-secret' }]) {
+    const childEnvironment = {
+      ...supplied,
+      PATH: `${directory}${delimiter}${process.env.PATH ?? ''}`,
+      ALLMAPS_RELEASE_TEST_OVERRIDE: 'child'
+    }
+    const output = await runCommand(args, childEnvironment)
+    assert.deepEqual(JSON.parse(output), {
+      hasDatabaseUrl: false,
+      inherited: 'preserved',
+      override: 'child',
+      args
+    })
+    assert.equal(process.env.DATABASE_URL, inherited.DATABASE_URL)
+    assert.equal(childEnvironment.DATABASE_URL, supplied.DATABASE_URL)
+  }
 })
 
 const success: typeof fetch = async (input, options) => {

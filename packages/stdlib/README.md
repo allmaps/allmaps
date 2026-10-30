@@ -507,18 +507,25 @@ Maximum number of maps available without authentication in the Allmaps APIs (`20
 
 `Array<GeojsonPolygon>`.
 
-### `fetchAnnotationsFromApi(restBaseUrl, parsedIiif, fetch)`
+### `fetchAnnotationsFromApi(annotationsBaseUrl, parsedIiif, fetch)`
+
+Fetch georeference annotations for a IIIF image or manifest.
 
 ###### Parameters
 
-* `restBaseUrl` (`string`)
+* `annotationsBaseUrl` (`string`)
+  * Annotations API base URL, such as
+    <https://annotations.allmaps.org>, serving annotation resources at /images/{id}
+    and /manifests/{id}. Do not pass the REST API base URL.
 * `parsedIiif` (`Collection | Image | Manifest`)
+  * Parsed IIIF image or manifest
 * `fetch?` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
     | undefined`)
+  * Optional fetch implementation
 
 ###### Returns
 
-`Promise<any>`.
+Georeference annotations for the IIIF resource (`Promise<any>`).
 
 ### `fetchImageBitmap(input, init, fetchFn)`
 

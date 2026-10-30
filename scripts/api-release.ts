@@ -257,10 +257,13 @@ export async function checkHealth(
   }
 }
 
-async function runCommand(args: string[], environment: Environment) {
+export async function runCommand(args: string[], environment: Environment) {
+  const childEnvironment = { ...process.env, ...environment }
+  // Only in-process Hyperdrive verification needs the migration credentials.
+  delete childEnvironment.DATABASE_URL
   const { stdout } = await promisify(execFile)('pnpm', args, {
     cwd: new URL('../', import.meta.url),
-    env: { ...process.env, ...environment },
+    env: childEnvironment,
     maxBuffer: 16 * 1024 * 1024,
     timeout: 20 * 60 * 1000
   })
