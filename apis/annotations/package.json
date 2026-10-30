@@ -9,7 +9,7 @@
   "scripts": {
     "deploy": "node ../../scripts/wrangler-deploy.ts --cwd . --dotenv-file ../../.env.production --dotenv-file ../../.env.production.local",
     "deploy:dev": "node ../../scripts/wrangler-deploy.ts --cwd . --wrangler-env dev --dotenv-file ../../.env.dev --dotenv-file ../../.env.dev.local",
-    "dev": "wrangler dev --port $(../../port.js annotations) --env dev --env-file ../../.env.localhost --env-file ../../.env.localhost.local",
+    "dev": "node ../../scripts/hyperdrive-dev.ts annotations",
     "cf-typegen": "wrangler types",
     "build": "tsc --noCheck",
     "lerna-build": "lerna run build --scope @allmaps/api-annotations --include-dependencies",

@@ -6,7 +6,6 @@ import {
   queryList,
   queryListGeoreferenceAnnotations
 } from '@allmaps/api-shared/db'
-import { createAuth } from '@allmaps/db/auth'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
@@ -43,7 +42,7 @@ type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
 export function createListsRoutes(
   env: AnnotationsEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({
     name: 'lists'

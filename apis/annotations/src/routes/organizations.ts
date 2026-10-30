@@ -6,7 +6,6 @@ import {
   setCacheControl
 } from '@allmaps/api-shared'
 import { queryMaps, queryOrganizationBySlug } from '@allmaps/api-shared/db'
-import { createAuth } from '@allmaps/db/auth'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
@@ -27,7 +26,7 @@ const organizationRoute = new RegExpRoute<{
 
 export function createOrganizationsRoutes(
   env: AnnotationsEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({ name: 'organizations' })
     .use(createBetterAuthPlugin(betterAuth))

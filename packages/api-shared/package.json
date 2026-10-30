@@ -18,7 +18,8 @@
     "./shared": "./dist/shared.js",
     "./tiers": "./dist/shared/tiers.js",
     "./types": "./dist/types.js",
-    "./projections": "./dist/projections.js"
+    "./projections": "./dist/projections.js",
+    "./response-cache": "./dist/response-cache.js"
   },
   "files": [
     "dist"

@@ -2,7 +2,6 @@ import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { Db } from '@allmaps/db'
-import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
@@ -51,7 +50,7 @@ async function createManifestsFromBody(db: Db, body: CreateManifestBody) {
 
 export function createManifestsRoutes(
   env: RestEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({ name: 'manifests' })
     .use(createBetterAuthPlugin(betterAuth))

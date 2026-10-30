@@ -30,7 +30,6 @@
     "json0-ot-diff": "^1.1.2",
     "lodash-es": "catalog:",
     "ot-json1": "catalog:",
-    "postgres": "catalog:",
     "ramda": "^0.29.0",
     "sharedb": "catalog:",
     "ws": "^8.13.0",

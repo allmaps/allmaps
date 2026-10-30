@@ -11,14 +11,36 @@ import type { Db } from './db.js'
 import * as authSchema from './schema/auth.js'
 import { lists as listsSchema } from './schema/lists.js'
 
-export function createAuth(env: BetterAuthEnv, database?: Db) {
+type AuthSettings = Omit<BetterAuthEnv, 'DATABASE_URL'>
+
+export function createAuth(
+  env: AuthSettings,
+  database: Db
+): ReturnType<typeof buildAuth>
+export function createAuth(env: BetterAuthEnv): ReturnType<typeof buildAuth>
+export function createAuth(
+  env: AuthSettings & { DATABASE_URL?: string },
+  database?: Db
+) {
+  if (!database && !env.DATABASE_URL) {
+    throw new Error(
+      'Authentication requires an explicit database or DATABASE_URL'
+    )
+  }
+  const db =
+    database ??
+    getNeonHttpDb(
+      env.DATABASE_URL!,
+      new URL(env.BETTER_AUTH_URL).hostname === 'localhost'
+    )
+  return buildAuth(env, db)
+}
+
+function buildAuth(env: AuthSettings, db: Db) {
   const baseURL = env.BETTER_AUTH_URL
 
   const hostname = new URL(baseURL).hostname
-  const isLocalhost = hostname === 'localhost'
   const useAllmapsCookieDomain = hostname.endsWith('.allmaps.org')
-
-  const db = database ?? getNeonHttpDb(env.DATABASE_URL, isLocalhost)
 
   const auth = betterAuth({
     baseURL,

@@ -2,7 +2,6 @@ import { t } from 'elysia'
 
 import { setCacheControl } from '@allmaps/api-shared'
 import type { BetterAuthContext } from '@allmaps/db/auth'
-import { createAuth } from '@allmaps/db/auth'
 import { createElysia, createBetterAuthPlugin, error } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 import {
@@ -18,10 +17,7 @@ import type { RestEnv } from '@allmaps/env/rest'
 
 const Role = t.UnionEnum(['admin', 'member', 'owner'])
 
-export function createAuthRoutes(
-  env: RestEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
-) {
+export function createAuthRoutes(env: RestEnv, betterAuth: BetterAuthContext) {
   const { auth } = betterAuth
 
   return createElysia({

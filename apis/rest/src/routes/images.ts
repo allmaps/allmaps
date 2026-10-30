@@ -2,7 +2,6 @@ import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { Db } from '@allmaps/db'
-import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
@@ -68,7 +67,7 @@ async function createImagesFromBody(db: Db, body: CreateImageBody) {
 
 export function createImagesRoutes(
   env: RestEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({ name: 'images' })
     .use(createBetterAuthPlugin(betterAuth))
