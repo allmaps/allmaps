@@ -22,6 +22,7 @@ const editLinkBaseUrl = `https://github.com/allmaps/allmaps/tree/${branch}/apps/
 
 export default defineConfig({
   site,
+  trailingSlash: 'always',
   server: { port: ports.docs, host: true },
   devToolbar: {
     enabled: false
@@ -42,18 +43,40 @@ export default defineConfig({
       logo: {
         src: './src/images/allmaps-logo.svg'
       },
-      head: STATS_WEBSITE_ID
-        ? [
-            {
-              tag: 'script',
-              attrs: {
-                async: true,
-                src: 'https://stats.allmaps.org/script.js',
-                'data-website-id': STATS_WEBSITE_ID
+      head: [
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'preload',
+            href: 'https://fonts.allmaps.org/geograph/geograph-regular.woff2',
+            as: 'font',
+            type: 'font/woff2',
+            crossorigin: 'anonymous'
+          }
+        },
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'preload',
+            href: 'https://fonts.allmaps.org/geograph/geograph-bold.woff2',
+            as: 'font',
+            type: 'font/woff2',
+            crossorigin: 'anonymous'
+          }
+        },
+        ...(STATS_WEBSITE_ID
+          ? [
+              {
+                tag: /** @type {const} */ ('script'),
+                attrs: {
+                  async: true,
+                  src: 'https://stats.allmaps.org/script.js',
+                  'data-website-id': STATS_WEBSITE_ID
+                }
               }
-            }
-          ]
-        : undefined,
+            ]
+          : [])
+      ],
       favicon: '/favicon.png',
       social: [
         {
@@ -70,7 +93,7 @@ export default defineConfig({
       },
       plugins: [
         scalarStarlight({
-          pathname: '/api/rest',
+          pathname: '/apis/rest',
           label: 'REST API',
           title: 'Allmaps REST API',
           configuration: {
@@ -85,7 +108,7 @@ export default defineConfig({
           }
         }),
         scalarStarlight({
-          pathname: '/api/annotations',
+          pathname: '/apis/annotations',
           label: 'Annotations API',
           title: 'Allmaps Annotations API',
           configuration: {
@@ -103,13 +126,13 @@ export default defineConfig({
           name: 'allmaps-api-sidebar',
           hooks: {
             'config:setup': ({ config, updateConfig }) => {
-              // Scalar appends top-level links; these live under Reference → API.
+              // Scalar appends top-level links; these live under Reference → APIs.
               updateConfig({
                 sidebar: config.sidebar?.filter(
                   (item) =>
                     typeof item !== 'object' ||
                     !('link' in item) ||
-                    !['/api/rest', '/api/annotations'].includes(item.link)
+                    !['/apis/rest', '/apis/annotations'].includes(item.link)
                 )
               })
             }
@@ -126,11 +149,11 @@ export default defineConfig({
             },
             {
               label: 'IIIF',
-              link: '/iiif'
+              link: '/iiif/'
             },
             {
               label: 'Georeference Annotations',
-              link: '/georeference-annotations'
+              link: '/georeference-annotations/'
             }
           ]
         },
@@ -139,27 +162,27 @@ export default defineConfig({
           items: [
             {
               label: 'Find maps to georeference',
-              link: '/guides/find-maps-to-georeference'
+              link: '/guides/find-maps-to-georeference/'
             },
             {
               label: 'Georeferencing maps',
-              link: '/guides/georeferencing-maps'
+              link: '/guides/georeferencing-maps/'
             },
             {
               label: 'Discover maps in Allmaps',
-              link: '/guides/discover-maps'
+              link: '/guides/discover-maps/'
             },
             {
               label: 'Viewing maps',
-              link: '/guides/viewing-maps'
+              link: '/guides/viewing-maps/'
             },
             {
               label: 'Using maps in other tools',
-              link: '/guides/using-maps'
+              link: '/guides/using-maps/'
             },
             {
               label: 'IDs in Allmaps',
-              link: '/guides/ids-in-allmaps'
+              link: '/guides/ids-in-allmaps/'
             }
           ]
         },
@@ -167,19 +190,19 @@ export default defineConfig({
           label: 'Reference',
           items: [
             {
-              label: 'API',
+              label: 'APIs',
               items: [
                 {
                   label: 'Overview',
-                  link: '/api'
+                  link: '/apis/'
                 },
                 {
                   label: 'Annotations API',
-                  link: '/api/annotations'
+                  link: '/apis/annotations/'
                 },
                 {
                   label: 'REST API',
-                  link: '/api/rest'
+                  link: '/apis/rest/'
                 }
               ]
             },

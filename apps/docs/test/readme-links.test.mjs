@@ -45,9 +45,9 @@ test('maps only published package directories and READMEs to docs routes', () =>
   assert.deepEqual(
     nodes(output, 'link').map(({ url }) => url),
     [
-      '/packages/render',
-      '/packages/render?plain=1#usage',
-      '/packages/source#usage',
+      '/packages/render/',
+      '/packages/render/?plain=1#usage',
+      '/packages/source/#usage',
       'https://github.com/allmaps/allmaps/tree/develop/packages/omitted/',
       'https://github.com/allmaps/allmaps/blob/develop/packages/render/src/index.ts'
     ]
@@ -87,7 +87,7 @@ test('rewrites image URLs and reference definitions while preserving titles', ()
   assert.deepEqual(
     nodes(output, 'definition').map(({ url, title }) => [url, title]),
     [
-      ['/packages/render#usage', 'Render'],
+      ['/packages/render/#usage', 'Render'],
       [
         'https://raw.githubusercontent.com/allmaps/allmaps/develop/packages/source/other.png?size=2#image',
         'Other map'
@@ -128,7 +128,7 @@ test('preserves GFM tables and rewrites links within their cells', () => {
   )
   assert.equal(nodes(output, 'table').length, 1)
   assert.equal(nodes(output, 'delete').length, 1)
-  assert.equal(nodes(output, 'link')[0].url, '/packages/render')
+  assert.equal(nodes(output, 'link')[0].url, '/packages/render/')
 })
 
 test('preserves surrounding Markdown byte for byte, including multiline inline code', () => {
@@ -146,7 +146,7 @@ test('preserves surrounding Markdown byte for byte, including multiline inline c
   ].join('\n')
   assert.equal(
     rewriteReadmeLinks(source, options),
-    source.replace('[Render](../render/)', '[Render](/packages/render)')
+    source.replace('[Render](../render/)', '[Render](/packages/render/)')
   )
 })
 
@@ -161,7 +161,7 @@ test('rewrites linked images without overlapping edits and preserves code in lab
   )
   assert.deepEqual(
     nodes(output, 'link').map(({ url }) => url),
-    ['/packages/render', '/packages/render']
+    ['/packages/render/', '/packages/render/']
   )
   assert.equal(nodes(output, 'inlineCode')[0].value, 'two\nlines')
 })
@@ -172,6 +172,6 @@ test('preserves escaped pipes in table link labels', () => {
     options
   )
   assert.equal(nodes(output, 'tableCell').length, 2)
-  assert.equal(nodes(output, 'link')[0].url, '/packages/render')
+  assert.equal(nodes(output, 'link')[0].url, '/packages/render/')
   assert.equal(nodes(output, 'link')[0].children[0].value, 'Render | maps')
 })
