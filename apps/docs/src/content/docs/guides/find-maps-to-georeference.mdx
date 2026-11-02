@@ -33,7 +33,7 @@ start:
 - [Yale University Library — Maps](https://collections.library.yale.edu/catalog?f%5Bgenre_ssim%5D%5B%5D=Maps)
 
 You can also use maps from other institutions that publish their images through
-[IIIF](/iiif).
+[IIIF](/iiif/).
 
 ## Find the IIIF URL
 
@@ -51,13 +51,13 @@ It can help you find a map's IIIF Manifest URL while browsing a collection.
 
 Once you have the URL, open [Allmaps Editor](https://editor.allmaps.org/) and
 paste it into the input field. Follow the
-[georeferencing guide](/guides/georeferencing-maps) to draw a mask and add
+[georeferencing guide](/guides/georeferencing-maps/) to draw a mask and add
 control points.
 
 ## Find maps through the API
 
 Allmaps ingests the map collections of partner institutions, recording their
-IIIF resources so you can find them through the [REST API](/api/rest). The
+IIIF resources so you can find them through the [REST API](/apis/rest/). The
 images themselves remain hosted by the institutions.
 
 Use `georeferenced=false` to find images that have not yet been georeferenced
@@ -77,11 +77,11 @@ The `limit=10` parameter requests up to ten images. To find images from another
 institution, look it up in the
 [list of partner organizations](https://api.allmaps.org/organizations?plan=supporter&plan=innovator)
 and add `?georeferenced=false&limit=10` to its `images` URL. See the
-[REST API reference](/api/rest) for the full documentation and all available
+[REST API reference](/apis/rest/) for the full documentation and all available
 query parameters.
 
 Each image's `uri` field contains its IIIF Image Service URL. Copy this URL
 into [Allmaps Editor](https://editor.allmaps.org/) to start georeferencing.
 
 To discover maps that people have already georeferenced with Allmaps, see
-[Discover maps in Allmaps](/guides/discover-maps).
+[Discover maps in Allmaps](/guides/discover-maps/).
