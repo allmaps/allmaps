@@ -14,6 +14,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const routeId = event.route.id
   const isProfileRoute = routeId?.startsWith('/profile')
+  const isListRoute = routeId?.startsWith('/profile/lists')
   const isOrganizationRoute = routeId?.startsWith('/organizations')
   const isUserIndexRoute = routeId === '/users'
 
@@ -25,7 +26,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     if (
-      (isOrganizationRoute || isUserIndexRoute) &&
+      (isListRoute || isOrganizationRoute || isUserIndexRoute) &&
       session?.user?.role !== 'admin'
     ) {
       error(403, 'Administrator access required')

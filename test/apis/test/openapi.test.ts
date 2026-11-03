@@ -92,20 +92,10 @@ describe.each([
       expect(spec.info.termsOfService).toBe(termsUrl)
       expect(spec.paths['/maps']).toBeDefined()
 
-      if (name === 'REST') {
-        const operation = spec.paths['/lists/{listId}/items'].delete
-        const query = operation.parameters.filter(
-          (parameter: { in: string }) => parameter.in === 'query'
-        )
-        expect(
-          query.map((parameter: { name: string }) => parameter.name).sort()
-        ).toEqual(['canvasId', 'imageId', 'manifestId', 'mapId'])
-        for (const parameter of query) {
-          expect(parameter.required).not.toBe(true)
-          expect(parameter.schema.type).toBe('string')
-        }
-        expect(operation.security).toEqual([{ sessionCookie: [] }])
-      }
+      expect(
+        Object.keys(spec.paths).some((path) => path.includes('/lists'))
+      ).toBe(false)
+      expect(spec.tags).not.toContainEqual({ name: 'Lists' })
     }
   )
 

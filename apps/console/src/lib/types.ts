@@ -78,6 +78,7 @@ export type ListItem = {
 export type ListSummary = {
   id: string
   name: string
+  deletable: boolean
   label: string | null
   createdAt: string
 }

@@ -136,9 +136,11 @@ it('preserves every HTTP authentication cookie and scopes login to the database 
     .map((cookie) => cookie.split(';')[0])
     .join('; ')
   expect(sessionCookie).toContain('.session_token=')
-  expect(
-    (await rest('/lists', { headers: { Cookie: sessionCookie } })).status
-  ).toBe(200)
+  const session = await rest('/auth/get-session', {
+    headers: { Cookie: sessionCookie }
+  })
+  expect(session.status).toBe(200)
+  expect((await session.json()).user.slug).toBe('local-editor')
 })
 it('flushes a WebSocket edit into REST and Annotations before restart, retaining the session and history', async () => {
   const map = catalog.maps[0]
@@ -195,9 +197,11 @@ it('flushes a WebSocket edit into REST and Annotations before restart, retaining
   expect((await (await rest(`/maps/${map.id}/versions`)).json()).length).toBe(
     map.initialVersions + 1
   )
-  expect(
-    (await rest('/lists', { headers: { Cookie: sessionCookie } })).status
-  ).toBe(200)
+  const session = await rest('/auth/get-session', {
+    headers: { Cookie: sessionCookie }
+  })
+  expect(session.status).toBe(200)
+  expect((await session.json()).user.slug).toBe('local-editor')
 }, 60000)
 
 it('refuses pending migrations on an existing database, even after SQL is corrected', async () => {

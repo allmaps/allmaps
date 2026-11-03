@@ -3,6 +3,7 @@ import { t } from 'elysia'
 import {
   queryUserLists,
   createUserList,
+  queryUserList,
   queryListWithItems,
   updateUserListName,
   addItemToList,
@@ -13,7 +14,7 @@ import {
 import { setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
-import { authenticatedDetail } from '../openapi.js'
+import { adminDetail } from '../openapi.js'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 
 const deleteListItemQuerySchema = t.Object({
@@ -48,29 +49,32 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return queryUserLists(db, getUserId(user))
       },
       {
-        auth: true,
+        admin: true,
         detail: {
           summary: 'Get current user lists',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
     .post(
       '/lists',
-      ({ db, user, body, set }) => {
+      ({ db, user, body, set, status }) => {
         setCacheControl(set, 'private-no-store')
+        if (body.name.trim().toLowerCase() === 'starred') {
+          return status(403, { error: 'The Starred list already exists' })
+        }
         return createUserList(db, getUserId(user), body.name)
       },
       {
-        auth: true,
+        admin: true,
         body: t.Object({
           name: t.String()
         }),
         detail: {
           summary: 'Create a list',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -91,12 +95,12 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return result
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         detail: {
           summary: 'Get a list with its items',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -107,6 +111,21 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         const name = body.name.trim()
         if (!name) {
           return status(400, { error: 'Name is required' })
+        }
+
+        const currentList = await queryUserList(
+          db,
+          getUserId(user),
+          params.listId
+        )
+        if (!currentList) {
+          return status(404, { error: 'List not found' })
+        }
+        if (!currentList.deletable) {
+          return status(403, { error: 'This list cannot be renamed' })
+        }
+        if (name.toLowerCase() === 'starred') {
+          return status(403, { error: 'The Starred list already exists' })
         }
 
         const list = await updateUserListName(
@@ -122,13 +141,13 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return list
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         body: t.Object({ name: t.String() }),
         detail: {
           summary: 'Update a list name',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -146,7 +165,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return addItemToList(db, params.listId, body)
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         body: t.Union([
           t.Object({
@@ -162,7 +181,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         detail: {
           summary: 'Add an item to a list',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -186,16 +205,16 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return result.item
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         body: t.Object({ url: t.String() }),
         detail: {
           summary: 'Add an item to a list by URL',
           description:
-            'Authenticated users only. Accepts annotations.allmaps.org URLs for maps, images, canvases, and manifests.',
+            'Admin only. Accepts annotations.allmaps.org URLs for maps, images, canvases, and manifests.',
           tags: ['Lists'],
-          security: authenticatedDetail.security,
-          'x-badges': authenticatedDetail['x-badges']
+          security: adminDetail.security,
+          'x-badges': adminDetail['x-badges']
         }
       }
     )
@@ -219,13 +238,13 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return result
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         query: deleteListItemQuerySchema,
         detail: {
           summary: 'Remove an item from a list',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -241,12 +260,12 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return result
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         detail: {
           summary: 'Delete a list',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )

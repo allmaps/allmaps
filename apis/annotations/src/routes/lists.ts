@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
-import { ResponseError, setCacheControl } from '@allmaps/api-shared'
+import { setCacheControl } from '@allmaps/api-shared'
 import {
   queryLists,
   queryList,
@@ -10,33 +10,7 @@ import {
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
-import { createElysia } from '../elysia.js'
-
-type SessionUser = {
-  role?: string
-  slug?: string | null
-}
-
-async function assertCanAccessUserLists(
-  betterAuth: BetterAuthContext,
-  headers: Headers,
-  username: string
-) {
-  const { auth } = betterAuth
-  const session = await auth.api.getSession({ headers })
-
-  if (!session) {
-    throw new ResponseError('Unauthorized', 401)
-  }
-
-  const user = session.user as SessionUser
-  const isAdmin = user.role === 'admin'
-  const userSlug = typeof user.slug === 'string' ? user.slug : null
-
-  if (!isAdmin && userSlug !== username) {
-    throw new ResponseError('Forbidden', 403)
-  }
-}
+import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
@@ -47,15 +21,11 @@ export function createListsRoutes(
   return createElysia({
     name: 'lists'
   })
+    .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/@:username/lists',
-      async ({ db, env, params, request, set }) => {
+      async ({ db, env, params, set }) => {
         setCacheControl(set, 'private-no-store')
-        await assertCanAccessUserLists(
-          betterAuth,
-          request.headers,
-          params.username
-        )
         const lists = await queryLists(db, params.username)
 
         return lists.map((list: UserList) => ({
@@ -64,6 +34,7 @@ export function createListsRoutes(
         }))
       },
       {
+        admin: true,
         params: t.Object({
           username: t.String()
         }),
@@ -77,11 +48,6 @@ export function createListsRoutes(
       '/@:username/lists/:listId',
       async ({ db, env, params, request, set }) => {
         setCacheControl(set, 'private-no-store')
-        await assertCanAccessUserLists(
-          betterAuth,
-          request.headers,
-          params.username
-        )
         return queryList(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
@@ -91,6 +57,7 @@ export function createListsRoutes(
         )
       },
       {
+        admin: true,
         params: t.Object({
           username: t.String(),
           listId: t.String()
@@ -105,11 +72,6 @@ export function createListsRoutes(
       '/@:username/lists/:listId/georeference-annotations',
       async ({ db, env, params, request, set }) => {
         setCacheControl(set, 'private-no-store')
-        await assertCanAccessUserLists(
-          betterAuth,
-          request.headers,
-          params.username
-        )
         return queryListGeoreferenceAnnotations(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
@@ -119,6 +81,7 @@ export function createListsRoutes(
         )
       },
       {
+        admin: true,
         params: t.Object({
           username: t.String(),
           listId: t.String()
