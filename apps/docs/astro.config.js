@@ -101,8 +101,8 @@ export default defineConfig({
             sources: [
               {
                 title: 'Allmaps REST API',
-                // slug: 'allmaps-api',
-                url: 'https://api.allmaps.org/openapi.json'
+                url: new URL('/openapi.json', process.env.PUBLIC_REST_BASE_URL)
+                  .href
               }
             ]
           }
@@ -116,8 +116,10 @@ export default defineConfig({
             sources: [
               {
                 title: 'Allmaps Annotations API',
-                // slug: 'allmaps-annotations-api',
-                url: 'https://annotations.allmaps.org/openapi.json'
+                url: new URL(
+                  '/openapi.json',
+                  process.env.PUBLIC_ANNOTATIONS_BASE_URL
+                ).href
               }
             ]
           }
