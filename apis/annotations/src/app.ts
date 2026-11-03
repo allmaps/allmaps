@@ -65,8 +65,7 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           servers: [{ url: env.PUBLIC_ANNOTATIONS_BASE_URL }],
           info: {
             title: 'Allmaps Annotations API Documentation',
-            description:
-              'API documentation for the Allmaps Annotations API. Use of this Allmaps-hosted service is free for non-commercial use. Commercial use requires a paid agreement with Allmaps.',
+            description: `API documentation for the Allmaps Annotations API. Use of this hosted service is subject to the [Allmaps Terms & Usage](${termsUrl}).`,
             termsOfService: termsUrl,
             version: packageJson.version
           },
