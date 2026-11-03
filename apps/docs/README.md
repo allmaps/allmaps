@@ -23,6 +23,18 @@ When it is unset, no tracking script is included.
 `PUBLIC_DOCS_BASE_URL` sets the canonical docs URL and social-image URL. The
 `build:dev` and `build:production` commands set it explicitly for each deployment.
 
+## Page URLs
+
+Docs pages use URLs without trailing slashes, such as `/guides/discover-maps`.
+Keep internal links and generated package links in this form, including links
+with fragments such as `/guides/viewing-maps#share-a-map`.
+
+Astro's `trailingSlash: 'never'` keeps Starlight navigation, canonical URLs,
+search results, and sitemap URLs consistent. Keep the default directory build
+format: Starlight generates `.html` links with the file format. Cloudflare's
+`drop-trailing-slash` HTML handling serves directory index files at slashless
+URLs and redirects existing links ending in `/` to their canonical form.
+
 ## Development deployment
 
 The `docs-develop` Cloudflare Worker serves static files from `dist` at

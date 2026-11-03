@@ -22,7 +22,7 @@ const editLinkBaseUrl = `https://github.com/allmaps/allmaps/tree/${branch}/apps/
 
 export default defineConfig({
   site,
-  trailingSlash: 'always',
+  trailingSlash: 'never',
   server: { port: ports.docs, host: true },
   devToolbar: {
     enabled: false
@@ -149,11 +149,11 @@ export default defineConfig({
             },
             {
               label: 'IIIF',
-              link: '/iiif/'
+              link: '/iiif'
             },
             {
               label: 'Georeference Annotations',
-              link: '/georeference-annotations/'
+              link: '/georeference-annotations'
             }
           ]
         },
@@ -162,27 +162,27 @@ export default defineConfig({
           items: [
             {
               label: 'Find maps to georeference',
-              link: '/guides/find-maps-to-georeference/'
+              link: '/guides/find-maps-to-georeference'
             },
             {
               label: 'Georeferencing maps',
-              link: '/guides/georeferencing-maps/'
+              link: '/guides/georeferencing-maps'
             },
             {
               label: 'Discover maps in Allmaps',
-              link: '/guides/discover-maps/'
+              link: '/guides/discover-maps'
             },
             {
               label: 'Viewing maps',
-              link: '/guides/viewing-maps/'
+              link: '/guides/viewing-maps'
             },
             {
               label: 'Using maps in other tools',
-              link: '/guides/using-maps/'
+              link: '/guides/using-maps'
             },
             {
               label: 'IDs in Allmaps',
-              link: '/guides/ids-in-allmaps/'
+              link: '/guides/ids-in-allmaps'
             }
           ]
         },
@@ -194,15 +194,15 @@ export default defineConfig({
               items: [
                 {
                   label: 'Overview',
-                  link: '/apis/'
+                  link: '/apis'
                 },
                 {
                   label: 'Annotations API',
-                  link: '/apis/annotations/'
+                  link: '/apis/annotations'
                 },
                 {
                   label: 'REST API',
-                  link: '/apis/rest/'
+                  link: '/apis/rest'
                 }
               ]
             },
