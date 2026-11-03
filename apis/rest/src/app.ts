@@ -71,8 +71,7 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
           servers: [{ url: env.PUBLIC_REST_BASE_URL }],
           info: {
             title: 'Allmaps API Documentation',
-            description:
-              'API documentation for the Allmaps REST API. Use of this Allmaps-hosted service is free for non-commercial use. Commercial use requires a paid agreement with Allmaps.',
+            description: `API documentation for the Allmaps REST API. Use of this hosted service is subject to the [Allmaps Terms & Usage](${termsUrl}).`,
             termsOfService: termsUrl,
             version: packageJson.version
           },

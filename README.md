@@ -58,6 +58,8 @@ We're welcoming contributions! You can read more about the many ways you can con
 - **Data**: georeference data published through the Allmaps project is licensed under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/) license
 - **Base map**: [ODbL](https://opendatacommons.org/licenses/odbl/), © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors. See Protomap's [licensing and attribution guidelines](https://github.com/protomaps/basemaps?tab=readme-ov-file#licensing-and-attribution-guidelines) for more details.
 
+These source-code and data licenses are separate from the [Allmaps Terms & Usage](https://allmaps.org/terms#hosted-allmaps-services) governing use of the hosted services.
+
 ## Installation
 
 Make sure you have Node.js (version 24 or higher) and [pnpm 12](https://pnpm.io/installation) installed. This repository pins its pnpm version in `package.json`.
