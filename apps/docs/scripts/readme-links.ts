@@ -66,7 +66,7 @@ export function rewriteReadmeLinks(
     const suffix = url.search + url.hash
 
     if (!image && packageMatch && packageNames.has(packageMatch[1])) {
-      return `/packages/${encodeURIComponent(packageMatch[1])}/${suffix}`
+      return `/packages/${encodeURIComponent(packageMatch[1])}${suffix}`
     }
 
     if (image) {
