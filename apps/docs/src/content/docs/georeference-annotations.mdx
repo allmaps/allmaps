@@ -6,7 +6,7 @@ description: An open standard for storing georeference data as a Web Annotation
 import { Code } from '@astrojs/starlight/components'
 import exampleAnnotation from '../../data/georeference-annotation-example.json?raw'
 
-Georeference Annotations are small JSON documents that describe how pixel coordinates on a digitized map relate to geographic coordinates. They contain the information that Allmaps needs to fetch an image through [IIIF](/iiif/), select the map within that image, and display it on a world map.
+Georeference Annotations are small JSON documents that describe how pixel coordinates on a digitized map relate to geographic coordinates. They contain the information that Allmaps needs to fetch an image through [IIIF](/iiif), select the map within that image, and display it on a world map.
 
 The image stays on the institution's IIIF server. The annotation stores the georeference data separately, so you can share or update that data without downloading the original image or saving a warped copy.
 
@@ -77,9 +77,9 @@ Multiple annotations can be grouped in an **Annotation Page**: a JSON document w
 
 ## Working with annotations
 
-[Allmaps Editor](https://editor.allmaps.org/) creates Georeference Annotations as you draw masks and add control points. You can export them and open them in [Allmaps Viewer](https://viewer.allmaps.org/), use them with Allmaps' mapping library plugins, or retrieve them through the [Annotations API](/apis/annotations/).
+[Allmaps Editor](https://editor.allmaps.org/) creates Georeference Annotations as you draw masks and add control points. You can export them and open them in [Allmaps Viewer](https://viewer.allmaps.org/), use them with Allmaps' mapping library plugins, or retrieve them through the [Annotations API](/apis/annotations).
 
-- Follow the [georeferencing guide](/guides/georeferencing-maps/) to create an annotation.
-- Follow the [viewing guide](/guides/viewing-maps/) to display georeferenced maps.
-- Read about [using maps in other tools](/guides/using-maps/) to reuse your work.
+- Follow the [georeferencing guide](/guides/georeferencing-maps) to create an annotation.
+- Follow the [viewing guide](/guides/viewing-maps) to display georeferenced maps.
+- Read about [using maps in other tools](/guides/using-maps) to reuse your work.
 - Consult the [IIIF Georeference Extension specification](https://iiif.io/api/extension/georef/) for the complete format.
