@@ -84,7 +84,8 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           tags: openApiTags
         },
         exclude: {
-          staticFile: false
+          staticFile: false,
+          tags: ['Lists']
         }
       })
     )

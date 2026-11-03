@@ -141,32 +141,34 @@
     </div>
   {/if}
 
-  <!-- Rename list -->
-  <div class="bg-white rounded-lg shadow p-6 mb-6">
-    <h2 class="text-xl font-semibold mb-3">List Name</h2>
-    <form {...renameListForm} class="space-y-3">
-      <input type="hidden" name="listId" value={listId} />
-      <input
-        type="text"
-        name="name"
-        value={list.name}
-        required
-        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-      <div class="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={!!renameListForm.pending}
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {renameListForm.pending ? 'Saving...' : 'Save name'}
-        </button>
-        {#if renameListForm.result}
-          <p class="text-sm text-green-600">List name updated</p>
-        {/if}
-      </div>
-    </form>
-  </div>
+  {#if list.deletable}
+    <!-- Rename list -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-3">List Name</h2>
+      <form {...renameListForm} class="space-y-3">
+        <input type="hidden" name="listId" value={listId} />
+        <input
+          type="text"
+          name="name"
+          value={list.name}
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div class="flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={!!renameListForm.pending}
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {renameListForm.pending ? 'Saving...' : 'Save name'}
+          </button>
+          {#if renameListForm.result}
+            <p class="text-sm text-green-600">List name updated</p>
+          {/if}
+        </div>
+      </form>
+    </div>
+  {/if}
 
   <!-- Add item by URL -->
   <div class="bg-white rounded-lg shadow p-6 mb-6">

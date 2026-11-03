@@ -503,7 +503,9 @@
   </form>
 
   {#if data.isCurrentUser}
-    <UserLists lists={data.lists} />
+    {#if data.isAdmin}
+      <UserLists lists={data.lists} />
+    {/if}
 
     <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-xl font-semibold mb-4">Session Information</h2>
