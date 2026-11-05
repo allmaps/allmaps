@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url'
 export default defineConfig({
   resolve: {
     alias: {
+      '@allmaps/api-shared/db': fileURLToPath(
+        new URL('../../packages/api-shared/src/db.ts', import.meta.url)
+      ),
       '@allmaps/api-rest': fileURLToPath(
         new URL('../../apis/rest/src/app.ts', import.meta.url)
       ),

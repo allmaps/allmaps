@@ -250,13 +250,13 @@ describe('Connected demo seed data', () => {
     expect(parseAnnotation(await annotations.json())).toHaveLength(3)
   })
 
-  it('denies non-admin users access to seeded lists', async () => {
+  it('denies regular users access to other users’ seeded lists', async () => {
     const headers = await login('local-visitor')
     const list = catalog.lists.find(
       (list) => list.key === 'amsterdam-research'
     )!
     const response = await rest(`/lists/${list.id}`, { headers })
-    expect(response.status, JSON.stringify(await response.json())).toBe(401)
+    expect(response.status, JSON.stringify(await response.json())).toBe(404)
     const annotations = await context.annotations.handle(
       new Request(
         `${context.env.PUBLIC_ANNOTATIONS_BASE_URL}/@local-editor/lists/${list.id}`,
