@@ -1,4 +1,0 @@
-@config '../../tailwind.config.ts';
-
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);

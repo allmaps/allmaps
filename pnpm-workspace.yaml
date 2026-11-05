@@ -9,6 +9,8 @@ packages:
 engineStrict: true
 
 allowBuilds:
+  # The homepage tunnel plugin downloads cloudflared on first use.
+  cloudflared: false
   esbuild: true
   sharp: true
   workerd: true

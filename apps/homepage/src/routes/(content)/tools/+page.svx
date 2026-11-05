@@ -1,0 +1,28 @@
+---
+title: Tools | Allmaps
+description: Explore the applications and command-line tools in the Allmaps ecosystem.
+label: Tools
+hero:
+  title: Tools
+  palette: blue
+---
+
+<script lang="ts">
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import ToolsGrid from '$lib/components/ToolsGrid.svelte'
+  import { tools } from '$lib/data/tools.js'
+</script>
+
+<PageIntro text="Apps and tools to georeference, explore and use digitized maps." />
+
+<div class="not-prose mt-12">
+  <ToolsGrid {tools} />
+</div>
+
+<div class="not-prose mt-12 rounded-xl bg-blue/10 p-6 [&_p]:m-0 [&_a]:font-bold [&_a]:text-blue-700 [&_a]:underline">
+
+More tools and experiments can be found on
+[GitHub](https://github.com/allmaps) and
+[Observable](https://observablehq.com/@allmaps).
+
+</div>

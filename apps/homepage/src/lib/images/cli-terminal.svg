@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2016" height="1344" viewBox="0 0 672 448">
+  <rect width="672" height="448" fill="#0a0a0a" />
+  <path d="M0 0h672v34H0z" fill="#202020" />
+  <circle cx="18" cy="17" r="5" fill="#ff5f57" />
+  <circle cx="35" cy="17" r="5" fill="#febc2e" />
+  <circle cx="52" cy="17" r="5" fill="#28c840" />
+  <text x="336" y="21" fill="#a3a3a3" font-family="Menlo, Monaco, Consolas, monospace" font-size="11" text-anchor="middle">allmaps — terminal</text>
+  <g font-family="Menlo, Monaco, Consolas, monospace" font-size="12.5" fill="#d4d4d4" xml:space="preserve">
+    <text x="24" y="61"><tspan fill="#86efac">$ </tspan><tspan fill="#fafafa">allmaps --help</tspan></text>
+    <text x="24" y="90" fill="#fafafa" font-weight="bold">Allmaps CLI</text>
+    <text x="24" y="118">Usage: allmaps [options] [command]</text>
+    <text x="24" y="146" fill="#fafafa" font-weight="bold">Options:</text>
+    <text x="24" y="160">  -h, --help                   display help for command</text>
+    <text x="24" y="188" fill="#fafafa" font-weight="bold">Commands:</text>
+    <text x="24" y="202">  annotation                   parse and generate Georeference Annotations</text>
+    <text x="24" y="216">  analyze                      analyze maps</text>
+    <text x="24" y="230">  attach [options] [files...]   attach maps</text>
+    <text x="24" y="244">  fetch                        fetch IIIF images</text>
+    <text x="24" y="258">  frame [options] [files...]    compute best viewport frame for georeferenced</text>
+    <text x="24" y="272">                               maps</text>
+    <text x="24" y="286">  iiif                         parse and generate IIIF resources</text>
+    <text x="24" y="300">  id [urls...]                 generate Allmaps IDs from input URLs</text>
+    <text x="24" y="314">  open                         open maps in Allmaps Viewer</text>
+    <text x="24" y="328">  script                       generate Bash scripts</text>
+    <text x="24" y="342">  transform                    transform resource coordinates to geospatial</text>
+    <text x="24" y="356">                               coordinates and vice versa</text>
+    <text x="24" y="370">  help [command]               display help for command</text>
+    <text x="24" y="398" fill="#a3a3a3">For more details about Allmaps, see https://allmaps.org</text>
+    <text x="24" y="427" fill="#86efac">$</text>
+  </g>
+  <rect x="39" y="416" width="7" height="13" fill="#d4d4d4" />
+</svg>

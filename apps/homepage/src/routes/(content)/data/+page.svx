@@ -1,0 +1,17 @@
+---
+title: Data | Allmaps
+description: Download and reuse open georeference data from Allmaps to find maps, connect collections and build new tools.
+label: Data
+hero:
+  title: Open Data
+  palette: green
+---
+
+<script lang="ts">
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import OpenData from '$lib/components/OpenData.svelte'
+</script>
+
+<PageIntro text="All georeference data created with Allmaps is open data, free to download and reuse." />
+
+<OpenData />

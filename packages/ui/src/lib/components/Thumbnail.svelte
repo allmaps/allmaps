@@ -400,7 +400,7 @@
       })}
     {:else}
       <div
-        class="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-red/20 p-3 text-center text-red"
+        class="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-red-100 p-3 text-center text-red"
         role="status"
         aria-label={title}
       >

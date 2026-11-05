@@ -1,12 +1,24 @@
 {
-  "extends": "astro/tsconfigs/strict",
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true
+  },
   "references": [
-    { "path": "../../packages/tailwind" },
     { "path": "../../packages/annotation" },
-    { "path": "../../packages/id" },
     { "path": "../../packages/maplibre" },
     { "path": "../../packages/project" },
     { "path": "../../packages/stdlib" },
-    { "path": "../../packages/types" }
+    { "path": "../../packages/transform" },
+    { "path": "../../packages/types" },
+    { "path": "../../packages/tailwind" }
   ]
 }

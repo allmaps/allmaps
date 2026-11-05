@@ -54,7 +54,7 @@ export function exampleSource(
   if (viewMode === 'bounds' && !bounds) return '// Loading map bounds…\n'
 
   const listMode = viewMode === 'list'
-  const annotationDeclaration = `const annotationUrl =\n  ${quote(settings.annotationUrl)}`
+  const annotationDeclaration = `const annotationUrl = ${quote(settings.annotationUrl)}`
   const listImport = listMode
     ? "import { WarpedMapList } from '@allmaps/render'\n"
     : ''

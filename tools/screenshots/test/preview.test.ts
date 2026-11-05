@@ -82,6 +82,8 @@ test('serves a newly created capture after falling back, without restarting', as
 
 test.each([
   '/__allmaps/screenshots/editor-iiif-map/v1.webp.json',
+  '/__allmaps/screenshots/editor-iiif-map/v1-480w.webp.json',
+  '/__allmaps/screenshots/editor-iiif-map/v1-480w.webp.upload.json',
   '/__allmaps/screenshots/../../secret.webp',
   '/__allmaps/screenshots/%2e%2e%2fsecret.webp',
   '/__allmaps/screenshots/editor-iiif-map/v1.webp?fallback=javascript:alert(1)'
@@ -93,6 +95,26 @@ test.each([
     'Location',
     expect.anything()
   )
+})
+
+test('serves responsive variants and redirects missing variants to their published URL', async () => {
+  const { directory, request } = await fixture()
+  const variantKey = 'screenshots/editor-iiif-map/v1-480w.webp'
+  const fallback = `https://files.allmaps.org/${variantKey}`
+  const url = `/__allmaps/${variantKey}?fallback=${encodeURIComponent(fallback)}`
+  expect((await request(url)).response.setHeader).toHaveBeenCalledWith(
+    'Location',
+    fallback
+  )
+  await mkdir(path.dirname(path.join(directory, variantKey)), {
+    recursive: true
+  })
+  const bytes = Buffer.from('responsive WebP fixture')
+  await writeFile(path.join(directory, variantKey), bytes)
+  const { response } = await request(url)
+  expect(response.statusCode).toBe(200)
+  expect(response.end).toHaveBeenCalledWith(bytes)
+  expect(response.setHeader).toHaveBeenCalledWith('Content-Type', 'image/webp')
 })
 
 test('respects the app base and leaves unrelated requests alone', async () => {

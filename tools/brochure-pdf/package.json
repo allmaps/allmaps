@@ -1,0 +1,20 @@
+{
+  "name": "@allmaps/brochure-pdf",
+  "version": "1.0.0-beta.0",
+  "private": true,
+  "description": "Export the Allmaps IIIF partnership brochure to PDF",
+  "type": "module",
+  "scripts": {
+    "pdf": "node src/index.ts",
+    "types": "tsc --noEmit",
+    "lint": "prettier --check src README.md package.json tsconfig.json && eslint src"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}

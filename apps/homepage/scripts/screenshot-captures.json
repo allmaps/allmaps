@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "screenshots": [
+    {
+      "url": "https://editor.allmaps.org/georeference?url=https%3A%2F%2Fiiif.llyfrgell.cymru%2Fiiif%2F04%2F669%2F04669576.jp2%2Finfo.json&image=https%3A%2F%2Fiiif.llyfrgell.cymru%2Fiiif%2F04%2F669%2F04669576.jp2",
+      "slug": "editor-iiif-map",
+      "version": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "deviceScaleFactor": 2
+      },
+      "delay": 5000
+    },
+    {
+      "url": "https://viewer.allmaps.org/?url=https://annotations.allmaps.org/images/a7afe9a34c3b8633",
+      "slug": "viewer-warped-map",
+      "version": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "deviceScaleFactor": 2
+      },
+      "waitForRender": true,
+      "delay": 1000
+    },
+    {
+      "url": "https://github.com/allmaps",
+      "slug": "allmaps-github",
+      "version": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "deviceScaleFactor": 2
+      },
+      "delay": 1000
+    },
+    {
+      "url": "https://iiif.io/",
+      "slug": "iiif-homepage",
+      "version": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "deviceScaleFactor": 2
+      },
+      "delay": 1000
+    },
+    {
+      "url": "https://editor.allmaps.org/georeference?url=https%3A%2F%2Fdlc.services%2Fiiif-img%2F7%2F4%2F0b0af56c-d836-4fe4-a9da-7ed66ea7a236%2Finfo.json&map=432c3766cb25d426&bbox=4.15%2C51.86%2C4.6%2C52.13&lang=en",
+      "slug": "tools-editor-rotterdam",
+      "version": 1,
+      "viewport": {
+        "width": 1200,
+        "height": 750,
+        "deviceScaleFactor": 2
+      },
+      "steps": [
+        {
+          "action": "click",
+          "selector": "button[aria-label=\"Minimize messages\"] >> nth=0"
+        }
+      ],
+      "delay": 5000
+    },
+    {
+      "url": "https://latest.allmaps.org/",
+      "slug": "tools-latest",
+      "version": 1,
+      "viewport": {
+        "width": 1200,
+        "height": 800,
+        "deviceScaleFactor": 2
+      },
+      "delay": 10000
+    },
+    {
+      "url": "https://arcade.allmaps.org/",
+      "slug": "tools-arcade",
+      "version": 1,
+      "viewport": {
+        "width": 1200,
+        "height": 800,
+        "deviceScaleFactor": 2
+      },
+      "delay": 5000
+    },
+    {
+      "url": "https://dev.explore.allmaps.org/#11.82/51.99947/4.36406",
+      "slug": "tools-explore-prototype",
+      "version": 1,
+      "viewport": {
+        "width": 1200,
+        "height": 800,
+        "deviceScaleFactor": 2
+      },
+      "delay": 10000
+    },
+    {
+      "url": "https://docs.allmaps.org/guides/annotating-maps-with-annotorious",
+      "slug": "annotorious-building-outlines",
+      "version": 1,
+      "viewport": {
+        "width": 900,
+        "height": 1200,
+        "deviceScaleFactor": 2
+      },
+      "crop": {
+        "selector": "[aria-label=\"Glendale map with Annotorious building polygons\"]",
+        "padding": 0
+      },
+      "steps": [
+        {
+          "action": "click",
+          "selector": "[aria-label=\"Glendale map with Annotorious building polygons\"]"
+        }
+      ],
+      "delay": 5000
+    },
+    {
+      "url": "https://annotations.allmaps.org/maps",
+      "slug": "allmaps-annotations-api",
+      "version": 1,
+      "viewport": {
+        "width": 600,
+        "height": 400,
+        "deviceScaleFactor": 2
+      },
+      "delay": 1000
+    },
+    {
+      "slug": "tools-viewer-liber-floridus",
+      "version": 2,
+      "url": "https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fimages%2F9d77cf5c62742b6a",
+      "viewport": {
+        "width": 1200,
+        "height": 750,
+        "deviceScaleFactor": 3
+      },
+      "waitForRender": true,
+      "delay": 5000,
+      "widths": [320, 480, 640, 960, 1280, 1600, 2400]
+    }
+  ]
+}

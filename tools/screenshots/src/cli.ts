@@ -12,6 +12,7 @@ import { chromium } from 'playwright'
 import { captureScreenshot } from './capture.ts'
 import { readManifest } from './manifest.ts'
 import { publishScreenshot } from './upload.ts'
+import { writeScreenshotVariants } from './variants.ts'
 import { screenshotKey } from '@allmaps/ui/screenshots'
 
 const program = new Command()
@@ -23,6 +24,10 @@ const program = new Command()
   .option('--output <path>', 'Local capture directory', '.screenshots/captures')
   .option('--slug <slug>', 'Capture one slug')
   .option('--refresh', 'Recapture even when local settings and image match')
+  .option(
+    '--variants-only',
+    'Resize existing captures without opening a browser'
+  )
   .option('--upload', 'Publish through the Allmaps Assets CLI')
   .addOption(
     new Option('--assets-cli <path>', 'Path to assets/scripts/assets.ts').env(
@@ -62,6 +67,8 @@ async function main() {
   const values = program.opts()
   if (values.overwrite && !values.upload)
     throw new Error('--overwrite requires --upload')
+  if (values.variantsOnly && values.refresh)
+    throw new Error('--variants-only cannot be combined with --refresh')
   const { timeout } = values
   const manifest = await readManifest(path.resolve(values.manifest))
   const definitions = manifest.screenshots.filter(
@@ -84,28 +91,44 @@ async function main() {
     await access(path.resolve(assetsCli))
   }
   const directory = path.resolve(values.output)
-  const browser = await chromium.launch({
-    headless: !values.headed,
-    ...(values.chrome ? { channel: 'chrome' } : {})
-  })
+  const browser = values.variantsOnly
+    ? undefined
+    : await chromium.launch({
+        headless: !values.headed,
+        ...(values.chrome ? { channel: 'chrome' } : {})
+      })
   const results: {
     slug: string
     filename?: string
     publicUrl?: string
     geometryPublicUrl?: string
+    variantPublicUrls?: Record<number, string>
     error?: string
   }[] = []
   try {
     for (const definition of definitions) {
       try {
-        const capture = await captureScreenshot(browser, definition, {
-          directory,
-          refresh: values.refresh,
-          timeout
-        })
-        process.stderr.write(
-          `${capture.cached ? 'Cached' : 'Captured'} ${screenshotKey(definition)}\n`
-        )
+        let filename: string
+        if (browser) {
+          const capture = await captureScreenshot(browser, definition, {
+            directory,
+            refresh: values.refresh,
+            timeout
+          })
+          filename = capture.filename
+          process.stderr.write(
+            `${capture.cached ? 'Cached' : 'Captured'} ${screenshotKey(definition)}\n`
+          )
+        } else {
+          filename = path.join(directory, screenshotKey(definition))
+          await access(filename)
+          const variants = await writeScreenshotVariants(definition, {
+            directory
+          })
+          process.stderr.write(
+            `Prepared ${variants.length} variants for ${screenshotKey(definition)}\n`
+          )
+        }
         const published =
           values.upload && assetsCli
             ? await publishScreenshot(definition, {
@@ -117,14 +140,15 @@ async function main() {
         if (published) {
           for (const url of [
             published.publicUrl,
-            published.geometryPublicUrl
+            published.geometryPublicUrl,
+            ...Object.values(published.variantPublicUrls ?? {})
           ]) {
             if (url) process.stderr.write(`Published ${url}\n`)
           }
         }
         results.push({
           slug: definition.slug,
-          filename: capture.filename,
+          filename,
           ...published
         })
       } catch (error) {
@@ -135,7 +159,7 @@ async function main() {
       }
     }
   } finally {
-    await browser.close()
+    await browser?.close()
   }
   await mkdir(directory, { recursive: true })
   await writeFile(

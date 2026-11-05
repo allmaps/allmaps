@@ -15,10 +15,14 @@
 </style>
 <g>
 	<defs>
+		<radialGradient id="header-gradient" gradientUnits="userSpaceOnUse" cx="561.2" cy="313.3" r="642.7304">
+			<stop offset="0%" stop-color="#25318f"/>
+			<stop offset="100%" stop-color="#101656"/>
+		</radialGradient>
 		<path id="SVGID_1_" d="M1088.8,626.6H33.6C15,626.6,0,611.5,0,592.9V33.6C0,15,15,0,33.6,0h1055.2c18.6,0,33.6,15,33.6,33.6v559.3
 			C1122.4,611.5,1107.4,626.6,1088.8,626.6z"/>
 	</defs>
-	<use xlink:href="#SVGID_1_"  style="overflow:visible;fill:#101656;"/>
+	<use xlink:href="#SVGID_1_"  style="overflow:visible;fill:url(#header-gradient);"/>
 	<clipPath id="SVGID_2_">
 		<use xlink:href="#SVGID_1_"  style="overflow:visible;"/>
 	</clipPath>

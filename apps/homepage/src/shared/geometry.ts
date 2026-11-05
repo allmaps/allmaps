@@ -7,6 +7,7 @@ import { ProjectedGcpTransformer } from '@allmaps/project'
 import type { Polygon as GeojsonPolygon } from 'geojson'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
+import type { Polygon } from '@allmaps/types'
 
 const mercator = geoProjection((x, y) => [
   x,
@@ -22,7 +23,8 @@ export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
         const projectedTransformer =
           ProjectedGcpTransformer.fromGeoreferencedMap(map)
 
-        let polygon = projectedTransformer.transformToGeo([map.resourceMask])
+        const resourcePolygon: Polygon = [map.resourceMask]
+        const polygon = projectedTransformer.transformToGeo(resourcePolygon)
         const geojsonPolygon = geometryToGeojsonGeometry(polygon)
 
         // d3-geo requires the opposite polygon winding order of
@@ -35,7 +37,7 @@ export function getGeojsonPolygon(map: GeoreferencedMap): GeojsonPolygon {
         if (err instanceof Error) {
           message = err.message
         }
-        throw new Error(message)
+        throw new Error(message, { cause: err })
       }
     } else {
       throw new Error('resource mask should have more than 2 points')

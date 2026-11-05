@@ -3,6 +3,7 @@ export type ScreenshotStep =
   | { action: 'click' | 'hover'; selector: string }
   | { action: 'fill' | 'select'; selector: string; value: string }
   | { action: 'press'; selector: string; key: string }
+  | { action: 'scroll'; selector: string; deltaY: number; deltaX?: number }
   | {
       action: 'waitFor'
       selector: string
@@ -47,6 +48,8 @@ export type ScreenshotOptions = {
   waitForSelector?: string
   waitForRender?: boolean
   delay?: number
+  /** Exact pixel widths of additional WebP files; never upscale a capture. */
+  widths?: number[]
 }
 
 export type ScreenshotDefinition = Omit<
@@ -99,6 +102,12 @@ export function defineScreenshot(
   const steps = options.steps === undefined ? [] : normalizeSteps(options.steps)
   const targets =
     options.targets === undefined ? {} : normalizeTargets(options.targets)
+  if (options.widths !== undefined && !Array.isArray(options.widths)) {
+    throw new Error('Screenshot widths must be an array')
+  }
+  const widths = [...new Set(options.widths ?? [])]
+    .map((width) => positiveInteger(width, 'variant width', 12288))
+    .sort((a, b) => a - b)
   const viewport = {
     width: positiveInteger(options.viewport?.width ?? 1440, 'width', 4096),
     height: positiveInteger(options.viewport?.height ?? 900, 'height', 4096)
@@ -147,21 +156,28 @@ export function defineScreenshot(
     ...(crop ? { crop } : {}),
     ...(steps.length ? { steps } : {}),
     ...(Object.keys(targets).length ? { targets } : {}),
-    delay
+    delay,
+    ...(widths.length ? { widths } : {})
   }
 }
 
 export function screenshotKey(
-  definition: Pick<ScreenshotDefinition, 'slug' | 'version'>
+  definition: Pick<ScreenshotDefinition, 'slug' | 'version'>,
+  width?: number
 ) {
-  return `screenshots/${definition.slug}/v${definition.version}.webp`
+  const variant =
+    width === undefined
+      ? ''
+      : `-${positiveInteger(width, 'variant width', 12288)}w`
+  return `screenshots/${definition.slug}/v${definition.version}${variant}.webp`
 }
 
 export function screenshotUrl(
   definition: Pick<ScreenshotDefinition, 'slug' | 'version'>,
-  baseUrl = screenshotFilesBaseUrl
+  baseUrl = screenshotFilesBaseUrl,
+  width?: number
 ) {
-  return `${baseUrl.replace(/\/$/, '')}/${screenshotKey(definition)}`
+  return `${baseUrl.replace(/\/$/, '')}/${screenshotKey(definition, width)}`
 }
 
 function nonemptyString(value: unknown, name: string): asserts value is string {
@@ -261,6 +277,15 @@ function normalizeSteps(steps: ScreenshotStep[]): ScreenshotStep[] {
       case 'press':
         nonemptyString(step.key, `step ${index + 1} key`)
         return { action, selector, key: step.key }
+      case 'scroll': {
+        const deltaX = step.deltaX ?? 0
+        if (!Number.isFinite(deltaX) || !Number.isFinite(step.deltaY)) {
+          throw new Error(
+            `Screenshot step ${index + 1} scroll deltas must be finite numbers`
+          )
+        }
+        return { action, selector, deltaX, deltaY: step.deltaY }
+      }
       case 'waitFor':
         if (
           step.state !== undefined &&
