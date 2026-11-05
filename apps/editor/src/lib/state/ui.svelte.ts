@@ -2,6 +2,10 @@ import { setContext, getContext } from 'svelte'
 import { browser } from '$app/environment'
 
 import { UiEvents, UiEventTarget } from '$lib/shared/ui-events.js'
+import { getVarsState } from '$lib/state/vars.svelte.js'
+import { basemapPresets, getBasemapPreset } from '@allmaps/basemap'
+
+import type { EditorPublicEnv } from '@allmaps/env/editor'
 
 import type { PickerProjection } from '@allmaps/ui/projections'
 
@@ -47,41 +51,6 @@ type ResultsOptions = {
   renderMasks: boolean
 }
 
-const basemapPresets: BasemapPresetItem[] = [
-  {
-    label: 'Protomaps',
-    value: 'protomaps',
-    type: 'protomaps',
-    attribution:
-      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
-  },
-  {
-    label: 'ESRI World Topo',
-    value: 'esri-world-topo',
-    type: 'raster',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-    attribution:
-      'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
-  },
-
-  {
-    label: 'Esri World Imagery',
-    value: 'esri-world-imagery',
-    type: 'raster',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    // TODO: also add https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/12/1340/2108
-    attribution:
-      'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-  },
-  {
-    label: 'OpenStreetMap',
-    value: 'osm',
-    type: 'raster',
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: 'OpenStreetMap'
-  }
-]
-
 const allmapsPlugins: AllmapsPluginItem[] = [
   {
     label: 'MapLibre GL',
@@ -104,6 +73,7 @@ type ProjectionIndices = {
 
 export class UiState extends UiEventTarget {
   #urlState: UrlState<typeof searchParams>
+  #defaultBasemapPresetId: string | undefined
 
   #firstUse = $state(true)
   #mapGuideOpen = $state(true)
@@ -157,11 +127,13 @@ export class UiState extends UiEventTarget {
 
   constructor(
     urlState: UrlState<typeof searchParams>,
-    sourceState: SourceState
+    sourceState: SourceState,
+    defaultBasemapPresetId?: string
   ) {
     super()
 
     this.#urlState = urlState
+    this.#defaultBasemapPresetId = defaultBasemapPresetId
 
     // Create proxy objects for modal and popover access
     this.modalOpen = new Proxy({} as Record<Modal, boolean>, {
@@ -255,15 +227,9 @@ export class UiState extends UiEventTarget {
   }
 
   get basemapPreset(): BasemapPresetItem {
-    const basemapPreset = this.basemapPresets.find(
-      (preset) => preset.value === this.#urlState.params.basemapPresetId
+    return getBasemapPreset(
+      this.#urlState.params.basemapPresetId ?? this.#defaultBasemapPresetId
     )
-
-    if (basemapPreset) {
-      return basemapPreset
-    } else {
-      return this.basemapPresets[0]
-    }
   }
 
   get allmapsPlugins() {
@@ -414,7 +380,14 @@ export function setUiState(
   urlState: UrlState<typeof searchParams>,
   sourceState: SourceState
 ) {
-  return setContext(UI_KEY, new UiState(urlState, sourceState))
+  return setContext(
+    UI_KEY,
+    new UiState(
+      urlState,
+      sourceState,
+      getVarsState<EditorPublicEnv>().PUBLIC_BASEMAP
+    )
+  )
 }
 
 export function getUiState() {

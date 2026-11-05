@@ -31,7 +31,6 @@
     "better-auth": "catalog:",
     "elysia": "catalog:",
     "postgres": "catalog:",
-    "wrangler": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -41,6 +40,7 @@
     "drizzle-kit": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "wrangler": "catalog:"
   }
 }

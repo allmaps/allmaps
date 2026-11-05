@@ -1,4 +1,4 @@
-import { basemapStyle } from '@allmaps/basemap'
+import { basemapStyle, rasterBasemapStyle } from '@allmaps/basemap'
 import { getCurrentLocale } from '$lib/i18n/locale.js'
 
 import { LngLat } from 'maplibre-gl'
@@ -55,28 +55,8 @@ export function getProtomapsStyle(): StyleSpecification {
 export function getXyzLayerStyle(
   basemap: BasemapRasterPreset
 ): StyleSpecification {
-  return {
-    version: 8 as const,
-    glyphs: 'https://fonts.allmaps.org/maplibre/{fontstack}/{range}.pbf',
-    sources: {
-      xyz: {
-        type: 'raster' as const,
-        tiles: [basemap.url],
-        tileSize: 256,
-        attribution: basemap.attribution || ''
-      }
-    },
-    layers: [
-      {
-        id: 'xyz',
-        type: 'raster' as const,
-        source: 'xyz',
-        paint: {
-          'raster-opacity': 1
-        }
-      }
-    ]
-  }
+  // @ts-expect-error incorrect MapLibre types
+  return rasterBasemapStyle(basemap)
 }
 
 function isTerraDrawId(id: unknown) {

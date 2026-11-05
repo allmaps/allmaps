@@ -53,6 +53,7 @@
     "@allmaps/types": "workspace:^",
     "@eslint/js": "catalog:",
     "@sveltejs/adapter-cloudflare": "catalog:",
+    "@sveltejs/adapter-node": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",

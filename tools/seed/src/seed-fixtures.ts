@@ -24,14 +24,21 @@ function cropMap(map: GeoreferencedMap, fraction: number): GeoreferencedMap {
   }
 }
 
-export async function createSeedFixtures(fixturePort = ports.iiif) {
+// The two demo organizations are told apart by their fixture server origins
+export async function createSeedFixtures(
+  fixturePort = ports.iiif,
+  origins = [
+    `http://localhost:${fixturePort}`,
+    `http://127.0.0.1:${fixturePort}`
+  ]
+) {
   const organizations = await Promise.all(
     [
       {
         key: 'amsterdam',
         name: 'Demo Amsterdam Archive',
         slug: 'demo-amsterdam',
-        domain: 'localhost',
+        origin: origins[0],
         plan: 'innovator',
         coordinates: [4.895, 52.375] as [number, number]
       },
@@ -39,12 +46,13 @@ export async function createSeedFixtures(fixturePort = ports.iiif) {
         key: 'europe',
         name: 'Demo European Map Library',
         slug: 'demo-europe',
-        domain: '127.0.0.1',
+        origin: origins[1],
         plan: null,
         coordinates: [-0.12, 51.5] as [number, number]
       }
     ].map(async (organization) => ({
       ...organization,
+      domain: new URL(organization.origin).hostname,
       id: await seedId('organization', organization.key)
     }))
   )
@@ -87,9 +95,21 @@ export async function createSeedFixtures(fixturePort = ports.iiif) {
         fixtureId: 'f6033bee94f7763e',
         organization: organizations[1],
         title: 'Europe geology (awaiting georeferencing)'
+      },
+      {
+        key: 'scheveningen-unmapped',
+        fixtureId: '670dbd9ccc9a453a',
+        organization: organizations[0],
+        title: 'Van Vogelenzang tot Scheveningen (awaiting georeferencing)'
+      },
+      {
+        key: 'boston-unmapped',
+        fixtureId: 'bf358ffda2ce5ff9',
+        organization: organizations[1],
+        title: 'Map of Boston Common (awaiting georeferencing)'
       }
     ].map(async (resource) => {
-      const baseUrl = `http://${resource.organization.domain}:${fixturePort}/cors`
+      const baseUrl = `${resource.organization.origin}/cors`
       const uri = `${baseUrl}/iiif/3/level2/${resource.fixtureId}`
       const manifestUri = `${baseUrl}/manifests/3/3/level2/${resource.fixtureId}.json`
       const annotationUri = `${baseUrl}/annotations/images/3/level2/${resource.fixtureId}.json`

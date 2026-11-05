@@ -6,6 +6,7 @@
   import { Footer } from '@allmaps/ui'
 
   import { getUrlState } from '$lib/shared/params.js'
+  import { getExamplesState } from '$lib/state/examples.svelte.js'
 
   import {
     gotoRoute,
@@ -21,6 +22,7 @@
   import { m } from '$lib/paraglide/messages.js'
 
   const urlState = getUrlState()
+  const examplesState = getExamplesState()
 
   function handleInputSubmit(url: string) {
     gotoRoute(
@@ -82,16 +84,21 @@
       </p>
     </div>
   </section>
-  <section class="flex w-full flex-col items-center bg-[#f2feff] pb-16">
-    <div class="flex w-full max-w-(--breakpoint-lg) flex-col items-center p-2">
-      <div class="flex flex-col items-center space-y-4 p-8 text-center">
-        <h2 class="text-2xl font-bold text-black">
-          {m.homepage_pick_collection()}
-        </h2>
+  <!-- Hidden on instances without organizations to show -->
+  {#if examplesState.homepagePending || examplesState.homepageFailed || examplesState.organizations.length > 0}
+    <section class="flex w-full flex-col items-center bg-[#f2feff] pb-16">
+      <div
+        class="flex w-full max-w-(--breakpoint-lg) flex-col items-center p-2"
+      >
+        <div class="flex flex-col items-center space-y-4 p-8 text-center">
+          <h2 class="text-2xl font-bold text-black">
+            {m.homepage_pick_collection()}
+          </h2>
+        </div>
+        <Organizations />
       </div>
-      <Organizations />
-    </div>
-  </section>
+    </section>
+  {/if}
 </div>
 <Footer />
 

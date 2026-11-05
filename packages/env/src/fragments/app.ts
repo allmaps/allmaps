@@ -8,7 +8,9 @@ export const appPublicEnvSchema = urlsEnvSchema.merge(
     PUBLIC_STATS_WEBSITE_ID: z.string().optional(),
     PUBLIC_GEOCODE_EARTH_KEY: z.string().optional(),
     PUBLIC_BANNER_ENABLED: envBoolean.optional(),
-    PUBLIC_BANNER_TEXT: z.string().optional()
+    PUBLIC_BANNER_TEXT: z.string().optional(),
+    // A basemap preset ID from @allmaps/basemap; Protomaps when unset
+    PUBLIC_BASEMAP: z.string().optional()
     // VITE_BANNER_ENABLED
     // VITE_BANNER_TEXT
   })

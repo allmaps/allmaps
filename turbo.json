@@ -9,8 +9,14 @@
         "vite.config.ts",
         "svelte.config.js"
       ],
-      "outputs": ["dist/**", "build/**", ".screenshots/manifest.json"],
-      "dependsOn": ["^build", "copy-between"]
+      "outputs": [
+        "dist/**",
+        "build/**",
+        ".screenshots/manifest.json",
+        "tsconfig.tsbuildinfo"
+      ],
+      "dependsOn": ["^build", "copy-between"],
+      "env": ["ADAPTER"]
     },
     "types": {
       "inputs": ["src/**", "package.json", "tsconfig.json"],

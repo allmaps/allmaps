@@ -3,7 +3,15 @@
 
   import { Map as MapLibreMap } from 'maplibre-gl'
 
-  import { basemapStyle, addTerrain, removeTerrain } from '@allmaps/basemap'
+  import { page } from '$app/state'
+
+  import {
+    basemapStyle,
+    addTerrain,
+    removeTerrain,
+    getBasemapPreset,
+    rasterBasemapStyle
+  } from '@allmaps/basemap'
   import { WarpedMapLayer } from '@allmaps/maplibre'
   import { WarpedMapList } from '@allmaps/render'
 
@@ -760,10 +768,16 @@
 
     const bbox = warpedMapList.getMapsBbox()
 
+    const basemap = getBasemapPreset(page.data.env?.PUBLIC_BASEMAP)
+    const style =
+      basemap.type === 'raster'
+        ? rasterBasemapStyle(basemap)
+        : basemapStyle('en')
+
     map = new MapLibreMap({
       container,
       // @ts-expect-error incorrect MapLibre types
-      style: basemapStyle('en'),
+      style,
       maxPitch: 0,
       bearingSnap: 0,
       attributionControl: false,

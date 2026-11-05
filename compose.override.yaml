@@ -1,0 +1,118 @@
+# Development: every service runs from the mounted source and reloads on edit.
+# `docker compose up` applies this file on top of compose.yaml.
+#
+# `install` installs and builds at startup and whenever pnpm-lock.yaml changes;
+# the other services run through docker/dev-run.sh, which waits for it and
+# stops them during a reinstall.
+
+x-dev-base: &dev-base
+  image: allmaps-dev
+  build: { context: ., target: toolchain }
+  working_dir: /src
+  volumes:
+    - .:/src
+    - pnpm-store:/pnpm-store
+    - cargo-registry:/root/.cargo/registry
+    - dev-state:/state
+
+x-dev: &dev
+  <<: *dev-base
+  depends_on:
+    install:
+      condition: service_started
+
+x-vite: &vite
+  <<: *dev
+  command:
+    - docker/dev-run.sh
+    - >-
+      __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=.${DOMAIN:-allmaps.localhost}
+      exec pnpm --filter "$$PACKAGE" exec vite dev --host 0.0.0.0 --port 8080
+
+x-wrangler: &wrangler
+  <<: *dev
+  command:
+    - docker/dev-run.sh
+    - >-
+      env | grep -E '^(PUBLIC_[A-Z_]+|NODE_VERSION|USE_CACHE|BROWSER_CACHE_HOURS|CLOUDFLARE_CACHE_HOURS)=' > /tmp/worker.env &&
+      exec pnpm --filter "$$PACKAGE" exec wrangler dev --ip 0.0.0.0 --port 8080 --env-file /tmp/worker.env
+
+services:
+  install:
+    <<: *dev-base
+    command: docker/dev-install.sh
+    environment:
+      SITE: ${SCHEME:-http}://{}.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+    restart: unless-stopped
+
+  watch:
+    <<: *dev
+    command: [docker/dev-run.sh, exec pnpm watch]
+    restart: unless-stopped
+
+  migrate:
+    <<: *dev
+    command:
+      - docker/dev-run.sh
+      - node packages/db/dist/migrate.js && exec node tools/seed/src/postgres.ts
+    environment:
+      SEED_FIXTURE_ORIGINS: >-
+        ${SCHEME:-http}://fixtures-amsterdam.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}},${SCHEME:-http}://fixtures-europe.${DOMAIN:-allmaps.localhost}${URL_PORT-:${HTTP_PORT:-5490}}
+
+  rest:
+    <<: *dev
+    command: [docker/dev-run.sh, exec node --watch apis/rest/dist/node.js]
+
+  annotations:
+    <<: *dev
+    command:
+      [docker/dev-run.sh, exec node --watch apis/annotations/dist/node.js]
+
+  live:
+    <<: *dev
+    command: [docker/dev-run.sh, exec node --watch apis/live/dist/index.js]
+
+  editor:
+    <<: *vite
+    environment: { PACKAGE: '@allmaps/editor' }
+
+  viewer:
+    <<: *vite
+    environment: { PACKAGE: '@allmaps/viewer' }
+
+  console:
+    <<: *vite
+    environment: { PACKAGE: '@allmaps/console' }
+
+  fixtures:
+    <<: *vite
+    environment: { PACKAGE: '@allmaps/tools-iiif-server' }
+    restart: unless-stopped
+
+  # Development data stays apart from deployment data
+  postgres:
+    volumes:
+      - postgres-dev:/var/lib/postgresql/data
+
+  proxy:
+    volumes:
+      - ./docker/caddy-dev:/etc/caddy-dev:ro
+    networks:
+      default:
+        aliases:
+          - fixtures-amsterdam.${DOMAIN:-allmaps.localhost}
+          - fixtures-europe.${DOMAIN:-allmaps.localhost}
+
+  tileserver:
+    <<: *wrangler
+    environment: { PACKAGE: '@allmaps/tileserver' }
+
+  preview:
+    <<: *wrangler
+    environment: { PACKAGE: '@allmaps/preview' }
+
+volumes:
+  postgres-dev:
+  pnpm-store:
+  cargo-registry:
+  dev-state:

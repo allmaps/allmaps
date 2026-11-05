@@ -5,6 +5,12 @@ const CHECK_DNS_TIMEOUT = 500
 function checkProtocol(url: URL) {
   if (url.protocol === 'https:') {
     return true
+  } else if (
+    url.protocol === 'http:' &&
+    globalThis.location?.protocol === 'http:'
+  ) {
+    // Browsers only block HTTP resources on HTTPS pages
+    return true
   } else if (url.protocol === 'http:') {
     throw new FetchError(url.toString(), {
       type: 'INVALID_PROTOCOL',

@@ -105,20 +105,21 @@ describe('error tiles', () => {
         request
       )
       const env = {
+        USE_CACHE: true,
         BROWSER_CACHE_HOURS: 1,
         CLOUDFLARE_CACHE_HOURS: 1
       } as Parameters<typeof cache.headers>[2]
       await cache.headers(response, request, env)
-      await cache.put(response, request)
+      await cache.put(response, request, env)
       expect(response.headers.get('Cache-Control')).toBe('no-store')
       expect(response.headers.get('CDN-Cache-Control')).toBe('no-store')
       expect(put).not.toHaveBeenCalled()
       const failed = new Response('error', { status: 502 })
       await cache.headers(failed, request, env)
-      await cache.put(failed, request)
+      await cache.put(failed, request, env)
       expect(failed.headers.get('Cache-Control')).toBe('no-store')
       expect(put).not.toHaveBeenCalled()
-      await cache.put(new Response('normal tile'), request)
+      await cache.put(new Response('normal tile'), request, env)
       expect(put).toHaveBeenCalledOnce()
     } finally {
       vi.unstubAllGlobals()

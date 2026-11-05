@@ -1,0 +1,4 @@
+# Development: upstream's IIIF fixture server, under one hostname per demo
+# organization (organizations are told apart by domain)
+import {$TLS:off} fixtures-amsterdam fixtures
+import {$TLS:off} fixtures-europe fixtures

@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { page } from '$app/state'
+
+  import { getBasemapPreset } from '@allmaps/basemap'
   import { Modal } from '@allmaps/ui'
 
   import { getIiifState } from '$lib/state/iiif.svelte.js'
@@ -27,6 +30,9 @@
   const iiifState = getAttributionIiifState()
   const mapsState = getAttributionMapsState()
   const uiState = getUiState()
+
+  // Same preset as Map.svelte
+  const basemap = getBasemapPreset(page.data.env?.PUBLIC_BASEMAP)
 
   let georeferencedMapAttributionGroups = $derived(
     mapsState && iiifState
@@ -99,14 +105,22 @@
         </dd>
         <dt class="font-medium">Base map</dt>
         <dt>
-          ©
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            class="text-pink underline">OpenStreetMap</a
-          >, rendered with
-          <a href="https://protomaps.com/" class="text-pink underline"
-            >Protomaps</a
-          >,
+          {#if basemap.type === 'raster'}
+            <!-- Preset attributions are constants in @allmaps/basemap -->
+            <span class="[&_a]:text-pink [&_a]:underline">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html basemap.attribution}</span
+            >, rendered with
+          {:else}
+            ©
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              class="text-pink underline">OpenStreetMap</a
+            >, rendered with
+            <a href="https://protomaps.com/" class="text-pink underline"
+              >Protomaps</a
+            >,
+          {/if}
           <a href="https://maplibre.org/" class="text-pink underline"
             >MapLibre</a
           >

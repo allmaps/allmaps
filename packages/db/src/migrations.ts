@@ -44,6 +44,15 @@ export function loadMigrations(directory = migrationsDirectory) {
   return migrations
 }
 
+// Migrations whose SQL was rewritten after release, with their original hash.
+// Databases that ran the original keep that hash in their history.
+const rewrittenMigrations: Record<string, string> = {
+  '20260326133904_seed-organizations':
+    'e1b8e5b2ab743834de4161489c236ebef3428d1a2027533ce0fa85bc1a69f177',
+  '20260413075226_seed-organization_urls':
+    'cf983dd5ab905037bb6802e291af6963269afc3be006c8d75b83b6f673a54df3'
+}
+
 export type MigrationConnection = {
   query: (sql: string, values?: unknown[]) => Promise<Record<string, unknown>[]>
 }
@@ -77,7 +86,8 @@ export async function migrationHistory(
     }
     // Legacy Drizzle timestamps can include milliseconds.
     const matches = (migration: (typeof local)[number]) =>
-      migration.hash === entry.hash &&
+      (migration.hash === entry.hash ||
+        rewrittenMigrations[migration.name ?? ''] === entry.hash) &&
       (entry.name
         ? migration.name === entry.name
         : migration.folderMillis ===
