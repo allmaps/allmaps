@@ -23,6 +23,8 @@ import Example from '../../components/Example.astro'
 import Examples from '../../components/Examples.astro'
 import DataTable from '../../components/DataTable.svelte'
 import UrlInput from '../../components/UrlInput.svelte'
+import MapNarration from '../../components/MapNarration.svelte'
+import { narrationConfig, narrationSlides } from '../map-narration'
 
 import About from '../../components/About.astro'
 import Libraries from '../../components/Libraries.mdx'
@@ -143,6 +145,14 @@ export const speechBalloonTextColor = white
     __Read all about it in our [IIIF-Allmaps Partnership Brochure](/iiif-partnership/).__
   </div>
 </section>
+
+<Wider>
+  <MapNarration
+    client:visible
+    slides={narrationSlides}
+    {...narrationConfig}
+  />
+</Wider>
 
 {/* <section class="contents snot-content prose prose-sm sm:prose-base xl:prose-lg m-auto"> */}
 <section class="contents m-auto">
