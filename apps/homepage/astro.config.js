@@ -109,6 +109,7 @@ export default defineConfig({
     svelte()
   ],
   vite: {
+    worker: { format: 'es' },
     ssr: {
       noExternal: ['maplibre-gl', 'maplibre-contour']
     },
