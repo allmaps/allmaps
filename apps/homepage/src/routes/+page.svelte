@@ -1,7 +1,10 @@
 <script lang="ts">
   import { Screenshot } from '@allmaps/ui'
   import { orange, blue, pink, purple, green } from '@allmaps/tailwind'
-  import { PUBLIC_DOCS_BASE_URL } from '$env/static/public'
+  import {
+    PUBLIC_DOCS_BASE_URL,
+    PUBLIC_HOMEPAGE_BASE_URL
+  } from '$env/static/public'
 
   import { homepageScreenshots } from '$lib/data/homepage-screenshots.js'
   import { toolIdentities } from '$lib/data/tool-identities.js'
@@ -15,7 +18,6 @@
   import HomepageFeature from '$lib/components/HomepageFeature.svelte'
   import Footer from '$lib/components/Footer.svelte'
   import LatestMaps from '$lib/components/LatestMaps.svelte'
-  import IIIFPartnershipCard from '$lib/components/IIIFPartnershipCard.svelte'
   import HomepageResources from '$lib/components/HomepageResources.svelte'
   import ArrowLabel from '$lib/components/ArrowLabel.svelte'
 
@@ -410,10 +412,42 @@
           </ScreenshotPanel>
         {/snippet}
       </HomepageFeature>
+
+      <HomepageFeature
+        id="iiif-partnership-title"
+        title="Support Allmaps through IIIF"
+        class="scroll-mt-20 [--feature-color:theme(colors.green)]"
+      >
+        {#snippet description()}
+          <p>
+            Help sustain the open source tools that bring map collections to
+            life. Through the <a href="/iiif-partnership/"
+              >IIIF–Allmaps partnership</a
+            >, IIIF Consortium members can fund ongoing development and
+            maintenance, with dedicated services, training and support in
+            return.
+          </p>
+        {/snippet}
+        {#snippet media()}
+          <ScreenshotPanel color={green} href="/iiif-partnership/">
+            <Screenshot
+              class="w-full"
+              {...getScreenshotImage('iiif-partnership')}
+              sizes={screenshotSizes}
+              url={`${PUBLIC_HOMEPAGE_BASE_URL.replace(/\/$/, '')}/iiif-partnership/`}
+              slug="iiif-partnership"
+              viewport={{ width: 1280, height: 917, deviceScaleFactor: 1 }}
+              waitForSelector="[data-partnership-mask-grid].revealed"
+              delay={10000}
+              alt="The Allmaps–IIIF partnership page, with colorful map masks and the Allmaps and IIIF logos"
+              showUrl
+              urlDisplay="route"
+            />
+          </ScreenshotPanel>
+        {/snippet}
+      </HomepageFeature>
     </ol>
   </section>
-
-  <IIIFPartnershipCard />
 
   <section class="not-prose" aria-labelledby="example-maps-title">
     <ol role="list" class="not-prose m-0 list-none p-0">
