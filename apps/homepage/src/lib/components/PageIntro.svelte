@@ -51,7 +51,7 @@
 
 <style>
   .page-intro {
-    --intro-ink: #2b302e;
+    --intro-ink: var(--color-black);
 
     margin: 0;
     padding-block: 2.5rem;
