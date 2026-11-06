@@ -46,7 +46,11 @@
     "homepage:masks": "node scripts/generate-homepage-masks.ts",
     "map-data:preview": "node scripts/generate-map-data-preview.ts",
     "partners:previews": "node scripts/generate-partner-previews.ts",
-    "images:upload": "node scripts/upload-images.ts"
+    "images:upload": "node scripts/upload-images.ts",
+    "build:dev": "vite build --mode dev && node --env-file=../../.env.dev scripts/prepare-cloudflare.ts",
+    "deploy:dev": "pnpm --workspace-root exec wrangler deploy --config apps/homepage/wrangler.jsonc",
+    "build:production": "vite build --mode production && node --env-file=../../.env.production scripts/prepare-cloudflare.ts",
+    "deploy:production": "pnpm --workspace-root exec wrangler deploy --config apps/homepage/wrangler.jsonc --env production"
   },
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
