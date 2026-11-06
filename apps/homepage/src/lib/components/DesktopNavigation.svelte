@@ -53,7 +53,9 @@
 
     const navigationBounds = navigation.getBoundingClientRect()
     const columnOffset =
-      column.getBoundingClientRect().left - navigationBounds.left
+      column.getBoundingClientRect().left +
+      parseFloat(getComputedStyle(column).paddingLeft) -
+      navigationBounds.left
     const headingLeft =
       heading.getBoundingClientRect().left +
       parseFloat(getComputedStyle(heading).paddingLeft)
