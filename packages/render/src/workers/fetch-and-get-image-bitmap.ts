@@ -2,6 +2,8 @@ import { expose, transfer } from 'comlink'
 
 import { fetchUrl } from '@allmaps/stdlib'
 
+import { createTileImageBitmap } from '../shared/image-bitmap.js'
+
 import type { FetchFn } from '@allmaps/types'
 
 const fetchAndGetImageBitmapWorker = {
@@ -30,7 +32,7 @@ const fetchAndGetImageBitmapWorker = {
     // createImageBitmap decodes off the main thread and yields a GPU-uploadable
     // bitmap, avoiding the OffscreenCanvas getImageData() readback that the
     // ImageData worker needs. The bitmap is transferred (not cloned) back.
-    const imageBitmap = await createImageBitmap(blob, 0, 0, width, height)
+    const imageBitmap = await createTileImageBitmap(blob, width, height)
 
     return transfer(imageBitmap, [imageBitmap])
   }

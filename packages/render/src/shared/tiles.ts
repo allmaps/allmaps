@@ -69,8 +69,7 @@ export function getTileZoomLevelForScale(
   // Notice when this happens before taking a Math.log2(), it has more effect on smaller scales then on bigger.
 
   // For images with different tileSizes, the tile size of the best tileZoomLevel could be any of the available.
-  // If equally good, pick the one with the larges tileSize so as to best use the WebGL texture,
-  // which is sized to the largest available tileSize
+  // If equally good, pick the one with the largest tileSize so fewer tiles are needed
 
   let smallestLog2ScaleFactorDiff = Number.POSITIVE_INFINITY
   let bestTileZoomLevel = tileZoomLevels.at(-1) as TileZoomLevel
