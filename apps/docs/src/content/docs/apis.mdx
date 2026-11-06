@@ -1,30 +1,71 @@
 ---
 title: APIs
-description: Explore the Allmaps REST and Annotations APIs and their interactive references.
-tableOfContents: false
+description: Choose between the Allmaps Annotations and REST APIs, try example URLs, and explore their interactive references.
 ---
 
-import { Aside } from '@astrojs/starlight/components'
+Allmaps provides two APIs that use the same underlying map data:
 
-export const homepageBaseUrl = import.meta.env.PUBLIC_HOMEPAGE_BASE_URL || 'https://allmaps.org'
+- **Annotations API:** retrieve georeferencing data to display maps in Allmaps
+  Viewer, mapping libraries, and other tools that support Georeference Annotations.
+- **REST API:** build applications that query map and IIIF resource records,
+  inspect map versions, or import resources.
 
-Allmaps provides two APIs for working with digitized maps and their georeferencing data.
-
-<Aside title="Hosted API terms" type="caution">
-  Use of APIs hosted by Allmaps is free for non-commercial use. Commercial use
-  requires a paid agreement with Allmaps. These terms apply to the hosted
-  services, not to the open source API software or the public CC0 georeference
-  data. Read the <a href={new URL('/terms#hosted-allmaps-services', homepageBaseUrl).href}>Terms &amp; Usage</a>.
-</Aside>
+You can read public data through both APIs without signing in. All example URLs
+below are public `GET` requests: click one to inspect its JSON response.
 
 ## Annotations API
 
-Use the Annotations API to retrieve [Georeference Annotations](/georeference-annotations) for maps, IIIF images, canvases, manifests, and organizations. These annotations describe how maps are georeferenced and can be used in Allmaps Viewer, mapping libraries, and other tools that support the format.
+The Annotations API returns [Georeference Annotations](/georeference-annotations):
+the image reference, ground control points, resource mask, and transformation
+needed to place a map in geographic space. A single map returns an `Annotation`;
+a group of maps returns an `AnnotationPage` containing annotations.
 
-[View API documentation](/apis/annotations)
+Retrieve annotations for a map, IIIF image, canvas, manifest, or organization.
+You can pass these URLs directly to [Allmaps Viewer](/guides/viewing-maps)
+or an [Allmaps mapping library](/guides/using-maps).
+
+<div class="api-examples">
+
+| Example                              | API URL                                                                                                                                                             |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Georeference Annotation for one map  | <a href="https://annotations.allmaps.org/maps/1bfb1eb4198e7240">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"/1bfb1eb4198e7240"}</a>                 |
+| Annotations for all maps on an image | <a href="https://annotations.allmaps.org/images/2aa3bde6bcae3817">{"https://annotations.allmaps.org"}<wbr />{"/images"}<wbr />{"/2aa3bde6bcae3817"}</a>             |
+| Up to ten recently updated maps      | <a href="https://annotations.allmaps.org/maps?limit=10">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"?limit=10"}</a>                                 |
+| The same map's footprint as GeoJSON  | <a href="https://annotations.allmaps.org/maps/1bfb1eb4198e7240.geojson">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"/1bfb1eb4198e7240.geojson"}</a> |
+
+</div>
+
+The `.geojson` example returns the map's geographic footprint for use in GIS
+tools. Use the annotation URL when you want to display the warped map image.
+
+[Explore the Annotations API reference](/apis/annotations) for all endpoints
+and filters, including queries by location and institution.
 
 ## REST API
 
-Use the REST API to query maps, manage organizations and import and update IIIF resources. This API requires authentication for most endpoints.
+The REST API returns Allmaps JSON records for maps, IIIF images, canvases,
+manifests, and organizations. Map records expose georeferencing fields directly;
+IIIF resource records describe the source material, including images that have
+not yet been georeferenced.
 
-[View API documentation](/apis/rest)
+For example, `/images/2aa3bde6bcae3817` returns an **image record** from the REST
+API and an **Annotation Page of maps on that image** from the Annotations API.
+Both APIs use the same [Allmaps IDs](/guides/ids-in-allmaps).
+
+<div class="api-examples">
+
+| Example                                | API URL                                                                                                                                                                        |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The same map as an Allmaps JSON record | <a href="https://api.allmaps.org/maps/1bfb1eb4198e7240">{"https://api.allmaps.org"}<wbr />{"/maps"}<wbr />{"/1bfb1eb4198e7240"}</a>                                            |
+| An image's metadata and IIIF Image URL | <a href="https://api.allmaps.org/images/2aa3bde6bcae3817">{"https://api.allmaps.org"}<wbr />{"/images"}<wbr />{"/2aa3bde6bcae3817"}</a>                                        |
+| Up to ten images still to georeference | <a href="https://api.allmaps.org/images?georeferenced=false&amp;limit=10">{"https://api.allmaps.org"}<wbr />{"/images"}<wbr />{"?georeferenced=false"}<wbr />{"&limit=10"}</a> |
+| Available versions of a map            | <a href="https://api.allmaps.org/maps/1bfb1eb4198e7240/versions">{"https://api.allmaps.org"}<wbr />{"/maps"}<wbr />{"/1bfb1eb4198e7240"}<wbr />{"/versions"}</a>               |
+
+</div>
+
+The REST API also supports creating and updating data. Organization imports
+require appropriate membership, and endpoints marked **Admin only** require an
+Allmaps administrator.
+
+[Explore the REST API reference](/apis/rest) for request bodies, query parameters,
+and access requirements.
