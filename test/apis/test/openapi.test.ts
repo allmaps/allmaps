@@ -24,7 +24,7 @@ describe.each([
     homepageBaseUrl: 'http://localhost:5511/'
   }
 ])('API references in $environment', ({ docsBaseUrl, homepageBaseUrl }) => {
-  const apiDocsUrl = new URL('/api', docsBaseUrl).href
+  const apiDocsUrl = new URL('/apis', docsBaseUrl).href
   const termsUrl = new URL('/terms#hosted-allmaps-services', homepageBaseUrl)
     .href
   let context: TestContext
