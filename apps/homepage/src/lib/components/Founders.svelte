@@ -47,7 +47,7 @@
       </a>
       <p class="m-0! min-w-0">
         <strong>Jules Schoonman</strong> is a digital curator at
-        <a href="/partners#partner-founding-tudelft"
+        <a href="/partners#partner-tudelft"
           >Delft University of Technology Library</a
         >, a founding partner of Allmaps. He leads educational projects for
         Allmaps.

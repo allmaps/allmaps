@@ -1,4 +1,4 @@
-import proj4 from 'proj4'
+import proj4, { type Converter } from 'proj4'
 
 import { defaultGcpTransformerOptions } from '@allmaps/transform'
 import { mergeOptions, mergePartialOptions } from '@allmaps/stdlib'
@@ -149,9 +149,9 @@ const lonLatProjectionToWebMecatorProjectionConverter = proj4(
   lonLatProjection.definition,
   webMercatorProjection.definition
 )
-export const lonLatToWebMercator =
+export const lonLatToWebMercator: Converter['forward'] =
   lonLatProjectionToWebMecatorProjectionConverter.forward
-export const webMercatorToLonLat =
+export const webMercatorToLonLat: Converter['inverse'] =
   lonLatProjectionToWebMecatorProjectionConverter.inverse
 
 export function projectionDefinitionToAntialiasedDefinition(
