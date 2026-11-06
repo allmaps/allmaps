@@ -4,10 +4,14 @@ description: View georeferenced maps in Allmaps Viewer or add them to your own w
 ---
 
 import { Screenshot } from '@allmaps/ui'
+import { getScreenshotImage } from '../../../screenshots/image'
 import EditorExportScreenshot from '../../../components/EditorExportScreenshot.svelte'
 import MapExample from '../../../components/MapExample.astro'
 import viewerScreenshot from '../../../images/viewer-saigon.webp'
 import editorExportImage from '../../../images/screenshots/editor-export-version.png'
+
+export const viewerImage = await getScreenshotImage(viewerScreenshot)
+export const exportImage = await getScreenshotImage(editorExportImage)
 
 Use [Allmaps Viewer](https://viewer.allmaps.org/) to explore georeferenced maps
 in your browser, or add them to your own website with an Allmaps plugin for
@@ -32,7 +36,7 @@ also used in the Georeference Annotations guide.
     <Screenshot
       url="https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F1bfb1eb4198e7240%40c83337fa4b8051c9"
       slug="viewer-saigon"
-      src={viewerScreenshot.src}
+      {...viewerImage}
       viewport={{
         width: viewerScreenshot.width,
         height: viewerScreenshot.height
@@ -103,7 +107,11 @@ available when sharing a single map or the maps on one image. When sharing all
 images in a Manifest or Collection, links use the latest version.
 
 <div class="not-content p-8">
-  <EditorExportScreenshot src={editorExportImage.src} />
+  <EditorExportScreenshot
+    src={exportImage.src}
+    srcset={exportImage.srcset}
+    sizes={exportImage.sizes}
+  />
 </div>
 
 Versioned links preserve the georeferencing data, including ground control

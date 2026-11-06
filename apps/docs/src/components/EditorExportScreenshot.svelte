@@ -4,13 +4,16 @@
   import { editorExportScreenshot } from '../screenshots/editor-export.js'
   import capturedGeometry from '../images/screenshots/editor-export-version.geometry.json'
 
-  let { src }: { src: string } = $props()
+  let { src, srcset, sizes }: { src: string; srcset?: string; sizes?: string } =
+    $props()
   const geometry = validateScreenshotGeometry(capturedGeometry)
 </script>
 
 <Screenshot
   {...editorExportScreenshot}
   {src}
+  {srcset}
+  {sizes}
   {geometry}
   shadow
   highlights={['export']}

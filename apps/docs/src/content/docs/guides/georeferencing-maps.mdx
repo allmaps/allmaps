@@ -4,7 +4,10 @@ description: 'Guide for georeferencing maps using Allmaps Editor'
 ---
 
 import EditorSettingsScreenshot from '../../../components/EditorSettingsScreenshot.svelte'
+import { getScreenshotImage } from '../../../screenshots/image'
 import editorSettingsImage from '../../../images/screenshots/editor-display-settings.webp'
+
+export const settingsImage = await getScreenshotImage(editorSettingsImage)
 
 export const homepageBaseUrl = import.meta.env.PUBLIC_HOMEPAGE_BASE_URL || 'https://allmaps.org'
 
@@ -186,7 +189,11 @@ reference.
 <figure class="not-content">
   <div class="p-8">
     <a href={editorSettingsImage.src} aria-label="View the Editor settings screenshot at full size">
-      <EditorSettingsScreenshot src={editorSettingsImage.src} />
+      <EditorSettingsScreenshot
+        src={settingsImage.src}
+        srcset={settingsImage.srcset}
+        sizes={settingsImage.sizes}
+      />
     </a>
   </div>
   <figcaption class="mt-3 text-sm text-[var(--sl-color-gray-2)]">

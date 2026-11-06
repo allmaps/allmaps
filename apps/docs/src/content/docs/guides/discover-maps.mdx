@@ -4,8 +4,12 @@ description: Discover maps already georeferenced with Allmaps and open them in A
 ---
 
 import { Screenshot } from '@allmaps/ui'
+import { getScreenshotImage } from '../../../screenshots/image'
 import latestScreenshot from '../../../images/allmaps-latest.png'
 import hereScreenshot from '../../../images/allmaps-here.png'
+
+export const latestImage = await getScreenshotImage(latestScreenshot)
+export const hereImage = await getScreenshotImage(hereScreenshot)
 
 Discover maps that people have already georeferenced with Allmaps. Browse recent
 contributions or find historical maps around you.
@@ -21,7 +25,7 @@ collections and seeing what other people are working on.
     <Screenshot
       url="https://latest.allmaps.org/"
       slug="allmaps-latest"
-      src={latestScreenshot.src}
+      {...latestImage}
       viewport={{
         width: latestScreenshot.width,
         height: latestScreenshot.height
@@ -46,7 +50,7 @@ current location.
     <Screenshot
       url="https://here.allmaps.org/?position=52.01,4.36"
       slug="allmaps-here"
-      src={hereScreenshot.src}
+      {...hereImage}
       viewport={{
         width: hereScreenshot.width,
         height: hereScreenshot.height
