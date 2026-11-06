@@ -1,10 +1,7 @@
 <script lang="ts">
   import { Screenshot } from '@allmaps/ui'
   import { orange, blue, pink, purple, green } from '@allmaps/tailwind'
-  import {
-    PUBLIC_DOCS_BASE_URL,
-    PUBLIC_HOMEPAGE_BASE_URL
-  } from '$env/static/public'
+  import { PUBLIC_DOCS_BASE_URL } from '$env/static/public'
 
   import { homepageScreenshots } from '$lib/data/homepage-screenshots.js'
   import { toolIdentities } from '$lib/data/tool-identities.js'
@@ -39,12 +36,6 @@
   const rotterdamPhoneImage = getExampleImage('rotterdam-city-map-phone')
 
   const docsBaseUrl = PUBLIC_DOCS_BASE_URL.replace(/\/$/, '')
-  const homepageUrl = new URL('/', PUBLIC_HOMEPAGE_BASE_URL).href
-  const title = 'Allmaps: curating, georeferencing and exploring IIIF maps'
-  const description = 'Curating, georeferencing and exploring for IIIF maps'
-  const ogImageUrl = new URL('/allmaps.jpg', homepageUrl).href
-  const ogImageAlt =
-    'Allmaps logo on a blue radial gradient with colorful map outlines'
   const screenshotSizes =
     'auto, (min-width: 1168px) 480px, (min-width: 768px) calc((100vw - 208px) / 2), (min-width: 640px) calc(100vw - 96px), calc(100vw - 64px)'
 
@@ -89,31 +80,6 @@
     }
   ]
 </script>
-
-<svelte:head>
-  <title>{title}</title>
-  <meta name="description" content={description} />
-  <link rel="canonical" href={homepageUrl} />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Allmaps" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:url" content={homepageUrl} />
-  <meta property="og:image" content={ogImageUrl} />
-  {#if ogImageUrl.startsWith('https:')}
-    <meta property="og:image:secure_url" content={ogImageUrl} />
-  {/if}
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content={ogImageAlt} />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={ogImageUrl} />
-  <meta name="twitter:image:alt" content={ogImageAlt} />
-</svelte:head>
 
 <HomepageTitle />
 

@@ -22,7 +22,13 @@ export const load: LayoutServerLoad = ({ url }) => {
     error(404, 'Content page not found')
   }
 
+  const metadata = normalizeContentPageMetadata(contentPageModule)
+
   return {
-    metadata: normalizeContentPageMetadata(contentPageModule)
+    metadata,
+    pageMetadata: {
+      title: metadata.title,
+      description: metadata.description
+    }
   }
 }
