@@ -7,7 +7,7 @@
 </script>
 
 <section
-  class="page-width mt-8 mb-16 grid items-center gap-6 md:grid-cols-2 md:gap-16 [&_img]:m-0"
+  class="page-width mt-8 mb-16 grid items-center gap-6 max-md:rounded-xl max-md:bg-[color-mix(in_srgb,theme(colors.green)_10%,white)] max-md:p-6 md:grid-cols-2 md:gap-16 max-md:[&>div_h3]:text-green max-md:[&>div_a]:text-green max-md:[&>a]:bg-transparent max-md:[&>a]:p-0 [&_img]:m-0"
   aria-labelledby="iiif-partnership-title"
 >
   <div class="md:order-2">
