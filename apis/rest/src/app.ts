@@ -43,7 +43,7 @@ const openApiTags = [
 ]
 
 export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
-  const apiDocsUrl = new URL('/api', env.PUBLIC_DOCS_BASE_URL).href
+  const apiDocsUrl = new URL('/apis', env.PUBLIC_DOCS_BASE_URL).href
   const termsUrl = new URL(
     '/terms#hosted-allmaps-services',
     env.PUBLIC_HOMEPAGE_BASE_URL
