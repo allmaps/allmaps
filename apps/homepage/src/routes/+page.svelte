@@ -88,7 +88,10 @@
 >
   <section class="page-width [&>ol]:m-0">
     <ol role="list" class="flex list-none flex-col gap-8 p-0 py-8 md:gap-16">
-      <HomepageFeature title="Works with any IIIF map">
+      <HomepageFeature
+        title="Works with any IIIF map"
+        class="[--feature-color:theme(colors.orange)]"
+      >
         {#snippet description()}
           <p>
             More and more institutions around the world use
@@ -118,7 +121,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Built on open standards">
+      <HomepageFeature
+        title="Built on open standards"
+        class="[--feature-color:theme(colors.blue)]"
+      >
         {#snippet description()}
           <p>
             All components of Allmaps use
@@ -157,7 +163,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Client-side map warping">
+      <HomepageFeature
+        title="Client-side map warping"
+        class="[--feature-color:theme(colors.pink)]"
+      >
         {#snippet description()}
           <p>
             Allmaps can warp maps on-the-fly, in the browser. Allmaps functions
@@ -196,7 +205,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="More than displaying map layers">
+      <HomepageFeature
+        title="More than displaying map layers"
+        class="[--feature-color:theme(colors.purple)]"
+      >
         {#snippet description()}
           <p>
             Allmaps is about more than warping images and displaying map
@@ -238,7 +250,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="It's all about the URL">
+      <HomepageFeature
+        title="It's all about the URL"
+        class="[--feature-color:theme(colors.green)]"
+      >
         {#snippet description()}
           <p>
             Start georeferencing in
@@ -277,7 +292,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Entirely open source">
+      <HomepageFeature
+        title="Entirely open source"
+        class="[--feature-color:theme(colors.orange)]"
+      >
         {#snippet description()}
           <p>
             The whole <a href="https://github.com/allmaps/allmaps"
@@ -310,7 +328,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Not just the browser">
+      <HomepageFeature
+        title="Not just the browser"
+        class="[--feature-color:theme(colors.blue)]"
+      >
         {#snippet description()}
           <p>
             Use georeferenced maps in QGIS and other GIS software. Load an
@@ -347,7 +368,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Aerial photos & building plans">
+      <HomepageFeature
+        title="Aerial photos & building plans"
+        class="[--feature-color:theme(colors.pink)]"
+      >
         {#snippet description()}
           <p>
             Allmaps works with any IIIF resource that can be georeferenced,
