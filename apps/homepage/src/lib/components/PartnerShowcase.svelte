@@ -32,7 +32,7 @@
       class="grid min-w-0 scroll-mt-24 grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 border-b border-black/10 py-6 md:grid-cols-[8rem_minmax(0,1fr)_min(32%,17.5rem)] md:gap-6 lg:grid-cols-[10rem_minmax(0,1fr)_17.5rem] [&>figure]:col-span-2 md:[&>figure]:col-span-1 md:[&>figure]:col-start-3"
     >
       <div
-        class="flex aspect-square w-full items-center justify-center rounded-md bg-[#f1f3f4] p-2 data-[plan=innovator]:bg-pink/10 data-[plan=supporter]:bg-green/10 md:p-3"
+        class="flex aspect-square w-full items-center justify-center rounded-md bg-[#f7f8f9] p-2 data-[plan=innovator]:bg-pink/10 data-[plan=supporter]:bg-green/10 md:p-3"
         class:invisible={!organization.logo}
         data-plan={organization.plan}
       >

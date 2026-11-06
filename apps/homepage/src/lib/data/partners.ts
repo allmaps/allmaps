@@ -115,8 +115,7 @@ export const partnerOrganizations: PartnerOrganization[] = [
     name: 'Universiteitsbibliotheek VU',
     slug: 'vu',
     logo: 'https://files.allmaps.org/images/organizations/vu.svg',
-    homepage:
-      'https://researchworks.oclc.org/iiif-explorer/search?q=collection.id%3Ahttps%3A%2F%2Fresearchworks.oclc.org%2Fdigital%2Fdataset%2F21033_krt',
+    homepage: 'https://vu.contentdm.oclc.org/digital/collection/krt',
     plan: 'partner'
   }
 ]

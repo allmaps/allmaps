@@ -73,11 +73,14 @@
 </script>
 
 {#snippet navigationSection(group: NavigationGroup, index: number)}
+  <!-- Extend desktop hover areas to the dividers while keeping links aligned. -->
   <section
     aria-labelledby={`${id}-${index}`}
     data-navigation-column={mobile ? undefined : ''}
     data-active={!mobile && activeGroupIndex === index ? '' : undefined}
-    class={mobile ? undefined : 'row-span-2 grid grid-rows-subgrid'}
+    class={mobile
+      ? undefined
+      : 'relative -mx-4 row-span-2 grid grid-rows-subgrid px-4 before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-black/10 before:transition-colors before:duration-100 before:ease-in-out data-[active]:before:bg-pink motion-reduce:before:transition-none'}
     onpointerenter={(event) => {
       if (event.pointerType === 'mouse') onActiveGroupChange?.(index, 'pointer')
     }}
@@ -118,12 +121,12 @@
         <li>
           <a
             class={[
-              'block rounded-sm py-2 text-sm no-underline transition-colors duration-150 hover:text-pink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink motion-reduce:transition-none',
+              'block rounded-sm py-2 text-sm no-underline transition-colors duration-100 ease-in-out hover:text-pink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink motion-reduce:transition-none',
               mobile
                 ? 'flex min-h-11 items-center text-black/80'
                 : activeGroupIndex === index
-                  ? 'font-semibold text-black'
-                  : 'text-gray-700'
+                  ? 'text-black'
+                  : 'text-gray-600'
             ]}
             href={link.href}
             onclick={onNavigate}
@@ -142,7 +145,7 @@
   aria-label="Main navigation"
   class={mobile
     ? 'flex gap-4 max-[380px]:gap-3'
-    : 'grid grid-cols-4 gap-x-4 gap-y-3'}
+    : 'grid grid-cols-4 gap-x-8 gap-y-3'}
 >
   {#if mobile}
     {#each [0, 1] as columnIndex (columnIndex)}

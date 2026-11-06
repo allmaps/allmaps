@@ -12,6 +12,6 @@ hero:
   import GetStarted from '$lib/components/GetStarted.svelte'
 </script>
 
-<PageIntro text="New here? Learn how to georeference maps, explore collections or add maps to your website." />
+<PageIntro text="New here? Georeference your first map, explore collections or use Allmaps on your website." />
 
 <GetStarted />

@@ -26,6 +26,6 @@ hero:
 - rotterdam time machine
 - Open Maps Meeting -->
 
-<PageIntro text="See how people georeference their collections and use Allmaps’ plugins, open source tools and georeference data." />
+<PageIntro text="See what other people are building with Allmaps’ tools and open data" />
 
 <ShowcaseList />

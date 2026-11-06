@@ -96,9 +96,14 @@
   class={[
     isHomepage ? 'fixed' : 'sticky',
     isVisible ? 'translate-y-0' : '-translate-y-full',
-    'top-0 z-20 w-full border-b border-black/10 bg-white/90 backdrop-blur transition-transform duration-300 focus-within:translate-y-0 focus-within:transition-none'
+    'top-0 z-20 w-full border-b border-black/10 transition-transform duration-300 focus-within:translate-y-0 focus-within:transition-none'
   ]}
 >
+  <!-- Keep the backdrop separate so the dropdown can blur the page too. -->
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 -z-10 bg-white/90 backdrop-blur"
+  ></div>
   <div
     class="page-width flex h-16 items-center justify-between gap-6 max-[380px]:gap-2 md:grid md:grid-cols-[10rem_minmax(0,1fr)_8rem]"
   >
@@ -117,7 +122,7 @@
         </Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Content
-            class="site-mobile-menu fixed top-0 right-0 z-50 flex h-[100dvh] w-full flex-col bg-white shadow-xl md:hidden"
+            class="site-mobile-menu fixed top-0 right-0 z-50 flex h-[100dvh] w-full flex-col bg-white/90 shadow-xl backdrop-blur md:hidden"
           >
             <div class="shrink-0 border-b border-black/10">
               <div
