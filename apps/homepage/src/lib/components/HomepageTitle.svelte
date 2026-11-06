@@ -275,18 +275,19 @@
   class="relative overflow-hidden flex justify-center items-center h-screen min-h-150 text-center text-white bg-[#101656] bg-[radial-gradient(circle_at_var(--gradient-x)_var(--gradient-y),var(--gradient-from)_0%,var(--gradient-to)_100%)]"
 >
   {#if width && height && masks.length}
-    <svg
-      class:loading
-      class="background pointer-events-none w-full h-full absolute"
-      id="masks"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      preserveAspectRatio="xMinYMin slice"
-      x="0px"
-      y="0px"
-      viewBox="0 0 {width} {height}"
-      ><g transform-origin="{width / 2} {height / 2}" class="scroll-group">
+    <div class="scroll-group pointer-events-none absolute inset-0">
+      <svg
+        class:loading
+        class="background pointer-events-none w-full h-full absolute"
+        id="masks"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        preserveAspectRatio="xMinYMin slice"
+        x="0px"
+        y="0px"
+        viewBox="0 0 {width} {height}"
+      >
         {#each masks as mask, index (index)}
           {#if mask}
             <g
@@ -325,8 +326,8 @@
             </g>
           {/if}
         {/each}
-      </g>
-    </svg>
+      </svg>
+    </div>
   {/if}
 
   {#if showMap && bounds}
@@ -382,10 +383,17 @@
 </div>
 
 <style>
-  #title svg .scroll-group {
+  #title .scroll-group {
+    transform-origin: center;
     animation: scroll linear;
     animation-timeline: scroll(block root);
     animation-range: 0 100vh;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #title .scroll-group {
+      animation: none;
+    }
   }
 
   #masks.loading path:hover {
@@ -409,11 +417,11 @@
 
   @keyframes scroll {
     0% {
-      scale: 1;
+      transform: scale(1);
     }
 
     100% {
-      scale: 1.4;
+      transform: scale(1.4);
     }
   }
 </style>
