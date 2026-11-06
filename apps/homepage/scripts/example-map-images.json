@@ -1,0 +1,41 @@
+{
+  "maps": [
+    {
+      "slug": "rotterdam-city-map",
+      "version": 2,
+      "annotationUrl": "https://annotations.allmaps.org/manifests/631b96e4d6d3f421",
+      "bounds": [4.425, 51.904, 4.496, 51.936],
+      "size": [3840, 2160],
+      "widths": [480, 640, 960, 1280, 1600, 1920, 2560, 3200, 3840],
+      "phoneCrop": {
+        "region": [1536, 216, 2304, 1728],
+        "widths": [480, 640, 960, 1280, 1600, 1920, 2304]
+      }
+    },
+    {
+      "slug": "lynn-city-atlas",
+      "version": 3,
+      "annotationUrl": "https://annotations.allmaps.org/manifests/23379602e8187445",
+      "bounds": [-70.9605, 42.4605, -70.9405, 42.4688],
+      "size": [3840, 2160],
+      "widths": [480, 640, 960, 1280, 1600, 1920, 2560, 3200, 3840],
+      "phoneCrop": {
+        "region": [768, 216, 2304, 1728],
+        "widths": [480, 640, 960, 1280, 1600, 1920, 2304]
+      }
+    },
+    {
+      "slug": "manhattan-aerial-survey",
+      "version": 3,
+      "annotationUrl": "https://annotations.allmaps.org/manifests/06b7d15dc577b7ee",
+      "bounds": [-73.982, 40.7655, -73.95, 40.8005],
+      "rotation": 61,
+      "size": [3840, 2160],
+      "widths": [480, 640, 960, 1280, 1600, 1920, 2560, 3200, 3840],
+      "phoneCrop": {
+        "region": [1152, 216, 2304, 1728],
+        "widths": [480, 640, 960, 1280, 1600, 1920, 2304]
+      }
+    }
+  ]
+}

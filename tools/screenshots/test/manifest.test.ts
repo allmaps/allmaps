@@ -78,6 +78,31 @@ describe('screenshot definitions', () => {
     ).toThrow('Conflicting screenshot')
   })
 
+  test('merges delivery widths for the same captured frame', () => {
+    const manifest = createManifest([
+      { ...options, widths: [960, 480, 960] },
+      { ...options, widths: [1920, 960] },
+      options
+    ])
+    expect(manifest.screenshots).toHaveLength(1)
+    expect(manifest.screenshots[0].widths).toEqual([480, 960, 1920])
+    expect(screenshotUrl(manifest.screenshots[0], undefined, 480)).toBe(
+      'https://files.allmaps.org/screenshots/viewer-rotterdam/v1-480w.webp'
+    )
+    expect(defineScreenshot({ ...options, widths: [] })).toEqual(
+      defineScreenshot(options)
+    )
+  })
+
+  test.each([0, -1, 1.5, NaN, Infinity, 12289, '480'])(
+    'rejects invalid variant width %s',
+    (width) => {
+      expect(() =>
+        defineScreenshot({ ...options, widths: [width as number] })
+      ).toThrow('variant width')
+    }
+  )
+
   test.each(['../escape', 'foo/bar', '', 'UPPERCASE', undefined])(
     'rejects unsafe slug %s',
     (slug) => {
@@ -154,7 +179,8 @@ test('normalizes preparation steps and sorted capture targets through JSON manif
     ...options,
     steps: [
       { action: 'click', selector: '#settings' },
-      { action: 'waitFor', selector: '#panel' }
+      { action: 'waitFor', selector: '#panel' },
+      { action: 'scroll', selector: '#map', deltaY: 396.6 }
     ],
     targets: { panel: '#panel', button: '#settings' }
   })
@@ -164,6 +190,12 @@ test('normalizes preparation steps and sorted capture targets through JSON manif
     state: 'visible'
   })
   expect(Object.keys(definition.targets!)).toEqual(['button', 'panel'])
+  expect(definition.steps?.[2]).toEqual({
+    action: 'scroll',
+    selector: '#map',
+    deltaX: 0,
+    deltaY: 396.6
+  })
   expect(
     createManifest([definition, JSON.parse(JSON.stringify(definition))])
       .screenshots
@@ -182,6 +214,10 @@ test.each([
   { steps: [{ action: 'click', selector: '' }] },
   { steps: [{ action: 'fill', selector: '#input', value: 1 }] },
   { steps: [{ action: 'press', selector: '#input', key: '' }] },
+  { steps: [{ action: 'scroll', selector: '#map', deltaY: NaN }] },
+  {
+    steps: [{ action: 'scroll', selector: '#map', deltaY: 1, deltaX: Infinity }]
+  },
   { steps: [{ action: 'waitFor', selector: '#input', state: 'detached' }] },
   { targets: [] },
   { targets: { 'bad name': '#button' } },

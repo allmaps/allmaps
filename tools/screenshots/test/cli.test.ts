@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
+import sharp from 'sharp'
 
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
@@ -74,6 +75,10 @@ test.each([
   [['--timeout', '120001'], 'must be between 1 and 120000'],
   [['--timeout', 'not-a-number'], 'must be between 1 and 120000'],
   [['--overwrite'], '--overwrite requires --upload'],
+  [
+    ['--variants-only', '--refresh'],
+    '--variants-only cannot be combined with --refresh'
+  ],
   [['--slug', 'missing'], 'Unknown screenshot slug: missing']
 ])('rejects %j before capturing or uploading', async (args, message) => {
   const result = await run(args)
@@ -98,4 +103,40 @@ test('takes the Assets CLI from the environment, with an explicit flag taking pr
   expect(fromFlag.code).toBe(1)
   expect(fromFlag.stderr).toContain('flag-assets.ts')
   expect(fromFlag.stderr).not.toContain('env-assets.ts')
+})
+
+test('prepares variants of an existing image without requiring a capture browser', async () => {
+  const captures = path.join(directory, 'captures')
+  await mkdir(path.join(captures, 'screenshots/viewer'), { recursive: true })
+  await sharp({
+    create: { width: 320, height: 200, channels: 3, background: '#ffffff' }
+  })
+    .webp()
+    .toFile(path.join(captures, 'screenshots/viewer/v1.webp'))
+  const manifest = path.join(directory, 'responsive.json')
+  await writeFile(
+    manifest,
+    JSON.stringify({
+      version: 1,
+      screenshots: [
+        { slug: 'viewer', url: 'https://example.org', widths: [80, 160] }
+      ]
+    })
+  )
+  const result = await run(
+    ['--manifest', manifest, '--output', captures, '--variants-only'],
+    { PLAYWRIGHT_BROWSERS_PATH: path.join(directory, 'no-browsers') }
+  )
+  expect(result.code).toBe(0)
+  expect(result.stderr).toContain('Prepared 2 variants')
+  expect(
+    (
+      await sharp(
+        path.join(captures, 'screenshots/viewer/v1-80w.webp')
+      ).metadata()
+    ).width
+  ).toBe(80)
+  expect(JSON.parse(result.stdout)[0].filename).toBe(
+    path.join(captures, 'screenshots/viewer/v1.webp')
+  )
 })

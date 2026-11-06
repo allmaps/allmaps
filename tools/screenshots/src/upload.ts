@@ -4,18 +4,30 @@ import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { contentHash, loadScreenshotGeometry } from './geometry.ts'
+import { writeScreenshotVariants } from './variants.ts'
 
 import { screenshotKey, screenshotGeometryKey } from '@allmaps/ui/screenshots'
 import type { ScreenshotDefinition } from '@allmaps/ui/screenshots'
 
 const executeFile = promisify(execFile)
 
+type ScreenshotAsset = 'image' | 'geometry' | { width: number }
+
+function assetKey(definition: ScreenshotDefinition, asset: ScreenshotAsset) {
+  return asset === 'geometry'
+    ? screenshotGeometryKey(definition)
+    : screenshotKey(
+        definition,
+        typeof asset === 'object' ? asset.width : undefined
+      )
+}
+
 export function uploadArguments(
   cli: string,
   filename: string,
   definition: ScreenshotDefinition,
   overwrite = false,
-  asset: 'image' | 'geometry' = 'image'
+  asset: ScreenshotAsset = 'image'
 ) {
   return [
     cli,
@@ -23,11 +35,9 @@ export function uploadArguments(
     'file',
     filename,
     '--key',
-    asset === 'image'
-      ? screenshotKey(definition)
-      : screenshotGeometryKey(definition),
+    assetKey(definition, asset),
     '--content-type',
-    asset === 'image' ? 'image/webp' : 'application/json',
+    asset === 'geometry' ? 'application/json' : 'image/webp',
     ...(overwrite ? ['--overwrite'] : [])
   ]
 }
@@ -37,7 +47,7 @@ export async function uploadScreenshot(
   filename: string,
   definition: ScreenshotDefinition,
   overwrite = false,
-  asset: 'image' | 'geometry' = 'image'
+  asset: ScreenshotAsset = 'image'
 ): Promise<{ publicUrl: string }> {
   let stdout: string
   try {
@@ -73,24 +83,29 @@ export async function uploadScreenshot(
   return { publicUrl: result.publicUrl }
 }
 
-/** Publish a validated image/geometry pair, retaining receipts for safe retries. */
+/** Publish validated images and geometry, retaining receipts for safe retries. */
 export async function publishScreenshot(
   definition: ScreenshotDefinition,
   options: { directory: string; assetsCli: string; overwrite?: boolean }
-): Promise<{ publicUrl: string; geometryPublicUrl?: string }> {
+): Promise<{
+  publicUrl: string
+  geometryPublicUrl?: string
+  variantPublicUrls?: Record<number, string>
+}> {
   if (definition.targets || definition.crop) {
     await loadScreenshotGeometry(definition, options)
   }
-  const assets: ('image' | 'geometry')[] =
-    definition.targets || definition.crop ? ['image', 'geometry'] : ['image']
-  const urls: string[] = []
+  await writeScreenshotVariants(definition, options)
+  const assets: ScreenshotAsset[] = [
+    'image',
+    ...(definition.targets || definition.crop ? ['geometry' as const] : []),
+    ...(definition.widths ?? []).map((width) => ({ width }))
+  ]
+  const urls = new Map<ScreenshotAsset, string>()
   const origin =
     process.env.ALLMAPS_ASSETS_BASE_URL ?? 'https://assets.allmaps.org'
   for (const asset of assets) {
-    const key =
-      asset === 'image'
-        ? screenshotKey(definition)
-        : screenshotGeometryKey(definition)
+    const key = assetKey(definition, asset)
     const filename = path.join(options.directory, key)
     const receiptFilename = `${filename}.upload.json`
     const hash = contentHash(await readFile(filename))
@@ -122,10 +137,21 @@ export async function publishScreenshot(
         JSON.stringify({ hash, origin, publicUrl })
       )
     }
-    urls.push(publicUrl)
+    urls.set(asset, publicUrl)
   }
   return {
-    publicUrl: urls[0],
-    ...(urls[1] ? { geometryPublicUrl: urls[1] } : {})
+    publicUrl: urls.get('image')!,
+    ...(urls.has('geometry')
+      ? { geometryPublicUrl: urls.get('geometry')! }
+      : {}),
+    ...(definition.widths?.length
+      ? {
+          variantPublicUrls: Object.fromEntries(
+            [...urls].flatMap(([asset, url]) =>
+              typeof asset === 'object' ? [[asset.width, url]] : []
+            )
+          )
+        }
+      : {})
   }
 }

@@ -1,0 +1,26 @@
+---
+title: Partners | Allmaps
+description: Organizations that support and fund Allmaps.
+label: Partners
+hero:
+  title: Partners
+  palette: purple
+---
+
+<script lang="ts">
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import PartnerShowcase from '$lib/components/PartnerShowcase.svelte'
+  import PartnerTiers from '$lib/components/PartnerTiers.svelte'
+  import type { PageData } from './$types'
+
+  let { data }: { data: PageData } = $props()
+</script>
+
+<PageIntro text="Meet the institutions supporting Allmaps’ open source tools and helping shape its future." />
+
+<PartnerTiers />
+
+Your institution can support Allmaps too. IIIF Consortium members can become
+an Innovator or Supporter through the [IIIF–Allmaps partnership](/iiif-partnership/).
+
+<PartnerShowcase organizations={data.organizations} partnerPreviews={data.partnerPreviews} />

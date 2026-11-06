@@ -1,8 +1,0 @@
----
-import Default from '@astrojs/starlight/components/PageTitle.astro'
-
-const { type } = Astro.locals.starlightRoute.entry.data
-let showTitle = type === 'normal'
----
-
-{showTitle && <Default {...Astro.props} />}

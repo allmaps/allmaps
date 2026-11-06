@@ -27,6 +27,10 @@ export async function prepareScreenshot(
         case 'press':
           await locator.press(step.key)
           break
+        case 'scroll':
+          await locator.hover()
+          await page.mouse.wheel(step.deltaX ?? 0, step.deltaY)
+          break
         case 'waitFor':
           await locator.waitFor({ state: step.state ?? 'visible' })
           break

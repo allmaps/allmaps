@@ -1,0 +1,489 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@import '@allmaps/ui/css/fonts.css';
+
+@config '../tailwind.config.ts';
+
+@theme {
+  --container-copy: 44rem;
+  --container-wide: 70rem;
+}
+
+:root {
+  --page-gutter: 1rem;
+  --geograph-ss01: 'ss01' off;
+  --geograph-ss02: 'ss02' off;
+  --geograph-ss03: 'ss03' off;
+  --geograph-tnum: 'tnum' off;
+  color: #121a1c;
+  background: #fff;
+  font-family: 'Geograph', system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: min(320px, 100%);
+}
+
+a {
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+code,
+pre {
+  font-family: 'DM Mono', ui-monospace, monospace;
+}
+
+.prose code:not(:where(pre *, .not-prose, .not-prose *)) {
+  background-color: #ecfbfc;
+  border: 0;
+  border-radius: 4px;
+  padding: 0.12em 0.35em;
+  color: inherit;
+  font-size: 0.87em;
+  font-weight: 400;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.prose code:not(:where(pre *, .not-prose, .not-prose *))::before,
+.prose code:not(:where(pre *, .not-prose, .not-prose *))::after {
+  content: none;
+}
+
+.prose a:has(code):not(:where(pre *, .not-prose, .not-prose *)),
+.prose code a:not(:where(pre *, .not-prose, .not-prose *)) {
+  color: #003653;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+img {
+  display: block;
+}
+
+@utility page-width {
+  width: min(100% - 2 * var(--page-gutter), var(--container-wide));
+  margin-inline: auto;
+}
+
+@utility copy-width {
+  width: min(100% - 2 * var(--page-gutter), var(--container-copy));
+  margin-inline: auto;
+}
+
+/* For wide content nested inside the centered copy column. */
+@utility breakout-width {
+  position: relative;
+  left: 50%;
+  width: min(100vw - 2 * var(--page-gutter), var(--container-wide));
+  max-width: none;
+  margin-inline: 0;
+  translate: -50% 0;
+}
+
+@utility screenshot-frame {
+  @apply block min-w-0 rounded-xl p-4 sm:p-6;
+  background: color-mix(in srgb, var(--accent) 10%, white);
+
+  & > img {
+    width: 100%;
+    border-radius: 0.625rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+  }
+}
+
+@media (width >= 40rem) {
+  :root {
+    --page-gutter: 1.5rem;
+  }
+}
+
+.site-menu-panel[data-state='open'],
+.site-mobile-menu[data-state='open'] .site-mobile-menu-links {
+  animation: site-menu-open 150ms ease-out;
+}
+
+.site-menu-panel[data-state='closed'],
+.site-mobile-menu[data-state='closed'] {
+  pointer-events: none;
+  animation: site-menu-close 100ms ease-in forwards;
+}
+
+.site-mobile-menu[data-state='closed'] {
+  --site-menu-offset: 0px;
+}
+
+@keyframes site-menu-open {
+  from {
+    opacity: 0;
+    transform: translateY(var(--site-menu-offset, -4px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes site-menu-close {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(var(--site-menu-offset, -4px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-menu-panel[data-state],
+  .site-mobile-menu[data-state],
+  .site-mobile-menu[data-state] .site-mobile-menu-links {
+    animation: none;
+  }
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+  scroll-margin-top: 5rem;
+}
+
+.section-title,
+.prose :where(h2):not(:where(.not-prose, .not-prose *)) {
+  font-size: clamp(1.75rem, 2.5vw, 2rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.subsection-title,
+.prose :where(h3):not(:where(.not-prose, .not-prose *)) {
+  font-size: clamp(1.375rem, 2vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.prose :where(h2):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 3rem 1rem;
+}
+
+.prose :where(h3):not(:where(.not-prose, .not-prose *)) {
+  margin-block: 2rem 0.75rem;
+}
+
+.prose > :where(h2, h3):first-child,
+.prose
+  :where(h2, h3):not(:where(.not-prose, .not-prose *))
+  + :where(p, ul, ol) {
+  margin-block-start: 0;
+}
+
+.prose :where(h2):not(:where(.not-prose, .not-prose *)) + h3 {
+  margin-block-start: 1.5rem;
+}
+
+.prose .heading-anchor {
+  position: absolute;
+  display: block;
+  inset-inline-end: 100%;
+  top: calc((1lh - 0.8em) / 2);
+  width: 0.8em;
+  height: 0.8em;
+  margin-inline-end: 0.35rem;
+  color: #df1783;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.prose .heading-anchor-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor,
+.prose .heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.mask-hero-content {
+  view-transition-name: page-content;
+}
+
+/* The hero slides and its content fades; shared page chrome stays still. */
+html[data-hero-navigation]::view-transition {
+  pointer-events: none;
+}
+
+html[data-hero-navigation]::view-transition-old(root) {
+  animation: none;
+  opacity: 0;
+}
+
+html[data-hero-navigation]::view-transition-new(root) {
+  animation: none;
+}
+
+html[data-hero-navigation]::view-transition-group(page-content),
+html[data-hero-navigation]::view-transition-group(partnership-copy) {
+  /* Keep text stationary and use destination geometry without resizing. */
+  animation: none;
+}
+
+html[data-hero-navigation]::view-transition-group(partnership-copy) {
+  z-index: 2;
+}
+
+html[data-hero-navigation]::view-transition-image-pair(page-content),
+html[data-hero-navigation]::view-transition-image-pair(partnership-copy) {
+  isolation: isolate;
+}
+
+html[data-hero-navigation]::view-transition-old(page-content),
+html[data-hero-navigation]::view-transition-new(page-content),
+html[data-hero-navigation]::view-transition-old(partnership-copy),
+html[data-hero-navigation]::view-transition-new(partnership-copy) {
+  /* Retain snapshot proportions across pages with different heights. */
+  width: 100%;
+  height: auto;
+  object-position: top left;
+  mix-blend-mode: normal;
+}
+
+html[data-hero-navigation]::view-transition-old(page-content),
+html[data-hero-navigation]::view-transition-old(partnership-copy) {
+  animation: page-content-fade-out 100ms ease-out both;
+}
+
+html[data-hero-navigation]::view-transition-new(page-content),
+html[data-hero-navigation]::view-transition-new(partnership-copy) {
+  animation: page-content-fade-in 180ms ease-in 80ms both;
+}
+
+@keyframes page-content-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-content-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+html[data-hero-navigation]::view-transition-group(mask-grid-top),
+html[data-hero-navigation]::view-transition-group(mask-grid-middle),
+html[data-hero-navigation]::view-transition-group(mask-grid-bottom),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-4),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-5),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-6),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-7),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-8),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-9),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-10),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-11),
+html[data-hero-navigation]::view-transition-group(mask-grid-row-12) {
+  animation: none;
+  overflow: clip;
+  z-index: 1;
+}
+
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-top),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-middle),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-bottom),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-4),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-5),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-6),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-7),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-8),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-9),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-10),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-11),
+html[data-hero-navigation]::view-transition-image-pair(mask-grid-row-12) {
+  isolation: isolate;
+}
+
+html[data-hero-navigation]::view-transition-old(mask-grid-top),
+html[data-hero-navigation]::view-transition-new(mask-grid-top),
+html[data-hero-navigation]::view-transition-old(mask-grid-middle),
+html[data-hero-navigation]::view-transition-new(mask-grid-middle),
+html[data-hero-navigation]::view-transition-old(mask-grid-bottom),
+html[data-hero-navigation]::view-transition-new(mask-grid-bottom),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-4),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-4),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-5),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-5),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-6),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-6),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-7),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-7),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-8),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-8),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-9),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-9),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-10),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-10),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-11),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-11),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-12),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-12) {
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: normal;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+html[data-hero-navigation]::view-transition-old(mask-grid-top),
+html[data-hero-navigation]::view-transition-old(mask-grid-bottom),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-5),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-7),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-9),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-11) {
+  animation-name: hero-slide-out-left;
+}
+
+html[data-hero-navigation]::view-transition-new(mask-grid-top),
+html[data-hero-navigation]::view-transition-new(mask-grid-bottom),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-5),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-7),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-9),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-11) {
+  animation-name: hero-slide-in-left;
+}
+
+html[data-hero-navigation]::view-transition-old(mask-grid-middle),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-4),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-6),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-8),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-10),
+html[data-hero-navigation]::view-transition-old(mask-grid-row-12) {
+  animation-name: hero-slide-out-right;
+}
+
+html[data-hero-navigation]::view-transition-new(mask-grid-middle),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-4),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-6),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-8),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-10),
+html[data-hero-navigation]::view-transition-new(mask-grid-row-12) {
+  animation-name: hero-slide-in-right;
+}
+
+html[data-hero-navigation='back']::view-transition-old(mask-grid-top),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-bottom),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-5),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-7),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-9),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-11) {
+  animation-name: hero-slide-out-right;
+}
+
+html[data-hero-navigation='back']::view-transition-new(mask-grid-top),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-bottom),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-5),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-7),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-9),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-11) {
+  animation-name: hero-slide-in-right;
+}
+
+html[data-hero-navigation='back']::view-transition-old(mask-grid-middle),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-4),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-6),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-8),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-10),
+html[data-hero-navigation='back']::view-transition-old(mask-grid-row-12) {
+  animation-name: hero-slide-out-left;
+}
+
+html[data-hero-navigation='back']::view-transition-new(mask-grid-middle),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-4),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-6),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-8),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-10),
+html[data-hero-navigation='back']::view-transition-new(mask-grid-row-12) {
+  animation-name: hero-slide-in-left;
+}
+
+@keyframes hero-slide-out-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes hero-slide-in-left {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes hero-slide-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes hero-slide-in-right {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  ::view-transition-group(page-content),
+  ::view-transition-old(page-content),
+  ::view-transition-new(page-content),
+  ::view-transition-group(partnership-copy),
+  ::view-transition-old(partnership-copy),
+  ::view-transition-new(partnership-copy),
+  ::view-transition-group(mask-grid-top),
+  ::view-transition-old(mask-grid-top),
+  ::view-transition-new(mask-grid-top),
+  ::view-transition-group(mask-grid-middle),
+  ::view-transition-old(mask-grid-middle),
+  ::view-transition-new(mask-grid-middle),
+  ::view-transition-group(mask-grid-bottom),
+  ::view-transition-old(mask-grid-bottom),
+  ::view-transition-new(mask-grid-bottom),
+  ::view-transition-group(mask-grid-row-4),
+  ::view-transition-old(mask-grid-row-4),
+  ::view-transition-new(mask-grid-row-4),
+  ::view-transition-group(mask-grid-row-5),
+  ::view-transition-old(mask-grid-row-5),
+  ::view-transition-new(mask-grid-row-5),
+  ::view-transition-group(mask-grid-row-6),
+  ::view-transition-old(mask-grid-row-6),
+  ::view-transition-new(mask-grid-row-6),
+  ::view-transition-group(mask-grid-row-7),
+  ::view-transition-old(mask-grid-row-7),
+  ::view-transition-new(mask-grid-row-7),
+  ::view-transition-group(mask-grid-row-8),
+  ::view-transition-old(mask-grid-row-8),
+  ::view-transition-new(mask-grid-row-8),
+  ::view-transition-group(mask-grid-row-9),
+  ::view-transition-old(mask-grid-row-9),
+  ::view-transition-new(mask-grid-row-9),
+  ::view-transition-group(mask-grid-row-10),
+  ::view-transition-old(mask-grid-row-10),
+  ::view-transition-new(mask-grid-row-10),
+  ::view-transition-group(mask-grid-row-11),
+  ::view-transition-old(mask-grid-row-11),
+  ::view-transition-new(mask-grid-row-11),
+  ::view-transition-group(mask-grid-row-12),
+  ::view-transition-old(mask-grid-row-12),
+  ::view-transition-new(mask-grid-row-12) {
+    animation: none !important;
+  }
+}

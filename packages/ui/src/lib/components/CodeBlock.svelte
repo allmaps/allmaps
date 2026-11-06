@@ -184,7 +184,10 @@
 <style>
   .code-block {
     color-scheme: light dark;
-    --background: var(--allmaps-code-background, light-dark(#f3f7f9, #182a2f));
+    --background: var(
+      --allmaps-code-background,
+      light-dark(rgb(255 255 255 / 85%), rgb(255 255 255 / 6%))
+    );
     --foreground: var(--allmaps-code-foreground, light-dark(#24292e, #e1e4e8));
     --border-width: var(--allmaps-code-border-width, 1px);
     --border-color: var(
@@ -224,7 +227,7 @@
     align-items: center;
     min-height: 2.5rem;
     border-bottom: var(--border-width) solid var(--border-color);
-    background: var(--allmaps-code-header-background, var(--background));
+    background: var(--allmaps-code-header-background, transparent);
     color: var(--allmaps-code-header-foreground, var(--foreground));
   }
   .title {
@@ -304,7 +307,7 @@
     padding: var(--allmaps-code-padding-block, 1rem)
       var(--allmaps-code-padding-inline, 1.35rem);
     overflow: auto;
-    background: var(--background);
+    background: transparent;
     color: light-dark(
       var(--shiki-light, var(--foreground)),
       var(--shiki-dark, var(--foreground))
@@ -320,6 +323,9 @@
     direction: ltr;
   }
   .source :global(code) {
+    /* Keep the block's theme background from being inherited by every token. */
+    --shiki-light-bg: transparent;
+    --shiki-dark-bg: transparent;
     font: inherit;
     background: none;
     border: 0;

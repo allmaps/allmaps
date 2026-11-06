@@ -1,0 +1,66 @@
+---
+title: Terms & Usage | Allmaps
+description: Review the terms for hosted Allmaps services and the licenses and rights information for Allmaps software, georeference data and map images.
+label: Terms & Usage
+hero:
+  title: Terms & Usage
+  palette: red
+---
+
+## Hosted Allmaps services
+
+These terms apply to APIs hosted and operated by Allmaps, including
+[api.allmaps.org](https://api.allmaps.org),
+[annotations.allmaps.org](https://annotations.allmaps.org) and
+[Allmaps Tile Server](https://allmaps.xyz).
+
+These terms govern access to the services operated by Allmaps. They do not
+change the licenses covering the API source code or georeference data, and they
+do not apply when you run the open source software on your own infrastructure.
+
+### Fair use of hosted APIs
+
+Commercial companies and institutions outside the
+[IIIF–Allmaps Partnership](/iiif-partnership) can currently use the hosted
+Allmaps APIs, including Allmaps Tile Server, without a paid agreement under
+this fair use policy.
+
+Please use the APIs responsibly and avoid excessive requests that affect
+availability for others. If you expect substantial traffic or plan a large
+automated workload, [contact us](/contact) to discuss your needs.
+
+This policy may change as Allmaps develops. Commercial use may become subject
+to different terms or a paid agreement in the future.
+
+## Software
+
+The public Allmaps packages include a license file in their source directory.
+For example, the [MapLibre plugin is published under the MIT license](https://github.com/allmaps/allmaps/blob/main/packages/maplibre/LICENSE.md).
+Check the license included with the specific package and version you use.
+
+The source code for the Allmaps APIs is published under the
+[GNU AGPL-3.0 license](https://github.com/allmaps/allmaps/blob/main/apis/rest/LICENSE.md),
+which permits commercial use, including running your own API instance, subject
+to the conditions of that license.
+
+[Browse the Allmaps source code](https://github.com/allmaps/allmaps)
+
+## Georeference data
+
+Allmaps publishes its public georeference dataset under
+[CC0](https://creativecommons.org/public-domain/cc0/). This includes ground
+control points, clipping masks and references to IIIF resources.
+
+[Explore and download the open data](/data)
+
+## Map images
+
+Map images are served by the institutions and repositories that publish them.
+The license for Allmaps georeference data does not describe the rights to those
+images. Consult the source collection's rights and attribution information
+when reusing an image.
+
+## Questions about usage
+
+[Contact Allmaps](/contact) with questions about using the software, data or
+hosted services in your project.

@@ -103,6 +103,119 @@ test('renders clean images as before and SVG outlines in initial server HTML', a
   assert.match(panel, /alt="Editor settings"/)
 })
 
+test('keeps the URL bar opt-in', async () => {
+  const Screenshot = await component()
+  const output = render(Screenshot, {
+    props: { ...definition, alt: 'Editor', urlDisplay: 'hostname' }
+  }).body
+  assert.doesNotMatch(output, /url-bar|<a\b|<input\b/)
+})
+
+test('renders responsive candidates with an original fallback and appropriate sizes', async () => {
+  const Screenshot = await component()
+  const props = { ...definition, alt: 'Editor', widths: [960, 480, 960] }
+  const responsive = render(Screenshot, { props }).body
+  assert.match(
+    responsive,
+    /src="https:\/\/files.allmaps.org\/screenshots\/editor\/v1.webp"/
+  )
+  assert.match(
+    responsive,
+    /srcset="https:\/\/files.allmaps.org\/screenshots\/editor\/v1-480w.webp 480w, https:\/\/files.allmaps.org\/screenshots\/editor\/v1-960w.webp 960w"/
+  )
+  assert.match(responsive, /sizes="auto, 100vw"/)
+  assert.match(responsive, /width="1440" height="900"/)
+  assert.match(
+    render(Screenshot, { props: { ...props, loading: 'eager' } }).body,
+    /sizes="100vw"/
+  )
+  const custom = render(Screenshot, {
+    props: {
+      ...props,
+      filesBaseUrl: 'https://images.example.org/',
+      sizes: '(min-width: 768px) 448px, 100vw'
+    }
+  }).body
+  assert.match(
+    custom,
+    /https:\/\/images.example.org\/screenshots\/editor\/v1-480w.webp 480w/
+  )
+  assert.match(custom, /sizes="\(min-width: 768px\) 448px, 100vw"/)
+  const original = render(Screenshot, {
+    props: { ...definition, alt: 'Editor', sizes: '448px' }
+  }).body
+  assert.doesNotMatch(original, /srcset=|sizes=/)
+})
+
+test('keeps custom sources in control of their candidates', async () => {
+  const Screenshot = await component()
+  const props = {
+    ...definition,
+    alt: 'Editor',
+    src: '/editor.webp',
+    widths: [480, 960]
+  }
+  const image = render(Screenshot, { props }).body
+  assert.match(image, /src="\/editor.webp"/)
+  assert.doesNotMatch(image, /srcset=|sizes=/)
+  const responsive = render(Screenshot, {
+    props: {
+      ...props,
+      srcset: '/small.webp 480w, /large.webp 960w',
+      sizes: '448px'
+    }
+  }).body
+  assert.match(
+    responsive,
+    /srcset="\/small.webp 480w, \/large.webp 960w" sizes="448px"/
+  )
+})
+
+test('formats the inert URL bar without adding links or inputs', async () => {
+  const Screenshot = await component()
+  const url =
+    'https://editor.allmaps.org:8443/georeference?map=example#settings'
+  for (const [urlDisplay, expected] of [
+    [undefined, url],
+    ['full', url],
+    ['hostname', 'editor.allmaps.org'],
+    ['route', 'editor.allmaps.org:8443/georeference']
+  ]) {
+    const output = render(Screenshot, {
+      props: {
+        ...definition,
+        url,
+        alt: 'Editor settings',
+        showUrl: true,
+        urlDisplay,
+        geometry,
+        highlights: ['settings']
+      }
+    }).body
+    assert.equal(
+      output.match(/<div class="url-bar[^\"]*">([^<]*)<\/div>/)?.[1],
+      expected
+    )
+    assert.match(output, /class="toolbar[^\"]*" aria-hidden="true" inert/)
+    assert.doesNotMatch(output, /<a\b|<input\b/)
+    assert.match(output, /<img\b[\s\S]*data-highlight="settings"/)
+  }
+})
+
+test('keeps cropped screenshots frameless with showUrl enabled', async () => {
+  const Screenshot = await component()
+  const output = render(Screenshot, {
+    props: {
+      ...definition,
+      alt: 'Settings',
+      showUrl: true,
+      crop: { x: 100, y: 80, width: 400, height: 300 }
+    }
+  }).body
+  assert.doesNotMatch(output, /toolbar|url-bar|<a\b/)
+  assert.match(output, /width="400" height="300"/)
+})
+
 test('renders a custom SVG snippet for each selected target with raw bounds and no fallback styles', async () => {
   const Screenshot = await component(true)
   const props = {

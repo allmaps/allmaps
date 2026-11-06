@@ -1,0 +1,3602 @@
+{
+  "cards/annotorious-buildings-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-buildings/480w-53291f672a43.webp",
+    "width": 480,
+    "height": 319,
+    "sha256": "53291f672a4347087f00c8c8aef8269fab79b6b30c577ec5466fba34ca7e0cdf"
+  },
+  "cards/annotorious-buildings-553.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-buildings/553w-af8fa682c0ca.webp",
+    "width": 553,
+    "height": 368,
+    "sha256": "af8fa682c0cac669ec17ad4491f0a5ef055742f65b974db4f603bbde5ef0cfcc"
+  },
+  "cards/editor-iiif-map-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "424be36aa799686e9ad70c617f866cbc004cbb78f9e994eee5362293e48d36e2"
+  },
+  "cards/editor-iiif-map-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v2-900w.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "401e0dca139e0ba66823a9ef0e6ea2f9abdfbb0ee368d6fe7c18fb72a383981e"
+  },
+  "cards/editor-url-entry-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-url-entry/480w-df8d5ecc604e.webp",
+    "width": 480,
+    "height": 243,
+    "sha256": "df8d5ecc604e2d9eda7af2d67b7d2463ba71ee289c47af655c20fd62a572c16e"
+  },
+  "cards/editor-url-entry-870.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-url-entry/870w-be0f8c826858.webp",
+    "width": 870,
+    "height": 440,
+    "sha256": "be0f8c826858c8ebe4fda52d5aab215fd5c40349a079f03d257bdefb45af68fa"
+  },
+  "cards/github-repository-1085.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v3-1085w.webp",
+    "width": 1085,
+    "height": 710,
+    "sha256": "62d4e2f3e9433895f43cdfb5892d2e3c586d95e7fdc0067b51151cea7315e3f9"
+  },
+  "cards/github-repository-1425.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v2-1425w.webp",
+    "width": 1425,
+    "height": 900,
+    "sha256": "f85446bde458f141df816faeaa3af8a40975eeae9903c983fedef1ed29005ae4"
+  },
+  "cards/github-repository-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v3-480w.webp",
+    "width": 480,
+    "height": 314,
+    "sha256": "aae12db7fb75966544517a7034ee8bcf291365a36eef8b6d260f1f4e91f7e47d"
+  },
+  "cards/github-repository-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v3-960w.webp",
+    "width": 960,
+    "height": 628,
+    "sha256": "49ffcd0df16f6476b33936883ab93e0f54417711db3ab6c2467a5db73c14bf71"
+  },
+  "cards/iiif-georeference-extension-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "f268d0b00d1985600a59d2d775e430de2cfa1dba5c84ca5b26cae685c013916f"
+  },
+  "cards/iiif-georeference-extension-885.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v1-885w.webp",
+    "width": 885,
+    "height": 590,
+    "sha256": "61345058be7c7e4391e1defa2c05317d57d30873d887e3ad6770c97bb00d63db"
+  },
+  "cards/iiif-partnership-1265.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v1-1265w.webp",
+    "width": 1265,
+    "height": 917,
+    "sha256": "23ebec930243d14e3140c66ab119f52e456b20f8300458da99b60d26f9db9de9"
+  },
+  "cards/iiif-partnership-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v1-480w.webp",
+    "width": 480,
+    "height": 348,
+    "sha256": "17926222528e64e7ecfa5dc9f1ac5d166676b90ab9cd861f130ef3d9b401d318"
+  },
+  "cards/iiif-partnership-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v1-960w.webp",
+    "width": 960,
+    "height": 696,
+    "sha256": "a8bbf9dd0a2efb4cd3416fc24330be6a1a55585bfac1ceee6bf354b8d8eff400"
+  },
+  "cards/iiif-partnership.png": {
+    "url": "https://files.allmaps.org/images/homepage/cards/iiif-partnership/fe394fd9c0fe.png",
+    "width": 1265,
+    "height": 917,
+    "sha256": "fe394fd9c0fe282e85ac5d4186caa02a37192384d7ad120fcb43c9ff382adbdd"
+  },
+  "cards/qgis-desktop-1308.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/qgis-desktop/v1-1308w.webp",
+    "width": 1308,
+    "height": 863,
+    "sha256": "df3016c8e550500807f2ac8f818444ee6e3bd28579434300c64d76a6a69757cb"
+  },
+  "cards/qgis-desktop-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/qgis-desktop/v1-480w.webp",
+    "width": 480,
+    "height": 316,
+    "sha256": "ac8b23fe6095e0cfd569a70dd24bebef9dfac40213ec800077c862a75976cbeb"
+  },
+  "cards/tools-arcade-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/480w-777fa3c1cb2d.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "777fa3c1cb2d0a0699ee4863b0e1ce277423b28e9ada067876c8f6ba8290bb8c"
+  },
+  "cards/tools-arcade-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/900w-b332dbdf7f1b.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "b332dbdf7f1bda386b681f263ab8cf7299c53ac17ff13b163fc7e4d7adad2301"
+  },
+  "cards/tools-cli-help-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/480w-c3215c47ef22.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "c3215c47ef226633045a27eb51e04289629f72f12063f788ece7a4dada2d377f"
+  },
+  "cards/tools-cli-help-672.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/672w-4e8d7caf21b6.webp",
+    "width": 672,
+    "height": 448,
+    "sha256": "4e8d7caf21b6986ddb3a7af8f539d0fd99d4610c65326fcdfd21de3ac7fec796"
+  },
+  "cards/tools-editor-rotterdam-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/480w-624c03916a6b.webp",
+    "width": 480,
+    "height": 300,
+    "sha256": "624c03916a6b92d421daf446db2f9a72aa14c2b7e4e972292a98413e3a9beafd"
+  },
+  "cards/tools-editor-rotterdam-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/900w-aff1146d7374.webp",
+    "width": 900,
+    "height": 563,
+    "sha256": "aff1146d73743c4f19478d2aae28fd260e7cdae302eaa6c568df5a6f7decb5d5"
+  },
+  "cards/tools-explore-prototype-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/480w-8f4eb560a806.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "8f4eb560a806ee06021cb50b2e382ce503d491931ba05b32f43fd1928563e45f"
+  },
+  "cards/tools-explore-prototype-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/900w-c50c275cdd51.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "c50c275cdd51a3bd02ffb6d7f01f8e583f5de64d234888f75045b2a76db548cc"
+  },
+  "cards/tools-here-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-here/480w-13c7f3537025.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "13c7f35370255829f3120859c2f6891b10298581a4be202c93d3e699bedd38ea"
+  },
+  "cards/tools-here-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-here/900w-950aa2bfabe2.webp",
+    "width": 900,
+    "height": 506,
+    "sha256": "950aa2bfabe2fd7505ee7fefcdf0d5aff9636a0e1a9d043a69657fb2a5dc64ab"
+  },
+  "cards/tools-latest-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/480w-386d0dcad84f.webp",
+    "width": 480,
+    "height": 324,
+    "sha256": "386d0dcad84f8717353433bcc41bc6eec6662cd6866817a71ae0bd079ab7780b"
+  },
+  "cards/tools-latest-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/900w-8d99bc3298ef.webp",
+    "width": 900,
+    "height": 608,
+    "sha256": "8d99bc3298ef7ff7ed09c0425094841717c7b4ab3d9550d106ff958a5688ff4f"
+  },
+  "cards/tools-viewer-saigon-1200.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/v1.webp",
+    "width": 1200,
+    "height": 750,
+    "sha256": "364c6b59aca3172795983f0eaf4a447b2b5ac1d53bc7c7250e4effba1caa6581"
+  },
+  "cards/tools-viewer-saigon-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/480w-14391bae9e21.webp",
+    "width": 480,
+    "height": 300,
+    "sha256": "14391bae9e210e6b20dfb9acd15a942c49b9747c2da7ddc7f25e7fa93cfe1b57"
+  },
+  "cards/tools-viewer-saigon-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/900w-85cfcbf1e17c.webp",
+    "width": 900,
+    "height": 563,
+    "sha256": "85cfcbf1e17c5cf2d74656906ec7d3fa0e844d28e9301bdf3e495c49ea3c4a24"
+  },
+  "cards/viewer-28ed75ea7a785f32-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "b4691bd917f4bb4930e4cbdd0bd7b6319cc1d25e1a2788cdc5d720be4b35d5fb"
+  },
+  "cards/viewer-28ed75ea7a785f32-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v1-900w.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "5916c16fd7e50956106db9b73d87a4ef7250ed8f86d699829a1b0be562b5026e"
+  },
+  "cards/viewer-delft-aula-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "8c7ea62fd3a1c6a8f16cc2cff61ac291790e86e647f5cb6ce3214ed210b430b9"
+  },
+  "cards/viewer-delft-aula-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v2-900w.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "2d5b666034a6827d4b1fe781938c044fcd56410f3a52c1d2681af5309827294f"
+  },
+  "cards/viewer-source-url-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "4f6d641555a0932067314f485bfc71b7a7112fb3e419ef06440c4eeb791673ae"
+  },
+  "cards/viewer-source-url-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v1-900w.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "ecfca4cc6df1b355c0d0b47401d4abc3973203b29c20188938a6eacda314b59e"
+  },
+  "data/here-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "3ae179a1dc03f1579547e6ebce540314bef1d3bc77c4b221584f9a75c2840398"
+  },
+  "data/here.png": {
+    "url": "https://files.allmaps.org/images/homepage/data/here/0da814144cb3.png",
+    "width": 1280,
+    "height": 720,
+    "sha256": "0da814144cb39c734df9c83b6166bbfa9911a246bf4f3f8c60d94d6a4f0c2bba"
+  },
+  "examples/lynn-city-atlas-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "2aded38b32fead6b0f7b87c30da2358a4c4794c27298b23f7c37310e7c913f45"
+  },
+  "examples/lynn-city-atlas-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-1600w.webp",
+    "width": 1600,
+    "height": 900,
+    "sha256": "dd3304fb192a302ac9ef8e1802c74694fef72ab078f23168cbcaa63c644564d7"
+  },
+  "examples/lynn-city-atlas-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "9741d60c155b226c7183450dc664aa64acbe65a7d37bac1b99c09933b35b0b2c"
+  },
+  "examples/lynn-city-atlas-2560.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-2560w.webp",
+    "width": 2560,
+    "height": 1440,
+    "sha256": "8d0a4c5cc18416c7a5cae5701cc0c4456eee7b53e989d1e5796c035aa23da843"
+  },
+  "examples/lynn-city-atlas-3200.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-3200w.webp",
+    "width": 3200,
+    "height": 1800,
+    "sha256": "c143ff45cd3d1022a34efdcba00519a3eeb1a7f2492c0b5161ec9168ebf11fad"
+  },
+  "examples/lynn-city-atlas-3840.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-3840w.webp",
+    "width": 3840,
+    "height": 2160,
+    "sha256": "f2c92eac20bc43f6cced32ca11557bf2201eef9d7c5b0fa4e11deecb9788733d"
+  },
+  "examples/lynn-city-atlas-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "8490cae5f7c81a1814933a9c2208853784c75d6afcbc03f100c243e3b48d2d39"
+  },
+  "examples/lynn-city-atlas-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "21ac4828a80d074a836e0edb7c70899cffe065c9a1fd11fe96c9005b838ad21d"
+  },
+  "examples/lynn-city-atlas-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "06ed99e93df3596510a850d60f982b873919bfec466e791388fa370306b60ce4"
+  },
+  "examples/lynn-city-atlas-phone-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-1280w.webp",
+    "width": 1280,
+    "height": 960,
+    "sha256": "c73cc06451fefb8e04d80e2f36903ac333ad0947930691455b6a161b3dd10dde"
+  },
+  "examples/lynn-city-atlas-phone-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-1600w.webp",
+    "width": 1600,
+    "height": 1200,
+    "sha256": "f03ab20be6f76e89c4c094bb9d4c473c1505735f534d9c26dea4799be67de951"
+  },
+  "examples/lynn-city-atlas-phone-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-1920w.webp",
+    "width": 1920,
+    "height": 1440,
+    "sha256": "a17755cc705a8afca1521249661a8a1a38a92f1a4bfaffd85e6cfc0acc133cf6"
+  },
+  "examples/lynn-city-atlas-phone-2304.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-2304w.webp",
+    "width": 2304,
+    "height": 1728,
+    "sha256": "a857fbceda8dea481f172f0721bfb18d06440ff755840f719816ceb3176825c0"
+  },
+  "examples/lynn-city-atlas-phone-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-480w.webp",
+    "width": 480,
+    "height": 360,
+    "sha256": "9fd3c4f891a574afa52f500b8972635d29bfcd6bde7ba3d9e339a4e77505058e"
+  },
+  "examples/lynn-city-atlas-phone-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-640w.webp",
+    "width": 640,
+    "height": 480,
+    "sha256": "d7475d563add8911c187c8169bbb6127e9f7bf71e2d8ef6d50ae886af0d5c3ca"
+  },
+  "examples/lynn-city-atlas-phone-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v3-phone-960w.webp",
+    "width": 960,
+    "height": 720,
+    "sha256": "42e35f30f78814b297fa6b18063473dcac5fdd1d61598a54291631493b4512dd"
+  },
+  "examples/manhattan-aerial-survey-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "5b74a789e6bbac107ca12c98aa86af8ffe2085e9dd16b9cc742216f0eec1ae0f"
+  },
+  "examples/manhattan-aerial-survey-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-1600w.webp",
+    "width": 1600,
+    "height": 900,
+    "sha256": "9e9a082a58436f04836c0105e585b62bfeb36930d5f1d104c6c35a40db6a0ba2"
+  },
+  "examples/manhattan-aerial-survey-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "d836241c5f54c3cb9ed5a2c27c45795569810501ef40e83470edade3891506b5"
+  },
+  "examples/manhattan-aerial-survey-2560.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-2560w.webp",
+    "width": 2560,
+    "height": 1440,
+    "sha256": "bf30fec514a15340269d9dfb75d29e67984e19809eb0603a330aae510afe8666"
+  },
+  "examples/manhattan-aerial-survey-3200.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-3200w.webp",
+    "width": 3200,
+    "height": 1800,
+    "sha256": "40e63d4b9493bdfe0a6d9d7aa6370f443a08181ad16adb0dd5b84af2effcdad1"
+  },
+  "examples/manhattan-aerial-survey-3840.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-3840w.webp",
+    "width": 3840,
+    "height": 2160,
+    "sha256": "3973f8cc2ffa10d0e7cd9c41b315f5b102405e4a9b43437b1b3b91979c1c7022"
+  },
+  "examples/manhattan-aerial-survey-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "3013a3ccd5005056a3120f30fe7976453fa8c122044f421db59c019007aee4d9"
+  },
+  "examples/manhattan-aerial-survey-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "d74dc5394f9a1965d398c517dac169cad724f3280c6bd8996b90ea468b705f27"
+  },
+  "examples/manhattan-aerial-survey-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "82ac212ff02748c8c9575baa52d5620d6ac317d1b92354d84758ceab643f29e1"
+  },
+  "examples/manhattan-aerial-survey-phone-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-1280w.webp",
+    "width": 1280,
+    "height": 960,
+    "sha256": "bc1671ce835dff5a7bf420b7e37b04a8e888ce48dd15744068a290037eb3b077"
+  },
+  "examples/manhattan-aerial-survey-phone-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-1600w.webp",
+    "width": 1600,
+    "height": 1200,
+    "sha256": "ad7830d528a82bed990156cc06fc55e2c91771e933f323fd47dd1e12409101c2"
+  },
+  "examples/manhattan-aerial-survey-phone-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-1920w.webp",
+    "width": 1920,
+    "height": 1440,
+    "sha256": "3e3092145e7612db0ef9d0d2d114cf121648c8b42099da0e0f2dc94095a7916e"
+  },
+  "examples/manhattan-aerial-survey-phone-2304.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-2304w.webp",
+    "width": 2304,
+    "height": 1728,
+    "sha256": "c521b905514ee4f8c538f3a7d92d81444782208fdd24ebd76efd10256d710fee"
+  },
+  "examples/manhattan-aerial-survey-phone-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-480w.webp",
+    "width": 480,
+    "height": 360,
+    "sha256": "4068f7fc058b87402fcbfc9805bd85d0b8baa856984a90b977637e8bb15af7fd"
+  },
+  "examples/manhattan-aerial-survey-phone-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-640w.webp",
+    "width": 640,
+    "height": 480,
+    "sha256": "b43c940e9d87af8e11ea07f5d75e5ad749fefd536436029e4e8251f2ca15a788"
+  },
+  "examples/manhattan-aerial-survey-phone-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v3-phone-960w.webp",
+    "width": 960,
+    "height": 720,
+    "sha256": "8a3288b0ac3fb2e75b56f0075e7843af026a10971a23594c89ccc84b7b1c4f56"
+  },
+  "examples/manifests-06b7d15dc577b7ee.jpg": {
+    "url": "https://files.allmaps.org/images/homepage/examples/manhattan-aerial-survey/v1.jpg",
+    "width": 1920,
+    "height": 480,
+    "sha256": "92e24f5f351c629b53ae4cfebff925f0b9bcce049410775283c12cd54e192b6f"
+  },
+  "examples/manifests-23379602e8187445.jpg": {
+    "url": "https://files.allmaps.org/images/homepage/examples/lynn-city-atlas/v1.jpg",
+    "width": 1920,
+    "height": 480,
+    "sha256": "b41488cd3c4096ee436f11ec1d32746c32ab27e1306396060e1852e561fe42fb"
+  },
+  "examples/manifests-631b96e4d6d3f421.jpg": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v1.jpg",
+    "width": 1920,
+    "height": 480,
+    "sha256": "4ce430ddf5e3747422cf43b5f4cac1f8ef8b00cb56a48e93153f53efc3d8d368"
+  },
+  "examples/manifests-64d6e35b64564692.jpg": {
+    "url": "https://files.allmaps.org/images/homepage/examples/hollywood-nirenstein-atlas/v1.jpg",
+    "width": 1920,
+    "height": 481,
+    "sha256": "ea899093b82f5297fe67b390737bcecf389b8d09737d114b3fcfcbeb938c3d84"
+  },
+  "examples/partnership-amsterdam-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-1280w.webp",
+    "width": 1280,
+    "height": 1023,
+    "sha256": "dc48606a8bbbc296628167b8a8284f4170e6c7419d839657c71cb5ff302b4222"
+  },
+  "examples/partnership-amsterdam-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-1600w.webp",
+    "width": 1600,
+    "height": 1279,
+    "sha256": "7fd9821fb30f63ee91b43a395a881e3effca97a738cc4479d9960fa67d449f4d"
+  },
+  "examples/partnership-amsterdam-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-1920w.webp",
+    "width": 1920,
+    "height": 1535,
+    "sha256": "169de0b1ed2669c76067201d93acfa10780af2fd7a4968105554a7b81aec057e"
+  },
+  "examples/partnership-amsterdam-320.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-320w.webp",
+    "width": 320,
+    "height": 256,
+    "sha256": "3a6f5f884299d3e2f22aa063013a0e8df9fbd4f1cbc008fd5f4bfe783996c2f0"
+  },
+  "examples/partnership-amsterdam-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-480w.webp",
+    "width": 480,
+    "height": 384,
+    "sha256": "fd590a3602fed5e7980f9126252a6cb99dcc16e26db34558eb39fcf986b2a1f1"
+  },
+  "examples/partnership-amsterdam-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-640w.webp",
+    "width": 640,
+    "height": 512,
+    "sha256": "6d3a79ebc524e5234506aac9bd070ef477032d144a67c48b7598bd4da96924de"
+  },
+  "examples/partnership-amsterdam-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partnership/amsterdam/v2-960w.webp",
+    "width": 960,
+    "height": 768,
+    "sha256": "fa41adb6192916b4cca4c06bf5e1bbb8b212002e786a87c5bda27631ac8e6ac9"
+  },
+  "examples/rotterdam-city-map-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "48aca7c3d5dd9ae241a930ad933fbfd3345e3d7ca2731c7d0c80d8962fabc4a6"
+  },
+  "examples/rotterdam-city-map-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-1600w.webp",
+    "width": 1600,
+    "height": 900,
+    "sha256": "eec4a473c8fd213d542ab9a16cfef50c12e053b754f39cb20a0ad4a9a8b18eca"
+  },
+  "examples/rotterdam-city-map-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "9913e9e8070c5f203c636b36b0e12dd3286d3e7151656da25f77d1f34ba0ecde"
+  },
+  "examples/rotterdam-city-map-2560.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-2560w.webp",
+    "width": 2560,
+    "height": 1440,
+    "sha256": "ee6f136ef72b9b730edf2b7ef61be11fa13f770e3254d9011073d8f817be0458"
+  },
+  "examples/rotterdam-city-map-3200.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-3200w.webp",
+    "width": 3200,
+    "height": 1800,
+    "sha256": "e45539cc12fc2f237a3d43ed5d947e110ce8e097d23b521e19410c09ae9b09e9"
+  },
+  "examples/rotterdam-city-map-3840.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-3840w.webp",
+    "width": 3840,
+    "height": 2160,
+    "sha256": "7b453da5894062b1699d836efc66f9b047f295bc615ba65d026faa12e9faec4c"
+  },
+  "examples/rotterdam-city-map-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "c534361945afa4b6ebb5dc7504b6e17b08d7c3a4d436fe6b8e03e9a28b3b094f"
+  },
+  "examples/rotterdam-city-map-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "d80654aa96bd85e5fc1e9350cf3c71ce7fb2f5c6b3ee4af53537e17829aca521"
+  },
+  "examples/rotterdam-city-map-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "8976697b46e740ac388d4406a7e818320a89ec15cd0d0372694475460fbf5c8c"
+  },
+  "examples/rotterdam-city-map-phone-1280.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-1280w.webp",
+    "width": 1280,
+    "height": 960,
+    "sha256": "40b7c12437392cda61db76bc1ad5fdf20572aa5205146fd3ea48d16f9aa9fa09"
+  },
+  "examples/rotterdam-city-map-phone-1600.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-1600w.webp",
+    "width": 1600,
+    "height": 1200,
+    "sha256": "2d2b096b9b3091594b05173e877e12e9fe849cd394ce9221bfa1bfee03ac649a"
+  },
+  "examples/rotterdam-city-map-phone-1920.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-1920w.webp",
+    "width": 1920,
+    "height": 1440,
+    "sha256": "058ae52c55738b27acecbe8c62c49029b32e9222d1a2cfff979885fe2c2754ae"
+  },
+  "examples/rotterdam-city-map-phone-2304.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-2304w.webp",
+    "width": 2304,
+    "height": 1728,
+    "sha256": "6a8241a0db32b6eece2b7e37492c40586bfb2f6608868ec021c98bca3a1bee69"
+  },
+  "examples/rotterdam-city-map-phone-480.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-480w.webp",
+    "width": 480,
+    "height": 360,
+    "sha256": "07dac6922406766d8cc836d8dbf08179a0852e38ed366577b650f567baae9aad"
+  },
+  "examples/rotterdam-city-map-phone-640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-640w.webp",
+    "width": 640,
+    "height": 480,
+    "sha256": "a5e9da3361c452210423d63b478ae9be3af9fac4843c98195a543ddab59f8c86"
+  },
+  "examples/rotterdam-city-map-phone-960.webp": {
+    "url": "https://files.allmaps.org/images/homepage/examples/rotterdam-city-map/v2-phone-960w.webp",
+    "width": 960,
+    "height": 720,
+    "sha256": "44b69a91fc28f138e5d348f837d21d4d915248f9bb755f814a3bcf068320dcef"
+  },
+  "faq/editor-utrecht-1800.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-utrecht/v1-1800w.webp",
+    "width": 1800,
+    "height": 1200,
+    "sha256": "a9198c26ab299c49d43b8b643d94d8d11090095c69ec0de46611cc47519d16e5"
+  },
+  "faq/editor-utrecht-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-utrecht/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "316ce2bbf3d5bad78387452c9e3e1cdd12449b68b50b888115893430a9372189"
+  },
+  "faq/editor-utrecht-900.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-utrecht/v1-900w.webp",
+    "width": 900,
+    "height": 600,
+    "sha256": "1a5cb768c55ca2d65df928d085720b6241d407f9f564deba988b8f9ba6df1539"
+  },
+  "get-started/editor.png": {
+    "url": "https://files.allmaps.org/images/homepage/get-started/editor/f2feecc8347e.png",
+    "width": 1280,
+    "height": 720,
+    "sha256": "f2feecc8347e03fc47fc6b38ebc59f063fda6edf1660c727bd85c1314d033206"
+  },
+  "get-started/github.png": {
+    "url": "https://files.allmaps.org/images/homepage/get-started/github/bb1a4112b651.png",
+    "width": 1280,
+    "height": 720,
+    "sha256": "bb1a4112b6516588010e83e3885cc41b4e6f6c1f365c02a76b8bc387cdf1de9a"
+  },
+  "get-started/iiif.png": {
+    "url": "https://files.allmaps.org/images/homepage/get-started/iiif/2934eb4004d7.png",
+    "width": 1265,
+    "height": 712,
+    "sha256": "2934eb4004d7d9badb8a422a7fc81e2ef9a37e3acb3d0931040a0b2b2f30d85a"
+  },
+  "get-started/viewer.png": {
+    "url": "https://files.allmaps.org/images/homepage/get-started/viewer/8de371c95ba2.png",
+    "width": 1280,
+    "height": 720,
+    "sha256": "8de371c95ba240af68fa1486b789a4e8f96d2aeb0238790c426adf74e30fb1d0"
+  },
+  "open-source/coordinates.png": {
+    "url": "https://files.allmaps.org/images/homepage/open-source/coordinates/9a5acf0cbceb.png",
+    "width": 627,
+    "height": 636,
+    "sha256": "9a5acf0cbceb778cd48eb929893067dd9a1e3609ea47e16feadf1e0b4135f6ed"
+  },
+  "open-source/holyoke.png": {
+    "url": "https://files.allmaps.org/images/homepage/open-source/holyoke/fd7017d51a1c.png",
+    "width": 1022,
+    "height": 496,
+    "sha256": "fd7017d51a1cb140664c22d0800d1e554e7510fc834a9a5efa2bf2d0f430912d"
+  },
+  "partners/agsl-320-1081ef5a7b50.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/agsl/320w-1081ef5a7b50.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "1081ef5a7b50c12bed2e9a6e20ffb63b76703dd8c387f6e750bff35dfc6649f2"
+  },
+  "partners/agsl-480-992e46f88154.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/agsl/480w-992e46f88154.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "992e46f88154dac28e210870f440abbcb31630ba7f87102b47469f87cdaf3a3a"
+  },
+  "partners/agsl-596-2af1082f4a38.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/agsl/596w-2af1082f4a38.webp",
+    "width": 596,
+    "height": 331,
+    "sha256": "2af1082f4a38ef66ade96348ce7b5bcc0b84d7364214004bc5588d7da2e692be"
+  },
+  "partners/bnf-1280-bf38b562356d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/1280w-bf38b562356d.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "bf38b562356dc62bbfa83cd0ec340a5829e8ae381575b1bfa3c5f0a093f06a3f"
+  },
+  "partners/bnf-320-1090284e99bd.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/320w-1090284e99bd.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "1090284e99bdfb990e54974f35e871094bb7417f343a319dfb4b12da031bdbb4"
+  },
+  "partners/bnf-320-b842bfe4caaa.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/320w-b842bfe4caaa.webp",
+    "width": 320,
+    "height": 177,
+    "sha256": "b842bfe4caaa114c9d941ee6ef48fb061aaf33b00ae6b6e19094defe48f6f9ec"
+  },
+  "partners/bnf-480-bca39a7d7730.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/480w-bca39a7d7730.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "bca39a7d77305b6c9b4f1390ee175142fa298a3758f8fde9630543dd2d364f17"
+  },
+  "partners/bnf-480-daad52d8b819.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/480w-daad52d8b819.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "daad52d8b8190c3c1a7d33bfba0ffc1884f38838055afde41f511ec956debbae"
+  },
+  "partners/bnf-640-02fc85be748f.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/640w-02fc85be748f.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "02fc85be748fc970d4f301d8f76182864c2b00c8805ee7c0c120ef6714d0f385"
+  },
+  "partners/bnf-640-1ee7b303e640.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/640w-1ee7b303e640.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "1ee7b303e64038deddfff51476ccbd0c6a00496c39cf6820a61545efe6f8b813"
+  },
+  "partners/bnf-655-1c672f951674.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/655w-1c672f951674.webp",
+    "width": 655,
+    "height": 363,
+    "sha256": "1c672f951674a58d97d8934784de3338e8b048d633902d20c3123503003ae68a"
+  },
+  "partners/bnf-960-e9c7b811d912.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bnf/960w-e9c7b811d912.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "e9c7b811d91250f77f107438bbad9544882e1f279aa10509b3f515e24ddf25bb"
+  },
+  "partners/bodleian-1280-b23bd058b149.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/1280w-b23bd058b149.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "b23bd058b14980a1188335751bcbcd93d284d950fc0d22a1c622568b8ebedb80"
+  },
+  "partners/bodleian-320-ba95f0fc9835.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/320w-ba95f0fc9835.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "ba95f0fc98352716ced2f2f54b3c8cfb615e5534376a12baec05174f58da9284"
+  },
+  "partners/bodleian-320-d9c4bfb77acd.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/320w-d9c4bfb77acd.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "d9c4bfb77acd9f764daac64313de5f23ba441af0c55f3ac00df40fb60ad9af2f"
+  },
+  "partners/bodleian-480-5ab6b267d9ed.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/480w-5ab6b267d9ed.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "5ab6b267d9edb6f847c8fd19d7e68138780422b6bd1c49150d1a6633ee2293c8"
+  },
+  "partners/bodleian-480-cc8ba21136c1.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/480w-cc8ba21136c1.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "cc8ba21136c145472a1cd55a44aa30407023877d1486ab149e746e7f0d22cf19"
+  },
+  "partners/bodleian-640-7f206436e300.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/640w-7f206436e300.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "7f206436e3006e88ddd21f8465be1c50dccc1b8dea8b139420f6cca509f48b12"
+  },
+  "partners/bodleian-640-91148d667c97.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/640w-91148d667c97.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "91148d667c97bc1f746818c71c5de9647dcb67a03cc39706e8a407ac7b3bd3ad"
+  },
+  "partners/bodleian-774-8c95adf24834.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/774w-8c95adf24834.webp",
+    "width": 774,
+    "height": 430,
+    "sha256": "8c95adf24834086e13a409358a95118926f06f87f4aabae461670dc16186f319"
+  },
+  "partners/bodleian-960-63f7d9467658.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/bodleian/960w-63f7d9467658.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "63f7d94676588b1d847be55be37c1f5b4aaa075e1bd796f6eaf7a0bee7d33f6e"
+  },
+  "partners/ghent-1280-d2664c5503af.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/ghent/1280w-d2664c5503af.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "d2664c5503afe583d48fc8b6ef5669953d6a36846620985a233fd9d7df524b31"
+  },
+  "partners/ghent-320-01de6c992179.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/ghent/320w-01de6c992179.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "01de6c992179d39dc73d2f63356a0ea4764025a1d79af13f5ef47563587f225a"
+  },
+  "partners/ghent-480-c1942c93dde6.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/ghent/480w-c1942c93dde6.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "c1942c93dde6d3a1072c987fa8e0812f8fa7c68d1a00b255cefa79315591483f"
+  },
+  "partners/ghent-640-717f3038cd79.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/ghent/640w-717f3038cd79.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "717f3038cd7920359675573a475f2d684d4387fbf02ba4edd276b2211a762a43"
+  },
+  "partners/ghent-960-7a06476a965e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/ghent/960w-7a06476a965e.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "7a06476a965e24da002f05e99646fca20df9fa4d7b840cec65a8c35bff98a66d"
+  },
+  "partners/indiana-university-1280-a6fa6e08646f.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/1280w-a6fa6e08646f.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "a6fa6e08646ffe2f2f674d315f7754d6b47af0e2cec72141bba4d0564cbec578"
+  },
+  "partners/indiana-university-320-3fe1c55198b1.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/320w-3fe1c55198b1.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "3fe1c55198b15d48b54ff6d7b45278623911d9e41d75e7994b104e44bbe565b6"
+  },
+  "partners/indiana-university-320-ca51077c2d5b.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/320w-ca51077c2d5b.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "ca51077c2d5bbf0d8099bd25171b39592632abe1aa51ea3d87d5add67433ccaf"
+  },
+  "partners/indiana-university-480-c0b690f60402.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/480w-c0b690f60402.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "c0b690f604021369cf03b4224d048a2a47279f8c75a90fce5b75a3019e453296"
+  },
+  "partners/indiana-university-480-cf16c2b14c9e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/480w-cf16c2b14c9e.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "cf16c2b14c9e5e87e6f7f24e9b70ab7041acafa59e9e6d1aa4a293f8843056cd"
+  },
+  "partners/indiana-university-640-115b9a5ce42d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/640w-115b9a5ce42d.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "115b9a5ce42d1eb84d74fb76489a5ee1b89461696207d35ba9654ae4ab0f0838"
+  },
+  "partners/indiana-university-640-dfd3bb59685c.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/640w-dfd3bb59685c.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "dfd3bb59685c6e6ef5786784435658109417ebcdcea60383ff05ba026acd1a6d"
+  },
+  "partners/indiana-university-726-354208e4f67d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/726w-354208e4f67d.webp",
+    "width": 726,
+    "height": 403,
+    "sha256": "354208e4f67d8890de661d3f64c71f2607516f75502c8e037bfb71b94b70ccfe"
+  },
+  "partners/indiana-university-960-76cee517b5e5.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/indiana-university/960w-76cee517b5e5.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "76cee517b5e5ecc11ba112a525c87234e3968200abd21ea3a3b95a0989b54423"
+  },
+  "partners/knaw-1280-ad4080e461bd.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/1280w-ad4080e461bd.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "ad4080e461bdf55aa9dc5def4cf7e70b53d73e740ae0c4ad18e60036a6739eeb"
+  },
+  "partners/knaw-320-7751e131e170.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/320w-7751e131e170.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "7751e131e17007f958c7808d7242779e9fd7879dca839b3df4e2b8fc4ecf9e58"
+  },
+  "partners/knaw-320-efcb083f48d1.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/320w-efcb083f48d1.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "efcb083f48d113dcd580ec106fb9f329d4a01cabb6aca623977a48dad8de6ab2"
+  },
+  "partners/knaw-480-8c0e12ac1a92.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/480w-8c0e12ac1a92.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "8c0e12ac1a921c187996557da3b8b16563eb3aaef28433a66193f6b74bda8656"
+  },
+  "partners/knaw-480-dc833c924751.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/480w-dc833c924751.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "dc833c92475136b26387d74ccd0507c5581e18079ad4ace67cd2aaff998f39cc"
+  },
+  "partners/knaw-640-0d4741917b62.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/640w-0d4741917b62.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "0d4741917b62a5560e5c77495f989406e5cb91846822bac1a6cce687d57945ef"
+  },
+  "partners/knaw-640-556fb64e2993.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/640w-556fb64e2993.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "556fb64e29934a88826f869e9ed2d8e9d92481c991eede7c0b0fa4286cbaf2ae"
+  },
+  "partners/knaw-647-e6258117f01d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/647w-e6258117f01d.webp",
+    "width": 647,
+    "height": 359,
+    "sha256": "e6258117f01d790d45712d91532cdb46d9a0b36246e4df42cc89bf79b9ace7da"
+  },
+  "partners/knaw-960-ec1ad69cf66d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/knaw/960w-ec1ad69cf66d.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "ec1ad69cf66d34bb7ecc3d77b3e06f574bf4c6052ec87da5e99bd94ba331c91a"
+  },
+  "partners/leiden-1280-4870e9dc238a.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/1280w-4870e9dc238a.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "4870e9dc238a2f2791fe9e1ee606e92ee801ee4415123edb4bfdda4de884fad0"
+  },
+  "partners/leiden-320-20d981846c5a.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/320w-20d981846c5a.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "20d981846c5a1feb3f2bf84a9f1ade84aceecc3cb516c04af6eb13e0e98fac2e"
+  },
+  "partners/leiden-320-e975ad707c42.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/320w-e975ad707c42.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "e975ad707c42aff395e2aeff1daddaf35ca6673d607f4c7f39d5cd90af45e5ca"
+  },
+  "partners/leiden-480-082dc8c0f491.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/480w-082dc8c0f491.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "082dc8c0f491773fda1803e903e99a6711cc1d0d11fc3b6e8142999a1c61803c"
+  },
+  "partners/leiden-480-c743b82a8656.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/480w-c743b82a8656.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "c743b82a8656896608fba8218dbc4a8583420f7d7ceff90ea7cb419d4e94b639"
+  },
+  "partners/leiden-640-584a1f379c25.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/640w-584a1f379c25.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "584a1f379c25f6456ace856b2bf5c1b95365218523f5c4cbe88590b6f92171f7"
+  },
+  "partners/leiden-640-84eafb5f89b9.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/640w-84eafb5f89b9.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "84eafb5f89b9cec1694241359e300ab93cda8470a7172c5bfe12b5f7092c297f"
+  },
+  "partners/leiden-675-e12c90b855b6.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/675w-e12c90b855b6.webp",
+    "width": 675,
+    "height": 375,
+    "sha256": "e12c90b855b6a21c51865726e3e33dd93d451aa2e220a5add9a74ba345834b99"
+  },
+  "partners/leiden-960-34570704a970.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/leiden/960w-34570704a970.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "34570704a970c96297cb616b1540de5d6d5592c546e58cfa15382108f12ef542"
+  },
+  "partners/llyfrgell-1280-d3943b73c4eb.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/1280w-d3943b73c4eb.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "d3943b73c4eba9645a782b9a6f1a2af771b394b25c5c81e8bb9e7b6be5fcbe01"
+  },
+  "partners/llyfrgell-320-40ce0a01fe8a.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/320w-40ce0a01fe8a.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "40ce0a01fe8a2e593ab9c63e5ce02b2991d09a9530d9b37a8a05356cfe3ef964"
+  },
+  "partners/llyfrgell-320-ea8b4daf2289.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/320w-ea8b4daf2289.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "ea8b4daf2289efa5a135da0bb4c43b0f2ebb27e50cff62385101516cf0dfedec"
+  },
+  "partners/llyfrgell-480-6252d170f9c6.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/480w-6252d170f9c6.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "6252d170f9c6937e101e3cb89febcb3914cc26b3640d1fea1c3e51ee41a57b88"
+  },
+  "partners/llyfrgell-480-ca9ddde51d56.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/480w-ca9ddde51d56.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "ca9ddde51d564c1996b905f59851bd468a479a6b66fdc912e83f4b2a28cebc2e"
+  },
+  "partners/llyfrgell-640-6603cfdc06ff.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/640w-6603cfdc06ff.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "6603cfdc06ff854a400b1218f7289c67d8df5b37083a03c4c5155c5b79f7b61d"
+  },
+  "partners/llyfrgell-640-a5119aca1912.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/640w-a5119aca1912.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "a5119aca1912fcf06e922e2761b0fd48d147a4ef538d032cdd989bde5d5e1d14"
+  },
+  "partners/llyfrgell-757-7e4030e0788c.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/757w-7e4030e0788c.webp",
+    "width": 757,
+    "height": 420,
+    "sha256": "7e4030e0788ca9c5150267bf66e3daaec0173b53e4651684a8f590392e6747ca"
+  },
+  "partners/llyfrgell-960-8bf530246bdf.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/llyfrgell/960w-8bf530246bdf.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "8bf530246bdf7713d6f588112776fa5b968826f53c45c56ef18f98a6949b2fdd"
+  },
+  "partners/lmec-1280-f2fc8a86acde.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/lmec/1280w-f2fc8a86acde.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "f2fc8a86acdea8552c7d2455ff75f7a6273468798a10f18a21f927fa96f3a102"
+  },
+  "partners/lmec-320-df48855f4f98.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/lmec/320w-df48855f4f98.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "df48855f4f98b166676b38e2362d2f469b9c28ad2394281651ffaa6828fb1e1d"
+  },
+  "partners/lmec-480-7b211848689a.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/lmec/480w-7b211848689a.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "7b211848689a9dc9256355c0dcf5950a7602dc6efbd402cd4cadaade26f634d6"
+  },
+  "partners/lmec-640-7cd18f0b1c90.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/lmec/640w-7cd18f0b1c90.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "7cd18f0b1c901f40a12d3cc3f868023fe7548e07a3718c9ede00061f831a8915"
+  },
+  "partners/lmec-960-b92f24d05161.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/lmec/960w-b92f24d05161.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "b92f24d05161375ade5e88f78aaa0bf1bb9025b73cef812fa948b7209168e22b"
+  },
+  "partners/nls-1280-3a8ad59c3f22.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/1280w-3a8ad59c3f22.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "3a8ad59c3f229afbd5b7bc42477a8fa10836024cad0d8174a24431f81f4a621a"
+  },
+  "partners/nls-320-94da05acd716.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/320w-94da05acd716.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "94da05acd71669683e744cc188b779ee996824107d8bd1fbfd21fcb4ecc534af"
+  },
+  "partners/nls-320-e9292e775008.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/320w-e9292e775008.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "e9292e775008daf353fc706b229c8a8b2c58b7e02e27d15c5e76f0a717099fe7"
+  },
+  "partners/nls-480-1cbc6c5c9f9f.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/480w-1cbc6c5c9f9f.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "1cbc6c5c9f9f1a134cda5226de212300ca59c954ede8d721ea2e6b4c20e680ce"
+  },
+  "partners/nls-480-9858167b1413.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/480w-9858167b1413.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "9858167b1413be27e8049260ef2c1f560172a5c497027c6c0065da60096e03c5"
+  },
+  "partners/nls-640-bcd03de65f20.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/640w-bcd03de65f20.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "bcd03de65f20c69cbc4c831c1b9d292c266c282bff4a2ee994997e199aede9f6"
+  },
+  "partners/nls-640-dfcfe156ac5d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/640w-dfcfe156ac5d.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "dfcfe156ac5da70213caca7f2ff06dc81dcf17842bbeb9ca39b8b4c9bebde325"
+  },
+  "partners/nls-696-6409785532bf.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/696w-6409785532bf.webp",
+    "width": 696,
+    "height": 387,
+    "sha256": "6409785532bf45ebbf7e2804083c1efc83e2505d09abc30aefae0afcaf3342e3"
+  },
+  "partners/nls-960-eb385d69ff4e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nls/960w-eb385d69ff4e.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "eb385d69ff4e2e73d19a77e7fadc34f0375012ea49ea9c88ee56d1c5f9459451"
+  },
+  "partners/nypl-1280-c5fd8f78b141.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/1280w-c5fd8f78b141.webp",
+    "width": 1280,
+    "height": 710,
+    "sha256": "c5fd8f78b14134842a21ab2a9893469d92d7ee475506411fb1283cd7a6cc64cb"
+  },
+  "partners/nypl-320-b69118f78c81.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/320w-b69118f78c81.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "b69118f78c8121d11ba13d3c2700c5d9685f36b2d0a948641e8252602c4aafea"
+  },
+  "partners/nypl-320-d96ee939b312.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/320w-d96ee939b312.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "d96ee939b31238ac82ab5a214e764043c51e07de56e7d23b169fdb9fbc0c6198"
+  },
+  "partners/nypl-480-4f000860b82c.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/480w-4f000860b82c.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "4f000860b82cb2a2749b5804a9167fa8c3b61d8eed5fd9f6a1f5bc78e176ce7d"
+  },
+  "partners/nypl-480-a9a06c69a3c2.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/480w-a9a06c69a3c2.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "a9a06c69a3c2934e32a7d1c7552e4e2342f4bbc97132738cf71d2049e2000170"
+  },
+  "partners/nypl-580-ea06f8f05c50.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/580w-ea06f8f05c50.webp",
+    "width": 580,
+    "height": 322,
+    "sha256": "ea06f8f05c5066381d6a1df557d79af8b31f05feb78700338f511d106a7839c7"
+  },
+  "partners/nypl-640-b4cfb0794cf0.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/640w-b4cfb0794cf0.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "b4cfb0794cf0268e6e2d70db42d573cc63c5fb01896c42da375db62966d0e307"
+  },
+  "partners/nypl-960-2637de67be88.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/nypl/960w-2637de67be88.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "2637de67be882c2b619d319b32121a2fc7134e48e9a5cdb6ab9e94feaefd7cdd"
+  },
+  "partners/rara-1280-aa77e34ed4e6.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/1280w-aa77e34ed4e6.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "aa77e34ed4e68bcc358477db7e54bc18b58cfa114f98ebd0545fabdca2665249"
+  },
+  "partners/rara-320-2d41b6f6e336.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/320w-2d41b6f6e336.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "2d41b6f6e336244742fa6dc7cdc51a8846d16337c70870b79e1cc1cdf14b0563"
+  },
+  "partners/rara-320-35bf98e4c80e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/320w-35bf98e4c80e.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "35bf98e4c80e70f7c0f9031997472c24b6a043e412fe34bd38c6df3b466028ce"
+  },
+  "partners/rara-480-4392555cd3a4.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/480w-4392555cd3a4.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "4392555cd3a48d3519284e091816b0510716af578793d5ddabf34daf84129095"
+  },
+  "partners/rara-480-f097139e3f13.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/480w-f097139e3f13.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "f097139e3f137fcb25b250833f7932230f70865fab1b2bf6d4ddff2e93abf08c"
+  },
+  "partners/rara-521-0f70260d42f2.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/521w-0f70260d42f2.webp",
+    "width": 521,
+    "height": 289,
+    "sha256": "0f70260d42f222eab8dc4824018f195148e26c3231819f41f916da9c96a4c063"
+  },
+  "partners/rara-640-3b873a81d7c2.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/640w-3b873a81d7c2.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "3b873a81d7c2d4639462d5c94fc55d2b0638ab18ee2fd548f742c6b24543fdbb"
+  },
+  "partners/rara-960-e33cd9a63d21.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/rara/960w-e33cd9a63d21.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "e33cd9a63d212c88b50136de8eeec1e95f47ea453fc99c7edb76d3fb0a835ded"
+  },
+  "partners/stanford-libraries-1280-8f755b7d658b.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/stanford-libraries/1280w-8f755b7d658b.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "8f755b7d658b8dd5062cddd4706ec6e3eb10646d7b0b6471d9559cc20b5ba63b"
+  },
+  "partners/stanford-libraries-320-ef4e99e10cd7.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/stanford-libraries/320w-ef4e99e10cd7.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "ef4e99e10cd75ca50dcb278fd481e153da66e44fed6de25402f39422043b9bb1"
+  },
+  "partners/stanford-libraries-480-1ce1ffa7e353.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/stanford-libraries/480w-1ce1ffa7e353.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "1ce1ffa7e353998c225fac93f2f4e7716da00d0da5bf80884a94f17c95282971"
+  },
+  "partners/stanford-libraries-640-763f171ae151.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/stanford-libraries/640w-763f171ae151.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "763f171ae15136032a52727ca24e1cb3eda9b2ba2bd4db48c8be1a0954fcaa4c"
+  },
+  "partners/stanford-libraries-960-fc4953415b7c.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/stanford-libraries/960w-fc4953415b7c.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "fc4953415b7cc99233df5f593bbd9a8de521272bc97c189ba18b4f3924d54654"
+  },
+  "partners/tamu-1280-ac9588eb25f5.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/1280w-ac9588eb25f5.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "ac9588eb25f5f4e488b83d6e40ef6e816918f4d40a860edfedb651a1d583df9e"
+  },
+  "partners/tamu-320-48f63f403ff4.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/320w-48f63f403ff4.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "48f63f403ff4eb0824e40cf60068825d9c2c746860609a607582ab43982af8c1"
+  },
+  "partners/tamu-320-9ee1e9f807c7.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/320w-9ee1e9f807c7.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "9ee1e9f807c763f1dc0ad82a5ff1e2e2eafcc6b5146cd6fab42d277d843a1bec"
+  },
+  "partners/tamu-480-102ccc642575.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/480w-102ccc642575.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "102ccc6425755267ce4bce571ff473ee1995a6a755d5d6d19aa5074ba23272eb"
+  },
+  "partners/tamu-480-ad76d06e1c45.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/480w-ad76d06e1c45.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "ad76d06e1c45107cefdf55166db49a8d42b4984984616322c82c3032ad4cd6c1"
+  },
+  "partners/tamu-640-5fb9c402a885.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/640w-5fb9c402a885.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "5fb9c402a885ccaf5b4e60a90cbc508b51eda8a126b34fe7c89aa6f77c039083"
+  },
+  "partners/tamu-640-d960d3da4951.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/640w-d960d3da4951.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "d960d3da4951e249deae6e9008e76b838660d786c18fbcde7b91057d0c84e885"
+  },
+  "partners/tamu-742-6468ed84658e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/742w-6468ed84658e.webp",
+    "width": 742,
+    "height": 412,
+    "sha256": "6468ed84658e1b6326e1075947048b6b2f9c33b65151bfc75418e7ed16b1ae03"
+  },
+  "partners/tamu-960-3bf37b983265.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tamu/960w-3bf37b983265.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "3bf37b983265dd8968406074d9b9a4dfa2f7ee5ffda7f6d5bf41caf406d6c689"
+  },
+  "partners/tudelft-1280-e276ed99f65e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tudelft/1280w-e276ed99f65e.webp",
+    "width": 1280,
+    "height": 712,
+    "sha256": "e276ed99f65e43657fff15b2daf505a43599504dba5c9b3aa8bb6e83dc2b4fbd"
+  },
+  "partners/tudelft-320-02a534b28f58.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tudelft/320w-02a534b28f58.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "02a534b28f584982f9131f231070ba8d35c2b80d70081071598ec411b14d34cc"
+  },
+  "partners/tudelft-480-b0d22c60b068.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tudelft/480w-b0d22c60b068.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "b0d22c60b06816e9de568ff576ecd8a176b09ff0fd75d75f21b2ed8c68a4984d"
+  },
+  "partners/tudelft-640-21cb69563d8e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tudelft/640w-21cb69563d8e.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "21cb69563d8ebebf7e675c21e95c00dd7f990c16dabb6ca90d93dcff74b578b2"
+  },
+  "partners/tudelft-960-c407d26adb96.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/tudelft/960w-c407d26adb96.webp",
+    "width": 960,
+    "height": 534,
+    "sha256": "c407d26adb962fa3e634c5aae6d913ee371bb52a732e1e269abd3ccecec74c18"
+  },
+  "partners/uchicago-1280-b22f528b6f46.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/1280w-b22f528b6f46.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "b22f528b6f46a4062a05255e427f56c334c1a04583e90c9ebc41f5bc05cb8f71"
+  },
+  "partners/uchicago-320-958cafd920e2.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/320w-958cafd920e2.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "958cafd920e2223860dfd08527e708838f17e6b9eda6b81f97da81172f4a0e27"
+  },
+  "partners/uchicago-320-c18e8b41a2bc.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/320w-c18e8b41a2bc.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "c18e8b41a2bca87db89e4dae7125a488a442580d07d13ed698acd9e25cb50075"
+  },
+  "partners/uchicago-480-7e1bc83c6af2.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/480w-7e1bc83c6af2.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "7e1bc83c6af2d6d65395eac2dea60da23c90fb604b52fb41e05793ef28785140"
+  },
+  "partners/uchicago-480-d4dd3f2972a7.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/480w-d4dd3f2972a7.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "d4dd3f2972a776c5e16d268631ef64c25103c0cb47badf79258e31ca33ba9981"
+  },
+  "partners/uchicago-640-8d15472e7275.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/640w-8d15472e7275.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "8d15472e72758dbcf28f362f85586be0d5a3e12d77472c2876ab5f72145ff4a2"
+  },
+  "partners/uchicago-640-9bb31c03f893.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/640w-9bb31c03f893.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "9bb31c03f8936cfa3c39b509fdee21307d65f9f5af8e7ac8fcd960d0cc11d854"
+  },
+  "partners/uchicago-652-137e3b41f634.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/652w-137e3b41f634.webp",
+    "width": 652,
+    "height": 362,
+    "sha256": "137e3b41f634266c81b65675000d16dc8ba174f6bf5355ada4cec37491fc8065"
+  },
+  "partners/uchicago-960-094c909697e0.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uchicago/960w-094c909697e0.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "094c909697e0e3e20061ff1cbc99a05606732f30ea0466fdc3667d9e6f98d8df"
+  },
+  "partners/univie-1280-b96358882dad.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/1280w-b96358882dad.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "b96358882dadf4ada943f8b0730bebf1e946fe9da7124e816814edfabe00a39e"
+  },
+  "partners/univie-320-1cedbd51f5b9.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/320w-1cedbd51f5b9.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "1cedbd51f5b95505a2ed71369abd5316284aface3595f3befdd5a8222654dc2a"
+  },
+  "partners/univie-320-ef370ffae794.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/320w-ef370ffae794.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "ef370ffae7944126f4586ef16b3f0ff36a953d7058fb82b40bad6e29ec00103c"
+  },
+  "partners/univie-480-5aa53e3f6029.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/480w-5aa53e3f6029.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "5aa53e3f6029ecbc9d1fbd0988a578b5b1ec39b527f71117da8ebc219e9586cf"
+  },
+  "partners/univie-480-e11e78462ded.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/480w-e11e78462ded.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "e11e78462ded1c217d4a67ebcdeca058887facd13f0b15286cd910dc24820ca0"
+  },
+  "partners/univie-640-c6b686ac237b.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/640w-c6b686ac237b.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "c6b686ac237b9ca85ef369d7a5d53c4d07047dde2939bcf9f1bd64da6a34dd3d"
+  },
+  "partners/univie-640-dbf421ae9823.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/640w-dbf421ae9823.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "dbf421ae9823d6638001876de59c93a85bf6e2efc2799509923045eb5bcfc799"
+  },
+  "partners/univie-746-13dc54adbe64.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/746w-13dc54adbe64.webp",
+    "width": 746,
+    "height": 414,
+    "sha256": "13dc54adbe647903904427255acac31ad0b22ada33ad8783448d37cf77f6fe66"
+  },
+  "partners/univie-960-fbf05f8a20bd.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/univie/960w-fbf05f8a20bd.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "fbf05f8a20bd4160f1dbac29f83c9d6b525e6d859f2a542151b3c192beebe509"
+  },
+  "partners/uva-1280-2b3c8358af18.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uva/1280w-2b3c8358af18.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "2b3c8358af18d03e2e5a82ddfefe0fe444122abd608e43ac904c8fc88455039b"
+  },
+  "partners/uva-320-6c9cdffcdf30.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uva/320w-6c9cdffcdf30.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "6c9cdffcdf3027c1829eea025c2fb1d1758fba445c35958737368b6f1922729c"
+  },
+  "partners/uva-480-0e2a2357ef2a.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uva/480w-0e2a2357ef2a.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "0e2a2357ef2a392767293ce03d245f696be318ddf5fe76dba9ed16019250ee43"
+  },
+  "partners/uva-640-28bb652a9e3e.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uva/640w-28bb652a9e3e.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "28bb652a9e3e1ccea6008f443398ea19568adc314082db7dad327092bd551a2b"
+  },
+  "partners/uva-960-9db7a2ea0cca.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/uva/960w-9db7a2ea0cca.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "9db7a2ea0ccaa4fdad1d2bd132a0e07f8687ece31f35d9053804bef9c1a5494a"
+  },
+  "partners/vu-1280-35144b042d93.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/vu/1280w-35144b042d93.webp",
+    "width": 1280,
+    "height": 711,
+    "sha256": "35144b042d93075399afd00a0680e30bf172846cb3619deae8389f4505b701d2"
+  },
+  "partners/vu-320-029ea78d2a00.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/vu/320w-029ea78d2a00.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "029ea78d2a002f22092645fa02fa06b383361c9f7bdc140e50e302c3336cabb5"
+  },
+  "partners/vu-480-4546f7c690e3.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/vu/480w-4546f7c690e3.webp",
+    "width": 480,
+    "height": 267,
+    "sha256": "4546f7c690e39b80a656daeeb37d5509e1fba0d33f9e5c1febb2aa59a1715889"
+  },
+  "partners/vu-640-aa42eaee3f01.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/vu/640w-aa42eaee3f01.webp",
+    "width": 640,
+    "height": 356,
+    "sha256": "aa42eaee3f01dc6fd2420b4d88068b9c6bc7dc51c203902d1bd353788d2c0568"
+  },
+  "partners/vu-960-6e8bd15df02d.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/vu/960w-6e8bd15df02d.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "6e8bd15df02db33a11f8df10e504abaa37ec95b554eb82697dfb3ca64c21d387"
+  },
+  "partners/yale-1280-3b7dabc3aa52.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/yale/1280w-3b7dabc3aa52.webp",
+    "width": 1280,
+    "height": 710,
+    "sha256": "3b7dabc3aa5211905e878786c2d7be7fe16a3657db47e17c986eebbf84cb54e4"
+  },
+  "partners/yale-320-7ea3c212ad59.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/yale/320w-7ea3c212ad59.webp",
+    "width": 320,
+    "height": 178,
+    "sha256": "7ea3c212ad592b088078a6abd98421e8c9680c830abea7f21c151749b98890ce"
+  },
+  "partners/yale-480-9331c0b5b3dd.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/yale/480w-9331c0b5b3dd.webp",
+    "width": 480,
+    "height": 266,
+    "sha256": "9331c0b5b3ddfc403ab7bdb503754118d85a9c55ad06ca08f1833c8bc51288db"
+  },
+  "partners/yale-640-8a14dcfef665.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/yale/640w-8a14dcfef665.webp",
+    "width": 640,
+    "height": 355,
+    "sha256": "8a14dcfef6659056f61dc893d21ce1b66926dac9f147a64cf1e79372658140f8"
+  },
+  "partners/yale-960-fcc9f53658ae.webp": {
+    "url": "https://files.allmaps.org/images/homepage/partners/yale/960w-fcc9f53658ae.webp",
+    "width": 960,
+    "height": 533,
+    "sha256": "fcc9f53658ae9427a5a28e237fd087c552b2b251c0c6babd87b30d7666fd6c73"
+  },
+  "screenshots/allmaps-annotations-api-1200.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-annotations-api/v1-1200w.webp",
+    "width": 1200,
+    "height": 800,
+    "sha256": "1a1f79552aca3eb145c26e983e5586550cb7387285044c3c27ffc95d2c7d6368"
+  },
+  "screenshots/allmaps-annotations-api-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-annotations-api/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "30ac46a819f5de2cba3e8c1b7d9a0669b68a8ae4c0c89fd6449f2800793d678f"
+  },
+  "screenshots/allmaps-annotations-api-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-annotations-api/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "c367bf6e1b36894d05d8b74255aee7a78cff3eb861139e4deb3463a35333d4bf"
+  },
+  "screenshots/allmaps-annotations-api-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-annotations-api/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "188e51137e845b194d5d26633d3a6bc644b97ddc6e56c17d8dce2a507a14f2f7"
+  },
+  "screenshots/allmaps-annotations-api-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-annotations-api/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "c11a077bdad38d07953bd35a85395a9d849f56929c7ca557df9bb335d26d0529"
+  },
+  "screenshots/allmaps-github-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github/v1-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "6e0b9a0b1be661b17264e366d99d82caf923b3cdd55ae3ead4764c9608338429"
+  },
+  "screenshots/allmaps-github-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github/v1-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "5cc0d9f0052746c9baa82ef677f5bb8da1a748c9c529abc89ada38da02a664cc"
+  },
+  "screenshots/allmaps-github-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github/v1-320w.webp",
+    "width": 320,
+    "height": 180,
+    "sha256": "5d670497c08265648c9ec09639cfc42ced80f1e8246f5a378a141dc40d4edc22"
+  },
+  "screenshots/allmaps-github-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github/v1-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "1404085128a476a67534cf18060cb6beeadebdbc54e4bf3a69e0ffcd8d8e0bba"
+  },
+  "screenshots/allmaps-github-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github/v1-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "bcab26022466ad1f25378cfec97a4afdf910ab0f1152571603b35238add542b7"
+  },
+  "screenshots/allmaps-github-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github/v1-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "f941b0e64dcfedf6b1658e699cf1d7e148c125cf7dc490be89d033656c2e6a97"
+  },
+  "screenshots/allmaps-github-desktop-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-1280w.webp",
+    "width": 1280,
+    "height": 838,
+    "sha256": "fc8f52b817f9b1ae80f3d8c15dd5f83948ff94bc5afb7b791bcd2dfdbac40d83"
+  },
+  "screenshots/allmaps-github-desktop-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-1600w.webp",
+    "width": 1600,
+    "height": 1047,
+    "sha256": "35f303c65395c77efcb5651388b9e4ac1ae72353c8e54816156aaa4f190fab86"
+  },
+  "screenshots/allmaps-github-desktop-2560.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-2560w.webp",
+    "width": 2560,
+    "height": 1676,
+    "sha256": "7dda74b6e2db94484d64f7a9b037bb941598b632a767b443a305846a97bdcfe2"
+  },
+  "screenshots/allmaps-github-desktop-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-320w.webp",
+    "width": 320,
+    "height": 209,
+    "sha256": "55e18cceb28d56ca4c799ba32fde7f352893c390ef42afff8a49cb5b07d869b0"
+  },
+  "screenshots/allmaps-github-desktop-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-480w.webp",
+    "width": 480,
+    "height": 314,
+    "sha256": "828d33699752db730e90ec4ef33d53d0d2261d36f3b6419d18d5c47ccb20e02e"
+  },
+  "screenshots/allmaps-github-desktop-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-640w.webp",
+    "width": 640,
+    "height": 419,
+    "sha256": "b531c9a71d99040b0748fe7503f8a0ff17908e5c2ecfd706a431f2450210fd80"
+  },
+  "screenshots/allmaps-github-desktop-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-github-desktop/v4-960w.webp",
+    "width": 960,
+    "height": 628,
+    "sha256": "0282a6f4f684693315597be777daff8f0154ed10be993e37418910a225078954"
+  },
+  "screenshots/allmaps-here-data-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "12d4db13d2ecf8e625a3be1362b4bc3c7ca5a6b2919cc6ce2890c3b1599306a1"
+  },
+  "screenshots/allmaps-here-data-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "8f2ca3bbc55d6501b7c0b22b359c6591869f9ec63ee20994d0dc401bf3d0cd77"
+  },
+  "screenshots/allmaps-here-data-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1-320w.webp",
+    "width": 320,
+    "height": 180,
+    "sha256": "757659dc39f205711d94e77759042e831e8c485fb4238ee25096f7333157b9d0"
+  },
+  "screenshots/allmaps-here-data-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "ea228d87a62974ee1649a9b31e4282f5d368ce5d46e5decb103f61f7fb87b0a9"
+  },
+  "screenshots/allmaps-here-data-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "8c711af0203b1155ad0735f4768403b3e116fba2a5be74288afa8e396c8dc630"
+  },
+  "screenshots/allmaps-here-data-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/allmaps-here-data/v1-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "2658553586594d8253eb6784514727aaa8a0756845254fde5a94d62e1f900730"
+  },
+  "screenshots/annotorious-building-outlines-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-1280w.webp",
+    "width": 1280,
+    "height": 856,
+    "sha256": "525fd44d28600248779eab05f82230b8ad32cfeea2c338b0e0f9b74d231f9cdd"
+  },
+  "screenshots/annotorious-building-outlines-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-1600w.webp",
+    "width": 1600,
+    "height": 1070,
+    "sha256": "a3fd5940febfdf4ff84390b627ba565fd50a9ab0586a543a0a61c826238a6d6e"
+  },
+  "screenshots/annotorious-building-outlines-1704.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-1704w.webp",
+    "width": 1704,
+    "height": 1140,
+    "sha256": "46840034e13e6a47786b2b02bee8936736c577b2ab7edf4b08f4dc1a5a628028"
+  },
+  "screenshots/annotorious-building-outlines-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-320w.webp",
+    "width": 320,
+    "height": 214,
+    "sha256": "b94d649d3946de24c2f25605788920d9cbb0453bafd60ae792f64c716d8f1279"
+  },
+  "screenshots/annotorious-building-outlines-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-480w.webp",
+    "width": 480,
+    "height": 321,
+    "sha256": "2943836f31134620ebfd7e7368150612f38e188c10f2af19bfdcc1b1576f4187"
+  },
+  "screenshots/annotorious-building-outlines-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-640w.webp",
+    "width": 640,
+    "height": 428,
+    "sha256": "aef376e0a20fdde28d7d17c5aea7b588b9a1d993e3b53eef7975086f8996940b"
+  },
+  "screenshots/annotorious-building-outlines-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/annotorious-building-outlines/v2-960w.webp",
+    "width": 960,
+    "height": 642,
+    "sha256": "40058ac5f6515574fbf5aa86ea61b7ff0532395a55ab56ff34e08e499178f003"
+  },
+  "screenshots/editor-iiif-map-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "499dd8bc82d0272d57e0222c8fe2001c32239e645aa4d42f13d858f193dda5b0"
+  },
+  "screenshots/editor-iiif-map-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-1600w.webp",
+    "width": 1600,
+    "height": 1067,
+    "sha256": "2e1d7188d47795420bfa386cc398093807bf9cc700ddf45b7bb4f550f509e25e"
+  },
+  "screenshots/editor-iiif-map-2560.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-2560w.webp",
+    "width": 2560,
+    "height": 1707,
+    "sha256": "342a62d8234308e022f5fae149b9cd4ae19b3a288305d9eed9dbeebd6ceb4a20"
+  },
+  "screenshots/editor-iiif-map-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "310ef0c9698114613510a26993dfe0cfff2b24cc5053887eda43fcd68f471a6a"
+  },
+  "screenshots/editor-iiif-map-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "475deeed04eddf87a24ad8579f5ac62da3bb91a95df920b1cc200131e464d34b"
+  },
+  "screenshots/editor-iiif-map-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "96531cda6216b6ce466811111f847fe0c2eb97f5a09741c1aa12dd6c76fee76d"
+  },
+  "screenshots/editor-iiif-map-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/editor-iiif-map/v3-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "23d9fe4479e2f92d8b6fd5b4c8bf73bb18409f65e62b87c8b3d8684a1119c481"
+  },
+  "screenshots/get-started-editor-utrecht-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "278069bc06ec2327c27b0a7a634dba881a334f4056dbce3c862bdd2110f807fc"
+  },
+  "screenshots/get-started-editor-utrecht-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-1600w.webp",
+    "width": 1600,
+    "height": 1067,
+    "sha256": "e823430c0a6c22d231599670ef77bfcb166c86ba0eed02b8e9949ccbcaa2eb21"
+  },
+  "screenshots/get-started-editor-utrecht-2160.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-2160w.webp",
+    "width": 2160,
+    "height": 1440,
+    "sha256": "2be7436ebc693b85bcfe2b1efce9704e9b26cb9cf5a5e231971cac68be8b0499"
+  },
+  "screenshots/get-started-editor-utrecht-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "3c42f693a0ed7a576c82ac53862801fdd57fc2ed1b4aba1f1ebed315b7c626a4"
+  },
+  "screenshots/get-started-editor-utrecht-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "85eb2abcc1fa596696d79254305b15885e11e9e6d3e4d0bb4c759096753bc94b"
+  },
+  "screenshots/get-started-editor-utrecht-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "1c413a926fb3ff54bb7b1a123e2e8cebc03f9c5bc05392cf785d21b363eaeddc"
+  },
+  "screenshots/get-started-editor-utrecht-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/get-started-editor-utrecht/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "ee7ce099b15bb6f00c5b8d88b828c47532b05db1ecd2cd1ecbb6012a47ace629"
+  },
+  "screenshots/holyoke-fallback-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/holyoke-fallback/v3-1280w.webp",
+    "width": 1280,
+    "height": 1277,
+    "sha256": "92da797306662d8f701712663af7bcad96cab45f4bc5ba3686fe1adc36450382"
+  },
+  "screenshots/holyoke-fallback-1494.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/holyoke-fallback/v3-1494w.webp",
+    "width": 1494,
+    "height": 1491,
+    "sha256": "f1cb50f6953c5e6ff8cca1184dd52a25d5fe4c52a4c3615ad9dff27db9159ee5"
+  },
+  "screenshots/holyoke-fallback-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/holyoke-fallback/v3-320w.webp",
+    "width": 320,
+    "height": 319,
+    "sha256": "825b5e63c4a42023120a2c755ca37fb8a39292e40e641f3802516bcf110f6812"
+  },
+  "screenshots/holyoke-fallback-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/holyoke-fallback/v3-480w.webp",
+    "width": 480,
+    "height": 479,
+    "sha256": "5fe47038a8f9c95499bbeec6bc3213a18edfa853c9be9076a6e9f12a79c1b72e"
+  },
+  "screenshots/holyoke-fallback-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/holyoke-fallback/v3-640w.webp",
+    "width": 640,
+    "height": 639,
+    "sha256": "004c9180f7fc40e617734195f6df413f7d7dd5373eef8df89da9c5b6ee070e33"
+  },
+  "screenshots/holyoke-fallback-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/holyoke-fallback/v3-960w.webp",
+    "width": 960,
+    "height": 958,
+    "sha256": "29a0e7b84dc369cde4f81aae320b5afb382d380d5d76868d0a0fd4f46eed0c63"
+  },
+  "screenshots/iiif-georeference-extension-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "b0996cc68eca368c94bc144a7244b59aebad3bfd1538371cf8e59c6c22a48c45"
+  },
+  "screenshots/iiif-georeference-extension-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-1600w.webp",
+    "width": 1600,
+    "height": 1067,
+    "sha256": "3d3c78cb30184103ae040605f02ac38ce0e322fddc6a4f0ba11ea4badc42fc68"
+  },
+  "screenshots/iiif-georeference-extension-2560.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-2560w.webp",
+    "width": 2560,
+    "height": 1707,
+    "sha256": "f179df98f9b9738fcceb4d56d2d9001b6847e1ac42776a361fc65cfb8e43ca00"
+  },
+  "screenshots/iiif-georeference-extension-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "d723cc7649f6af3e254f66e555ba921c9468dbaefab1c3fd8bf5e0f81216141b"
+  },
+  "screenshots/iiif-georeference-extension-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "a6a6a220c899e3d9d93108e4647973cc1c5130280e6cb5f72ced0aeaab577778"
+  },
+  "screenshots/iiif-georeference-extension-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "d6a8ac6dabaad40432961c1742d6c7bf37d7831f7630e9f1019a33126ec8d9c3"
+  },
+  "screenshots/iiif-georeference-extension-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-georeference-extension/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "f7dd0b4cfbe4eedf5ff2b85053115033351596761d378ea0bb46acdb13a4dd91"
+  },
+  "screenshots/iiif-homepage-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-homepage/v1-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "07a928c9dfb7a6557f6e2dea519a82df90d22ac56f46693ae0e4aa34ef7cc196"
+  },
+  "screenshots/iiif-homepage-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-homepage/v1-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "09df6c2ba3c9c6455c889953199abe81f841c8cc07213b712189398e895b2527"
+  },
+  "screenshots/iiif-homepage-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-homepage/v1-320w.webp",
+    "width": 320,
+    "height": 180,
+    "sha256": "c7fac0481436cf19f45cdb3e5b1ff808684ceb94bc0b63d1caee5440d24f827b"
+  },
+  "screenshots/iiif-homepage-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-homepage/v1-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "98eeba19ad2711029dc8debd419b10be8bae57c779c3fb87e2ca82565e63823e"
+  },
+  "screenshots/iiif-homepage-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-homepage/v1-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "e98e3e23cb4f70e44d1c8afec1984db036faac9793b6afc72ab1f49f039b1131"
+  },
+  "screenshots/iiif-homepage-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-homepage/v1-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "d387d228fb549787e08b6e219afab09c519c3cb37bb0578aa8dfdc93dc9677bd"
+  },
+  "screenshots/iiif-partnership-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-1280w.webp",
+    "width": 1280,
+    "height": 911,
+    "sha256": "f22d423efe57e4caed518f20f08ae3fe93c96947b14dbeb97f76d62a9c7e822b"
+  },
+  "screenshots/iiif-partnership-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-1600w.webp",
+    "width": 1600,
+    "height": 1138,
+    "sha256": "303791add719afd01be8c901cfe552403609f30006f8b2ba804f930c5c282d60"
+  },
+  "screenshots/iiif-partnership-2530.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-2530w.webp",
+    "width": 2530,
+    "height": 1800,
+    "sha256": "5a8899cb72212a07fcc4e899dc16ca9604efcc640a47b9f62af39b1972cbc516"
+  },
+  "screenshots/iiif-partnership-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-320w.webp",
+    "width": 320,
+    "height": 228,
+    "sha256": "d017236509eac4ee6fbeca8974f127debc66d9569672a435484d8725e9acaed9"
+  },
+  "screenshots/iiif-partnership-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-480w.webp",
+    "width": 480,
+    "height": 342,
+    "sha256": "3710795759d53a8f837113cff8a2481e206184feac318364023db3dcd0209108"
+  },
+  "screenshots/iiif-partnership-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-640w.webp",
+    "width": 640,
+    "height": 455,
+    "sha256": "fc03ad3cb581b44462ada540229b540131001d560635c0888807d36f8dfafe29"
+  },
+  "screenshots/iiif-partnership-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/iiif-partnership/v2-960w.webp",
+    "width": 960,
+    "height": 683,
+    "sha256": "fb3254bc16bd70bda2bf5c873a3015309e3ae34159a47dda2b3056bcff4936a4"
+  },
+  "screenshots/showcase-aggieland-through-time-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-aggieland-through-time/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "3a50db4c07d922e81bbc96ad9366d936d105a9778e72b7840e474c6fe860fe9f"
+  },
+  "screenshots/showcase-aggieland-through-time-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-aggieland-through-time/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "c43975d20e4d2120334428b93c68e82f6ee73fc3467473b4b52fff9cd63d0500"
+  },
+  "screenshots/showcase-aggieland-through-time-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-aggieland-through-time/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "51d4f4fc9dcc09cb4dd11b4eaaada6e47a9219f0500855edf3e7c5aa6e636f45"
+  },
+  "screenshots/showcase-aggieland-through-time-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-aggieland-through-time/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "577a1ecb135b58dd2ee7cda14b3fd599f5b480872655972bbcda26dde8c9c325"
+  },
+  "screenshots/showcase-aggieland-through-time-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-aggieland-through-time/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "4054506009cb8d969e96c3b7ad754a0b1d6eff4cbcd55d96ea1f5be7333cdbf5"
+  },
+  "screenshots/showcase-aggieland-through-time-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-aggieland-through-time/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "b40f8e84ba0fc36e2a2f3e9f33e9cd7aa7142fdd4fe3486715b33cf0ea55dd83"
+  },
+  "screenshots/showcase-agsl-geodiscovery-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-agsl-geodiscovery/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "604460b089b439704fa1a4fab76aa4a19fff78ff227be2d9c4b1b7c56b437bd8"
+  },
+  "screenshots/showcase-agsl-geodiscovery-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-agsl-geodiscovery/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "cdccc9dad4db52dc463f3830e1ced64eb4170c9ac2e4725590870f935f6e1232"
+  },
+  "screenshots/showcase-agsl-geodiscovery-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-agsl-geodiscovery/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "2b47892889fedbc715e9c7fc98611335215e1641434637752653593f69237fca"
+  },
+  "screenshots/showcase-agsl-geodiscovery-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-agsl-geodiscovery/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "e8e353e47e1a60cba8a762989850b1222833300e90762091243b36c907dde23b"
+  },
+  "screenshots/showcase-agsl-geodiscovery-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-agsl-geodiscovery/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "c60eda3996f150c0b4e1c1db807ae875e046cfde6b166b49e8a72bd6cf9a385b"
+  },
+  "screenshots/showcase-agsl-geodiscovery-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-agsl-geodiscovery/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "b6ac3920cd97f538ea79b544d20fec0e22003aa16f6adb2a69ca67c9df1aa802"
+  },
+  "screenshots/showcase-allmaps-cursors-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-cursors/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "410e1e3b5204c2c63d9b324de65a14ddb2387e82f080903e9bb30fbcb4143627"
+  },
+  "screenshots/showcase-allmaps-cursors-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-cursors/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "3323c2c940f47b4eae8836d88487913a97f513134634387cfbf71c686407c3cd"
+  },
+  "screenshots/showcase-allmaps-cursors-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-cursors/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "b8b0f0a4689a37a26b3599aaf3be2b09bda148c7d583825045aff592b0af5100"
+  },
+  "screenshots/showcase-allmaps-cursors-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-cursors/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "04da97b8d64686ea81c542378a22ad514845b68e1c7a216231b76d23f45e8e3a"
+  },
+  "screenshots/showcase-allmaps-cursors-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-cursors/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "adab36962cb52c517ddb52435878b8373520181f3d183f4feb00aca999b131f2"
+  },
+  "screenshots/showcase-allmaps-cursors-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-cursors/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "c76c0ace83d28adb124f781995d2c33d0bd145c78a3c022f45b651d3413f2c37"
+  },
+  "screenshots/showcase-allmaps-latest-bot-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-latest-bot/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "c6b4b7562b9b636681c2e507af648c3800b51acdf0f5abde6170fd9bd325a973"
+  },
+  "screenshots/showcase-allmaps-latest-bot-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-latest-bot/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "29c4d07083a87f5ffec065e9ed4e23ef3dac0383a9ff0ec2ca59cf27f98e5cdb"
+  },
+  "screenshots/showcase-allmaps-latest-bot-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-latest-bot/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "9ea2ed4f2b616cd0181934ecbd7d3ddf6c7741fa457c49207efffd21b4ebd1c4"
+  },
+  "screenshots/showcase-allmaps-latest-bot-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-latest-bot/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "42d69fc056e1af4b8d5049eb0a43b45819115feb86db17023f64c16564f3b411"
+  },
+  "screenshots/showcase-allmaps-latest-bot-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-latest-bot/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "6cdbc7c1be3fbba2ac8a0e938d8d198c599fc19804898f337202ebd6833820c7"
+  },
+  "screenshots/showcase-allmaps-latest-bot-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-allmaps-latest-bot/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "401ca41ae66cc9597069e356dabcb1e521d46a76d87242b89bfba7c8f4a6ded7"
+  },
+  "screenshots/showcase-argo-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-argo/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "fbe7408705d45e79c8dc5c29516fc9ad6bda9a5aee12b30ea984c0afe6c72801"
+  },
+  "screenshots/showcase-argo-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-argo/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "b97f3afefbb00f8789078d09175cfd321044ea9765e5de7ead777cf87599ab70"
+  },
+  "screenshots/showcase-argo-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-argo/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "4f9059e962f9221738ae19aca815e8abe3907e903846a3cbdb2551fc1fec962e"
+  },
+  "screenshots/showcase-argo-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-argo/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "cb42ae8a0200c2d9318407beb7d5dee904ddaff4d15919caf367664dd447ccb2"
+  },
+  "screenshots/showcase-argo-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-argo/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "574c676e29669da892ae2891bdec3a5cfd55c0d326172c5fd8b8adf29868d258"
+  },
+  "screenshots/showcase-argo-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-argo/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "a97b24cadf2a440230fecdf14a2ca2daf342a17a90013560d14c1bc459703724"
+  },
+  "screenshots/showcase-art-and-empire-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-art-and-empire/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "0beaa0dec5310dbcf33f76372ed47da4fea4f3fa7916c0baf1c8de0a1be9066c"
+  },
+  "screenshots/showcase-art-and-empire-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-art-and-empire/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "df2a18a5d3c16dbdece1d88f0ac0c3b76cc0a4d5daaa81ae76dd697804295db4"
+  },
+  "screenshots/showcase-art-and-empire-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-art-and-empire/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "34de72936730e076756c93d231ce3ec8bba454aebe2c91a93e85830165b403ea"
+  },
+  "screenshots/showcase-art-and-empire-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-art-and-empire/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "7b6a0ec5e964921f587c620278a2c104d6e949dfcc55fbfc354fd0fec8b0c40e"
+  },
+  "screenshots/showcase-art-and-empire-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-art-and-empire/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "39c8cb2570e2cd6be9f1c03d6e7e85be1391fdddea080cc62dd71ec32bbc158b"
+  },
+  "screenshots/showcase-art-and-empire-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-art-and-empire/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "39ec79125f798c6f3d94f024d57f9e444f0428e4dc5758387fa03761f3b8e1d7"
+  },
+  "screenshots/showcase-big-ten-geoportal-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-big-ten-geoportal/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "7fb54eeb156422690ebbc26f02b4a0039f4c6a9f65166889fc6537ebf1df5515"
+  },
+  "screenshots/showcase-big-ten-geoportal-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-big-ten-geoportal/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "462f0acd98f5a9248e4f3722b4477d86bb33a6a0ff24200a0fbd20f03e832b4b"
+  },
+  "screenshots/showcase-big-ten-geoportal-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-big-ten-geoportal/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "d6835c257b1a0b4dc72c77d7df9dc52610bdee9dcc8249ba74aa89595c0a9eef"
+  },
+  "screenshots/showcase-big-ten-geoportal-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-big-ten-geoportal/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "467b85303db278e3fa38d8948af3b7a0004bca24f09c48be70d05976aa4b032a"
+  },
+  "screenshots/showcase-big-ten-geoportal-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-big-ten-geoportal/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "7b4ae045fac4ffef0477e0c70ebfae65d439ee070fb99844189825e01091492b"
+  },
+  "screenshots/showcase-big-ten-geoportal-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-big-ten-geoportal/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "d3e09a0846d0a7824db4846110656650d9e1e2ba0bedfe924efa78dfa866c7d6"
+  },
+  "screenshots/showcase-city-atlas-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-city-atlas/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "aebb1f9df655adeb1c775b4729bca7dd37b0343db370aaa31dde0f8521f141cf"
+  },
+  "screenshots/showcase-city-atlas-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-city-atlas/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "8c4a44293a923373c698b6164a1136258f30848ef36f95ca2935de56814d7328"
+  },
+  "screenshots/showcase-city-atlas-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-city-atlas/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "6546805ba8a6ce35525d141ceca632a65900111af1b5262c37dde728b446e8e1"
+  },
+  "screenshots/showcase-city-atlas-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-city-atlas/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "45cbc725a35c63b3737e7457c862071c0805b4a9e6b69ce543d9d128c117081e"
+  },
+  "screenshots/showcase-city-atlas-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-city-atlas/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "990e48a57b7441e8178a709c5f7bf1b73abc65ce0baa5479e00dbc56737be730"
+  },
+  "screenshots/showcase-city-atlas-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-city-atlas/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "92c7a515dcc6d07ec423b86f15a78a351104d34ed7c5896810cf4a4381fb1d94"
+  },
+  "screenshots/showcase-csu-groundwater-explorer-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-groundwater-explorer/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "8c493a5bcce93a445474a4048135919dba9b29920fb137ac063c3696fed61db9"
+  },
+  "screenshots/showcase-csu-groundwater-explorer-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-groundwater-explorer/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "ee37a08bf5977c82fde57cc19203e060b6ff1eb9b915ea3ada3d8c73c2f3717a"
+  },
+  "screenshots/showcase-csu-groundwater-explorer-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-groundwater-explorer/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "eb151597fb2b7bb005ba884f67cdbf932ff3c950378a9877a729d35da6e8b1df"
+  },
+  "screenshots/showcase-csu-groundwater-explorer-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-groundwater-explorer/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "fe5203e06f8013f1444297f202b515f1241b29428ab16b68d4a1d640c99b4af8"
+  },
+  "screenshots/showcase-csu-groundwater-explorer-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-groundwater-explorer/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "bebadc7d9368873c133382ac1cff180b9bf4c3f209924730d7a74dd4e979d9af"
+  },
+  "screenshots/showcase-csu-groundwater-explorer-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-groundwater-explorer/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "954dcfa03e94cce68a1d9fd43108280c1619fed7fe9fc6f55087491670bac1ba"
+  },
+  "screenshots/showcase-csu-historic-map-explorer-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-historic-map-explorer/v3-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "83d029efc06250217d59e3cf2df172f89490a51bbd62e5e9dbe4d76717170da4"
+  },
+  "screenshots/showcase-csu-historic-map-explorer-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-historic-map-explorer/v3-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "1347e1a30aacb55f9993078d6b8b7d9e4c7879826d3b2cb29f5350cc522bffb7"
+  },
+  "screenshots/showcase-csu-historic-map-explorer-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-historic-map-explorer/v3-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "ece9bbd4f48f32bbdeaca98e5f8d82395ba86ace6b74f2409f31595200b88c98"
+  },
+  "screenshots/showcase-csu-historic-map-explorer-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-historic-map-explorer/v3-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "d342f47bc912ee797e20c78ab49187de2544e11c2db3b0f77a122a83794d9cac"
+  },
+  "screenshots/showcase-csu-historic-map-explorer-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-historic-map-explorer/v3-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "25984a0ddd094df67dea9d3678c1baa8ffb54fb4acc96e71b99e46ed983ee619"
+  },
+  "screenshots/showcase-csu-historic-map-explorer-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-csu-historic-map-explorer/v3-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "148508c10441b82c33cefa6272beea6a7d51db579f5b99393e93d8a84977d031"
+  },
+  "screenshots/showcase-ferrovias-do-brasil-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-ferrovias-do-brasil/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "bc28c6db4d1c9c7b8f5438c6a8057e8d9c95bc79efc6bdb6b21a60aadb03173b"
+  },
+  "screenshots/showcase-ferrovias-do-brasil-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-ferrovias-do-brasil/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "232ac05f1b816003bc784e51b85c62c240807480712c3301a2d0f58dae3dbbe1"
+  },
+  "screenshots/showcase-ferrovias-do-brasil-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-ferrovias-do-brasil/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "85ee6d609fd3ec2f2c802300472cb340550eb8fb369976816b749cf26ae84478"
+  },
+  "screenshots/showcase-ferrovias-do-brasil-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-ferrovias-do-brasil/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "1954282cfcd9ec9f875bd1c27a4a4297cb1694006580453a9c321c484c1ad2d1"
+  },
+  "screenshots/showcase-ferrovias-do-brasil-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-ferrovias-do-brasil/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "acf20713232f8c38758251d8476e1c4df87d7c7da7cdd93338202900afac2347"
+  },
+  "screenshots/showcase-ferrovias-do-brasil-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-ferrovias-do-brasil/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "80862cc9d607db5597f0c18c44bfe7278c359bf479cbd707ec2e6bbbb5ebdcf2"
+  },
+  "screenshots/showcase-gent-gemapt-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gent-gemapt/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "fb878ea19c2d1cd35fb7ceec2b40ea8ef7e41cba75b6f8caf1246c57143d7aa2"
+  },
+  "screenshots/showcase-gent-gemapt-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gent-gemapt/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "d47eecf75cf2e9006be8390af0fb8aa3268aab69b33fa6119840415ba760ccd6"
+  },
+  "screenshots/showcase-gent-gemapt-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gent-gemapt/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "2cd172536f321fe21a5cf7c2074671f410588ab8683b83bb9954e0c92e3448f8"
+  },
+  "screenshots/showcase-gent-gemapt-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gent-gemapt/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "8e9153b27eba82ca1015072ccbac3925fe62715362e8cc6fe018d0cf88dc8879"
+  },
+  "screenshots/showcase-gent-gemapt-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gent-gemapt/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "414c4d61c0eae5a5f41f6074860ed396548f006a5f9d4c0fdb39ae483461e617"
+  },
+  "screenshots/showcase-gent-gemapt-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gent-gemapt/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "ca08313ed35f97b56b0279d9098eaacb8bda04a99a18b1f4d158a09e54600f91"
+  },
+  "screenshots/showcase-georgia-coast-atlas-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-georgia-coast-atlas/v3-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "aa6383db8e7a312679ca48ca86e54486e8133161660e4e13e47142689fb7d715"
+  },
+  "screenshots/showcase-georgia-coast-atlas-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-georgia-coast-atlas/v3-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "daca5acf8a834dd8f557344233b52c6fe3197349830ab0c44b839e8703ed2461"
+  },
+  "screenshots/showcase-georgia-coast-atlas-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-georgia-coast-atlas/v3-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "3db4a5cce7d6afcac11841013d79aab3fdae6e464baaff2d33fc9638527d09c7"
+  },
+  "screenshots/showcase-georgia-coast-atlas-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-georgia-coast-atlas/v3-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "9f8b37c8955749e207a282b8cacd7a936574843bd32808bc26043f9dac9efbd7"
+  },
+  "screenshots/showcase-georgia-coast-atlas-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-georgia-coast-atlas/v3-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "537e256ec5036690dab3515c01199206b632251a89cace05d75947966ffc9735"
+  },
+  "screenshots/showcase-georgia-coast-atlas-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-georgia-coast-atlas/v3-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "1bdb54fff2faf9c7fbc43b8f6ea9943779aa6f1e30caa1c2948f39298ab4e669"
+  },
+  "screenshots/showcase-goudse-kaarten-kabinet-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-goudse-kaarten-kabinet/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "581f53f0600a3503ff4a3f07fa2210a2d94908b5efa85df77f4435b6012abde7"
+  },
+  "screenshots/showcase-goudse-kaarten-kabinet-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-goudse-kaarten-kabinet/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "8e54b22188e9e9e3115701fd6f493606c8b65cd51bb465f8de345f3d820cc110"
+  },
+  "screenshots/showcase-goudse-kaarten-kabinet-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-goudse-kaarten-kabinet/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "75f80db5651d34cb807e9cf46f3960fcf9c1debb5f646c355b4a3e52d00a7e3b"
+  },
+  "screenshots/showcase-goudse-kaarten-kabinet-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-goudse-kaarten-kabinet/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "fa980aa1fc9d77d8895298842ce59cb116c8a1b039fc97b01fa9676d40c4971e"
+  },
+  "screenshots/showcase-goudse-kaarten-kabinet-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-goudse-kaarten-kabinet/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "b5d3b4beb49d9b35c23465249850873cf788c64583613435e2d086768eabd98f"
+  },
+  "screenshots/showcase-goudse-kaarten-kabinet-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-goudse-kaarten-kabinet/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "15feea37793128e14c0e3792c6de878d14a379a5ebbf4c34ea1e82292787dc1c"
+  },
+  "screenshots/showcase-gravity-at-sea-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gravity-at-sea/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "a1fed701de4b736a7517e8b7b91ae748f6d5a59c940ee5e19a750f64b1cb3f42"
+  },
+  "screenshots/showcase-gravity-at-sea-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gravity-at-sea/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "2f8a65f6cba7cadd9a76a0d13c0156526cbc61c36e8a119998729682213e4110"
+  },
+  "screenshots/showcase-gravity-at-sea-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gravity-at-sea/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "f0745821db5059eb5976f4aa75432dfe6864725d60b200d5e117cf16a4fdf0d8"
+  },
+  "screenshots/showcase-gravity-at-sea-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gravity-at-sea/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "df6bae2bc91f4a0c8d7ba95c1ee2b8d5a8c8ff4537d3db43c395f4b7ce265fea"
+  },
+  "screenshots/showcase-gravity-at-sea-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gravity-at-sea/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "5240e4b016e4d519416f32bb107aec37451a83263f157f3e600e865811630fe6"
+  },
+  "screenshots/showcase-gravity-at-sea-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-gravity-at-sea/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "f0203ef905b5999eafe8fc4476a6de19a31a171f83f4a90a304959b1ea0ddaa4"
+  },
+  "screenshots/showcase-historical-atlas-polish-towns-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-historical-atlas-polish-towns/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "80f00ac3277d548e0b2bae28ae0ad05dfe72c27e3d7075221e889174cc347d56"
+  },
+  "screenshots/showcase-historical-atlas-polish-towns-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-historical-atlas-polish-towns/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "5b1c0ad665db2297b7ec6db23ee2a4e36be5910c53d07f54d7760273413d7f52"
+  },
+  "screenshots/showcase-historical-atlas-polish-towns-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-historical-atlas-polish-towns/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "920f213777ddcac057205d1d8a19da2c8b98783ee6d0f167823e1d5d52481490"
+  },
+  "screenshots/showcase-historical-atlas-polish-towns-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-historical-atlas-polish-towns/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "e8e55e9d879693a7886fdd92349fc4b3cea74f6908e396e14fd8fa1962ff01f5"
+  },
+  "screenshots/showcase-historical-atlas-polish-towns-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-historical-atlas-polish-towns/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "6ded296532e812397110494659a3e7dd94df60aad5cbfb31e76e08ac9ffa36a5"
+  },
+  "screenshots/showcase-historical-atlas-polish-towns-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-historical-atlas-polish-towns/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "daf18051867b57e961b097cb5290b488941dca77f1b393498e61d778a4d9be2d"
+  },
+  "screenshots/showcase-iiif-pyramid-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-iiif-pyramid/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "9a1ccbae05aef2546350be59261862ec3e0e8e7da25987e9677e6493cd5da538"
+  },
+  "screenshots/showcase-iiif-pyramid-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-iiif-pyramid/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "94949f56f9712c074a09fe1b59f41ad9e782ab4453957f10c35518dc6033f902"
+  },
+  "screenshots/showcase-iiif-pyramid-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-iiif-pyramid/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "50a197908d9974c2fd62719c17f65408617c35da5412f35695361e43a9db2ef5"
+  },
+  "screenshots/showcase-iiif-pyramid-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-iiif-pyramid/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "2f2afda593b07a8a8853b36608f5101d75136c4df101619822a8b0a969dc3196"
+  },
+  "screenshots/showcase-iiif-pyramid-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-iiif-pyramid/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "45ac7c1373b8746fc36a34754b8b2ad328646bb6810476174c3a57adce96acbb"
+  },
+  "screenshots/showcase-iiif-pyramid-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-iiif-pyramid/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "eb33315e5e34e56de5bf3910ebd5c01bad1336159b8802cc8f24e257a5bba348"
+  },
+  "screenshots/showcase-kattenburg-atlas-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-kattenburg-atlas/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "fb8ae805e5ddb0816665fb611edc35790b394f251339a0717fcb11f6b4898a0f"
+  },
+  "screenshots/showcase-kattenburg-atlas-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-kattenburg-atlas/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "90230b344dfb88c02d0e18684604b19afb3be2beadceac3b753450a459784981"
+  },
+  "screenshots/showcase-kattenburg-atlas-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-kattenburg-atlas/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "c09ad54fdfb0b4830074e06551268ea21e5f1e174cd88abca419f67e8ccf2e0d"
+  },
+  "screenshots/showcase-kattenburg-atlas-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-kattenburg-atlas/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "fc4bdc66961ddfd5620fcb74585caff931e9be6553224418dbaef1b042b5f824"
+  },
+  "screenshots/showcase-kattenburg-atlas-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-kattenburg-atlas/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "4606011b8d75a6db23dc5e257656deff69356fb14965904352a6eac746f960da"
+  },
+  "screenshots/showcase-kattenburg-atlas-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-kattenburg-atlas/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "0ae868591418e50bb0314f72ba0f9dc9c6ecf0ad541717aa5b76225cf9b602b7"
+  },
+  "screenshots/showcase-mapping-chicagoland-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapping-chicagoland/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "15315acd190c023c0a455b9112828d84140c7c90e62171c9630bc8076aed3bfe"
+  },
+  "screenshots/showcase-mapping-chicagoland-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapping-chicagoland/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "6300750685bdb6d309f1bd981392ee48b9fdc4276fc15159b976de9c6286ad4c"
+  },
+  "screenshots/showcase-mapping-chicagoland-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapping-chicagoland/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "a0d0b69aca39f453fc62e94793fc5660d8b4c2f8907877cff2ba0e82cb43511e"
+  },
+  "screenshots/showcase-mapping-chicagoland-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapping-chicagoland/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "d6c4c48b568a510b9c0fc01496a13fb5008f4086855caa038b09f8a00609e3da"
+  },
+  "screenshots/showcase-mapping-chicagoland-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapping-chicagoland/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "1805eee3d321625748b2d330b0daf71ed35b1b0c33f7348342aa44bd546cb1e1"
+  },
+  "screenshots/showcase-mapping-chicagoland-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapping-chicagoland/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "9c34a3751930e75a361305ddab319c35c6f23a17ded9a3db5e64531862d2d6f9"
+  },
+  "screenshots/showcase-mapsnap-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapsnap/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "a6b14fae0dc816798530a65de9cb88eb617a1ab6bc9930bfb665cfb7481ca9a9"
+  },
+  "screenshots/showcase-mapsnap-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapsnap/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "08a48f8c4241ee06b50a9c6edeb8af44965902c4b04b44ed758e4283d61e031f"
+  },
+  "screenshots/showcase-mapsnap-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapsnap/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "74449fec0f997d7394959babb24b26a292e46ea1eb52b9c8a3bc7fb11f1d713f"
+  },
+  "screenshots/showcase-mapsnap-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapsnap/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "b7fdfdad3e1962dd46bb6a2b0f4dd15e3e82d4037591474198e6921a0ebdf856"
+  },
+  "screenshots/showcase-mapsnap-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapsnap/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "68cd6c98a6391b4e71eed32dd45b4de68f4b06798b1e1798f2b7500897e324a4"
+  },
+  "screenshots/showcase-mapsnap-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mapsnap/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "aeab1f9709f9276b8a0a2985dc9c47b618d8cd39bf2b1a73f1eac883b944e18e"
+  },
+  "screenshots/showcase-mare-nostrum-lab-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mare-nostrum-lab/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "b8abc7c7ef83dc783616a5441aab4a1feeedbaef44a1e9b3a6aed903e90c48ef"
+  },
+  "screenshots/showcase-mare-nostrum-lab-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mare-nostrum-lab/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "aaf3ea1db4db3844c0de637675a35cc83c527402050b145801c5a3fdac7228e6"
+  },
+  "screenshots/showcase-mare-nostrum-lab-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mare-nostrum-lab/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "46cf97f2c63e93f5992dc8f45d5ac79cfd4cba302a64d31e6e89ecf7b44d7eb4"
+  },
+  "screenshots/showcase-mare-nostrum-lab-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mare-nostrum-lab/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "a2d29e30fee3e052127ad6264669ff12534927704fe1cf8b413a42b983c441bf"
+  },
+  "screenshots/showcase-mare-nostrum-lab-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mare-nostrum-lab/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "6aeafdf8498598b8332feda0fe1799715820fb4b3278ce47bdeed498000736cd"
+  },
+  "screenshots/showcase-mare-nostrum-lab-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-mare-nostrum-lab/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "dfa1fd714be06beb304d75c4da16d289e65262d718cec70aef703856a79dfea0"
+  },
+  "screenshots/showcase-necessary-reunions-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-necessary-reunions/v3-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "4b6f681d7c5d59c08698c9e5308fe9d8586c74fb8fe14456a7b6ad5fc7defc0c"
+  },
+  "screenshots/showcase-necessary-reunions-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-necessary-reunions/v3-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "ec8d5b6927a5d0d6e34267d197a85689d8c2b0770c443f63a63d74617c46a8ce"
+  },
+  "screenshots/showcase-necessary-reunions-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-necessary-reunions/v3-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "130d1bd053dd464d2008e190dcf93b7893b33d5684c57c5e29e7ecde6e665fae"
+  },
+  "screenshots/showcase-necessary-reunions-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-necessary-reunions/v3-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "4a711b8045387294e0baef1389a5d7e0111d62bda6def1f560f31c11a795c254"
+  },
+  "screenshots/showcase-necessary-reunions-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-necessary-reunions/v3-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "b4d1352e7bd015def262ed80e5d660470f71d0d6b060e4189c2d9ef68f30cb5f"
+  },
+  "screenshots/showcase-necessary-reunions-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-necessary-reunions/v3-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "bd5225b3a4981935fdb097446ec105cce5a2f6edf7cac5fbf63670255ee048fc"
+  },
+  "screenshots/showcase-nypl-digital-collections-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-nypl-digital-collections/v4-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "1d7d6eb0e9d8f7e88e5da33aa752730ce811f0c912f4d2b2755ac45e6a4b6062"
+  },
+  "screenshots/showcase-nypl-digital-collections-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-nypl-digital-collections/v4-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "f884ae21f4a86f436653de99a7211635c27668b47511e8fb3c65a168fe8cc38e"
+  },
+  "screenshots/showcase-nypl-digital-collections-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-nypl-digital-collections/v4-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "5aa197891dd3c07a816ad88802c46a7297dd19a054f6c016d866f43cc26bbfe8"
+  },
+  "screenshots/showcase-nypl-digital-collections-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-nypl-digital-collections/v4-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "d008d1e9afdc1586477e4d7fe5bc4bdd106f0e3e10267c0b553ec21c1aacac67"
+  },
+  "screenshots/showcase-nypl-digital-collections-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-nypl-digital-collections/v4-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "99cc9a9435d2496db21739e83de8715f221c83d8ab64df2470a98e1bf39f6f95"
+  },
+  "screenshots/showcase-nypl-digital-collections-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-nypl-digital-collections/v4-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "f446a8cfc855217f09f6324602d2b7b762320c48624ac1b98d4858dafd4ca247"
+  },
+  "screenshots/showcase-reuzenarbeid-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-reuzenarbeid/v4-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "f8a481847a0fc19fd0c35b5cd9b31d1329a56f22f4f226621291ec5815762207"
+  },
+  "screenshots/showcase-reuzenarbeid-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-reuzenarbeid/v4-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "2b8bb0a3d14392bb77325bf10dc57805eb66d7db3ab3cc5d6432eec79da97f7f"
+  },
+  "screenshots/showcase-reuzenarbeid-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-reuzenarbeid/v4-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "f56b26a3eb84c9ee1c3b217547c6eb66fbecd51168b885d9926d9b538ca5e490"
+  },
+  "screenshots/showcase-reuzenarbeid-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-reuzenarbeid/v4-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "b49240ce15594d62a963ad61c75c7e2bc56b77da7d644c7e2f594ed5e29fa124"
+  },
+  "screenshots/showcase-reuzenarbeid-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-reuzenarbeid/v4-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "021d885f8c4f905fe5545fe95437c5d4a54673736abf7feb6b1544cc49a67a53"
+  },
+  "screenshots/showcase-reuzenarbeid-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-reuzenarbeid/v4-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "3917c45b2c8354026ae934fc01b80cebef49865eeb19c3249949ef50aaee6eac"
+  },
+  "screenshots/showcase-rotterdam-time-machine-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-rotterdam-time-machine/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "a4ec944f2ec3e1155f487d6cb1b92ed21658abfa5a27ec3afcea9a07a7cbfb98"
+  },
+  "screenshots/showcase-rotterdam-time-machine-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-rotterdam-time-machine/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "aa26f10e3c2d49e953f7a3a66de044d3310cfc48056bfa7ef5cf6e5510413fce"
+  },
+  "screenshots/showcase-rotterdam-time-machine-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-rotterdam-time-machine/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "8f4b136f34692e5c4344e0cc335abc024a330e7fa7df95fc7e90363f7bdf27b3"
+  },
+  "screenshots/showcase-rotterdam-time-machine-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-rotterdam-time-machine/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "09d956ec0a9af2e0468487bf7aed1e8fa1b2dd6d16d035f4de4171a5a30d23c2"
+  },
+  "screenshots/showcase-rotterdam-time-machine-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-rotterdam-time-machine/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "7f4ed23a945ce5ad0a3ab040e7224a0ef2e5394a8c151043a1e2ee8946b5ca17"
+  },
+  "screenshots/showcase-rotterdam-time-machine-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-rotterdam-time-machine/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "d185ec997577c1e27bdadcac730e5e9698b2e0a51686d6cffc26298e45a7a207"
+  },
+  "screenshots/showcase-schelde-gemapt-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-schelde-gemapt/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "71fae236edf912eb93ef93432e0dee1779401f5d2caea021b4b1165fa9890357"
+  },
+  "screenshots/showcase-schelde-gemapt-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-schelde-gemapt/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "949f54bfbe3a064b330e53562b6cd3cd2f34f380e296c0da2c6ca76400715778"
+  },
+  "screenshots/showcase-schelde-gemapt-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-schelde-gemapt/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "694b365c0c26c3c9d1b61ea54dd902e816c17aea6188929842cef5937a3e1026"
+  },
+  "screenshots/showcase-schelde-gemapt-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-schelde-gemapt/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "b7b6014dce52ff9dab3a219d32567ced72107c4d48268f2a199e09e1d0043e40"
+  },
+  "screenshots/showcase-schelde-gemapt-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-schelde-gemapt/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "8524c6598513f898a5a09dddaac42fb0d96ca80ec4fd84c0d73f2d7587680b6b"
+  },
+  "screenshots/showcase-schelde-gemapt-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-schelde-gemapt/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "226969022d90319b679b99b2a9b5484d6b8237f2684c414efb19cbade81fc7cd"
+  },
+  "screenshots/showcase-soduco-paris-atlases-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-soduco-paris-atlases/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "c8536a9ad3910eb58c512ae6bd27c85a36030ed9023ee6f41d2c851ad7670547"
+  },
+  "screenshots/showcase-soduco-paris-atlases-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-soduco-paris-atlases/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "0b2249a14e64cee2185ea188a4af68063f4fca199297388aac607212723acd2a"
+  },
+  "screenshots/showcase-soduco-paris-atlases-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-soduco-paris-atlases/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "b78e0fdef0f58d5c15aa3ae997f6e15654408582d4234201bb1d37b6d0f9b4c8"
+  },
+  "screenshots/showcase-soduco-paris-atlases-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-soduco-paris-atlases/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "da19b146857204f81615b88a81d07d9e0a6d26e6010c24ab1d4cf8b8e9b327bc"
+  },
+  "screenshots/showcase-soduco-paris-atlases-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-soduco-paris-atlases/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "abb0aaf351ef05e172badb2c636b1e0d7868de84fb6901dbbff762bde7a82465"
+  },
+  "screenshots/showcase-soduco-paris-atlases-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-soduco-paris-atlases/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "90796cb56765dc76529f4c01aac108f520ec3a736994989b3e4b7baf0c401bd2"
+  },
+  "screenshots/showcase-source-library-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-source-library/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "19d7312f495c5858e213aedda14996bdc8d5f7856f02ae829e6353a7935991fc"
+  },
+  "screenshots/showcase-source-library-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-source-library/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "5fe511a5fe16f04f9af9ceab95bede20a159cbb89272982ab56590e9005a58c5"
+  },
+  "screenshots/showcase-source-library-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-source-library/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "9d398a4d1bd9571057b5e314c5b6db862f9b7c3d7c3cdd0bc3c1c84301608cc7"
+  },
+  "screenshots/showcase-source-library-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-source-library/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "8b044ec9ee7f7b21418d0e77b32503ed9b8eb5be310d5e289291ff433da1c29d"
+  },
+  "screenshots/showcase-source-library-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-source-library/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "2d456a62665d2afa831ac5159195909346c32f2a55b7acdd034f9f30f5525f11"
+  },
+  "screenshots/showcase-source-library-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-source-library/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "771c0a80ddec92912e2696f716f6dd7523a85cac043b40cddba3feaed3ddd2e8"
+  },
+  "screenshots/showcase-state-library-victoria-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-state-library-victoria/v3-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "53706c173c214516cacb163d5622eb73dbda919a1d98fbc012aa192cb0bd96a3"
+  },
+  "screenshots/showcase-state-library-victoria-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-state-library-victoria/v3-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "0d00bdde33415981b9bc82c6c5d4b88f7900d22f823b2f466a9f31cebbd29478"
+  },
+  "screenshots/showcase-state-library-victoria-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-state-library-victoria/v3-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "c5f777342c3512ee487792ab4deae80b6f37d03401fc50ad00246999588ab946"
+  },
+  "screenshots/showcase-state-library-victoria-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-state-library-victoria/v3-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "15a934c950fb79a4f8b9c816a799c40578db7108574aa7b2d7631b65e9b19162"
+  },
+  "screenshots/showcase-state-library-victoria-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-state-library-victoria/v3-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "bbff28bbee85ceaa192db90f91cd5b0ef5b29d1ecf85bcd0a66c47f58c1d6162"
+  },
+  "screenshots/showcase-state-library-victoria-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-state-library-victoria/v3-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "cab2e376139a6a9346720094458418e96faf34b2729ae85d8dcb9e3809bccb71"
+  },
+  "screenshots/showcase-tabula-peutingeriana-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-tabula-peutingeriana/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "f0440c63b549851c6391d3292bb0f6bd23db78ed773e996b9a6951b5712b8ac0"
+  },
+  "screenshots/showcase-tabula-peutingeriana-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-tabula-peutingeriana/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "def705721a5d19038f47edd1aa398fded14d27083c492892b886f2d72aea588c"
+  },
+  "screenshots/showcase-tabula-peutingeriana-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-tabula-peutingeriana/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "eb84f9c88aaf521268975c95390e9d3bb505fcfa04b54d5b4068681828a3350a"
+  },
+  "screenshots/showcase-tabula-peutingeriana-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-tabula-peutingeriana/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "b05a7e8b36c03a7e3a1a2d7d923711ec364bb23470e61d4c8a0a2f1f06751407"
+  },
+  "screenshots/showcase-tabula-peutingeriana-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-tabula-peutingeriana/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "117cd1ad3a93dd0c13371fdf19ce0fcc0d826286eebdcd8b2826e7f5de2ee6de"
+  },
+  "screenshots/showcase-tabula-peutingeriana-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-tabula-peutingeriana/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "cd34b9dcc1ab7822b4eb956788cdecd8ea7bc73844dda405ca0136e123ea722c"
+  },
+  "screenshots/showcase-texas-am-digital-collections-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-texas-am-digital-collections/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "0066376674628e70d5e8fef64f32740c83984e9bd57c52e61ed6fb97530ee516"
+  },
+  "screenshots/showcase-texas-am-digital-collections-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-texas-am-digital-collections/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "d99a4f18c0a2ff845f5b9d19d8c1db48d0f756d25cf9ddd087c512cb014f9efb"
+  },
+  "screenshots/showcase-texas-am-digital-collections-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-texas-am-digital-collections/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "0f52fb6acd4d4ddcb4f22652e95f3057d27f83bed1b43c4275487c8b62973f3c"
+  },
+  "screenshots/showcase-texas-am-digital-collections-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-texas-am-digital-collections/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "0f3a76950a9f0101cff2cc1df5440843937c376df4279e9b0ebd02ee3140e0df"
+  },
+  "screenshots/showcase-texas-am-digital-collections-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-texas-am-digital-collections/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "3765742e6d3b8901dfcf7d9b0127e0a610c39cbb8da2351615c06bf238f6145a"
+  },
+  "screenshots/showcase-texas-am-digital-collections-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-texas-am-digital-collections/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "f9e53ebc28bdf43d899526f71699fa398c0583bf9ec42aaa22db91e8cb969811"
+  },
+  "screenshots/showcase-vietnam-map-archive-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-vietnam-map-archive/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "9d4daf3171a5d6139fae23c623e3fa42d938cd01adddb70c13b8df22dd322a70"
+  },
+  "screenshots/showcase-vietnam-map-archive-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-vietnam-map-archive/v1-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "4ae7500f0be0bf43dd24c6663e8a003add86e2bd4b8b7025edc0e8e2dbe7a08a"
+  },
+  "screenshots/showcase-vietnam-map-archive-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-vietnam-map-archive/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "fd678f5ebf7f1798de76478b9cb4216dd7ab50ec067b9e1136642b5182d1c7b7"
+  },
+  "screenshots/showcase-vietnam-map-archive-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-vietnam-map-archive/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "7dcdd8728456b3358ece483e9a25417ba8c78c339e2b44cd4b4c8a32441093bd"
+  },
+  "screenshots/showcase-vietnam-map-archive-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-vietnam-map-archive/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "3ae38d0616d89f1daaac00012303b648dee0d0eefbd55a4c36679cb4d84fef57"
+  },
+  "screenshots/showcase-vietnam-map-archive-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-vietnam-map-archive/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "c5a85dfd2fe19e57ba115105ab49a5da528feb783f2ad81728cd86b2ea48b673"
+  },
+  "screenshots/showcase-watertijdreis-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-watertijdreis/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "c3db244d0df0d6831338db20c9160d0adf9e293c68059620f87eaed6df16bcd2"
+  },
+  "screenshots/showcase-watertijdreis-1400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-watertijdreis/v2-1400w.webp",
+    "width": 1400,
+    "height": 933,
+    "sha256": "acda08a510218df72975c2ce4f4275e61961e2dc1f720e52e7f361699d2e1c77"
+  },
+  "screenshots/showcase-watertijdreis-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-watertijdreis/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "fe785d13271a7a2c386d0ee479c696f452f9589d00e20784e6c32c907e9d6312"
+  },
+  "screenshots/showcase-watertijdreis-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-watertijdreis/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "0bbdf46733a3e510840b4926d2c87e1ded89ff54c5a2879e3f469e3c4a59aa65"
+  },
+  "screenshots/showcase-watertijdreis-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-watertijdreis/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "6fb6130d83961cc17a7899ee8add2686b619e58b3e01118568dbe1710f66b9cb"
+  },
+  "screenshots/showcase-watertijdreis-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/showcase-watertijdreis/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "d52e1d98ef6c0f3ef8868e89d3ee78745e7f2b58f71cbee0b74ec95345bcd085"
+  },
+  "screenshots/tools-arcade-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "44682d11dec248cd3aeac62ba827fe0cc12ef7e9e1b9a8cc95e370297f477f9b"
+  },
+  "screenshots/tools-arcade-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/v1-1920w.webp",
+    "width": 1920,
+    "height": 1280,
+    "sha256": "c87b0adacea17b9032d2e0af7b8c876376794738e241cd0fab36c1862d0577cf"
+  },
+  "screenshots/tools-arcade-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "4c9d06cd713f20a75ded453f7b54ba21281213e33ad3eaeea6d0c220a57f69ad"
+  },
+  "screenshots/tools-arcade-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "0181da086c48136e8e3f34f7b384fe412b02a602d1fe37108aba25115a82c0d4"
+  },
+  "screenshots/tools-arcade-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "da70fc80c9b4bcb9044561a901bcfad99f667a5bae1b1653c07f6156226f416c"
+  },
+  "screenshots/tools-arcade-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-arcade/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "d24dc8d5ef4a4320a5ab36389d2177998d3ded6b76f8cfe98303eb8fc032cb47"
+  },
+  "screenshots/tools-cli-help-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "fc5e1452c26a5bc8156a86720cb6f4ef31cefb103a06b0256232ce66369f419b"
+  },
+  "screenshots/tools-cli-help-1344.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/v1-1344w.webp",
+    "width": 1344,
+    "height": 896,
+    "sha256": "64c7beaf966e0ca99c6866009e2f31f74939512a26f665347734483c6f5a1fbb"
+  },
+  "screenshots/tools-cli-help-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "3f6778badf5f2fd2936968863c2652b61cec808c71a13f00b9812145c29cbb31"
+  },
+  "screenshots/tools-cli-help-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "344c36fe266bb081849d73354bca9fea33c36b4a9cd7f4a4f87651d74338c5f7"
+  },
+  "screenshots/tools-cli-help-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "48ec714bdfbe6266d000a07abcbd0ed3f5aa73c2c0d586a6a8161a54f87e1058"
+  },
+  "screenshots/tools-cli-help-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-help/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "fa9f1f070fe1473297424194ebda637aecc88c67b9b3501edfb70b718f050a79"
+  },
+  "screenshots/tools-cli-terminal-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-terminal/v1-1280w.webp?sha256=f77b29f46bbe7ecd73293fdd65eb8bcf251544cd8c6ebd1e78d34784d7fc51c5",
+    "width": 1280,
+    "height": 853,
+    "sha256": "f77b29f46bbe7ecd73293fdd65eb8bcf251544cd8c6ebd1e78d34784d7fc51c5"
+  },
+  "screenshots/tools-cli-terminal-2016.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-terminal/v1-2016w.webp?sha256=db4d345d64ccd75a4ae87b6a0d1fe8a301ead531ba4f1e858d8b41c6d7d21e0f",
+    "width": 2016,
+    "height": 1344,
+    "sha256": "db4d345d64ccd75a4ae87b6a0d1fe8a301ead531ba4f1e858d8b41c6d7d21e0f"
+  },
+  "screenshots/tools-cli-terminal-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-terminal/v1-320w.webp?sha256=bfcb92f9f311d1976b8f07a5286590ba76dba60a453ae443f3624b900a5f4b1c",
+    "width": 320,
+    "height": 213,
+    "sha256": "bfcb92f9f311d1976b8f07a5286590ba76dba60a453ae443f3624b900a5f4b1c"
+  },
+  "screenshots/tools-cli-terminal-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-terminal/v1-480w.webp?sha256=a0c37325eb9a85b89727f2f636cc76efdad3c52077b04cc8fe06f51f9e845c7b",
+    "width": 480,
+    "height": 320,
+    "sha256": "a0c37325eb9a85b89727f2f636cc76efdad3c52077b04cc8fe06f51f9e845c7b"
+  },
+  "screenshots/tools-cli-terminal-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-terminal/v1-640w.webp?sha256=7768a486253727e423cb45ca490759998f590109a2edb15cdfaf7da5616532ca",
+    "width": 640,
+    "height": 427,
+    "sha256": "7768a486253727e423cb45ca490759998f590109a2edb15cdfaf7da5616532ca"
+  },
+  "screenshots/tools-cli-terminal-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-cli-terminal/v1-960w.webp?sha256=1221d81482ceac4e6d7e201af1590053a038d2deadaf80de69ed292c7b00dbee",
+    "width": 960,
+    "height": 640,
+    "sha256": "1221d81482ceac4e6d7e201af1590053a038d2deadaf80de69ed292c7b00dbee"
+  },
+  "screenshots/tools-editor-rotterdam-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/v1-1280w.webp",
+    "width": 1280,
+    "height": 800,
+    "sha256": "4adbd8e93372190565ddba71c160db737de6b27fac4c0fd08c2f2f1fed7566a2"
+  },
+  "screenshots/tools-editor-rotterdam-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/v1-1920w.webp",
+    "width": 1920,
+    "height": 1200,
+    "sha256": "888b28e1612e4e0a617d615f3ee62dab28110340e0d4117d6c0c3f91f95eb612"
+  },
+  "screenshots/tools-editor-rotterdam-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/v1-320w.webp",
+    "width": 320,
+    "height": 200,
+    "sha256": "35d093f06658927391dcc92a6633831d6c8d584f2a66238ce1589922d28ee1f8"
+  },
+  "screenshots/tools-editor-rotterdam-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/v1-480w.webp",
+    "width": 480,
+    "height": 300,
+    "sha256": "e9cff5e65c330ac3cc876d0e3af06366ac65acf8438e68cfba60645585accce2"
+  },
+  "screenshots/tools-editor-rotterdam-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/v1-640w.webp",
+    "width": 640,
+    "height": 400,
+    "sha256": "d7ec8bd68590c89f243eda44e90f86332998db7cdec46cf108bd067b4fc0a340"
+  },
+  "screenshots/tools-editor-rotterdam-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-editor-rotterdam/v1-960w.webp",
+    "width": 960,
+    "height": 600,
+    "sha256": "5afe94414d75cee636668238ba45516c52215f86fe3580f3756179bd2dd1fd10"
+  },
+  "screenshots/tools-explore-prototype-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "54970325e21af1c8bd9f93f16245cfe532adc717567a195b4e1204d21b9f2064"
+  },
+  "screenshots/tools-explore-prototype-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/v1-1920w.webp",
+    "width": 1920,
+    "height": 1280,
+    "sha256": "e5912f4daf1444b3072a6f2c227211ebbdd85d6fe4dd3d2a12a973cf3dca8274"
+  },
+  "screenshots/tools-explore-prototype-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "84f44109eea2ec14a8023e814d14aaa4aff2f4eeb48afe49faae25dbf50f6d01"
+  },
+  "screenshots/tools-explore-prototype-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "c8e76f648cbe56ccb97645aa043ab10bb716d1a99a9ffd944f96507d5e92ddb9"
+  },
+  "screenshots/tools-explore-prototype-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "d1b170acf1a05309aa776cfc75d6b010ae69c468871852bd54cd132ce648557a"
+  },
+  "screenshots/tools-explore-prototype-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-explore-prototype/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "c4012601409192311a79b9a1eb029828cf519f0aed1cfedcbb2be089d448deb4"
+  },
+  "screenshots/tools-latest-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/v1-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "c5a898338851273078e0e4befe2a51cc080d94489ac06fd5d99bca066479059f"
+  },
+  "screenshots/tools-latest-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/v1-1920w.webp",
+    "width": 1920,
+    "height": 1280,
+    "sha256": "2f8148597d75ec2c017d25bdfc446b36efe79b616c40818b75443bcbc197758f"
+  },
+  "screenshots/tools-latest-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/v1-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "750db8ccb78d3aab3dbfef55919851373d0da6c338217bc169f1e74bb7d6bf2d"
+  },
+  "screenshots/tools-latest-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/v1-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "4bcc4a87a6fbfaaec730ae34c84bd02e177ca938c1ad829ff7d0ab087bc411c2"
+  },
+  "screenshots/tools-latest-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/v1-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "081ad0ec904ad85a2fbf44be625461375e2d63c0220b6b1bd1866a8918c83f17"
+  },
+  "screenshots/tools-latest-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-latest/v1-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "47c961cdeb9f95bf6a44d33e1981a8819ecff43f19456d3168bd23877d29dd08"
+  },
+  "screenshots/tools-viewer-liber-floridus-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-1280w.webp",
+    "width": 1280,
+    "height": 800,
+    "sha256": "dba8705d066cb81aef2e57d8f65148c5654774ae42408d0c30620834d3bdf116"
+  },
+  "screenshots/tools-viewer-liber-floridus-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-1600w.webp",
+    "width": 1600,
+    "height": 1000,
+    "sha256": "8e6a54ca865fbc0f598a18daf236a999db4d0d924ffef6e0607cfe21272979c5"
+  },
+  "screenshots/tools-viewer-liber-floridus-2400.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-2400w.webp",
+    "width": 2400,
+    "height": 1500,
+    "sha256": "6e9e0aab68aa7973d14bb1ea4b95d119d631a5144deecca7d459371679a8aacf"
+  },
+  "screenshots/tools-viewer-liber-floridus-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-320w.webp",
+    "width": 320,
+    "height": 200,
+    "sha256": "b6c9034731afedd5d31dece4f0d8ed528f4bf6fe8eeb85b9c1e5d0cf5c32693b"
+  },
+  "screenshots/tools-viewer-liber-floridus-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-480w.webp",
+    "width": 480,
+    "height": 300,
+    "sha256": "28970024d0fc3b771b4630c6412609852b83475dbf96c851dd5746767fdd8e3f"
+  },
+  "screenshots/tools-viewer-liber-floridus-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-640w.webp",
+    "width": 640,
+    "height": 400,
+    "sha256": "917f87945d483882a67f7ce31cd0c298d68bc9683eaf92162986029f1897da5e"
+  },
+  "screenshots/tools-viewer-liber-floridus-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-liber-floridus/v2-960w.webp",
+    "width": 960,
+    "height": 600,
+    "sha256": "bb575351112347d2ac5aaa4865d905ca21628d095de9594308a4b9f2d996bcac"
+  },
+  "screenshots/tools-viewer-saigon-1200.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/v1-1200w.webp",
+    "width": 1200,
+    "height": 750,
+    "sha256": "33ccd22458b30b1d01e4f9af1e346ecc6e77276060000f98b40bfeed03db1305"
+  },
+  "screenshots/tools-viewer-saigon-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/v1-320w.webp",
+    "width": 320,
+    "height": 200,
+    "sha256": "393f60c24241528eb5f6ec43f3637f917cec6f0fbd17353fb48ab9c0e419dfcc"
+  },
+  "screenshots/tools-viewer-saigon-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/v1-480w.webp",
+    "width": 480,
+    "height": 300,
+    "sha256": "34967643bb2125ea801854f332495a3f9b2f7f77f5dc80b2a1ae8258eada319a"
+  },
+  "screenshots/tools-viewer-saigon-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/v1-640w.webp",
+    "width": 640,
+    "height": 400,
+    "sha256": "a8092a32a4ec404920a6a0669900267da342cd343b8ef2221baac301060bb72b"
+  },
+  "screenshots/tools-viewer-saigon-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/tools-viewer-saigon/v1-960w.webp",
+    "width": 960,
+    "height": 600,
+    "sha256": "99e62a3a5274818d322c11683522f538f4d7f48e1b75d1f25148041447fb437d"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "b4e5a2bc0bd0ff1510b92b6a9fc9831016d552d321af602bdebeac78f174c0f6"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-1600w.webp",
+    "width": 1600,
+    "height": 1067,
+    "sha256": "6f3cdab8f71bc46f6dda0a5c73d6a296bc8d919dd4b33badf927ec559a0f921b"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-2560.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-2560w.webp",
+    "width": 2560,
+    "height": 1707,
+    "sha256": "314f14d3d69277def38d89c77793c2a1a46cde64ef053ea923b74af0b3ededb7"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "7c1adf1c916eb79eca67654a6806d0ea2b26a83eeecc297c1281147c9b68c02c"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "3d15d991bc15ae37ed7bc6b36b936fdbf5628035017b6baebb4fe167f830a5ba"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "3ba413a12d4984ec15556a0d6227c18fdcca5c7777d6946b53309b873b095896"
+  },
+  "screenshots/viewer-28ed75ea7a785f32-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-28ed75ea7a785f32/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "ddea6179b878bf526a27ef97fe8927a28026ecdade059cc623b62b91c5f04140"
+  },
+  "screenshots/viewer-delft-aula-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "f94b450f981fdd03eb4a417534d6b7b34ac038ffcea918c688da3109adabbd62"
+  },
+  "screenshots/viewer-delft-aula-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-1600w.webp",
+    "width": 1600,
+    "height": 1067,
+    "sha256": "3dac770d161a30e7ebf06390be5925103c9ab2f17f60dc6d82cc4183cc4ad84f"
+  },
+  "screenshots/viewer-delft-aula-2560.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-2560w.webp",
+    "width": 2560,
+    "height": 1707,
+    "sha256": "4e16cb4ef48ecc781bde9258b0106195594145ba9f8e256b85cfbfa27e876d81"
+  },
+  "screenshots/viewer-delft-aula-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "c51a35bf28b653380cd61b3aac27577915fc9c7c64af40094495f472a0a38314"
+  },
+  "screenshots/viewer-delft-aula-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "3b28d8c57b00e49f8af9267c969d29fcc8a29fa81b28a79e2049149057900a11"
+  },
+  "screenshots/viewer-delft-aula-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "087d76b34b05b70a8685f5d9cec8cdac60e320ef4074a4ae3a187c890c8532ef"
+  },
+  "screenshots/viewer-delft-aula-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-delft-aula/v3-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "2dd89fe347695cbbeb94bfe8dc53ebc7871ab5d52250848f8aedf43895ef819a"
+  },
+  "screenshots/viewer-source-url-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-1280w.webp",
+    "width": 1280,
+    "height": 853,
+    "sha256": "ebb1462b3cd1bd79483d22265f349ff0fb2e9347279f0a14ad16bb1d64f0c6bd"
+  },
+  "screenshots/viewer-source-url-1600.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-1600w.webp",
+    "width": 1600,
+    "height": 1067,
+    "sha256": "9600ba455a8142f28a2d3dea6872d75ebb9ab8d5148cd38d57f6164311843845"
+  },
+  "screenshots/viewer-source-url-2560.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-2560w.webp",
+    "width": 2560,
+    "height": 1707,
+    "sha256": "ffbbc1db5dac9c714370f518f68b4bb7eafb74d825c45b600e700177062671b4"
+  },
+  "screenshots/viewer-source-url-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-320w.webp",
+    "width": 320,
+    "height": 213,
+    "sha256": "562676aa76ca6950a85b780e309a126da486bb4cdef55eb32f2d3159acde898e"
+  },
+  "screenshots/viewer-source-url-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-480w.webp",
+    "width": 480,
+    "height": 320,
+    "sha256": "87e654768e7960c86f7bd781f2c224104f2512e5ec52a7251d7d3394b2d1b099"
+  },
+  "screenshots/viewer-source-url-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-640w.webp",
+    "width": 640,
+    "height": 427,
+    "sha256": "0bf89fc310b45f33f3e6265b68f9f13dca60331739d5a7a4794f30f17e96f3fc"
+  },
+  "screenshots/viewer-source-url-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-source-url/v2-960w.webp",
+    "width": 960,
+    "height": 640,
+    "sha256": "b5c85061965a0a0e1ebfda0ee154300f6fdcdac1ad1d6910aa91415527265142"
+  },
+  "screenshots/viewer-warped-map-1280.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-warped-map/v1-1280w.webp",
+    "width": 1280,
+    "height": 720,
+    "sha256": "bfc2393573a5c02dace204ad44feb7781298ed98a5a5970b247368e51ed0eeeb"
+  },
+  "screenshots/viewer-warped-map-1920.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-warped-map/v1-1920w.webp",
+    "width": 1920,
+    "height": 1080,
+    "sha256": "5368b2cd5716e6558c53c5b67d0645bb6c0bee32267d1cd6b8e4bf005cdfed8a"
+  },
+  "screenshots/viewer-warped-map-320.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-warped-map/v1-320w.webp",
+    "width": 320,
+    "height": 180,
+    "sha256": "8bb2ee97a787fae550209427155dfaa34ab81fd24de12c5e2688b42da14e1635"
+  },
+  "screenshots/viewer-warped-map-480.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-warped-map/v1-480w.webp",
+    "width": 480,
+    "height": 270,
+    "sha256": "caba5ebd7fdef6fafcf01eae32fa9c4558b0064eeb0356c179210b61fca3dc0e"
+  },
+  "screenshots/viewer-warped-map-640.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-warped-map/v1-640w.webp",
+    "width": 640,
+    "height": 360,
+    "sha256": "5b5216f4c8060cca16a7ae69783f4ddae503bfca452f006641b3bc9ef578c2b6"
+  },
+  "screenshots/viewer-warped-map-960.webp": {
+    "url": "https://files.allmaps.org/images/screenshots/viewer-warped-map/v1-960w.webp",
+    "width": 960,
+    "height": 540,
+    "sha256": "d0ddaae7e835118406471807bb3cbf81546ff7b62cbd64a34b52294d9185a5ba"
+  },
+  "src/images/faces/bert.jpg": {
+    "url": "https://files.allmaps.org/images/homepage/src/images/faces/bert/822a80a56f51.jpg",
+    "width": 512,
+    "height": 512,
+    "sha256": "822a80a56f51945c7eb37d024f3bb9ca7f7a886862f830361025ae4726f1f02c"
+  },
+  "src/images/faces/jules.jpg": {
+    "url": "https://files.allmaps.org/images/homepage/src/images/faces/jules/69f00f20b55c.jpg",
+    "width": 512,
+    "height": 512,
+    "sha256": "69f00f20b55c6c8d7641a637a3ac64f272390f8c6d038d0e22334aa2fb8c2a2a"
+  },
+  "static/favicon.png": {
+    "url": "https://files.allmaps.org/images/homepage/static/favicon/732639d6ef7d.png",
+    "width": 128,
+    "height": 128,
+    "sha256": "732639d6ef7d71da594bfd7f2a2907f4411ba87a24a98b5228e706232330daf2"
+  }
+}

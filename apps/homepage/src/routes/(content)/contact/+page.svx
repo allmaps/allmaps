@@ -1,0 +1,30 @@
+---
+title: Contact | Allmaps
+description: Get in touch with Allmaps, join the community or report a problem.
+label: Contact
+hero:
+  title: Contact
+  palette: pink
+---
+
+## Get in touch
+
+Have a question about Allmaps, an idea to share or a project you'd like to
+discuss? [Send us an email](mailto:hello@allmaps.org).
+
+## Join the conversation
+
+Find us in the **#allmaps** channel on [IIIF Slack](https://iiif.io/community/).
+The [IIIF Maps Community Group](https://iiif.io/community/groups/maps/) is
+another place to meet people working with maps and IIIF.
+
+## Report a problem
+
+Found a bug or have a feature request?
+[Open an issue on GitHub](https://github.com/allmaps/allmaps/issues).
+Include the tool you're using and the steps to reproduce the problem.
+
+## Support Allmaps
+
+Read about the [IIIF Partnership](/iiif-partnership) to learn how IIIF
+Consortium members can support the project.

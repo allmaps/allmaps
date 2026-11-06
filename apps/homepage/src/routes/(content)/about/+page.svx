@@ -1,0 +1,104 @@
+---
+title: About | Allmaps
+description: Allmaps is an open source project for georeferencing and exploring digitized maps published through IIIF.
+label: About
+hero:
+  title: About Allmaps
+  palette: blue
+---
+
+<script lang="ts">
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import Founders from '$lib/components/Founders.svelte'
+</script>
+
+<PageIntro text="Allmaps makes digitized maps easier to find and use across collections and institutions." />
+
+Allmaps helps people georeference and explore maps from libraries, archives and
+museums around the world. Its [open source tools](/open-source) work across
+collections, and the resulting georeference data becomes part of a
+[shared, open database](/data) that anyone can use.
+
+The images stay with the institutions that publish them through IIIF. The
+georeference data is open and reusable, so the work people contribute can remain
+useful beyond Allmaps itself.
+
+## Founders
+
+<Founders />
+
+## People behind Allmaps
+
+Allmaps is shaped by people with backgrounds in cartography, software
+development, design and cultural heritage.
+
+- **Bert Spaan** and **Jules Schoonman** — Founded Allmaps, lead its development
+  and manage the project.
+- [Manuel Claeys Bouuaert](https://manuelclaeysbouuaert.be/) —  Freelance
+  facilitator and cartographer. Developer and strategic thinker for Allmaps,
+  expert in the mathematics that make it all work.
+- [Ian Spangler](https://itspangler.com/) — Was
+  Assistant Curator of Digital & Participatory Geography at the Leventhal Map
+  & Education Center, where he directed the NEH-funded project that supported
+  Allmaps’ development.
+- [Luuk van de Ven](https://luukvandeven.nl/) — Brand designer and art director.
+  Develops Allmaps’ visual identity and interface designs.
+- [Bryan Haberberger](https://habesoftware.rocks/) — Developer and independent
+  consultant who played a key role in writing the
+  [IIIF Georeference Extension specification](https://iiif.io/api/extension/georef/).
+
+Many others contribute code, documentation, ideas and feedback through
+[GitHub](https://github.com/allmaps/), the
+[IIIF Maps Community Group](https://iiif.io/community/groups/maps/) and our
+[institutional partners](/partners).
+
+## Project principles
+
+### Open data in, open data out
+
+Allmaps works with maps published through IIIF and brings georeferencing from
+across collections together as [open data](/data). The images stay with the
+institutions that publish them. We make it easy for institutions to bring the
+georeference data back into their own systems, so work done with Allmaps can
+improve access to maps wherever their collections are used.
+
+### Data should outlive the software
+
+The work people put into georeferencing should remain useful beyond Allmaps.
+We use open, documented standards such as
+[Georeference Annotations](https://iiif.io/api/extension/georef/), so people
+can download, preserve, adapt and reuse the data in other projects. Access to
+that data should never depend on a subscription or continued use of our tools.
+
+### Small tools that work together
+
+Allmaps is an ecosystem of [open source libraries, plugins and applications](/open-source).
+These tools can be used together or combined with other software. We keep
+individual tools focused and simple, so people can use the parts they need
+and build on them for their own projects.
+
+### Easy to start, open to everyone
+
+Working with digitized maps should be approachable and fun. You can start
+georeferencing with Allmaps Editor without creating an account or setting up
+specialist software. We aim to keep the tools easy to use and collect as
+little personal data as possible.
+
+## How Allmaps is organized
+
+Bert Spaan and Jules Schoonman lead Allmaps’ development and manage the
+project. They work with independent developers and institutional partners to
+turn shared needs into open source tools that benefit the wider community.
+
+The Allmaps Advisory Board helps steer the project and sets priorities for
+the annual roadmap together with the Allmaps team. It brings together
+representatives from Allmaps Innovators, the IIIF Consortium and long-term
+institutional partners, alongside the founders.
+
+Through the [IIIF-Allmaps partnership](/iiif-partnership), institutions support
+ongoing maintenance and new development. Partners receive dedicated services,
+training and support, while Allmaps’ software and georeference data remain
+open.
+
+Interested in working with Allmaps? [Get in touch](/contact) or learn how your
+institution can [support the project](/partners).
