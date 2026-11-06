@@ -11,10 +11,6 @@
   import BrochureSection from '$lib/components/brochure/BrochureSection.svelte'
 </script>
 
-<svelte:head>
-  <title>Allmaps - IIIF Partnership</title>
-</svelte:head>
-
 <main
   class="[&_section.brochure-page]:print:m-0 [&_section.brochure-page]:print:aspect-3/2 [&_section.brochure-page]:print:max-w-full [&_section.brochure-page]:print:overflow-hidden [&_section.brochure-section]:print:m-0 [&_section.brochure-section]:print:max-w-full"
 >

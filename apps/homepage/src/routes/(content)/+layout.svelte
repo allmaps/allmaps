@@ -5,13 +5,6 @@
   let { children, data } = $props()
 </script>
 
-<svelte:head>
-  <title>{data.metadata.title}</title>
-  {#if data.metadata.description}
-    <meta name="description" content={data.metadata.description} />
-  {/if}
-</svelte:head>
-
 <main class="content-page">
   {#if data.metadata.hero}
     <MaskGridHero {...data.metadata.hero} pathname={page.url.pathname} />

@@ -6,6 +6,11 @@ import { loadMaskedMap } from '$lib/server/masked-map.js'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ fetch }) => ({
+  pageMetadata: {
+    title: 'Allmaps: IIIF Partnership',
+    description:
+      'Support Allmaps and help institutions georeference, curate and share historical maps through IIIF.'
+  },
   maskedMaps: await Promise.all(
     partnershipMapSources.map(async ({ annotationUrl, previewImage }) => {
       const map = await loadMaskedMap(fetch, annotationUrl)
