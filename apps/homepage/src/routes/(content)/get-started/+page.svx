@@ -1,0 +1,17 @@
+---
+title: Get started | Allmaps
+description: Georeference a historical map, explore recent contributions or build with Allmaps.
+label: Get started
+hero:
+  title: Get Started
+  palette: pink
+---
+
+<script lang="ts">
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import GetStarted from '$lib/components/GetStarted.svelte'
+</script>
+
+<PageIntro text="New here? Learn how to georeference maps, explore collections or add maps to your website." />
+
+<GetStarted />

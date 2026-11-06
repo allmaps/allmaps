@@ -3,6 +3,7 @@ import { t } from 'elysia'
 import {
   queryUserLists,
   createUserList,
+  queryUserList,
   queryListWithItems,
   updateUserListName,
   addItemToList,
@@ -10,10 +11,10 @@ import {
   deleteListItem,
   deleteUserList
 } from '@allmaps/api-shared/db'
-import { setCacheControl } from '@allmaps/api-shared'
+import { ResponseError, setCacheControl } from '@allmaps/api-shared'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
-import { authenticatedDetail } from '../openapi.js'
+import { adminDetail, authenticatedDetail } from '../openapi.js'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 
 const deleteListItemQuerySchema = t.Object({
@@ -23,17 +24,34 @@ const deleteListItemQuerySchema = t.Object({
   manifestId: t.Optional(t.String())
 })
 
-function getUserId(user: unknown): string {
+const starredListItemLimit = 500
+
+function getListUser(user: unknown) {
   if (
     !user ||
     typeof user !== 'object' ||
     !('id' in user) ||
-    typeof user.id !== 'string'
+    typeof user.id !== 'string' ||
+    ('isAnonymous' in user && user.isAnonymous)
   ) {
-    throw new Error('Invalid authenticated user')
+    throw new ResponseError('Unauthorized', 401)
   }
 
-  return user.id
+  return {
+    id: user.id,
+    isAdmin: 'role' in user && user.role === 'admin'
+  }
+}
+
+function isStarredList(list: { name: string; deletable: boolean }) {
+  return list.name === 'Starred' && !list.deletable
+}
+
+function canAccessList(
+  list: { name: string; deletable: boolean } | null | undefined,
+  user: ReturnType<typeof getListUser>
+) {
+  return list && (user.isAdmin || isStarredList(list))
 }
 
 export function createListsRoutes(betterAuth: BetterAuthContext) {
@@ -43,9 +61,11 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/lists',
-      ({ db, user, set }) => {
+      async ({ db, user, set }) => {
         setCacheControl(set, 'private-no-store')
-        return queryUserLists(db, getUserId(user))
+        const listUser = getListUser(user)
+        const lists = await queryUserLists(db, listUser.id)
+        return listUser.isAdmin ? lists : lists.filter(isStarredList)
       },
       {
         auth: true,
@@ -58,19 +78,22 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .post(
       '/lists',
-      ({ db, user, body, set }) => {
+      ({ db, user, body, set, status }) => {
         setCacheControl(set, 'private-no-store')
-        return createUserList(db, getUserId(user), body.name)
+        if (body.name.trim().toLowerCase() === 'starred') {
+          return status(403, { error: 'The Starred list already exists' })
+        }
+        return createUserList(db, getListUser(user).id, body.name)
       },
       {
-        auth: true,
+        admin: true,
         body: t.Object({
           name: t.String()
         }),
         detail: {
           summary: 'Create a list',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -78,13 +101,10 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId',
       async ({ db, user, params, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const result = await queryListWithItems(
-          db,
-          getUserId(user),
-          params.listId
-        )
+        const listUser = getListUser(user)
+        const result = await queryListWithItems(db, listUser.id, params.listId)
 
-        if (!result) {
+        if (!canAccessList(result, listUser)) {
           return status(404, { error: 'List not found' })
         }
 
@@ -109,9 +129,24 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
           return status(400, { error: 'Name is required' })
         }
 
+        const currentList = await queryUserList(
+          db,
+          getListUser(user).id,
+          params.listId
+        )
+        if (!currentList) {
+          return status(404, { error: 'List not found' })
+        }
+        if (!currentList.deletable) {
+          return status(403, { error: 'This list cannot be renamed' })
+        }
+        if (name.toLowerCase() === 'starred') {
+          return status(403, { error: 'The Starred list already exists' })
+        }
+
         const list = await updateUserListName(
           db,
-          getUserId(user),
+          getListUser(user).id,
           params.listId,
           name
         )
@@ -122,13 +157,13 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return list
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         body: t.Object({ name: t.String() }),
         detail: {
           summary: 'Update a list name',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )
@@ -136,14 +171,19 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId/items',
       async ({ db, user, params, body, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const userId = getUserId(user)
-        const list = await queryListWithItems(db, userId, params.listId)
+        const listUser = getListUser(user)
+        const list = await queryUserList(db, listUser.id, params.listId)
 
-        if (!list) {
+        if (!canAccessList(list, listUser)) {
           return status(404, { error: 'List not found' })
         }
 
-        return addItemToList(db, params.listId, body)
+        return addItemToList(
+          db,
+          params.listId,
+          body,
+          listUser.isAdmin ? undefined : starredListItemLimit
+        )
       },
       {
         auth: true,
@@ -170,14 +210,19 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId/items/url',
       async ({ db, user, params, body, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const userId = getUserId(user)
-        const list = await queryListWithItems(db, userId, params.listId)
+        const listUser = getListUser(user)
+        const list = await queryUserList(db, listUser.id, params.listId)
 
-        if (!list) {
+        if (!canAccessList(list, listUser)) {
           return status(404, { error: 'List not found' })
         }
 
-        const result = await addItemToListByUrl(db, params.listId, body.url)
+        const result = await addItemToListByUrl(
+          db,
+          params.listId,
+          body.url,
+          listUser.isAdmin ? undefined : starredListItemLimit
+        )
 
         if (!result.success) {
           return status(result.status, { error: result.error })
@@ -203,10 +248,10 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId/items',
       async ({ db, user, params, query, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const userId = getUserId(user)
-        const list = await queryListWithItems(db, userId, params.listId)
+        const listUser = getListUser(user)
+        const list = await queryUserList(db, listUser.id, params.listId)
 
-        if (!list) {
+        if (!canAccessList(list, listUser)) {
           return status(404, { error: 'List not found' })
         }
 
@@ -233,7 +278,11 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
       '/lists/:listId',
       async ({ db, user, params, status, set }) => {
         setCacheControl(set, 'private-no-store')
-        const result = await deleteUserList(db, getUserId(user), params.listId)
+        const result = await deleteUserList(
+          db,
+          getListUser(user).id,
+          params.listId
+        )
         if (!result.success) {
           return status(result.status, { error: result.error })
         }
@@ -241,12 +290,12 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         return result
       },
       {
-        auth: true,
+        admin: true,
         params: t.Object({ listId: t.String() }),
         detail: {
           summary: 'Delete a list',
           tags: ['Lists'],
-          ...authenticatedDetail
+          ...adminDetail
         }
       }
     )

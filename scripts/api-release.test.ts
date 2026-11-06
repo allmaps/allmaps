@@ -2,11 +2,15 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { delimiter, join } from 'node:path'
 import {
   checkHealth,
-  deploy,
-  preflight,
+  deploy as deployRelease,
+  preflight as preflightRelease,
   releaseTarget,
+  runCommand,
   waitForRailway
 } from './api-release.ts'
 
@@ -26,6 +30,30 @@ const environment = {
   RAILWAY_TOKEN: 'test-railway-token'
 }
 const noSleep = async () => {}
+const developmentHyperdriveId = '1'.repeat(32)
+const productionHyperdriveId = '2'.repeat(32)
+const readFixtureConfig = (api: 'rest' | 'annotations') => ({
+  name: api,
+  hyperdrive: [{ binding: 'HYPERDRIVE', id: productionHyperdriveId }],
+  env: {
+    dev: {
+      name: `${api}-develop`,
+      hyperdrive: [{ binding: 'HYPERDRIVE', id: developmentHyperdriveId }]
+    }
+  }
+})
+const preflight: typeof preflightRelease = (
+  env,
+  request,
+  config = readFixtureConfig
+) => preflightRelease(env, request, config)
+const deploy: typeof deployRelease = (
+  env,
+  command,
+  request,
+  sleep,
+  config = readFixtureConfig
+) => deployRelease(env, command, request, sleep, config)
 
 test('CI migration runs directly from TypeScript and fails before connecting without a URL', () => {
   const result = spawnSync(
@@ -48,6 +76,56 @@ test('CI migration runs directly from TypeScript and fails before connecting wit
   )
 })
 
+test('deployment subprocesses never inherit the migration database URL', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'allmaps-release-command-'))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
+  // Execute the real subprocess boundary with an offline pnpm stand-in.
+  writeFileSync(
+    join(directory, 'pnpm'),
+    `#!/usr/bin/env node
+console.log(JSON.stringify({
+  hasDatabaseUrl: Object.hasOwn(process.env, 'DATABASE_URL'),
+  inherited: process.env.ALLMAPS_RELEASE_TEST_INHERITED,
+  override: process.env.ALLMAPS_RELEASE_TEST_OVERRIDE,
+  args: process.argv.slice(2)
+}))
+`,
+    { mode: 0o755 }
+  )
+  const inherited = {
+    DATABASE_URL: 'postgresql://migration:unused@database.invalid/test',
+    ALLMAPS_RELEASE_TEST_INHERITED: 'preserved',
+    ALLMAPS_RELEASE_TEST_OVERRIDE: 'parent'
+  }
+  const original = Object.fromEntries(
+    Object.keys(inherited).map((name) => [name, process.env[name]])
+  )
+  t.after(() => {
+    for (const [name, value] of Object.entries(original)) {
+      if (value === undefined) delete process.env[name]
+      else process.env[name] = value
+    }
+  })
+  Object.assign(process.env, inherited)
+  const args = ['exec', 'wrangler', 'deploy']
+  for (const supplied of [{}, { DATABASE_URL: 'explicit-migration-secret' }]) {
+    const childEnvironment = {
+      ...supplied,
+      PATH: `${directory}${delimiter}${process.env.PATH ?? ''}`,
+      ALLMAPS_RELEASE_TEST_OVERRIDE: 'child'
+    }
+    const output = await runCommand(args, childEnvironment)
+    assert.deepEqual(JSON.parse(output), {
+      hasDatabaseUrl: false,
+      inherited: 'preserved',
+      override: 'child',
+      args
+    })
+    assert.equal(process.env.DATABASE_URL, inherited.DATABASE_URL)
+    assert.equal(childEnvironment.DATABASE_URL, supplied.DATABASE_URL)
+  }
+})
+
 const success: typeof fetch = async (input, options) => {
   const url = String(input)
   if (url.includes('backboard.railway.com')) {
@@ -68,11 +146,23 @@ const success: typeof fetch = async (input, options) => {
         : { deployment: { id: variables.id, status: 'SUCCESS' } }
     })
   }
-  if (url.includes('api.cloudflare.com'))
+  if (url.includes('/hyperdrive/configs/')) {
     return Response.json({
       success: true,
-      result: { bindings: [{ name: 'DATABASE_URL' }] }
+      result: {
+        id: url.split('/').at(-1),
+        caching: { disabled: true },
+        origin: {
+          scheme: 'postgres',
+          host: 'database.invalid',
+          port: 5432,
+          database: 'test'
+        }
+      }
     })
+  }
+  if (url.includes('api.cloudflare.com'))
+    return Response.json({ success: true, result: { bindings: [] } })
   if (url.includes('api.github.com')) return Response.json({ object: { sha } })
   return Response.json({ version: 'test-version' })
 }
@@ -135,11 +225,11 @@ test('preflight checks credentials, target Workers, Railway token scope and the 
   )
   await assert.rejects(
     preflight(environment, async (url, options) =>
-      String(url).includes('api.cloudflare.com')
-        ? Response.json({ success: true, result: { bindings: [] } })
+      String(url).endsWith('/settings')
+        ? Response.json({ success: false })
         : success(url, options)
     ),
-    /runtime DATABASE_URL/
+    /must exist before release/
   )
 })
 
@@ -151,8 +241,7 @@ for (const branch of ['develop', 'main']) {
     await deploy(
       {
         ...environment,
-        GITHUB_REF: `refs/heads/${branch}`,
-        DATABASE_URL: undefined
+        GITHUB_REF: `refs/heads/${branch}`
       },
       async (args) => {
         commands.push(args)
@@ -163,7 +252,8 @@ for (const branch of ['develop', 'main']) {
       async (url, options) => {
         if (String(url).includes('backboard.railway.com'))
           polledIds.push(JSON.parse(String(options?.body)).variables.id)
-        else healthUrls.push(String(url))
+        else if (!String(url).includes('api.cloudflare.com'))
+          healthUrls.push(String(url))
         return success(url, options)
       },
       noSleep
@@ -346,7 +436,7 @@ test('release configuration normalizes values for HTTP requests and deployment c
   }
   await preflight(padded, request)
   await deploy(
-    { ...padded, DATABASE_URL: undefined, GITHUB_TOKEN: undefined },
+    { ...padded, GITHUB_TOKEN: undefined },
     async (args, commandEnvironment) => {
       assert.equal(commandEnvironment.DATABASE_URL, undefined)
       if (args.includes('up')) {
@@ -371,5 +461,121 @@ test('release configuration normalizes values for HTTP requests and deployment c
     },
     request,
     noSleep
+  )
+})
+
+test('preflight verifies the selected Hyperdrive once before other infrastructure checks', async () => {
+  for (const branch of ['develop', 'main']) {
+    const urls: string[] = []
+    await preflight(
+      { ...environment, GITHUB_REF: `refs/heads/${branch}` },
+      async (input, options) => {
+        urls.push(String(input))
+        return success(input, options)
+      }
+    )
+    const checks = urls.filter((url) => url.includes('/hyperdrive/configs/'))
+    assert.equal(checks.length, 1, 'Both APIs share the same configuration')
+    assert.ok(
+      checks[0].endsWith(
+        branch === 'develop' ? developmentHyperdriveId : productionHyperdriveId
+      )
+    )
+    assert.equal(urls[0], checks[0])
+    assert.ok(urls.at(-1)?.endsWith(`/git/ref/heads/${branch}`))
+  }
+})
+
+test('placeholder IDs and wrong Worker names fail before network or deployments', async () => {
+  for (const config of [
+    () => ({
+      name: 'rest',
+      hyperdrive: [{ binding: 'HYPERDRIVE', id: '0'.repeat(32) }]
+    }),
+    () => ({
+      env: {
+        dev: {
+          name: 'rest',
+          hyperdrive: [{ binding: 'HYPERDRIVE', id: developmentHyperdriveId }]
+        }
+      }
+    })
+  ]) {
+    const noRequest: typeof fetch = async () =>
+      assert.fail('must not make requests')
+    await assert.rejects(
+      preflight(environment, noRequest, config),
+      /HYPERDRIVE ID|Worker name/
+    )
+    await assert.rejects(
+      deploy(
+        environment,
+        async () => assert.fail('must not deploy'),
+        noRequest,
+        noSleep,
+        config
+      ),
+      /HYPERDRIVE ID|Worker name/
+    )
+  }
+  // Production placeholders must fail even when development is fully configured.
+  await assert.rejects(
+    preflightRelease(
+      { ...environment, GITHUB_REF: 'refs/heads/main' },
+      async () => assert.fail('must not request'),
+      (api) => ({
+        ...readFixtureConfig(api),
+        hyperdrive: [{ binding: 'HYPERDRIVE', id: '0'.repeat(32) }]
+      })
+    ),
+    /HYPERDRIVE ID/
+  )
+})
+
+test('SQL caching or origin drift blocks both preflight and direct deploy', async () => {
+  for (const change of [
+    { caching: { disabled: false } },
+    {
+      origin: {
+        scheme: 'postgres',
+        host: 'wrong-database.invalid',
+        port: 5432,
+        database: 'test'
+      }
+    }
+  ]) {
+    const request: typeof fetch = async (input, options) => {
+      assert.ok(
+        String(input).includes('/hyperdrive/configs/'),
+        'Fail before any other infrastructure operation'
+      )
+      const data = await (await success(input, options)).json()
+      return Response.json({ ...data, result: { ...data.result, ...change } })
+    }
+    await assert.rejects(
+      preflight(environment, request),
+      /caching must be disabled|origin does not match/
+    )
+    await assert.rejects(
+      deploy(
+        environment,
+        async () => assert.fail('must not deploy'),
+        request,
+        noSleep
+      ),
+      /caching must be disabled|origin does not match/
+    )
+  }
+})
+
+test('deploy requires the migration database for its second verification without passing it as a Worker variable', async () => {
+  await assert.rejects(
+    deploy(
+      { ...environment, DATABASE_URL: undefined },
+      async () => assert.fail('must not deploy'),
+      success,
+      noSleep
+    ),
+    /Missing DATABASE_URL/
   )
 })

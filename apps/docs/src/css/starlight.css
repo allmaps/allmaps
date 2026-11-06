@@ -1,5 +1,5 @@
 :root {
-  --sl-font: 'Geograph', serif;
+  --sl-font: 'Geograph', system-ui, sans-serif;
   --sl-content-width: 65ch;
 }
 

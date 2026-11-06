@@ -24,8 +24,16 @@
     highlight?: Snippet<[{ name: string; bounds: ScreenshotBounds }]>
     highlightPadding?: number
     shadow?: boolean
+    /** Show an inert URL bar beside the browser controls. */
+    showUrl?: boolean
+    /** Route shows the host and pathname, without query parameters or a hash. */
+    urlDisplay?: 'full' | 'hostname' | 'route'
     alt: string
     src?: string
+    /** Explicit candidates for a custom src; otherwise generated from widths. */
+    srcset?: string
+    /** Rendered image width; defaults to auto for lazy images, with 100vw fallback. */
+    sizes?: string
     filesBaseUrl?: string
     loading?: 'lazy' | 'eager'
     class?: string
@@ -43,12 +51,17 @@
     waitForSelector,
     waitForRender,
     delay,
+    widths,
     geometry,
     highlights = [],
     highlight,
     highlightPadding = 4,
     shadow = false,
+    showUrl = false,
+    urlDisplay = 'full',
     src,
+    srcset,
+    sizes,
     filesBaseUrl,
     loading = 'lazy',
     class: className = ''
@@ -66,7 +79,8 @@
         targets,
         waitForSelector,
         waitForRender,
-        delay
+        delay,
+        widths
       })
     )
   )
@@ -89,6 +103,36 @@
         screenshotUrl(screenshot, filesBaseUrl)
       )
   )
+  const displayedUrl = $derived.by(() => {
+    const pageUrl = new URL(screenshot.url)
+    switch (urlDisplay) {
+      case 'hostname':
+        return pageUrl.hostname
+      case 'route':
+        return `${pageUrl.host}${pageUrl.pathname}`
+      default:
+        return screenshot.url
+    }
+  })
+  const imageSrcset = $derived(
+    srcset ??
+      (src !== undefined
+        ? undefined
+        : screenshot.widths
+            ?.map(
+              (width) =>
+                `${screenshotImageUrl(
+                  screenshotKey(screenshot, width),
+                  screenshotUrl(screenshot, filesBaseUrl, width)
+                )} ${width}w`
+            )
+            .join(', '))
+  )
+  const imageSizes = $derived(
+    imageSrcset
+      ? (sizes ?? (loading === 'lazy' ? 'auto, 100vw' : '100vw'))
+      : undefined
+  )
 </script>
 
 <div
@@ -97,17 +141,22 @@
   class:cropped={!!screenshot.crop}
 >
   {#if !screenshot.crop}
-    <div class="toolbar" aria-hidden="true">
+    <div class="toolbar" aria-hidden="true" inert>
       <svg width="40" height="12" viewBox="0 0 40 12">
         <circle cx="6" cy="6" r="5" fill="#ff5f57" />
         <circle cx="20" cy="6" r="5" fill="#febc2e" />
         <circle cx="34" cy="6" r="5" fill="#28c840" />
       </svg>
+      {#if showUrl}
+        <div class="url-bar">{displayedUrl}</div>
+      {/if}
     </div>
   {/if}
   <div class="image">
     <img
       src={imageUrl}
+      srcset={imageSrcset}
+      sizes={imageSizes}
       {alt}
       width={imageSize?.width}
       height={imageSize?.height}
@@ -143,8 +192,14 @@
 </div>
 
 <style>
+  /* Remove the ancestor decoration; descendants cannot cancel its underline. */
+  :global(a:has(.screenshot)) {
+    text-decoration: none !important;
+  }
+
   .screenshot {
     display: block;
+    min-width: 0;
     overflow: visible;
     border: 1px solid var(--screenshot-border, #d4d4d4);
     border-radius: 0.625rem;
@@ -172,8 +227,29 @@
   .toolbar {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
     padding: 0.3125rem 0.5rem;
     border-bottom: 1px solid var(--screenshot-border, #d4d4d4);
+  }
+
+  .toolbar svg {
+    flex-shrink: 0;
+  }
+
+  .url-bar {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    height: 1.5rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--screenshot-url-border, #e5e5e5);
+    border-radius: 0.3125rem;
+    background: var(--screenshot-url-background, #fff);
+    font-size: 0.75rem;
+    line-height: 1.375rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .image {

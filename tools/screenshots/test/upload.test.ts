@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { contentHash } from '../src/geometry.ts'
+import sharp from 'sharp'
 
 import {
   defineScreenshot,
@@ -60,6 +61,81 @@ test('publishes geometry separately from private capture metadata', () => {
     '--content-type',
     'application/json'
   ])
+})
+
+test('publishes responsive WebPs with separate receipts and retries only failed variants', async () => {
+  const directory = await mkdtemp(
+    path.join(tmpdir(), 'screenshot-publish-variants-')
+  )
+  const assetsCli = path.join(directory, 'assets.mjs')
+  const callsFilename = path.join(directory, 'calls.jsonl')
+  const failureFilename = path.join(directory, 'fail-variant')
+  const definition = defineScreenshot({
+    slug: 'editor',
+    url: 'https://example.org',
+    widths: [80, 160]
+  })
+  const filename = path.join(directory, screenshotKey(definition))
+  try {
+    await mkdir(path.dirname(filename), { recursive: true })
+    await sharp({
+      create: { width: 320, height: 200, channels: 3, background: '#ffffff' }
+    })
+      .webp()
+      .toFile(filename)
+    await writeFile(
+      assetsCli,
+      `
+      import { appendFileSync, existsSync } from 'node:fs'
+      const args = process.argv.slice(2)
+      const key = args[args.indexOf('--key') + 1]
+      appendFileSync(${JSON.stringify(callsFilename)}, JSON.stringify(args) + '\\n')
+      if (key.endsWith('-160w.webp') && existsSync(${JSON.stringify(failureFilename)})) {
+        console.log(JSON.stringify({ error: { message: 'Fixture variant failure' } }))
+        process.exit(1)
+      }
+      console.log(JSON.stringify({ ok: true, status: 'complete', publicUrl: 'https://files.example.org/' + key }))
+    `
+    )
+    const options = { directory, assetsCli }
+    await expect(
+      publishScreenshot({ ...definition, widths: [80, 640] }, options)
+    ).rejects.toThrow('exceeds')
+    await expect(readFile(callsFilename)).rejects.toMatchObject({
+      code: 'ENOENT'
+    })
+    await writeFile(failureFilename, '')
+    await expect(publishScreenshot(definition, options)).rejects.toThrow(
+      'Fixture variant failure'
+    )
+    await rm(failureFilename)
+    const published = await publishScreenshot(definition, options)
+    expect(published).toEqual({
+      publicUrl: 'https://files.example.org/screenshots/editor/v1.webp',
+      variantPublicUrls: {
+        80: 'https://files.example.org/screenshots/editor/v1-80w.webp',
+        160: 'https://files.example.org/screenshots/editor/v1-160w.webp'
+      }
+    })
+    expect(await publishScreenshot(definition, options)).toEqual(published)
+    const calls = (await readFile(callsFilename, 'utf8'))
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line) as string[])
+    expect(calls.map((args) => args[args.indexOf('--key') + 1])).toEqual([
+      'screenshots/editor/v1.webp',
+      'screenshots/editor/v1-80w.webp',
+      'screenshots/editor/v1-160w.webp',
+      'screenshots/editor/v1-160w.webp'
+    ])
+    expect(
+      calls.every(
+        (args) => args[args.indexOf('--content-type') + 1] === 'image/webp'
+      )
+    ).toBe(true)
+  } finally {
+    await rm(directory, { recursive: true, force: true })
+  }
 })
 
 test.each([false, true])(

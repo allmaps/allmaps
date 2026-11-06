@@ -19,6 +19,7 @@ import type {
 import type { Browser, Page } from 'playwright'
 import { contentHash, loadScreenshotGeometry } from './geometry.ts'
 import { measureCapture, prepareScreenshot } from './prepare.ts'
+import { writeScreenshotVariants } from './variants.ts'
 
 export async function captureScreenshot(
   browser: Browser,
@@ -31,26 +32,30 @@ export async function captureScreenshot(
     screenshotGeometryKey(definition)
   )
   const metadataFilename = `${filename}.json`
-  const signature = JSON.stringify(definition)
+  // Delivery widths do not change the captured page or require a new browser visit.
+  const signature = JSON.stringify({ ...definition, widths: undefined })
+  let cached = false
   if (!options.refresh) {
     try {
       if ((await readFile(metadataFilename, 'utf8')) === signature) {
-        const cached = await sharp(filename).metadata()
-        if (cached.format === 'webp') {
+        const metadata = await sharp(filename).metadata()
+        if (metadata.format === 'webp') {
           if (definition.targets || definition.crop)
             await loadScreenshotGeometry(definition, options)
-          return {
-            filename,
-            geometryFilename:
-              definition.targets || definition.crop
-                ? geometryFilename
-                : undefined,
-            cached: true
-          }
+          cached = true
         }
       }
     } catch {
       // A missing, incomplete or unreadable capture is regenerated.
+    }
+  }
+  if (cached) {
+    await writeScreenshotVariants(definition, options)
+    return {
+      filename,
+      geometryFilename:
+        definition.targets || definition.crop ? geometryFilename : undefined,
+      cached: true
     }
   }
 
@@ -105,6 +110,11 @@ export async function captureScreenshot(
       options.timeout
     )
     const webp = await sharp(image).webp({ quality: 90 }).toBuffer()
+    await writeScreenshotVariants(definition, {
+      directory: options.directory,
+      image: webp,
+      source: image
+    })
     await mkdir(path.dirname(filename), { recursive: true })
     const temporaryFilename = `${filename}.${randomUUID()}.tmp`
     await writeFile(temporaryFilename, webp)

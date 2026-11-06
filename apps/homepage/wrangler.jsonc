@@ -1,0 +1,25 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "homepage-develop",
+  "account_id": "6b4ce0b3a6c21b7769cc1c3eff7eaadf",
+  "compatibility_date": "2026-11-06",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./build",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "dev.allmaps.org", "custom_domain": true }],
+  "env": {
+    "production": {
+      "name": "homepage",
+      "workers_dev": false,
+      "assets": {
+        "directory": "./build",
+        "html_handling": "drop-trailing-slash",
+        "not_found_handling": "404-page"
+      },
+      "routes": [{ "pattern": "allmaps.org", "custom_domain": true }]
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import devtoolsJson from 'vite-plugin-devtools-json'
 import tailwindcss from '@tailwindcss/vite'
 import { sveltekit } from '@sveltejs/kit/vite'
+import { sveltePhosphorOptimize } from 'phosphor-svelte/vite'
 import { qrcode } from 'vite-plugin-qrcode'
 
 import { defineConfig, searchForWorkspaceRoot, type UserConfig } from 'vite'
@@ -22,6 +23,7 @@ export default defineConfig({
     devtoolsJson(),
     tailwindcss(),
     sveltekit(),
+    sveltePhosphorOptimize(),
     qrcode(),
     // This is needed to serve the app over HTTPS
     process.env.SSL

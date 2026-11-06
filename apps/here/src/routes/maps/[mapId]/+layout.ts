@@ -9,16 +9,17 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 
 import type { LayoutLoad } from './$types.js'
 
-export const load: LayoutLoad = async ({ params, fetch }) => {
+export const load: LayoutLoad = async ({ params, fetch, parent }) => {
   const { mapId: allmapsMapId } = params
 
-  const mapId = `https://annotations.allmaps.org/maps/${allmapsMapId}`
+  const { env } = await parent()
+  const mapId = `${env.PUBLIC_ANNOTATIONS_BASE_URL}/maps/${allmapsMapId}`
 
   let map: GeoreferencedMap
   let imageInfo: unknown
 
   try {
-    const annotation = await fetchJson(mapId, undefined, fetch)
+    const annotation = await fetchJson(mapId, { credentials: 'omit' }, fetch)
     const maps = parseAnnotation(annotation)
     map = maps[0]
   } catch {

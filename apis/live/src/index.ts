@@ -1,7 +1,7 @@
 import AllmapsShareDB from './sharedb/sharedb.ts'
 import { createLiveServer } from './app.ts'
 
-import { getPostgresContext } from '@allmaps/db'
+import { getPgContext } from '@allmaps/db'
 import { parseLiveEnv } from '@allmaps/env/live'
 
 const env = parseLiveEnv(process.env)
@@ -10,8 +10,8 @@ if (!env.DATABASE_URL) {
   throw new Error('Missing DATABASE_URL')
 }
 
-const postgresContext = getPostgresContext(env.DATABASE_URL)
-const shareDb = new AllmapsShareDB(postgresContext)
+const database = getPgContext(env.DATABASE_URL)
+const shareDb = new AllmapsShareDB(database)
 
 const { server, wss } = createLiveServer(shareDb)
 
@@ -61,8 +61,11 @@ function closeHttpServer() {
 function cleanupResources() {
   if (!cleanupPromise) {
     cleanupPromise = (async () => {
-      await shareDb.close()
-      await postgresContext.sql.end({ timeout: 5 })
+      try {
+        await shareDb.close()
+      } finally {
+        await database.close()
+      }
     })()
   }
 

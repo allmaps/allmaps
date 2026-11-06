@@ -6,9 +6,9 @@ After checks pass, an enabled release validates the target database's migration
 history, applies pending SQL, and deploys REST, Annotations, and Live from the
 checked-out commit. A migration failure prevents all deployment steps.
 
-Releases are **disabled by default**. The workflow is ready for review and local
-testing without changing hosted databases or taking over existing deployments.
-Enable each branch separately during the cutover below.
+Releases run only when the corresponding repository enable switch is exactly
+`true`. Check the current switch before merging: a merge into an enabled branch
+triggers migrations and deployment. Tests and Worker dry runs do not deploy.
 
 | Git branch | GitHub environment | Neon branch | Cloudflare Workers                    | Railway environment |
 | ---------- | ------------------ | ----------- | ------------------------------------- | ------------------- |
@@ -67,7 +67,7 @@ Set these secrets separately in each GitHub environment:
 | Secret                 | Value                                                                                      |
 | ---------------------- | ------------------------------------------------------------------------------------------ |
 | `DATABASE_URL`         | Direct, non-pooled Neon connection URL for the correct branch, database and migration role |
-| `CLOUDFLARE_API_TOKEN` | Account-scoped Workers deployment token                                                    |
+| `CLOUDFLARE_API_TOKEN` | Account-scoped Workers deployment token with Hyperdrive Read permission                    |
 | `RAILWAY_TOKEN`        | Railway project token scoped to the target environment                                     |
 
 Set these variables in each GitHub environment:
@@ -89,10 +89,13 @@ The existing Railway targets were verified during preparation:
 | `main` environment    | `7a6be1be-bcf0-4fcd-adce-ff629cb02b75` |
 | Cloudflare account    | `6b4ce0b3a6c21b7769cc1c3eff7eaadf`     |
 
-Confirm these targets during cutover. Keep runtime database/authentication secrets
+Confirm these targets during cutover. REST and Annotations use a `HYPERDRIVE`
+binding; Live retains its runtime `DATABASE_URL`. Keep authentication secrets
 configured on the corresponding Workers and Railway service. The GitHub
-`DATABASE_URL` is supplied only to preflight and migration, not deployment.
-Wrangler uses `--keep-vars` and does not import local dotenv overrides in CI.
+`DATABASE_URL` identifies the migration database and is supplied to preflight,
+migration, and deployment verification. It is never passed as a Wrangler variable
+or included in command arguments. Wrangler uses `--keep-vars` and does not import
+local dotenv overrides in CI.
 Live uses the repository root as its build context and `apis/live/railway.json`
 as its Railway config file.
 
@@ -139,6 +142,29 @@ loaded. They do not cancel a release already in progress.
 Frontend deployments and the IIIF fixture service are outside this workflow.
 The switch must precede enabling releases so a hosting provider cannot deploy
 new code before migration.
+
+## Hyperdrive verification
+
+Create one Hyperdrive configuration per database environment, pointing at Neon's
+direct endpoint, with SQL query caching disabled. Bind it as `HYPERDRIVE` in both
+API Wrangler configs: `env.dev.hyperdrive` for development and top-level
+`hyperdrive` for production. Development is configured; production IDs remain
+placeholders until provisioning. See [Hyperdrive setup](../apis/HYPERDRIVE.md).
+
+The release reads the selected configs from the checkout, rejects placeholders,
+missing/duplicate bindings and unexpected Worker names, then reads each distinct
+Hyperdrive resource through Cloudflare's API. It requires `caching.disabled: true`
+and the same PostgreSQL host, port and database as the environment's migration
+`DATABASE_URL`. Hyperdrive may use a dedicated API role with different credentials.
+The Cloudflare token therefore needs **Hyperdrive Read** in addition to its Worker
+deployment permissions; a failed lookup stops the release.
+
+These checks run before migration and again immediately before deployment. They
+validate the bindings about to be deployed, allowing the initial transition from
+Workers still using `DATABASE_URL`. Existing Worker settings are checked for
+existence, not for the obsolete database binding. GitHub's current branch head
+check still runs last in preflight. Neither verification prints database
+credentials or queries the database.
 
 ## Failure and concurrency behavior
 

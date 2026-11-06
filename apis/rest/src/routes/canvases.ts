@@ -1,7 +1,6 @@
 import { t } from 'elysia'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
-import { createAuth } from '@allmaps/db/auth'
 import type { RestEnv } from '@allmaps/env/rest'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
@@ -34,7 +33,7 @@ const mapsQuerySchema = t.Object({
 
 export function createCanvasesRoutes(
   env: RestEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({ name: 'canvases' })
     .use(createBetterAuthPlugin(betterAuth))

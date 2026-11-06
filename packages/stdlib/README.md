@@ -8,6 +8,10 @@ MIT
 
 ## API
 
+### `PUBLIC_API_MAX_LIMIT`
+
+Maximum number of maps available without authentication in the Allmaps APIs (`200`).
+
 ### `angle(line)`
 
 ###### Parameters
@@ -503,15 +507,25 @@ MIT
 
 `Array<GeojsonPolygon>`.
 
-### `fetchAnnotationsFromApi(parsedIiif)`
+### `fetchAnnotationsFromApi(annotationsBaseUrl, parsedIiif, fetch)`
+
+Fetch georeference annotations for a IIIF image or manifest.
 
 ###### Parameters
 
-* `parsedIiif` (`Image | Manifest | Collection`)
+* `annotationsBaseUrl` (`string`)
+  * Annotations API base URL, such as
+    <https://annotations.allmaps.org>, serving annotation resources at /images/{id}
+    and /manifests/{id}. Do not pass the REST API base URL.
+* `parsedIiif` (`Collection | Image | Manifest`)
+  * Parsed IIIF image or manifest
+* `fetch?` (`  | ((input: RequestInfo | URL, init?: RequestInit) => Promise<Response>)
+    | undefined`)
+  * Optional fetch implementation
 
 ###### Returns
 
-`Promise<Array<unknown>>`.
+Georeference annotations for the IIIF resource (`Promise<any>`).
 
 ### `fetchImageBitmap(input, init, fetchFn)`
 
@@ -580,6 +594,20 @@ MIT
 ###### Returns
 
 `[number, number]`.
+
+### `getMapQueryCredentials(limit)`
+
+Choose credentials for a public map search. Larger requests still need the
+signed-in user's tier; ordinary searches can use the shared response cache.
+
+###### Parameters
+
+* `limit` (`number`)
+  * Requested number of maps
+
+###### Returns
+
+Fetch credentials mode (`'include' | 'omit' | 'same-origin'`).
 
 ### `geojsonFeatureCollectionToGeojsonGeometries(geojsonFeatureCollection)`
 

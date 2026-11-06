@@ -1,5 +1,6 @@
 <script lang="ts">
   import Select from '$lib/components/Select.svelte'
+  import Projective from '$lib/components/icons/transformations/Projective.svelte'
 
   import { Polynomial1, ThinPlateSpline, Helmert } from '$lib/icons.js'
 
@@ -18,7 +19,8 @@
       label: 'Thin plate spline',
       Icon: ThinPlateSpline
     },
-    { value: 'helmert', label: 'Helmert', Icon: Helmert }
+    { value: 'helmert', label: 'Helmert', Icon: Helmert },
+    { value: 'projective', label: 'Projective', Icon: Projective }
   ]
 </script>
 

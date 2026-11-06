@@ -17,7 +17,8 @@ test.skipIf(process.env.ALLMAPS_SCREENSHOT_BROWSER_TEST !== '1')(
       response.end(`<html><body style="margin:0;background:white">
         <button id="open" style="position:fixed;left:20px;top:20px;width:80px;height:30px"
           onclick="document.querySelector('#panel').hidden=false">Settings</button>
-        <div id="panel" hidden style="position:fixed;left:120px;top:70px;width:200px;height:100px;background:#eee">
+        <div id="panel" hidden style="position:fixed;left:120px;top:70px;width:200px;height:100px;background:#eee"
+          onwheel="event.preventDefault();this.dataset.wheel=[event.deltaX,event.deltaY].join(',');this.style.height='120px'">
           <input id="input"><select id="select"><option value="a">A</option><option value="b">B</option></select>
         </div>
         <div id="offscreen" style="position:absolute;top:1000px">Offscreen</div>
@@ -41,6 +42,7 @@ test.skipIf(process.env.ALLMAPS_SCREENSHOT_BROWSER_TEST !== '1')(
           { action: 'fill', selector: '#input', value: 'Hello' },
           { action: 'select', selector: '#select', value: 'b' },
           { action: 'press', selector: '#input', key: 'Tab' },
+          { action: 'scroll', selector: '#panel', deltaX: 5, deltaY: 20 },
           { action: 'hover', selector: '#open' }
         ],
         targets: { button: '#open', panel: '#panel' }
@@ -54,7 +56,7 @@ test.skipIf(process.env.ALLMAPS_SCREENSHOT_BROWSER_TEST !== '1')(
         x: 120,
         y: 70,
         width: 200,
-        height: 100
+        height: 120
       })
       expect(geometry.targets.button).toEqual({
         x: 20,
@@ -100,6 +102,9 @@ test.skipIf(process.env.ALLMAPS_SCREENSHOT_BROWSER_TEST !== '1')(
       await prepareScreenshot(page, definition)
       expect(await page.locator('#input').inputValue()).toBe('Hello')
       expect(await page.locator('#select').inputValue()).toBe('b')
+      await expect
+        .poll(() => page.locator('#panel').getAttribute('data-wheel'))
+        .toBe('5,20')
       await page.close()
     } finally {
       await browser.close()

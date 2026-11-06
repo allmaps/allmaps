@@ -1,0 +1,309 @@
+---
+title: FAQ | Allmaps
+description: Frequently asked questions about Allmaps, IIIF, georeferencing and open data.
+label: FAQ
+hero:
+  title: FAQ
+  palette: yellow
+---
+
+<script lang="ts">
+  import { toolIdentities } from '$lib/data/tool-identities.js'
+  import { getScreenshotImage } from '$lib/data/screenshot-images.js'
+  import { Screenshot } from '@allmaps/ui'
+  import { orange, green, pink } from '@allmaps/tailwind'
+  import { PUBLIC_DOCS_BASE_URL, PUBLIC_HOMEPAGE_BASE_URL } from '$env/static/public'
+  import PluginPreview from '$lib/components/PluginPreview.svelte'
+  import { faqGeoreferencingScreenshot } from '$lib/data/faq-screenshots.js'
+  import { tools } from '$lib/data/tools.js'
+  const editorImage900 = 'https://files.allmaps.org/images/screenshots/editor-utrecht/v1-900w.webp'
+
+  const editorImage = 'https://files.allmaps.org/images/screenshots/editor-utrecht/v1-1800w.webp'
+  const editorImage480 = 'https://files.allmaps.org/images/screenshots/editor-utrecht/v1-480w.webp'
+
+  const docsBaseUrl = PUBLIC_DOCS_BASE_URL.replace(/\/$/, '')
+  const arcadeTool = tools.find((tool) => tool.label === toolIdentities.arcade.name)
+
+</script>
+
+## What is Allmaps?
+
+Allmaps is an open source ecosystem for curating, georeferencing and exploring
+digitized maps. Use <a href={toolIdentities.editor.href}>{toolIdentities.editor.name}</a> to place
+historical maps in their geographical context, and
+<a href={toolIdentities.viewer.href}>{toolIdentities.viewer.name}</a> to display them over a modern map.
+Allmaps works with images published through IIIF by libraries, archives and museums.
+
+Developers can use its [open source libraries and plugins](/open-source) to build their
+own mapping tools and websites. The [open georeference data](/data) created with
+Allmaps is available for anyone to download and reuse.
+
+## What is the goal of Allmaps?
+
+Allmaps aims to make every digitized map in the world easier to find and use,
+across libraries, archives and museums. We bring georeference data together in a
+shared, open database and provide open source tools for people to explore, work
+with and build on these maps. There are millions of digitized maps available through IIIF, and you can help georeferencing them!
+
+<section
+  class="breakout-width clear-both my-14 grid items-center gap-8 rounded-lg bg-orange/8 px-6 py-8 sm:px-9 sm:py-9 lg:grid-cols-2 lg:gap-10 [&_h2]:text-orange! [&_a]:text-orange!"
+  aria-labelledby="what-is-georeferencing"
+>
+<div class="min-w-0 [&>h2]:mt-0! [&>p:last-child]:mb-0">
+
+## What is georeferencing?
+
+Georeferencing connects places on a digitized map to their real-world locations.
+In <a href={toolIdentities.editor.href}>{toolIdentities.editor.name}</a>, you mark matching points on the
+historical map and a modern map.
+
+Allmaps uses these control points to align the historical map with its surroundings,
+so you can compare maps from different periods and see how places have changed.
+
+<p class="mt-6">
+  Learn how to place your first map with our
+  <a href={`${docsBaseUrl}/guides/georeferencing-maps`}>guide to georeferencing</a>.
+</p>
+
+</div>
+
+<figure class="not-prose m-0 min-w-0">
+  <div class="screenshot-frame" style:--accent={orange}>
+    <a
+      class="block rounded-sm focus-visible:outline-3 focus-visible:outline-offset-5 focus-visible:outline-orange"
+      href={faqGeoreferencingScreenshot.url}
+      aria-label="Open this map in Allmaps Editor"
+    >
+      <Screenshot
+        {...faqGeoreferencingScreenshot}
+        src={editorImage}
+        srcset={`${editorImage480} 480w, ${editorImage900} 900w, ${editorImage} 1800w`}
+        alt="Allmaps Editor showing matching control points and complete map masks on a historical map of Utrecht and a modern map"
+        sizes="auto, (min-width: 1168px) 456px, (min-width: 1024px) calc((100vw - 256px) / 2), (min-width: 640px) calc(100vw - 168px), calc(100vw - 112px)"
+      />
+    </a>
+  </div>
+</figure>
+
+</section>
+
+## What is IIIF?
+
+IIIF (International Image Interoperability Framework, pronounced “triple-eye-eff”)
+is a set of open standards for sharing images and other digital collections on
+the web. Libraries, archives and museums use IIIF to make their collections
+accessible across different tools and websites.
+
+Because Allmaps supports IIIF, it can load maps directly from these institutions
+without you needing to download or upload the images.
+
+Read <a href="{docsBaseUrl}/iiif">our introduction to IIIF</a> or visit the
+[IIIF website](https://iiif.io/) to learn more.
+
+## I still don’t understand -- I just want to look at maps!
+
+Browse recently georeferenced maps in <a href={toolIdentities.latest.href}>{toolIdentities.latest.name}</a>,
+or discover historical maps around your current location with
+<a href={toolIdentities.here.href}>{toolIdentities.here.name}</a>. Open a map in
+<a href={toolIdentities.viewer.href}>{toolIdentities.viewer.name}</a> to explore it over a modern map.
+
+## Can I upload my own maps?
+
+No. Allmaps works with maps that are already published through IIIF by libraries,
+archives and other repositories. You provide a IIIF URL, and the images stay with
+the institution or service hosting them.
+
+## Does Allmaps create map tiles or GeoTIFFs?
+
+Allmaps can display georeferenced maps directly in your browser without first
+creating map tiles or GeoTIFFs. It loads the original IIIF images and transforms
+them on demand.
+
+If you need maps in other tools, Allmaps Tile Server provides XYZ map tiles, and
+you can generate GeoTIFFs using Allmaps and GDAL. See our
+<a href="{docsBaseUrl}/guides/using-maps">guide to using maps</a> for the available
+options.
+
+
+<section
+  class="breakout-width clear-both my-14 grid items-center gap-8 rounded-lg bg-blue/8 px-6 py-8 sm:px-9 sm:py-9 lg:grid-cols-2 lg:gap-10"
+  aria-labelledby="can-i-display-georeferenced-maps-on-my-own-website"
+>
+<div class="min-w-0 [&>h2]:mt-0! [&>p:last-child]:mb-0 [&_h2]:text-blue! [&_a]:text-blue!">
+
+## Can I display georeferenced maps on my own website?
+
+<p>
+  Yes. Allmaps provides plugins for
+  <a href={`${docsBaseUrl}/packages/maplibre`}>MapLibre</a>,
+  <a href={`${docsBaseUrl}/packages/openlayers`}>OpenLayers</a> and
+  <a href={`${docsBaseUrl}/packages/leaflet`}>Leaflet</a>, so you can add
+  georeferenced maps to your own website.
+</p>
+
+The plugins load images directly from IIIF servers and use Georeference
+Annotations to position and transform them in the browser.
+
+<p class="mt-6">
+  Explore interactive examples and code for all three plugins in our
+  <a href={`${docsBaseUrl}/guides/viewing-maps#try-the-plugins`}>guide to viewing maps</a>.
+</p>
+
+</div>
+
+<div class="not-prose min-w-0">
+  <PluginPreview compact />
+</div>
+</section>
+
+## Can I use georeferenced maps in books or presentations?
+
+Yes. You can create PNG, JPEG or WebP images of georeferenced maps for books,
+articles, presentations and other publications.
+
+Our <a href="{docsBaseUrl}/guides/using-maps#png-jpeg-and-webp">guide to exporting map images</a>
+lets you choose the image dimensions and download the result directly in your
+browser. Developers can also use the
+<a href="{docsBaseUrl}/packages/render">Allmaps render module</a> to generate
+images in their own projects.
+
+## Is Allmaps free to use?
+
+Allmaps’ software and open georeference data are free to use, including in
+commercial projects, under their respective licenses.
+
+The hosted Allmaps APIs, including Allmaps Tile Server, are currently free to
+use under our [fair use policy](/terms#fair-use-of-hosted-apis). See our
+[Terms & Usage](/terms) for details.
+
+## Is Allmaps open source?
+
+Yes. The whole Allmaps project is open source, including its web applications,
+APIs, libraries and plugins. You can find the code on
+[GitHub](https://github.com/allmaps/allmaps), use it in your own projects and
+contribute improvements.
+
+## Can I host Allmaps myself?
+
+Allmaps is open source, so you can run the software yourself. However, we
+recommend using the hosted Allmaps Editor and APIs. Keeping contributions
+together in one shared database helps everyone discover and reuse georeferenced
+maps across institutions.
+
+We don’t actively provide support for setting up separate Allmaps instances.
+If you want to build your own tools or websites, our open source libraries,
+plugins and open data are designed for reuse.
+
+## Who is behind Allmaps?
+
+Allmaps was started by Bert Spaan and Jules Schoonman. The project is developed
+together with freelancers, partner institutions and contributors from the wider
+IIIF community.
+
+Read more about [the people and ideas behind Allmaps](/about).
+
+## How is Allmaps funded?
+
+Allmaps is funded through grants, commissioned work and support from partner
+institutions. The IIIF–Allmaps Partnership gives members of the IIIF Consortium
+a way to support ongoing development and maintenance through their membership.
+
+Learn more about the [IIIF–Allmaps Partnership](/iiif-partnership).
+
+<section
+  class="breakout-width clear-both my-14 grid items-center gap-8 rounded-lg bg-pink/8 px-6 py-8 sm:px-9 sm:py-9 lg:grid-cols-2 lg:gap-10 [&_h2]:text-pink! [&_a]:text-pink!"
+  aria-labelledby="how-can-my-institution-support-the-project"
+>
+<div class="min-w-0 [&>h2]:mt-0! [&>p:last-child]:mb-0">
+
+## How can my institution support the project?
+
+Members of the IIIF Consortium can support Allmaps through the
+[IIIF–Allmaps Partnership](/iiif-partnership). You can also
+[contact us](/contact) about funding development or commissioning work.
+
+Help people discover and use your maps by linking to Allmaps from map records in
+your collection portal. Links to Allmaps Editor invite people to georeference
+your maps, while links to Allmaps Viewer let them explore maps that have already
+been georeferenced.
+
+</div>
+
+<figure class="not-prose m-0 min-w-0">
+  <div class="screenshot-frame" style:--accent={pink}>
+    <a
+      class="block rounded-sm focus-visible:outline-3 focus-visible:outline-offset-5 focus-visible:outline-pink"
+      href="/iiif-partnership"
+      aria-label="Learn about the IIIF–Allmaps Partnership"
+    >
+      <Screenshot
+        url={`${PUBLIC_HOMEPAGE_BASE_URL.replace(/\/$/, '')}/iiif-partnership/`}
+        slug="iiif-partnership"
+        showUrl
+        urlDisplay="route"
+        viewport={{ width: 1280, height: 917, deviceScaleFactor: 1 }}
+        waitForSelector="[data-partnership-mask-grid].revealed"
+        delay={10000}
+        {...getScreenshotImage('iiif-partnership')}
+        alt="The IIIF–Allmaps Partnership page with colorful map masks and the Allmaps and IIIF logos"
+        sizes="auto, (min-width: 1168px) 456px, (min-width: 1024px) calc((100vw - 256px) / 2), (min-width: 640px) calc(100vw - 168px), calc(100vw - 112px)"
+      />
+    </a>
+  </div>
+</figure>
+</section>
+
+## What about sustainability?
+
+Allmaps is designed so that the georeference data you create remains useful
+beyond the project itself. [The data is open](/data) and uses the Georeference
+Annotation standard, so you can download it, preserve it and reuse it in other tools.
+
+Our open source libraries and plugins let you display maps on your own website
+using your own copies of the annotations, without depending on Allmaps’ hosted
+services. The original map images remain with the institutions that publish them
+through IIIF.
+
+<a href="{docsBaseUrl}/georeference-annotations">Learn about Georeference Annotations</a>.
+
+<section
+  class="breakout-width clear-both my-14 grid items-center gap-8 rounded-lg bg-green/8 px-6 py-8 sm:px-9 sm:py-9 lg:grid-cols-2 lg:gap-10 [&_h2]:text-green! [&_a]:text-green!"
+  aria-labelledby="is-allmaps-fun"
+>
+<div class="min-w-0 [&>h2]:mt-0! [&>p:last-child]:mb-0">
+
+## Is Allmaps fun?
+
+Yes, it’s lots of fun! There’s something satisfying about finding a familiar
+street on an old map and watching everything fall into place. Try it yourself
+in <a href={toolIdentities.editor.href}>{toolIdentities.editor.name}</a>.
+
+<p class="mt-6">
+  Play a round of <a href={toolIdentities.arcade.href}>Allmaps Arcade</a>
+  and see how quickly you can put historical maps back where they belong.
+</p>
+
+</div>
+
+{#if arcadeTool?.screenshot}
+<figure class="not-prose m-0 min-w-0">
+  <div class="screenshot-frame" style:--accent={green}>
+    <a
+      class="block rounded-sm focus-visible:outline-3 focus-visible:outline-offset-5 focus-visible:outline-green"
+      href={arcadeTool.href}
+      aria-label="Play Allmaps Arcade"
+    >
+      <Screenshot
+        {...arcadeTool.screenshot}
+        showUrl
+        urlDisplay="hostname"
+        src={arcadeTool.image.src}
+        srcset={arcadeTool.image.srcset}
+        alt={arcadeTool.image.alt}
+        sizes="auto, (min-width: 1168px) 456px, (min-width: 1024px) calc((100vw - 256px) / 2), (min-width: 640px) calc(100vw - 168px), calc(100vw - 112px)"
+      />
+    </a>
+  </div>
+</figure>
+{/if}
+</section>

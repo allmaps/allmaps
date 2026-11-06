@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { FileImage, ArrowUpRight } from 'phosphor-svelte'
+  import FileImage from 'phosphor-svelte/lib/FileImageIcon'
+  import ArrowUpRight from 'phosphor-svelte/lib/ArrowUpRightIcon'
   import * as Select from '../ui/select/index.js'
   import CodeBlock from '../CodeBlock.svelte'
   import LoadingSmall from '../LoadingSmall.svelte'

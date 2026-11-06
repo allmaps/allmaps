@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm'
+import { and, count, eq, sql } from 'drizzle-orm'
 
 import { generateAnnotation } from '@allmaps/annotation'
 import { generateRandomId } from '@allmaps/id/sync'
@@ -465,19 +465,54 @@ export async function addItemToList(
       }
     | { imageId: string }
     | { canvasId: string }
-    | { manifestId: string }
+    | { manifestId: string },
+  maximumItems?: number
 ) {
-  const [listItem] = await db
-    .insert(listsSchema.listItems)
-    .values({ listId, ...item })
-    .returning()
-  return listItem
+  const insertItem = async (db: DbOrTx) => {
+    const [listItem] = await db
+      .insert(listsSchema.listItems)
+      .values({ listId, ...item })
+      .onConflictDoNothing()
+      .returning()
+    return listItem
+  }
+
+  if (maximumItems === undefined) {
+    return (await insertItem(db)) ?? { listId, ...item }
+  }
+
+  return db.transaction(async (transaction) => {
+    // Serialize additions to this list so concurrent requests cannot exceed the cap.
+    await transaction
+      .select({ id: listsSchema.lists.id })
+      .from(listsSchema.lists)
+      .where(eq(listsSchema.lists.id, listId))
+      .for('update')
+
+    const listItem = await insertItem(transaction)
+    // Adding an existing item remains a no-op, even when the list is full.
+    if (listItem) {
+      const [{ total }] = await transaction
+        .select({ total: count() })
+        .from(listsSchema.listItems)
+        .where(eq(listsSchema.listItems.listId, listId))
+      if (total > maximumItems) {
+        // Throwing rolls back the insertion as part of this transaction.
+        throw new ResponseError(
+          `List cannot contain more than ${maximumItems} items`,
+          409
+        )
+      }
+    }
+    return listItem ?? { listId, ...item }
+  })
 }
 
 export async function addItemToListByUrl(
   db: Db,
   listId: string,
-  url: string
+  url: string,
+  maximumItems?: number
 ): Promise<
   | { success: true; item: typeof listsSchema.listItems.$inferSelect | object }
   | { success: false; status: number; error: string }
@@ -514,12 +549,13 @@ export async function addItemToListByUrl(
       }
     }
 
-    const [item] = await db
-      .insert(listsSchema.listItems)
-      .values({ listId, imageId: resourceId })
-      .onConflictDoNothing()
-      .returning()
-    return { success: true, item: item ?? { listId, imageId: resourceId } }
+    const item = await addItemToList(
+      db,
+      listId,
+      { imageId: resourceId },
+      maximumItems
+    )
+    return { success: true, item }
   }
 
   if (resourceType === 'canvases') {
@@ -536,12 +572,13 @@ export async function addItemToListByUrl(
       }
     }
 
-    const [item] = await db
-      .insert(listsSchema.listItems)
-      .values({ listId, canvasId: resourceId })
-      .onConflictDoNothing()
-      .returning()
-    return { success: true, item: item ?? { listId, canvasId: resourceId } }
+    const item = await addItemToList(
+      db,
+      listId,
+      { canvasId: resourceId },
+      maximumItems
+    )
+    return { success: true, item }
   }
 
   if (resourceType === 'manifests') {
@@ -558,12 +595,13 @@ export async function addItemToListByUrl(
       }
     }
 
-    const [item] = await db
-      .insert(listsSchema.listItems)
-      .values({ listId, manifestId: resourceId })
-      .onConflictDoNothing()
-      .returning()
-    return { success: true, item: item ?? { listId, manifestId: resourceId } }
+    const item = await addItemToList(
+      db,
+      listId,
+      { manifestId: resourceId },
+      maximumItems
+    )
+    return { success: true, item }
   }
 
   if (resourceType === 'maps') {
@@ -585,18 +623,18 @@ export async function addItemToListByUrl(
       }
     }
 
-    const [item] = await db
-      .insert(listsSchema.listItems)
-      .values({
-        listId,
+    const item = await addItemToList(
+      db,
+      listId,
+      {
         mapId: map.id,
         mapImageId: map.imageId,
         mapChecksum: map.checksum,
         mapVersion: map.version
-      })
-      .onConflictDoNothing()
-      .returning()
-    return { success: true, item: item ?? { listId, mapId: map.id } }
+      },
+      maximumItems
+    )
+    return { success: true, item }
   }
 
   return {

@@ -10,7 +10,8 @@
     "./schema/*": "./dist/schema/*.js",
     "./maps": "./dist/maps.js",
     "./auth": "./dist/auth.js",
-    "./migrations": "./dist/migrations.js"
+    "./migrations": "./dist/migrations.js",
+    "./request": "./dist/request.js"
   },
   "files": [
     "dist"
@@ -35,6 +36,7 @@
     "@allmaps/iiif-parser": "workspace:^",
     "@neondatabase/serverless": "catalog:",
     "better-auth": "catalog:",
+    "pg": "catalog:",
     "postgres": "catalog:",
     "zod": "catalog:"
   },
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@electric-sql/pglite": "catalog:",
     "@types/node": "catalog:",
+    "@types/pg": "catalog:",
     "@types/sharedb": "catalog:",
     "@typescript/native": "catalog:",
     "drizzle-kit": "catalog:",

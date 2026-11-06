@@ -166,16 +166,31 @@ pnpm dev:apis --db=postgres
 
 `DATABASE_URL` is the only connection selector. It supports `postgres://` and
 `postgresql://` URLs with a host and database. Connection parameters such as
-`sslmode=require` are passed unchanged to the existing PostgreSQL driver.
+`sslmode=require` are passed unchanged to the `pg` driver.
 No Neon CLI or `NEON_*` settings are needed to start the APIs. `pnpm setup:env --db=postgres` can collect the URL and
 generate the authentication secret.
 
-GitHub login is optional. To enable it, set both `GITHUB_CLIENT_ID` and
-`GITHUB_CLIENT_SECRET`; leaving both unset or empty disables the provider.
-Supplying only one is a configuration error. The REST API omits its GitHub login
-link and the app menus hide GitHub sign-in when the provider is disabled. PGlite's
-seeded-user login still works. PostgreSQL without GitHub supports public API access
-and existing sessions, but does not provide a new interactive sign-in method.
+GitHub and Google login are independently optional. Set `GITHUB_CLIENT_ID` and
+`GITHUB_CLIENT_SECRET` for GitHub, or `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+for Google. Keep real credentials in `.env.localhost.local` or deployment secrets,
+never in tracked env files. Leaving both values unset or empty disables that
+provider; supplying only one is a configuration error.
+
+The API root's `loginProviders` array lists enabled providers with their `provider`
+and `url`. `/login/github` and `/login/google` start login and accept a `returnTo`
+URL under the configured trusted origins (or a relative path). The legacy `login`
+field remains the GitHub URL when GitHub is enabled. Console only shows configured
+providers, and still supports the legacy field when talking to an older API.
+
+Register Google's callback as `${BETTER_AUTH_URL}/auth/callback/google`; for the
+default local API this is `http://localhost:5499/auth/callback/google`.
+Google-only users receive an opaque `user-` prefixed username. Account linking is
+enabled for matching verified emails without a trusted-provider bypass. Linking
+and subsequent logins preserve the existing username and profile.
+
+PGlite's seeded-user login still works without OAuth. PostgreSQL without either
+provider supports public API access and existing sessions, but does not provide a
+new interactive sign-in method.
 
 The runner connects directly to the supplied URL and prints the host and database
 without credentials or query parameters. There is no confirmation prompt or
@@ -193,7 +208,10 @@ Startup checks migration compatibility using read queries; it never initializes,
 seeds, migrates, or deletes a PostgreSQL database. Apply PostgreSQL migrations
 through the [API release workflow](../../.github/API_RELEASES.md).
 
-All APIs and authentication share the same PostgreSQL connection helper.
+REST, Annotations, Live and authentication share one `pg.Pool` and Drizzle
+instance in PostgreSQL mode. The migration-history check uses that pool too.
+Shutdown flushes pending Live writes before closing the pool. The same `pg`
+helper is used by deployed APIs; PGlite mode retains its embedded driver.
 PostgreSQL mode allows normal API data writes. Auth secrets are explicit, and
 cookies are separated by the selected connection URL. Demo seeding and
 seeded-user login are PGlite-only.

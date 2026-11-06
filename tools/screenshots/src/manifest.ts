@@ -17,10 +17,22 @@ export function createManifest(
     const definition = defineScreenshot(options)
     const key = screenshotKey(definition)
     const previous = screenshots.get(key)
-    if (previous && JSON.stringify(previous) !== JSON.stringify(definition)) {
+    if (
+      previous &&
+      JSON.stringify({ ...previous, widths: undefined }) !==
+        JSON.stringify({ ...definition, widths: undefined })
+    ) {
       throw new Error(`Conflicting screenshot definitions for ${key}`)
     }
-    screenshots.set(key, definition)
+    screenshots.set(
+      key,
+      previous
+        ? defineScreenshot({
+            ...definition,
+            widths: [...(previous.widths ?? []), ...(definition.widths ?? [])]
+          })
+        : definition
+    )
   }
   return {
     version: 1,

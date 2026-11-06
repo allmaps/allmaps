@@ -143,11 +143,25 @@ describe('Polynomial transformation, order 1', async () => {
   })
 })
 
-describe('Polynomial transformation, order 1, roundtrip', async () => {
+describe('Polynomial transformation, order 1, 3 GCPs, roundtrip', async () => {
   const transformer = new GcpTransformer(gcps3, 'polynomial')
   const resourcePoint: Point = [100, 100]
 
-  test(`should have the same output as running GDAL's gdaltransform`, () => {
+  test(`should do a roundtrip since polynomial1 and 3 GCPs`, () => {
+    expectToBeCloseToArray(
+      transformer.transformToResource(
+        transformer.transformToGeo(resourcePoint)
+      ),
+      resourcePoint
+    )
+  })
+})
+
+describe('Polynomial transformation, order 1, 6 GCPs, roundtrip', async () => {
+  const transformer = new GcpTransformer(gcps6, 'polynomial1')
+  const resourcePoint: Point = [1000, 1000]
+
+  test(`should do a roundtrip since exact inverse for polynomial1`, () => {
     expectToBeCloseToArray(
       transformer.transformToResource(
         transformer.transformToGeo(resourcePoint)
@@ -182,9 +196,9 @@ describe('Polynomial transformation, order 3', async () => {
 })
 
 describe('Projective transformation', async () => {
-  const transformer = new GcpTransformer(gcps6, 'projective')
+  const transformer = new GcpTransformer(gcps10, 'projective')
   const resourcePoint: Point = [1000, 1000]
-  const geoPoint = [4.3996721825549265, 51.957630080558445] // TODO: Check this in a reference implementation
+  const geoPoint = [-12.34458421820119, 57.94927274621239] // TODO: Check this in a reference implementation
 
   test(`should have the same output as (TODO: check reference)`, () => {
     expectToBeCloseToArray(transformer.transformToGeo(resourcePoint), geoPoint)

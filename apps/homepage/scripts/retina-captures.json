@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "screenshots": [
+    {
+      "viewport": {
+        "width": 900,
+        "height": 600,
+        "deviceScaleFactor": 3
+      },
+      "url": "https://editor.allmaps.org/georeference?url=https%3A%2F%2Fiiif.llyfrgell.cymru%2Fiiif%2F04%2F669%2F04669576.jp2%2Finfo.json&image=https%3A%2F%2Fiiif.llyfrgell.cymru%2Fiiif%2F04%2F669%2F04669576.jp2",
+      "slug": "editor-iiif-map",
+      "version": 3,
+      "widths": [320, 480, 640, 960, 1280, 1600],
+      "steps": [
+        {
+          "action": "click",
+          "selector": "button[aria-label=\"Minimize messages\"] >> nth=0"
+        }
+      ],
+      "delay": 5000
+    },
+    {
+      "viewport": {
+        "width": 900,
+        "height": 600,
+        "deviceScaleFactor": 3
+      },
+      "url": "https://iiif.io/api/extension/georef/",
+      "slug": "iiif-georeference-extension",
+      "widths": [320, 480, 640, 960, 1280, 1600],
+      "version": 2
+    },
+    {
+      "viewport": {
+        "width": 900,
+        "height": 600,
+        "deviceScaleFactor": 3
+      },
+      "url": "https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F28ed75ea7a785f32",
+      "slug": "viewer-28ed75ea7a785f32",
+      "widths": [320, 480, 640, 960, 1280, 1600],
+      "waitForRender": true,
+      "version": 2
+    },
+    {
+      "viewport": {
+        "width": 900,
+        "height": 2000,
+        "deviceScaleFactor": 3
+      },
+      "url": "http://localhost:5517/guides/annotating-maps-with-annotorious",
+      "slug": "annotorious-building-outlines",
+      "crop": {
+        "selector": "[aria-label=\"Glendale map with Annotorious building polygons\"]"
+      },
+      "steps": [
+        {
+          "action": "scroll",
+          "selector": "[aria-label=\"Glendale map with Annotorious building polygons\"]",
+          "deltaY": 600,
+          "deltaX": 0
+        },
+        {
+          "action": "click",
+          "selector": "[aria-label=\"Glendale map with Annotorious building polygons\"]"
+        }
+      ],
+      "widths": [320, 480, 640, 960, 1280, 1600],
+      "delay": 5000,
+      "version": 2
+    },
+    {
+      "viewport": {
+        "width": 900,
+        "height": 600,
+        "deviceScaleFactor": 3
+      },
+      "url": "https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fimages%2F5719a92f4727cdc3",
+      "slug": "viewer-source-url",
+      "widths": [320, 480, 640, 960, 1280, 1600],
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 900,
+        "height": 600
+      },
+      "steps": [
+        {
+          "action": "click",
+          "selector": "button[aria-label=\"Show image view\"]"
+        },
+        {
+          "action": "click",
+          "selector": "button:has-text(\"Source information\")"
+        }
+      ],
+      "waitForSelector": "input[aria-label^=URL]",
+      "waitForRender": true,
+      "delay": 5000,
+      "version": 2
+    },
+    {
+      "viewport": {
+        "width": 1100,
+        "height": 720,
+        "deviceScaleFactor": 3
+      },
+      "url": "https://github.com/allmaps/allmaps",
+      "slug": "allmaps-github-desktop",
+      "version": 4,
+      "widths": [320, 480, 640, 960, 1280, 1600]
+    },
+    {
+      "viewport": {
+        "width": 900,
+        "height": 600,
+        "deviceScaleFactor": 3
+      },
+      "url": "https://viewer.allmaps.org/?url=https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F50942a4e010841aa",
+      "slug": "viewer-delft-aula",
+      "version": 3,
+      "widths": [320, 480, 640, 960, 1280, 1600],
+      "steps": [
+        {
+          "action": "click",
+          "selector": "button[aria-label=\"Zoom to extent\"]"
+        },
+        {
+          "action": "click",
+          "selector": "button[aria-label=\"Zoom in\"]"
+        }
+      ],
+      "waitForRender": true
+    },
+    {
+      "slug": "iiif-partnership",
+      "version": 2,
+      "url": "http://localhost:5511/iiif-partnership",
+      "viewport": {
+        "width": 1265,
+        "height": 900,
+        "deviceScaleFactor": 2
+      },
+      "delay": 1000
+    },
+    {
+      "slug": "holyoke-fallback",
+      "version": 3,
+      "url": "http://localhost:5511/open-source",
+      "viewport": {
+        "width": 1440,
+        "height": 2000,
+        "deviceScaleFactor": 3
+      },
+      "steps": [
+        {
+          "action": "scroll",
+          "selector": ".maplibregl-canvas",
+          "deltaX": 0,
+          "deltaY": 0
+        }
+      ],
+      "crop": {
+        "selector": "canvas.maplibregl-canvas",
+        "padding": 0
+      },
+      "delay": 12000
+    },
+    {
+      "url": "https://editor.allmaps.org/georeference?url=https%3A%2F%2Fobjects.library.uu.nl%2Ffcgi-bin%2Fiipsrv.fcgi%3FIIIF%3D%2Fmanifestation%2Fviewer%2F19%2F34%2F88%2F19348847988460989169497350348427224179.jp2%2Finfo.json&image=https%3A%2F%2Fobjects.library.uu.nl%2Ffcgi-bin%2Fiipsrv.fcgi%3FIIIF%3D%2Fmanifestation%2Fviewer%2F19%2F34%2F88%2F19348847988460989169497350348427224179.jp2&lang=en",
+      "slug": "get-started-editor-utrecht",
+      "version": 2,
+      "viewport": {
+        "width": 720,
+        "height": 480,
+        "deviceScaleFactor": 3
+      },
+      "waitForRender": true,
+      "steps": [
+        {
+          "action": "waitFor",
+          "selector": "a[href*=\"/results?\"]",
+          "state": "visible"
+        },
+        {
+          "action": "click",
+          "selector": "button[aria-label=\"Minimize messages\"] >> nth=0"
+        },
+        {
+          "action": "scroll",
+          "selector": "canvas.maplibregl-canvas >> nth=0",
+          "deltaX": 0,
+          "deltaY": 600
+        },
+        {
+          "action": "scroll",
+          "selector": "canvas.maplibregl-canvas >> nth=1",
+          "deltaX": 0,
+          "deltaY": 600
+        }
+      ],
+      "delay": 5000,
+      "widths": [320, 480, 640, 960, 1280, 1600]
+    }
+  ]
+}

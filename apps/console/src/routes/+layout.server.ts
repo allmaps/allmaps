@@ -1,20 +1,38 @@
 import { consoleEnv } from '$lib/server/console-env.js'
+import { z } from 'zod'
 
 import type { LayoutServerLoad } from './$types'
 
-async function fetchLoginUrl(fetch: typeof globalThis.fetch) {
+const loginMetadataSchema = z.object({
+  login: z.string().url().optional(),
+  loginProviders: z
+    .array(
+      z.object({
+        provider: z.enum(['github', 'google']),
+        url: z.string().url()
+      })
+    )
+    .optional()
+})
+
+async function fetchLoginProviders(fetch: typeof globalThis.fetch) {
   try {
     const response = await fetch(`${consoleEnv.PUBLIC_REST_BASE_URL}/`, {
       // Login availability must not depend on the current user's session.
       credentials: 'omit',
       signal: AbortSignal.timeout(10_000)
     })
-    if (!response.ok) return undefined
-    const { login } = await response.json()
-    return typeof login === 'string' ? login : undefined
+    if (!response.ok) return []
+    const { login, loginProviders } = loginMetadataSchema.parse(
+      await response.json()
+    )
+    return (
+      loginProviders ??
+      (login ? [{ provider: 'github' as const, url: login }] : [])
+    )
   } catch {
     // Optional login metadata should not prevent the page from loading.
-    return undefined
+    return []
   }
 }
 
@@ -23,10 +41,10 @@ export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
   // state can change outside this app (for example during OAuth sign-in).
   void url.pathname
 
-  const [session, loginUrl] = await Promise.all([
+  const [session, loginProviders] = await Promise.all([
     locals.getConsoleSession(),
-    fetchLoginUrl(fetch)
+    fetchLoginProviders(fetch)
   ])
 
-  return { env: consoleEnv, session, loginUrl }
+  return { env: consoleEnv, session, loginProviders }
 }

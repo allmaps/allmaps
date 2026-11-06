@@ -43,6 +43,7 @@ import {
 } from '../shared/conversion-functions.js'
 import {
   invertHelmertWeightsArrays,
+  invertPolynomial1WeightsArrays,
   invertStraightMeasures
 } from '../shared/inversion-functions.js'
 
@@ -177,6 +178,20 @@ export abstract class BaseGcpTransformer {
           this.destinationPointsInternal,
           this.sourcePointsInternal,
           backwardHelmertTransformationWeightsArrays[0]
+        )
+      } else if (this.type === 'polynomial' || this.type === 'polynomial1') {
+        const forwardPolynomial1Transformation =
+          this.getForwardTransformationInternal() as Helmert
+        const forwardPolynomial1TransformationWeightsArrays =
+          forwardPolynomial1Transformation.getWeightsArrays()
+        const backwardPolynomial1TransformationWeightsArrays =
+          invertPolynomial1WeightsArrays(
+            forwardPolynomial1TransformationWeightsArrays
+          )
+        this.backwardTransformation = new Polynomial1(
+          this.destinationPointsInternal,
+          this.sourcePointsInternal,
+          backwardPolynomial1TransformationWeightsArrays
         )
       } else {
         // By default just invert source and destination

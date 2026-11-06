@@ -31,6 +31,9 @@
 - name: Chesapeake and Ohio Canal
   url: https://annotations.allmaps.org/images/7f2494dd1ad9ed7a
   reason: Two maps from same image, overlapping, mask outside full mask, sideways map
+- name: Berlin composite map
+  url: https://annotations.allmaps.org/images/4b77ab264319e009
+  reason: For some inset maps mask is only very small part of full mask
 - name: Strait of Magellan
   url: https://annotations.allmaps.org/maps/96a50503ef4261aa
   reason: Best with projection

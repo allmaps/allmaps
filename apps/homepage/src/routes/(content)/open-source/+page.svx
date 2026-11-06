@@ -1,0 +1,17 @@
+---
+title: Open Source | Allmaps
+description: Explore the source code, plugins and libraries behind Allmaps, and build on open georeference data.
+label: Open Source
+hero:
+  title: Open source
+  palette: darkblue
+---
+
+<script lang="ts">
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import OpenSource from '$lib/components/OpenSource.svelte'
+</script>
+
+<PageIntro text="Allmaps is open source, with libraries, plugins and APIs you can use in your own work." />
+
+<OpenSource />

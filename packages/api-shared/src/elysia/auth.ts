@@ -134,12 +134,22 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
   return createElysia<TEnv>({ name: 'better-auth-routes' })
     .mount(auth.handler)
     .get(
-      '/login/github',
-      async ({ set, query }) => {
+      '/login/:provider',
+      async ({ set, query, params: { provider } }) => {
         setCacheControl(set, 'private-no-store')
-        if (!auth.options.socialProviders.github)
-          throw new ResponseError('GitHub login is not configured', 404)
+        const providerName = provider === 'github' ? 'GitHub' : 'Google'
+        if (!auth.options.socialProviders[provider])
+          throw new ResponseError(
+            `${providerName} login is not configured`,
+            404
+          )
         const callbackURL = query.returnTo ?? '/'
+        const context = await auth.$context
+        if (
+          !context.isTrustedOrigin(callbackURL, { allowRelativePaths: true })
+        ) {
+          throw new ResponseError('Invalid return URL', 403)
+        }
 
         const result = await auth.handler(
           new Request(`${baseURL}/auth/sign-in/social`, {
@@ -148,27 +158,35 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              provider: 'github',
+              provider,
               callbackURL
             })
           })
         )
 
+        if (!result.ok) return result
+
         const data = (await result.json()) as { url?: string }
-        copySetCookieHeader(result, set)
 
         if (data.url) {
-          return redirect(data.url)
+          const response = redirect(data.url)
+          for (const cookie of result.headers.getSetCookie()) {
+            response.headers.append('Set-Cookie', cookie)
+          }
+          return response
         }
 
-        return { error: 'Failed to get GitHub OAuth URL' }
+        throw new ResponseError(`Failed to get ${providerName} OAuth URL`, 502)
       },
       {
+        params: t.Object({
+          provider: t.Union([t.Literal('github'), t.Literal('google')])
+        }),
         query: t.Object({ returnTo: t.Optional(t.String()) }),
         detail: {
-          summary: 'Login with GitHub',
+          summary: 'Login with GitHub or Google',
           description:
-            'Initiates GitHub OAuth flow and redirects to GitHub authorization page',
+            'Initiates OAuth flow and redirects to the configured provider authorization page',
           tags: ['Authentication']
         }
       }
@@ -199,4 +217,16 @@ export function createBetterAuthRoutes<TEnv = Record<string, unknown>>(
         }
       }
     )
+}
+
+export function getLoginProviders(
+  { auth }: BetterAuthContext,
+  baseURL: string
+) {
+  return (['github', 'google'] as const)
+    .filter((provider) => auth.options.socialProviders[provider])
+    .map((provider) => ({
+      provider,
+      url: `${baseURL}/login/${provider}`
+    }))
 }

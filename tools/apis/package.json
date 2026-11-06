@@ -21,7 +21,6 @@
     "drizzle-orm": "catalog:",
     "@elysia/node": "catalog:",
     "elysia": "catalog:",
-    "postgres": "catalog:",
     "@allmaps/api-live": "workspace:*",
     "@allmaps/api-rest": "workspace:*",
     "@allmaps/api-annotations": "workspace:*",

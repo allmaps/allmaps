@@ -7,6 +7,10 @@ import { IIIF } from '@allmaps/iiif-parser'
 import { fetchJson } from '@allmaps/stdlib'
 import { generateId } from '@allmaps/id'
 import { setCacheControl } from '@allmaps/api-shared'
+import {
+  createCachePolicy,
+  getLoginProviders
+} from '@allmaps/api-shared/elysia'
 
 import {
   createElysia,
@@ -47,11 +51,12 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
   ).href
 
   return createElysia({ name: 'app' })
-    .use(createBetterAuthRoutes(betterAuth))
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)
-    .use(cors())
+    .use(cors({ origin: () => true }))
+    .use(createCachePolicy())
+    .use(createBetterAuthRoutes(betterAuth))
     .use(
       openapi({
         provider: null,
@@ -60,8 +65,7 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           servers: [{ url: env.PUBLIC_ANNOTATIONS_BASE_URL }],
           info: {
             title: 'Allmaps Annotations API Documentation',
-            description:
-              'API documentation for the Allmaps Annotations API. Use of this Allmaps-hosted service is free for non-commercial use. Commercial use requires a paid agreement with Allmaps.',
+            description: `API documentation for the Allmaps Annotations API. Use of this hosted service is subject to the [Allmaps Terms & Usage](${termsUrl}).`,
             termsOfService: termsUrl,
             version: packageJson.version
           },
@@ -79,7 +83,8 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           tags: openApiTags
         },
         exclude: {
-          staticFile: false
+          staticFile: false,
+          tags: ['Lists']
         }
       })
     )
@@ -119,7 +124,13 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           version: packageJson.version,
           docs: apiDocsUrl,
           terms: termsUrl,
-          login: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/login/github`,
+          login: betterAuth.auth.options.socialProviders.github
+            ? `${env.PUBLIC_ANNOTATIONS_BASE_URL}/login/github`
+            : undefined,
+          loginProviders: getLoginProviders(
+            betterAuth,
+            env.PUBLIC_ANNOTATIONS_BASE_URL
+          ),
           logout: `${env.PUBLIC_ANNOTATIONS_BASE_URL}/logout`
         }
       },

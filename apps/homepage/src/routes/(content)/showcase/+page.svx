@@ -1,0 +1,31 @@
+---
+title: Showcase | Allmaps
+description: See what people are making with Allmaps.
+label: Showcase
+hero:
+  title: Showcase
+  palette: orange
+---
+
+<script>
+  import PageIntro from '$lib/components/PageIntro.svelte'
+  import ShowcaseList from '$lib/components/ShowcaseList.svelte'
+</script>
+<!--
+- reuzenarbeid
+- Watertijdreis
+- https://maparchive.vn/
+- https://pages.allmaps.org/tabula-peutingeriana/
+- allmaps cursors
+- lmec, guide to georeferencing with allmaps
+- mapsnap
+- https://wragge.github.io/slv-allmaps/dashboard.html
+- city atlas
+- latest bot
+- kattenburgatlas
+- rotterdam time machine
+- Open Maps Meeting -->
+
+<PageIntro text="See how people georeference their collections and use Allmaps’ plugins, open source tools and georeference data." />
+
+<ShowcaseList />

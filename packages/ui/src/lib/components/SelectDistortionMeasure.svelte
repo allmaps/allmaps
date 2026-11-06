@@ -1,7 +1,8 @@
 <script lang="ts">
   import Select from '$lib/components/Select.svelte'
 
-  import { Angle as AngleIcon, Resize as ResizeIcon } from 'phosphor-svelte'
+  import AngleIcon from 'phosphor-svelte/lib/AngleIcon'
+  import ResizeIcon from 'phosphor-svelte/lib/ResizeIcon'
 
   import type { DistortionMeasure } from '@allmaps/transform'
 

@@ -6,22 +6,43 @@ See https://docs.allmaps.org.
 
 ## Environment
 
-The docs use the repository root's environment files. `pnpm dev` loads
-`.env.localhost`; builds use `.env.production` by default or `.env.dev` with
-`--mode dev`.
+The docs commands load the repository root's environment files before starting
+Astro. `pnpm dev` and `pnpm start` load `.env.localhost` plus
+`.env.localhost.local` when present. `pnpm build:dev` loads `.env.dev`, while
+`pnpm build` and `pnpm build:production` load `.env.production`.
+`pnpm check`, `pnpm preview`, and `pnpm astro` also use `.env.production`.
 
 `PUBLIC_HOMEPAGE_BASE_URL` sets the destination for homepage, contact, and terms
 links: `http://localhost:5511` locally, `https://dev.allmaps.org` in dev, and
 `https://allmaps.org` in production.
 
+`PUBLIC_REST_BASE_URL` and `PUBLIC_ANNOTATIONS_BASE_URL` set the OpenAPI sources
+for the interactive API references. The Astro configuration reads these values
+from `process.env` and appends `/openapi.json`. Environment variables set by the
+shell or build service override values from the files. Use the named commands
+above to select the environment; `--mode` alone does not change the file loaded
+by Node.
+
 `PUBLIC_STATS_WEBSITE_ID` enables visitor tracking with `stats.allmaps.org`.
 Set it in Cloudflare's **Build Variables and Secrets**, then rebuild and deploy.
-The Astro configuration reads it from the build process environment; a runtime
-Worker variable or an entry in an `.env` file alone does not enable tracking.
+The Astro configuration reads it from the build process environment, including
+the loaded environment file; a runtime Worker variable does not enable tracking.
 When it is unset, no tracking script is included.
 
 `PUBLIC_DOCS_BASE_URL` sets the canonical docs URL and social-image URL. The
 `build:dev` and `build:production` commands set it explicitly for each deployment.
+
+## Page URLs
+
+Docs pages use URLs without trailing slashes, such as `/guides/discover-maps`.
+Keep internal links and generated package links in this form, including links
+with fragments such as `/guides/viewing-maps#share-a-map`.
+
+Astro's `trailingSlash: 'never'` keeps Starlight navigation, canonical URLs,
+search results, and sitemap URLs consistent. Keep the default directory build
+format: Starlight generates `.html` links with the file format. Cloudflare's
+`drop-trailing-slash` HTML handling serves directory index files at slashless
+URLs and redirects existing links ending in `/` to their canonical form.
 
 ## Development deployment
 

@@ -195,8 +195,8 @@ describe('Transform MultiPoint Backward To MultiPoint', async () => {
     [50, 50]
   ]
   const resourceMultiPoint: MultiPoint = [
-    [31.06060606060611, 155.30303030303048],
-    [237.12121212121218, 185.60606060606085]
+    [34.848484848484816, 174.24242424242414],
+    [237.87878787878782, 189.39393939393915]
   ]
 
   test(`should recognise multi geometry and transform the points piecewise, not considering the input as lineString, and hence not add midpoints and ignore lineString options`, () => {

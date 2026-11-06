@@ -1,0 +1,2426 @@
+[
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/8af5fb867819e6f3@f7b2168e245dc932",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/8af5fb867819e6f3",
+      "created": "2024-06-03T03:00:55.964Z",
+      "modified": "2024-06-03T03:00:55.964Z",
+      "resource": {
+        "id": "https://cdm21033.contentdm.oclc.org/digital/iiif/krt/5696",
+        "width": 3341,
+        "height": 2245,
+        "type": "ImageService2",
+        "provider": [
+          {
+            "label": {
+              "none": ["Universiteitsbibliotheek VU"]
+            },
+            "homepage": [
+              {
+                "id": "https://researchworks.oclc.org/iiif-explorer/search?q=collection.id%3Ahttps%3A%2F%2Fresearchworks.oclc.org%2Fdigital%2Fdataset%2F21033_krt"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [2975, 976],
+          "geo": [128.35370431576845, -3.6154988809585262]
+        },
+        {
+          "resource": [2709, 302],
+          "geo": [128.30867853084547, -3.49987516869912]
+        },
+        {
+          "resource": [1404, 792],
+          "geo": [128.08565488282926, -3.5831838506973526]
+        },
+        {
+          "resource": [1439, 2009],
+          "geo": [128.08986077939147, -3.792989869194315]
+        },
+        {
+          "resource": [2498, 1538],
+          "geo": [128.27182183896184, -3.712803214259239]
+        },
+        {
+          "resource": [424, 1563],
+          "geo": [127.91789140621175, -3.7153114654332597]
+        }
+      ],
+      "resourceMask": [
+        [3102, 198],
+        [3100, 2049],
+        [258, 2046],
+        [260, 195]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/8af5fb867819e6f3",
+        "version": "https://annotations.allmaps.org/maps/8af5fb867819e6f3@f7b2168e245dc932",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/003408309fbcf7de",
+          "version": "https://annotations.allmaps.org/images/003408309fbcf7de@559f947b59d2868d",
+          "canvases": []
+        },
+        "scale": 0.052614,
+        "area": 1900331074.08
+      }
+    },
+    "path": "M420,73.309L417.946,348.794L0,346.691L2.054,71.206Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/752ac3651a9432ed@015c57ddf287e2b9",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/752ac3651a9432ed",
+      "created": "2024-02-17T20:54:13.082Z",
+      "modified": "2024-02-17T20:57:24.954Z",
+      "resource": {
+        "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b530208879/f1",
+        "width": 12163,
+        "height": 8467,
+        "type": "ImageService3",
+        "provider": [
+          {
+            "label": {
+              "none": ["Bibliothèque nationale de France"]
+            },
+            "homepage": [
+              {
+                "id": "https://gallica.bnf.fr/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [4254, 4180],
+          "geo": [144.9149513, -37.7991517]
+        },
+        {
+          "resource": [6599, 6260],
+          "geo": [144.9787951, -37.8560262]
+        },
+        {
+          "resource": [4447, 6697],
+          "geo": [144.9097408, -37.8615838]
+        }
+      ],
+      "resourceMask": [
+        [775, 600],
+        [729, 7986],
+        [11612, 7940],
+        [11484, 616]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/752ac3651a9432ed",
+        "version": "https://annotations.allmaps.org/maps/752ac3651a9432ed@015c57ddf287e2b9",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/379253fdf2ff33e0",
+          "version": "https://annotations.allmaps.org/images/379253fdf2ff33e0@534cd08be87f9be2",
+          "canvases": []
+        },
+        "scale": 0.362523,
+        "area": 604195515.88
+      }
+    },
+    "path": "M39.217,60.627L420,98.554L387.287,359.373L0,323.043Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/0431887a9d208417@f0b68ac47fe5a7b2",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/0431887a9d208417",
+      "created": "2022-07-10T08:01:00.656Z",
+      "modified": "2022-07-10T08:01:00.656Z",
+      "resource": {
+        "id": "https://iiif.universiteitleiden.nl/iiif/2/hdl:1887.1%252Fitem:2012417",
+        "width": 8873,
+        "height": 7559,
+        "type": "ImageService2",
+        "provider": [
+          {
+            "label": {
+              "none": ["Universitaire Bibliotheken Leiden"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/islandora/search"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [1409, 2553],
+          "geo": [-55.1845632, 5.8400335]
+        },
+        {
+          "resource": [3067, 5354],
+          "geo": [-55.1718361, 5.8186458]
+        },
+        {
+          "resource": [6957, 3474],
+          "geo": [-55.1422001, 5.8330451]
+        },
+        {
+          "resource": [4781, 4472],
+          "geo": [-55.1587803, 5.8253478]
+        },
+        {
+          "resource": [4303, 1906],
+          "geo": [-55.1624936, 5.8449954]
+        },
+        {
+          "resource": [3093, 4639],
+          "geo": [-55.1716528, 5.824061]
+        }
+      ],
+      "resourceMask": [
+        [1148, 567],
+        [7710, 558],
+        [7709, 4894],
+        [5849, 4912],
+        [5852, 5655],
+        [4832, 5676],
+        [4837, 7137],
+        [2828, 7142],
+        [2744, 7304],
+        [2676, 7369],
+        [2579, 7378],
+        [2147, 7145],
+        [1128, 7144]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/0431887a9d208417",
+        "version": "https://annotations.allmaps.org/maps/0431887a9d208417@f0b68ac47fe5a7b2",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/1537b35f9aebef5b",
+          "version": "https://annotations.allmaps.org/images/1537b35f9aebef5b@a499c4b1699d2fa7",
+          "canvases": []
+        },
+        "scale": 1.182741,
+        "area": 26926119
+      }
+    },
+    "path": "M9.192,0.999L409.949,0L410.808,266.805L297.216,268.039L297.557,313.757L235.268,315.119L235.883,405.017L113.189,405.461L108.094,415.435L103.955,419.44L98.032,420L71.6,405.692L9.367,405.7Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/6fa4aed2ebd5e14e@50a2151442d78e20",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/6fa4aed2ebd5e14e",
+      "created": "2024-06-03T03:13:36.472Z",
+      "modified": "2024-06-03T03:13:36.472Z",
+      "resource": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~350035~90117425",
+        "width": 17682,
+        "height": 12334,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~350035~90117425/canvas/c1",
+            "type": "Canvas",
+            "label": {
+              "none": ["Casablanca"]
+            },
+            "partOf": [
+              {
+                "id": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~350035~90117425/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": ["Casablanca"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["David Rumsey Map Collection"]
+            },
+            "homepage": [
+              {
+                "id": "https://www.davidrumsey.com/luna/servlet/view/all"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [15551, 6660],
+          "geo": [-7.6569167, 33.5871404]
+        },
+        {
+          "resource": [9442, 6691],
+          "geo": [-7.6210884, 33.5876969]
+        },
+        {
+          "resource": [3398, 8112],
+          "geo": [-7.585912, 33.5953922]
+        },
+        {
+          "resource": [15153, 9056],
+          "geo": [-7.6550385, 33.5984718]
+        },
+        {
+          "resource": [13465, 2943],
+          "geo": [-7.6441283, 33.5691529]
+        }
+      ],
+      "resourceMask": [
+        [584, 2342],
+        [534, 8407],
+        [538, 9852],
+        [532, 11821],
+        [6069, 11854],
+        [6218, 12185],
+        [7184, 12191],
+        [7649, 11855],
+        [17193, 11864],
+        [17221, 3492],
+        [15699, 3481],
+        [15711, 451],
+        [10735, 435],
+        [10374, 2214],
+        [8731, 2210],
+        [8594, 2050],
+        [7755, 2055],
+        [7755, 2162]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/6fa4aed2ebd5e14e",
+        "version": "https://annotations.allmaps.org/maps/6fa4aed2ebd5e14e@50a2151442d78e20",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/51646a41c7f9ea75",
+          "version": "https://annotations.allmaps.org/images/51646a41c7f9ea75@3f1bc4601c707cbf",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/08779489a92ccde1",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/05e5788d568dd404"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 1.849554,
+        "area": 49122788.54
+      }
+    },
+    "path": "M420,302.018L241.648,310.552L241.722,313.188L220.844,313.791L217.323,309.928L176.428,310.769L168.68,354.802L44.823,357.253L43.014,282.599L5.126,283.199L0,76.93L237.545,71.695L248.884,63.151L272.931,62.747L276.87,70.816L414.702,68.463L415.922,116.975L417.026,152.571Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/57298e3519d47c63@042a601dcde09d02",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/57298e3519d47c63",
+      "created": "2024-10-15T18:20:08.675Z",
+      "modified": "2024-10-15T18:20:08.675Z",
+      "resource": {
+        "id": "https://iiif-server.lib.uchicago.edu/ark:61001/b2nm8rx3995r/00000001",
+        "width": 8888,
+        "height": 11238,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://4666ff10-c808-41d8-bb3a-be373d851c59",
+            "type": "Canvas",
+            "label": {
+              "en": ["Image 001"]
+            },
+            "partOf": [
+              {
+                "id": "https://iiif-collection.lib.uchicago.edu/object/ark:61001/b2nm8rx3995r.json",
+                "type": "Manifest"
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["University of Chicago Library"]
+            },
+            "homepage": [
+              {
+                "id": "https://www.lib.uchicago.edu/collex/collections/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [5030, 966],
+          "geo": [-87.6144891, 41.8311798]
+        },
+        {
+          "resource": [4990, 10023],
+          "geo": [-87.6143524, 41.8238699]
+        },
+        {
+          "resource": [4998, 5478],
+          "geo": [-87.614428, 41.8275091]
+        },
+        {
+          "resource": [8632, 973],
+          "geo": [-87.6105825, 41.831191]
+        },
+        {
+          "resource": [6563, 10046],
+          "geo": [-87.6126399, 41.823904]
+        },
+        {
+          "resource": [7598, 5487],
+          "geo": [-87.6116346, 41.8275446]
+        }
+      ],
+      "resourceMask": [
+        [1869, 10369],
+        [6971, 10338],
+        [8831, 1766],
+        [8846, 569],
+        [877, 638],
+        [894, 8430],
+        [1872, 8434]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/57298e3519d47c63",
+        "version": "https://annotations.allmaps.org/maps/57298e3519d47c63@042a601dcde09d02",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/5ff3b6675fd3aac7",
+          "version": "https://annotations.allmaps.org/images/5ff3b6675fd3aac7@4d4139f87b178a5d",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/f856d367f2aeb9f3",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/3c1c9533094c65d4"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 11.162459,
+        "area": 542404.51
+      }
+    },
+    "path": "M90.164,420L88.777,337.905L47.159,338.328L40.333,7.758L379.368,0L379.667,50.793L307.235,415.592Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/db6569cd47f3a6c5@d20bdf65c01ac847",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/db6569cd47f3a6c5",
+      "created": "2022-07-10T08:01:11.747Z",
+      "modified": "2022-07-10T08:01:11.747Z",
+      "resource": {
+        "id": "https://iiif.library.utoronto.ca/image/v2/mdl%3AG3574_V3_50_1952_front",
+        "width": 7982,
+        "height": 5412,
+        "type": "ImageService2"
+      },
+      "gcps": [
+        {
+          "resource": [3965, 1508],
+          "geo": [-123.1172439, 49.3008759]
+        },
+        {
+          "resource": [2170, 2196],
+          "geo": [-123.2239241, 49.2748115]
+        },
+        {
+          "resource": [7207, 4103],
+          "geo": [-122.9285173, 49.1981785]
+        }
+      ],
+      "resourceMask": [
+        [1302, 170],
+        [1318, 3425],
+        [2396, 3425],
+        [2395, 4462],
+        [5942, 4506],
+        [5940, 4635],
+        [7813, 4669],
+        [7832, 182]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/db6569cd47f3a6c5",
+        "version": "https://annotations.allmaps.org/maps/db6569cd47f3a6c5@d20bdf65c01ac847",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/626fb21d4c02a2e7",
+          "version": "https://annotations.allmaps.org/images/626fb21d4c02a2e7@4417898e9d9b56c4",
+          "canvases": []
+        },
+        "scale": 0.231484,
+        "area": 508026919.76
+      }
+    },
+    "path": "M2.606,62.019L420,67.46L413.783,357.981L294.096,354.442L294.368,346.09L67.687,340.708L68.907,273.563L0,272.793Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/303742196a799825@7341fb9b2c9799a0",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/303742196a799825",
+      "created": "2024-02-23T16:02:53.666Z",
+      "modified": "2024-02-23T22:36:08.769Z",
+      "resource": {
+        "id": "https://cdm17272.contentdm.oclc.org/iiif/2/agdm:7226",
+        "width": 13607,
+        "height": 7407,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://cdm17272.contentdm.oclc.org/iiif/agdm:7226/canvas/c0",
+            "type": "Canvas",
+            "label": {
+              "none": ["City of Madison, 1950"]
+            },
+            "partOf": [
+              {
+                "id": "https://cdm17272.contentdm.oclc.org/iiif/agdm:7226/manifest.json",
+                "type": "Manifest",
+                "label": {
+                  "none": ["City of Madison, 1950"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["University of Wisconsin-Milwaukee Libraries"]
+            },
+            "homepage": [
+              {
+                "id": "https://collections.lib.uwm.edu/digital/collection/agdm/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [6713, 4380],
+          "geo": [-89.3841606, 43.0746853]
+        },
+        {
+          "resource": [3184, 3432],
+          "geo": [-89.4387299, 43.0625588]
+        },
+        {
+          "resource": [5777, 5718],
+          "geo": [-89.385552, 43.0560436]
+        }
+      ],
+      "resourceMask": [
+        [128, 105],
+        [119, 7264],
+        [13498, 7279],
+        [13449, 83]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/303742196a799825",
+        "version": "https://annotations.allmaps.org/maps/303742196a799825@7341fb9b2c9799a0",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/57817a2e4276741e",
+          "version": "https://annotations.allmaps.org/images/57817a2e4276741e@8b8f3420d6d41ca0",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/2fdb5360f2c0d7a8",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/3d1ea9f502203989"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 0.787261,
+        "area": 154602723.85
+      }
+    },
+    "path": "M0,223.613L313.542,27.174L420,196.408L104.55,392.826Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/60459eb8648e36ca@ffe65f7b101b7f6d",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/60459eb8648e36ca",
+      "created": "2024-05-06T18:07:12.411Z",
+      "modified": "2024-05-06T18:07:12.411Z",
+      "resource": {
+        "id": "https://quod.lib.umich.edu/cgi/i/image/api/image/clark1ic:013014050:39015095413020_01",
+        "width": 11832,
+        "height": 8648,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://quod.lib.umich.edu/cgi/i/image/api/manifest/clark1ic:013014050:39015095413020_01/canvas/0",
+            "type": "Canvas",
+            "label": {
+              "none": ["Sheet 1"]
+            },
+            "partOf": [
+              {
+                "id": "https://quod.lib.umich.edu/cgi/i/image/api/manifest/clark1ic:013014050",
+                "type": "Manifest",
+                "label": {
+                  "none": ["Detroit and Vicinity."]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["University of Michigan Library"]
+            },
+            "homepage": [
+              {
+                "id": "https://quod.lib.umich.edu/c/clark1ic?view=reslist;q1=clark1ic"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [2366, 6227],
+          "geo": [-83.1051652, 42.305921]
+        },
+        {
+          "resource": [10515, 5617],
+          "geo": [-82.9808099, 42.3617676]
+        },
+        {
+          "resource": [6145, 1121],
+          "geo": [-83.0878223, 42.3918972]
+        }
+      ],
+      "resourceMask": [
+        [543, 7930],
+        [566, 4308],
+        [1967, 4313],
+        [1994, 2144],
+        [3545, 1220],
+        [3543, 599],
+        [9166, 627],
+        [9146, 1956],
+        [11161, 1968],
+        [11134, 6586],
+        [11119, 7981],
+        [8389, 7978],
+        [4282, 7986]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/60459eb8648e36ca",
+        "version": "https://annotations.allmaps.org/maps/60459eb8648e36ca@ffe65f7b101b7f6d",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/366c421b8acc638f",
+          "version": "https://annotations.allmaps.org/images/366c421b8acc638f@ad11d872910e774a",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/85e447fb97508ed0",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/e87644406a841842"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 0.66456,
+        "area": 154645170.92
+      }
+    },
+    "path": "M63.348,413.442L0,283.778L47.215,260.198L9.724,182.326L45.538,123.045L34.477,100.915L224.115,6.558L246.97,54.331L314.962,20.589L395.808,185.869L420,235.912L328.117,282.101L190.11,352.034Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/38ae25630336748e@a4fd6fad900c8b7d",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/38ae25630336748e",
+      "created": "2024-11-13T22:28:46.097Z",
+      "modified": "2024-11-13T22:28:46.097Z",
+      "resource": {
+        "id": "https://iiif.universiteitleiden.nl/iiif/2/hdl:1887.1%252Fitem:876329",
+        "width": 7067,
+        "height": 5191,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:876329/canvas/default",
+            "type": "Canvas",
+            "label": {
+              "none": ["Plano del famozo porto di Malta"]
+            },
+            "partOf": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:876329/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": ["Plano del famozo porto di Malta"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Universitaire Bibliotheken Leiden"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/islandora/search"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [5373, 2288],
+          "geo": [14.5058388, 35.8987145]
+        },
+        {
+          "resource": [4200, 2604],
+          "geo": [14.5170026, 35.8922286]
+        },
+        {
+          "resource": [3147, 2964],
+          "geo": [14.5286122, 35.8867337]
+        },
+        {
+          "resource": [2784, 1648],
+          "geo": [14.5171104, 35.8775847]
+        },
+        {
+          "resource": [3458, 2185],
+          "geo": [14.5189346, 35.8842726]
+        },
+        {
+          "resource": [4051, 3772],
+          "geo": [14.528741, 35.8980166]
+        },
+        {
+          "resource": [4975, 3253],
+          "geo": [14.5178163, 35.901455]
+        },
+        {
+          "resource": [4787, 1197],
+          "geo": [14.4997815, 35.8875276]
+        },
+        {
+          "resource": [2818, 3016],
+          "geo": [14.531087, 35.8842761]
+        },
+        {
+          "resource": [5926, 2601],
+          "geo": [14.5047963, 35.9039096]
+        }
+      ],
+      "resourceMask": [
+        [2241, 83],
+        [2278, 84],
+        [7037, 110],
+        [6928, 5096],
+        [351, 5099],
+        [336, 3925],
+        [2288, 3920]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/38ae25630336748e",
+        "version": "https://annotations.allmaps.org/maps/38ae25630336748e@a4fd6fad900c8b7d",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/c3d04d5f6aa604d9",
+          "version": "https://annotations.allmaps.org/images/c3d04d5f6aa604d9@0d09fdc04e7ce65f",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/f1191d387450cd75",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/30dc3bee04faa1c6"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 0.965921,
+        "area": 27706570.17
+      }
+    },
+    "path": "M149.159,378.037L148.041,376.603L0,195.41L213.762,41.963L420,291.143L370.942,328.815L309.559,254.99Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/efa06f142ae9e0b5@a33dde3c5d208f26",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/efa06f142ae9e0b5",
+      "created": "2024-11-13T16:31:29.557Z",
+      "modified": "2024-11-13T16:31:29.557Z",
+      "resource": {
+        "id": "https://iiif.universiteitleiden.nl/iiif/2/hdl:1887.1%252Fitem:3766988",
+        "width": 6985,
+        "height": 5494,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:3766988/canvas/default",
+            "type": "Canvas",
+            "label": {
+              "none": [
+                "Plan of the city, castle and suburbs of Edinburgh, 1775 - COLLBN 011-15-092"
+              ]
+            },
+            "partOf": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:3766988/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": [
+                    "Plan of the city, castle and suburbs of Edinburgh, 1775 - COLLBN 011-15-092"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Universitaire Bibliotheken Leiden"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/islandora/search"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [1903, 2627],
+          "geo": [-3.2001751, 55.9479278]
+        },
+        {
+          "resource": [2750, 4045],
+          "geo": [-3.1902564, 55.9427251]
+        },
+        {
+          "resource": [4161, 4287],
+          "geo": [-3.1781074, 55.9432754]
+        },
+        {
+          "resource": [3185, 1288],
+          "geo": [-3.1927002, 55.9550344]
+        },
+        {
+          "resource": [1192, 1601],
+          "geo": [-3.2080792, 55.9509402]
+        },
+        {
+          "resource": [5599, 2595],
+          "geo": [-3.171375, 55.9525506]
+        },
+        {
+          "resource": [1494, 4071],
+          "geo": [-3.2009918, 55.9410409]
+        },
+        {
+          "resource": [3128, 2559],
+          "geo": [-3.1904419, 55.9496843]
+        },
+        {
+          "resource": [4577, 2495],
+          "geo": [-3.1796855, 55.9516628]
+        }
+      ],
+      "resourceMask": [
+        [925, 687],
+        [6162, 689],
+        [6191, 4599],
+        [947, 4616]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/efa06f142ae9e0b5",
+        "version": "https://annotations.allmaps.org/maps/efa06f142ae9e0b5@a33dde3c5d208f26",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/3de8a70359944072",
+          "version": "https://annotations.allmaps.org/images/3de8a70359944072@2fde279443b9b1d9",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/7b16fd88686704e3",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/74680eb2a0da6f98"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 1.980201,
+        "area": 5238280.95
+      }
+    },
+    "path": "M0,134.44L347.141,35.417L420,284.215L72.74,384.583Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/6bfaa2dde9a941f2@cc6c19cb2433bfc4",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/6bfaa2dde9a941f2",
+      "created": "2024-11-13T15:17:23.594Z",
+      "modified": "2024-11-13T15:17:23.594Z",
+      "resource": {
+        "id": "https://iiif.universiteitleiden.nl/iiif/2/hdl:1887.1%252Fitem:3785115",
+        "width": 6263,
+        "height": 4669,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:3785115/canvas/default",
+            "type": "Canvas",
+            "label": {
+              "none": [
+                "Plan tot uitbreiding van 's-Gravenhage - COLLBN 011-11-015"
+              ]
+            },
+            "partOf": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:3785115/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": [
+                    "Plan tot uitbreiding van 's-Gravenhage - COLLBN 011-11-015"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Universitaire Bibliotheken Leiden"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/islandora/search"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [4777, 2103],
+          "geo": [4.3308315, 52.1000445]
+        },
+        {
+          "resource": [2416, 3030],
+          "geo": [4.2933603, 52.0681726]
+        },
+        {
+          "resource": [1707, 1677],
+          "geo": [4.2609849, 52.0793958]
+        },
+        {
+          "resource": [3793, 3197],
+          "geo": [4.3246283, 52.0775254]
+        },
+        {
+          "resource": [5154, 2671],
+          "geo": [4.3464055, 52.0958693]
+        },
+        {
+          "resource": [2665, 3953],
+          "geo": [4.3104141, 52.0587015]
+        },
+        {
+          "resource": [2055, 4149],
+          "geo": [4.3006817, 52.0503973]
+        },
+        {
+          "resource": [4236, 962],
+          "geo": [4.3039189, 52.1103896]
+        },
+        {
+          "resource": [3070, 497],
+          "geo": [4.2727256, 52.1068649]
+        },
+        {
+          "resource": [1590, 2610],
+          "geo": [4.270071, 52.0666861]
+        },
+        {
+          "resource": [2732, 2807],
+          "geo": [4.2968696, 52.0737894]
+        },
+        {
+          "resource": [5781, 2020],
+          "geo": [4.3508756, 52.1095923]
+        },
+        {
+          "resource": [3109, 2062],
+          "geo": [4.2948858, 52.0866249]
+        },
+        {
+          "resource": [2333, 1160],
+          "geo": [4.2658683, 52.0919969]
+        },
+        {
+          "resource": [3240, 3393],
+          "geo": [4.315449, 52.0702466]
+        },
+        {
+          "resource": [2004, 2143],
+          "geo": [4.2725703, 52.0763192]
+        },
+        {
+          "resource": [1824, 2612],
+          "geo": [4.2753845, 52.0687368]
+        },
+        {
+          "resource": [3214, 2453],
+          "geo": [4.3023057, 52.0824805]
+        },
+        {
+          "resource": [3640, 326],
+          "geo": [4.2820156, 52.1138449]
+        },
+        {
+          "resource": [3013, 3064],
+          "geo": [4.3063602, 52.0728298]
+        },
+        {
+          "resource": [3343, 1183],
+          "geo": [4.2878515, 52.1002662]
+        },
+        {
+          "resource": [2513, 1853],
+          "geo": [4.2793516, 52.0844012]
+        },
+        {
+          "resource": [3766, 2442],
+          "geo": [4.3139148, 52.0871923]
+        },
+        {
+          "resource": [4424, 4099],
+          "geo": [4.350294, 52.0711176]
+        },
+        {
+          "resource": [4523, 3356],
+          "geo": [4.3422414, 52.0815542]
+        }
+      ],
+      "resourceMask": [
+        [1026, 95],
+        [6166, 105],
+        [6150, 3396],
+        [5933, 3412],
+        [5933, 3460],
+        [5232, 3503],
+        [5216, 4584],
+        [980, 4570],
+        [984, 3244],
+        [95, 3242],
+        [95, 1373],
+        [1025, 1378]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/6bfaa2dde9a941f2",
+        "version": "https://annotations.allmaps.org/maps/6bfaa2dde9a941f2@cc6c19cb2433bfc4",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/2800b8de702c782e",
+          "version": "https://annotations.allmaps.org/images/2800b8de702c782e@14c8d795b7ff7621",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/7df659c10e10a790",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/4ab22e092d9c49f3"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 0.580193,
+        "area": 70504674.51
+      }
+    },
+    "path": "M19.273,177.583L294.9,0L406.801,177.66L395.727,186.041L397.372,188.624L361.302,215.231L397.483,273.96L170.135,420L124.917,348.502L77.236,379.202L13.199,278.621L63.178,246.662Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/f5c250b78d26a6f8@def696e05b836a48",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/f5c250b78d26a6f8",
+      "created": "2022-11-21T11:29:23.323Z",
+      "modified": "2022-11-21T12:56:59.504Z",
+      "resource": {
+        "id": "https://zas.bn.org.pl/iiif/32507386/33073417.tif",
+        "width": 11244,
+        "height": 9365,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://zas.bn.org.pl/iiif/32507386/33073417.tif/info.json",
+            "type": "Canvas",
+            "label": {
+              "pl": ["[1r]"]
+            },
+            "partOf": [
+              {
+                "id": "https://polona.pl/iiif/item/MzI1MDczODY/manifest.json",
+                "type": "Manifest",
+                "label": {
+                  "pl": ["Pharus-Plan Swinemünde"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Polona"]
+            },
+            "homepage": [
+              {
+                "id": "https://polona.pl"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [9857, 4305],
+          "geo": [14.2592357, 53.9187648]
+        },
+        {
+          "resource": [6450, 5635],
+          "geo": [14.2492918, 53.9105053]
+        },
+        {
+          "resource": [7381, 2859],
+          "geo": [14.2460779, 53.9181905]
+        }
+      ],
+      "resourceMask": [
+        [494, 1661],
+        [2376, 1655],
+        [2351, 407],
+        [10699, 345],
+        [10777, 8974],
+        [551, 9017]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/f5c250b78d26a6f8",
+        "version": "https://annotations.allmaps.org/maps/f5c250b78d26a6f8@def696e05b836a48",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/2f25e1d0c5fa41a6",
+          "version": "https://annotations.allmaps.org/images/2f25e1d0c5fa41a6@c7e99d7df7bb1f64",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/3bc4f74e593839ed",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/2d9a628b191a2d49"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 3.303667,
+        "area": 7851725.18
+      }
+    },
+    "path": "M6.687,223.572L57.88,188.695L35.636,155.652L262.1,0L413.313,230.216L135.333,420Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/dbc3f1835cf237d4@60a70c763fdaa7c4",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/dbc3f1835cf237d4",
+      "created": "2024-02-17T20:49:33.389Z",
+      "modified": "2024-02-17T20:54:36.248Z",
+      "resource": {
+        "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53066612q/f1",
+        "width": 10664,
+        "height": 7976,
+        "type": "ImageService3",
+        "partOf": [
+          {
+            "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53066612q/canvas/f1",
+            "type": "Canvas",
+            "label": {
+              "none": ["NP"]
+            },
+            "partOf": [
+              {
+                "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53066612q/manifest.json",
+                "type": "Manifest",
+                "label": {
+                  "none": ["BnF, département Cartes et plans, GE C-5660"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Bibliothèque nationale de France"]
+            },
+            "homepage": [
+              {
+                "id": "https://gallica.bnf.fr/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [7568, 3888],
+          "geo": [105.8557894, 21.0269674]
+        },
+        {
+          "resource": [7480, 5015],
+          "geo": [105.8551066, 21.0184226]
+        },
+        {
+          "resource": [6041, 4078],
+          "geo": [105.8432514, 21.0254416]
+        },
+        {
+          "resource": [7778, 4430],
+          "geo": [105.8574695, 21.0228963]
+        }
+      ],
+      "resourceMask": [
+        [516, 732],
+        [464, 4457],
+        [2628, 4456],
+        [2613, 7408],
+        [10153, 7435],
+        [10184, 754]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/dbc3f1835cf237d4",
+        "version": "https://annotations.allmaps.org/maps/dbc3f1835cf237d4@60a70c763fdaa7c4",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/bf0efd29142526cd",
+          "version": "https://annotations.allmaps.org/images/bf0efd29142526cd@03ee39cf8723bf72",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/73b878359406fb8b",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/5fda206b29057292"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 1.182696,
+        "area": 41694991.59
+      }
+    },
+    "path": "M1.483,68.512L419.965,65.966L420,352.471L93.627,354.034L93.668,227.441L0,228.265Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/4426ecd99c57de21@4f8f8e9423771a3b",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/4426ecd99c57de21",
+      "created": "2024-10-17T02:03:51.424Z",
+      "modified": "2024-10-17T02:03:51.424Z",
+      "resource": {
+        "id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:b5647n14b",
+        "width": 10574,
+        "height": 7108,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://ark.digitalcommonwealth.org/ark:/50959/rv045p09h/canvas/b5647n14b",
+            "type": "Canvas",
+            "label": {
+              "none": ["image 6"]
+            },
+            "partOf": [
+              {
+                "id": "https://ark.digitalcommonwealth.org/ark:/50959/rv045p09h/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": [
+                    "Richards standard atlas of the city of Holyoke, Massachusetts"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Digital Commonwealth"]
+            },
+            "homepage": [
+              {
+                "id": "https://www.digitalcommonwealth.org/search?f%5Bgenre_basic_ssim%5D%5B%5D=Maps"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [825, 512],
+          "geo": [-72.6060805, 42.203001]
+        },
+        {
+          "resource": [7941, 3359],
+          "geo": [-72.6137433, 42.2118251]
+        },
+        {
+          "resource": [8847, 2138],
+          "geo": [-72.6163729, 42.2111174]
+        },
+        {
+          "resource": [9158, 593],
+          "geo": [-72.6185265, 42.2097001]
+        },
+        {
+          "resource": [3669, 6612],
+          "geo": [-72.6038834, 42.2118129]
+        }
+      ],
+      "resourceMask": [
+        [773, 452],
+        [766, 796],
+        [741, 2387],
+        [703, 4447],
+        [696, 4907],
+        [699, 5808],
+        [704, 5921],
+        [832, 5925],
+        [1014, 5922],
+        [1812, 6018],
+        [1959, 6092],
+        [3010, 6576],
+        [3596, 6857],
+        [3581, 6886],
+        [4719, 6897],
+        [5401, 6848],
+        [5637, 6546],
+        [6037, 6328],
+        [6758, 5745],
+        [6756, 5436],
+        [8307, 4755],
+        [8566, 4748],
+        [9230, 4744],
+        [9247, 4476],
+        [9280, 4078],
+        [9438, 3914],
+        [9552, 3799],
+        [9611, 3827],
+        [10152, 3295],
+        [9636, 2603],
+        [9747, 2517],
+        [9701, 2452],
+        [9648, 2376],
+        [9219, 1757],
+        [9314, 1687],
+        [9188, 1513],
+        [9068, 1351],
+        [9968, 677],
+        [9971, 538],
+        [5393, 471],
+        [3015, 467]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/4426ecd99c57de21",
+        "version": "https://annotations.allmaps.org/maps/4426ecd99c57de21@4f8f8e9423771a3b",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/e69c8c7d7eca0508",
+          "version": "https://annotations.allmaps.org/images/e69c8c7d7eca0508@996bdf995614d413",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/13a706539964dc63",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/071c6ba31f9c88d4"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 6.648591,
+        "area": 1096176.98
+      }
+    },
+    "path": "M293.533,374.408L221.85,322.238L145.547,267.274L0,159.613L3.254,155.349L47.48,155.094L47.305,147.277L47.21,138.947L51.853,138.956L52.134,109.767L52.158,106.176L52.157,103.089L57.677,102.968L56.822,69.498L86.288,65.39L87.547,67.624L93.822,66.668L102.624,65.199L112.726,53.554L119.361,45.592L140.783,60.78L149.262,66.534L214.56,81.074L221.516,71.395L257.923,69.849L275.726,72.278L290.169,68.306L313.191,82.507L349.5,109.093L348.359,109.651L360.8,131.924L383.568,171.248L386.609,176.945L410.064,198.34L415.979,202.444L420,205.52L417.593,209.158L397.22,237.313L386.544,251.491L338.523,314.829L301.574,363.847Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/0c83208cc17694ae@e26881de958b291e",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/0c83208cc17694ae",
+      "created": "2024-10-22T20:06:12.872Z",
+      "modified": "2024-10-22T20:06:12.872Z",
+      "resource": {
+        "id": "https://iiif.nypl.org/iiif/2/58009096",
+        "width": 11155,
+        "height": 7738,
+        "type": "ImageService2",
+        "provider": [
+          {
+            "label": {
+              "none": ["New York Public Library"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.nypl.org/search/index?filters%5Btype%5D=cartographic"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [3010, 4793],
+          "geo": [-73.9834448, 40.5754151]
+        },
+        {
+          "resource": [249, 2608],
+          "geo": [-73.9903861, 40.5782162]
+        },
+        {
+          "resource": [7568, 5656],
+          "geo": [-73.9732231, 40.5749402]
+        },
+        {
+          "resource": [8484, 4802],
+          "geo": [-73.9714846, 40.5765935]
+        },
+        {
+          "resource": [4307, 2607],
+          "geo": [-73.9812929, 40.5790932]
+        },
+        {
+          "resource": [9777, 5270],
+          "geo": [-73.9684853, 40.5763085]
+        },
+        {
+          "resource": [5226, 1961],
+          "geo": [-73.9798128, 40.5804945]
+        },
+        {
+          "resource": [629, 4990],
+          "geo": [-73.9887638, 40.5743238]
+        },
+        {
+          "resource": [1177, 2613],
+          "geo": [-73.9883585, 40.5785696]
+        },
+        {
+          "resource": [585, 6121],
+          "geo": [-73.988468, 40.5725767]
+        }
+      ],
+      "resourceMask": [
+        [10707, 490],
+        [144, 412],
+        [105, 7346],
+        [10707, 7316]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/0c83208cc17694ae",
+        "version": "https://annotations.allmaps.org/maps/0c83208cc17694ae@e26881de958b291e",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/ea443ffaabb121e2",
+          "version": "https://annotations.allmaps.org/images/ea443ffaabb121e2@99ca4f62c9f350f9",
+          "canvases": []
+        },
+        "scale": 5.370337,
+        "area": 2524506.15
+      }
+    },
+    "path": "M380.877,61.449L420,301.911L38.338,358.551L0,114.08Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/e5c32c229a53f00d@0ff31db3e73c9b8e",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/e5c32c229a53f00d",
+      "created": "2024-05-31T09:48:28.662Z",
+      "modified": "2024-05-31T09:48:28.662Z",
+      "resource": {
+        "id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:4m90f389k",
+        "width": 4452,
+        "height": 4690,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://ark.digitalcommonwealth.org/ark:/50959/4m90f3889/canvas/4m90f389k",
+            "type": "Canvas",
+            "label": {
+              "none": ["image 1"]
+            },
+            "partOf": [
+              {
+                "id": "https://ark.digitalcommonwealth.org/ark:/50959/4m90f3889/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": ["The nation's capital"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Digital Commonwealth"]
+            },
+            "homepage": [
+              {
+                "id": "https://www.digitalcommonwealth.org/search?f%5Bgenre_basic_ssim%5D%5B%5D=Maps"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [2680, 3113],
+          "geo": [-77.0094394653, 38.8898219637]
+        },
+        {
+          "resource": [2396.25, 2879.25],
+          "geo": [-77.0175263255, 38.8947947148]
+        },
+        {
+          "resource": [2165.5, 2529],
+          "geo": [-77.0239314406, 38.9024848834]
+        },
+        {
+          "resource": [1881.25, 2388.75],
+          "geo": [-77.0319244235, 38.9056659149]
+        }
+      ],
+      "resourceMask": [
+        [1090, 1609],
+        [1105, 426],
+        [3532, 424],
+        [3532, 1369],
+        [4190, 1369],
+        [4196, 4379],
+        [292, 4376],
+        [298, 1609]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/e5c32c229a53f00d",
+        "version": "https://annotations.allmaps.org/maps/e5c32c229a53f00d@0ff31db3e73c9b8e",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/1fe0f5ff12d298b3",
+          "version": "https://annotations.allmaps.org/images/1fe0f5ff12d298b3@2517eb46e6e31831",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/dcb8b7843c654735",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/7407595662fb71f2"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 0.412243,
+        "area": 81395561.69
+      }
+    },
+    "path": "M88.37,124.758L91.285,1.716L350.714,5.699L349.665,104.007L420,105.143L417.302,418.284L0,411.231L3.711,123.39Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/871fadc753e4e213@2d4fb18080130f19",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/871fadc753e4e213",
+      "created": "2024-02-17T21:21:29.531Z",
+      "modified": "2024-02-17T21:47:53.375Z",
+      "resource": {
+        "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53064951c/f1",
+        "width": 11048,
+        "height": 8272,
+        "type": "ImageService3",
+        "partOf": [
+          {
+            "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53064951c/canvas/f1",
+            "type": "Canvas",
+            "label": {
+              "none": ["NP"]
+            },
+            "partOf": [
+              {
+                "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53064951c/manifest.json",
+                "type": "Manifest",
+                "label": {
+                  "none": ["BnF, département Cartes et plans, GE C-5283"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Bibliothèque nationale de France"]
+            },
+            "homepage": [
+              {
+                "id": "https://gallica.bnf.fr/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [6134, 3790],
+          "geo": [-17.4372929, 14.6692568]
+        },
+        {
+          "resource": [8279, 3467],
+          "geo": [-17.4289527, 14.6705144]
+        },
+        {
+          "resource": [7122, 5048],
+          "geo": [-17.4335639, 14.6645618]
+        }
+      ],
+      "resourceMask": [
+        [694, 906],
+        [701, 1403],
+        [600, 1420],
+        [609, 2533],
+        [706, 2577],
+        [711, 3250],
+        [3044, 3267],
+        [3037, 7417],
+        [6012, 7417],
+        [10322, 7436],
+        [10321, 915],
+        [8111, 897]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/871fadc753e4e213",
+        "version": "https://annotations.allmaps.org/maps/871fadc753e4e213@2d4fb18080130f19",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/6c0a62f6710a2c58",
+          "version": "https://annotations.allmaps.org/images/6c0a62f6710a2c58@932cb9380d37537e",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/9419eb2a27b54319",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/6f257235b038ed9f"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 2.402988,
+        "area": 9194332.31
+      }
+    },
+    "path": "M5.111,71.135L324.771,68.894L420,69.117L414.243,350.105L228.51,350.363L100.296,351.106L104.289,172.282L3.758,172.133L4.141,143.135L0,141.263L0.602,93.306L4.97,92.549Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/54569b87a374065f@eeaa6c1bc309bb20",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/54569b87a374065f",
+      "created": "2024-04-18T15:38:08.976Z",
+      "modified": "2024-04-18T15:38:08.976Z",
+      "resource": {
+        "id": "https://quod.lib.umich.edu/cgi/i/image/api/image/clark1ic:000906072:39015091920200_03",
+        "width": 17600,
+        "height": 12936,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://quod.lib.umich.edu/cgi/i/image/api/image/clark1ic:000906072:39015091920200_03/canvas/c0",
+            "type": "Canvas",
+            "partOf": [
+              {
+                "id": "https://quod.lib.umich.edu/cgi/i/image/api/manifest/clark1ic:000906072:39015091920200_03",
+                "type": "Manifest",
+                "label": {
+                  "none": ["Tōkyō zenzu / Sagano Hikotarō."]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["University of Michigan Library"]
+            },
+            "homepage": [
+              {
+                "id": "https://quod.lib.umich.edu/c/clark1ic?view=reslist;q1=clark1ic"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [14844, 10058],
+          "geo": [139.8139301, 35.740042]
+        },
+        {
+          "resource": [11027, 3922],
+          "geo": [139.7301901, 35.68589]
+        },
+        {
+          "resource": [10393, 11843],
+          "geo": [139.8500393, 35.6865556]
+        }
+      ],
+      "resourceMask": [
+        [4621, 1656],
+        [16879, 1667],
+        [16920, 12471],
+        [6812, 12437],
+        [6775, 9267],
+        [4672, 9199]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/54569b87a374065f",
+        "version": "https://annotations.allmaps.org/maps/54569b87a374065f@eeaa6c1bc309bb20",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/5546f044e7501b18",
+          "version": "https://annotations.allmaps.org/images/5546f044e7501b18@19f48e02254204a1",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/ecc3a6e6515ec4f2",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/18682b992bf4018f"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 0.726671,
+        "area": 237333024.71
+      }
+    },
+    "path": "M74.531,420L21.289,31.05L355.579,0L398.711,320.798L300.736,330.701L307.824,397.612Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/83ec5095adf295af@7dd02a6f3ae37da4",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/83ec5095adf295af",
+      "created": "2024-05-15T20:12:33.290Z",
+      "modified": "2024-05-15T20:12:33.290Z",
+      "resource": {
+        "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53022893m/f1",
+        "width": 22702,
+        "height": 17120,
+        "type": "ImageService3",
+        "partOf": [
+          {
+            "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53022893m/canvas/f1",
+            "type": "Canvas",
+            "label": {
+              "none": ["NP"]
+            },
+            "partOf": [
+              {
+                "id": "https://gallica.bnf.fr/iiif/ark:/12148/btv1b53022893m/manifest.json",
+                "type": "Manifest",
+                "label": {
+                  "none": ["BnF, GE C-769"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Bibliothèque nationale de France"]
+            },
+            "homepage": [
+              {
+                "id": "https://gallica.bnf.fr/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [8934, 7785],
+          "geo": [106.8267735, -6.1485312]
+        },
+        {
+          "resource": [6657, 6743],
+          "geo": [106.8091025, -6.1403569]
+        },
+        {
+          "resource": [7477, 6760],
+          "geo": [106.8154047, -6.1405845]
+        }
+      ],
+      "resourceMask": [
+        [1004, 1113],
+        [1063, 16185],
+        [9531, 15984],
+        [9484, 15657],
+        [9390, 15487],
+        [9394, 15433],
+        [9348, 15413],
+        [9179, 15134],
+        [9186, 15070],
+        [9248, 14996],
+        [10451, 13896],
+        [10963, 13366],
+        [11051, 12678],
+        [11528, 12307],
+        [14344, 12125],
+        [15562, 9954],
+        [16533, 10660],
+        [16868, 6301],
+        [13781, 4554],
+        [15314, 3267],
+        [15301, 3189],
+        [16656, 2601],
+        [16819, 2626],
+        [16824, 1956],
+        [17230, 1829],
+        [17260, 1022],
+        [17407, 459],
+        [15119, 459],
+        [15006, 539],
+        [14984, 698],
+        [15022, 1060],
+        [11293, 1043],
+        [6541, 1096],
+        [6410, 943],
+        [6273, 850],
+        [6109, 833],
+        [5993, 844],
+        [5878, 888],
+        [5769, 948],
+        [5659, 1031],
+        [5610, 1091]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/83ec5095adf295af",
+        "version": "https://annotations.allmaps.org/maps/83ec5095adf295af@7dd02a6f3ae37da4",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/f93f25ac5aaeaecb",
+          "version": "https://annotations.allmaps.org/images/f93f25ac5aaeaecb@df1605d8e506804b",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/7d8a2f85df5954f3",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/153fc5e63b80ba26"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 1.184567,
+        "area": 144622089.58
+      }
+    },
+    "path": "M0,23.744L118.03,25.045L119.251,23.538L122.022,21.471L124.782,19.989L127.704,18.916L130.67,18.683L134.883,19.182L138.447,21.603L141.892,25.548L263.646,26.119L359.222,28.058L358.041,18.833L358.513,14.797L361.363,12.808L420,13.732L416.555,27.995L416.249,48.512L405.917,51.579L406.172,68.622L401.981,67.92L367.592,82.331L367.97,84.321L329.42,116.442L409.534,162.132L403.446,272.887L378.157,254.535L348.186,309.272L276.122,312.765L264.111,322.01L262.25,339.477L249.432,352.753L219.232,380.251L217.685,382.108L217.542,383.733L222.033,390.899L223.224,391.427L223.152,392.799L225.659,397.162L227.05,405.499L10.148,407.192Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/9b4fe711438e9c2e@82448e356a4cbdd3",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/9b4fe711438e9c2e",
+      "created": "2024-06-14T11:34:28.897Z",
+      "modified": "2024-06-14T11:34:28.897Z",
+      "resource": {
+        "id": "https://ids.lib.harvard.edu/ids/iiif/7930064",
+        "width": 6396,
+        "height": 5220,
+        "type": "ImageService2",
+        "provider": [
+          {
+            "label": {
+              "none": ["Harvard Library Digital Collections"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.library.harvard.edu/catalog?f%5BresourceType%5D%5B%5D=cartographic"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [3102, 1047],
+          "geo": [12.3355227, 45.446374]
+        },
+        {
+          "resource": [3228, 3344],
+          "geo": [12.3370467, 45.4309474]
+        },
+        {
+          "resource": [4323, 2107],
+          "geo": [12.3470025, 45.4394783]
+        },
+        {
+          "resource": [1428, 2171],
+          "geo": [12.3196285, 45.4391793]
+        },
+        {
+          "resource": [2107, 1627],
+          "geo": [12.3260494, 45.4425171]
+        },
+        {
+          "resource": [4165, 3635],
+          "geo": [12.3461312, 45.4291322]
+        },
+        {
+          "resource": [1293, 1067],
+          "geo": [12.3183601, 45.4466083]
+        }
+      ],
+      "resourceMask": [
+        [939, 2278],
+        [140, 2277],
+        [131, 3299],
+        [926, 3300],
+        [918, 4552],
+        [5635, 4561],
+        [5645, 3193],
+        [5863, 3196],
+        [5874, 2397],
+        [3362, 1072],
+        [3359, 621],
+        [960, 632]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/9b4fe711438e9c2e",
+        "version": "https://annotations.allmaps.org/maps/9b4fe711438e9c2e@82448e356a4cbdd3",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/5f04f76e43d89190",
+          "version": "https://annotations.allmaps.org/images/5f04f76e43d89190@c05fd49cb5404b5d",
+          "canvases": []
+        },
+        "scale": 1.344973,
+        "area": 9460001.62
+      }
+    },
+    "path": "M58.446,184.849L57.505,63.465L232.967,64.343L233.865,97.608L419.603,197.1L420,256.021L404.05,255.647L405.376,356.535L60.331,352.55L59.032,260.216L0.879,259.583L0,184.213Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/31c1d537d0bd9ff2@055378572bd2e2cd",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/31c1d537d0bd9ff2",
+      "created": "2024-11-18T11:40:57.189Z",
+      "modified": "2024-11-18T11:40:57.189Z",
+      "resource": {
+        "id": "https://iiif.universiteitleiden.nl/iiif/2/hdl:1887.1%252Fitem:3439968",
+        "width": 6216,
+        "height": 8837,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:3439968/canvas/default",
+            "type": "Canvas",
+            "label": {
+              "none": ["Naqshah Madīnah Munawwarah COLLBN 046-26-002"]
+            },
+            "partOf": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:3439968/manifest",
+                "type": "Manifest",
+                "label": {
+                  "none": ["Naqshah Madīnah Munawwarah COLLBN 046-26-002"]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Universitaire Bibliotheken Leiden"]
+            },
+            "homepage": [
+              {
+                "id": "https://digitalcollections.universiteitleiden.nl/islandora/search"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [1542, 2244],
+          "geo": [39.6115432, 24.4674545]
+        },
+        {
+          "resource": [4727, 2254],
+          "geo": [39.6107403, 24.4674595]
+        },
+        {
+          "resource": [2064, 6631],
+          "geo": [39.6114679, 24.4692375]
+        },
+        {
+          "resource": [4254, 6650],
+          "geo": [39.6107563, 24.4692549]
+        }
+      ],
+      "resourceMask": [
+        [1500, 1101],
+        [1484, 382],
+        [4728, 374],
+        [4728, 1099],
+        [5849, 1096],
+        [5861, 7636],
+        [368, 7620],
+        [377, 1100],
+        [1217, 1100]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/31c1d537d0bd9ff2",
+        "version": "https://annotations.allmaps.org/maps/31c1d537d0bd9ff2@055378572bd2e2cd",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/de56bdce43cc7eb7",
+          "version": "https://annotations.allmaps.org/images/de56bdce43cc7eb7@817472052f71eb44",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/8b151cc069bdd31d",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/7cbbf9c816bdc90a"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 28.170926,
+        "area": 48045.38
+      }
+    },
+    "path": "M269.758,378.466L270.814,420L155.515,419.72L155.024,377.843L115.181,377.76L110.325,0L305.579,2.18L309.675,378.781L279.818,378.589Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/50942a4e010841aa@1dc28c191077338b",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/50942a4e010841aa",
+      "created": "2022-08-24T12:21:13.947Z",
+      "modified": "2022-08-24T12:25:14.006Z",
+      "resource": {
+        "id": "https://dlc.services/iiif-img/7/6/5fab6316-785e-4e98-863a-47e3def83789",
+        "width": 3392,
+        "height": 2367,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://dlc.services/iiif-query/7/?canvas=n2&manifest=s1&sequence=n1&s1=th-mededelingen&n1=&n2=67",
+            "type": "Canvas",
+            "partOf": [
+              {
+                "id": "https://dlc.services/iiif-resource/7/string1string2string3/th-mededelingen/1961/9",
+                "type": "Manifest"
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["TU Delft Library"]
+            },
+            "homepage": [
+              {
+                "id": "https://dlc.services/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [2208, 216],
+          "geo": [4.3740022, 52.0025701]
+        },
+        {
+          "resource": [2213, 1199],
+          "geo": [4.3743078, 52.0021412]
+        },
+        {
+          "resource": [320, 354],
+          "geo": [4.3726238, 52.0021315]
+        },
+        {
+          "resource": [317, 1044],
+          "geo": [4.3728418, 52.0018256]
+        }
+      ],
+      "resourceMask": [
+        [317, 353],
+        [811, 210],
+        [1068, 212],
+        [1068, 136],
+        [2220, 133],
+        [2219, 211],
+        [2305, 212],
+        [2301, 1203],
+        [2216, 1203],
+        [2216, 1282],
+        [1064, 1274],
+        [1065, 1193],
+        [804, 1193],
+        [313, 1047]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/50942a4e010841aa",
+        "version": "https://annotations.allmaps.org/maps/50942a4e010841aa@1dc28c191077338b",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/454bef5c99453f10",
+          "version": "https://annotations.allmaps.org/images/454bef5c99453f10@f2049bdddc451a5f",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/69444edeaf383357",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/969c57311852a678"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 18.271174,
+        "area": 6195.71
+      }
+    },
+    "path": "M0,243.887L78.145,180.755L124.493,160.964L118.829,147.979L325.691,57.222L331.325,70.627L346.859,64.061L420,233.699L404.72,240.357L410.608,253.855L202.925,342.733L197.068,328.815L150.15,349.261L51.005,362.778Z"
+  },
+  {
+    "annotationUrl": "https://annotations.allmaps.org/maps/a05aca049adadc77@ef2ac6056432f676",
+    "map": {
+      "@context": "https://schemas.allmaps.org/map/2/context.json",
+      "type": "GeoreferencedMap",
+      "id": "https://annotations.allmaps.org/maps/a05aca049adadc77",
+      "created": "2024-11-13T23:10:59.872Z",
+      "modified": "2024-11-13T23:10:59.872Z",
+      "resource": {
+        "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd403m:g4034m:g4034sm:g4034sm_g087401885:08740_1885-0006",
+        "width": 6450,
+        "height": 7650,
+        "type": "ImageService2",
+        "partOf": [
+          {
+            "id": "https://tile.loc.gov/image-services/iiif/service:gmd:gmd403m:g4034m:g4034sm:g4034sm_g087401885:08740_1885-0006",
+            "type": "Canvas",
+            "label": {
+              "none": ["Page 6"]
+            },
+            "partOf": [
+              {
+                "id": "https://www.loc.gov/item/sanborn08740_001/manifest.json",
+                "type": "Manifest",
+                "label": {
+                  "none": [
+                    "Sanborn Fire Insurance Map from San Antonio, Bexar County, Texas."
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "provider": [
+          {
+            "label": {
+              "none": ["Library of Congress"]
+            },
+            "homepage": [
+              {
+                "id": "https://www.loc.gov/maps/"
+              }
+            ]
+          }
+        ]
+      },
+      "gcps": [
+        {
+          "resource": [3138, 6032],
+          "geo": [-98.4941981, 29.4224434]
+        },
+        {
+          "resource": [4443, 6215],
+          "geo": [-98.4935267, 29.4221625]
+        },
+        {
+          "resource": [4481, 6506],
+          "geo": [-98.4935453, 29.4221131]
+        },
+        {
+          "resource": [1809, 1675],
+          "geo": [-98.4942679, 29.4246391]
+        },
+        {
+          "resource": [1815, 5840],
+          "geo": [-98.494985, 29.4227676]
+        },
+        {
+          "resource": [2505, 1984],
+          "geo": [-98.4939425, 29.4243943]
+        },
+        {
+          "resource": [4926, 6543],
+          "geo": [-98.4934847, 29.4220926]
+        },
+        {
+          "resource": [3957, 495],
+          "geo": [-98.4930413, 29.4248731]
+        }
+      ],
+      "resourceMask": [
+        [901, 542],
+        [967, 798],
+        [400, 1000],
+        [494, 3283],
+        [150, 3378],
+        [165, 6234],
+        [1604, 5981],
+        [1846, 6089],
+        [2550, 6202],
+        [2657, 7128],
+        [3472, 7171],
+        [3499, 7534],
+        [6287, 7558],
+        [6299, 5219],
+        [5967, 5140],
+        [5479, 4855],
+        [5223, 4266],
+        [5196, 3840],
+        [5329, 3668],
+        [5544, 3603],
+        [6041, 3583],
+        [6215, 3541],
+        [6068, 2362],
+        [5799, 530],
+        [5224, 245],
+        [3988, 248]
+      ],
+      "transformation": {
+        "type": "polynomial",
+        "options": {
+          "order": 1
+        }
+      },
+      "_allmaps": {
+        "id": "https://annotations.allmaps.org/maps/a05aca049adadc77",
+        "version": "https://annotations.allmaps.org/maps/a05aca049adadc77@ef2ac6056432f676",
+        "image": {
+          "id": "https://annotations.allmaps.org/images/00a6b2a785a36820",
+          "version": "https://annotations.allmaps.org/images/00a6b2a785a36820@d471483de57b73a6",
+          "canvases": [
+            {
+              "id": "https://annotations.allmaps.org/canvases/00a6b2a785a36820",
+              "manifests": [
+                {
+                  "id": "https://annotations.allmaps.org/manifests/4bca004644051345"
+                }
+              ]
+            }
+          ]
+        },
+        "scale": 19.101496,
+        "area": 100783.64
+      }
+    },
+    "path": "M146.772,0L303.373,29.215L364.476,46.535L388.911,68.63L376.669,162.226L367.501,222.091L358.319,221.691L333.488,215.648L321.961,215.795L312.993,222.346L308.39,243.608L312.829,276.095L332.966,296.961L348.266,305.525L315.077,420L177.679,379.424L181.404,361.25L141.74,347.625L149.359,300.725L116.155,285.238L105.705,276.525L31.089,268.589L70.149,128.392L88.468,128.597L115.639,15.369L146.465,13.48Z"
+  }
+]

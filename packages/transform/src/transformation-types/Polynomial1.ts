@@ -12,8 +12,16 @@ import type { Polynomial1Measures } from '../shared/types.js'
 export class Polynomial1 extends BasePolynomialTransformation {
   measures?: Polynomial1Measures
 
-  constructor(sourcePoints: Point[], destinationPoints: Point[]) {
+  constructor(
+    sourcePoints: Point[],
+    destinationPoints: Point[],
+    weightsArrays?: [number[], number[]]
+  ) {
     super(sourcePoints, destinationPoints, 1)
+
+    if (weightsArrays) {
+      this.setWeightsArrays(weightsArrays)
+    }
   }
 
   getSourcePointCoefsArray(sourcePoint: Point): number[] {

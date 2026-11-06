@@ -25,6 +25,7 @@ export function invertStraightMeasures(
     translation
   }
 }
+
 export function invertHelmertWeightsArrays(
   forwardTransformationWeightsArrays: [number[], number[]]
 ): [number[], number[]] {
@@ -42,4 +43,26 @@ export function invertHelmertWeightsArrays(
     backwardTransformationWeightsArray,
     backwardTransformationWeightsArray
   ]
+}
+
+export function invertPolynomial1WeightsArrays(
+  forwardTransformationWeightsArrays: [number[], number[]]
+): [number[], number[]] {
+  const w = forwardTransformationWeightsArrays
+  const denominator = w[0][1] * w[1][2] - w[1][1] * w[0][2]
+
+  const backwardTransformationWeightsArrays = [
+    [
+      (-1 * w[0][0] * w[1][2] + w[1][0] * w[0][2]) / denominator,
+      w[1][2] / denominator,
+      (-1 * w[0][2]) / denominator
+    ],
+    [
+      (w[0][0] * w[1][1] - w[1][0] * w[0][1]) / denominator,
+      (-1 * w[1][1]) / denominator,
+      w[0][1] / denominator
+    ]
+  ] as [number[], number[]]
+
+  return backwardTransformationWeightsArrays
 }

@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { parseAnnotation } from '@allmaps/annotation'
 import { toDbMap3 } from '@allmaps/api-shared'
+import { queryListWithItems } from '@allmaps/api-shared/db'
 import { schema } from '@allmaps/db/schema'
 import { Image, Manifest } from '@allmaps/iiif-parser'
 
@@ -224,15 +225,13 @@ describe('Connected demo seed data', () => {
   })
 
   it('seeds lists containing historical maps, images, canvases, and manifests', async () => {
-    const headers = await login('local-editor')
+    const headers = await login('local-admin')
     const list = catalog.lists.find(
       (list) => list.key === 'amsterdam-research'
     )!
-    const response = await rest(`/lists/${list.id}`, { headers })
-    expect(response.status).toBe(200)
-    const data = await response.json()
-    expect(data.items).toHaveLength(4)
-    expect(data.items).toEqual(
+    const data = await queryListWithItems(context.db, list.userId, list.id)
+    expect(data?.items).toHaveLength(4)
+    expect(data?.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ mapId: catalog.maps[0].id, mapVersion: 1 }),
         expect.objectContaining({ imageId: catalog.images[1].id }),
@@ -251,7 +250,7 @@ describe('Connected demo seed data', () => {
     expect(parseAnnotation(await annotations.json())).toHaveLength(3)
   })
 
-  it('enforces list ownership between seeded users', async () => {
+  it('denies regular users access to other users’ seeded lists', async () => {
     const headers = await login('local-visitor')
     const list = catalog.lists.find(
       (list) => list.key === 'amsterdam-research'
@@ -264,7 +263,7 @@ describe('Connected demo seed data', () => {
         { headers }
       )
     )
-    expect(annotations.status).toBe(403)
+    expect(annotations.status).toBe(401)
   })
 
   it('replays ShareDB operations to recover every historical snapshot', async () => {

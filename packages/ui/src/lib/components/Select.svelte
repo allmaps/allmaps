@@ -3,12 +3,10 @@
 
   import { Select } from 'bits-ui'
 
-  import {
-    Check as CheckIcon,
-    CaretUpDown as CaretUpDownIcon,
-    CaretDoubleUp as CaretDoubleUpIcon,
-    CaretDoubleDown as CaretDoubleDownIcon
-  } from 'phosphor-svelte'
+  import CheckIcon from 'phosphor-svelte/lib/CheckIcon'
+  import CaretUpDownIcon from 'phosphor-svelte/lib/CaretUpDownIcon'
+  import CaretDoubleUpIcon from 'phosphor-svelte/lib/CaretDoubleUpIcon'
+  import CaretDoubleDownIcon from 'phosphor-svelte/lib/CaretDoubleDownIcon'
 
   import type { SelectBaseItem } from '$lib/shared/types.js'
 

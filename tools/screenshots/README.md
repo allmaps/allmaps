@@ -78,7 +78,8 @@ explicit `--manifest` and `--output` to the tool.
 
 Captures are saved under `.screenshots/captures/screenshots/{slug}/v{version}.webp`
 in the app. PNG bytes from Playwright are converted in memory with Sharp; PNG
-files are never saved. The default capture is 1440 × 900 CSS pixels at 2× density,
+files are never saved. WebP output uses quality 90. The default capture is
+1440 × 900 CSS pixels at 2× density,
 with light colors, reduced motion, an English locale, and UTC timezone.
 
 Local captures are reused when their definitions match. Use `--refresh` when
@@ -92,6 +93,43 @@ command and refresh the page to see new images without uploading them. Productio
 builds still use `files.allmaps.org` (or the component's `filesBaseUrl`). An explicit
 `src` takes precedence in both modes. If you customize the capture CLI's `--output`,
 set the plugin's `captures` option to the same directory, relative to the app root.
+
+### Responsive images
+
+Set `widths` on `Screenshot` to generate additional WebPs from the same captured
+frame, and `sizes` to describe its width in the page layout:
+
+```svelte
+<Screenshot
+  url="https://viewer.allmaps.org"
+  slug="viewer"
+  alt="Allmaps Viewer"
+  widths={[480, 960, 1920]}
+  sizes="auto, (min-width: 768px) 448px, 100vw"
+/>
+```
+
+Candidates use exact pixel widths and keys such as
+`screenshots/viewer/v1-480w.webp`. The original `v1.webp` remains the fallback.
+Widths are sorted and deduplicated; registrations of the same frame merge their
+widths. A requested width larger than the actual image (including any crop) fails
+without upscaling. All variants retain the same composition and aspect ratio, so
+SVG highlight coordinates and geometry continue to use the original frame.
+
+Adding widths does not invalidate the capture cache. Missing or changed variants
+are regenerated locally. To resize existing captures without launching a browser,
+update the manifest's `widths` and run:
+
+```sh
+pnpm screenshots --variants-only
+```
+
+This can be combined with `--upload`, but not `--refresh`. Local preview serves
+variants as well as originals. Private variant hashes and upload receipts are
+never served. Explicit `src` overrides disable generated candidates; use `srcset`
+for variants of an existing or bundled image. The default `sizes` is
+`auto, 100vw` for lazy loading and `100vw` for eager loading; specify layout sizes
+for eager images and browsers without automatic sizing.
 
 ## Publishing with Assets
 
@@ -121,6 +159,11 @@ URL and leaves older pages' images intact. Uploads never overwrite by default;
 `--upload --overwrite` explicitly allows replacing an existing key, but does not
 purge any CDN/browser caches. Successful uploads are remembered locally by image
 hash and Assets origin so retries can skip previously published captures.
+
+When `widths` are set, upload also publishes every variant with its own receipt.
+Images and geometry are validated and variants prepared before uploading. Retry
+skips completed files and resumes failed ones. Publish all candidates before
+deploying a page with the corresponding `srcset`.
 
 ## Capture readiness
 
@@ -183,7 +226,10 @@ This also works in Astro through a Svelte wrapper.
 `steps` runs browser interactions after navigation, before `waitForSelector`,
 fonts, the settling delay and final render readiness. Supported actions are `click`,
 `hover`, `fill` (with `value`), `select` (with an option `value`), `press` (with
-`key`), and `waitFor` (`state: 'visible'` or `'hidden'`, default `'visible'`).
+`key`), `scroll` (with `deltaY` and optional `deltaX`, in CSS pixels), and
+`waitFor` (`state: 'visible'` or `'hidden'`, default `'visible'`). A scroll step
+hovers over its selector and sends a mouse-wheel event, so it can also zoom
+map panes. Use the settling delay or render readiness to wait for animations.
 Steps run in order and use Playwright's waiting behavior. Failures identify the
 screenshot and step. Interactions act on the real app; use fixtures for edits to
 shared map data.

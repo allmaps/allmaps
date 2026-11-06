@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Checkbox, Label } from 'bits-ui'
 
-  import { Check as CheckIcon } from 'phosphor-svelte'
+  import CheckIcon from 'phosphor-svelte/lib/CheckIcon'
 
   import type { Snippet } from 'svelte'
 

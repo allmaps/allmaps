@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getPostgresContext } from '@allmaps/db'
+import { getPgContext } from '@allmaps/db'
 import { parseRestEnv } from '@allmaps/env/rest'
 import { parseDataExportEnv } from '@allmaps/env/data-export'
 import { apiEnvironment, createPostgresContext } from '@allmaps/tools-apis'
@@ -8,7 +8,7 @@ import { createTestEnvironment } from './helpers/environment.ts'
 
 vi.mock('@allmaps/db', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@allmaps/db')>()),
-  getPostgresContext: vi.fn(() => {
+  getPgContext: vi.fn(() => {
     throw new Error('PostgreSQL connections disabled in tests')
   })
 }))
@@ -125,8 +125,9 @@ describe('PostgreSQL target configuration', () => {
     expect(env.BETTER_AUTH_SECRET).toBeTruthy()
   })
 
-  it('passes DATABASE_URL to the existing PostgreSQL helper without opening a real connection', async () => {
+  it('passes DATABASE_URL to the shared pg helper without opening a real connection', async () => {
     const env = environment({
+      LOG_QUERIES: 'true',
       GITHUB_CLIENT_ID: 'test-client',
       GITHUB_CLIENT_SECRET: 'test-secret',
       DIRECT_DATABASE_URL: 'postgresql://unused.invalid/main'
@@ -134,6 +135,8 @@ describe('PostgreSQL target configuration', () => {
     await expect(createPostgresContext(env)).rejects.toThrow(
       'PostgreSQL connections disabled in tests'
     )
-    expect(getPostgresContext).toHaveBeenCalledWith(source.DATABASE_URL)
+    expect(getPgContext).toHaveBeenCalledWith(source.DATABASE_URL, {
+      logger: true
+    })
   })
 })

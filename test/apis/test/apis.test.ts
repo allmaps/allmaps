@@ -127,13 +127,14 @@ describe('APIs with embedded PostgreSQL and PostGIS', () => {
     expect((await rest('/lists')).status).toBe(401)
   })
 
-  it('creates an anonymous session and persists its user lists', async () => {
+  it('creates an anonymous session with exactly one protected Starred list', async () => {
     const response = await rest('/auth/sign-in/anonymous', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: '{}'
     })
     expect(response.status).toBe(200)
+    const { user } = await response.json()
     const cookies = response.headers
       .getSetCookie()
       .map((cookie) => cookie.split(';')[0])
@@ -142,18 +143,18 @@ describe('APIs with embedded PostgreSQL and PostGIS', () => {
       `${context.env.BETTER_AUTH_COOKIE_PREFIX}.session_token=`
     )
     const headers = { Cookie: cookies, 'Content-Type': 'application/json' }
-    const lists = await rest('/lists', { headers })
-    expect(lists.status).toBe(200)
-    expect(await lists.json()).toEqual(
-      expect.arrayContaining([expect.objectContaining({ name: 'Starred' })])
+    const lists = await context.client.query(
+      'SELECT name, deletable FROM lists WHERE user_id = $1',
+      [user.id]
     )
+    expect(lists.rows).toEqual([{ name: 'Starred', deletable: false }])
+    expect((await rest('/lists', { headers })).status).toBe(401)
     const created = await rest('/lists', {
       method: 'POST',
       headers,
       body: JSON.stringify({ name: 'Local test maps' })
     })
-    expect(created.status).toBe(200)
-    expect(await created.json()).toMatchObject({ name: 'Local test maps' })
+    expect(created.status).toBe(401)
   })
 
   it('rolls back a failed transaction and remains usable', async () => {

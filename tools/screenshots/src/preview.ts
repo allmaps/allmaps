@@ -26,7 +26,7 @@ export function screenshotPreview(directory: string, base: string) {
     const key = url.pathname.slice(prefix.length)
     if (
       !['GET', 'HEAD'].includes(request.method ?? '') ||
-      !/^screenshots\/[a-z0-9]+(?:-[a-z0-9]+)*\/v[1-9][0-9]*\.(webp|geometry\.json)$/.test(
+      !/^screenshots\/[a-z0-9]+(?:-[a-z0-9]+)*\/v[1-9][0-9]*(?:-[1-9][0-9]*w\.webp|\.webp|\.geometry\.json)$/.test(
         key
       )
     ) {

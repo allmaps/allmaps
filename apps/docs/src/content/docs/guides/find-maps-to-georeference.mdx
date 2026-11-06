@@ -57,7 +57,7 @@ control points.
 ## Find maps through the API
 
 Allmaps ingests the map collections of partner institutions, recording their
-IIIF resources so you can find them through the [REST API](/api/rest). The
+IIIF resources so you can find them through the [REST API](/apis/rest). The
 images themselves remain hosted by the institutions.
 
 Use `georeferenced=false` to find images that have not yet been georeferenced
@@ -77,7 +77,7 @@ The `limit=10` parameter requests up to ten images. To find images from another
 institution, look it up in the
 [list of partner organizations](https://api.allmaps.org/organizations?plan=supporter&plan=innovator)
 and add `?georeferenced=false&limit=10` to its `images` URL. See the
-[REST API reference](/api/rest) for the full documentation and all available
+[REST API reference](/apis/rest) for the full documentation and all available
 query parameters.
 
 Each image's `uri` field contains its IIIF Image Service URL. Copy this URL

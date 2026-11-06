@@ -135,7 +135,7 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
       `/maps/${mapRoute.path}`,
       ({ env, db, params, set }) => {
         const { mapId, version, ext } = mapRoute.parse(params)
-        setCacheControl(set, version ? 'public-immutable' : 'public-medium')
+        setCacheControl(set, 'public-medium')
         const format = ext === 'geojson' ? 'geojson' : 'map'
         return queryMaps(
           env.PUBLIC_REST_BASE_URL,

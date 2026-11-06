@@ -89,8 +89,9 @@ Display a saved WebP screenshot in a simplified browser window:
 />
 ```
 
-The component renders a `<div>`, without a link. `url` only controls the page
-to capture. Wrap the component in your own `<a>` to link anywhere you choose:
+The component renders a `<div>` without links or click handlers. `url` controls
+the page to capture and the optional URL bar. Wrap the component in your own
+`<a>` to link anywhere you choose:
 
 ```svelte
 <a href="https://allmaps.org/">
@@ -102,6 +103,31 @@ to capture. Wrap the component in your own `<a>` to link anywhere you choose:
 </a>
 ```
 
+Set `showUrl` (default `false`) to display an inert URL bar beside the browser
+controls. Long addresses truncate with an ellipsis. Use `urlDisplay` to choose
+the displayed address:
+
+```svelte
+<Screenshot
+  url="https://editor.allmaps.org/georeference?map=example#settings"
+  slug="editor"
+  alt="Allmaps Editor"
+  showUrl
+  urlDisplay="route"
+/>
+```
+
+| `urlDisplay`     | Displayed address                                              |
+| ---------------- | -------------------------------------------------------------- |
+| `full` (default) | `https://editor.allmaps.org/georeference?map=example#settings` |
+| `hostname`       | `editor.allmaps.org`                                           |
+| `route`          | `editor.allmaps.org/georeference`                              |
+
+`route` includes the host (and port, if present) and pathname, omitting the
+scheme, query parameters, and fragment. Display modes never change capture
+settings or add interactivity; use a surrounding `<a>` for links. Cropped
+screenshots keep their frameless appearance, even with `showUrl` enabled.
+
 The default image URL is
 `https://files.allmaps.org/screenshots/viewer/v1.webp`. The component renders a
 normal image with SVG browser controls, intrinsic dimensions, and lazy loading.
@@ -109,7 +135,33 @@ Use `loading="eager"` for a prominent image above the fold. `src` overrides the
 image URL for local previews or existing images, and `filesBaseUrl` selects
 another file host. `class` styles the outer container. The frame exposes
 `--screenshot-border`, `--screenshot-background`, and `--screenshot-color` CSS
-custom properties.
+custom properties. The URL bar also exposes `--screenshot-url-border` and
+`--screenshot-url-background`.
+
+Pass `widths` to generate responsive WebP candidates and `sizes` to describe the
+image's rendered width:
+
+```svelte
+<Screenshot
+  url="https://viewer.allmaps.org"
+  slug="viewer"
+  alt="Allmaps Viewer"
+  widths={[480, 960, 1920]}
+  sizes="auto, (min-width: 768px) 448px, 100vw"
+/>
+```
+
+`widths` lists exact output pixel widths, not browser viewport sizes. The capture
+tool resizes the same frame into `v1-480w.webp`, `v1-960w.webp`, and
+`v1-1920w.webp`; it rejects widths larger than the original capture. Capture and
+publish these files before deploying a page that references them. The original
+`v1.webp` remains the `src` fallback. Without `widths`, the component keeps its
+single-image behavior. Repeated registrations of one capture merge their widths.
+
+The default `sizes` is `auto, 100vw` for lazy images and `100vw` for eager images.
+Provide layout-specific sizes for older browsers and eager loading. An explicit
+`src` disables generated candidates; pass `srcset` alongside it for bundled or
+externally managed variants. `sizes` is only emitted when there is a `srcset`.
 
 Optional capture props are `version` (default 1), `viewport` (1440 × 900 at 2×
 density), `waitForSelector`, `waitForRender` (observe Allmaps tile loading and

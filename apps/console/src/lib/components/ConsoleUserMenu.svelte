@@ -3,11 +3,18 @@
   import { UserMenu } from '@allmaps/ui/auth'
 
   import { authClient } from '$lib/auth-client.js'
+  import type { LayoutData } from '../../routes/$types'
 
-  const signInURL = $derived(
-    page.data.loginUrl
-      ? `${page.data.loginUrl}?returnTo=${encodeURIComponent(page.url.href)}`
-      : undefined
+  const loginProviders: LayoutData['loginProviders'] = $derived(
+    page.data.loginProviders ?? []
+  )
+
+  const signInProviders = $derived(
+    loginProviders.map(({ provider, url }) => {
+      const signInURL = new URL(url)
+      signInURL.searchParams.set('returnTo', page.url.href)
+      return { provider, url: signInURL.href }
+    })
   )
 
   async function signOut() {
@@ -16,4 +23,8 @@
   }
 </script>
 
-<UserMenu user={page.data.session?.user} {signInURL} onSignOut={signOut} />
+<UserMenu
+  user={page.data.session?.user}
+  {signInProviders}
+  onSignOut={signOut}
+/>

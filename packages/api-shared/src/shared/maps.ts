@@ -11,7 +11,7 @@ import {
   makeCanvasUrl,
   makeManifestUrl
 } from './urls.js'
-import { DbMapSchema } from '@allmaps/db/maps'
+import { DbMapSchema, DbTransformationSchema } from '@allmaps/db/maps'
 import {
   getProjectionsByDbId,
   getProjectionDbId,
@@ -226,19 +226,12 @@ function toDbTransformation(
   transformation?: ApiMap['transformation']
 ): DbTransformation | undefined {
   if (transformation) {
-    if (transformation?.type === 'polynomial') {
-      if (transformation.options?.order === 2) {
-        return 'polynomial2'
-      } else if (transformation.options?.order === 3) {
-        return 'polynomial3'
-      }
-
-      return 'polynomial1'
-    } else if (transformation?.type === 'thinPlateSpline') {
-      return 'thinPlateSpline'
-    } else if (transformation?.type === 'helmert') {
-      return 'helmert'
+    if (transformation.type === 'polynomial') {
+      const order = transformation.options?.order ?? 1
+      return DbTransformationSchema.parse(`polynomial${order}`)
     }
+
+    return DbTransformationSchema.parse(transformation.type)
   }
 }
 
@@ -286,22 +279,23 @@ function toGeoreferencedMapTransformation(transformation?: DbTransformation) {
         order: 3
       }
     }
-  } else if (transformation === 'thinPlateSpline') {
+  }
+
+  if (
+    !transformation ||
+    transformation === 'polynomial' ||
+    transformation === 'polynomial1'
+  ) {
     return {
-      type: 'thinPlateSpline' as const
-    }
-  } else if (transformation === 'helmert') {
-    return {
-      type: 'helmert' as const
+      type: 'polynomial' as const,
+      options: {
+        order: 1
+      }
     }
   }
 
-  // TODO: add other tranformation types
   return {
-    type: 'polynomial' as const,
-    options: {
-      order: 1
-    }
+    type: transformation
   }
 }
 

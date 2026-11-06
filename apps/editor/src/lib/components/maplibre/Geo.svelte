@@ -242,6 +242,8 @@
           transformationType = 'thinPlateSpline'
         } else if (transformation === 'helmert') {
           transformationType = 'helmert'
+        } else if (transformation === 'projective') {
+          transformationType = 'projective'
         }
       }
 

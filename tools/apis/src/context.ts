@@ -5,7 +5,7 @@ import { drizzle } from 'drizzle-orm/pglite'
 import { createElysia } from '@allmaps/api-shared/elysia'
 import { nodeAdapter } from './node-adapter.ts'
 
-import { relations, getPostgresContext } from '@allmaps/db'
+import { relations, getPgContext } from '@allmaps/db'
 import type { Db } from '@allmaps/db'
 import { createAuth } from '@allmaps/db/auth'
 import { parseRestEnv } from '@allmaps/env/rest'
@@ -13,11 +13,7 @@ import { createApp as createRestApp } from '@allmaps/api-rest'
 import { createApp as createAnnotationsApp } from '@allmaps/api-annotations'
 import { AllmapsShareDB } from '@allmaps/api-live'
 
-import {
-  initializePglite,
-  checkMigrations,
-  postgresMigrations
-} from './migrations.ts'
+import { initializePglite, checkMigrations } from './migrations.ts'
 import { seedDemoData, getSeedSummary } from '@allmaps/tools-seed'
 import { loginSeedUser } from './local-auth.ts'
 
@@ -129,10 +125,16 @@ export async function createPostgresContext(
   environment: Record<string, string | undefined>
 ) {
   const env = parseRestEnv(environment)
-  const { sql, db } = getPostgresContext(env.DATABASE_URL)
+  if (!env.DATABASE_URL)
+    throw new Error('DATABASE_URL is required for the PostgreSQL API runner')
+  const { pool, db, close } = getPgContext(env.DATABASE_URL, {
+    logger: env.LOG_QUERIES
+  })
   let shareDb: AllmapsShareDB | undefined
   try {
-    await checkMigrations(postgresMigrations(sql))
+    await checkMigrations({
+      query: async (query, values) => (await pool.query(query, values)).rows
+    })
     const apps = createApps(db, env)
     shareDb = new AllmapsShareDB({ db })
     const sharedDatabase = shareDb
@@ -144,7 +146,7 @@ export async function createPostgresContext(
         try {
           await closeShareDb(sharedDatabase)
         } finally {
-          await sql.end()
+          await close()
         }
       }
     }
@@ -152,7 +154,7 @@ export async function createPostgresContext(
     try {
       await shareDb?.close()
     } finally {
-      await sql.end()
+      await close()
     }
     throw error
   }

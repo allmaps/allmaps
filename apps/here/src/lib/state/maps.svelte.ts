@@ -1,7 +1,7 @@
 import { setContext, getContext } from 'svelte'
 import { SvelteMap } from 'svelte/reactivity'
 
-import { fetchJson } from '@allmaps/stdlib'
+import { fetchJson, getMapQueryCredentials } from '@allmaps/stdlib'
 import { parseAnnotation } from '@allmaps/annotation'
 
 import { computePositionDistance } from '$lib/shared/position.js'
@@ -128,7 +128,9 @@ export class MapsState {
       longitude
     ].join(',')}&maxarea=${MAX_AREA}`
 
-    const annotations = await fetchJson(url, { credentials: 'include' })
+    const annotations = await fetchJson(url, {
+      credentials: getMapQueryCredentials(this.#limit)
+    })
     const maps = parseAnnotation(annotations)
 
     this.#mapsFromCoordinates = new SvelteMap(

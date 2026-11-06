@@ -6,7 +6,7 @@ export {
   getNeonHttpDb,
   getNeonDb,
   getPostgresDb,
-  getPostgresContext
+  getPgContext
 } from './db.js'
 
 export type {
@@ -14,8 +14,9 @@ export type {
   DbOrTx,
   DbTransaction,
   PostgresDb,
+  PgDb,
   PgliteDb,
-  PostgresContext,
+  PgContext,
   NeonHttpDb,
   NeonDb
 } from './db.js'

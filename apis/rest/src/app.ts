@@ -2,6 +2,10 @@ import { cors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 
 import { setCacheControl } from '@allmaps/api-shared'
+import {
+  createCachePolicy,
+  getLoginProviders
+} from '@allmaps/api-shared/elysia'
 
 import {
   createElysia,
@@ -57,7 +61,8 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     .decorate('error', error)
     .decorate('redirect', redirect)
     .onError(handleApiError)
-    .use(cors())
+    .use(cors({ origin: () => true }))
+    .use(createCachePolicy())
     .use(
       openapi({
         provider: null,
@@ -66,8 +71,7 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
           servers: [{ url: env.PUBLIC_REST_BASE_URL }],
           info: {
             title: 'Allmaps API Documentation',
-            description:
-              'API documentation for the Allmaps REST API. Use of this Allmaps-hosted service is free for non-commercial use. Commercial use requires a paid agreement with Allmaps.',
+            description: `API documentation for the Allmaps REST API. Use of this hosted service is subject to the [Allmaps Terms & Usage](${termsUrl}).`,
             termsOfService: termsUrl,
             version: packageJson.version
           },
@@ -85,7 +89,8 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
           tags: openApiTags
         },
         exclude: {
-          staticFile: false
+          staticFile: false,
+          tags: ['Lists']
         }
       })
     )
@@ -124,6 +129,9 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
             !session && betterAuth.auth.options.socialProviders.github
               ? `${env.PUBLIC_REST_BASE_URL}/login/github`
               : undefined,
+          loginProviders: !session
+            ? getLoginProviders(betterAuth, env.PUBLIC_REST_BASE_URL)
+            : [],
           logout: session ? `${env.PUBLIC_REST_BASE_URL}/logout` : undefined,
           user
         }

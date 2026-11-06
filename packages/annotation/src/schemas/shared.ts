@@ -131,6 +131,11 @@ function parseInvalidTransformation(val: string): Transformation | undefined {
       type: 'polynomial',
       options: { order: 2 }
     }
+  } else if (valLowerCase === 'polynomial3') {
+    return {
+      type: 'polynomial',
+      options: { order: 3 }
+    }
   }
 }
 

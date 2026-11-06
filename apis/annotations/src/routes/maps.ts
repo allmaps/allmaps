@@ -8,7 +8,6 @@ import {
   queryRandom,
   setCacheControl
 } from '@allmaps/api-shared'
-import { createAuth } from '@allmaps/db/auth'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
@@ -37,7 +36,7 @@ const mapRoute = new RegExpRoute<{
 
 export function createMapsRoutes(
   env: AnnotationsEnv,
-  betterAuth: BetterAuthContext = createAuth(env)
+  betterAuth: BetterAuthContext
 ) {
   return createElysia({ name: 'maps' })
     .use(createBetterAuthPlugin(betterAuth))
@@ -146,7 +145,7 @@ export function createMapsRoutes(
       `/maps/${mapRoute.path}`,
       ({ env, db, params, set }) => {
         const { mapId, checksum, ext } = mapRoute.parse(params)
-        setCacheControl(set, checksum ? 'public-immutable' : 'public-medium')
+        setCacheControl(set, 'public-medium')
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,

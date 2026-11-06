@@ -26,7 +26,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     isAdmin
       ? restFetch<Organization[]>(`/organizations?limit=${CONSOLE_LIST_LIMIT}`)
       : Promise.resolve([]),
-    isCurrentUser ? restFetch<ListSummary[]>('/lists') : Promise.resolve([])
+    isAdmin && isCurrentUser
+      ? restFetch<ListSummary[]>('/lists')
+      : Promise.resolve([])
   ])
 
   return {

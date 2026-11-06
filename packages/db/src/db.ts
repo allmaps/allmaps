@@ -1,6 +1,8 @@
+import { Pool } from 'pg'
+import { drizzle as nodePostgresDrizzle } from 'drizzle-orm/node-postgres'
 import postgres from 'postgres'
 import { drizzle as postgresDrizzle } from 'drizzle-orm/postgres-js'
-import { Logger } from 'drizzle-orm/logger'
+import type { Logger } from 'drizzle-orm/logger'
 
 import { neon, neonConfig } from '@neondatabase/serverless'
 import { drizzle as neonHttpDrizzle } from 'drizzle-orm/neon-http'
@@ -60,11 +62,34 @@ export function getPostgresDb(
   })
 }
 
-export function getPostgresContext(databaseUrl: string, logger = false) {
-  const sql = getPostgresSql(databaseUrl)
-  const db = getPostgresDb(sql, logger)
+/** The owner closes this pool: a Node process or one Cloudflare Worker request. */
+export function getPgContext(
+  databaseUrl: string,
+  { logger = false, maxConnections = 10 } = {}
+) {
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    connectionTimeoutMillis: 10000,
+    application_name: 'allmaps-api',
+    // Concurrent Drizzle transactions must check out separate connections.
+    max: maxConnections
+  })
 
-  return { sql, db }
+  pool.on('error', () => {
+    // pg emits idle-connection failures on the pool rather than on a query.
+    console.warn('Idle PostgreSQL connection failed')
+  })
+
+  const db = nodePostgresDrizzle({
+    client: pool,
+    relations,
+    logger: logger ? new InterpolatedQueryLogger() : undefined
+  })
+  return {
+    pool,
+    db,
+    close: () => pool.end()
+  }
 }
 
 export function getDb(databaseUrl: string, useNeon = false) {
@@ -78,14 +103,16 @@ export function getDb(databaseUrl: string, useNeon = false) {
 export type NeonDb = ReturnType<typeof getNeonDb>
 export type NeonHttpDb = ReturnType<typeof getNeonHttpDb>
 export type PostgresDb = ReturnType<typeof getPostgresDb>
-export type PostgresContext = ReturnType<typeof getPostgresContext>
 export type PgliteDb = PgliteDatabase<typeof relations>
-export type Db = PostgresDb | NeonHttpDb | NeonDb | PgliteDb
+export type PgContext = ReturnType<typeof getPgContext>
+export type PgDb = PgContext['db']
+export type Db = PostgresDb | PgDb | NeonHttpDb | NeonDb | PgliteDb
 
 export type DbTransaction =
+  | Parameters<Parameters<PgDb['transaction']>[0]>[0]
   | Parameters<Parameters<PgliteDb['transaction']>[0]>[0]
   | Parameters<Parameters<PostgresDb['transaction']>[0]>[0]
   | Parameters<Parameters<NeonDb['transaction']>[0]>[0]
   | Parameters<Parameters<NeonHttpDb['transaction']>[0]>[0]
 
-export type DbOrTx = Db | PostgresDb | DbTransaction
+export type DbOrTx = Db | DbTransaction
