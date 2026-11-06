@@ -11,7 +11,7 @@
   aria-labelledby="iiif-partnership-title"
 >
   <div class="md:order-2">
-    <h3 id="iiif-partnership-title" class="mt-0">
+    <h3 id="iiif-partnership-title" class="mt-0!">
       Support Allmaps through IIIF
     </h3>
     <p class="mb-0 text-lg leading-relaxed">

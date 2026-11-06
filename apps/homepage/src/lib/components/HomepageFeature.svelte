@@ -18,7 +18,7 @@
   ]}
 >
   <div>
-    <h3 class="max-md:mt-0!">{title}</h3>
+    <h3 class="mt-0!">{title}</h3>
     {@render description()}
   </div>
   {@render media()}
