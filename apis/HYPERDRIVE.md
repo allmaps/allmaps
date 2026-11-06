@@ -49,9 +49,11 @@ pooling or query caching. See [Cloudflare's local development guide](https://dev
 Both development Wrangler configurations reference `allmaps-develop`
 (`d0b30a925f434ccfbd8c15279e7071df`), with SQL query caching disabled.
 
-The production IDs remain zero placeholders. The deployment script refuses
-those placeholders and omits the old `DATABASE_URL` Worker variable for these
-APIs. Updating these local configurations does not deploy either API.
+Both production configurations reference `allmaps-production`
+(`90d27742a8a74d57a6fc301ad1f2bc98`), connected to the **main** Neon branch
+with SQL query caching disabled. The deployment script rejects placeholder IDs
+and omits the old `DATABASE_URL` Worker variable for these APIs. Updating these
+local configurations does not deploy either API.
 
 For each environment, configure a Hyperdrive resource in the Allmaps
 Cloudflare account:
@@ -64,11 +66,10 @@ Cloudflare account:
 - **Disable query caching** (`caching.disabled: true`). This is a Hyperdrive
   resource setting, not a Wrangler binding option.
 
-The development ID is already set under `env.dev.hyperdrive` in **both**
-Wrangler files. Before production deployment, set the production ID under
-top-level `hyperdrive`. The APIs may share one configuration per
-database/environment. Keep credentials out of those
-files. Regenerate bindings with each API's `cf-typegen` command.
+Both Wrangler files set the development ID under `env.dev.hyperdrive` and the
+production ID under top-level `hyperdrive`. The APIs share one configuration per
+database/environment. Keep credentials out of those files. Regenerate bindings
+with each API's `cf-typegen` command when changing bindings.
 
 With SQL query caching disabled, authentication/session queries always go to
 Postgres. Anonymous public GET responses can be served by the separate Worker
