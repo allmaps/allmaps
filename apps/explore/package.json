@@ -25,7 +25,9 @@
     "format": "prettier --ignore-path ../../.gitignore --write src",
     "types": "tsc --noEmit",
     "build:dev": "vite build --mode dev",
-    "deploy:dev": "pnpm run build:dev && pnpm --workspace-root exec wrangler deploy --config apps/explore/wrangler.jsonc"
+    "build:production": "vite build --mode production",
+    "deploy:dev": "pnpm run build:dev && pnpm --workspace-root exec wrangler deploy --config apps/explore/wrangler.jsonc --env ''",
+    "deploy:production": "pnpm run build:production && pnpm --workspace-root exec wrangler deploy --config apps/explore/wrangler.jsonc --env production"
   },
   "dependencies": {
     "@allmaps/basemap": "workspace:^",
