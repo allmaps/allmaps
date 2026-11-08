@@ -34,10 +34,17 @@ pnpm --filter @allmaps/data-export run pmtiles
 
 The `Data export` workflow (`.github/workflows/data-export.yml`) runs the scripts
 on a standard Ubuntu runner with Node.js 24, the repository's pinned pnpm
-version, rclone, and Tippecanoe 2.79.0. It exports from Neon, generates PMTiles,
-then uploads to R2 and checks that remote file sizes match the local files.
+version, rclone 1.76.0, and Tippecanoe 2.79.0. It exports from Neon, generates
+PMTiles, then uploads to R2 and checks that remote file sizes match the local files.
 Only the export's workspace dependencies are built, with declaration generation
 disabled because this job only needs JavaScript. No Docker image is needed.
+
+The workflow installs rclone from its pinned official release and verifies the
+archive's SHA-256 checksum. Ubuntu's rclone 1.60.1 sends a version-specific
+`HEAD` request after uploading, which R2 rejects with `501 Not Implemented` even
+though the upload succeeded. The pinned version keeps the post-upload metadata
+check without requesting an object version. Normal retries remain enabled for
+transient failures; the workflow also verifies remote file sizes afterward.
 
 The workflow uses these secrets in the GitHub `production` environment:
 
