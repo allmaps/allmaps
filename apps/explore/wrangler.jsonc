@@ -8,5 +8,16 @@
     "directory": "./build",
     "not_found_handling": "single-page-application"
   },
-  "routes": [{ "pattern": "dev.explore.allmaps.org", "custom_domain": true }]
+  "routes": [{ "pattern": "dev.explore.allmaps.org", "custom_domain": true }],
+  "env": {
+    "production": {
+      "name": "explore",
+      "workers_dev": false,
+      "assets": {
+        "directory": "./build",
+        "not_found_handling": "single-page-application"
+      },
+      "routes": [{ "pattern": "explore.allmaps.org", "custom_domain": true }]
+    }
+  }
 }
