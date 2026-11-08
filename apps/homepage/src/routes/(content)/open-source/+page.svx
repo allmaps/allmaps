@@ -12,6 +12,6 @@ hero:
   import OpenSource from '$lib/components/OpenSource.svelte'
 </script>
 
-<PageIntro text="Allmaps is open source, with libraries, plugins and APIs you can use in your own work." />
+<PageIntro text="Build your own projects with Allmaps’ open source libraries, plugins and APIs." />
 
 <OpenSource />

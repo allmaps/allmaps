@@ -6,6 +6,7 @@
 
   import Footer from '$lib/components/Footer.svelte'
   import Header from '$lib/components/Header.svelte'
+  import PageHead from '$lib/components/PageHead.svelte'
   import { getHeroTransitionDirection } from '$lib/hero/navigation.js'
   import { heroLayoutEvent } from '$lib/hero/grid.js'
 
@@ -70,9 +71,7 @@
   })
 </script>
 
-<svelte:head>
-  <title>Allmaps</title>
-</svelte:head>
+<PageHead />
 
 <Stats />
 <div class="flex min-h-dvh flex-col">

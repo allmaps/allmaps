@@ -16,7 +16,7 @@ hero:
   let { data }: { data: PageData } = $props()
 </script>
 
-<PageIntro text="Meet the institutions supporting Allmaps’ open source tools and helping shape its future." />
+<PageIntro text="Meet the institutions supporting Allmaps and shaping its future." />
 
 <PartnerTiers />
 

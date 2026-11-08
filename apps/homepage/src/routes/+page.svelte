@@ -18,7 +18,6 @@
   import HomepageFeature from '$lib/components/HomepageFeature.svelte'
   import Footer from '$lib/components/Footer.svelte'
   import LatestMaps from '$lib/components/LatestMaps.svelte'
-  import IIIFPartnershipCard from '$lib/components/IIIFPartnershipCard.svelte'
   import HomepageResources from '$lib/components/HomepageResources.svelte'
   import ArrowLabel from '$lib/components/ArrowLabel.svelte'
 
@@ -39,12 +38,6 @@
   const rotterdamPhoneImage = getExampleImage('rotterdam-city-map-phone')
 
   const docsBaseUrl = PUBLIC_DOCS_BASE_URL.replace(/\/$/, '')
-  const homepageUrl = new URL('/', PUBLIC_HOMEPAGE_BASE_URL).href
-  const title = 'Allmaps: curating, georeferencing and exploring IIIF maps'
-  const description = 'Curating, georeferencing and exploring for IIIF maps'
-  const ogImageUrl = new URL('/allmaps.jpg', homepageUrl).href
-  const ogImageAlt =
-    'Allmaps logo on a blue radial gradient with colorful map outlines'
   const screenshotSizes =
     'auto, (min-width: 1168px) 480px, (min-width: 768px) calc((100vw - 208px) / 2), (min-width: 640px) calc(100vw - 96px), calc(100vw - 64px)'
 
@@ -90,31 +83,6 @@
   ]
 </script>
 
-<svelte:head>
-  <title>{title}</title>
-  <meta name="description" content={description} />
-  <link rel="canonical" href={homepageUrl} />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Allmaps" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:url" content={homepageUrl} />
-  <meta property="og:image" content={ogImageUrl} />
-  {#if ogImageUrl.startsWith('https:')}
-    <meta property="og:image:secure_url" content={ogImageUrl} />
-  {/if}
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content={ogImageAlt} />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={ogImageUrl} />
-  <meta name="twitter:image:alt" content={ogImageAlt} />
-</svelte:head>
-
 <HomepageTitle />
 
 <main
@@ -122,7 +90,10 @@
 >
   <section class="page-width [&>ol]:m-0">
     <ol role="list" class="flex list-none flex-col gap-8 p-0 py-8 md:gap-16">
-      <HomepageFeature title="Works with any IIIF map">
+      <HomepageFeature
+        title="Works with any IIIF map"
+        class="[--feature-color:theme(colors.orange)]"
+      >
         {#snippet description()}
           <p>
             More and more institutions around the world use
@@ -152,7 +123,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Built on open standards">
+      <HomepageFeature
+        title="Built on open standards"
+        class="[--feature-color:theme(colors.blue)]"
+      >
         {#snippet description()}
           <p>
             All components of Allmaps use
@@ -191,7 +165,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Client-side map warping">
+      <HomepageFeature
+        title="Client-side map warping"
+        class="[--feature-color:theme(colors.pink)]"
+      >
         {#snippet description()}
           <p>
             Allmaps can warp maps on-the-fly, in the browser. Allmaps functions
@@ -230,7 +207,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="More than displaying map layers">
+      <HomepageFeature
+        title="More than displaying map layers"
+        class="[--feature-color:theme(colors.purple)]"
+      >
         {#snippet description()}
           <p>
             Allmaps is about more than warping images and displaying map
@@ -272,7 +252,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="It's all about the URL">
+      <HomepageFeature
+        title="It's all about the URL"
+        class="[--feature-color:theme(colors.green)]"
+      >
         {#snippet description()}
           <p>
             Start georeferencing in
@@ -311,7 +294,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Entirely open source">
+      <HomepageFeature
+        title="Entirely open source"
+        class="[--feature-color:theme(colors.orange)]"
+      >
         {#snippet description()}
           <p>
             The whole <a href="https://github.com/allmaps/allmaps"
@@ -344,7 +330,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Not just the browser">
+      <HomepageFeature
+        title="Not just the browser"
+        class="[--feature-color:theme(colors.blue)]"
+      >
         {#snippet description()}
           <p>
             Use georeferenced maps in QGIS and other GIS software. Load an
@@ -381,7 +370,10 @@
         {/snippet}
       </HomepageFeature>
 
-      <HomepageFeature title="Aerial photos & building plans">
+      <HomepageFeature
+        title="Aerial photos & building plans"
+        class="[--feature-color:theme(colors.pink)]"
+      >
         {#snippet description()}
           <p>
             Allmaps works with any IIIF resource that can be georeferenced,
@@ -420,10 +412,42 @@
           </ScreenshotPanel>
         {/snippet}
       </HomepageFeature>
+
+      <HomepageFeature
+        id="iiif-partnership-title"
+        title="Support Allmaps through IIIF"
+        class="scroll-mt-20 [--feature-color:theme(colors.green)]"
+      >
+        {#snippet description()}
+          <p>
+            Help sustain the open source tools that bring map collections to
+            life. Through the <a href="/iiif-partnership/"
+              >IIIF–Allmaps partnership</a
+            >, IIIF Consortium members can fund ongoing development and
+            maintenance, with dedicated services, training and support in
+            return.
+          </p>
+        {/snippet}
+        {#snippet media()}
+          <ScreenshotPanel color={green} href="/iiif-partnership/">
+            <Screenshot
+              class="w-full"
+              {...getScreenshotImage('iiif-partnership')}
+              sizes={screenshotSizes}
+              url={`${PUBLIC_HOMEPAGE_BASE_URL.replace(/\/$/, '')}/iiif-partnership/`}
+              slug="iiif-partnership"
+              viewport={{ width: 1280, height: 917, deviceScaleFactor: 1 }}
+              waitForSelector="[data-partnership-mask-grid].revealed"
+              delay={10000}
+              alt="The Allmaps–IIIF partnership page, with colorful map masks and the Allmaps and IIIF logos"
+              showUrl
+              urlDisplay="route"
+            />
+          </ScreenshotPanel>
+        {/snippet}
+      </HomepageFeature>
     </ol>
   </section>
-
-  <IIIFPartnershipCard />
 
   <section class="not-prose" aria-labelledby="example-maps-title">
     <ol role="list" class="not-prose m-0 list-none p-0">

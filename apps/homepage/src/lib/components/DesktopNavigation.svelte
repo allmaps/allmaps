@@ -53,7 +53,9 @@
 
     const navigationBounds = navigation.getBoundingClientRect()
     const columnOffset =
-      column.getBoundingClientRect().left - navigationBounds.left
+      column.getBoundingClientRect().left +
+      parseFloat(getComputedStyle(column).paddingLeft) -
+      navigationBounds.left
     const headingLeft =
       heading.getBoundingClientRect().left +
       parseFloat(getComputedStyle(heading).paddingLeft)
@@ -258,7 +260,7 @@
   <Popover.ContentStatic
     id={`${id}-panel`}
     bind:ref={panel}
-    class="site-menu-panel absolute top-full left-0 hidden max-h-[calc(100dvh-4rem)] w-full overflow-y-auto border-b border-black/10 bg-white py-4 shadow-lg md:block"
+    class="site-menu-panel absolute top-full left-0 hidden max-h-[calc(100dvh-4rem)] w-full overflow-y-auto border-b border-black/10 bg-white/90 py-4 shadow-lg backdrop-blur md:block"
     trapFocus={false}
     preventScroll={false}
     onOpenAutoFocus={(event) => event.preventDefault()}

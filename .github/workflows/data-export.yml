@@ -1,0 +1,109 @@
+name: Data export
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      destination:
+        description: Upload to the trial prefix or publish the production files
+        type: choice
+        options: [trial, production]
+        default: trial
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-export
+  cancel-in-progress: false
+
+jobs:
+  export:
+    name: Export data and PMTiles to R2
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' || vars.DATA_EXPORT_SCHEDULE_ENABLED == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    environment: production
+    env:
+      HUSKY: '0'
+      DATA_EXPORT_R2_DESTINATION: ${{ github.event_name == 'workflow_dispatch' && inputs.destination == 'trial' && 'r2:allmaps-files/github-actions-test' || 'r2:allmaps-files' }}
+      TIPPECANOE_COMMIT: 68ab8dcc229f95b8b25877697d5e8d66783af503 # 2.79.0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          install: false
+      - name: Check export configuration
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.RCLONE_CONFIG_R2_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.RCLONE_CONFIG_R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.RCLONE_CONFIG_R2_ENDPOINT }}
+        run: |
+          echo "DATA_EXPORT_OUTPUT_DIR=$RUNNER_TEMP/allmaps-data-export" >> "$GITHUB_ENV"
+          for name in DATABASE_URL RCLONE_CONFIG_R2_ACCESS_KEY_ID RCLONE_CONFIG_R2_SECRET_ACCESS_KEY RCLONE_CONFIG_R2_ENDPOINT; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing production environment secret: $name"
+              exit 1
+            fi
+          done
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build export dependencies
+        # This runtime job does not publish TypeScript declaration files.
+        run: pnpm --filter '@allmaps/data-export^...' run build --declaration false --composite false
+      - name: Install rclone and build Tippecanoe
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libsqlite3-dev zlib1g-dev rclone
+          mkdir -p "$RUNNER_TEMP/tippecanoe"
+          curl --fail --location --retry 3 "https://github.com/felt/tippecanoe/archive/$TIPPECANOE_COMMIT.tar.gz" |
+            tar -xz --strip-components=1 -C "$RUNNER_TEMP/tippecanoe"
+          make -C "$RUNNER_TEMP/tippecanoe" -j2
+          sudo make -C "$RUNNER_TEMP/tippecanoe" install
+          tippecanoe --version
+          rclone version
+      - name: Export from Neon
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm --filter @allmaps/data-export run export
+      - name: Generate PMTiles
+        run: pnpm --filter @allmaps/data-export run pmtiles
+      - name: Check generated files
+        run: |
+          for filename in maps.json maps.ndjson maps.geojson maps.geojsonl maps-flattened.geojson annotations.json domains-counted.json files.json maps.pmtiles; do
+            test -s "$DATA_EXPORT_OUTPUT_DIR/$filename"
+          done
+          du -sh "$DATA_EXPORT_OUTPUT_DIR"
+          df -h "$RUNNER_TEMP"
+      - name: Upload to R2 and verify file sizes
+        working-directory: tools/data-export
+        env:
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.RCLONE_CONFIG_R2_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.RCLONE_CONFIG_R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.RCLONE_CONFIG_R2_ENDPOINT }}
+        run: |
+          pnpm run upload
+          rclone --config=./config/rclone.conf check \
+            "$DATA_EXPORT_OUTPUT_DIR" "$DATA_EXPORT_R2_DESTINATION" \
+            --one-way --size-only
+      - name: Summarize completed export
+        run: |
+          {
+            echo '### Data export completed'
+            echo
+            echo "Destination: \`$DATA_EXPORT_R2_DESTINATION\`"
+            echo
+            echo "Generated size: $(du -sh "$DATA_EXPORT_OUTPUT_DIR" | cut -f1)"
+            echo
+            echo 'All generated files were uploaded and their remote sizes verified.'
+          } >> "$GITHUB_STEP_SUMMARY"

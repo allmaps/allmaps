@@ -30,6 +30,50 @@ pnpm --filter @allmaps/data-export run export production
 pnpm --filter @allmaps/data-export run pmtiles
 ```
 
+## GitHub Actions
+
+The `Data export` workflow (`.github/workflows/data-export.yml`) runs the scripts
+on a standard Ubuntu runner with Node.js 24, the repository's pinned pnpm
+version, rclone, and Tippecanoe 2.79.0. It exports from Neon, generates PMTiles,
+then uploads to R2 and checks that remote file sizes match the local files.
+Only the export's workspace dependencies are built, with declaration generation
+disabled because this job only needs JavaScript. No Docker image is needed.
+
+The workflow uses these secrets in the GitHub `production` environment:
+
+- `DATABASE_URL` (shared with the API release workflow)
+- `RCLONE_CONFIG_R2_ACCESS_KEY_ID`
+- `RCLONE_CONFIG_R2_SECRET_ACCESS_KEY`
+- `RCLONE_CONFIG_R2_ENDPOINT`
+
+Give the R2 credentials read/write access to the `allmaps-files` bucket. The
+endpoint is the existing R2 S3 API endpoint, not `files.allmaps.org`.
+
+To run it manually, select **Actions → Data export → Run workflow** on `main`:
+
+- `trial` (default) uploads to `r2:allmaps-files/github-actions-test`.
+- `production` uploads to `r2:allmaps-files`, updating the public downloads.
+
+Trial runs use the same production database and generate the full export. Their
+uploads stay under the test prefix; remove that prefix from R2 when finished.
+Uploads use `rclone copy`, retaining existing files that are absent from a run.
+The job uploads only after the export and PMTiles generation both succeed.
+Uploads are per file, so readers may see a mixture of versions during publishing.
+
+Set the **repository Actions variable** `DATA_EXPORT_SCHEDULE_ENABLED` to `true`
+after a successful trial to enable daily production exports at **03:17 UTC**.
+Set it to `false` to pause scheduled exports; manual runs remain available.
+The workflow must be on the default branch (`main`) for GitHub to schedule it.
+The production environment permits only `main`. Runs share a concurrency group,
+so GitHub does not run two exports simultaneously or cancel an active export.
+The job has a six-hour timeout. GitHub may delay or drop scheduled runs, and may
+disable schedules after 60 days without repository activity.
+
+The workflow supplies environment variables directly and invokes `export`
+without a profile, so repository env files cannot override the Actions secrets.
+Do not run production exports on both Render and GitHub during the cutover:
+verify a GitHub trial, disable the Render cron, and enable the GitHub schedule.
+
 ## Render Docker
 
 Configure the Render service with the monorepo root as the Docker build context,
@@ -83,7 +127,3 @@ overzoomed when Explore is zoomed further in:
 | `masks_region`    |           `100,000,000-10,000,000,000` |       6-12 |
 | `masks_city`      |                `1,000,000-100,000,000` |       8-14 |
 | `masks_local`     |                          `< 1,000,000` |      10-14 |
-
-Next implementation steps:
-
-- upload completed files to R2
