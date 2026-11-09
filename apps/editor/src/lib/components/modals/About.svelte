@@ -45,7 +45,7 @@
   <div class="flex max-w-sm flex-col gap-2">
     <p>
       {m.about_intro()}
-      <a class="underline" href="https://allmaps.org/#getting-started"
+      <a class="underline" href="https://allmaps.org/get-started"
         >{m.find_a_map()}</a
       >.
       {m.about_find_map()}

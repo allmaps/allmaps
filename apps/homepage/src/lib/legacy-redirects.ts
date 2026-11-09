@@ -39,6 +39,8 @@ const homepageRedirects: Record<string, string> = {
 const docsRedirects: Record<string, string> = {
   '/docs': '/',
   '/docs/introduction': '/',
+  '/docs/apps/cli': '/packages/cli',
+  '/docs/apps/tileserver': '/packages/tileserver',
   '/docs/packages': '/packages',
   '/guides/finding-maps': '/guides/find-maps-to-georeference',
   ...Object.fromEntries(

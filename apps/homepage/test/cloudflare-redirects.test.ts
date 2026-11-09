@@ -33,3 +33,17 @@ test('production redirects use the live documentation hostname', () => {
   )
   expect(redirects).not.toContain('dev.docs.allmaps.org')
 })
+
+test.each(['cli', 'tileserver'])(
+  'redirects both legacy %s docs URLs to the package reference',
+  (packageName) => {
+    const redirects = createCloudflareRedirects('https://docs.allmaps.org')
+    const destination = `https://docs.allmaps.org/packages/${packageName}`
+    expect(redirects).toContain(
+      `/docs/apps/${packageName} ${destination} 308\n`
+    )
+    expect(redirects).toContain(
+      `/docs/apps/${packageName}/ ${destination} 308\n`
+    )
+  }
+)

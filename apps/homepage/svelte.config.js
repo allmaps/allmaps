@@ -62,6 +62,10 @@ const config = {
     env: {
       dir: '../..'
     },
+    paths: {
+      // Cloudflare serves the same 404.html at any missing URL.
+      relative: false
+    },
     alias: {
       $lib: './src/lib',
       '$lib/*': './src/lib/*'
