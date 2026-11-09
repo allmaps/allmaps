@@ -10,7 +10,7 @@ type MarkdownNode = Root | Root['children'][number]
 type ReadmeLinkOptions = {
   repositoryRoot: string
   readmePath: string
-  packageNames: ReadonlySet<string>
+  readmeRoutes: ReadonlyMap<string, string>
   branch?: string
 }
 
@@ -20,7 +20,7 @@ export function rewriteReadmeLinks(
   {
     repositoryRoot,
     readmePath,
-    packageNames,
+    readmeRoutes,
     branch = 'develop'
   }: ReadmeLinkOptions
 ) {
@@ -53,6 +53,22 @@ export function rewriteReadmeLinks(
   }
 
   function rewrite(destination: string, image: boolean) {
+    // Published README links may also use GitHub URLs in the source files.
+    const githubReadme =
+      /^https:\/\/github\.com\/allmaps\/allmaps\/(?:tree|blob)\/(?:main|develop)\/(.+)$/i.exec(
+        destination
+      )
+    if (!image && githubReadme) {
+      const url = new URL(githubReadme[1], 'https://repository.invalid/')
+      const route = readmeRoutes.get(
+        decodeURIComponent(url.pathname.slice(1)).replace(
+          /\/(?:README\.md)?$/i,
+          ''
+        )
+      )
+      return route ? `${route}${url.search}${url.hash}` : destination
+    }
+
     // Leave absolute URLs, root-relative URLs, and same-page anchors alone.
     if (!destination || /^(?:[a-z][a-z\d+.-]*:|\/|#|\?)/i.test(destination)) {
       return destination
@@ -60,13 +76,13 @@ export function rewriteReadmeLinks(
 
     const url = new URL(destination, baseUrl)
     const repositoryPath = decodeURIComponent(url.pathname.slice(1))
-    const packageMatch = /^packages\/([^/]+)(?:\/(?:README\.md)?)?$/i.exec(
-      repositoryPath
+    const route = readmeRoutes.get(
+      repositoryPath.replace(/\/(?:README\.md)?$/i, '')
     )
     const suffix = url.search + url.hash
 
-    if (!image && packageMatch && packageNames.has(packageMatch[1])) {
-      return `/packages/${encodeURIComponent(packageMatch[1])}${suffix}`
+    if (!image && route) {
+      return `${route}${suffix}`
     }
 
     if (image) {
