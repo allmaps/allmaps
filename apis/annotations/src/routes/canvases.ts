@@ -18,7 +18,7 @@ export function createCanvasesRoutes(
     .get(
       '/canvases/:canvasId',
       ({ request, env, db, params, set }) => {
-        setCacheControl(set, 'public-medium')
+        setCacheControl(set, 'public-current-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
@@ -26,6 +26,7 @@ export function createCanvasesRoutes(
           {
             id: request.url,
             format: 'annotation',
+            excludeArchived: true,
             expectRows: true,
             singular: false,
             resultScope: 'complete'

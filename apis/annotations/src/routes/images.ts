@@ -29,7 +29,7 @@ export function createImagesRoutes(
         const { imageId, imageChecksum, ext } = imageRoute.parse(params)
         setCacheControl(
           set,
-          imageChecksum ? 'public-immutable' : 'public-medium'
+          imageChecksum ? 'public-immutable' : 'public-current-medium'
         )
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
@@ -42,6 +42,7 @@ export function createImagesRoutes(
           {
             id: request.url,
             format,
+            excludeArchived: true,
             expectRows: true,
             singular: false,
             resultScope: 'complete'

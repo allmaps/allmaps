@@ -197,6 +197,9 @@ async function queryListMapRows(
       }
     },
     where: {
+      // A list URL is a current publication, even when an item pins a version.
+      archived: false,
+      image: { archived: false },
       OR: whereConditions
     },
     orderBy: (maps, { desc }) => [desc(maps.updatedAt)]

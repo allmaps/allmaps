@@ -8,6 +8,7 @@ import type { RestEnv } from '@allmaps/env/rest'
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 import {
+  archiveImage,
   queryImage,
   queryImages,
   queryRandomImagesByOrganizationIds,
@@ -72,6 +73,24 @@ export function createImagesRoutes(
 ) {
   return createElysia({ name: 'images' })
     .use(createBetterAuthPlugin(betterAuth))
+    .delete(
+      '/images/:imageId',
+      ({ db, params, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return archiveImage(db, params.imageId)
+      },
+      {
+        admin: true,
+        params: t.Object({ imageId: t.String() }),
+        detail: {
+          ...adminDetail,
+          summary: 'Archive an image and its maps',
+          description:
+            'Archive this image and all its maps without deleting data. Historical annotations and individual REST reads remain available. The next saved editor change on this image unarchives it and all its maps.',
+          tags: ['Images']
+        }
+      }
+    )
     .get(
       '/images',
       async ({ env, db, query, set, getLimitRole }) => {

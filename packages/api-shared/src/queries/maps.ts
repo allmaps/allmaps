@@ -90,6 +90,8 @@ export async function queryMaps(
   const isGeospatialQuery =
     params.intersectsWith || params.containedBy ? true : false
   const onlyLatest = !(params.checksum || params.imageChecksum)
+  // Explicit historical versions remain available even when archived.
+  const excludeArchived = onlyLatest && responseOptions.excludeArchived
 
   const rows = await db.query.maps.findMany({
     columns: {
@@ -168,6 +170,7 @@ export async function queryMaps(
       }
     },
     where: {
+      archived: { eq: excludeArchived ? false : undefined },
       AND: [
         {
           id: {
@@ -208,6 +211,7 @@ export async function queryMaps(
         }
       ],
       image: {
+        archived: { eq: excludeArchived ? false : undefined },
         domain: {
           eq: params.imageServiceDomain
         },

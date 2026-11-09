@@ -58,7 +58,7 @@ export function createOrganizationsRoutes(
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-medium' : 'private-no-store'
+          userRole === 'public' ? 'public-current-medium' : 'private-no-store'
         )
 
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
@@ -70,7 +70,13 @@ export function createOrganizationsRoutes(
             limit: query.limit,
             userRole
           },
-          { id: request.url, format, expectRows: true, singular: false }
+          {
+            id: request.url,
+            format,
+            excludeArchived: true,
+            expectRows: true,
+            singular: false
+          }
         )
       },
       {

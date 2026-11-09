@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
-import { queryMaps, queryChecksums } from '@allmaps/api-shared/db'
+import { queryMaps, queryChecksums, archiveMap } from '@allmaps/api-shared/db'
 import {
   needsElevatedLimitRole,
   normalizeMapsQueryParams,
@@ -55,6 +55,24 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     name: 'maps-routes'
   })
     .use(createBetterAuthPlugin(betterAuth))
+    .delete(
+      '/maps/:mapId',
+      ({ db, params, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return archiveMap(db, params.mapId)
+      },
+      {
+        admin: true,
+        params: t.Object({ mapId: t.String() }),
+        detail: {
+          ...adminDetail,
+          summary: 'Archive a map',
+          description:
+            'Archive this map without deleting its data. Historical annotations and individual REST reads remain available. The next saved editor change on its image unarchives the image and all its maps.',
+          tags: ['Maps']
+        }
+      }
+    )
     .get(
       '/maps',
       async ({ request, env, db, set, getLimitRole }) => {
@@ -64,13 +82,18 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
+          userRole === 'public' ? 'public-current-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           { ...queryParams, userRole },
-          { format: 'map', expectRows: false, singular: false }
+          {
+            format: 'map',
+            expectRows: false,
+            singular: false,
+            excludeArchived: true
+          }
         )
       },
       {
@@ -87,13 +110,18 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
+          userRole === 'public' ? 'public-current-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           { ...queryParams, userRole },
-          { format: 'geojson', expectRows: false, singular: false }
+          {
+            format: 'geojson',
+            expectRows: false,
+            singular: false,
+            excludeArchived: true
+          }
         )
       },
       {

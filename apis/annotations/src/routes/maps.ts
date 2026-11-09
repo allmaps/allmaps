@@ -50,7 +50,7 @@ export function createMapsRoutes(
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
+          userRole === 'public' ? 'public-current-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
@@ -59,6 +59,7 @@ export function createMapsRoutes(
           {
             id: request.url,
             format: 'annotation',
+            excludeArchived: true,
             expectRows: false,
             singular: false
           }
@@ -81,7 +82,7 @@ export function createMapsRoutes(
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-short' : 'private-no-store'
+          userRole === 'public' ? 'public-current-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
@@ -90,6 +91,7 @@ export function createMapsRoutes(
           {
             id: request.url,
             format: 'geojson',
+            excludeArchived: true,
             expectRows: false,
             singular: false
           }
@@ -125,6 +127,7 @@ export function createMapsRoutes(
               },
               {
                 format: 'map',
+                excludeArchived: true,
                 expectRows: false,
                 singular: false
               }
@@ -146,7 +149,10 @@ export function createMapsRoutes(
       `/maps/${mapRoute.path}`,
       ({ env, db, params, set }) => {
         const { mapId, checksum, ext } = mapRoute.parse(params)
-        setCacheControl(set, checksum ? 'public-immutable' : 'public-medium')
+        setCacheControl(
+          set,
+          checksum ? 'public-immutable' : 'public-current-medium'
+        )
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
@@ -155,7 +161,7 @@ export function createMapsRoutes(
             mapId,
             ...(checksum ? { checksum } : {})
           },
-          { format, expectRows: true, singular: true }
+          { format, excludeArchived: true, expectRows: true, singular: true }
         )
       },
       {

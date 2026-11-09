@@ -62,6 +62,7 @@ export const maps = pgTable(
     imageChecksum: text('image_checksum').notNull(),
     version: integer('version').notNull(),
     latest: boolean('latest').notNull().default(true),
+    archived: boolean('archived').notNull().default(false),
     createdAt: createTimestamp('created_at'),
     updatedAt: createTimestamp('updated_at'),
     map: jsonb('data').notNull().$type<DbMap>(),

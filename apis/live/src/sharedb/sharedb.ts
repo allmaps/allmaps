@@ -7,7 +7,7 @@ import { groupBy } from 'ramda'
 import { debounce } from 'lodash-es'
 import { debuglog } from 'node:util'
 
-import { sql, eq, and } from 'drizzle-orm'
+import { sql, eq, and, or } from 'drizzle-orm'
 
 import { generateId, generateChecksum } from '@allmaps/id'
 import { polygonToGeojsonPolygon } from '@allmaps/stdlib'
@@ -252,16 +252,8 @@ export default class AllmapsShareDB {
       return
     }
 
-    if (!Object.keys(dbMaps).length) {
-      return
-    }
-
     const dbMaps3 = Object.values(dbMaps).map((map) => dbMapToDbMap3(map))
     const firstDbMap3 = dbMaps3[0]
-
-    // TODO: update database schema - then this is not needed
-    const resourceWidth = firstDbMap3.resource.width || 0
-    const resourceHeight = firstDbMap3.resource.height || 0
 
     const imageId = snapshot.id
     const version = snapshot.v
@@ -269,23 +261,37 @@ export default class AllmapsShareDB {
     const imageChecksum = await generateChecksum(maps)
 
     await this.db.transaction(async (tx) => {
-      // First, ensure that the image exists
-      await tx
-        .insert(schema.images)
-        .values({
-          id: imageId,
-          uri: firstDbMap3.resource.uri,
-          width: resourceWidth,
-          height: resourceHeight
-        })
-        .onConflictDoNothing()
+      // A saved editor change republishes the whole image, including siblings.
+      if (firstDbMap3) {
+        await tx
+          .insert(schema.images)
+          .values({
+            id: imageId,
+            uri: firstDbMap3.resource.uri,
+            width: firstDbMap3.resource.width || 0,
+            height: firstDbMap3.resource.height || 0
+          })
+          .onConflictDoUpdate({
+            target: schema.images.id,
+            set: { archived: false }
+          })
+      } else {
+        await tx
+          .update(schema.images)
+          .set({ archived: false })
+          .where(eq(schema.images.id, imageId))
+      }
 
-      // Then, set latest = false for all maps with imageId
+      // Clear archive flags on every version and replace the current maps,
+      // including when the editor removes the image's last map.
       await tx
         .update(schema.maps)
-        .set({ latest: false })
+        .set({ latest: false, archived: false })
         .where(
-          and(eq(schema.maps.imageId, imageId), eq(schema.maps.latest, true))
+          and(
+            eq(schema.maps.imageId, imageId),
+            or(eq(schema.maps.latest, true), eq(schema.maps.archived, true))
+          )
         )
 
       // Then, insert new maps
