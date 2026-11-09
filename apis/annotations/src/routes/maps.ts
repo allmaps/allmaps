@@ -58,6 +58,7 @@ export function createMapsRoutes(
           {
             id: request.url,
             format: 'annotation',
+            excludeArchived: true,
             expectRows: false,
             singular: false
           }
@@ -89,6 +90,7 @@ export function createMapsRoutes(
           {
             id: request.url,
             format: 'geojson',
+            excludeArchived: true,
             expectRows: false,
             singular: false
           }
@@ -124,6 +126,7 @@ export function createMapsRoutes(
               },
               {
                 format: 'map',
+                excludeArchived: true,
                 expectRows: false,
                 singular: false
               }
@@ -154,7 +157,7 @@ export function createMapsRoutes(
             mapId,
             ...(checksum ? { checksum } : {})
           },
-          { format, expectRows: true, singular: true }
+          { format, excludeArchived: true, expectRows: true, singular: true }
         )
       },
       {

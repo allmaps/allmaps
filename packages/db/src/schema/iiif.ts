@@ -33,6 +33,7 @@ export const images = iiifSchema.table(
     height: integer('height'),
     data: jsonb('data'),
     embedded: boolean('embedded').notNull().default(true),
+    archived: boolean('archived').notNull().default(false),
     checksum: text('checksum'),
     createdAt: createTimestamp('created_at'),
     updatedAt: createTimestamp('updated_at')
