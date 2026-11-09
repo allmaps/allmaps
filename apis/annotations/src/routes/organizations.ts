@@ -58,7 +58,7 @@ export function createOrganizationsRoutes(
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-current-medium' : 'private-no-store'
+          userRole === 'public' ? 'public-medium' : 'private-no-store'
         )
 
         const format = ext === 'geojson' ? 'geojson' : 'annotation'

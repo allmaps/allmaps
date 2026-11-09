@@ -82,7 +82,7 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-current-short' : 'private-no-store'
+          userRole === 'public' ? 'public-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
@@ -110,7 +110,7 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-current-short' : 'private-no-store'
+          userRole === 'public' ? 'public-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,

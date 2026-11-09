@@ -27,10 +27,7 @@ export function createImagesRoutes(
       `/images/${imageRoute.path}`,
       ({ request, env, db, params, set }) => {
         const { imageId, imageChecksum, ext } = imageRoute.parse(params)
-        setCacheControl(
-          set,
-          imageChecksum ? 'public-immutable' : 'public-current-medium'
-        )
+        setCacheControl(set, 'public-medium')
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,

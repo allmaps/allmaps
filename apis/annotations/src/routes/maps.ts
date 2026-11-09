@@ -50,7 +50,7 @@ export function createMapsRoutes(
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-current-short' : 'private-no-store'
+          userRole === 'public' ? 'public-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
@@ -82,7 +82,7 @@ export function createMapsRoutes(
           : 'public'
         setCacheControl(
           set,
-          userRole === 'public' ? 'public-current-short' : 'private-no-store'
+          userRole === 'public' ? 'public-short' : 'private-no-store'
         )
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
@@ -149,10 +149,7 @@ export function createMapsRoutes(
       `/maps/${mapRoute.path}`,
       ({ env, db, params, set }) => {
         const { mapId, checksum, ext } = mapRoute.parse(params)
-        setCacheControl(
-          set,
-          checksum ? 'public-immutable' : 'public-current-medium'
-        )
+        setCacheControl(set, 'public-medium')
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,

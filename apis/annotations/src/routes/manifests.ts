@@ -18,7 +18,7 @@ export function createManifestsRoutes(
     .get(
       '/manifests/:manifestId',
       ({ request, env, db, params, set }) => {
-        setCacheControl(set, 'public-current-medium')
+        setCacheControl(set, 'public-medium')
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,

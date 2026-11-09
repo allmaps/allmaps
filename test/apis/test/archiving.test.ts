@@ -169,7 +169,7 @@ describe('admin archiving', () => {
             : parseAnnotation(await response.json())
         expect(maps).toHaveLength(catalog.maps.length - 1)
         expect(response.headers.get('Cache-Control')).toBe(
-          'public, max-age=30, s-maxage=30, must-revalidate'
+          'public, max-age=30, s-maxage=30'
         )
         const geojson = await (await request(api, '/maps.geojson')).json()
         expect(geojson.features).toHaveLength(catalog.maps.length - 1)
@@ -195,7 +195,7 @@ describe('admin archiving', () => {
         )
       ).toBe(true)
       expect(organization.headers.get('Cache-Control')).toBe(
-        'public, max-age=60, s-maxage=300, must-revalidate'
+        'public, max-age=60, s-maxage=300'
       )
       const historicalAfter = await Promise.all(
         historicalPaths.map(async (path) => {
