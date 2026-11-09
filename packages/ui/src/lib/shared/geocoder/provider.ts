@@ -32,31 +32,33 @@ export abstract class GeocoderProvider {
       return []
     }
 
-    let results: GeocoderProviderGeoJsonFeature[] = []
-
     try {
-      results = await fetch(this.getFetchFeaturesUrl(input), {
-        signal
-      })
-        .then((response) => response.json())
-        .then((response) => response.features)
-        .then((features) => this.transformFeatures(features))
+      const response = await fetch(this.getFetchFeaturesUrl(input), { signal })
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+
+      const { features } = await response.json()
+      if (!Array.isArray(features)) {
+        throw new Error('Expected an array of geocoding features')
+      }
+
+      return this.transformFeatures(features).map((feature) => ({
+        ...feature,
+        properties: {
+          id: `${this.id}:${feature.properties.id}`,
+          provider: {
+            id: this.id,
+            label: this.label
+          },
+          data: feature.properties
+        }
+      }))
     } catch (error) {
       if (!signal.aborted) {
         console.error('Error fetching', this.label, ': ', error)
       }
+      return []
     }
-
-    return results.map((feature) => ({
-      ...feature,
-      properties: {
-        id: `${this.id}:${feature.properties.id}`,
-        provider: {
-          id: this.id,
-          label: this.label
-        },
-        data: feature.properties
-      }
-    }))
   }
 }
