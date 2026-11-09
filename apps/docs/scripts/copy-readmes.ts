@@ -7,7 +7,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const packagesDir = path.join(__dirname, '../../../packages')
 const repositoryRoot = path.join(__dirname, '../../..')
-const outputDir = path.join(__dirname, '../src/content/docs/packages')
+const outputDir = path.join(__dirname, '../src/content/docs')
 
 /**
  * Function to check if a README.md file is valid.
@@ -44,9 +44,12 @@ function removeFirstLine(lines: string) {
   return lines.substring(lines.indexOf('\n') + 1)
 }
 
-await mkdir(outputDir, { recursive: true })
+await mkdir(path.join(outputDir, 'packages'), { recursive: true })
 
-const readmes = new Map<string, { readme: string; readmePath: string }>()
+const readmes = new Map<
+  string,
+  { readme: string; readmePath: string; title: string; route: string }
+>()
 
 for (const packageName of await getDirectories(packagesDir)) {
   const readmePath = path.join(packagesDir, packageName, 'README.md')
@@ -63,16 +66,33 @@ for (const packageName of await getDirectories(packagesDir)) {
     continue
   }
 
-  readmes.set(packageName, { readme, readmePath })
+  readmes.set(`packages/${packageName}`, {
+    readme,
+    readmePath,
+    title: `@allmaps/${packageName}`,
+    route: `/packages/${packageName}`
+  })
 }
 
-// Resolve package links only after knowing which READMEs will be published.
-const packageNames = new Set(readmes.keys())
+// Include package references whose source workspaces live outside packages/.
+for (const [directory, title, route] of [
+  ['apps/cli', '@allmaps/cli', '/packages/cli'],
+  ['workers/tileserver', '@allmaps/tileserver', '/packages/tileserver']
+]) {
+  const readmePath = path.join(repositoryRoot, directory, 'README.md')
+  const readme = await readFile(readmePath, 'utf8')
+  readmes.set(directory, { readme, readmePath, title, route })
+}
 
-for (const [packageName, { readme, readmePath }] of readmes) {
+// Resolve links only after knowing which READMEs will be published.
+const readmeRoutes = new Map(
+  [...readmes].map(([directory, { route }]) => [directory, route])
+)
+
+for (const { readme, readmePath, title, route } of readmes.values()) {
   let description
   try {
-    const packageFilename = path.join(packagesDir, packageName, 'package.json')
+    const packageFilename = path.join(path.dirname(readmePath), 'package.json')
     const packageModule = await import(packageFilename, {
       with: { type: 'json' }
     })
@@ -85,16 +105,16 @@ for (const [packageName, { readme, readmePath }] of readmes) {
 
   const newReadme =
     `---
-title: '@allmaps/${packageName}'
+title: ${JSON.stringify(title)}
 description: ${JSON.stringify(description ?? '')}
 ---\n` +
     rewriteReadmeLinks(removeFirstLine(readme), {
       repositoryRoot,
       readmePath,
-      packageNames
+      readmeRoutes
     })
 
-  const outputPath = path.join(outputDir, `${packageName}.md`)
+  const outputPath = path.join(outputDir, `${route.slice(1)}.md`)
 
   await writeFile(outputPath, newReadme, { encoding: 'utf8' })
 }
