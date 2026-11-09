@@ -374,7 +374,13 @@ describe('admin archiving', () => {
 
   it('documents both DELETE operations as admin-only archival', async () => {
     const response = await request('rest', '/openapi.json')
+    expect(response.status).toBe(200)
     const specification = await response.json()
+    expect(
+      Object.keys(specification.paths).some((path) =>
+        path.startsWith('/__dev/')
+      )
+    ).toBe(false)
     for (const path of ['/maps/{mapId}', '/images/{imageId}']) {
       const operation = specification.paths[path].delete
       expect(operation.security).toEqual([{ sessionCookie: [] }])
