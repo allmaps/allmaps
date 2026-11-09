@@ -34,7 +34,6 @@
     "@allmaps/env": "workspace:^",
     "@allmaps/id": "workspace:^",
     "@allmaps/iiif-parser": "workspace:^",
-    "@neondatabase/serverless": "catalog:",
     "better-auth": "catalog:",
     "pg": "catalog:",
     "postgres": "catalog:",

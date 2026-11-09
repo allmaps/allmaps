@@ -74,7 +74,6 @@ catalog:
   '@elysia/node': 1.4.6
   '@elysiajs/cors': ^1.4
   '@elysiajs/openapi': ^1.4
-  '@neondatabase/serverless': ^1.0
   '@sinclair/typebox': ^0.34.52
   '@types/diff-match-patch': ^1.0.36
   '@types/sharedb': ^3.3.12

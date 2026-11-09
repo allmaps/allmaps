@@ -1,13 +1,19 @@
-import { describe, expect, it } from 'vitest'
+import { afterAll, describe, expect, it } from 'vitest'
+import { getPgContext } from '@allmaps/db'
 import { createAuth } from '@allmaps/db/auth'
 
 describe('account linking policy', () => {
-  const { auth } = createAuth({
-    DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
-    BETTER_AUTH_URL: 'http://localhost:5499',
-    BETTER_AUTH_SECRET: 'test-secret-for-account-linking-policy',
-    BETTER_AUTH_COOKIE_PREFIX: 'account-linking-test'
-  })
+  const database = getPgContext('postgresql://test:test@localhost:5432/test')
+  afterAll(() => database.close())
+
+  const { auth } = createAuth(
+    {
+      BETTER_AUTH_URL: 'http://localhost:5499',
+      BETTER_AUTH_SECRET: 'test-secret-for-account-linking-policy',
+      BETTER_AUTH_COOKIE_PREFIX: 'account-linking-test'
+    },
+    database.db
+  )
 
   it('enables automatic linking without bypassing email verification', () => {
     expect(auth.options.account.accountLinking).toMatchObject({
