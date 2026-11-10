@@ -1,5 +1,4 @@
 import { ImageResponse } from '@cloudflare/pages-plugin-vercel-og/api'
-import { json } from 'itty-router'
 
 import tinycolor from 'tinycolor2'
 
@@ -127,9 +126,8 @@ export async function generateLatestCard(
       width: size[0],
       height: size[1]
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('OG Image generation error:', error)
-    // todo status 500
-    return json({ error: 'Failed to generate image', details: error.message })
+    throw error
   }
 }

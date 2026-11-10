@@ -1,7 +1,7 @@
 import { png, webp, jpeg, StatusError } from 'itty-router'
 import tinycolor from 'tinycolor2'
 
-import { Viewport } from '@allmaps/render'
+import { Viewport, WarpedMapEventType } from '@allmaps/render'
 import { WasmRenderer } from '@allmaps/render/wasm'
 import { bboxToPolygon } from '@allmaps/stdlib'
 import { findBestFrame } from '@allmaps/frame'
@@ -10,7 +10,7 @@ import { createCachedFetch } from './fetch.js'
 import { getAnnotationUrl } from './urls.js'
 
 import type { Env, QueryOptions, ResourceWithId } from './types.js'
-import type { Size, FetchFn, Polygon } from '@allmaps/types'
+import type { Size, Polygon } from '@allmaps/types'
 
 // Import WASM module (initialization happens at worker startup)
 import * as wasmModule from '@allmaps/render-wasm'
@@ -37,9 +37,7 @@ export async function generateWarpedMapImage(
     )
   }
 
-  const annotation = await cachedFetch(annotationUrl).then((response) =>
-    response.json()
-  )
+  const annotation = await annotationResponse.json()
 
   // Parse transformation type
   let transformationType
@@ -62,7 +60,7 @@ export async function generateWarpedMapImage(
   }
 
   const renderer = new WasmRenderer(wasmModule, {
-    fetchFn: cachedFetch as FetchFn,
+    fetchFn: cachedFetch,
     createRTree: false,
     transformationType,
     outputFormat: format,
@@ -70,48 +68,72 @@ export async function generateWarpedMapImage(
     interpolation: 'cubic'
   })
 
-  renderer.addGeoreferenceAnnotation(annotation)
+  let failure: Error | undefined
+  renderer.warpedMapList.addEventListener(
+    WarpedMapEventType.IMAGEINFOFETCHERROR,
+    () => {
+      failure ??= new StatusError(502, 'Failed to load source image metadata')
+    }
+  )
+  renderer.tileCache.addEventListener(WarpedMapEventType.TILEFETCHERROR, () => {
+    failure ??= new StatusError(502, 'Failed to load source image tiles')
+  })
+  renderer.addEventListener(WarpedMapEventType.ERROR, () => {
+    failure ??= new StatusError(500, 'Failed to render preview')
+  })
 
-  // Create viewport with full feature parity
-  let viewport: Viewport
-
-  if (options.bounds) {
-    // Strategy 1: Use explicit bounds
-    const geoPolygon = bboxToPolygon(options.bounds)
-    viewport = Viewport.fromSizeAndGeoPolygon(size, geoPolygon)
-  } else if (options.fit === 'best') {
-    // Strategy 2: Find best inside-fit frame
-    const warpedMaps = renderer.warpedMapList.getWarpedMaps()
-    const mapPolygons: Polygon[] = []
-    for (const warpedMap of warpedMaps) {
-      // geoMask is a Ring, wrap it in array to make Polygon
-      mapPolygons.push([warpedMap.geoMask])
+  try {
+    const results = renderer.addGeoreferenceAnnotation(annotation)
+    if (results.length === 0 || results.some((result) => !result.ok)) {
+      throw new StatusError(422, 'No valid maps to render')
     }
 
-    if (mapPolygons.length === 0) {
-      throw new Error('Cannot determine map geometry for inside fit')
+    // Create viewport with full feature parity
+    let viewport: Viewport
+
+    if (options.bounds) {
+      // Strategy 1: Use explicit bounds
+      const geoPolygon = bboxToPolygon(options.bounds)
+      viewport = Viewport.fromSizeAndGeoPolygon(size, geoPolygon)
+    } else if (options.fit === 'best') {
+      // Strategy 2: Find best inside-fit frame
+      const warpedMaps = renderer.warpedMapList.getWarpedMaps()
+      const mapPolygons: Polygon[] = []
+      for (const warpedMap of warpedMaps) {
+        // geoMask is a Ring, wrap it in array to make Polygon
+        mapPolygons.push([warpedMap.geoMask])
+      }
+
+      if (mapPolygons.length === 0) {
+        throw new Error('Cannot determine map geometry for inside fit')
+      }
+
+      const insideBounds = findBestFrame(mapPolygons, size)
+      const geoPolygon = bboxToPolygon(insideBounds)
+      viewport = Viewport.fromSizeAndGeoPolygon(size, geoPolygon)
+    } else {
+      // Strategy 3: Default fit behavior
+      viewport = Viewport.fromSizeAndMaps(size, renderer.warpedMapList, {
+        fit: options.fit || 'contain'
+      })
     }
 
-    const insideBounds = findBestFrame(mapPolygons, size)
-    const geoPolygon = bboxToPolygon(insideBounds)
-    viewport = Viewport.fromSizeAndGeoPolygon(size, geoPolygon)
-  } else {
-    // Strategy 3: Default fit behavior
-    viewport = Viewport.fromSizeAndMaps(size, renderer.warpedMapList, {
-      fit: options.fit || 'contain'
-    })
+    const imageBuffer = await renderer.render(viewport)
+    if (failure) throw failure
+
+    // Return appropriate response based on format
+    if (format === 'webp') {
+      return webp(imageBuffer)
+    } else if (format === 'jpeg') {
+      return jpeg(imageBuffer)
+    } else if (format === 'png') {
+      return png(imageBuffer)
+    }
+
+    throw new Error(`Unsupported preview output format: ${format}`)
+  } catch (cause) {
+    throw failure ?? cause
+  } finally {
+    renderer.destroy()
   }
-
-  const imageBuffer = await renderer.render(viewport)
-
-  // Return appropriate response based on format
-  if (format === 'webp') {
-    return webp(imageBuffer)
-  } else if (format === 'jpeg') {
-    return jpeg(imageBuffer)
-  } else if (format === 'png') {
-    return png(imageBuffer)
-  }
-
-  throw new Error(`Unsupported preview output format: ${format}`)
 }

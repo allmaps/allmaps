@@ -24,6 +24,7 @@
     "cf-typegen": "wrangler types",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
+    "test": "vitest run",
     "format": "prettier --ignore-path ../../.gitignore --write src"
   },
   "license": "MIT",
@@ -62,6 +63,7 @@
     "tinycolor2": "^1.6.0",
     "typescript": "catalog:",
     "upng-js": "catalog:",
+    "vitest": "catalog:",
     "wrangler": "catalog:"
   }
 }

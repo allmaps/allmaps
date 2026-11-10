@@ -8,6 +8,11 @@ type RequestInitWithCf = RequestInit & {
 export function createCachedFetch(env: WorkerEnv): FetchFn {
   return async (url, requestInit) => {
     let init = requestInit as RequestInitWithCf | undefined
+    const headers = new Headers(
+      init?.headers ?? (url instanceof Request ? url.headers : undefined)
+    )
+    headers.set('User-Agent', 'Allmaps Tile Server (+https://allmaps.xyz/)')
+    init = { ...init, headers }
 
     if (env.USE_CACHE) {
       const cf: Record<string, unknown> = { ...init?.cf }
