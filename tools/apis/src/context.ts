@@ -80,12 +80,19 @@ export async function createPgliteContext(options: {
 
     if (seedCatalog) {
       rest
-        .get('/__dev/seed', async () => ({
-          ...seedCatalog,
-          summary: await getSeedSummary(client, seedCatalog)
-        }))
-        .post('/__dev/login/:slug', async ({ params }) =>
-          loginSeedUser(betterAuth, seedCatalog, params.slug)
+        .get(
+          '/__dev/seed',
+          async () => ({
+            ...seedCatalog,
+            summary: await getSeedSummary(client, seedCatalog)
+          }),
+          { detail: { hide: true } }
+        )
+        .post(
+          '/__dev/login/:slug',
+          async ({ params }) =>
+            loginSeedUser(betterAuth, seedCatalog, params.slug),
+          { detail: { hide: true } }
         )
     }
     rest.compile()

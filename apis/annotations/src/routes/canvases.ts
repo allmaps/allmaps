@@ -25,6 +25,7 @@ export function createCanvasesRoutes(
           {
             id: request.url,
             format: 'annotation',
+            excludeArchived: true,
             expectRows: true,
             singular: false,
             resultScope: 'complete'

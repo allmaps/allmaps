@@ -72,6 +72,7 @@ export type ExtParams = {
 export type ResponseFormat = 'map' | 'annotation' | 'geojson'
 
 export type ResponseOptions = {
+  excludeArchived?: boolean
   format: ResponseFormat
   expectRows: boolean
   singular: boolean

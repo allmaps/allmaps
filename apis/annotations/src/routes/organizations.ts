@@ -69,7 +69,13 @@ export function createOrganizationsRoutes(
             limit: query.limit,
             userRole
           },
-          { id: request.url, format, expectRows: true, singular: false }
+          {
+            id: request.url,
+            format,
+            excludeArchived: true,
+            expectRows: true,
+            singular: false
+          }
         )
       },
       {

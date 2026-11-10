@@ -38,6 +38,7 @@ export function createImagesRoutes(
           {
             id: request.url,
             format,
+            excludeArchived: true,
             expectRows: true,
             singular: false,
             resultScope: 'complete'

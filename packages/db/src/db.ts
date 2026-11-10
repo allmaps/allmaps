@@ -4,10 +4,6 @@ import postgres from 'postgres'
 import { drizzle as postgresDrizzle } from 'drizzle-orm/postgres-js'
 import type { Logger } from 'drizzle-orm/logger'
 
-import { neon, neonConfig } from '@neondatabase/serverless'
-import { drizzle as neonHttpDrizzle } from 'drizzle-orm/neon-http'
-import { drizzle as neonServerlessDrizzle } from 'drizzle-orm/neon-serverless'
-
 import type { PgliteDatabase } from 'drizzle-orm/pglite'
 
 import { relations } from './schema.js'
@@ -22,32 +18,11 @@ class InterpolatedQueryLogger implements Logger {
   }
 }
 
-export function getNeonSql(databaseUrl: string) {
-  return neon(databaseUrl)
-}
-
 export function getPostgresSql(databaseUrl: string) {
   return postgres(databaseUrl)
 }
 
 type PostgresSqlClient = ReturnType<typeof getPostgresSql>
-
-export function getNeonHttpDb(databaseUrl: string, logger = false) {
-  return neonHttpDrizzle(databaseUrl, {
-    relations,
-    logger: logger ? new InterpolatedQueryLogger() : undefined
-  })
-}
-
-export function getNeonDb(databaseUrl: string, logger = false) {
-  neonConfig.webSocketConstructor = WebSocket
-  return neonServerlessDrizzle({
-    connection: databaseUrl,
-    relations,
-    ws: WebSocket,
-    logger: logger ? new InterpolatedQueryLogger() : undefined
-  })
-}
 
 export function getPostgresDb(
   databaseUrlOrClient: string | PostgresSqlClient,
@@ -92,27 +67,15 @@ export function getPgContext(
   }
 }
 
-export function getDb(databaseUrl: string, useNeon = false) {
-  if (useNeon) {
-    return getNeonDb(databaseUrl)
-  } else {
-    return getPostgresDb(databaseUrl)
-  }
-}
-
-export type NeonDb = ReturnType<typeof getNeonDb>
-export type NeonHttpDb = ReturnType<typeof getNeonHttpDb>
 export type PostgresDb = ReturnType<typeof getPostgresDb>
 export type PgliteDb = PgliteDatabase<typeof relations>
 export type PgContext = ReturnType<typeof getPgContext>
 export type PgDb = PgContext['db']
-export type Db = PostgresDb | PgDb | NeonHttpDb | NeonDb | PgliteDb
+export type Db = PostgresDb | PgDb | PgliteDb
 
 export type DbTransaction =
   | Parameters<Parameters<PgDb['transaction']>[0]>[0]
   | Parameters<Parameters<PgliteDb['transaction']>[0]>[0]
   | Parameters<Parameters<PostgresDb['transaction']>[0]>[0]
-  | Parameters<Parameters<NeonDb['transaction']>[0]>[0]
-  | Parameters<Parameters<NeonHttpDb['transaction']>[0]>[0]
 
 export type DbOrTx = Db | DbTransaction

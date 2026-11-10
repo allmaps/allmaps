@@ -8,7 +8,7 @@ If this is your first time contributing to an open source project, here's a good
 
 There are many ways to contribute to Allmaps, and many of them don't involve writing any code. Here's a few ideas to get started:
 
-- Simply start using Allmaps! Go through the [Get Started](https://allmaps.org/#getting-started) guide and play around. Just by creating new annotations, you're already helping a lot.
+- Simply start using Allmaps! Go through the [Get Started](https://allmaps.org/get-started) guide and play around. Just by creating new annotations, you're already helping a lot.
 - Our documentation is still growing. If you need more documentation about a topic, or if you've written your own documentation, notes or tutorial and you'd like to share it with us, please let us know!
 - Take a look at the [discussions](https://github.com/allmaps/allmaps/discussions), where you'll find feature requests and development ideas. You can open a new discussion to [share your ideas](https://github.com/allmaps/allmaps/discussions/new/choose) with us. We gather small feature requests in pinned discussions. When we start working on a bunch of ideas, we plan that work for the coming months in the Projects tab where you'll find the [Roadmap](https://github.com/orgs/allmaps/projects/3).
 - You found something that's not working as expected? Let us know about the bug you found by [opening an issue](https://github.com/allmaps/allmaps/issues/new/choose).

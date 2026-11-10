@@ -1,13 +1,5 @@
 export { schema, relations } from './schema.js'
-export {
-  getDb,
-  getNeonSql,
-  getPostgresSql,
-  getNeonHttpDb,
-  getNeonDb,
-  getPostgresDb,
-  getPgContext
-} from './db.js'
+export { getPostgresSql, getPostgresDb, getPgContext } from './db.js'
 
 export type {
   Db,
@@ -16,11 +8,9 @@ export type {
   PostgresDb,
   PgDb,
   PgliteDb,
-  PgContext,
-  NeonHttpDb,
-  NeonDb
+  PgContext
 } from './db.js'
-export type { PostgresSql, NeonSql } from './types.js'
+export type { PostgresSql } from './types.js'
 export type {
   DbMap,
   DbMap1,

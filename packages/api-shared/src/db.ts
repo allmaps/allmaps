@@ -11,6 +11,7 @@ export {
 } from './queries/iiif.js'
 
 export { queryMaps } from './queries/maps.js'
+export { archiveMap, archiveImage } from './queries/archive.js'
 
 export { queryChecksums, queryImageChecksums } from './queries/versions.js'
 

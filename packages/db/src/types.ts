@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 import type ShareDB from 'sharedb'
 import type postgres from 'postgres'
-import type { NeonQueryFunction } from '@neondatabase/serverless'
 
 import {
   PointSchema,
@@ -34,7 +33,6 @@ import {
 // SQL client types
 
 export type PostgresSql = postgres.Sql
-export type NeonSql = NeonQueryFunction<false, false>
 
 // ShareDB types
 
