@@ -15,6 +15,10 @@ import type { LanguageString } from '@allmaps/iiif-parser'
 import type { Db } from '@allmaps/db'
 import type { UserRole } from '../shared/limits.js'
 
+const iiifRequestOptions = {
+  headers: { 'User-Agent': 'Allmaps API (+https://allmaps.org/)' }
+}
+
 type DbManifest = {
   id: string
   uri: string
@@ -977,7 +981,7 @@ export async function createImageFromUrl(
   options: CreateIiifOptions = {}
 ) {
   assertAllowedDomain(getHttpUrlDomain(newImageUrl), options.allowedUrlDomains)
-  const newImageData = await fetchJson(newImageUrl)
+  const newImageData = await fetchJson(newImageUrl, iiifRequestOptions)
 
   return createParsedImage(db, newImageData, undefined, options)
 }
@@ -987,7 +991,7 @@ export async function createImage(
   newImageId: string,
   newImageUrl: string
 ) {
-  const newImageData = await fetchJson(newImageUrl)
+  const newImageData = await fetchJson(newImageUrl, iiifRequestOptions)
 
   return createParsedImage(db, newImageData, newImageId)
 }
@@ -1001,7 +1005,7 @@ export async function createManifestFromUrl(
     getHttpUrlDomain(newManifestUrl),
     options.allowedUrlDomains
   )
-  const newManifestData = await fetchJson(newManifestUrl)
+  const newManifestData = await fetchJson(newManifestUrl, iiifRequestOptions)
 
   return createParsedManifest(db, newManifestData, undefined, options)
 }
@@ -1011,7 +1015,7 @@ export async function createManifest(
   newManifestId: string,
   newManifestUrl: string
 ) {
-  const newManifestData = await fetchJson(newManifestUrl)
+  const newManifestData = await fetchJson(newManifestUrl, iiifRequestOptions)
 
   return createParsedManifest(db, newManifestData, newManifestId)
 }

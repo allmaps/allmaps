@@ -11,6 +11,12 @@ export async function headers(
   request: Request,
   env: WorkerEnv
 ) {
+  if (response.status >= 400) {
+    response.headers.set('Cache-Control', 'no-store')
+    response.headers.set('CDN-Cache-Control', 'no-store')
+    return response
+  }
+
   // Convert hours to seconds
   const browserCacheSeconds = env.BROWSER_CACHE_HOURS * 60 * 60
   const cloudflareCacheSeconds = env.CLOUDFLARE_CACHE_HOURS * 60 * 60
