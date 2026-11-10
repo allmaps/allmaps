@@ -34,7 +34,10 @@ describe('upstream fetch', () => {
     ).toBe(response)
     expect(fetch).toHaveBeenCalledWith('https://example.org/image', {
       signal,
-      headers: init.headers,
+      headers: new Headers({
+        ...init.headers,
+        'User-Agent': 'Allmaps Tile Server (+https://allmaps.xyz/)'
+      }),
       cf: {
         cacheKey: 'custom-key',
         cacheEverything: true,
@@ -69,7 +72,13 @@ describe('upstream fetch', () => {
         age: '120',
         cfCacheStatus: 'HIT'
       })
-      if (!useCache) expect(fetch.mock.calls[0][1]).toBe(init)
+      expect(fetch.mock.calls[0][1].headers.get('User-Agent')).toBe(
+        'Allmaps Tile Server (+https://allmaps.xyz/)'
+      )
+      expect(fetch.mock.calls[0][1].headers.get('Accept')).toBe(
+        'application/json'
+      )
+      expect(init.headers).toEqual({ Accept: 'application/json' })
     }
   )
 
@@ -88,4 +97,22 @@ describe('upstream fetch', () => {
       cfCacheStatus: null
     })
   })
+
+  it.each([false, true])(
+    'preserves Request headers and adds a User-Agent with caching enabled=%s',
+    async (useCache) => {
+      const fetch = vi.fn().mockResolvedValue(new Response('image'))
+      vi.stubGlobal('fetch', fetch)
+      const request = new Request('https://example.org/info.json', {
+        headers: { Accept: 'application/json' }
+      })
+      await createCachedFetch({ ...env, USE_CACHE: useCache })(request)
+      const headers = fetch.mock.calls[0][1].headers
+      expect(headers.get('Accept')).toBe('application/json')
+      expect(headers.get('User-Agent')).toBe(
+        'Allmaps Tile Server (+https://allmaps.xyz/)'
+      )
+      expect(request.headers.has('User-Agent')).toBe(false)
+    }
+  )
 })

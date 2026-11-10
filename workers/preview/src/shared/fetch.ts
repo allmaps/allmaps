@@ -8,30 +8,30 @@ type RequestInitWithCf = RequestInit & {
 
 export function createCachedFetch(env: Env): FetchFn {
   return (url, requestInit) => {
-    if (!env.USE_CACHE) {
-      return fetch(url, requestInit)
-    }
-
-    const cacheTtl = env.CLOUDFLARE_CACHE_HOURS * 60 * 60
-
-    if (requestInit instanceof Request) {
-      return fetch(url, {
-        ...requestInit,
-        cf: {
-          cacheTtl,
-          cacheEverything: true
-        }
-      })
-    }
-
     const init = requestInit as RequestInitWithCf | undefined
+    const headers = new Headers(
+      init?.headers ?? (url instanceof Request ? url.headers : undefined)
+    )
+    headers.set('User-Agent', 'Allmaps Preview (+https://preview.allmaps.org/)')
+
+    if (!env.USE_CACHE) {
+      return fetch(url, { ...init, headers })
+    }
+
+    const cf: Record<string, unknown> = { ...init?.cf }
+    // Do not cache failed source requests, even if the caller supplies a TTL.
+    delete cf.cacheTtl
 
     return fetch(url, {
       ...init,
+      headers,
       cf: {
-        cacheTtl,
+        ...cf,
         cacheEverything: true,
-        ...init?.cf
+        cacheTtlByStatus: {
+          '200-299': env.CLOUDFLARE_CACHE_HOURS * 60 * 60,
+          '300-599': -1
+        }
       }
     })
   }

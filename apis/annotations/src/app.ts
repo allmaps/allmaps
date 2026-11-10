@@ -99,7 +99,12 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
       async ({ env, query, set }) => {
         if (query.url) {
           setCacheControl(set, 'public-medium')
-          const iiifData = await fetchJson(query.url)
+          const iiifData = await fetchJson(query.url, {
+            headers: {
+              'User-Agent':
+                'Allmaps Annotations API (+https://annotations.allmaps.org/)'
+            }
+          })
           const parsedIiif = IIIF.parse(iiifData)
           const id = await generateId(parsedIiif.uri)
 
