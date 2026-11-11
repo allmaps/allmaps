@@ -19,7 +19,6 @@ import type { GeojsonPolygon, Gcp, Size, Rectangle } from '@allmaps/types'
 import type { TransformationType } from '@allmaps/transform'
 import type { GeoreferencedMap } from '@allmaps/annotation'
 
-const jqNotFoundMessage = 'Please install jq: https://jqlang.github.io/jq/.'
 const gdalNotFoundMessage = 'Please install GDAL.'
 
 function pathJoin(...parts: string[]) {
@@ -83,8 +82,7 @@ mkdir -p ${mergedOptions.outputDir}
 ${generateCheckCommand('gdalinfo', gdalNotFoundMessage)}
 ${generateCheckCommand('gdalbuildvrt', gdalNotFoundMessage)}
 ${generateCheckCommand('gdal_translate', gdalNotFoundMessage)}
-${generateCheckCommand('gdalwarp', gdalNotFoundMessage)}
-${generateCheckCommand('jq', jqNotFoundMessage)}`.trim()
+${generateCheckCommand('gdalwarp', gdalNotFoundMessage)}`.trim()
 }
 
 export async function generateGeoreferencedMapGdalwarpScripts(
@@ -225,8 +223,16 @@ fi
 required_width_${basename}=${resourceSize[0]}
 required_height_${basename}=${resourceSize[1]}
 
-width_${basename}=( $(gdalinfo -json ${imageFilename} | jq '.size[0]') )
-height_${basename}=( $(gdalinfo -json ${imageFilename} | jq '.size[1]') )
+image_info=$(gdalinfo -json ${imageFilename}) || exit 1
+size_pattern='"size"[[:space:]]*:[[:space:]]*\\[[[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\\]'
+
+if [[ $image_info =~ $size_pattern ]]; then
+  width_${basename}=\${BASH_REMATCH[1]}
+  height_${basename}=\${BASH_REMATCH[2]}
+else
+  echo "Error: could not read image dimensions: ${imageFilename}" >&2
+  exit 1
+fi
 
 if [ "$width_${basename}" -eq "$required_width_${basename}" ] &&
    [ "$height_${basename}" -eq "$required_height_${basename}" ]; then

@@ -22,11 +22,6 @@ then
   echo "Error: gdalwarp could not be found. Please install GDAL."
   exit 1
 fi
-if ! command -v jq &> /dev/null
-then
-  echo "Error: jq could not be found. Please install jq: https://jqlang.github.io/jq/."
-  exit 1
-fi
 
 if ! [ -f ./c21d3a8cff2ff76f.jpg ]; then
   echo "Image file does not exist: ./c21d3a8cff2ff76f.jpg"
@@ -37,8 +32,16 @@ fi
 required_width_c21d3a8cff2ff76f_c969e4bba21381cf=5207
 required_height_c21d3a8cff2ff76f_c969e4bba21381cf=7446
 
-width_c21d3a8cff2ff76f_c969e4bba21381cf=( $(gdalinfo -json ./c21d3a8cff2ff76f.jpg | jq '.size[0]') )
-height_c21d3a8cff2ff76f_c969e4bba21381cf=( $(gdalinfo -json ./c21d3a8cff2ff76f.jpg | jq '.size[1]') )
+image_info=$(gdalinfo -json ./c21d3a8cff2ff76f.jpg) || exit 1
+size_pattern='"size"[[:space:]]*:[[:space:]]*\[[[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\]'
+
+if [[ $image_info =~ $size_pattern ]]; then
+  width_c21d3a8cff2ff76f_c969e4bba21381cf=${BASH_REMATCH[1]}
+  height_c21d3a8cff2ff76f_c969e4bba21381cf=${BASH_REMATCH[2]}
+else
+  echo "Error: could not read image dimensions: ./c21d3a8cff2ff76f.jpg" >&2
+  exit 1
+fi
 
 if [ "$width_c21d3a8cff2ff76f_c969e4bba21381cf" -eq "$required_width_c21d3a8cff2ff76f_c969e4bba21381cf" ] &&
    [ "$height_c21d3a8cff2ff76f_c969e4bba21381cf" -eq "$required_height_c21d3a8cff2ff76f_c969e4bba21381cf" ]; then
