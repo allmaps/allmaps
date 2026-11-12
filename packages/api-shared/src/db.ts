@@ -68,3 +68,5 @@ export {
   updateOrganization,
   deleteOrganization
 } from './queries/organizations.js'
+
+export { queryStatistics } from './queries/statistics.js'

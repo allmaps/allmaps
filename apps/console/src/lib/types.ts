@@ -86,3 +86,13 @@ export type ListSummary = {
 export type ListDetail = ListSummary & {
   items: ListItem[]
 }
+
+export type Statistics = {
+  images: number
+  maps: number
+  manifests: number
+  imagesWithoutManifest: number
+  georeferencedImages: number
+  georeferencedPercentage: number | null
+  measuredAt: string
+}
