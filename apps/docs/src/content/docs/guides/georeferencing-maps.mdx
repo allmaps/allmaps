@@ -19,7 +19,7 @@ To get started, you’ll need the URL of a IIIF resource containing a map. See
 [Find maps to georeference](/guides/find-maps-to-georeference) for collection
 links and help finding a IIIF URL.
 
-### What is georeferencing?
+## What is georeferencing?
 
 Georeferencing connects places on a historical map to their geographic
 locations. You identify matching points on the map image and a modern reference
@@ -35,7 +35,7 @@ control points, map mask, and transformation settings in a
 display the georeferenced map in your browser without creating a separate image
 file.
 
-### Step 1: Open a IIIF resource
+## Step 1: Open a IIIF resource
 
 1. Open [Allmaps Editor](https://editor.allmaps.org/).
 2. Paste a IIIF resource URL into the input field and press <kbd>Enter</kbd>. You can
@@ -72,7 +72,7 @@ If you need help, [report an issue](https://github.com/allmaps/allmaps/issues)
 and include the resource URL and the error message.
 :::
 
-### Step 2: Draw a mask
+## Step 2: Draw a mask
 
 A **map mask** outlines the part of the image you want to georeference. It
 determines which area is displayed in the results and in Allmaps Viewer.
@@ -94,7 +94,7 @@ you can draw a separate mask for each. Each map can then have its own control
 points.
 :::
 
-#### Edit a mask
+### Edit a mask
 
 You can refine the outline in the **Draw mask** tab:
 
@@ -123,7 +123,7 @@ Annotation. See [Share and export your map](#share-and-export-your-map)
 for details.
 :::
 
-### Step 3: Add ground control points
+## Step 3: Add ground control points
 
 Ground control points (GCPs) connect locations on the historical map to the same
 places on a modern reference map.
@@ -153,7 +153,7 @@ the reference map.
 If the loaded IIIF Manifest contains a [navPlace](https://iiif.io/api/extension/navplace/) property, this will be used to initiate the map view.
 :::
 
-#### Edit ground control points
+### Edit ground control points
 
 In the **Georeference** tab, drag a ground control point on either the image or
 the reference map to adjust its position.
@@ -165,7 +165,7 @@ it, click its trash icon and confirm.
 If the image contains several maps, select the map you want to work on in the
 **Maps** panel. Each map has its own ground control points.
 
-#### Navigate the image and reference map
+### Navigate the image and reference map
 
 Zoom and pan either view to position your ground control points precisely. Use
 the search button to find a place on the reference map.
@@ -173,7 +173,7 @@ the search button to find a place on the reference map.
 To rotate the image or reference map, hold <kbd>Ctrl</kbd> and drag with the
 left mouse button.
 
-#### Adjust the display
+### Adjust the display
 
 Click the cogwheel icon in the map view to open the display settings.
 
@@ -205,7 +205,7 @@ reference.
   </figcaption>
 </figure>
 
-#### Import existing georeferencing data
+### Import existing georeferencing data
 
 If you already have a mask or ground control points for an image, you can import
 them into Allmaps Editor instead of drawing them again.
@@ -225,7 +225,7 @@ SVG polygon. Ground control points can be imported from formats used by QGIS,
 GDAL, and ESRI. Image coordinates must correspond to the original IIIF image's
 dimensions.
 
-### Step 4: View and export results
+## Step 4: View and export results
 
 Open the **Results** tab to see your georeferenced map overlaid on the reference
 map. The image is cropped to the mask you drew.
@@ -245,7 +245,7 @@ Use the **Show** menu at the bottom to choose which maps to display:
 
 The available options depend on the resource you opened.
 
-#### Choose a transformation
+### Choose a transformation
 
 A transformation determines how Allmaps positions and warps the historical map
 using your ground control points. The default, **Polynomial**, works well for
@@ -266,7 +266,7 @@ Polynomial and Helmert find an overall fit, so individual ground control points
 may not align exactly. Before changing the transformation, check that your
 ground control points are accurate and spread across the map.
 
-#### Share and export your map
+### Share and export your map
 
 Click **Export** to open the export panel. Under **Export options for**, choose
 **Current map**, **Current image**, or **All images**. The available options
@@ -277,7 +277,7 @@ The panel provides links you can open or copy:
 - **View in Allmaps Viewer:** explore and share the selected maps. Choose
   **Latest version** to include future edits, or **Current version** to keep
   the link fixed to the current georeferencing. See
-  [Share a map](/guides/viewing-maps#share-a-map) for details.
+  [Share a map](/guides/allmaps-viewer#share-a-map) for details.
 - **Georeference Annotation:** access the georeferencing data for your selection.
   Multiple maps are returned together in an Annotation Page. Use **Code** to
   inspect the annotation.
@@ -288,10 +288,10 @@ Select **Show more export options** for GeoJSON, web mapping code examples, and
 instructions for creating a GeoTIFF.
 
 See [Georeference Annotations](/georeference-annotations) for details about the
-data format, or [Using maps in other tools](/guides/using-maps)
-for more ways to use your work.
+data format. To use maps in GIS software, see [XYZ tiles](/guides/xyz-map-tiles)
+and [GeoTIFFs](/guides/export-geotiffs).
 
-### Versions and shared edits
+## Versions and shared edits
 
 Anyone can edit a map in Allmaps Editor, including maps you have georeferenced.
 Allmaps keeps a history of the georeferencing data, so you can refer to a

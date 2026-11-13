@@ -1,0 +1,109 @@
+---
+title: XYZ map tiles with Allmaps Tile Server
+description: Add georeferenced maps to GIS software as XYZ tile layers
+---
+
+export const homepageBaseUrl = import.meta.env.PUBLIC_HOMEPAGE_BASE_URL || 'https://allmaps.org'
+
+XYZ tiles let you display georeferenced maps in GIS software and other tools
+that support tile layers, such as QGIS. Your tool loads small image tiles as
+you zoom and pan.
+
+## How it works
+
+Allmaps Tile Server creates XYZ tiles on demand. It fetches the source tiles
+it needs from the institutions’ IIIF image servers and uses Georeference
+Annotations to warp them into place. The server renders the output tile with
+Allmaps’ Rust renderer, compiled to WebAssembly as
+[`@allmaps/render-wasm`](https://github.com/allmaps/allmaps/tree/develop/packages/render-wasm).
+
+## Get an XYZ tile URL
+
+Copy a URL from Allmaps Editor:
+
+1. Open the map in **Allmaps Editor**.
+2. Open the **Export** panel and select the maps you want to use.
+3. Copy the **XYZ map tiles** URL.
+
+Keep the `{z}`, `{x}`, and `{y}` placeholders in the URL. Your tool replaces
+them with the zoom level and tile coordinates when requesting tiles.
+
+To construct a tile URL from an Allmaps annotation URL, replace
+`annotations.allmaps.org` with `allmaps.xyz` and append `/{z}/{x}/{y}.webp`.
+This works for a single map, all maps on an image, or all maps in a IIIF Manifest.
+
+<div class="api-examples">
+
+| Annotation URL | XYZ tile URL |
+| --- | --- |
+| <a href="https://annotations.allmaps.org/maps/135dfd2d58dc26ec">{"https://annotations.allmaps.org"}<wbr />{"/maps"}<wbr />{"/135dfd2d58dc26ec"}</a> | <a href="https://allmaps.xyz/maps/135dfd2d58dc26ec/%7Bz%7D/%7Bx%7D/%7By%7D.webp">{"https://allmaps.xyz"}<wbr />{"/maps"}<wbr />{"/135dfd2d58dc26ec"}<wbr />{"/{z}/{x}/{y}.webp"}</a> |
+| <a href="https://annotations.allmaps.org/images/f6033bee94f7763e">{"https://annotations.allmaps.org"}<wbr />{"/images"}<wbr />{"/f6033bee94f7763e"}</a> | <a href="https://allmaps.xyz/images/f6033bee94f7763e/%7Bz%7D/%7Bx%7D/%7By%7D.webp">{"https://allmaps.xyz"}<wbr />{"/images"}<wbr />{"/f6033bee94f7763e"}<wbr />{"/{z}/{x}/{y}.webp"}</a> |
+| <a href="https://annotations.allmaps.org/manifests/23379602e8187445">{"https://annotations.allmaps.org"}<wbr />{"/manifests"}<wbr />{"/23379602e8187445"}</a> | <a href="https://allmaps.xyz/manifests/23379602e8187445/%7Bz%7D/%7Bx%7D/%7By%7D.webp">{"https://allmaps.xyz"}<wbr />{"/manifests"}<wbr />{"/23379602e8187445"}<wbr />{"/{z}/{x}/{y}.webp"}</a> |
+
+</div>
+
+For more URL options, including TileJSON and double-resolution tiles, see the
+[Allmaps Tile Server reference](/packages/tileserver#api).
+
+## Add a layer in QGIS
+
+1. In the **Browser** panel, right-click **XYZ Tiles** and choose **New Connection**.
+2. Give the connection a name and paste the XYZ tile URL into the **URL** field.
+3. Select **OK**, then double-click the new connection under **XYZ Tiles** to
+   add the layer to your project.
+
+If the layer looks blank, open the XYZ tile URL in your browser to see where
+the historical map is located. Pan and zoom to that area in QGIS.
+
+<figure class="not-content">
+  <img
+    class="h-auto max-w-full"
+    src="https://files.allmaps.org/images/screenshots/qgis-desktop/v1-1308w.webp"
+    srcSet="https://files.allmaps.org/images/screenshots/qgis-desktop/v1-480w.webp 480w, https://files.allmaps.org/images/screenshots/qgis-desktop/v1-1308w.webp 1308w"
+    sizes="auto, 100vw"
+    width={1308}
+    height={863}
+    loading="lazy"
+    decoding="async"
+    alt="A historical map of Asia over OpenStreetMap in QGIS"
+  />
+  <figcaption class="mt-3 text-sm text-[var(--sl-color-gray-2)]">
+    An XYZ tile layer from Allmaps Tile Server in QGIS.
+  </figcaption>
+</figure>
+
+## Hosted service and limits
+
+For every tile request, Allmaps Tile Server loads the list of
+georeferenced maps associated with the request's Georeference Annotation, then fetches IIIF image information (`info.json`) and
+source tiles for the maps needed in that area. At low zoom levels, a single
+output tile covers a larger area and can need imagery from many sheets.
+
+Allmaps Tile Server runs on [Cloudflare Workers](https://developers.cloudflare.com/workers/platform/limits/#subrequests).
+Cloudflare limits how many outgoing requests the Worker can make to render
+each tile. If you only need a few sheets from a large Manifest, use tile URLs for those
+maps or images to reduce the work each tile request triggers.
+
+:::caution[Large IIIF Manifests]
+In the future, we may put more limits on how many georeferenced maps from a single IIIF
+Manifest the hosted Allmaps Tile Server can render.
+:::
+
+Where possible, we strongly recommend using our
+[Leaflet, MapLibre, or OpenLayers plugins](/guides/plugins).
+They warp images in your browser, avoiding the tile server's rendering costs.
+
+:::caution[Fair use]
+The hosted service is subject to fair use, and we cannot guarantee that it will
+remain free of charge. See
+<a href={new URL('/terms', homepageBaseUrl).href}>Terms &amp; Usage</a> for details.
+
+The [OpenHistoricalMap project](https://www.openhistoricalmap.org/) currently
+covers the cost of running the hosted tile service.
+:::
+
+## Offline use and self-hosting
+
+For offline work, [create a GeoTIFF](/guides/export-geotiffs). For bulk tile generation,
+you can [generate your own XYZ tiles with gdal2tiles](/guides/export-geotiffs#create-xyz-tiles-with-gdal2tiles)
+or [host the open source tile server yourself](https://github.com/allmaps/allmaps/tree/develop/workers/tileserver).

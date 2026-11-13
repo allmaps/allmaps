@@ -1,4 +1,4 @@
-import { validateAnnotationUrl } from '@allmaps/ui/examples/source'
+import { validateAnnotationUrl } from './examples/source.ts'
 
 export type ImageSettings = {
   annotationUrl: string
@@ -28,20 +28,15 @@ export function validateImageSettings(settings: ImageSettings): ImageSettings {
 }
 
 export function imageExampleSource(settings: ImageSettings) {
-  return `import { Viewport } from '@allmaps/render'
-import { WasmRenderer } from '@allmaps/render/wasm'
-import initializeWasm, * as wasmModule from '@allmaps/render-wasm'
+  return `import { CanvasRenderer } from '@allmaps/render/canvas'
 
 // Run this code in a Web Worker to keep the page responsive.
-await initializeWasm()
-
 const response = await fetch(${JSON.stringify(settings.annotationUrl)})
 if (!response.ok) throw new Error('Could not load the annotation')
 const annotation = await response.json()
 
-const renderer = new WasmRenderer(wasmModule, {
-  outputFormat: '${settings.format}'${settings.format === 'jpeg' ? ',\n  backgroundColor: [255, 255, 255]' : ''}
-})
+const canvas = new OffscreenCanvas(${settings.width}, ${settings.height})
+const renderer = new CanvasRenderer(canvas)
 
 try {
   const results = renderer.addGeoreferenceAnnotation(annotation)
@@ -49,12 +44,16 @@ try {
   if (failure) throw failure.error
   if (!results.length) throw new Error('No georeferenced maps found')
 
-  const viewport = Viewport.fromSizeAndMaps(
-    [${settings.width}, ${settings.height}], renderer.warpedMapList,
-    { fit: 'contain' }
-  )
-  const bytes = await renderer.render(viewport)
-  const blob = new Blob([bytes], { type: 'image/${settings.format}' })
+  await renderer.render()${
+    settings.format === 'jpeg'
+      ? `
+  // Fill transparent areas with white before encoding as JPEG.
+  renderer.context.globalCompositeOperation = 'destination-over'
+  renderer.context.fillStyle = '#fff'
+  renderer.context.fillRect(0, 0, canvas.width, canvas.height)`
+      : ''
+  }
+  const blob = await canvas.convertToBlob({ type: 'image/${settings.format}' })
   // Send the image back to the page for preview and download.
   self.postMessage({ blob })
 } finally {
