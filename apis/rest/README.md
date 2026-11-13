@@ -71,3 +71,31 @@ network calls are mocked; state handling, encrypted transport and session writes
 are real. Ordinary Google login, session and account-linking tests also run.
 No deployed browser login has been verified before the develop PR is merged and
 the preview code is deployed.
+
+## Statistics branch build wiring
+
+Cloudflare Workers Builds watches only `feat/console-domain-statistics` for the
+separate `console-preview` and `rest-preview` Workers. These triggers reuse the
+existing Allmaps GitHub repository connection and the corresponding develop
+build-token registrations. The repository-root build command installs the frozen
+lockfile, builds APIs and console dependencies, then invokes
+`node scripts/deploy-console-preview.ts console` or the `rest` target.
+
+The deploy script refuses any other branch and derives both hostnames from
+`PREVIEW_NAME` (default `pr-statistics`):
+`<name>.preview.console.allmaps.org` and `<name>.preview.api.allmaps.org`. It
+uses only the dedicated preview Hyperdrive binding, and disables workers.dev.
+The REST build needs `OAUTH_PROXY_SECRET`, `PREVIEW_BETTER_AUTH_SECRET` (distinct
+secrets) and `PREVIEW_HYPERDRIVE_ID`. Secret values are written to a temporary
+mode-0600 file and uploaded alongside code with Wrangler's `--secrets-file`, then
+deleted. They never enter the generated public Wrangler configuration or command
+arguments. The public OAuth client IDs may be supplied as build variables or
+read from develop's ordinary provider authorization redirects; no provider
+client secrets are copied into previews.
+
+Preview code and custom domains are deployed by the GitHub-connected builds,
+not by ad-hoc uploads through the Cloudflare plugin. The callback-proxy PR must
+be merged and its develop build must succeed before preview login works.
+The first preview statistics migration and population are managed separately on
+the isolated Neon branch; production and the develop database are not migrated
+by the preview deployment script.
