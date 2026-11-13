@@ -75,6 +75,18 @@ describe('development OAuth Proxy', () => {
         GOOGLE_CLIENT_ID: '',
         GOOGLE_CLIENT_SECRET: ''
       })
+      for (const url of [
+        'https://dev.api.allmaps.org/',
+        'https://DEV.API.ALLMAPS.ORG:443'
+      ]) {
+        expect(() =>
+          parseRestEnv({
+            ...centralEnv,
+            BETTER_AUTH_URL: url,
+            GITHUB_CLIENT_SECRET: ''
+          })
+        ).toThrow()
+      }
       const centralAuth = createAuth(centralEnv, centralContext.db).auth
       const previewAuth = createAuth(previewEnv, previewContext.db).auth
       const productionAuth = createAuth(
