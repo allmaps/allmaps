@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "slug": "editor-export-version",
-  "version": 5,
-  "imageSha256": "c97ff97a5f1a3362b6ae8b3fdee9cf8fcbe6f6878b6b672523622377507d36e2",
+  "version": 8,
+  "imageSha256": "7e16e64e221cce6bfb4ef329e21b4d4eef81b7c1e0aac031ac7a5ee2c5e086f9",
   "viewport": {
-    "width": 1280,
-    "height": 720
+    "width": 1067,
+    "height": 667
   },
   "targets": {
     "export": {
-      "height": 476,
+      "height": 388,
       "width": 399.2265625,
-      "x": 864,
-      "y": 83
+      "x": 651,
+      "y": 63
     }
   }
 }

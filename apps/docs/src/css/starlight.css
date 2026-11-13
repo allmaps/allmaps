@@ -37,6 +37,17 @@
   --sl-color-bg-inline-code: #ecfbfc;
 }
 
+.sl-markdown-content a:not(:where(.not-content *, .starlight-aside *)) {
+  color: var(--sl-color-accent);
+  font-weight: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.right-sidebar a:is(:hover, :focus-visible) {
+  color: var(--sl-color-accent);
+}
+
 .sl-markdown-content code:not(:where(pre *, .not-content *)) {
   background-color: var(--sl-color-bg-inline-code);
   border: 0;
@@ -94,6 +105,10 @@
   vertical-align: -0.15em;
 }
 
+figcaption {
+  text-align: center;
+}
+
 /* Annotate the example with margin rules and lightly emphasized labels. */
 .georeference-annotation-example {
   --annotation-marker-color: #ff85cb;
@@ -107,6 +122,14 @@
 
 .georeference-annotation-example .expressive-code .ec-line.mark {
   background: transparent;
+}
+
+/* Separate labeled ranges only when their marked lines are adjacent. */
+.georeference-annotation-example
+  .expressive-code
+  .ec-line.mark
+  + .ec-line.mark.tm-label {
+  margin-top: 10px;
 }
 
 .georeference-annotation-example .expressive-code .ec-line.mark .code {
@@ -128,6 +151,11 @@
 
 .site-title {
   color: var(--sl-color-white);
+}
+
+/* Give the theme toggle the same space beside the divider as at the page edge. */
+header .right-group {
+  gap: var(--sl-nav-pad-x);
 }
 
 :root[data-theme='light'] .site-title {

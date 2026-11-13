@@ -36,7 +36,7 @@ When it is unset, no tracking script is included.
 
 Docs pages use URLs without trailing slashes, such as `/guides/discover-maps`.
 Keep internal links and generated package links in this form, including links
-with fragments such as `/guides/viewing-maps#share-a-map`.
+with fragments such as `/guides/allmaps-viewer#share-a-map`.
 
 Astro's `trailingSlash: 'never'` keeps Starlight navigation, canonical URLs,
 search results, and sitemap URLs consistent. Keep the default directory build
@@ -102,6 +102,72 @@ Starlight provides page titles, descriptions, canonical URLs, and the large-imag
 card type. `src/route-data.ts` adds the image metadata and Twitter card text,
 removes the repeated homepage title, and prevents indexing of development sites.
 Image URLs use the configured `PUBLIC_DOCS_BASE_URL`, like canonical URLs.
+
+## Interactive map examples
+
+Use `MapExample.astro` from `src/components/` to switch between MapLibre, Leaflet
+and OpenLayers. It defaults to MapLibre; pass `library="Leaflet"` or
+`library="OpenLayers"` to select another initial library. The annotation URL,
+opacity, transformation and initial-view settings are preserved when switching,
+and the source code and install command update for the selected library.
+Switching disposes the old map and creates a new one. Each library, Allmaps
+plugin and stylesheet loads only when selected and the map is near the viewport;
+loaded modules are reused when switching back.
+
+Use an interactive map and its JavaScript example together:
+
+```svelte
+<script>
+  import MapLibreExample from './src/components/examples/MapLibreExample.svelte'
+</script>
+
+<MapLibreExample
+  annotationUrl="https://annotations.allmaps.org/maps/1bfb1eb4198e7240@c83337fa4b8051c9"
+  opacity={1}
+  transformation="annotation"
+  height={400}
+/>
+```
+
+The read-only, highlighted source code reflects the map controls. Opacity and
+transformation apply immediately. Choose a map from the examples dropdown to
+load it immediately, or submit an annotation URL with Load or Enter.
+Changing the transformation preserves the current view. Reset view fits the map
+to its extent again.
+The default transformation, `annotation`, preserves each map's transformation.
+You can override it with `polynomial1`, `helmert` or `thinPlateSpline`, or choose
+From annotation to restore it. Default opacity and transformation setters are
+omitted from the copied code.
+Copy code gives you a short, standalone example using the selected settings.
+The map container markup and install command appear in separate highlighted HTML
+and Bash blocks below the JavaScript. Each block has its own Copy code button.
+
+Initial view offers three approaches, with **Fit after loading** as the default:
+
+- **Fit after loading** adds the annotation, then fits the map to its extent.
+- **Known bounds** uses fixed coordinates to position the map before loading the
+  annotation. The example fills in these coordinates for the selected map. You
+  can also supply a `bounds` prop as `[west, south, east, north]`.
+- **WarpedMapList** loads the annotation into a list first, calculates its extent,
+  and shares the list with the layer. The install command adds `@allmaps/render`.
+
+Use `viewMode="fit"`, `viewMode="bounds"` or `viewMode="list"` to choose the
+initial option. Switching it recreates the map and updates the source code.
+IIIF HTTP and network failures appear with a retry option, and stalled image
+requests time out.
+
+The dropdown includes Saigon, Amsterdam, Vienna, and Britain and Ireland. Pass an
+`examples` array of `{ label, annotationUrl }` objects to use your own list, or
+`examples={[]}` to hide the dropdown.
+
+The Svelte components live in `src/components/examples/`. Their prop types,
+annotation presets, loading helpers, and GeoTIFF script generation live in
+`src/lib/examples/`, with tests in `test/`. Use the Astro wrappers in MDX to
+include visibility-based hydration and the docs code theme.
+
+The docs and homepage share source generation and lazy map runtimes through
+`@allmaps/ui/examples/source`. Reusable code blocks and selects remain in
+`@allmaps/ui`.
 
 ## License
 

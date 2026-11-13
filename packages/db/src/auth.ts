@@ -4,7 +4,16 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import type { BetterAuthEnv } from '@allmaps/env'
 import { generateRandomId } from '@allmaps/id/sync'
 
-import { anonymous, openAPI, admin, organization } from 'better-auth/plugins'
+import {
+  anonymous,
+  openAPI,
+  admin,
+  organization,
+  oAuthProxy
+} from 'better-auth/plugins'
+import { getOAuthProxyConfiguration } from './oauth-proxy.js'
+
+export { getOAuthProxyConfiguration } from './oauth-proxy.js'
 
 import type { Db } from './db.js'
 import * as authSchema from './schema/auth.js'
@@ -14,6 +23,12 @@ type AuthSettings = Omit<BetterAuthEnv, 'DATABASE_URL'>
 
 export function createAuth(env: AuthSettings, db: Db) {
   const baseURL = env.BETTER_AUTH_URL
+  const proxy = getOAuthProxyConfiguration(env)
+  const previewProxy = proxy && proxy.currentURL !== proxy.productionURL
+  const trustedOrigins = proxy?.trustedOrigins ?? [
+    'https://*.allmaps.org',
+    'http://localhost:*'
+  ]
 
   const hostname = new URL(baseURL).hostname
   const useAllmapsCookieDomain = hostname.endsWith('.allmaps.org')
@@ -28,6 +43,7 @@ export function createAuth(env: AuthSettings, db: Db) {
       usePlural: true
     }),
     account: {
+      storeStateStrategy: 'database',
       accountLinking: {
         enabled: true,
         disableImplicitLinking: false,
@@ -53,7 +69,7 @@ export function createAuth(env: AuthSettings, db: Db) {
       crossSubDomainCookies: useAllmapsCookieDomain
         ? { enabled: true, domain: 'allmaps.org' }
         : { enabled: false },
-      trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
+      trustedOrigins,
       database: {
         generateId: (options) => {
           if (
@@ -71,7 +87,7 @@ export function createAuth(env: AuthSettings, db: Db) {
       }
     },
     socialProviders: {
-      ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+      ...(env.GITHUB_CLIENT_ID && (env.GITHUB_CLIENT_SECRET || previewProxy)
         ? {
             github: {
               clientId: env.GITHUB_CLIENT_ID,
@@ -82,7 +98,7 @@ export function createAuth(env: AuthSettings, db: Db) {
             }
           }
         : {}),
-      ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ...(env.GOOGLE_CLIENT_ID && (env.GOOGLE_CLIENT_SECRET || previewProxy)
         ? {
             google: {
               clientId: env.GOOGLE_CLIENT_ID,
@@ -95,7 +111,7 @@ export function createAuth(env: AuthSettings, db: Db) {
           }
         : {})
     },
-    trustedOrigins: ['https://*.allmaps.org', 'http://localhost:*'],
+    trustedOrigins,
     // experimental: { joins: true },
     plugins: [
       anonymous(),
@@ -129,8 +145,17 @@ export function createAuth(env: AuthSettings, db: Db) {
             }
           }
         }
-      })
-    ],
+      }),
+      ...(proxy
+        ? [
+            oAuthProxy({
+              productionURL: proxy.productionURL,
+              currentURL: proxy.currentURL,
+              secret: proxy.secret
+            })
+          ]
+        : [])
+    ] as const,
     session: {
       cookieCache: {
         enabled: true,

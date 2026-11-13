@@ -1,0 +1,114 @@
+---
+title: GeoTIFFs with Allmaps CLI and GDAL
+description: Create GeoTIFFs from Georeference Annotations with Allmaps CLI and GDAL
+---
+
+import GeotiffExample from '../../../components/GeotiffExample.astro'
+
+GeoTIFF files store image pixels together with the coordinate information
+needed to place them on a map. Export your georeferenced IIIF maps as GeoTIFFs
+to open them in QGIS or other GIS software, combine them with other datasets,
+and work with them offline.
+
+You can export a single map or process several sheets together. The workflow
+below creates Cloud Optimized GeoTIFFs on your computer from the original
+images and their georeferencing data. You can also turn the results into XYZ
+tiles to publish on your own web server.
+
+## How it works
+
+Allmaps CLI is Allmaps’ command-line interface. You run it in a terminal to
+read and process Georeference Annotations, download IIIF images, and generate
+scripts for other tools. See the [Allmaps CLI installation instructions](/packages/cli#installation).
+
+GDAL is an open source toolkit for processing geospatial data. The
+`allmaps script geotiff` command reads a Georeference Annotation and generates
+a Bash script with GDAL commands. It uses the annotation’s ground control
+points and map masks to prepare instructions for positioning and cropping the
+original images.
+
+When you run the script, GDAL reads the downloaded, full-resolution images,
+warps each map into its geographic position, crops it to its mask, and writes
+a [Cloud Optimized GeoTIFF](https://www.cogeo.org/). For annotations containing several maps, the
+script creates a GeoTIFF for each map.
+
+The generated script uses four GDAL commands.
+
+- [`gdalinfo`](https://gdal.org/en/stable/programs/gdalinfo.html) reads the source image dimensions so the script can check that
+  each downloaded image has the expected size.
+- [`gdal_translate`](https://gdal.org/en/stable/programs/gdal_translate.html) creates a virtual raster (VRT) that associates the source
+  image with its ground control points and coordinate system.
+- [`gdalwarp`](https://gdal.org/en/stable/programs/gdalwarp.html) warps the image, crops it to the map mask, and writes the Cloud
+  Optimized GeoTIFF.
+- [`gdalbuildvrt`](https://gdal.org/en/stable/programs/gdalbuildvrt.html) creates an output VRT that references the generated GeoTIFFs,
+  so you can open or process the maps together.
+
+A VRT is a small file that describes how to read other raster files. Keep it
+with the GeoTIFFs it references when opening the maps or generating tiles.
+
+## Create GeoTIFFs
+
+The `allmaps script geotiff` command reads a Georeference Annotation and
+generates a Bash script that creates GeoTIFFs with GDAL. To run that script,
+you also need the original, full-resolution map images as JPEGs.
+
+1. Install [Allmaps CLI](/packages/cli#installation) and **GDAL**.
+2. Generate the script from your annotation file:
+
+   ```bash
+   allmaps script geotiff annotation.json > allmaps-geotiff.sh
+   ```
+
+3. Download the full-resolution JPEGs with `allmaps fetch full-image` and save
+   them in the same directory as the script. The filenames and pixel dimensions
+   must match those expected by the script. You can list the IIIF image service
+   URLs with `allmaps annotation image-ids`.
+4. Run the script from that directory:
+
+   ```bash
+   bash allmaps-geotiff.sh
+   ```
+
+If a server limits full-image downloads, use `allmaps script dezoomify` to
+generate a Bash script that downloads and assembles image tiles with
+[dezoomify-rs](https://dezoomify-rs.ophir.dev/). Both download methods use the
+filenames expected by the GeoTIFF script.
+
+For image-download commands, custom filenames, and more options, see the
+[Allmaps CLI GeoTIFF documentation](/packages/cli#create-geotiffs-using-gdal).
+
+## Generate a script in your browser
+
+Choose an example or paste a Georeference Annotation URL, then select
+**Generate script**. Copy or download the script.
+The **Required source images** section provides download commands,
+full-resolution JPEG links, and the expected filenames and dimensions.
+Download those images and run the script locally as described above.
+
+<GeotiffExample />
+
+## Create XYZ tiles with gdal2tiles
+
+After running the GeoTIFF script, use its output VRT as the input to GDAL’s
+[`gdal2tiles`](https://gdal.org/en/stable/programs/gdal2tiles.html) command to generate a directory of XYZ tiles:
+
+```bash
+gdal2tiles --xyz map.vrt tiles
+```
+
+Replace `map.vrt` with the VRT created by the final `gdalbuildvrt` command in
+the generated script. Some GDAL installations name the command `gdal2tiles.py`.
+The `--xyz` option uses the tile numbering expected by XYZ tile layers.
+
+For an annotation containing several maps, the GeoTIFF script also creates
+`merged.vrt`. This file references the generated GeoTIFFs and lets you create
+one tile layer containing all the maps:
+
+```bash
+gdal2tiles --xyz merged.vrt tiles
+```
+
+Keep the GeoTIFFs alongside `merged.vrt` while generating the tiles. Use the
+`--zoom` option to choose a zoom range, such as `--zoom=10-16`.
+
+For more options, see the [gdal2tiles documentation](https://gdal.org/en/stable/programs/gdal2tiles.html).

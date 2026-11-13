@@ -17,7 +17,6 @@
     { "path": "../bearing" },
     { "path": "../iiif-parser" },
     { "path": "../id" },
-    { "path": "../io" },
     { "path": "../project" },
     { "path": "../render" },
     { "path": "../stdlib" },

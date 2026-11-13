@@ -34,13 +34,38 @@ describe('screenshot definitions', () => {
     const definition = defineScreenshot(options)
     expect(definition.url).toBe(options.url)
     expect(definition.viewport).toEqual({
-      width: 1440,
-      height: 900,
+      width: 1067,
+      height: 667,
       deviceScaleFactor: 2
     })
     expect(screenshotUrl(definition)).toBe(
       'https://files.allmaps.org/screenshots/viewer-rotterdam/v1.webp'
     )
+  })
+
+  test('resolves display sizing before collecting the manifest', () => {
+    const sized = { ...options, displayWidth: 600, aspectRatio: 2 }
+    const manifest = createManifest([sized])
+    expect(manifest.screenshots[0].viewport).toEqual({
+      width: 1000,
+      height: 500,
+      deviceScaleFactor: 2
+    })
+    expect(
+      createManifest(JSON.parse(JSON.stringify(manifest.screenshots)))
+    ).toEqual(manifest)
+  })
+
+  test('keeps explicit viewport dimensions and density', () => {
+    const viewport = { width: 1440, height: 900, deviceScaleFactor: 3 }
+    expect(
+      defineScreenshot({
+        ...options,
+        displayWidth: 600,
+        aspectRatio: 2,
+        viewport
+      }).viewport
+    ).toEqual(viewport)
   })
 
   test('retains opt-in render readiness and rejects invalid values', () => {
@@ -61,7 +86,7 @@ describe('screenshot definitions', () => {
   test('deduplicates normalized definitions and supports published versions', () => {
     const manifest = createManifest([
       { ...options, version: 2 },
-      { ...options, viewport: { width: 1440 } },
+      { ...options, viewport: { width: 1067 } },
       options
     ])
     expect(

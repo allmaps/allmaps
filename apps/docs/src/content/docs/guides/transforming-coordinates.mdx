@@ -1,0 +1,211 @@
+---
+title: From pixels to geographic coordinates
+description: Transform points between pixels, WGS84 longitude and latitude, and projected coordinates.
+---
+
+import CoordinateExample from '../../../components/CoordinateExample.svelte'
+
+Transforming between pixels and geographic coordinates is the core
+functionality of Allmaps. It makes it possible to place historical maps on a
+modern map, and to move points, lines, and polygons between the two coordinate
+systems. A [Georeference Annotation](/georeference-annotations) records matching
+image and geographic locations as **ground control points (GCPs)**. Allmaps
+uses these points to calculate a transformation for the rest of the image.
+
+## How it works
+
+Each GCP tells Allmaps that one pixel corresponds to one geographic
+location: for example, a street corner on the historical map and the same corner
+on the modern map. These are the only correspondences we have identified.
+We do not know the location of every pixel between them. A transformation
+algorithm supplies a mathematical rule for estimating those locations.
+
+Different algorithms allow different kinds of movement and distortion:
+
+| Transformation                  | How it changes the image                                                                                  |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Helmert                         | Adds rotation while preserving shapes and angles.                                                         |
+| First-order polynomial (affine) | Also allows unequal scaling and shearing. Straight lines stay straight, and parallel lines stay parallel. |
+| Projective                      | Models perspective. Straight lines stay straight, but parallel lines can converge.                        |
+| Thin plate spline               | Smoothly bends the image like a flexible sheet, passing through every GCP.                                |
+
+Estimating positions within the area covered by the GCPs is **interpolation**.
+For a simple linear example, halfway between two known positions is halfway
+between their destinations. Other algorithms can bend that relationship.
+Thin plate spline interpolates the GCPs exactly; algorithms that find an
+overall fit can leave errors at the GCPs themselves. The same points can
+therefore produce different results depending on the algorithm.
+
+Even an exact match at every GCP does not prove that the locations between them
+are correct. Errors in the original map or in the selected points still affect
+the result. Beyond the area surrounded by GCPs, the transformation is
+**extrapolating**, where its estimates can be less reliable. Well-distributed
+GCPs and additional locations checked independently help you judge the result.
+
+The example below uses a first-order polynomial transformation, recorded in its
+Georeference Annotation. See the
+[transformation types reference](/packages/transform#transformation-types)
+for the supported algorithms and their control point requirements.
+
+## Explore the transformation
+
+Explore how a location on this
+[1921 aerial survey of Manhattan](https://www.loc.gov/item/90680339/)
+from the Library of Congress corresponds to a place on the modern map. Pan
+either view beneath the pink circle, and the other view and the coordinates
+below follow along. Zoom in to inspect a location more closely.
+
+<CoordinateExample
+  annotationUrl="https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca"
+  client:visible
+/>
+
+## From pixels to geographic coordinates
+
+Start with a point on the image, expressed as `[x, y]` in **pixels** measured
+from the top left of the full-resolution image.
+
+Use `GcpTransformer` from `@allmaps/transform` to transform this point to WGS84
+geographic coordinates. The result is `[longitude, latitude]` in **degrees**,
+the order used by GeoJSON.
+
+This example loads a Georeference Annotation for the Manhattan aerial survey
+and transforms a point from pixels to longitude and latitude:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca'
+const response = await fetch(annotationUrl)
+const annotation = await response.json()
+const [georeferencedMap] = parseAnnotation(annotation)
+
+const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+const imagePoint = [8605, 4094]
+const geographicPoint = transformer.transformToGeo(imagePoint)
+
+console.log(geographicPoint)
+// Approximately [-73.982207, 40.752802]
+```
+
+## From geographic coordinates to pixels
+
+Use this direction when you know a geographic location and want to find it on
+the original image. For example, you can highlight a searched address on a
+historical map, draw geographic features over the image, or keep a point on a
+modern map synchronized with an image viewer, as in the interactive example
+above.
+
+Pass a WGS84 point as `[longitude, latitude]` to get its pixel position:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca'
+const response = await fetch(annotationUrl)
+const annotation = await response.json()
+const [georeferencedMap] = parseAnnotation(annotation)
+
+const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+const geographicPoint = [-73.982207, 40.752802]
+const imagePoint = transformer.transformToResource(geographicPoint)
+
+console.log(imagePoint)
+// Approximately [8605, 4094]
+```
+
+The transformation is a fit to the control points. Depending on the
+transformation and the point, converting there and back can produce slightly
+different coordinates.
+
+## Transform to and from a projected coordinate system
+
+Use `ProjectedGcpTransformer` from `@allmaps/project` when the destination
+uses a projected coordinate reference system (CRS). For example, in
+Web Mercator (EPSG:3857), the result is `[x, y]` in **meters**.
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import {
+  ProjectedGcpTransformer,
+  webMercatorProjection
+} from '@allmaps/project'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca'
+const response = await fetch(annotationUrl)
+const annotation = await response.json()
+const [georeferencedMap] = parseAnnotation(annotation)
+
+const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
+  georeferencedMap,
+  { projection: webMercatorProjection }
+)
+
+const imagePoint = [8605, 4094]
+const projectedPoint = projectedTransformer.transformToProjectedGeo(imagePoint)
+// Approximately [-8235661.60, 4975950.76]
+
+const imagePixel = projectedTransformer.transformToResource(projectedPoint)
+// Approximately [8605, 4094]
+```
+
+Here `transformToResource()` expects a point in the configured projection.
+If you need WGS84 coordinates from the projected transformer, use
+`transformToGeo()`.
+
+### Use a custom projection
+
+For a regional CRS, try **NAD83 / New York Long Island (ftUS), EPSG:2263**,
+used by [New York City's zoning maps](https://www.nyc.gov/assets/planning/download/pdf/data-maps/open-data/georeferenced-zmaps_metadata.pdf).
+The result is `[easting, northing]` in **US survey feet**.
+
+Find definitions for other coordinate systems on
+[SpatialReference.org](https://spatialreference.org/): search by name or EPSG
+code and open the **Proj4** link. Supply that PROJ string in the `projection`
+option:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { ProjectedGcpTransformer } from '@allmaps/project'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca'
+const response = await fetch(annotationUrl)
+const annotation = await response.json()
+const [georeferencedMap] = parseAnnotation(annotation)
+
+const newYorkLongIslandProjection = {
+  name: 'EPSG:2263',
+  definition:
+    '+proj=lcc +lat_1=41.0333333333333 +lat_2=40.6666666666667 ' +
+    '+lat_0=40.1666666666667 +lon_0=-74 +x_0=300000 +y_0=0 ' +
+    '+datum=NAD83 +units=us-ft +no_defs'
+}
+
+const projectedTransformer = ProjectedGcpTransformer.fromGeoreferencedMap(
+  georeferencedMap,
+  { projection: newYorkLongIslandProjection }
+)
+
+const imagePoint = [8605, 4094]
+const projectedPoint = projectedTransformer.transformToProjectedGeo(imagePoint)
+// Approximately [989179.78, 213549.83] in US survey feet
+
+const imagePixel = projectedTransformer.transformToResource(projectedPoint)
+// Approximately [8605, 4094]
+```
+
+The
+[project package reference](/packages/project) covers choosing an output CRS
+and setting the internal projection used to fit the transformation.
+
+Once you have a transformer, the same relationship applies to whole lines and
+polygons. Continue with [Transforming SVG to GeoJSON](/guides/svg-to-geojson)
+or [Transforming OCR and other annotations](/guides/transforming-ocr-annotations).

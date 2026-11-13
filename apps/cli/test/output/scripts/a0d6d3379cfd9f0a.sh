@@ -22,11 +22,6 @@ then
   echo "Error: gdalwarp could not be found. Please install GDAL."
   exit 1
 fi
-if ! command -v jq &> /dev/null
-then
-  echo "Error: jq could not be found. Please install jq: https://jqlang.github.io/jq/."
-  exit 1
-fi
 
 if ! [ -f ./bc5d7040bad8e28b.jpg ]; then
   echo "Image file does not exist: ./bc5d7040bad8e28b.jpg"
@@ -37,8 +32,16 @@ fi
 required_width_bc5d7040bad8e28b_5cf13f6681d355e3=5240
 required_height_bc5d7040bad8e28b_5cf13f6681d355e3=3994
 
-width_bc5d7040bad8e28b_5cf13f6681d355e3=( $(gdalinfo -json ./bc5d7040bad8e28b.jpg | jq '.size[0]') )
-height_bc5d7040bad8e28b_5cf13f6681d355e3=( $(gdalinfo -json ./bc5d7040bad8e28b.jpg | jq '.size[1]') )
+image_info=$(gdalinfo -json ./bc5d7040bad8e28b.jpg) || exit 1
+size_pattern='"size"[[:space:]]*:[[:space:]]*\[[[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\]'
+
+if [[ $image_info =~ $size_pattern ]]; then
+  width_bc5d7040bad8e28b_5cf13f6681d355e3=${BASH_REMATCH[1]}
+  height_bc5d7040bad8e28b_5cf13f6681d355e3=${BASH_REMATCH[2]}
+else
+  echo "Error: could not read image dimensions: ./bc5d7040bad8e28b.jpg" >&2
+  exit 1
+fi
 
 if [ "$width_bc5d7040bad8e28b_5cf13f6681d355e3" -eq "$required_width_bc5d7040bad8e28b_5cf13f6681d355e3" ] &&
    [ "$height_bc5d7040bad8e28b_5cf13f6681d355e3" -eq "$required_height_bc5d7040bad8e28b_5cf13f6681d355e3" ]; then
@@ -80,8 +83,16 @@ fi
 required_width_b001de2950590a8d_83d44a0b956681b0=5208
 required_height_b001de2950590a8d_83d44a0b956681b0=3949
 
-width_b001de2950590a8d_83d44a0b956681b0=( $(gdalinfo -json ./b001de2950590a8d.jpg | jq '.size[0]') )
-height_b001de2950590a8d_83d44a0b956681b0=( $(gdalinfo -json ./b001de2950590a8d.jpg | jq '.size[1]') )
+image_info=$(gdalinfo -json ./b001de2950590a8d.jpg) || exit 1
+size_pattern='"size"[[:space:]]*:[[:space:]]*\[[[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\]'
+
+if [[ $image_info =~ $size_pattern ]]; then
+  width_b001de2950590a8d_83d44a0b956681b0=${BASH_REMATCH[1]}
+  height_b001de2950590a8d_83d44a0b956681b0=${BASH_REMATCH[2]}
+else
+  echo "Error: could not read image dimensions: ./b001de2950590a8d.jpg" >&2
+  exit 1
+fi
 
 if [ "$width_b001de2950590a8d_83d44a0b956681b0" -eq "$required_width_b001de2950590a8d_83d44a0b956681b0" ] &&
    [ "$height_b001de2950590a8d_83d44a0b956681b0" -eq "$required_height_b001de2950590a8d_83d44a0b956681b0" ]; then
@@ -123,8 +134,16 @@ fi
 required_width_44a2797e3fc5e3cf_3b72f58c723da9c4=5328
 required_height_44a2797e3fc5e3cf_3b72f58c723da9c4=4003
 
-width_44a2797e3fc5e3cf_3b72f58c723da9c4=( $(gdalinfo -json ./44a2797e3fc5e3cf.jpg | jq '.size[0]') )
-height_44a2797e3fc5e3cf_3b72f58c723da9c4=( $(gdalinfo -json ./44a2797e3fc5e3cf.jpg | jq '.size[1]') )
+image_info=$(gdalinfo -json ./44a2797e3fc5e3cf.jpg) || exit 1
+size_pattern='"size"[[:space:]]*:[[:space:]]*\[[[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\]'
+
+if [[ $image_info =~ $size_pattern ]]; then
+  width_44a2797e3fc5e3cf_3b72f58c723da9c4=${BASH_REMATCH[1]}
+  height_44a2797e3fc5e3cf_3b72f58c723da9c4=${BASH_REMATCH[2]}
+else
+  echo "Error: could not read image dimensions: ./44a2797e3fc5e3cf.jpg" >&2
+  exit 1
+fi
 
 if [ "$width_44a2797e3fc5e3cf_3b72f58c723da9c4" -eq "$required_width_44a2797e3fc5e3cf_3b72f58c723da9c4" ] &&
    [ "$height_44a2797e3fc5e3cf_3b72f58c723da9c4" -eq "$required_height_44a2797e3fc5e3cf_3b72f58c723da9c4" ]; then
@@ -166,8 +185,16 @@ fi
 required_width_0618d3727f002bcf_bb4029969eeff948=5288
 required_height_0618d3727f002bcf_bb4029969eeff948=3959
 
-width_0618d3727f002bcf_bb4029969eeff948=( $(gdalinfo -json ./0618d3727f002bcf.jpg | jq '.size[0]') )
-height_0618d3727f002bcf_bb4029969eeff948=( $(gdalinfo -json ./0618d3727f002bcf.jpg | jq '.size[1]') )
+image_info=$(gdalinfo -json ./0618d3727f002bcf.jpg) || exit 1
+size_pattern='"size"[[:space:]]*:[[:space:]]*\[[[:space:]]*([0-9]+)[[:space:]]*,[[:space:]]*([0-9]+)[[:space:]]*\]'
+
+if [[ $image_info =~ $size_pattern ]]; then
+  width_0618d3727f002bcf_bb4029969eeff948=${BASH_REMATCH[1]}
+  height_0618d3727f002bcf_bb4029969eeff948=${BASH_REMATCH[2]}
+else
+  echo "Error: could not read image dimensions: ./0618d3727f002bcf.jpg" >&2
+  exit 1
+fi
 
 if [ "$width_0618d3727f002bcf_bb4029969eeff948" -eq "$required_width_0618d3727f002bcf_bb4029969eeff948" ] &&
    [ "$height_0618d3727f002bcf_bb4029969eeff948" -eq "$required_height_0618d3727f002bcf_bb4029969eeff948" ]; then
