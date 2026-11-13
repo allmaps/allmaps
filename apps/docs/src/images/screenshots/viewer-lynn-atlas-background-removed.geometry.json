@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "slug": "viewer-lynn-atlas-background-removed",
+  "version": 2,
+  "imageSha256": "47444e58c0bda9675bda98e7a2f113ab615eb76578a088a58d2d72e346352aac",
+  "viewport": {
+    "width": 1067,
+    "height": 667
+  },
+  "targets": {
+    "background": {
+      "height": 28,
+      "width": 28,
+      "x": 537.4921875,
+      "y": 626.5
+    }
+  }
+}

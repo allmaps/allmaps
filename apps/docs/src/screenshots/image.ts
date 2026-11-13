@@ -1,20 +1,28 @@
 import { getImage } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
 
-/** Optimize bundled screenshots without changing their capture or geometry. */
+/** Resize bundled screenshots while preserving full-size WebP captures. */
 export async function getScreenshotImage(image: ImageMetadata) {
+  const sizes = 'auto, 100vw'
+  const useOriginal = image.format === 'webp'
+  const widths = [480, 960, 1440, 1920].filter((width) => width < image.width)
+
+  if (!useOriginal) widths.push(image.width)
+  if (!widths.length) return { src: image.src, sizes }
+
   const optimized = await getImage({
     src: image,
-    widths: [...new Set([480, 960, 1440, 1920, image.width])]
-      .filter((width) => width <= image.width)
-      .sort((a, b) => a - b),
+    width: widths[widths.length - 1],
+    widths,
     format: 'webp',
     quality: 90
   })
 
   return {
-    src: optimized.src,
-    srcset: optimized.srcSet.attribute,
-    sizes: 'auto, 100vw'
+    src: useOriginal ? image.src : optimized.src,
+    srcset: useOriginal
+      ? `${optimized.srcSet.attribute}, ${image.src} ${image.width}w`
+      : optimized.srcSet.attribute,
+    sizes
   }
 }

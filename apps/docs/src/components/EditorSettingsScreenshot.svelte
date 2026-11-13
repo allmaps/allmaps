@@ -16,11 +16,12 @@
   {sizes}
   {geometry}
   shadow
+  showUrl
   highlights={['settings']}
-  alt="Allmaps Editor showing a historical map of Delfland and a reference map with four numbered ground control points, with the open display settings panel outlined in pink."
+  alt="Allmaps Editor showing a historical map of Delfland and a reference map with numbered ground control points. The open display settings panel is outlined in pink."
 >
   {#snippet highlight({ bounds })}
-    {@const padding = 20}
+    {@const padding = 12}
     <rect
       x={bounds.x - padding}
       y={bounds.y - padding}

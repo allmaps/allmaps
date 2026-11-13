@@ -11,7 +11,8 @@ import type { ScreenshotGeometry } from '../src/lib/screenshots.ts'
 
 const definition = defineScreenshot({
   url: 'https://editor.allmaps.org',
-  slug: 'editor'
+  slug: 'editor',
+  viewport: { width: 1440, height: 900 }
 })
 const geometry: ScreenshotGeometry = {
   schemaVersion: 1,
@@ -109,6 +110,20 @@ test('keeps the URL bar opt-in', async () => {
     props: { ...definition, alt: 'Editor', urlDisplay: 'hostname' }
   }).body
   assert.doesNotMatch(output, /url-bar|<a\b|<input\b/)
+})
+
+test('renders dimensions resolved from the expected display width', async () => {
+  const Screenshot = await component()
+  const output = render(Screenshot, {
+    props: {
+      url: 'https://editor.allmaps.org',
+      slug: 'editor',
+      alt: 'Editor',
+      displayWidth: 600,
+      aspectRatio: 2
+    }
+  }).body
+  assert.match(output, /width="1000" height="500"/)
 })
 
 test('renders responsive candidates with an original fallback and appropriate sizes', async () => {
