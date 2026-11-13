@@ -1,5 +1,21 @@
 import { z } from 'zod'
 
+function isProxyPreview(env: {
+  OAUTH_PROXY_ENABLED?: string
+  BETTER_AUTH_URL: string
+  OAUTH_PROXY_URL?: string
+}) {
+  if (env.OAUTH_PROXY_ENABLED !== 'true' || !env.OAUTH_PROXY_URL) return false
+  try {
+    return (
+      new URL(env.BETTER_AUTH_URL).origin !==
+      new URL(env.OAUTH_PROXY_URL).origin
+    )
+  } catch {
+    return false
+  }
+}
+
 export const authEnvSchema = z
   .object({
     BETTER_AUTH_URL: z.string().url(),
@@ -8,11 +24,18 @@ export const authEnvSchema = z
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CLIENT_ID: z.string().optional(),
-    GOOGLE_CLIENT_SECRET: z.string().optional()
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    OAUTH_PROXY_ENABLED: z.enum(['true', 'false']).optional(),
+    OAUTH_PROXY_URL: z.string().url().optional(),
+    OAUTH_PROXY_SECRET: z.string().optional(),
+    OAUTH_PROXY_ALLOWED_ORIGINS: z.string().optional()
   })
   .refine(
     (env) =>
-      Boolean(env.GITHUB_CLIENT_ID) === Boolean(env.GITHUB_CLIENT_SECRET),
+      Boolean(env.GITHUB_CLIENT_ID) === Boolean(env.GITHUB_CLIENT_SECRET) ||
+      (isProxyPreview(env) &&
+        Boolean(env.GITHUB_CLIENT_ID) &&
+        !env.GITHUB_CLIENT_SECRET),
     {
       message:
         'Set both GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET, or leave both empty',
@@ -21,7 +44,10 @@ export const authEnvSchema = z
   )
   .refine(
     (env) =>
-      Boolean(env.GOOGLE_CLIENT_ID) === Boolean(env.GOOGLE_CLIENT_SECRET),
+      Boolean(env.GOOGLE_CLIENT_ID) === Boolean(env.GOOGLE_CLIENT_SECRET) ||
+      (isProxyPreview(env) &&
+        Boolean(env.GOOGLE_CLIENT_ID) &&
+        !env.GOOGLE_CLIENT_SECRET),
     {
       message:
         'Set both GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET, or leave both empty',
