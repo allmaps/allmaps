@@ -1,0 +1,65 @@
+name: Daily statistics
+
+on:
+  schedule:
+    - cron: '43 23 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [development, production]
+        default: development
+        required: true
+      mode:
+        type: choice
+        options: [refresh, backfill]
+        default: refresh
+        required: true
+      from:
+        description: Inclusive UTC start date (required for backfill)
+        type: string
+      through:
+        description: Inclusive UTC end date (backfill only)
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  statistics:
+    # Scheduling remains off until migrations and initial backfill are reviewed.
+    if: >-
+      (github.event_name == 'schedule' && vars.STATISTICS_SCHEDULE_ENABLED == 'true') ||
+      (github.event_name == 'workflow_dispatch' &&
+       ((inputs.environment == 'development' && github.ref == 'refs/heads/develop') ||
+        (inputs.environment == 'production' && github.ref == 'refs/heads/main')))
+    environment: ${{ github.event_name == 'schedule' && 'production' || inputs.environment }}
+    concurrency:
+      group: statistics-${{ github.event_name == 'schedule' && 'production' || inputs.environment }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter '@allmaps/api-shared...' run build
+      - name: Update statistics
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STATISTICS_MODE: ${{ inputs.mode || 'refresh' }}
+          STATISTICS_FROM: ${{ inputs.from }}
+          STATISTICS_THROUGH: ${{ inputs.through }}
+        shell: bash
+        run: |
+          args=(--mode "$STATISTICS_MODE")
+          if [[ -n "$STATISTICS_FROM" ]]; then args+=(--from "$STATISTICS_FROM"); fi
+          if [[ -n "$STATISTICS_THROUGH" ]]; then args+=(--through "$STATISTICS_THROUGH"); fi
+          pnpm --filter @allmaps/tools-apis run statistics "${args[@]}"

@@ -1,58 +1,117 @@
-# Console statistics: first implementation
+# Console statistics
 
-This branch adds current numeric statistics to the existing REST API and console.
-There are no schema migrations, triggers, scheduled tasks, chart dependencies or
-production database changes. Queries currently aggregate source records on demand;
-persisted per-domain summaries remain a later performance optimization, not an
-implemented feature. Domain configuration changes never run a statistics rebuild.
+Daily per-domain statistics power global and organization dashboards. Domain
+mapping changes only affect which summary rows are read; they do not rebuild
+source data. No chart library is selected. History is displayed as a table with
+UTC date and day/week/month/year selectors.
 
-## Try it locally
+## Storage and semantics
 
-Use the repository's existing setup and PGlite demo workflow. Sign in as
-`local-admin` to open **Allmaps statistics** on the console home page. Organization
-links now open a read-only overview with figures and labeled API links. An admin
-can open **Edit organization** to use the existing settings form. The direct edit
-page and existing mutation API both require an Allmaps admin. Sign in as
-`local-member` to try organization statistics without edit access.
+`statistics_daily` has a primary key on `(domain, day)` and a day index. An empty
+domain represents resources whose URI has no parsed domain: these are included
+globally and are never mapped to an organization. Unassigned real domains are
+also included globally.
 
-Run the API integration test using `pnpm --filter @allmaps/test-apis exec vitest run
-test/statistics.test.ts`, the console check with `pnpm --filter @allmaps/console
-check`, and the standalone SQL proof with `node --test
-scripts/statistics/prototype.test.mjs`.
+Each row contains two different kinds of metrics:
 
-## API and definitions
+- Activity: new retained images, manifests, logical maps, and images first seen
+  with a geographic footprint. Map versions are grouped by map ID and image ID
+  before counting. Multiple maps/versions do not multiply first-georeferenced
+  image counts. This is inferred from retained records and earliest retained
+  versions, **not** a complete audit log of user actions or deleted records.
+- Stock: sampled counts of active images, current active maps, manifests,
+  images without a manifest, and images with a geographic footprint. These are
+  populated only by an actual refresh. The sample time is preserved. They are
+  not claimed to be exact midnight or reconstructed historical end-of-day stock.
 
-- `GET /statistics`: Allmaps admins and users assigned the `collaborator` role.
-- `GET /organizations/:organizationId/statistics`: any organization member or an
-  Allmaps admin. Being a collaborator alone does not grant organization access.
-- Responses are private and not cacheable. No new role-assignment UI is added:
-  the existing repository does not define a collaborator management workflow.
-- Maps count only current, non-archived rows, attached to non-archived images.
-- An image with at least one such map with a geographic mask counts once as
-  georeferenced. This is a provisional footprint-based definition, not quality.
-- Zero images yields a null percentage rather than a misleading zero percent.
-- Images without manifests use the image/canvas/manifest relationships; duplicate
-  links do not inflate counts.
-- An organization's images follow image URI domains; manifests follow manifest URI
-  domains, consistent with existing organization API filtering. A related manifest
-  on another domain is not included in the manifest total. Related-manifest listing
-  is a separate metric and should use distinct manifest IDs.
-- Existing API resource links use their existing georeference filter, which can
-  differ from the footprint criterion above; the overview explains that difference.
+Backfill writes activity only. Historical stocks remain NULL and appear as a
+dash in the console; existing measured stocks are never overwritten by a
+backfill. Additions sum across periods; stock takes the last available sample
+within the selected range of each period. Partial periods use only selected
+days, weeks start on Monday, dates use UTC, and coverage/stock dates are returned.
+A missing snapshot is different from a zero count. No-images percentage is NULL.
 
-## Deferred decisions
+A manifest is attributed by its own URI domain, as in existing organization API
+filtering. An image without a manifest is detected through canvas relationships,
+including cross-domain relationships, without duplicate counts. Related manifest
+lists are a different metric and must use distinct IDs across domains.
 
-Choose a chart library on the laptop after assessing current maintenance, releases,
-issue response, features and Svelte compatibility. No library is selected. Future
-organization views in Here, Editor, Explore and Latest are labeled placeholders,
-not new routes or filters in those applications.
+## Prepare and try locally
 
-Time-series SQL prototypes group retained image/manifest creation timestamps by
-hour/day/week/month in UTC. They do not reconstruct historical stock. Map-version
-creation is not automatically a map edit: saving an image republishes sibling maps.
-Do not expose those timestamps as precise editing activity without further work.
+1. Build the existing API dependencies (`pnpm build:apis`).
+2. For an existing PGlite database, stop the runner and apply migrations with
+   `pnpm db:migrate --db=pglite`. A fresh local API database uses the normal
+   initialization/seed workflow.
+3. Run the initial backfill for the desired inclusive range, then refresh:
 
-If needed, persist aggregates by domain and time bucket, then combine them using
-current organization domain mappings. Avoid expensive rebuilds for domain toggles.
-Unique cross-domain relationship metrics require distinct IDs, not summing counts.
-Measure real Neon query performance before choosing persistence or indexing.
+   ```sh
+   pnpm --filter @allmaps/tools-apis run statistics --mode backfill --db pglite --data-dir /absolute/path/to/pglite --from 2025-01-01 --through 2026-11-13
+   pnpm --filter @allmaps/tools-apis run statistics --mode refresh --db pglite --data-dir /absolute/path/to/pglite
+   ```
+
+4. Restart the API runner and console. Sign in as `local-admin` for global
+   statistics or as `local-member` for organization statistics. The overview is
+   read-only; the separate edit page and mutation API require an Allmaps admin.
+
+The CLI never creates or migrates a database implicitly. For PostgreSQL, omit
+`--db pglite`/`--data-dir` and supply the intended `DATABASE_URL` through the
+existing secure environment. Never put credentials in arguments or checked-in
+files. A direct connection is appropriate for this long-running maintenance job.
+The migration adds only the summary table and index, not the initial backfill.
+It must be deployed before the API switches to summary reads. Before the first
+refresh the API returns 503 rather than silently scanning the source tables.
+
+## Daily maintenance
+
+The GitHub Actions workflow `Daily statistics` is configured for a daily sample
+near the end of the UTC day and a manual refresh/backfill. Scheduling is disabled
+until `STATISTICS_SCHEDULE_ENABLED=true` is reviewed and configured. Scheduled
+runs use the existing production environment's `DATABASE_URL`. Manual runs target
+`development` on develop or `production` on main. No job is activated by this
+working-tree change. Apply migrations and run initial backfill/refresh before
+shipping the new API.
+
+The CLI serializes backfill/refresh using a transaction-scoped advisory lock.
+Refresh atomically recalculates activity since the preceding day (or since the
+last recorded sample after an outage) and captures today's stock. Re-running a
+job replaces its results instead of incrementing counters. Missed stock samples
+cannot be recovered honestly; their activity can still be backfilled. An explicit
+refresh `--from` can revisit older activity after imports/corrections. Source
+reassignment/corrections outside that window require an explicit backfill;
+organization domain mapping changes never require one.
+
+GitHub schedules are best-effort and may be delayed. `snapshotAt`/`measuredAt`
+record the actual sample time and the sample belongs to its real UTC date. A
+late run never invents a snapshot for yesterday. This batch may scan all retained
+map versions once; that expensive work happens in maintenance, not per dashboard
+request. Maintenance performance has not yet been measured on a Neon test branch.
+
+## API
+
+- `GET /statistics`: admins or users assigned the `collaborator` role.
+- `GET /organizations/:organizationId/statistics`: any member of that
+  organization or an Allmaps admin. Collaborator status alone grants no access.
+- Append `/history?from=YYYY-MM-DD&through=YYYY-MM-DD&interval=day` to either route
+  for history. Intervals: day, week, month, year. Range is inclusive and at most
+  ten years; invalid dates/ranges are rejected.
+- Responses are private/no-store. Current totals include their daily sample time.
+  Current domain mappings apply to historical organization selections.
+
+Existing image resource links retain their existing georeference filter, which
+can differ from the statistics' geographic-footprint definition; the overview
+explains the distinction. Organization views in Here, Editor, Explore and Latest
+remain labeled placeholders. No new app filters, quality analysis, hourly data,
+role-management UI, or preview deployment is included.
+
+## Validation
+
+```sh
+pnpm --filter @allmaps/test-apis exec vitest run test/statistics.test.ts test/statistics-daily.test.ts test/migrations.test.ts
+pnpm --filter @allmaps/console check
+node --test scripts/statistics/prototype.test.mjs
+```
+
+The standalone SQL files remain exploratory live-query references; the runtime
+API now reads only stored summary rows. Tests exercise rights, retry behavior,
+retained-version deduplication, empty versus missing counts, stock versus flow,
+UTC grouping, and preserved snapshots. No benchmark results are checked in.

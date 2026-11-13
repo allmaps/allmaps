@@ -9,7 +9,8 @@
     "db:migrate": "node src/cli.ts migrate",
     "seed:pglite": "node src/cli.ts seed --db=pglite",
     "types": "tsc --noEmit",
-    "lint": "prettier --check src && eslint src"
+    "lint": "prettier --check src && eslint src",
+    "statistics": "node src/statistics.ts"
   },
   "dependencies": {
     "@allmaps/api-shared": "workspace:^",

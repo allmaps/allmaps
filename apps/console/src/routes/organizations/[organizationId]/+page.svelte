@@ -1,6 +1,7 @@
 <script lang="ts">
   /* eslint-disable svelte/no-navigation-without-resolve -- API resource links are external */
   import { resolve } from '$app/paths'
+  import StatisticsHistory from '$lib/components/StatisticsHistory.svelte'
   import StatisticsCards from '$lib/components/StatisticsCards.svelte'
   import type { PageProps } from './$types'
   let { data }: PageProps = $props()
@@ -42,6 +43,7 @@
   <section aria-label="Statistics">
     <StatisticsCards statistics={data.statistics} />
   </section>
+  <StatisticsHistory history={data.history} />
   <section>
     <h2 class="mb-3 text-xl font-semibold">API resources</h2>
     <ul class="space-y-2 font-sans">

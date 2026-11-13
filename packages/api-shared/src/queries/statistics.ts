@@ -1,51 +1,123 @@
 import { sql } from 'drizzle-orm'
 import type { Db } from '@allmaps/db'
+import { ResponseError } from '../shared/errors.js'
+import { validateStatisticsRange } from './statistics-maintenance.js'
 
-// Read-only first version. Organization changes never trigger recomputation.
-// Each resource is attributed to its own URI domain; related manifest lists
-// may also contain manifests hosted on other domains.
+function domainScope(organizationId?: string) {
+  return organizationId === undefined
+    ? sql`true`
+    : sql`domain IN (
+    SELECT url FROM organization_urls WHERE organization_id = ${organizationId} AND type = 'domain'
+  )`
+}
+const numeric = (value: unknown) => Number(value ?? 0)
+const nullableNumeric = (value: unknown) =>
+  value == null ? null : Number(value)
+const timestamp = (value: unknown) =>
+  value instanceof Date ? value.toISOString() : String(value)
+
+// Reads only the small summary, never source records or historical map versions.
 export async function queryStatistics(db: Db, organizationId?: string) {
-  const scope = (alias: string) =>
-    organizationId === undefined
-      ? sql`true`
-      : sql`
-    ${sql.identifier(alias)}.domain IN (
-      SELECT url FROM organization_urls WHERE organization_id = ${organizationId} AND type = 'domain'
-    )`
   const result = await db.execute(sql`
-    WITH scoped_images AS (
-      SELECT i.* FROM iiif.images i WHERE NOT i.archived AND ${scope('i')}
-    ), current_maps AS (
-      SELECT m.* FROM maps m JOIN scoped_images i ON i.id = m.image_id
-      WHERE m.latest AND NOT m.archived
-    )
-    SELECT
-      (SELECT count(*) FROM scoped_images) AS images,
-      (SELECT count(*) FROM current_maps) AS maps,
-      (SELECT count(*) FROM iiif.manifests f WHERE ${scope('f')}) AS manifests,
-      (SELECT count(*) FROM scoped_images i WHERE NOT EXISTS (
-        SELECT 1 FROM iiif.canvases_images ci
-        JOIN iiif.manifests_canvases mc ON mc.canvas_id = ci.canvas_id
-        WHERE ci.image_id = i.id
-      )) AS images_without_manifest,
-      (SELECT count(*) FROM scoped_images i WHERE EXISTS (
-        SELECT 1 FROM current_maps m WHERE m.image_id = i.id AND m.geo_mask IS NOT NULL
-      )) AS georeferenced_images
+    WITH latest AS (SELECT max(day) AS day FROM statistics_daily WHERE snapshot_at IS NOT NULL)
+    SELECT sum(images) AS images, sum(maps) AS maps, sum(manifests) AS manifests,
+      sum(images_without_manifest) AS images_without_manifest, sum(georeferenced_images) AS georeferenced_images,
+      (SELECT max(snapshot_at) FROM statistics_daily WHERE day = (SELECT day FROM latest)) AS measured_at
+    FROM statistics_daily WHERE day = (SELECT day FROM latest) AND ${domainScope(organizationId)}
   `)
-  // postgres-js returns an array; node-postgres and PGlite return { rows }.
   const rows = 'rows' in result ? result.rows : result
   const row = rows[0] as Record<string, unknown>
-  const images = Number(row.images)
-  const georeferencedImages = Number(row.georeferenced_images)
+  if (!row.measured_at)
+    throw new ResponseError('Daily statistics have not been generated yet', 503)
+  const images = numeric(row.images)
+  const georeferencedImages = numeric(row.georeferenced_images)
   return {
     images,
-    maps: Number(row.maps),
-    manifests: Number(row.manifests),
-    imagesWithoutManifest: Number(row.images_without_manifest),
+    maps: numeric(row.maps),
+    manifests: numeric(row.manifests),
+    imagesWithoutManifest: numeric(row.images_without_manifest),
+    ungeoreferencedImages: images - georeferencedImages,
     georeferencedImages,
     georeferencedPercentage: images
       ? (100 * georeferencedImages) / images
       : null,
-    measuredAt: new Date().toISOString()
+    measuredAt: timestamp(row.measured_at),
+    source: 'daily' as const
+  }
+}
+
+export type StatisticsInterval = 'day' | 'week' | 'month' | 'year'
+export async function queryStatisticsHistory(
+  db: Db,
+  options: {
+    from: string
+    through: string
+    interval: StatisticsInterval
+    organizationId?: string
+  }
+) {
+  try {
+    validateStatisticsRange(options.from, options.through)
+  } catch (error) {
+    throw new ResponseError((error as Error).message, 400)
+  }
+  if (!['day', 'week', 'month', 'year'].includes(options.interval))
+    throw new ResponseError('Invalid statistics interval', 400)
+  const result = await db.execute(sql`
+    WITH daily AS (
+      SELECT day, sum(images_added) AS images_added, sum(maps_added) AS maps_added,
+        sum(manifests_added) AS manifests_added, sum(images_first_georeferenced) AS images_first_georeferenced,
+        sum(images) AS images, sum(maps) AS maps, sum(manifests) AS manifests,
+        sum(images_without_manifest) AS images_without_manifest, sum(georeferenced_images) AS georeferenced_images,
+        max(snapshot_at) AS snapshot_at
+      FROM statistics_daily WHERE day >= ${options.from}::date AND day <= ${options.through}::date
+        AND ${domainScope(options.organizationId)} GROUP BY day
+    )
+    SELECT date_trunc(${options.interval}, day::timestamp)::date::text AS period,
+      sum(images_added) AS images_added, sum(maps_added) AS maps_added,
+      sum(manifests_added) AS manifests_added, sum(images_first_georeferenced) AS images_first_georeferenced,
+      (array_agg(images ORDER BY day DESC) FILTER (WHERE snapshot_at IS NOT NULL))[1] AS images,
+      (array_agg(maps ORDER BY day DESC) FILTER (WHERE snapshot_at IS NOT NULL))[1] AS maps,
+      (array_agg(manifests ORDER BY day DESC) FILTER (WHERE snapshot_at IS NOT NULL))[1] AS manifests,
+      (array_agg(images_without_manifest ORDER BY day DESC) FILTER (WHERE snapshot_at IS NOT NULL))[1] AS images_without_manifest,
+      (array_agg(georeferenced_images ORDER BY day DESC) FILTER (WHERE snapshot_at IS NOT NULL))[1] AS georeferenced_images,
+      (array_agg(day::text ORDER BY day DESC) FILTER (WHERE snapshot_at IS NOT NULL))[1] AS stock_day,
+      max(snapshot_at) AS measured_at, count(*) AS available_days
+    FROM daily GROUP BY 1 ORDER BY 1
+  `)
+  const rows = 'rows' in result ? result.rows : result
+  return {
+    from: options.from,
+    through: options.through,
+    interval: options.interval,
+    activityBasis: 'earliest-retained-records' as const,
+    periods: rows.map((value) => {
+      const row = value as Record<string, unknown>
+      const images = nullableNumeric(row.images)
+      const georeferencedImages = nullableNumeric(row.georeferenced_images)
+      return {
+        period: String(row.period),
+        imagesAdded: numeric(row.images_added),
+        mapsAdded: numeric(row.maps_added),
+        manifestsAdded: numeric(row.manifests_added),
+        imagesFirstGeoreferenced: numeric(row.images_first_georeferenced),
+        images,
+        maps: nullableNumeric(row.maps),
+        manifests: nullableNumeric(row.manifests),
+        imagesWithoutManifest: nullableNumeric(row.images_without_manifest),
+        georeferencedImages,
+        ungeoreferencedImages:
+          images === null || georeferencedImages === null
+            ? null
+            : images - georeferencedImages,
+        georeferencedPercentage:
+          images && georeferencedImages !== null
+            ? (100 * georeferencedImages) / images
+            : null,
+        stockDay: row.stock_day == null ? null : String(row.stock_day),
+        measuredAt: row.measured_at == null ? null : timestamp(row.measured_at),
+        availableDays: numeric(row.available_days)
+      }
+    })
   }
 }

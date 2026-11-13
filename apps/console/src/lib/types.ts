@@ -95,4 +95,28 @@ export type Statistics = {
   georeferencedImages: number
   georeferencedPercentage: number | null
   measuredAt: string
+  ungeoreferencedImages: number
+  source: 'daily'
+}
+
+export type StatisticsHistory = {
+  from: string
+  through: string
+  interval: 'day' | 'week' | 'month' | 'year'
+  activityBasis: 'earliest-retained-records'
+  periods: {
+    period: string
+    imagesAdded: number
+    mapsAdded: number
+    manifestsAdded: number
+    imagesFirstGeoreferenced: number
+    images: number | null
+    maps: number | null
+    manifests: number | null
+    imagesWithoutManifest: number | null
+    georeferencedImages: number | null
+    ungeoreferencedImages: number | null
+    stockDay: string | null
+    availableDays: number
+  }[]
 }

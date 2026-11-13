@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { eq } from 'drizzle-orm'
 import { schema } from '@allmaps/db'
-import { queryStatistics } from '@allmaps/api-shared/db'
+import { queryStatistics, refreshDailyStatistics } from '@allmaps/api-shared/db'
 import { createTestContext } from './helpers/context.ts'
 
 describe('statistics', () => {
@@ -35,6 +35,8 @@ describe('statistics', () => {
         .where(eq(schema.organizations.slug, 'demo-amsterdam'))
       expect((await request('/statistics')).status).toBe(401)
       const admin = await login('local-admin')
+      expect((await request('/statistics', admin)).status).toBe(503)
+      await refreshDailyStatistics(context.db)
       const member = await login('local-member')
       const visitor = await login('local-visitor')
       const path = `/organizations/${org.id}/statistics`
@@ -42,6 +44,25 @@ describe('statistics', () => {
       expect((await request('/statistics', member)).status).toBe(403)
       expect((await request(path, member)).status).toBe(200)
       expect((await request(path, visitor)).status).toBe(403)
+      const historyPath = `${path}/history?from=2025-01-01&through=2025-12-31&interval=week`
+      expect((await request(historyPath, member)).status).toBe(200)
+      expect((await request(historyPath, visitor)).status).toBe(403)
+      expect(
+        (
+          await request(
+            '/statistics/history?from=2025-01-01&through=2025-12-31&interval=week',
+            member
+          )
+        ).status
+      ).toBe(403)
+      expect(
+        (
+          await request(
+            `${path}/history?from=2025-02-30&through=2025-12-31&interval=day`,
+            admin
+          )
+        ).status
+      ).toBe(400)
       const response = await request(path, admin)
       expect(response.headers.get('Cache-Control')).toBe('private, no-store')
       const stats = await response.json()
@@ -70,6 +91,10 @@ describe('statistics', () => {
         .update(schema.images)
         .set({ archived: true })
         .where(eq(schema.images.id, image.id))
+      expect((await queryStatistics(context.db, org.id)).images).toBe(
+        before.images
+      )
+      await refreshDailyStatistics(context.db)
       const after = await queryStatistics(context.db, org.id)
       expect(after.images).toBe(before.images - 1)
       expect(after.maps).toBeLessThanOrEqual(before.maps)

@@ -7,6 +7,7 @@
     ['Manifests', statistics.manifests],
     ['Images without a manifest', statistics.imagesWithoutManifest],
     ['Georeferenced images', statistics.georeferencedImages],
+    ['Images without georeference', statistics.ungeoreferencedImages],
     [
       'Images georeferenced',
       statistics.georeferencedPercentage === null
@@ -27,7 +28,9 @@
   {/each}
 </div>
 <p class="mt-3 font-sans text-sm text-gray-500">
-  Current, non-archived maps and images. An image counts as georeferenced when a
-  current map has a geographic footprint. Manifests are attributed by their own
-  domain. Updated {new Date(statistics.measuredAt).toLocaleString('en')}.
+  Daily snapshot of non-archived maps and images; changes appear after the next
+  refresh. An image counts as georeferenced when a current map has a geographic
+  footprint. Manifests are attributed by their own domain. Updated {new Date(
+    statistics.measuredAt
+  ).toLocaleString('en')}.
 </p>
