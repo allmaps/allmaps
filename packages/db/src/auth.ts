@@ -102,7 +102,13 @@ export function createAuth(env: AuthSettings, db: Db) {
         ? {
             google: {
               clientId: env.GOOGLE_CLIENT_ID,
-              clientSecret: env.GOOGLE_CLIENT_SECRET,
+              // Google's authorization URL builder requires a non-empty value,
+              // although OAuth Proxy exchanges the code only on the coordinator.
+              clientSecret:
+                env.GOOGLE_CLIENT_SECRET ||
+                (previewProxy
+                  ? 'oauth-proxy-preview-no-provider-secret'
+                  : undefined),
               // Google has no username. Use an opaque, valid Allmaps slug.
               mapProfileToUser: () => ({
                 slug: `user-${generateRandomId(32)}`

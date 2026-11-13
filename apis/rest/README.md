@@ -56,6 +56,10 @@ Hyperdrive/database, its own main secret and cookie prefix, and the shared proxy
 secret. Provider client IDs are public and may be configured on the preview;
 provider client secrets are only needed by the fixed callback server. The schema
 allows IDs without provider secrets only in explicitly enabled proxy previews.
+Google additionally needs a non-empty client-secret field to build its
+authorization URL. Enabled proxy previews use a clearly marked non-secret
+placeholder for that local check; only the coordinator exchanges codes with
+Google using the real provider secret. Normal login never uses this placeholder.
 
 Preview origins and the shared proxy secret are for trusted first-party branch
 code. Do not inject them into arbitrary contributor or fork previews: a holder
