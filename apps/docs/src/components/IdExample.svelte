@@ -139,7 +139,7 @@
 {#snippet copyButton(value: string, label: string)}
   <button
     type="button"
-    class="copy-button"
+    class="[font-family:inherit] [font-weight:inherit] [line-height:inherit] cursor-pointer focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--sl-color-accent)] focus-visible:outline-offset-[3px] flex items-center justify-center gap-1.5 min-w-20 min-h-8 py-1 px-2 text-xs text-[color:var(--sl-color-accent)] bg-[color:var(--accent-fill)] border border-solid border-[color:var(--accent-border)] rounded hover:bg-[color:color-mix(in_srgb,var(--sl-color-accent)_12%,var(--sl-color-bg))]"
     aria-label={copiedValue === value ? `${label} copied` : `Copy ${label}`}
     onclick={() => copyValue(value)}
   >
@@ -161,19 +161,26 @@
 
 {#snippet exampleLabel(label: string)}
   {@const separator = label.indexOf(' — ')}
-  <span class="select-label">
-    <span class="example-title"
+  <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+    <span class="font-semibold"
       >{separator === -1 ? label : label.slice(0, separator)}</span
-    >{#if separator !== -1}<span class="example-institution"
+    >{#if separator !== -1}<span class="font-normal opacity-75"
         >{label.slice(separator)}</span
       >{/if}
   </span>
 {/snippet}
 
-<section class="id-example" aria-label="Compute Allmaps IDs">
-  <div class="source-controls">
-    <label id={`${componentId}-example-label`} for={`${componentId}-example`}
-      >Choose an example</label
+<section
+  class="[--panel-fill:color-mix(in_srgb,var(--sl-color-gray-6)_42%,var(--sl-color-bg))] [--accent-fill:color-mix(in_srgb,var(--sl-color-accent)_6%,var(--sl-color-bg))] [--accent-border:color-mix(in_srgb,var(--sl-color-accent)_45%,var(--sl-color-gray-5))] border border-solid border-[color:var(--sl-color-gray-5)] rounded-xl text-[color:var(--sl-color-text)] bg-[color:var(--sl-color-bg)] text-sm leading-[1.5] overflow-hidden"
+  aria-label="Compute Allmaps IDs"
+>
+  <div
+    class="p-5 bg-[color:var(--panel-fill)] border-b border-solid border-b-[color:var(--sl-color-gray-5)] max-[40rem]:p-4"
+  >
+    <label
+      class="block text-[0.8125rem] font-semibold mb-2"
+      id={`${componentId}-example-label`}
+      for={`${componentId}-example`}>Choose an example</label
     >
     <Select.Root
       type="single"
@@ -206,14 +213,19 @@
     </Select.Root>
 
     <form
+      class="mt-4"
       onsubmit={(event) => {
         event.preventDefault()
         load()
       }}
     >
-      <label for={`${componentId}-url`}>Or enter a IIIF URL</label>
-      <div class="url-input">
+      <label
+        class="block text-[0.8125rem] font-semibold mb-2"
+        for={`${componentId}-url`}>Or enter a IIIF URL</label
+      >
+      <div class="flex gap-2 [&_input]:text-[0.8125rem] max-[40rem]:flex-col">
         <input
+          class="[font-family:inherit] [font-size:inherit] [font-weight:inherit] [line-height:inherit] box-border w-full min-w-0 min-h-11 py-2.5 px-3 border border-solid border-[color:var(--sl-color-gray-5)] rounded-md text-[color:inherit] bg-[color:var(--sl-color-bg)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--sl-color-accent)] focus-visible:outline-offset-[3px]"
           id={`${componentId}-url`}
           type="url"
           required
@@ -221,23 +233,28 @@
           aria-describedby={`${componentId}-hint`}
           spellcheck="false"
         />
-        <button class="load-button" type="submit"
-          >Show IDs <span aria-hidden="true">→</span></button
+        <button
+          class="[font-family:inherit] [font-size:inherit] [line-height:inherit] cursor-pointer flex items-center justify-center gap-3 shrink-0 py-2.5 px-3.5 border-0 rounded-md bg-[color:var(--sl-color-text)] text-[color:var(--sl-color-bg)] font-medium focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--sl-color-accent)] focus-visible:outline-offset-[3px] hover:opacity-85"
+          type="submit">Show IDs <span aria-hidden="true">→</span></button
         >
       </div>
-      <p id={`${componentId}-hint`} class="hint">
+      <p
+        id={`${componentId}-hint`}
+        class="text-xs text-[color:var(--sl-color-gray-2)] [margin:0.5rem_0_0]"
+      >
         Manifest, Collection, or image info.json
       </p>
     </form>
   </div>
 
-  <div class="inspector">
-    <div class="resource-heading">
+  <div class="p-5 max-[40rem]:p-4">
+    <div class="flex items-baseline justify-between gap-2 mb-2 [&_label]:m-0">
       <label
+        class="block text-[0.8125rem] font-semibold mb-2"
         id={`${componentId}-resource-label`}
         for={`${componentId}-resource`}>Inspect an ID</label
       >
-      <span role="status" class="status">
+      <span role="status" class="text-xs text-[color:var(--sl-color-gray-2)]">
         {loading
           ? 'Loading…'
           : error
@@ -246,7 +263,12 @@
       </span>
     </div>
     {#if error}
-      <p role="alert">{error}</p>
+      <p
+        class="border-l-[2px] border-solid border-l-[color:var(--sl-color-accent)] pl-3"
+        role="alert"
+      >
+        {error}
+      </p>
     {/if}
 
     {#if selectedResource}
@@ -268,7 +290,7 @@
           id={`${componentId}-resource`}
           aria-labelledby={`${componentId}-resource-label`}
         >
-          <span class="select-label"
+          <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap"
             >{resourceOptions[selectedIndex]?.label}</span
           >
         </Select.Trigger>
@@ -279,66 +301,133 @@
         </Select.Content>
       </Select.Root>
 
-      <div class="calculation" aria-live="polite" aria-atomic="true">
-        <ol aria-label="From IIIF ID to annotation URL">
-          <li>
-            <span class="step-number" aria-hidden="true">1</span>
-            <div class="step-content">
-              <div class="step-heading">
-                <h3>IIIF ID</h3>
-                <span class="resource-type">{selectedResource.type}</span>
-              </div>
-              <code class="source-id">{selectedResource.uri}</code>
-              <p class="hint">Use this exact string as the input.</p>
-            </div>
-          </li>
-          <li>
-            <span class="step-number" aria-hidden="true">2</span>
-            <div class="step-content">
-              <div class="step-heading">
-                <h3>SHA-1 hash</h3>
-                <span class="step-detail">40 characters</span>
-              </div>
-              <code class="hash"
-                ><mark>{selectedResource.allmapsId}</mark
-                ><span class="hash-remainder"
-                  >{selectedResource.hash.slice(16)}</span
-                ></code
+      <div class="mt-6" aria-live="polite" aria-atomic="true">
+        <ol
+          class="list-none p-0 m-0"
+          aria-label="From IIIF ID to annotation URL"
+        >
+          <li
+            class="[ol_&]:grid [ol_&]:grid-cols-[1.75rem_minmax(0,1fr)] [ol_&]:gap-3 [ol_&]:relative [ol_&]:pb-6 [ol_&:last-child]:pb-0 [ol_&:not(:last-child)::before]:[content:''] [ol_&:not(:last-child)::before]:absolute [ol_&:not(:last-child)::before]:top-7 [ol_&:not(:last-child)::before]:bottom-0 [ol_&:not(:last-child)::before]:left-[0.84375rem] [ol_&:not(:last-child)::before]:w-[1px] [ol_&:not(:last-child)::before]:bg-[color:var(--sl-color-gray-5)]"
+          >
+            <span
+              class="grid place-items-center w-7 h-7 box-border border border-solid border-[color:var(--sl-color-gray-5)] rounded-full text-xs tabular-nums text-[color:var(--sl-color-gray-2)] [[data-part~=result-step]_&]:bg-[color:var(--accent-fill)] [[data-part~=result-step]_&]:border-[color:var(--accent-border)] [[data-part~=result-step]_&]:text-[color:var(--sl-color-accent)]"
+              aria-hidden="true">1</span
+            >
+            <div>
+              <div
+                class="flex items-center gap-3 min-h-7 mb-2 max-[40rem]:flex-wrap max-[40rem]:gap-y-1 max-[40rem]:gap-x-2"
               >
-              <p class="hint">
-                The <span class="retained-label">first 16 characters</span> form
-                the Allmaps ID.
+                <h3 class="text-sm font-semibold m-0">IIIF ID</h3>
+                <span
+                  class="text-[0.6875rem] [padding:0.1rem_0.4rem] rounded bg-[color:var(--panel-fill)] capitalize"
+                  >{selectedResource.type}</span
+                >
+              </div>
+              <code
+                class="font-[family-name:var(--sl-font-mono)] text-[0.8125rem] leading-[1.7] wrap-anywhere block p-3 rounded-md bg-[color:var(--panel-fill)]"
+                >{selectedResource.uri}</code
+              >
+              <p
+                class="text-xs text-[color:var(--sl-color-gray-2)] [margin:0.5rem_0_0]"
+              >
+                Use this exact string as the input.
               </p>
             </div>
           </li>
-          <li class="result-step">
-            <span class="step-number" aria-hidden="true">3</span>
-            <div class="step-content">
-              <div class="step-heading"><h3>Allmaps ID</h3></div>
-              <div class="result-row">
-                <code class="result">{selectedResource.allmapsId}</code>
+          <li
+            class="[ol_&]:grid [ol_&]:grid-cols-[1.75rem_minmax(0,1fr)] [ol_&]:gap-3 [ol_&]:relative [ol_&]:pb-6 [ol_&:last-child]:pb-0 [ol_&:not(:last-child)::before]:[content:''] [ol_&:not(:last-child)::before]:absolute [ol_&:not(:last-child)::before]:top-7 [ol_&:not(:last-child)::before]:bottom-0 [ol_&:not(:last-child)::before]:left-[0.84375rem] [ol_&:not(:last-child)::before]:w-[1px] [ol_&:not(:last-child)::before]:bg-[color:var(--sl-color-gray-5)]"
+          >
+            <span
+              class="grid place-items-center w-7 h-7 box-border border border-solid border-[color:var(--sl-color-gray-5)] rounded-full text-xs tabular-nums text-[color:var(--sl-color-gray-2)] [[data-part~=result-step]_&]:bg-[color:var(--accent-fill)] [[data-part~=result-step]_&]:border-[color:var(--accent-border)] [[data-part~=result-step]_&]:text-[color:var(--sl-color-accent)]"
+              aria-hidden="true">2</span
+            >
+            <div>
+              <div
+                class="flex items-center gap-3 min-h-7 mb-2 max-[40rem]:flex-wrap max-[40rem]:gap-y-1 max-[40rem]:gap-x-2"
+              >
+                <h3 class="text-sm font-semibold m-0">SHA-1 hash</h3>
+                <span class="text-xs text-[color:var(--sl-color-gray-2)]"
+                  >40 characters</span
+                >
+              </div>
+              <code
+                class="font-[family-name:var(--sl-font-mono)] text-[0.8125rem] leading-[1.7] wrap-anywhere rounded-md bg-[color:var(--panel-fill)] flex items-baseline flex-wrap gap-1.5 py-2.5 px-3 border border-solid border-[color:var(--sl-color-gray-5)] select-all"
+                ><mark
+                  class="text-[color:var(--sl-color-accent)] bg-[color:var(--accent-fill)] border border-solid border-[color:var(--accent-border)] rounded py-0.5 px-1.5 whitespace-nowrap"
+                  >{selectedResource.allmapsId}</mark
+                ><span class="text-[color:var(--sl-color-gray-2)] min-w-0"
+                  >{selectedResource.hash.slice(16)}</span
+                ></code
+              >
+              <p
+                class="text-xs text-[color:var(--sl-color-gray-2)] [margin:0.5rem_0_0]"
+              >
+                The <span class="text-[color:var(--sl-color-text)] font-medium"
+                  >first 16 characters</span
+                > form the Allmaps ID.
+              </p>
+            </div>
+          </li>
+          <li
+            class="[ol_&]:grid [ol_&]:grid-cols-[1.75rem_minmax(0,1fr)] [ol_&]:gap-3 [ol_&]:relative [ol_&]:pb-6 [ol_&:last-child]:pb-0 [ol_&:not(:last-child)::before]:[content:''] [ol_&:not(:last-child)::before]:absolute [ol_&:not(:last-child)::before]:top-7 [ol_&:not(:last-child)::before]:bottom-0 [ol_&:not(:last-child)::before]:left-[0.84375rem] [ol_&:not(:last-child)::before]:w-[1px] [ol_&:not(:last-child)::before]:bg-[color:var(--sl-color-gray-5)]"
+            data-part="result-step"
+          >
+            <span
+              class="grid place-items-center w-7 h-7 box-border border border-solid border-[color:var(--sl-color-gray-5)] rounded-full text-xs tabular-nums text-[color:var(--sl-color-gray-2)] [[data-part~=result-step]_&]:bg-[color:var(--accent-fill)] [[data-part~=result-step]_&]:border-[color:var(--accent-border)] [[data-part~=result-step]_&]:text-[color:var(--sl-color-accent)]"
+              aria-hidden="true">3</span
+            >
+            <div>
+              <div
+                class="flex items-center gap-3 min-h-7 mb-2 max-[40rem]:flex-wrap max-[40rem]:gap-y-1 max-[40rem]:gap-x-2"
+              >
+                <h3 class="text-sm font-semibold m-0">Allmaps ID</h3>
+              </div>
+              <div
+                class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-3 bg-[color:var(--accent-fill)] border border-solid border-[color:var(--accent-border)] rounded-md"
+              >
+                <code
+                  class="font-[family-name:var(--sl-font-mono)] text-[0.8125rem] leading-[1.7] wrap-anywhere min-w-0 font-normal text-[color:var(--sl-color-accent)] select-all"
+                  >{selectedResource.allmapsId}</code
+                >
                 {@render copyButton(selectedResource.allmapsId, 'Allmaps ID')}
               </div>
             </div>
           </li>
-          <li class="result-step">
-            <span class="step-number" aria-hidden="true">4</span>
-            <div class="step-content">
-              <div class="step-heading"><h3>Annotation URL</h3></div>
+          <li
+            class="[ol_&]:grid [ol_&]:grid-cols-[1.75rem_minmax(0,1fr)] [ol_&]:gap-3 [ol_&]:relative [ol_&]:pb-6 [ol_&:last-child]:pb-0 [ol_&:not(:last-child)::before]:[content:''] [ol_&:not(:last-child)::before]:absolute [ol_&:not(:last-child)::before]:top-7 [ol_&:not(:last-child)::before]:bottom-0 [ol_&:not(:last-child)::before]:left-[0.84375rem] [ol_&:not(:last-child)::before]:w-[1px] [ol_&:not(:last-child)::before]:bg-[color:var(--sl-color-gray-5)]"
+            data-part="result-step"
+          >
+            <span
+              class="grid place-items-center w-7 h-7 box-border border border-solid border-[color:var(--sl-color-gray-5)] rounded-full text-xs tabular-nums text-[color:var(--sl-color-gray-2)] [[data-part~=result-step]_&]:bg-[color:var(--accent-fill)] [[data-part~=result-step]_&]:border-[color:var(--accent-border)] [[data-part~=result-step]_&]:text-[color:var(--sl-color-accent)]"
+              aria-hidden="true">4</span
+            >
+            <div>
+              <div
+                class="flex items-center gap-3 min-h-7 mb-2 max-[40rem]:flex-wrap max-[40rem]:gap-y-1 max-[40rem]:gap-x-2"
+              >
+                <h3 class="text-sm font-semibold m-0">Annotation URL</h3>
+              </div>
               {#if annotationUrl}
-                <div class="result-row">
+                <div
+                  class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-3 bg-[color:var(--accent-fill)] border border-solid border-[color:var(--accent-border)] rounded-md"
+                >
                   <a
-                    class="annotation-url"
+                    class="min-w-0 text-[color:var(--sl-color-accent)] underline [text-underline-offset:0.2em] hover:[text-decoration-thickness:2px] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--sl-color-accent)] focus-visible:outline-offset-[3px]"
                     href={annotationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <code class="result">{annotationUrl}</code>
+                    <code
+                      class="font-[family-name:var(--sl-font-mono)] text-[0.8125rem] leading-[1.7] wrap-anywhere min-w-0 font-normal text-[color:var(--sl-color-accent)] select-all"
+                      >{annotationUrl}</code
+                    >
                   </a>
                   {@render copyButton(annotationUrl, 'annotation URL')}
                 </div>
               {:else}
-                <p class="hint">
+                <p
+                  class="text-xs text-[color:var(--sl-color-gray-2)] [margin:0.5rem_0_0]"
+                >
                   Collections do not have an annotation endpoint. Select a
                   Manifest, Canvas, or image to get its annotation URL.
                 </p>
@@ -347,300 +436,12 @@
           </li>
         </ol>
       </div>
-      {#if copyError}<p role="alert">{copyError}</p>{/if}
+      {#if copyError}<p
+          class="border-l-[2px] border-solid border-l-[color:var(--sl-color-accent)] pl-3"
+          role="alert"
+        >
+          {copyError}
+        </p>{/if}
     {/if}
   </div>
 </section>
-
-<style>
-  .id-example {
-    --panel-fill: color-mix(
-      in srgb,
-      var(--sl-color-gray-6) 42%,
-      var(--sl-color-bg)
-    );
-    --accent-fill: color-mix(
-      in srgb,
-      var(--sl-color-accent) 6%,
-      var(--sl-color-bg)
-    );
-    --accent-border: color-mix(
-      in srgb,
-      var(--sl-color-accent) 45%,
-      var(--sl-color-gray-5)
-    );
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 0.75rem;
-    color: var(--sl-color-text);
-    background: var(--sl-color-bg);
-    font-size: 0.875rem;
-    line-height: 1.5;
-    overflow: hidden;
-  }
-  .source-controls,
-  .inspector {
-    padding: 1.25rem;
-  }
-  .source-controls {
-    background: var(--panel-fill);
-    border-bottom: 1px solid var(--sl-color-gray-5);
-  }
-  label {
-    display: block;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-  input,
-  button {
-    font: inherit;
-  }
-  input {
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    min-height: 2.75rem;
-    padding: 0.625rem 0.75rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 0.375rem;
-    color: inherit;
-    background: var(--sl-color-bg);
-  }
-  form {
-    margin-top: 1rem;
-  }
-  .url-input {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .url-input input {
-    font-size: 0.8125rem;
-  }
-  button {
-    cursor: pointer;
-  }
-  .load-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    flex-shrink: 0;
-    padding: 0.625rem 0.875rem;
-    border: 0;
-    border-radius: 0.375rem;
-    background: var(--sl-color-text);
-    color: var(--sl-color-bg);
-    font-weight: 500;
-  }
-  .load-button:hover {
-    opacity: 0.85;
-  }
-  :is(button, input):focus-visible {
-    outline: 2px solid var(--sl-color-accent);
-    outline-offset: 3px;
-  }
-  .select-label {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .example-title {
-    font-weight: 600;
-  }
-  .example-institution {
-    font-weight: 400;
-    opacity: 0.75;
-  }
-  .hint {
-    font-size: 0.75rem;
-    color: var(--sl-color-gray-2);
-    margin: 0.5rem 0 0;
-  }
-  .resource-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  .resource-heading label {
-    margin: 0;
-  }
-  .status {
-    font-size: 0.75rem;
-    color: var(--sl-color-gray-2);
-  }
-  [role='alert'] {
-    border-left: 2px solid var(--sl-color-accent);
-    padding-left: 0.75rem;
-  }
-  .calculation {
-    margin-top: 1.5rem;
-  }
-  ol {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  ol li {
-    display: grid;
-    grid-template-columns: 1.75rem minmax(0, 1fr);
-    gap: 0.75rem;
-    position: relative;
-    padding-bottom: 1.5rem;
-  }
-  ol li:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    top: 1.75rem;
-    bottom: 0;
-    left: 0.84375rem;
-    width: 1px;
-    background: var(--sl-color-gray-5);
-  }
-  ol li:last-child {
-    padding-bottom: 0;
-  }
-  .step-number {
-    display: grid;
-    place-items: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    box-sizing: border-box;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 50%;
-    font-size: 0.75rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--sl-color-gray-2);
-  }
-  .step-heading {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-height: 1.75rem;
-    margin-bottom: 0.5rem;
-  }
-  h3 {
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin: 0;
-  }
-  .resource-type {
-    font-size: 0.6875rem;
-    padding: 0.1rem 0.4rem;
-    border-radius: 0.25rem;
-    background: var(--panel-fill);
-    text-transform: capitalize;
-  }
-  .step-detail {
-    font-size: 0.75rem;
-    color: var(--sl-color-gray-2);
-  }
-  code {
-    font-family: var(--sl-font-mono);
-    font-size: 0.8125rem;
-    line-height: 1.7;
-    overflow-wrap: anywhere;
-  }
-  .source-id,
-  .hash {
-    display: block;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    background: var(--panel-fill);
-  }
-  .hash {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-    padding: 0.625rem 0.75rem;
-    border: 1px solid var(--sl-color-gray-5);
-    user-select: all;
-  }
-  mark {
-    color: var(--sl-color-accent);
-    background: var(--accent-fill);
-    border: 1px solid var(--accent-border);
-    border-radius: 0.25rem;
-    padding: 0.125rem 0.375rem;
-    white-space: nowrap;
-  }
-  .hash-remainder {
-    color: var(--sl-color-gray-2);
-    min-width: 0;
-  }
-  .retained-label {
-    color: var(--sl-color-text);
-    font-weight: 500;
-  }
-  .result-step .step-number {
-    background: var(--accent-fill);
-    border-color: var(--accent-border);
-    color: var(--sl-color-accent);
-  }
-  .result-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: var(--accent-fill);
-    border: 1px solid var(--accent-border);
-    border-radius: 0.375rem;
-  }
-  .result {
-    min-width: 0;
-    font-weight: 400;
-    color: var(--sl-color-accent);
-    user-select: all;
-  }
-  .annotation-url {
-    min-width: 0;
-    color: var(--sl-color-accent);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-  .annotation-url:hover {
-    text-decoration-thickness: 2px;
-  }
-  .annotation-url:focus-visible {
-    outline: 2px solid var(--sl-color-accent);
-    outline-offset: 3px;
-  }
-  .copy-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    min-width: 5rem;
-    min-height: 2rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    color: var(--sl-color-accent);
-    background: var(--accent-fill);
-    border: 1px solid var(--accent-border);
-    border-radius: 0.25rem;
-  }
-  .copy-button:hover {
-    background: color-mix(
-      in srgb,
-      var(--sl-color-accent) 12%,
-      var(--sl-color-bg)
-    );
-  }
-  @media (max-width: 40rem) {
-    .source-controls,
-    .inspector {
-      padding: 1rem;
-    }
-    .url-input {
-      flex-direction: column;
-    }
-    .step-heading {
-      flex-wrap: wrap;
-      gap: 0.25rem 0.5rem;
-    }
-  }
-</style>
