@@ -1,0 +1,62 @@
+{
+  "type": "Annotation",
+  "@context": [
+    "http://iiif.io/api/extension/georef/1/context.json",
+    "http://iiif.io/api/presentation/3/context.json"
+  ],
+  "motivation": "georeferencing",
+  "target": {
+    "type": "SpecificResource",
+    "source": {
+      "id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:2r36vc46x",
+      "type": "ImageService2",
+      "width": 4862,
+      "height": 6063
+    },
+    "selector": {
+      "type": "SvgSelector",
+      "value": "<svg width=\"4862\" height=\"6063\"><polygon points=\"863,1187 862,3248 2935,3263 2955,3959 3179,4353 3847,4316 4233,3667 3683,3342 3538,3337 3535,1970 4314,1975 4319,850 4804,740 4797,454 4621,44 2910,62 3012,787 2622,887 2633,1085\" /></svg>"
+    }
+  },
+  "body": {
+    "type": "FeatureCollection",
+    "transformation": {
+      "type": "polynomial",
+      "options": {
+        "order": 1
+      }
+    },
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [1957, 1301]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-72.6680761, 42.2651928]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [1255, 2509]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-72.6670793, 42.2655566]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "resourceCoords": [3613, 3422]
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-72.6682381, 42.2668058]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,208 @@
+---
+title: Transforming OCR and other annotations
+description: Turn OCR text polygons and Annotorious drawings into geographic GeoJSON while preserving their contents.
+---
+
+import OcrMapExample from '../../../components/OcrMapExample.svelte'
+import GeometryComparison from '../../../components/GeometryComparison.svelte'
+import { Code } from '@astrojs/starlight/components'
+import ocrAnnotations from '../../../../public/examples/ocr/san-francisco.ocr.json'
+
+export const exampleOcrAnnotation = JSON.stringify(
+  ocrAnnotations.find((annotation) => annotation.body.value === 'FERMENTING'),
+  null,
+  2
+).replace(/^(\s*"(?:body|source|selector)":)/gm, '\n$1')
+
+Turn text labels and traced features on a historical map into GeoJSON you can
+display on a modern map or analyze in a GIS. Allmaps uses the image's
+[Georeference Annotation](/georeference-annotations) to transform their shapes
+from pixels to longitude and latitude. Your code keeps the text and other
+metadata as properties of the resulting features.
+
+This guide follows two examples: words detected by optical character
+recognition (OCR) around a San Francisco brewery, and buildings traced
+with [Annotorious](#from-annotorious-to-geojson) on a factory map in
+Massachusetts. Both use the same workflow: transform the geometry and retain
+the annotation's contents.
+
+<figure class="not-content my-6">
+  <a
+    href="https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497/1680,1940,1200,760/full/0/default.jpg"
+    aria-label="Open the Enterprise Brewing Co. crop at full resolution"
+  >
+    <div class="relative aspect-[1200/760] overflow-hidden">
+      <img
+        class="absolute inset-0 h-full w-full"
+        src="/examples/ocr/san-francisco-crop.jpg"
+        alt="A San Francisco insurance map of Enterprise Brewing Co., with thirteen OCR text polygons outlined in blue around words including BREWING, FERMENTING, LAGER, and BEER."
+        width={1200}
+        height={760}
+        decoding="async"
+      />
+      <img
+        class="absolute inset-0 h-full w-full"
+        src="/examples/ocr/san-francisco-polygons.svg"
+        alt=""
+        width={1200}
+        height={760}
+      />
+    </div>
+  </a>
+  <figcaption class="mt-3 text-sm text-[var(--sl-color-gray-2)]">
+    Thirteen OCR polygons around words including “BREWING,” “FERMENTING,”
+    “LAGER,” and “BEER.”{' '}
+    <a
+      class="text-[color:var(--sl-color-accent)] underline decoration-[0.08em] underline-offset-[0.18em]"
+      href="https://www.davidrumsey.com/luna/servlet/detail/RUMSEY~8~1~214142~5501497"
+    >
+      San Francisco Sanborn Insurance Map, volume 5, pages 515–516
+    </a>
+    (1905), David Rumsey Map Collection.
+  </figcaption>
+</figure>
+
+The crop shows **Enterprise Brewing Co.**, with labels for fermenting rooms,
+beer cellars, water tanks, and ice machinery. Each highlighted word has been
+correctly recognized by OCR and has its own polygon. These polygons locate
+the **printed text**, rather than tracing the brewery buildings.
+
+## Inside an OCR annotation
+
+Each detected word is stored as a W3C Web Annotation. Its `body` contains the
+recognized text, while its `target` identifies the IIIF source image and an
+SVG polygon in full-resolution image pixels. Here is the complete annotation
+for **FERMENTING**:
+
+<div class="georeference-annotation-example">
+  <Code
+    code={exampleOcrAnnotation}
+    lang="json"
+    wrap={true}
+    title="ocr-annotation.json"
+    mark={[
+      { range: '4-8', label: 'Recognized text' },
+      { range: '11-15', label: 'IIIF source image' },
+      { range: '16-20', label: 'Text polygon in image pixels' }
+    ]}
+  />
+</div>
+
+A separate [Georeference Annotation](/georeference-annotations) supplies the
+control points and transformation for the same image. Together, these two
+annotations let you transform the word's polygon to geographic coordinates
+and retain its text as a GeoJSON property.
+
+## Transform the polygons
+
+The following JavaScript loads both inputs, creates one transformer for the
+map, and applies the [SVG conversion](/guides/svg-to-geojson) to each OCR
+selector. Each annotation in this example contains one polygon, which becomes
+one GeoJSON feature with the text and source image ID in its properties.
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+const annotation = await fetch(
+  'https://annotations.allmaps.org/maps/ad38324ab9d18a27@7eef0e705892f244'
+).then((response) => response.json())
+const labels = await fetch(
+  'https://docs.allmaps.org/examples/ocr/san-francisco.ocr.json'
+).then((response) => response.json())
+
+const [georeferencedMap] = parseAnnotation(annotation)
+const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+const features = labels.map(({ body, target }) => {
+  const [feature] = GcpTransformer.transformSvgStringToGeojsonFeatureCollection(
+    transformer,
+    target.selector.value
+  ).features
+
+  feature.properties = { text: body.value, imageId: target.source.id }
+  return feature
+})
+
+const geojson = { type: 'FeatureCollection', features }
+
+console.log(JSON.stringify(geojson, null, 2))
+```
+
+## View the transformed labels
+
+Here are the thirteen transformed text polygons on a modern map of San Francisco.
+Pan and zoom to inspect their positions:
+
+<OcrMapExample client:visible url="/examples/ocr/san-francisco.geojson" />
+
+[Download the GeoJSON](/examples/ocr/san-francisco.geojson) to open it in
+QGIS or another mapping tool. The OCR data comes from
+[Machines Reading Maps](https://machines-reading-maps.github.io/).
+[Text on Maps](https://text-on-maps-viz.allmaps.workers.dev/) is a visualization
+of this data, where you can explore and search for labels across the collection.
+
+## From Annotorious to GeoJSON
+
+The same conversion works for manually drawn features. This example uses
+three buildings traced with [Annotorious](https://annotorious.dev/) on a map
+of the [Glendale Elastic Fabrics Company](https://www.digitalcommonwealth.org/search/commonwealth:2r36vc45n)
+in Easthampton, Massachusetts, from the American Textile History Museum
+collection on Digital Commonwealth. Here the polygons outline **buildings**,
+rather than printed text:
+
+<div id="glendale-building-outlines">
+  <GeometryComparison
+    client:visible
+    annotationUrl="/examples/annotorious/glendale.annotation.json"
+    geojsonUrl="/examples/annotorious/buildings.geojson"
+    initialView={{
+      image: [3300, 1585],
+      imageZoom: 1.7,
+      geographicZoom: 16.2
+    }}
+    imageAttribution="American Textile History Museum / Digital Commonwealth"
+  />
+</div>
+
+Pan or zoom either view to explore the buildings; the other view follows.
+
+Each building annotation stores its outline as an SVG polygon in
+`target.selector.value`. Its `body` is an array of text entries, and its `id`
+identifies the drawing. A separate Georeference Annotation supplies the
+image's control points and transformation. The code below transforms each
+outline and retains the drawing's text and annotation ID as GeoJSON properties.
+
+Adapt the conversion as follows:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+const annotation = await fetch(
+  'https://docs.allmaps.org/examples/annotorious/glendale.annotation.json'
+).then((response) => response.json())
+const drawings = await fetch(
+  'https://docs.allmaps.org/examples/annotorious/buildings.annotations.json'
+).then((response) => response.json())
+
+const [georeferencedMap] = parseAnnotation(annotation)
+const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+const features = drawings.map((drawing) => {
+  const [feature] = GcpTransformer.transformSvgStringToGeojsonFeatureCollection(
+    transformer,
+    drawing.target.selector.value
+  ).features
+
+  feature.properties = {
+    annotationId: drawing.id,
+    text: drawing.body.map((body) => body.value).join('\n')
+  }
+  return feature
+})
+
+const geojson = { type: 'FeatureCollection', features }
+
+console.log(JSON.stringify(geojson, null, 2))
+```
