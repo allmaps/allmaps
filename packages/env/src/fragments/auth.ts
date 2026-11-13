@@ -1,5 +1,21 @@
 import { z } from 'zod'
 
+function isProxyPreview(env: {
+  OAUTH_PROXY_ENABLED?: string
+  BETTER_AUTH_URL: string
+  OAUTH_PROXY_URL?: string
+}) {
+  if (env.OAUTH_PROXY_ENABLED !== 'true' || !env.OAUTH_PROXY_URL) return false
+  try {
+    return (
+      new URL(env.BETTER_AUTH_URL).origin !==
+      new URL(env.OAUTH_PROXY_URL).origin
+    )
+  } catch {
+    return false
+  }
+}
+
 export const authEnvSchema = z
   .object({
     BETTER_AUTH_URL: z.string().url(),
@@ -17,8 +33,7 @@ export const authEnvSchema = z
   .refine(
     (env) =>
       Boolean(env.GITHUB_CLIENT_ID) === Boolean(env.GITHUB_CLIENT_SECRET) ||
-      (env.OAUTH_PROXY_ENABLED === 'true' &&
-        env.BETTER_AUTH_URL !== env.OAUTH_PROXY_URL &&
+      (isProxyPreview(env) &&
         Boolean(env.GITHUB_CLIENT_ID) &&
         !env.GITHUB_CLIENT_SECRET),
     {
@@ -30,8 +45,7 @@ export const authEnvSchema = z
   .refine(
     (env) =>
       Boolean(env.GOOGLE_CLIENT_ID) === Boolean(env.GOOGLE_CLIENT_SECRET) ||
-      (env.OAUTH_PROXY_ENABLED === 'true' &&
-        env.BETTER_AUTH_URL !== env.OAUTH_PROXY_URL &&
+      (isProxyPreview(env) &&
         Boolean(env.GOOGLE_CLIENT_ID) &&
         !env.GOOGLE_CLIENT_SECRET),
     {
