@@ -2,12 +2,15 @@
 
 These fixtures come from the
 [Allmaps & Annotorious notebook](https://observablehq.com/@allmaps/allmaps-and-annotorious)
-by Bert Spaan. They accompany the **Annotating maps with Annotorious** guide.
+by Bert Spaan. They accompany the **From Annotorious to GeoJSON** example in
+the **Transforming OCR and other annotations** guide.
 
-- `glendale.annotation.json`: the notebook's three control points and map mask,
-  converted to the current Georeference Annotation format. The duplicate
-  closing mask vertex was removed. The first-order polynomial transformation
-  matches the notebook's `new GcpTransformer(parsedMap.gcps, 'polynomial')`.
+- `glendale.annotation.json`: a snapshot of the
+  [versioned Georeference Annotation](https://annotations.allmaps.org/maps/654b26fa1850e5fc@26f09f0bcf3066b5)
+  used by the guide. It preserves the notebook's map mask and uses 22 building
+  corner control points with a thin-plate-spline transformation. The revised
+  georeference aligns the mill complex with OpenStreetMap building footprints;
+  historical and modern building shapes can still differ.
 - `buildings.annotations.json`: the notebook's three polygon annotations,
   including their original IDs, text bodies, and fractional pixel coordinates.
   These are W3C Web Annotations for use with Annotorious' `W3CImageFormat` adapter.
@@ -27,3 +30,7 @@ itself is not included.
 `building-outlines.svg` uses the same three selectors and frames the IIIF
 image crop used by the guide. `buildings.geojson` is the guide's output,
 with the original labels and annotation IDs.
+
+To regenerate `buildings.geojson`, run the guide's conversion code using the
+versioned annotation URL above and `buildings.annotations.json`. Save the
+resulting FeatureCollection without changing the drawing IDs or text.

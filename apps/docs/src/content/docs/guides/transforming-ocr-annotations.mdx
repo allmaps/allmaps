@@ -154,7 +154,7 @@ rather than printed text:
 <div id="glendale-building-outlines">
   <GeometryComparison
     client:visible
-    annotationUrl="/examples/annotorious/glendale.annotation.json"
+    annotationUrl="https://annotations.allmaps.org/maps/654b26fa1850e5fc@26f09f0bcf3066b5"
     geojsonUrl="/examples/annotorious/buildings.geojson"
     initialView={{
       image: [3300, 1585],
@@ -166,6 +166,11 @@ rather than printed text:
 </div>
 
 Pan or zoom either view to explore the buildings; the other view follows.
+
+The example uses a [versioned Georeference Annotation](https://annotations.allmaps.org/maps/654b26fa1850e5fc@26f09f0bcf3066b5)
+with 22 control points and a thin-plate-spline transformation to align the mill
+buildings. Pinning the annotation version keeps the displayed outlines and
+downloadable GeoJSON consistent if the map is edited later.
 
 Each building annotation stores its outline as an SVG polygon in
 `target.selector.value`. Its `body` is an array of text entries, and its `id`
@@ -180,7 +185,7 @@ import { parseAnnotation } from '@allmaps/annotation'
 import { GcpTransformer } from '@allmaps/transform'
 
 const annotation = await fetch(
-  'https://docs.allmaps.org/examples/annotorious/glendale.annotation.json'
+  'https://annotations.allmaps.org/maps/654b26fa1850e5fc@26f09f0bcf3066b5'
 ).then((response) => response.json())
 const drawings = await fetch(
   'https://docs.allmaps.org/examples/annotorious/buildings.annotations.json'
