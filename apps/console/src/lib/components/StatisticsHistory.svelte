@@ -1,11 +1,12 @@
 <script lang="ts">
+  import StatisticsChart from './StatisticsChart.svelte'
   import type { StatisticsHistory } from '$lib/types.js'
   let { history }: { history: StatisticsHistory } = $props()
   const count = (value: number | null) =>
     value === null ? '—' : value.toLocaleString('en')
 </script>
 
-<section class="space-y-4" aria-label="Statistics over time">
+<section class="space-y-4 font-sans" aria-label="Statistics over time">
   <h2 class="text-xl font-semibold">Statistics over time</h2>
   <form method="GET" class="flex flex-wrap items-end gap-4 font-sans">
     <label class="flex flex-col gap-1 text-sm"
@@ -36,7 +37,7 @@
         ><option value="month">Month</option><option value="year">Year</option>
       </select></label
     >
-    <button class="rounded bg-blue-600 px-4 py-2 text-white" type="submit"
+    <button class="rounded bg-blue px-4 py-2 text-white" type="submit"
       >Show statistics</button
     >
   </form>
@@ -46,6 +47,16 @@
     means no historical snapshot is available. All dates use UTC; weeks start on
     Monday.
   </p>
+  <div class="grid gap-4 md:grid-cols-2">
+    <StatisticsChart {history} metric="mapsAdded" title="New maps" />
+    <StatisticsChart {history} metric="imagesAdded" title="New images" />
+    <StatisticsChart {history} metric="manifestsAdded" title="New manifests" />
+    <StatisticsChart
+      {history}
+      metric="imagesFirstGeoreferenced"
+      title="Images first georeferenced"
+    />
+  </div>
   <div class="overflow-x-auto rounded border border-gray-200">
     <table class="w-full text-left font-sans text-sm">
       <thead class="bg-gray-50"
