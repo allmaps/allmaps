@@ -122,7 +122,7 @@ test('stale initial highlighting never replaces changed source', async () => {
   }).body
   assert.ok(page.includes('newSource()'))
   assert.ok(!page.includes('oldSource()'))
-  assert.ok(!page.includes('wrapped'))
+  assert.ok(!page.includes('data-wrapped="true"'))
 })
 
 test('install commands retain a terminal frame', async () => {
@@ -132,7 +132,7 @@ test('install commands retain a terminal frame', async () => {
   const page = render(CodeBlock, {
     props: { code, language: 'bash', initial }
   }).body
-  assert.match(page, /terminal-dots/)
+  assert.match(page, /data-terminal="true"/)
   assert.match(page, /class="shiki"/)
 })
 

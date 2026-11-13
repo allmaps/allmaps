@@ -1,4 +1,5 @@
 import type { ThemeRegistration } from 'shiki'
+import type { Snippet } from 'svelte'
 
 export type CodeLanguage = 'javascript' | 'html' | 'bash'
 
@@ -27,6 +28,9 @@ export type CodeBlockProps = {
   code: string
   language: CodeLanguage
   title?: string
+  titleContent?: Snippet
+  headerActions?: Snippet
+  ondownload?: () => void
   wrap?: boolean
   folds?: CodeFold[]
   theme?: CodeThemeConfig
