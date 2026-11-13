@@ -20,6 +20,7 @@
     initialView,
     showPoint = true,
     showFooter = true,
+    showLabels = false,
     imageAttribution = 'Library of Congress'
   }: {
     annotationUrl: string
@@ -27,6 +28,7 @@
     initialView?: CoordinateExampleInitialView
     showPoint?: boolean
     showFooter?: boolean
+    showLabels?: boolean
     imageAttribution?: string
   } = $props()
   const id = $props.id()
@@ -365,6 +367,7 @@
         )
         request.signal.throwIfAborted()
         if (geojson && imageGeojson) {
+          if (showLabels) imageMap.setGlyphs(geographicMap.getGlyphs())
           for (const [map, data] of [
             [imageMap, imageGeojson],
             [geographicMap, geojson]
@@ -382,6 +385,25 @@
               source: 'annotations',
               paint: { 'line-color': '#e83f46', 'line-width': 2 }
             })
+            if (showLabels) {
+              map.addLayer({
+                id: 'annotation-text',
+                type: 'symbol',
+                source: 'annotations',
+                layout: {
+                  'text-field': ['get', 'text'],
+                  'text-font': ['Open Sans Regular'],
+                  'text-size': 12,
+                  'text-max-width': 10,
+                  'text-allow-overlap': true
+                },
+                paint: {
+                  'text-color': '#8d1724',
+                  'text-halo-color': '#ffffff',
+                  'text-halo-width': 2
+                }
+              })
+            }
           }
         }
         ready = true

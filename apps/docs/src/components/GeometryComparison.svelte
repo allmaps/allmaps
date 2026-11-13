@@ -22,4 +22,5 @@
   {imageAttribution}
   showPoint={false}
   showFooter={false}
+  showLabels={true}
 />

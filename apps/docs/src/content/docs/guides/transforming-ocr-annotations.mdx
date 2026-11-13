@@ -7,9 +7,18 @@ import OcrMapExample from '../../../components/OcrMapExample.svelte'
 import GeometryComparison from '../../../components/GeometryComparison.svelte'
 import { Code } from '@astrojs/starlight/components'
 import ocrAnnotations from '../../../../public/examples/ocr/san-francisco.ocr.json'
+import buildingAnnotations from '../../../../public/examples/annotorious/buildings.annotations.json'
 
 export const exampleOcrAnnotation = JSON.stringify(
   ocrAnnotations.find((annotation) => annotation.body.value === 'FERMENTING'),
+  null,
+  2
+).replace(/^(\s*"(?:body|source|selector)":)/gm, '\n$1')
+
+export const exampleBuildingAnnotation = JSON.stringify(
+  buildingAnnotations.find((annotation) =>
+    annotation.body.some((body) => body.value === 'DYE & BLEACH HO.')
+  ),
   null,
   2
 ).replace(/^(\s*"(?:body|source|selector)":)/gm, '\n$1')
@@ -166,19 +175,29 @@ rather than printed text:
 </div>
 
 Pan or zoom either view to explore the buildings; the other view follows.
+Both views show the transcribed text from each building annotation.
 
-The example uses a [versioned Georeference Annotation](https://annotations.allmaps.org/maps/654b26fa1850e5fc@26f09f0bcf3066b5)
-with 22 control points and a thin-plate-spline transformation to align the mill
-buildings. Pinning the annotation version keeps the displayed outlines and
-downloadable GeoJSON consistent if the map is edited later.
-
-Each building annotation stores its outline as an SVG polygon in
-`target.selector.value`. Its `body` is an array of text entries, and its `id`
+The annotation's `body` is an array of text entries, and its `id`
 identifies the drawing. A separate Georeference Annotation supplies the
-image's control points and transformation. The code below transforms each
-outline and retains the drawing's text and annotation ID as GeoJSON properties.
+image's control points and transformation. Here is the complete Annotorious
+annotation for **DYE & BLEACH HO.**:
 
-Adapt the conversion as follows:
+<div id="annotorious-annotation" class="georeference-annotation-example">
+  <Code
+    code={exampleBuildingAnnotation}
+    lang="json"
+    wrap={true}
+    title="annotorious-annotation.json"
+    mark={[
+      { range: '3-10', label: 'Transcribed text' },
+      { range: '12-13', label: 'IIIF source image' },
+      { range: '14-18', label: 'Building outline in image pixels' }
+    ]}
+  />
+</div>
+
+The following code transforms each outline and retains the drawing's text and
+annotation ID as GeoJSON properties:
 
 ```js
 import { parseAnnotation } from '@allmaps/annotation'
