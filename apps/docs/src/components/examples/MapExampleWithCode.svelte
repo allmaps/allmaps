@@ -1,7 +1,7 @@
 <script lang="ts">
   import MapExample from './MapExample.svelte'
-  import CodeBlock from '../CodeBlock.svelte'
-  import type { MapExampleImplementationProps } from '../../examples/types.js'
+  import { CodeBlock } from '@allmaps/ui/code'
+  import type { MapExampleImplementationProps } from '../../lib/examples/types.js'
 
   let {
     codeTheme,
@@ -26,39 +26,31 @@
     {#if sourceContent}
       {@render sourceContent(code)}
     {:else}
-      <div class="source">
+      <div class="mt-4">
         <CodeBlock
           code={code.javascript}
           language="javascript"
           theme={codeTheme}
           initial={initialCode?.javascript}
         />
-        <p>Add a map container to your page:</p>
+        <p class="my-3 mx-0 text-sm">Add a map container to your page:</p>
         <CodeBlock
           code={code.html}
           language="html"
           theme={codeTheme}
           initial={initialCode?.html}
         />
-        <p>Install the packages:</p>
+        <p class="my-3 mx-0 text-sm">Install the packages:</p>
         <CodeBlock
           code={code.bash}
           language="bash"
           theme={codeTheme}
           initial={initialCode?.bash}
         />
-        <p>The example uses a bundler such as Vite.</p>
+        <p class="my-3 mx-0 text-sm">
+          The example uses a bundler such as Vite.
+        </p>
       </div>
     {/if}
   {/snippet}
 </MapExample>
-
-<style>
-  .source {
-    margin-top: 1rem;
-  }
-  p {
-    margin: 0.75rem 0;
-    font-size: 0.875rem;
-  }
-</style>

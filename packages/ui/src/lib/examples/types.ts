@@ -1,5 +1,3 @@
-import type { Snippet } from 'svelte'
-import type { CodeThemeConfig, RenderedCodeBlock } from '../code/types.js'
 import type { FetchFn } from '@allmaps/types'
 import type { WarpedMapList } from '@allmaps/render'
 import type { WebGL2WarpedMap } from '@allmaps/render/webgl2'
@@ -46,27 +44,7 @@ export type ExampleMap = {
   destroy: () => void
 }
 
-export type MapExampleOption = {
-  label: string
-  annotationUrl: string
-}
-
-export type MapExampleProps = Partial<ExampleSettings> & {
-  annotationUrl: string
-  height?: number
-  examples?: MapExampleOption[]
-  viewMode?: ExampleViewMode
-  bounds?: ExampleBounds
-  codeTheme?: CodeThemeConfig
-  initialCode?: Record<keyof ExampleCode, RenderedCodeBlock>
-  /** Override source presentation with a snippet receiving the updated code. */
-  children?: Snippet<[ExampleCode]>
-}
 export type ExampleLibrary = 'MapLibre' | 'Leaflet' | 'OpenLayers'
-
-export type MapExampleSwitcherProps = MapExampleProps & {
-  library?: ExampleLibrary
-}
 
 export type ExampleCode = {
   javascript: string
@@ -74,8 +52,13 @@ export type ExampleCode = {
   bash: string
 }
 
-export type MapExampleImplementationProps = MapExampleProps & {
-  library: ExampleLibrary
+export type ExampleCodeOptions = Partial<ExampleSettings> & {
+  annotationUrl: string
+  height?: number
+  viewMode?: ExampleViewMode
+}
+
+export type ExampleImplementation = {
   packages: string
   createExample: (
     container: HTMLElement,

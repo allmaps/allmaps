@@ -2,19 +2,19 @@
   import { onMount, untrack } from 'svelte'
   import { fade } from 'svelte/transition'
   import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwiseIcon'
-  import * as Select from '../ui/select/index.js'
-  import LoadingSmall from '../LoadingSmall.svelte'
+  import * as Select from '@allmaps/ui/select'
+  import { LoadingSmall } from '@allmaps/ui'
 
-  import { annotationExamples } from '../../examples/annotations.js'
-  import { initializeView } from '../../examples/initialize-view.js'
-  import { createImageFetch } from '../../examples/image-fetch.js'
-  import { watchImageLoading } from '../../examples/image-loading.js'
+  import { annotationExamples } from '../../lib/examples/annotations.js'
+  import { initializeView } from '../../lib/examples/initialize-view.js'
+  import { createImageFetch } from '../../lib/examples/image-fetch.js'
+  import { watchImageLoading } from '../../lib/examples/image-loading.js'
   import {
     exampleCode,
     transformations,
     viewModes,
     validateAnnotationUrl
-  } from '../../examples/source.js'
+  } from '../../lib/examples/source.js'
 
   import type {
     ExampleMap,
@@ -22,7 +22,7 @@
     ExampleViewMode,
     ExampleTransformation,
     MapExampleImplementationProps
-  } from '../../examples/types.js'
+  } from '../../lib/examples/types.js'
 
   type Props = MapExampleImplementationProps
 
@@ -208,24 +208,30 @@
 
 {#snippet exampleLabel(label: string)}
   {@const separator = label.indexOf(' — ')}
-  <span class="example-label">
-    <span class="example-title"
+  <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
+    <span class="font-semibold"
       >{separator === -1 ? label : label.slice(0, separator)}</span
-    >{#if separator !== -1}<span class="example-institution"
+    >{#if separator !== -1}<span class="font-normal opacity-75"
         >{label.slice(separator)}</span
       >{/if}
   </span>
 {/snippet}
 
-<div bind:this={root} class="map-example" data-map-example={library}>
-  <div class="map-panel">
+<div
+  bind:this={root}
+  class="[--example-background:var(--sl-color-bg,#fff)] [--example-border:var(--sl-color-gray-5,#bac4c8)] [--example-text:var(--sl-color-text,#182a2f)] [--example-muted:var(--sl-color-gray-3,#495c62)] [--example-accent:var(--sl-color-accent,#ff56ba)] [font-family:inherit] text-[color:var(--example-text)]"
+  data-map-example={library}
+>
+  <div
+    class="overflow-hidden border border-solid border-[color:var(--example-border)] [border-top-width:var(--example-panel-top-border,1px)] rounded-[var(--example-panel-radius,14px)] [box-shadow:0_3px_12px_rgb(0_0_0_/_3%)] bg-[color:var(--example-background)] relative"
+  >
     {#key library}
       <!-- Give each library a clean container without the previous library's classes or DOM state. -->
       <!-- svelte-ignore a11y_no_noninteractive_tabindex (The map handles keyboard interaction; OpenLayers also requires a focusable target.) -->
       <div
         bind:this={container}
-        class="map"
-        class:positioned={mapPositioned}
+        class="isolate w-full bg-[color:#e7eff2] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--example-accent)] focus-visible:outline-offset-[-2px] [&_.ol-zoom]:left-auto [&_.ol-zoom]:right-[0.5em] [&:not([data-positioned=true])_.maplibregl-canvas]:invisible [&:not([data-positioned=true])_.leaflet-pane]:invisible [&:not([data-positioned=true])_.ol-viewport]:invisible"
+        data-positioned={mapPositioned}
         style:height={`${height}px`}
         tabindex="0"
         role="application"
@@ -235,7 +241,7 @@
     {/key}
     {#if !imageLoaded && !error && !imageError}
       <div
-        class="loading"
+        class="flex items-center gap-1.5 absolute top-4 left-4 py-1 px-2 m-0 border border-solid border-[color:var(--example-border)] rounded text-xs leading-[1.5] bg-[color:var(--example-background)] [&_img]:block [&_img]:w-4 [&_img]:h-4 [[data-theme='dark']_&_img]:invert"
         aria-hidden="true"
         transition:fade={{ duration: 150 }}
       >
@@ -245,16 +251,18 @@
     {/if}
 
     <form
-      class="controls"
+      class="grid grid-cols-[minmax(0,1fr)] gap-4 p-5 border-t border-solid border-t-[color:var(--example-border)] @container [&_[data-slot='select-trigger']]:w-full [&_[data-slot='select-trigger']]:min-w-0 [&_[data-slot='select-trigger']]:min-h-10.5 [&_[data-slot='select-trigger']]:h-auto [&_[data-slot='select-trigger']]:py-2.5 [&_[data-slot='select-trigger']]:px-3 [&_[data-slot='select-trigger']]:border [&_[data-slot='select-trigger']]:border-solid [&_[data-slot='select-trigger']]:border-[color:var(--example-border)] [&_[data-slot='select-trigger']]:rounded-lg [&_[data-slot='select-trigger']]:bg-[color:var(--example-background)] [&_[data-slot='select-trigger']]:text-[color:var(--example-text)] [&_[data-slot='select-trigger']]:text-sm [&_[data-slot='select-trigger']]:shadow-none"
       onsubmit={(event) => {
         event.preventDefault()
         openAnnotation()
       }}
     >
       {#if examples.length}
-        <div class="example-control">
-          <label id={`${id}-example-label`} for={`${id}-example`}
-            >Example map</label
+        <div class="[&_label]:mb-1">
+          <label
+            class="block text-xs font-medium"
+            id={`${id}-example-label`}
+            for={`${id}-example`}>Example map</label
           >
           <Select.Root
             type="single"
@@ -291,17 +299,35 @@
           </Select.Root>
         </div>
       {/if}
-      <div class="url-control">
-        <label for={`${id}-url`}>Annotation URL</label>
-        <div class="url-input">
-          <input id={`${id}-url`} type="url" bind:value={draftUrl} required />
-          <button class="load" type="submit">Load map</button>
+      <div>
+        <label class="block text-xs font-medium" for={`${id}-url`}
+          >Annotation URL</label
+        >
+        <div
+          class="flex gap-2 mt-1 [&_input]:min-w-0 [&_input]:w-full [&_input]:font-[family-name:var(--sl-font-mono,monospace)] [&_input]:text-xs"
+        >
+          <input
+            class="[font-family:inherit] [font-size:inherit] [font-weight:inherit] [line-height:inherit] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--example-accent)] focus-visible:outline-offset-[2px] [&:not([type='range'])]:border [&:not([type='range'])]:border-solid [&:not([type='range'])]:border-[color:var(--example-border)] [&:not([type='range'])]:rounded-lg [&:not([type='range'])]:text-[color:var(--example-text)] [&:not([type='range'])]:bg-[color:var(--example-background)] [&:not([type='range'])]:py-2.5 [&:not([type='range'])]:px-3"
+            id={`${id}-url`}
+            type="url"
+            bind:value={draftUrl}
+            required
+          />
+          <button
+            class="[font-family:inherit] [line-height:inherit] border border-solid border-[color:var(--example-border)] rounded-lg py-2.5 px-3 cursor-pointer focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--example-accent)] focus-visible:outline-offset-[2px] disabled:opacity-50 disabled:cursor-default shrink-0 px-4 border-[color:color-mix(in_srgb,#ff56ba_55%,var(--example-border))] bg-[color:color-mix(in_srgb,#ff56ba_10%,var(--example-background))] text-[color:#ff56ba] text-sm font-semibold whitespace-nowrap [transition:background-color_120ms,border-color_120ms] hover:border-[color:#ff56ba] hover:bg-[color:color-mix(in_srgb,#ff56ba_20%,var(--example-background))] [&:active]:bg-[color:color-mix(in_srgb,#ff56ba_28%,var(--example-background))]"
+            type="submit">Load map</button
+          >
         </div>
       </div>
-      <div class="map-settings">
-        <div class="setting-control">
-          <label id={`${id}-view-mode-label`} for={`${id}-view-mode`}
-            >Initial view</label
+      <div
+        class="grid grid-cols-3 items-start gap-4 @max-[30rem]:grid-cols-2"
+        data-part="map-settings"
+      >
+        <div class="[&_label]:mb-1 [[data-part~=map-settings]_>_&]:min-w-0">
+          <label
+            class="block text-xs font-medium"
+            id={`${id}-view-mode-label`}
+            for={`${id}-view-mode`}>Initial view</label
           >
           <Select.Root
             type="single"
@@ -321,9 +347,11 @@
             </Select.Content>
           </Select.Root>
         </div>
-        <div class="setting-control">
-          <label id={`${id}-transformation-label`} for={`${id}-transformation`}
-            >Transformation</label
+        <div class="[&_label]:mb-1 [[data-part~=map-settings]_>_&]:min-w-0">
+          <label
+            class="block text-xs font-medium"
+            id={`${id}-transformation-label`}
+            for={`${id}-transformation`}>Transformation</label
           >
           <Select.Root
             type="single"
@@ -343,276 +371,63 @@
             </Select.Content>
           </Select.Root>
         </div>
-        <label class="opacity-control" for={`${id}-opacity`}>
-          <span>Opacity <output>{Math.round(opacity * 100)}%</output></span>
+        <div
+          class="flex items-center self-end gap-2 [&_label]:flex-none [&_label]:whitespace-nowrap [&_input]:block [&_input]:flex-1 [&_input]:min-w-0 [&_input]:w-0 [&_input]:h-10.5 [&_input]:m-0 [&_input]:[accent-color:var(--example-accent)] @max-[30rem]:col-span-full [[data-part~=map-settings]_>_&]:min-w-0"
+        >
+          <label class="block text-xs font-medium" for={`${id}-opacity`}
+            >Opacity</label
+          >
           <input
+            class="[font-family:inherit] [font-size:inherit] [font-weight:inherit] [line-height:inherit] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--example-accent)] focus-visible:outline-offset-[2px] [&:not([type='range'])]:border [&:not([type='range'])]:border-solid [&:not([type='range'])]:border-[color:var(--example-border)] [&:not([type='range'])]:rounded-lg [&:not([type='range'])]:text-[color:var(--example-text)] [&:not([type='range'])]:bg-[color:var(--example-background)] [&:not([type='range'])]:py-2.5 [&:not([type='range'])]:px-3"
             id={`${id}-opacity`}
             type="range"
             min="0"
             max="1"
             step="0.01"
             value={opacity}
+            aria-valuetext={`${Math.round(opacity * 100)}%`}
             oninput={(event) =>
               changeOpacity(event.currentTarget.valueAsNumber)}
           />
-        </label>
+          <button
+            class="[font-family:inherit] [font-size:inherit] [font-weight:inherit] [line-height:inherit] border border-solid border-[color:var(--example-border)] rounded-lg text-[color:var(--example-text)] bg-[color:var(--example-background)] cursor-pointer focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--example-accent)] focus-visible:outline-offset-[2px] hover:bg-[color:color-mix(in_srgb,var(--example-accent)_8%,var(--example-background))] disabled:opacity-50 disabled:cursor-default inline-flex flex-none items-center justify-center w-10.5 h-10.5 p-0 pointer-coarse:w-11 pointer-coarse:h-11"
+            type="button"
+            aria-label="Reset view"
+            title="Reset view"
+            disabled={!example}
+            onclick={() => example?.fitBounds()}
+          >
+            <ArrowCounterClockwise size={20} aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </form>
-    <div class="map-footer">
+    <div
+      class="flex items-center justify-between gap-4 py-3 px-5 border-t border-solid border-t-[color:var(--example-border)] text-[color:var(--example-muted)] text-xs"
+    >
       <span>{library} example</span>
-      <button
-        class="reset"
-        type="button"
-        disabled={!example}
-        onclick={() => example?.fitBounds()}
-      >
-        <ArrowCounterClockwise size={16} aria-hidden="true" />
-        Reset view
-      </button>
     </div>
   </div>
 
-  <div class="feedback" role="status" aria-live="polite">
+  <div
+    class="text-sm [&:has([data-part~=error])]:my-3"
+    role="status"
+    aria-live="polite"
+  >
     {#if error || imageError}
-      <span class="error">{error || imageError}</span>
-      <button type="button" onclick={openAnnotation}>Try again</button>
+      <span class="me-3" data-part="error">{error || imageError}</span>
+      <button
+        class="[font-family:inherit] [font-size:inherit] [font-weight:inherit] [line-height:inherit] border border-solid border-[color:var(--example-border)] rounded-lg text-[color:var(--example-text)] bg-[color:var(--example-background)] py-2.5 px-3 cursor-pointer focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--example-accent)] focus-visible:outline-offset-[2px] hover:bg-[color:color-mix(in_srgb,var(--example-accent)_8%,var(--example-background))] disabled:opacity-50 disabled:cursor-default"
+        type="button"
+        onclick={openAnnotation}>Try again</button
+      >
     {:else}
-      <span class="visually-hidden">{status}</span>
+      <span
+        class="absolute w-[1px] h-[1px] p-0 overflow-hidden [clip-path:inset(50%)] whitespace-nowrap"
+        >{status}</span
+      >
     {/if}
   </div>
 
   {@render children?.(code)}
 </div>
-
-<style>
-  .map-example {
-    --example-background: var(--sl-color-bg, #fff);
-    --example-border: var(--sl-color-gray-5, #bac4c8);
-    --example-text: var(--sl-color-text, #182a2f);
-    --example-muted: var(--sl-color-gray-3, #495c62);
-    --example-accent: var(--sl-color-accent, #ff56ba);
-    font-family: inherit;
-    color: var(--example-text);
-  }
-  .map-panel {
-    overflow: hidden;
-    border: 1px solid var(--example-border);
-    border-top-width: var(--example-panel-top-border, 1px);
-    border-radius: var(--example-panel-radius, 14px);
-    box-shadow: 0 3px 12px rgb(0 0 0 / 3%);
-    background: var(--example-background);
-    position: relative;
-  }
-  .map {
-    isolation: isolate;
-    width: 100%;
-    background: #e7eff2;
-  }
-  .map:focus-visible {
-    outline: 2px solid var(--example-accent);
-    outline-offset: -2px;
-  }
-  .map:not(.positioned) :global(.maplibregl-canvas),
-  .map:not(.positioned) :global(.leaflet-pane),
-  .map:not(.positioned) :global(.ol-viewport) {
-    visibility: hidden;
-  }
-  .loading {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    padding: 0.25rem 0.5rem;
-    margin: 0;
-    border: 1px solid var(--example-border);
-    border-radius: 4px;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    background: var(--example-background);
-  }
-  .map :global(.ol-zoom) {
-    left: auto;
-    right: 0.5em;
-  }
-  .loading :global(img) {
-    display: block;
-    width: 1rem;
-    height: 1rem;
-  }
-  :global([data-theme='dark']) .loading :global(img) {
-    filter: invert(1);
-  }
-  .controls {
-    display: grid;
-    gap: 1rem;
-    padding: 1.25rem;
-    border-top: 1px solid var(--example-border);
-  }
-  label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  input,
-  button {
-    font: inherit;
-  }
-  input:not([type='range']),
-  button {
-    border: 1px solid var(--example-border);
-    border-radius: 8px;
-    color: var(--example-text);
-    background: var(--example-background);
-    padding: 0.625rem 0.75rem;
-  }
-  input:focus-visible,
-  button:focus-visible {
-    outline: 2px solid var(--example-accent);
-    outline-offset: 2px;
-  }
-  button {
-    cursor: pointer;
-  }
-  button:hover {
-    background: color-mix(
-      in srgb,
-      var(--example-accent) 8%,
-      var(--example-background)
-    );
-  }
-  button:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-  .url-input {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
-  }
-  .example-control label,
-  .setting-control label {
-    margin-bottom: 0.25rem;
-  }
-  .example-label {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .example-title {
-    font-weight: 600;
-  }
-  .example-institution {
-    font-weight: 400;
-    opacity: 0.75;
-  }
-  .url-input input {
-    min-width: 0;
-    width: 100%;
-    font-family: var(--sl-font-mono, monospace);
-    font-size: 0.75rem;
-  }
-  .load {
-    flex-shrink: 0;
-    padding-inline: 1rem;
-    border-color: color-mix(in srgb, #ff56ba 55%, var(--example-border));
-    background: color-mix(in srgb, #ff56ba 10%, var(--example-background));
-    color: #ff56ba;
-    font-size: 0.875rem;
-    font-weight: 600;
-    white-space: nowrap;
-    transition:
-      background-color 120ms,
-      border-color 120ms;
-  }
-  .load:hover {
-    border-color: #ff56ba;
-    background: color-mix(in srgb, #ff56ba 20%, var(--example-background));
-  }
-  .load:active {
-    background: color-mix(in srgb, #ff56ba 28%, var(--example-background));
-  }
-  .controls :global([data-slot='select-trigger']) {
-    width: 100%;
-    min-width: 0;
-    min-height: 2.625rem;
-    height: auto;
-    padding: 0.625rem 0.75rem;
-    border: 1px solid var(--example-border);
-    border-radius: 8px;
-    background: var(--example-background);
-    color: var(--example-text);
-    font-size: 0.875rem;
-    box-shadow: none;
-  }
-  .map-settings {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: start;
-    gap: 1rem;
-  }
-  .map-settings > label,
-  .map-settings > .setting-control {
-    min-width: 0;
-  }
-
-  .opacity-control span {
-    display: flex;
-    justify-content: space-between;
-  }
-  .opacity-control input {
-    display: block;
-    width: 100%;
-    height: 2.625rem;
-    margin: 0.25rem 0 0;
-    accent-color: var(--example-accent);
-  }
-  .map-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 1.25rem;
-    border-top: 1px solid var(--example-border);
-    color: var(--example-muted);
-    font-size: 0.75rem;
-  }
-  .reset {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.625rem;
-    font-size: 0.75rem;
-  }
-  .controls {
-    container-type: inline-size;
-  }
-  @container (max-width: 30rem) {
-    .map-settings {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .opacity-control {
-      grid-column: 1 / -1;
-    }
-  }
-  .feedback {
-    font-size: 0.875rem;
-  }
-  .feedback:has(.error) {
-    margin-block: 0.75rem;
-  }
-  .error {
-    margin-inline-end: 0.75rem;
-  }
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-</style>

@@ -1,10 +1,10 @@
 <script lang="ts">
   import MapExample from './MapExampleWithCode.svelte'
-  import { exampleLibraries } from '../../examples/libraries.js'
+  import { exampleLibraries } from '@allmaps/ui/examples/source'
   import type {
     ExampleLibrary,
     MapExampleSwitcherProps
-  } from '../../examples/types.js'
+  } from '../../lib/examples/types.js'
 
   let {
     library = $bindable<ExampleLibrary>('MapLibre'),
@@ -36,10 +36,17 @@
   }
 </script>
 
-<div class="example-switcher">
-  <div class="library-selector" role="tablist" aria-label="Mapping library">
+<div
+  class="[--example-panel-radius:0_0_14px_14px] [--example-panel-top-border:0]"
+>
+  <div
+    class="flex overflow-hidden border border-solid border-[color:var(--sl-color-gray-5,#bac4c8)] rounded-[14px_14px_0_0] bg-[color:var(--sl-color-bg,#fff)]"
+    role="tablist"
+    aria-label="Mapping library"
+  >
     {#each libraries as option, index (option)}
       <button
+        class="relative flex-1 min-w-0 py-3 px-2 border-0 bg-[color:transparent] text-[color:var(--sl-color-gray-3,#495c62)] [font-family:inherit] [font-weight:inherit] [line-height:inherit] text-sm cursor-pointer hover:bg-[color:color-mix(in_srgb,var(--sl-color-text,#182a2f)_5%,var(--sl-color-bg,#fff))] aria-selected:text-[color:var(--sl-color-text,#182a2f)] aria-selected:font-semibold focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[color:var(--sl-color-accent,#ff56ba)] focus-visible:outline-offset-[-3px] [&[aria-selected='true']::after]:[content:''] [&[aria-selected='true']::after]:absolute [&[aria-selected='true']::after]:bottom-0 [&[aria-selected='true']::after]:left-[20%] [&[aria-selected='true']::after]:right-[20%] [&[aria-selected='true']::after]:h-[2px] [&[aria-selected='true']::after]:bg-[color:#ff56ba]"
         type="button"
         role="tab"
         id={`${id}-${option}`}
@@ -64,53 +71,3 @@
     />
   </div>
 </div>
-
-<style>
-  .example-switcher {
-    --example-panel-radius: 0 0 14px 14px;
-    --example-panel-top-border: 0;
-  }
-  .library-selector {
-    display: flex;
-    overflow: hidden;
-    border: 1px solid var(--sl-color-gray-5, #bac4c8);
-    border-radius: 14px 14px 0 0;
-    background: var(--sl-color-bg, #fff);
-  }
-  button {
-    position: relative;
-    flex: 1;
-    min-width: 0;
-    padding: 0.75rem 0.5rem;
-    border: 0;
-    background: transparent;
-    color: var(--sl-color-gray-3, #495c62);
-    font: inherit;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-  button:hover {
-    background: color-mix(
-      in srgb,
-      var(--sl-color-text, #182a2f) 5%,
-      var(--sl-color-bg, #fff)
-    );
-  }
-  button[aria-selected='true'] {
-    color: var(--sl-color-text, #182a2f);
-    font-weight: 600;
-  }
-  button[aria-selected='true']::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    background: #ff56ba;
-  }
-  button:focus-visible {
-    outline: 2px solid var(--sl-color-accent, #ff56ba);
-    outline-offset: -3px;
-  }
-</style>
