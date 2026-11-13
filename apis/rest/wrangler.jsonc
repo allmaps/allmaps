@@ -13,7 +13,7 @@
       "vars": {
         "OAUTH_PROXY_ENABLED": "true",
         "OAUTH_PROXY_URL": "https://dev.api.allmaps.org",
-        "OAUTH_PROXY_ALLOWED_ORIGINS": "https://api-preview.allmaps.org,https://console-preview.allmaps.org",
+        "OAUTH_PROXY_ALLOWED_ORIGINS": "https://pr-*.preview.api.allmaps.org,https://pr-*.preview.console.allmaps.org",
         "PUBLIC_DOCS_BASE_URL": "https://dev.docs.allmaps.org",
         "PUBLIC_HOMEPAGE_BASE_URL": "https://dev.allmaps.org"
       },

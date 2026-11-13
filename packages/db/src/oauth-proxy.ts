@@ -2,17 +2,6 @@ import type { BetterAuthEnv } from '@allmaps/env'
 
 type Settings = Omit<BetterAuthEnv, 'DATABASE_URL'>
 const coordinator = 'https://dev.api.allmaps.org'
-const developmentOrigins = [
-  'https://dev.allmaps.org',
-  'https://dev.console.allmaps.org',
-  'https://dev.editor.allmaps.org',
-  'https://dev.here.allmaps.org',
-  'https://dev.explore.allmaps.org',
-  'https://dev.latest.allmaps.org',
-  'https://dev.viewer.allmaps.org',
-  'https://dev.tiles.allmaps.org',
-  'https://dev.docs.allmaps.org'
-]
 const production = new Set([
   'https://api.allmaps.org',
   'https://console.allmaps.org',
@@ -49,8 +38,11 @@ export function getOAuthProxyConfiguration(env: Settings) {
     .map((value) => value.trim())
     .filter(Boolean)
   if (!origins.length)
-    throw new Error('OAuth Proxy requires explicit trusted preview origins')
+    throw new Error('OAuth Proxy requires trusted preview origins')
+  const previewPattern =
+    /^https:\/\/pr-\*\.preview\.(console|api)\.allmaps\.org$/
   for (const value of origins) {
+    if (previewPattern.test(value)) continue
     const url = new URL(value)
     if (
       url.origin !== value ||
@@ -60,11 +52,21 @@ export function getOAuthProxyConfiguration(env: Settings) {
       url.hostname.includes('*')
     ) {
       throw new Error(
-        'OAuth Proxy origins must be explicit non-production HTTPS Allmaps origins'
+        'OAuth Proxy origins must be non-production HTTPS Allmaps origins or scoped PR preview patterns'
       )
     }
   }
-  if (base.origin !== coordinator && !origins.includes(base.origin))
+  if (
+    base.origin !== coordinator &&
+    !origins.some((origin) =>
+      previewPattern.test(origin)
+        ? base.origin.replace(
+            /^https:\/\/pr-[a-z0-9]+(?:-[a-z0-9]+)*(?=\.preview\.)/,
+            'https://pr-*'
+          ) === origin
+        : origin === base.origin
+    )
+  )
     throw new Error(
       'Preview auth origin is missing from the OAuth Proxy allowlist'
     )
@@ -73,7 +75,12 @@ export function getOAuthProxyConfiguration(env: Settings) {
     currentURL: base.origin,
     secret: env.OAUTH_PROXY_SECRET,
     trustedOrigins: [
-      ...new Set([coordinator, ...developmentOrigins, ...origins])
+      ...new Set([
+        coordinator,
+        'https://dev.allmaps.org',
+        'https://dev.*.allmaps.org',
+        ...origins
+      ])
     ]
   }
 }
