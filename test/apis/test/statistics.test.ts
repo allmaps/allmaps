@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { eq } from 'drizzle-orm'
 import { schema } from '@allmaps/db'
-import { queryStatistics, refreshDailyStatistics } from '@allmaps/api-shared/db'
+import {
+  queryStatistics,
+  queryStatisticsOrganizations,
+  refreshDailyStatistics
+} from '@allmaps/api-shared/db'
 import { createTestContext } from './helpers/context.ts'
 
 describe('statistics', () => {
@@ -42,6 +46,29 @@ describe('statistics', () => {
       const path = `/organizations/${org.id}/statistics`
       expect((await request('/statistics', admin)).status).toBe(200)
       expect((await request('/statistics', member)).status).toBe(403)
+      expect((await request('/statistics/organizations')).status).toBe(401)
+      expect((await request('/statistics/organizations', member)).status).toBe(
+        403
+      )
+      const distributionResponse = await request(
+        '/statistics/organizations',
+        admin
+      )
+      expect(distributionResponse.status).toBe(200)
+      expect(distributionResponse.headers.get('Cache-Control')).toBe(
+        'private, no-store'
+      )
+      const distribution = await queryStatisticsOrganizations(context.db)
+      const global = await queryStatistics(context.db)
+      for (const metric of ['images', 'maps', 'georeferencedImages'] as const) {
+        expect(
+          distribution.organizations.reduce((sum, row) => sum + row[metric], 0)
+        ).toBe(global[metric])
+      }
+      expect(
+        distribution.organizations.find((row) => row.id === org.id)?.images
+      ).toBeGreaterThan(0)
+
       expect((await request(path, member)).status).toBe(200)
       expect((await request(path, visitor)).status).toBe(403)
       const historyPath = `${path}/history?from=2025-01-01&through=2025-12-31&interval=week`
@@ -105,6 +132,16 @@ describe('statistics', () => {
       expect(empty.images).toBe(0)
       expect(empty.manifests).toBe(0)
       expect(empty.georeferencedPercentage).toBeNull()
+      const reassigned = await queryStatisticsOrganizations(context.db)
+      expect(reassigned.organizations.some((row) => row.id === org.id)).toBe(
+        false
+      )
+      expect(
+        reassigned.organizations.find((row) => row.id === null)?.images
+      ).toBeGreaterThan(0)
+      expect(
+        reassigned.organizations.reduce((sum, row) => sum + row.images, 0)
+      ).toBe((await queryStatistics(context.db)).images)
     } finally {
       await context.close()
     }

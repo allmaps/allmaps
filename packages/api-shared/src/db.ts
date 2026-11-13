@@ -71,6 +71,7 @@ export {
 
 export {
   queryStatistics,
+  queryStatisticsOrganizations,
   queryStatisticsHistory
 } from './queries/statistics.js'
 export {

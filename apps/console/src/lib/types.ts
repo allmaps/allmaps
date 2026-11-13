@@ -117,6 +117,19 @@ export type StatisticsHistory = {
     georeferencedImages: number | null
     ungeoreferencedImages: number | null
     stockDay: string | null
+    measuredAt: string | null
+    georeferencedPercentage: number | null
     availableDays: number
+  }[]
+}
+
+export type StatisticsOrganizations = {
+  measuredAt: string
+  organizations: {
+    id: string | null
+    name: string
+    images: number
+    maps: number
+    georeferencedImages: number
   }[]
 }

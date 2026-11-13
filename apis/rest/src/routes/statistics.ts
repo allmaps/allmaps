@@ -1,6 +1,7 @@
 import { t } from 'elysia'
 import {
   queryStatistics,
+  queryStatisticsOrganizations,
   queryStatisticsHistory,
   queryOrganizationMemberByUserId,
   queryOrganizationById
@@ -55,6 +56,21 @@ export function createStatisticsRoutes({ auth }: BetterAuthContext) {
       {
         detail: {
           summary: 'Get daily global statistics (admin or collaborator)',
+          tags: ['Statistics']
+        }
+      }
+    )
+    .get(
+      '/statistics/organizations',
+      async ({ db, request, set }) => {
+        setCacheControl(set, 'private-no-store')
+        await authorize(db, request)
+        return queryStatisticsOrganizations(db)
+      },
+      {
+        detail: {
+          summary:
+            'Get organization shares of global daily statistics (admin or collaborator)',
           tags: ['Statistics']
         }
       }

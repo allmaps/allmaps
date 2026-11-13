@@ -1,11 +1,12 @@
 import { restFetch } from '$lib/server/rest.js'
 import { loadStatisticsHistory } from '$lib/server/statistics.js'
-import type { Statistics } from '$lib/types.js'
+import type { Statistics, StatisticsOrganizations } from '$lib/types.js'
 import type { PageServerLoad } from './$types'
 export const load: PageServerLoad = async ({ url }) => {
-  const [statistics, history] = await Promise.all([
+  const [statistics, history, distribution] = await Promise.all([
     restFetch<Statistics>('/statistics'),
-    loadStatisticsHistory(url, '/statistics')
+    loadStatisticsHistory(url, '/statistics'),
+    restFetch<StatisticsOrganizations>('/statistics/organizations')
   ])
-  return { statistics, history }
+  return { statistics, history, distribution }
 }

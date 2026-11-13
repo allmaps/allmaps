@@ -121,3 +121,36 @@ export async function queryStatisticsHistory(
     })
   }
 }
+
+// Each domain belongs to at most one organization (organization_urls.url is unique).
+// Include unassigned domains so these disjoint groups reconcile to global totals.
+export async function queryStatisticsOrganizations(db: Db) {
+  const result = await db.execute(sql`
+    WITH latest AS (SELECT max(day) AS day FROM statistics_daily WHERE snapshot_at IS NOT NULL)
+    SELECT o.id, o.name, sum(s.images) AS images, sum(s.maps) AS maps,
+      sum(s.georeferenced_images) AS georeferenced_images,
+      max(s.snapshot_at) AS measured_at
+    FROM statistics_daily s
+    LEFT JOIN organization_urls u ON u.url = s.domain AND u.type = 'domain'
+    LEFT JOIN organizations o ON o.id = u.organization_id
+    WHERE s.day = (SELECT day FROM latest)
+    GROUP BY o.id, o.name
+    ORDER BY sum(s.images) DESC, o.id
+  `)
+  const rows = 'rows' in result ? result.rows : result
+  if (!rows.length)
+    throw new ResponseError('Daily statistics have not been generated yet', 503)
+  return {
+    measuredAt: timestamp((rows[0] as Record<string, unknown>).measured_at),
+    organizations: rows.map((value) => {
+      const row = value as Record<string, unknown>
+      return {
+        id: row.id == null ? null : String(row.id),
+        name: row.name == null ? 'Without organization' : String(row.name),
+        images: numeric(row.images),
+        maps: numeric(row.maps),
+        georeferencedImages: numeric(row.georeferenced_images)
+      }
+    })
+  }
+}

@@ -68,7 +68,7 @@
       viewBox={`0 0 ${width} ${height}`}
       class="mt-2 w-full font-sans"
       role="img"
-      aria-label={`${title} per ${history.interval}, from ${history.from} through ${history.through}. Exact values are in the table below.`}
+      aria-label={`${title} per ${history.interval}, from ${history.from} through ${history.through}. ${total.toLocaleString('en')} in this selection.`}
     >
       <title>{title}</title>
       {#each y.ticks(4).filter(Number.isInteger) as tick (tick)}
@@ -101,7 +101,7 @@
         d={path ?? ''}
         fill="none"
         stroke={color}
-        stroke-width="2.5"
+        stroke-width="3.5"
         stroke-linejoin="round"
       />
       {#if rows.length <= 90}
