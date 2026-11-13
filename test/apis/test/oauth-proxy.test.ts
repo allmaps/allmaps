@@ -34,6 +34,8 @@ describe('development OAuth Proxy', () => {
     ).toBeUndefined()
     for (const overrides of [
       { BETTER_AUTH_URL: 'https://api.allmaps.org' },
+      { BETTER_AUTH_URL: 'https://future-service.allmaps.org' },
+      { OAUTH_PROXY_ALLOWED_ORIGINS: 'https://future-service.allmaps.org' },
       { BETTER_AUTH_COOKIE_PREFIX: 'allmaps' },
       { BETTER_AUTH_URL: 'https://external.example' },
       { OAUTH_PROXY_URL: 'https://api.allmaps.org' },

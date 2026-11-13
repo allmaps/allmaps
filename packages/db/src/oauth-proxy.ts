@@ -2,20 +2,19 @@ import type { BetterAuthEnv } from '@allmaps/env'
 
 type Settings = Omit<BetterAuthEnv, 'DATABASE_URL'>
 const coordinator = 'https://dev.api.allmaps.org'
-const production = new Set([
-  'https://api.allmaps.org',
-  'https://console.allmaps.org',
-  'https://allmaps.org'
-])
+const developmentOrigin =
+  /^https:\/\/dev(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)?\.allmaps\.org$/
+const previewOrigin =
+  /^https:\/\/pr-[a-z0-9]+(?:-[a-z0-9]+)*\.preview\.(console|api)\.allmaps\.org$/
+const isNonProductionOrigin = (origin: string) =>
+  developmentOrigin.test(origin) || previewOrigin.test(origin)
 
 // Fail closed if preview settings accidentally reach a production deployment.
 export function getOAuthProxyConfiguration(env: Settings) {
   if (env.OAUTH_PROXY_ENABLED !== 'true') return undefined
   const base = new URL(env.BETTER_AUTH_URL)
   if (
-    base.protocol !== 'https:' ||
-    !base.hostname.endsWith('.allmaps.org') ||
-    production.has(base.origin) ||
+    !isNonProductionOrigin(base.origin) ||
     env.BETTER_AUTH_COOKIE_PREFIX === 'allmaps'
   ) {
     throw new Error(
@@ -44,13 +43,7 @@ export function getOAuthProxyConfiguration(env: Settings) {
   for (const value of origins) {
     if (previewPattern.test(value)) continue
     const url = new URL(value)
-    if (
-      url.origin !== value ||
-      url.protocol !== 'https:' ||
-      !url.hostname.endsWith('.allmaps.org') ||
-      production.has(url.origin) ||
-      url.hostname.includes('*')
-    ) {
+    if (url.origin !== value || !isNonProductionOrigin(url.origin)) {
       throw new Error(
         'OAuth Proxy origins must be non-production HTTPS Allmaps origins or scoped PR preview patterns'
       )
