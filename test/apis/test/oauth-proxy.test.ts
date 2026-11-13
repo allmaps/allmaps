@@ -5,8 +5,8 @@ import { schema } from '@allmaps/db'
 import { createTestContext } from './helpers/context.ts'
 
 const coordinator = 'https://dev.api.allmaps.org'
-const preview = 'https://api-preview.allmaps.org'
-const consoleOrigin = 'https://console-preview.allmaps.org'
+const preview = 'https://pr-765.preview.api.allmaps.org'
+const consoleOrigin = 'https://pr-765.preview.console.allmaps.org'
 const sharedSecret = 'test-dedicated-oauth-proxy-secret-32-characters'
 const settings = {
   BETTER_AUTH_URL: coordinator,
@@ -15,7 +15,8 @@ const settings = {
   OAUTH_PROXY_ENABLED: 'true' as const,
   OAUTH_PROXY_URL: coordinator,
   OAUTH_PROXY_SECRET: sharedSecret,
-  OAUTH_PROXY_ALLOWED_ORIGINS: `${preview},${consoleOrigin},https://dev.console.allmaps.org`
+  OAUTH_PROXY_ALLOWED_ORIGINS:
+    'https://pr-*.preview.api.allmaps.org,https://pr-*.preview.console.allmaps.org'
 }
 
 describe('development OAuth Proxy', () => {
@@ -33,6 +34,8 @@ describe('development OAuth Proxy', () => {
     ).toBeUndefined()
     for (const overrides of [
       { BETTER_AUTH_URL: 'https://api.allmaps.org' },
+      { BETTER_AUTH_URL: 'https://future-service.allmaps.org' },
+      { OAUTH_PROXY_ALLOWED_ORIGINS: 'https://future-service.allmaps.org' },
       { BETTER_AUTH_COOKIE_PREFIX: 'allmaps' },
       { BETTER_AUTH_URL: 'https://external.example' },
       { OAUTH_PROXY_URL: 'https://api.allmaps.org' },
@@ -49,6 +52,36 @@ describe('development OAuth Proxy', () => {
     expect(getOAuthProxyConfiguration(settings)?.productionURL).toBe(
       coordinator
     )
+  })
+
+  it('trusts develop app patterns without enumerating services or production apps', () => {
+    const origins = getOAuthProxyConfiguration(settings)?.trustedOrigins
+    expect(origins).toContain('https://dev.*.allmaps.org')
+    expect(origins).toContain('https://dev.allmaps.org')
+    expect(origins).not.toContain('https://*.allmaps.org')
+    expect(origins).not.toContain('https://dev.editor.allmaps.org')
+    expect(origins).toContain('https://pr-*.preview.api.allmaps.org')
+  })
+
+  it('accepts scoped PR preview patterns and rejects unrelated auth origins', () => {
+    const options = {
+      ...settings,
+      OAUTH_PROXY_ALLOWED_ORIGINS:
+        'https://pr-*.preview.api.allmaps.org,https://pr-*.preview.console.allmaps.org',
+      BETTER_AUTH_URL: 'https://pr-765.preview.api.allmaps.org'
+    }
+    expect(getOAuthProxyConfiguration(options)?.currentURL).toBe(
+      options.BETTER_AUTH_URL
+    )
+    for (const origin of [
+      'https://api.allmaps.org',
+      'https://other.preview.api.allmaps.org',
+      'https://pr-765.preview.api.allmaps.org.evil.example'
+    ]) {
+      expect(() =>
+        getOAuthProxyConfiguration({ ...options, BETTER_AUTH_URL: origin })
+      ).toThrow()
+    }
   })
 
   it('uses the develop provider callback while creating the session only in the preview database', async () => {

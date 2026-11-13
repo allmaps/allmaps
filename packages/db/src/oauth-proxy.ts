@@ -2,31 +2,19 @@ import type { BetterAuthEnv } from '@allmaps/env'
 
 type Settings = Omit<BetterAuthEnv, 'DATABASE_URL'>
 const coordinator = 'https://dev.api.allmaps.org'
-const developmentOrigins = [
-  'https://dev.allmaps.org',
-  'https://dev.console.allmaps.org',
-  'https://dev.editor.allmaps.org',
-  'https://dev.here.allmaps.org',
-  'https://dev.explore.allmaps.org',
-  'https://dev.latest.allmaps.org',
-  'https://dev.viewer.allmaps.org',
-  'https://dev.tiles.allmaps.org',
-  'https://dev.docs.allmaps.org'
-]
-const production = new Set([
-  'https://api.allmaps.org',
-  'https://console.allmaps.org',
-  'https://allmaps.org'
-])
+const developmentOrigin =
+  /^https:\/\/dev(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)?\.allmaps\.org$/
+const previewOrigin =
+  /^https:\/\/pr-[a-z0-9]+(?:-[a-z0-9]+)*\.preview\.(console|api)\.allmaps\.org$/
+const isNonProductionOrigin = (origin: string) =>
+  developmentOrigin.test(origin) || previewOrigin.test(origin)
 
 // Fail closed if preview settings accidentally reach a production deployment.
 export function getOAuthProxyConfiguration(env: Settings) {
   if (env.OAUTH_PROXY_ENABLED !== 'true') return undefined
   const base = new URL(env.BETTER_AUTH_URL)
   if (
-    base.protocol !== 'https:' ||
-    !base.hostname.endsWith('.allmaps.org') ||
-    production.has(base.origin) ||
+    !isNonProductionOrigin(base.origin) ||
     env.BETTER_AUTH_COOKIE_PREFIX === 'allmaps'
   ) {
     throw new Error(
@@ -49,22 +37,29 @@ export function getOAuthProxyConfiguration(env: Settings) {
     .map((value) => value.trim())
     .filter(Boolean)
   if (!origins.length)
-    throw new Error('OAuth Proxy requires explicit trusted preview origins')
+    throw new Error('OAuth Proxy requires trusted preview origins')
+  const previewPattern =
+    /^https:\/\/pr-\*\.preview\.(console|api)\.allmaps\.org$/
   for (const value of origins) {
+    if (previewPattern.test(value)) continue
     const url = new URL(value)
-    if (
-      url.origin !== value ||
-      url.protocol !== 'https:' ||
-      !url.hostname.endsWith('.allmaps.org') ||
-      production.has(url.origin) ||
-      url.hostname.includes('*')
-    ) {
+    if (url.origin !== value || !isNonProductionOrigin(url.origin)) {
       throw new Error(
-        'OAuth Proxy origins must be explicit non-production HTTPS Allmaps origins'
+        'OAuth Proxy origins must be non-production HTTPS Allmaps origins or scoped PR preview patterns'
       )
     }
   }
-  if (base.origin !== coordinator && !origins.includes(base.origin))
+  if (
+    base.origin !== coordinator &&
+    !origins.some((origin) =>
+      previewPattern.test(origin)
+        ? base.origin.replace(
+            /^https:\/\/pr-[a-z0-9]+(?:-[a-z0-9]+)*(?=\.preview\.)/,
+            'https://pr-*'
+          ) === origin
+        : origin === base.origin
+    )
+  )
     throw new Error(
       'Preview auth origin is missing from the OAuth Proxy allowlist'
     )
@@ -73,7 +68,12 @@ export function getOAuthProxyConfiguration(env: Settings) {
     currentURL: base.origin,
     secret: env.OAUTH_PROXY_SECRET,
     trustedOrigins: [
-      ...new Set([coordinator, ...developmentOrigins, ...origins])
+      ...new Set([
+        coordinator,
+        'https://dev.allmaps.org',
+        'https://dev.*.allmaps.org',
+        ...origins
+      ])
     ]
   }
 }
