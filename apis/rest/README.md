@@ -82,7 +82,7 @@ lockfile, builds APIs and console dependencies, then invokes
 `node scripts/deploy-console-preview.ts console` or the `rest` target.
 
 The deploy script refuses any other branch and derives both hostnames from
-`PREVIEW_NAME` (default `pr-statistics`):
+`PREVIEW_NAME` (default `pr-766`):
 `<name>.preview.console.allmaps.org` and `<name>.preview.api.allmaps.org`. It
 uses only the dedicated preview Hyperdrive binding, and disables workers.dev.
 The REST build needs `OAUTH_PROXY_SECRET`, `PREVIEW_BETTER_AUTH_SECRET` (distinct

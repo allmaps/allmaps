@@ -19,7 +19,7 @@ if (branch !== 'feat/console-domain-statistics')
   throw new Error(
     'This preview deploy is restricted to the statistics feature branch'
   )
-const previewName = process.env.PREVIEW_NAME ?? 'pr-statistics'
+const previewName = process.env.PREVIEW_NAME ?? 'pr-766'
 if (!/^pr-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(previewName))
   throw new Error('Preview name must be a DNS-safe PR identifier')
 const consoleHost = `${previewName}.preview.console.allmaps.org`
