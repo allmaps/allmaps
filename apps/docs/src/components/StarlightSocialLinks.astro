@@ -1,0 +1,20 @@
+---
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro'
+---
+
+<a class="homepage-link" href="https://allmaps.org/">allmaps.org</a>
+<SocialIcons {...Astro.props} />
+
+<style>
+  .homepage-link {
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .homepage-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+</style>

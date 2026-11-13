@@ -37,6 +37,10 @@ export type ScreenshotOptions = {
   url: string
   slug: string
   version?: number
+  /** Expected desktop display width in CSS pixels, defaulting to 640. */
+  displayWidth?: number
+  /** Capture width divided by height, defaulting to 16:10. */
+  aspectRatio?: number
   viewport?: {
     width?: number
     height?: number
@@ -54,7 +58,7 @@ export type ScreenshotOptions = {
 
 export type ScreenshotDefinition = Omit<
   ScreenshotOptions,
-  'version' | 'viewport' | 'delay'
+  'version' | 'displayWidth' | 'aspectRatio' | 'viewport' | 'delay'
 > & {
   version: number
   viewport: Required<NonNullable<ScreenshotOptions['viewport']>>
@@ -67,6 +71,11 @@ export type ScreenshotManifest = {
 }
 
 export const screenshotFilesBaseUrl = 'https://files.allmaps.org'
+
+const defaultDisplayWidth = 640
+const defaultAspectRatio = 16 / 10
+const defaultUiScale = 0.6
+const maximumViewportDimension = 4096
 
 function positiveInteger(value: number, name: string, maximum: number) {
   if (!Number.isInteger(value) || value < 1 || value > maximum) {
@@ -108,10 +117,26 @@ export function defineScreenshot(
   const widths = [...new Set(options.widths ?? [])]
     .map((width) => positiveInteger(width, 'variant width', 12288))
     .sort((a, b) => a - b)
-  const viewport = {
-    width: positiveInteger(options.viewport?.width ?? 1440, 'width', 4096),
-    height: positiveInteger(options.viewport?.height ?? 900, 'height', 4096)
+  const displayWidth = positiveInteger(
+    options.displayWidth ?? defaultDisplayWidth,
+    'display width',
+    maximumViewportDimension
+  )
+  const aspectRatio = options.aspectRatio ?? defaultAspectRatio
+  if (!Number.isFinite(aspectRatio) || aspectRatio <= 0) {
+    throw new Error('Screenshot aspect ratio must be a positive number')
   }
+  const width = positiveInteger(
+    options.viewport?.width ?? Math.round(displayWidth / defaultUiScale),
+    'width',
+    maximumViewportDimension
+  )
+  const height = positiveInteger(
+    options.viewport?.height ?? Math.round(width / aspectRatio),
+    'height',
+    maximumViewportDimension
+  )
+  const viewport = { width, height }
   const crop =
     options.crop === undefined
       ? undefined

@@ -163,11 +163,19 @@ Provide layout-specific sizes for older browsers and eager loading. An explicit
 `src` disables generated candidates; pass `srcset` alongside it for bundled or
 externally managed variants. `sizes` is only emitted when there is a `srcset`.
 
-Optional capture props are `version` (default 1), `viewport` (1440 × 900 at 2×
-density), `waitForSelector`, `waitForRender` (observe Allmaps tile loading and
-wait for stable pixels), and `delay` (milliseconds, default 1000). Slugs use
-lowercase words separated by hyphens. Increment `version` to publish a new image
-URL without replacing images used by older pages.
+Use `displayWidth` for the expected desktop display width in CSS pixels. The
+capture viewport is about 1.67 times as wide, so captured UI appears at about
+60% of its original size when displayed at that width. With the default
+`displayWidth` of 640 and `aspectRatio` of 16:10, the viewport is 1067 × 667
+CSS pixels. The default pixel density is 2×. Use `viewport` to override the
+width, height, or density for a specific capture. The `sizes` prop still
+controls responsive image selection in the browser.
+
+Other capture props are `version` (default 1), `waitForSelector`,
+`waitForRender` (observe Allmaps tile loading and wait for stable pixels), and
+`delay` (milliseconds, default 1000). Slugs use lowercase words separated by
+hyphens. Increment `version` to publish a new image URL without replacing
+images used by older pages.
 
 The component works without a collector and never captures or uploads images
 from a visitor's browser. With the optional Vite plugin, instances register
@@ -192,72 +200,15 @@ loader or imported alongside the image. The screenshot tool provides
 [preparation and highlight documentation](../../tools/screenshots/README.md#preparing-a-page-and-capturing-highlight-targets)
 for the complete workflow and examples.
 
-## Interactive map examples
+## Shared map example helpers
 
-Use `MapExample` from `@allmaps/ui/examples` to switch between MapLibre, Leaflet
-and OpenLayers. It defaults to MapLibre; pass `library="Leaflet"` or
-`library="OpenLayers"` to select another initial library. The annotation URL,
-opacity, transformation and initial-view settings are preserved when switching,
-and the source code and install command update for the selected library.
-Switching disposes the old map and creates a new one. Each library, Allmaps
-plugin and stylesheet loads only when selected and the map is near the viewport;
-loaded modules are reused when switching back.
+`@allmaps/ui/examples/source` provides `exampleCode`, `exampleSource`, and
+`exampleLibraries` for the docs and homepage. The registry loads each mapping
+library, Allmaps plugin, and stylesheet on demand. It also exports the shared
+settings, code, and runtime types.
 
-Use an interactive map and its JavaScript example together:
-
-```svelte
-<script>
-  import { MapLibreExample } from '@allmaps/ui/examples/maplibre'
-</script>
-
-<MapLibreExample
-  annotationUrl="https://annotations.allmaps.org/maps/1bfb1eb4198e7240@c83337fa4b8051c9"
-  opacity={1}
-  transformation="annotation"
-  height={400}
-/>
-```
-
-The read-only, highlighted source code reflects the map controls. Opacity and
-transformation apply immediately. Choose a map from the examples dropdown to
-load it immediately, or submit an annotation URL with Load or Enter.
-Changing the transformation preserves the current view. Reset view fits the map
-to its extent again.
-The default transformation, `annotation`, preserves each map's transformation.
-You can override it with `polynomial1`, `helmert` or `thinPlateSpline`, or choose
-From annotation to restore it. Default opacity and transformation setters are
-omitted from the copied code.
-Copy code gives you a short, standalone example using the selected settings.
-The map container markup and install command appear in separate highlighted HTML
-and Bash blocks below the JavaScript. Each block has its own Copy code button.
-
-Initial view offers three approaches, with **Fit after loading** as the default:
-
-- **Fit after loading** adds the annotation, then fits the map to its extent.
-- **Known bounds** uses fixed coordinates to position the map before loading the
-  annotation. The example fills in these coordinates for the selected map. You
-  can also supply a `bounds` prop as `[west, south, east, north]`.
-- **WarpedMapList** loads the annotation into a list first, calculates its extent,
-  and shares the list with the layer. The install command adds `@allmaps/render`.
-
-Use `viewMode="fit"`, `viewMode="bounds"` or `viewMode="list"` to choose the
-initial option. Switching it recreates the map and updates the source code.
-IIIF HTTP and network failures appear with a retry option, and stalled image
-requests time out.
-
-The dropdown includes Saigon, Amsterdam, Vienna, and Britain and Ireland. Pass an
-`examples` array of `{ label, annotationUrl }` objects to use your own list, or
-`examples={[]}` to hide the dropdown.
-
-Separate entry points also export `LeafletExample` from
-`@allmaps/ui/examples/leaflet` and `OpenLayersExample` from
-`@allmaps/ui/examples/openlayers`. Each component dynamically imports its own
-mapping library when the map approaches the viewport. The components and copied
-examples use a bundler such as Vite for CSS imports and the MapLibre worker.
-
-In Astro MDX, import the component and add `client:visible`. The same components
-work directly in Svelte apps. They use the site's Starlight theme variables when
-available and otherwise have their own defaults.
+The documentation example components and their usage notes live in
+[`apps/docs`](../../apps/docs/README.md#interactive-map-examples).
 
 ## Latest maps
 

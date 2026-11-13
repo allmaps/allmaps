@@ -344,7 +344,7 @@
             <a href={`${docsBaseUrl}/guides/using-maps#geotiff`}>GeoTIFFs</a>
             and
             <a
-              href={`${docsBaseUrl}/packages/cli#use-gdal-to-generate-an-xyz-tile-layer-from-a-georeference-annotation`}
+              href={`${docsBaseUrl}/guides/export-geotiffs#create-xyz-tiles-with-gdal2tiles`}
               >generate your own map tiles</a
             >.
           </p>

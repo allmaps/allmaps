@@ -1,0 +1,97 @@
+---
+import { Icon } from '@astrojs/starlight/components'
+---
+
+<allmaps-theme-toggle>
+  <button type="button" aria-label="Dark mode" aria-pressed="false">
+    <Icon name="sun" class="sun" />
+    <Icon name="moon" class="moon" />
+  </button>
+</allmaps-theme-toggle>
+
+<script>
+  const storageKey = 'starlight-theme'
+
+  function updateToggles() {
+    const isDark = document.documentElement.dataset.theme === 'dark'
+    document.querySelectorAll('allmaps-theme-toggle button').forEach((button) => {
+      button.setAttribute('aria-pressed', String(isDark))
+      button.setAttribute('title', `Switch to ${isDark ? 'light' : 'dark'} mode`)
+    })
+  }
+
+  class AllmapsThemeToggle extends HTMLElement {
+    toggleTheme = () => {
+      const theme =
+        document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+      document.documentElement.dataset.theme = theme
+      try {
+        localStorage.setItem(storageKey, theme)
+      } catch {
+        // The toggle still works when browser storage is unavailable.
+      }
+      updateToggles()
+    }
+
+    connectedCallback() {
+      updateToggles()
+      this.querySelector('button')?.addEventListener('click', this.toggleTheme)
+    }
+
+    disconnectedCallback() {
+      this.querySelector('button')?.removeEventListener('click', this.toggleTheme)
+    }
+  }
+
+  customElements.define('allmaps-theme-toggle', AllmapsThemeToggle)
+
+  // Keep following the system theme until a light/dark preference is saved.
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', (event) => {
+    try {
+      const theme = localStorage.getItem(storageKey)
+      if (theme === 'light' || theme === 'dark') return
+    } catch {
+      return
+    }
+    document.documentElement.dataset.theme = event.matches ? 'light' : 'dark'
+    updateToggles()
+  })
+</script>
+
+<style>
+  allmaps-theme-toggle {
+    display: inline-flex;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Match Starlight's social icon controls: padded hit area, icon-sized layout. */
+    padding: 0.5em;
+    margin: -0.5em;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--sl-color-white);
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: var(--sl-color-gray-6);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--sl-color-text-accent);
+    outline-offset: 2px;
+  }
+
+  .sun,
+  :global([data-theme='light']) .moon {
+    display: none;
+  }
+
+  :global([data-theme='light']) .sun {
+    display: block;
+  }
+</style>

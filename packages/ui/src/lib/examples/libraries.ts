@@ -1,11 +1,8 @@
-import type { ExampleLibrary, MapExampleImplementationProps } from './types.js'
+import type { ExampleLibrary, ExampleImplementation } from './types.js'
 
 // Keep the registry safe to import during SSR and before the map is visible.
 // Each runtime loads its mapping library, Allmaps plugin and CSS on demand.
-export const exampleLibraries: Record<
-  ExampleLibrary,
-  Pick<MapExampleImplementationProps, 'packages' | 'createExample'>
-> = {
+export const exampleLibraries: Record<ExampleLibrary, ExampleImplementation> = {
   MapLibre: {
     packages: 'maplibre-gl @allmaps/maplibre',
     createExample: async (container, signal, view) =>

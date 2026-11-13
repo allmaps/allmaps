@@ -4,20 +4,24 @@
   import { editorSettingsScreenshot } from '../screenshots/editor-settings.js'
   import capturedGeometry from '../images/screenshots/editor-display-settings.geometry.json'
 
-  let { src }: { src: string } = $props()
+  let { src, srcset, sizes }: { src: string; srcset?: string; sizes?: string } =
+    $props()
   const geometry = validateScreenshotGeometry(capturedGeometry)
 </script>
 
 <Screenshot
   {...editorSettingsScreenshot}
   {src}
+  {srcset}
+  {sizes}
   {geometry}
   shadow
+  showUrl
   highlights={['settings']}
-  alt="Allmaps Editor showing a historical map of Delfland and a reference map with four numbered ground control points, with the open display settings panel outlined in pink."
+  alt="Allmaps Editor showing a historical map of Delfland and a reference map with numbered ground control points. The open display settings panel is outlined in pink."
 >
   {#snippet highlight({ bounds })}
-    {@const padding = 20}
+    {@const padding = 12}
     <rect
       x={bounds.x - padding}
       y={bounds.y - padding}

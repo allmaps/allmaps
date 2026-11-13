@@ -1,0 +1,145 @@
+---
+title: Allmaps Viewer
+description: Open, compare, and share georeferenced maps in Allmaps Viewer
+---
+
+import { Screenshot } from '@allmaps/ui'
+import { getScreenshotImage } from '../../../screenshots/image'
+import { lynnAtlasViewerUrl, viewerMapMode, viewerBackgroundRemoved, viewerImageMode } from '../../../screenshots/viewer-comparison'
+import EditorExportScreenshot from '../../../components/EditorExportScreenshot.svelte'
+import viewerScreenshot from '../../../images/screenshots/viewer-lynn-atlas.webp'
+import backgroundRemovedScreenshot from '../../../images/screenshots/viewer-lynn-atlas-background-removed.webp'
+import backgroundRemovedGeometry from '../../../images/screenshots/viewer-lynn-atlas-background-removed.geometry.json'
+import imageModeScreenshot from '../../../images/screenshots/viewer-lynn-atlas-image-mode.webp'
+import imageModeGeometry from '../../../images/screenshots/viewer-lynn-atlas-image-mode.geometry.json'
+import editorExportImage from '../../../images/screenshots/editor-export-version.webp'
+
+export const viewerImage = await getScreenshotImage(viewerScreenshot)
+export const backgroundRemovedImage = await getScreenshotImage(backgroundRemovedScreenshot)
+export const imageModeImage = await getScreenshotImage(imageModeScreenshot)
+export const exportImage = await getScreenshotImage(editorExportImage)
+
+Allmaps Viewer lets you compare historical maps with a modern basemap and
+inspect their original IIIF images. It fetches IIIF image tiles directly from
+the institutions that host them and uses WebGL to warp and display them in
+your browser.
+
+Try it with the <a href={lynnAtlasViewerUrl}>Atlas of the city of Lynn, Massachusetts</a>
+from the Leventhal Map & Education Center.
+
+<div class="not-content p-8">
+  <a href={lynnAtlasViewerUrl}>
+    <Screenshot
+      {...viewerMapMode}
+      {...viewerImage}
+      shadow={true}
+      showUrl={true}
+      alt="Allmaps Viewer showing the georeferenced Lynn atlas sheets together over a modern basemap, with Map, Image, and previous and next map controls."
+    />
+  </a>
+</div>
+
+## Open a map
+
+1. Open [Allmaps Viewer](https://viewer.allmaps.org/).
+2. Paste the URL of a **Georeference Annotation**, **Annotation Page**, or
+   **IIIF Manifest** into the input field and press <kbd>Enter</kbd>.
+3. Allmaps Viewer loads the georeferenced maps and zooms to their location.
+
+When you open a IIIF Manifest, Allmaps Viewer loads its embedded Georeference
+Annotations and looks for associated maps in the Allmaps database.
+
+You can also paste the complete JSON contents of an annotation or Manifest,
+or drag and drop a JSON file onto the input field.
+
+If a map has not been georeferenced yet, follow the
+[georeferencing guide](/guides/georeferencing-maps) to get started in Allmaps
+Editor.
+
+## Compare the map and original image
+
+Use **Map** to see the historical map warped into its geographic position over
+a modern basemap. Zoom and pan to explore how streets, buildings, and other
+features have changed.
+
+Adjust the opacity to make the historical map more transparent and compare it
+with the basemap underneath.
+
+To see the basemap through the paper, select the **magic wand** button. Viewer
+estimates the background color from the most common color inside the map mask
+and makes pixels close to that color transparent. This leaves streets and
+labels visible while revealing more of the basemap. Map details close to the
+background color can fade too. Select the button again to restore the original
+colors.
+
+<div class="not-content p-8">
+  <Screenshot
+    {...viewerBackgroundRemoved}
+    {...backgroundRemovedImage}
+    geometry={backgroundRemovedGeometry}
+    highlights={['background']}
+    shadow={true}
+    showUrl={true}
+    alt="A close-up of the Lynn atlas near Pine Grove Cemetery and Flax Pond, with the paper color removed to reveal the modern basemap. The active magic wand button is outlined in pink."
+  />
+</div>
+
+Use **Image** to inspect the original IIIF image without warping, including
+margins, legends, and other details outside the map mask. The pink line marks
+the mask. Switch back to **Map** to see the map in its geographic context.
+
+<div class="not-content p-8">
+  <Screenshot
+    {...viewerImageMode}
+    {...imageModeImage}
+    geometry={imageModeGeometry}
+    highlights={['view']}
+    shadow={true}
+    showUrl={true}
+    alt="Allmaps Viewer in Image mode showing an original Lynn atlas plate and its map mask. The Map and Image buttons are outlined together at bottom left."
+  />
+</div>
+
+## View multiple maps
+
+An Annotation Page or IIIF Manifest can contain georeferencing data for several
+maps. Allmaps Viewer displays them together in **Map** view, so you can explore
+maps made up of multiple sheets or compare maps covering the same area.
+
+Use the previous and next map buttons to select a map. Switch to **Image** to
+inspect the original IIIF image of the selected map.
+
+You can also use <kbd>[</kbd> and <kbd>]</kbd> to select the previous or next map.
+
+## Share a map
+
+Copy the Allmaps Viewer URL from your browser's address bar to share the maps
+you have opened.
+
+When sharing from Allmaps Editor, open **Export**, choose which maps to share,
+and copy the **View in Allmaps Viewer** link.
+
+<div class="not-content p-8">
+  <EditorExportScreenshot
+    src={exportImage.src}
+    srcset={exportImage.srcset}
+    sizes={exportImage.sizes}
+  />
+</div>
+
+When the Export panel offers a version choice, choose how the link should
+handle future edits:
+
+- **Latest version** uses the latest georeferencing data. Anyone opening or
+  reloading the link sees changes made in Allmaps Editor.
+- **Current version** links to the georeferencing data as it is when you share
+  it. This option applies to a single map or the maps on one image.
+
+Links for all images in a Manifest or Collection use the latest version.
+
+Versioned links preserve the georeferencing data, including ground control
+points and masks. The original IIIF images are still loaded from the institution
+that hosts them. See [Versions and shared edits](/guides/georeferencing-maps#versions-and-shared-edits)
+for an example of a versioned annotation URL.
+
+To add a georeferenced map to your own website, see [Allmaps plugins](/guides/plugins).

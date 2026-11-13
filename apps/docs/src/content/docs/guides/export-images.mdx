@@ -1,0 +1,69 @@
+---
+title: PNG, JPEG, and WebP
+description: Render and download images of georeferenced maps
+---
+
+import ImageExample from '../../../components/ImageExample.astro'
+
+Create PNG, JPEG, or WebP images of your georeferenced maps for presentations,
+publications, or other applications with [`@allmaps/render`](/packages/render).
+The module provides renderers for browsers and server-side JavaScript runtimes,
+including Node.js and Cloudflare Workers. It fetches the original IIIF images
+and warps them using their georeferencing data. These are ordinary image files; use
+[GeoTIFF](/guides/export-geotiffs) when you need embedded georeferencing information.
+
+## How it works
+
+This example uses `CanvasRenderer` to render a map and create a PNG. It
+requires the Canvas 2D APIs, including `OffscreenCanvas`, `ImageData`, and
+`createImageBitmap`:
+
+```ts
+import { CanvasRenderer } from '@allmaps/render/canvas'
+
+const annotationUrl =
+  'https://annotations.allmaps.org/maps/1bfb1eb4198e7240'
+const annotation = await fetch(annotationUrl).then((response) =>
+  response.json()
+)
+
+const canvas = new OffscreenCanvas(1024, 1024)
+const renderer = new CanvasRenderer(canvas)
+renderer.addGeoreferenceAnnotation(annotation)
+await renderer.render()
+
+const image = await canvas.convertToBlob({ type: 'image/png' })
+renderer.destroy()
+```
+
+The renderer uses the ground control points and masks in the Georeference
+Annotation to position and crop the maps. It fits them into the canvas,
+downloads the IIIF tiles needed for that image size, and transforms their
+pixels into geographic positions.
+
+For server-side rendering or generating many images, `@allmaps/render` also
+provides `WasmRenderer`, backed by [Allmaps' Rust renderer compiled to
+WebAssembly](/packages/render-wasm). It performs image decoding, warping,
+and encoding in optimized Rust code and works in environments without
+browser canvas APIs, including Node.js and Cloudflare Workers.
+[Allmaps Tile Server](/guides/xyz-map-tiles) uses it to render map tiles.
+
+## Try the renderer
+
+Choose an example or paste a Georeference Annotation URL, select a format
+and image dimensions, then select **Render image**. All maps
+in the annotation are fitted into the image without stretching them. Areas
+outside the maps' masks are transparent in PNG and WebP images. JPEG images
+use a white background.
+
+This interactive example limits width and height to **2,048 pixels**.
+`@allmaps/render` does not impose this limit: you can set larger output
+dimensions in your own code, within your environment's memory and canvas
+limits.
+
+<ImageExample />
+
+Download the result or use the generated code example to render an image
+with the same settings in your own application. See the
+[`@allmaps/render` documentation](/packages/render) for more rendering
+options and examples.

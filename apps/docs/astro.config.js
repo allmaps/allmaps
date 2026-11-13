@@ -89,7 +89,9 @@ export default defineConfig({
         baseUrl: editLinkBaseUrl
       },
       components: {
-        Search: './src/components/StarlightSearch.astro'
+        Search: './src/components/StarlightSearch.astro',
+        SocialIcons: './src/components/StarlightSocialLinks.astro',
+        ThemeSelect: './src/components/StarlightThemeToggle.astro'
       },
       plugins: [
         scalarStarlight({
@@ -159,6 +161,7 @@ export default defineConfig({
             }
           ]
         },
+
         {
           label: 'Guides',
           items: [
@@ -175,16 +178,29 @@ export default defineConfig({
               link: '/guides/discover-maps'
             },
             {
-              label: 'Viewing maps',
-              link: '/guides/viewing-maps'
-            },
-            {
-              label: 'Using maps in other tools',
-              link: '/guides/using-maps'
-            },
-            {
               label: 'IDs in Allmaps',
               link: '/guides/ids-in-allmaps'
+            },
+            {
+              label: 'Viewing maps',
+              items: ['guides/allmaps-viewer', 'guides/plugins']
+            },
+            {
+              label: 'Exporting and reusing maps',
+              items: [
+                'guides/xyz-map-tiles',
+                'guides/export-geotiffs',
+                'guides/export-images',
+                'guides/export-geojson'
+              ]
+            },
+            {
+              label: 'Transforming coordinates',
+              items: [
+                'guides/transforming-coordinates',
+                'guides/svg-to-geojson',
+                'guides/transforming-ocr-annotations'
+              ]
             }
           ]
         },

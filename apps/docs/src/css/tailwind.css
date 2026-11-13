@@ -7,6 +7,8 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import '@allmaps/ui/css/ui.css';
 
+@source '../../../../packages/ui/src/lib';
+
 @theme {
   --font-sans: 'Geograph', system-ui, sans-serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;

@@ -78,9 +78,15 @@ explicit `--manifest` and `--output` to the tool.
 
 Captures are saved under `.screenshots/captures/screenshots/{slug}/v{version}.webp`
 in the app. PNG bytes from Playwright are converted in memory with Sharp; PNG
-files are never saved. WebP output uses quality 90. The default capture is
-1440 × 900 CSS pixels at 2× density,
-with light colors, reduced motion, an English locale, and UTC timezone.
+files are never saved. WebP output uses quality 90, with light colors, reduced
+motion, an English locale, and UTC timezone.
+
+The capture viewport is derived from the expected `displayWidth` in CSS
+pixels. The default of 640 CSS pixels and a 16:10 `aspectRatio` resolve to
+1067 × 667 CSS pixels at 2× density. At the expected display width, the
+captured controls appear at about 60% of their original size. Set `viewport`
+to override individual dimensions or density. When reusing a capture with
+existing highlight geometry, use the viewport that produced the image.
 
 Local captures are reused when their definitions match. Use `--refresh` when
 the page has changed at the same URL. Failed captures preserve the last local
