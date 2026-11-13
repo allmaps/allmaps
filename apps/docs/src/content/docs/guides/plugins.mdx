@@ -1,0 +1,70 @@
+---
+title: Allmaps plugins for MapLibre, Leaflet, and OpenLayers
+description: Display georeferenced maps in MapLibre GL JS, Leaflet, or OpenLayers
+sidebar:
+  label: MapLibre, Leaflet, and OpenLayers
+---
+
+import MapExample from '../../../components/MapExample.astro'
+
+Use an Allmaps plugin to add georeferenced maps to your own website. Plugins
+are available for **MapLibre GL JS**, **Leaflet**, and **OpenLayers**. Choose
+the plugin for the mapping library your website uses.
+
+<div class="full-width-table overflow-x-auto">
+
+| Mapping library | Package | Documentation |
+| --- | --- | --- |
+| [MapLibre GL JS](https://maplibre.org/) | `@allmaps/maplibre` | [MapLibre plugin](/packages/maplibre) |
+| [Leaflet](https://leafletjs.com/) | `@allmaps/leaflet` | [Leaflet plugin](/packages/leaflet) |
+| [OpenLayers](https://openlayers.org/) | `@allmaps/openlayers` | [OpenLayers plugin](/packages/openlayers) |
+
+</div>
+
+## How the plugins work
+
+Each plugin provides a `WarpedMapLayer` TypeScript class. Add this layer to
+your web map, then load a Georeference Annotation from a URL or its JSON
+contents. A single layer can display multiple georeferenced maps.
+
+Like [Allmaps Viewer](/guides/allmaps-viewer), the plugins fetch IIIF image
+tiles directly from the institutions that host them. The layer uses the
+annotation's ground control points to warp the image into position over your
+basemap and the map mask to show the part of the image within its boundary.
+This happens in the browser as you pan and zoom.
+
+## Try the plugins
+
+Switch between **MapLibre**, **Leaflet**, and **OpenLayers**, choose an example,
+or enter your own annotation URL. Zoom and pan to explore the map, and adjust
+its opacity or transformation. Your settings are preserved when switching
+libraries.
+
+The code and installation command update to match your choices. Copy them
+to use the selected plugin on your own website.
+
+There are several ways to initialize the map and set its starting position
+and zoom level. Use **Initial view** to try these approaches and compare the
+code they require:
+
+- **Fit after loading:** load the annotation, then zoom to the map's extent.
+  This is the simplest approach and a good starting point. The map's position
+  changes once the annotation has loaded.
+- **Known bounds:** create the map with a predefined geographic extent, then
+  load the annotation. The map starts in the right place, but you need to know
+  the bounds beforehand and update them if you display different maps.
+- **WarpedMapList:** load the annotation and calculate its extent before
+  creating the map and layer. This gives you the right initial view without
+  hardcoding bounds or zooming after loading. It's the most flexible approach,
+  but requires a little more code and delays creating the map until the
+  annotation has loaded.
+
+By default, each map uses the transformation specified in its annotation.
+
+<div class="not-content">
+  <MapExample annotationUrl="https://annotations.allmaps.org/manifests/631b96e4d6d3f421" />
+</div>
+
+For installation instructions and more options, see the
+[MapLibre](/packages/maplibre), [Leaflet](/packages/leaflet), or
+[OpenLayers](/packages/openlayers) plugin documentation.

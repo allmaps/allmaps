@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "slug": "viewer-lynn-atlas-image-mode",
+  "version": 1,
+  "imageSha256": "6ee36f05f578e0eadee92257559f653cdcca09b09968f39bfca044a40972d2a2",
+  "viewport": {
+    "width": 1067,
+    "height": 667
+  },
+  "targets": {
+    "view": {
+      "height": 41,
+      "width": 195.0234375,
+      "x": 8,
+      "y": 618
+    }
+  }
+}

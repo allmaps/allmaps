@@ -1,0 +1,249 @@
+[
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "BREWING"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"1754,2382 1755,2349 1757,2319 1759,2288 1759,2257 1759,2224 1758,2192 1759,2162 1814,2165 1814,2196 1813,2224 1812,2259 1812,2291 1811,2324 1810,2356 1809,2386\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "CELLAR"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"1890,2057 1904,2059 1919,2060 1933,2060 1948,2061 1963,2061 1978,2062 1992,2062 1989,2089 1975,2088 1961,2088 1946,2088 1931,2087 1917,2087 1903,2087 1888,2087\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "CELLARS"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"1950,2440 1952,2423 1953,2406 1953,2388 1954,2371 1954,2352 1954,2336 1954,2319 1986,2320 1985,2336 1983,2355 1980,2372 1981,2390 1980,2407 1981,2425 1980,2440\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "BEER"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"1913,2125 1923,2125 1933,2125 1943,2125 1953,2126 1963,2126 1973,2126 1983,2126 1979,2149 1971,2149 1961,2149 1951,2149 1941,2149 1931,2149 1921,2149 1911,2149\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "FERMENTING"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2238,2595 2242,2574 2246,2548 2249,2523 2252,2498 2254,2470 2255,2446 2256,2420 2284,2424 2284,2448 2282,2475 2280,2502 2278,2529 2276,2555 2274,2580 2271,2606\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "LAGER"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"1946,2637 1947,2625 1949,2611 1950,2599 1952,2586 1952,2571 1952,2558 1952,2545 1981,2545 1980,2560 1980,2575 1979,2588 1978,2602 1979,2616 1979,2629 1976,2642\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "MILL"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2219,2134 2219,2124 2220,2117 2222,2109 2222,2101 2222,2094 2223,2086 2223,2079 2244,2079 2245,2087 2245,2096 2246,2104 2245,2113 2245,2120 2245,2128 2245,2136\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "WATER"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2373,2116 2384,2117 2394,2117 2404,2118 2415,2118 2426,2118 2436,2118 2446,2118 2445,2143 2434,2142 2424,2142 2413,2142 2403,2142 2393,2142 2382,2142 2371,2142\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "TANK"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2036,2021 2044,2021 2050,2021 2058,2021 2065,2021 2072,2021 2079,2021 2087,2022 2085,2042 2079,2041 2071,2041 2064,2041 2056,2041 2049,2041 2042,2041 2034,2041\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "ICE"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2644,2050 2649,2050 2654,2050 2659,2050 2665,2050 2671,2050 2676,2050 2681,2050 2679,2070 2674,2070 2668,2070 2663,2070 2658,2070 2653,2070 2648,2070 2642,2070\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "PUMP"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2696,2134 2704,2135 2713,2135 2721,2135 2730,2135 2738,2136 2746,2136 2755,2136 2753,2156 2744,2156 2736,2156 2728,2156 2720,2156 2711,2156 2702,2156 2694,2156\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "FRONT"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2566,1940 2584,1941 2601,1942 2618,1942 2636,1943 2653,1943 2670,1943 2687,1943 2686,1972 2669,1972 2651,1972 2634,1971 2616,1971 2599,1971 2581,1970 2564,1970\" /></svg>"
+      }
+    }
+  },
+  {
+    "@context": "http://www.w3.org/ns/anno.jsonld",
+    "type": "Annotation",
+    "body": {
+      "type": "TextualBody",
+      "value": "BRICK"
+    },
+    "target": {
+      "type": "SpecificResource",
+      "source": {
+        "id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~214142~5501497",
+        "type": "ImageService2"
+      },
+      "selector": {
+        "type": "SvgSelector",
+        "value": "<svg><polygon points=\"2159,1946 2175,1947 2190,1948 2206,1948 2221,1949 2236,1949 2251,1949 2267,1949 2266,1974 2251,1974 2235,1974 2220,1974 2205,1973 2189,1973 2174,1973 2158,1973\" /></svg>"
+      }
+    }
+  }
+]

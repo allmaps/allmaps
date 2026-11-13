@@ -1,0 +1,73 @@
+---
+title: GeoJSON footprints
+description: Get geographic footprints for georeferenced maps from the Allmaps Annotations API
+---
+
+import { Screenshot } from '@allmaps/ui'
+import { getScreenshotImage } from '../../../screenshots/image'
+import { lynnAtlasGeojsonUrl, lynnAtlasGeojsonPreviewUrl, lynnAtlasGeojsonScreenshot } from '../../../screenshots/geojson'
+import geojsonScreenshot from '../../../images/screenshots/geojson-io-lynn-atlas.webp'
+
+export const geojsonImage = await getScreenshotImage(geojsonScreenshot)
+
+Use GeoJSON to display map footprints in GIS software or on a web map. Each
+footprint represents a map's mask transformed into geographic coordinates.
+This is useful for showing which areas your maps cover and making maps searchable
+by location, for example by storing the footprints in PostGIS with a spatial
+index. The GeoJSON contains the footprints and map metadata, but not the map
+images.
+
+<figure class="not-content p-8">
+  <a href={lynnAtlasGeojsonPreviewUrl}>
+    <Screenshot
+      {...lynnAtlasGeojsonScreenshot}
+      {...geojsonImage}
+      shadow={true}
+      showUrl={true}
+      urlDisplay="hostname"
+      alt="geojson.io showing the Lynn atlas map footprints over a modern basemap, alongside their GeoJSON data."
+    />
+  </a>
+  <figcaption class="mt-3 text-sm text-[var(--sl-color-gray-2)]">
+    Map footprints from the Atlas of the city of Lynn, Massachusetts.
+  </figcaption>
+</figure>
+
+## How it works
+
+Allmaps uses the ground control points in a Georeference Annotation to calculate
+a [transformation from image coordinates to geographic coordinates](/guides/transforming-coordinates). It applies
+this transformation to the map's mask, which defines the part of the image that
+contains the map. The resulting polygon is the map's geographic footprint.
+
+The **Allmaps Annotations API** returns this footprint as the geometry of a
+GeoJSON Feature, with map metadata in its properties. You can use these polygons
+to find maps that cover a location or overlap an area.
+
+## Get GeoJSON footprints
+
+The **Allmaps APIs** can return GeoJSON for a single map, all georeferenced maps
+on an image or in a IIIF Manifest, or a search result:
+
+<div class="api-examples">
+
+| Maps | GeoJSON | Preview |
+| --- | --- | --- |
+| A single map | <a href="https://annotations.allmaps.org/maps/135dfd2d58dc26ec.geojson">/maps/<wbr />135dfd2d58dc26ec.geojson</a> | [View in geojson.io](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fannotations.allmaps.org%2Fmaps%2F135dfd2d58dc26ec.geojson) |
+| Maps on an image | <a href="https://annotations.allmaps.org/images/f6033bee94f7763e.geojson">/images/<wbr />f6033bee94f7763e.geojson</a> | [View in geojson.io](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fannotations.allmaps.org%2Fimages%2Ff6033bee94f7763e.geojson) |
+| Lynn atlas (IIIF Manifest) | <a href={lynnAtlasGeojsonUrl}>api.allmaps.org/<wbr />manifests/<wbr />23379602e8187445/<wbr />maps.geojson</a> | <a href={lynnAtlasGeojsonPreviewUrl}>View in geojson.io</a> |
+| Maps covering a location | <a href="https://annotations.allmaps.org/maps.geojson?intersects=52.01,4.36&limit=10">/maps.geojson<wbr />?intersects=52.01,4.36<wbr />&amp;limit=10</a> | [View in geojson.io](https://geojson.io/#data=data:text/x-url,https%3A%2F%2Fannotations.allmaps.org%2Fmaps.geojson%3Fintersects%3D52.01%2C4.36%26limit%3D10) |
+
+</div>
+
+A single map returns a GeoJSON **Feature**; multiple maps return a
+**FeatureCollection**. Download the GeoJSON or load its URL directly into a
+tool that supports it. Select **View in geojson.io** to explore the footprints
+on an interactive map.
+
+See the [Annotations API documentation](/apis/annotations) for available filters
+and query parameters.
+
+To turn traced features or OCR results into GeoJSON, see
+[Transforming OCR and other annotations](/guides/transforming-ocr-annotations),
+including the [Annotorious example](/guides/transforming-ocr-annotations#from-annotorious-to-geojson).

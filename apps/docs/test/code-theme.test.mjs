@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { selectAll, toText } from '@astrojs/starlight/expressive-code/hast'
 import { liveCodeTheme } from '../src/plugins/live-code-theme.mjs'
-import { renderCode } from '../../../packages/ui/dist/code/renderer.js'
+import { renderCode } from '../../../packages/ui/src/lib/code/renderer.ts'
 
 function styles(value) {
   return Object.fromEntries(

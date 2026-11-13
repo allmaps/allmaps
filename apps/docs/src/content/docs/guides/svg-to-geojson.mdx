@@ -1,0 +1,139 @@
+---
+title: Transforming SVG to GeoJSON
+description: Turn an SVG line or polygon drawn on a georeferenced image into geographic GeoJSON.
+---
+
+import GeojsonImageExample from '../../../components/GeojsonImageExample.svelte'
+import { Screenshot } from '@allmaps/ui'
+import { getScreenshotImage } from '../../../screenshots/image'
+import {
+  broadwayGeojsonPreviewUrl,
+  broadwayGeojsonScreenshot
+} from '../../../screenshots/geojson'
+import broadwayScreenshot from '../../../images/screenshots/geojson-io-broadway.jpg'
+
+export const broadwayImage = await getScreenshotImage(broadwayScreenshot)
+
+Use Allmaps to move lines and polygons between a historical map image and a
+modern map. SVG shapes drawn on the image use pixel coordinates, while GeoJSON
+uses longitude and latitude. The image's
+[Georeference Annotation](/georeference-annotations) supplies the control
+points that connect these coordinate systems.
+
+This guide starts with [GeoJSON of Broadway in Manhattan](/examples/transforming-coordinates/broadway.geojson).
+You'll transform the route into an SVG overlay on a 1921 aerial photograph,
+then convert an SVG line back into GeoJSON for use in a GIS or web map.
+
+<figure class="not-content p-8">
+  <a href={broadwayGeojsonPreviewUrl}>
+    <Screenshot
+      {...broadwayGeojsonScreenshot}
+      {...broadwayImage}
+      shadow={true}
+      showUrl={true}
+      urlDisplay="hostname"
+      alt="geojson.io showing all five parts of Broadway through Manhattan on a modern map, alongside the GeoJSON data."
+    />
+  </a>
+  <figcaption class="mt-3 text-sm text-[var(--sl-color-gray-2)]">
+    The complete Broadway GeoJSON in geojson.io.
+  </figcaption>
+</figure>
+
+## From GeoJSON to SVG
+
+Transform the geographic coordinates to image pixels to draw Broadway over a
+[1921 aerial photograph of Manhattan](https://www.loc.gov/item/90680339/)
+from the Library of Congress. Pan and zoom to explore the route:
+
+<GeojsonImageExample
+  annotationUrl="https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca"
+  geojsonUrl="/examples/transforming-coordinates/broadway.geojson"
+  client:visible
+/>
+
+Pass the Broadway FeatureCollection directly to
+`GcpTransformer.transformGeojsonFeatureCollectionToSvgString()`:
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+const [annotation, broadway] = await Promise.all([
+  fetch(
+    'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca'
+  ).then((response) => response.json()),
+  fetch(
+    'https://docs.allmaps.org/examples/transforming-coordinates/broadway.geojson'
+  ).then((response) => response.json())
+])
+
+const [georeferencedMap] = parseAnnotation(annotation)
+const transformer = GcpTransformer.fromGeoreferencedMap(georeferencedMap)
+
+const svg = GcpTransformer.transformGeojsonFeatureCollectionToSvgString(
+  transformer,
+  broadway
+)
+
+console.log(svg)
+```
+
+The result contains five `<polyline>` elements in the original image's pixel
+coordinates. When displaying the SVG over the image, give it a `viewBox`
+matching the image dimensions and set the lines' stroke and fill styles.
+
+## From SVG to GeoJSON
+
+For the reverse direction, download the
+[full Broadway SVG](/examples/transforming-coordinates/broadway.svg)
+and its [Georeference Annotation](https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca).
+Its five `<polyline>` elements use the full-resolution photograph's pixel
+coordinates, and its `viewBox` covers the full image: `0 0 30387 8460`.
+
+```js
+import { parseAnnotation } from '@allmaps/annotation'
+import { GcpTransformer } from '@allmaps/transform'
+
+const [annotation, svg] = await Promise.all([
+  fetch(
+    'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca'
+  ).then((response) => response.json()),
+  fetch(
+    'https://docs.allmaps.org/examples/transforming-coordinates/broadway.svg'
+  ).then((response) => response.text())
+])
+
+const [map] = parseAnnotation(annotation)
+const transformer = GcpTransformer.fromGeoreferencedMap(map)
+const geojson = GcpTransformer.transformSvgStringToGeojsonFeatureCollection(
+  transformer,
+  svg
+)
+```
+
+For your own drawings, use `<polyline>` for lines or `<polygon>` for areas.
+Give each shape explicit coordinates in the original image's pixel system.
+Allmaps does not support SVG `<path>` elements or the `transform` attribute,
+including `translate()`, `rotate()`, and `scale()`.
+
+## Using Allmaps CLI
+
+You can also transform SVG to GeoJSON in a terminal with
+[Allmaps CLI](/packages/cli#installation). Download the
+[Broadway SVG](/examples/transforming-coordinates/broadway.svg), then fetch
+the Georeference Annotation and transform the SVG:
+
+```sh
+curl --fail --location \
+  'https://annotations.allmaps.org/maps/48da96d9296515a6@cbd8273e25cd5aca' \
+  --output annotation.json
+
+allmaps transform svg \
+  --annotation annotation.json \
+  < broadway.svg > broadway-transformed.geojson
+```
+
+The `--annotation` option supplies the map's control points and transformation
+type. The command reads the SVG from standard input and writes a GeoJSON
+FeatureCollection with five LineString features to `broadway-transformed.geojson`.

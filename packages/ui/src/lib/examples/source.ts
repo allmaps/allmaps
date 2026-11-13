@@ -4,37 +4,12 @@ import type {
   ExampleSettings,
   ExampleViewMode,
   ExampleCode,
-  MapExampleProps
+  ExampleCodeOptions
 } from './types.js'
 
 export { exampleLibraries } from './libraries.ts'
 
-export const transformations = [
-  { value: 'annotation', label: 'From annotation' },
-  { value: 'polynomial1', label: 'Polynomial (order 1)' },
-  { value: 'helmert', label: 'Helmert' },
-  { value: 'thinPlateSpline', label: 'Thin plate spline' }
-] as const
-
-export const viewModes = [
-  { value: 'fit', label: 'Fit after loading' },
-  { value: 'bounds', label: 'Known bounds' },
-  { value: 'list', label: 'WarpedMapList' }
-] as const
-
-export function validateAnnotationUrl(value: string) {
-  const url = new URL(value)
-  if (
-    !['https:', 'http:'].includes(url.protocol) ||
-    url.username ||
-    url.password
-  ) {
-    throw new Error(
-      'Enter an HTTP or HTTPS annotation URL without credentials.'
-    )
-  }
-  return url.href
-}
+export type * from './types.js'
 
 function quote(value: string) {
   return `'${value
@@ -182,7 +157,7 @@ export function exampleCode(
     transformation = 'annotation',
     viewMode = 'fit',
     height = 400
-  }: MapExampleProps,
+  }: ExampleCodeOptions,
   library: ExampleLibrary,
   packages: string,
   bounds?: ExampleBounds

@@ -4,17 +4,21 @@
   import { editorExportScreenshot } from '../screenshots/editor-export.js'
   import capturedGeometry from '../images/screenshots/editor-export-version.geometry.json'
 
-  let { src }: { src: string } = $props()
+  let { src, srcset, sizes }: { src: string; srcset?: string; sizes?: string } =
+    $props()
   const geometry = validateScreenshotGeometry(capturedGeometry)
 </script>
 
 <Screenshot
   {...editorExportScreenshot}
   {src}
+  {srcset}
+  {sizes}
   {geometry}
   shadow
+  showUrl
   highlights={['export']}
-  alt="Allmaps Editor’s Results tab showing the BnF map of Saigon over a modern basemap, with the export panel outlined in pink and Current version selected."
+  alt="Allmaps Editor’s Results tab showing the Lynn atlas. The Export panel is outlined in pink and shows the View in Allmaps Viewer link for all images."
 >
   {#snippet highlight({ bounds })}
     {@const padding = 20}
