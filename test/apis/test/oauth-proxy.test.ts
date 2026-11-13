@@ -1,4 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
+import {
+  createElysia,
+  createBetterAuthRoutes,
+  handleApiError
+} from '@allmaps/api-shared/elysia'
 import { createAuth, getOAuthProxyConfiguration } from '@allmaps/db/auth'
 import { parseRestEnv } from '@allmaps/env/rest'
 import { schema } from '@allmaps/db'
@@ -81,6 +86,110 @@ describe('development OAuth Proxy', () => {
       expect(() =>
         getOAuthProxyConfiguration({ ...options, BETTER_AUTH_URL: origin })
       ).toThrow()
+    }
+  })
+
+  it('starts Google login through the REST preview login route without a provider secret', async () => {
+    const context = await createTestContext()
+    const coordinatorContext = await createTestContext()
+    try {
+      const env = parseRestEnv({
+        ...context.env,
+        ...settings,
+        BETTER_AUTH_URL: preview,
+        BETTER_AUTH_COOKIE_PREFIX: 'allmaps-preview-test',
+        GITHUB_CLIENT_ID: '',
+        GITHUB_CLIENT_SECRET: '',
+        GOOGLE_CLIENT_ID: 'test-google-public-id',
+        GOOGLE_CLIENT_SECRET: ''
+      })
+      const routes = createElysia()
+        .onError(handleApiError)
+        .use(createBetterAuthRoutes(createAuth(env, context.db)))
+        .compile()
+      const response = await routes.handle(
+        new Request(
+          `${preview}/login/google?returnTo=${encodeURIComponent(consoleOrigin)}`
+        )
+      )
+      expect(response.status, await response.clone().text()).toBe(302)
+      const authorization = new URL(response.headers.get('Location')!)
+      expect(authorization.hostname).toBe('accounts.google.com')
+      expect(authorization.searchParams.get('redirect_uri')).toBe(
+        `${coordinator}/auth/callback/google`
+      )
+      const central = createAuth(
+        parseRestEnv({
+          ...coordinatorContext.env,
+          ...settings,
+          GITHUB_CLIENT_ID: '',
+          GITHUB_CLIENT_SECRET: '',
+          GOOGLE_CLIENT_ID: 'test-google-public-id',
+          GOOGLE_CLIENT_SECRET: 'coordinator-real-provider-secret'
+        }),
+        coordinatorContext.db
+      ).auth
+      const cookie = response.headers
+        .getSetCookie()
+        .map((value) => value.split(';')[0])
+        .join('; ')
+      const payload = {
+        sub: 'google-preview-person',
+        email: 'google-preview@example.test',
+        email_verified: true,
+        name: 'Google preview person',
+        aud: 'test-google-public-id',
+        iss: 'https://accounts.google.com',
+        exp: Math.floor(Date.now() / 1000) + 3600
+      }
+      const idToken =
+        [{ alg: 'RS256', typ: 'JWT' }, payload]
+          .map((value) =>
+            Buffer.from(JSON.stringify(value)).toString('base64url')
+          )
+          .join('.') + '.test-signature'
+      const fetch = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(async (input, init) => {
+          expect(String(input)).toBe('https://oauth2.googleapis.com/token')
+          expect(String(init?.body)).toContain(
+            'coordinator-real-provider-secret'
+          )
+          return Response.json({
+            access_token: 'test-access-token',
+            token_type: 'Bearer',
+            expires_in: 3600,
+            id_token: idToken
+          })
+        })
+      try {
+        const callback = new URL(`${coordinator}/auth/callback/google`)
+        callback.searchParams.set(
+          'state',
+          authorization.searchParams.get('state')!
+        )
+        callback.searchParams.set('code', 'test-provider-code')
+        const centralResponse = await central.handler(
+          new Request(callback, { headers: { Cookie: cookie } })
+        )
+        expect(centralResponse.status).toBe(302)
+        const location = centralResponse.headers.get('Location')!
+        expect(new URL(location).origin).toBe(preview)
+        const completed = await routes.handle(
+          new Request(location, { headers: { Cookie: cookie } })
+        )
+        expect(completed.status).toBe(302)
+        expect(completed.headers.get('Location')).toBe(consoleOrigin)
+        expect(await context.db.select().from(schema.sessions)).toHaveLength(1)
+        expect(
+          await coordinatorContext.db.select().from(schema.users)
+        ).toHaveLength(0)
+      } finally {
+        fetch.mockRestore()
+      }
+    } finally {
+      await context.close()
+      await coordinatorContext.close()
     }
   })
 

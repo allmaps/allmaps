@@ -68,3 +68,13 @@ export {
   updateOrganization,
   deleteOrganization
 } from './queries/organizations.js'
+
+export {
+  queryStatistics,
+  queryStatisticsOrganizations,
+  queryStatisticsHistory
+} from './queries/statistics.js'
+export {
+  backfillDailyStatistics,
+  refreshDailyStatistics
+} from './queries/statistics-maintenance.js'

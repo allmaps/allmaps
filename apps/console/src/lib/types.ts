@@ -86,3 +86,50 @@ export type ListSummary = {
 export type ListDetail = ListSummary & {
   items: ListItem[]
 }
+
+export type Statistics = {
+  images: number
+  maps: number
+  manifests: number
+  imagesWithoutManifest: number
+  georeferencedImages: number
+  georeferencedPercentage: number | null
+  measuredAt: string
+  ungeoreferencedImages: number
+  source: 'daily'
+}
+
+export type StatisticsHistory = {
+  from: string
+  through: string
+  interval: 'day' | 'week' | 'month' | 'year'
+  activityBasis: 'earliest-retained-records'
+  periods: {
+    period: string
+    imagesAdded: number
+    mapsAdded: number
+    manifestsAdded: number
+    imagesFirstGeoreferenced: number
+    images: number | null
+    maps: number | null
+    manifests: number | null
+    imagesWithoutManifest: number | null
+    georeferencedImages: number | null
+    ungeoreferencedImages: number | null
+    stockDay: string | null
+    measuredAt: string | null
+    georeferencedPercentage: number | null
+    availableDays: number
+  }[]
+}
+
+export type StatisticsOrganizations = {
+  measuredAt: string
+  organizations: {
+    id: string | null
+    name: string
+    images: number
+    maps: number
+    georeferencedImages: number
+  }[]
+}

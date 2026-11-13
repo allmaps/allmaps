@@ -8,6 +8,8 @@
   },
   "include": [
     "api-release.ts",
+    "deploy-console-preview.ts",
+    "prepare-develop-oauth.ts",
     "api-release.test.ts",
     "hyperdrive-config.ts",
     "hyperdrive-config.test.ts",

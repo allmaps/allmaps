@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths'
   import { routes } from '$lib/routes.js'
 
   import type { PageProps } from './$types.js'
@@ -60,6 +61,17 @@
     {@const initials = getInitials(displayName)}
 
     <div class="space-y-5">
+      {#if user?.role
+        ?.split(',')
+        .some((role) => ['admin', 'collaborator'].includes(role.trim()))}
+        <a
+          class="block rounded-xl border border-gray-200 bg-white p-5 font-sans text-blue-600"
+          href={resolve('/statistics')}>Allmaps statistics</a
+        >
+      {/if}
+      <a class="block font-sans text-blue-600" href={routes.organizations()}
+        >Organizations</a
+      >
       <!-- User card -->
       <a
         href={routes.user(user.id)}
