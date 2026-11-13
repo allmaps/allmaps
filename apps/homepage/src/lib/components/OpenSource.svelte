@@ -149,7 +149,7 @@
         and latitude. Use your map’s control points to transform your own
         coordinates. <a
           class={linkClass}
-          href={`${docsBaseUrl}/guides/transforming-coordinates#from-image-pixels-to-geographic-coordinates`}
+          href={`${docsBaseUrl}/guides/transforming-coordinates#from-pixels-to-geographic-coordinates`}
           >Learn how to transform coordinates →</a
         >
       </figcaption>
