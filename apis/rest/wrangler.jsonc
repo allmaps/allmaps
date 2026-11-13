@@ -3,9 +3,7 @@
   "name": "rest",
   "main": "./src/worker.ts",
   "compatibility_date": "2025-06-01",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": false
   },
@@ -13,6 +11,9 @@
     "dev": {
       "name": "rest-develop",
       "vars": {
+        "OAUTH_PROXY_ENABLED": "true",
+        "OAUTH_PROXY_URL": "https://dev.api.allmaps.org",
+        "OAUTH_PROXY_ALLOWED_ORIGINS": "https://api-preview.allmaps.org,https://console-preview.allmaps.org",
         "PUBLIC_DOCS_BASE_URL": "https://dev.docs.allmaps.org",
         "PUBLIC_HOMEPAGE_BASE_URL": "https://dev.allmaps.org"
       },
