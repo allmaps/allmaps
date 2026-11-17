@@ -12,17 +12,16 @@
   import { getVarsState } from '$lib/state/vars.svelte.js'
   import { getUrlState } from '$lib/shared/params.js'
   import { getView, getViewUrl } from '$lib/shared/router.js'
+  import {
+    getTourViewTarget,
+    prepareTourStep
+  } from '$lib/shared/editor-tour.js'
+  import type { TourTarget } from '$lib/shared/editor-tour.js'
   import { UiEvents } from '$lib/shared/ui-events.js'
   import { m } from '$lib/paraglide/messages.js'
 
-  import type {
-    Driver,
-    DriverHook,
-    DriveStep,
-    PopoverDOM,
-    State
-  } from 'driver.js'
-  import type { MaybeView } from '$lib/types/shared.js'
+  import type { Driver, DriveStep, PopoverDOM, State } from 'driver.js'
+  import type { MaybeView, View } from '$lib/types/shared.js'
   import type { EditorPublicEnv } from '@allmaps/env/editor'
 
   const uiState = getUiState()
@@ -37,6 +36,7 @@
   let movingToView = false
   let mountedPopover: Record<string, unknown> | undefined
   let tourStartView: MaybeView
+  let steps: TourStep[] = []
 
   const selector = {
     source: '[data-tour="editor-source"]',
@@ -112,14 +112,8 @@
     description: string
   }
 
-  type TourDirection = 'next' | 'previous'
-  type TourPopover = 'info' | 'maps' | 'mapSettings' | 'geocoder' | 'export'
-
-  type MoveTourOptions = {
-    direction: TourDirection
-    targetSelector: string
-    view?: MaybeView
-    popover?: TourPopover
+  type TourStep = DriveStep & {
+    target: () => TourTarget
   }
 
   function sleep(duration: number) {
@@ -273,133 +267,87 @@
     })
   }
 
-  async function moveTour(driver: Driver, options: MoveTourOptions) {
-    if (movingToView) {
+  function viewTarget(view: View): TourTarget {
+    return getTourViewTarget(view, {
+      canEdit: sourceState.canEdit,
+      resultsEnabled:
+        mapsMergedState.completeMaps.length > 0 ||
+        mapsState.activeMap !== undefined
+    })
+  }
+
+  async function moveTour(driver: Driver, direction: 1 | -1) {
+    const activeIndex = driver.getActiveIndex()
+    if (movingToView || activeIndex === undefined) {
       return
     }
 
     movingToView = true
 
     try {
-      uiState.closeModalsAndPopovers()
+      const destination = await prepareTourStep(steps, activeIndex, direction, {
+        isActive: () => tour === driver && driver.isActive(),
+        prepare: async (target) => {
+          uiState.closeModalsAndPopovers()
+          await tick()
 
-      if ('view' in options) {
-        await goto(getTourUrl(options.view), {
-          keepFocus: true,
-          noScroll: true
-        })
-      }
+          if (tour !== driver || !driver.isActive()) {
+            return
+          }
 
-      if (options.popover) {
-        uiState.popoverOpen[options.popover] = true
-      }
+          if ('view' in target && getView(page) !== target.view) {
+            await goto(getTourUrl(target.view), {
+              keepFocus: true,
+              noScroll: true
+            })
+          }
 
-      const targetElement = await waitForElement(options.targetSelector)
-      if (!targetElement) {
+          if (tour === driver && driver.isActive() && target.popover) {
+            uiState.popoverOpen[target.popover] = true
+          }
+        },
+        waitForElement
+      })
+
+      if (!destination || tour !== driver || !driver.isActive()) {
         return
       }
 
+      if (destination.index >= steps.length) {
+        driver.destroy()
+        return
+      }
+
+      const step = steps[destination.index]
+      step.element = destination.selector
+
+      const targetElement = document.querySelector(destination.selector)
       if (
-        options.targetSelector === selector.transformation ||
-        options.targetSelector === selector.gcps
+        destination.selector === selector.transformation ||
+        destination.selector === selector.gcps
       ) {
-        targetElement.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+        targetElement?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
       }
 
-      if (options.direction === 'next') {
-        driver.moveNext()
-      } else {
-        driver.movePrevious()
-      }
-
+      driver.moveTo(destination.index)
       await tick()
       driver.refresh()
     } finally {
-      movingToView = false
-    }
-  }
-
-  function moveToViewOnNext(view: MaybeView, nextSelector: string): DriverHook {
-    return (_element, _step, { driver }) => {
-      void moveTour(driver, {
-        direction: 'next',
-        targetSelector: nextSelector,
-        view
-      })
-    }
-  }
-
-  function moveToViewOnPrevious(
-    view: MaybeView,
-    previousSelector: string
-  ): DriverHook {
-    return (_element, _step, { driver }) => {
-      void moveTour(driver, {
-        direction: 'previous',
-        targetSelector: previousSelector,
-        view
-      })
-    }
-  }
-
-  function moveToPopoverOnNext(
-    popover: TourPopover,
-    nextSelector: string
-  ): DriverHook {
-    return (_element, _step, { driver }) => {
-      void moveTour(driver, {
-        direction: 'next',
-        targetSelector: nextSelector,
-        popover
-      })
-    }
-  }
-
-  function moveToPopoverOnPrevious(
-    popover: TourPopover,
-    previousSelector: string,
-    view?: MaybeView
-  ): DriverHook {
-    return (_element, _step, { driver }) => {
-      const options: MoveTourOptions = {
-        direction: 'previous',
-        targetSelector: previousSelector,
-        popover
+      if (tour === driver) {
+        movingToView = false
       }
-
-      if (view) {
-        options.view = view
-      }
-
-      void moveTour(driver, options)
-    }
-  }
-
-  function closePopoversOnNext(nextSelector: string): DriverHook {
-    return (_element, _step, { driver }) => {
-      void moveTour(driver, {
-        direction: 'next',
-        targetSelector: nextSelector
-      })
-    }
-  }
-
-  function closePopoversOnPrevious(previousSelector: string): DriverHook {
-    return (_element, _step, { driver }) => {
-      void moveTour(driver, {
-        direction: 'previous',
-        targetSelector: previousSelector
-      })
     }
   }
 
   function getStep(
-    element: string,
+    target: TourTarget | (() => TourTarget),
     data: TourPopoverData,
     popover: DriveStep['popover'] = {}
-  ): DriveStep {
+  ): TourStep {
+    const getTarget = typeof target === 'function' ? target : () => target
     return {
-      element,
+      element: getTarget().selector,
+      target: getTarget,
       data,
       popover: {
         title: data.title,
@@ -409,205 +357,144 @@
     }
   }
 
-  function setOnNextClick(step: DriveStep, onNextClick: DriverHook) {
-    step.popover = {
-      ...step.popover,
-      onNextClick
+  function mapsTarget(targetSelector: string): TourTarget {
+    return {
+      selector: targetSelector,
+      fallbackSelector: selector.maps,
+      view: 'georeference',
+      popover: 'maps',
+      available: sourceState.canEdit
     }
   }
 
-  function getSteps(): DriveStep[] {
+  function getSteps(): TourStep[] {
     const hasGeocoder = Boolean(varsState.PUBLIC_GEOCODE_EARTH_KEY)
     const activeMap = mapsState.activeMap
 
     const steps = [
       getStep(
-        selector.source,
+        { selector: selector.source },
         {
           title: m.tour_source_title(),
           description: m.tour_source_description()
-        },
-        {
-          onNextClick: moveToPopoverOnNext('info', selector.infoPopover)
         }
       ),
       getStep(
-        selector.infoPopover,
+        {
+          selector: selector.infoPopover,
+          fallbackSelector: selector.source,
+          popover: 'info'
+        },
         {
           title: m.tour_info_title(),
           description: m.tour_info_description()
-        },
-        {
-          onPrevClick: closePopoversOnPrevious(selector.source),
-          onNextClick: closePopoversOnNext(selector.workflow)
         }
       ),
       getStep(
-        selector.workflow,
+        { selector: selector.workflow, view: tourStartView },
         {
           title: m.tour_workflow_title(),
           description: m.tour_workflow_description()
-        },
-        {
-          onPrevClick: moveToPopoverOnPrevious('info', selector.infoPopover),
-          onNextClick: moveToViewOnNext('images', selector.imagesView)
         }
       ),
-      getStep(
-        selector.imagesView,
-        {
-          title: m.tour_images_title(),
-          description: m.tour_images_description()
-        },
-        {
-          onPrevClick: moveToViewOnPrevious(tourStartView, selector.workflow),
-          onNextClick: moveToViewOnNext('mask', selector.maskView)
-        }
-      ),
-      getStep(
-        selector.maskView,
-        {
-          title: m.tour_mask_title(),
-          description: m.tour_mask_description()
-        },
-        {
-          onPrevClick: moveToViewOnPrevious('images', selector.imagesView),
-          onNextClick: moveToViewOnNext(
-            'georeference',
-            selector.georeferenceView
-          )
-        }
-      ),
-      getStep(
-        selector.georeferenceView,
-        {
-          title: m.tour_georeference_title(),
-          description: m.tour_georeference_description()
-        },
-        {
-          onPrevClick: moveToViewOnPrevious('mask', selector.maskView),
-          onNextClick: hasGeocoder
-            ? moveToPopoverOnNext('geocoder', selector.geocoderPopover)
-            : moveToPopoverOnNext('mapSettings', selector.mapSettingsPopover)
-        }
-      ),
-      ...(hasGeocoder
-        ? [
-            getStep(
-              selector.geocoderPopover,
-              {
-                title: m.tour_search_title(),
-                description: m.tour_search_description()
-              },
-              {
-                onPrevClick: closePopoversOnPrevious(selector.georeferenceView),
-                onNextClick: moveToPopoverOnNext(
-                  'mapSettings',
-                  selector.mapSettingsPopover
-                )
-              }
-            )
-          ]
-        : []),
-      getStep(
-        selector.mapSettingsPopover,
-        {
-          title: m.tour_map_settings_title(),
-          description: m.tour_map_settings_description()
-        },
-        {
-          onPrevClick: hasGeocoder
-            ? moveToPopoverOnPrevious('geocoder', selector.geocoderPopover)
-            : closePopoversOnPrevious(selector.georeferenceView),
-          onNextClick: moveToPopoverOnNext('maps', selector.mapsPopover)
-        }
-      ),
-      getStep(selector.mapsPopover, getMapsPopoverData(), {
-        onPrevClick: moveToPopoverOnPrevious(
-          'mapSettings',
-          selector.mapSettingsPopover
-        )
+      getStep(() => viewTarget('images'), {
+        title: m.tour_images_title(),
+        description: m.tour_images_description()
+      }),
+      getStep(() => viewTarget('mask'), {
+        title: m.tour_mask_title(),
+        description: m.tour_mask_description()
+      }),
+      getStep(() => viewTarget('georeference'), {
+        title: m.tour_georeference_title(),
+        description: m.tour_georeference_description()
       })
     ]
 
-    let previousMapsSelector = selector.mapsPopover
-
-    if (activeMap) {
-      setOnNextClick(
-        steps[steps.length - 1],
-        moveToPopoverOnNext('maps', selector.transformation)
-      )
-      steps.push(
-        getStep(
-          selector.transformation,
-          {
-            title: m.tour_transformation_title(),
-            description: m.tour_transformation_description()
-          },
-          {
-            onPrevClick: moveToPopoverOnPrevious('maps', previousMapsSelector)
-          }
-        )
-      )
-      previousMapsSelector = selector.transformation
-
-      if (Object.keys(activeMap.gcps).length > 0) {
-        setOnNextClick(
-          steps[steps.length - 1],
-          moveToPopoverOnNext('maps', selector.gcps)
-        )
+    if (sourceState.canEdit) {
+      if (hasGeocoder) {
         steps.push(
           getStep(
-            selector.gcps,
+            () => ({
+              selector: selector.geocoderPopover,
+              fallbackSelector: selector.georeferenceView,
+              view: 'georeference',
+              popover: 'geocoder',
+              available: sourceState.canEdit
+            }),
             {
-              title: m.tour_gcps_title(),
-              description: m.tour_gcps_description()
-            },
-            {
-              onPrevClick: moveToPopoverOnPrevious('maps', previousMapsSelector)
+              title: m.tour_search_title(),
+              description: m.tour_search_description()
             }
           )
         )
-        previousMapsSelector = selector.gcps
+      }
+
+      steps.push(
+        getStep(
+          () => ({
+            selector: selector.mapSettingsPopover,
+            fallbackSelector: selector.georeferenceView,
+            view: 'georeference',
+            popover: 'mapSettings',
+            available: sourceState.canEdit
+          }),
+          {
+            title: m.tour_map_settings_title(),
+            description: m.tour_map_settings_description()
+          }
+        ),
+        getStep(() => mapsTarget(selector.mapsPopover), getMapsPopoverData())
+      )
+
+      if (activeMap) {
+        steps.push(
+          getStep(
+            () => ({
+              ...mapsTarget(selector.transformation),
+              available: sourceState.canEdit && Boolean(mapsState.activeMap)
+            }),
+            {
+              title: m.tour_transformation_title(),
+              description: m.tour_transformation_description()
+            }
+          )
+        )
+
+        if (Object.keys(activeMap.gcps).length > 0) {
+          steps.push(
+            getStep(
+              () => ({
+                ...mapsTarget(selector.gcps),
+                available:
+                  sourceState.canEdit &&
+                  Object.keys(mapsState.activeMap?.gcps || {}).length > 0
+              }),
+              {
+                title: m.tour_gcps_title(),
+                description: m.tour_gcps_description()
+              }
+            )
+          )
+        }
       }
     }
 
-    setOnNextClick(
-      steps[steps.length - 1],
-      moveToViewOnNext('results', selector.resultsView)
+    steps.push(
+      getStep(() => viewTarget('results'), getResultsData()),
+      getStep(
+        () =>
+          canOpenExportPopover()
+            ? {
+                selector: selector.exportPopover,
+                fallbackSelector: selector.export,
+                popover: 'export'
+              }
+            : { selector: selector.export },
+        getExportData(),
+        { side: 'left' }
+      )
     )
-
-    const resultsStep = getStep(selector.resultsView, getResultsData(), {
-      onPrevClick: moveToPopoverOnPrevious(
-        'maps',
-        previousMapsSelector,
-        'georeference'
-      )
-    })
-
-    if (canOpenExportPopover()) {
-      setOnNextClick(
-        resultsStep,
-        moveToPopoverOnNext('export', selector.exportPopover)
-      )
-    }
-
-    steps.push(resultsStep)
-
-    if (canOpenExportPopover()) {
-      steps.push(
-        getStep(selector.exportPopover, getExportData(), {
-          side: 'left',
-          onPrevClick: moveToViewOnPrevious('results', selector.resultsView)
-        })
-      )
-    } else {
-      steps.push(
-        getStep(selector.export, getExportData(), {
-          side: 'left'
-        })
-      )
-    }
 
     return steps
   }
@@ -625,8 +512,15 @@
     tour?.destroy()
     tourStartView = getView(page)
 
+    steps = getSteps()
     tour = driver({
-      steps: getSteps(),
+      steps,
+      onNextClick: (_element, _step, { driver }) => {
+        void moveTour(driver, 1)
+      },
+      onPrevClick: (_element, _step, { driver }) => {
+        void moveTour(driver, -1)
+      },
       showProgress: true,
       allowScroll: false,
       stagePadding: 6,
