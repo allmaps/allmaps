@@ -98,7 +98,7 @@ export function createAuth(env: AuthSettings, db: Db) {
             }
           }
         : {}),
-      ...(env.GOOGLE_CLIENT_ID && (env.GOOGLE_CLIENT_SECRET || previewProxy)
+      ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
         ? {
             google: {
               clientId: env.GOOGLE_CLIENT_ID,
