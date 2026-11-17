@@ -25,6 +25,7 @@
     "lint": "prettier --ignore-path ../../.gitignore --check . && eslint .",
     "format": "prettier --ignore-path ../../.gitignore --write src",
     "types": "tsc --noEmit",
+    "test": "node --test test/*.test.ts",
     "build:dev": "vite build --mode dev",
     "build:production": "vite build --mode production",
     "deploy:dev": "pnpm run build:dev && pnpm --workspace-root exec wrangler deploy --config apps/latest/wrangler.jsonc --env ''",

@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { getMapQueryCredentials } from '@allmaps/stdlib'
-
   import Collection from '$lib/components/Collection.svelte'
 
   import Header from '$lib/latest/components/Header.svelte'
@@ -10,10 +8,14 @@
   import Items from '$lib/latest/components/Items.svelte'
 
   import { setUiState } from '$lib/latest/state/ui.svelte.js'
+  import { fetchLatestMaps } from '$lib/latest/shared/fetch.js'
 
   type Props = {
     count?: number
     mapsApiBaseUrl?: string
+    annotationsApiBaseUrl?: string
+    organizationSlug?: string
+    organizationName?: string
     showHeader?: boolean
     showProperties?: boolean
     showUrls?: boolean
@@ -22,6 +24,9 @@
   let {
     count = 100,
     mapsApiBaseUrl = 'https://api.allmaps.org',
+    annotationsApiBaseUrl = 'https://annotations.allmaps.org',
+    organizationSlug,
+    organizationName,
     showHeader = false,
     showProperties = true,
     showUrls = true
@@ -37,17 +42,13 @@
   // - hide errors
 
   onMount(async () => {
-    const mapsUrl = `${mapsApiBaseUrl}/maps?limit=${count}`
-
     try {
-      const response = await fetch(mapsUrl, {
-        credentials: getMapQueryCredentials(count)
+      apiMaps = await fetchLatestMaps({
+        count,
+        mapsApiBaseUrl,
+        annotationsApiBaseUrl,
+        organizationSlug
       })
-      apiMaps = await response.json()
-
-      if (!Array.isArray(apiMaps)) {
-        throw new Error('Invalid response')
-      }
     } catch (err) {
       // TODO: create Error component
       console.error(err)
@@ -59,7 +60,7 @@
 
 <Collection>
   {#if showHeader}
-    <Header />
+    <Header {organizationName} />
   {/if}
   {#if uiState.loading}
     <Loading {count} />

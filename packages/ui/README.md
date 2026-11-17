@@ -229,6 +229,11 @@ Import the latest georeferenced maps component through its dedicated entry point
 | `showProperties` | `true`  | Show control point count, mask point count, and area. |
 | `showUrls`       | `true`  | Show links to the editor, viewer, and annotation.     |
 
+Use `organizationSlug` to request a partner's collection from the annotations
+API, and `organizationName` to include its name in the heading. The consuming
+app validates partner eligibility. `mapsApiBaseUrl` and `annotationsApiBaseUrl`
+override the REST and annotations API base URLs respectively.
+
 The component fetches maps from `https://api.allmaps.org/maps` in the browser.
 It owns its loading state and per-map error presentation. Consuming apps provide
 routing and global styles. Use the Allmaps Tailwind theme and scan all UI output,

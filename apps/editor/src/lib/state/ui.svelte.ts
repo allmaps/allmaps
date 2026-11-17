@@ -199,7 +199,8 @@ export class UiState extends UiEventTarget {
     if (browser) {
       try {
         this.#firstUse = localStorage.getItem(FIRST_USE_KEY) !== 'false'
-        this.#mapGuideOpen = localStorage.getItem(MAP_GUIDE_OPEN_KEY) !== 'false'
+        this.#mapGuideOpen =
+          localStorage.getItem(MAP_GUIDE_OPEN_KEY) !== 'false'
       } catch {
         console.warn('Error reading from localStorage')
       }
@@ -339,7 +340,11 @@ export class UiState extends UiEventTarget {
   }
 
   #setPopoverOpen(popover: Popover, open: boolean) {
-    this.#popoverOpen = open ? popover : undefined
+    if (open) {
+      this.#popoverOpen = popover
+    } else if (this.#popoverOpen === popover) {
+      this.#popoverOpen = undefined
+    }
   }
 
   closeModalsAndPopovers() {
