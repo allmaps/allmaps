@@ -2,7 +2,7 @@
   import { tick } from 'svelte'
   import { prefersReducedMotion } from 'svelte/motion'
   import { hierarchy, treemap } from 'd3-hierarchy'
-  import { blue } from '@allmaps/tailwind'
+  import { blue, pink, green, gray } from '@allmaps/tailwind'
   import {
     fullZoomBox,
     zoomEnter,
@@ -36,6 +36,28 @@
   const percentage = (value: number, total: number) =>
     total ? Math.max(0, Math.min(100, (100 * value) / total)) : 0
   const progress = (tile: Tile) => percentage(tile.georeferenced, tile.value)
+  const tileColor = (tile: Tile) =>
+    tile.other || !tile.organization?.id
+      ? gray
+      : tile.organization.plan === 'innovator'
+        ? pink
+        : tile.organization.plan === 'supporter'
+          ? green
+          : blue
+  const colorLegend = [
+    { label: 'Innovator', color: pink },
+    { label: 'Supporter', color: green },
+    { label: 'Contributor / no plan', color: blue },
+    { label: 'Other / without organization', color: gray }
+  ]
+  const showDetail = (tile: (typeof layout)[number]) =>
+    tile.y1 - tile.y0 >= 80 && tile.x1 - tile.x0 >= 100
+  const nameLines = (tile: (typeof layout)[number]) =>
+    Math.max(
+      1,
+      Math.floor((tile.y1 - tile.y0 - 12 - (showDetail(tile) ? 20 : 0)) / 15)
+    )
+
   let limit = $derived(width < 600 ? 10 : 25)
   let offset = $derived(levels.at(-1)?.offset ?? 0)
   let organizations = $derived(
@@ -167,27 +189,24 @@
     Current snapshot. Each block's area shows its share of {metric}. Select a
     block for counts or open “Other” to see more organizations.
   </p>
+  <div
+    class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-gray-700"
+    aria-label="Organization colours"
+  >
+    {#each colorLegend as item (item.label)}
+      <span class="flex items-center gap-2"
+        ><span
+          class="h-3 w-3 rounded-sm"
+          style:background-color={item.color}
+          aria-hidden="true"
+        ></span>{item.label}</span
+      >
+    {/each}
+  </div>
   {#if metric === 'images'}
-    <div
-      class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-gray-700"
-      aria-label="Georeferencing legend"
-    >
-      <span class="flex items-center gap-2"
-        ><span
-          class="h-3 w-3 rounded-sm"
-          style:background-color={blue}
-          aria-hidden="true"
-        ></span>Georeferenced</span
-      >
-      <span class="flex items-center gap-2"
-        ><span
-          class="h-3 w-3 rounded-sm"
-          style:background-color={blue}
-          style:opacity={0.18}
-          aria-hidden="true"
-        ></span>Without georeference</span
-      >
-    </div>
+    <p class="text-sm text-gray-600">
+      Solid colour: georeferenced. Light tint: without georeference.
+    </p>
   {/if}
   {#if offset > 0}<button
       class="rounded border border-gray-300 px-3 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
@@ -258,21 +277,23 @@
             >
               <span
                 class="pointer-events-none absolute inset-0"
-                style:background-color={blue}
+                style:background-color={tileColor(tile.data)}
                 style:opacity={metric === 'images' ? 0.18 : 1}
               ></span>
               {#if metric === 'images'}<span
                   class="pointer-events-none absolute inset-y-0 left-0"
-                  style:background-color={blue}
+                  style:background-color={tileColor(tile.data)}
                   style:width={`${progress(tile.data)}%`}
                 ></span>{/if}
               <span
-                class="pointer-events-none absolute inset-0 flex min-w-0 flex-col justify-center px-1.5"
+                class="pointer-events-none absolute inset-0 flex min-w-0 flex-col p-1.5"
               >
-                <span class="block truncate text-xs font-semibold leading-tight"
+                <span
+                  class="overflow-hidden text-xs leading-[15px] font-semibold break-words [display:-webkit-box] [-webkit-box-orient:vertical] [overflow-wrap:anywhere]"
+                  style={`-webkit-line-clamp: ${nameLines(tile)}`}
                   >{tile.data.name}</span
                 >
-                {#if tile.y1 - tile.y0 > 48 && tile.x1 - tile.x0 > 70}<span
+                {#if showDetail(tile)}<span
                     class="mt-1 block truncate text-xs tabular-nums"
                     >{metric === 'images'
                       ? `${progress(tile.data).toFixed(1)}% georeferenced`

@@ -132,6 +132,7 @@ export type StatisticsOrganizations = {
   organizations: {
     id: string | null
     name: string
+    plan: OrganizationPlan | null
     images: number
     maps: number
     georeferencedImages: number

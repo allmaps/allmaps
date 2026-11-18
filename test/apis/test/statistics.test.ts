@@ -50,6 +50,10 @@ describe('statistics', () => {
       expect((await request('/statistics/organizations', member)).status).toBe(
         403
       )
+      await context.db
+        .update(schema.organizations)
+        .set({ plan: 'innovator' })
+        .where(eq(schema.organizations.id, org.id))
       const distributionResponse = await request(
         '/statistics/organizations',
         admin
@@ -59,6 +63,9 @@ describe('statistics', () => {
         'private, no-store'
       )
       const distribution = await queryStatisticsOrganizations(context.db)
+      expect(
+        distribution.organizations.find((row) => row.id === org.id)?.plan
+      ).toBe('innovator')
       const global = await queryStatistics(context.db)
       for (const metric of ['images', 'maps', 'georeferencedImages'] as const) {
         expect(

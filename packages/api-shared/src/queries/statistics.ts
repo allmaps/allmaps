@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm'
 import type { Db } from '@allmaps/db'
+import { isOrganizationPlan } from '../shared/tiers.js'
 import { ResponseError } from '../shared/errors.js'
 import { validateStatisticsRange } from './statistics-maintenance.js'
 
@@ -127,14 +128,14 @@ export async function queryStatisticsHistory(
 export async function queryStatisticsOrganizations(db: Db) {
   const result = await db.execute(sql`
     WITH latest AS (SELECT max(day) AS day FROM statistics_daily WHERE snapshot_at IS NOT NULL)
-    SELECT o.id, o.name, sum(s.images) AS images, sum(s.maps) AS maps,
+    SELECT o.id, o.name, o.plan, sum(s.images) AS images, sum(s.maps) AS maps,
       sum(s.georeferenced_images) AS georeferenced_images,
       max(s.snapshot_at) AS measured_at
     FROM statistics_daily s
     LEFT JOIN organization_urls u ON u.url = s.domain AND u.type = 'domain'
     LEFT JOIN organizations o ON o.id = u.organization_id
     WHERE s.day = (SELECT day FROM latest)
-    GROUP BY o.id, o.name
+    GROUP BY o.id, o.name, o.plan
     ORDER BY sum(s.images) DESC, o.id
   `)
   const rows = 'rows' in result ? result.rows : result
@@ -147,6 +148,10 @@ export async function queryStatisticsOrganizations(db: Db) {
       return {
         id: row.id == null ? null : String(row.id),
         name: row.name == null ? 'Without organization' : String(row.name),
+        plan:
+          row.plan != null && isOrganizationPlan(String(row.plan))
+            ? String(row.plan)
+            : null,
         images: numeric(row.images),
         maps: numeric(row.maps),
         georeferencedImages: numeric(row.georeferenced_images)
