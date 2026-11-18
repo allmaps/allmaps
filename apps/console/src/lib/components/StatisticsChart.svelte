@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { scaleLinear, scaleUtc } from 'd3-scale'
+  import { scaleBand, scaleLinear, scaleUtc } from 'd3-scale'
   import { fade } from 'svelte/transition'
   import { prefersReducedMotion } from 'svelte/motion'
   import { line } from 'd3-shape'
@@ -48,6 +48,29 @@
     scaleUtc()
       .domain([start, +start === +end ? new Date(+end + 86400000) : end])
       .range([margin.left, width - margin.right])
+  )
+  let bars = $derived(
+    scaleBand<string>()
+      .domain(rows.map((row) => row.period))
+      .range([margin.left, width - margin.right])
+      .padding(0.2)
+  )
+  let ticks = $derived(
+    history.view === 'cumulative'
+      ? x
+          .ticks(3)
+          .map((value) => ({
+            key: +value,
+            x: x(value),
+            label: formatDate(value)
+          }))
+      : [...new Set([0, Math.floor((rows.length - 1) / 2), rows.length - 1])]
+          .filter((index) => index >= 0 && index < rows.length)
+          .map((index) => ({
+            key: +date(rows[index].period),
+            x: bars(rows[index].period)! + bars.bandwidth() / 2,
+            label: formatDate(date(rows[index].period))
+          }))
   )
   let y = $derived(
     scaleLinear()
@@ -105,32 +128,48 @@
               class="fill-gray-700">{number.format(tick)}</text
             >
           {/each}
-          {#each x.ticks(3) as tick (+tick)}
+          {#each ticks as tick (tick.key)}
             <text
-              x={x(tick)}
+              x={tick.x}
               y={height - 10}
               text-anchor="middle"
               font-size="11"
-              class="fill-gray-700">{formatDate(tick)}</text
+              class="fill-gray-700">{tick.label}</text
             >
           {/each}
-          <path
-            d={path ?? ''}
-            fill="none"
-            stroke={color}
-            stroke-width="3.5"
-            stroke-linejoin="round"
-          />
-          {#if rows.length <= 90}
+          {#if history.view === 'cumulative'}
+            <path
+              d={path ?? ''}
+              fill="none"
+              stroke={color}
+              stroke-width="3.5"
+              stroke-linejoin="round"
+            />
+            {#if rows.length <= 90}
+              {#each rows as row (row.period)}
+                <circle
+                  cx={x(date(row.period))}
+                  cy={y(row[metric])}
+                  r="3"
+                  fill={color}
+                  ><title
+                    >{row.period}: {row[metric].toLocaleString('en')}</title
+                  ></circle
+                >
+              {/each}
+            {/if}
+          {:else}
             {#each rows as row (row.period)}
-              <circle
-                cx={x(date(row.period))}
-                cy={y(row[metric])}
-                r="3"
+              <rect
+                x={bars(row.period)}
+                y={y(row[metric])}
+                width={bars.bandwidth()}
+                height={Math.max(0, y(0) - y(row[metric]))}
+                rx="1.5"
                 fill={color}
-                ><title>{row.period}: {row[metric].toLocaleString('en')}</title
-                ></circle
               >
+                <title>{row.period}: {row[metric].toLocaleString('en')}</title>
+              </rect>
             {/each}
           {/if}
         </svg>

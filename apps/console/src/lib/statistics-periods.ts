@@ -48,5 +48,12 @@ export function resolveStatisticsPeriod(
 
 export function statisticsInterval(from: string, through: string) {
   const days = (Date.parse(through) - Date.parse(from)) / 86400000 + 1
-  return days <= 60 ? 'day' : days <= 365 ? 'week' : 'month'
+  // Keep roughly a few dozen points; annual selections use monthly totals.
+  return days <= 60
+    ? 'day'
+    : days <= 180
+      ? 'week'
+      : days <= 5 * 366
+        ? 'month'
+        : 'year'
 }
