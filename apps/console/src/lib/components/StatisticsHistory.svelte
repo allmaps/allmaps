@@ -14,7 +14,12 @@
 <section class="space-y-4 font-sans" aria-label="Statistics over time">
   <div class="space-y-4 rounded-xl border border-gray-200 bg-white p-5">
     <h2 class="text-xl font-semibold">Statistics over time</h2>
-    <form method="GET" class="flex flex-wrap items-end gap-4 font-sans">
+    <form
+      method="GET"
+      data-sveltekit-noscroll
+      data-sveltekit-keepfocus
+      class="flex flex-wrap items-end gap-4 font-sans"
+    >
       <label class="flex flex-col gap-1 text-sm"
         >Period
         <select
