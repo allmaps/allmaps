@@ -26,12 +26,14 @@ import { createImagesRoutes } from './routes/images.js'
 import { createMapsRoutes } from './routes/maps.js'
 import { createListsRoutes } from './routes/lists.js'
 import { createOrganizationsRoutes } from './routes/organizations.js'
+import { createStatisticsRoutes } from './routes/statistics.js'
 import { projections } from './routes/projections.js'
 
 import packageJson from '../package.json' with { type: 'json' }
 
 const openApiTags = [
   { name: 'API' },
+  { name: 'Statistics' },
   { name: 'Maps' },
   { name: 'Images' },
   { name: 'Canvases' },
@@ -96,6 +98,7 @@ export function createApp(env: RestEnv, betterAuth: BetterAuthContext) {
     )
     .use(createSharedBetterAuthRoutes(betterAuth))
     .use(createAuthRoutes(env, betterAuth))
+    .use(createStatisticsRoutes(betterAuth))
     .use(createMapsRoutes(betterAuth))
     .use(createListsRoutes(betterAuth))
     .use(createOrganizationsRoutes(env, betterAuth))

@@ -1,4 +1,5 @@
 import { ops, snapshots } from './schema/sharedb.js'
+import { statisticsDaily } from './schema/statistics.js'
 import {
   users,
   sessions,
@@ -25,6 +26,7 @@ import {
 } from './schema/iiif.js'
 
 export const schema = {
+  statisticsDaily,
   ops,
   snapshots,
   users,
