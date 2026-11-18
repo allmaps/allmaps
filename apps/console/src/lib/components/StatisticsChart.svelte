@@ -1,5 +1,7 @@
 <script lang="ts">
   import { scaleLinear, scaleUtc } from 'd3-scale'
+  import { fade } from 'svelte/transition'
+  import { prefersReducedMotion } from 'svelte/motion'
   import { line } from 'd3-shape'
   import { blue, purple, orange, green } from '@allmaps/tailwind'
   import type { StatisticsHistory } from '$lib/types.js'
@@ -31,7 +33,14 @@
       timeZone: 'UTC'
     }).format(value)
   const number = new Intl.NumberFormat('en', { notation: 'compact' })
-  let rows = $derived(history.periods)
+  let rows = $derived.by(() => {
+    if (history.view !== 'cumulative') return history.periods
+    let sum = 0
+    return history.periods.map((row) => ({
+      ...row,
+      [metric]: (sum += row[metric])
+    }))
+  })
   let dates = $derived(rows.map((row) => date(row.period)))
   let start = $derived(dates[0] ?? date(history.from))
   let end = $derived(dates.at(-1) ?? date(history.through))
@@ -51,75 +60,87 @@
       .x((row) => x(date(row.period)))
       .y((row) => y(row[metric]))(rows)
   )
-  let total = $derived(rows.reduce((sum, row) => sum + row[metric], 0))
+  let total = $derived(
+    history.periods.reduce((sum, row) => sum + row[metric], 0)
+  )
 </script>
 
 <figure
   class="min-w-0 rounded-xl border border-gray-200 bg-white p-5 font-sans"
 >
   <figcaption class="flex flex-wrap items-baseline justify-between gap-2">
-    <span class="font-semibold">{title}</span>
+    <span class="font-semibold"
+      >{title}{history.view === 'cumulative' ? ' · cumulative' : ''}</span
+    >
     <span class="font-sans text-sm tabular-nums text-gray-600"
       >{total.toLocaleString('en')} in selection</span
     >
   </figcaption>
-  {#if rows.length}
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      class="mt-2 w-full font-sans"
-      role="img"
-      aria-label={`${title} per ${history.interval}, from ${history.from} through ${history.through}. ${total.toLocaleString('en')} in this selection.`}
-    >
-      <title>{title}</title>
-      {#each y.ticks(4).filter(Number.isInteger) as tick (tick)}
-        <line
-          x1={margin.left}
-          x2={width - margin.right}
-          y1={y(tick)}
-          y2={y(tick)}
-          class="stroke-gray-200"
-        />
-        <text
-          x={margin.left - 10}
-          y={y(tick)}
-          dy="0.35em"
-          text-anchor="end"
-          font-size="12"
-          class="fill-gray-700">{number.format(tick)}</text
+  <div class="grid">
+    {#key `${history.from}:${history.through}:${history.interval}:${history.view ?? 'period'}`}
+      {#if rows.length}
+        <svg
+          in:fade={{ duration: prefersReducedMotion.current ? 0 : 220 }}
+          out:fade={{ duration: prefersReducedMotion.current ? 0 : 120 }}
+          viewBox={`0 0 ${width} ${height}`}
+          class="col-start-1 row-start-1 mt-2 w-full font-sans"
+          role="img"
+          aria-label={`${title}${history.view === 'cumulative' ? ' cumulative within the selection' : ''} per ${history.interval}, from ${history.from} through ${history.through}. ${total.toLocaleString('en')} in this selection.`}
         >
-      {/each}
-      {#each x.ticks(3) as tick (+tick)}
-        <text
-          x={x(tick)}
-          y={height - 10}
-          text-anchor="middle"
-          font-size="11"
-          class="fill-gray-700">{formatDate(tick)}</text
+          <title>{title}</title>
+          {#each y.ticks(4).filter(Number.isInteger) as tick (tick)}
+            <line
+              x1={margin.left}
+              x2={width - margin.right}
+              y1={y(tick)}
+              y2={y(tick)}
+              class="stroke-gray-200"
+            />
+            <text
+              x={margin.left - 10}
+              y={y(tick)}
+              dy="0.35em"
+              text-anchor="end"
+              font-size="12"
+              class="fill-gray-700">{number.format(tick)}</text
+            >
+          {/each}
+          {#each x.ticks(3) as tick (+tick)}
+            <text
+              x={x(tick)}
+              y={height - 10}
+              text-anchor="middle"
+              font-size="11"
+              class="fill-gray-700">{formatDate(tick)}</text
+            >
+          {/each}
+          <path
+            d={path ?? ''}
+            fill="none"
+            stroke={color}
+            stroke-width="3.5"
+            stroke-linejoin="round"
+          />
+          {#if rows.length <= 90}
+            {#each rows as row (row.period)}
+              <circle
+                cx={x(date(row.period))}
+                cy={y(row[metric])}
+                r="3"
+                fill={color}
+                ><title>{row.period}: {row[metric].toLocaleString('en')}</title
+                ></circle
+              >
+            {/each}
+          {/if}
+        </svg>
+      {:else}
+        <p
+          class="col-start-1 row-start-1 py-12 text-center font-sans text-sm text-gray-500"
         >
-      {/each}
-      <path
-        d={path ?? ''}
-        fill="none"
-        stroke={color}
-        stroke-width="3.5"
-        stroke-linejoin="round"
-      />
-      {#if rows.length <= 90}
-        {#each rows as row (row.period)}
-          <circle
-            cx={x(date(row.period))}
-            cy={y(row[metric])}
-            r="3"
-            fill={color}
-            ><title>{row.period}: {row[metric].toLocaleString('en')}</title
-            ></circle
-          >
-        {/each}
+          No statistics for this selection.
+        </p>
       {/if}
-    </svg>
-  {:else}
-    <p class="py-12 text-center font-sans text-sm text-gray-500">
-      No statistics for this selection.
-    </p>
-  {/if}
+    {/key}
+  </div>
 </figure>

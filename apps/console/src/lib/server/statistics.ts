@@ -1,13 +1,32 @@
+import { error } from '@sveltejs/kit'
 import { restFetch } from './rest.js'
+import {
+  resolveStatisticsPeriod,
+  statisticsInterval
+} from '$lib/statistics-periods.js'
 import type { StatisticsHistory } from '$lib/types.js'
 
 export async function loadStatisticsHistory(url: URL, apiPath: string) {
-  const today = new Date().toISOString().slice(0, 10)
-  const from =
-    url.searchParams.get('from') ??
-    new Date(Date.parse(today) - 30 * 86400000).toISOString().slice(0, 10)
-  const through = url.searchParams.get('through') ?? today
-  const interval = url.searchParams.get('interval') ?? 'day'
-  const query = new URLSearchParams({ from, through, interval })
-  return restFetch<StatisticsHistory>(`${apiPath}/history?${query}`)
+  let selection
+  try {
+    selection = resolveStatisticsPeriod(url.searchParams)
+  } catch {
+    error(400, 'Unknown statistics period')
+  }
+  const grouping = url.searchParams.get('interval') ?? 'auto'
+  const interval =
+    grouping === 'auto'
+      ? statisticsInterval(selection.from, selection.through)
+      : grouping
+  const view: NonNullable<StatisticsHistory['view']> =
+    url.searchParams.get('view') === 'cumulative' ? 'cumulative' : 'period'
+  const query = new URLSearchParams({
+    from: selection.from,
+    through: selection.through,
+    interval
+  })
+  const history = await restFetch<StatisticsHistory>(
+    `${apiPath}/history?${query}`
+  )
+  return { ...history, period: selection.period, grouping, view }
 }

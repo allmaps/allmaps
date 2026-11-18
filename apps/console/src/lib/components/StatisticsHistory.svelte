@@ -1,8 +1,14 @@
 <script lang="ts">
+  import { statisticsPeriods } from '$lib/statistics-periods.js'
   import StatisticsChart from './StatisticsChart.svelte'
   import { downloadStatistics } from '$lib/statistics-export.js'
   import type { StatisticsHistory } from '$lib/types.js'
   let { history }: { history: StatisticsHistory } = $props()
+  function customRange(event: Event) {
+    const form = (event.currentTarget as HTMLInputElement).form
+    const period = form?.elements.namedItem('period')
+    if (period instanceof HTMLSelectElement) period.value = 'custom'
+  }
 </script>
 
 <section class="space-y-4 font-sans" aria-label="Statistics over time">
@@ -10,10 +16,33 @@
     <h2 class="text-xl font-semibold">Statistics over time</h2>
     <form method="GET" class="flex flex-wrap items-end gap-4 font-sans">
       <label class="flex flex-col gap-1 text-sm"
+        >Period
+        <select
+          class="rounded border border-gray-300 bg-white p-2"
+          name="period"
+          value={history.period ?? 'custom'}
+          onchange={(event) => {
+            if (event.currentTarget.value !== 'custom') {
+              const form = event.currentTarget.form
+              if (form) {
+                form.noValidate = true
+                form.requestSubmit()
+                form.noValidate = false
+              }
+            }
+          }}
+        >
+          {#each statisticsPeriods as period (period.value)}<option
+              value={period.value}>{period.label}</option
+            >{/each}
+        </select>
+      </label>
+      <label class="flex flex-col gap-1 text-sm"
         >From<input
           class="rounded border border-gray-300 p-2"
           type="date"
           name="from"
+          onchange={customRange}
           value={history.from}
           required
         /></label
@@ -23,6 +52,7 @@
           class="rounded border border-gray-300 p-2"
           type="date"
           name="through"
+          onchange={customRange}
           value={history.through}
           required
         /></label
@@ -31,13 +61,25 @@
         >Group by<select
           class="rounded border border-gray-300 p-2"
           name="interval"
-          value={history.interval}
+          value={history.grouping ?? history.interval}
         >
-          <option value="day">Day</option><option value="week">Week</option
-          ><option value="month">Month</option><option value="year">Year</option
-          >
+          <option value="auto">Automatic</option><option value="day">Day</option
+          ><option value="week">Week</option><option value="month">Month</option
+          ><option value="year">Year</option>
         </select></label
       >
+      <label class="flex flex-col gap-1 text-sm"
+        >Display
+        <select
+          class="rounded border border-gray-300 bg-white p-2"
+          name="view"
+          value={history.view ?? 'period'}
+          onchange={(event) => event.currentTarget.form?.requestSubmit()}
+        >
+          <option value="period">Additions per period</option>
+          <option value="cumulative">Cumulative additions</option>
+        </select>
+      </label>
       <button class="rounded bg-blue px-4 py-2 text-white" type="submit"
         >Show statistics</button
       >
@@ -45,7 +87,10 @@
     <p class="font-sans text-sm text-gray-500">
       Additions are inferred from retained records, not a complete edit log.
       Choose a date range and group by day, week, month or year. All dates use
-      UTC; weeks start on Monday.
+      UTC; weeks start on Monday. Currently grouped by {history.interval}.
+      {#if history.view === 'cumulative'}Cumulative values add up only the
+        additions within this selection; they are not historical database
+        totals.{/if}
     </p>
   </div>
   <div class="flex flex-wrap justify-end gap-3 text-sm">

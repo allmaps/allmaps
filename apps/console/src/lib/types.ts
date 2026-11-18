@@ -1,3 +1,4 @@
+import type { StatisticsPeriod } from './statistics-periods.js'
 import type { OrganizationPlan } from '$lib/organization-plans.js'
 
 export type Organization = {
@@ -100,6 +101,9 @@ export type Statistics = {
 }
 
 export type StatisticsHistory = {
+  period?: StatisticsPeriod
+  grouping?: string
+  view?: 'period' | 'cumulative'
   from: string
   through: string
   interval: 'day' | 'week' | 'month' | 'year'
