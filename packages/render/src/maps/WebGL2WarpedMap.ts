@@ -106,10 +106,54 @@ const DEFAULT_SHOULD_RENDER_OPTIONS: ShouldRenderOptions = {
 const TEXTURES_MAX_HIGHER_LOG2_SCALE_FACTOR_DIFF = 5
 const TEXTURES_MAX_LOWER_LOG2_SCALE_FACTOR_DIFF = 1
 
-// The tiles texture array depth is allocated in steps of this many layers, so
-// that individual tile arrivals append into pre-allocated headroom instead of
-// triggering a full (immutable) texStorage3D reallocation on every tile.
-const TEXTURE_ARRAY_DEPTH_GROWTH = 8
+// The tiles texture array depth is allocated in steps of up to this many
+// layers, so that individual tile arrivals append into pre-allocated headroom
+// instead of triggering a full (immutable) texStorage3D reallocation on every
+// tile. The step is reduced for large layers so the unused headroom stays under
+// TEXTURE_ARRAY_MAX_HEADROOM_BYTES: an untiled (level 0) image whose only tile
+// is the full image would otherwise reserve several image-sized layers per map.
+const TEXTURE_ARRAY_MAX_DEPTH_GROWTH = 8
+const TEXTURE_ARRAY_MAX_HEADROOM_BYTES = 8 * 1024 * 1024
+
+// Once all removals are done, the texture array is reallocated at a smaller
+// size if it uses more than this factor of the memory its resident tiles need
+// (e.g. after zooming out from large, detailed tiles to small, overview tiles).
+const TEXTURE_ARRAY_SHRINK_FACTOR = 2
+
+// Size of the texture array layers needed to hold the given tiles: the largest
+// width and height among them. Released tiles (without data) are skipped.
+function getTextureArraySize(
+  cachedTiles: Iterable<CachedTile<ImageBitmap>>
+): Size {
+  let width = 1
+  let height = 1
+  for (const cachedTile of cachedTiles) {
+    const source = cachedTile.data as ImageBitmap | undefined
+    if (source) {
+      width = Math.max(width, source.width)
+      height = Math.max(height, source.height)
+    }
+  }
+  return [width, height]
+}
+
+// Depth to allocate for the required number of layers, rounded up to a growth
+// step that keeps the unused headroom below TEXTURE_ARRAY_MAX_HEADROOM_BYTES.
+function getTextureArrayDepth(
+  requiredDepth: number,
+  width: number,
+  height: number
+) {
+  const layerBytes = width * height * 4
+  const growth = Math.max(
+    1,
+    Math.min(
+      TEXTURE_ARRAY_MAX_DEPTH_GROWTH,
+      Math.floor(TEXTURE_ARRAY_MAX_HEADROOM_BYTES / layerBytes)
+    )
+  )
+  return Math.ceil(requiredDepth / growth) * growth
+}
 
 export function createWebGL2WarpedMapFactory(
   gl: WebGL2RenderingContext,
@@ -174,6 +218,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   cachedTilesTextureArray: WebGLTexture | null = null
   cachedTilesResourceOriginPointsAndSizesTexture: WebGLTexture | null = null
   cachedTilesScaleFactorsTexture: WebGLTexture | null = null
+  private cachedTilesTextureArrayAllocatedWidth = 0
+  private cachedTilesTextureArrayAllocatedHeight = 0
   private cachedTilesTextureArrayAllocatedDepth = 0
 
   // Slot bookkeeping for incremental texture updates: each resident tile keeps
@@ -250,6 +296,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     this.cachedTilesScaleFactorsTexture = this.gl.createTexture()
     this.cachedTilesResourceOriginPointsAndSizesTexture =
       this.gl.createTexture()
+    this.cachedTilesTextureArrayAllocatedWidth = 0
+    this.cachedTilesTextureArrayAllocatedHeight = 0
     this.cachedTilesTextureArrayAllocatedDepth = 0
 
     // The freshly created textures are empty, so reset the slot bookkeeping.
@@ -398,7 +446,6 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
 
     gl.deleteTexture(this.cachedTilesTextureArray)
     this.cachedTilesTextureArray = gl.createTexture()
-    this.cachedTilesTextureArrayAllocatedDepth = 0
 
     gl.deleteTexture(this.cachedTilesResourceOriginPointsAndSizesTexture)
     this.cachedTilesResourceOriginPointsAndSizesTexture = gl.createTexture()
@@ -406,6 +453,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.deleteTexture(this.cachedTilesScaleFactorsTexture)
     this.cachedTilesScaleFactorsTexture = gl.createTexture()
 
+    this.cachedTilesTextureArrayAllocatedWidth = 0
+    this.cachedTilesTextureArrayAllocatedHeight = 0
     this.cachedTilesTextureArrayAllocatedDepth = 0
 
     this.cachedTilesForTextureByTileUrl.clear()
@@ -1105,7 +1154,15 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     if (cachedTilesToAddNow.length > 0) {
       const requiredDepth =
         this.cachedTilesByTextureSlot.size + cachedTilesToAddNow.length
-      if (requiredDepth > this.cachedTilesTextureArrayAllocatedDepth) {
+      const [requiredWidth, requiredHeight] = getTextureArraySize([
+        ...this.cachedTilesByTextureSlot.values(),
+        ...cachedTilesToAddNow
+      ])
+      if (
+        requiredDepth > this.cachedTilesTextureArrayAllocatedDepth ||
+        requiredWidth > this.cachedTilesTextureArrayAllocatedWidth ||
+        requiredHeight > this.cachedTilesTextureArrayAllocatedHeight
+      ) {
         // Grow in steps so single arrivals append into headroom instead of
         // reallocating every time. reallocateTextures re-uploads the tiles
         // currently in cachedTilesByTextureSlot (the existing residents) into the
@@ -1115,10 +1172,16 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         // cachedTilesByTextureSlot.set() below this call to preserve that.
         // (Growing for the whole batch even though the deadline may upload only
         // part of it just leaves the rest as headroom, filled on later frames.)
-        const depth =
-          Math.ceil(requiredDepth / TEXTURE_ARRAY_DEPTH_GROWTH) *
-          TEXTURE_ARRAY_DEPTH_GROWTH
-        this.reallocateTextures(depth)
+        //
+        // The layers are sized to the largest tile actually resident, not to
+        // the largest tile the image could serve (this.tileSize): zoomed out,
+        // only small overview tiles are needed, and for untiled images the
+        // largest tile is the full-resolution image.
+        this.reallocateTextures(
+          requiredWidth,
+          requiredHeight,
+          getTextureArrayDepth(requiredDepth, requiredWidth, requiredHeight)
+        )
       }
       for (const cachedTile of cachedTilesToAddNow) {
         if (performance.now() >= deadline) {
@@ -1168,6 +1231,10 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
         this.cachedTilesByTextureSlot.delete(lastSlot)
       }
       remainingRemoves = tileUrlsToRemove.length - removeIndex
+
+      if (remainingRemoves === 0 && tileUrlsToRemove.length > 0) {
+        this.shrinkTexturesIfOversized()
+      }
     }
 
     this.textureSlotCount = this.cachedTilesByTextureSlot.size
@@ -1179,17 +1246,41 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
   }
 
   /**
-   * (Re)allocate the tiles texture array and the two lookup textures at the
-   * given depth, then re-upload all currently resident tiles into their slots.
-   *
-   * texStorage3D is immutable, so growing the depth requires a fresh texture
-   * object. This only runs when the number of resident tiles crosses a
-   * TEXTURE_ARRAY_DEPTH_GROWTH boundary, not on every tile arrival.
+   * Reallocate the textures at a smaller size if the resident tiles use only a
+   * small part of them, e.g. after zooming out from detailed to overview tiles.
    */
-  private reallocateTextures(depth: number) {
+  private shrinkTexturesIfOversized() {
+    const residentCount = this.cachedTilesByTextureSlot.size
+    if (residentCount === 0) {
+      return
+    }
+    const [width, height] = getTextureArraySize(
+      this.cachedTilesByTextureSlot.values()
+    )
+    const depth = getTextureArrayDepth(residentCount, width, height)
+    const allocatedTexels =
+      this.cachedTilesTextureArrayAllocatedWidth *
+      this.cachedTilesTextureArrayAllocatedHeight *
+      this.cachedTilesTextureArrayAllocatedDepth
+    if (
+      allocatedTexels >
+      TEXTURE_ARRAY_SHRINK_FACTOR * width * height * depth
+    ) {
+      this.reallocateTextures(width, height, depth)
+    }
+  }
+
+  /**
+   * (Re)allocate the tiles texture array and the two lookup textures at the
+   * given size, then re-upload all currently resident tiles into their slots.
+   *
+   * texStorage3D is immutable, so resizing requires a fresh texture object.
+   * This only runs when the number of resident tiles crosses a depth growth
+   * boundary, when a tile larger than the current layers arrives, or when the
+   * textures are shrunk; not on every tile arrival.
+   */
+  private reallocateTextures(width: number, height: number, depth: number) {
     const gl = this.gl
-    const width = this.tileSize[0]
-    const height = this.tileSize[1]
 
     // Cached tiles texture array
     gl.deleteTexture(this.cachedTilesTextureArray)
@@ -1256,6 +1347,8 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
+    this.cachedTilesTextureArrayAllocatedWidth = width
+    this.cachedTilesTextureArrayAllocatedHeight = height
     this.cachedTilesTextureArrayAllocatedDepth = depth
 
     // Re-upload the resident tiles into the freshly allocated textures.
@@ -1284,15 +1377,14 @@ export class WebGL2WarpedMap extends TriangulatedWarpedMap {
       throw new Error('Missing resource origin points and sizes')
     }
 
-    // The texture size is the largest available size in the image's
-    // tileZoomLevels (since the image could be served in multiple sizes).
-    // The size of the source is determined when fetching tiles and getting the
-    // optimal tileZoomLevel based on the scale derived from the viewport.
-    // Hence, the source could be smaller then the texture. This is not a
-    // problem in se, but sub-optimal if the difference is large. (Also note
-    // that if the resource is only on part of the image, the source is still
-    // its the full size.)
-    if (source.width > this.tileSize[0] || source.height > this.tileSize[1]) {
+    // The texture layers are sized to the largest resident tile (see
+    // updateTextures), so smaller tiles (e.g. edge tiles, or overview tiles of
+    // untiled images) only use part of their layer. The shader accounts for
+    // this by dividing by the texture size.
+    if (
+      source.width > this.cachedTilesTextureArrayAllocatedWidth ||
+      source.height > this.cachedTilesTextureArrayAllocatedHeight
+    ) {
       throw new Error("Cached tile doesn't fit in texture")
     }
 
