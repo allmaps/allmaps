@@ -40,6 +40,7 @@
     "watch": "vite build --watch",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
     "types": "tsc --noEmit",
     "build:types": "tsc --declaration --esModuleInterop",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
@@ -59,14 +60,19 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@typescript/native": "catalog:",
+    "@vitest/browser-playwright": "4.1.10",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
+    "happy-dom": "^21.0.4",
+    "playwright": "^1.64.1",
     "prettier": "catalog:",
     "remark-api": "catalog:",
     "remark-cli": "catalog:",
+    "testdocs": "^0.3.0",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
-    "vite-plugin-no-bundle": "catalog:"
+    "vite-plugin-no-bundle": "catalog:",
+    "vitest": "catalog:"
   }
 }

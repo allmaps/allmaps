@@ -45,7 +45,7 @@ Built for MapLibre 5.0, but should work with earlier versions as well.
 
 Creating a `WarpedMapLayer` and adding it to a map looks like this:
 
-```js
+```ts test
 import { Map as MapLibreMap } from 'maplibre-gl'
 import { WarpedMapLayer } from '@allmaps/maplibre'
 
