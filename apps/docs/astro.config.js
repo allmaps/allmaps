@@ -186,6 +186,10 @@ export default defineConfig({
               items: ['guides/allmaps-viewer', 'guides/plugins']
             },
             {
+              label: 'Open in Allmaps',
+              link: '/guides/open-in-allmaps'
+            },
+            {
               label: 'Exporting and reusing maps',
               items: [
                 'guides/xyz-map-tiles',

@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+@import '@allmaps/ui/css/fonts.css';
+
+@config '../tailwind.config.ts';
+@source '../../../packages/ui/src/lib/components/CodeBlock.svelte';
+@source '../../../packages/ui/src/lib/components/LoadingSmall.svelte';
+
+@theme {
+  --breakpoint-sm: 38rem;
+  --duration-grid-flight: 3.6s;
+  --grid-start-offset: -1.35s;
+  --animate-grid-reveal: grid-reveal 650ms ease-out both;
+  --animate-grid-flight: grid-flight var(--duration-grid-flight)
+    cubic-bezier(0.33, 0.23, 0.67, 0.54) var(--grid-start-offset) infinite;
+  --animate-grid-appear: grid-appear var(--duration-grid-flight) ease-in-out
+    var(--grid-start-offset) infinite;
+
+  @keyframes grid-reveal {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes grid-flight {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(2);
+    }
+  }
+
+  @keyframes grid-appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

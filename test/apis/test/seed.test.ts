@@ -1,5 +1,5 @@
 import { rm } from 'node:fs/promises'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { parseAnnotation } from '@allmaps/annotation'
 import { toDbMap3 } from '@allmaps/api-shared'
@@ -85,6 +85,253 @@ describe('Connected demo seed data', () => {
     expect(relationships.rows[0].count).toBe(4)
     const members = await context.db.select().from(schema.members)
     expect(members).toHaveLength(4)
+  })
+
+  it('reports map and canvas counts from indexed manifest relationships', async () => {
+    const firstManifest = catalog.manifests[0]
+    const unmappedManifest = catalog.manifests[3]
+    const unmappedCanvasId = catalog.images[3].canvasId
+    const path = '/manifests/' + firstManifest.id + '/georeferenced'
+    const summary = async (resourcePath = path) => {
+      const response = await rest(resourcePath)
+      expect(response.status).toBe(200)
+      return await response.json()
+    }
+    const [publishedMap] = await context.db
+      .select({ updatedAt: schema.maps.updatedAt })
+      .from(schema.maps)
+      .where(
+        and(
+          eq(schema.maps.id, catalog.maps[0].id),
+          eq(schema.maps.latest, true)
+        )
+      )
+    const georeferencingUpdatedAt = publishedMap.updatedAt.toISOString()
+    const fullSummary = {
+      mapCount: 1,
+      georeferencedMapCount: 1,
+      georeferencingUpdatedAt,
+      canvasCount: 1,
+      georeferencedCanvasCount: 1
+    }
+    const [first] = await context.db
+      .select()
+      .from(schema.manifests)
+      .where(eq(schema.manifests.id, firstManifest.id))
+
+    // The seed has several historical map versions, which count only once.
+    expect(await summary()).toEqual(fullSummary)
+    await context.db.insert(schema.manifestsToCanvases).values({
+      manifestId: firstManifest.id,
+      canvasId: unmappedCanvasId
+    })
+
+    try {
+      const partialSummary = {
+        ...fullSummary,
+        canvasCount: 2
+      }
+      // Membership comes from indexed links even if stored JSON differs.
+      expect(await summary()).toEqual(partialSummary)
+
+      await context.db
+        .update(schema.manifests)
+        .set({ data: null })
+        .where(eq(schema.manifests.id, firstManifest.id))
+      expect(await summary()).toEqual(partialSummary)
+
+      // A second canvas reusing an image counts its maps once.
+      await context.db.insert(schema.canvasesToImages).values({
+        canvasId: unmappedCanvasId,
+        imageId: catalog.images[0].id
+      })
+      expect(await summary()).toEqual({
+        ...fullSummary,
+        canvasCount: 2,
+        georeferencedCanvasCount: 2
+      })
+    } finally {
+      await context.db
+        .delete(schema.canvasesToImages)
+        .where(
+          and(
+            eq(schema.canvasesToImages.canvasId, unmappedCanvasId),
+            eq(schema.canvasesToImages.imageId, catalog.images[0].id)
+          )
+        )
+      await context.db
+        .update(schema.manifests)
+        .set({ data: first.data })
+        .where(eq(schema.manifests.id, firstManifest.id))
+      await context.db
+        .delete(schema.manifestsToCanvases)
+        .where(
+          and(
+            eq(schema.manifestsToCanvases.manifestId, firstManifest.id),
+            eq(schema.manifestsToCanvases.canvasId, unmappedCanvasId)
+          )
+        )
+    }
+
+    expect(
+      await summary('/manifests/' + unmappedManifest.id + '/georeferenced')
+    ).toEqual({
+      mapCount: 0,
+      georeferencedMapCount: 0,
+      georeferencingUpdatedAt: null,
+      canvasCount: 1,
+      georeferencedCanvasCount: 0
+    })
+    expect(
+      await summary('/images/' + catalog.images[0].id + '/georeferenced')
+    ).toEqual({
+      georeferenced: true,
+      mapCount: 1,
+      georeferencedMapCount: 1,
+      georeferencingUpdatedAt
+    })
+    expect(
+      await summary('/images/' + catalog.images[3].id + '/georeferenced')
+    ).toEqual({
+      georeferenced: false,
+      mapCount: 0,
+      georeferencedMapCount: 0,
+      georeferencingUpdatedAt: null
+    })
+    expect(await summary('/images/0000000000000000/georeferenced')).toEqual({
+      georeferenced: false,
+      mapCount: 0,
+      georeferencedMapCount: 0,
+      georeferencingUpdatedAt: null
+    })
+    expect(await summary('/manifests/0000000000000000/georeferenced')).toEqual({
+      mapCount: 0,
+      georeferencedMapCount: 0,
+      georeferencingUpdatedAt: null,
+      canvasCount: null,
+      georeferencedCanvasCount: 0
+    })
+
+    // Known manifests with no indexed canvases have empty coverage.
+    await context.db
+      .delete(schema.manifestsToCanvases)
+      .where(eq(schema.manifestsToCanvases.manifestId, unmappedManifest.id))
+    try {
+      expect(
+        await summary('/manifests/' + unmappedManifest.id + '/georeferenced')
+      ).toEqual({
+        mapCount: 0,
+        georeferencedMapCount: 0,
+        georeferencingUpdatedAt: null,
+        canvasCount: 0,
+        georeferencedCanvasCount: 0
+      })
+    } finally {
+      await context.db.insert(schema.manifestsToCanvases).values({
+        manifestId: unmappedManifest.id,
+        canvasId: unmappedCanvasId
+      })
+    }
+  })
+
+  it('counts unfinished maps separately from published maps', async () => {
+    const draftId = 'summary-draft-map'
+    const firstMap = catalog.maps[0]
+    const [publishedMap] = await context.db
+      .select({ updatedAt: schema.maps.updatedAt })
+      .from(schema.maps)
+      .where(and(eq(schema.maps.id, firstMap.id), eq(schema.maps.latest, true)))
+    const georeferencingUpdatedAt = publishedMap.updatedAt.toISOString()
+    await context.client.query(
+      `INSERT INTO maps (
+        id, image_id, checksum, image_checksum, version, latest, data, resource_mask
+      )
+      SELECT $1, image_id, checksum, image_checksum, 1, true, data, resource_mask
+      FROM maps WHERE id = $2 AND latest`,
+      [draftId, firstMap.id]
+    )
+
+    try {
+      const image = await rest('/images/' + firstMap.imageId + '/georeferenced')
+      expect(await image.json()).toEqual({
+        georeferenced: true,
+        mapCount: 2,
+        georeferencedMapCount: 1,
+        georeferencingUpdatedAt
+      })
+      const manifest = await rest(
+        '/manifests/' + catalog.manifests[0].id + '/georeferenced'
+      )
+      expect(await manifest.json()).toEqual({
+        mapCount: 2,
+        georeferencedMapCount: 1,
+        georeferencingUpdatedAt,
+        canvasCount: 1,
+        georeferencedCanvasCount: 1
+      })
+
+      await context.db
+        .update(schema.maps)
+        .set({ archived: true })
+        .where(eq(schema.maps.id, firstMap.id))
+      const unfinished = await rest(
+        '/images/' + firstMap.imageId + '/georeferenced'
+      )
+      expect(await unfinished.json()).toEqual({
+        georeferenced: false,
+        mapCount: 1,
+        georeferencedMapCount: 0,
+        georeferencingUpdatedAt: null
+      })
+    } finally {
+      await context.db.delete(schema.maps).where(eq(schema.maps.id, draftId))
+      await context.db
+        .update(schema.maps)
+        .set({ archived: false })
+        .where(eq(schema.maps.id, firstMap.id))
+    }
+  })
+
+  it('filters organizations by exact domain and returns API URL IDs', async () => {
+    const [paid, unpaid] = catalog.organizations
+    const lookup = async (domain: string, plan?: string) => {
+      const query = new URLSearchParams({ domain })
+      if (plan) query.set('plan', plan)
+      const response = await rest('/organizations?' + query)
+      expect(response.status).toBe(200)
+      return await response.json()
+    }
+
+    for (const organization of [paid, unpaid]) {
+      const result = await lookup(organization.domain.toUpperCase())
+      expect(result).toMatchObject([
+        {
+          id: `${context.env.PUBLIC_REST_BASE_URL}/organizations/${organization.id}`,
+          name: organization.name,
+          logo: null,
+          plan: organization.plan,
+          domains: [organization.domain]
+        }
+      ])
+      expect(result[0]).not.toHaveProperty('users')
+    }
+
+    expect(await lookup('sub.' + paid.domain)).toEqual([])
+    expect(await lookup(paid.domain, 'supporter')).toEqual([])
+    expect((await rest('/organizations?domain=bad%2Fpath')).status).toBe(400)
+
+    const geojson = await rest('/organizations.geojson?domain=' + paid.domain)
+    expect(geojson.status).toBe(200)
+    expect(await geojson.json()).toMatchObject({
+      type: 'FeatureCollection',
+      features: [
+        {
+          properties: {
+            id: `${context.env.PUBLIC_REST_BASE_URL}/organizations/${paid.id}`
+          }
+        }
+      ]
+    })
   })
 
   it.each([0, 1, 2, 3])(

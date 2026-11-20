@@ -1,5 +1,6 @@
 import { ResponseError } from './errors.js'
 import { isOrganizationPlan } from './tiers.js'
+import { normalizeDomain } from './urls.js'
 
 import type {
   ContainedBy,
@@ -127,6 +128,17 @@ export function normalizeOrganizationsQueryParams(
       case 'plan':
         plans.add(parseOrganizationPlanParam(value))
         break
+      case 'domain': {
+        const domain = normalizeDomain(value)
+        if (!domain) {
+          throw new ResponseError(
+            `Invalid query parameter domain: ${value}`,
+            400
+          )
+        }
+        params.domain = domain
+        break
+      }
       case 'displaycollections':
         if (value !== 'true' && value !== 'false') {
           throw new ResponseError(

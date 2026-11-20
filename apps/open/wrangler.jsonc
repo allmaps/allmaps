@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "open",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "compatibility_date": "2026-11-10",
+  "workers_dev": false,
+  "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
+  "routes": [{ "pattern": "open.allmaps.org", "custom_domain": true }],
+  "observability": {
+    "enabled": true,
+    "logs": { "invocation_logs": false }
+  },
+  "env": {
+    "dev": {
+      "name": "open-develop",
+      "workers_dev": false,
+      "assets": { "directory": ".svelte-kit/cloudflare", "binding": "ASSETS" },
+      "routes": [{ "pattern": "dev.open.allmaps.org", "custom_domain": true }]
+    }
+  }
+}

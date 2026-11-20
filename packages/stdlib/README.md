@@ -595,6 +595,18 @@ Georeference annotations for the IIIF resource (`Promise<any>`).
 
 `[number, number]`.
 
+### `getGeoreferenceAnnotationItems(page)`
+
+Select georeferencing annotations using the purpose of the page or its items.
+
+###### Parameters
+
+* `page` (`unknown`)
+
+###### Returns
+
+`Array<unknown>`.
+
 ### `getMapQueryCredentials(limit)`
 
 Choose credentials for a public map search. Larger requests still need the
