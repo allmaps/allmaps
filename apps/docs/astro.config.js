@@ -182,12 +182,12 @@ export default defineConfig({
               link: '/guides/ids-in-allmaps'
             },
             {
-              label: 'Viewing maps',
-              items: ['guides/allmaps-viewer', 'guides/plugins']
-            },
-            {
               label: 'Open in Allmaps',
               link: '/guides/open-in-allmaps'
+            },
+            {
+              label: 'Viewing maps',
+              items: ['guides/allmaps-viewer', 'guides/plugins']
             },
             {
               label: 'Exporting and reusing maps',
