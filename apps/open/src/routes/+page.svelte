@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { prefersReducedMotion } from 'svelte/motion'
+  import { page } from '$app/state'
   import { fade } from 'svelte/transition'
   import { LoadingSmall, Logo } from '@allmaps/ui'
   import { CodeBlock } from '@allmaps/ui/code'
@@ -43,6 +44,14 @@
     resolution?.state === 'ready'
       ? handoffUrl(data, resolution.handoff)
       : undefined
+  )
+
+  const title = 'Open in Allmaps'
+  const description = 'Open a IIIF map in Allmaps Viewer or Allmaps Editor.'
+  const socialImageAlt =
+    'Open in Allmaps with the Allmaps logo on a pink dotted tunnel'
+  const socialImageUrl = $derived(
+    new URL('/open-in-allmaps.jpg', page.url).href
   )
 
   const redirectDelay = 4000
@@ -134,11 +143,23 @@
 </script>
 
 <svelte:head>
-  <title>Open in Allmaps</title>
-  <meta
-    name="description"
-    content="Open a IIIF map in Allmaps Viewer or Allmaps Editor."
-  />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Allmaps" />
+  <meta property="og:url" content={page.url.href} />
+  <meta property="og:image" content={socialImageUrl} />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={socialImageAlt} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={socialImageUrl} />
+  <meta name="twitter:image:alt" content={socialImageAlt} />
 </svelte:head>
 
 {#snippet actionLabel(label: string)}
@@ -180,7 +201,7 @@
         <h1
           class="text-lg leading-tight font-bold [font-feature-settings:var(--geograph-ss01),var(--geograph-ss02),'ss03'_off,var(--geograph-tnum)] min-[340px]:text-xl sm:text-2xl"
         >
-          Open in Allmaps
+          {title}
         </h1>
       </div>
 
