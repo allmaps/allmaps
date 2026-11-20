@@ -9,6 +9,7 @@ import { adminDetail } from '../openapi.js'
 import {
   archiveImage,
   queryImage,
+  queryImageGeoreferencing,
   queryImages,
   queryRandomImagesByOrganizationIds,
   createImage,
@@ -226,6 +227,38 @@ export function createImagesRoutes(
         params: t.Object({ imageId: t.String() }),
         detail: {
           summary: 'Get all versions for a single IIIF Image',
+          tags: ['Images']
+        }
+      }
+    )
+    .get(
+      '/images/:imageId/georeferenced',
+      async ({ db, params, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryImageGeoreferencing(db, params.imageId)
+      },
+      {
+        params: t.Object({ imageId: t.String() }),
+        response: t.Object({
+          georeferenced: t.Boolean(),
+          georeferencingUpdatedAt: t.Nullable(
+            t.String({
+              format: 'date-time',
+              description: 'Latest update to a currently published map'
+            })
+          ),
+          mapCount: t.Integer({
+            minimum: 0,
+            description: 'Current unarchived maps, including unfinished maps'
+          }),
+          georeferencedMapCount: t.Integer({
+            minimum: 0,
+            description:
+              'Current unarchived maps published in the Annotations API'
+          })
+        }),
+        detail: {
+          summary: 'Check for published georeferencing for a IIIF Image',
           tags: ['Images']
         }
       }

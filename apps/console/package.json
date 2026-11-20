@@ -41,8 +41,10 @@
     "wrangler": "catalog:"
   },
   "dependencies": {
+    "@allmaps/annotation": "workspace:^",
     "@allmaps/api-shared": "workspace:^",
     "@allmaps/env": "workspace:^",
+    "@allmaps/id": "workspace:^",
     "@allmaps/tailwind": "workspace:^",
     "@allmaps/ui": "workspace:^",
     "better-auth": "catalog:",

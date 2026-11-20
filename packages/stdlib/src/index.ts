@@ -4,6 +4,8 @@ export {
   PUBLIC_API_MAX_LIMIT
 } from './api.js'
 
+export { getGeoreferenceAnnotationItems } from './georeference-annotations.js'
+
 // export {
 //   getImageData,
 //   getColorsArray,

@@ -18,6 +18,7 @@ export type OrganizationLocation = {
 
 export type OrganizationsQueryParams = {
   limit: number
+  domain: string
   organizationIds: string[]
   organizationSlugs: string[]
   plans: OrganizationPlan[]
