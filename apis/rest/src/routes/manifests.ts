@@ -8,6 +8,7 @@ import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 import {
   queryManifests,
+  queryManifestCoverage,
   createManifest,
   createManifestFromUrl,
   queryMaps
@@ -131,6 +132,50 @@ export function createManifestsRoutes(
         params: t.Object({ manifestId: t.String() }),
         query: t.Object({ georeferenced: t.Optional(t.Boolean()) }),
         detail: { summary: 'Get a single IIIF Manifest', tags: ['Manifests'] }
+      }
+    )
+    .get(
+      '/manifests/:manifestId/georeferenced',
+      async ({ db, params, set }) => {
+        setCacheControl(set, 'public-short')
+        return queryManifestCoverage(db, params.manifestId)
+      },
+      {
+        params: t.Object({ manifestId: t.String() }),
+        response: t.Object({
+          georeferencingUpdatedAt: t.Nullable(
+            t.String({
+              format: 'date-time',
+              description: 'Latest update to a currently published map'
+            })
+          ),
+          mapCount: t.Integer({
+            minimum: 0,
+            description:
+              'Distinct current unarchived maps on indexed manifest images, including unfinished maps'
+          }),
+          georeferencedMapCount: t.Integer({
+            minimum: 0,
+            description:
+              'Distinct current unarchived maps on indexed manifest images published in the Annotations API'
+          }),
+          canvasCount: t.Nullable(
+            t.Integer({
+              minimum: 0,
+              description:
+                'Indexed canvases linked to the manifest. Null for an absent manifest.'
+            })
+          ),
+          georeferencedCanvasCount: t.Integer({
+            minimum: 0,
+            description: 'Indexed canvases with at least one published map'
+          })
+        }),
+        detail: {
+          summary:
+            'Get published georeferencing coverage for the indexed IIIF Manifest',
+          tags: ['Manifests']
+        }
       }
     )
     .get(

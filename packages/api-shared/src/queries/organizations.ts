@@ -11,11 +11,12 @@ import {
 } from './auth.js'
 
 import { clampLimit } from '../shared/limits.js'
+import { normalizeDomain } from '../shared/urls.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
 import type { SQL } from 'drizzle-orm'
 import type { UserRole } from '../shared/limits.js'
-import type { OrganizationPlan } from '../types.js'
+import type { OrganizationPlan, OrganizationsQueryParams } from '../types.js'
 import type { OrganizationLocation } from '@allmaps/db/schema/auth'
 
 type DbOrganization = {
@@ -35,58 +36,8 @@ type DbOrganization = {
   }[]
 }
 
-type ListOrganizationsOptions = {
-  limit?: number
-  organizationIds?: string[]
-  organizationSlugs?: string[]
-  plans?: OrganizationPlan[]
-  displayCollections?: boolean
+type ListOrganizationsOptions = Partial<OrganizationsQueryParams> & {
   userRole?: UserRole
-}
-
-export function normalizeDomain(value: string): string | undefined {
-  const input = value.trim()
-
-  if (!input) {
-    return
-  }
-
-  const withProtocol = /^[a-zA-Z][a-zA-Z\d+.-]*:\/\//.test(input)
-  let hostname = input
-
-  if (withProtocol) {
-    try {
-      const url = new URL(input)
-      if (
-        url.username ||
-        url.password ||
-        (url.pathname && url.pathname !== '/') ||
-        url.search ||
-        url.hash ||
-        url.port
-      ) {
-        return
-      }
-      hostname = url.hostname
-    } catch {
-      return
-    }
-  }
-
-  const domain = hostname.toLowerCase()
-  if (
-    /[/?#@:]/.test(domain) ||
-    domain.startsWith('.') ||
-    domain.endsWith('.') ||
-    domain.includes('..')
-  ) {
-    return
-  }
-
-  const label = '[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?'
-  const domainRegex = new RegExp(`^(?:${label})(?:\\.(?:${label}))*$`)
-
-  return domainRegex.test(domain) ? domain : undefined
 }
 
 export function normalizeOrganizationSlug(value: string): string | undefined {
@@ -266,7 +217,10 @@ function getOrganizationsWhere(options: ListOrganizationsOptions) {
       options.plans && options.plans.length > 0
         ? { in: options.plans }
         : undefined,
-    displayCollections: options.displayCollections
+    displayCollections: options.displayCollections,
+    urls: options.domain
+      ? { url: options.domain, type: 'domain' as const }
+      : undefined
   }
 }
 

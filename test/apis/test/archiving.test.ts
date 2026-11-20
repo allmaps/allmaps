@@ -184,6 +184,28 @@ describe('admin archiving', () => {
       ]) {
         expect((await request('annotations', path)).status).toBe(404)
       }
+      const manifestStatus = await request(
+        'rest',
+        '/manifests/' + catalog.manifests[0].id + '/georeferenced'
+      )
+      const imageStatus = await request(
+        'rest',
+        '/images/' + image.id + '/georeferenced'
+      )
+      expect(await manifestStatus.json()).toEqual({
+        mapCount: 0,
+        georeferencedMapCount: 0,
+        georeferencingUpdatedAt: null,
+        canvasCount: 1,
+        georeferencedCanvasCount: 0
+      })
+      expect(await imageStatus.json()).toEqual({
+        georeferenced: false,
+        mapCount: 0,
+        georeferencedMapCount: 0,
+        georeferencingUpdatedAt: null
+      })
+
       const organization = await request(
         'annotations',
         `/organizations/${catalog.organizations[0].slug}`
