@@ -807,12 +807,18 @@ importers:
 
   apps/console:
     dependencies:
+      '@allmaps/annotation':
+        specifier: workspace:^
+        version: link:../../packages/annotation
       '@allmaps/api-shared':
         specifier: workspace:^
         version: link:../../packages/api-shared
       '@allmaps/env':
         specifier: workspace:^
         version: link:../../packages/env
+      '@allmaps/id':
+        specifier: workspace:^
+        version: link:../../packages/id
       '@allmaps/tailwind':
         specifier: workspace:^
         version: link:../../packages/tailwind
