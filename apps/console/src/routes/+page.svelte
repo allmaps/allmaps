@@ -1,4 +1,5 @@
 <script lang="ts">
+  import MapImport from '$lib/components/MapImport.svelte'
   import { routes } from '$lib/routes.js'
 
   import type { PageProps } from './$types.js'
@@ -147,6 +148,11 @@
             </a>
           </div>
         </div>
+
+        <MapImport
+          annotationsBaseUrl={data.env.PUBLIC_ANNOTATIONS_BASE_URL}
+          viewerBaseUrl={data.env.PUBLIC_VIEWER_BASE_URL}
+        />
       {/if}
     </div>
   {/if}
