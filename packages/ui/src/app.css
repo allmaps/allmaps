@@ -20,3 +20,12 @@
 h1#_top {
   font-feature-settings: normal;
 }
+
+/* Keep the outgoing page visible until the next page can paint. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(root) {
+  animation-duration: 0s;
+}
