@@ -26,6 +26,16 @@ export default defineConfig({
       logo: { src: '../../apps/docs/src/images/allmaps-logo.svg' },
       routeMiddleware: './src/component-navigation.ts',
       components: { Sidebar: './src/components/StyleguideSidebar.astro' },
+      head: ['regular', 'bold'].map((weight) => ({
+        tag: 'link',
+        attrs: {
+          rel: 'preload',
+          as: 'font',
+          type: 'font/woff2',
+          crossorigin: 'anonymous',
+          href: `https://fonts.allmaps.org/geograph/geograph-${weight}.woff2`
+        }
+      })),
       favicon: '/favicon.png',
       social: [
         {
