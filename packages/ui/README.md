@@ -2,6 +2,34 @@
 
 UI components and functions for Allmaps.
 
+## Component styleguide
+
+The [Allmaps UI styleguide](https://ui.allmaps.org) documents AllmapsLogo,
+Button, Dialog, DropdownMenu, Kbd, LoginDialog, and LoginMenu. Each component
+has an interactive example and usage notes.
+
+Run `pnpm --filter @allmaps/ui dev` from the repository root to open the
+Astro Starlight development server on port 5505. Component pages live in
+`src/content/docs/components` and their Svelte playgrounds in `src/components`.
+Run `pnpm --filter @allmaps/ui check` to check the Astro and Svelte sources.
+
+### Production deployment
+
+From the repository root, install the workspace and build the dependencies,
+then build the static site and deploy it to the Cloudflare Worker named `ui`.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec turbo run build --filter '@allmaps/ui^...'
+pnpm --filter @allmaps/ui run build:styleguide
+pnpm --filter @allmaps/ui run deploy:production
+```
+
+Wrangler serves `packages/ui/build/` at `ui.allmaps.org`. For Cloudflare
+Workers Builds, use the repository root and the two build commands above,
+followed by the deploy command. Use Node 24+ and the repository’s pinned pnpm version.
+The library build writes the publishable Svelte package to `dist/`.
+
 ## New shared controls
 
 The shadcn-svelte-based Select is available alongside the existing Allmaps Select:

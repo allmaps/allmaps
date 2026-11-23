@@ -1,0 +1,128 @@
+<script lang="ts">
+  import '../../../css/ui.css'
+  import LoadingSmall from '../../LoadingSmall.svelte'
+
+  import type {
+    HTMLAnchorAttributes,
+    HTMLButtonAttributes
+  } from 'svelte/elements'
+  import type { ButtonProps, ButtonVariant } from './types.js'
+
+  let {
+    children,
+    icon,
+    iconPosition = 'leading',
+    loadingIndicator,
+    variant = 'default',
+    shape = 'rounded',
+    iconOnly = false,
+    active = false,
+    loading = false,
+    disabled = false,
+    ref = $bindable(null),
+    class: className,
+    ...restProps
+  }: ButtonProps = $props()
+
+  const variants: Record<ButtonVariant, string> = {
+    default: '[--button-fill:var(--allmaps-ui-background)] text-foreground',
+    primary: '[--button-fill:var(--allmaps-ui-primary)] text-white',
+    destructive:
+      '[--button-fill:var(--allmaps-ui-button-destructive)] text-white'
+  }
+
+  let unavailable = $derived(disabled || loading)
+  let anchorAttributes = $derived(restProps as HTMLAnchorAttributes)
+  let buttonAttributes = $derived(restProps as HTMLButtonAttributes)
+  let classes = $derived([
+    'inline-flex max-w-full shrink-0 items-center justify-center gap-2 border font-(family-name:--allmaps-ui-font-sans) text-sm leading-5 font-medium transition-colors motion-reduce:transition-none',
+    variant === 'default' ? 'border-border' : 'border-transparent',
+    'no-underline bg-(--button-fill) not-disabled:not-aria-disabled:hover:bg-[color-mix(in_srgb,var(--button-fill)_95%,black)]',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--allmaps-ui-ring)',
+    'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+    'aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-invalid:ring-2 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+    'pointer-coarse:min-h-11 pointer-coarse:min-w-11',
+    !unavailable && 'cursor-pointer',
+    shape === 'pill' ? 'rounded-full' : 'rounded-(--allmaps-ui-radius)',
+    'min-h-(--allmaps-ui-control-height)',
+    iconOnly ? 'w-(--allmaps-ui-control-height) p-1.5' : 'px-3 py-2',
+    active && variant !== 'destructive'
+      ? '[--button-fill:var(--allmaps-ui-accent)] text-primary'
+      : variants[variant],
+    active && 'ring-2 ring-(--allmaps-ui-ring) ring-inset',
+    className
+  ])
+</script>
+
+{#snippet content()}
+  {#if icon}
+    <span
+      aria-hidden="true"
+      class={[
+        'relative inline-grid shrink-0 place-items-center',
+        iconPosition === 'trailing' && 'order-last'
+      ]}
+    >
+      <span class="inline-grid place-items-center" class:invisible={loading}
+        >{@render icon()}</span
+      >
+      {#if loading}
+        <span
+          data-slot="loading-indicator"
+          class="absolute inset-0 grid place-items-center"
+        >
+          {#if loadingIndicator}
+            {@render loadingIndicator()}
+          {:else}
+            <span class="contents motion-reduce:hidden"
+              ><LoadingSmall color="currentColor" /></span
+            >
+            <span class="hidden motion-reduce:inline">…</span>
+          {/if}
+        </span>
+      {/if}
+    </span>
+  {/if}
+  {@render children?.()}
+{/snippet}
+
+{#if restProps.href !== undefined}
+  <!-- The caller owns resolving application routes. -->
+  <!-- eslint-disable svelte/no-navigation-without-resolve -->
+  <a
+    {...anchorAttributes}
+    bind:this={ref}
+    href={unavailable ? undefined : restProps.href}
+    role={unavailable ? 'link' : anchorAttributes.role}
+    tabindex={unavailable ? -1 : anchorAttributes.tabindex}
+    aria-disabled={unavailable || undefined}
+    aria-busy={loading || anchorAttributes['aria-busy']}
+    data-slot="button"
+    data-variant={variant}
+    class={classes}
+    onclick={(event) => {
+      if (unavailable) {
+        event.preventDefault()
+        event.stopPropagation()
+        return
+      }
+      anchorAttributes.onclick?.(event)
+    }}
+  >
+    {@render content()}
+  </a>
+  <!-- eslint-enable svelte/no-navigation-without-resolve -->
+{:else}
+  <button
+    {...buttonAttributes}
+    bind:this={ref}
+    type={buttonAttributes.type ?? 'button'}
+    disabled={unavailable}
+    aria-busy={loading || buttonAttributes['aria-busy']}
+    data-slot="button"
+    data-variant={variant}
+    class={classes}
+  >
+    {@render content()}
+  </button>
+{/if}

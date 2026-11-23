@@ -1,0 +1,30 @@
+---
+import Sidebar from '@astrojs/starlight/components/Sidebar.astro'
+---
+
+<Sidebar />
+
+<script>
+  const sidebar = document.getElementById('starlight__sidebar')
+  const currentLink = sidebar?.querySelector<HTMLAnchorElement>(
+    'a[aria-current="page"]'
+  )
+
+  currentLink?.addEventListener('click', (event) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      currentLink.href !== window.location.href
+    ) {
+      return
+    }
+
+    event.preventDefault()
+    if (sidebar?.popover) sidebar.hidePopover()
+    window.scrollTo({ top: 0 })
+  })
+</script>

@@ -18,6 +18,11 @@
   "svelte": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./button": {
+      "types": "./dist/button.d.ts",
+      "svelte": "./dist/button.js",
+      "default": "./dist/button.js"
+    },
     "./screenshots/integration": {
       "types": "./dist/screenshots-integration.d.ts",
       "default": "./dist/screenshots-integration.js"
@@ -71,6 +76,21 @@
       "types": "./dist/latest.d.ts",
       "svelte": "./dist/latest.js",
       "default": "./dist/latest.js"
+    },
+    "./dialog": {
+      "types": "./dist/dialog.d.ts",
+      "svelte": "./dist/dialog.js",
+      "default": "./dist/dialog.js"
+    },
+    "./dropdown-menu": {
+      "types": "./dist/dropdown-menu.d.ts",
+      "svelte": "./dist/dropdown-menu.js",
+      "default": "./dist/dropdown-menu.js"
+    },
+    "./kbd": {
+      "types": "./dist/kbd.d.ts",
+      "svelte": "./dist/kbd.js",
+      "default": "./dist/kbd.js"
     }
   },
   "files": [
@@ -87,23 +107,26 @@
     "directory": "packages/ui"
   },
   "scripts": {
-    "dev": "vite dev --mode localhost",
+    "dev": "astro dev --mode localhost",
     "watch": "svelte-package --watch",
-    "prepare": "svelte-kit sync || echo ''",
-    "build": "vite build && pnpm run prepack",
-    "preview": "vite preview",
-    "prepack": "svelte-kit sync && svelte-package && publint",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "build": "pnpm run prepack",
+    "preview": "astro preview",
+    "prepack": "svelte-package && publint",
+    "check": "astro check --tsconfig ./tsconfig.styleguide.json && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --ignore-path ../../.gitignore --write .",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .ts,.svelte",
     "types": "tsc --noEmit",
-    "test": "node --test test/*.test.ts"
+    "test": "node --test test/*.test.ts",
+    "build:styleguide": "astro build",
+    "deploy:production": "wrangler deploy"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/starlight": "^0.42.4",
+    "@astrojs/starlight-tailwind": "^4.0.0",
+    "@astrojs/svelte": "^9.0.1",
     "@eslint/js": "catalog:",
-    "@sveltejs/adapter-auto": "catalog:",
-    "@sveltejs/kit": "catalog:",
     "@sveltejs/package": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
     "@tailwindcss/vite": "catalog:",
@@ -112,6 +135,7 @@
     "@types/leaflet": "catalog:",
     "@types/lodash-es": "catalog:",
     "@typescript/native": "catalog:",
+    "astro": "^7.3.5",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-svelte": "catalog:",
@@ -125,10 +149,9 @@
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-devtools-json": "catalog:"
+    "wrangler": "catalog:"
   },
   "peerDependencies": {
-    "@sveltejs/kit": "catalog:",
     "svelte": "catalog:"
   },
   "dependencies": {
@@ -146,6 +169,7 @@
     "@allmaps/types": "workspace:^",
     "@turf/rewind": "catalog:",
     "bits-ui": "catalog:",
+    "clsx": "^2.1.1",
     "d3-geo": "catalog:",
     "flatbush": "^4.4.0",
     "fuse.js": "^7.1.0",
@@ -154,6 +178,7 @@
     "maplibre-gl": "catalog:",
     "ol": "catalog:",
     "phosphor-svelte": "catalog:",
-    "shiki": "4.4.3"
+    "shiki": "4.4.3",
+    "tailwind-merge": "^3.7.1"
   }
 }
