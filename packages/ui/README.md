@@ -27,9 +27,8 @@ pnpm --filter @allmaps/ui run deploy:production
 
 Wrangler serves `packages/ui/build/` at `ui.allmaps.org`. For Cloudflare
 Workers Builds, use the repository root and the two build commands above,
-followed by the deploy command. Use Node 24+, the pinned pnpm version, and
-Rust with wasm-pack for the workspace dependencies. The library build writes
-the publishable Svelte package to `dist/`.
+followed by the deploy command. Use Node 24+ and the repository’s pinned pnpm version.
+The library build writes the publishable Svelte package to `dist/`.
 
 ## New shared controls
 
