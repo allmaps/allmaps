@@ -14,3 +14,9 @@
 
 @source './lib';
 @source './components';
+
+/* Use Geograph’s pointy A in the site and page titles, as on Allmaps Docs. */
+.site-title,
+h1#_top {
+  font-feature-settings: normal;
+}
