@@ -13,5 +13,16 @@
       "pattern": "ui.allmaps.org",
       "custom_domain": true
     }
-  ]
+  ],
+  "env": {
+    "development": {
+      "name": "ui-develop",
+      "routes": [
+        {
+          "pattern": "dev.ui.allmaps.org",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }
