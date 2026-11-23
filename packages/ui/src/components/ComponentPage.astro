@@ -1,0 +1,19 @@
+---
+import { getComponentSections } from '../component-sections'
+
+const { entry } = Astro.locals.starlightRoute
+const sections = getComponentSections(entry.data.sections ?? [])
+---
+<p>{entry.data.description}</p>
+{sections.map(async ({ slug, text, children }) => (
+  <section aria-labelledby={slug}>
+    <h2 id={slug}>{text}</h2>
+    <Fragment set:html={await Astro.slots.render(slug)} />
+    {children.map(async (child) => (
+      <section aria-labelledby={child.slug}>
+        <h3 id={child.slug}>{child.text}</h3>
+        <Fragment set:html={await Astro.slots.render(child.slug)} />
+      </section>
+    ))}
+  </section>
+))}

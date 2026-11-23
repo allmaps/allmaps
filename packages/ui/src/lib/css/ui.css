@@ -26,7 +26,9 @@
       var(--allmaps-ui-background)
     );
     --allmaps-ui-accent-foreground: #182a2f;
+    --allmaps-ui-button-destructive: var(--color-red, #fe5e60);
     --allmaps-ui-destructive: #c02e46;
+    --allmaps-ui-destructive-foreground: #ffffff;
     --allmaps-ui-border: #bac4c8;
     --allmaps-ui-input: #bac4c8;
     --allmaps-ui-ring: var(--allmaps-ui-primary);
@@ -51,6 +53,7 @@
     );
     --allmaps-ui-accent-foreground: #e7eff2;
     --allmaps-ui-destructive: #ff8b9d;
+    --allmaps-ui-destructive-foreground: #182a2f;
     --allmaps-ui-border: #495c62;
     --allmaps-ui-input: #495c62;
     --allmaps-ui-shadow: 0 4px 16px rgb(0 0 0 / 30%);
@@ -76,6 +79,7 @@
   --color-accent: var(--allmaps-ui-accent);
   --color-accent-foreground: var(--allmaps-ui-accent-foreground);
   --color-destructive: var(--allmaps-ui-destructive);
+  --color-destructive-button: var(--allmaps-ui-button-destructive);
   --color-border: var(--allmaps-ui-border);
   --color-input: var(--allmaps-ui-input);
   --color-ring: var(--allmaps-ui-ring);

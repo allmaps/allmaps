@@ -1,0 +1,53 @@
+---
+title: Modal
+description: Show a dialog over a 40% black backdrop. The title and close button stay visible while the body scrolls.
+sections: [Playground, Usage, Props]
+---
+
+import ComponentPage from '../../../components/ComponentPage.astro'
+import ModalPlayground from '../../../components/ModalPlayground.svelte'
+
+<ComponentPage>
+
+<div slot="playground">
+
+<ModalPlayground client:load />
+
+</div>
+
+<div slot="usage">
+
+Bind `open` to control the dialog. The close button, Escape, and a click on the backdrop dismiss it.
+
+```svelte
+<script lang="ts">
+  import { Modal } from '@allmaps/ui'
+  import { Button } from '@allmaps/ui/button'
+
+  let open = $state(false)
+</script>
+
+<Button onclick={() => (open = true)}>About this atlas</Button>
+<Modal bind:open>
+  {#snippet title()}About this atlas{/snippet}
+  <p>This atlas contains 48 map sheets.</p>
+</Modal>
+```
+
+</div>
+
+<div slot="props">
+
+| Prop                 | Behavior                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| `open`               | Bind the boolean that opens and closes the dialog.                                   |
+| `returnFocus`        | Optional element to focus on dismissal, such as the avatar that opened a login menu. |
+| `aria-describedby`   | ID of the element that describes the dialog.                                         |
+| `title`              | Optional snippet for the heading. It also provides the dialog’s accessible name.     |
+| `closeButtonInTitle` | Show the close button alongside the title. Defaults to `true`.                       |
+| `children`           | Dialog body. Each axis scrolls only when the content overflows.                      |
+| `background`         | Optional decorative snippet behind the panel.                                        |
+
+</div>
+
+</ComponentPage>

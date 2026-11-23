@@ -88,7 +88,7 @@
   {#if section.html}
     {@html section.html}
   {:else}
-    <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Scrollable code must be keyboard focusable. -->
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex (Scrollable code must be keyboard focusable.) -->
     <pre tabindex="0" aria-label={title ?? language}><code>{section.code}</code
       ></pre>
   {/if}
@@ -183,7 +183,7 @@
       {:else if rendered}
         {@html rendered.html}
       {:else}
-        <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Scrollable code must be keyboard focusable. -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex (Scrollable code must be keyboard focusable.) -->
         <pre tabindex="0" aria-label={title ?? language}><code>{code}</code
           ></pre>
       {/if}

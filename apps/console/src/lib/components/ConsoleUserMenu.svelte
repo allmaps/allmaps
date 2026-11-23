@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
-  import { UserMenu } from '@allmaps/ui/auth'
+  import { LoginMenu } from '@allmaps/ui/auth'
 
   import { authClient } from '$lib/auth-client.js'
   import type { LayoutData } from '../../routes/$types'
@@ -18,12 +18,13 @@
   )
 
   async function signOut() {
-    await authClient.signOut()
+    const { error } = await authClient.signOut()
+    if (error) throw new Error(error.message)
     window.location.href = page.url.href
   }
 </script>
 
-<UserMenu
+<LoginMenu
   user={page.data.session?.user}
   {signInProviders}
   onSignOut={signOut}
