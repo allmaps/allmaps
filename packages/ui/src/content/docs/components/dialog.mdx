@@ -1,0 +1,43 @@
+---
+title: Dialog
+description: Open a dialog that keeps keyboard focus inside until dismissed.
+sections: [Playground, Usage]
+---
+
+import ComponentPage from '../../../components/ComponentPage.astro'
+import DialogPlayground from '../../../components/DialogPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<DialogPlayground client:load />
+
+</div>
+<div slot="usage">
+
+Allmaps uses [shadcn-svelte Dialog](https://www.shadcn-svelte.com/docs/components/dialog). Give the dialog an accessible name with `Dialog.Title`. Use `Dialog.Trigger` to open it and return focus to the opener on dismissal, or bind `open` on `Dialog.Root` to control it from your app.
+
+```svelte
+<script lang="ts">
+  import * as Dialog from '@allmaps/ui/dialog'
+  import { Button } from '@allmaps/ui/button'
+</script>
+
+<Dialog.Root>
+  <Dialog.Trigger>
+    {#snippet child({ props })}
+      <Button {...props}>About this atlas</Button>
+    {/snippet}
+  </Dialog.Trigger>
+  <Dialog.Content>
+    <Dialog.Header>
+      <Dialog.Title>About this atlas</Dialog.Title>
+      <Dialog.Description>This atlas contains 48 map sheets.</Dialog.Description
+      >
+    </Dialog.Header>
+  </Dialog.Content>
+</Dialog.Root>
+```
+
+</div>
+</ComponentPage>

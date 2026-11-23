@@ -77,6 +77,11 @@
       "svelte": "./dist/latest.js",
       "default": "./dist/latest.js"
     },
+    "./dialog": {
+      "types": "./dist/dialog.d.ts",
+      "svelte": "./dist/dialog.js",
+      "default": "./dist/dialog.js"
+    },
     "./dropdown-menu": {
       "types": "./dist/dropdown-menu.d.ts",
       "svelte": "./dist/dropdown-menu.js",

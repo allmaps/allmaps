@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { LoginMenu, LoginModal, type SignInProvider } from '$lib/auth.js'
+  import { LoginMenu, LoginDialog, type SignInProvider } from '$lib/auth.js'
   import Button from '$lib/components/ui/button/button.svelte'
   import Playground from './Playground.svelte'
   import PlaygroundSelect from './PlaygroundSelect.svelte'
 
-  let { component }: { component: 'LoginMenu' | 'LoginModal' } = $props()
+  let { component }: { component: 'LoginMenu' | 'LoginDialog' } = $props()
   let session = $state('Logged out')
   let open = $state(false)
   let message = $state('')
@@ -49,7 +49,7 @@
         />
       {:else}
         <Button onclick={() => (open = true)}>Log in</Button>
-        <LoginModal bind:open {signInProviders} />
+        <LoginDialog bind:open {signInProviders} />
       {/if}
       {#if message}<p role="status" class="text-sm">{message}</p>{/if}
     </div>

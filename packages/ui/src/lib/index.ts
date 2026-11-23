@@ -46,6 +46,7 @@ import Projective from '$lib/components/icons/transformations/Projective.svelte'
 import Straight from '$lib/components/icons/transformations/Straight.svelte'
 import ThinPlateSpline from '$lib/icons/transformations/ThinPlateSpline.svelte'
 
+export * as Dialog from './dialog.js'
 export { Button } from './button.js'
 export type { ButtonProps, ButtonVariant, ButtonShape } from './button.js'
 export { default as AllmapsLogo } from './components/AllmapsLogo.svelte'

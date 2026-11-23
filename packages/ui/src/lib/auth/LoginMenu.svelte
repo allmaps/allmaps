@@ -4,7 +4,7 @@
   import SignInIcon from 'phosphor-svelte/lib/SignInIcon'
   import SignOutIcon from 'phosphor-svelte/lib/SignOutIcon'
   import UserCircleIcon from 'phosphor-svelte/lib/UserCircleIcon'
-  import LoginModal from './LoginModal.svelte'
+  import LoginDialog from './LoginDialog.svelte'
   import type { AccountLink, LoginUser, SignInProvider } from './types.js'
 
   let {
@@ -111,7 +111,7 @@
     </DropdownMenu.Content>
   </DropdownMenu.Root>
   {#if !user}
-    <LoginModal
+    <LoginDialog
       bind:open={loginOpen}
       {apiBaseUrl}
       {signInProviders}

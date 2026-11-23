@@ -17,7 +17,7 @@ import LoginPlayground from '../../../components/LoginPlayground.svelte'
 
 <div slot="usage">
 
-Choose **Log in** in the avatar menu to open LoginModal. Choosing a provider signs you in locally for this demo.
+Choose **Log in** in the avatar menu to open [LoginDialog](/components/login-dialog). Choosing a provider signs you in locally for this demo.
 
 ```svelte
 <script lang="ts">
@@ -42,7 +42,7 @@ Choose **Log in** in the avatar menu to open LoginModal. Choosing a provider sig
 | Prop              | Behavior                                                                                                                      |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `user`            | Pass the app’s session user to show their photo or the Allmaps MapMonster and the Log out action. Pass `null` for a guest.    |
-| `apiBaseUrl`      | Allmaps API root used to discover enabled providers when the modal opens. Defaults to `https://api.allmaps.org`.              |
+| `apiBaseUrl`      | Allmaps API root used to discover enabled providers when the dialog opens. Defaults to `https://api.allmaps.org`.             |
 | `signInProviders` | Optional preloaded list of provider links. Omit to discover all enabled providers and return to the current page after login. |
 | `signInURL`       | Optional direct login URL. Used when no explicit provider links are supplied, and skips discovery.                            |
 | `onSignOut`       | App callback that ends the session and updates the user. Throw on failure to display a retry message.                         |

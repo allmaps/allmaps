@@ -5,7 +5,7 @@ UI components and functions for Allmaps.
 ## Component styleguide
 
 The [Allmaps UI styleguide](https://ui.allmaps.org) documents AllmapsLogo,
-Button, DropdownMenu, Kbd, LoginMenu, LoginModal, and Modal. Each component
+Button, Dialog, DropdownMenu, Kbd, LoginDialog, and LoginMenu. Each component
 has an interactive example and usage notes.
 
 Run `pnpm --filter @allmaps/ui dev` from the repository root to open the

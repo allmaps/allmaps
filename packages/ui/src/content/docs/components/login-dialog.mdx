@@ -1,5 +1,5 @@
 ---
-title: LoginModal
+title: LoginDialog
 description: Choose from the login providers enabled on the Allmaps API.
 sections: [Playground, Usage, Props]
 ---
@@ -11,24 +11,24 @@ import LoginPlayground from '../../../components/LoginPlayground.svelte'
 
 <div slot="playground">
 
-<LoginPlayground component="LoginModal" client:load />
+<LoginPlayground component="LoginDialog" client:load />
 
 </div>
 
 <div slot="usage">
 
-LoginModal uses the shared [Modal](/components/modal) with the [AllmapsLogo](/components/allmaps-logo) in its title. Choosing a provider in the playground signs you in locally for the demo.
+LoginDialog uses the shared [Dialog](/components/dialog) with the [AllmapsLogo](/components/allmaps-logo) in its title. Choosing a provider in the playground signs you in locally for the demo.
 
 ```svelte
 <script lang="ts">
-  import { LoginModal } from '@allmaps/ui/auth'
+  import { LoginDialog } from '@allmaps/ui/auth'
   import { Button } from '@allmaps/ui/button'
 
   let open = $state(false)
 </script>
 
 <Button onclick={() => (open = true)}>Log in</Button>
-<LoginModal bind:open />
+<LoginDialog bind:open />
 ```
 
 </div>
@@ -38,7 +38,7 @@ LoginModal uses the shared [Modal](/components/modal) with the [AllmapsLogo](/co
 | Prop              | Behavior                                                                                                                      |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `open`            | Bind the dialog’s open state. Escape, the close button, and a click outside dismiss it.                                       |
-| `apiBaseUrl`      | Allmaps API root used to discover enabled providers when the modal opens. Defaults to `https://api.allmaps.org`.              |
+| `apiBaseUrl`      | Allmaps API root used to discover enabled providers when the dialog opens. Defaults to `https://api.allmaps.org`.             |
 | `signInProviders` | Optional preloaded list of provider links. Omit to discover all enabled providers and return to the current page after login. |
 | `signInURL`       | Optional direct login URL. Used when no explicit provider links are supplied, and skips discovery.                            |
 | `returnFocus`     | Optional element to focus when the dialog closes. Use this when the opener is inside a dropdown that closes.                  |

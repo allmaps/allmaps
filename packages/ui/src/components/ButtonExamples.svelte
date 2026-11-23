@@ -45,9 +45,9 @@
       {#snippet icon()}<GlobeIcon class="size-5" />{/snippet}
       Allmaps logo
     </Button>
-    <Button href="/components/modal" iconPosition="trailing">
+    <Button href="/components/dialog" iconPosition="trailing">
       {#snippet icon()}<ArrowRightIcon class="size-5" />{/snippet}
-      Modal
+      Dialog
     </Button>
     <Button
       href="/"
