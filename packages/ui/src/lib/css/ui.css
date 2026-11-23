@@ -13,6 +13,7 @@
     --allmaps-ui-card: #ffffff;
     --allmaps-ui-card-foreground: #182a2f;
     --allmaps-ui-popover: #ffffff;
+    --allmaps-ui-menu-highlight: #efefef;
     --allmaps-ui-popover-foreground: #182a2f;
     --allmaps-ui-primary: #ff56ba;
     --allmaps-ui-primary-foreground: #182a2f;
@@ -26,7 +27,9 @@
       var(--allmaps-ui-background)
     );
     --allmaps-ui-accent-foreground: #182a2f;
+    --allmaps-ui-button-destructive: var(--color-red, #fe5e60);
     --allmaps-ui-destructive: #c02e46;
+    --allmaps-ui-destructive-foreground: #ffffff;
     --allmaps-ui-border: #bac4c8;
     --allmaps-ui-input: #bac4c8;
     --allmaps-ui-ring: var(--allmaps-ui-primary);
@@ -39,6 +42,7 @@
     --allmaps-ui-card: #182a2f;
     --allmaps-ui-card-foreground: #e7eff2;
     --allmaps-ui-popover: #182a2f;
+    --allmaps-ui-menu-highlight: #474747;
     --allmaps-ui-popover-foreground: #e7eff2;
     --allmaps-ui-secondary: #2a3b41;
     --allmaps-ui-secondary-foreground: #e7eff2;
@@ -51,6 +55,7 @@
     );
     --allmaps-ui-accent-foreground: #e7eff2;
     --allmaps-ui-destructive: #ff8b9d;
+    --allmaps-ui-destructive-foreground: #182a2f;
     --allmaps-ui-border: #495c62;
     --allmaps-ui-input: #495c62;
     --allmaps-ui-shadow: 0 4px 16px rgb(0 0 0 / 30%);
@@ -66,6 +71,7 @@
   --color-card: var(--allmaps-ui-card);
   --color-card-foreground: var(--allmaps-ui-card-foreground);
   --color-popover: var(--allmaps-ui-popover);
+  --color-menu-highlight: var(--allmaps-ui-menu-highlight);
   --color-popover-foreground: var(--allmaps-ui-popover-foreground);
   --color-primary: var(--allmaps-ui-primary);
   --color-primary-foreground: var(--allmaps-ui-primary-foreground);
@@ -76,6 +82,7 @@
   --color-accent: var(--allmaps-ui-accent);
   --color-accent-foreground: var(--allmaps-ui-accent-foreground);
   --color-destructive: var(--allmaps-ui-destructive);
+  --color-destructive-button: var(--allmaps-ui-button-destructive);
   --color-border: var(--allmaps-ui-border);
   --color-input: var(--allmaps-ui-input);
   --color-ring: var(--allmaps-ui-ring);

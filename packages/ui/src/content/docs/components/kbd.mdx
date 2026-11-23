@@ -1,0 +1,34 @@
+---
+title: Kbd
+description: Display a keyboard key or combination of keys.
+sections: [Playground, Usage]
+---
+
+import ComponentPage from '../../../components/ComponentPage.astro'
+import KbdPlayground from '../../../components/KbdPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<KbdPlayground client:load />
+
+</div>
+<div slot="usage">
+
+To display a shortcut like Shift + Enter, wrap the two keycaps in `Kbd.Group`.
+
+```svelte
+<script lang="ts">
+  import * as Kbd from '@allmaps/ui/kbd'
+</script>
+
+<Kbd.Group>
+  <Kbd.Root>Shift</Kbd.Root>
+  <Kbd.Root>Enter</Kbd.Root>
+</Kbd.Group>
+```
+
+The existing `import { Kbd } from '@allmaps/ui'` also renders a single key.
+
+</div>
+</ComponentPage>
