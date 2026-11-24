@@ -3,6 +3,37 @@
 See [Hyperdrive setup](../HYPERDRIVE.md) for database connections and local
 development, and [cache policies](../CACHE-POLICIES.md) for the endpoint audit.
 
+## IIIF image aliases
+
+`GET /images/:imageId` returns the image record for a canonical ID. For a known
+alias it returns a short-lived `302` to that record. New image IDs hash the exact
+service URI declared in the preferred service's `info.json`. Dimensions come
+from the same response. Registering a manifest stores its canvas links without
+requesting image metadata. When Editor opens an image for editing, it sends
+`PUT /images/:imageId` with `{"url":"…/info.json","resolve":true}` to obtain
+the current document URI and full metadata. Verified metadata is reused.
+Services listed together on a painting body can share
+an image when the manifest publisher controls their domains. Discovery uses
+the preferred service when neither service has edits. If one group has edits,
+it stays canonical. If both groups have edits, discovery returns `409` and
+both documents remain accessible. Existing images can be read before they
+have alias rows.
+
+An administrator can move one image with `PATCH /images/:imageId` and a body
+such as `{"url":"https://library.example/iiif/new-id/info.json"}`. The operation
+checks pixel dimensions, preserves the current maps and Canvas links, and
+repoints the alias group. An existing alias can be promoted, including one
+opened in Editor with an empty initial document. A destination with edits or
+map history returns `409`. If recent edits are still being persisted, retry after
+they appear in the REST API. Clients editing the old document must reopen the
+image after the move. Version URLs keep their original document IDs. Saved
+images in lists follow the move, and pinned map versions keep their original
+image and checksum.
+
+The schema migration creates an empty alias table. Reconciliation of historical
+documents is a separate operation. A future institution-scoped bulk route can
+dry-run URL substitutions and invoke the same single-image migration per result.
+
 ## Develop OAuth callback proxy
 
 The existing develop OAuth applications and registered callbacks remain in use.

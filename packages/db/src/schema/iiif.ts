@@ -44,6 +44,17 @@ export const images = iiifSchema.table(
   ]
 )
 
+export const imageAliases = iiifSchema.table(
+  'image_aliases',
+  {
+    imageId: text('image_id').primaryKey(),
+    canonicalImageId: text('canonical_image_id')
+      .notNull()
+      .references(() => images.id)
+  },
+  (table) => [index().on(table.canonicalImageId)]
+)
+
 export const canvases = iiifSchema.table('canvases', {
   id: text('id').notNull().primaryKey(),
   uri: text('uri').notNull(),
@@ -96,10 +107,15 @@ export const manifestsToCanvases = iiifSchema.table(
       .references(() => manifests.id),
     canvasId: text('canvas_id')
       .notNull()
-      .references(() => canvases.id)
+      .references(() => canvases.id),
+    publisherServiceUris: text('publisher_service_uris').array()
   },
   (table) => [
     primaryKey({ columns: [table.manifestId, table.canvasId] }),
+    index('manifests_canvases_service_uris_idx').using(
+      'gin',
+      table.publisherServiceUris
+    ),
     index('manifests_to_canvases_manifest_id_idx').on(table.manifestId),
     index('manifests_to_canvases_canvas_id_idx').on(table.canvasId),
     index('manifests_to_canvases_composite_idx').on(

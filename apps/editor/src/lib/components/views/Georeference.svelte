@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Image as IIIFImage } from '@allmaps/iiif-parser'
   import { onMount } from 'svelte'
 
   import { Map as MapLibreMap, LngLatBounds } from 'maplibre-gl'
@@ -783,7 +784,7 @@
       } else {
         mapsState.insertGcp({ mapId, gcp })
       }
-    } else if (sourceState.activeImage) {
+    } else if (sourceState.activeImage instanceof IIIFImage) {
       const map = {
         ...(await createMapWithFullImageResourceMask(
           sourceState.activeImage,

@@ -382,7 +382,7 @@
 
     const image = sourceState.activeImage
 
-    if (!image) {
+    if (!image || image.embedded) {
       console.error('No active image!')
       return
     }

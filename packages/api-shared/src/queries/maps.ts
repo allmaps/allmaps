@@ -1,3 +1,4 @@
+import { canonicalImageId } from './image-aliases.js'
 import { sql } from 'drizzle-orm'
 
 import { generateAnnotation } from '@allmaps/annotation'
@@ -75,6 +76,9 @@ export async function queryMaps(
   params: Partial<MapsQueryParams>,
   responseOptions?: Partial<ResponseOptions>
 ) {
+  if (params.imageId && !params.imageChecksum && !params.checksum) {
+    params = { ...params, imageId: await canonicalImageId(db, params.imageId) }
+  }
   const defaultResponseOptions: ResponseOptions = {
     format: 'map',
     expectRows: false,

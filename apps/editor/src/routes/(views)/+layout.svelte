@@ -46,6 +46,7 @@
   const urlState = getUrlState()
   // svelte-ignore state_referenced_locally
   const sourceState = setSourceState(
+    apiBaseUrl,
     data.env.PUBLIC_ANNOTATIONS_BASE_URL,
     urlState,
     errorState
@@ -209,7 +210,11 @@
       <Error error={errorState.error} />
     {:else}
       <div class="col-span-full row-span-full min-h-0 min-w-0">
-        {@render children()}
+        {#if sourceState.imageError}
+          <Error error={sourceState.imageError} />
+        {:else}
+          {@render children()}
+        {/if}
       </div>
 
       {#if sourceState.fetching}

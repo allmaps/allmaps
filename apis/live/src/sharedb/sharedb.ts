@@ -1,3 +1,8 @@
+import {
+  canonicalImageId,
+  lockImageIds,
+  resolveImageServices
+} from '@allmaps/api-shared/db'
 import ShareDB from 'sharedb'
 import WebSocketJSONStream from '@teamwork/websocket-json-stream'
 import json1 from 'ot-json1'
@@ -261,6 +266,23 @@ export default class AllmapsShareDB {
     const imageChecksum = await generateChecksum(maps)
 
     await this.db.transaction(async (tx) => {
+      await lockImageIds(tx, [imageId])
+      if ((await canonicalImageId(tx, imageId)) !== imageId) return
+      // An alias promotion can populate an empty document while its initial
+      // Editor snapshot is still waiting in the persistence debounce.
+      if (!firstDbMap3 && version === 1) {
+        const { snapshots } = schema
+        const [current] = await tx
+          .select({ version: snapshots.version })
+          .from(snapshots)
+          .where(
+            and(
+              eq(snapshots.collection, 'images'),
+              eq(snapshots.docId, imageId)
+            )
+          )
+        if (current && current.version > version) return
+      }
       // A saved editor change republishes the whole image, including siblings.
       if (firstDbMap3) {
         await tx
@@ -418,11 +440,11 @@ export default class AllmapsShareDB {
     // generate random ID for each map.
     const result = []
 
+    maps = await Promise.all(maps.map((map) => this.resolveMap(map)))
     const mapsByImageUri = groupBy((map) => map.resource.id, maps)
 
     for (const [imageUri, mapsForImageUri] of Object.entries(mapsByImageUri)) {
       if (mapsForImageUri) {
-        // TODO: do we need to fetch imageUri and see if ID in info.json corresponds?
         const imageId = await generateId(imageUri)
         const dbMaps: DbMaps3 = {}
         for (const map of mapsForImageUri) {
@@ -436,26 +458,6 @@ export default class AllmapsShareDB {
           mapIds: Object.values(dbMaps).map((map) => map.id)
         }
 
-        // TODO: update database schema - then this is not needed
-        const resourceWidth = mapsForImageUri[0].resource.width || 0
-        const resourceHeight = mapsForImageUri[0].resource.height || 0
-
-        // Insert empty image if it doesn't exist
-        await this.db
-          .insert(schema.images)
-          .values({
-            id: imageId,
-            uri: imageUri,
-            width: resourceWidth,
-            height: resourceHeight
-          })
-          .onConflictDoUpdate({
-            target: schema.images.id,
-            set: {
-              updatedAt: sql`NOW()`
-            }
-          })
-
         await this.saveDoc(imageId, dbMaps)
         result.push(responseImage)
       }
@@ -464,7 +466,22 @@ export default class AllmapsShareDB {
     return result
   }
 
+  private async resolveMap(map: GeoreferencedMap) {
+    const image = await resolveImageServices(this.db, [map.resource.id])
+    return {
+      ...map,
+      resource: {
+        ...map.resource,
+        id: image.uri,
+        type: image.type,
+        width: image.width,
+        height: image.height
+      }
+    }
+  }
+
   async updateMap(mapId: string, map: GeoreferencedMap) {
+    map = await this.resolveMap(map)
     // TODO: check map.id
 
     const imageId = await generateId(map.resource.id)

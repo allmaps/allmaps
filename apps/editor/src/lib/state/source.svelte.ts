@@ -1,12 +1,16 @@
+import { page } from '$app/state'
+import { getView } from '$lib/shared/router.js'
+import { SvelteMap } from 'svelte/reactivity'
 import { setContext, getContext } from 'svelte'
 
-import { IIIF, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
+import { Image, IIIF, Manifest as IIIFManifest } from '@allmaps/iiif-parser'
 import { parseAnnotation } from '@allmaps/annotation'
 
 import type { UrlState } from '$lib/state/url.svelte.js'
 import type { ErrorState } from '$lib/state/error.svelte.js'
 
 import { searchParams } from '$lib/shared/params.js'
+import { fetchManifestRecord, resolveEditorImage } from '$lib/shared/api.js'
 import { superFetch } from '$lib/shared/fetch.js'
 import { generateId } from '$lib/shared/ids.js'
 import { parseLocalizedLanguageString } from '$lib/shared/iiif.js'
@@ -30,12 +34,18 @@ import type {
 const SOURCE_KEY = Symbol('source')
 
 export class SourceState {
+  #apiBaseUrl: string
+  #resolvedImages = new SvelteMap<string, IIIFImage>()
+  #navigationUris = new SvelteMap<string, string>()
+  #manifestServiceUris = new WeakMap<IIIFCanvas['image'], string>()
+  #manifestImages = new WeakMap<IIIFManifest, Promise<void>>()
   #annotationsApiBaseUrl: string
 
   #urlState: UrlState<typeof searchParams>
   #errorState: ErrorState
 
   #source = $state<Source>()
+  imageError = $state<Error>()
   #requestedUrl: string | undefined
 
   #abortController: AbortController | undefined
@@ -94,7 +104,11 @@ export class SourceState {
       if (sourceType === 'manifest') {
         const canvases = this.#editSource?.parsedIiif.canvases || []
         return new Map(
-          canvases.map((canvas) => [canvas.image.uri, canvas.image])
+          canvases.map((canvas) => {
+            const image =
+              this.#resolvedImages.get(canvas.image.uri) ?? canvas.image
+            return [image.uri, image]
+          })
         )
       } else if (sourceType === 'image') {
         const parsedIiif = this.#editSource?.parsedIiif
@@ -113,7 +127,12 @@ export class SourceState {
 
     if (sourceType === 'manifest') {
       const canvases = this.#editSource?.parsedIiif.canvases || []
-      return new Map(canvases.map((canvas) => [canvas.image.uri, canvas]))
+      return new Map(
+        canvases.map((canvas) => [
+          this.#resolvedImages.get(canvas.image.uri)?.uri ?? canvas.image.uri,
+          canvas
+        ])
+      )
     }
 
     return new Map()
@@ -126,8 +145,10 @@ export class SourceState {
       const canvases = this.#editSource?.parsedIiif.canvases || []
       return new Map(
         canvases.map((canvas) => [
-          canvas.image.uri,
-          generateId(canvas.image.uri)
+          this.#resolvedImages.get(canvas.image.uri)?.uri ?? canvas.image.uri,
+          generateId(
+            this.#resolvedImages.get(canvas.image.uri)?.uri ?? canvas.image.uri
+          )
         ])
       )
     } else if (sourceType === 'image') {
@@ -199,10 +220,12 @@ export class SourceState {
   #imageCount = $derived(this.#imagesByImageId.size)
 
   constructor(
+    apiBaseUrl: string,
     annotationsApiBaseUrl: string,
     urlState: UrlState<typeof searchParams>,
     errorState: ErrorState
   ) {
+    this.#apiBaseUrl = apiBaseUrl
     this.#annotationsApiBaseUrl = annotationsApiBaseUrl
 
     this.#urlState = urlState
@@ -217,6 +240,31 @@ export class SourceState {
         }
       } else {
         this.#reset()
+      }
+    })
+
+    $effect(() => {
+      const manifest = this.#parsedManifest
+      const image = this.activeImage
+      const view = getView(page)
+      this.imageError = undefined
+      if (!view || view === 'images' || !manifest || !image?.embedded) return
+      let active = true
+      this.#resolveCanvasImage(manifest, image)
+        .then((resolved) => {
+          if (active) {
+            const original = this.#manifestServiceUris.get(image)
+            if (original) this.#navigationUris.set(original, resolved.uri)
+            for (const uri of image.serviceUris)
+              this.#navigationUris.set(uri, resolved.uri)
+            this.#resolvedImages.set(image.uri, resolved)
+          }
+        })
+        .catch((error) => {
+          if (active) this.imageError = error
+        })
+      return () => {
+        active = false
       }
     })
 
@@ -238,27 +286,43 @@ export class SourceState {
     })
   }
 
-  async fetchImageInfo(imageId: string) {
-    // TODO: run fetch function in parsedManifest or parsedCollection
-    if (this.#source?.type === 'manifest') {
-      const canvas = this.getCanvasByImageId(imageId)
-      const image = canvas?.image
-
-      if (image?.embedded) {
-        const fetchedImage =
-          await this.#source.parsedIiif.fetchImageByUri(imageId)
-
-        if (fetchedImage) {
-          if (imageId === fetchedImage.uri) {
-            this.#imagesByImageId.set(imageId, fetchedImage)
-          } else {
-            console.warn("Image IDs don't match:", imageId, fetchedImage.uri)
-
-            // this.#manifestImageIdsDontMatch = true
-          }
-        }
+  async #manifestImageUris(manifest: IIIFManifest, sourceUrl = manifest.uri) {
+    const data = await fetchManifestRecord(
+      this.#apiBaseUrl,
+      manifest,
+      sourceUrl
+    )
+    const uris = new Map(
+      data.canvases.flatMap((canvas) =>
+        canvas.images
+          .slice(0, 1)
+          .map((image) => [canvas.uri, image.uri] as const)
+      )
+    )
+    for (const canvas of manifest.canvases) {
+      const canonical = uris.get(canvas.uri)
+      if (canonical) {
+        this.#manifestServiceUris.set(canvas.image, canvas.image.uri)
+        for (const uri of canvas.image.serviceUris)
+          this.#navigationUris.set(uri, canonical)
+        canvas.image.uri = canonical
       }
     }
+  }
+
+  async #resolveCanvasImage(manifest: IIIFManifest, image: EmbeddedIIIFImage) {
+    let manifestImages = this.#manifestImages.get(manifest)
+    if (!manifestImages) {
+      manifestImages = this.#manifestImageUris(manifest)
+      this.#manifestImages.set(manifest, manifestImages)
+      manifestImages.catch(() => this.#manifestImages.delete(manifest))
+    }
+    await manifestImages
+    const uri = this.#manifestServiceUris.get(image) ?? image.uri
+    const record = await resolveEditorImage(this.#apiBaseUrl, uri)
+    const parsed = Image.parse(record.data)
+    parsed.uri = record.uri
+    return parsed
   }
 
   #getParsedIiifAtPath(path: CollectionPath) {
@@ -269,8 +333,10 @@ export class SourceState {
     }
   }
 
-  async #fetchIiif(url: string, sourceIiif: unknown) {
+  async #fetchIiif(url: string, sourceIiif: unknown, imageUri?: string) {
     const parsedIiif = IIIF.parse(sourceIiif, { keepSource: true })
+
+    if (parsedIiif.type === 'image' && imageUri) parsedIiif.uri = imageUri
 
     const baseSource = {
       url,
@@ -293,6 +359,9 @@ export class SourceState {
         parsedIiif
       }
     } else if (parsedIiif.type === 'manifest') {
+      const manifestImages = this.#manifestImageUris(parsedIiif, url)
+      await manifestImages
+      this.#manifestImages.set(parsedIiif, manifestImages)
       source = {
         ...baseSource,
         type: 'manifest',
@@ -309,7 +378,7 @@ export class SourceState {
       throw new Error('Unknown IIIF type')
     }
 
-    this.#source = source
+    if (this.#requestedUrl === url) this.#source = source
   }
 
   *#flattenPartOf(partOf?: PartOf): Generator<PartOfItem> {
@@ -342,23 +411,45 @@ export class SourceState {
   }
 
   async #fetch(url: string) {
+    this.#resolvedImages.clear()
+    this.#navigationUris.clear()
     this.#requestedUrl = url
 
     if (this.#abortController) {
       this.#abortController.abort()
     }
 
-    this.#abortController = new AbortController()
+    const controller = new AbortController()
+    this.#abortController = controller
 
     this.#fetching = true
     this.#errorState.error = null
 
     try {
-      const sourceData = await superFetch(url, {
-        signal: this.#abortController.signal
-      })
-
-      this.#abortController = undefined
+      const isInfoUrl = url.endsWith('/info.json')
+      const uri = isInfoUrl ? url.slice(0, -'/info.json'.length) : url
+      const imageApiUrl = `${this.#apiBaseUrl}/images/${generateId(uri)}`
+      let imageUri: string | undefined
+      let sourceData: unknown
+      let isImage = isInfoUrl
+      if (!isImage) {
+        const lookup = await fetch(imageApiUrl, { signal: controller.signal })
+        isImage = lookup.ok
+        if (!isImage && lookup.status !== 404)
+          throw new Error(`Image lookup failed (${lookup.status})`)
+      }
+      if (isImage) {
+        const record = await resolveEditorImage(
+          this.#apiBaseUrl,
+          uri,
+          controller.signal
+        )
+        imageUri = record.uri
+        sourceData = record.data
+      } else {
+        sourceData = await superFetch(url, { signal: controller.signal })
+      }
+      if (controller.signal.aborted) return
 
       if (
         sourceData &&
@@ -377,13 +468,14 @@ export class SourceState {
           )
         }
       } else {
-        await this.#fetchIiif(url, sourceData)
+        await this.#fetchIiif(url, sourceData, imageUri)
       }
     } catch (err) {
+      if (controller.signal.aborted) return
       this.#errorState.error = err
       this.#reset()
     } finally {
-      this.#fetching = false
+      if (!controller.signal.aborted) this.#fetching = false
     }
   }
 
@@ -483,6 +575,11 @@ export class SourceState {
       return
     }
 
+    const requested = this.#urlState.params.imageId
+    if (requested) {
+      const resolved = this.#navigationUris.get(requested)
+      if (resolved && this.#imagesByImageId.has(resolved)) return resolved
+    }
     if (
       this.#isImageIdValid(this.#urlState.params.imageId) &&
       this.#urlState.params.imageId
@@ -567,13 +664,14 @@ export class SourceState {
 }
 
 export function setSourceState(
+  apiBaseUrl: string,
   annotationsApiBaseUrl: string,
   urlState: UrlState<typeof searchParams>,
   errorState: ErrorState
 ) {
   return setContext(
     SOURCE_KEY,
-    new SourceState(annotationsApiBaseUrl, urlState, errorState)
+    new SourceState(apiBaseUrl, annotationsApiBaseUrl, urlState, errorState)
   )
 }
 

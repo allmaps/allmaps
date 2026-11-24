@@ -101,6 +101,12 @@ export class EmbeddedImage {
   width: number
   height: number
 
+  #serviceUris: string[] = []
+
+  get serviceUris(): readonly string[] {
+    return [...new Set([this.uri, ...this.#serviceUris])]
+  }
+
   majorVersion: MajorVersion
 
   constructor(
@@ -123,6 +129,11 @@ export class EmbeddedImage {
           try {
             const currentMajorVersion =
               getMajorIiifVersionFromImageService(currentImageService)
+            const uri =
+              '@id' in currentImageService
+                ? currentImageService['@id']
+                : currentImageService.id
+            this.#serviceUris.push(uri)
             if (!majorVersion || currentMajorVersion > majorVersion) {
               majorVersion = currentMajorVersion
               imageService = currentImageService

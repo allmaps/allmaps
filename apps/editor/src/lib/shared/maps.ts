@@ -3,10 +3,7 @@ import { generateId, generateRandomId } from '@allmaps/id'
 import { getApiUrl } from '$lib/shared/urls.js'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type {
-  Image as IIIFImage,
-  EmbeddedImage as EmbeddedIIIFImage
-} from '@allmaps/iiif-parser'
+import type { Image as IIIFImage } from '@allmaps/iiif-parser'
 import type { PickerProjection } from '@allmaps/ui/projections'
 
 import type {
@@ -112,7 +109,7 @@ export function getGcpGeoPoint(dbGcp: DbGcp) {
 }
 
 export async function createMapWithFullImageResourceMask(
-  image: IIIFImage | EmbeddedIIIFImage,
+  image: IIIFImage,
   index: number
 ): Promise<DbMap3> {
   const mapId = await generateRandomId()
@@ -134,10 +131,7 @@ export async function createMapWithFullImageResourceMask(
       uri: image.uri,
       width: image.width,
       height: image.height,
-      type:
-        image.majorVersion === 2
-          ? ('ImageService2' as const)
-          : ('ImageService3' as const)
+      type: `ImageService${image.majorVersion}`
     },
     gcps: {},
     resourceMask

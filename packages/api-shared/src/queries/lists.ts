@@ -1,4 +1,4 @@
-import { and, count, eq, sql } from 'drizzle-orm'
+import { and, count, eq, inArray, sql } from 'drizzle-orm'
 
 import { generateAnnotation } from '@allmaps/annotation'
 import { generateRandomId } from '@allmaps/id/sync'
@@ -88,6 +88,7 @@ async function queryListMapRows(
   }>
 ) {
   const whereConditions: Array<Record<string, unknown>> = []
+  const savedImageIds: string[] = []
 
   for (const item of listItems) {
     if (
@@ -105,9 +106,7 @@ async function queryListMapRows(
         ]
       })
     } else if (item.imageId) {
-      whereConditions.push({
-        AND: [{ latest: { eq: true } }, { imageId: { eq: item.imageId } }]
-      })
+      savedImageIds.push(item.imageId)
     } else if (item.canvasId) {
       whereConditions.push({
         AND: [
@@ -131,6 +130,22 @@ async function queryListMapRows(
         ]
       })
     }
+  }
+
+  if (savedImageIds.length) {
+    const { images, imageAliases } = iiifSchema
+    const canonicalIds = db
+      .select({
+        id: sql<string>`COALESCE(${imageAliases.canonicalImageId}, ${images.id})`
+      })
+      .from(images)
+      .leftJoin(imageAliases, eq(imageAliases.imageId, images.id))
+      .where(inArray(images.id, savedImageIds))
+
+    whereConditions.push({
+      latest: true,
+      RAW: (maps: typeof mapsSchema.maps) => inArray(maps.imageId, canonicalIds)
+    })
   }
 
   if (whereConditions.length === 0) {
