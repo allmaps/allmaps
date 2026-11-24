@@ -21,7 +21,7 @@
   import { getUiState } from '$lib/state/ui.svelte.js'
 
   import { BackGroundColorEvents } from '$lib/shared/background-color-events.js'
-  import { hasInputTarget } from '$lib/shared/keyboard.js'
+  import { shouldIgnoreMapShortcut } from '$lib/shared/keyboard.js'
   import { setView, selectMap } from '$lib/shared/views.js'
 
   import type { MapMouseEvent } from 'maplibre-gl'
@@ -649,7 +649,7 @@
   })
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (hasInputTarget(event)) {
+    if (shouldIgnoreMapShortcut(event)) {
       return
     }
 
@@ -686,7 +686,7 @@
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    if (hasInputTarget(event)) {
+    if (shouldIgnoreMapShortcut(event)) {
       return
     }
 

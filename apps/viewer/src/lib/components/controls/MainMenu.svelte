@@ -13,7 +13,7 @@
 </script>
 
 <DropdownMenu.Root>
-  <DropdownMenu.Trigger>
+  <DropdownMenu.Trigger id="viewer-main-menu-trigger">
     {#snippet child({ props })}
       <Control {...props} ariaLabel="Open main menu">
         <ListIcon class="size-full" weight="bold" />

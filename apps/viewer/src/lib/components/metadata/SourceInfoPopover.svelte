@@ -101,7 +101,7 @@
   })
 
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === '/' && event.metaKey) {
+    if (!uiState.modalOpen.keyboard && event.key === '/' && event.metaKey) {
       open = !open
     }
   }
