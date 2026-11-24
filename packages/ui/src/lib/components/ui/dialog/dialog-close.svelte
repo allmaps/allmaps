@@ -1,8 +1,25 @@
 <script lang="ts">
-  import { Dialog as DialogPrimitive } from 'bits-ui'
+  import { cn } from '../utils.js'
+  import { elementRef } from '../element-ref.js'
+  import { DialogClose } from '@ui-sdk/svelte/dialog'
+  import type { ComponentProps } from 'svelte'
 
-  let { ref = $bindable(null), ...restProps }: DialogPrimitive.CloseProps =
-    $props()
+  let {
+    ref = $bindable(null),
+    child,
+    class: className,
+    ...restProps
+  }: ComponentProps<typeof DialogClose> & {
+    child?: ComponentProps<typeof DialogClose>['render']
+  } & { ref?: HTMLButtonElement | null } = $props()
 </script>
 
-<DialogPrimitive.Close bind:ref data-slot="dialog-close" {...restProps} />
+<DialogClose
+  {@attach elementRef<HTMLButtonElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
+  class={cn('delay-0', className)}
+  render={child}
+  {...restProps}
+/>

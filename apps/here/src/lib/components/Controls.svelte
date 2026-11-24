@@ -124,6 +124,7 @@
     {#if compassState.rotation !== undefined}
       <div class="contents" in:fade>
         <NorthArrow
+          aria-label="Change compass mode"
           rotation={compassState.rotation}
           followOrientation={compassState.compassMode === 'follow-orientation'}
           onclick={handleNorthArrowClick}

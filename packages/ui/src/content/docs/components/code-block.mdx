@@ -1,0 +1,80 @@
+---
+title: CodeBlock
+description: Display source code with syntax highlighting, labeled line ranges, and a copy button.
+sections: [Playground, Usage, Props]
+---
+
+import { formatCodeBlockUsage } from '../../../starlight/components/code-block-examples'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import CodeBlockPreview from '../../../starlight/components/CodeBlockPreview.astro'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+
+<ComponentPage>
+<div slot="playground">
+
+<CodeBlockPreview />
+
+</div>
+<div slot="usage">
+
+This example reads the source file as text with Vite’s `?raw` import. Select another example or change a control to update the snippet.
+
+<UsageCode live code={formatCodeBlockUsage()} />
+
+Use `mark` to label lines and `folds` to collapse a range. Copy and Download include all source lines, even when a fold is closed. Display labels stay on the page.
+
+To add a download, place `DownloadButton` in the `headerActions` snippet. Pass `text` and `filename` to save a file, or `ondownload` to run your own action. For a separate copy action, use [CopyButton](/components/copy-button).
+
+**Highlighting in Astro**
+
+To send highlighted HTML with an Astro page, prepare the source in the page’s frontmatter.
+
+<UsageCode language="typescript" title="Astro frontmatter" code={`import { CodeBlock } from '@allmaps/ui/code'
+import { renderCode } from '@allmaps/ui/code/renderer'
+
+const options = { code: 'const zoom: number = 4', language: 'typescript' } as const
+const initial = await renderCode(options)`} />
+
+In the template, use `<CodeBlock {...options} {initial} client:load />`. The page opens with syntax colors already applied. The copy and download controls become interactive when Svelte loads.
+
+**Highlighting in SvelteKit**
+
+Prepare the initial block in a server load function. SvelteKit sends the highlighted HTML on first paint. When a user edits the source, the browser highlights the new code and swaps it in as soon as it is ready. The previous snippet keeps its syntax colors during the update.
+
+<UsageCode language="typescript" title="+page.server.ts" code={`import { renderCode } from '@allmaps/ui/code/renderer'
+
+export async function load() {
+  const initial = await renderCode({ code: 'const zoom: number = 4', language: 'typescript' })
+  return { initial }
+}`} />
+
+<UsageCode title="+page.svelte" code={`<script lang="ts">
+  import { CodeBlock } from '@allmaps/ui/code'
+  import type { PageProps } from './$types'
+
+let { data }: PageProps = $props()
+let code = $derived(data.initial.code)
+
+</script>
+
+<label>Source <textarea bind:value={code}></textarea></label>
+<CodeBlock {code} language={data.initial.language} initial={data.initial} />`} />
+
+</div>
+<div slot="props">
+
+| Prop                    | Behavior                                                                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `code`, `language`      | Source text and highlighting language. Supports JavaScript, TypeScript, Svelte, HTML, JSON, and Bash.                                 |
+| `title`, `titleContent` | A monospace title or a custom title snippet. Bash uses the terminal frame.                                                            |
+| `mark`                  | An array of one-based ranges, such as `{ range: '3-8', label: 'IIIF source image' }`. Omit the label for a margin marker alone.       |
+| `folds`                 | Collapsible ranges with `startLine`, `endLine`, and a summary `label`. Set `collapsed: false` to start expanded.                      |
+| `colorMode`             | `auto` follows the page theme, falling back to the system. Choose `system` to follow the device directly, or force `light` or `dark`. |
+| `wrap`                  | Wrap long lines by default. Set to `false` to scroll horizontally.                                                                    |
+| `downloadFilename`      | Shortcut for a built-in header download using this filename.                                                                          |
+| `ondownload`            | Custom action for the built-in header download.                                                                                       |
+| `headerActions`         | Render custom actions in the header.                                                                                                  |
+| `theme`, `initial`      | Supply syntax themes and frame styles, or pass highlighted output prepared with `renderCode()`.                                       |
+
+</div>
+</ComponentPage>

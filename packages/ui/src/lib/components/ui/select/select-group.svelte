@@ -1,16 +1,24 @@
 <script lang="ts">
-  import { Select as SelectPrimitive } from 'bits-ui'
+  import { SelectGroup } from '@ui-sdk/svelte/select'
+  import type { ComponentProps } from 'svelte'
+  import { elementRef } from '../element-ref.js'
+  import type { WithElementRef } from '../types.js'
 
   let {
     ref = $bindable(null),
     class: className,
-    ...restProps
-  }: SelectPrimitive.GroupProps = $props()
+    ...rest
+  }: WithElementRef<
+    ComponentProps<typeof SelectGroup>,
+    HTMLDivElement
+  > = $props()
 </script>
 
-<SelectPrimitive.Group
-  bind:ref
-  data-slot="select-group"
+<SelectGroup
+  {...rest}
+  {@attach elementRef<HTMLDivElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
   class={['allmaps-ui allmaps-select-group', className]}
-  {...restProps}
 />

@@ -91,6 +91,31 @@
       "types": "./dist/kbd.d.ts",
       "svelte": "./dist/kbd.js",
       "default": "./dist/kbd.js"
+    },
+    "./north-arrow": {
+      "types": "./dist/north-arrow.d.ts",
+      "svelte": "./dist/north-arrow.js",
+      "default": "./dist/north-arrow.js"
+    },
+    "./opacity-slider": {
+      "types": "./dist/opacity-slider.d.ts",
+      "svelte": "./dist/opacity-slider.js",
+      "default": "./dist/opacity-slider.js"
+    },
+    "./checkbox": {
+      "types": "./dist/checkbox.d.ts",
+      "svelte": "./dist/checkbox.js",
+      "default": "./dist/checkbox.js"
+    },
+    "./toggle": {
+      "types": "./dist/toggle.d.ts",
+      "svelte": "./dist/toggle.js",
+      "default": "./dist/toggle.js"
+    },
+    "./star-toggle": {
+      "types": "./dist/star-toggle.d.ts",
+      "svelte": "./dist/star-toggle.js",
+      "default": "./dist/star-toggle.js"
     }
   },
   "files": [
@@ -168,6 +193,8 @@
     "@allmaps/transform": "workspace:^",
     "@allmaps/types": "workspace:^",
     "@turf/rewind": "catalog:",
+    "@ui-sdk/core": "0.1.0-beta.14",
+    "@ui-sdk/svelte": "0.1.0-beta.14",
     "bits-ui": "catalog:",
     "clsx": "^2.1.1",
     "d3-geo": "catalog:",

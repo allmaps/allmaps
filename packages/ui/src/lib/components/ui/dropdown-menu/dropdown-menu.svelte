@@ -1,10 +1,9 @@
 <script lang="ts">
-  import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui'
+  import { Menu } from '@ui-sdk/svelte/menu'
+  import type { ComponentProps } from 'svelte'
 
-  let {
-    open = $bindable(false),
-    ...restProps
-  }: DropdownMenuPrimitive.RootProps = $props()
+  let { open = $bindable(false), ...restProps }: ComponentProps<typeof Menu> =
+    $props()
 </script>
 
-<DropdownMenuPrimitive.Root bind:open {...restProps} />
+<Menu bind:open {...restProps} />

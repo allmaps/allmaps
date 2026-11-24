@@ -1,0 +1,40 @@
+---
+title: Select
+description: Choose an option from a keyboard-accessible list.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import SelectPlayground, {
+  formatUsage
+} from '../../../starlight/components/SelectPlayground.svelte'
+
+<ComponentPage>
+
+<div slot="playground">
+
+<SelectPlayground client:load />
+
+</div>
+
+<div slot="usage">
+
+Use **Multiple** to choose several resources and **Show icons** to display icons beside the options and the selected value.
+
+<UsageCode live code={formatUsage()} />
+
+</div>
+
+<div slot="props">
+
+| Component | Props                                                                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Root`    | Set `type` to `single` or `multiple`. Bind `value` to a string or array respectively. Use `disabled` to disable the control.                                |
+| `Trigger` | Fills its parent’s width. Use Tailwind classes to adjust its dimensions. Give it an accessible label and an optional `icon` snippet for the selected value. |
+| `Content` | Set `align` to `start` (default), `center`, or `end` to position the options relative to the trigger.                                                       |
+| `Item`    | Set `value` and a human-readable `label`. Pass an optional `icon` snippet to display a decorative leading icon.                                             |
+
+</div>
+
+</ComponentPage>

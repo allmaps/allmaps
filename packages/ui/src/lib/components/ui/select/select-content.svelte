@@ -1,40 +1,44 @@
 <script lang="ts">
-  import '../../../css/ui.css'
+  import '../../../css/ui-base.css'
   import './select.css'
-  import { Select as SelectPrimitive } from 'bits-ui'
-  import { type WithoutChild } from '../types.js'
-  import type { WithoutChildrenOrChild } from '../types.js'
+  import { SelectContent } from '@ui-sdk/svelte/select'
+  import type { ComponentProps } from 'svelte'
+  import { elementRef } from '../element-ref.js'
   import SelectPortal from './select-portal.svelte'
   import SelectScrollDownButton from './select-scroll-down-button.svelte'
   import SelectScrollUpButton from './select-scroll-up-button.svelte'
-  import type { ComponentProps } from 'svelte'
 
   let {
     ref = $bindable(null),
     class: className,
     sideOffset = 4,
+    align = 'start',
     portalProps,
-    children,
-    preventScroll = true,
-    ...restProps
-  }: WithoutChild<SelectPrimitive.ContentProps> & {
-    portalProps?: WithoutChildrenOrChild<ComponentProps<typeof SelectPortal>>
+    children: renderChildren,
+    ...rest
+  }: ComponentProps<typeof SelectContent> & {
+    ref?: HTMLDivElement | null
+    portalProps?: Omit<ComponentProps<typeof SelectPortal>, 'children'>
   } = $props()
 </script>
 
 <SelectPortal {...portalProps}>
-  <SelectPrimitive.Content
-    bind:ref
+  <SelectContent
+    {...rest}
+    {@attach elementRef<HTMLDivElement>(
+      () => ref,
+      (node) => (ref = node)
+    )}
     {sideOffset}
-    {preventScroll}
-    data-slot="select-content"
+    {align}
     class={['allmaps-ui allmaps-select-content', className]}
-    {...restProps}
   >
-    <SelectScrollUpButton />
-    <SelectPrimitive.Viewport class="allmaps-select-viewport">
-      {@render children?.()}
-    </SelectPrimitive.Viewport>
-    <SelectScrollDownButton />
-  </SelectPrimitive.Content>
+    {#snippet children(state)}
+      <SelectScrollUpButton />
+      <div class="allmaps-select-viewport">
+        {@render renderChildren?.(state)}
+      </div>
+      <SelectScrollDownButton />
+    {/snippet}
+  </SelectContent>
 </SelectPortal>

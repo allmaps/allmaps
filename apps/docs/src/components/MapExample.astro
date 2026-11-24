@@ -3,7 +3,6 @@ import MapExample from './examples/MapExampleSwitcher.svelte'
 import type { MapExampleSwitcherProps as MapExampleProps } from '../lib/examples/types.js'
 import { exampleCode, exampleLibraries } from '@allmaps/ui/examples/source'
 import { renderCode } from '@allmaps/ui/code/renderer'
-import codeTheme from 'virtual:allmaps-code-theme'
 
 export type Props = MapExampleProps
 const props = Astro.props as Props
@@ -12,13 +11,9 @@ const library = props.library ?? 'MapLibre'
 const source = exampleCode(props, library, exampleLibraries[library].packages)
 const languages = ['javascript', 'html', 'bash'] as const
 const [javascript, html, bash] = await Promise.all(
-  languages.map((language) => renderCode({
-    code: source[language],
-    language,
-    theme: codeTheme
-  }))
+  languages.map((language) => renderCode({ code: source[language], language }))
 )
 const initialCode = { javascript, html, bash }
 ---
 
-<MapExample {...props} codeTheme={codeTheme} initialCode={initialCode} client:visible />
+<MapExample {...props} initialCode={initialCode} client:visible />

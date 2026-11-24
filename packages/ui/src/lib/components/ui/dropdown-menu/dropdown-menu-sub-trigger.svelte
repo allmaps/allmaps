@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui'
+  import { elementRef } from '../element-ref.js'
+  import { MenuSubTrigger } from '@ui-sdk/svelte/menu'
+  import type { ComponentProps } from 'svelte'
   import ChevronRightIcon from 'phosphor-svelte/lib/CaretRightIcon'
   import { cn } from '../utils.js'
 
@@ -7,23 +9,27 @@
     ref = $bindable(null),
     class: className,
     inset,
-    children,
+    children: label,
     ...restProps
-  }: DropdownMenuPrimitive.SubTriggerProps & {
+  }: ComponentProps<typeof MenuSubTrigger> & { ref?: HTMLDivElement | null } & {
     inset?: boolean
   } = $props()
 </script>
 
-<DropdownMenuPrimitive.SubTrigger
-  bind:ref
-  data-slot="dropdown-menu-sub-trigger"
+<MenuSubTrigger
+  {@attach elementRef<HTMLDivElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
   data-inset={inset}
   class={cn(
-    "data-highlighted:bg-menu-highlight data-highlighted:text-popover-foreground data-[state=open]:bg-menu-highlight data-[state=open]:text-popover-foreground [&_svg:not([class*='text-'])]:text-muted-foreground flex not-data-disabled:cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:ps-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    "data-highlighted:bg-menu-highlight data-highlighted:text-popover-foreground data-open:bg-menu-highlight data-open:text-popover-foreground [&_svg:not([class*='text-'])]:text-muted-foreground flex delay-0 not-data-disabled:cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:ps-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     className
   )}
   {...restProps}
 >
-  {@render children?.()}
-  <ChevronRightIcon class="ms-auto size-4" />
-</DropdownMenuPrimitive.SubTrigger>
+  {#snippet children(state)}
+    {@render label?.(state)}
+    <ChevronRightIcon class="ms-auto size-4" />
+  {/snippet}
+</MenuSubTrigger>

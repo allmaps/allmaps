@@ -7,7 +7,6 @@
   import { annotationExamples } from '../../lib/examples/annotations.js'
   import { fetchAnnotation } from '../../lib/examples/annotation.js'
   import { validateAnnotationUrl } from '../../lib/examples/source.js'
-  import type { CodeThemeConfig, RenderedCodeBlock } from '@allmaps/ui/code'
   import type { MapExampleOption } from '../../lib/examples/types.js'
   import type {
     generateGeotiffExample,
@@ -16,19 +15,16 @@
 
   let {
     annotationUrl = annotationExamples[0].annotationUrl,
-    examples = annotationExamples,
-    codeTheme
+    examples = annotationExamples
   }: {
     annotationUrl?: string
     examples?: MapExampleOption[]
-    codeTheme?: CodeThemeConfig
   } = $props()
 
   const id = $props.id()
   let draftUrl = $state(untrack(() => annotationUrl))
   let result = $state.raw<
     Awaited<ReturnType<typeof generateGeotiffExample>> & {
-      highlighted: RenderedCodeBlock
       sourceCommands: ReturnType<typeof generateSourceImageCommands>
     }
   >()
@@ -64,17 +60,9 @@
       ])
       request.signal.throwIfAborted()
       const generated = await generateGeotiffExample(annotation)
-      const { renderCode } = await import('@allmaps/ui/code/renderer')
-      const highlighted = await renderCode({
-        code: generated.script,
-        language: 'bash',
-        folds: generated.folds,
-        theme: codeTheme
-      })
       if (!request.signal.aborted) {
         result = {
           ...generated,
-          highlighted,
           sourceCommands: generateSourceImageCommands(url)
         }
       }
@@ -199,8 +187,6 @@
           code={result.script}
           folds={result.folds}
           language="bash"
-          theme={codeTheme}
-          initial={result.highlighted}
           title="allmaps-geotiff.sh"
           ondownload={download}
         >
@@ -237,7 +223,6 @@
         <CodeBlock
           code={result.sourceCommands.download}
           language="bash"
-          theme={codeTheme}
           title="Download source images"
         />
         <h3>Download with dezoomify-rs</h3>
@@ -252,7 +237,6 @@
         <CodeBlock
           code={result.sourceCommands.dezoomify}
           language="bash"
-          theme={codeTheme}
           title="Download source images with dezoomify-rs"
         />
         <h3>List image URLs</h3>
@@ -266,7 +250,6 @@
         <CodeBlock
           code={result.sourceCommands.imageIds}
           language="bash"
-          theme={codeTheme}
           title="List IIIF image service URLs"
         />
         <h3>Required files</h3>

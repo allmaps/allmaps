@@ -4,8 +4,11 @@ description: Open a dialog that keeps keyboard focus inside until dismissed.
 sections: [Playground, Usage]
 ---
 
-import ComponentPage from '../../../components/ComponentPage.astro'
-import DialogPlayground from '../../../components/DialogPlayground.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import DialogPlayground, {
+  formatUsage
+} from '../../../starlight/components/DialogPlayground.svelte'
 
 <ComponentPage>
 <div slot="playground">
@@ -17,27 +20,9 @@ import DialogPlayground from '../../../components/DialogPlayground.svelte'
 
 Give the dialog an accessible name with `Dialog.Title`. Use `Dialog.Trigger` to open it and return focus to the opener on dismissal, or bind `open` on `Dialog.Root` to control it from your app.
 
-```svelte
-<script lang="ts">
-  import * as Dialog from '@allmaps/ui/dialog'
-  import { Button } from '@allmaps/ui/button'
-</script>
+For long content, put the title in the `stickyHeader` snippet on `Dialog.Content`. The title and built-in Close button stay visible while the body scrolls. Set `showCloseButton={false}` if you provide your own dismissal control.
 
-<Dialog.Root>
-  <Dialog.Trigger>
-    {#snippet child({ props })}
-      <Button {...props}>About this atlas</Button>
-    {/snippet}
-  </Dialog.Trigger>
-  <Dialog.Content>
-    <Dialog.Header>
-      <Dialog.Title>About this atlas</Dialog.Title>
-      <Dialog.Description>This atlas contains 48 map sheets.</Dialog.Description
-      >
-    </Dialog.Header>
-  </Dialog.Content>
-</Dialog.Root>
-```
+<UsageCode live code={formatUsage()} />
 
 </div>
 </ComponentPage>

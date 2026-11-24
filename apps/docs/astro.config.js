@@ -6,9 +6,9 @@ import svelte from '@astrojs/svelte'
 import { scalarStarlight } from '@scalar/starlight'
 import { satteri } from '@astrojs/markdown-satteri'
 
+import expressiveCode from '../../packages/ui/src/starlight/expressive-code.ts'
 import ports from '../../ports.json' with { type: 'json' }
 import headingLinks from './src/plugins/heading-links'
-import { liveCodeTheme } from './src/plugins/live-code-theme.mjs'
 import { mapExampleDependencies } from './src/plugins/map-example-dependencies.mjs'
 
 const STATS_WEBSITE_ID = process.env.PUBLIC_STATS_WEBSITE_ID
@@ -32,6 +32,7 @@ export default defineConfig({
   },
   integrations: [
     starlight({
+      expressiveCode,
       title: 'Allmaps Docs',
       description:
         'Guides, examples, and API reference for georeferencing historical maps and building with Allmaps.',
@@ -248,6 +249,6 @@ export default defineConfig({
   vite: {
     worker: { format: 'es' },
     envDir: '../..',
-    plugins: [tailwindcss(), liveCodeTheme(new URL('.', import.meta.url))]
+    plugins: [tailwindcss()]
   }
 })

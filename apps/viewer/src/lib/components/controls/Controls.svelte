@@ -66,6 +66,9 @@
   >
     <div class="size-12 pointer-coarse:size-14 *:pointer-events-auto">
       <NorthArrow
+        aria-label={mapBearing === 0 && imageUpBearing !== undefined && imageUpBearing !== 0
+          ? 'Point image up'
+          : 'Point north up'}
         rotation={-mapBearing}
         {imageUpRotation}
         onclick={onResetBearing}

@@ -5,6 +5,7 @@ import starlight from '@astrojs/starlight'
 import svelte from '@astrojs/svelte'
 import tailwindcss from '@tailwindcss/vite'
 
+import expressiveCode from './src/starlight/expressive-code.ts'
 import ports from '../../ports.json' with { type: 'json' }
 
 export default defineConfig({
@@ -20,12 +21,13 @@ export default defineConfig({
   },
   integrations: [
     starlight({
+      expressiveCode,
       title: 'Allmaps UI',
       description:
         'Shared Allmaps components, examples, and interactive controls.',
       logo: { src: '../../apps/docs/src/images/allmaps-logo.svg' },
       routeMiddleware: './src/component-navigation.ts',
-      components: { Sidebar: './src/components/StyleguideSidebar.astro' },
+      components: { Sidebar: './src/starlight/components/StyleguideSidebar.astro' },
       head: ['regular', 'bold'].map((weight) => ({
         tag: 'link',
         attrs: {
@@ -50,16 +52,12 @@ export default defineConfig({
           label: 'Components',
           items: [{ autogenerate: { directory: 'components' } }]
         }
-      ],
-      customCss: [
-        './src/app.css',
-        './src/lib/css/fonts.css',
-        '../../apps/docs/src/css/starlight.css'
       ]
     }),
     svelte()
   ],
   vite: {
+    envDir: fileURLToPath(new URL('../..', import.meta.url)),
     // Keep the running playground's optimized modules isolated from Astro checks.
     cacheDir: fileURLToPath(
       new URL(
@@ -70,7 +68,7 @@ export default defineConfig({
       )
     ),
     optimizeDeps: {
-      entries: ['src/components/*Playground.svelte'],
+      entries: ['src/starlight/components/*Playground.svelte'],
       exclude: ['phosphor-svelte']
     },
     plugins: [tailwindcss()]

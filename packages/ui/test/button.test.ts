@@ -1,41 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { readFile } from 'node:fs/promises'
-import { compile } from 'svelte/compiler'
 import { createRawSnippet } from 'svelte'
 import { render } from 'svelte/server'
+import { svelteLoader } from './helpers/svelte-loader.ts'
 
-async function componentUrl(
-  file: string,
-  replacements: Record<string, string>
-) {
-  const source = await readFile(new URL(file, import.meta.url), 'utf8')
-  const { js } = compile(source, { generate: 'server', filename: file })
-  let javascript = js.code.replace(
-    /'(svelte(?:\/[^']*)?)'/g,
-    (_, specifier) => `'${import.meta.resolve(specifier)}'`
-  )
-  for (const [from, to] of Object.entries(replacements)) {
-    javascript = javascript.replace(from, to)
-  }
-  return `data:text/javascript;base64,${Buffer.from(javascript).toString('base64')}`
-}
-
-const loadingSmall = await componentUrl(
-  '../src/lib/components/LoadingSmall.svelte',
-  {
-    '$lib/images/loading-small.webp?url':
-      'data:text/javascript,export default "/loading-small.webp"'
-  }
+const { default: Button } = await import(
+  new URL('../src/lib/components/ui/button/button.svelte', import.meta.url).href
 )
-const Button = (
-  await import(
-    await componentUrl('../src/lib/components/ui/button/button.svelte', {
-      "import '../../../css/ui.css';": '',
-      '../../LoadingSmall.svelte': loadingSmall
-    })
-  )
-).default
+svelteLoader.deregister()
 const children = createRawSnippet(() => ({
   render: () => '<span>Open map</span>'
 }))
@@ -47,6 +19,14 @@ test('buttons do not submit forms unless explicitly requested', () => {
       props: { children, type: 'submit', name: 'action', value: 'open' }
     }).body,
     /type="submit"/
+  )
+})
+
+test('button shapes use standard Tailwind radii', () => {
+  assert.match(render(Button, { props: { children } }).body, /\brounded-md\b/)
+  assert.match(
+    render(Button, { props: { children, rounded: 'full' } }).body,
+    /\brounded-full\b/
   )
 })
 

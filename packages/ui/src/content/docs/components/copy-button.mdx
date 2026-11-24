@@ -1,0 +1,35 @@
+---
+title: CopyButton
+description: Copy text to the clipboard and announce whether it succeeded.
+sections: [Playground, Usage, Props]
+---
+
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import CopyButtonPlayground, {
+  formatUsage
+} from '../../../starlight/components/CopyButtonPlayground.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+
+<ComponentPage>
+<div slot="playground">
+
+<CopyButtonPlayground client:load />
+
+</div>
+<div slot="usage">
+
+Pass the exact text to copy. [CodeBlock](/components/code-block) uses the same button for its source.
+
+<UsageCode live code={formatUsage()} />
+
+</div>
+<div slot="props">
+
+| Prop         | Behavior                                                                             |
+| ------------ | ------------------------------------------------------------------------------------ |
+| `text`       | The exact string to copy, including whitespace. An empty string disables the button. |
+| `aria-label` | Names the button and supplies its idle tooltip. Defaults to “Copy to clipboard”.     |
+| `disabled`   | Disable the copy action.                                                             |
+
+</div>
+</ComponentPage>

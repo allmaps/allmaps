@@ -3,7 +3,9 @@
 @import '@astrojs/starlight-tailwind';
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
-@import './lib/css/ui.css';
+@import '@allmaps/tailwind/theme.css';
+@import './lib/css/fonts.css';
+@import '../../../apps/docs/src/css/starlight.css';
 
 @config '../../../apps/docs/tailwind.config.ts';
 
@@ -13,19 +15,20 @@
 }
 
 @source './lib';
-@source './components';
+@source './starlight/components';
+
+/* Keep the catalog column at its Geograph reading width during font loading. */
+:root[data-has-sidebar] {
+  --sl-content-width: 42rem;
+}
+
+/* Match the Starlight theme when it differs from the OS preference. */
+[data-ui-preview] {
+  color-scheme: inherit;
+}
 
 /* Use Geograph’s pointy A in the site and page titles, as on Allmaps Docs. */
 .site-title,
 h1#_top {
   font-feature-settings: normal;
-}
-
-/* Keep the outgoing page visible until the next page can paint. */
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-group(root) {
-  animation-duration: 0s;
 }

@@ -4,26 +4,26 @@
   import * as Select from '@allmaps/ui/select'
   import { CodeBlock } from '@allmaps/ui/code'
   import { LoadingSmall } from '@allmaps/ui'
-  import { annotationExamples } from '../lib/examples/data.js'
-  import { validateImageSettings, imageExampleSource } from '../lib/image.ts'
+  import {
+    defaultImageSettings,
+    imageExamples,
+    imageExampleSource,
+    validateImageSettings
+  } from '../lib/image.ts'
   import type { ImageSettings, ImageWorkerResponse } from '../lib/image.ts'
-  import type { CodeThemeConfig } from '@allmaps/ui/code'
+  import type { RenderedCodeBlock } from '@allmaps/ui/code'
 
-  let { codeTheme }: { codeTheme?: CodeThemeConfig } = $props()
+  let { initial }: { initial: RenderedCodeBlock } = $props()
   const id = $props.id()
-  const examples = annotationExamples.map((example) => ({
-    ...example,
-    annotationUrl: example.annotationUrl.replace(/@[0-9a-f]{16}$/, '')
-  }))
   const formats = [
     { value: 'png', label: 'PNG' },
     { value: 'jpeg', label: 'JPEG' },
     { value: 'webp', label: 'WebP' }
   ] as const
-  let draftUrl = $state(examples[0].annotationUrl)
-  let width = $state<number>(1024)
-  let height = $state<number>(1024)
-  let format = $state<ImageSettings['format']>('png')
+  let draftUrl = $state(defaultImageSettings.annotationUrl)
+  let width = $state(defaultImageSettings.width)
+  let height = $state(defaultImageSettings.height)
+  let format = $state(defaultImageSettings.format)
   let loading = $state(false)
   let status = $state('')
   let error = $state('')
@@ -36,7 +36,7 @@
   let worker: Worker | undefined
   let timeout: ReturnType<typeof setTimeout> | undefined
   const selectedExample = $derived(
-    examples.find((option) => option.annotationUrl === draftUrl.trim())
+    imageExamples.find((option) => option.annotationUrl === draftUrl.trim())
   )
 
   const previewAspectRatio = $derived(
@@ -173,7 +173,7 @@
       >
       <Select.Root
         type="single"
-        items={examples.map(({ annotationUrl, label }) => ({
+        items={imageExamples.map(({ annotationUrl, label }) => ({
           value: annotationUrl,
           label
         }))}
@@ -189,7 +189,7 @@
           {@render exampleLabel(selectedExample?.label ?? 'Custom URL')}
         </Select.Trigger>
         <Select.Content>
-          {#each examples as option (option.annotationUrl)}
+          {#each imageExamples as option (option.annotationUrl)}
             <Select.Item value={option.annotationUrl} label={option.label}>
               {#snippet children()}{@render exampleLabel(
                   option.label
@@ -300,7 +300,7 @@
             src={result.url}
             width={result.settings.width}
             height={result.settings.height}
-            alt={`Rendered georeferenced map: ${examples.find((example) => example.annotationUrl === result?.settings.annotationUrl)?.label ?? 'Custom annotation'}`}
+            alt={`Rendered georeferenced map: ${imageExamples.find((example) => example.annotationUrl === result?.settings.annotationUrl)?.label ?? 'Custom annotation'}`}
           />
         {/if}
       </div>
@@ -412,7 +412,7 @@
         format
       })}
       language="javascript"
-      theme={codeTheme}
+      {initial}
       title="Render a map image"
     />
   </div>

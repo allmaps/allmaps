@@ -4,10 +4,11 @@ description: Trigger an action or follow a link. Labeled and icon-only buttons s
 sections: [Playground, Usage, Examples, Props]
 ---
 
-import ComponentPage from '../../../components/ComponentPage.astro'
-import ButtonPlayground from '../../../components/ButtonPlayground.svelte'
-import ButtonUsage from '../../../components/ButtonUsage.svelte'
-import ButtonExamples from '../../../components/ButtonExamples.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import { formatButtonUsage } from '../../../starlight/components/button-usage.js'
+import ButtonPlayground from '../../../starlight/components/ButtonPlayground.svelte'
+import ButtonExamples from '../../../starlight/components/ButtonExamples.svelte'
 
 <ComponentPage>
 
@@ -19,7 +20,7 @@ import ButtonExamples from '../../../components/ButtonExamples.svelte'
 
 <div slot="usage">
 
-<ButtonUsage client:load />
+<UsageCode live code={formatButtonUsage()} />
 
 </div>
 
@@ -34,7 +35,7 @@ import ButtonExamples from '../../../components/ButtonExamples.svelte'
 | Prop               | Values                                                                      | Default        |
 | ------------------ | --------------------------------------------------------------------------- | -------------- |
 | `variant`          | `default`, `primary`, `destructive`                                         | `default`      |
-| `shape`            | `rounded`, `pill`                                                           | `rounded`      |
+| `rounded`          | `rounded`, `full`                                                           | `rounded`      |
 | `icon`             | Optional Svelte snippet for the icon                                        | unset          |
 | `iconPosition`     | `leading` or `trailing`                                                     | `leading`      |
 | `iconOnly`         | Square control; supply an accessible label                                  | `false`        |

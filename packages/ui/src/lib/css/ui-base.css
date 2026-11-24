@@ -1,0 +1,12 @@
+@import '@allmaps/tailwind/tokens.css';
+
+@layer components {
+  .allmaps-ui {
+    box-sizing: border-box;
+    font-family: var(--allmaps-ui-font-sans);
+    font-size: var(--allmaps-ui-font-size);
+    font-weight: var(--allmaps-ui-font-weight);
+    line-height: 1.5;
+    letter-spacing: normal;
+  }
+}

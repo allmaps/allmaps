@@ -1,5 +1,5 @@
 import Root from './dialog.svelte'
-import Portal from './dialog-portal.svelte'
+import Portal from '../popup-portal.svelte'
 import Title from './dialog-title.svelte'
 import Footer from './dialog-footer.svelte'
 import Header from './dialog-header.svelte'

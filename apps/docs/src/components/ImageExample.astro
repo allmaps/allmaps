@@ -1,6 +1,12 @@
 ---
+import { renderCode } from '@allmaps/ui/code/renderer'
 import ImageExample from './ImageExample.svelte'
-import codeTheme from 'virtual:allmaps-code-theme'
+import { defaultImageSettings, imageExampleSource } from '../lib/image'
+
+const initial = await renderCode({
+  code: imageExampleSource(defaultImageSettings),
+  language: 'javascript'
+})
 ---
 
-<ImageExample {codeTheme} client:visible />
+<ImageExample {initial} client:visible />

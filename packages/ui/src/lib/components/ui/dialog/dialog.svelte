@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Dialog as DialogPrimitive } from 'bits-ui'
+  import { Dialog } from '@ui-sdk/svelte/dialog'
+  import type { ComponentProps } from 'svelte'
 
-  let { open = $bindable(false), ...restProps }: DialogPrimitive.RootProps =
+  let { open = $bindable(false), ...restProps }: ComponentProps<typeof Dialog> =
     $props()
 </script>
 
-<DialogPrimitive.Root bind:open {...restProps} />
+<Dialog bind:open {...restProps} />

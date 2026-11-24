@@ -4,8 +4,9 @@ description: Choose from the login providers enabled on the Allmaps API.
 sections: [Playground, Usage, Props]
 ---
 
-import ComponentPage from '../../../components/ComponentPage.astro'
-import LoginPlayground from '../../../components/LoginPlayground.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import LoginPlayground from '../../../starlight/components/LoginPlayground.svelte'
 
 <ComponentPage>
 
@@ -17,19 +18,18 @@ import LoginPlayground from '../../../components/LoginPlayground.svelte'
 
 <div slot="usage">
 
-LoginDialog uses the shared [Dialog](/components/dialog) with the [AllmapsLogo](/components/allmaps-logo) in its title. Choosing a provider in the playground signs you in locally for the demo.
+Opening LoginDialog loads all login methods advertised by the Allmaps API. If the request fails, choose **Try again** to reload the list.
 
-```svelte
-<script lang="ts">
+<UsageCode code={`<script lang="ts">
   import { LoginDialog } from '@allmaps/ui/auth'
   import { Button } from '@allmaps/ui/button'
 
-  let open = $state(false)
+let open = $state(false)
+
 </script>
 
 <Button onclick={() => (open = true)}>Log in</Button>
-<LoginDialog bind:open />
-```
+<LoginDialog bind:open />`} />
 
 </div>
 

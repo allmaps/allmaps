@@ -4,8 +4,10 @@ description: Open a list of actions from a button.
 sections: [Playground, Usage]
 ---
 
-import ComponentPage from '../../../components/ComponentPage.astro'
-import DropdownMenuPlayground from '../../../components/DropdownMenuPlayground.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import { formatDropdownMenuUsage } from '../../../starlight/components/dropdown-menu-usage'
+import DropdownMenuPlayground from '../../../starlight/components/DropdownMenuPlayground.svelte'
 
 <ComponentPage>
 
@@ -17,42 +19,13 @@ import DropdownMenuPlayground from '../../../components/DropdownMenuPlayground.s
 
 <div slot="usage">
 
-The playground uses `align="start"` to align the menu with its trigger. Use the arrow keys to move between enabled items and Escape to return to the trigger. In the playground, press **F** on the trigger or inside the menu to toggle the map’s favorite status.
+Set `align` on `DropdownMenu.Content` to `start`, `center`, or `end` to align the menu with its trigger. Use the arrow keys to move between enabled items and Escape to return to the trigger. With **Enable F shortcut** checked, press **F** on the trigger or inside the menu to toggle the map’s favorite status.
 
 Hover over **Add to collection** or focus it and press **Right Arrow** to open its submenu. Choose a collection with Enter, or press **Left Arrow** to return to the parent item. Wrap `SubTrigger` and `SubContent` in `DropdownMenu.Sub` to create a submenu.
 
 Place an icon inside an item and use `DropdownMenu.Shortcut` to display its keyboard shortcut. The app handles the keypress. For a navigation item, render a link in the `child` snippet and spread the supplied props onto it.
 
-```svelte
-<script lang="ts">
-  import StarIcon from 'phosphor-svelte/lib/StarIcon'
-  import { Button } from '@allmaps/ui/button'
-  import * as DropdownMenu from '@allmaps/ui/dropdown-menu'
-
-  let { toggleFavorite }: { toggleFavorite: () => void } = $props()
-</script>
-
-<DropdownMenu.Root>
-  <DropdownMenu.Trigger>
-    {#snippet child({ props })}
-      <Button {...props}>Map actions</Button>
-    {/snippet}
-  </DropdownMenu.Trigger>
-  <DropdownMenu.Content align="start">
-    <DropdownMenu.Item onSelect={toggleFavorite} aria-keyshortcuts="F">
-      <StarIcon aria-hidden="true" />
-      Toggle favorite
-      <DropdownMenu.Shortcut>F</DropdownMenu.Shortcut>
-    </DropdownMenu.Item>
-    <DropdownMenu.Item>
-      {#snippet child({ props })}
-        <a {...props} href="/components/kbd">View keycaps</a>
-      {/snippet}
-    </DropdownMenu.Item>
-    <DropdownMenu.Item disabled>Download map</DropdownMenu.Item>
-  </DropdownMenu.Content>
-</DropdownMenu.Root>
-```
+<UsageCode live code={formatDropdownMenuUsage()} />
 
 </div>
 

@@ -30,7 +30,7 @@
   ],
   "include": [
     "src/lib/**/*",
-    "src/components/**/*",
+    "src/starlight/components/**/*",
     "test/**/*",
     "svelte.config.js"
   ],
