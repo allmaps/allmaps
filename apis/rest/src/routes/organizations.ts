@@ -26,6 +26,7 @@ import {
 } from '@allmaps/api-shared/db'
 import {
   ORGANIZATION_PLANS,
+  ResponseError,
   needsElevatedLimitRole,
   normalizeOrganizationsQueryParams,
   setCacheControl
@@ -92,6 +93,9 @@ const organizationsQuerySchema = t.Object({
   limit: t.Optional(t.Number()),
   plan: t.Optional(t.Array(t.UnionEnum(ORGANIZATION_PLANS))),
   displayCollections: t.Optional(t.Boolean()),
+  domain: t.Optional(
+    t.String({ description: 'Match a configured organization domain exactly.' })
+  ),
   slug: t.Optional(t.Array(t.String()))
 })
 

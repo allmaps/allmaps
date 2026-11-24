@@ -20,6 +20,37 @@ const settings = {
 }
 
 describe('development OAuth Proxy', () => {
+  it.each([undefined, '', 'test-google-secret'])(
+    'only enables Google in a proxy preview when its secret is present (%j)',
+    async (googleClientSecret) => {
+      const context = await createTestContext()
+      try {
+        const env = parseRestEnv({
+          ...context.env,
+          ...settings,
+          BETTER_AUTH_URL: preview,
+          BETTER_AUTH_COOKIE_PREFIX: 'allmaps-preview-test',
+          GITHUB_CLIENT_ID: 'proxy-test-client',
+          GITHUB_CLIENT_SECRET: '',
+          GOOGLE_CLIENT_ID: 'google-test-client',
+          GOOGLE_CLIENT_SECRET: googleClientSecret
+        })
+        const { auth } = createAuth(env, context.db)
+        expect(auth.options.socialProviders.github).toBeDefined()
+        if (googleClientSecret) {
+          expect(auth.options.socialProviders.google).toMatchObject({
+            clientId: 'google-test-client',
+            clientSecret: googleClientSecret
+          })
+        } else {
+          expect(auth.options.socialProviders.google).toBeUndefined()
+        }
+      } finally {
+        await context.close()
+      }
+    }
+  )
+
   it('is opt-in and refuses production, wildcard origins, missing or shared main secrets', () => {
     expect(
       getOAuthProxyConfiguration({

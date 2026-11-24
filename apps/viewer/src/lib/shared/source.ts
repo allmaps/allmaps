@@ -1,6 +1,9 @@
 import { IIIF } from '@allmaps/iiif-parser'
 import { parseAnnotation } from '@allmaps/annotation'
-import { fetchAnnotationsFromApi } from '@allmaps/stdlib'
+import {
+  fetchAnnotationsFromApi,
+  getGeoreferenceAnnotationItems
+} from '@allmaps/stdlib'
 import { generateChecksum } from '@allmaps/id/sync'
 
 import { getAllmapsIdFromUrl } from '$lib/shared/api.js'
@@ -27,11 +30,6 @@ type AnnotationPage = {
   items?: unknown[]
 }
 
-type AnnotationWithPurpose = {
-  motivation?: unknown
-  purpose?: unknown
-}
-
 type AnnotationParseContext = {
   resource?: GeoreferencedMap['resource']
   canvas?: PartOfItem
@@ -46,26 +44,6 @@ type ParsedGeoreferenceAnnotations = {
 
 type ErrorWithIssues = {
   issues?: unknown
-}
-
-function hasGeoreferencingValue(value: unknown) {
-  if (typeof value === 'string') {
-    return value === 'georeferencing'
-  } else if (Array.isArray(value)) {
-    return value.some(hasGeoreferencingValue)
-  }
-
-  return false
-}
-
-function hasGeoreferencingPurpose(annotation: unknown) {
-  if (!annotation || typeof annotation !== 'object') {
-    return false
-  }
-
-  const { motivation, purpose } = annotation as AnnotationWithPurpose
-
-  return hasGeoreferencingValue(motivation) || hasGeoreferencingValue(purpose)
 }
 
 function getStringProperty(value: unknown, key: string) {
@@ -262,13 +240,7 @@ function parseGeoreferenceAnnotationPage(
   annotationPage: AnnotationPage,
   context: AnnotationParseContext = {}
 ): ParsedGeoreferenceAnnotations {
-  const annotations = hasGeoreferencingPurpose(annotationPage)
-    ? annotationPage.items
-    : annotationPage.items?.filter(hasGeoreferencingPurpose)
-
-  if (!annotations || annotations.length === 0) {
-    return emptyGeoreferenceAnnotations()
-  }
+  const annotations = getGeoreferenceAnnotationItems(annotationPage)
 
   return annotations.reduce<ParsedGeoreferenceAnnotations>(
     (result, annotation, index) => {

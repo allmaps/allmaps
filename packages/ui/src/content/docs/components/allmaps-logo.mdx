@@ -1,0 +1,38 @@
+---
+title: AllmapsLogo
+description: Display the Allmaps mark in its regular or inverted colors.
+sections: [Playground, Usage, Props]
+---
+
+import ComponentPage from '../../../components/ComponentPage.astro'
+import AllmapsLogoPlayground from '../../../components/AllmapsLogoPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<AllmapsLogoPlayground client:load />
+
+</div>
+<div slot="usage">
+
+Use the default alternative text for a standalone logo. When the surrounding text already says “Allmaps”, pass an empty `alt` so screen readers announce the name once.
+
+```svelte
+<script lang="ts">
+  import { AllmapsLogo } from '@allmaps/ui'
+</script>
+
+<AllmapsLogo />
+```
+
+</div>
+<div slot="props">
+
+| Prop                       | Behavior                                                                           |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| `inverted`                 | Use the inverted artwork for a dark background. Defaults to `false`.               |
+| `alt`                      | Accessible text for the image. Defaults to `Allmaps`.                              |
+| `width`, `height`, `class` | Size the mark with image attributes or utility classes. The default is 32 × 32 px. |
+
+</div>
+</ComponentPage>

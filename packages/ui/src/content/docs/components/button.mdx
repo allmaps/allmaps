@@ -1,0 +1,51 @@
+---
+title: Button
+description: Trigger an action or follow a link. Labeled and icon-only buttons share a 40px minimum height and a 44px minimum touch target.
+sections: [Playground, Usage, Examples, Props]
+---
+
+import ComponentPage from '../../../components/ComponentPage.astro'
+import ButtonPlayground from '../../../components/ButtonPlayground.svelte'
+import ButtonUsage from '../../../components/ButtonUsage.svelte'
+import ButtonExamples from '../../../components/ButtonExamples.svelte'
+
+<ComponentPage>
+
+<div slot="playground">
+
+<ButtonPlayground client:load />
+
+</div>
+
+<div slot="usage">
+
+<ButtonUsage client:load />
+
+</div>
+
+<div slot="examples">
+
+<ButtonExamples client:load />
+
+</div>
+
+<div slot="props">
+
+| Prop               | Values                                                                      | Default        |
+| ------------------ | --------------------------------------------------------------------------- | -------------- |
+| `variant`          | `default`, `primary`, `destructive`                                         | `default`      |
+| `shape`            | `rounded`, `pill`                                                           | `rounded`      |
+| `icon`             | Optional Svelte snippet for the icon                                        | unset          |
+| `iconPosition`     | `leading` or `trailing`                                                     | `leading`      |
+| `iconOnly`         | Square control; supply an accessible label                                  | `false`        |
+| `active`           | Visual selection; supply the appropriate ARIA state separately              | `false`        |
+| `disabled`         | Disable activation; links lose their href and leave the tab order           | `false`        |
+| `loading`          | Replace the icon with a spinner, disable activation, and expose `aria-busy` | `false`        |
+| `loadingIndicator` | Optional Svelte snippet for the loading indicator                           | `LoadingSmall` |
+| `href`             | Render a native anchor instead of a button                                  | unset          |
+| `ref`              | Bindable native button or anchor element                                    | `null`         |
+| `children`         | Button label                                                                | unset          |
+
+</div>
+
+</ComponentPage>

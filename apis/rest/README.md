@@ -84,9 +84,12 @@ The `console-statistics-preview` Neon branch is a copy of develop. The dedicated
 The intended hostnames are `pr-<identifier>.preview.console.allmaps.org` and
 `pr-<identifier>.preview.api.allmaps.org`. The REST preview must use the dedicated preview
 Hyperdrive/database, its own main secret and cookie prefix, and the shared proxy
-secret. Provider client IDs are public and may be configured on the preview;
-provider client secrets are only needed by the fixed callback server. The schema
-allows IDs without provider secrets only in explicitly enabled proxy previews.
+secret. Provider client IDs are public and may be configured on the preview.
+GitHub only needs its client secret on the fixed callback server; explicitly
+enabled proxy previews may configure just the GitHub client ID. Google requires
+both its client ID and client secret on the preview as well, because Better Auth
+checks both before generating the authorization URL. An ID-only Google
+configuration is accepted in proxy previews but leaves Google login disabled.
 
 Preview origins and the shared proxy secret are for trusted first-party branch
 code. Do not inject them into arbitrary contributor or fork previews: a holder

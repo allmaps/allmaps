@@ -13,6 +13,12 @@ export {
 } from './queries/iiif.js'
 
 export { migrateImage } from './queries/migrate-image.js'
+
+export {
+  queryImageGeoreferencing,
+  queryManifestCoverage
+} from './queries/georeferencing.js'
+
 export { queryMaps } from './queries/maps.js'
 export { archiveMap, archiveImage } from './queries/archive.js'
 
@@ -53,7 +59,6 @@ export {
 export {
   normalizeOrganizationSlug,
   normalizeHomepageUrl,
-  normalizeDomain,
   normalizeDomains,
   normalizeOrganizationLocation,
   organizationLocationGeographySql,
@@ -71,3 +76,4 @@ export {
   updateOrganization,
   deleteOrganization
 } from './queries/organizations.js'
+export { normalizeDomain } from './shared/urls.js'
