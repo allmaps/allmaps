@@ -1,0 +1,43 @@
+---
+title: ListDialog
+description: Open one or all items in a saved list.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+
+import ListDialogPlayground, {
+  formatUsage
+} from '../../../starlight/components/ListDialogPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<ListDialogPlayground client:load />
+
+</div>
+
+<div slot="usage">
+
+Use `ListDialog` when each item has a destination and the whole list can open together. The app fetches the list and supplies the loading, error, or ready state. Give each item a stable ID and a label that identifies its destination.
+
+<UsageCode live code={formatUsage()} />
+
+</div>
+
+<div slot="props">
+
+| Prop           | Behavior                                                                                                                     |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `open`         | Bind to open or close the dialog.                                                                                            |
+| `title`        | Names the list and labels the dialog.                                                                                        |
+| `emptyMessage` | Appears when the ready list contains no items.                                                                               |
+| `state`        | Pass `{ status: 'loading', message }`, `{ status: 'error', message, retry }`, or `{ status: 'ready', items, openAllHref? }`. |
+| `returnFocus`  | Returns focus to this element when the dialog closes.                                                                        |
+
+Each item accepts optional `detail` text and a `thumbnail` containing `{ imageInfo }` from the IIIF Image API. For a manifest, use the first image in canvas order. If the metadata needs to be fetched, supply `thumbnail: { loadImageInfo }` instead. The loader receives an `AbortSignal` and returns the IIIF image information. It runs when the thumbnail comes into view, and the request is canceled when the row is removed.
+
+</div>
+
+</ComponentPage>

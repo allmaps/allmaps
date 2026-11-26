@@ -48,6 +48,8 @@ import ThinPlateSpline from '$lib/icons/transformations/ThinPlateSpline.svelte'
 
 export { Toggle, type Rounded } from './toggle.js'
 export { StarToggle } from './star-toggle.js'
+export { ListDialog } from './list-dialog.js'
+export type { ListDialogItem, ListDialogState } from './list-dialog.js'
 export * as Tooltip from './tooltip.js'
 export * as Dialog from './dialog.js'
 export { Button } from './button.js'
