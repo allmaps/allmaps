@@ -37,13 +37,18 @@ signOut: () => Promise<void>
 
 <LoginMenu {user} onSignOut={signOut} />`} />
 
+To combine account actions with app commands, use `LoginMenuTrigger` inside a [DropdownMenu](/components/dropdown-menu) root and render `LoginMenuItems` inside its content. Pass your app’s dropdown items as children of `LoginMenuItems` to place them between the avatar-and-name header and **Log out**. Both are exported from `@allmaps/ui/auth` and accept the same `user`. Give the trigger an accessible name such as `aria-label="Open Viewer menu"`.
+
+Pass `onLogIn` to `LoginMenuItems` to show **Log in…** for guests. Have it open a `LoginDialog` rendered outside the dropdown. Bind the trigger’s `ref` and pass it to the dialog as `returnFocus`. Signed-in users see their account links and the **Log out** action supplied by `onSignOut`.
+
 </div>
 
 <div slot="props">
 
 | Prop              | Behavior                                                                                                                                                         |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `user`            | Pass the app’s session user to show their photo or the Allmaps MapMonster and the Log out action. Pass `null` for a guest.                                       |
+| `class`           | Applies classes to the trigger in both session states. Use `size-full` to fill a sized parent.                                                                   |
+| `user`            | Pass the app’s session user to show their photo or the guest account icon and the Log out action. Pass `null` for a guest.                                       |
 | `apiBaseUrl`      | Allmaps API root used to discover enabled providers when the dialog opens. Defaults to `https://api.allmaps.org`.                                                |
 | `signInProviders` | Optional preloaded list of provider links. Omit to discover all enabled providers and return to the current page after login.                                    |
 | `signInURL`       | Optional direct login URL. Used when no explicit provider links are supplied, and skips discovery.                                                               |

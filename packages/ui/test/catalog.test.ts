@@ -21,6 +21,8 @@ const { default: CatalogSelect } =
 const { default: OpenDialog } = await import('./fixtures/OpenDialog.svelte')
 const { default: NorthArrow } =
   await import('../src/lib/components/NorthArrow.svelte')
+const { default: CombinedMenu } = await import('./fixtures/CombinedMenu.svelte')
+const { default: LoginMenu } = await import('../src/lib/auth/LoginMenu.svelte')
 svelteLoader.deregister()
 
 test('an open dialog renders the selected backdrop', () => {
@@ -49,6 +51,43 @@ test('a dialog renders its decorative background inside the backdrop only while 
   assert.doesNotMatch(
     render(OpenDialog, { props: { background, open: false } }).body,
     /<canvas>/
+  )
+})
+
+test('a composed login menu exposes app and account actions in one menu', () => {
+  for (const user of [undefined, { name: 'Map reader' }]) {
+    const { body } = render(CombinedMenu, { props: { user } })
+    assert.match(body, /aria-label="Viewer menu"/)
+    assert.equal(body.match(/role="menu"/g)?.length, 1)
+    assert.match(body, /Open another map…/)
+    assert.match(body, user ? /Log out/ : /Log in…/)
+    assert.doesNotMatch(body, user ? /Log in…/ : /Log out/)
+  }
+})
+
+test('a single divider separates the account header from all menu actions', () => {
+  const user = { name: 'Map reader', image: '/avatar.jpg' }
+  for (const showAction of [true, false]) {
+    const { body } = render(CombinedMenu, { props: { user, showAction } })
+    const sections = body.split('role="separator"')
+    assert.equal(sections.length, 2)
+    assert.match(
+      sections[0],
+      /role="menu"[\s\S]*src="\/avatar.jpg"[\s\S]*>Map reader</
+    )
+    assert.match(
+      sections[1],
+      showAction ? /Open another map…[\s\S]*Log out/ : /Log out/
+    )
+  }
+})
+
+test('the standalone guest trigger opens a dialog and respects disabled login methods', () => {
+  const props = { onSignOut: () => {} }
+  assert.match(render(LoginMenu, { props }).body, /aria-haspopup="dialog"/)
+  assert.doesNotMatch(
+    render(LoginMenu, { props: { ...props, signInProviders: [] } }).body,
+    /<button/
   )
 })
 
