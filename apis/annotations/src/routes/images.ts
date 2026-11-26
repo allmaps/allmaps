@@ -1,3 +1,4 @@
+import { mapsQuerySchema } from '@allmaps/api-shared/elysia'
 import { queryMaps } from '@allmaps/api-shared/db'
 import { setCacheControl } from '@allmaps/api-shared'
 
@@ -5,6 +6,7 @@ import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin, RegExpRoute } from '../elysia.js'
+import { readAnnotationQuery } from '../query.js'
 
 // Matches: imageId  OR  imageId@imageChecksum  OR  imageId.geojson etc.
 const imageRoute = new RegExpRoute<{
@@ -24,14 +26,23 @@ export function createImagesRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       `/images/${imageRoute.path}`,
-      ({ request, env, db, params, set }) => {
+      async ({ request, env, db, params, set, getLimitRole }) => {
         const { imageId, imageChecksum, ext } = imageRoute.parse(params)
-        setCacheControl(set, 'public-medium')
+        const { filters, userRole } = await readAnnotationQuery(
+          request,
+          getLimitRole
+        )
+        setCacheControl(
+          set,
+          userRole === 'public' ? 'public-medium' : 'private-no-store'
+        )
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
+            ...filters,
+            userRole,
             imageId,
             ...(imageChecksum ? { imageChecksum } : {})
           },
@@ -39,14 +50,15 @@ export function createImagesRoutes(
             id: request.url,
             format,
             excludeArchived: true,
-            expectRows: true,
+            expectIiifResource: true,
             singular: false,
-            resultScope: 'complete'
+            resultScope: filters.limit === undefined ? 'complete' : 'bounded'
           }
         )
       },
       {
         params: imageRoute.params,
+        query: mapsQuerySchema,
         detail: {
           summary:
             'Get Georeference Annotations for a single IIIF Image (with optional version)',

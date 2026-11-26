@@ -43,7 +43,7 @@ const utcDateTimePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
 function parseNumberParam(name: string, value: string) {
   const number = Number(value)
 
-  if (!Number.isFinite(number)) {
+  if (!value.trim() || !Number.isFinite(number)) {
     throw new ResponseError(`Invalid query parameter ${name}: ${value}`, 400)
   }
 
@@ -51,10 +51,17 @@ function parseNumberParam(name: string, value: string) {
 }
 
 function parseNumberArrayParam(name: string, values: string[]) {
-  return values
+  const coordinates = values
     .flatMap((value) => value.split(','))
-    .filter((value) => value !== '')
     .map((value) => parseNumberParam(name, value))
+  if (
+    coordinates.some(
+      (coordinate, index) => Math.abs(coordinate) > (index % 2 === 0 ? 90 : 180)
+    )
+  ) {
+    throw new ResponseError(`Invalid latitude or longitude in ${name}`, 400)
+  }
+  return coordinates
 }
 
 function parseDateParam(
@@ -85,16 +92,18 @@ function parseDateParam(
   return date
 }
 
-function parseIntersects(intersects?: number[]): IntersectsWith | undefined {
-  if (intersects && (intersects.length === 2 || intersects.length === 4)) {
+function parseIntersects(intersects: number[]): IntersectsWith {
+  if (intersects.length === 2 || intersects.length === 4) {
     return intersects as IntersectsWith
   }
+  throw new ResponseError('intersects requires two or four coordinates', 400)
 }
 
-function parseContainedBy(containedBy?: number[]): ContainedBy | undefined {
-  if (containedBy && containedBy.length === 4) {
+function parseContainedBy(containedBy: number[]): ContainedBy {
+  if (containedBy.length === 4) {
     return containedBy as ContainedBy
   }
+  throw new ResponseError('containedBy requires four coordinates', 400)
 }
 
 function parseOrganizationPlanParam(value: string) {
@@ -192,6 +201,9 @@ export function normalizeMapsQueryParams(
     switch (name) {
       case 'limit':
         params.limit = parseNumberParam(name, lastValue)
+        if (!Number.isSafeInteger(params.limit) || params.limit < 1) {
+          throw new ResponseError('limit must be a positive integer', 400)
+        }
         break
       case 'imageServiceDomain':
         params.imageServiceDomain = lastValue
