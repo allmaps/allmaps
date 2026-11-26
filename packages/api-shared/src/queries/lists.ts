@@ -1,4 +1,4 @@
-import { and, count, eq, sql } from 'drizzle-orm'
+import { and, count, desc, eq, sql } from 'drizzle-orm'
 
 import { generateAnnotation } from '@allmaps/annotation'
 import { generateRandomId } from '@allmaps/id/sync'
@@ -423,6 +423,7 @@ export async function deleteListItem(
   listId: string,
   item: {
     mapId?: string
+    mapChecksum?: string
     imageId?: string
     canvasId?: string
     manifestId?: string
@@ -430,13 +431,16 @@ export async function deleteListItem(
 ): Promise<
   { success: true } | { success: false; status: number; error: string }
 > {
-  const { mapId, imageId, canvasId, manifestId } = item
+  const { mapId, mapChecksum, imageId, canvasId, manifestId } = item
 
   let condition
   if (mapId) {
     condition = and(
       eq(listsSchema.listItems.listId, listId),
-      eq(listsSchema.listItems.mapId, mapId)
+      eq(listsSchema.listItems.mapId, mapId),
+      mapChecksum === undefined
+        ? undefined
+        : eq(listsSchema.listItems.mapChecksum, mapChecksum)
     )
   } else if (imageId) {
     condition = and(
@@ -613,15 +617,27 @@ export async function addItemToListByUrl(
   }
 
   if (resourceType === 'maps') {
+    const match = resourceId.match(/^([^@]+)(?:@([^@]+))?$/)
+    if (!match) return { success: false, status: 400, error: 'Invalid map URL' }
+
+    const [, mapId, checksum] = match
+    const { maps } = mapsSchema
     const [map] = await db
       .select({
-        id: mapsSchema.mapsLatest.id,
-        imageId: mapsSchema.mapsLatest.imageId,
-        checksum: mapsSchema.mapsLatest.checksum,
-        version: mapsSchema.mapsLatest.version
+        id: maps.id,
+        imageId: maps.imageId,
+        checksum: maps.checksum,
+        version: maps.version
       })
-      .from(mapsSchema.mapsLatest)
-      .where(eq(mapsSchema.mapsLatest.id, resourceId))
+      .from(maps)
+      .where(
+        and(
+          eq(maps.id, mapId),
+          checksum ? eq(maps.checksum, checksum) : eq(maps.latest, true)
+        )
+      )
+      .orderBy(desc(maps.version))
+      .limit(1)
 
     if (!map) {
       return {

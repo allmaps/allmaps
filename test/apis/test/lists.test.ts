@@ -279,6 +279,46 @@ describe('list access and Starred item limits', () => {
     }
   })
 
+  it('adds and removes a single saved map revision without affecting other revisions', async () => {
+    const headers = await login('local-editor')
+    const { id: listId } = starredList('local-editor')
+    const mapId = context.seedCatalog!.maps[0].id
+    const revisions = await context.client.query<{ checksum: string }>(
+      'SELECT DISTINCT checksum FROM maps WHERE id = $1 ORDER BY checksum LIMIT 2',
+      [mapId]
+    )
+    expect(revisions.rows).toHaveLength(2)
+    const [first, second] = revisions.rows.map(({ checksum }) => checksum)
+    const itemsPath = `/lists/${listId}/items`
+
+    for (const checksum of [first, second]) {
+      const response = await rest(`${itemsPath}/url`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          url: `https://annotations.allmaps.org/maps/${mapId}@${checksum}`
+        })
+      })
+      expect(response.status).toBe(200)
+      expect(await response.json()).toMatchObject({
+        mapId,
+        mapChecksum: checksum
+      })
+    }
+
+    for (const suffix of [`&mapChecksum=${first}`, '']) {
+      const response = await rest(`${itemsPath}?mapId=${mapId}${suffix}`, {
+        method: 'DELETE',
+        headers
+      })
+      expect(response.status).toBe(200)
+      const detail = await rest(`/lists/${listId}`, { headers })
+      expect((await detail.json()).items).toEqual(
+        suffix ? [expect.objectContaining({ mapId, mapChecksum: second })] : []
+      )
+    }
+  })
+
   async function fillList(listId: string, amount: number) {
     await context.client.query(`
       INSERT INTO iiif.images (id, uri)

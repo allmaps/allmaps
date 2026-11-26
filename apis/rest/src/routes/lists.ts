@@ -19,6 +19,7 @@ import type { BetterAuthContext } from '@allmaps/db/auth'
 
 const deleteListItemQuerySchema = t.Object({
   mapId: t.Optional(t.String()),
+  mapChecksum: t.Optional(t.String()),
   imageId: t.Optional(t.String()),
   canvasId: t.Optional(t.String()),
   manifestId: t.Optional(t.String())
@@ -237,7 +238,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         detail: {
           summary: 'Add an item to a list by URL',
           description:
-            'Authenticated users only. Accepts annotations.allmaps.org URLs for maps, images, canvases, and manifests.',
+            'Authenticated users only. Accepts Allmaps annotation URLs for maps, including specific map revisions, images, canvases, and manifests.',
           tags: ['Lists'],
           security: authenticatedDetail.security,
           'x-badges': authenticatedDetail['x-badges']
