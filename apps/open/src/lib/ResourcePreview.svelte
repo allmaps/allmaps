@@ -28,7 +28,7 @@
             'h-full min-h-0 w-full object-contain motion-safe:transition-opacity motion-safe:duration-200 motion-safe:starting:opacity-0',
             loadedImageUrl === preview.imageUrl ? 'opacity-100' : 'opacity-0'
           ]}
-          referrerpolicy="no-referrer"
+          referrerpolicy="strict-origin"
           onload={(event) =>
             (loadedImageUrl =
               event.currentTarget.getAttribute('src') ?? undefined)}
