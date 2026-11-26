@@ -1,3 +1,4 @@
+import { mapsQuerySchema } from '@allmaps/api-shared/elysia'
 import { t } from 'elysia'
 
 import { setCacheControl } from '@allmaps/api-shared'
@@ -11,6 +12,7 @@ import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { readAnnotationQuery } from '../query.js'
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
@@ -46,18 +48,24 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId',
-      async ({ db, env, params, request, set }) => {
+      async ({ db, env, params, request, set, getLimitRole }) => {
         setCacheControl(set, 'private-no-store')
+        const { filters, userRole } = await readAnnotationQuery(
+          request,
+          getLimitRole
+        )
         return queryList(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
           params.listId,
-          request.url
+          request.url,
+          { ...filters, userRole }
         )
       },
       {
         admin: true,
+        query: mapsQuerySchema,
         params: t.Object({
           username: t.String(),
           listId: t.String()
@@ -70,18 +78,24 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId/georeference-annotations',
-      async ({ db, env, params, request, set }) => {
+      async ({ db, env, params, request, set, getLimitRole }) => {
         setCacheControl(set, 'private-no-store')
+        const { filters, userRole } = await readAnnotationQuery(
+          request,
+          getLimitRole
+        )
         return queryListGeoreferenceAnnotations(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
           params.listId,
-          request.url
+          request.url,
+          { ...filters, userRole }
         )
       },
       {
         admin: true,
+        query: mapsQuerySchema,
         params: t.Object({
           username: t.String(),
           listId: t.String()

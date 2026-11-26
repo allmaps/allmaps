@@ -1,9 +1,7 @@
-import { t } from 'elysia'
-
+import { mapsQuerySchema } from '@allmaps/api-shared/elysia'
 import { generateAnnotation, type GeoreferencedMap } from '@allmaps/annotation'
 import { queryMaps } from '@allmaps/api-shared/db'
 import {
-  needsElevatedLimitRole,
   normalizeMapsQueryParams,
   queryRandom,
   setCacheControl
@@ -13,20 +11,7 @@ import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin, RegExpRoute } from '../elysia.js'
-
-const mapsQuerySchema = t.Object({
-  limit: t.Optional(t.Number()),
-  imageServiceDomain: t.Optional(t.String()),
-  manifestDomain: t.Optional(t.String()),
-  intersects: t.Optional(t.Array(t.Number())),
-  containedBy: t.Optional(t.Array(t.Number())),
-  minScale: t.Optional(t.Number()),
-  maxScale: t.Optional(t.Number()),
-  minArea: t.Optional(t.Number()),
-  maxArea: t.Optional(t.Number()),
-  modifiedAfter: t.Optional(t.String()),
-  modifiedBefore: t.Optional(t.String())
-})
+import { readAnnotationQuery } from '../query.js'
 
 const mapRoute = new RegExpRoute<{
   mapId: string
@@ -43,10 +28,10 @@ export function createMapsRoutes(
     .get(
       '/maps',
       async ({ request, env, db, set, getLimitRole }) => {
-        const queryParams = normalizeMapsQueryParams(request)
-        const userRole = needsElevatedLimitRole(queryParams.limit)
-          ? await getLimitRole()
-          : 'public'
+        const { filters, userRole } = await readAnnotationQuery(
+          request,
+          getLimitRole
+        )
         setCacheControl(
           set,
           userRole === 'public' ? 'public-short' : 'private-no-store'
@@ -54,7 +39,7 @@ export function createMapsRoutes(
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          { ...queryParams, userRole },
+          { ...filters, userRole },
           {
             id: request.url,
             format: 'annotation',
@@ -75,10 +60,10 @@ export function createMapsRoutes(
     .get(
       '/maps.geojson',
       async ({ request, env, db, set, getLimitRole }) => {
-        const queryParams = normalizeMapsQueryParams(request)
-        const userRole = needsElevatedLimitRole(queryParams.limit)
-          ? await getLimitRole()
-          : 'public'
+        const { filters, userRole } = await readAnnotationQuery(
+          request,
+          getLimitRole
+        )
         setCacheControl(
           set,
           userRole === 'public' ? 'public-short' : 'private-no-store'
@@ -86,7 +71,7 @@ export function createMapsRoutes(
         return queryMaps(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
-          { ...queryParams, userRole },
+          { ...filters, userRole },
           {
             id: request.url,
             format: 'geojson',
@@ -146,7 +131,7 @@ export function createMapsRoutes(
     )
     .get(
       `/maps/${mapRoute.path}`,
-      ({ env, db, params, set }) => {
+      ({ env, db, params, request, set }) => {
         const { mapId, checksum, ext } = mapRoute.parse(params)
         setCacheControl(set, 'public-medium')
         const format = ext === 'geojson' ? 'geojson' : 'annotation'
@@ -154,6 +139,7 @@ export function createMapsRoutes(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
+            ...normalizeMapsQueryParams(request),
             mapId,
             ...(checksum ? { checksum } : {})
           },
@@ -162,6 +148,7 @@ export function createMapsRoutes(
       },
       {
         params: mapRoute.params,
+        query: mapsQuerySchema,
         detail: {
           summary:
             'Get a single Georeference Annotation (with optional version)',

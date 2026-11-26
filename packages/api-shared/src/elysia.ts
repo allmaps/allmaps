@@ -1,3 +1,4 @@
+export { mapsQuerySchema } from './elysia/maps-query.js'
 import type { ElysiaConfig } from 'elysia'
 import type { BetterAuthContext } from '@allmaps/db/auth'
 

@@ -9,7 +9,8 @@ import { generateId } from '@allmaps/id'
 import { setCacheControl } from '@allmaps/api-shared'
 import {
   createCachePolicy,
-  getLoginProviders
+  getLoginProviders,
+  mapsQuerySchema
 } from '@allmaps/api-shared/elysia'
 
 import {
@@ -31,6 +32,10 @@ import { createOrganizationsRoutes } from './routes/organizations.js'
 import { createListsRoutes } from './routes/lists.js'
 
 import packageJson from '../package.json' with { type: 'json' }
+
+const mapParameterNames = new Set(
+  Object.keys(mapsQuerySchema.properties).map((name) => name.toLowerCase())
+)
 
 const openApiTags = [
   { name: 'API' },
@@ -96,7 +101,7 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
     .use(createListsRoutes(env, betterAuth))
     .get(
       '/',
-      async ({ env, query, set }) => {
+      async ({ env, query, request, set }) => {
         if (query.url) {
           setCacheControl(set, 'public-medium')
           const iiifData = await fetchJson(query.url, {
@@ -119,7 +124,13 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
           }
 
           set.status = 301
-          set.headers['Location'] = location
+          const target = new URL(location)
+          for (const [key, value] of new URL(request.url).searchParams) {
+            if (mapParameterNames.has(key.toLowerCase())) {
+              target.searchParams.append(key, value)
+            }
+          }
+          set.headers['Location'] = target.href
           return
         }
 
@@ -140,7 +151,10 @@ export function createApp(env: AnnotationsEnv, betterAuth: BetterAuthContext) {
         }
       },
       {
-        query: t.Object({ url: t.Optional(t.String()) }),
+        query: t.Object({
+          ...mapsQuerySchema.properties,
+          url: t.Optional(t.String())
+        }),
         detail: { summary: 'Allmaps Annotations API', tags: ['API'] }
       }
     )
