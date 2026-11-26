@@ -26,10 +26,10 @@ export function handoffUrl(
   },
   { destination, source }: Handoff
 ) {
-  const target = new URL(
-    '/',
-    destination === 'viewer' ? viewerBaseUrl : editorBaseUrl
-  )
+  const target =
+    destination === 'viewer'
+      ? new URL('/', viewerBaseUrl)
+      : new URL('/images', editorBaseUrl)
   target.searchParams.set('url', source)
   return target.href
 }
