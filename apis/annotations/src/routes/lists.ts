@@ -1,6 +1,6 @@
 import { t } from 'elysia'
 
-import { setCacheControl } from '@allmaps/api-shared'
+import { ResponseError, setCacheControl } from '@allmaps/api-shared'
 import {
   queryLists,
   queryList,
@@ -14,6 +14,26 @@ import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
+function getListOwnerId(user: unknown, username: string) {
+  if (
+    !user ||
+    typeof user !== 'object' ||
+    !('id' in user) ||
+    typeof user.id !== 'string' ||
+    ('isAnonymous' in user && user.isAnonymous)
+  ) {
+    throw new ResponseError('Unauthorized', 401)
+  }
+
+  if ('role' in user && user.role === 'admin') return
+
+  if (!('slug' in user) || user.slug !== username) {
+    throw new ResponseError('Lists not found', 404)
+  }
+
+  return user.id
+}
+
 export function createListsRoutes(
   env: AnnotationsEnv,
   betterAuth: BetterAuthContext
@@ -24,9 +44,10 @@ export function createListsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/@:username/lists',
-      async ({ db, env, params, set }) => {
+      async ({ db, env, params, set, user }) => {
         setCacheControl(set, 'private-no-store')
-        const lists = await queryLists(db, params.username)
+        const ownerId = getListOwnerId(user, params.username)
+        const lists = await queryLists(db, params.username, ownerId)
 
         return lists.map((list: UserList) => ({
           ...list,
@@ -34,7 +55,7 @@ export function createListsRoutes(
         }))
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({
           username: t.String()
         }),
@@ -46,18 +67,19 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId',
-      async ({ db, env, params, request, set }) => {
+      async ({ db, env, params, request, set, user }) => {
         setCacheControl(set, 'private-no-store')
         return queryList(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
           params.listId,
-          request.url
+          request.url,
+          getListOwnerId(user, params.username)
         )
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({
           username: t.String(),
           listId: t.String()
@@ -70,18 +92,19 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId/georeference-annotations',
-      async ({ db, env, params, request, set }) => {
+      async ({ db, env, params, request, set, user }) => {
         setCacheControl(set, 'private-no-store')
         return queryListGeoreferenceAnnotations(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
           params.listId,
-          request.url
+          request.url,
+          getListOwnerId(user, params.username)
         )
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({
           username: t.String(),
           listId: t.String()

@@ -61,6 +61,9 @@ served under these public policies.
 | `/maps/random`                                                                                         | private, no-store                   |
 | `/@:username/lists`, `/@:username/lists/:listId`, `/@:username/lists/:listId/georeference-annotations` | private, no-store                   |
 
+Signed-in users can read their own lists from the Annotations API. Admins can
+read any user's lists.
+
 In both APIs, `/auth` and `/auth/*` (Better Auth), `/login/github`, `/login/google`, `/logout` and
 `/openapi.json` are private/no-store. OPTIONS responses are uncached HTTP
 responses; CORS preflight caching via Access-Control-Max-Age is independent.

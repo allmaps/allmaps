@@ -184,6 +184,27 @@ describe('list access and Starred item limits', () => {
           images.map((image) => expect.objectContaining({ imageId: image.id }))
         )
       )
+      const listedAnnotations = await annotations(`/@${slug}/lists`, headers)
+      expect(listedAnnotations.status).toBe(200)
+      expect(await listedAnnotations.json()).toContainEqual(
+        expect.objectContaining({ id: list.id, name: 'Starred' })
+      )
+
+      for (const suffix of ['', '/georeference-annotations']) {
+        const response = await annotations(
+          `/@${slug}/lists/${list.id}${suffix}`,
+          headers
+        )
+        expect(response.status).toBe(200)
+        expect(response.headers.get('Cache-Control')).toBe('private, no-store')
+        expect(await response.json()).toMatchObject({
+          type: 'AnnotationPage',
+          items: expect.arrayContaining([
+            expect.objectContaining({ type: 'Annotation' })
+          ])
+        })
+      }
+
       for (const image of images) {
         expect(
           (
@@ -202,15 +223,15 @@ describe('list access and Starred item limits', () => {
         )
       ).toBe(true)
 
-      for (const suffix of [
-        '',
-        `/${list.id}`,
-        `/${list.id}/georeference-annotations`
-      ]) {
-        expect(
-          (await annotations(`/@${slug}/lists${suffix}`, headers)).status
-        ).toBe(401)
-      }
+      const emptyAnnotations = await annotations(
+        `/@${slug}/lists/${list.id}/georeference-annotations`,
+        headers
+      )
+      expect(emptyAnnotations.status).toBe(200)
+      expect(await emptyAnnotations.json()).toMatchObject({
+        type: 'AnnotationPage',
+        items: []
+      })
     }
   )
 
@@ -555,19 +576,37 @@ describe('list access and Starred item limits', () => {
     ])
   })
 
-  it('allows admins to read user annotations while retaining REST ownership checks', async () => {
+  it('rejects cross-user annotation reads, including a foreign list ID under the current username', async () => {
+    const headers = await login('local-member')
+    const list = starredList('local-editor')
+    for (const path of [
+      '/@local-editor/lists',
+      `/@local-editor/lists/${list.id}`,
+      `/@local-editor/lists/${list.id}/georeference-annotations`,
+      `/@local-member/lists/${list.id}`,
+      `/@local-member/lists/${list.id}/georeference-annotations`
+    ]) {
+      expect((await annotations(path, headers)).status, path).toBe(404)
+    }
+  })
+
+  it('allows owners and admins to read custom list annotations while retaining REST ownership checks', async () => {
     const list = context.seedCatalog!.lists.find(
       (list) => list.key === 'amsterdam-research'
     )!
-    for (const suffix of [
-      '',
-      `/${list.id}`,
-      `/${list.id}/georeference-annotations`
-    ]) {
-      expect(
-        (await annotations(`/@local-editor/lists${suffix}`, adminHeaders))
-          .status
-      ).toBe(200)
+    const ownerHeaders = await login('local-editor')
+    for (const headers of [ownerHeaders, adminHeaders]) {
+      for (const suffix of [
+        '',
+        `/${list.id}`,
+        `/${list.id}/georeference-annotations`
+      ]) {
+        const response = await annotations(
+          `/@local-editor/lists${suffix}`,
+          headers
+        )
+        expect(response.status).toBe(200)
+      }
     }
     expect(
       (await rest(`/lists/${list.id}`, { headers: adminHeaders })).status

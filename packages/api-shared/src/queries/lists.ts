@@ -15,7 +15,7 @@ import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 import type { Db, DbOrTx } from '@allmaps/db'
 import type { Polygon } from 'geojson'
 
-export async function queryLists(db: Db, username: string) {
+export async function queryLists(db: Db, username: string, ownerId?: string) {
   const lists = await db.query.lists.findMany({
     columns: {
       id: true,
@@ -24,6 +24,7 @@ export async function queryLists(db: Db, username: string) {
       updatedAt: true
     },
     where: {
+      ...(ownerId === undefined ? {} : { userId: ownerId }),
       user: {
         slug: username
       }
@@ -38,14 +39,16 @@ export async function queryList(
   db: Db,
   username: string,
   listId: string,
-  listUrl?: string
+  listUrl?: string,
+  ownerId?: string
 ) {
   return queryListGeoreferenceAnnotations(
     annotationsBaseUrl,
     db,
     username,
     listId,
-    listUrl
+    listUrl,
+    ownerId
   )
 }
 
@@ -211,13 +214,15 @@ export async function queryListGeoreferenceAnnotations(
   db: Db,
   username: string,
   listId: string,
-  annotationPageId?: string
+  annotationPageId?: string,
+  ownerId?: string
 ) {
   const list = await db.query.lists.findFirst({
     columns: {
       id: true
     },
     where: {
+      ...(ownerId === undefined ? {} : { userId: ownerId }),
       id: {
         eq: listId
       },
