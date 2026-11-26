@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as Tooltip from '../../../tooltip.js'
   import { bindHold } from '@ui-sdk/core'
   import {
     Popover,
@@ -97,25 +98,32 @@
 </script>
 
 <Popover bind:open>
-  <PopoverTrigger
-    {disabled}
-    aria-label={label}
-    title={label}
-    class="relative grid aspect-square h-auto w-full touch-none cursor-pointer place-items-center rounded-full border-0 bg-white p-0 text-inherit transition-colors delay-0 not-disabled:hover:bg-pink/10 not-disabled:hover:text-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:text-gray pointer-coarse:p-1"
-    {@attach elementRef<HTMLButtonElement>(
-      () => trigger,
-      (element) => (trigger = element)
-    )}
-    {@attach disabled ? undefined : holdToPeek}
-  >
-    <DropIcon class="size-full" aria-hidden="true" />
-    {#if opacity <= 0.05}
-      <span
-        class="pointer-events-none absolute h-1 w-3/5 rotate-45 rounded-full border border-white bg-pink"
-        aria-hidden="true"
-      ></span>
-    {/if}
-  </PopoverTrigger>
+  <Tooltip.Root disabled={disabled || open}>
+    <Tooltip.Trigger>
+      {#snippet render({ props })}
+        <PopoverTrigger
+          {...props}
+          {disabled}
+          aria-label={label}
+          class="relative grid aspect-square h-auto w-full touch-none cursor-pointer place-items-center rounded-full border-0 bg-white p-0 text-inherit transition-colors delay-0 not-disabled:hover:bg-pink/10 not-disabled:hover:text-pink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:text-gray pointer-coarse:p-1"
+          {@attach elementRef<HTMLButtonElement>(
+            () => trigger,
+            (element) => (trigger = element)
+          )}
+          {@attach disabled ? undefined : holdToPeek}
+        >
+          <DropIcon class="size-full" aria-hidden="true" />
+          {#if opacity <= 0.05}
+            <span
+              class="pointer-events-none absolute h-1 w-3/5 rotate-45 rounded-full border border-white bg-pink"
+              aria-hidden="true"
+            ></span>
+          {/if}
+        </PopoverTrigger>
+      {/snippet}
+    </Tooltip.Trigger>
+    <Tooltip.Content>{label}</Tooltip.Content>
+  </Tooltip.Root>
   <PopoverContent
     aria-label={label}
     {anchor}

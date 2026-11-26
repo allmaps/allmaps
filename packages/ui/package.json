@@ -112,6 +112,11 @@
       "svelte": "./dist/toggle.js",
       "default": "./dist/toggle.js"
     },
+    "./tooltip": {
+      "types": "./dist/tooltip.d.ts",
+      "svelte": "./dist/tooltip.js",
+      "default": "./dist/tooltip.js"
+    },
     "./star-toggle": {
       "types": "./dist/star-toggle.d.ts",
       "svelte": "./dist/star-toggle.js",

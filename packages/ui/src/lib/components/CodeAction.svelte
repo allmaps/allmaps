@@ -1,10 +1,6 @@
 <script lang="ts">
   import { onMount, type Snippet } from 'svelte'
-  import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger
-  } from '@ui-sdk/svelte/tooltip'
+  import * as Tooltip from '../tooltip.js'
   import type { HTMLButtonAttributes } from 'svelte/elements'
   import { cn } from './ui/utils.js'
 
@@ -13,6 +9,7 @@
     tooltip = label,
     open = $bindable(false),
     disabled = false,
+    onOpenChangeComplete,
     class: className,
     children,
     ...attributes
@@ -20,6 +17,7 @@
     label: string
     tooltip?: string
     open?: boolean
+    onOpenChangeComplete?: (open: boolean) => void
     children: Snippet
   } = $props()
 
@@ -29,8 +27,8 @@
   })
 </script>
 
-<Tooltip bind:open closeOnPress={false}>
-  <TooltipTrigger
+<Tooltip.Root bind:open closeOnPress={false} {onOpenChangeComplete}>
+  <Tooltip.Trigger
     {...attributes}
     type="button"
     aria-label={attributes['aria-label'] ?? label}
@@ -41,14 +39,6 @@
     )}
   >
     {@render children()}
-  </TooltipTrigger>
-  <TooltipContent
-    side="left"
-    sideOffset={6}
-    class="pointer-events-none z-50 w-max rounded bg-foreground px-2 py-1 font-allmaps-ui text-xs font-medium text-background shadow-sm"
-  >
-    {#snippet render({ props })}
-      <div {...props} hidden={!open}>{tooltip}</div>
-    {/snippet}
-  </TooltipContent>
-</Tooltip>
+  </Tooltip.Trigger>
+  <Tooltip.Content side="left">{tooltip}</Tooltip.Content>
+</Tooltip.Root>

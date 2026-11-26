@@ -38,7 +38,6 @@
     open = true
     timer = setTimeout(() => {
       open = false
-      feedback = ''
     }, 2000)
   }
 </script>
@@ -49,6 +48,9 @@
   tooltip={feedback || label}
   disabled={disabled || text === ''}
   bind:open
+  onOpenChangeComplete={(isOpen) => {
+    if (!isOpen) feedback = ''
+  }}
   onclick={copy}
 >
   {#if feedback === 'Copied!'}
