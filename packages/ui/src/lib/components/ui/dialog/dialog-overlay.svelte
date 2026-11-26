@@ -7,9 +7,11 @@
   let {
     ref = $bindable(null),
     class: className,
+    variant = 'default',
     ...restProps
   }: ComponentProps<typeof DialogBackdrop> & {
     ref?: HTMLDivElement | null
+    variant?: 'default' | 'dark'
   } = $props()
 </script>
 
@@ -19,7 +21,8 @@
     (node) => (ref = node)
   )}
   class={cn(
-    'data-open:animate-in data-ending-style:animate-out data-ending-style:fade-out-0 data-open:fade-in-0 fixed inset-0 z-50 bg-black/50',
+    'fixed inset-0 z-50 transition-opacity duration-200 ease-out data-starting-style:opacity-0 data-ending-style:opacity-0 data-ending-style:duration-150 motion-reduce:transition-none',
+    variant === 'dark' ? 'bg-black/90' : 'bg-black/50',
     className
   )}
   {...restProps}

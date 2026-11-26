@@ -18,9 +18,39 @@ const { default: StarToggle } =
 const { default: MenuCheckbox } = await import('./fixtures/MenuCheckbox.svelte')
 const { default: CatalogSelect } =
   await import('./fixtures/CatalogSelect.svelte')
+const { default: OpenDialog } = await import('./fixtures/OpenDialog.svelte')
 const { default: NorthArrow } =
   await import('../src/lib/components/NorthArrow.svelte')
 svelteLoader.deregister()
+
+test('an open dialog renders the selected backdrop', () => {
+  for (const backdrop of [undefined, 'default', 'dark'] as const) {
+    const { body } = render(OpenDialog, { props: { backdrop } })
+    const overlay = body.match(
+      /<div\b[^>]*data-slot="dialog-backdrop"[^>]*>/
+    )?.[0]
+    assert.ok(overlay)
+    assert.match(
+      overlay,
+      backdrop === 'dark' ? /bg-black\/90\b/ : /bg-black\/50\b/
+    )
+  }
+})
+
+test('a dialog renders its decorative background inside the backdrop only while visible', () => {
+  const background = createRawSnippet(() => ({
+    render: () => '<canvas></canvas>'
+  }))
+  const { body } = render(OpenDialog, { props: { background } })
+  assert.match(
+    body,
+    /data-slot="dialog-backdrop"[^>]*>.*?<div[^>]*\binert\b[^>]*>.*?<canvas>/s
+  )
+  assert.doesNotMatch(
+    render(OpenDialog, { props: { background, open: false } }).body,
+    /<canvas>/
+  )
+})
 
 test('the SDK renders the logo as an image with the requested artwork and accessible name', () => {
   const { body } = render(Logo, { props: { inverted: true, alt: '' } })

@@ -1,15 +1,18 @@
 <script lang="ts">
   import * as Dialog from '$lib/dialog.js'
   import { Button } from '$lib/button.js'
+  import type { DialogExampleProps } from './DialogPlayground.svelte'
+
+  let { backdrop, onOpenChange }: DialogExampleProps = $props()
 </script>
 
-<Dialog.Root>
+<Dialog.Root {onOpenChange}>
   <Dialog.Trigger>
     {#snippet child({ props })}
-      <Button {...props}>Open dialog</Button>
+      <Button {...props}>Short dialog</Button>
     {/snippet}
   </Dialog.Trigger>
-  <Dialog.Content>
+  <Dialog.Content {backdrop}>
     <Dialog.Header>
       <Dialog.Title class="px-8 sm:ps-0">About this atlas</Dialog.Title>
       <Dialog.Description>

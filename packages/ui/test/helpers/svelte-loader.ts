@@ -5,6 +5,13 @@ import { compile, compileModule } from 'svelte/compiler'
 
 export const svelteLoader = registerHooks({
   resolve(specifier, context, next) {
+    if (specifier.startsWith('$lib/')) {
+      specifier = './' + specifier.slice('$lib/'.length)
+      context = {
+        ...context,
+        parentURL: new URL('../../src/lib/index.ts', import.meta.url).href
+      }
+    }
     if (specifier.endsWith('?url') || specifier.endsWith('.css')) {
       return {
         url: 'data:text/javascript,export default ' + JSON.stringify(specifier),

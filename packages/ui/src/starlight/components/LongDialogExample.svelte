@@ -1,6 +1,9 @@
 <script lang="ts">
   import * as Dialog from '$lib/dialog.js'
   import { Button } from '$lib/button.js'
+  import type { DialogExampleProps } from './DialogPlayground.svelte'
+
+  let { backdrop, onOpenChange }: DialogExampleProps = $props()
 
   const sheets = Array.from({ length: 48 }, (_, index) => ({
     number: index + 1,
@@ -9,17 +12,17 @@
   }))
 </script>
 
-<Dialog.Root>
+<Dialog.Root {onOpenChange}>
   <Dialog.Trigger>
     {#snippet child({ props })}
-      <Button {...props}>Open dialog</Button>
+      <Button {...props}>Long dialog</Button>
     {/snippet}
   </Dialog.Trigger>
-  <Dialog.Content>
+  <Dialog.Content {backdrop}>
     {#snippet stickyHeader()}
       <Dialog.Title>Atlas sheet index</Dialog.Title>
     {/snippet}
-    <Dialog.Description class="m-0 text-center sm:text-start">
+    <Dialog.Description class="text-center sm:text-start">
       Grid references for all 48 map sheets.
     </Dialog.Description>
     <ol class="m-0 list-none p-0">

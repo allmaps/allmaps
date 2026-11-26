@@ -18,6 +18,6 @@
     () => ref,
     (node) => (ref = node)
   )}
-  class={cn('text-muted-foreground text-sm', className)}
+  class={cn('m-0 text-muted-foreground text-sm', className)}
   {...restProps}
 />
