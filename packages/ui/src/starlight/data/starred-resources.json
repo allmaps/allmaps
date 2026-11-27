@@ -33,10 +33,26 @@
       }
     },
     {
+      "id": "09d2de2727b7c288",
+      "label": "Map of Boston Common",
+      "detail": "Manifest · Digital Commonwealth",
+      "href": "https://viewer.allmaps.org/?url=https://annotations.allmaps.org/manifests/09d2de2727b7c288",
+      "thumbnail": {
+        "imageInfo": {
+          "@context": "http://iiif.io/api/image/2/context.json",
+          "@id": "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:jh343z26w",
+          "protocol": "http://iiif.io/api/image",
+          "width": 7415,
+          "height": 5837,
+          "profile": ["http://iiif.io/api/image/2/level2.json"]
+        }
+      }
+    },
+    {
       "id": "23379602e8187445",
       "label": "Atlas of the city of Lynn, Massachusetts",
-      "detail": "Manifest · Digital Commonwealth",
-      "href": "https://viewer.allmaps.org/?url=https://annotations.allmaps.org/manifests/23379602e8187445",
+      "detail": "Open in Allmaps Editor to start georeferencing",
+      "href": "https://editor.allmaps.org/images?url=https%3A%2F%2Fark.digitalcommonwealth.org%2Fark%3A%2F50959%2Fdj530101x%2Fmanifest",
       "thumbnail": {
         "imageInfo": {
           "@context": "http://iiif.io/api/image/2/context.json",

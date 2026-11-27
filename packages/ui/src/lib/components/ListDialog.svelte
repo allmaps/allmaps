@@ -112,12 +112,7 @@
                 ? observeRow
                 : undefined}
             >
-              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- The caller supplies the destination. -->
-              <a
-                href={item.href}
-                onclick={closeOnNavigation}
-                class="group flex items-center gap-3 rounded-md p-2 text-foreground no-underline hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
-              >
+              {#snippet row()}
                 <div
                   class="h-18 w-24 shrink-0 overflow-hidden rounded bg-muted p-px"
                   aria-hidden="true"
@@ -146,20 +141,35 @@
                     >
                   {/if}
                 </span>
-                <ArrowRightIcon
-                  aria-hidden="true"
-                  class="size-4 shrink-0 text-muted-foreground"
-                />
-              </a>
+              {/snippet}
+              {#if item.href}
+                <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- The caller supplies the destination. -->
+                <a
+                  href={item.href}
+                  onclick={closeOnNavigation}
+                  class="group flex items-center gap-3 rounded-md p-2 text-foreground no-underline hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  {@render row()}
+                  <ArrowRightIcon
+                    aria-hidden="true"
+                    class="size-4 shrink-0 text-muted-foreground"
+                  />
+                </a>
+              {:else}
+                <div class="flex items-center gap-3 p-2">
+                  {@render row()}
+                </div>
+              {/if}
             </li>
           {/each}
         </ul>
       {/if}
     </div>
-    {#if list.status === 'ready' && list.items.length && list.openAllHref}
+    {#if list.status === 'ready' && list.items.length && list.openAllHref !== undefined}
       <Dialog.Footer>
         <Button
-          href={list.openAllHref}
+          href={list.openAllHref ?? undefined}
+          disabled={list.openAllHref === null}
           variant="primary"
           onclick={closeOnNavigation}>Open all</Button
         >
