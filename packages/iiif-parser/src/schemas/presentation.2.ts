@@ -105,7 +105,15 @@ export const Metadata2Schema = filterValidItems(ValidMetadataItem2Schema)
 export const ImageResource2Schema = z.object({
   width: optionalValue(z.number().int()),
   height: optionalValue(z.number().int()),
-  service: z.union([ImageServiceSchema, ImageServiceSchema.array()])
+  service: z.union([
+    ImageServiceSchema,
+    filterValidItems(ImageServiceSchema).refine(
+      (services) => services.length > 0,
+      {
+        error: 'At least one supported image service is required'
+      }
+    )
+  ])
 })
 
 export const Annotation2Schema = z.object({
