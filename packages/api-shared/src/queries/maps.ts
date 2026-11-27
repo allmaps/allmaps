@@ -1,4 +1,5 @@
-import { canonicalImageId } from './image-aliases.js'
+import { eq, type SQL } from 'drizzle-orm'
+import { canonicalImageIdSql } from './image-aliases.js'
 import { mapFilters, imageFilters } from './map-filters.js'
 
 import { generateAnnotation } from '@allmaps/annotation'
@@ -30,9 +31,6 @@ export async function queryMaps(
   params: Partial<MapsQueryParams>,
   responseOptions?: Partial<ResponseOptions>
 ) {
-  if (params.imageId && !params.imageChecksum && !params.checksum) {
-    params = { ...params, imageId: await canonicalImageId(db, params.imageId) }
-  }
   const defaultResponseOptions: ResponseOptions = {
     format: 'map',
     expectRows: false,
@@ -48,6 +46,10 @@ export async function queryMaps(
   const isGeospatialQuery =
     params.intersectsWith || params.containedBy ? true : false
   const onlyLatest = !(params.checksum || params.imageChecksum)
+  const imageId =
+    onlyLatest && params.imageId
+      ? canonicalImageIdSql(params.imageId)
+      : params.imageId
   // Explicit historical versions remain available even when archived.
   const excludeArchived = onlyLatest && responseOptions.excludeArchived
 
@@ -138,9 +140,10 @@ export async function queryMaps(
           }
         },
         {
-          imageId: {
-            eq: params.imageId
-          }
+          RAW:
+            imageId === undefined
+              ? undefined
+              : (maps) => eq(maps.imageId, imageId)
         },
         {
           latest: { eq: onlyLatest ? true : undefined }
@@ -193,7 +196,7 @@ export async function queryMaps(
     rows.length === 0 &&
     (responseOptions.expectRows ||
       (responseOptions.expectIiifResource &&
-        !(await iiifScopeExists(db, params))))
+        !(await iiifScopeExists(db, params, imageId))))
   ) {
     let message = 'Not found'
     if (params.mapId) {
@@ -249,7 +252,11 @@ export async function queryMaps(
   }
 }
 
-async function iiifScopeExists(db: Db, params: Partial<MapsQueryParams>) {
+async function iiifScopeExists(
+  db: Db,
+  params: Partial<MapsQueryParams>,
+  imageId: SQL<string> | string | undefined
+) {
   const columns = { id: true } as const
   if (params.imageChecksum) {
     return db.query.maps.findFirst({
@@ -257,10 +264,10 @@ async function iiifScopeExists(db: Db, params: Partial<MapsQueryParams>) {
       where: { imageId: params.imageId, imageChecksum: params.imageChecksum }
     })
   }
-  if (params.imageId)
+  if (imageId !== undefined)
     return db.query.images.findFirst({
       columns,
-      where: { id: params.imageId, archived: false }
+      where: { archived: false, RAW: (images) => eq(images.id, imageId) }
     })
   if (params.canvasId)
     return db.query.canvases.findFirst({

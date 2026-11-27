@@ -395,6 +395,36 @@ it('resolves alternate services, preserves pixel coordinates and moves the edite
     uri: moved
   })
   expect(await getMaps()).toMatchObject([{ resource: { id: moved } }])
+  const getImageMaps = async (uri: string, status: number) => {
+    const reads = vi.spyOn(context.client, 'query')
+    try {
+      const response = await request('/images/' + hash(uri) + '/maps')
+      expect(response.status).toBe(status)
+      expect(reads).toHaveBeenCalledTimes(1)
+      return await response.json()
+    } finally {
+      reads.mockRestore()
+    }
+  }
+  const currentMaps = await getImageMaps(moved, 200)
+  expect(currentMaps).toMatchObject([{ resource: { id: moved } }])
+  expect(await getImageMaps(canonical, 200)).toEqual(currentMaps)
+  await getImageMaps(base + '/missing', 404)
+
+  const filtered = await context.annotations.handle(
+    new Request(
+      context.env.PUBLIC_ANNOTATIONS_BASE_URL +
+        '/images/' +
+        hash(v2) +
+        '?minArea=1e20'
+    )
+  )
+  expect(filtered.status).toBe(200)
+  expect(await filtered.json()).toMatchObject({
+    type: 'AnnotationPage',
+    items: []
+  })
+
   const getStatus = async (uri: string) => {
     const response = await request('/images/' + hash(uri) + '/georeferenced')
     expect(response.status).toBe(200)

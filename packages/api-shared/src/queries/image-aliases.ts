@@ -15,6 +15,14 @@ export async function lockImageIds(db: DbOrTx, ids: string[]) {
   }
 }
 
+export function canonicalImageIdSql(imageId: string) {
+  // Images registered before aliases use their own ID.
+  return sql<string>`coalesce((
+    select ${imageAliases.canonicalImageId} from ${imageAliases}
+    where ${imageAliases.imageId} = ${imageId}
+  ), ${imageId}::text)`
+}
+
 export async function canonicalImageId(db: DbOrTx, imageId: string) {
   const [row] = await db
     .select()
