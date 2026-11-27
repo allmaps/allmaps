@@ -7,6 +7,7 @@ import {
   createImageFromUrl,
   createManifestFromUrl,
   createUserList,
+  getSavedImageResource,
   queryListGeoreferenceAnnotations,
   migrateImage,
   queryImageChecksums,
@@ -597,6 +598,76 @@ it('leaves a legacy document with existing edits reachable when discovery finds 
     )
   )
   expect((await migrated.json()).maps).toHaveLength(1)
+})
+
+it('reads image details and saved resources in one query for each image ID', async () => {
+  const current = base + '/single-read/current'
+  const old = base + '/single-read/old'
+  const legacy = base + '/single-read/legacy'
+  const pending = base + '/single-read/pending'
+  const unknown = base + '/single-read/unknown'
+  await context.db.insert(schema.images).values(
+    [current, legacy, pending].map((uri) => ({
+      id: hash(uri),
+      uri,
+      data: uri === pending ? null : info(uri)
+    }))
+  )
+  await context.db.insert(schema.imageAliases).values(
+    [current, old].map((uri) => ({
+      imageId: hash(uri),
+      canonicalImageId: hash(current)
+    }))
+  )
+
+  const inOneRead = async <T>(read: () => Promise<T>) => {
+    const queries = vi.spyOn(context.client, 'query')
+    try {
+      return await read()
+    } finally {
+      const count = queries.mock.calls.length
+      queries.mockRestore()
+      expect(count).toBe(1)
+    }
+  }
+  const api = context.env.PUBLIC_REST_BASE_URL
+  const details = (uri: string) =>
+    inOneRead(() =>
+      context.rest.handle(new Request(api + '/images/' + hash(uri)))
+    )
+  const saved = (uri: string) =>
+    inOneRead(() => getSavedImageResource(context.db, uri))
+
+  for (const uri of [current, legacy, pending]) {
+    const response = await details(uri)
+    expect(response.status).toBe(200)
+    expect(await response.json()).toMatchObject({
+      id: api + '/images/' + hash(uri),
+      uri,
+      fetched: uri !== pending,
+      createdAt: expect.stringMatching(/Z$/),
+      maps: [],
+      canvases: []
+    })
+  }
+  const redirect = await details(old)
+  expect(redirect.status).toBe(302)
+  expect(redirect.headers.get('Location')).toBe(
+    api + '/images/' + hash(current)
+  )
+  expect((await details(unknown)).status).toBe(404)
+
+  for (const uri of [old, current, legacy]) {
+    expect(await saved(uri)).toEqual({
+      id: uri === old ? current : uri,
+      type: 'ImageService3',
+      width: 1000,
+      height: 1000
+    })
+  }
+  for (const uri of [pending, unknown]) {
+    await expect(saved(uri)).rejects.toMatchObject({ status: 409 })
+  }
 })
 
 it('moves an unedited image twice and redirects directly to the current service', async () => {

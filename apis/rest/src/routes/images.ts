@@ -9,7 +9,6 @@ import { adminDetail } from '../openapi.js'
 import {
   migrateImage,
   archiveImage,
-  canonicalImageId,
   queryImage,
   queryImageGeoreferencing,
   queryImages,
@@ -207,13 +206,20 @@ export function createImagesRoutes(
     .get(
       '/images/:imageId',
       async ({ env, db, params, set, redirect }) => {
-        const id = await canonicalImageId(db, params.imageId)
-        if (id !== params.imageId) {
+        const result = await queryImage(
+          env.PUBLIC_REST_BASE_URL,
+          db,
+          params.imageId
+        )
+        if ('redirectId' in result) {
           setCacheControl(set, 'public-short')
-          return redirect(`${env.PUBLIC_REST_BASE_URL}/images/${id}`, 302)
+          return redirect(
+            `${env.PUBLIC_REST_BASE_URL}/images/${result.redirectId}`,
+            302
+          )
         }
         setCacheControl(set, 'public-medium')
-        return queryImage(env.PUBLIC_REST_BASE_URL, db, params.imageId)
+        return result
       },
       {
         params: t.Object({ imageId: t.String() }),

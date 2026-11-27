@@ -6,6 +6,7 @@ import {
   gt,
   inArray,
   lte,
+  ne,
   notExists,
   sql
 } from 'drizzle-orm'
@@ -27,7 +28,7 @@ import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 import type { LanguageString } from '@allmaps/iiif-parser'
 import {
   EditedImageAliasError,
-  canonicalImageId,
+  canonicalImageIdSql,
   editedImageGroups,
   repointImageGroup,
   lockImageIds,
@@ -230,7 +231,7 @@ function fromDbCanvas(restBaseUrl: string, dbCanvas: DbCanvas) {
 }
 
 export async function queryImage(restBaseUrl: string, db: Db, imageId: string) {
-  const image = await db.query.images.findFirst({
+  const details = db.query.images.findFirst({
     columns: {
       id: true,
       uri: true,
@@ -283,12 +284,38 @@ export async function queryImage(restBaseUrl: string, db: Db, imageId: string) {
     }
   })
 
-  if (image) {
-    return fromDbImage(restBaseUrl, image)
-  } else {
-    const message = `Image not found: ${imageId}`
-    throw new ResponseError(message, 404)
+  // A redirect only needs the alias row. Evaluate the detail query (including
+  // maps and canvases) only when the requested ID serves the image itself.
+  const { imageAliases } = schema
+  type ImageDetails = Omit<
+    NonNullable<Awaited<typeof details>>,
+    'createdAt' | 'updatedAt'
+  > & {
+    createdAt: string
+    updatedAt: string
   }
+  const [result] = await db
+    .select({
+      redirectId: imageAliases.canonicalImageId,
+      image: sql<ImageDetails | null>`case when ${imageAliases.imageId} is null
+        then (select row_to_json(detail) from (${details.getSQL()}) detail)
+      end`
+    })
+    .from(sql`(values (${imageId}::text)) as requested(id)`)
+    .leftJoin(
+      imageAliases,
+      and(
+        eq(imageAliases.imageId, sql`requested.id`),
+        ne(imageAliases.canonicalImageId, imageId)
+      )
+    )
+  if (result.redirectId) return { redirectId: result.redirectId }
+  if (!result.image) throw new ResponseError(`Image not found: ${imageId}`, 404)
+  return fromDbImage(restBaseUrl, {
+    ...result.image,
+    createdAt: new Date(result.image.createdAt),
+    updatedAt: new Date(result.image.updatedAt)
+  })
 }
 
 export async function queryImages(
@@ -876,9 +903,9 @@ function serviceUri(url: string) {
 }
 
 export async function getSavedImageResource(db: Db, uri: string) {
-  const id = await canonicalImageId(db, generateImageHash(uri))
+  const id = canonicalImageIdSql(generateImageHash(uri))
   const record = await db.query.images.findFirst({
-    where: { id },
+    where: { RAW: (images) => eq(images.id, id) },
     columns: { data: true }
   })
   if (!record?.data) {
