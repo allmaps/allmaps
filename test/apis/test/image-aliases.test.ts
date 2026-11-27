@@ -373,6 +373,26 @@ it('resolves alternate services, preserves pixel coordinates and moves the edite
     uri: moved
   })
   expect(await getMaps()).toMatchObject([{ resource: { id: moved } }])
+  const getStatus = async (uri: string) => {
+    const response = await request('/images/' + hash(uri) + '/georeferenced')
+    expect(response.status).toBe(200)
+    return response.json()
+  }
+  const statusQuery = vi.spyOn(context.client, 'query')
+  try {
+    const currentStatus = await getStatus(moved)
+    expect(currentStatus).toEqual({
+      georeferenced: true,
+      mapCount: 1,
+      georeferencedMapCount: 1,
+      georeferencingUpdatedAt: expect.any(String)
+    })
+    expect(await getStatus(canonical)).toEqual(currentStatus)
+    expect(statusQuery).toHaveBeenCalledTimes(2)
+  } finally {
+    statusQuery.mockRestore()
+  }
+
   const historyQuery = vi.spyOn(context.client, 'query')
   try {
     const history = await queryImageChecksums(

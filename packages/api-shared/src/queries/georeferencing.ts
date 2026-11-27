@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, not, sql } from 'drizzle-orm'
 
 import { schema } from '@allmaps/db/schema'
 
@@ -16,18 +16,22 @@ const mapSummary = {
 }
 
 export async function queryImageGeoreferencing(db: Db, imageId: string) {
-  const { maps, images } = schema
+  const { maps, images, imageAliases } = schema
+  // Images registered before aliases use their own ID.
+  const canonicalId = sql`coalesce((
+    select ${imageAliases.canonicalImageId} from ${imageAliases}
+    where ${imageAliases.imageId} = ${imageId}
+  ), ${imageId}::text)`
+  const activeImageId = db
+    .select({ id: images.id })
+    .from(images)
+    .where(and(eq(images.id, canonicalId), not(images.archived)))
+
   const [summary] = await db
     .select(mapSummary)
     .from(maps)
-    .innerJoin(images, eq(images.id, maps.imageId))
     .where(
-      and(
-        eq(maps.imageId, imageId),
-        eq(maps.latest, true),
-        eq(maps.archived, false),
-        eq(images.archived, false)
-      )
+      and(eq(maps.imageId, activeImageId), maps.latest, not(maps.archived))
     )
 
   return {
