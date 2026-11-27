@@ -74,6 +74,12 @@
     return () => clearTimeout(timeout)
   })
 
+  const headerTitle = $derived.by(() => {
+    if (source.parsed.type === 'annotation' && source.parsed.label)
+      return source.parsed.label
+    return title
+  })
+
   let labelStrings = $derived.by(() => {
     let manifestLabel: string | undefined
     let canvasLabel: string | undefined
@@ -201,8 +207,8 @@
         {/if}
         <span class="sr-only">{iconLabel}</span>
       </div>
-      {#if title}
-        <span class="min-w-0 truncate font-medium">{title}</span>
+      {#if headerTitle}
+        <span class="min-w-0 truncate font-medium">{headerTitle}</span>
         {#if titleBadge}
           <span
             class="hidden shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 @min-lg:inline"

@@ -22,7 +22,7 @@ import ListDialogPlayground, {
 
 Use `ListDialog` to show saved resources. The app fetches the list and supplies the loading, error, or ready state. Give each item a stable ID and a label. Supply `href` to make the whole row a link. For a manifest without georeferenced maps, link to Allmaps Editor and use `detail` to explain the destination. Omit `href` for items with no destination.
 
-Supply the list URL in `openAllHref` when at least one item can open in Viewer. Pass `null` to show **Open all** disabled, or omit it to hide the button.
+Supply a Viewer link in `openAllHref` when at least one bookmark contains a georeferenced map. Set the Viewer link’s `url` parameter to the list’s `georeferenceAnnotations` URL. Pass `null` to show **Open all** disabled, or omit it to hide the button.
 
 <UsageCode live code={formatUsage()} />
 
