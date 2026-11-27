@@ -6,7 +6,7 @@
   "include": [
     ".astro/types.d.ts",
     "src/content.config.ts",
-    "src/components/**/*",
+    "src/starlight/components/**/*",
     "astro.config.js"
   ]
 }

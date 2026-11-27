@@ -4,7 +4,7 @@
   import ControlContainer from './ControlContainer.svelte'
   import Control from './Control.svelte'
 
-  import { hasInputTarget } from '$lib/shared/keyboard.js'
+  import { shouldIgnoreMapShortcut } from '$lib/shared/keyboard.js'
 
   import { getUiState } from '$lib/state/ui.svelte.js'
 
@@ -14,7 +14,7 @@
   let isImageView = $derived(uiState.view === 'image')
 
   function handleKeyPress(event: KeyboardEvent) {
-    if (hasInputTarget(event)) {
+    if (shouldIgnoreMapShortcut(event)) {
       return
     }
 

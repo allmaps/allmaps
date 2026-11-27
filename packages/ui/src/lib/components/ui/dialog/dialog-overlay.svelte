@@ -1,19 +1,28 @@
 <script lang="ts">
-  import { Dialog as DialogPrimitive } from 'bits-ui'
+  import { elementRef } from '../element-ref.js'
+  import { DialogBackdrop } from '@ui-sdk/svelte/dialog'
+  import type { ComponentProps } from 'svelte'
   import { cn } from '../utils.js'
 
   let {
     ref = $bindable(null),
     class: className,
+    variant = 'default',
     ...restProps
-  }: DialogPrimitive.OverlayProps = $props()
+  }: ComponentProps<typeof DialogBackdrop> & {
+    ref?: HTMLDivElement | null
+    variant?: 'default' | 'dark'
+  } = $props()
 </script>
 
-<DialogPrimitive.Overlay
-  bind:ref
-  data-slot="dialog-overlay"
+<DialogBackdrop
+  {@attach elementRef<HTMLDivElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
   class={cn(
-    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
+    'fixed inset-0 z-50 transition-opacity duration-200 ease-out data-starting-style:opacity-0 data-ending-style:opacity-0 data-ending-style:duration-150 motion-reduce:transition-none',
+    variant === 'dark' ? 'bg-black/90' : 'bg-black/50',
     className
   )}
   {...restProps}

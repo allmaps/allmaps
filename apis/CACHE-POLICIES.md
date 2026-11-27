@@ -61,6 +61,11 @@ served under these public policies.
 | `/maps/random`                                                                                         | private, no-store                   |
 | `/@:username/lists`, `/@:username/lists/:listId`, `/@:username/lists/:listId/georeference-annotations` | private, no-store                   |
 
+An individual list URL publishes an ordered Web Annotation bookmark collection.
+Its `/georeference-annotations` link publishes the drawable map revisions, or returns 204 when there are none.
+Listing a user's lists requires an owner or admin session. All list responses
+use `private, no-store` so changes are visible on the next request.
+
 In both APIs, `/auth` and `/auth/*` (Better Auth), `/login/github`, `/login/google`, `/logout` and
 `/openapi.json` are private/no-store. OPTIONS responses are uncached HTTP
 responses; CORS preflight caching via Access-Control-Max-Age is independent.
@@ -104,7 +109,7 @@ explicit no-cache requests go to the database, without storing their response.
 Here and Latest omit credentials for map searches within the public limit of 200,
 including for signed-in visitors. Larger requests retain `credentials: 'include'`
 so the user's tier still applies. The limit is shared by the API and browser
-helper in `@allmaps/stdlib`. Private lists and personalized organization requests
+helper in `@allmaps/stdlib`. List management and personalized organization requests
 retain their existing authentication behavior. Viewer already uses the default
 same-origin credentials mode for arbitrary source URLs; its public image/manifest
 annotation lookups now explicitly omit credentials. External sources retain their

@@ -1,5 +1,6 @@
 export type SourceLoadErrorCode =
   | 'annotation-without-maps'
+  | 'list-without-maps'
   // TODO: add `canvas-without-maps` once Viewer and Editor can load IIIF Canvas resources directly.
   | 'image-without-maps'
   | 'manifest-without-maps'
@@ -10,6 +11,10 @@ type SourceLoadErrorInfo = {
 }
 
 const sourceLoadErrors: Record<SourceLoadErrorCode, SourceLoadErrorInfo> = {
+  'list-without-maps': {
+    title: 'No georeferenced maps found',
+    message: 'This list has no georeferenced maps.'
+  },
   'annotation-without-maps': {
     title: 'Annotation contains no maps',
     message:

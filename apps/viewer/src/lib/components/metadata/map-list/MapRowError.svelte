@@ -1,13 +1,16 @@
 <script lang="ts">
   import { SealWarning as SealWarningIcon } from 'phosphor-svelte'
 
+  import type { Snippet } from 'svelte'
+
   type Props = {
+    children?: Snippet
     title: string
     errorTitle: string
     errorMessage?: string
   }
 
-  let { title, errorTitle, errorMessage }: Props = $props()
+  let { title, errorTitle, errorMessage, children }: Props = $props()
 </script>
 
 <div
@@ -20,6 +23,7 @@
     >
       {title}
     </h4>
+    {@render children?.()}
   </div>
 
   <p>{errorTitle}</p>

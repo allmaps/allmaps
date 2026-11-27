@@ -9,7 +9,10 @@
   import AnnotationInput from '$lib/components/input/AnnotationInput.svelte'
   import MapList from './MapList.svelte'
   import OrganizationBadge from './OrganizationBadge.svelte'
+  import SourceStarToggle from './SourceStarToggle.svelte'
 
+  import { annotationsBaseUrl } from '$lib/shared/auth.js'
+  import { getStarredResource } from '$lib/shared/starred.js'
   import { getErrorsState } from '$lib/state/errors.svelte.js'
   import { getUiState } from '$lib/state/ui.svelte.js'
 
@@ -41,6 +44,7 @@
   }: Props = $props()
 
   let open = $state(false)
+  let starredResource = $derived(getStarredResource(source, annotationsBaseUrl))
 
   const uiState = getUiState()
   const errorsState = getErrorsState()
@@ -74,34 +78,74 @@
     return () => clearTimeout(timeout)
   })
 
-  let labelStrings = $derived.by(() => {
-    let manifestLabel: string | undefined
-    let canvasLabel: string | undefined
-
-    if (labels.manifest) {
-      manifestLabel = parseLanguageString(labels.manifest, 'en')
-    }
-
-    if (labels.canvas) {
-      canvasLabel = parseLanguageString(labels.canvas, 'en')
-    }
-
-    // If the manifest and canvas labels are the same, don't show the canvas label
-    if (manifestLabel === canvasLabel) {
-      canvasLabel = undefined
-    }
-
-    return [manifestLabel, canvasLabel].filter((label) => label !== undefined)
-  })
-
   let sourceUrl = $derived.by(() => {
     if (source.sourceType === 'url') {
       return source.url
     }
   })
 
+  const headerResource = $derived.by(() => {
+    if (source.sourceType !== 'url') return
+    if (starredResource) return starredResource.type
+    if (source.allmapsId?.startsWith('maps/')) return 'map'
+    if (
+      source.allmapsId?.startsWith('images/') ||
+      (source.parsed.type === 'iiif' && source.parsed.iiif.type === 'image')
+    )
+      return 'image'
+    if (
+      source.allmapsId?.startsWith('manifests/') ||
+      (source.parsed.type === 'iiif' && source.parsed.iiif.type === 'manifest')
+    )
+      return 'manifest'
+    if (
+      source.parsed.type === 'annotation' &&
+      source.parsed.maps.length === 1 &&
+      source.parsed.maps[0].id === source.url
+    )
+      return 'map'
+  })
+
+  const imageHeaderTitle = $derived.by(() => {
+    if (headerResource !== 'image') return
+
+    const canvases = [
+      ...(mapsHierarchy.mapsByCanvas ?? []),
+      ...(mapsHierarchy.mapsByManifest ?? []).flatMap(
+        (manifest) => manifest.mapsByCanvas
+      )
+    ]
+    const titles = new Set(
+      canvases
+        .map(({ canvas }) => parseLanguageString(canvas.label, 'en').trim())
+        .filter((label) => label && label !== '-')
+    )
+    return titles.size === 1 ? [...titles][0] : sourceUrl
+  })
+
+  const headerTitle = $derived.by(() => {
+    if (source.parsed.type === 'annotation' && source.parsed.label)
+      return source.parsed.label
+    if (!headerResource) return title
+  })
+
+  const labelStrings = $derived.by(() => {
+    const manifest = parseLanguageString(labels.manifest, 'en').trim()
+    if (headerResource === 'manifest') {
+      const manifestTitle =
+        source.parsed.type === 'iiif' && source.parsed.iiif.type === 'manifest'
+          ? parseLanguageString(source.parsed.iiif.label, 'en').trim()
+          : undefined
+      return [manifestTitle || manifest].filter(Boolean)
+    }
+    if (headerResource === 'map') return [manifest, 'Map 1'].filter(Boolean)
+    const sheet =
+      imageHeaderTitle ?? parseLanguageString(labels.canvas, 'en').trim()
+    return [...new Set([manifest, sheet].filter(Boolean))]
+  })
+
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === '/' && event.metaKey) {
+    if (!uiState.modalOpen.keyboard && event.key === '/' && event.metaKey) {
       open = !open
     }
   }
@@ -121,7 +165,12 @@
   {#each labels as label, index (index)}
     {@const last = index === labels.length - 1}
 
-    <span class={['min-w-6 truncate font-medium']}>{label}</span>
+    <span
+      class={[
+        'min-w-6 truncate font-medium',
+        imageHeaderTitle && labels.length > 1 && last && 'max-w-1/2 shrink-0'
+      ]}>{label}</span
+    >
     {#if !last}
       {@render separator()}
     {/if}
@@ -170,63 +219,79 @@
   />
 {/snippet}
 
-<Popover bind:open>
-  {#snippet button()}
-    <div
-      class="min-w-0 max-w-xl min-h-8.5 truncate shadow hover:shadow-lg transition-all duration-100
-          bg-white rounded-full px-2 py-1.5 cursor-pointer text-sm text-green font-medium leading-tight
-            flex gap-2 items-center"
-    >
-      <div class="grid size-5 shrink-0 place-items-center text-black/80">
-        {#if showTilesLoading}
-          <div
-            class="col-start-1 row-start-1 grid size-5 place-items-center"
-            in:receive={{ key: 'info-loading-icon' }}
-            out:send={{ key: 'info-loading-icon' }}
-          >
-            <LoadingSmall />
-          </div>
+<div
+  class="flex min-w-0 max-w-xl items-center rounded-full bg-white pe-0.5 shadow transition-shadow duration-100 hover:shadow-lg"
+>
+  <Popover bind:open>
+    {#snippet button()}
+      <div
+        class={[
+          'flex min-h-8.5 min-w-0 cursor-pointer items-center gap-2 truncate rounded-full py-1.5 ps-2 text-sm leading-tight font-medium text-green',
+          headerResource ? 'pe-0.5' : 'pe-2'
+        ]}
+      >
+        <div class="grid size-5 shrink-0 place-items-center text-black/80">
+          {#if showTilesLoading}
+            <div
+              class="col-start-1 row-start-1 grid size-5 place-items-center"
+              in:receive={{ key: 'info-loading-icon' }}
+              out:send={{ key: 'info-loading-icon' }}
+            >
+              <LoadingSmall />
+            </div>
+          {:else}
+            <div
+              class="col-start-1 row-start-1 grid size-5 place-items-center"
+              in:receive={{ key: 'info-loading-icon' }}
+              out:send={{ key: 'info-loading-icon' }}
+            >
+              {#if errorsState.hasSourceInfoWarnings}
+                <SealWarningIcon class="size-5 text-red" weight="bold" />
+              {:else}
+                <InfoIcon class="size-5" weight="bold" />
+              {/if}
+            </div>
+          {/if}
+          <span class="sr-only">{iconLabel}</span>
+        </div>
+        {#if headerTitle}
+          <span class="min-w-0 truncate font-medium">{headerTitle}</span>
+          {#if titleBadge}
+            <span
+              class="hidden shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 @min-lg:inline"
+            >
+              {titleBadge}
+            </span>
+          {/if}
+          <OrganizationBadge {organization} class="hidden @min-2xl:inline" />
         {:else}
-          <div
-            class="col-start-1 row-start-1 grid size-5 place-items-center"
-            in:receive={{ key: 'info-loading-icon' }}
-            out:send={{ key: 'info-loading-icon' }}
-          >
-            {#if errorsState.hasSourceInfoWarnings}
-              <SealWarningIcon class="size-5 text-red" weight="bold" />
-            {:else}
-              <InfoIcon class="size-5" weight="bold" />
-            {/if}
-          </div>
+          {@render segments({
+            labelStrings,
+            sourceUrl,
+            organization
+          })}
         {/if}
-        <span class="sr-only">{iconLabel}</span>
       </div>
-      {#if title}
-        <span class="min-w-0 truncate font-medium">{title}</span>
-        {#if titleBadge}
-          <span
-            class="hidden shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 @min-lg:inline"
-          >
-            {titleBadge}
-          </span>
-        {/if}
-        <OrganizationBadge {organization} class="hidden @min-2xl:inline" />
-      {:else}
-        {@render segments({
-          labelStrings,
-          sourceUrl,
-          organization
-        })}
-      {/if}
-    </div>
-  {/snippet}
-  {#snippet contents()}
-    <div class="max-w-full w-xl">
-      <div class="hidden pb-2 sm:block pointer-coarse:hidden">
-        {@render urlInput()}
-      </div>
+    {/snippet}
+    {#snippet contents()}
+      <div class="max-w-full w-xl">
+        <div class="hidden pb-2 sm:block pointer-coarse:hidden">
+          {@render urlInput()}
+        </div>
 
-      <MapList {mapsHierarchy} bind:selectedMapId {open} />
-    </div>
-  {/snippet}
-</Popover>
+        <MapList
+          sourceResource={headerResource}
+          {mapsHierarchy}
+          bind:selectedMapId
+          {open}
+        />
+      </div>
+    {/snippet}
+  </Popover>
+  {#if headerResource}
+    {@const headerStar = `Star ${headerResource}`}
+    {#key source.hash}
+      <SourceStarToggle resource={starredResource} label={headerStar} />
+    {/key}
+  {/if}
+</div>

@@ -1,3 +1,4 @@
+import { annotationExamples } from './examples/annotations.ts'
 import { validateAnnotationUrl } from './examples/source.ts'
 
 export type ImageSettings = {
@@ -5,6 +6,18 @@ export type ImageSettings = {
   width: number
   height: number
   format: 'png' | 'webp' | 'jpeg'
+}
+
+export const imageExamples = annotationExamples.map((example) => ({
+  ...example,
+  annotationUrl: example.annotationUrl.replace(/@[0-9a-f]{16}$/, '')
+}))
+
+export const defaultImageSettings: ImageSettings = {
+  annotationUrl: imageExamples[0].annotationUrl,
+  width: 1024,
+  height: 1024,
+  format: 'png'
 }
 
 export type ImageWorkerResponse =

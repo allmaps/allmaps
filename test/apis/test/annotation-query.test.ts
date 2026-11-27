@@ -57,8 +57,7 @@ describe('annotation query parameters', () => {
       canvas: '/canvases/' + image.canvasId,
       manifest: '/manifests/' + catalog.manifests[0].id,
       organization: '/organizations/' + catalog.organizations[0].slug,
-      list: listPath,
-      listAlias: listPath + '/georeference-annotations'
+      listExport: listPath + '/georeference-annotations'
     }))
       paths.set(key, path)
   })
@@ -77,8 +76,7 @@ describe('annotation query parameters', () => {
     'canvas',
     'manifest',
     'organization',
-    'list',
-    'listAlias'
+    'listExport'
   ])('honors the same spatial filters on %s', async (route) => {
     const path = paths.get(route)!
     const single = ['map', 'random', 'version'].includes(route)

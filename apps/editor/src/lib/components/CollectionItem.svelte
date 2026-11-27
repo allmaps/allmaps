@@ -130,6 +130,7 @@
       {#if thumbnail}
         <img
           class="h-full w-full rounded object-contain inset-shadow-xs"
+          loading="lazy"
           src={thumbnail.id}
           alt={m.thumbnail()}
         />

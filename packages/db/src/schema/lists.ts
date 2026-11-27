@@ -3,6 +3,7 @@ import {
   integer,
   boolean,
   foreignKey,
+  index,
   pgTable,
   check,
   uniqueIndex
@@ -43,6 +44,7 @@ export const listItems = pgTable(
     createdAt: createTimestamp('created_at')
   },
   (table) => [
+    index('list_items_list_id_idx').on(table.listId),
     uniqueIndex('list_items_list_map_uidx')
       .on(
         table.listId,

@@ -1,0 +1,28 @@
+@import './tokens.css';
+
+/* Map Tailwind utilities to the Allmaps theme. */
+@theme inline {
+  --font-allmaps-ui: var(--allmaps-ui-font-sans);
+  --font-allmaps-ui-mono: var(--allmaps-ui-font-mono);
+  --color-background: var(--allmaps-ui-background);
+  --color-foreground: var(--allmaps-ui-foreground);
+  --color-card: var(--allmaps-ui-card);
+  --color-card-foreground: var(--allmaps-ui-card-foreground);
+  --color-popover: var(--allmaps-ui-popover);
+  --color-menu-highlight: var(--allmaps-ui-menu-highlight);
+  --color-popover-foreground: var(--allmaps-ui-popover-foreground);
+  --color-primary: var(--allmaps-ui-primary);
+  --color-primary-foreground: var(--allmaps-ui-primary-foreground);
+  --color-secondary: var(--allmaps-ui-secondary);
+  --color-secondary-foreground: var(--allmaps-ui-secondary-foreground);
+  --color-muted: var(--allmaps-ui-muted);
+  --color-muted-foreground: var(--allmaps-ui-muted-foreground);
+  --color-accent: var(--allmaps-ui-accent);
+  --color-accent-foreground: var(--allmaps-ui-accent-foreground);
+  --color-destructive: var(--allmaps-ui-destructive);
+  --color-destructive-button: var(--allmaps-ui-button-destructive);
+  --color-border: var(--allmaps-ui-border);
+  --color-input: var(--allmaps-ui-input);
+  --color-ring: var(--allmaps-ui-ring);
+  --radius-ui: var(--allmaps-ui-radius);
+}

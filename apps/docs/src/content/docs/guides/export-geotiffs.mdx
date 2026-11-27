@@ -3,7 +3,7 @@ title: GeoTIFFs with Allmaps CLI and GDAL
 description: Create GeoTIFFs from Georeference Annotations with Allmaps CLI and GDAL
 ---
 
-import GeotiffExample from '../../../components/GeotiffExample.astro'
+import GeotiffExample from '../../../components/examples/GeotiffExample.svelte'
 
 GeoTIFF files store image pixels together with the coordinate information
 needed to place them on a map. Export your georeferenced IIIF maps as GeoTIFFs
@@ -85,7 +85,7 @@ The **Required source images** section provides download commands,
 full-resolution JPEG links, and the expected filenames and dimensions.
 Download those images and run the script locally as described above.
 
-<GeotiffExample />
+<GeotiffExample client:visible />
 
 ## Create XYZ tiles with gdal2tiles
 

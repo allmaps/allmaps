@@ -1,17 +1,24 @@
 <script lang="ts">
-  import { Separator } from 'bits-ui'
-  import type { Separator as SeparatorPrimitive } from 'bits-ui'
+  import { SelectSeparator } from '@ui-sdk/svelte/select'
+  import type { ComponentProps } from 'svelte'
+  import { elementRef } from '../element-ref.js'
+  import type { WithElementRef } from '../types.js'
 
   let {
     ref = $bindable(null),
     class: className,
-    ...restProps
-  }: SeparatorPrimitive.RootProps = $props()
+    ...rest
+  }: WithElementRef<
+    ComponentProps<typeof SelectSeparator>,
+    HTMLDivElement
+  > = $props()
 </script>
 
-<Separator.Root
-  bind:ref
-  data-slot="select-separator"
+<SelectSeparator
+  {...rest}
+  {@attach elementRef<HTMLDivElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
   class={['allmaps-ui allmaps-select-separator', className]}
-  {...restProps}
 />

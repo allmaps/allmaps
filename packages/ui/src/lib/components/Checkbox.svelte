@@ -1,53 +1,84 @@
 <script lang="ts">
-  import { Checkbox, Label } from 'bits-ui'
-
+  import '../css/ui-base.css'
+  import { Checkbox as CheckboxPrimitive } from '@ui-sdk/svelte/checkbox'
+  import { elementRef } from './ui/element-ref.js'
   import CheckIcon from 'phosphor-svelte/lib/CheckIcon'
-
-  import type { Snippet } from 'svelte'
-
-  type Props = {
-    checked?: boolean
-    disabled?: boolean
-    children: Snippet
-  }
+  import MinusIcon from 'phosphor-svelte/lib/MinusIcon'
+  import type { NamedProps } from './ui/types.js'
+  import type { ComponentProps, Snippet } from 'svelte'
+  import { cn } from './ui/utils.js'
 
   const uid = $props.id()
-
   let {
+    id = uid,
     checked = $bindable(false),
-    disabled = false,
-    children
-  }: Props = $props()
+    indeterminate = $bindable(false),
+    ref = $bindable(null),
+    class: className,
+    children,
+    onCheckedChange,
+    onIndeterminateChange,
+    ...rest
+  }: Omit<
+    NamedProps<ComponentProps<typeof CheckboxPrimitive>>,
+    'checked' | 'defaultChecked' | 'onCheckedChange' | 'children'
+  > & {
+    checked?: boolean
+    indeterminate?: boolean
+    ref?: HTMLButtonElement | null
+    onCheckedChange?: (value: boolean) => void
+    onIndeterminateChange?: (value: boolean) => void
+    children?: Snippet
+  } = $props()
 </script>
 
-<div class="flex items-center gap-2">
-  <Checkbox.Root
-    id={uid}
-    bind:checked
-    {disabled}
-    aria-labelledby="{uid}-label"
-    class="border-gray peer group cursor-pointer
-      border-1 inset-shadow-xs
-      hover:not-disabled:bg-gray-50
-      disabled:cursor-not-allowed disabled:opacity-60
-      inline-flex size-6 items-center justify-center rounded-md
-      transition-all"
+{#snippet control()}
+  <CheckboxPrimitive
+    {...rest}
+    defaultChecked={undefined}
+    {id}
+    {@attach elementRef<HTMLButtonElement>(
+      () => ref,
+      (node) => (ref = node)
+    )}
+    bind:checked={
+      () => (indeterminate ? 'indeterminate' : checked),
+      (next) => {
+        if (indeterminate !== (next === 'indeterminate')) {
+          indeterminate = next === 'indeterminate'
+          onIndeterminateChange?.(indeterminate)
+        }
+        checked = next === true
+        onCheckedChange?.(checked)
+      }
+    }
+    data-slot="checkbox"
+    class={cn(
+      'peer inline-grid size-4.5 shrink-0 cursor-pointer place-items-center rounded-[5px] border border-muted-foreground/70 bg-background p-0 shadow-xs',
+      'data-unchecked:enabled:hover:border-foreground data-unchecked:enabled:hover:bg-muted',
+      'data-checked:border-primary data-checked:bg-primary data-indeterminate:border-primary data-indeterminate:bg-primary text-white',
+      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50 delay-0 motion-safe:transition-colors',
+      className
+    )}
   >
-    {#snippet children({ checked })}
-      <div
-        class="text-pink group-disabled:text-gray inline-flex items-center justify-center"
-      >
-        {#if checked}
-          <CheckIcon class="size-4" weight="bold" />
-        {/if}
-      </div>
-    {/snippet}
-  </Checkbox.Root>
-  <Label.Root
-    id="{uid}-label"
-    for={uid}
-    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-60"
-  >
-    {@render children()}
-  </Label.Root>
-</div>
+    {#if indeterminate}
+      <MinusIcon class="size-3.5" weight="bold" aria-hidden="true" />
+    {:else if checked}
+      <CheckIcon class="size-3.5" weight="bold" aria-hidden="true" />
+    {/if}
+  </CheckboxPrimitive>
+{/snippet}
+
+{#if children}
+  <div class="inline-flex w-fit items-center">
+    {@render control()}
+    <label
+      for={id}
+      class="inline-flex min-h-8 cursor-pointer items-center ps-2.5 font-allmaps-ui text-sm font-medium leading-5 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 pointer-coarse:min-h-11"
+    >
+      {@render children()}
+    </label>
+  </div>
+{:else}
+  {@render control()}
+{/if}

@@ -1,7 +1,17 @@
-import { mapFilters, imageFilters } from './map-filters.js'
-import type { MapsQueryParams } from '../types.js'
-import { and, count, eq, sql } from 'drizzle-orm'
+import {
+  and,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  max,
+  or,
+  sql
+} from 'drizzle-orm'
 
+import { Manifest } from '@allmaps/iiif-parser'
 import { generateAnnotation } from '@allmaps/annotation'
 import { generateRandomId } from '@allmaps/id/sync'
 
@@ -10,22 +20,26 @@ import * as mapsSchema from '@allmaps/db/schema/maps'
 import * as iiifSchema from '@allmaps/db/schema/iiif'
 
 import { ResponseError, clampLimit } from '@allmaps/api-shared'
+import { makeMapUrl } from '../shared/urls.js'
+import { mapFilters, imageFilters } from './map-filters.js'
+import type { MapsQueryParams } from '../types.js'
 import { fromDbRow } from '../shared/maps.js'
 import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 
-import type { Annotation, AnnotationPage } from '@allmaps/annotation'
 import type { Db, DbOrTx } from '@allmaps/db'
 import type { Polygon } from 'geojson'
 
-export async function queryLists(db: Db, username: string) {
+export async function queryLists(db: Db, username: string, ownerId?: string) {
   const lists = await db.query.lists.findMany({
     columns: {
       id: true,
       name: true,
+      deletable: true,
       createdAt: true,
       updatedAt: true
     },
     where: {
+      ...(ownerId === undefined ? {} : { userId: ownerId }),
       user: {
         slug: username
       }
@@ -35,113 +49,127 @@ export async function queryLists(db: Db, username: string) {
   return lists
 }
 
-export async function queryList(
-  annotationsBaseUrl: string,
-  db: Db,
-  username: string,
-  listId: string,
-  listUrl?: string,
-  params: Partial<MapsQueryParams> = {}
-) {
-  return queryListGeoreferenceAnnotations(
-    annotationsBaseUrl,
-    db,
-    username,
-    listId,
-    listUrl,
-    params
-  )
+function listUrl(base: string, username: string, listId: string) {
+  return new URL(
+    `/@${encodeURIComponent(username)}/lists/${encodeURIComponent(listId)}`,
+    base
+  ).href
 }
 
-function normalizeToAnnotationItems(
-  annotation: AnnotationPage | Annotation
-): Array<Annotation> {
-  if (
-    annotation &&
-    typeof annotation === 'object' &&
-    'type' in annotation &&
-    annotation.type === 'AnnotationPage' &&
-    'items' in annotation &&
-    Array.isArray(annotation.items)
-  ) {
-    return annotation.items
-  }
+type ListItemInput =
+  | {
+      mapId: string
+      mapImageId: string
+      mapChecksum: string
+      mapVersion: number
+    }
+  | { imageId: string }
+  | { canvasId: string }
+  | { manifestId: string }
 
-  if (
-    annotation &&
-    typeof annotation === 'object' &&
-    'type' in annotation &&
-    annotation.type === 'Annotation'
-  ) {
-    return [annotation]
-  }
+type ItemIdentifier = {
+  mapId?: string
+  mapChecksum?: string
+  imageId?: string
+  canvasId?: string
+  manifestId?: string
+}
 
-  return []
+function matchItem(item?: ItemIdentifier) {
+  const { listItems } = listsSchema
+  if (item?.mapId)
+    return and(
+      eq(listItems.mapId, item.mapId),
+      item.mapChecksum === undefined
+        ? undefined
+        : eq(listItems.mapChecksum, item.mapChecksum)
+    )
+  if (item?.imageId) return eq(listItems.imageId, item.imageId)
+  if (item?.canvasId) return eq(listItems.canvasId, item.canvasId)
+  if (item?.manifestId) return eq(listItems.manifestId, item.manifestId)
+}
+
+// Resolve each bookmark to its images, then match pinned or latest map revisions.
+function listMapMembership(db: DbOrTx, listId: string, key?: ListItemInput) {
+  const { listItems } = listsSchema
+  const { maps } = mapsSchema
+  const { images, canvasesToImages, manifestsToCanvases } = iiifSchema
+  return db
+    .selectDistinct({
+      path: sql<string>`coalesce(
+      'maps/' || ${listItems.mapId} || '@' || ${listItems.mapChecksum},
+      'images/' || ${listItems.imageId}, 'canvases/' || ${listItems.canvasId},
+      'manifests/' || ${listItems.manifestId}
+    )`.as('path'),
+      id: maps.id,
+      imageId: maps.imageId,
+      checksum: maps.checksum,
+      version: maps.version
+    })
+    .from(listItems)
+    .leftJoin(
+      manifestsToCanvases,
+      eq(manifestsToCanvases.manifestId, listItems.manifestId)
+    )
+    .leftJoin(
+      canvasesToImages,
+      eq(
+        canvasesToImages.canvasId,
+        sql`coalesce(${listItems.canvasId}, ${manifestsToCanvases.canvasId})`
+      )
+    )
+    .innerJoin(
+      images,
+      eq(
+        images.id,
+        sql`coalesce(${listItems.mapImageId}, ${listItems.imageId}, ${canvasesToImages.imageId})`
+      )
+    )
+    .innerJoin(maps, eq(maps.imageId, images.id))
+    .where(
+      and(
+        eq(listItems.listId, listId),
+        matchItem(key),
+        eq(images.archived, false),
+        eq(maps.archived, false),
+        isNotNull(maps.geoMask),
+        or(
+          and(isNull(listItems.mapId), eq(maps.latest, true)),
+          and(
+            eq(maps.id, listItems.mapId),
+            eq(maps.checksum, listItems.mapChecksum),
+            eq(maps.version, listItems.mapVersion)
+          )
+        )
+      )
+    )
+    .as('membership')
+}
+
+async function getPublishedList(db: Db, username: string, listId: string) {
+  const list = await db.query.lists.findFirst({
+    columns: { id: true, name: true },
+    where: { id: listId, user: { slug: username } }
+  })
+  if (!list) throw new ResponseError(`List not found: ${listId}`, 404)
+  return list
 }
 
 async function queryListMapRows(
   db: Db,
-  listItems: Array<{
-    mapId: string | null
-    mapImageId: string | null
-    mapChecksum: string | null
-    mapVersion: number | null
-    imageId: string | null
-    canvasId: string | null
-    manifestId: string | null
-  }>,
+  listId: string,
   params: Partial<MapsQueryParams>
 ) {
-  const whereConditions: Array<Record<string, unknown>> = []
-
-  for (const item of listItems) {
-    if (
-      item.mapId &&
-      item.mapImageId &&
-      item.mapChecksum &&
-      item.mapVersion !== null
-    ) {
-      whereConditions.push({
-        AND: [
-          { id: { eq: item.mapId } },
-          { imageId: { eq: item.mapImageId } },
-          { checksum: { eq: item.mapChecksum } },
-          { version: { eq: item.mapVersion } }
-        ]
-      })
-    } else if (item.imageId) {
-      whereConditions.push({
-        AND: [{ latest: { eq: true } }, { imageId: { eq: item.imageId } }]
-      })
-    } else if (item.canvasId) {
-      whereConditions.push({
-        AND: [
-          { latest: { eq: true } },
-          { image: { canvases: { id: { eq: item.canvasId } } } }
-        ]
-      })
-    } else if (item.manifestId) {
-      whereConditions.push({
-        AND: [
-          { latest: { eq: true } },
-          {
-            image: {
-              canvases: {
-                manifests: {
-                  id: { eq: item.manifestId }
-                }
-              }
-            }
-          }
-        ]
-      })
-    }
-  }
-
-  if (whereConditions.length === 0) {
-    return []
-  }
-
+  const membership = listMapMembership(db, listId)
+  const revisions = db
+    .select({
+      id: membership.id,
+      imageId: membership.imageId,
+      checksum: membership.checksum,
+      version: max(membership.version)
+    })
+    .from(membership)
+    .groupBy(membership.id, membership.imageId, membership.checksum)
   return db.query.maps.findMany({
     columns: {
       id: true,
@@ -202,11 +230,13 @@ async function queryListMapRows(
       }
     },
     where: {
-      // A list URL is a current publication, even when an item pins a version.
-      archived: false,
-      ...mapFilters(params),
-      image: { archived: false, ...imageFilters(params) },
-      OR: whereConditions
+      AND: [mapFilters(params)],
+      image: imageFilters(params),
+      RAW: (map) =>
+        inArray(
+          sql`(${map.id}, ${map.imageId}, ${map.checksum}, ${map.version})`,
+          revisions
+        )
     },
     limit:
       params.limit === undefined
@@ -221,61 +251,223 @@ async function queryListMapRows(
   })
 }
 
+const listContext = [
+  'http://www.w3.org/ns/anno.jsonld',
+  {
+    georeferenceAnnotations: {
+      '@id': 'https://schemas.allmaps.org/lists/georeferenceAnnotations',
+      '@type': '@id'
+    },
+    georeferencedMapCount:
+      'https://schemas.allmaps.org/lists/georeferencedMapCount',
+    allmapsUrl: {
+      '@id': 'https://schemas.allmaps.org/lists/allmapsUrl',
+      '@type': '@id'
+    },
+    fallbackImageService: {
+      '@id': 'https://schemas.allmaps.org/lists/fallbackImageService',
+      '@type': '@id'
+    },
+    imageService: {
+      '@id': 'https://schemas.allmaps.org/lists/imageService',
+      '@type': '@id'
+    }
+  }
+]
+
+function titleFromLabel(value: unknown) {
+  const label = parseStoredNullableLanguageString(value)
+  return [...(label?.en ?? []), ...Object.values(label ?? {}).flat()]
+    .map((value) => String(value).trim())
+    .find((text) => text && text !== '-')
+}
+
+function firstManifestImage(data: unknown) {
+  if (data) {
+    try {
+      return Manifest.parse(data).canvases[0]?.image.uri
+    } catch {
+      // Older catalog entries may contain only a partial manifest.
+    }
+  }
+}
+
+async function queryListBookmarks(
+  base: string,
+  db: DbOrTx,
+  username: string,
+  listId: string,
+  key?: ListItemInput
+) {
+  const id = listUrl(base, username, listId)
+  const membership = listMapMembership(db, listId, key)
+  const organization = {
+    columns: {},
+    with: { organization: { columns: { name: true } } }
+  } as const
+  const manifestColumns = { uri: true, label: true } as const
+  const canvas = {
+    columns: { uri: true, label: true },
+    with: {
+      manifests: { columns: manifestColumns, orderBy: { id: 'asc' }, limit: 1 }
+    }
+  } as const
+  const firstImage = {
+    columns: { uri: true },
+    limit: 1,
+    orderBy: { id: 'asc' }
+  } as const
+  const [saved, counts] = await Promise.all([
+    db.query.listItems.findMany({
+      where: { listId, ...key },
+      orderBy: {
+        createdAt: 'desc',
+        mapId: 'asc',
+        mapChecksum: 'asc',
+        imageId: 'asc',
+        canvasId: 'asc',
+        manifestId: 'asc'
+      },
+      with: {
+        manifest: {
+          columns: { ...manifestColumns, data: true },
+          with: {
+            organizationUrl: organization,
+            canvases: {
+              columns: {},
+              limit: 1,
+              orderBy: { id: 'asc' },
+              with: { images: firstImage }
+            }
+          }
+        },
+        canvas: {
+          ...canvas,
+          with: {
+            ...canvas.with,
+            organizationUrl: organization,
+            images: firstImage
+          }
+        }
+      }
+    }),
+    db
+      .select({ path: membership.path, count: count() })
+      .from(membership)
+      .groupBy(membership.path)
+  ])
+  const imageIds = saved.flatMap(
+    (item) => item.mapImageId ?? item.imageId ?? []
+  )
+  const images = imageIds.length
+    ? await db.query.images.findMany({
+        where: { id: { in: imageIds } },
+        columns: { id: true, uri: true },
+        with: {
+          organizationUrl: organization,
+          canvases: { ...canvas, limit: 1, orderBy: { id: 'asc' } }
+        }
+      })
+    : []
+  const imagesById = new Map(images.map((image) => [image.id, image]))
+  const countsByPath = new Map(counts.map((row) => [row.path, row.count]))
+  return saved.map((item) => {
+    const image = imagesById.get(item.mapImageId ?? item.imageId ?? '')
+    const sheet = item.canvas ?? image?.canvases[0]
+    const manifest = item.manifest ?? sheet?.manifests[0]
+    const uri = item.manifest?.uri ?? item.canvas?.uri ?? image?.uri
+    const organizationName = (item.manifest ?? item.canvas ?? image)
+      ?.organizationUrl?.organization?.name
+    const [path, targetType] = item.mapId
+      ? [`maps/${item.mapId}@${item.mapChecksum}`, 'Annotation']
+      : item.imageId
+        ? [`images/${item.imageId}`, 'dctypes:Service']
+        : item.canvasId
+          ? [
+              `canvases/${item.canvasId}`,
+              'http://iiif.io/api/presentation/3#Canvas'
+            ]
+          : [
+              `manifests/${item.manifestId}`,
+              'http://iiif.io/api/presentation/3#Manifest'
+            ]
+    const url = new URL(path, base + '/').href
+    const manifestTitle = titleFromLabel(manifest?.label)
+    const title = titleFromLabel(sheet?.label) ?? manifestTitle
+    const imageService = item.manifest
+      ? firstManifestImage(item.manifest.data)
+      : (image?.uri ?? item.canvas?.images[0]?.uri)
+    return {
+      id: `${id}#${path}`,
+      type: 'Annotation',
+      motivation: 'bookmarking',
+      created: item.createdAt.toISOString(),
+      georeferencedMapCount: countsByPath.get(path) ?? 0,
+      allmapsUrl: url,
+      target: {
+        id: item.mapId ? url : uri,
+        type: targetType,
+        'dcterms:title': title,
+        'dcterms:isPartOf':
+          !item.manifest && manifest
+            ? { id: manifest.uri, 'dcterms:title': manifestTitle }
+            : undefined,
+        'schema:provider': organizationName
+          ? { 'schema:name': organizationName }
+          : undefined,
+        imageService,
+        fallbackImageService: !imageService
+          ? item.manifest?.canvases[0]?.images[0]?.uri
+          : undefined
+      }
+    }
+  })
+}
+
+export async function queryList(
+  base: string,
+  db: Db,
+  username: string,
+  listId: string
+) {
+  const list = await getPublishedList(db, username, listId)
+  const id = listUrl(base, username, list.id)
+  const items = await queryListBookmarks(base, db, username, listId)
+  const pageId = id + '#bookmarks'
+  return {
+    '@context': listContext,
+    id,
+    type: 'AnnotationCollection',
+    label: list.name,
+    total: items.length,
+    georeferenceAnnotations: id + '/georeference-annotations',
+    first: items.length
+      ? { id: pageId, type: 'AnnotationPage', partOf: id, startIndex: 0, items }
+      : undefined,
+    last: items.length ? pageId : undefined
+  }
+}
+
 export async function queryListGeoreferenceAnnotations(
   annotationsBaseUrl: string,
   db: Db,
   username: string,
   listId: string,
-  annotationPageId?: string,
-  params: Partial<MapsQueryParams> = {}
+  params: Partial<MapsQueryParams> = {},
+  search = ''
 ) {
-  const list = await db.query.lists.findFirst({
-    columns: {
-      id: true
-    },
-    where: {
-      id: {
-        eq: listId
-      },
-      user: {
-        slug: {
-          eq: username
-        }
-      }
-    },
-    with: {
-      listItems: {
-        columns: {
-          mapId: true,
-          mapImageId: true,
-          mapChecksum: true,
-          mapVersion: true,
-          imageId: true,
-          canvasId: true,
-          manifestId: true
-        }
-      }
-    }
-  })
+  const list = await getPublishedList(db, username, listId)
+  const rows = await queryListMapRows(db, list.id, params)
+  if (!rows.length && !search) return
 
-  if (!list) {
-    throw new ResponseError(`List not found: ${listId}`, 404)
-  }
-
-  const rows = await queryListMapRows(db, list.listItems, params)
-
-  const apiMaps = rows.map((row) => fromDbRow(row, annotationsBaseUrl))
-  const annotationItems = normalizeToAnnotationItems(
-    generateAnnotation(apiMaps)
-  )
-
+  const maps = rows.map((row) => ({
+    ...fromDbRow(row, annotationsBaseUrl),
+    id: makeMapUrl(annotationsBaseUrl, row.id, row.checksum)
+  }))
   return {
-    '@context': 'http://www.w3.org/ns/anno.jsonld',
-    id:
-      annotationPageId ??
-      `${annotationsBaseUrl}/@${username}/lists/${listId}/georeference-annotations`,
-    type: 'AnnotationPage',
-    items: annotationItems
+    ...generateAnnotation(maps),
+    id: `${listUrl(annotationsBaseUrl, username, list.id)}/georeference-annotations${search}`,
+    label: list.name
   }
 }
 
@@ -421,121 +613,96 @@ export async function updateUserListName(
 export async function deleteListItem(
   db: Db,
   listId: string,
-  item: {
-    mapId?: string
-    imageId?: string
-    canvasId?: string
-    manifestId?: string
-  }
+  item: ItemIdentifier
 ): Promise<
   { success: true } | { success: false; status: number; error: string }
 > {
-  const { mapId, imageId, canvasId, manifestId } = item
-
-  let condition
-  if (mapId) {
-    condition = and(
-      eq(listsSchema.listItems.listId, listId),
-      eq(listsSchema.listItems.mapId, mapId)
-    )
-  } else if (imageId) {
-    condition = and(
-      eq(listsSchema.listItems.listId, listId),
-      eq(listsSchema.listItems.imageId, imageId)
-    )
-  } else if (canvasId) {
-    condition = and(
-      eq(listsSchema.listItems.listId, listId),
-      eq(listsSchema.listItems.canvasId, canvasId)
-    )
-  } else if (manifestId) {
-    condition = and(
-      eq(listsSchema.listItems.listId, listId),
-      eq(listsSchema.listItems.manifestId, manifestId)
-    )
-  } else {
+  const condition = matchItem(item)
+  if (!condition) {
     return { success: false, status: 400, error: 'No item identifier provided' }
   }
-
-  await db.delete(listsSchema.listItems).where(condition)
+  await db
+    .delete(listsSchema.listItems)
+    .where(and(eq(listsSchema.listItems.listId, listId), condition))
   return { success: true }
 }
 
-export async function addItemToList(
-  db: Db,
+async function insertListItem(
+  db: DbOrTx,
   listId: string,
-  item:
-    | {
-        mapId: string
-        mapImageId: string
-        mapChecksum: string
-        mapVersion: number
-      }
-    | { imageId: string }
-    | { canvasId: string }
-    | { manifestId: string },
+  item: ListItemInput,
   maximumItems?: number
 ) {
-  const insertItem = async (db: DbOrTx) => {
-    const [listItem] = await db
-      .insert(listsSchema.listItems)
-      .values({ listId, ...item })
-      .onConflictDoNothing()
-      .returning()
-    return listItem
-  }
-
-  if (maximumItems === undefined) {
-    return (await insertItem(db)) ?? { listId, ...item }
-  }
-
-  return db.transaction(async (transaction) => {
-    // Serialize additions to this list so concurrent requests cannot exceed the cap.
-    await transaction
-      .select({ id: listsSchema.lists.id })
-      .from(listsSchema.lists)
-      .where(eq(listsSchema.lists.id, listId))
+  const { lists, listItems } = listsSchema
+  if (maximumItems !== undefined) {
+    // Lock the list before counting so concurrent saves cannot exceed the cap.
+    await db
+      .select({ id: lists.id })
+      .from(lists)
+      .where(eq(lists.id, listId))
       .for('update')
+  }
+  const [added] = await db
+    .insert(listItems)
+    .values({ listId, ...item })
+    .onConflictDoNothing()
+    .returning()
+  if (added && maximumItems !== undefined) {
+    const total = await db.$count(listItems, eq(listItems.listId, listId))
+    if (total > maximumItems)
+      throw new ResponseError(
+        `List cannot contain more than ${maximumItems} items`,
+        409
+      )
+  }
+  return added ?? { listId, ...item }
+}
 
-    const listItem = await insertItem(transaction)
-    // Adding an existing item remains a no-op, even when the list is full.
-    if (listItem) {
-      const [{ total }] = await transaction
-        .select({ total: count() })
-        .from(listsSchema.listItems)
-        .where(eq(listsSchema.listItems.listId, listId))
-      if (total > maximumItems) {
-        // Throwing rolls back the insertion as part of this transaction.
-        throw new ResponseError(
-          `List cannot contain more than ${maximumItems} items`,
-          409
-        )
-      }
-    }
-    return listItem ?? { listId, ...item }
-  })
+export function addItemToList(
+  db: Db,
+  listId: string,
+  item: ListItemInput,
+  maximumItems?: number
+) {
+  return maximumItems === undefined
+    ? insertListItem(db, listId, item)
+    : db.transaction((tx) => insertListItem(tx, listId, item, maximumItems))
 }
 
 export async function addItemToListByUrl(
   db: Db,
   listId: string,
   url: string,
-  maximumItems?: number
-): Promise<
-  | { success: true; item: typeof listsSchema.listItems.$inferSelect | object }
-  | { success: false; status: number; error: string }
-> {
+  maximumItems?: number,
+  publication?: { base: string; username: string }
+) {
+  function save(key: ListItemInput) {
+    return db.transaction(async (tx) => {
+      const item = await insertListItem(tx, listId, key, maximumItems)
+      const [bookmark] = publication
+        ? await queryListBookmarks(
+            publication.base,
+            tx,
+            publication.username,
+            listId,
+            key
+          )
+        : []
+      return { success: true as const, item: { ...item, bookmark } }
+    })
+  }
+
   let parsedUrl: URL
   try {
     parsedUrl = new URL(url)
   } catch {
-    return { success: false, status: 400, error: 'Invalid URL' }
+    return { success: false as const, status: 400, error: 'Invalid URL' }
   }
 
   const parts = parsedUrl.pathname.split('/').filter(Boolean)
   if (parts.length < 2) {
     return {
-      success: false,
+      success: false as const,
       status: 400,
       error: 'Cannot determine resource type from URL'
     }
@@ -551,19 +718,13 @@ export async function addItemToListByUrl(
 
     if (!image) {
       return {
-        success: false,
+        success: false as const,
         status: 404,
         error: `Image not found: ${resourceId}`
       }
     }
 
-    const item = await addItemToList(
-      db,
-      listId,
-      { imageId: resourceId },
-      maximumItems
-    )
-    return { success: true, item }
+    return save({ imageId: resourceId })
   }
 
   if (resourceType === 'canvases') {
@@ -574,19 +735,13 @@ export async function addItemToListByUrl(
 
     if (!canvas) {
       return {
-        success: false,
+        success: false as const,
         status: 404,
         error: `Canvas not found: ${resourceId}`
       }
     }
 
-    const item = await addItemToList(
-      db,
-      listId,
-      { canvasId: resourceId },
-      maximumItems
-    )
-    return { success: true, item }
+    return save({ canvasId: resourceId })
   }
 
   if (resourceType === 'manifests') {
@@ -597,56 +752,57 @@ export async function addItemToListByUrl(
 
     if (!manifest) {
       return {
-        success: false,
+        success: false as const,
         status: 404,
         error: `Manifest not found: ${resourceId}`
       }
     }
 
-    const item = await addItemToList(
-      db,
-      listId,
-      { manifestId: resourceId },
-      maximumItems
-    )
-    return { success: true, item }
+    return save({ manifestId: resourceId })
   }
 
   if (resourceType === 'maps') {
+    const match = resourceId.match(/^([^@]+)(?:@([^@]+))?$/)
+    if (!match)
+      return { success: false as const, status: 400, error: 'Invalid map URL' }
+
+    const [, mapId, checksum] = match
+    const { maps } = mapsSchema
     const [map] = await db
       .select({
-        id: mapsSchema.mapsLatest.id,
-        imageId: mapsSchema.mapsLatest.imageId,
-        checksum: mapsSchema.mapsLatest.checksum,
-        version: mapsSchema.mapsLatest.version
+        id: maps.id,
+        imageId: maps.imageId,
+        checksum: maps.checksum,
+        version: maps.version
       })
-      .from(mapsSchema.mapsLatest)
-      .where(eq(mapsSchema.mapsLatest.id, resourceId))
+      .from(maps)
+      .where(
+        and(
+          eq(maps.id, mapId),
+          checksum ? eq(maps.checksum, checksum) : eq(maps.latest, true)
+        )
+      )
+      .orderBy(desc(maps.version))
+      .limit(1)
 
     if (!map) {
       return {
-        success: false,
+        success: false as const,
         status: 404,
         error: `Map not found: ${resourceId}`
       }
     }
 
-    const item = await addItemToList(
-      db,
-      listId,
-      {
-        mapId: map.id,
-        mapImageId: map.imageId,
-        mapChecksum: map.checksum,
-        mapVersion: map.version
-      },
-      maximumItems
-    )
-    return { success: true, item }
+    return save({
+      mapId: map.id,
+      mapImageId: map.imageId,
+      mapChecksum: map.checksum,
+      mapVersion: map.version
+    })
   }
 
   return {
-    success: false,
+    success: false as const,
     status: 400,
     error: `Unknown resource type: ${resourceType}. Expected maps, images, canvases, or manifests.`
   }

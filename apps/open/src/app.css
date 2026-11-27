@@ -1,7 +1,6 @@
-@import 'tailwindcss';
+@import '@allmaps/tailwind';
 @import '@allmaps/ui/css/fonts.css';
 
-@config '../tailwind.config.ts';
 @source '../../../packages/ui/src/lib/components/CodeBlock.svelte';
 @source '../../../packages/ui/src/lib/components/LoadingSmall.svelte';
 

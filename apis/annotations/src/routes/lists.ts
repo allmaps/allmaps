@@ -1,7 +1,7 @@
 import { mapsQuerySchema } from '@allmaps/api-shared/elysia'
 import { t } from 'elysia'
 
-import { setCacheControl } from '@allmaps/api-shared'
+import { ResponseError, setCacheControl } from '@allmaps/api-shared'
 import {
   queryLists,
   queryList,
@@ -16,6 +16,26 @@ import { readAnnotationQuery } from '../query.js'
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
+function getListOwnerId(user: unknown, username: string) {
+  if (
+    !user ||
+    typeof user !== 'object' ||
+    !('id' in user) ||
+    typeof user.id !== 'string' ||
+    ('isAnonymous' in user && user.isAnonymous)
+  ) {
+    throw new ResponseError('Unauthorized', 401)
+  }
+
+  if ('role' in user && user.role === 'admin') return
+
+  if (!('slug' in user) || user.slug !== username) {
+    throw new ResponseError('Lists not found', 404)
+  }
+
+  return user.id
+}
+
 export function createListsRoutes(
   env: AnnotationsEnv,
   betterAuth: BetterAuthContext
@@ -26,9 +46,10 @@ export function createListsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       '/@:username/lists',
-      async ({ db, env, params, set }) => {
+      async ({ db, env, params, set, user }) => {
         setCacheControl(set, 'private-no-store')
-        const lists = await queryLists(db, params.username)
+        const ownerId = getListOwnerId(user, params.username)
+        const lists = await queryLists(db, params.username, ownerId)
 
         return lists.map((list: UserList) => ({
           ...list,
@@ -36,7 +57,7 @@ export function createListsRoutes(
         }))
       },
       {
-        admin: true,
+        auth: true,
         params: t.Object({
           username: t.String()
         }),
@@ -48,24 +69,22 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId',
-      async ({ db, env, params, request, set, getLimitRole }) => {
+      async ({ db, env, params, set }) => {
         setCacheControl(set, 'private-no-store')
-        const { filters, userRole } = await readAnnotationQuery(
-          request,
-          getLimitRole
-        )
-        return queryList(
+        const collection = await queryList(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
-          params.listId,
-          request.url,
-          { ...filters, userRole }
+          params.listId
         )
+        return Response.json(collection, {
+          headers: {
+            'Content-Type':
+              'application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"'
+          }
+        })
       },
       {
-        admin: true,
-        query: mapsQuerySchema,
         params: t.Object({
           username: t.String(),
           listId: t.String()
@@ -84,17 +103,23 @@ export function createListsRoutes(
           request,
           getLimitRole
         )
-        return queryListGeoreferenceAnnotations(
+        const page = await queryListGeoreferenceAnnotations(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
           params.listId,
-          request.url,
-          { ...filters, userRole }
+          { ...filters, userRole },
+          Object.keys(filters).length ? new URL(request.url).search : ''
+        )
+        return (
+          page ??
+          new Response(null, {
+            status: 204,
+            headers: { 'Cache-Control': 'private, no-store' }
+          })
         )
       },
       {
-        admin: true,
         query: mapsQuerySchema,
         params: t.Object({
           username: t.String(),

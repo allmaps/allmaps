@@ -268,15 +268,21 @@ describe('admin archiving', () => {
     const before = await context.db.select().from(schema.listItems)
     await archive('maps', map.id)
     await archive('images', catalog.maps[1].imageId)
-    for (const suffix of ['', '/georeference-annotations']) {
-      const response = await request(
-        'annotations',
-        `/@${owner.slug}/lists/${list.id}${suffix}`,
-        { headers: adminHeaders }
-      )
-      expect(response.status).toBe(200)
-      expect((await response.json()).items).toEqual([])
-    }
+    const path = `/@${owner.slug}/lists/${list.id}`
+    const collection = await (
+      await request('annotations', path, { headers: adminHeaders })
+    ).json()
+    expect(collection.total).toBe(4)
+    expect(collection.first.items).toHaveLength(4)
+    for (const bookmark of collection.first.items)
+      expect(bookmark.georeferencedMapCount).toBe(0)
+    expect(
+      (
+        await request('annotations', path + '/georeference-annotations', {
+          headers: adminHeaders
+        })
+      ).status
+    ).toBe(204)
     expect(await context.db.select().from(schema.listItems)).toEqual(before)
   })
 

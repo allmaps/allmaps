@@ -1,9 +1,10 @@
 <script lang="ts">
   import { NorthArrow } from '@allmaps/ui'
+  import { OpacitySlider } from '@allmaps/ui/opacity-slider'
+  import { getUiState } from '$lib/state/ui.svelte.js'
 
   import MapControls from './MapControls.svelte'
   import SelectView from './SelectView.svelte'
-  import OpacityControl from './OpacityControl.svelte'
   import BackgroundColorControl from './BackgroundColorControl.svelte'
   import PrevNext from './PrevNext.svelte'
   import ControlContainer from './ControlContainer.svelte'
@@ -29,6 +30,8 @@
     mapBearing,
     imageUpBearing
   }: Props = $props()
+
+  const uiState = getUiState()
 
   let imageUpRotation = $derived(
     imageUpBearing === undefined ? undefined : imageUpBearing - mapBearing
@@ -56,7 +59,12 @@
   </div>
   <div class="col-2 row-3 self-end place-self-center flex flex-row">
     <ControlContainer roundedFull>
-      <OpacityControl />
+      <div class="size-7 pointer-coarse:size-9">
+        <OpacitySlider
+          bind:opacity={uiState.opacity}
+          disabled={uiState.view !== 'map'}
+        />
+      </div>
       <BackgroundColorControl />
     </ControlContainer>
   </div>
@@ -66,6 +74,11 @@
   >
     <div class="size-12 pointer-coarse:size-14 *:pointer-events-auto">
       <NorthArrow
+        aria-label={mapBearing === 0 &&
+        imageUpBearing !== undefined &&
+        imageUpBearing !== 0
+          ? 'Point image up'
+          : 'Point north up'}
         rotation={-mapBearing}
         {imageUpRotation}
         onclick={onResetBearing}

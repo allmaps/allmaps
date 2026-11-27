@@ -1,0 +1,67 @@
+@import './dist/palette.css' layer(theme);
+
+/* Runtime tokens shared by Allmaps components. */
+@layer theme {
+  :root {
+    --allmaps-ui-font-sans: 'Geograph', system-ui, sans-serif;
+    --allmaps-ui-font-mono: 'DM Mono', ui-monospace, monospace;
+    --allmaps-ui-font-size: 0.875rem;
+    --allmaps-ui-font-weight: 400;
+    --allmaps-ui-control-height: 2.5rem;
+    --allmaps-ui-control-height-sm: 2rem;
+    --allmaps-ui-radius: 0.375rem;
+    --allmaps-ui-background: var(--allmaps-color-white);
+    --allmaps-ui-foreground: var(--allmaps-color-black);
+    --allmaps-ui-card: var(--allmaps-color-white);
+    --allmaps-ui-card-foreground: var(--allmaps-color-black);
+    --allmaps-ui-popover: var(--allmaps-color-white);
+    --allmaps-ui-menu-highlight: var(--allmaps-color-gray-100);
+    --allmaps-ui-popover-foreground: var(--allmaps-color-black);
+    --allmaps-ui-primary: var(--allmaps-color-pink);
+    --allmaps-ui-primary-foreground: var(--allmaps-color-black);
+    --allmaps-ui-secondary: var(--allmaps-color-gray-200);
+    --allmaps-ui-secondary-foreground: var(--allmaps-color-black);
+    --allmaps-ui-muted: var(--allmaps-color-gray-100);
+    --allmaps-ui-muted-foreground: var(--allmaps-color-gray-700);
+    --allmaps-ui-accent: color-mix(
+      in srgb,
+      var(--allmaps-ui-primary) 10%,
+      var(--allmaps-ui-background)
+    );
+    --allmaps-ui-accent-foreground: var(--allmaps-color-black);
+    --allmaps-ui-button-destructive: var(--allmaps-color-red);
+    --allmaps-ui-destructive: var(--allmaps-color-red-700);
+    --allmaps-ui-destructive-foreground: var(--allmaps-color-white);
+    --allmaps-ui-border: var(--allmaps-color-gray-400);
+    --allmaps-ui-input: var(--allmaps-color-gray-400);
+    --allmaps-ui-ring: var(--allmaps-ui-primary);
+    --allmaps-ui-shadow: 0 4px 16px
+      color-mix(in srgb, var(--allmaps-color-black) 12%, transparent);
+  }
+
+  :root:is(.dark, [data-theme='dark']) {
+    --allmaps-ui-background: var(--allmaps-color-black);
+    --allmaps-ui-foreground: var(--allmaps-color-gray-100);
+    --allmaps-ui-card: var(--allmaps-color-gray-900);
+    --allmaps-ui-card-foreground: var(--allmaps-color-gray-100);
+    --allmaps-ui-popover: var(--allmaps-color-gray-900);
+    --allmaps-ui-menu-highlight: var(--allmaps-color-gray-800);
+    --allmaps-ui-popover-foreground: var(--allmaps-color-gray-100);
+    --allmaps-ui-secondary: var(--allmaps-color-gray-800);
+    --allmaps-ui-secondary-foreground: var(--allmaps-color-gray-100);
+    --allmaps-ui-muted: var(--allmaps-color-gray-900);
+    --allmaps-ui-muted-foreground: var(--allmaps-color-gray-300);
+    --allmaps-ui-accent: color-mix(
+      in srgb,
+      var(--allmaps-ui-primary) 15%,
+      var(--allmaps-ui-popover)
+    );
+    --allmaps-ui-accent-foreground: var(--allmaps-color-gray-100);
+    --allmaps-ui-destructive: var(--allmaps-color-red-300);
+    --allmaps-ui-destructive-foreground: var(--allmaps-color-gray-900);
+    --allmaps-ui-border: var(--allmaps-color-gray-700);
+    --allmaps-ui-input: var(--allmaps-color-gray-700);
+    --allmaps-ui-shadow: 0 4px 16px
+      color-mix(in srgb, var(--allmaps-color-black) 30%, transparent);
+  }
+}

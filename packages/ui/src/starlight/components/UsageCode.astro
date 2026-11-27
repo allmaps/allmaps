@@ -1,0 +1,24 @@
+---
+import type { CodeLanguage } from '../../lib/code/types'
+import { renderCode } from '../../lib/code/renderer'
+import CodeBlock from '../../lib/components/CodeBlock.svelte'
+import Usage from './Usage.svelte'
+
+type Props = {
+  code: string
+  live?: boolean
+  language?: CodeLanguage
+  title?: string
+}
+
+const { code, live = false, language = 'svelte', title = 'Svelte' } = Astro.props
+const initial = await renderCode({ code, language })
+---
+
+<div>
+  {live ? (
+    <Usage {initial} {title} client:load />
+  ) : (
+    <CodeBlock {code} {language} {title} {initial} client:load />
+  )}
+</div>

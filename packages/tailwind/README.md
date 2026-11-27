@@ -2,6 +2,17 @@
 
 Tailwind CSS theme for Allmaps.
 
+Import the preset once in a Tailwind 4 application's stylesheet:
+
+```css
+@import '@allmaps/tailwind';
+```
+
+This includes Tailwind, the Allmaps palette, and the UI theme. To load Tailwind
+layers separately, import `@allmaps/tailwind/theme.css` alongside them.
+`bg-primary` and `outline-ring` use the shared UI colors. `rounded-ui` uses
+`--allmaps-ui-radius`. Standard radius utilities follow Tailwind's scale.
+
 ## License
 
 MIT

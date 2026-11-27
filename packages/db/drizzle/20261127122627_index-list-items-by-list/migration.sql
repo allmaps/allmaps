@@ -1,0 +1,1 @@
+CREATE INDEX "list_items_list_id_idx" ON "list_items" ("list_id");

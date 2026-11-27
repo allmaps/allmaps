@@ -39,6 +39,7 @@ type BaseSource = {
 export type ParsedSource =
   | {
       type: 'annotation'
+      label?: string
       maps: GeoreferencedMap[]
     }
   | {

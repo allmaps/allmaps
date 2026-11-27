@@ -3,7 +3,7 @@
 
   import Control from './Control.svelte'
 
-  import { hasInputTarget } from '$lib/shared/keyboard.js'
+  import { shouldIgnoreMapShortcut } from '$lib/shared/keyboard.js'
 
   type Props = {
     onZoomToExtent: () => void
@@ -16,7 +16,7 @@
   }
 
   function handleKeyPress(event: KeyboardEvent) {
-    if (hasInputTarget(event)) {
+    if (shouldIgnoreMapShortcut(event)) {
       return
     }
 

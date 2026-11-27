@@ -249,7 +249,11 @@
           <span class="flex-1">Georeference</span>
         </MenuSubTrigger>
         <MenuSubContent>
-          <MapAnnotationMenuItems map={georeferencedMap} {isEmbedded} />
+          <MapAnnotationMenuItems
+            map={georeferencedMap}
+            {isEmbedded}
+            contextMenu
+          />
         </MenuSubContent>
       </DropdownMenu.Sub>
 

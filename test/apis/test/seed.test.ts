@@ -488,7 +488,7 @@ describe('Connected demo seed data', () => {
     )
     const annotations = await context.annotations.handle(
       new Request(
-        `${context.env.PUBLIC_ANNOTATIONS_BASE_URL}/@local-editor/lists/${list.id}`,
+        `${context.env.PUBLIC_ANNOTATIONS_BASE_URL}/@local-editor/lists/${list.id}/georeference-annotations`,
         { headers }
       )
     )
@@ -497,7 +497,7 @@ describe('Connected demo seed data', () => {
     expect(parseAnnotation(await annotations.json())).toHaveLength(3)
   })
 
-  it('denies regular users access to other users’ seeded lists', async () => {
+  it('keeps seeded list management private while sharing its annotations', async () => {
     const headers = await login('local-visitor')
     const list = catalog.lists.find(
       (list) => list.key === 'amsterdam-research'
@@ -510,7 +510,7 @@ describe('Connected demo seed data', () => {
         { headers }
       )
     )
-    expect(annotations.status).toBe(401)
+    expect(annotations.status).toBe(200)
   })
 
   it('replays ShareDB operations to recover every historical snapshot', async () => {

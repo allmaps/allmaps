@@ -1,20 +1,24 @@
 <script lang="ts">
-  import { Select as SelectPrimitive } from 'bits-ui'
+  import { SelectGroupLabel } from '@ui-sdk/svelte/select'
   import type { ComponentProps } from 'svelte'
+  import { elementRef } from '../element-ref.js'
+  import type { WithElementRef } from '../types.js'
 
   let {
     ref = $bindable(null),
     class: className,
-    children,
-    ...restProps
-  }: ComponentProps<typeof SelectPrimitive.GroupHeading> = $props()
+    ...rest
+  }: WithElementRef<
+    ComponentProps<typeof SelectGroupLabel>,
+    HTMLDivElement
+  > = $props()
 </script>
 
-<SelectPrimitive.GroupHeading
-  bind:ref
-  data-slot="select-group-heading"
+<SelectGroupLabel
+  {...rest}
+  {@attach elementRef<HTMLDivElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
   class={['allmaps-ui allmaps-select-group-heading', className]}
-  {...restProps}
->
-  {@render children?.()}
-</SelectPrimitive.GroupHeading>
+/>
