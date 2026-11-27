@@ -41,6 +41,11 @@
       "svelte": "./dist/auth.js",
       "default": "./dist/auth.js"
     },
+    "./auth-client": {
+      "types": "./dist/auth-client.d.ts",
+      "svelte": "./dist/auth-client.js",
+      "default": "./dist/auth-client.js"
+    },
     "./icons": {
       "types": "./dist/icons.d.ts",
       "svelte": "./dist/icons.js",
@@ -205,6 +210,7 @@
     "@turf/rewind": "catalog:",
     "@ui-sdk/core": "0.1.0-beta.14",
     "@ui-sdk/svelte": "0.1.0-beta.14",
+    "better-auth": "catalog:",
     "bits-ui": "catalog:",
     "clsx": "^2.1.1",
     "d3-geo": "catalog:",
