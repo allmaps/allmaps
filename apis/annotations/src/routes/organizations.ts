@@ -1,20 +1,12 @@
-import { t } from 'elysia'
-
-import {
-  needsElevatedLimitRole,
-  ResponseError,
-  setCacheControl
-} from '@allmaps/api-shared'
+import { mapsQuerySchema } from '@allmaps/api-shared/elysia'
+import { ResponseError, setCacheControl } from '@allmaps/api-shared'
 import { queryMaps, queryOrganizationBySlug } from '@allmaps/api-shared/db'
 
 import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin, RegExpRoute } from '../elysia.js'
-
-const querySchema = t.Object({
-  limit: t.Optional(t.Number())
-})
+import { readAnnotationQuery } from '../query.js'
 
 const organizationRoute = new RegExpRoute<{
   organizationSlug: string
@@ -32,15 +24,7 @@ export function createOrganizationsRoutes(
     .use(createBetterAuthPlugin(betterAuth))
     .get(
       `/organizations/${organizationRoute.path}`,
-      async ({
-        request,
-        env,
-        db,
-        params,
-        query,
-        set,
-        getOrganizationLimitRole
-      }) => {
+      async ({ request, env, db, params, set, getOrganizationLimitRole }) => {
         const { organizationSlug, ext } = organizationRoute.parse(params)
         const organization = await queryOrganizationBySlug(
           db,
@@ -52,9 +36,9 @@ export function createOrganizationsRoutes(
           throw new ResponseError('Organization not found', 404)
         }
 
-        const userRole = needsElevatedLimitRole(query.limit)
-          ? await getOrganizationLimitRole({ slug: organizationSlug })
-          : 'public'
+        const { filters, userRole } = await readAnnotationQuery(request, () =>
+          getOrganizationLimitRole({ slug: organizationSlug })
+        )
         setCacheControl(
           set,
           userRole === 'public' ? 'public-medium' : 'private-no-store'
@@ -65,22 +49,22 @@ export function createOrganizationsRoutes(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           {
-            organizationSlug,
-            limit: query.limit,
-            userRole
+            ...filters,
+            userRole,
+            organizationSlug
           },
           {
             id: request.url,
             format,
             excludeArchived: true,
-            expectRows: true,
+            expectRows: false,
             singular: false
           }
         )
       },
       {
         params: organizationRoute.params,
-        query: querySchema,
+        query: mapsQuerySchema,
         detail: {
           summary: 'Get Georeference Annotations for a single organization',
           tags: ['Organizations']

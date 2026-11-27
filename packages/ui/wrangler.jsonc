@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ui",
+  "compatibility_date": "2026-10-28",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./build",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    {
+      "pattern": "ui.allmaps.org",
+      "custom_domain": true
+    }
+  ],
+  "env": {
+    "development": {
+      "name": "ui-develop",
+      "routes": [
+        {
+          "pattern": "dev.ui.allmaps.org",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
+}

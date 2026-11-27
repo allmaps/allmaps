@@ -12,7 +12,7 @@ import Geocoder from '$lib/components/Geocoder.svelte'
 import Grid from '$lib/components/Grid.svelte'
 import Header from '$lib/components/Header.svelte'
 import IIIFLogo from '$lib/components/images/IIIFLogo.svelte'
-import Kbd from '$lib/components/Kbd.svelte'
+import { Kbd } from './kbd.js'
 import Loading from '$lib/components/Loading.svelte'
 import LoadingSmall from '$lib/components/LoadingSmall.svelte'
 import Logo from '$lib/components/Logo.svelte'
@@ -45,6 +45,11 @@ import Polynomial3 from '$lib/components/icons/transformations/Polynomial3.svelt
 import Projective from '$lib/components/icons/transformations/Projective.svelte'
 import Straight from '$lib/components/icons/transformations/Straight.svelte'
 import ThinPlateSpline from '$lib/icons/transformations/ThinPlateSpline.svelte'
+
+export * as Dialog from './dialog.js'
+export { Button } from './button.js'
+export type { ButtonProps, ButtonVariant, ButtonShape } from './button.js'
+export { default as AllmapsLogo } from './components/AllmapsLogo.svelte'
 
 export {
   Banner,

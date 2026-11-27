@@ -201,7 +201,7 @@ export async function resolveResource(
   const request: typeof fetch = (url) =>
     fetchResource(url, {
       credentials: 'omit',
-      referrerPolicy: 'no-referrer',
+      referrerPolicy: 'strict-origin',
       signal
     })
   const infoUrl = resourceUrl.pathname.endsWith('/info.json')

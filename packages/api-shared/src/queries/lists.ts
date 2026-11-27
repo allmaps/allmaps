@@ -1,3 +1,5 @@
+import { mapFilters, imageFilters } from './map-filters.js'
+import type { MapsQueryParams } from '../types.js'
 import { and, count, eq, sql } from 'drizzle-orm'
 
 import { generateAnnotation } from '@allmaps/annotation'
@@ -7,7 +9,7 @@ import * as listsSchema from '@allmaps/db/schema/lists'
 import * as mapsSchema from '@allmaps/db/schema/maps'
 import * as iiifSchema from '@allmaps/db/schema/iiif'
 
-import { ResponseError } from '@allmaps/api-shared'
+import { ResponseError, clampLimit } from '@allmaps/api-shared'
 import { fromDbRow } from '../shared/maps.js'
 import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 
@@ -38,14 +40,16 @@ export async function queryList(
   db: Db,
   username: string,
   listId: string,
-  listUrl?: string
+  listUrl?: string,
+  params: Partial<MapsQueryParams> = {}
 ) {
   return queryListGeoreferenceAnnotations(
     annotationsBaseUrl,
     db,
     username,
     listId,
-    listUrl
+    listUrl,
+    params
   )
 }
 
@@ -85,7 +89,8 @@ async function queryListMapRows(
     imageId: string | null
     canvasId: string | null
     manifestId: string | null
-  }>
+  }>,
+  params: Partial<MapsQueryParams>
 ) {
   const whereConditions: Array<Record<string, unknown>> = []
 
@@ -199,10 +204,20 @@ async function queryListMapRows(
     where: {
       // A list URL is a current publication, even when an item pins a version.
       archived: false,
-      image: { archived: false },
+      ...mapFilters(params),
+      image: { archived: false, ...imageFilters(params) },
       OR: whereConditions
     },
-    orderBy: (maps, { desc }) => [desc(maps.updatedAt)]
+    limit:
+      params.limit === undefined
+        ? undefined
+        : clampLimit(params.limit, params.userRole),
+    orderBy: (maps, { desc }) =>
+      desc(
+        params.intersectsWith || params.containedBy
+          ? maps.scale
+          : maps.updatedAt
+      )
   })
 }
 
@@ -211,7 +226,8 @@ export async function queryListGeoreferenceAnnotations(
   db: Db,
   username: string,
   listId: string,
-  annotationPageId?: string
+  annotationPageId?: string,
+  params: Partial<MapsQueryParams> = {}
 ) {
   const list = await db.query.lists.findFirst({
     columns: {
@@ -246,18 +262,7 @@ export async function queryListGeoreferenceAnnotations(
     throw new ResponseError(`List not found: ${listId}`, 404)
   }
 
-  const rows = await queryListMapRows(
-    db,
-    list.listItems.map((item) => ({
-      mapId: item.mapId,
-      mapImageId: item.mapImageId,
-      mapChecksum: item.mapChecksum,
-      mapVersion: item.mapVersion,
-      imageId: item.imageId,
-      canvasId: item.canvasId,
-      manifestId: item.manifestId
-    }))
-  )
+  const rows = await queryListMapRows(db, list.listItems, params)
 
   const apiMaps = rows.map((row) => fromDbRow(row, annotationsBaseUrl))
   const annotationItems = normalizeToAnnotationItems(

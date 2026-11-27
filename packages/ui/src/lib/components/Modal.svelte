@@ -7,16 +7,21 @@
 
   type Props = {
     open: boolean
+    returnFocus?: HTMLElement | null
+    'aria-describedby'?: string
     title?: Snippet
     closeButtonInTitle?: boolean
     background?: Snippet
     children: Snippet
   }
 
+  const titleId = $props.id()
   let dialog = $state<HTMLDialogElement>()
 
   let {
     open = $bindable(false),
+    returnFocus,
+    'aria-describedby': describedBy,
     title,
     closeButtonInTitle = true,
     background,
@@ -25,10 +30,12 @@
 
   function handleClose() {
     open = false
+    if (returnFocus?.isConnected) returnFocus.focus()
   }
 
   function handleMousedown(event: MouseEvent) {
     if (event.target === dialog) {
+      event.preventDefault()
       open = false
     }
   }
@@ -48,8 +55,9 @@
   <dialog
     transition:fade={{ duration: 100 }}
     bind:this={dialog}
-    class="data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out h-full max-h-full w-full max-w-full items-center justify-center bg-transparent
-    backdrop:bg-black/90 open:flex"
+    aria-describedby={describedBy}
+    aria-labelledby={title ? titleId : undefined}
+    class="fixed inset-0 m-0 box-border h-full max-h-full w-full max-w-full items-center justify-center overflow-hidden border-0 bg-transparent p-0 backdrop:bg-black/40 open:pointer-events-auto open:flex"
     onclose={handleClose}
     onmousedown={handleMousedown}
   >
@@ -62,15 +70,18 @@
     {/if}
     <div
       class="absolute m-4 flex max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] flex-col gap-2
-        rounded-lg bg-white p-2 shadow-lg outline-none sm:gap-4 sm:p-4 md:m-16 md:max-h-[calc(100%-8rem)] md:max-w-[calc(100%-8rem)]"
+        box-border rounded-lg bg-white p-2 text-black shadow-lg outline-none sm:gap-4 sm:p-4 md:m-16 md:max-h-[calc(100%-8rem)] md:max-w-[calc(100%-8rem)]"
     >
       {#if title}
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-medium">{@render title()}</h2>
+        <div class="flex shrink-0 items-center justify-between gap-2">
+          <h2 id={titleId} class="m-0 min-w-0 text-xl font-medium">
+            {@render title()}
+          </h2>
           {#if closeButtonInTitle}
             <button
+              type="button"
               onclick={() => (open = false)}
-              class="cursor-pointer rounded-full bg-white p-1 transition-colors duration-200 hover:bg-gray-100/80"
+              class="grid size-8 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-white p-0 text-inherit transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               <span class="sr-only">Close</span>
               <XIcon class="size-5" size="100%" weight="bold" />
@@ -78,7 +89,7 @@
           {/if}
         </div>
       {/if}
-      <div class="overflow-scroll">
+      <div class="min-h-0 min-w-0 overflow-auto overscroll-contain">
         {@render children?.()}
       </div>
     </div>

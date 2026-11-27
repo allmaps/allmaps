@@ -1,1 +1,22 @@
-@import 'tailwindcss';
+@layer base, starlight, theme, components, utilities;
+
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import './lib/css/ui.css';
+
+@config '../../../apps/docs/tailwind.config.ts';
+
+/* Resolve gray utilities from the Allmaps palette in the Tailwind config. */
+@theme {
+  --color-gray-*: initial;
+}
+
+@source './lib';
+@source './components';
+
+/* Use Geograph’s pointy A in the site and page titles, as on Allmaps Docs. */
+.site-title,
+h1#_top {
+  font-feature-settings: normal;
+}

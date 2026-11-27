@@ -13,7 +13,12 @@ import Neutral from './faces/Neutral.svelte'
 import type { MapMonsterMood } from '$lib/shared/types.js'
 
 // Generated from map-monster-grid.svg. Bounds include the shape stroke.
-export const mapMonsterShapes = [
+export const mapMonsterShapes: readonly {
+  component: typeof Shape0
+  viewBox: string
+  width: number
+  height: number
+}[] = [
   {
     component: Shape0,
     viewBox: '-0.57 0.41 101.14 99.18',
@@ -44,12 +49,12 @@ export const mapMonsterShapes = [
     width: 101.14,
     height: 99.18
   }
-] as const
+]
 
-export const mapMonsterFaces = {
+export const mapMonsterFaces: Record<MapMonsterMood, typeof Happy> = {
   happy: Happy,
   sad: Sad,
   confused: Confused,
   excited: Excited,
   neutral: Neutral
-} satisfies Record<MapMonsterMood, typeof Happy>
+}
