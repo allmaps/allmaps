@@ -50,7 +50,7 @@ describe('list access and Starred item limits', () => {
   })
 
   it.each(['unauthenticated', 'anonymous'])(
-    'rejects every list operation for %s users, including their own lists',
+    'rejects list discovery and management for %s users',
     async (role) => {
       let headers: Record<string, string> = {
         'Content-Type': 'application/json'
@@ -107,14 +107,9 @@ describe('list access and Starred item limits', () => {
         })
         expect(response.status, `${method} ${path}`).toBe(401)
       }
-      for (const suffix of [
-        '',
-        `/${listId}`,
-        `/${listId}/georeference-annotations`
-      ]) {
-        const path = `/@${username}/lists${suffix}`
-        expect((await annotations(path, headers)).status, path).toBe(401)
-      }
+      expect((await annotations(`/@${username}/lists`, headers)).status).toBe(
+        401
+      )
       const remaining = await context.client.query(
         'SELECT name, deletable FROM lists WHERE id = $1',
         [listId]
@@ -190,20 +185,39 @@ describe('list access and Starred item limits', () => {
         expect.objectContaining({ id: list.id, name: 'Starred' })
       )
 
-      for (const suffix of ['', '/georeference-annotations']) {
-        const response = await annotations(
-          `/@${slug}/lists/${list.id}${suffix}`,
-          headers
-        )
-        expect(response.status).toBe(200)
-        expect(response.headers.get('Cache-Control')).toBe('private, no-store')
-        expect(await response.json()).toMatchObject({
-          type: 'AnnotationPage',
-          items: expect.arrayContaining([
-            expect.objectContaining({ type: 'Annotation' })
-          ])
-        })
-      }
+      const path = `/@${slug}/lists/${list.id}`
+      const url = context.env.PUBLIC_ANNOTATIONS_BASE_URL + path
+      const response = await annotations(path + '?cache=123', headers)
+      expect(response.status).toBe(200)
+      expect(response.headers.get('Cache-Control')).toBe('private, no-store')
+      expect(response.headers.get('Content-Type')).toContain(
+        'application/ld+json'
+      )
+      expect(await response.json()).toMatchObject({
+        id: url,
+        type: 'AnnotationCollection',
+        label: 'Starred',
+        total: 2,
+        georeferenceAnnotations: url + '/georeference-annotations',
+        first: {
+          id: url + '#bookmarks',
+          partOf: url,
+          items: images.toReversed().map((image) => ({
+            type: 'Annotation',
+            motivation: 'bookmarking',
+            target: { id: image.uri },
+            georeferencedMapCount: expect.any(Number)
+          }))
+        }
+      })
+      const expanded = await annotations(
+        path + '/georeference-annotations?cache=123',
+        headers
+      )
+      expect(await expanded.json()).toMatchObject({
+        id: url + '/georeference-annotations',
+        type: 'AnnotationPage'
+      })
 
       for (const image of images) {
         expect(
@@ -227,13 +241,112 @@ describe('list access and Starred item limits', () => {
         `/@${slug}/lists/${list.id}/georeference-annotations`,
         headers
       )
-      expect(emptyAnnotations.status).toBe(200)
-      expect(await emptyAnnotations.json()).toMatchObject({
-        type: 'AnnotationPage',
-        items: []
-      })
+      expect(emptyAnnotations.status).toBe(204)
+      const empty = await annotations(path, headers)
+      const emptyList = await empty.json()
+      expect(emptyList).toMatchObject({ id: url, total: 0 })
+      expect(emptyList).not.toHaveProperty('first')
     }
   )
+
+  it('retains a saved manifest before its first map and counts mixed bookmarks independently', async () => {
+    const listId = starredList('local-member').id
+    const headers = await login('local-member')
+    const path = `/@local-member/lists/${listId}`
+    const manifestId = '0011aa'
+    const manifestUri = 'https://example.test/unmapped/manifest'
+    await context.client.query(
+      'INSERT INTO iiif.manifests (id, uri, label) VALUES ($1, $2, $3)',
+      [manifestId, manifestUri, JSON.stringify({ en: ['Unmapped atlas'] })]
+    )
+    const imageId = context.seedCatalog!.images[0].id
+    const items = `/lists/${listId}/items`
+    for (const item of [{ manifestId }, { imageId }]) {
+      expect(
+        (
+          await rest(items, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(item)
+          })
+        ).status
+      ).toBe(200)
+    }
+    try {
+      const collection = await (await annotations(path, headers)).json()
+      expect(collection.total).toBe(2)
+      const [image, manifest] = collection.first.items
+      expect(image.georeferencedMapCount).toBeGreaterThan(0)
+      expect(manifest).toMatchObject({
+        georeferencedMapCount: 0,
+        target: { id: manifestUri, 'dcterms:title': 'Unmapped atlas' }
+      })
+      await rest(items + '?imageId=' + imageId, { method: 'DELETE', headers })
+      expect(
+        (await annotations(path + '/georeference-annotations', headers)).status
+      ).toBe(204)
+      expect((await (await annotations(path, headers)).json()).total).toBe(1)
+    } finally {
+      for (const query of [{ imageId }, { manifestId }]) {
+        await rest(items + '?' + new URLSearchParams(Object.entries(query)), {
+          method: 'DELETE',
+          headers
+        })
+      }
+    }
+  })
+
+  it('counts overlapping bookmarks separately and exports their shared map once', async () => {
+    const headers = await login('local-member')
+    const { id } = starredList('local-member')
+    const catalog = context.seedCatalog!
+    const image = catalog.images[0]
+    const path = `/@local-member/lists/${id}`
+    const resources = [
+      `maps/${catalog.maps[0].id}`,
+      `images/${image.id}`,
+      `canvases/${image.canvasId}`,
+      `manifests/${catalog.manifests[0].id}`
+    ]
+
+    try {
+      for (const resource of resources) {
+        const response = await rest(`/lists/${id}/items/url`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            url: `${context.env.PUBLIC_ANNOTATIONS_BASE_URL}/${resource}`
+          })
+        })
+        expect(response.status).toBe(200)
+        const { bookmark } = await response.json()
+        expect(bookmark.georeferencedMapCount).toBe(1)
+      }
+      const collection = await (await annotations(path, headers)).json()
+      expect(collection.total).toBe(4)
+      const exported = await (
+        await annotations(path + '/georeference-annotations', headers)
+      ).json()
+      expect(exported.items).toHaveLength(1)
+      expect(collection.first.items).toContainEqual(
+        expect.objectContaining({
+          allmapsUrl: exported.items[0].id
+        })
+      )
+    } finally {
+      for (const query of [
+        { mapId: catalog.maps[0].id },
+        { imageId: image.id },
+        { canvasId: image.canvasId },
+        { manifestId: catalog.manifests[0].id }
+      ]) {
+        await rest(
+          `/lists/${id}/items?` + new URLSearchParams(Object.entries(query)),
+          { method: 'DELETE', headers }
+        )
+      }
+    }
+  })
 
   it('rejects custom lists and other users’ Starred lists for regular users', async () => {
     const headers = await login('local-editor')
@@ -291,7 +404,8 @@ describe('list access and Starred item limits', () => {
     const [first, second] = revisions.rows.map(({ checksum }) => checksum)
     const itemsPath = `/lists/${listId}/items`
 
-    for (const checksum of [first, second]) {
+    const collectionPath = `/@local-editor/lists/${listId}`
+    for (const checksum of [first, second, first]) {
       const response = await rest(`${itemsPath}/url`, {
         method: 'POST',
         headers,
@@ -300,7 +414,17 @@ describe('list access and Starred item limits', () => {
         })
       })
       expect(response.status).toBe(200)
-      expect(await response.json()).toMatchObject({
+      const added = await response.json()
+      const collection = await (
+        await annotations(collectionPath, headers)
+      ).json()
+      expect(added.bookmark.id).toBe(
+        context.env.PUBLIC_ANNOTATIONS_BASE_URL +
+          collectionPath +
+          `#maps/${mapId}@${checksum}`
+      )
+      expect(collection.first.items).toContainEqual(added.bookmark)
+      expect(added).toMatchObject({
         mapId,
         mapChecksum: checksum
       })
@@ -616,17 +740,33 @@ describe('list access and Starred item limits', () => {
     ])
   })
 
-  it('rejects cross-user annotation reads, including a foreign list ID under the current username', async () => {
-    const headers = await login('local-member')
-    const list = starredList('local-editor')
-    for (const path of [
-      '/@local-editor/lists',
-      `/@local-editor/lists/${list.id}`,
-      `/@local-editor/lists/${list.id}/georeference-annotations`,
-      `/@local-member/lists/${list.id}`,
-      `/@local-member/lists/${list.id}/georeference-annotations`
-    ]) {
-      expect((await annotations(path, headers)).status, path).toBe(404)
+  it('shares individual list annotations by URL and keeps discovery private', async () => {
+    const memberHeaders = await login('local-member')
+    const listIds = [
+      starredList('local-editor').id,
+      context.seedCatalog!.lists.find(
+        (list) => list.key === 'amsterdam-research'
+      )!.id
+    ]
+    for (const headers of [{}, memberHeaders]) {
+      expect((await annotations('/@local-editor/lists', headers)).status).toBe(
+        headers === memberHeaders ? 404 : 401
+      )
+      for (const listId of listIds) {
+        for (const suffix of ['', '/georeference-annotations']) {
+          const path = `/@local-editor/lists/${listId}${suffix}`
+          const response = await annotations(path, headers)
+          const emptyExport =
+            suffix && listId === starredList('local-editor').id
+          expect(response.status, path).toBe(emptyExport ? 204 : 200)
+          if (!emptyExport)
+            expect(await response.json()).toMatchObject({
+              type: suffix ? 'AnnotationPage' : 'AnnotationCollection'
+            })
+          const wrongOwner = `/@local-member/lists/${listId}${suffix}`
+          expect((await annotations(wrongOwner, headers)).status).toBe(404)
+        }
+      }
     }
   })
 

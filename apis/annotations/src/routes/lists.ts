@@ -67,19 +67,22 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId',
-      async ({ db, env, params, request, set, user }) => {
+      async ({ db, env, params, set }) => {
         setCacheControl(set, 'private-no-store')
-        return queryList(
+        const collection = await queryList(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
-          params.listId,
-          request.url,
-          getListOwnerId(user, params.username)
+          params.listId
         )
+        return Response.json(collection, {
+          headers: {
+            'Content-Type':
+              'application/ld+json; profile="http://www.w3.org/ns/anno.jsonld"'
+          }
+        })
       },
       {
-        auth: true,
         params: t.Object({
           username: t.String(),
           listId: t.String()
@@ -92,19 +95,23 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId/georeference-annotations',
-      async ({ db, env, params, request, set, user }) => {
+      async ({ db, env, params, set }) => {
         setCacheControl(set, 'private-no-store')
-        return queryListGeoreferenceAnnotations(
+        const page = await queryListGeoreferenceAnnotations(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
-          params.listId,
-          request.url,
-          getListOwnerId(user, params.username)
+          params.listId
+        )
+        return (
+          page ??
+          new Response(null, {
+            status: 204,
+            headers: { 'Cache-Control': 'private, no-store' }
+          })
         )
       },
       {
-        auth: true,
         params: t.Object({
           username: t.String(),
           listId: t.String()

@@ -40,6 +40,8 @@ function getListUser(user: unknown) {
 
   return {
     id: user.id,
+    slug:
+      'slug' in user && typeof user.slug === 'string' ? user.slug : undefined,
     isAdmin: 'role' in user && user.role === 'admin'
   }
 }
@@ -209,7 +211,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
     )
     .post(
       '/lists/:listId/items/url',
-      async ({ db, user, params, body, status, set }) => {
+      async ({ db, env, user, params, body, status, set }) => {
         setCacheControl(set, 'private-no-store')
         const listUser = getListUser(user)
         const list = await queryUserList(db, listUser.id, params.listId)
@@ -222,7 +224,10 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
           db,
           params.listId,
           body.url,
-          listUser.isAdmin ? undefined : starredListItemLimit
+          listUser.isAdmin ? undefined : starredListItemLimit,
+          listUser.slug
+            ? { base: env.PUBLIC_ANNOTATIONS_BASE_URL, username: listUser.slug }
+            : undefined
         )
 
         if (!result.success) {
@@ -238,7 +243,7 @@ export function createListsRoutes(betterAuth: BetterAuthContext) {
         detail: {
           summary: 'Add an item to a list by URL',
           description:
-            'Authenticated users only. Accepts Allmaps annotation URLs for maps, including specific map revisions, images, canvases, and manifests.',
+            'Authenticated users only. Accepts Allmaps annotation URLs for maps, including specific map revisions, images, canvases, and manifests. The response includes the saved bookmark for users with a public list URL.',
           tags: ['Lists'],
           security: authenticatedDetail.security,
           'x-badges': authenticatedDetail['x-badges']
