@@ -34,7 +34,9 @@
     <div class="flex min-w-0 pointer-events-auto">
       {@render children?.()}
     </div>
-    <div class="flex items-center gap-2 justify-self-end">
+    <div
+      class="flex shrink-0 flex-col items-end gap-2 justify-self-end sm:flex-row sm:items-center"
+    >
       <ViewerLoginMenu />
       <MainMenu />
     </div>

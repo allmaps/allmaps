@@ -11,6 +11,8 @@
   import PageSection from '$lib/components/app/PageSection.svelte'
   import Map from '$lib/components/map/Map.svelte'
   import Controls from '$lib/components/controls/Controls.svelte'
+  import MainMenu from '$lib/components/controls/MainMenu.svelte'
+  import ViewerLoginMenu from '$lib/components/controls/ViewerLoginMenu.svelte'
   import Header from '$lib/components/app/Header.svelte'
   import SourceInfoPopover from '$lib/components/metadata/SourceInfoPopover.svelte'
   import AnnotationInput from '$lib/components/input/AnnotationInput.svelte'
@@ -170,6 +172,12 @@
     </View>
   {/key}
 {:else}
+  <header
+    class="absolute end-2 top-2 z-20 flex flex-col items-end gap-2 sm:flex-row sm:items-center"
+  >
+    <ViewerLoginMenu />
+    <MainMenu />
+  </header>
   <PageSection>
     <div class="flex w-full max-w-md flex-col items-center gap-6">
       <Title />
