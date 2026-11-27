@@ -13,7 +13,8 @@ import {
   resolveImageServices
 } from '@allmaps/api-shared/db'
 import { createTestContext, type TestContext } from './helpers/context.ts'
-import type { DbMaps3 } from '@allmaps/db'
+import { schema, type DbMaps3 } from '@allmaps/db'
+import { eq } from 'drizzle-orm'
 import { parseAnnotation } from '@allmaps/annotation'
 import { Manifest } from '@allmaps/iiif-parser'
 import {
@@ -52,7 +53,8 @@ const responses = new Map<string, unknown>()
 function addManifest(
   uri: string,
   olderService: string,
-  preferredService: string
+  preferredService: string,
+  ...alternateV2Services: string[]
 ) {
   const manifest = JSON.parse(
     readFileSync(
@@ -69,11 +71,11 @@ function addManifest(
   canvas.id = uri + '/canvas'
   canvas.width = canvas.height = 250
   canvas.items[0].items[0].body.service = [
-    {
-      id: olderService,
+    ...[olderService, ...alternateV2Services].map((id) => ({
+      id,
       type: 'ImageService2',
       profile: 'http://iiif.io/api/image/2/level2.json'
-    },
+    })),
     { id: preferredService, type: 'ImageService3', profile: 'level2' }
   ]
   responses.set(uri, manifest)
@@ -672,6 +674,26 @@ it('migrates an unopened manifest image using its service dimensions', async () 
     )
   )
   expect((await record.json()).canvases[0].images[0].uri).toBe(destination)
+})
+
+it('keeps both HTTPS image services in the publisher group and skips an FTP alternate', async () => {
+  const manifest = base + '/manifest/mixed-schemes'
+  const older = base + '/2/mixed-schemes'
+  const preferred = base + '/3/mixed-schemes'
+  const ftp = 'ftp://library.example/2/mixed-schemes'
+  addManifest(manifest, older, preferred, ftp)
+  responses.set(older + '/info.json', infoV2(older))
+  responses.set(preferred + '/info.json', info(preferred))
+
+  const registered = await createManifestFromUrl(context.db, manifest)
+  expect(registered.canvases[0].images[0].uri).toBe(preferred)
+  const { manifestsToCanvases } = schema
+  const links = await context.db
+    .select({ services: manifestsToCanvases.publisherServiceUris })
+    .from(manifestsToCanvases)
+    .where(eq(manifestsToCanvases.manifestId, registered.id))
+  expect(links).toEqual([{ services: [preferred, older] }])
+  expect((await resolveImageServices(context.db, [older])).uri).toBe(preferred)
 })
 
 it('does not group services on the authority of a third-party manifest', async () => {

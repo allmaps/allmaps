@@ -16,7 +16,7 @@ import {
   generateRandomId,
   generateId as generateImageHash
 } from '@allmaps/id/sync'
-import { fetchJson, fetchUrl } from '@allmaps/stdlib'
+import { fetchJson, fetchUrl, isValidHttpUrl } from '@allmaps/stdlib'
 import { Manifest, Image } from '@allmaps/iiif-parser'
 
 import { schema } from '@allmaps/db/schema'
@@ -1239,7 +1239,9 @@ async function createParsedManifest(
           label: canvas.label
         })
         imageLinks.push({ canvasId, imageId: image.id })
-        const services = canvas.image.serviceUris
+        const services = canvas.image.serviceUris.filter(
+          (uri) => uri === canvas.image.uri || isValidHttpUrl(uri)
+        )
         manifestLinks.set(canvasId, {
           canvasId,
           manifestId: newManifestId,
@@ -1247,7 +1249,7 @@ async function createParsedManifest(
             services.length > 1 &&
             domains &&
             services.every((uri) => domains.has(getHttpUrlDomain(uri)))
-              ? [...services]
+              ? services
               : null
         })
         resultCanvases.push({
