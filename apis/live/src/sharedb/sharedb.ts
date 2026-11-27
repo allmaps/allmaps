@@ -448,6 +448,8 @@ export default class AllmapsShareDB {
   }
 
   private async resolveMap(map: GeoreferencedMap) {
+    if (map.resource.type === 'Canvas') return map
+
     const image = await resolveImageServices(this.db, [map.resource.id])
     return {
       ...map,

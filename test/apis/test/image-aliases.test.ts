@@ -13,6 +13,7 @@ import {
   resolveImageServices
 } from '@allmaps/api-shared/db'
 import { createTestContext, type TestContext } from './helpers/context.ts'
+import type { DbMaps3 } from '@allmaps/db'
 import { parseAnnotation } from '@allmaps/annotation'
 import { Manifest } from '@allmaps/iiif-parser'
 import {
@@ -133,6 +134,56 @@ it.for([
     )
   }
 )
+
+it('preserves the Canvas resource and control points on save and update without fetching info.json', async ({
+  onTestFinished
+}) => {
+  const canvas = {
+    id: base + '/canvas/amsterdam',
+    type: 'Canvas' as const,
+    width: 1200,
+    height: 1500
+  }
+  const map = { ...fixtureMap, resource: canvas }
+  const fetchSpy = vi.spyOn(globalThis, 'fetch')
+  onTestFinished(() => {
+    fetchSpy.mockRestore()
+  })
+
+  const [saved] = await context.shareDb.saveMaps([map])
+  const [mapId] = saved.mapIds
+  const expectSnapshot = async (gcps: typeof map.gcps) => {
+    await context.shareDb.flushPendingSnapshots()
+    const snapshot = await context.client.query<{ data: DbMaps3 }>(
+      'SELECT data FROM snapshots WHERE doc_id = $1',
+      [hash(canvas.id)]
+    )
+    const stored = snapshot.rows[0].data[mapId]
+    expect(stored.resource).toEqual({
+      id: hash(canvas.id),
+      uri: canvas.id,
+      type: canvas.type,
+      width: canvas.width,
+      height: canvas.height
+    })
+    const storedGcps = Object.values(stored.gcps)
+    expect(storedGcps).toHaveLength(gcps.length)
+    gcps.forEach((gcp, index) => {
+      expect(storedGcps).toContainEqual(
+        expect.objectContaining({ ...gcp, index })
+      )
+    })
+    expect(fetchSpy).not.toHaveBeenCalled()
+  }
+  await expectSnapshot(map.gcps)
+
+  const updatedGcps: typeof map.gcps = [
+    ...map.gcps.slice(0, -1),
+    { resource: [125, 875], geo: [4.891, 52.379] }
+  ]
+  await context.shareDb.updateMap(mapId, { ...map, gcps: updatedGcps })
+  await expectSnapshot(updatedGcps)
+})
 
 it('resolves alternate services, preserves pixel coordinates and moves the edited image with its history', async () => {
   const api = context.env.PUBLIC_REST_BASE_URL
