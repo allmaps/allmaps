@@ -1,4 +1,5 @@
 <script lang="ts">
+  import MapRowMenu from '../../menu/MapRowMenu.svelte'
   import MapRowDetails from './MapRowDetails.svelte'
   import MapRowError from './MapRowError.svelte'
   import MapThumbnail from './MapThumbnail.svelte'
@@ -67,12 +68,15 @@
       title={row.title}
       errorTitle={displayedErrorTitle}
       errorMessage={displayedErrorMessage}
-    />
+    >
+      <MapRowMenu map={row.map} isEmbedded={row.isEmbedded} />
+    </MapRowError>
   {:else}
     <MapRowDetails
       {row}
       {selected}
       {hidden}
+      {selectable}
       {canToggleHidden}
       {onToggleHidden}
     />

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { resolve } from '$app/paths'
+  import { page } from '$app/state'
   import { untrack } from 'svelte'
 
   import { CaretDownIcon, Image as ImageIcon } from 'phosphor-svelte'
@@ -396,7 +396,7 @@
   }
 
   function getMapUrl(mapId?: string) {
-    return untrack(() => urlState.generateUrl(resolve('/(app)'), { mapId }))
+    return untrack(() => urlState.generateUrl(page.url.pathname, { mapId }))
   }
 
   function buildMapUrlsByMapId(imageEntries: ImageEntry[]) {
@@ -405,7 +405,7 @@
     )
 
     return untrack(() =>
-      urlState.generateUrlsForParam(resolve('/(app)'), 'mapId', mapIds)
+      urlState.generateUrlsForParam(page.url.pathname, 'mapId', mapIds)
     )
   }
 
@@ -418,6 +418,7 @@
   ): MapListRow {
     const mapNumber = getMapNumber(map, index, currentMapNumberState)
 
+    const isEmbedded = mapsState.isEmbeddedMap(map.id)
     return {
       map,
       mapId: map.id,
@@ -431,7 +432,7 @@
       mapUrl: mapUrlsByMapId.get(map.id) ?? getMapUrl(map.id),
       thumbnailAlt: map.id ?? getLabel(image.resource),
       renderError: mapsState.getMapRenderError(map.id),
-      isEmbedded: mapsState.isEmbeddedMap(map.id)
+      isEmbedded
     }
   }
 

@@ -17,6 +17,7 @@
 
   type Props = {
     row: MapListRow
+    selectable: boolean
     selected?: boolean
     hidden?: boolean
     canToggleHidden?: boolean
@@ -25,6 +26,7 @@
 
   let {
     row,
+    selectable,
     selected = false,
     hidden = false,
     canToggleHidden = false,
@@ -55,7 +57,15 @@
         class="size-6 inline-block"
         weight={selected ? 'duotone' : 'regular'}
       />
-      {row.title}
+      {#if selectable && !hidden}
+        <a
+          href={row.mapUrl}
+          aria-current={selected ? 'true' : undefined}
+          class="hover:underline">{row.title}</a
+        >
+      {:else}
+        {row.title}
+      {/if}
     </h4>
     <span class="text-xs opacity-75">
       <span class="hidden sm:inline">Last edit on {row.modifiedLabel}</span>
