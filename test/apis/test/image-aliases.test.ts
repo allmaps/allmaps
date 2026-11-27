@@ -366,6 +366,26 @@ it('resolves alternate services, preserves pixel coordinates and moves the edite
     { resource: { id: canonical, width: 1000, height: 1000 } }
   ])
 
+  const getVersions = async (uri: string): Promise<{ version: string }[]> => {
+    const response = await request('/images/' + hash(uri) + '/versions')
+    expect(response.status).toBe(200)
+    return response.json()
+  }
+  const readVersion = async (url: string) => {
+    const response = await context.annotations.handle(new Request(url))
+    expect(response.status).toBe(200)
+    const maps = parseAnnotation(await response.json())
+    expect(maps).toHaveLength(1)
+    return maps[0]
+  }
+  const [{ version: savedVersionUrl }] = await getVersions(canonical)
+  expect(new URL(savedVersionUrl).origin).toBe(
+    new URL(context.env.PUBLIC_ANNOTATIONS_BASE_URL).origin
+  )
+  const original = await readVersion(savedVersionUrl)
+  expect(original.resource.id).toBe(canonical)
+  expect(original.gcps).toHaveLength(fixtureMap.gcps.length)
+
   await migrateImage(context.db, hash(v2), moved + '/info.json')
   responses.delete(encoded + '/info.json')
   expect(
@@ -397,11 +417,8 @@ it('resolves alternate services, preserves pixel coordinates and moves the edite
 
   const historyQuery = vi.spyOn(context.client, 'query')
   try {
-    const history = await queryImageChecksums(
-      'https://annotations.example',
-      context.db,
-      hash(encoded)
-    )
+    const history = await getVersions(encoded)
+    expect(history[1].version).toBe(savedVersionUrl)
     expect(
       history.map((row) => row.version.split('/').pop()?.split('@')[0])
     ).toEqual([hash(moved), hash(canonical)])
@@ -409,6 +426,10 @@ it('resolves alternate services, preserves pixel coordinates and moves the edite
   } finally {
     historyQuery.mockRestore()
   }
+  const historical = await readVersion(savedVersionUrl)
+  expect(historical.resource.id).toBe(original.resource.id)
+  expect(historical.gcps).toEqual(original.gcps)
+
   const snapshots = await context.client.query<{
     doc_id: string
     data: Record<string, { resource: { uri: string } }>
