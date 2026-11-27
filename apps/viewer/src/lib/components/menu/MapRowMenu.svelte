@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { DropdownMenu } from 'bits-ui'
+  import * as DropdownMenu from '@allmaps/ui/dropdown-menu'
   import { CaretDown as CaretDownIcon } from 'phosphor-svelte'
 
   import MapAnnotationMenuItems from '$lib/components/menu/MapAnnotationMenuItems.svelte'
-  import MenuContent from '$lib/components/menu/MenuContent.svelte'
   import {
     getAllmapsAnnotationMapId,
     getMapAnnotationSource,
@@ -47,9 +46,5 @@
     {@render sourceLabel()}
     <CaretDownIcon class="size-3.5" />
   </DropdownMenu.Trigger>
-  <DropdownMenu.Portal>
-    <MenuContent side="bottom" align="start" sideOffset={4}>
-      <MapAnnotationMenuItems {map} {isEmbedded} />
-    </MenuContent>
-  </DropdownMenu.Portal>
+  <MapAnnotationMenuItems {map} {isEmbedded} />
 </DropdownMenu.Root>
