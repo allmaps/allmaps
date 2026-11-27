@@ -7,9 +7,11 @@ import {
   getStarredResource,
   matchesResource
 } from '../src/lib/shared/starred.js'
+
 import {
   getStarredOpenAllHref,
-  viewerHref
+  viewerHref,
+  getStarredDialogItems
 } from '../src/lib/shared/starred-dialog.js'
 
 const urls = {
@@ -41,7 +43,7 @@ const collection = {
 }
 
 describe('Viewer Starred lists', () => {
-  it('uses the supplied export URL when at least one bookmark has maps', async () => {
+  it('opens mapped bookmarks in Viewer and unmapped manifests in Editor before loading thumbnails', async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(
@@ -50,6 +52,7 @@ describe('Viewer Starred lists', () => {
         ])
       )
       .mockResolvedValueOnce(Response.json(collection))
+      .mockResolvedValueOnce(Response.json({ width: 100 }))
     vi.stubGlobal('fetch', fetchMock)
     try {
       const { signal } = new AbortController()
@@ -59,11 +62,66 @@ describe('Viewer Starred lists', () => {
         signal
       )
       expect(list?.georeferenceAnnotations).toBe(exportUrl)
+      const rows = getStarredDialogItems(list!.items, '/')
+      expect(rows[0]).toMatchObject({
+        label: 'Atlas 0',
+        detail: 'Open in Allmaps Editor to start georeferencing',
+        href: 'https://editor.allmaps.org/images?url=https%3A%2F%2Fexample.test%2Fmanifest%2F0'
+      })
+      expect(rows[1]).toMatchObject({
+        label: 'Atlas 2',
+        href: viewerHref('/', collection.first.items[1].allmapsUrl)
+      })
       expect(getStarredOpenAllHref(list, '/')).toBe(viewerHref('/', exportUrl))
       expect(
         getStarredOpenAllHref({ ...list!, items: [list!.items[0]] }, '/')
       ).toBeNull()
+      const [image] = getStarredDialogItems(
+        [{ ...list!.items[0], resource: { type: 'image', id: 'abc' } }],
+        '/'
+      )
+      expect(image.detail).toBe('No georeferenced maps yet')
+      expect(image.href).toBeUndefined()
       expect(fetchMock).toHaveBeenCalledTimes(2)
+      await rows[0].thumbnail?.loadImageInfo?.(signal)
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        'https://example.test/image/0/info.json',
+        { credentials: 'omit', signal }
+      )
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('uses a cataloged image when an incomplete manifest cannot be fetched', async () => {
+    const bookmark = collection.first.items[0]
+    const [row] = getStarredDialogItems(
+      [
+        {
+          resource: { type: 'manifest', id: 'abc0' },
+          ...bookmark,
+          target: {
+            id: bookmark.target.id,
+            fallbackImageService: 'https://example.test/fallback'
+          }
+        }
+      ],
+      '/'
+    )
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError('CORS'))
+      .mockResolvedValueOnce(Response.json({ width: 100 }))
+    vi.stubGlobal('fetch', fetch)
+    try {
+      const info = await row.thumbnail?.loadImageInfo?.(
+        new AbortController().signal
+      )
+      expect(info).toEqual({ width: 100 })
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+        bookmark.target.id,
+        'https://example.test/fallback/info.json'
+      ])
     } finally {
       vi.unstubAllGlobals()
     }

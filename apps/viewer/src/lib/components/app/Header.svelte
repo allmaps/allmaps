@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Logo } from '@allmaps/ui'
 
+  import ViewerLoginMenu from '$lib/components/controls/ViewerLoginMenu.svelte'
   import MainMenu from '$lib/components/controls/MainMenu.svelte'
 
   import type { Snippet } from 'svelte'
@@ -34,6 +35,7 @@
       {@render children?.()}
     </div>
     <div class="flex items-center gap-2 justify-self-end">
+      <ViewerLoginMenu />
       <MainMenu />
     </div>
   </nav>
