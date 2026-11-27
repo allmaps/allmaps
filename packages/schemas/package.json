@@ -6,7 +6,7 @@
     "email": "hello@bertspaan.nl",
     "url": "https://bertspaan.nl"
   },
-  "description": "Allmaps JSON Schemas",
+  "description": "Versioned JSON-LD contexts and JSON Schemas for Allmaps",
   "type": "module",
   "exports": "./dist/index.js",
   "files": [
@@ -25,23 +25,33 @@
     "allmaps"
   ],
   "scripts": {
-    "watch": "tsc --watch --noCheck",
-    "build": "tsc --noCheck",
-    "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
-    "format": "prettier --ignore-path ../../.gitignore --write src",
-    "types": "tsc --noEmit"
+    "watch": "vite build --watch",
+    "build": "vite build",
+    "lint": "prettier --ignore-path ../../.gitignore --check src test/*.ts vite.config.ts && eslint src test vite.config.ts",
+    "format": "prettier --ignore-path ../../.gitignore --write src test/*.ts vite.config.ts",
+    "types": "tsc -p tsconfig.check.json",
+    "test": "node --test test/*.test.ts",
+    "deploy:development": "wrangler deploy --env development",
+    "deploy:production": "wrangler deploy --env production"
   },
   "license": "MIT",
   "dependencies": {
     "@allmaps/annotation": "workspace:^",
-    "zod": "catalog:",
-    "zod-to-json-schema": "^3.22.4"
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/jsonld": "^1.5.15",
+    "@types/node": "catalog:",
     "@typescript/native": "catalog:",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
+    "jsonld": "^9.0.0",
     "prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "wrangler": "catalog:"
   }
 }

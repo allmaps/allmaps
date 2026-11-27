@@ -1,4 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { readFile } from 'node:fs/promises'
+import { parseEnv } from 'node:util'
+import { createElysia } from '@allmaps/api-shared/elysia'
+import { parseAnnotationsEnv } from '@allmaps/env/annotations'
+import { createApp as createAnnotationsApp } from '../../../apis/annotations/src/app.ts'
+import { nodeAdapter } from '../../../tools/apis/src/node-adapter.ts'
 import { createTestContext, type TestContext } from './helpers/context.ts'
 
 describe('list access and Starred item limits', () => {
@@ -739,6 +745,40 @@ describe('list access and Starred item limits', () => {
       })
     ])
   })
+
+  it.each([
+    ['dev', 'https://dev.schemas.allmaps.org/lists/1/context.json'],
+    ['production', 'https://schemas.allmaps.org/lists/1/context.json']
+  ])(
+    'exports a public list with the %s list context',
+    async (mode, expected) => {
+      const file = new URL(`../../../.env.${mode}`, import.meta.url)
+      const { PUBLIC_SCHEMAS_BASE_URL } = parseEnv(await readFile(file, 'utf8'))
+      expect(PUBLIC_SCHEMAS_BASE_URL).toBeDefined()
+      const env = parseAnnotationsEnv({
+        ...context.env,
+        PUBLIC_SCHEMAS_BASE_URL
+      })
+      const app = createElysia({ adapter: nodeAdapter() })
+        .decorate('env', env)
+        .decorate('db', context.db)
+        .use(createAnnotationsApp(env, context.betterAuth))
+      const list = context.seedCatalog!.lists.find(
+        (list) => list.key === 'amsterdam-research'
+      )!
+      const response = await app.handle(
+        new Request(
+          `${env.PUBLIC_ANNOTATIONS_BASE_URL}/@local-editor/lists/${list.id}`
+        )
+      )
+      expect(response.status).toBe(200)
+      expect(await response.json()).toMatchObject({
+        '@context': expected,
+        type: 'AnnotationCollection',
+        first: { type: 'AnnotationPage' }
+      })
+    }
+  )
 
   it('shares individual list annotations by URL and keeps discovery private', async () => {
     const memberHeaders = await login('local-member')

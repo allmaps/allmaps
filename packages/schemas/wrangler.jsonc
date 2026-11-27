@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "schemas",
+  "compatibility_date": "2026-11-27",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./dist/site",
+    "html_handling": "none",
+    "not_found_handling": "none"
+  },
+  "env": {
+    "development": {
+      "name": "schemas-develop",
+      "routes": [
+        { "pattern": "dev.schemas.allmaps.org", "custom_domain": true }
+      ]
+    },
+    "production": {
+      "name": "schemas",
+      "routes": [{ "pattern": "schemas.allmaps.org", "custom_domain": true }]
+    }
+  }
+}
