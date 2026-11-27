@@ -671,13 +671,29 @@ it('leaves both documents reachable if both services have edits', async () => {
   }
   await context.shareDb.flushPendingSnapshots()
   await createManifestFromUrl(context.db, manifest)
+  // Both edited images already have their own saved service metadata.
+  responses.delete(older + '/info.json')
+  responses.delete(preferred + '/info.json')
   for (const uri of [older, preferred]) {
     await expect(resolveImageServices(context.db, [uri])).rejects.toMatchObject(
       { status: 409 }
     )
-    const response = await context.rest.handle(
-      new Request(context.env.PUBLIC_REST_BASE_URL + '/images/' + hash(uri))
+    const endpoint = context.env.PUBLIC_REST_BASE_URL + '/images/' + hash(uri)
+    const metadata = await context.rest.handle(
+      new Request(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: uri + '/info.json', resolve: true })
+      })
     )
+    expect(metadata.status).toBe(200)
+    expect(await metadata.json()).toMatchObject({
+      id: hash(uri),
+      uri,
+      data: uri === older ? infoV2(uri) : info(uri)
+    })
+    const response = await context.rest.handle(new Request(endpoint))
+    expect(response.status).toBe(200)
     expect((await response.json()).maps).toHaveLength(1)
   }
 })

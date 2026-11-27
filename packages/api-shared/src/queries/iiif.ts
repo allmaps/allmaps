@@ -1071,9 +1071,9 @@ async function reconcilePublisherServices(
   }
   const edited = await editedImageGroups(tx, [...groups])
   if (edited.length > 1) {
-    throw new ResponseError(
-      'Multiple image services have edits requiring reconciliation',
-      409
+    throw new EditedImageAliasError(
+      edited,
+      'Multiple image services have edits requiring reconciliation'
     )
   }
   const canonical = edited[0] ?? preferredId
@@ -1319,12 +1319,16 @@ export async function resolveImageWithMetadata(
       !error.imageIds.includes(imageId)
     )
       throw error
-    // Keep a pre-alias edited document accessible until an explicit migration.
-    const data = await fetchJson(infoUrl, iiifRequestOptions)
+    // Open the requested edited document without reconciling its aliases.
+    const record = await db.query.images.findFirst({
+      where: { id: imageId },
+      columns: { uri: true, data: true }
+    })
+    const data = record?.data ?? (await fetchJson(infoUrl, iiifRequestOptions))
     const parsed = Image.parse(data)
     return {
       id: imageId,
-      uri,
+      uri: record?.uri ?? uri,
       width: parsed.width,
       height: parsed.height,
       type: `ImageService${parsed.majorVersion}`,

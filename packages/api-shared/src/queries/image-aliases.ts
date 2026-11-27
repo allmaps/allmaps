@@ -78,8 +78,11 @@ export async function repointImageGroup(db: DbOrTx, from: string, to: string) {
 export class EditedImageAliasError extends ResponseError {
   readonly imageIds: string[]
 
-  constructor(imageIds: string[]) {
-    super('Image alias already has edits requiring reconciliation', 409)
+  constructor(
+    imageIds: string[],
+    message = 'Image alias already has edits requiring reconciliation'
+  ) {
+    super(message, 409)
     this.imageIds = imageIds
   }
 }
