@@ -988,7 +988,10 @@ export async function resolveImageServices(
     // A proxy can point to a canonical service. Read the metadata from that
     // service before storing it under the publisher's ID.
     const canonicalUri = Image.parse(data).uri
-    getHttpUrlDomain(canonicalUri)
+    assertAllowedDomain(
+      getHttpUrlDomain(canonicalUri),
+      options.allowedParsedUriDomains
+    )
     data = await fetchJson(
       `${canonicalUri.replace(/\/$/, '')}/info.json`,
       iiifRequestOptions

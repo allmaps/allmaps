@@ -4,6 +4,7 @@ import { afterAll, beforeAll, expect, it, vi } from 'vitest'
 import {
   addItemToList,
   addItemToListByUrl,
+  createImageFromUrl,
   createManifestFromUrl,
   createUserList,
   queryListGeoreferenceAnnotations,
@@ -95,6 +96,43 @@ afterAll(async () => {
   vi.unstubAllGlobals()
   await context?.close()
 })
+
+it.for([
+  { host: 'scans.library.example', allowed: true },
+  { host: 'unrelated.example', allowed: false }
+])(
+  'checks the canonical domain before fetching metadata from $host',
+  async ({ host, allowed }, { onTestFinished }) => {
+    const sourceUrl = base + '/proxy/' + host + '/info.json'
+    const canonicalUri = 'https://' + host + '/scan'
+    const canonicalUrl = canonicalUri + '/info.json'
+    responses.set(sourceUrl, info(canonicalUri))
+    responses.set(canonicalUrl, { ...info(canonicalUri), width: 3000 })
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    onTestFinished(() => {
+      fetchSpy.mockRestore()
+    })
+
+    const image = createImageFromUrl(context.db, sourceUrl, {
+      allowedUrlDomains: ['library.example'],
+      allowedParsedUriDomains: ['library.example', 'scans.library.example']
+    })
+    if (allowed) {
+      await expect(image).resolves.toMatchObject({
+        uri: canonicalUri,
+        width: 3000
+      })
+    } else {
+      await expect(image).rejects.toMatchObject({
+        status: 403,
+        message: `Domain not allowed: ${host}`
+      })
+    }
+    expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual(
+      allowed ? [sourceUrl, canonicalUrl] : [sourceUrl]
+    )
+  }
+)
 
 it('resolves alternate services, preserves pixel coordinates and moves the edited image with its history', async () => {
   const api = context.env.PUBLIC_REST_BASE_URL
