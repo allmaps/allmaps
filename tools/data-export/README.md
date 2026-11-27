@@ -37,7 +37,7 @@ on a standard Ubuntu runner with Node.js 24, the repository's pinned pnpm
 version, rclone 1.76.0, and Tippecanoe 2.79.0. It exports from Neon, generates
 PMTiles, then uploads to R2 and checks that remote file sizes match the local files.
 Only the export's workspace dependencies are built, with declaration generation
-disabled because this job only needs JavaScript. No Docker image is needed.
+disabled because this job only needs JavaScript.
 
 The workflow installs rclone from its pinned official release and verifies the
 archive's SHA-256 checksum. Ubuntu's rclone 1.60.1 sends a version-specific
@@ -78,17 +78,8 @@ disable schedules after 60 days without repository activity.
 
 The workflow supplies environment variables directly and invokes `export`
 without a profile, so repository env files cannot override the Actions secrets.
-Do not run production exports on both Render and GitHub during the cutover:
-verify a GitHub trial, disable the Render cron, and enable the GitHub schedule.
 
-## Render Docker
-
-Configure the Render service with the monorepo root as the Docker build context,
-so workspace dependencies are available locally during the image build:
-
-- Root Directory: unset, or repository root
-- Dockerfile Path: `tools/data-export/Dockerfile`
-- Docker Context: `.`
+## Environment profiles
 
 Passing `dev`, `localhost`, or `production` loads the matching env file from the
 repository root:

@@ -19,13 +19,12 @@ import * as listsSchema from '@allmaps/db/schema/lists'
 import * as mapsSchema from '@allmaps/db/schema/maps'
 import * as iiifSchema from '@allmaps/db/schema/iiif'
 
-import { ResponseError } from '@allmaps/api-shared'
+import { ResponseError, clampLimit } from '@allmaps/api-shared'
 import { makeMapUrl } from '../shared/urls.js'
+import { mapFilters, imageFilters } from './map-filters.js'
+import type { MapsQueryParams } from '../types.js'
 import { fromDbRow } from '../shared/maps.js'
-import {
-  parseStoredJson,
-  parseStoredNullableLanguageString
-} from '../shared/stored-json.js'
+import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 
 import type { Db, DbOrTx } from '@allmaps/db'
 import type { Polygon } from 'geojson'
@@ -156,7 +155,11 @@ async function getPublishedList(db: Db, username: string, listId: string) {
   return list
 }
 
-async function queryListMapRows(db: Db, listId: string) {
+async function queryListMapRows(
+  db: Db,
+  listId: string,
+  params: Partial<MapsQueryParams>
+) {
   const membership = listMapMembership(db, listId)
   const revisions = db
     .select({
@@ -227,13 +230,24 @@ async function queryListMapRows(db: Db, listId: string) {
       }
     },
     where: {
+      AND: [mapFilters(params)],
+      image: imageFilters(params),
       RAW: (map) =>
         inArray(
           sql`(${map.id}, ${map.imageId}, ${map.checksum}, ${map.version})`,
           revisions
         )
     },
-    orderBy: (maps, { desc }) => [desc(maps.updatedAt)]
+    limit:
+      params.limit === undefined
+        ? undefined
+        : clampLimit(params.limit, params.userRole),
+    orderBy: (maps, { desc }) =>
+      desc(
+        params.intersectsWith || params.containedBy
+          ? maps.scale
+          : maps.updatedAt
+      )
   })
 }
 
@@ -271,7 +285,7 @@ function titleFromLabel(value: unknown) {
 function firstManifestImage(data: unknown) {
   if (data) {
     try {
-      return Manifest.parse(parseStoredJson(data)).canvases[0]?.image.uri
+      return Manifest.parse(data).canvases[0]?.image.uri
     } catch {
       // Older catalog entries may contain only a partial manifest.
     }
@@ -438,11 +452,13 @@ export async function queryListGeoreferenceAnnotations(
   annotationsBaseUrl: string,
   db: Db,
   username: string,
-  listId: string
+  listId: string,
+  params: Partial<MapsQueryParams> = {},
+  search = ''
 ) {
   const list = await getPublishedList(db, username, listId)
-  const rows = await queryListMapRows(db, list.id)
-  if (!rows.length) return
+  const rows = await queryListMapRows(db, list.id, params)
+  if (!rows.length && !search) return
 
   const maps = rows.map((row) => ({
     ...fromDbRow(row, annotationsBaseUrl),
@@ -450,7 +466,7 @@ export async function queryListGeoreferenceAnnotations(
   }))
   return {
     ...generateAnnotation(maps),
-    id: `${listUrl(annotationsBaseUrl, username, list.id)}/georeference-annotations`,
+    id: `${listUrl(annotationsBaseUrl, username, list.id)}/georeference-annotations${search}`,
     label: list.name
   }
 }

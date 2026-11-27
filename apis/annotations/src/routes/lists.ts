@@ -1,3 +1,4 @@
+import { mapsQuerySchema } from '@allmaps/api-shared/elysia'
 import { t } from 'elysia'
 
 import { ResponseError, setCacheControl } from '@allmaps/api-shared'
@@ -11,6 +12,7 @@ import type { BetterAuthContext } from '@allmaps/db/auth'
 import type { AnnotationsEnv } from '@allmaps/env/annotations'
 
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
+import { readAnnotationQuery } from '../query.js'
 
 type UserList = Awaited<ReturnType<typeof queryLists>>[number]
 
@@ -95,13 +97,19 @@ export function createListsRoutes(
     )
     .get(
       '/@:username/lists/:listId/georeference-annotations',
-      async ({ db, env, params, set }) => {
+      async ({ db, env, params, request, set, getLimitRole }) => {
         setCacheControl(set, 'private-no-store')
+        const { filters, userRole } = await readAnnotationQuery(
+          request,
+          getLimitRole
+        )
         const page = await queryListGeoreferenceAnnotations(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
-          params.listId
+          params.listId,
+          { ...filters, userRole },
+          Object.keys(filters).length ? new URL(request.url).search : ''
         )
         return (
           page ??
@@ -112,6 +120,7 @@ export function createListsRoutes(
         )
       },
       {
+        query: mapsQuerySchema,
         params: t.Object({
           username: t.String(),
           listId: t.String()

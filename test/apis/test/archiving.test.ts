@@ -174,15 +174,33 @@ describe('admin archiving', () => {
         const geojson = await (await request(api, '/maps.geojson')).json()
         expect(geojson.features).toHaveLength(catalog.maps.length - 1)
       }
-      for (const path of [
-        `/maps/${map.id}`,
-        `/maps/${map.id}.geojson`,
+      const imagePaths = [
         `/images/${map.imageId}`,
-        `/images/${map.imageId}.geojson`,
+        `/images/${map.imageId}.geojson`
+      ]
+      const missingPaths = [`/maps/${map.id}`, `/maps/${map.id}.geojson`]
+      const emptyPaths = [
         `/canvases/${image.canvasId}`,
         `/manifests/${catalog.manifests[0].id}`
-      ]) {
-        expect((await request('annotations', path)).status).toBe(404)
+      ]
+      if (resource === 'images') missingPaths.push(...imagePaths)
+      else emptyPaths.push(...imagePaths)
+
+      for (const query of ['', '?limit=1']) {
+        for (const path of missingPaths) {
+          expect(
+            (await request('annotations', path + query)).status,
+            path
+          ).toBe(404)
+        }
+        for (const path of emptyPaths) {
+          const response = await request('annotations', path + query)
+          expect(response.status, path).toBe(200)
+          const collection = await response.json()
+          expect(
+            path.endsWith('.geojson') ? collection.features : collection.items
+          ).toEqual([])
+        }
       }
       const manifestStatus = await request(
         'rest',
