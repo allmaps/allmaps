@@ -22,7 +22,9 @@ import type {
   ResourceMask,
   CompleteDbGcp3
 } from '$lib/types/maps.js'
-import type { ProjectionsById, Point } from '$lib/types/shared.js'
+import type { Point } from '$lib/types/shared.js'
+
+type ProjectionsById = Record<string, PickerProjection>
 
 export function isDbMap1(dbMap: DbMap): dbMap is DbMap1 {
   return dbMap.version === 1
