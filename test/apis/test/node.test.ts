@@ -15,6 +15,7 @@ import {
   type RunnerConfiguration
 } from '@allmaps/tools-apis'
 import type { SeedCatalog } from '@allmaps/tools-seed'
+import { fixtureMap } from './fixtures/map.ts'
 import { startTestRunner, temporaryDirectory } from './helpers/context.ts'
 import { startRunner } from './helpers/runner.ts'
 import { createTestEnvironment } from './helpers/environment.ts'
@@ -85,6 +86,21 @@ it('runs native TypeScript on Node, serves all APIs and owns a reusable IIIF fix
     expect(pixels.headers.get('content-type')).toBe('image/jpeg')
     expect((await pixels.arrayBuffer()).byteLength).toBeGreaterThan(1000)
   }
+})
+
+it('returns a conflict for a direct Live import without saved image metadata', async () => {
+  const response = await fetch(
+    configuration.environment.PUBLIC_LIVE_BASE_URL + '/maps',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fixtureMap)
+    }
+  )
+  expect(response.status).toBe(409)
+  expect(await response.json()).toMatchObject({
+    error: expect.stringContaining('Resolve the image through the REST API')
+  })
 })
 
 it('rejects PostgreSQL, preserved storage, and fixture reuse inside the child process', async () => {

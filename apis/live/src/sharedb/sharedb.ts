@@ -1,7 +1,7 @@
 import {
   canonicalImageId,
   lockImageIds,
-  resolveImageServices
+  getSavedImageResource
 } from '@allmaps/api-shared/db'
 import ShareDB from 'sharedb'
 import WebSocketJSONStream from '@teamwork/websocket-json-stream'
@@ -450,17 +450,8 @@ export default class AllmapsShareDB {
   private async resolveMap(map: GeoreferencedMap) {
     if (map.resource.type === 'Canvas') return map
 
-    const image = await resolveImageServices(this.db, [map.resource.id])
-    return {
-      ...map,
-      resource: {
-        ...map.resource,
-        id: image.uri,
-        type: image.type,
-        width: image.width,
-        height: image.height
-      }
-    }
+    const resource = await getSavedImageResource(this.db, map.resource.id)
+    return { ...map, resource: { ...map.resource, ...resource } }
   }
 
   async updateMap(mapId: string, map: GeoreferencedMap) {

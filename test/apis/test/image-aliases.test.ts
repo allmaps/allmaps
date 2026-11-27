@@ -185,6 +185,121 @@ it('preserves the Canvas resource and control points on save and update without 
   await expectSnapshot(updatedGcps)
 })
 
+it('resolves missing metadata in REST before Live saves or updates the map', async ({
+  onTestFinished
+}) => {
+  const { client, db, env, rest, shareDb } = context
+  const uri = base + '/write/declared'
+  const proxy = base + '/write/proxy'
+  const metadata = { ...info(uri), width: 7000, height: 8000 }
+  responses.set(proxy + '/info.json', metadata)
+  responses.set(uri + '/info.json', metadata)
+  const map = {
+    ...fixtureMap,
+    resource: { ...fixtureMap.resource, id: proxy, width: 250, height: 250 }
+  }
+  await client.query(
+    'INSERT INTO iiif.images (id, uri, width, height) VALUES ($1, $2, 250, 250)',
+    [hash(proxy), proxy]
+  )
+  const headers = {
+    'Content-Type': 'application/json',
+    Cookie: await adminCookie()
+  }
+  const publisherFetch = globalThis.fetch
+  const fetchSpy = vi.spyOn(globalThis, 'fetch')
+  onTestFinished(() => {
+    fetchSpy.mockRestore()
+  })
+  const missingMetadata = { status: 409 }
+  await expect(shareDb.saveMaps([map])).rejects.toMatchObject(missingMetadata)
+  await expect(shareDb.updateMap('missing', map)).rejects.toMatchObject(
+    missingMetadata
+  )
+  expect(fetchSpy).not.toHaveBeenCalled()
+
+  // Observe the REST-to-Live handoff using the same database as both APIs.
+  const live = env.PUBLIC_LIVE_BASE_URL + '/maps'
+  fetchSpy.mockImplementation(async (url, init) => {
+    if (!String(url).startsWith(live)) return publisherFetch(url, init)
+    const saved = await db.query.images.findFirst({ where: { id: hash(uri) } })
+    expect(saved?.data).toEqual(metadata)
+    // Stale scalar dimensions must never override the saved info.json.
+    await client.query('UPDATE iiif.images SET width = 250 WHERE id = $1', [
+      hash(uri)
+    ])
+    const callsBeforeLive = fetchSpy.mock.calls.length
+    const body = JSON.parse(String(init?.body))
+    const result =
+      init?.method === 'POST'
+        ? await shareDb.saveMaps(body)
+        : await shareDb.updateMap(String(url).slice(live.length + 1), body)
+    expect(fetchSpy.mock.calls).toHaveLength(callsBeforeLive)
+    return Response.json(result)
+  })
+  const mapsUrl = env.PUBLIC_REST_BASE_URL + '/maps'
+  const post = await rest.handle(
+    new Request(mapsUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify([map, { ...map, gcps: map.gcps.slice(0, 3) }])
+    })
+  )
+  expect(post.status).toBe(200)
+  const [saved] = await post.json()
+  expect(saved.imageId).toBe(hash(uri))
+  expect(saved.mapIds).toHaveLength(2)
+  const [mapId] = saved.mapIds
+  expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+    proxy + '/info.json',
+    uri + '/info.json',
+    live
+  ])
+  const expectSavedMap = async (gcp: (typeof map.gcps)[number]) => {
+    await shareDb.flushPendingSnapshots()
+    const snapshot = await client.query<{ data: DbMaps3 }>(
+      'SELECT data FROM snapshots WHERE doc_id = $1',
+      [hash(uri)]
+    )
+    const stored = snapshot.rows[0].data[mapId]
+    expect(stored.resource).toMatchObject({
+      id: hash(uri),
+      uri,
+      width: metadata.width,
+      height: metadata.height
+    })
+    expect(Object.values(stored.gcps)).toContainEqual(
+      expect.objectContaining(gcp)
+    )
+  }
+  await expectSavedMap(map.gcps[1])
+  await client.query('UPDATE iiif.images SET data = NULL WHERE id = $1', [
+    hash(uri)
+  ])
+  fetchSpy.mockClear()
+  const updatedGcp: (typeof map.gcps)[number] = {
+    resource: [3921, 4132],
+    geo: [4.89, 52.38]
+  }
+  const patch = await rest.handle(
+    new Request(mapsUrl + '/' + mapId, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({
+        ...map,
+        resource: { ...map.resource, id: uri },
+        gcps: [...map.gcps, updatedGcp]
+      })
+    })
+  )
+  expect(patch.status).toBe(200)
+  expect(fetchSpy.mock.calls.map(([url]) => url)).toEqual([
+    uri + '/info.json',
+    live + '/' + mapId
+  ])
+  await expectSavedMap(updatedGcp)
+})
+
 it('resolves alternate services, preserves pixel coordinates and moves the edited image with its history', async () => {
   const api = context.env.PUBLIC_REST_BASE_URL
   const publisherFetch = globalThis.fetch
@@ -360,6 +475,7 @@ it('registers 300 canvases without fetching info.json and resolves only the sele
 it('leaves a legacy document with existing edits reachable when discovery finds a different canonical ID', async () => {
   const legacy = base + '/legacy'
   responses.set(legacy + '/info.json', info(legacy))
+  await resolveImageServices(context.db, [legacy])
   const [saved] = await context.shareDb.saveMaps([
     { ...fixtureMap, resource: { ...fixtureMap.resource, id: legacy } }
   ])
@@ -665,6 +781,7 @@ it('keeps migrated maps current when an empty Editor create loses the race', asy
 it('leaves both documents reachable if both services have edits', async () => {
   const { manifest, older, preferred } = alternateServices('both-edited')
   for (const uri of [older, preferred]) {
+    await resolveImageServices(context.db, [uri])
     await context.shareDb.saveMaps([
       { ...fixtureMap, resource: { ...fixtureMap.resource, id: uri } }
     ])
@@ -705,6 +822,7 @@ it('follows image moves in a saved list and keeps a map version pinned', async (
   for (const uri of [original, moved, current]) {
     responses.set(uri + '/info.json', info(uri))
   }
+  await resolveImageServices(context.db, [original])
   const [saved] = await context.shareDb.saveMaps([
     { ...fixtureMap, resource: { ...fixtureMap.resource, id: original } }
   ])

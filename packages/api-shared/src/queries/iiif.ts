@@ -27,6 +27,7 @@ import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 import type { LanguageString } from '@allmaps/iiif-parser'
 import {
   EditedImageAliasError,
+  canonicalImageId,
   editedImageGroups,
   repointImageGroup,
   lockImageIds,
@@ -872,6 +873,27 @@ export async function storeImage(
 
 function serviceUri(url: string) {
   return url.replace(/\/info\.json$/, '')
+}
+
+export async function getSavedImageResource(db: Db, uri: string) {
+  const id = await canonicalImageId(db, generateImageHash(uri))
+  const record = await db.query.images.findFirst({
+    where: { id },
+    columns: { data: true }
+  })
+  if (!record?.data) {
+    throw new ResponseError(
+      `No saved info.json for ${uri}. Resolve the image through the REST API first.`,
+      409
+    )
+  }
+  const image = Image.parse(record.data)
+  return {
+    id: image.uri,
+    type: `ImageService${image.majorVersion}` as const,
+    width: image.width,
+    height: image.height
+  }
 }
 
 export async function resolveImageServices(

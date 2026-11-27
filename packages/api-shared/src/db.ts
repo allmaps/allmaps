@@ -8,6 +8,7 @@ export {
   createImage,
   createImageFromUrl,
   resolveImageServices,
+  getSavedImageResource,
   createManifest,
   createManifestFromUrl
 } from './queries/iiif.js'

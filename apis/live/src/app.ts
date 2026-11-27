@@ -1,8 +1,9 @@
-import express from 'express'
+import express, { type ErrorRequestHandler } from 'express'
 import http from 'node:http'
 import cors from 'cors'
 import { WebSocketServer } from 'ws'
 
+import { ResponseError } from '@allmaps/api-shared'
 import { validateGeoreferencedMap } from '@allmaps/annotation'
 import AllmapsShareDB from './sharedb/sharedb.ts'
 
@@ -38,6 +39,15 @@ export function createLiveServer(shareDb: AllmapsShareDB) {
     }
     res.send(await shareDb.updateMap(mapId, mapOrMaps))
   })
+
+  const handleResponseError: ErrorRequestHandler = (error, _req, res, next) => {
+    if (error instanceof ResponseError) {
+      res.status(error.status).json({ error: error.message })
+    } else {
+      next(error)
+    }
+  }
+  app.use(handleResponseError)
 
   const server = http.createServer(app)
   const wss = new WebSocketServer({ server })
