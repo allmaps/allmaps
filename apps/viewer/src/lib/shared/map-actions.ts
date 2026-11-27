@@ -1,4 +1,5 @@
 import { generateAnnotation } from '@allmaps/annotation'
+import { fetchJson } from '@allmaps/stdlib'
 
 import { getCanonicalManifest } from '$lib/shared/iiif.js'
 
@@ -107,5 +108,24 @@ export async function copyMapAnnotationUrl(mapId: string, isEmbedded = false) {
 
   if (annotationUrl) {
     await navigator.clipboard.writeText(annotationUrl)
+  }
+}
+
+export async function copyPublishedAnnotation(url: string) {
+  const text = fetchJson(url).then((annotation) =>
+    JSON.stringify(annotation, null, 2)
+  )
+
+  // Safari requires the clipboard write to start during the selection gesture.
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/plain': text.then(
+          (json) => new Blob([json], { type: 'text/plain' })
+        )
+      })
+    ])
+  } else {
+    await navigator.clipboard.writeText(await text)
   }
 }

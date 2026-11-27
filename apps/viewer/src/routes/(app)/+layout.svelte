@@ -37,7 +37,8 @@
   const metadataState = setMetadataState(mapsState, urlState)
   const imagesState = setImagesState(mapsState)
   setErrorsState(sourceState, mapsState, imagesState)
-  setIiifState(mapsState)
+  // svelte-ignore state_referenced_locally
+  setIiifState(mapsState, data.env.PUBLIC_REST_BASE_URL)
   if (browser) {
     setBackgroundColorsState(mapsState, imagesState)
   }

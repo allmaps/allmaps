@@ -2,7 +2,7 @@
   import { resolve } from '$app/paths'
   import { untrack } from 'svelte'
 
-  import { Image as ImageIcon, Info as InfoIcon } from 'phosphor-svelte'
+  import { CaretDownIcon, Image as ImageIcon } from 'phosphor-svelte'
 
   import { parseLanguageString } from '@allmaps/iiif-inspector'
 
@@ -18,6 +18,7 @@
   import { getUrlState } from '$lib/shared/params.js'
 
   import Metadata from './Metadata.svelte'
+  import ResourceMapMenu from './ResourceMapMenu.svelte'
   import MapRow from './map-list/MapRow.svelte'
   import MapRowError from './map-list/MapRowError.svelte'
   import OrganizationBadge from './OrganizationBadge.svelte'
@@ -31,12 +32,14 @@
     InvalidGeoreferenceAnnotation,
     MapsByCanvas,
     MapsByImage,
+    OrganizationSummary,
     MapsByManifest,
     MapsHierarchy
   } from '$lib/types/shared.js'
   import type { GeoreferencedMap, PartOfItem } from '@allmaps/annotation'
 
   type Props = {
+    sourceResource?: 'map' | 'image' | 'manifest' | 'canvas'
     mapsHierarchy: MapsHierarchy
     selectedMapId?: string
     open?: boolean
@@ -60,6 +63,7 @@
 
   let {
     mapsHierarchy,
+    sourceResource,
     selectedMapId = $bindable(),
     open = false
   }: Props = $props()
@@ -163,13 +167,6 @@
 
   function getImageEntriesOrganizationSummary(imageEntries: ImageEntry[]) {
     return getOrganizationSummary(getImageEntryMaps(imageEntries))
-  }
-
-  function handleMetadataHeaderKeydown(event: KeyboardEvent, key: string) {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      uiState.toggleMetadataSectionCollapsed(key)
-    }
   }
 
   function getParsedManifest(manifestId?: string) {
@@ -519,10 +516,6 @@
     return `image:${entry.canvas?.id ?? entry.image.resource.id}:${entry.image.resource.id}`
   }
 
-  function getManifestMetadataKey(manifestId: string | undefined) {
-    return manifestId ? `manifest:${manifestId}` : undefined
-  }
-
   async function scrollSelectedMapIntoView() {
     const selectedMapElement = metadataListElement?.querySelector(
       '[data-selected-map="true"]'
@@ -576,23 +569,47 @@
   })
 </script>
 
-{#snippet metadataToggle(key: string, label: string)}
-  {@const collapsed = uiState.isMetadataSectionCollapsed(key)}
-  <button
-    type="button"
-    class={[
-      'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-black/80 transition-colors hover:bg-gray-100 hover:text-gray-900',
-      !collapsed ? 'bg-pink-100 text-pink' : ''
-    ]}
-    onclick={(event) => {
-      event.stopPropagation()
-      uiState.toggleMetadataSectionCollapsed(key)
-    }}
-    aria-expanded={!collapsed}
-    aria-label={`${collapsed ? 'Show' : 'Hide'} ${label}`}
-  >
-    <InfoIcon class="size-5" weight="bold" />
-  </button>
+{#snippet metadataHeader(
+  key: string,
+  title: string,
+  kind: 'manifest' | 'image' | 'canvas',
+  organization?: OrganizationSummary,
+  uri?: string
+)}
+  {@const expanded = !uiState.isMetadataSectionCollapsed(key)}
+  <div class="relative flex min-h-8 min-w-0 items-center gap-2 rounded px-1">
+    <svelte:element
+      this={kind === 'image' ? 'h3' : 'h2'}
+      class={['min-w-0 flex-1 font-semibold', kind === 'image' && 'text-sm']}
+    >
+      <button
+        type="button"
+        class="flex w-full min-w-0 cursor-pointer items-center gap-2 text-start after:absolute after:inset-0 after:rounded hover:after:bg-black/5 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-pink"
+        aria-label={`${title} — ${kind} metadata`}
+        aria-expanded={expanded}
+        onclick={() => uiState.toggleMetadataSectionCollapsed(key)}
+      >
+        {#if kind !== 'manifest'}
+          <ImageIcon class="size-6 shrink-0" aria-hidden="true" />
+        {/if}
+        <span class="truncate">{title}</span>
+      </button>
+    </svelte:element>
+    {#if uri && kind !== 'canvas' && sourceResource && sourceResource !== 'canvas' && sourceResource !== kind}
+      <ResourceMapMenu {kind} {uri} />
+    {/if}
+    <OrganizationBadge
+      {organization}
+      class="pointer-events-none max-w-1/2 truncate"
+    />
+    <CaretDownIcon
+      aria-hidden="true"
+      class={[
+        'pointer-events-none size-4 shrink-0 motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-in-out',
+        expanded && 'rotate-180'
+      ]}
+    />
+  </div>
 {/snippet}
 
 {#snippet mapList(image: MapsByImage)}
@@ -672,33 +689,17 @@
         'border p-2 border-gray-200 rounded-2xl bg-gray-100/30 shadow-sm'
     ]}
   >
-    <div
-      role="button"
-      tabindex="0"
-      class="flex cursor-pointer items-center justify-between gap-3 rounded"
-      onclick={() => uiState.toggleMetadataSectionCollapsed(metadataKey)}
-      onkeydown={(event) => handleMetadataHeaderKeydown(event, metadataKey)}
-      aria-expanded={!uiState.isMetadataSectionCollapsed(metadataKey)}
-    >
-      <div class="flex min-w-0 items-center gap-2">
-        <ImageIcon class="size-6 shrink-0" />
-        <h3 class="min-w-0 text-sm font-semibold text-gray-900">
-          <span class="block select-none max-w-full truncate text-left">
-            {imageTitle}
-          </span>
-        </h3>
-      </div>
-
-      <div class="flex shrink-0 items-center gap-1">
-        {#if showOrganization}
-          <OrganizationBadge {organization} link />
-        {/if}
-        {@render metadataToggle(metadataKey, 'image metadata')}
-      </div>
-    </div>
+    {@render metadataHeader(
+      metadataKey,
+      imageTitle,
+      'image',
+      organization,
+      getImageServiceId(entry.image.resource)
+    )}
     {#if !uiState.isMetadataSectionCollapsed(metadataKey)}
       <Metadata
         resource={canvas}
+        {organization}
         uri={getImageInfoUrl(entry.image.resource)}
         uriLabel={getImageServiceId(entry.image.resource)}
         resourceType="image-service"
@@ -714,49 +715,24 @@
 {#snippet manifestSection(
   title: string,
   imageEntries: ImageEntry[],
-  manifestId?: string,
-  metadataKey = getManifestMetadataKey(manifestId),
-  metadataUri = manifestId,
+  manifestId: string,
   label?: string
 )}
+  {@const metadataKey = `manifest:${manifestId}`}
   {@const organization = getImageEntriesOrganizationSummary(imageEntries)}
   {@const parsedManifest = getParsedManifest(manifestId)}
-
-  <div
-    role="button"
-    tabindex="0"
-    class="flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded"
-    onclick={() =>
-      metadataKey && uiState.toggleMetadataSectionCollapsed(metadataKey)}
-    onkeydown={(event) =>
-      metadataKey && handleMetadataHeaderKeydown(event, metadataKey)}
-    aria-expanded={metadataKey
-      ? !uiState.isMetadataSectionCollapsed(metadataKey)
-      : undefined}
-  >
-    <div class="flex min-w-0 items-center gap-2">
-      <h2 class="min-w-0 font-semibold">
-        {#if metadataKey}
-          <span class="select-none block max-w-full truncate text-left"
-            >{title}</span
-          >
-        {:else}
-          <span class="select-none block truncate">{title}</span>
-        {/if}
-      </h2>
-    </div>
-    <div class="flex shrink-0 items-center gap-1">
-      <OrganizationBadge {organization} link />
-      {#if metadataKey}
-        {@render metadataToggle(metadataKey, 'manifest metadata')}
-      {/if}
-    </div>
-  </div>
-  {#if metadataKey && !uiState.isMetadataSectionCollapsed(metadataKey)}
+  {@render metadataHeader(
+    metadataKey,
+    title,
+    'manifest',
+    organization,
+    manifestId
+  )}
+  {#if !uiState.isMetadataSectionCollapsed(metadataKey)}
     <Metadata
       resource={parsedManifest}
-      uri={metadataUri}
-      uriLabel={metadataUri}
+      {organization}
+      uri={manifestId}
       resourceType="manifest"
       {label}
     />
@@ -775,28 +751,10 @@
   {#if imageEntries.length === 1}
     {@render imageSection(imageEntries[0], undefined, true)}
   {:else}
-    <div
-      role="button"
-      tabindex="0"
-      class="flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded focus-visible:outline-2 focus-visible:outline-pink"
-      onclick={() => uiState.toggleMetadataSectionCollapsed(metadataKey)}
-      onkeydown={(event) => handleMetadataHeaderKeydown(event, metadataKey)}
-      aria-expanded={!uiState.isMetadataSectionCollapsed(metadataKey)}
-    >
-      <div class="flex min-w-0 items-center gap-2">
-        <ImageIcon class="size-6 shrink-0" />
-        <h2 class="min-w-0 font-semibold">
-          <span class="block max-w-full truncate text-left">{title}</span>
-        </h2>
-      </div>
-      <div class="flex shrink-0 items-center gap-1">
-        <OrganizationBadge {organization} link />
-
-        {@render metadataToggle(metadataKey, 'canvas metadata')}
-      </div>
-    </div>
+    {@render metadataHeader(metadataKey, title, 'canvas', organization)}
     {#if !uiState.isMetadataSectionCollapsed(metadataKey)}
       <Metadata
+        {organization}
         uri={canvas.canvas.id}
         uriLabel={canvas.canvas.id}
         resourceType="canvas"
@@ -834,8 +792,6 @@
           getTitle(manifest.manifest, 'IIIF Manifest'),
           getManifestImageEntries(manifest),
           manifest.manifest.id,
-          undefined,
-          undefined,
           getActualLabel(manifest.manifest)
         )}
       </section>

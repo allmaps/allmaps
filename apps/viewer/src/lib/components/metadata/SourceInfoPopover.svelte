@@ -279,7 +279,12 @@
           {@render urlInput()}
         </div>
 
-        <MapList {mapsHierarchy} bind:selectedMapId {open} />
+        <MapList
+          sourceResource={headerResource}
+          {mapsHierarchy}
+          bind:selectedMapId
+          {open}
+        />
       </div>
     {/snippet}
   </Popover>
