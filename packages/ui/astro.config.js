@@ -22,12 +22,19 @@ export default defineConfig({
   integrations: [
     starlight({
       expressiveCode,
+      customCss: [
+        './src/app.css',
+        '../../apps/docs/src/css/fonts.css',
+        '../../apps/docs/src/css/starlight.css'
+      ],
       title: 'Allmaps UI',
       description:
         'Shared Allmaps components, examples, and interactive controls.',
       logo: { src: '../../apps/docs/src/images/allmaps-logo.svg' },
       routeMiddleware: './src/component-navigation.ts',
-      components: { Sidebar: './src/starlight/components/StyleguideSidebar.astro' },
+      components: {
+        Sidebar: './src/starlight/components/StyleguideSidebar.astro'
+      },
       head: ['regular', 'bold'].map((weight) => ({
         tag: 'link',
         attrs: {

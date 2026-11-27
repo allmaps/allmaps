@@ -1,5 +1,6 @@
 import { black, white } from '@allmaps/tailwind'
 import { backgrounds } from '../starlight/components/playground-backgrounds'
+import starlightLayers from '../../../../apps/docs/src/css/layers.css?raw'
 import sdkStyles from '@ui-sdk/core/web.css?raw'
 
 export function GET() {
@@ -21,7 +22,8 @@ export function GET() {
     })
     .join('\n')
   return new Response(
-    `${palette}
+    `${starlightLayers}
+${palette}
 @layer components { @scope ([data-ui-preview]) { ${styles} } }`,
     { headers: { 'Content-Type': 'text/css; charset=utf-8' } }
   )

@@ -1,6 +1,6 @@
 @config '../../tailwind.config.ts';
 
-@layer base, starlight, theme, components, utilities;
+@import './layers.css';
 
 @import '@astrojs/starlight-tailwind';
 @import 'tailwindcss/theme.css' layer(theme);

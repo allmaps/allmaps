@@ -1,16 +1,10 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data'
 
-import catalogStyles from './app.css?url'
 import { backgroundStorageKey } from './starlight/components/playground-backgrounds'
 import { getComponentSections } from './component-sections'
 
 export const onRequest = defineRouteMiddleware(({ locals }) => {
   const route = locals.starlightRoute
-  route.head.push({
-    tag: 'link',
-    attrs: { rel: 'stylesheet', href: catalogStyles }
-  })
-
   const sections = route.entry.data.sections
   if (!sections) return
 

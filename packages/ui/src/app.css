@@ -1,34 +1,13 @@
-@layer base, starlight, theme, components, utilities;
-
-@import '@astrojs/starlight-tailwind';
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);
-@import '@allmaps/tailwind/theme.css';
-@import './lib/css/fonts.css';
-@import '../../../apps/docs/src/css/starlight.css';
-
-@config '../../../apps/docs/tailwind.config.ts';
+@import '../../../apps/docs/src/css/tailwind.css';
 
 /* Resolve gray utilities from the Allmaps palette in the Tailwind config. */
 @theme {
   --color-gray-*: initial;
 }
 
-@source './lib';
 @source './starlight/components';
-
-/* Keep the catalog column at its Geograph reading width during font loading. */
-:root[data-has-sidebar] {
-  --sl-content-width: 42rem;
-}
 
 /* Match the Starlight theme when it differs from the OS preference. */
 [data-ui-preview] {
   color-scheme: inherit;
-}
-
-/* Use Geograph’s pointy A in the site and page titles, as on Allmaps Docs. */
-.site-title,
-h1#_top {
-  font-feature-settings: normal;
 }
