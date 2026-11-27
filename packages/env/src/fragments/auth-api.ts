@@ -7,6 +7,10 @@ export const authApiEnvSchema = apiEnvSchema
   // Workers receive their connection through a Hyperdrive binding.
   .partial({ DATABASE_URL: true })
   .extend({
+    PUBLIC_SCHEMAS_BASE_URL: z
+      .string()
+      .url()
+      .default('https://schemas.allmaps.org'),
     PUBLIC_DOCS_BASE_URL: z.string().url().default('https://docs.allmaps.org'),
     PUBLIC_HOMEPAGE_BASE_URL: z.string().url().default('https://allmaps.org')
   })

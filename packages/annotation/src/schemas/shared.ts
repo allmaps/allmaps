@@ -82,9 +82,13 @@ export const HomepageSchema = oneOrMany(OptionalHomepageItemSchema).transform(
     )
 )
 
-export const ProviderItemSchema = z.object({
+export const SerializedProviderItemSchema = z.object({
   id: z.string().url().optional(),
   label: LanguageValueSchema.optional(),
+  homepage: HomepageItemSchema.array().optional()
+})
+
+export const ProviderItemSchema = SerializedProviderItemSchema.extend({
   homepage: HomepageSchema.transform((values) =>
     values.length > 0 ? values : undefined
   ).optional()
@@ -92,7 +96,7 @@ export const ProviderItemSchema = z.object({
 
 export const ProviderSchema = oneOrMany(ProviderItemSchema)
 
-const ValidTransformationSchema = z.object({
+export const ValidTransformationSchema = z.object({
   type: z.enum([
     'helmert',
     'polynomial',

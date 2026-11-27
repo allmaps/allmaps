@@ -75,7 +75,8 @@ export function createListsRoutes(
           env.PUBLIC_ANNOTATIONS_BASE_URL,
           db,
           params.username,
-          params.listId
+          params.listId,
+          env.PUBLIC_SCHEMAS_BASE_URL
         )
         return Response.json(collection, {
           headers: {

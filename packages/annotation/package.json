@@ -8,7 +8,10 @@
   },
   "description": "Functions for generating and parsing IIIF georeference annotations",
   "type": "module",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./serialized": "./dist/schemas/serialized.js"
+  },
   "files": [
     "dist"
   ],

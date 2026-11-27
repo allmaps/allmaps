@@ -251,30 +251,6 @@ async function queryListMapRows(
   })
 }
 
-const listContext = [
-  'http://www.w3.org/ns/anno.jsonld',
-  {
-    georeferenceAnnotations: {
-      '@id': 'https://schemas.allmaps.org/lists/georeferenceAnnotations',
-      '@type': '@id'
-    },
-    georeferencedMapCount:
-      'https://schemas.allmaps.org/lists/georeferencedMapCount',
-    allmapsUrl: {
-      '@id': 'https://schemas.allmaps.org/lists/allmapsUrl',
-      '@type': '@id'
-    },
-    fallbackImageService: {
-      '@id': 'https://schemas.allmaps.org/lists/fallbackImageService',
-      '@type': '@id'
-    },
-    imageService: {
-      '@id': 'https://schemas.allmaps.org/lists/imageService',
-      '@type': '@id'
-    }
-  }
-]
-
 function titleFromLabel(value: unknown) {
   const label = parseStoredNullableLanguageString(value)
   return [...(label?.en ?? []), ...Object.values(label ?? {}).flat()]
@@ -428,14 +404,15 @@ export async function queryList(
   base: string,
   db: Db,
   username: string,
-  listId: string
+  listId: string,
+  schemasBaseUrl = 'https://schemas.allmaps.org'
 ) {
   const list = await getPublishedList(db, username, listId)
   const id = listUrl(base, username, list.id)
   const items = await queryListBookmarks(base, db, username, listId)
   const pageId = id + '#bookmarks'
   return {
-    '@context': listContext,
+    '@context': new URL('/lists/1/context.json', schemasBaseUrl).href,
     id,
     type: 'AnnotationCollection',
     label: list.name,
