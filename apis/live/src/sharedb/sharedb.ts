@@ -35,7 +35,6 @@ import type { GeoreferencedMap } from '@allmaps/annotation'
 import type { DebouncedFunc } from 'lodash-es'
 
 import type { Db, DbMaps, DbMaps3 } from '@allmaps/db'
-import type { Callback } from '@allmaps/api-shared/types'
 
 ShareDB.types.register(json1.type)
 
@@ -88,35 +87,17 @@ export default class AllmapsShareDB {
       this.pendingSubmissions.delete(request)
     })
 
-    this.shareDb.use(
-      'commit',
-      (context: ShareDB.middleware.CommitContext, callback: Callback<never>) =>
-        this.onCommit(context.snapshot, callback)
-    )
-  }
-
-  private onCommit(
-    snapshot: ShareDB.Snapshot | null,
-    callback: Callback<never>
-  ) {
-    console.log(
-      'Received ShareDB commit for document',
-      snapshot ? snapshot.id : null
-    )
-    if (!snapshot) {
-      callback()
-      return
-    }
-
-    this.commitsReceived += 1
-    this.latestSnapshotByImageId.set(snapshot.id, snapshot)
-
-    const persistEntry = this.getOrCreatePersistEntry(snapshot.id)
-    persistEntry.debouncedPersist()
-
-    this.logSnapshotMetrics()
-
-    callback()
+    // A competing migration can win the database write after commit middleware runs.
+    this.shareDb.use('afterWrite', ({ snapshot }, next) => {
+      if (snapshot) {
+        console.log('Received ShareDB commit for document', snapshot.id)
+        this.commitsReceived += 1
+        this.latestSnapshotByImageId.set(snapshot.id, snapshot)
+        this.getOrCreatePersistEntry(snapshot.id).debouncedPersist()
+        this.logSnapshotMetrics()
+      }
+      next()
+    })
   }
 
   private getOrCreatePersistEntry(imageId: string) {

@@ -446,6 +446,52 @@ it('keeps the edited service until an admin promotes its previously opened alias
   expect(doc.data).toHaveProperty(saved.mapIds[0])
 })
 
+it('keeps migrated maps current when an empty Editor create loses the race', async ({
+  onTestFinished
+}) => {
+  const { db, client, shareDb, close } = await createTestContext({
+    seed: 'map'
+  })
+  onTestFinished(close)
+  const sourceId = hash(fixtureMap.resource.id)
+  const destination = base + '/racing-create'
+  const destinationId = hash(destination)
+  responses.set(destination + '/info.json', info(destination))
+
+  // Finish the migration after ShareDB prepares the empty snapshot but before
+  // its database adapter attempts to write it.
+  shareDb.shareDb.use('commit', (_request, next) => {
+    migrateImage(db, sourceId, destination + '/info.json').then(
+      () => next(),
+      next
+    )
+  })
+  const doc = shareDb.connection.get('images', destinationId)
+  const create = new Promise<void>((resolve, reject) =>
+    doc.create({}, 'json1', (error) => (error ? reject(error) : resolve()))
+  )
+  await expect(create).rejects.toMatchObject({
+    code: 'ERR_DOC_ALREADY_CREATED'
+  })
+  await shareDb.flushPendingSnapshots()
+
+  const snapshot = await client.query<{
+    data: Record<string, unknown>
+    version: number
+  }>(
+    "SELECT data, version FROM snapshots WHERE collection = 'images' AND doc_id = $1",
+    [destinationId]
+  )
+  expect(snapshot.rows[0].version).toBe(1)
+  const currentMaps = await db.query.maps.findMany({
+    columns: { id: true },
+    where: { imageId: destinationId, latest: true }
+  })
+  const mapIds = Object.keys(snapshot.rows[0].data)
+  expect(mapIds).toHaveLength(1)
+  expect(currentMaps.map((map) => map.id)).toEqual(mapIds)
+})
+
 it('leaves both documents reachable if both services have edits', async () => {
   const { manifest, older, preferred } = alternateServices('both-edited')
   for (const uri of [older, preferred]) {
