@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from 'drizzle-orm'
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { schema, type Db, type DbMaps3 } from '@allmaps/db'
 import { DbMapsSchema } from '@allmaps/db/maps'
 import { generateChecksum, generateId } from '@allmaps/id'
@@ -12,7 +12,7 @@ import {
   repointImageGroup,
   registerImageAliases
 } from './image-aliases.js'
-import { resolveImageServices, storeImage } from './iiif.js'
+import { resolveImageWithMetadata, storeImage } from './iiif.js'
 
 export async function migrateImage(db: Db, requestedId: string, url: string) {
   const { images, maps, snapshots, imageAliases } = schema
@@ -22,17 +22,19 @@ export async function migrateImage(db: Db, requestedId: string, url: string) {
   const suppliedId = url.endsWith('/info.json')
     ? await generateId(url.slice(0, -'/info.json'.length))
     : nextId
-  let oldId = await canonicalImageId(db, requestedId)
-  const sourceRecord = await db.query.images.findFirst({
-    where: { id: oldId },
-    columns: { uri: true, width: true, height: true }
-  })
-  if (
-    sourceRecord &&
-    (sourceRecord.width === null || sourceRecord.height === null)
-  ) {
-    oldId = (await resolveImageServices(db, [sourceRecord.uri])).id
-  }
+  const currentId = await canonicalImageId(db, requestedId)
+  const [unfetched] = await db
+    .select({ uri: images.uri })
+    .from(images)
+    .where(and(eq(images.id, currentId), isNull(images.data)))
+  const resolvedSource = unfetched
+    ? await resolveImageWithMetadata(
+        db,
+        currentId,
+        `${unfetched.uri}/info.json`
+      )
+    : undefined
+  const oldId = resolvedSource?.id ?? currentId
   return db.transaction(async (tx) => {
     await lockImageIds(tx, [oldId, nextId, suppliedId])
     const destinationGroup = await canonicalImageId(tx, nextId)
@@ -44,7 +46,13 @@ export async function migrateImage(db: Db, requestedId: string, url: string) {
     }
     const old = await tx.query.images.findFirst({ where: { id: oldId } })
     if (!old) throw new ResponseError('Image not found', 404)
-    if (old.width !== parsed.width || old.height !== parsed.height) {
+    const sourceImage =
+      old.data == null ? resolvedSource : Image.parse(old.data)
+    if (
+      !sourceImage ||
+      sourceImage.width !== parsed.width ||
+      sourceImage.height !== parsed.height
+    ) {
       throw new ResponseError(
         'Migration requires matching image dimensions',
         409

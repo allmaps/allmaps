@@ -1300,35 +1300,42 @@ export async function createImage(
       throw new ResponseError("Image downloaded, but IDs don't match", 409)
     }
   }
-  if (resolve) {
-    let image
-    try {
-      image = await resolveImageServices(db, [uri])
-    } catch (error) {
-      if (
-        !(error instanceof EditedImageAliasError) ||
-        !error.imageIds.includes(newImageId)
-      )
-        throw error
-      // Keep a pre-alias edited document accessible until an explicit migration.
-      const data = await fetchJson(newImageUrl, iiifRequestOptions)
-      const parsed = Image.parse(data)
-      return {
-        id: newImageId,
-        uri,
-        width: parsed.width,
-        height: parsed.height,
-        type: `ImageService${parsed.majorVersion}`,
-        data
-      }
-    }
-    const record = await db.query.images.findFirst({
-      where: { id: image.id },
-      columns: { data: true }
-    })
-    return { ...image, data: record?.data }
-  }
+  if (resolve) return resolveImageWithMetadata(db, newImageId, newImageUrl)
   return resolveImageServices(db, [uri], { sourceUrl: newImageUrl })
+}
+
+export async function resolveImageWithMetadata(
+  db: Db,
+  imageId: string,
+  infoUrl: string
+) {
+  const uri = serviceUri(infoUrl)
+  let image
+  try {
+    image = await resolveImageServices(db, [uri])
+  } catch (error) {
+    if (
+      !(error instanceof EditedImageAliasError) ||
+      !error.imageIds.includes(imageId)
+    )
+      throw error
+    // Keep a pre-alias edited document accessible until an explicit migration.
+    const data = await fetchJson(infoUrl, iiifRequestOptions)
+    const parsed = Image.parse(data)
+    return {
+      id: imageId,
+      uri,
+      width: parsed.width,
+      height: parsed.height,
+      type: `ImageService${parsed.majorVersion}`,
+      data
+    }
+  }
+  const record = await db.query.images.findFirst({
+    where: { id: image.id },
+    columns: { data: true }
+  })
+  return { ...image, data: record?.data }
 }
 
 export async function createManifestFromUrl(

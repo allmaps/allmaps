@@ -21,8 +21,10 @@ have alias rows.
 
 An administrator can move one image with `PATCH /images/:imageId` and a body
 such as `{"url":"https://library.example/iiif/new-id/info.json"}`. The operation
-checks pixel dimensions, preserves the current maps and Canvas links, and
-repoints the alias group. An existing alias can be promoted, including one
+compares the destination’s pixel dimensions with the source’s saved `info.json`.
+If the source metadata is missing, Allmaps resolves it before comparing. A size
+mismatch returns `409`. A successful move preserves the current maps and Canvas
+links and repoints the alias group. An existing alias can be promoted, including one
 opened in Editor with an empty initial document. A destination with edits or
 map history returns `409`. If recent edits are still being persisted, retry after
 they appear in the REST API. Clients editing the old document must reopen the

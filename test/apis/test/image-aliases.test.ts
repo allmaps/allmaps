@@ -319,7 +319,7 @@ it('leaves a legacy document with existing edits reachable when discovery finds 
     [saved.imageId]
   )
   await context.client.query(
-    'UPDATE iiif.images SET data = NULL WHERE id = $1',
+    'UPDATE iiif.images SET data = NULL, width = 250, height = 250 WHERE id = $1',
     [saved.imageId]
   )
   responses.set(legacy + '/info.json', info(moved))
@@ -347,6 +347,16 @@ it('leaves a legacy document with existing edits reachable when discovery finds 
   expect(history.map((row) => row.version)).toEqual([
     expect.stringContaining(`/images/${saved.imageId}@`)
   ])
+
+  const destination = legacy + '/new-service'
+  responses.set(destination + '/info.json', info(destination))
+  await migrateImage(context.db, saved.imageId, destination + '/info.json')
+  const migrated = await context.rest.handle(
+    new Request(
+      context.env.PUBLIC_REST_BASE_URL + '/images/' + hash(destination)
+    )
+  )
+  expect((await migrated.json()).maps).toHaveLength(1)
 })
 
 it('moves an unedited image twice and redirects directly to the current service', async () => {
@@ -382,6 +392,84 @@ function alternateServices(name: string) {
   responses.set(preferred + '/info.json', info(preferred))
   return { manifest, older, preferred }
 }
+
+async function adminCookie() {
+  const api = context.env.PUBLIC_REST_BASE_URL
+  const login = await context.rest.handle(
+    new Request(api + '/__dev/login/local-admin', { method: 'POST' })
+  )
+  expect(login.status).toBe(200)
+  return login.headers
+    .getSetCookie()
+    .map((value) => value.split(';')[0])
+    .join('; ')
+}
+
+it.for([
+  { metadata: 'saved', matches: true },
+  { metadata: 'fetched', matches: true },
+  { metadata: 'saved', matches: false },
+  { metadata: 'fetched', matches: false }
+])(
+  'checks migration dimensions using $metadata source info.json (matching pixels: $matches)',
+  async ({ metadata, matches }, { onTestFinished }) => {
+    const source = base + '/migration-dimensions/' + metadata + '/' + matches
+    const destination = source + '/new'
+    const sourceInfo = { ...info(source), width: 7000, height: 8000 }
+    const storedDimensions = { width: 1000, height: 1500 }
+    // The legacy image row has canvas dimensions, even when info.json is available.
+    await context.client.query(
+      'INSERT INTO iiif.images (id, uri, width, height, data) VALUES ($1, $2, $3, $4, $5::jsonb)',
+      [
+        hash(source),
+        source,
+        storedDimensions.width,
+        storedDimensions.height,
+        metadata === 'saved' ? JSON.stringify(sourceInfo) : null
+      ]
+    )
+    const sourceUrl = source + '/info.json'
+    if (metadata === 'fetched') responses.set(sourceUrl, sourceInfo)
+    const destinationUrl = destination + '/info.json'
+    responses.set(destinationUrl, {
+      ...sourceInfo,
+      ...(matches ? {} : storedDimensions),
+      id: destination
+    })
+
+    const cookie = await adminCookie()
+    const fetchSpy = vi.spyOn(globalThis, 'fetch')
+    onTestFinished(() => {
+      fetchSpy.mockRestore()
+    })
+    const api = context.env.PUBLIC_REST_BASE_URL
+    const response = await context.rest.handle(
+      new Request(api + '/images/' + hash(source), {
+        method: 'PATCH',
+        headers: { Cookie: cookie, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: destinationUrl })
+      })
+    )
+    expect(response.status).toBe(matches ? 200 : 409)
+    const record = await context.rest.handle(
+      new Request(api + '/images/' + hash(source))
+    )
+    if (matches) {
+      expect(await response.json()).toMatchObject({ id: hash(destination) })
+      expect(record.headers.get('Location')).toBe(
+        api + '/images/' + hash(destination)
+      )
+    } else {
+      expect(await response.json()).toMatchObject({
+        error: 'Migration requires matching image dimensions'
+      })
+      expect(record.status).toBe(200)
+    }
+    expect(
+      fetchSpy.mock.calls.filter(([url]) => url === sourceUrl)
+    ).toHaveLength(metadata === 'saved' ? 0 : 1)
+  }
+)
 
 it('migrates an unopened manifest image using its service dimensions', async () => {
   const { manifest, preferred } = alternateServices('unopened')
@@ -453,14 +541,7 @@ it('keeps the edited service until an admin promotes its previously opened alias
       )
     ).json()
   expect(await getMaps()).toMatchObject([{ resource: { id: older } }])
-  const login = await context.rest.handle(
-    new Request(api + '/__dev/login/local-admin', { method: 'POST' })
-  )
-  expect(login.status).toBe(200)
-  const cookie = login.headers
-    .getSetCookie()
-    .map((value) => value.split(';')[0])
-    .join('; ')
+  const cookie = await adminCookie()
   const promotion = await context.rest.handle(
     new Request(api + '/images/' + hash(preferred), {
       method: 'PATCH',
