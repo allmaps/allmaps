@@ -75,6 +75,7 @@ export type ResponseFormat = 'map' | 'annotation' | 'geojson'
 export type ResponseOptions = {
   excludeArchived?: boolean
   format: ResponseFormat
+  expectIiifResource?: boolean
   expectRows: boolean
   singular: boolean
   resultScope: 'bounded' | 'complete'

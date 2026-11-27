@@ -1,10 +1,7 @@
 import { generateId, generateChecksum, generateRandomId } from '@allmaps/id'
 
 import { toFixed } from './numbers.js'
-import {
-  parseStoredJson,
-  parseStoredNullableLanguageString
-} from './stored-json.js'
+import { parseStoredNullableLanguageString } from './stored-json.js'
 import {
   makeMapUrl,
   makeImageUrl,
@@ -364,5 +361,5 @@ export function fromDbRow(dbRow: DbRow, annotationsBaseUrl: string): ApiMap {
 }
 
 export function parseStoredDbMap(value: unknown): DbMap {
-  return DbMapSchema.parse(parseStoredJson(value))
+  return DbMapSchema.parse(value)
 }

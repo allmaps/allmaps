@@ -1,9 +1,8 @@
 import { canonicalImageId } from './image-aliases.js'
-import { sql } from 'drizzle-orm'
+import { mapFilters, imageFilters } from './map-filters.js'
 
 import { generateAnnotation } from '@allmaps/annotation'
 
-import { schema } from '@allmaps/db/schema'
 import { ResponseError, clampLimit } from '@allmaps/api-shared'
 
 import {
@@ -18,56 +17,11 @@ import type { Db } from '@allmaps/db'
 
 import type { MapsQueryParams, ResponseOptions } from '../types.js'
 
-function addScaleAreaFilters(params: Partial<MapsQueryParams>) {
-  return [
-    {
-      area: {
-        lt: params.maxArea,
-        gt: params.minArea
-      }
-    },
-    {
-      scale: {
-        lt: params.maxScale,
-        gt: params.minScale
-      }
-    }
-  ]
-}
-
 function addRandomMapFilters(params: Partial<MapsQueryParams>) {
   return {
     gt: params.randomMapIdOp === 'gt' ? params.randomMapId : undefined,
     lte: params.randomMapIdOp === 'lte' ? params.randomMapId : undefined
   }
-}
-
-function addGeospatialFilters(
-  isGeospatialQuery: boolean,
-  params: Partial<MapsQueryParams>,
-  maps: typeof schema.maps
-) {
-  if (isGeospatialQuery) {
-    if (params.intersectsWith && params.intersectsWith.length === 2) {
-      const lat = params.intersectsWith[0]
-      const lng = params.intersectsWith[1]
-      return sql`ST_Contains(${maps.geoMask}, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326))`
-    } else if (params.intersectsWith && params.intersectsWith.length === 4) {
-      const lat1 = params.intersectsWith[0]
-      const lng1 = params.intersectsWith[1]
-      const lat2 = params.intersectsWith[2]
-      const lng2 = params.intersectsWith[3]
-      return sql`ST_Intersects(${maps.geoMask}, ST_MakeEnvelope(${lng1}, ${lat1}, ${lng2}, ${lat2}, 4326))`
-    } else if (params.containedBy) {
-      const lat1 = params.containedBy[0]
-      const lng1 = params.containedBy[1]
-      const lat2 = params.containedBy[2]
-      const lng2 = params.containedBy[3]
-      return sql`ST_Contains(ST_MakeEnvelope(${lng1}, ${lat1}, ${lng2}, ${lat2}, 4326), ${maps.geoMask})`
-    }
-  }
-
-  return sql`TRUE`
 }
 
 export async function queryMaps(
@@ -175,6 +129,7 @@ export async function queryMaps(
     },
     where: {
       archived: { eq: excludeArchived ? false : undefined },
+      ...mapFilters(params),
       AND: [
         {
           id: {
@@ -194,10 +149,6 @@ export async function queryMaps(
           geoMask: { isNotNull: onlyLatest ? true : undefined }
         },
         {
-          RAW: (maps) => addGeospatialFilters(isGeospatialQuery, params, maps)
-        },
-        ...addScaleAreaFilters(params),
-        {
           imageChecksum: {
             eq: params.imageChecksum
           }
@@ -206,19 +157,11 @@ export async function queryMaps(
           checksum: {
             eq: params.checksum
           }
-        },
-        {
-          updatedAt: {
-            gte: params.modifiedAfter,
-            lte: params.modifiedBefore
-          }
         }
       ],
       image: {
         archived: { eq: excludeArchived ? false : undefined },
-        domain: {
-          eq: params.imageServiceDomain
-        },
+        ...imageFilters(params),
         organizationUrl: params.organizationSlug
           ? {
               organization: {
@@ -227,26 +170,7 @@ export async function queryMaps(
                 }
               }
             }
-          : undefined,
-        canvases:
-          params.canvasId || params.manifestId || params.manifestDomain
-            ? {
-                id: {
-                  eq: params.canvasId
-                },
-                manifests:
-                  params.manifestId || params.manifestDomain
-                    ? {
-                        id: {
-                          eq: params.manifestId
-                        },
-                        domain: {
-                          eq: params.manifestDomain
-                        }
-                      }
-                    : undefined
-              }
-            : undefined
+          : undefined
       }
     },
     orderBy: (maps, { asc, desc }) => {
@@ -265,7 +189,12 @@ export async function queryMaps(
         : clampLimit(params.limit, params.userRole)
   })
 
-  if (responseOptions.expectRows && rows.length === 0) {
+  if (
+    rows.length === 0 &&
+    (responseOptions.expectRows ||
+      (responseOptions.expectIiifResource &&
+        !(await iiifScopeExists(db, params))))
+  ) {
     let message = 'Not found'
     if (params.mapId) {
       if (params.checksum) {
@@ -318,4 +247,29 @@ export async function queryMaps(
   } else {
     throw new Error(`Invalid responseFormat: ${responseOptions.format}`)
   }
+}
+
+async function iiifScopeExists(db: Db, params: Partial<MapsQueryParams>) {
+  const columns = { id: true } as const
+  if (params.imageChecksum) {
+    return db.query.maps.findFirst({
+      columns,
+      where: { imageId: params.imageId, imageChecksum: params.imageChecksum }
+    })
+  }
+  if (params.imageId)
+    return db.query.images.findFirst({
+      columns,
+      where: { id: params.imageId, archived: false }
+    })
+  if (params.canvasId)
+    return db.query.canvases.findFirst({
+      columns,
+      where: { id: params.canvasId }
+    })
+  if (params.manifestId)
+    return db.query.manifests.findFirst({
+      columns,
+      where: { id: params.manifestId }
+    })
 }

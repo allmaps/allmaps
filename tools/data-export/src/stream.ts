@@ -1,6 +1,5 @@
 import postgres from 'postgres'
 
-import type { LanguageString } from '@allmaps/iiif-parser'
 import type { DbRow } from '@allmaps/api-shared/types'
 
 export type RawExportRow = {
@@ -11,11 +10,11 @@ export type RawExportRow = {
   version: number
   created_at: Date
   updated_at: Date
-  map: unknown
-  geo_mask: unknown
+  map: DbRow['map']
+  geo_mask: DbRow['geoMask']
   scale: number | null
   area: number | null
-  image: unknown
+  image: DbRow['image']
 }
 
 export type StreamMapsOptions = {
@@ -34,7 +33,7 @@ export async function streamMaps({
   })
 
   try {
-    const cursor = sql`
+    const cursor = sql<RawExportRow[]>`
       select
         maps.id,
         maps.image_id,
@@ -110,7 +109,7 @@ export async function streamMaps({
 
     for await (const rows of cursor) {
       for (const row of rows) {
-        await onRow(normalizeExportRow(row as unknown as RawExportRow))
+        await onRow(normalizeExportRow(row))
       }
     }
   } finally {
@@ -119,14 +118,10 @@ export async function streamMaps({
 }
 
 function normalizeExportRow(row: RawExportRow): DbRow {
-  const map = parseJsonValue(row.map)
-  const geoMask = parseJsonValue(row.geo_mask)
-  const image = parseJsonValue(row.image) as DbRow['image']
-
   return {
-    map: map as DbRow['map'],
-    geoMask: geoMask as DbRow['geoMask'],
-    image: normalizeImage(image),
+    map: row.map,
+    geoMask: row.geo_mask,
+    image: row.image,
     checksum: row.checksum,
     imageChecksum: row.image_checksum,
     createdAt: row.created_at,
@@ -134,46 +129,4 @@ function normalizeExportRow(row: RawExportRow): DbRow {
     scale: row.scale,
     area: row.area
   }
-}
-
-function parseJsonValue(value: unknown): unknown {
-  if (typeof value !== 'string') {
-    return value
-  }
-
-  try {
-    return JSON.parse(value)
-  } catch {
-    return value
-  }
-}
-
-function normalizeImage(image: DbRow['image']): DbRow['image'] {
-  if (!image) {
-    return image
-  }
-
-  return {
-    ...image,
-    canvases: image.canvases.map((canvas) => ({
-      ...canvas,
-      label: normalizeLanguageString(canvas.label),
-      manifests: canvas.manifests.map((manifest) => ({
-        ...manifest,
-        label: normalizeLanguageString(manifest.label)
-      }))
-    }))
-  }
-}
-
-function normalizeLanguageString(
-  label: LanguageString | string | null
-): LanguageString | null {
-  if (typeof label === 'string') {
-    return {
-      none: [label]
-    }
-  }
-
-  return label
 }
