@@ -1,2 +1,0 @@
-ALTER TABLE "iiif"."manifests_canvases" ADD COLUMN "publisher_service_uris" text[];--> statement-breakpoint
-CREATE INDEX "manifests_canvases_service_uris_idx" ON "iiif"."manifests_canvases" USING gin ("publisher_service_uris");

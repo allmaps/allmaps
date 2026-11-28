@@ -1,9 +1,9 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "4d557020-dd16-4e58-9c06-5d1d579cadab",
+  "id": "0ba92e22-57c6-4da5-9a00-ae939964894d",
   "prevIds": [
-    "13b1ccec-c53e-438a-b321-11ada136e308"
+    "a9c0fde6-1028-44da-b3a5-70068e853b59"
   ],
   "ddl": [
     {
@@ -2425,6 +2425,27 @@
       "entityType": "indexes",
       "schema": "iiif",
       "table": "manifests_canvases"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "list_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "list_items_list_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "list_items"
     },
     {
       "nameExplicit": true,
