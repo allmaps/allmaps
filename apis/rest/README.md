@@ -19,6 +19,13 @@ it stays canonical. If both groups have edits, discovery returns `409` and
 both documents remain accessible. Existing images can be read before they
 have alias rows.
 
+Each manifest–canvas link stores the publisher’s trusted group in
+`image_service_uris`. An empty array means registration found no trusted
+group. A null value identifies a link created before service indexing.
+The manifest detail response reports `imageServicesIndexed` per canvas.
+Editor refreshes a previously registered manifest when it first encounters
+an unindexed canvas with multiple services.
+
 An administrator can move one image with `PATCH /images/:imageId` and a body
 such as `{"url":"https://library.example/iiif/new-id/info.json"}`. The operation
 compares the destination’s pixel dimensions with the source’s saved `info.json`.

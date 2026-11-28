@@ -56,6 +56,7 @@ type DbManifest = {
   canvases: {
     id: string
     uri: string
+    imageServicesIndexed?: boolean
     images: {
       id: string
       uri: string
@@ -746,6 +747,7 @@ export async function queryManifests(
     singular: boolean
   } = { expectRows: false, singular: false }
 ) {
+  const links = schema.manifestsToCanvases
   const rows = await db.query.manifests.findMany({
     columns: {
       id: true,
@@ -814,6 +816,17 @@ export async function queryManifests(
           id: true,
           uri: true
         },
+        extras: params.manifestId
+          ? {
+              imageServicesIndexed: (canvas) =>
+                sql<boolean>`exists (
+                  select 1 from ${links}
+                  where ${links.manifestId} = ${params.manifestId}
+                    and ${links.canvasId} = ${canvas.id}
+                    and ${links.imageServiceUris} is not null
+                )`.as('imageServicesIndexed')
+            }
+          : undefined,
         with: {
           images: {
             columns: {
@@ -935,9 +948,9 @@ export async function resolveImageServices(
   if (serviceUris.length === 1) {
     const links = schema.manifestsToCanvases
     const [group] = await db
-      .select({ services: links.publisherServiceUris })
+      .select({ services: links.imageServiceUris })
       .from(links)
-      .where(arrayContains(links.publisherServiceUris, [serviceUris[0]]))
+      .where(arrayContains(links.imageServiceUris, [serviceUris[0]]))
       .orderBy(links.manifestId, links.canvasId)
       .limit(1)
     if (group?.services) {
@@ -1170,6 +1183,7 @@ async function createParsedManifest(
   type ResultCanvas = {
     id: string
     uri: string
+    imageServicesIndexed: boolean
     images: [
       {
         id: string
@@ -1272,16 +1286,17 @@ async function createParsedManifest(
         manifestLinks.set(canvasId, {
           canvasId,
           manifestId: newManifestId,
-          publisherServiceUris:
+          imageServiceUris:
             services.length > 1 &&
             domains &&
             services.every((uri) => domains.has(getHttpUrlDomain(uri)))
               ? services
-              : null
+              : []
         })
         resultCanvases.push({
           id: canvasId,
           uri: canvas.uri,
+          imageServicesIndexed: true,
           images: [{ id: image.id, uri: image.uri }]
         })
       }
@@ -1313,7 +1328,7 @@ async function createParsedManifest(
             schema.manifestsToCanvases.manifestId,
             schema.manifestsToCanvases.canvasId
           ],
-          set: { publisherServiceUris: sql`excluded.publisher_service_uris` }
+          set: { imageServiceUris: sql`excluded.image_service_uris` }
         })
     }
   })

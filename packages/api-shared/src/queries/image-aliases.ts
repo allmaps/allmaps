@@ -113,18 +113,23 @@ export async function registerImageAliases(
   const uniqueIds = [...new Set([canonicalId, ...ids])].sort()
   const aliases = uniqueIds.filter((id) => id !== canonicalId)
   if (aliases.length) {
-    const documents = await db
-      .select({ id: snapshots.docId, data: snapshots.data })
+    const edited = await db
+      .select({ id: snapshots.docId })
       .from(snapshots)
       .where(
         and(
           eq(snapshots.collection, 'images'),
-          inArray(snapshots.docId, aliases),
-          sql`NOT EXISTS (SELECT 1 FROM ${imageAliases} WHERE ${imageAliases.imageId} = ${snapshots.docId} AND ${imageAliases.canonicalImageId} = ${canonicalId})`
+          inArray(snapshots.docId, uniqueIds),
+          sql`${snapshots.data} not in ('{}'::jsonb, 'null'::jsonb)`,
+          or(
+            eq(snapshots.docId, canonicalId),
+            sql`NOT EXISTS (SELECT 1 FROM ${imageAliases} WHERE ${imageAliases.imageId} = ${snapshots.docId} AND ${imageAliases.canonicalImageId} = ${canonicalId})`
+          )
         )
       )
-    const edited = documents.filter((doc) => Object.keys(doc.data ?? {}).length)
-    if (edited.length)
+    // On conflict, Editor can reopen either edited document, including a
+    // preferred service whose edits predate the alias table.
+    if (edited.some((doc) => doc.id !== canonicalId))
       throw new EditedImageAliasError(edited.map((doc) => doc.id))
   }
   await db

@@ -108,13 +108,14 @@ export const manifestsToCanvases = iiifSchema.table(
     canvasId: text('canvas_id')
       .notNull()
       .references(() => canvases.id),
-    publisherServiceUris: text('publisher_service_uris').array()
+    // NULL for legacy links, empty after indexing if no trusted group was found.
+    imageServiceUris: text('image_service_uris').array()
   },
   (table) => [
     primaryKey({ columns: [table.manifestId, table.canvasId] }),
     index('manifests_canvases_service_uris_idx').using(
       'gin',
-      table.publisherServiceUris
+      table.imageServiceUris
     ),
     index('manifests_to_canvases_manifest_id_idx').on(table.manifestId),
     index('manifests_to_canvases_canvas_id_idx').on(table.canvasId),

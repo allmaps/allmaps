@@ -34,21 +34,45 @@ async function putSource(apiUrl: string, url: string, sourceIiif: unknown) {
   })
 }
 
+type ManifestRecord = {
+  canvases: {
+    uri: string
+    images: { uri: string }[]
+    imageServicesIndexed?: boolean
+  }[]
+}
+
+function readManifestRecord(response: Response): Promise<ManifestRecord> {
+  if (!response.ok)
+    throw new Error(`Could not resolve manifest (${response.status})`)
+  return response.json()
+}
+
 export async function fetchManifestRecord(
   apiBaseUrl: string,
   manifest: Manifest,
   sourceUrl = manifest.uri
 ) {
   const apiUrl = `${apiBaseUrl}/manifests/${await generateId(manifest.uri)}`
-  let response = await fetch(apiUrl)
-  if (response.status === 404) {
-    response = await putSource(apiUrl, sourceUrl, manifest.source)
+  const multiServiceCanvases = manifest.canvases.filter(
+    (canvas) => canvas.image.serviceUris.length > 1
+  )
+  const response = await fetch(
+    apiUrl,
+    multiServiceCanvases.length ? { cache: 'no-store' } : undefined
+  )
+  if (response.status !== 404) {
+    const record = await readManifestRecord(response)
+    if (!multiServiceCanvases.length) return record
+    const indexed = new Set(
+      record.canvases
+        .filter((canvas) => canvas.imageServicesIndexed)
+        .map((canvas) => canvas.uri)
+    )
+    if (multiServiceCanvases.every((canvas) => indexed.has(canvas.uri)))
+      return record
   }
-  if (!response.ok)
-    throw new Error(`Could not resolve manifest (${response.status})`)
-  return (await response.json()) as {
-    canvases: { uri: string; images: { uri: string }[] }[]
-  }
+  return readManifestRecord(await putSource(apiUrl, sourceUrl, manifest.source))
 }
 
 export async function resolveEditorImage(

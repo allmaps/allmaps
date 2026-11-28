@@ -9,7 +9,7 @@ import { parseAnnotation } from '@allmaps/annotation'
 import type { UrlState } from '$lib/state/url.svelte.js'
 import type { ErrorState } from '$lib/state/error.svelte.js'
 
-import { searchParams } from '$lib/shared/params.js'
+import type { searchParams } from '$lib/shared/params.js'
 import { fetchManifestRecord, resolveEditorImage } from '$lib/shared/api.js'
 import { superFetch } from '$lib/shared/fetch.js'
 import { generateId } from '$lib/shared/ids.js'
@@ -36,8 +36,7 @@ const SOURCE_KEY = Symbol('source')
 export class SourceState {
   #apiBaseUrl: string
   #resolvedImages = new SvelteMap<string, IIIFImage>()
-  #navigationUris = new SvelteMap<string, string>()
-  #manifestServiceUris = new WeakMap<IIIFCanvas['image'], string>()
+  #manifestServiceUris = new SvelteMap<IIIFCanvas['image'], string>()
   #manifestImages = new WeakMap<IIIFManifest, Promise<void>>()
   #annotationsApiBaseUrl: string
 
@@ -97,69 +96,44 @@ export class SourceState {
   #fetching = $state(false)
   #fetchingInsideCollection = $state(false)
 
+  #canvasImages = $derived.by(() => {
+    const requested = this.#urlState.params.imageId
+    return (this.#parsedManifest?.canvases ?? []).map((canvas) => {
+      const preferred =
+        this.#manifestServiceUris.get(canvas.image) ?? canvas.image.uri
+      const serviceUri =
+        requested &&
+        (requested === preferred ||
+          canvas.image.serviceUris.some(
+            (uri) =>
+              uri === requested ||
+              this.#resolvedImages.get(uri)?.uri === requested
+          ))
+          ? requested
+          : preferred
+      const image = this.#resolvedImages.get(serviceUri) ?? canvas.image
+      return { canvas, serviceUri, image }
+    })
+  })
+
+  #selectedCanvasImage = $derived(
+    this.#canvasImages.find(
+      ({ serviceUri }) => serviceUri === this.#urlState.params.imageId
+    ) ?? this.#canvasImages[0]
+  )
+
   #imagesByImageId = $derived.by<Map<string, IIIFImage | EmbeddedIIIFImage>>(
     () => {
-      const sourceType = this.#editSource?.type
-
-      if (sourceType === 'manifest') {
-        const canvases = this.#editSource?.parsedIiif.canvases || []
-        return new Map(
-          canvases.map((canvas) => {
-            const image =
-              this.#resolvedImages.get(canvas.image.uri) ?? canvas.image
-            return [image.uri, image]
-          })
-        )
-      } else if (sourceType === 'image') {
-        const parsedIiif = this.#editSource?.parsedIiif
-
-        if (parsedIiif) {
-          return new Map([[parsedIiif.uri, parsedIiif]])
-        }
-      }
-
-      return new Map()
+      const source = this.#editSource
+      if (source?.type === 'image')
+        return new Map([[source.parsedIiif.uri, source.parsedIiif]])
+      return new Map(this.#canvasImages.map(({ image }) => [image.uri, image]))
     }
   )
 
-  #canvasesByImageId = $derived.by<Map<string, IIIFCanvas>>(() => {
-    const sourceType = this.#editSource?.type
-
-    if (sourceType === 'manifest') {
-      const canvases = this.#editSource?.parsedIiif.canvases || []
-      return new Map(
-        canvases.map((canvas) => [
-          this.#resolvedImages.get(canvas.image.uri)?.uri ?? canvas.image.uri,
-          canvas
-        ])
-      )
-    }
-
-    return new Map()
-  })
-
-  #allmapsIdsByImageId = $derived.by<Map<string, string>>(() => {
-    const sourceType = this.#editSource?.type
-
-    if (sourceType === 'manifest') {
-      const canvases = this.#editSource?.parsedIiif.canvases || []
-      return new Map(
-        canvases.map((canvas) => [
-          this.#resolvedImages.get(canvas.image.uri)?.uri ?? canvas.image.uri,
-          generateId(
-            this.#resolvedImages.get(canvas.image.uri)?.uri ?? canvas.image.uri
-          )
-        ])
-      )
-    } else if (sourceType === 'image') {
-      const parsedIiif = this.#editSource?.parsedIiif
-      if (parsedIiif) {
-        return new Map([[parsedIiif.uri, generateId(parsedIiif.uri)]])
-      }
-    }
-
-    return new Map()
-  })
+  #canvasesByImageId = $derived(
+    new Map(this.#canvasImages.map(({ canvas, image }) => [image.uri, canvas]))
+  )
 
   #breadcrumbs = $derived.by<Breadcrumb[]>(() => {
     const crumbs: Breadcrumb[] = []
@@ -245,24 +219,34 @@ export class SourceState {
 
     $effect(() => {
       const manifest = this.#parsedManifest
-      const image = this.activeImage
+      const selected = this.#selectedCanvasImage
       const view = getView(page)
       this.imageError = undefined
-      if (!view || view === 'images' || !manifest || !image?.embedded) return
+      if (
+        !view ||
+        view === 'images' ||
+        !manifest ||
+        !selected ||
+        this.#fetching
+      )
+        return
       let active = true
-      this.#resolveCanvasImage(manifest, image)
-        .then((resolved) => {
-          if (active) {
-            const original = this.#manifestServiceUris.get(image)
-            if (original) this.#navigationUris.set(original, resolved.uri)
-            for (const uri of image.serviceUris)
-              this.#navigationUris.set(uri, resolved.uri)
-            this.#resolvedImages.set(image.uri, resolved)
-          }
-        })
-        .catch((error) => {
-          if (active) this.imageError = error
-        })
+      const onError = (error: Error) => {
+        if (active) this.imageError = error
+      }
+      if (!this.#manifestServiceUris.has(selected.canvas.image)) {
+        this.#registerManifest(manifest).catch(onError)
+      } else if (selected.image.embedded) {
+        resolveEditorImage(this.#apiBaseUrl, selected.serviceUri)
+          .then((record) => {
+            if (!active) return
+            const parsed = Image.parse(record.data)
+            parsed.uri = record.uri
+            this.#resolvedImages.set(selected.serviceUri, parsed)
+            this.#resolvedImages.set(record.uri, parsed)
+          })
+          .catch(onError)
+      }
       return () => {
         active = false
       }
@@ -301,28 +285,20 @@ export class SourceState {
     )
     for (const canvas of manifest.canvases) {
       const canonical = uris.get(canvas.uri)
-      if (canonical) {
-        this.#manifestServiceUris.set(canvas.image, canvas.image.uri)
-        for (const uri of canvas.image.serviceUris)
-          this.#navigationUris.set(uri, canonical)
-        canvas.image.uri = canonical
-      }
+      const preferred = canvas.image.uri
+      if (canonical) canvas.image.uri = canonical
+      this.#manifestServiceUris.set(canvas.image, preferred)
     }
   }
 
-  async #resolveCanvasImage(manifest: IIIFManifest, image: EmbeddedIIIFImage) {
-    let manifestImages = this.#manifestImages.get(manifest)
-    if (!manifestImages) {
-      manifestImages = this.#manifestImageUris(manifest)
-      this.#manifestImages.set(manifest, manifestImages)
-      manifestImages.catch(() => this.#manifestImages.delete(manifest))
+  #registerManifest(manifest: IIIFManifest, sourceUrl = manifest.uri) {
+    let registration = this.#manifestImages.get(manifest)
+    if (!registration) {
+      registration = this.#manifestImageUris(manifest, sourceUrl)
+      this.#manifestImages.set(manifest, registration)
+      registration.catch(() => this.#manifestImages.delete(manifest))
     }
-    await manifestImages
-    const uri = this.#manifestServiceUris.get(image) ?? image.uri
-    const record = await resolveEditorImage(this.#apiBaseUrl, uri)
-    const parsed = Image.parse(record.data)
-    parsed.uri = record.uri
-    return parsed
+    return registration
   }
 
   #getParsedIiifAtPath(path: CollectionPath) {
@@ -359,9 +335,7 @@ export class SourceState {
         parsedIiif
       }
     } else if (parsedIiif.type === 'manifest') {
-      const manifestImages = this.#manifestImageUris(parsedIiif, url)
-      await manifestImages
-      this.#manifestImages.set(parsedIiif, manifestImages)
+      await this.#registerManifest(parsedIiif, url)
       source = {
         ...baseSource,
         type: 'manifest',
@@ -412,7 +386,8 @@ export class SourceState {
 
   async #fetch(url: string) {
     this.#resolvedImages.clear()
-    this.#navigationUris.clear()
+    this.#manifestServiceUris.clear()
+    this.#manifestImages = new WeakMap()
     this.#requestedUrl = url
 
     if (this.#abortController) {
@@ -477,14 +452,6 @@ export class SourceState {
     } finally {
       if (!controller.signal.aborted) this.#fetching = false
     }
-  }
-
-  #isImageIdValid(imageId?: string) {
-    if (!imageId) {
-      return false
-    }
-
-    return this.#imagesByImageId.has(imageId)
   }
 
   #reset() {
@@ -571,28 +538,7 @@ export class SourceState {
   }
 
   get activeImageId() {
-    if (this.#fetching) {
-      return
-    }
-
-    const requested = this.#urlState.params.imageId
-    if (requested) {
-      const resolved = this.#navigationUris.get(requested)
-      if (resolved && this.#imagesByImageId.has(resolved)) return resolved
-    }
-    if (
-      this.#isImageIdValid(this.#urlState.params.imageId) &&
-      this.#urlState.params.imageId
-    ) {
-      return this.#urlState.params.imageId
-    }
-
-    const imagesArray = [...this.images]
-    const firstImage = imagesArray[0]
-
-    if (firstImage) {
-      return firstImage.uri
-    }
+    return this.activeImage?.uri
   }
 
   get activeImageIndex(): number | undefined {
@@ -606,21 +552,21 @@ export class SourceState {
   }
 
   get activeImage() {
-    if (this.activeImageId) {
-      return this.#imagesByImageId.get(this.activeImageId)
-    }
+    if (this.#fetching) return
+    return (
+      this.#selectedCanvasImage?.image ??
+      (this.#editSource?.type === 'image'
+        ? this.#editSource.parsedIiif
+        : undefined)
+    )
   }
 
   get activeCanvas() {
-    if (this.activeImageId) {
-      return this.#canvasesByImageId.get(this.activeImageId)
-    }
+    if (!this.#fetching) return this.#selectedCanvasImage?.canvas
   }
 
   get activeImageAllmapsId() {
-    if (this.activeImageId) {
-      return this.#allmapsIdsByImageId.get(this.activeImageId)
-    }
+    if (this.activeImageId) return generateId(this.activeImageId)
   }
 
   get breadcrumbs() {

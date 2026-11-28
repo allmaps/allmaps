@@ -70,7 +70,7 @@ export class MapsState extends MapsEventTarget {
   #maps = $state.raw<DbMaps3 | undefined>()
   #mapsCount = $derived(this.#maps ? Object.keys(this.#maps).length : 0)
 
-  #connecting = false
+  #connecting = $state(false)
   #connected = $state(false)
 
   #sourceState: SourceState
@@ -188,6 +188,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   #handleSnapshot(err: ShareDBError) {
+    this.#connecting = false
     if (err) {
       console.error('ShareDB error:', err)
       return
@@ -226,7 +227,6 @@ export class MapsState extends MapsEventTarget {
       this.#activeGcpIdPerMap = {}
 
       this.#connected = true
-      this.#connecting = false
     } catch (err) {
       this.#errorState.error = err
     }

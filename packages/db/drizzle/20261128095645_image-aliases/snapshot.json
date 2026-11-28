@@ -1415,7 +1415,7 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "publisher_service_uris",
+      "name": "image_service_uris",
       "entityType": "columns",
       "schema": "iiif",
       "table": "manifests_canvases"
@@ -2339,7 +2339,7 @@
       "nameExplicit": true,
       "columns": [
         {
-          "value": "publisher_service_uris",
+          "value": "image_service_uris",
           "isExpression": false,
           "asc": true,
           "nullsFirst": false,

@@ -820,12 +820,67 @@ it('keeps both HTTPS image services in the publisher group and skips an FTP alte
   expect(registered.canvases[0].images[0].uri).toBe(preferred)
   const { manifestsToCanvases } = schema
   const links = await context.db
-    .select({ services: manifestsToCanvases.publisherServiceUris })
+    .select({ services: manifestsToCanvases.imageServiceUris })
     .from(manifestsToCanvases)
     .where(eq(manifestsToCanvases.manifestId, registered.id))
   expect(links).toEqual([{ services: [preferred, older] }])
   expect((await resolveImageServices(context.db, [older])).uri).toBe(preferred)
 })
+
+it.each([true, false])(
+  'refreshes legacy manifest links once (trusted publisher: %s)',
+  async (trusted) => {
+    const { manifest, preferred, older } = alternateServices(
+      'legacy-links-' + trusted
+    )
+    const sourceUrl = trusted
+      ? manifest
+      : 'https://other.example/legacy-manifest'
+    responses.set(sourceUrl, responses.get(manifest))
+    await createManifestFromUrl(context.db, sourceUrl)
+    const links = schema.manifestsToCanvases
+    await context.db
+      .update(links)
+      .set({ imageServiceUris: null })
+      .where(eq(links.manifestId, hash(manifest)))
+    const api = context.env.PUBLIC_REST_BASE_URL
+    const publisherFetch = globalThis.fetch
+    const requests: string[] = []
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation((url, init) => {
+        requests.push(`${init?.method ?? 'GET'} ${url}`)
+        return String(url).startsWith(api + '/')
+          ? context.rest.handle(new Request(url, init))
+          : publisherFetch(url, init)
+      })
+    try {
+      const source = Manifest.parse(responses.get(manifest), {
+        keepSource: true
+      })
+      await fetchManifestRecord(api, source, sourceUrl)
+      const refreshed = await fetchManifestRecord(api, source, sourceUrl)
+      expect(refreshed.canvases[0].imageServicesIndexed).toBe(true)
+      const endpoint = api + '/manifests/' + hash(manifest)
+      expect(requests).toEqual([
+        'GET ' + endpoint,
+        'PUT ' + endpoint,
+        'GET ' + sourceUrl,
+        'GET ' + endpoint
+      ])
+      const [link] = await context.db
+        .select({ services: links.imageServiceUris })
+        .from(links)
+        .where(eq(links.manifestId, hash(manifest)))
+      expect(link.services).toEqual(trusted ? [preferred, older] : [])
+      expect((await resolveEditorImage(api, older)).uri).toBe(
+        trusted ? preferred : older
+      )
+    } finally {
+      fetchSpy.mockRestore()
+    }
+  }
+)
 
 it('does not group services on the authority of a third-party manifest', async () => {
   const { manifest, older, preferred } = alternateServices('untrusted')
@@ -951,42 +1006,53 @@ it('keeps migrated maps current when an empty Editor create loses the race', asy
   expect(currentMaps.map((map) => map.id)).toEqual(mapIds)
 })
 
-it('leaves both documents reachable if both services have edits', async () => {
-  const { manifest, older, preferred } = alternateServices('both-edited')
-  for (const uri of [older, preferred]) {
-    await resolveImageServices(context.db, [uri])
-    await context.shareDb.saveMaps([
-      { ...fixtureMap, resource: { ...fixtureMap.resource, id: uri } }
-    ])
-  }
-  await context.shareDb.flushPendingSnapshots()
-  await createManifestFromUrl(context.db, manifest)
-  // Both edited images already have their own saved service metadata.
-  responses.delete(older + '/info.json')
-  responses.delete(preferred + '/info.json')
-  for (const uri of [older, preferred]) {
-    await expect(resolveImageServices(context.db, [uri])).rejects.toMatchObject(
-      { status: 409 }
+it.each([false, true])(
+  'leaves both edited documents reachable (legacy aliases: %s)',
+  async (legacy) => {
+    const { manifest, older, preferred } = alternateServices(
+      'both-edited-' + legacy
     )
-    const endpoint = context.env.PUBLIC_REST_BASE_URL + '/images/' + hash(uri)
-    const metadata = await context.rest.handle(
-      new Request(endpoint, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: uri + '/info.json', resolve: true })
+    for (const uri of [older, preferred]) {
+      await resolveImageServices(context.db, [uri])
+      await context.shareDb.saveMaps([
+        { ...fixtureMap, resource: { ...fixtureMap.resource, id: uri } }
+      ])
+    }
+    await context.shareDb.flushPendingSnapshots()
+    await createManifestFromUrl(context.db, manifest)
+    if (legacy) {
+      await context.client.query(
+        'DELETE FROM iiif.image_aliases WHERE image_id IN ($1, $2)',
+        [hash(older), hash(preferred)]
+      )
+    }
+    // Both edited images already have their own saved service metadata.
+    responses.delete(older + '/info.json')
+    responses.delete(preferred + '/info.json')
+    for (const uri of [older, preferred]) {
+      await expect(
+        resolveImageServices(context.db, [uri])
+      ).rejects.toMatchObject({ status: 409 })
+      const endpoint = context.env.PUBLIC_REST_BASE_URL + '/images/' + hash(uri)
+      const metadata = await context.rest.handle(
+        new Request(endpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: uri + '/info.json', resolve: true })
+        })
+      )
+      expect(metadata.status).toBe(200)
+      expect(await metadata.json()).toMatchObject({
+        id: hash(uri),
+        uri,
+        data: uri === older ? infoV2(uri) : info(uri)
       })
-    )
-    expect(metadata.status).toBe(200)
-    expect(await metadata.json()).toMatchObject({
-      id: hash(uri),
-      uri,
-      data: uri === older ? infoV2(uri) : info(uri)
-    })
-    const response = await context.rest.handle(new Request(endpoint))
-    expect(response.status).toBe(200)
-    expect((await response.json()).maps).toHaveLength(1)
+      const response = await context.rest.handle(new Request(endpoint))
+      expect(response.status).toBe(200)
+      expect((await response.json()).maps).toHaveLength(1)
+    }
   }
-})
+)
 
 it('follows image moves in a saved list and keeps a map version pinned', async () => {
   const [original, moved, current] = ['original', 'moved', 'current'].map(
