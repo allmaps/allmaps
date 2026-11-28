@@ -1,7 +1,15 @@
 import { t } from 'elysia'
 
-import { queryMaps, queryChecksums, archiveMap } from '@allmaps/api-shared/db'
+import { validateGeoreferencedMap } from '@allmaps/annotation'
+import type { Db } from '@allmaps/db'
 import {
+  queryMaps,
+  queryChecksums,
+  archiveMap,
+  resolveImageServices
+} from '@allmaps/api-shared/db'
+import {
+  ResponseError,
   needsElevatedLimitRole,
   normalizeMapsQueryParams,
   setCacheControl
@@ -34,17 +42,36 @@ const mapRoute = new RegExpRoute<{
   /^(?<mapId>[0-9a-f]{16})(@(?<version>[0-9a-f]{16}))?(\.(?<ext>geojson))?$/
 )
 
-async function callLive(liveBaseUrl: string, path: string, body: unknown) {
+async function writeMaps(
+  db: Db,
+  liveBaseUrl: string,
+  body: unknown,
+  mapId?: string
+) {
+  const mapOrMaps = validateGeoreferencedMap(body)
+  if (mapId !== undefined && Array.isArray(mapOrMaps))
+    throw new ResponseError('body must be a single map', 400)
+
+  const maps = Array.isArray(mapOrMaps) ? mapOrMaps : [mapOrMaps]
+  const serviceUris = new Set(
+    maps
+      .filter((map) => map.resource.type !== 'Canvas')
+      .map((map) => map.resource.id)
+  )
+  for (const uri of serviceUris) await resolveImageServices(db, [uri])
+
+  const path = mapId === undefined ? '/maps' : `/maps/${mapId}`
   const response = await fetch(`${liveBaseUrl}${path}`, {
-    method: path.includes('/maps/') ? 'PATCH' : 'POST',
+    method: mapId === undefined ? 'POST' : 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    body: JSON.stringify(mapOrMaps)
   })
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}))
-    throw new Error(
-      (data as { error?: string }).error ?? `Live API error ${response.status}`
+    throw new ResponseError(
+      (data as { error?: string }).error ?? `Live API error ${response.status}`,
+      response.status
     )
   }
   return response.json()
@@ -131,9 +158,9 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .post(
       '/maps',
-      async ({ env, body, set }) => {
+      async ({ env, db, body, set }) => {
         setCacheControl(set, 'private-no-store')
-        return callLive(env.PUBLIC_LIVE_BASE_URL, '/maps', body)
+        return writeMaps(db, env.PUBLIC_LIVE_BASE_URL, body)
       },
       {
         admin: true,
@@ -183,9 +210,9 @@ export function createMapsRoutes(betterAuth: BetterAuthContext) {
     )
     .patch(
       '/maps/:mapId',
-      async ({ env, params, body, set }) => {
+      async ({ env, db, params, body, set }) => {
         setCacheControl(set, 'private-no-store')
-        return callLive(env.PUBLIC_LIVE_BASE_URL, `/maps/${params.mapId}`, body)
+        return writeMaps(db, env.PUBLIC_LIVE_BASE_URL, body, params.mapId)
       },
       {
         admin: true,

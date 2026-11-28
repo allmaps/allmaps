@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "pnpm --filter @allmaps/tools-iiif-server exec svelte-kit sync && vitest run",
+    "test": "pnpm --filter @allmaps/editor --filter @allmaps/tools-iiif-server exec svelte-kit sync && vitest run",
     "types": "tsc --noEmit",
-    "test:watch": "pnpm --filter @allmaps/tools-iiif-server exec svelte-kit sync && vitest",
+    "test:watch": "pnpm --filter @allmaps/editor --filter @allmaps/tools-iiif-server exec svelte-kit sync && vitest",
     "lint": "prettier --check test *.ts && eslint test"
   },
   "dependencies": {

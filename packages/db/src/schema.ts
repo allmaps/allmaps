@@ -17,6 +17,7 @@ import {
 import { listItems, lists, listsRelationsPart } from './schema/lists.js'
 import {
   images,
+  imageAliases,
   canvases,
   manifests,
   canvasesToImages,
@@ -39,6 +40,7 @@ export const schema = {
   listItems,
   lists,
   images,
+  imageAliases,
   canvases,
   manifests,
   canvasesToImages,

@@ -1,3 +1,4 @@
+import { canonicalImageId, lockImageIds } from '@allmaps/api-shared/db'
 import ShareDB from 'sharedb'
 
 import { sql, type InferModel } from 'drizzle-orm'
@@ -71,7 +72,13 @@ export default class PostgresDB extends DB {
      * Casting is required as postgres thinks that collection and doc_id are
      * not varchar
      */
-    const query = this.db.execute<{ version: number }>(sql`WITH snapshot_id AS (
+    const query = this.db.transaction(async (tx) => {
+      if (collection === 'images') {
+        await lockImageIds(tx, [id])
+        if ((await canonicalImageId(tx, id)) !== id)
+          throw new Error('Image moved; reopen it before editing')
+      }
+      return tx.execute<{ version: number }>(sql`WITH snapshot_id AS (
         INSERT INTO snapshots (collection, doc_id, doc_type, version, data)
         SELECT ${collection}::varchar collection, ${id}::varchar doc_id, ${snapshot.type} doc_type, ${snapshot.v} v, ${serializedSnapshotData}::jsonb d
         WHERE ${snapshot.v} = (
@@ -104,6 +111,7 @@ export default class PostgresDB extends DB {
         )
       ) AND EXISTS (SELECT 1 FROM snapshot_id)
       RETURNING version`)
+    })
 
     query
       .then((res) => {

@@ -1,3 +1,4 @@
+export { canonicalImageId, lockImageIds } from './queries/image-aliases.js'
 export {
   queryImage,
   queryImages,
@@ -6,9 +7,13 @@ export {
   queryManifests,
   createImage,
   createImageFromUrl,
+  resolveImageServices,
+  getSavedImageResource,
   createManifest,
   createManifestFromUrl
 } from './queries/iiif.js'
+
+export { migrateImage } from './queries/migrate-image.js'
 
 export {
   queryImageGeoreferencing,

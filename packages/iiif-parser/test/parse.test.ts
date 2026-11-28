@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import { describe, expect, test } from 'vitest'
 
-import { IIIF } from '../src/index.js'
+import { IIIF, Manifest } from '../src/index.js'
 
 const inputDir = './test/input'
 const outputDir = './test/output'
@@ -71,6 +71,43 @@ fs.readdirSync(inputDir)
     }
   })
   .forEach(runTests)
+
+describe('Parsing image service arrays in Presentation 2 manifests', () => {
+  const auth = {
+    '@id': 'https://example.org/login',
+    profile: 'http://iiif.io/api/auth/1/login'
+  }
+
+  function parseWithServices(services: unknown[]) {
+    const manifest = readJSONFile(
+      path.join(inputDir, 'manifest.2.leiden-130206.json')
+    )
+    manifest.sequences[0].canvases[0].images[0].resource.service = services
+    return Manifest.parse(manifest)
+  }
+
+  test('keeps both supported image services alongside an authentication service', () => {
+    const v2 = {
+      '@id': 'https://example.org/iiif/2/map',
+      profile: 'http://iiif.io/api/image/2/level2.json'
+    }
+    const v3 = {
+      id: 'https://example.org/iiif/3/map',
+      type: 'ImageService3',
+      profile: 'level2'
+    }
+    const image = parseWithServices([v2, auth, v3]).canvases[0].image
+    expect(image.uri).toBe(v3.id)
+    expect(image.serviceUris).toEqual([v3.id, v2['@id']])
+  })
+
+  test.each([
+    { name: 'only unsupported services', services: [auth] },
+    { name: 'no services', services: [] }
+  ])('rejects an array with $name during validation', ({ services }) => {
+    expect(() => parseWithServices(services)).toThrow(z.ZodError)
+  })
+})
 
 describe('Parsing summaries in Presentation 3 manifests', () => {
   test.each([

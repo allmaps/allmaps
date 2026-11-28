@@ -70,9 +70,10 @@ export class MapsState extends MapsEventTarget {
   #maps = $state.raw<DbMaps3 | undefined>()
   #mapsCount = $derived(this.#maps ? Object.keys(this.#maps).length : 0)
 
-  #connecting = false
+  #connecting = $state(false)
   #connected = $state(false)
 
+  #sourceState: SourceState
   #connectedImageId = $state<string>()
 
   #errorState: ErrorState
@@ -130,6 +131,7 @@ export class MapsState extends MapsEventTarget {
   ) {
     super()
 
+    this.#sourceState = sourceState
     this.#errorState = errorState
     this.#mapsHistoryState = mapsHistoryState
 
@@ -144,13 +146,11 @@ export class MapsState extends MapsEventTarget {
 
     $effect(() => {
       if (
+        sourceState.activeImage &&
+        !sourceState.activeImage.embedded &&
         sourceState.activeImageId &&
         this.#connectedImageId !== sourceState.activeImageId
       ) {
-        // // TODO: move to source state, run fetchImageInfo when
-        // // sourceState.activeImageId changes there instead of here
-        // sourceState.fetchImageInfo(this.#imageId)
-
         if (!this.#connecting) {
           this.#connected = false
           this.#connecting = true
@@ -188,6 +188,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   #handleSnapshot(err: ShareDBError) {
+    this.#connecting = false
     if (err) {
       console.error('ShareDB error:', err)
       return
@@ -226,7 +227,6 @@ export class MapsState extends MapsEventTarget {
       this.#activeGcpIdPerMap = {}
 
       this.#connected = true
-      this.#connecting = false
     } catch (err) {
       this.#errorState.error = err
     }
@@ -520,7 +520,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   get activeMap() {
-    return this.#activeMap
+    return this.connected ? this.#activeMap : undefined
   }
 
   get previousMapId() {
@@ -577,7 +577,7 @@ export class MapsState extends MapsEventTarget {
   }
 
   insertMap({ mapId, map }: InsertMap) {
-    if (!this.#doc) {
+    if (!this.connected || !this.#doc || this.#doc.id !== map.resource.id) {
       return
     }
 
@@ -717,7 +717,11 @@ export class MapsState extends MapsEventTarget {
   }
 
   get connected() {
-    return this.#connected
+    return (
+      this.#connected &&
+      !this.#sourceState.activeImage?.embedded &&
+      this.#connectedImageId === this.#sourceState.activeImageId
+    )
   }
 
   get maps(): DbMap3[] {

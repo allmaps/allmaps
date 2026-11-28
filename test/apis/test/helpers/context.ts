@@ -1,3 +1,5 @@
+import { schema } from '@allmaps/db'
+import { createHash } from 'node:crypto'
 import { mkdtemp } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
@@ -36,6 +38,22 @@ export async function createTestContext(
   })
   try {
     if (options.seed === 'map') {
+      const { id: uri, width, height } = fixtureMap.resource
+      await context.db.insert(schema.images).values({
+        id: createHash('sha1').update(uri).digest('hex').slice(0, 16),
+        uri,
+        width,
+        height,
+        embedded: false,
+        data: {
+          id: uri,
+          type: 'ImageService3',
+          profile: 'level2',
+          protocol: 'http://iiif.io/api/image',
+          width,
+          height
+        }
+      })
       await context.shareDb.saveMaps([fixtureMap])
       await context.shareDb.flushPendingSnapshots()
       if (context.shareDb.persistErrors)

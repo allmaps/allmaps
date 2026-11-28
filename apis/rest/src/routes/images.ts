@@ -7,6 +7,7 @@ import type { RestEnv } from '@allmaps/env/rest'
 import { createElysia, createBetterAuthPlugin } from '../elysia.js'
 import { adminDetail } from '../openapi.js'
 import {
+  migrateImage,
   archiveImage,
   queryImage,
   queryImageGeoreferencing,
@@ -204,9 +205,21 @@ export function createImagesRoutes(
     )
     .get(
       '/images/:imageId',
-      ({ env, db, params, set }) => {
+      async ({ env, db, params, set, redirect }) => {
+        const result = await queryImage(
+          env.PUBLIC_REST_BASE_URL,
+          db,
+          params.imageId
+        )
+        if ('redirectId' in result) {
+          setCacheControl(set, 'public-short')
+          return redirect(
+            `${env.PUBLIC_REST_BASE_URL}/images/${result.redirectId}`,
+            302
+          )
+        }
         setCacheControl(set, 'public-medium')
-        return queryImage(env.PUBLIC_REST_BASE_URL, db, params.imageId)
+        return result
       },
       {
         params: t.Object({ imageId: t.String() }),
@@ -337,15 +350,32 @@ export function createImagesRoutes(
         }
       }
     )
+    .patch(
+      '/images/:imageId',
+      ({ db, params, body, set }) => {
+        setCacheControl(set, 'private-no-store')
+        return migrateImage(db, params.imageId, body.url)
+      },
+      {
+        admin: true,
+        params: t.Object({ imageId: t.String() }),
+        body: t.Object({ url: t.String({ format: 'uri' }) }),
+        detail: {
+          summary: 'Move an image to a new IIIF service',
+          tags: ['Images'],
+          ...adminDetail
+        }
+      }
+    )
     .put(
       '/images/:imageId',
       ({ db, params, body, set }) => {
         setCacheControl(set, 'private-no-store')
-        return createImage(db, params.imageId, body.url)
+        return createImage(db, params.imageId, body.url, body.resolve)
       },
       {
         params: t.Object({ imageId: t.String() }),
-        body: t.Object({ url: t.String() }),
+        body: t.Object({ url: t.String(), resolve: t.Optional(t.Boolean()) }),
         detail: {
           hide: true,
           summary: 'Create or update a single IIIF Image from a IIIF URL',

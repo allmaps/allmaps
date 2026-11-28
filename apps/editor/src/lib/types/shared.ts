@@ -9,7 +9,6 @@ import type {
 } from '@allmaps/iiif-parser'
 
 import type { GeoreferencedMap } from '@allmaps/annotation'
-import type { PickerProjection } from '@allmaps/ui/projections'
 
 export type Organization = {
   title: string
@@ -131,9 +130,6 @@ export type BasemapPresetItem = {
 
 export type ClickedItem =
   { type: 'map'; mapId: string } | { type: 'gcp'; mapId: string; gcpId: string }
-
-// export type GetProjectionById = (id: string) => PickerProjection | undefined
-export type ProjectionsById = Record<string, PickerProjection>
 
 export type Message = { text: string; type: 'error' | 'success' | 'info' }
 

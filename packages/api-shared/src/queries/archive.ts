@@ -1,3 +1,4 @@
+import { canonicalImageId } from './image-aliases.js'
 import { eq } from 'drizzle-orm'
 
 import { schema, type Db } from '@allmaps/db'
@@ -19,6 +20,7 @@ export async function archiveMap(db: Db, mapId: string) {
 
 export async function archiveImage(db: Db, imageId: string) {
   await db.transaction(async (transaction) => {
+    imageId = await canonicalImageId(transaction, imageId)
     const rows = await transaction
       .update(schema.images)
       .set({ archived: true })

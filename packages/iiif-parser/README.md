@@ -905,6 +905,16 @@ number | undefined
 Array<string>
 ```
 
+### `EmbeddedImage#serviceUris`
+
+Image service URIs for the same painting body, with the preferred service first.
+
+###### Type
+
+```ts
+ReadonlyArray<string>
+```
+
 ### `EmbeddedImage#supportedFormats`
 
 ###### Type

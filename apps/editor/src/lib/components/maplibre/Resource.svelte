@@ -10,7 +10,6 @@
   import { pink } from '@allmaps/tailwind'
 
   import { getSourceState } from '$lib/state/source.svelte.js'
-  import { getImageInfoState } from '$lib/state/image-info.svelte.js'
 
   import {
     generateFakeStraightAnnotation,
@@ -37,7 +36,6 @@
   }
 
   const sourceState = getSourceState()
-  const imageInfoState = getImageInfoState()
 
   let currentImageId = $state<string>()
   let currentMapId = $state<string>()
@@ -104,8 +102,8 @@
     imageId: string,
     resourceMask?: ResourceMask
   ) {
-    const imageInfo = await imageInfoState.fetchImageInfo(imageId)
-    const parsedImage = Image.parse(imageInfo)
+    const parsedImage = sourceState.activeImage
+    if (!(parsedImage instanceof Image) || parsedImage.uri !== imageId) return
 
     const width = parsedImage.width
     const height = parsedImage.height
@@ -162,6 +160,7 @@
 
   $effect(() => {
     if (
+      sourceState.activeImage instanceof Image &&
       sourceState.activeImageId &&
       currentImageId !== sourceState.activeImageId
     ) {

@@ -1,9 +1,23 @@
-import { and, eq, exists, gt, lte, notExists, sql } from 'drizzle-orm'
+import {
+  and,
+  arrayContains,
+  eq,
+  exists,
+  gt,
+  inArray,
+  lte,
+  ne,
+  notExists,
+  sql
+} from 'drizzle-orm'
 import { alias, unionAll } from 'drizzle-orm/pg-core'
 
 import { generateId, generateChecksum } from '@allmaps/id'
-import { generateRandomId } from '@allmaps/id/sync'
-import { fetchJson } from '@allmaps/stdlib'
+import {
+  generateRandomId,
+  generateId as generateImageHash
+} from '@allmaps/id/sync'
+import { fetchJson, fetchUrl, isValidHttpUrl } from '@allmaps/stdlib'
 import { Manifest, Image } from '@allmaps/iiif-parser'
 
 import { schema } from '@allmaps/db/schema'
@@ -12,7 +26,15 @@ import { ResponseError, clampLimit } from '@allmaps/api-shared'
 import { parseStoredNullableLanguageString } from '../shared/stored-json.js'
 
 import type { LanguageString } from '@allmaps/iiif-parser'
-import type { Db } from '@allmaps/db'
+import {
+  EditedImageAliasError,
+  canonicalImageIdSql,
+  editedImageGroups,
+  repointImageGroup,
+  lockImageIds,
+  registerImageAliases
+} from './image-aliases.js'
+import type { Db, DbOrTx, DbTransaction } from '@allmaps/db'
 import type { UserRole } from '../shared/limits.js'
 
 const iiifRequestOptions = {
@@ -34,6 +56,7 @@ type DbManifest = {
   canvases: {
     id: string
     uri: string
+    imageServicesIndexed?: boolean
     images: {
       id: string
       uri: string
@@ -209,7 +232,7 @@ function fromDbCanvas(restBaseUrl: string, dbCanvas: DbCanvas) {
 }
 
 export async function queryImage(restBaseUrl: string, db: Db, imageId: string) {
-  const image = await db.query.images.findFirst({
+  const details = db.query.images.findFirst({
     columns: {
       id: true,
       uri: true,
@@ -262,12 +285,38 @@ export async function queryImage(restBaseUrl: string, db: Db, imageId: string) {
     }
   })
 
-  if (image) {
-    return fromDbImage(restBaseUrl, image)
-  } else {
-    const message = `Image not found: ${imageId}`
-    throw new ResponseError(message, 404)
+  // A redirect only needs the alias row. Evaluate the detail query (including
+  // maps and canvases) only when the requested ID serves the image itself.
+  const { imageAliases } = schema
+  type ImageDetails = Omit<
+    NonNullable<Awaited<typeof details>>,
+    'createdAt' | 'updatedAt'
+  > & {
+    createdAt: string
+    updatedAt: string
   }
+  const [result] = await db
+    .select({
+      redirectId: imageAliases.canonicalImageId,
+      image: sql<ImageDetails | null>`case when ${imageAliases.imageId} is null
+        then (select row_to_json(detail) from (${details.getSQL()}) detail)
+      end`
+    })
+    .from(sql`(values (${imageId}::text)) as requested(id)`)
+    .leftJoin(
+      imageAliases,
+      and(
+        eq(imageAliases.imageId, sql`requested.id`),
+        ne(imageAliases.canonicalImageId, imageId)
+      )
+    )
+  if (result.redirectId) return { redirectId: result.redirectId }
+  if (!result.image) throw new ResponseError(`Image not found: ${imageId}`, 404)
+  return fromDbImage(restBaseUrl, {
+    ...result.image,
+    createdAt: new Date(result.image.createdAt),
+    updatedAt: new Date(result.image.updatedAt)
+  })
 }
 
 export async function queryImages(
@@ -303,6 +352,10 @@ export async function queryImages(
         sql<boolean>`${images.data} IS NOT NULL`.as('fetched')
     },
     where: {
+      RAW: (image) => sql`NOT EXISTS (
+        SELECT 1 FROM ${schema.imageAliases} WHERE ${schema.imageAliases.imageId} = ${image.id}
+        AND ${schema.imageAliases.canonicalImageId} <> ${image.id}
+      )`,
       id: {
         eq: params.imageId,
         in: params.imageIds,
@@ -496,6 +549,17 @@ export async function queryRandomImagesByOrganizationIds(
           wrap === 0
             ? gt(images.id, requestedOrganizations.randomId)
             : lte(images.id, requestedOrganizations.randomId),
+          notExists(
+            db
+              .select({ id: schema.imageAliases.imageId })
+              .from(schema.imageAliases)
+              .where(
+                and(
+                  eq(schema.imageAliases.imageId, images.id),
+                  sql`${schema.imageAliases.canonicalImageId} <> ${images.id}`
+                )
+              )
+          ),
           georeferencedFilter,
           organizationManifestFilter
         )
@@ -683,6 +747,7 @@ export async function queryManifests(
     singular: boolean
   } = { expectRows: false, singular: false }
 ) {
+  const links = schema.manifestsToCanvases
   const rows = await db.query.manifests.findMany({
     columns: {
       id: true,
@@ -751,6 +816,17 @@ export async function queryManifests(
           id: true,
           uri: true
         },
+        extras: params.manifestId
+          ? {
+              imageServicesIndexed: (canvas) =>
+                sql<boolean>`exists (
+                  select 1 from ${links}
+                  where ${links.manifestId} = ${params.manifestId}
+                    and ${links.canvasId} = ${canvas.id}
+                    and ${links.imageServiceUris} is not null
+                )`.as('imageServicesIndexed')
+            }
+          : undefined,
         with: {
           images: {
             columns: {
@@ -790,10 +866,9 @@ export async function queryManifests(
   return responseOptions.singular ? apiManifests[0] : apiManifests
 }
 
-async function createParsedImage(
-  db: Db,
+export async function storeImage(
+  db: DbOrTx,
   newImageData: unknown,
-  expectedImageId?: string,
   options: CreateIiifOptions = {}
 ) {
   const newImageChecksum = await generateChecksum(newImageData)
@@ -804,10 +879,6 @@ async function createParsedImage(
     getHttpUrlDomain(newParsedImage.uri),
     options.allowedParsedUriDomains
   )
-
-  if (expectedImageId && newImageId !== expectedImageId) {
-    throw new ResponseError("Image downloaded, but IDs don't match", 409)
-  }
 
   await db
     .insert(schema.images)
@@ -833,13 +904,259 @@ async function createParsedImage(
 
   return {
     id: newImageId,
-    uri: newParsedImage.uri
+    uri: newParsedImage.uri,
+    width: newParsedImage.width,
+    height: newParsedImage.height,
+    type: `ImageService${newParsedImage.majorVersion}` as const
   }
+}
+
+function serviceUri(url: string) {
+  return url.replace(/\/info\.json$/, '')
+}
+
+export async function getSavedImageResource(db: Db, uri: string) {
+  const id = canonicalImageIdSql(generateImageHash(uri))
+  const record = await db.query.images.findFirst({
+    where: { RAW: (images) => eq(images.id, id) },
+    columns: { data: true }
+  })
+  if (!record?.data) {
+    throw new ResponseError(
+      `No saved info.json for ${uri}. Resolve the image through the REST API first.`,
+      409
+    )
+  }
+  const image = Image.parse(record.data)
+  return {
+    id: image.uri,
+    type: `ImageService${image.majorVersion}` as const,
+    width: image.width,
+    height: image.height
+  }
+}
+
+export async function resolveImageServices(
+  db: Db,
+  serviceUris: readonly string[],
+  options: CreateIiifOptions & {
+    sourceUrl?: string
+    publisherDomains?: Set<string>
+  } = {}
+) {
+  let publisherDomains = options.publisherDomains
+  if (serviceUris.length === 1) {
+    const links = schema.manifestsToCanvases
+    const [group] = await db
+      .select({ services: links.imageServiceUris })
+      .from(links)
+      .where(arrayContains(links.imageServiceUris, [serviceUris[0]]))
+      .orderBy(links.manifestId, links.canvasId)
+      .limit(1)
+    if (group?.services) {
+      serviceUris = group.services
+      publisherDomains = new Set(serviceUris.map(getHttpUrlDomain))
+    }
+  }
+  const ids = new Set(serviceUris.map((uri) => generateImageHash(uri)))
+  const aliases = schema.imageAliases
+  const existing = await db
+    .select()
+    .from(aliases)
+    .where(inArray(aliases.imageId, [...ids]))
+  const targets = new Set(existing.map((row) => row.canonicalImageId))
+  const publisherServices =
+    serviceUris.length > 1 &&
+    publisherDomains &&
+    serviceUris.every((uri) => publisherDomains.has(getHttpUrlDomain(uri)))
+  if (targets.size > 1 && !publisherServices)
+    throw new ResponseError('Conflicting image aliases', 409)
+
+  const preferredId = generateImageHash(serviceUris[0])
+  const knownId =
+    existing.find((row) => row.imageId === preferredId)?.canonicalImageId ??
+    preferredId
+  const known = await db.query.images.findFirst({ where: { id: knownId } })
+  if (
+    known?.data &&
+    targets.size === 1 &&
+    existing.length === ids.size &&
+    !options.sourceUrl
+  ) {
+    const parsed = Image.parse(known.data)
+    assertAllowedDomain(
+      getHttpUrlDomain(parsed.uri),
+      options.allowedParsedUriDomains
+    )
+    return {
+      id: known.id,
+      uri: parsed.uri,
+      width: parsed.width,
+      height: parsed.height,
+      type: `ImageService${parsed.majorVersion}` as const
+    }
+  }
+  const candidates: unknown[] = []
+  const refresh = options.sourceUrl && known?.uri === serviceUris[0]
+  if (known?.data && !refresh) candidates.push(known.data)
+  for (const uri of serviceUris) {
+    if (
+      !refresh &&
+      known?.data &&
+      (known.uri === uri ||
+        existing.some((row) => row.imageId === generateImageHash(uri)))
+    )
+      continue
+    getHttpUrlDomain(uri)
+    try {
+      const data = await fetchJson(
+        options.sourceUrl && serviceUri(options.sourceUrl) === uri
+          ? options.sourceUrl
+          : `${uri.replace(/\/$/, '')}/info.json`,
+        iiifRequestOptions
+      )
+      const parsed = Image.parse(data)
+      // Independent services may only contribute an additional alias on a
+      // domain whose publisher vouched for the association.
+      if (
+        !candidates.length ||
+        !publisherDomains ||
+        publisherDomains.has(getHttpUrlDomain(parsed.uri))
+      ) {
+        ids.add(await generateId(parsed.uri))
+      }
+      candidates.push(data)
+    } catch (error) {
+      if (serviceUris.length === 1) throw error
+    }
+  }
+  if (!candidates.length)
+    throw new ResponseError('Image information unavailable', 502)
+  // The declared ID may itself have moved since the manifest was published.
+  const declared = await generateId(Image.parse(candidates[0]).uri)
+  const [target] = await db
+    .select()
+    .from(aliases)
+    .where(eq(aliases.imageId, declared))
+  let data = candidates[0]
+  if (target && target.canonicalImageId !== declared) {
+    const current = await db.query.images.findFirst({
+      where: { id: target.canonicalImageId }
+    })
+    if (!current?.data)
+      throw new ResponseError('Missing canonical image information', 409)
+    data = current.data
+  } else if (!known?.data && !serviceUris.includes(Image.parse(data).uri)) {
+    // A proxy can point to a canonical service. Read the metadata from that
+    // service before storing it under the publisher's ID.
+    const canonicalUri = Image.parse(data).uri
+    assertAllowedDomain(
+      getHttpUrlDomain(canonicalUri),
+      options.allowedParsedUriDomains
+    )
+    data = await fetchJson(
+      `${canonicalUri.replace(/\/$/, '')}/info.json`,
+      iiifRequestOptions
+    )
+    if (Image.parse(data).uri !== canonicalUri)
+      throw new ResponseError('Inconsistent canonical image ID', 409)
+  }
+  return db.transaction(async (tx) => {
+    const dataId = generateImageHash(Image.parse(data).uri)
+    ids.add(dataId)
+    let image
+    if (publisherServices && publisherDomains) {
+      image = await reconcilePublisherServices(
+        tx,
+        [...ids],
+        dataId,
+        data,
+        publisherDomains,
+        options
+      )
+    } else {
+      await lockImageIds(tx, [...ids])
+      image = await storeImage(tx, data, options)
+    }
+    await registerImageAliases(tx, [...ids], image.id)
+    return image
+  })
+}
+
+async function reconcilePublisherServices(
+  tx: DbTransaction,
+  ids: string[],
+  preferredId: string,
+  data: unknown,
+  publisherDomains: Set<string>,
+  options: CreateIiifOptions
+) {
+  const { imageAliases, images } = schema
+  // info.json can introduce IDs beyond the ones originally listed in the manifest.
+  const readAliases = () =>
+    tx.select().from(imageAliases).where(inArray(imageAliases.imageId, ids))
+  const beforeLock = await readAliases()
+  const locked = new Set([
+    ...ids,
+    ...beforeLock.map((row) => row.canonicalImageId)
+  ])
+  await lockImageIds(tx, [...locked])
+  const rows = await readAliases()
+  const groups = new Set([
+    preferredId,
+    ...rows.map((row) => row.canonicalImageId)
+  ])
+  if (
+    [...groups].some((id) => !locked.has(id)) ||
+    rows.some(
+      (row) =>
+        row.imageId === preferredId && row.canonicalImageId !== preferredId
+    )
+  ) {
+    throw new ResponseError('Image alias group changed', 409)
+  }
+
+  if (groups.size === 1) return storeImage(tx, data, options)
+
+  const records = await tx
+    .select({ id: images.id, uri: images.uri, data: images.data })
+    .from(images)
+    .where(inArray(images.id, [...groups]))
+  if (
+    !publisherDomains.has(getHttpUrlDomain(Image.parse(data).uri)) ||
+    records.some((row) => !publisherDomains.has(getHttpUrlDomain(row.uri)))
+  ) {
+    throw new ResponseError(
+      'Conflicting image aliases outside publisher domains',
+      409
+    )
+  }
+  const edited = await editedImageGroups(tx, [...groups])
+  if (edited.length > 1) {
+    throw new EditedImageAliasError(
+      edited,
+      'Multiple image services have edits requiring reconciliation'
+    )
+  }
+  const canonical = edited[0] ?? preferredId
+  const canonicalData =
+    canonical === preferredId
+      ? data
+      : records.find((row) => row.id === canonical)?.data
+  if (!canonicalData)
+    throw new ResponseError('Missing canonical image information', 409)
+
+  const image = await storeImage(tx, canonicalData, options)
+  for (const group of groups) {
+    if (group !== canonical) await repointImageGroup(tx, group, canonical)
+  }
+  return image
 }
 
 async function createParsedManifest(
   db: Db,
   newManifestData: unknown,
+  manifestUrl: string,
   expectedManifestId?: string,
   options: CreateIiifOptions = {}
 ) {
@@ -866,6 +1183,7 @@ async function createParsedManifest(
   type ResultCanvas = {
     id: string
     uri: string
+    imageServicesIndexed: boolean
     images: [
       {
         id: string
@@ -874,9 +1192,53 @@ async function createParsedManifest(
     ]
   }
 
+  const publisher = getHttpUrlDomain(manifestUrl)
+  let domains: Set<string> | undefined
   const resultCanvases: ResultCanvas[] = []
+  const canvases = newParsedManifest.canvases
+  if (canvases.some((canvas) => canvas.image.serviceUris.length > 1)) {
+    domains = new Set([publisher])
+    const { organizations, organizationUrls } = schema
+    const hosts = await db
+      .select({ domain: organizationUrls.url })
+      .from(organizationUrls)
+      .innerJoin(
+        organizations,
+        eq(organizations.id, organizationUrls.organizationId)
+      ).where(sql`${organizationUrls.organizationId} IN (
+              SELECT organization_id FROM organization_urls WHERE url = ${publisher}
+            ) OR lower(split_part(split_part(${organizations.homepage}, '://', 2), '/', 1)) = ${publisher}`)
+    for (const row of hosts) domains.add(row.domain)
+  }
 
+  const preferredIds = canvases.map((canvas) =>
+    generateImageHash(canvas.image.uri)
+  )
   await db.transaction(async (tx) => {
+    const { imageAliases, images } = schema
+    const readKnown = () =>
+      tx
+        .select({
+          from: imageAliases.imageId,
+          id: images.id,
+          uri: images.uri
+        })
+        .from(imageAliases)
+        .innerJoin(images, eq(images.id, imageAliases.canonicalImageId))
+        .where(
+          sql`${imageAliases.imageId} IN (SELECT jsonb_array_elements_text(${JSON.stringify(preferredIds)}::jsonb))`
+        )
+    const before = await readKnown()
+    const locked = new Set([...preferredIds, ...before.map((row) => row.id)])
+    await lockImageIds(tx, [...locked])
+    const known = await readKnown()
+    if (known.some(({ id }) => !locked.has(id))) {
+      throw new ResponseError(
+        'Image alias group changed; retry manifest registration',
+        409
+      )
+    }
+    const byId = new Map(known.map((image) => [image.from, image]))
     await tx
       .insert(schema.manifests)
       .values({
@@ -895,76 +1257,79 @@ async function createParsedManifest(
         }
       })
 
-    for (const canvas of newParsedManifest.canvases) {
-      const canvasId = await generateId(canvas.uri)
-      const canvasLabel = canvas.label
-
-      await tx
-        .insert(schema.canvases)
-        .values({
+    // Bound the number of SQL parameters even for very large manifests.
+    for (let offset = 0; offset < canvases.length; offset += 500) {
+      const chunk = canvases.slice(offset, offset + 500)
+      const canvasRows = new Map<string, typeof schema.canvases.$inferInsert>()
+      const placeholders = new Map<string, typeof images.$inferInsert>()
+      const imageLinks = []
+      const manifestLinks = new Map<
+        string,
+        typeof schema.manifestsToCanvases.$inferInsert
+      >()
+      for (const [index, canvas] of chunk.entries()) {
+        const canvasId = generateImageHash(canvas.uri)
+        const id = preferredIds[offset + index]
+        const image = byId.get(id) ?? { id, uri: canvas.image.uri }
+        if (!byId.has(id)) placeholders.set(id, { id, uri: image.uri })
+        canvasRows.set(canvasId, {
           id: canvasId,
           uri: canvas.uri,
           width: canvas.width,
           height: canvas.height,
-          label: canvasLabel
+          label: canvas.label
         })
+        imageLinks.push({ canvasId, imageId: image.id })
+        const services = canvas.image.serviceUris.filter(
+          (uri) => uri === canvas.image.uri || isValidHttpUrl(uri)
+        )
+        manifestLinks.set(canvasId, {
+          canvasId,
+          manifestId: newManifestId,
+          imageServiceUris:
+            services.length > 1 &&
+            domains &&
+            services.every((uri) => domains.has(getHttpUrlDomain(uri)))
+              ? services
+              : []
+        })
+        resultCanvases.push({
+          id: canvasId,
+          uri: canvas.uri,
+          imageServicesIndexed: true,
+          images: [{ id: image.id, uri: image.uri }]
+        })
+      }
+      if (placeholders.size)
+        await tx
+          .insert(images)
+          .values([...placeholders.values()])
+          .onConflictDoNothing()
+      await tx
+        .insert(schema.canvases)
+        .values([...canvasRows.values()])
         .onConflictDoUpdate({
           target: schema.canvases.id,
           set: {
-            width: canvas.width,
-            height: canvas.height,
+            width: sql`excluded.width`,
+            height: sql`excluded.height`,
             updatedAt: sql`NOW()`
           }
         })
-
-      const image = canvas.image
-      const imageId = await generateId(image.uri)
-
-      await tx
-        .insert(schema.images)
-        .values({
-          id: imageId,
-          uri: image.uri,
-          width: image.width,
-          height: image.height,
-          embedded: true
-        })
-        .onConflictDoUpdate({
-          target: schema.images.id,
-          set: {
-            width: image.width,
-            height: image.height,
-            updatedAt: sql`NOW()`
-          },
-          where: eq(schema.images.embedded, true)
-        })
-
       await tx
         .insert(schema.canvasesToImages)
-        .values({
-          canvasId,
-          imageId
-        })
+        .values(imageLinks)
         .onConflictDoNothing()
-
       await tx
         .insert(schema.manifestsToCanvases)
-        .values({
-          manifestId: newManifestId,
-          canvasId
+        .values([...manifestLinks.values()])
+        .onConflictDoUpdate({
+          target: [
+            schema.manifestsToCanvases.manifestId,
+            schema.manifestsToCanvases.canvasId
+          ],
+          set: { imageServiceUris: sql`excluded.image_service_uris` }
         })
-        .onConflictDoNothing()
-
-      resultCanvases.push({
-        id: canvasId,
-        uri: canvas.uri,
-        images: [
-          {
-            id: imageId,
-            uri: image.uri
-          }
-        ]
-      })
     }
   })
 
@@ -981,19 +1346,66 @@ export async function createImageFromUrl(
   options: CreateIiifOptions = {}
 ) {
   assertAllowedDomain(getHttpUrlDomain(newImageUrl), options.allowedUrlDomains)
-  const newImageData = await fetchJson(newImageUrl, iiifRequestOptions)
-
-  return createParsedImage(db, newImageData, undefined, options)
+  return resolveImageServices(db, [serviceUri(newImageUrl)], {
+    ...options,
+    sourceUrl: newImageUrl
+  })
 }
 
 export async function createImage(
   db: Db,
   newImageId: string,
-  newImageUrl: string
+  newImageUrl: string,
+  resolve = false
 ) {
-  const newImageData = await fetchJson(newImageUrl, iiifRequestOptions)
+  const uri = serviceUri(newImageUrl)
+  if (newImageId !== (await generateId(uri))) {
+    // Existing Editor clients use the ID declared inside the response.
+    const data = await fetchJson(newImageUrl, iiifRequestOptions)
+    if (newImageId !== (await generateId(Image.parse(data).uri))) {
+      throw new ResponseError("Image downloaded, but IDs don't match", 409)
+    }
+  }
+  if (resolve) return resolveImageWithMetadata(db, newImageId, newImageUrl)
+  return resolveImageServices(db, [uri], { sourceUrl: newImageUrl })
+}
 
-  return createParsedImage(db, newImageData, newImageId)
+export async function resolveImageWithMetadata(
+  db: Db,
+  imageId: string,
+  infoUrl: string
+) {
+  const uri = serviceUri(infoUrl)
+  let image
+  try {
+    image = await resolveImageServices(db, [uri])
+  } catch (error) {
+    if (
+      !(error instanceof EditedImageAliasError) ||
+      !error.imageIds.includes(imageId)
+    )
+      throw error
+    // Open the requested edited document without reconciling its aliases.
+    const record = await db.query.images.findFirst({
+      where: { id: imageId },
+      columns: { uri: true, data: true }
+    })
+    const data = record?.data ?? (await fetchJson(infoUrl, iiifRequestOptions))
+    const parsed = Image.parse(data)
+    return {
+      id: imageId,
+      uri: record?.uri ?? uri,
+      width: parsed.width,
+      height: parsed.height,
+      type: `ImageService${parsed.majorVersion}`,
+      data
+    }
+  }
+  const record = await db.query.images.findFirst({
+    where: { id: image.id },
+    columns: { data: true }
+  })
+  return { ...image, data: record?.data }
 }
 
 export async function createManifestFromUrl(
@@ -1005,9 +1417,16 @@ export async function createManifestFromUrl(
     getHttpUrlDomain(newManifestUrl),
     options.allowedUrlDomains
   )
-  const newManifestData = await fetchJson(newManifestUrl, iiifRequestOptions)
+  const response = await fetchUrl(newManifestUrl, iiifRequestOptions)
+  const newManifestData: unknown = await response.json()
 
-  return createParsedManifest(db, newManifestData, undefined, options)
+  return createParsedManifest(
+    db,
+    newManifestData,
+    response.url || newManifestUrl,
+    undefined,
+    options
+  )
 }
 
 export async function createManifest(
@@ -1015,7 +1434,13 @@ export async function createManifest(
   newManifestId: string,
   newManifestUrl: string
 ) {
-  const newManifestData = await fetchJson(newManifestUrl, iiifRequestOptions)
+  const response = await fetchUrl(newManifestUrl, iiifRequestOptions)
+  const newManifestData: unknown = await response.json()
 
-  return createParsedManifest(db, newManifestData, newManifestId)
+  return createParsedManifest(
+    db,
+    newManifestData,
+    response.url || newManifestUrl,
+    newManifestId
+  )
 }

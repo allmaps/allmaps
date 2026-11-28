@@ -21,6 +21,7 @@ import * as iiifSchema from '@allmaps/db/schema/iiif'
 
 import { ResponseError, clampLimit } from '@allmaps/api-shared'
 import { makeMapUrl } from '../shared/urls.js'
+import { canonicalImageIdSql } from './image-aliases.js'
 import { mapFilters, imageFilters } from './map-filters.js'
 import type { MapsQueryParams } from '../types.js'
 import { fromDbRow } from '../shared/maps.js'
@@ -89,6 +90,14 @@ function matchItem(item?: ItemIdentifier) {
   if (item?.manifestId) return eq(listItems.manifestId, item.manifestId)
 }
 
+function bookmarkImageId(
+  item: Pick<typeof listsSchema.listItems, 'mapImageId' | 'imageId'>
+) {
+  return sql<
+    string | null
+  >`coalesce(${item.mapImageId}, ${canonicalImageIdSql(item.imageId)})`
+}
+
 // Resolve each bookmark to its images, then match pinned or latest map revisions.
 function listMapMembership(db: DbOrTx, listId: string, key?: ListItemInput) {
   const { listItems } = listsSchema
@@ -122,7 +131,7 @@ function listMapMembership(db: DbOrTx, listId: string, key?: ListItemInput) {
       images,
       eq(
         images.id,
-        sql`coalesce(${listItems.mapImageId}, ${listItems.imageId}, ${canvasesToImages.imageId})`
+        sql`coalesce(${bookmarkImageId(listItems)}, ${canvasesToImages.imageId})`
       )
     )
     .innerJoin(maps, eq(maps.imageId, images.id))
@@ -296,6 +305,9 @@ async function queryListBookmarks(
   const [saved, counts] = await Promise.all([
     db.query.listItems.findMany({
       where: { listId, ...key },
+      extras: {
+        resourceImageId: (item) => bookmarkImageId(item).as('resourceImageId')
+      },
       orderBy: {
         createdAt: 'desc',
         mapId: 'asc',
@@ -332,9 +344,7 @@ async function queryListBookmarks(
       .from(membership)
       .groupBy(membership.path)
   ])
-  const imageIds = saved.flatMap(
-    (item) => item.mapImageId ?? item.imageId ?? []
-  )
+  const imageIds = saved.flatMap((item) => item.resourceImageId ?? [])
   const images = imageIds.length
     ? await db.query.images.findMany({
         where: { id: { in: imageIds } },
@@ -348,7 +358,7 @@ async function queryListBookmarks(
   const imagesById = new Map(images.map((image) => [image.id, image]))
   const countsByPath = new Map(counts.map((row) => [row.path, row.count]))
   return saved.map((item) => {
-    const image = imagesById.get(item.mapImageId ?? item.imageId ?? '')
+    const image = imagesById.get(item.resourceImageId ?? '')
     const sheet = item.canvas ?? image?.canvases[0]
     const manifest = item.manifest ?? sheet?.manifests[0]
     const uri = item.manifest?.uri ?? item.canvas?.uri ?? image?.uri
