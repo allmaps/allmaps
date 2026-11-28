@@ -2,6 +2,7 @@ import { eq, desc, inArray, sql } from 'drizzle-orm'
 
 import { schema } from '@allmaps/db'
 import { makeMapUrl, makeImageUrl } from '../shared/urls.js'
+import { canonicalImageIdSql } from './image-aliases.js'
 
 import type { Db } from '@allmaps/db'
 
@@ -43,19 +44,20 @@ export async function queryImageChecksums(
   const { imageAliases } = schema
   // Keep alias resolution and history on the same snapshot during an image move.
   // Before alias registration, a legacy image's own ID holds its history.
-  const memberIds = sql`(
-    WITH canonical_image AS (
-      SELECT COALESCE((
-        SELECT ${imageAliases.canonicalImageId} FROM ${imageAliases}
-        WHERE ${imageAliases.imageId} = ${imageId}
-      ), ${imageId}::text) AS id
+  const canonical = db
+    .$with('canonical_image', { id: sql<string>`id`.as('id') })
+    .as(sql`select ${canonicalImageIdSql(imageId)} as id`)
+  const memberIds = db
+    .select({ id: canonical.id })
+    .from(canonical)
+    .union(
+      db
+        .select({ id: imageAliases.imageId })
+        .from(imageAliases)
+        .innerJoin(canonical, eq(imageAliases.canonicalImageId, canonical.id))
     )
-    SELECT id FROM canonical_image
-    UNION
-    SELECT ${imageAliases.imageId} FROM ${imageAliases}
-    WHERE ${imageAliases.canonicalImageId} = (SELECT id FROM canonical_image)
-  )`
   const rows = await db
+    .with(canonical)
     .selectDistinct({
       imageId: schema.maps.imageId,
       imageChecksum: schema.maps.imageChecksum,
