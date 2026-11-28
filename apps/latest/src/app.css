@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import '@allmaps/tailwind';
 
 @config '../tailwind.config.ts';
 

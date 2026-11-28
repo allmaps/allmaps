@@ -1,11 +1,11 @@
 @config '../../tailwind.config.ts';
 
-@layer base, starlight, theme, components, utilities;
+@import './layers.css';
 
 @import '@astrojs/starlight-tailwind';
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
-@import '@allmaps/ui/css/ui.css';
+@import '@allmaps/tailwind/theme.css';
 
 @source '../../../../packages/ui/src/lib';
 

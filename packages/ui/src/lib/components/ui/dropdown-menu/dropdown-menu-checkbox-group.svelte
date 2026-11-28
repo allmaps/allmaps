@@ -1,16 +1,35 @@
 <script lang="ts">
-  import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui'
+  import { elementRef } from '../element-ref.js'
+  import { MenuGroup } from '@ui-sdk/svelte/menu'
+  import type { ComponentProps } from 'svelte'
+  import { setCheckboxGroup } from './checkbox-group.js'
 
   let {
     ref = $bindable(null),
     value = $bindable([]),
-    ...restProps
-  }: DropdownMenuPrimitive.CheckboxGroupProps = $props()
+    onValueChange,
+    ...props
+  }: ComponentProps<typeof MenuGroup> & {
+    ref?: HTMLDivElement | null
+    value?: string[]
+    onValueChange?: (value: string[]) => void
+  } = $props()
+
+  setCheckboxGroup({
+    includes: (item) => value.includes(item),
+    setChecked(item, checked) {
+      value = checked
+        ? [...new Set([...value, item])]
+        : value.filter((v) => v !== item)
+      onValueChange?.(value)
+    }
+  })
 </script>
 
-<DropdownMenuPrimitive.CheckboxGroup
-  bind:ref
-  bind:value
-  data-slot="dropdown-menu-checkbox-group"
-  {...restProps}
+<MenuGroup
+  {...props}
+  {@attach elementRef<HTMLDivElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
 />

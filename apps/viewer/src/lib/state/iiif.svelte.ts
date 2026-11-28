@@ -29,6 +29,8 @@ type FetchResult = FetchingResult | ManifestResult | ErrorResult
 
 export class IiifState {
   #mapsState: MapsState
+  #restBaseUrl: string
+  #mapCounts = new Map<string, Promise<number | undefined>>()
 
   #manifestItems = $derived.by(() => [
     ...this.#mapsState.maps.flatMap((map) =>
@@ -122,8 +124,29 @@ export class IiifState {
   //   }
   // })
 
-  constructor(mapsState: MapsState) {
+  constructor(mapsState: MapsState, restBaseUrl: string) {
     this.#mapsState = mapsState
+    this.#restBaseUrl = restBaseUrl
+  }
+
+  getPublishedMapCount(resourcePath: string) {
+    const cached = this.#mapCounts.get(resourcePath)
+    if (cached) return cached
+
+    const url = new URL(`/${resourcePath}/georeferenced`, this.#restBaseUrl)
+    const pending = fetchJson(url, { credentials: 'omit' })
+      .then((result) => {
+        const { georeferencedMapCount } = result as {
+          georeferencedMapCount: number
+        }
+        return georeferencedMapCount
+      })
+      .catch(() => {
+        this.#mapCounts.delete(resourcePath)
+        return undefined
+      })
+    this.#mapCounts.set(resourcePath, pending)
+    return pending
   }
 
   async #fetchParsedManifest(manifestId: string) {
@@ -186,8 +209,8 @@ export class IiifState {
   }
 }
 
-export function setIiifState(mapsState: MapsState) {
-  return setContext(IIIF_KEY, new IiifState(mapsState))
+export function setIiifState(mapsState: MapsState, restBaseUrl: string) {
+  return setContext(IIIF_KEY, new IiifState(mapsState, restBaseUrl))
 }
 
 export function getIiifState() {

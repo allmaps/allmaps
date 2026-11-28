@@ -1,0 +1,41 @@
+---
+title: Toggle
+description: Turn an option on or off with a two-state button.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import TogglePlayground, {
+  formatUsage
+} from '../../../starlight/components/TogglePlayground.svelte'
+
+<ComponentPage>
+
+<div slot="playground">
+
+<TogglePlayground client:load />
+
+</div>
+
+<div slot="usage">
+
+<UsageCode live code={formatUsage()} />
+
+Use text, an icon, or both. Give an icon-only toggle a stable accessible name with `aria-label`.
+
+</div>
+
+<div slot="props">
+
+| Prop              | Behavior                                      |
+| ----------------- | --------------------------------------------- |
+| `pressed`         | Bind the pressed state. Defaults to `false`.  |
+| `onPressedChange` | Receives the new boolean value on activation. |
+| `rounded`         | Choose `rounded` (default) or `full`.         |
+| `disabled`        | Disable activation.                           |
+| `ref`             | Bind the underlying button element.           |
+
+</div>
+
+</ComponentPage>

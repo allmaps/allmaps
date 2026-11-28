@@ -1,0 +1,39 @@
+---
+title: NorthArrow
+description: Show where north and the top of the map image point.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import NorthArrowPlayground, {
+  formatUsage
+} from '../../../starlight/components/NorthArrowPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<NorthArrowPlayground client:load />
+
+</div>
+<div slot="usage">
+
+Tab to the compass and press **Enter** or **Space** to point north up. The image-top marker turns by the same angle, and the button keeps focus. Its accessible description includes the current directions and whether the compass follows the device.
+
+<UsageCode live code={formatUsage()} />
+
+</div>
+<div slot="props">
+
+| Prop                | Behavior                                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `rotation`          | Clockwise degrees from the top of the control to north. Defaults to 0. Negative angles are supported.          |
+| `imageUpRotation`   | Clockwise degrees to the top of the image. The marker appears when the two directions are more than 10° apart. |
+| `followOrientation` | Adds a dot at the north tip and includes device-following mode in the accessible description.                  |
+| `onclick`           | Runs the app’s orientation action on click, Enter, or Space.                                                   |
+| `aria-label`        | Names the button action or the static compass.                                                                 |
+
+The parent sets the compass width. The playground uses a 48-pixel square.
+
+</div>
+</ComponentPage>

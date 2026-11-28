@@ -8,6 +8,7 @@ import {
   createManifestFromUrl,
   createUserList,
   getSavedImageResource,
+  queryList,
   queryListGeoreferenceAnnotations,
   migrateImage,
   queryImageChecksums,
@@ -1036,6 +1037,29 @@ it('follows image moves in a saved list and keeps a map version pinned', async (
   for (const uri of [moved, current]) {
     await migrateImage(db, saved.imageId, uri + '/info.json')
     expect(await readImageUris()).toEqual([original, uri].sort())
+    const collection = await queryList(
+      env.PUBLIC_ANNOTATIONS_BASE_URL,
+      db,
+      owner.slug,
+      list.id
+    )
+    expect(collection.first?.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          allmapsUrl:
+            env.PUBLIC_ANNOTATIONS_BASE_URL + '/images/' + saved.imageId,
+          georeferencedMapCount: 1,
+          target: expect.objectContaining({ id: uri, imageService: uri })
+        }),
+        expect.objectContaining({
+          georeferencedMapCount: 1,
+          target: expect.objectContaining({
+            type: 'Annotation',
+            imageService: original
+          })
+        })
+      ])
+    )
   }
   // Saving the new ID alongside the original still publishes each map row once.
   await addItemToList(db, list.id, { imageId: hash(current) })

@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import '@allmaps/tailwind';
 @plugin '@tailwindcss/typography';
 @import '@allmaps/ui/css/fonts.css';
 

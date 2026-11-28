@@ -4,7 +4,6 @@
   import type { MapExampleImplementationProps } from '../../lib/examples/types.js'
 
   let {
-    codeTheme,
     initialCode,
     children: sourceContent,
     annotationUrl = $bindable(),
@@ -30,21 +29,18 @@
         <CodeBlock
           code={code.javascript}
           language="javascript"
-          theme={codeTheme}
           initial={initialCode?.javascript}
         />
         <p class="my-3 mx-0 text-sm">Add a map container to your page:</p>
         <CodeBlock
           code={code.html}
           language="html"
-          theme={codeTheme}
           initial={initialCode?.html}
         />
         <p class="my-3 mx-0 text-sm">Install the packages:</p>
         <CodeBlock
           code={code.bash}
           language="bash"
-          theme={codeTheme}
           initial={initialCode?.bash}
         />
         <p class="my-3 mx-0 text-sm">

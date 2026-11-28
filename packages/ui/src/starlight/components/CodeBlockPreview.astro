@@ -1,0 +1,9 @@
+---
+import { renderCode } from '../../lib/code/renderer'
+import { defaultExample, examples } from './code-block-examples'
+import CodeBlockPlayground from './CodeBlockPlayground.svelte'
+
+const initial = await renderCode({ ...examples[defaultExample], folds: [] })
+---
+
+<CodeBlockPlayground {initial} client:load />

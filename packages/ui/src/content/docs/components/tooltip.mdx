@@ -1,0 +1,28 @@
+---
+title: Tooltip
+description: Show a short hint on hover or keyboard focus.
+sections: [Playground, Usage]
+---
+
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import TooltipPlayground, {
+  formatUsage
+} from '../../../starlight/components/TooltipPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<TooltipPlayground client:load />
+
+</div>
+<div slot="usage">
+
+Use `Tooltip.Trigger` for the control and `Tooltip.Content` for its hint. The tooltip flips when the preferred side has too little room. Press Escape to dismiss it.
+
+<UsageCode live code={formatUsage()} />
+
+For action feedback, bind `open` on `Tooltip.Root` and pass the button element as the content’s `anchor`. StarToggle uses this pattern to display its confirmation after activation.
+
+</div>
+</ComponentPage>

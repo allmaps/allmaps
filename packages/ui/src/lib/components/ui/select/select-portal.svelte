@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Select as SelectPrimitive } from 'bits-ui'
+  import PopupPortal from '../popup-portal.svelte'
+  import type { ComponentProps } from 'svelte'
 
-  let { ...restProps }: SelectPrimitive.PortalProps = $props()
+  let props: ComponentProps<typeof PopupPortal> = $props()
 </script>
 
-<SelectPrimitive.Portal {...restProps} />
+<PopupPortal {...props} />

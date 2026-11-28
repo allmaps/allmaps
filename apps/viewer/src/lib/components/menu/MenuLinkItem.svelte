@@ -1,6 +1,9 @@
 <script lang="ts">
   import { DropdownMenu } from 'bits-ui'
-  import { ArrowSquareOut as ArrowSquareOutIcon } from 'phosphor-svelte'
+  import {
+    ArrowSquareOut as ArrowSquareOutIcon,
+    ArrowRightIcon
+  } from 'phosphor-svelte'
 
   import { menuItemClass } from './classes.js'
 
@@ -9,11 +12,12 @@
   type Props = {
     children: Snippet
     href: string | undefined
+    sameTab?: boolean
     icon?: Snippet
     textValue?: string
   }
 
-  let { children, href, icon, textValue }: Props = $props()
+  let { children, href, icon, textValue, sameTab = false }: Props = $props()
 </script>
 
 <DropdownMenu.Item {textValue} disabled={!href}>
@@ -23,11 +27,13 @@
         {...props}
         class={menuItemClass}
         {href}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={sameTab ? undefined : '_blank'}
+        rel={sameTab ? undefined : 'noopener noreferrer'}
       >
         {#if icon}
           {@render icon()}
+        {:else if sameTab}
+          <ArrowRightIcon class="size-4" />
         {:else}
           <ArrowSquareOutIcon class="size-4" />
         {/if}
@@ -37,6 +43,8 @@
       <span {...props} class={menuItemClass}>
         {#if icon}
           {@render icon()}
+        {:else if sameTab}
+          <ArrowRightIcon class="size-4" />
         {:else}
           <ArrowSquareOutIcon class="size-4" />
         {/if}

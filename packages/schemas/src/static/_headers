@@ -1,0 +1,17 @@
+/*
+  Access-Control-Allow-Origin: *
+
+/
+  Content-Type: application/json
+
+/map/2/context.json
+  Content-Type: application/ld+json
+
+/lists/1/context.json
+  Content-Type: application/ld+json
+
+/map/1/schema.json
+  Content-Type: application/schema+json
+
+/map/2/schema.json
+  Content-Type: application/schema+json

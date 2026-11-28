@@ -1,20 +1,11 @@
 <script lang="ts">
-  import { Select as SelectPrimitive } from 'bits-ui'
-  import Icon from 'phosphor-svelte/lib/CaretDownIcon'
-  import { type WithoutChildrenOrChild } from '../types.js'
+  import ScrollButton from './scroll-button.svelte'
+  import type { ComponentProps } from 'svelte'
 
   let {
     ref = $bindable(null),
-    class: className,
-    ...restProps
-  }: WithoutChildrenOrChild<SelectPrimitive.ScrollDownButtonProps> = $props()
+    ...rest
+  }: Omit<ComponentProps<typeof ScrollButton>, 'direction'> = $props()
 </script>
 
-<SelectPrimitive.ScrollDownButton
-  bind:ref
-  data-slot="select-scroll-down-button"
-  class={['allmaps-ui allmaps-select-scroll-down-button', className]}
-  {...restProps}
->
-  <Icon size={16} aria-hidden="true" />
-</SelectPrimitive.ScrollDownButton>
+<ScrollButton direction="down" bind:ref {...rest} />

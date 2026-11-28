@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte'
-import type { CodeThemeConfig, RenderedCodeBlock } from '@allmaps/ui/code'
+import type { RenderedCodeBlock } from '@allmaps/ui/code'
 import type {
   ExampleBounds,
   ExampleCode,
@@ -18,7 +18,6 @@ export type MapExampleOption = {
 export type MapExampleProps = ExampleCodeOptions & {
   examples?: MapExampleOption[]
   bounds?: ExampleBounds
-  codeTheme?: CodeThemeConfig
   initialCode?: Record<keyof ExampleCode, RenderedCodeBlock>
   /** Override source presentation with a snippet receiving the updated code. */
   children?: Snippet<[ExampleCode]>

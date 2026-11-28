@@ -10,7 +10,7 @@ has an interactive example and usage notes.
 
 Run `pnpm --filter @allmaps/ui dev` from the repository root to open the
 Astro Starlight development server on port 5505. Component pages live in
-`src/content/docs/components` and their Svelte playgrounds in `src/components`.
+`src/content/docs/components` and their Svelte playgrounds in `src/starlight/components`.
 Run `pnpm --filter @allmaps/ui check` to check the Astro and Svelte sources.
 
 ### Production deployment
@@ -32,7 +32,7 @@ The library build writes the publishable Svelte package to `dist/`.
 
 ## New shared controls
 
-The shadcn-svelte-based Select is available alongside the existing Allmaps Select:
+The UI SDK-backed Select is available alongside the existing Allmaps Select:
 
 ```svelte
 <script>
@@ -59,47 +59,28 @@ The shadcn-svelte-based Select is available alongside the existing Allmaps Selec
 ```
 
 The original `import { Select } from '@allmaps/ui'` is unchanged. The new entry
-point follows shadcn-svelte's composable API, uses Bits UI for behavior and
+point follows shadcn-svelte's composable API, uses UI SDK for behavior and
 Phosphor icons, and imports its own CSS. It does not require an app to scan the
-package for Tailwind classes. See [the source and license](src/lib/components/ui/select/README.md).
+package for Tailwind classes. See [the Select README](src/lib/components/ui/select/README.md).
 
-### One Allmaps theme
+### Shared Tailwind theme
 
-`src/lib/css/ui.css` is the single source for the new controls' colors, fonts,
-control heights, radius, focus ring and shadows. It defines semantic
-`--allmaps-ui-*` variables and supports both `.dark` and Starlight's
-`data-theme="dark"` on the document root. The Select entry point imports it
-automatically. Other consumers can import `@allmaps/ui/css/ui.css` explicitly.
-Font families use Geograph and DM Mono; import `@allmaps/ui/css/fonts.css` if the
-app does not already load those fonts.
-
-Override tokens on the document root, after importing the theme, so controls and
-menus portaled to the document body share the same values:
+Import the Allmaps preset in the app’s Tailwind stylesheet:
 
 ```css
-:root {
-  --allmaps-ui-primary: #ff56ba;
-  --allmaps-ui-ring: var(--allmaps-ui-primary);
-  --allmaps-ui-radius: 0.375rem;
-  --allmaps-ui-font-sans: 'Geograph', system-ui, sans-serif;
-}
+@import '@allmaps/tailwind';
 ```
 
-Add future shadcn-based components under `src/lib/components/ui/`, use the
-shared `.allmaps-ui` typography class and theme tokens, and export each through
-its own entry point. To use Tailwind 4's semantic shadcn utilities, import the
-theme into the app's Tailwind stylesheet as well:
+The preset includes Tailwind, the Allmaps palette, and light and dark UI colors.
+Apps that load Tailwind’s layers individually can import
+`@allmaps/tailwind/theme.css` alongside those layers. Include the UI output in
+the app’s Tailwind sources so it generates the utilities used by the components.
+Load `@allmaps/ui/css/fonts.css` if the app needs the Geograph and DM Mono fonts.
 
-```css
-@import 'tailwindcss';
-@import '@allmaps/ui/css/ui.css';
-```
-
-Names such as `bg-popover`, `text-foreground`, `border-input`, `ring-ring` and
-`rounded-md` then use the same Allmaps variables. Component CSS lives in the
-`components` layer, allowing utility classes and app overrides to customize it.
-Keep theme values out of individual components. There is no global reset or
-change to the existing components' styles.
+Override `--allmaps-ui-*` properties on the document root to customize controls
+and menus portaled to the body. Button and Toggle use `rounded-md` by default
+and `rounded-full` for the `full` option. The optional `rounded-ui` utility
+follows `--allmaps-ui-radius`.
 
 ## Screenshot
 
@@ -268,14 +249,11 @@ routing and global styles. Use the Allmaps Tailwind theme and scan all UI output
 including the nested Latest components:
 
 ```ts
-import { theme } from '@allmaps/tailwind'
-
 export default {
   content: [
     './src/**/*.{html,js,svelte,ts}',
     './node_modules/@allmaps/ui/dist/**/*.{html,js,svelte,ts}'
-  ],
-  theme
+  ]
 }
 ```
 

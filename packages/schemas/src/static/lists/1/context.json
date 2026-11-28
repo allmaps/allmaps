@@ -1,0 +1,24 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/anno.jsonld",
+    {
+      "georeferenceAnnotations": {
+        "@id": "https://schemas.allmaps.org/lists/georeferenceAnnotations",
+        "@type": "@id"
+      },
+      "georeferencedMapCount": "https://schemas.allmaps.org/lists/georeferencedMapCount",
+      "allmapsUrl": {
+        "@id": "https://schemas.allmaps.org/lists/allmapsUrl",
+        "@type": "@id"
+      },
+      "fallbackImageService": {
+        "@id": "https://schemas.allmaps.org/lists/fallbackImageService",
+        "@type": "@id"
+      },
+      "imageService": {
+        "@id": "https://schemas.allmaps.org/lists/imageService",
+        "@type": "@id"
+      }
+    }
+  ]
+}

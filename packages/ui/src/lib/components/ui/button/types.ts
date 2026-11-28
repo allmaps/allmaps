@@ -1,4 +1,5 @@
 import type { Snippet } from 'svelte'
+import type { Rounded } from '../types.js'
 import type {
   HTMLAnchorAttributes,
   HTMLButtonAttributes
@@ -6,14 +7,12 @@ import type {
 
 export type ButtonVariant = 'default' | 'primary' | 'destructive'
 
-export type ButtonShape = 'rounded' | 'pill'
-
 type SharedProps = {
   children?: Snippet
   icon?: Snippet
   iconPosition?: 'leading' | 'trailing'
   variant?: ButtonVariant
-  shape?: ButtonShape
+  rounded?: Rounded
   iconOnly?: boolean
   active?: boolean
   loading?: boolean

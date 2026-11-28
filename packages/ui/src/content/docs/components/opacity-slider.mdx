@@ -1,0 +1,39 @@
+---
+title: OpacitySlider
+description: Adjust a map layer’s opacity or briefly hide it to see what’s underneath.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import OpacitySliderPlayground, {
+  formatUsage
+} from '../../../starlight/components/OpacitySliderPlayground.svelte'
+
+<ComponentPage>
+<div slot="playground">
+
+<OpacitySliderPlayground client:load />
+
+</div>
+<div slot="usage">
+
+Click or tap the droplet to open the vertical slider. Hold the droplet to peek underneath the map, then release to restore its opacity. Holding when the map is fully transparent temporarily reveals it. While holding, drag onto the slider and release at the opacity you want to keep. The slider opens above the droplet when there is room, or below it near the top of the screen.
+
+With the droplet focused, press Enter or Space to open the slider. Use the arrow keys for one-percent steps, Home or End for the limits, and Escape to close it.
+
+<UsageCode live code={formatUsage()} />
+
+The droplet fills its container’s width and stays square. Set the container width to size it. Apply the bound value to the layer you want to fade.
+
+</div>
+<div slot="props">
+
+| Prop       | Behavior                                                               |
+| ---------- | ---------------------------------------------------------------------- |
+| `opacity`  | Bindable number from 0 (transparent) to 1 (opaque). Defaults to 1.     |
+| `disabled` | Disables the control. Defaults to `false`.                             |
+| `label`    | Accessible name for the trigger and slider. Defaults to `Map opacity`. |
+
+</div>
+</ComponentPage>

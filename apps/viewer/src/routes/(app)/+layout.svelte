@@ -37,7 +37,8 @@
   const metadataState = setMetadataState(mapsState, urlState)
   const imagesState = setImagesState(mapsState)
   setErrorsState(sourceState, mapsState, imagesState)
-  setIiifState(mapsState)
+  // svelte-ignore state_referenced_locally
+  setIiifState(mapsState, data.env.PUBLIC_REST_BASE_URL)
   if (browser) {
     setBackgroundColorsState(mapsState, imagesState)
   }
@@ -97,6 +98,7 @@
         setSource(data.source)
       } else if (
         data.clientSourceLoadReason &&
+        data.urlParam === urlParam &&
         (!data.source || data.source.url !== urlParam)
       ) {
         const requestedUrlParam = urlParam
@@ -104,14 +106,28 @@
         currentUrlParam = requestedUrlParam
         currentDataParamChecksum = undefined
         setSource(undefined)
-        sourceFromUrl(data.env.PUBLIC_ANNOTATIONS_BASE_URL, requestedUrlParam)
+
+        const controller = new AbortController()
+        const fetchSource: typeof fetch = (input, options) =>
+          fetch(input, { ...options, signal: controller.signal })
+        sourceFromUrl(
+          data.env.PUBLIC_ANNOTATIONS_BASE_URL,
+          requestedUrlParam,
+          fetchSource
+        )
           .then((source) => {
-            if (getCurrentUrlParam() === requestedUrlParam) {
+            if (
+              !controller.signal.aborted &&
+              getCurrentUrlParam() === requestedUrlParam
+            ) {
               setSource(source)
             }
           })
           .catch((err) => {
-            if (getCurrentUrlParam() === requestedUrlParam) {
+            if (
+              !controller.signal.aborted &&
+              getCurrentUrlParam() === requestedUrlParam
+            ) {
               sourceState.error = {
                 reason: 'url',
                 message: getErrorMessage(
@@ -126,6 +142,7 @@
               }
             }
           })
+        return () => controller.abort()
       }
 
       return
@@ -144,12 +161,19 @@
         currentUrlParam = undefined
         setSource(undefined)
 
-        // TODO: cancel fetch in sourceFromData when still fetching
+        function isCurrentSource() {
+          return (
+            !getCurrentUrlParam() && currentDataParamChecksum === dataChecksum
+          )
+        }
+
         sourceFromData(data.env.PUBLIC_ANNOTATIONS_BASE_URL, dataParam)
           .then((source) => {
-            setSource(source)
+            if (isCurrentSource()) setSource(source)
           })
           .catch((err) => {
+            if (!isCurrentSource()) return
+
             sourceState.error = {
               reason: 'data',
               message: getErrorMessage(

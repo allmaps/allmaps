@@ -7,6 +7,8 @@
 
   import { setUrlState } from '$lib/state/url.svelte.js'
   import { setUiState } from '$lib/state/ui.svelte.js'
+  import { StarredState, setStarredState } from '$lib/state/starred.svelte.js'
+  import { authClient } from '$lib/shared/auth.js'
 
   import { searchParams } from '$lib/shared/params.js'
 
@@ -24,6 +26,15 @@
 
   const urlState = setUrlState(page.url, searchParams)
   setUiState()
+
+  const session = authClient.useSession()
+  const starredState = setStarredState(new StarredState())
+  $effect.pre(() => {
+    const user = $session.data?.user
+    starredState.setAccount(
+      user?.isAnonymous ? undefined : (user?.slug ?? undefined)
+    )
+  })
 
   let currentUrlParam = $state<string | undefined>(urlState.params.url)
 

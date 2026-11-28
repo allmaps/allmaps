@@ -1,28 +1,38 @@
 <script lang="ts">
-  import '../../../css/ui.css'
+  import '../../../css/ui-base.css'
   import './select.css'
-  import { Select as SelectPrimitive } from 'bits-ui'
   import Icon from 'phosphor-svelte/lib/CaretDownIcon'
-  import { type WithoutChild } from '../types.js'
+  import { SelectTrigger } from '@ui-sdk/svelte/select'
+  import type { ComponentProps, Snippet } from 'svelte'
+  import { elementRef } from '../element-ref.js'
+  import type { WithElementRef } from '../types.js'
 
   let {
     ref = $bindable(null),
     class: className,
-    children,
-    size = 'default',
-    ...restProps
-  }: WithoutChild<SelectPrimitive.TriggerProps> & {
-    size?: 'sm' | 'default'
+    icon,
+    children: renderChildren,
+    ...rest
+  }: WithElementRef<ComponentProps<typeof SelectTrigger>, HTMLButtonElement> & {
+    icon?: Snippet
   } = $props()
 </script>
 
-<SelectPrimitive.Trigger
-  bind:ref
-  data-slot="select-trigger"
-  data-size={size}
+<SelectTrigger
+  {...rest}
+  {@attach elementRef<HTMLButtonElement>(
+    () => ref,
+    (node) => (ref = node)
+  )}
   class={['allmaps-ui allmaps-select-trigger', className]}
-  {...restProps}
 >
-  {@render children?.()}
-  <Icon size={16} aria-hidden="true" />
-</SelectPrimitive.Trigger>
+  {#snippet children(state)}
+    {#if icon}
+      <span aria-hidden="true" class="inline-flex shrink-0 empty:hidden">
+        {@render icon()}
+      </span>
+    {/if}
+    {@render renderChildren?.(state)}
+    <Icon size={16} aria-hidden="true" class="ms-auto" />
+  {/snippet}
+</SelectTrigger>

@@ -13,6 +13,7 @@
     "dev": {
       "name": "annotations-develop",
       "vars": {
+        "PUBLIC_SCHEMAS_BASE_URL": "https://dev.schemas.allmaps.org",
         "PUBLIC_DOCS_BASE_URL": "https://dev.docs.allmaps.org",
         "PUBLIC_HOMEPAGE_BASE_URL": "https://dev.allmaps.org"
       },
@@ -25,6 +26,7 @@
     }
   },
   "vars": {
+    "PUBLIC_SCHEMAS_BASE_URL": "https://schemas.allmaps.org",
     "PUBLIC_DOCS_BASE_URL": "https://docs.allmaps.org",
     "PUBLIC_HOMEPAGE_BASE_URL": "https://allmaps.org"
   },

@@ -1,5 +1,7 @@
 import type { SignInProvider } from './types.js'
 
+export const loginProviderLoaderKey = Symbol('loginProviderLoader')
+
 export async function fetchLoginProviders(
   apiBaseUrl: string,
   returnTo: string,

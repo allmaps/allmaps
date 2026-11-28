@@ -516,6 +516,7 @@ async function parseSource(
 
     return {
       type: 'annotation',
+      label: getStringProperty(json, 'label'),
       maps
     }
   } else {
@@ -594,6 +595,14 @@ export async function sourceFromUrl(
   fetch = globalThis.fetch
 ): Promise<UrlSource> {
   const response = await fetch(url)
+  if (
+    response.status === 204 &&
+    /^\/@[^/]+\/lists\/[^/]+\/georeference-annotations\/?$/.test(
+      new URL(url).pathname
+    )
+  ) {
+    throw new SourceLoadError('list-without-maps')
+  }
   let data: unknown
 
   try {

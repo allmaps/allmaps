@@ -1,0 +1,43 @@
+---
+title: Checkbox
+description: Select an option using a checkmark, or show a partial selection with a dash.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import CheckboxPlayground, {
+  formatUsage
+} from '../../../starlight/components/CheckboxPlayground.svelte'
+
+<ComponentPage>
+
+<div slot="playground">
+
+<CheckboxPlayground client:load />
+
+</div>
+
+<div slot="usage">
+
+<UsageCode live code={formatUsage()} />
+
+The label and the box both toggle the option. Press Space to change a focused checkbox. For a checkbox without visible text, supply an accessible name with `aria-label` or an associated label.
+
+</div>
+
+<div slot="props">
+
+| Prop              | Behavior                                                                         |
+| ----------------- | -------------------------------------------------------------------------------- |
+| `checked`         | Bind the selected state. Defaults to `false`.                                    |
+| `indeterminate`   | Bind the mixed state. Activating a mixed checkbox checks it and clears the dash. |
+| `disabled`        | Disable interaction with the checkbox and its label.                             |
+| `onCheckedChange` | Receive the new checked value on activation.                                     |
+| `name`, `value`   | Include the checked value in a form submission.                                  |
+| `children`        | Supply visible label text.                                                       |
+| `ref`             | Bind the checkbox button element.                                                |
+
+</div>
+
+</ComponentPage>

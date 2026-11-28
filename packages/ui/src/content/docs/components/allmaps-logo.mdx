@@ -4,8 +4,11 @@ description: Display the Allmaps mark in its regular or inverted colors.
 sections: [Playground, Usage, Props]
 ---
 
-import ComponentPage from '../../../components/ComponentPage.astro'
-import AllmapsLogoPlayground from '../../../components/AllmapsLogoPlayground.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import AllmapsLogoPlayground, {
+  formatUsage
+} from '../../../starlight/components/AllmapsLogoPlayground.svelte'
 
 <ComponentPage>
 <div slot="playground">
@@ -17,13 +20,9 @@ import AllmapsLogoPlayground from '../../../components/AllmapsLogoPlayground.sve
 
 Use the default alternative text for a standalone logo. When the surrounding text already says “Allmaps”, pass an empty `alt` so screen readers announce the name once.
 
-```svelte
-<script lang="ts">
-  import { AllmapsLogo } from '@allmaps/ui'
-</script>
+<UsageCode live code={formatUsage()} />
 
-<AllmapsLogo />
-```
+For a 64 × 64 px logo, use `<AllmapsLogo width={64} height={64} />` or the Tailwind class `size-16`.
 
 </div>
 <div slot="props">

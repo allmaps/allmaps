@@ -8,9 +8,20 @@
   },
   "description": "Allmaps Tailwind CSS presets",
   "type": "module",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "style": "./index.css",
+      "default": "./dist/index.js"
+    },
+    "./theme.css": "./theme.css",
+    "./ui.css": "./ui.css",
+    "./tokens.css": "./tokens.css"
+  },
   "files": [
-    "dist"
+    "dist",
+    "*.css",
+    "preset.js"
   ],
   "publishConfig": {
     "access": "public"
@@ -27,8 +38,8 @@
     "css"
   ],
   "scripts": {
-    "watch": "tsc --watch --noCheck",
-    "build": "tsc --noCheck",
+    "watch": "turbo watch build --filter=@allmaps/tailwind",
+    "build": "tsc --noCheck && node dist/write-palette.js",
     "lint": "prettier --ignore-path ../../.gitignore --check src && eslint src --ext .js,.ts",
     "types": "tsc --noEmit",
     "format": "prettier --ignore-path ../../.gitignore --write src",
@@ -44,5 +55,8 @@
     "remark-cli": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
   }
 }

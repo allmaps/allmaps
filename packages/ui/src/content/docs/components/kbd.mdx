@@ -4,8 +4,11 @@ description: Display a keyboard key or combination of keys.
 sections: [Playground, Usage]
 ---
 
-import ComponentPage from '../../../components/ComponentPage.astro'
-import KbdPlayground from '../../../components/KbdPlayground.svelte'
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import KbdPlayground, {
+  formatUsage
+} from '../../../starlight/components/KbdPlayground.svelte'
 
 <ComponentPage>
 <div slot="playground">
@@ -15,18 +18,9 @@ import KbdPlayground from '../../../components/KbdPlayground.svelte'
 </div>
 <div slot="usage">
 
-To display a shortcut like Shift + Enter, wrap the two keycaps in `Kbd.Group`.
+Use `Kbd.Root` for a single key. For a combination like Shift + Enter, wrap the keycaps in `Kbd.Group`.
 
-```svelte
-<script lang="ts">
-  import * as Kbd from '@allmaps/ui/kbd'
-</script>
-
-<Kbd.Group>
-  <Kbd.Root>Shift</Kbd.Root>
-  <Kbd.Root>Enter</Kbd.Root>
-</Kbd.Group>
-```
+<UsageCode live code={formatUsage()} />
 
 The existing `import { Kbd } from '@allmaps/ui'` also renders a single key.
 

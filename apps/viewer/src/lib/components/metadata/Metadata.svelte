@@ -7,6 +7,8 @@
     type RichTextPart
   } from '$lib/shared/html.js'
 
+  import OrganizationBadge from './OrganizationBadge.svelte'
+  import type { OrganizationSummary } from '$lib/types/shared.js'
   import MetadataResourceMenu from '../menu/MetadataResourceMenu.svelte'
 
   import type {
@@ -26,6 +28,7 @@
 
   type Props = {
     resource?: MetadataResource
+    organization?: OrganizationSummary
     loading?: boolean
     uri?: string
     uriLabel?: string
@@ -43,6 +46,7 @@
 
   let {
     resource,
+    organization,
     loading = false,
     uri,
     uriLabel,
@@ -237,6 +241,11 @@
                 {@render metadataLink(resourceUri, resourceUriLabel, true)}
               {/if}
             </dd>
+          {/if}
+
+          {#if organization}
+            <dt class="font-medium text-gray-500">Organization</dt>
+            <dd><OrganizationBadge {organization} link /></dd>
           {/if}
 
           {#if resourceLabel}

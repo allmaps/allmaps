@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Image, type ImageRequest } from '@allmaps/iiif-parser'
+  import LoadingSmall from './LoadingSmall.svelte'
   import { pink } from '@allmaps/tailwind'
 
   import type { Snippet } from 'svelte'
@@ -50,6 +51,7 @@
   }
 
   type Props = {
+    loading?: 'eager' | 'lazy'
     imageInfo?: unknown
     imageBitmap?: ImageBitmap
     width?: number
@@ -68,6 +70,7 @@
   }
 
   let {
+    loading = 'lazy',
     imageInfo,
     imageBitmap,
     width,
@@ -87,6 +90,23 @@
 
   let canvas = $state<HTMLCanvasElement>()
   let loadError = $state<ThumbnailLoadError>()
+
+  let waitingForPixels = $state(false)
+
+  function watchPixels(element: HTMLElement) {
+    if (!imageRequest || imageBitmap) return
+    function update() {
+      waitingForPixels = Array.from(element.querySelectorAll('img')).some(
+        (image) => !image.complete
+      )
+    }
+    update()
+    element.addEventListener('load', update, true)
+    return () => {
+      element.removeEventListener('load', update, true)
+      waitingForPixels = false
+    }
+  }
 
   function getSourceWidth() {
     return sourceWidthProp || imageBitmap?.width || parsedImage?.width || 0
@@ -428,6 +448,7 @@
       <div class="absolute inset-0 overflow-hidden">
         <div
           class="absolute"
+          {@attach watchPixels}
           style={getBoxStyle(imageBox, contentBox.width, contentBox.height)}
         >
           {#if imageBitmap}
@@ -437,6 +458,7 @@
             <img
               class="h-full w-full"
               alt={alt || `Thumbnail for ${parsedImage.uri}`}
+              {loading}
               src={imageUrl}
               onerror={() => handleImageError(imageUrl)}
             />
@@ -458,6 +480,7 @@
                   {@const tileUrl = parsedImage.getImageUrl(tile)}
                   <img
                     class="h-full w-full"
+                    {loading}
                     src={tileUrl}
                     alt={alt ||
                       `Thumbnail for ${parsedImage.uri} (${rowIndex}, ${columnIndex})`}
@@ -503,6 +526,12 @@
           aria-hidden="true"
         ></div>
       {/if}
+    </div>
+  {/if}
+
+  {#if !errorMessage && waitingForPixels}
+    <div class="pointer-events-none absolute inset-0 grid place-items-center">
+      <LoadingSmall />
     </div>
   {/if}
 

@@ -1,0 +1,45 @@
+---
+title: StarToggle
+description: Star a map with an animated yellow star.
+sections: [Playground, Usage, Props]
+---
+
+import UsageCode from '../../../starlight/components/UsageCode.astro'
+import ComponentPage from '../../../starlight/components/ComponentPage.astro'
+import TogglePlayground, {
+  formatUsage
+} from '../../../starlight/components/TogglePlayground.svelte'
+
+<ComponentPage>
+
+<div slot="playground">
+
+<TogglePlayground star client:load />
+
+</div>
+
+<div slot="usage">
+
+<UsageCode live code={formatUsage({ star: true })} />
+
+Use `starredMessage` and `unstarredMessage` to name the item in the tooltip, such as “Image starred” and “Image unstarred”. The icon fills when starred. Activating the star plays a short pop when motion is enabled. The app owns the starred state and its persistence.
+
+</div>
+
+<div slot="props">
+
+| Prop               | Behavior                                                                                     |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| `starred`          | Bind the starred state. Defaults to `false`.                                                 |
+| `starredMessage`   | Tooltip after starring. Defaults to `Starred`.                                               |
+| `unstarredMessage` | Tooltip after unstarring. Defaults to `Unstarred`.                                           |
+| `tooltipSide`      | Preferred side (`top`, `right`, `bottom`, or `left`). Defaults to `bottom` and flips to fit. |
+| `showFeedback`     | Show the built-in feedback tooltip. Defaults to `true`.                                    |
+| `onStarredChange`  | Receives the requested boolean and change details. Call `details.cancel()` to decline it. |
+| `aria-label`       | Defaults to `Star map`. Include the map title when several stars appear together.            |
+| `disabled`         | Disable activation.                                                                          |
+| `ref`              | Bind the underlying button element.                                                          |
+
+</div>
+
+</ComponentPage>

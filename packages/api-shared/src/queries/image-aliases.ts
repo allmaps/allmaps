@@ -1,4 +1,5 @@
 import { and, eq, exists, inArray, or, sql } from 'drizzle-orm'
+import type { AnyPgColumn } from 'drizzle-orm/pg-core'
 import { schema } from '@allmaps/db/schema'
 import type { DbOrTx } from '@allmaps/db'
 import { ResponseError } from '../shared/errors.js'
@@ -15,7 +16,7 @@ export async function lockImageIds(db: DbOrTx, ids: string[]) {
   }
 }
 
-export function canonicalImageIdSql(imageId: string) {
+export function canonicalImageIdSql(imageId: string | AnyPgColumn) {
   // Images registered before aliases use their own ID.
   return sql<string>`coalesce((
     select ${imageAliases.canonicalImageId} from ${imageAliases}

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Logo } from '@allmaps/ui'
 
-  import MainMenuControl from '$lib/components/controls/MainMenuControl.svelte'
+  import ViewerLoginMenu from '$lib/components/controls/ViewerLoginMenu.svelte'
+  import MainMenu from '$lib/components/controls/MainMenu.svelte'
 
   import type { Snippet } from 'svelte'
 
@@ -33,8 +34,11 @@
     <div class="flex min-w-0 pointer-events-auto">
       {@render children?.()}
     </div>
-    <div class="flex items-center gap-2 justify-self-end">
-      <MainMenuControl />
+    <div
+      class="flex shrink-0 flex-col items-end gap-2 justify-self-end sm:flex-row sm:items-center"
+    >
+      <ViewerLoginMenu />
+      <MainMenu />
     </div>
   </nav>
 </header>
