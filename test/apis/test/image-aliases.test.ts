@@ -784,9 +784,15 @@ it.for([
 
 it('migrates an unopened manifest image using its service dimensions', async () => {
   const { manifest, preferred } = alternateServices('unopened')
-  await createManifestFromUrl(context.db, manifest)
+  const registered = await createManifestFromUrl(context.db, manifest)
   const destination = base + '/migrated-unopened'
   responses.set(destination + '/info.json', info(destination))
+  // The canvas already links to both services before the migration.
+  await resolveImageServices(context.db, [destination])
+  await context.db.insert(schema.canvasesToImages).values({
+    canvasId: registered.canvases[0].id,
+    imageId: hash(destination)
+  })
   expect(
     await migrateImage(context.db, hash(preferred), destination + '/info.json')
   ).toMatchObject({ uri: destination })
@@ -795,7 +801,9 @@ it('migrates an unopened manifest image using its service dimensions', async () 
       context.env.PUBLIC_REST_BASE_URL + '/manifests/' + hash(manifest)
     )
   )
-  expect((await record.json()).canvases[0].images[0].uri).toBe(destination)
+  expect((await record.json()).canvases[0].images).toMatchObject([
+    { uri: destination }
+  ])
 })
 
 it('keeps both HTTPS image services in the publisher group and skips an FTP alternate', async () => {

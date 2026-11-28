@@ -69,9 +69,18 @@ async function moveCanvasLinks(db: DbOrTx, fromIds: string[], to: string) {
   if (!fromIds.length) return
   const links = schema.canvasesToImages
   const predicate = inArray(links.imageId, fromIds)
-  await db.execute(sql`INSERT INTO ${links} (canvas_id, image_id)
-    SELECT DISTINCT ${links.canvasId}, ${to} FROM ${links} WHERE ${predicate}
-    ON CONFLICT DO NOTHING`)
+  await db
+    .insert(links)
+    .select(
+      db
+        .selectDistinct({
+          canvasId: links.canvasId,
+          imageId: sql<string>`${to}::text`.as(links.imageId.name)
+        })
+        .from(links)
+        .where(predicate)
+    )
+    .onConflictDoNothing()
   await db.delete(links).where(predicate)
 }
 
